@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-300392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BVgABp3FM2pOGAYAu9opvQ
-	(envelope-from <netdev+bounces-300392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:17:01 +0200
+	id /EWfNerFM2paGAYAu9opvQ
+	(envelope-from <netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:18:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 699BA69F33C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A4BD69F35D
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:18:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baylibre.com header.s=google header.b=dOFwZzTK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300392-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300392-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=baylibre.com header.s=google header.b=ZdPgfVt1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C615F30599D3
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:15:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8E7EF308A5EB
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7CF3E8660;
-	Thu, 18 Jun 2026 10:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98823EBF3B;
+	Thu, 18 Jun 2026 10:15:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F243EA95F
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 10:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF543EC2F8
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 10:15:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781777715; cv=none; b=Y9hWRXd4pnlOhZNttn8mXhNPT75mCrMwAkqvxCCo0jWGw2vebDVRdcEzV9F227nHCn/Hd8yaYK9N5rZSpT/Z2A9rVM+gDnZ/vq8/N5TxscGT92NDXswc+WiouhliHJcvF7DxWLvMGJkC0yPJl4Qnqtt4GyJWs68WF92D9Yk8uCM=
+	t=1781777720; cv=none; b=YetgL21CHOAzpFlEj795dvwpTWEpL1Qm99VsHpmuhhm9rg7qBhJ5OU3B7h+CMYxYT1K79uEoFpAocXet+RQ5EYj8frEGZ6V2NDTNAFeY9+q2a4rbW3pAL68Po9oXTOZAvPjYN6h/ZWh38dcttEcD2Io35zKSEbbH5PmQMreip78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781777715; c=relaxed/simple;
-	bh=VRaDko0DUVq72GOfqGykoCOU7FMNSQo1WTrbna5YUT8=;
+	s=arc-20240116; t=1781777720; c=relaxed/simple;
+	bh=BWcvhUW+0cc5VX+GP36rvT15yne5n9RmucB5Uo/uotk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PivDWISMYCe0ZUuc5uFug4wSb4ZocWCjvptKLDbGdKK3edpb7wk8OoJyENbIhE5eKkI1bSXk7qn8cGBBkA5p1rOuiuXFpUtTPOZ60mPFdRK2MJblyXxpd11CVUJcvXtrDIeEEK5dIO6ox7O4HYyJvrHcfV+K6QJvOBvt7NwLfT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=dOFwZzTK; arc=none smtp.client-ip=209.85.221.50
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-45fe59255beso455265f8f.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:15:09 -0700 (PDT)
+	 MIME-Version:Content-Type; b=IJb/5loL1o8xDyW8m+l11Agr5Ze9zkFsxNgDfBAwL35JY4jKnai/0lLpDdNZOmXewqSnbquYADGF/Au2lEy0SEkfjICO0/i4x3b4JEzvXphDxvc+UFZFxHP7U89uVjMXNFRGqshFbryE7HRZQbz+I2Y6P61d89tgGacE+MiQAOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=ZdPgfVt1; arc=none smtp.client-ip=209.85.221.47
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-45ef29c5561so460370f8f.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:15:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1781777707; x=1782382507; darn=vger.kernel.org;
+        d=baylibre.com; s=google; t=1781777711; x=1782382511; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HUwaRcs/J+cVFA/Hno8SLSYO8ZO17SVINUvpRUgcPhg=;
-        b=dOFwZzTKoCVrcXmwqK8uFqbEqpWXioXM+hvqV9Qr62Zca3Eqj9z1Q4Med0ejhGDKFj
-         54CY/XNFnOQnaMVcdsPa6U2w/qcGyGxc1J+Rh2qZ+wL1hiO4T9WWdTdLal4Ycgw3A4jU
-         YOhwG/h/3xRVXaUrqeyghCqivEYqSPxAKsCpU6mmKm/Okn11rAPBWxdBn/U6CHiG/LwC
-         jlbCxOU4PU2SszRKxGVTSu7K0ehddUI+71kH55I+2/atc4lBOybncNdk/fzT747wThkd
-         NLt47sGBfxpJD0SJNiuJMOXbO3+yFqsZqEgRRx1NTMsXuBo8FaRg5u0PxinahSbxQ/HQ
-         CZJQ==
+        bh=OxcIh58Ro8lbA8Z7AdmochDFxerQSeNXvjZHG1Ej2DE=;
+        b=ZdPgfVt1kE2ZaVtU53o5akgU1DgCVRjXIqbxbOeb+SnN93Py2j33xiKcOoVcScw1+m
+         87N1V1EZZssn003Nl2bB18c2cN6pK3zl5XytXdYYRP0DDtcB6qAoD7z0mWFZkI4o8mFs
+         tVqiq88H7/cgkF/6hZLOjLG4ZRHivrX7UrQsqKDooZDjxw3t4ao4d/cSyQjZgZ/SeyH0
+         N991mE41o+0YdxHFrQXyejnnnuJvu3xt/0gFMNkNdsXQDF4yiIgM2ZxIVWa2zwFLu6r0
+         Vhrb3B4prX6ofs0lRvlVjYIgNsat84T3wWUhKZHi8r8NoCl61rH/HmlNok/RwvkSNdqm
+         Fh5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781777707; x=1782382507;
+        d=1e100.net; s=20251104; t=1781777711; x=1782382511;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HUwaRcs/J+cVFA/Hno8SLSYO8ZO17SVINUvpRUgcPhg=;
-        b=e5CQHj5djiGghAmQYEMAJQM4MlcDtdNKY5kWeuxVzg8r7svSr0uLCmt1lMFt5R7Gm7
-         CfZreA+ppmkYU9qTsrSwXkNZWfIGDuZVQdQuWv0Rb97qL6nNsMSM0pD/V5sMlPDojd7Q
-         BXi1XgQebG7ncQA2u2u0RX3wG3x/sQMgCSiP8SBDfYqXtovKY9ShwN5V2I9av5QEOudh
-         YGPOF57uz7Zq2VLYLMC/4XX9PJJVjRtYbsxM02Bgc1Ga+9AmcCLQz+FRumn8KY4+AtCS
-         yymx74s/EwUwgrjCZH8m0vMlZuFoErUXUYOo36aFCp6IaptjvcnpoWuPwtQt/E4mgavI
-         6pSA==
-X-Forwarded-Encrypted: i=1; AFNElJ8+CknZ69OGlk45avkzjABK89Ag4zJCaQIFON5KeLyjRh96S0Q8ZyRl/SzCn6C5xhM8k/xkRq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGDWjw1p93vnwgzys8Dm3gNF41J+LFS0926seLPXqiXn3aheJl
-	XKh+e8KYLYZTQKXaDpU4CKRsRVHAfoSIn4lfV9yzKh+vhZnGTKxcWOBdkv1gzSa8ATA=
-X-Gm-Gg: AfdE7clow38N5DyvYKWBaJOK7KF4B9Eu5hgb7tPXmXMseumqRL/DOGk6f8aTd2UiUQy
-	y06a7PJXiL/DEPYoxNC4IZt3sZvx/H+WFuUnys2cQ6+DgXR/Y6dlGM+L5KcFyX1kZQxBkZei9tl
-	kBHa6z6aCXZnWM09YN/3dIwIfnBEYMuWUYkhdD6qg3S5pGv5W9jwa1EXPs9z3y2AxpCPf2SrRtb
-	QG6p1kEmDs7oVJSdn/txCPrOaMYA1mMccoL3gmRycvTueDn5J30oSj1d2N6CjhD2dtvKWHiGOyC
-	Boep33kaHdywTRRFm6FuPue+erVqmNIIxEHuZCcrTTWK4f2pqR/4na/PLVogL/PLYcJ4U71zDji
-	vajUtmXb0tPHK/o6Wq8vPSwBotTHPmj4r6tWL+6PGVGxzaUpkMU93Zh7kmqoDwbnqhOoz82O9wH
-	K9+RWJLjHgd37dbuOycEAGPpesnOZHAoi6ds6tbh/nivJNSfOk7L/q5KvR0UvzFSfk6qiOZEghC
-	kak
-X-Received: by 2002:a5d:51cc:0:b0:461:a169:f757 with SMTP id ffacd0b85a97d-4623fd87011mr9676750f8f.16.1781777707392;
-        Thu, 18 Jun 2026 03:15:07 -0700 (PDT)
+        bh=OxcIh58Ro8lbA8Z7AdmochDFxerQSeNXvjZHG1Ej2DE=;
+        b=aBnUcLl9X7yhL+kVCkBO+Egy+QbqQQBYohKIHHqMTi6XOJ2MHBtRRyxLdrI5fS1elt
+         mgStTw7OxjgoQ/BVvLzSjTMBX31dfI68Wc7yVjRt+jJ9oiWzeUrjPjOdFUBOb52hWGir
+         22bpA6L4N6lmPyXZZ+mobr7YcpHYi5OAfQsS9C75qgva1MODDm/iLkHbDiOqw+m45OBS
+         m33OAdtxpwLU+gBtK1MWgkWS4y5qx+5/NhkYZEXImiD0qK3/ziRw9U8EE9+mJOs4lYrK
+         WrmS0gsUGPRt2t2q/U95KT/VeQlH4FiDc/1Vi5pY+CdjmdgaExBLLL3TZeWbJ/aZ5Aoo
+         4HpQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9IpJV2olfUegWsjxJtEU+vewNgNfE6TLvjtTO00o7WS/5fMUDiYpC0Dsz6LzWYXMnYZNVQdD4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHccNY2UsNXNVLRjGCA9oFNPmbBmGUMhfdb4Nc9+SrgKxQ4Ssh
+	iBvJ79CfqC1dcGgo6ZQREEPur1/cxHKCKSijuniSelxmRRYCw5rRBZs57BzeTEyJoWY=
+X-Gm-Gg: AfdE7cmaM3OPg+AmQp7Vm1cu5FsdUQjPwK7cp7bwuvy81J3eFVvdWc67PxYRCpCXjyR
+	Z1FFX1lNfN3GfpXmvcFv8fT2KS3AarP0fp8xyaa17De27xO41Hp5NAGvEMR3wYGN8DtmBxFj2L7
+	j8N2zp+iw7XdxPs7QuWEI6l++/lpkwHnX9K/WoqEZ8kcyYr6preW6X1fbuq6ieIhIEzL5f9JQvz
+	XcIeE0WX3mPM1sBKF7uYWSkXCKkpTTYKs24tYcSeLi2doEdOWl/7eyC+zMFDUNSk930qBb3lXvO
+	flXdZfGaDJ+HBXFpeZg+wodjnYmbr/q/QmEFw5cr8NIvKN6U/nEm2Nr0kH4V/6lksWNGLIIOrRv
+	ZOB36Tizirbca/nTA8HeJFuFOOn4FyY6RJWovmBcPZPjeylCKE+WxP2kOzKf7R4YHtVWhlWhu0g
+	m6tCJCONaEDz9U8Z3+mTQKQYU89R2IXDs2dL7GWmHVQoPfDVLiRCoLcNAtxqU7TOM2PlcZzBwGm
+	iTD
+X-Received: by 2002:a05:6000:2087:b0:460:70ff:fe14 with SMTP id ffacd0b85a97d-463adc9236bmr4887039f8f.42.1781777711239;
+        Thu, 18 Jun 2026 03:15:11 -0700 (PDT)
 Received: from localhost (p200300f65f47db048595530b320b6c5c.dip0.t-ipconnect.de. [2003:f6:5f47:db04:8595:530b:320b:6c5c])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-4606f263945sm64066132f8f.8.2026.06.18.03.15.06
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-462236047c8sm17760805f8f.10.2026.06.18.03.15.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 03:15:06 -0700 (PDT)
+        Thu, 18 Jun 2026 03:15:10 -0700 (PDT)
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
 To: Mika Westerberg <westeri@kernel.org>,
 	Yehezkel Bernat <YehezkelShB@gmail.com>,
@@ -89,9 +89,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-usb@vger.kernel.org
-Subject: [PATCH v1 1/3] thunderbold: Stop passing matched device ID to .probe()
-Date: Thu, 18 Jun 2026 12:14:50 +0200
-Message-ID:  <67d4dff187016bdef8fa41c23bb9b6647f1ad41b.1781776904.git.u.kleine-koenig@baylibre.com>
+Subject: [PATCH v1 3/3] thunderbold: Drop comma after device id array terminator
+Date: Thu, 18 Jun 2026 12:14:52 +0200
+Message-ID:  <329e2c612b360a01524df7630a8a3acc34a90940.1781776904.git.u.kleine-koenig@baylibre.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <cover.1781776904.git.u.kleine-koenig@baylibre.com>
 References: <cover.1781776904.git.u.kleine-koenig@baylibre.com>
@@ -102,7 +102,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3270; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=VRaDko0DUVq72GOfqGykoCOU7FMNSQo1WTrbna5YUT8=; b=owGbwMvMwMXY3/A7olbonx/jabUkhizjo7L8AoeW5ci3hu5TkFc++6olOI7F7kxtZu56XseYO 5rsZuadjMYsDIxcDLJiiiz2jWsyrarkIjvX/rsMM4iVCWQKAxenAEzEbwb7P0ulLv9r2yI/FOqf z/lTxFb04sEUlZqe+ll7FJv8Lrzdz/hlKZMSu53TN87z85Yp1x1NVL18ddbDE68cUmTLnmoHhLX 23Pxf/y7/z4bXE+pN1JXUjj783bVWp0RSaPdEjor1+6KWTjrH52N+NqD3jmC7rt51TysLWyfB9t sBVtXzL3j8u9whfbPkrXzvijX3PjisKFxt4FXhUmTzb7eNkIhPkzrfZF6FKGFFJasMRn6Xyq3TG icuc1PTm7S3/u7M6/nVxs+Lt3487GQ7MdreOYhRb4Wpom08/4cX4m8id/lvbDuwpOz0lPUW60Sr v7w9t76uOqeeZVveFYegc6lq/fvVdwm8XXu2gLmHPdgbAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1655; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=BWcvhUW+0cc5VX+GP36rvT15yne5n9RmucB5Uo/uotk=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqM8UiytK7hE/SMYGmvn17tEkYw4JJmFqOZ+FZ2 TZ5qPoMm06JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCajPFIgAKCRCPgPtYfRL+ TraLB/sEasozUm4YNFh+0ZWpXwFBATBMd6XdLIle165DLme+RkDZn/OSuY3SXYYspOq5PRZZZG7 8EZ7zdpJEdeE6YEYt9Ls5VYG0W1bkqC6ROoie7T75DTFHG6jQZEsH4YKUQ3EIF+zmDfDCVJDKTo ieJ2dKxNrkKgN15TInMfAm60gKjeBc+Zz+Xgjjlh3ldDmeoT9FrBjPW4PPKdzqrPKRgqlXITzcP xFaQUNIaEsHT2dIoCrnNxJL5helTWll5KCzqsQoMa8h9Wi/zVHyZK8AcfKpok02gDFAuv0mnSNA wsnSRoi/lBFIIzrIJ6bsIpUdI7gF6AVbGB7evuFsBnAq99QG
 X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
@@ -115,7 +115,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300392-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300393-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DMARC_NA(0.00)[baylibre.com];
@@ -138,92 +138,59 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,baylibre.com:dkim,baylibre.com:email,baylibre.com:mid,baylibre.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:dkim,baylibre.com:email,baylibre.com:mid,baylibre.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 699BA69F33C
+X-Rspamd-Queue-Id: 1A4BD69F35D
 
-No driver makes use of that parameter, so drop it and don't spend the
-effort to determine the matching entry.
+The usual style for other device id arrays doesn't have a comma after
+the initializer.
 
 Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
 ---
  drivers/net/thunderbolt/main.c | 2 +-
  drivers/thunderbolt/dma_test.c | 2 +-
- drivers/thunderbolt/domain.c   | 4 +---
  drivers/thunderbolt/stream.c   | 2 +-
- include/linux/thunderbolt.h    | 2 +-
- 5 files changed, 5 insertions(+), 7 deletions(-)
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index f8f97e8e2226..edfcfc41a316 100644
+index edfcfc41a316..c1003e06a8bd 100644
 --- a/drivers/net/thunderbolt/main.c
 +++ b/drivers/net/thunderbolt/main.c
-@@ -1335,7 +1335,7 @@ static void tbnet_generate_mac(struct net_device *dev)
- 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
- }
+@@ -1455,7 +1455,7 @@ static DEFINE_SIMPLE_DEV_PM_OPS(tbnet_pm_ops, tbnet_suspend, tbnet_resume);
  
--static int tbnet_probe(struct tb_service *svc, const struct tb_service_id *id)
-+static int tbnet_probe(struct tb_service *svc)
- {
- 	struct tb_xdomain *xd = tb_service_parent(svc);
- 	struct net_device *dev;
+ static const struct tb_service_id tbnet_ids[] = {
+ 	{ TB_SERVICE("network", 1) },
+-	{ },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(tbsvc, tbnet_ids);
+ 
 diff --git a/drivers/thunderbolt/dma_test.c b/drivers/thunderbolt/dma_test.c
-index 7877319b1b03..63e6bbf00e12 100644
+index 63e6bbf00e12..519c67678b08 100644
 --- a/drivers/thunderbolt/dma_test.c
 +++ b/drivers/thunderbolt/dma_test.c
-@@ -636,7 +636,7 @@ static void dma_test_debugfs_init(struct tb_service *svc)
- 	debugfs_create_file("test", 0200, debugfs_dir, svc, &test_fops);
- }
+@@ -689,7 +689,7 @@ static const struct dev_pm_ops dma_test_pm_ops = {
  
--static int dma_test_probe(struct tb_service *svc, const struct tb_service_id *id)
-+static int dma_test_probe(struct tb_service *svc)
- {
- 	struct tb_xdomain *xd = tb_service_parent(svc);
- 	struct dma_test *dt;
-diff --git a/drivers/thunderbolt/domain.c b/drivers/thunderbolt/domain.c
-index 479fa4d265c2..24611f05b3cd 100644
---- a/drivers/thunderbolt/domain.c
-+++ b/drivers/thunderbolt/domain.c
-@@ -77,12 +77,10 @@ static int tb_service_probe(struct device *dev)
- {
- 	struct tb_service *svc = tb_to_service(dev);
- 	struct tb_service_driver *driver;
--	const struct tb_service_id *id;
+ static const struct tb_service_id dma_test_ids[] = {
+ 	{ TB_SERVICE("dma_test", 1) },
+-	{ },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(tbsvc, dma_test_ids);
  
- 	driver = container_of(dev->driver, struct tb_service_driver, driver);
--	id = __tb_service_match(dev, &driver->driver);
- 
--	return driver->probe(svc, id);
-+	return driver->probe(svc);
- }
- 
- static void tb_service_remove(struct device *dev)
 diff --git a/drivers/thunderbolt/stream.c b/drivers/thunderbolt/stream.c
-index c1f5c55583d0..b28e4e95b422 100644
+index b28e4e95b422..68d81958262e 100644
 --- a/drivers/thunderbolt/stream.c
 +++ b/drivers/thunderbolt/stream.c
-@@ -1540,7 +1540,7 @@ static void tbstream_group_detach_stream(struct tbstream *stream)
- 	config_group_put(&sg->group);
- }
+@@ -1630,7 +1630,7 @@ static const struct dev_pm_ops tbstream_pm_ops = {
  
--static int tbstream_probe(struct tb_service *svc, const struct tb_service_id *id)
-+static int tbstream_probe(struct tb_service *svc)
- {
- 	struct tbstream *stream;
+ static const struct tb_service_id tbstream_ids[] = {
+ 	{ TB_SERVICE("stream", 1) },
+-	{ },
++	{ }
+ };
+ MODULE_DEVICE_TABLE(tbsvc, tbstream_ids);
  
-diff --git a/include/linux/thunderbolt.h b/include/linux/thunderbolt.h
-index feb1af175cfd..d9dec4322aa0 100644
---- a/include/linux/thunderbolt.h
-+++ b/include/linux/thunderbolt.h
-@@ -465,7 +465,7 @@ static inline struct tb_service *tb_to_service(struct device *dev)
-  */
- struct tb_service_driver {
- 	struct device_driver driver;
--	int (*probe)(struct tb_service *svc, const struct tb_service_id *id);
-+	int (*probe)(struct tb_service *svc);
- 	void (*remove)(struct tb_service *svc);
- 	void (*shutdown)(struct tb_service *svc);
- 	const struct tb_service_id *id_table;
 -- 
 2.47.3
 
