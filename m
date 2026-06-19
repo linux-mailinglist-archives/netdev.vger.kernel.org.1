@@ -1,141 +1,212 @@
-Return-Path: <netdev+bounces-300630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300637-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VKF8OzPrNGpdkAYAu9opvQ
-	(envelope-from <netdev+bounces-300630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:09:40 +0200
+	id 16IlFaLsNGrqkAYAu9opvQ
+	(envelope-from <netdev+bounces-300637-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:15:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A5B6A43DF
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:09:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A348F6A448A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:15:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CQ4Vn1VL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300630-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300630-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=ds5vPXkc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300637-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300637-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 447CA306CC5E
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:09:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DADED3045383
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D1F359A89;
-	Fri, 19 Jun 2026 07:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD7C34D4CE;
+	Fri, 19 Jun 2026 07:14:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9623546C5;
-	Fri, 19 Jun 2026 07:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170A333ADA8;
+	Fri, 19 Jun 2026 07:14:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781852941; cv=none; b=MgunTcYA2hCeEBFzsq0Q02qAqX/pJaDbEtIGuENpMxaDUfLjrJoGw3zGKysjzT5gR6JI7spK2dFSzmIjsazKmZznX4YO4iJ6DtPetzvJMS2RIXtM0LK9JXxxEx7L4yJAPT0CHN0nFSB/INk/7POK1hjzwL5SbvTkCyBiLwb2FM0=
+	t=1781853288; cv=none; b=l6ITHURz4I7qiHnM5CnDb6rZ2XgfM7e+6xwXVdE9YilfFuecyKjRyzsGuXdBiudJw60CmsDAZomo/8X0zYbe86JomFTrW8XdcckRgXFkWG5rCQYE3vHwQTU7BN/1Mf2FzWdkl5AtmgwFJwxCajUvBEScczfWfP//1NsrbLRK+qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781852941; c=relaxed/simple;
-	bh=Tiso43pDMy23Il4Q3L9MYRi/ohAadXxDqKPj23OKa38=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=QTeFQ/4/86fTFGE3DaGCoWv8Y7vja7XP/7CqVCSpsrke1rUrH+yV2kOxPAzpQdHXf0Y0HsRtV/+a2ZQ3VgsQQtgBIE7MVL4dc1ncEUvoGjzjyy/D7a3zxOenS1cbqmHLLH83bSB202oDlL6U31v+I99zZ/MiOWKeuITOAtCYLis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQ4Vn1VL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E85C1F000E9;
-	Fri, 19 Jun 2026 07:08:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781852939;
-	bh=5WrPA1KpRetg2BPKOpisB4uo6P3OEkWjhbEdh0thGZQ=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=CQ4Vn1VL8RscqXEuv1NxcGQshEZZTA2S7Vuo8i4BhrPNusZk6SyQTYA70qCi4Qs9Z
-	 z5rYKO1HEoa2vDFWvfrZFV+NhxjoHV5QNeLQ1AXyS8MKFCJqFFW4bp4OCgm1LVHs57
-	 t3V5g1DpEX1munMMvEMJA+Y7h7S7ZzoayVA5apTaGxjb+JxbZXMfUtTySb39j9ThyM
-	 7JNBw95ZoIEwJLLQ024TG2Dkw2TNCb7NmexDNJtMVGF8euhO8QR20Yeq0i4AA7ixhS
-	 5SuqH61Wj8aYXRMbOUijrZlKwqftkY5AAt2fxiP7C9K4jyUH/62HUfiM5Mv13/uPk5
-	 0Q8aAkkU/gm2A==
-Content-Type: multipart/mixed; boundary="===============1744918091706664894=="
+	s=arc-20240116; t=1781853288; c=relaxed/simple;
+	bh=nKL6fTOWwY6Hg51AnU7XaHSMtjptIchNEHMyb2ZXzTk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=DLiK/E+infp9pmihAmuMGz8HVvIaYKKbP4n1zfC/NW2g87DYHKPQakHXsPLFFW8NJb10MgLgLMaOyiNB1+iPojVZEptYEnbt29PPlGGA/OYmHmehVbu0C6lUfP60kgydH5YhFGXrzUOynDO/5ZrkypD10puHrfU1MNL1Z6ievws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ds5vPXkc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C0865C2BCB4;
+	Fri, 19 Jun 2026 07:14:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1781853287;
+	bh=nKL6fTOWwY6Hg51AnU7XaHSMtjptIchNEHMyb2ZXzTk=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=ds5vPXkcqAhs3tK7398CUaBYYhJVO8S6p2m0lNFBB7nacTaIIEkQbidu1Cv3REnYv
+	 GkAEmNWA01A17+O+X47UNz5mQ+0gXV8EtJdOPChciIkI+5708Bl7ZxpCEPNVAKelgG
+	 7pgneeKiasgTaMfPyZJ8IVeIIXg3B3EikHdHB0cLG1n1dx1gYidv75qCo3iYSfaYCF
+	 V6mkD41gtXZTLF5rSy9rUys279tl9brwD1rJEYBJ7zKVBABd/b+F4L874yrtySmsfg
+	 700KfEqUsP9GupvbyeEiBQ96pBfIFF9Pak5BrSAAl1nG0kXRAp/CtcHq+3ekFwFdCD
+	 zmPlEsew6Hzag==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A504ACD98F8;
+	Fri, 19 Jun 2026 07:14:47 +0000 (UTC)
+From: Tjerk Kusters via B4 Relay <devnull+tkusters.aweta.nl@kernel.org>
+Date: Fri, 19 Jun 2026 09:14:44 +0200
+Subject: [PATCH net v2] igb: only strip Rx timestamp header on the first
+ buffer of a frame
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <09e6a462b410be0756bf7c80ff66c27874ce0f3582e548f12625bd2794b95bc4@mail.kernel.org>
-In-Reply-To: <20260619062959.3277612-2-rhkrqnwk98@gmail.com>
-References: <20260619062959.3277612-2-rhkrqnwk98@gmail.com>
-Subject: Re: [PATCH bpf v4 1/3] selftests/bpf: don't modify the skb in the strparser parser prog
-From: bot+bpf-ci@kernel.org
-To: rhkrqnwk98@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,memxor@gmail.com,john.fastabend@gmail.com,jakub@cloudflare.com,davem@davemloft.net,kuba@kernel.org,edumazet@google.com,pabeni@redhat.com,kuniyu@google.com,willemb@google.com,shuah@kernel.org
-Cc: jolsa@kernel.org,martin.lau@linux.dev,song@kernel.org,yonghong.song@linux.dev,horms@kernel.org,bobbyeshleman@gmail.com,jiayuan.chen@linux.dev,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 19 Jun 2026 07:08:59 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260619-igb-rx-ts-fix-v2-1-d3b8d605ca62@aweta.nl>
+X-B4-Tracking: v=1; b=H4sIAGPsNGoC/yWMywrCMBQFf6WctRfSlMbHr4gLmx7rdRElN0qh9
+ N8bdTkDMwuMWWk4NQsyP2r6TBX8rkG8X9NE0bEyvPPBhfYoOg2SZykmN50ljnvXH3qyawNq88q
+ s+vc7I7Hg8pf2Hh6M5XvCum7/AMrddgAAAA==
+X-Change-ID: 20260619-igb-rx-ts-fix-cd70585ee316
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ Tjerk Kusters <tkusters@aweta.nl>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781853286; l=3623;
+ i=tkusters@aweta.nl; s=20260619; h=from:subject:message-id;
+ bh=pmAEYror60wCpEvmPM789DYVzXqwCNs6uz+fXRtY1nI=;
+ b=EPtIwt2TBPCz6NMGbTjzfttUjar17h7wguSFerhCZOC/fKnwEY4M0GEmdJgTBJ2nSlJGQA1Kv
+ yQfBwVYve/FA9DdCxq6hAH0LbuHDS8c62xJWNKPgNjGRpcC8A/HQMaU
+X-Developer-Key: i=tkusters@aweta.nl; a=ed25519;
+ pk=JYRpYQ3+LrphEabgnxcbiOUpwvNP8WDDMcLzz+cwKsk=
+X-Endpoint-Received: by B4 Relay for tkusters@aweta.nl/20260619 with
+ auth_id=831
+X-Original-From: Tjerk Kusters <tkusters@aweta.nl>
+Reply-To: tkusters@aweta.nl
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	TAGGED_FROM(0.00)[bounces-300630-lists,netdev=lfdr.de,bpf-ci];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-300637-lists,netdev=lfdr.de,tkusters.aweta.nl];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:hawk@kernel.org,m:kurt@linutronix.de,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:tkusters@aweta.nl,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,linux.dev,gmail.com,vger.kernel.org,iogearbox.net,meta.com];
-	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:ast@kernel.org,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:kuniyu@google.com,m:willemb@google.com,m:shuah@kernel.org,m:jolsa@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:horms@kernel.org,m:bobbyeshleman@gmail.com,m:jiayuan.chen@linux.dev,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net,cloudflare.com,davemloft.net,google.com,redhat.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	HAS_REPLYTO(0.00)[tkusters@aweta.nl];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.kernel.org:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,aweta.nl:replyto,aweta.nl:email,aweta.nl:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 98A5B6A43DF
+X-Rspamd-Queue-Id: A348F6A448A
 
---===============1744918091706664894==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tjerk Kusters <tkusters@aweta.nl>
 
->     selftests/bpf: don't modify the skb in the strparser parser prog
->
->     sockmap_parse_prog.c is attached as an SK_SKB stream parser and modifies
->     the skb. It calls bpf_skb_pull_data() and writes a byte into the packet.
->     A stream parser runs on strparser's message head and must not modify it.
->     A resize frees the frag_list segments strparser still tracks, leading to
->     a use-after-free.
->
->     Make the parser read-only. It only needs to return the message length,
->     which keeps it attaching once packet-modifying parsers are rejected.
->
->     Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
->     Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+When Rx hardware timestamping is enabled (e.g. ptp4l, which configures
+HWTSTAMP_FILTER_ALL), the NIC prepends a 16-byte timestamp header to the
+first Rx buffer of every received frame. igb_clean_rx_irq() strips this
+header inside its per-buffer loop:
 
-This removes a use-after-free where bpf_skb_pull_data(skb, 10) resizes and
-frees the frag_list segments that strparser still tracks for the message
-head.  The buggy bpf_skb_pull_data(skb, 10) call and the packet write being
-removed here were added by commit 82a8616889d5 ("bpf: add map tests for
-BPF_PROG_TYPE_SK_MSG").
+	if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
+		ts_hdr_len = igb_ptp_rx_pktstamp(rx_ring->q_vector,
+						 pktbuf, &timestamp);
+		pkt_offset += ts_hdr_len;
+		size -= ts_hdr_len;
+	}
 
-Should this carry a Fixes: tag?
+For a frame that spans more than one Rx buffer (e.g. a jumbo frame), this
+block runs once per buffer. The timestamp header only exists at the start
+of the first buffer, but igb_ptp_rx_pktstamp() is called for every buffer.
 
-  Fixes: 82a8616889d5 ("bpf: add map tests for BPF_PROG_TYPE_SK_MSG")
+On a continuation buffer the data is packet payload, not a timestamp
+header. igb_ptp_rx_pktstamp() already has two guards against acting on a
+non-header buffer: it returns 0 if PTP is disabled, and returns 0 if the
+reserved dwords (the first 8 bytes) are non-zero. Neither is sufficient
+here: PTP is enabled, and a continuation buffer whose payload happens to
+begin with 8 zero bytes passes the reserved-dword check. In that case the
+payload is mistaken for a valid timestamp header and igb_ptp_rx_pktstamp()
+returns IGB_TS_HDR_LEN, so the caller strips 16 bytes of real data from
+that buffer. A frame spanning N buffers whose continuation buffers start
+with zero bytes therefore loses 16 * (N - 1) bytes from its tail.
 
+This is easily triggered by a GigE Vision camera streaming dark frames
+(mostly 0x00 pixel data) over jumbo UDP with PTP active on the receiver:
+the all-zero frames arrive truncated while frames with non-zero content
+are fine. There is no error indication.
+
+No content-based check can reliably tell a continuation buffer that begins
+with zero bytes from a real timestamp header, because both are all zero.
+Fix it structurally instead: only attempt the strip on the first buffer of
+a frame, which is the only buffer that can contain a timestamp header. In
+igb_clean_rx_irq() skb is NULL until the first buffer has been processed,
+so guarding the strip with !skb restricts it to the first buffer
+regardless of payload content.
+
+Fixes: 5379260852b0 ("igb: Fix XDP with PTP enabled")
+Cc: stable@vger.kernel.org
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Signed-off-by: Tjerk Kusters <tkusters@aweta.nl>
+---
+Changes in v2:
+ - resend via b4 (v1 was sent with a mail client)
+ - use full author name "Tjerk Kusters" (Jacob Keller)
+ - add Reviewed-by from Kurt Kanzenbach
+ - no functional change
+
+Link to v1: https://lore.kernel.org/all/PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com/
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index ce91dda00ec0..abb55cd589a9 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -9061,7 +9061,8 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
+ 		pktbuf = page_address(rx_buffer->page) + rx_buffer->page_offset;
+ 
+ 		/* pull rx packet timestamp if available and valid */
+-		if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
++		if (!skb &&
++		    igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
+ 			int ts_hdr_len;
+ 
+ 			ts_hdr_len = igb_ptp_rx_pktstamp(rx_ring->q_vector,
 
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+base-commit: 2d3090a8aeb596a26935db0955d46c9a5db5c6ce
+change-id: 20260619-igb-rx-ts-fix-cd70585ee316
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/27809861429
---===============1744918091706664894==--
+Best regards,
+--  
+Tjerk Kusters <tkusters@aweta.nl>
+
+
 
