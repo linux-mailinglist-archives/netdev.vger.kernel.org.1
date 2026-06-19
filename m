@@ -1,138 +1,131 @@
-Return-Path: <netdev+bounces-300555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300556-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cAv5K+iUNGoTcAYAu9opvQ
-	(envelope-from <netdev+bounces-300555-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:01:28 +0200
+	id pZaZBKWUNGr2bwYAu9opvQ
+	(envelope-from <netdev+bounces-300556-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:00:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E1A6A37D4
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:01:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 574CF6A37BB
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:00:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Qy2QQOMn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300555-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300555-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=UaKHXy0L;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300556-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300556-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 509CC3043575
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 00:50:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4222530456AF
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 00:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F7623392E;
-	Fri, 19 Jun 2026 00:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A70D1FA859;
+	Fri, 19 Jun 2026 00:52:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D9F1EB9E3;
-	Fri, 19 Jun 2026 00:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E9D1D88B4;
+	Fri, 19 Jun 2026 00:52:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781830218; cv=none; b=D0iSGm0TQiZV4xgQWnlSuguviwBUKIpcnxaXYGcGVFThoMNuWY6BPvshSEPoW5hTaw6lxBVzka5FL6z6bSRWe6jrhvIR53uQxeXJkvVupGTHkUORHyWGzwE4aJ1Bu3poBkvLYp33mqp4uw3mApet86SzRRvswfW7Za0MbRWqHFM=
+	t=1781830367; cv=none; b=ZnmatRcFCx3lzxtSBTSnAkNmv/H0RAogiXm+aXf9ZrKCTcrKVFIpaU0ekJT4ji+AHJVT7TMWVqjj/2ALAUWnhiZELxL+BT966/+00U4olafDi8PRKGfdZ9HqIvP1QMx1yWCgFY9YpjfGAnyjoAV8GU+o/sRw3o/d3wtdpqXNoUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781830218; c=relaxed/simple;
-	bh=A2HR7cM9enjGlt2vYbSoJy7DtAcslfPk8U39R7U3R7Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rAsT6ck58lr9BNEdIFFeXffNoT1cXS8mfvCO86dklcfOk3zEEHN0Q/lQVd/NRdGtu/AcJujbwPk8gtR8Dh1Fb77qf2uBen96R5PTJ4z65OH71oG+IOaABPPvSxwFclfBmIJzlRL+fGRXVArpoIMqaoalK0yTXCHyhr8Qujp6knA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qy2QQOMn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0E51F00A3A;
-	Fri, 19 Jun 2026 00:50:17 +0000 (UTC)
+	s=arc-20240116; t=1781830367; c=relaxed/simple;
+	bh=+PRrW/2SN3BbJGLnS8WOoy4So+Fs/MDB0do3UquF96M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tiAYE8uj6q/PD6ROGsPaIdew056i6HByAc6V99sbZh6foT5J3Pwu1m8oGBbpTauaHqoUBTT/rgbvhBjGM3IcZBZzLB8m9U0iHsABfJ3mvvyEwk3aomPkZVc4UlM+Dx3de8qUSsw/+IaL6BILmj2vlpmaZ83Xs6tGznzHm64/L8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaKHXy0L; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48ED31F000E9;
+	Fri, 19 Jun 2026 00:52:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781830217;
-	bh=+3YGlL7KpKqfhRts97wLZhIoeta+3YgLMi5wAdb5IgU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Qy2QQOMnmLYCTge8c7PJ4eEPQWO5zERMkGrlG4qdNiN9lC7ESq4lmg9lGDyqEsuK+
-	 QG6+9DXquTJ4x/ldhd6xxyas4hr/JLPec/sOKqUTXuVIVxCkLYbO987yivSg7PO5C0
-	 0JbWJnwpqv9w0ADpuMOsVBHAYXvy1VrfI79s+2DC674KMPUuttEeJVbdXWk6Dx8n7C
-	 NCA0Ck+u11a32H8h+diSDxRJQl3mli/TZlCkQ5yKiaR1/8q73Qx0zFFSI0xLsRuX0r
-	 NrDtX+Ml3QUFPo9NOE0V3KnS7hCQMXMRYJxiOLObpEhWr6n8SKx/ZEeYSBN0KHzuSr
-	 wsBOf1HebbWYw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198853A78A7C;
-	Fri, 19 Jun 2026 00:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1781830366;
+	bh=oX92llFN1p3l7JzPvmVkiWUJ60Kak+9P0cVKOb/guBE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=UaKHXy0L+HqCpefmwZa/Z0bTs121U7SefTShomyUKLC+F73MhOq0xi+Qmj8zJa4zC
+	 lMAinFBtVVDsbuarpfCloP9VtMozQa1jcB67oDq8umKKPb1Au5jPTf+yp/SYcc8Bko
+	 E5ZjypV1FmRCv2ZL3AuoQhb0eSS9ftU37vEQOVOu1iKBgTW0OFHI29Quc9mJ66C3cd
+	 oXMWMiZOPx6YFgASluST2tj9YhWLMiaqyQsqJJKnKsYVFe86xS+tSd3D4v5nwKzrch
+	 fxwGAcY948qRhX62WHNVraxIqZKOJcMfeqAD/q0ocXwhHyO2Xm/XZzg3b1Fepz7x8p
+	 PeXecAGIx5YGQ==
+Date: Thu, 18 Jun 2026 17:52:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wentao Guan <guanwentao@uniontech.com>
+Cc: joel.granados@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhanjun@uniontech.com,
+ niecheng1@uniontech.com
+Subject: Re: [PATCH net] net: llc: make empty have static storage duration
+Message-ID: <20260618175245.25c0c523@kernel.org>
+In-Reply-To: <20260616064053.690154-1-guanwentao@uniontech.com>
+References: <20260616064053.690154-1-guanwentao@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] virtio-net: fix len check in receive_big()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178183021063.3143278.6923275972130325346.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Jun 2026 00:50:10 +0000
-References: <20260616042837.2249468-1-xmei5@asu.edu>
-In-Reply-To: <20260616042837.2249468-1-xmei5@asu.edu>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, minhquangbui99@gmail.com, bestswngs@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org,lists.linux.dev,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:guanwentao@uniontech.com,m:joel.granados@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zhanjun@uniontech.com,m:niecheng1@uniontech.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300555-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300556-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,uniontech.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B7E1A6A37D4
+X-Rspamd-Queue-Id: 574CF6A37BB
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 15 Jun 2026 21:28:37 -0700 you wrote:
-> receive_big() bounds the device-announced length by
-> (big_packets_num_skbfrags + 1) * PAGE_SIZE.  That is still too loose:
-> add_recvbuf_big() sets sg[1] to start at offset
-> sizeof(struct padded_vnet_hdr) into the first page, so the chain
-> actually carries hdr_len + (PAGE_SIZE - sizeof(padded_vnet_hdr)) +
-> big_packets_num_skbfrags * PAGE_SIZE bytes -- 20 bytes less than the
-> check allows for the common hdr_len == 12 case.
+On Tue, 16 Jun 2026 14:40:53 +0800 Wentao Guan wrote:
+> Make empty have static storage duration (like net/sysctl_net.c does) to
+> avoid a potential use-after-return and keep consistent with
+> __register_sysctl_table @table 'should not be free'd after registration'.
 > 
-> [...]
+> Fixes: 73dbd8cf7947 ("net: Remove ctl_table sentinel elements from several networking subsystems")
+> Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+> ---
+>  net/llc/sysctl_net_llc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/llc/sysctl_net_llc.c b/net/llc/sysctl_net_llc.c
+> index c8d88e2508fce..15f1e5d88f208 100644
+> --- a/net/llc/sysctl_net_llc.c
+> +++ b/net/llc/sysctl_net_llc.c
+> @@ -47,7 +47,7 @@ static struct ctl_table_header *llc_station_header;
+>  
+>  int __init llc_sysctl_init(void)
+>  {
+> -	struct ctl_table empty[1] = {};
+> +	static struct ctl_table empty[1] = {};
+>  	llc2_timeout_header = register_net_sysctl(&init_net, "net/llc/llc2/timeout", llc2_timeout_table);
+>  	llc_station_header = register_net_sysctl_sz(&init_net, "net/llc/station", empty, 0);
 
-Here is the summary with links:
-  - [net,v4] virtio-net: fix len check in receive_big()
-    https://git.kernel.org/netdev/net/c/9e5ad06ea826
+I will apply this but it's not a bug.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+The size is 0, even tho the pointer is stored there can be no access.
 
