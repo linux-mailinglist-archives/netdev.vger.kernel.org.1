@@ -1,231 +1,292 @@
-Return-Path: <netdev+bounces-300767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dan6Ip7JNWrM4QYAu9opvQ
-	(envelope-from <netdev+bounces-300767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:58:38 +0200
+	id v8wwJ7vJNWrQ4QYAu9opvQ
+	(envelope-from <netdev+bounces-300768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:59:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 865156A7F0D
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:58:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343986A7F19
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:59:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amazon.com header.s=amazoncorp2 header.b=UF6EUy4i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300767-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300767-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amazon.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300768-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300768-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8F0613008451
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 22:58:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D63A13025F73
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 22:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023A33655CE;
-	Fri, 19 Jun 2026 22:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C680336D4F1;
+	Fri, 19 Jun 2026 22:58:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from iad-out-015.esa.us-east-1.outbound.mail-perimeter.amazon.com (iad-out-015.esa.us-east-1.outbound.mail-perimeter.amazon.com [44.210.169.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB93332E73E;
-	Fri, 19 Jun 2026 22:58:29 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781909910; cv=fail; b=DLOiwAcoH345RbSzWEpNYgmh5HkUt13XH/5XGh6PVM09LNHnyiX65eoUmocZl1QfyhF966M5zj8oPJUmJQY2KT9JlhiSQgZLPXK7WJlDg4QtMK/otTblRo1DmvVB10SdOge4RG0J/8VyzyWqZ8xaSjuRvtGCUpBQATCpJy0Og7E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781909910; c=relaxed/simple;
-	bh=1cVHWXs06h27TBGdFZkBvoW4uBTeMQbQsMXVaySZWwU=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Mn783hFml7izPAVdl7QnE9Tv584Jad2lGffPBUD2RW5X04KjG8kjUyh2hPmMc/STZ90o/ERZKkuD436/WD+rigWjHL+wicx4YM6aY1TwnS2goGs/4umn/+WcAGf8drxGTjHcbW/L0Qt4VWXuDHOUwiRBVVmbZn/gaGZJTBYU/lg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UF6EUy4i; arc=fail smtp.client-ip=44.210.169.44
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1781909909; x=1813445909;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=1cVHWXs06h27TBGdFZkBvoW4uBTeMQbQsMXVaySZWwU=;
-  b=UF6EUy4i7P/02MhrnW3ULdHfzKT2Hq5hFo12mmbQwTdcf9lCOvTrVElg
-   QqkcJfQ3De4ylPZhrjC7EulIuIMtDx83ezHCXJK2nTfBHe8Enj6u4n2N4
-   BRNEonnRQ4l/zFUKD6qcoD19X6xwvEQHeq7KaKXpC/wP7SG2MDN+8IkGq
-   g63m2LUKg6xGSnbpi4pzz2BdfhabIOvqT7KFHkncH6vXCkXgcRfhSYiRa
-   2mzxuu8PwSxt73Mr2O3qSk6YkZEyOvBXAmGptMTW739qIHmdiagSTD+vN
-   0jw1jrF6YqM2LGoLvvjt7VNwrq4mga0BmwmO/cpEyGDO8PZq2DwYnkOfo
-   A==;
-X-CSE-ConnectionGUID: fKiGJrKLQwSb6Qui+Emsqw==
-X-CSE-MsgGUID: XB5IubZOQDSEbkxTyToyPw==
-X-IronPort-AV: E=Sophos;i="6.24,214,1774310400"; 
-   d="scan'208";a="20723793"
-Subject: Re: [BUG] net: tcp: SO_LINGER with l_linger=0 leaks memory when closing
- sockets with pending send data
-Thread-Topic: [BUG] net: tcp: SO_LINGER with l_linger=0 leaks memory when closing sockets
- with pending send data
-Received: from ip-10-4-3-150.ec2.internal (HELO smtpout.naws.us-east-1.prod.farcaster.email.amazon.dev) ([10.4.3.150])
-  by internal-iad-out-015.esa.us-east-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2026 22:58:28 +0000
-Received: from EX19MTAUEB001.ant.amazon.com [72.21.198.67:20921]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.18.185:2525] with esmtp (Farcaster)
- id decf7f20-2528-4f22-a046-6306eb931f5d; Fri, 19 Jun 2026 22:58:28 +0000 (UTC)
-X-Farcaster-Flow-ID: decf7f20-2528-4f22-a046-6306eb931f5d
-Received: from EX19EXOUEA001.ant.amazon.com (10.252.134.47) by
- EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Fri, 19 Jun 2026 22:58:28 +0000
-Received: from EX19EXOUEA001.ant.amazon.com (10.252.134.47) by
- EX19EXOUEA001.ant.amazon.com (10.252.134.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Fri, 19 Jun 2026 22:58:28 +0000
-Received: from DS2PR08CU001.outbound.protection.outlook.com (10.252.135.199)
- by EX19EXOUEA001.ant.amazon.com (10.252.134.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37
- via Frontend Transport; Fri, 19 Jun 2026 22:58:28 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=exYs5c4Dw94LsuJGjD495iTOfL3vAQ1nbsEWY+J/4Z2IzQyROvOko79LAPb0bFEiHvKZE8MjkkpdgVVeuZX+voYYpt61rBcildmekhRPfsZ3Gn1OKm8xrPjfgCRa5N8sm1hXT6iaAC2CljxU0FTrmITk4Dgs/Iiwl9egrDZga0TAN/Zp5ODs+QvAGbup5j46yEbk4Txve6bsZcSJeWU87vbNco0wvy+dTEKLB4CmKYMz3t4q0QOIyU+H4hLwiegDVO+Nsw32tw6z3SeuyL4mdviEtntr2ciISzwfF6Ct6foJZIra54w28bMl2jsTPY1VMtlLqy6ZytLKfSTmpNqonA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1cVHWXs06h27TBGdFZkBvoW4uBTeMQbQsMXVaySZWwU=;
- b=uRaWghOqSyW1n3X6ag4CP3xPVYvBS3Myz3KCo2mF/SvPy/T2Ngx5vgNODR41/acxxxHhvg8zydrc59L9WMhrNyisyNVIU4T0M/QzK8uMkxNg7884TBXcxKRv1F8lpmFZljWMtBM75qLxULFZgtyXmJ9DZeXT90G+j3HIgYY/aNw+Q/yemVZvKKifzE3mr7iY/H2ynchahtPzqa9mV3K+/1IvKbk/mMjM2JxrD5XxVlj+lBMAfoBSjT33ot8XSfE2fP4K5rwkh/LQJicYEtUM71sygrln3RBNXT/aQDvmBdeexCZRci0aA95EnHuC7nwFqqf0yhgEol0XUQkffs8BJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amazon.com; dmarc=pass action=none header.from=amazon.com;
- dkim=pass header.d=amazon.com; arc=none
-Received: from SA1PR18MB4728.namprd18.prod.outlook.com (2603:10b6:806:1db::15)
- by SJ4PPF2862F1335.namprd18.prod.outlook.com (2603:10b6:a0f:fc02::f11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.15; Fri, 19 Jun
- 2026 22:58:23 +0000
-Received: from SA1PR18MB4728.namprd18.prod.outlook.com
- ([fe80::3fa5:9d2e:e6a6:67d5]) by SA1PR18MB4728.namprd18.prod.outlook.com
- ([fe80::3fa5:9d2e:e6a6:67d5%6]) with mapi id 15.21.0139.009; Fri, 19 Jun 2026
- 22:58:23 +0000
-From: "Ahmed, Aaron" <aarnahmd@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-CC: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ncardwell@google.com"
-	<ncardwell@google.com>, "edumazet@google.com" <edumazet@google.com>
-Thread-Index: AQHczskVAbHrfsqWm0ylDOIzc6Zy8LXj+36AgA8bggCAAJPFgIAtIPKAgAB9AQCAJSKfgA==
-Date: Fri, 19 Jun 2026 22:58:23 +0000
-Message-ID: <34F462A1-CEB9-4812-8E98-239E38585F14@amazon.com>
-References: <48BADABE-4DFB-4DAD-8248-E94D8F5238D2@amazon.com>
- <CAAVpQUCfMsWBpPpywbwBLRCdHUqWqFBoDK=17dwDkG6T0dQxzw@mail.gmail.com>
- <A7A3F2FE-B18C-4F6D-A5E4-78164D6904F5@amazon.com>
- <CAAVpQUCKQQF=noqxQwD=dJvO3tuhPZxssDygyuVaZxTQGKiWfQ@mail.gmail.com>
- <9E49374E-D1D6-4D41-BFE0-03EE734DF9F2@amazon.com>
- <CAAVpQUBtKBzq36Wz9p3MaHR=G10-NFBtQXgGW3S3QV5THW2iCg@mail.gmail.com>
-In-Reply-To: <CAAVpQUBtKBzq36Wz9p3MaHR=G10-NFBtQXgGW3S3QV5THW2iCg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels: MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Enabled=true;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_SetDate=2026-06-19T22:56:04Z;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_ContentBits=0;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Enabled=true;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Tag=50,
- 3, 0,
- 1;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Name=Confidential;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_ActionId=4c115a83-ccee-44f4-a87a-b6b536cf5017;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_SiteId=5280104a-472d-4538-9ccf-1e1d0efe8b1b;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Method=Standard;
-user-agent: Microsoft-MacOutlook/16.109.26051019
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR18MB4728:EE_|SJ4PPF2862F1335:EE_
-x-ms-office365-filtering-correlation-id: e56060b7-7ef1-460b-83c6-08dece5643ed
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|23010399003|10070799003|1800799024|56012099006|4143699003|11063799006|38070700021|18002099003|22082099003;
-x-microsoft-antispam-message-info: pS/TlLZZhUJKlF+94x8JWkCMsgvup3znt3tdRXDOomy/WRqkxDoNMNQvwa206TTqKTYj28xBBAls0LnPn+muLVNMOMHsZbscg5dexec6iMFgFSgyRl2+498IOnasvnHcGqjN4pnkrewaUERkoFNZGw5tpY51ZriFLpXtGBuTP2bawZTyWlGTKTdJdQ1D9xapjeDDqKtwPIQmOYV8u+lKXrv4jPvFNSior3I91vfugL6x8/+L7e6twCYujP7zM/i3x21tv94p6effkNUesvrPoVh4auG7hF1GffFpJ6/rdjzlx6Pd/LI80httG3lmgkT92AmTLd7sMutnHk2BYvrvnNRn4/iOyopxxJOPLR/u2WNJaaXS4fQRUkdBfwN4V2OgBI78HJK4cA7FeK0FUf3LwRXMZ3XHr4b01AMtGiNVtIMmFg45wOJXtMjaj6Pf1HwllFwUOp+bauOafjt113HzaCuhH5K+hDpd454OECCIVBLfyLhlrikbVkXW3umDO5k+WwBpRpKm1ANQavlb+ejgNYLyayhepoI3dWcbcHjeiCWzht5Wp9r3587T1Y+iR2iVFrHciOl/FENOMNGej4mCPa2qPKEtbDu/8a59fhnfwR0eXkM7GFLrHUg3Jt4TZTXwb+ZgLP5UXNEVEMhS/8iwGnRivExp0N6HyScOj3e9F8E25CFzTeK8O85m/9aFbYByRf9dqe+DbPQ8G4juWi5zV18AqLPla8n70Pi+w6xjxdY=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR18MB4728.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(10070799003)(1800799024)(56012099006)(4143699003)(11063799006)(38070700021)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RU9HSTI5ZVRpcHo2aWdyWEhzZzVWbHJ5M3RROUo1OExEa3Z0akpERExwYnNn?=
- =?utf-8?B?SjdSZWk1Y3U0MTBpS25GSTdSSGIrRmZyTnJFRXowakJENmlPSlB5bFJvNWJv?=
- =?utf-8?B?ZzNyT2tnQnVHR2ZUSVJmUmdiUHZlQjc4dzNZTVA4clRWd0l2TEhpTlRxZnor?=
- =?utf-8?B?VE1kdFdjV1p3d3M2OGZKWnpMcmV6L3NEUGNqU1Q2T0lMM2VYWG5ZSmpNdEk2?=
- =?utf-8?B?TFhvMGE0dmpNMklRV2hqOWlIbDUvTFlZNDZOd2NNcDQwdEhRcVlJZzJ6YU1Y?=
- =?utf-8?B?KzJMVUxYM1lCWlhudHo0UmxGY1JkeldtU2haaHRLRnFLbndSRlgzUFE4cjNo?=
- =?utf-8?B?YTFwVjJNOGZrNVFDVWxNWjdwcG4wZ1h0amhIZjBEaU1SSStIaVpCdFlxSkN4?=
- =?utf-8?B?VHZTM3hoZGR3bDBuSGk1SU1BeFBoWjBKdUJRVXZubXhtK2tjK2g2bWVEZFZS?=
- =?utf-8?B?bkRVcGs5MGVUaU0rQWxaVjNFQWNpTHhMcTNOMTVIOFFxK0wvRGw1NUhreCtY?=
- =?utf-8?B?c0I0aTMvWUpDOUx5Mmx4c0ZaNjIvWEkxbG5CTnNYNG9iWmNBK3dWWFFGcHNh?=
- =?utf-8?B?N0lSNklNQmxlcmQvSENja0xPRXpHUDBnYTN5ZTd4ZEsvYmNxVGtkSGM1eWFk?=
- =?utf-8?B?bmM5V2tPSTJFL1c2SnJzSUo2OG5wd3pYQW9zSWhTTlZkUHZkUkRjTUlrbnhM?=
- =?utf-8?B?RlVpblByU08vUW1aYmMrb1AzLy85Q1BWcXdrb1NhSVczQ2JOTHZTWGVva1U2?=
- =?utf-8?B?ZTVNKzRUSEd0ZWd6M2EyL1Q1cG5Za1R3ZHRmZkdKTGxadDM5Y3RJT0hkcE9S?=
- =?utf-8?B?ckV5VFF5dUQ0WEViMEFDWmdkOUdiaXJPTnN1NmtmcXk5SFRpbCtQNVJya21r?=
- =?utf-8?B?cFFMM1BJc2ZXRnNVM0N6U0xZbWdpeWNPZFptemJYU29IU3MybWU3NE9uZGJm?=
- =?utf-8?B?bHNYSTlQMWVWMnR6a3lEaFk2Y0FxUW96YXgzaXlCWEhUSkNYSjEvVnBlRjlv?=
- =?utf-8?B?alUwaGpqN0NvMnF6M3VoL2gxc1JkUE8yckI3ODhaV1cyNmVkWHk5ZXFBT1VL?=
- =?utf-8?B?aWd1aUVPWFcwVkVrZndiQ2ZuZVJNdFVuTzJDVERTWnpOVzVYUUE4Z2FhZGp3?=
- =?utf-8?B?UEVtanhRWCtwWG9yVXdhRW9ZdC9uM1Y4ZitsVkdDWkJPR2FJdUlKaFUzb1ZK?=
- =?utf-8?B?SmxZR1NGWUZVaE5IUkdXL05sMTlZdjBJNitGTFJoam9BanZpcDF3VlZFenJr?=
- =?utf-8?B?MERET0ltZlNpRENhNjBzQkwvSG1HS0hEb0ErS2c1V3hMdWVSL08veEFseVE2?=
- =?utf-8?B?WEJvMU1VYXU1RE1TclJkRXBEekNWaGVBS1FOcFdlZU1nU2E1dEx1MHdSNkRE?=
- =?utf-8?B?TmhIeFBYdEIwTHRqNDRVVUlDWSswY24xdm1wcGVlNDNSdCtSNTdORlQ4TkRy?=
- =?utf-8?B?dWdhZGptaXppKzZkT1ljd3c1NEtZa1FkTVZ1OWdieGdobkNQL3dyMkdGWHZu?=
- =?utf-8?B?ak9vMXlxcjNTcy93QWVqa2c2cThWT1NnZ1hMRW9MaFFnUXUwR1lhSzF1bU9V?=
- =?utf-8?B?ZWhGUFVHZzFGVFlWSlliMHB6N2F5TnhkVWJheWRMdm0yQjlXMUJwci82NnhW?=
- =?utf-8?B?MllsVDFGTVE0R2lWMm5rQ2FYSjFGN1kyaHVsakRpd3dCcWFMVHdGMmdjOFFv?=
- =?utf-8?B?R0lvNnNIcFdyUjM2RUx0Ly9SUjhxRlpad2hxaXJudkVJUjljd2xTN2RMM3FX?=
- =?utf-8?B?OGpwbGs4amlVMHU0MXEvYmlzcFdIUHgvZnIxR25uU3lnVEl2cDN5WTdXRjdi?=
- =?utf-8?B?TmtUWHdRbkgrWlhMNFhacUpBYXQ1WXE3OFlFSnN0SVB2R0Z6S1FqS2pNZ2lp?=
- =?utf-8?B?b3NXN0J0ZG1NdWpUN21oUEx0bURPeGpXNnk5TUt3UWg0ektJamU4azA5MDBM?=
- =?utf-8?B?MzNkeUM0QXRhbHEzWUViQ2JTdkVaTk1OMGh2Y3hOaVQxKzdldHpFck5YTnFk?=
- =?utf-8?B?STZMeHI1emFJZnZrUlUyWWFqY1hHUTdxNHhmeUx4eUdjNjVCMDdsL2tpeE5B?=
- =?utf-8?B?cmgxeDYySGdiaGd3aHdidVFiNzk1L21SeENoTCtNUFIyVVN1eTJnOE0zUm5C?=
- =?utf-8?B?Y2pzcDNYc0paRXdJL3dpZXowandEQmNDZDdMRE55VUpvOTRJR0szd0pKM3NL?=
- =?utf-8?B?Z2d0ZnVjK0NLdzdsOXpNUnU3VjZuc09YZjIxZWFPOXlkUjVGc29BK2lUVHFH?=
- =?utf-8?B?b0d3VVZYcXMwWFRaUitoVkdDeVhqOWVCUi9Ic2VMdEFDZzZTZ3pOUlJCSklQ?=
- =?utf-8?B?d09hTENWUTdHZ3hVUFpPMmhNUU9obzJKVjkzcnN0Z1c2R3F0K2JSWXF6Mm52?=
- =?utf-8?Q?enrs2YXPlrh/qutNPWrLsMu2KSvmW9MiETvo9FABoNXXg?=
-x-ms-exchange-antispam-messagedata-1: xlUAg0hxwC1+Kg==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3AC63AEDFDF2614DB94267FBEFA5EF39@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1C633EB0E
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 22:58:55 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781909938; cv=none; b=SNN/UTElkGh8bu6WkrjxKkjhHIhTww4gMG4zI9cpENLxIUIi/HA5VjWG8SfCzYEZM6S/2ltrFufAikhQxQRGtejHE7eT0I8CE4YuV9TbL3QLLoqXlDrXt6wklswvALO1AVJmwVLsDZEXvN8AgXFpWj45Wz4/vVPHHJowtaTvHow=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781909938; c=relaxed/simple;
+	bh=P44btkX/5G9W5QhX0wBooqqGpL5H58AxXskj6RX48zk=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=i0IQwlgkrOdrzuH8wAttCKNNpQyH+PkO8vMtncjB9viz8xKPy/X6B7D5gbPcuwPM50S/HpoknyUsr+UAMzyrMpgSXJOpD1e8X6pCJplmdNokzaxAP4Y+rQC4Fau6GFMpx085An8solsn2A9oRknp6rlRzfSL3rmSPLQXd4kVDGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.66
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-49222b6e871so21446995e9.3
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 15:58:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781909934; x=1782514734;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=07lVSutuBZtSqSTP2+DZuX+nW0UInURGUViWnvtWS0g=;
+        b=BH9Ka5c6Rjho+z5sucTyl2q9OdYcLSjU3k2Ye6EtKnUVOxhdD3dkWKPN59NyT2wudp
+         VnsVKiOc9YQzTx/Ucl+Qb/15Yfak0i86oCM7NhXOkPtt6bV2lQHEKurf4uUwzjFu8YoK
+         kCRu1qqpAejTA8DQGMm6kUR+Q5Rw7nRexTdY+kgl1G5frsr3jbdroKCyN0USO/7pDdNF
+         E6IS+KYiL7OgASYpQyoL8K3+nu+rBp9kimaT7QBPHgQuD1YKBNMbq0nNLacpKYwUlY3X
+         ptTsCmzWMWZ3+mJDn/ig8UlLP1Nz9qGyVXc6IY1Pcfmwr35I6S9oa+Lx6Nc397OhXEbL
+         R3ZA==
+X-Forwarded-Encrypted: i=1; AFNElJ+m+pVtcay6V9DgdFDQwysDSN45bOF3yrEpX+cUMrWK+LGBC7uMmxArMsy3ApnnFgw2Xcu3g6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfJxWmw9E6mPbB6qlZi/A4/szV9i9SvsYS1ivPDnaPvahWBWYp
+	Ia+YUehiFs0XG9jGy005Do3BHnBNS0t5DLeaWFaNJtFLdfZJbHWVeefu
+X-Gm-Gg: AfdE7cnpMzNimdCEipASyiK4LEKUuKFwMPrY3bZJJKxx1HbUS9Eu9H63D7X5iQ+n5FY
+	kPP32k20bolLYH/ZwNqxwPKQZ8byVi3Lf2LeDo8jNq9XqVQAx6lKoRrBiz97JypUKhuFl8hJNY7
+	hlgB6Ro1FudVBACEZFVKRNGy4+bgFo79mkJmFfmpobU4/maSqiMAXd4xqRcSa3iBp8qHmYk817i
+	BBCkUXMlXL+Vzrsnw7J+ldCv3itXk9g9Zk9idNfE9lsVSqls/VGJK81P1YzJWkp1qa6T/HS1YiR
+	S6wvx+QxY3BiwzUaOzCiS9gu5m5X6q19U5Bq/OTI8V4nQcCJLFC4nvoyY2z+VMEcAC3AFbrEloR
+	59cfrxvV/64t/iB61w4rwJij52MYLVdVn4RIWu83PAEUaGK9DgGk1ez4eMQYlqbDSGKo4Xhsoqr
+	/HqBwMObSKQTcKcWEtOnlN9yPqs/OVmK3BE4ND0SyVK7JmAq3nkpYwdB8=
+X-Received: by 2002:a05:600c:3e83:b0:492:3fb5:4697 with SMTP id 5b1f17b1804b1-492423140e0mr91571045e9.5.1781909934193;
+        Fri, 19 Jun 2026 15:58:54 -0700 (PDT)
+Received: from [192.168.88.241] (89-24-48-145.nat.epc.tmcz.cz. [89.24.48.145])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49240eef2basm98973675e9.2.2026.06.19.15.58.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2026 15:58:53 -0700 (PDT)
+Message-ID: <d967e161-f0a8-434f-9f71-a8838b8576ac@ovn.org>
+Date: Sat, 20 Jun 2026 00:58:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: QzvF7r6eQh3rfXH4bZUf+hNPxKJKTh8pL3Lxg1UIHQMMm2fjdA95YsWr9enq1mAYhGZ6uUbnBeoJNDDE6RMLBEnxCrNfJNBiKGdm1A9cFvb8lw8a+nyfysNiKO3n/LvxtANNusurXdj7xrJW4wIN55lC2OFUenVXIHh049A8TNvMzh/hOqqvAJ1HmV3kP/P/jdXWgS0c5+mom+HREl2bEE8gPxy10R5RV8f7DyG/XLwDCdR/iyV4oETNo9HlRLyM7BlxsNSwgGX2QobLhldib5yMaQ9Jux+oTvk4JE/n6HH3WgkMLuh2IdGzpBptO12zTWE3Q/y6J+sFd4xo85DESA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR18MB4728.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e56060b7-7ef1-460b-83c6-08dece5643ed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jun 2026 22:58:23.5053
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5280104a-472d-4538-9ccf-1e1d0efe8b1b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8yPm32dkSL7l/V+7VNT6cOfRFjWT5M/9UD6eWqZITTUTJGkirwlHDwzYntIJU7+H/zFRzjpj0T26ON+8+aPCaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ4PPF2862F1335
-X-OriginatorOrg: amazon.com
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev, Johan Thomsen <write@ownrisk.dk>
+Subject: Re: [PATCH net] net: dst_metadata: fix false-positive memcpy overflow
+ in tun_dst_unclone
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, netdev@vger.kernel.org
+References: <20260616100332.1308294-1-i.maximets@ovn.org>
+ <9e941b82-23d4-44e6-a240-b7949ace76ab@embeddedor.com>
+ <b16e8bac-e149-4052-b1cb-8fd3e1137f9c@ovn.org>
+ <a95aabe9-6294-42ed-8327-b7d74bb4a8c8@embeddedor.com>
+ <13b922ce-8450-48fd-adf7-5377989fb6e4@embeddedor.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <13b922ce-8450-48fd-adf7-5377989fb6e4@embeddedor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-10.06 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[amazon.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:ncardwell@google.com,m:edumazet@google.com,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[aarnahmd@amazon.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300767-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aarnahmd@amazon.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300768-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[ovn.org];
+	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:gustavoars@kernel.org,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,m:llvm@lists.linux.dev,m:write@ownrisk.dk,m:gustavo@embeddedor.com,m:netdev@vger.kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[ovn.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.linux.dev,ownrisk.dk];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,ovn.org:email,ovn.org:mid,ovn.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 865156A7F0D
+X-Rspamd-Queue-Id: 343986A7F19
 
-DQoNCu+7v0hpIEt1bml5dWtpLA0KDQpTb3JyeSB0byBrZWVwIGFza2luZywgd2VyZSB5b3UgYWJs
-ZSB0YWtlIGEgbG9vayBhdCB0aGUgdXBkYXRlZCByZXByb2R1Y2VyPyBJJ3ZlIHN0aWxsIGJlZW4g
-YWJsZSB0byByZXBybyB3aXRoIHRoZSBsYXRlc3QgNi4xOCBMVFMuDQoNClRoYW5rcywNCkFhcm9u
-IA0KDQoNCg==
+On 6/18/26 6:02 AM, Gustavo A. R. Silva wrote:
+> 
+> 
+> On 6/17/26 16:59, Gustavo A. R. Silva wrote:
+>>
+>>
+>> On 6/17/26 16:01, Ilya Maximets wrote:
+>>> On 6/17/26 10:08 PM, Gustavo A. R. Silva wrote:
+>>>> Hi,
+>>>>
+>>>> On 6/16/26 04:03, Ilya Maximets wrote:
+>>>>> kmalloc_flex() in metadata_dst_alloc() sets __counted_by for the
+>>>>> structure to the options_len, which is then initialized to zero.
+>>>>> Later, we're initializing the structure by copying the tunnel info
+>>>>> together with the options, and this triggers a warning for a potential
+>>>>> memcpy overflow, since the compiler estimates that the options can't
+>>>>> fit into the structure, even though the memory for them is actually
+>>>>> allocated.
+>>>>>
+>>>>>    memcpy: detected buffer overflow: 104 byte write of buffer size 96
+>>>>>    WARNING: CPU: X PID: Y at lib/string_helpers.c:1036 __fortify_report
+>>>>>     skb_tunnel_info_unclone+0x179/0x190
+>>>>>     geneve_xmit+0x7fe/0xe00
+>>>>
+>>>> This warning has nothing to do with counted_by. See below for more
+>>>> comments.
+>>>>
+>>>>>
+>>>>> The issue is triggered when built with clang and source fortification.
+>>>>>
+>>>>> Fix that by doing the copy in two stages: first - the main data with
+>>>>> the options_len, then the options.  This way the correct length should
+>>>>> be known at the time of the copy.
+>>>>>
+>>>>> It would be better if the options_len never changed after allocation,
+>>>>> but the allocation code is a little separate from the initialization
+>>>>> and it would be awkward and potentially dangerous to return a struct
+>>>>> with options_len set to a non-zero value from the metadata_dst_alloc().
+>>>>>
+>>>>> Another option would be to use ip_tunnel_info_opts_set(), but it is
+>>>>> doing too many unnecessary operations for the use case here.
+>>>>>
+>>>>> Fixes: 69050f8d6d07 ("treewide: Replace kmalloc with kmalloc_obj for non-scalar types")
+>>>>> Reported-by: Johan Thomsen <write@ownrisk.dk>
+>>>>> Closes: https://lore.kernel.org/netdev/CAKv6aAM8_EWgXScnKmKYm_4SwGDVBK++dzfP+Y6msUXbp99QUw@mail.gmail.com/
+>>>>> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+>>>>> ---
+>>>>>
+>>>>> Johan, if you can test this one in your setup as well, that would
+>>>>> be great.  Thanks.
+>>>>>
+>>>>>    include/net/dst_metadata.h | 7 +++++--
+>>>>>    1 file changed, 5 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
+>>>>> index 1fc2fb03ce3f..f45d1e3163f0 100644
+>>>>> --- a/include/net/dst_metadata.h
+>>>>> +++ b/include/net/dst_metadata.h
+>>>>> @@ -164,8 +164,11 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+>>>>>        if (!new_md)
+>>>>>            return ERR_PTR(-ENOMEM);
+>>>>> -    memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
+>>>>> -           sizeof(struct ip_tunnel_info) + md_size);
+>>>>
+>>>> What's going on here is that, internally, fortified memcpy() retrieves
+>>>> the destination size via __builtin_dynamic_object_size() in mode 1.
+>>>>
+>>>> That is:
+>>>>
+>>>> __builtin_dynamic_object_size(&new_md->u.tun_info, 1)
+>>>>
+>>>> For the above case, Clang returns sizeof(new_md->u.tun_info) == 96.
+>>>>
+>>>> So the warning is reporting that 104 bytes don't fit in an object of
+>>>> size 96 bytes, regardless of any counted_by annotation or allocation.
+>>>
+>>> Hmm.  Does __builtin_dynamic_object_size(&new_md->u.tun_info, 1) return
+>>> 104 when the options_len is 8?  If so, isn't that because it is counted
+>>> by that field?  Asking because the fortification doesn't complain if we
+>>> keep the full 104-byte copy as-is, but set the options_len beforehand,
+>>> as tested by Johan.
+>>
+>> I see. If that is the case, then, internally, fortified memcpy() ends up
+>> using mode 0 instead of mode 1. Something like this:
+>>
+>> __builtin_dynamic_object_size(&new_md->u.tun_info, 0)
+>>
+>> The above will effectively consider the allocation and counted_by because
+>> it will interpret new_md->u.tun_info as an open-ended object due to the
+>> flexible-array member (in struct ip_tunnel_info) whose size is determined
+>> by counted_by.
+> 
+> Indeed. The execution stops here:
+> 
+> fortify_memcpy_chk():
+> 588         /*
+> 589          * Always stop accesses beyond the struct that contains the
+> 590          * field, when the buffer's remaining size is known.
+> 591          * (The SIZE_MAX test is to optimize away checks where the buffer
+> 592          * lengths are unknown.)
+> 593          */
+> 594         if (p_size != SIZE_MAX && p_size < size)
+> 595                 fortify_panic(func, FORTIFY_WRITE, p_size, size, true);
+> 
+> with p_size = __builtin_dynamic_object_size(&new_md->u.tun_info, 0)
+> 
+> The code never reaches the part where p_size_field (__bdos(&new_md->u.tun_info, 1))
+> is checked at runtime because there is no need for that.
+> 
+> So yep, this patch is okay as-is.
+
+Ack.  Thanks for looking into this!
+
+Best regards, Ilya Maximets.
 
