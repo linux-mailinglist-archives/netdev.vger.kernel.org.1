@@ -1,150 +1,228 @@
-Return-Path: <netdev+bounces-300672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aUGvObURNWpfmgYAu9opvQ
-	(envelope-from <netdev+bounces-300672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:53:57 +0200
+	id ZzrlBQoSNWprmgYAu9opvQ
+	(envelope-from <netdev+bounces-300673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:55:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 545A56A50F1
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:53:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 685686A5109
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:55:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=aDNyWtOJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300672-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300672-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=suse.com header.s=google header.b=A3bXkiJs;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300673-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300673-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5C2D53003531
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:53:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DDCD43078994
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6A4367B68;
-	Fri, 19 Jun 2026 09:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32B6367F31;
+	Fri, 19 Jun 2026 09:54:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D466365A11;
-	Fri, 19 Jun 2026 09:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5271236897C
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 09:54:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781862833; cv=none; b=iC3rStRA5fsZ6lI0eK+UyTPVReQk2F+mkvhFsZYZfYf2hSb+RPYjkF1T12SvJ+5+FIEjAIzRAW4D22cmPoc9bheyyOIZk3OtHY1yvPCNiR49hD7QpsRxT3BewqkORNfI5Ge6iCOIV0pC1714fLO8qAuRj4iPxSCDBeT9NNKPf2s=
+	t=1781862844; cv=none; b=nb6iMhDkTzZK8Orvmes957k4eSoBNL2MwH10VFLia6oVw61ObanXbNgp+2SlyJhY8iCfZx3SpL1sr9+sMgFDYFJ8pBaGsuw8hn1gzKsq2dj/KwduNmLVktHLFFytIKxwsDXTEXonkm2dxLe7tGvE9z8jIV+tPFqWejn3ECGscI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781862833; c=relaxed/simple;
-	bh=oRQQFZKzQiLFW/pZ9s5Xq9sNgO5G8J8EukMbRA6kD10=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=N6hL2CnI7bkfsvbMkPEd3C1rSEBmekOoo2UWcnEAmwL1dPkTUB+fugRMXvxKze0QRP28bLOe6PWtKVDbSEgzNZcDNVJqdecNfwSB/6Fod0ZpItpExlrSISuNTwShtCJz3oHshmq3H3HcVzmURBBfx/lAFBHFG7gnwkIfZekadic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=aDNyWtOJ; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3246CA0378;
-	Fri, 19 Jun 2026 11:53:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1781862827; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=/WAo8TzqFb7hDUkv6TQqniOf6hHCRnPknHRBd3UajO0=;
-	b=aDNyWtOJiuNogn/zfnGr7iR4o9dLVM3/+yeAZJrWrGjSbJw8U5cQbXx9Y5TiMi144ogQcD
-	q/25YEsr8+d0OS17IcHx76KqghRfTbc71/JGTurSiVUZK6F3OYt7f4ueLogEDmE/SMSbZI
-	isLPbTp2IAb0B52cIjkXq1BrRpmCXygqW4bN+81aFTUHi+A+JZ9GZCuVu5h70VKck3vo7Y
-	AitzZKhkZ6cQdcNn6+1hssYUU8WbGClJMrFEjkuiMmrK6fjnQhrdEe1/GR2Pu9FraO/5vn
-	SrgYbm2ifF0hjBDUwsNwlfQ6baF5aJwSjES3y79eQZgP+SbdiaawZrEmX6KaSA==
+	s=arc-20240116; t=1781862844; c=relaxed/simple;
+	bh=aGauklNPabtsO7LQIp29AL9IE+hawJEwI3Iyt1CmxkU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ndQ1+Ue19rnM26TpXugmeuX/Pmrp+gvhFmi5fRAV6HsQ52WlVli4WcXb0ZKCkEmm+XPPqBE+LhYbmrGHdKsNCjgXbM2nLehLwkzGF5JeIBOpKGETOxbq0+Qj3REswMFO1dIKR1LMqz6zI3Eu/S+XGMoLPkyWOuORa+PgI5davHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=A3bXkiJs; arc=none smtp.client-ip=209.85.221.53
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-4629051c9d1so1454006f8f.2
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 02:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1781862840; x=1782467640; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=es6lhLq2EOm7yOBpWKOLsnIHgXPOu61O1PDmQl8gQmU=;
+        b=A3bXkiJsZvFlPgQQlnTMBCxmcRsMid8/k+Imw5Eq8zqVVC6tThSs4GQ+Xb+Ecprm8i
+         f387gbqIb9sutCUCYoZ6fXIp25C/3ezfkjiWFSvX6zDYxUjVYgKKb7ESyIw6qFkPpuYA
+         +7F1nkn7qH+LQaaMiAZt+8dG3QMs4VLa0+pnuiugm4LLPU5T9cavhZAM3od1xfSagaRN
+         kRAMrsM0+Rst436u06NiqGHiLJxGXU3VH4ZktoGeFOBG+qOmbkB02eTqixTHJRhW/+GF
+         QCnHihBvUYp6rN1LZlI6Mto0uWsYtELmEtqtIEjrwwMMYWOyrfN/x4yIGjoTWcjzFev9
+         2ULA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781862840; x=1782467640;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=es6lhLq2EOm7yOBpWKOLsnIHgXPOu61O1PDmQl8gQmU=;
+        b=STNhifMA/M61rMyHSh62F/pfpmfzWNoJ9ghNUaHnfvxvQNUqC6zUfeGcg1iJkE6mbE
+         Dd1ui39ByUNHCWEtdZwM9yFGqlGyx6rNx7ERzcT2op4Dou8ut6f0ZvV4gMg6BbSk0W4m
+         +fIl25kSLwGQRYE3yy1lFDfGVJVqY0o79xIbu+McFygxR9ZhxqOXfBXirNKNbQyctGZa
+         CWJRnO1xRZooDJ+BIhQI0SFGHDuYdVJACzqHq0Mpjm6+PTJ3prZ8tw3mIcCEuuKT0/ZN
+         cBAFrdfT9TXOKr95u/zjOlUqB0F9Y5KaYPWJKXYqHIkQWHsWe0cpAm8KsjvMVwpiElbm
+         JKxg==
+X-Forwarded-Encrypted: i=1; AFNElJ/awhOqq82+VNQ4xn0wUJ5LE21o2VKP0Lme3jhJ5zIw8b3HwXZxIB6iC24+IG0oO4dijZb5J2s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5rubaciTfAfGbvPkiYoJr+LcNn+pCio+tzkyCsKY5w7p3qv6b
+	f04MdjCH7eb5eRErpW2vJdSXuTB+wYc1gv0fbBcWx8d2K3RLzHZkoeXKmhVkBgMNKUY=
+X-Gm-Gg: AfdE7cl2BvCnPTHwMwtHSnTJjtOSKrlxuxpSqJT6qlOgZ3VeG4ZdE3s1lk9gCzRUQxb
+	wW2hcIVXtL3Zn1EBi5X3fRkHBSPRGpulXCu2gM40ZuJAH6kejb5ZcsSkL9eibowHWE01yxfCr9e
+	miDk+KdfJFARzDqdi+emdnKqMgb2j8GI6B7aTxiUP0Ej3xRxAJHxetiYh537QAhriacsRBKhONe
+	Z0rLzxkM3dpdqF7ED1selHoFTcwJuFHMi+5o2gkoBpsInywb07ad7oCI4BNt0CiVXnlFh+lS2ta
+	J7m+CNJAlPuQTeiphiqrnRQgg4NxHmOvD7nRdO/IETnbqcKMEBuafOmCNW86iMAGfr/uQpKLQIu
+	cTRWDsL3qLuDOH5LA+hq8L79x1RhRBusmjpDaqf9WpUYRbtm3edOgavW8AULMkHmvDPnw7QXO2i
+	Vkhlkajz/AAo+U2HM=
+X-Received: by 2002:adf:f751:0:b0:45e:d6b2:e6a5 with SMTP id ffacd0b85a97d-46509d58218mr4397934f8f.34.1781862839762;
+        Fri, 19 Jun 2026 02:53:59 -0700 (PDT)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46508a04c15sm6766712f8f.3.2026.06.19.02.53.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jun 2026 02:53:59 -0700 (PDT)
+Date: Fri, 19 Jun 2026 11:53:51 +0200
+From: Petr Mladek <pmladek@suse.com>
+To: John Ogness <john.ogness@linutronix.de>
+Cc: Breno Leitao <leitao@debian.org>, Peter Zijlstra <peterz@infradead.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Vlad Poenaru <vlad.wing@gmail.com>,
+	Thomas Gleixner <tglx@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	linux-rt-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>
+Subject: Re: [PATCH net] netpoll: run NAPI poll in softirq context to avoid
+ rq->lock self-deadlock
+Message-ID: <ajURr1G-12EJ4u-d@pathway.suse.cz>
+References: <20260610183621.3915271-1-vlad.wing@gmail.com>
+ <20260611191114.5bc43a59@kernel.org>
+ <20260616103529.Yh9Dxsjp@linutronix.de>
+ <20260616170257.GH49951@noisy.programming.kicks-ass.net>
+ <20260616141719.67684bf0@kernel.org>
+ <ajJ46o4fomfxY5CX@pathway.suse.cz>
+ <20260617111958.GL49951@noisy.programming.kicks-ass.net>
+ <ajKi4wtA8U1iZkMD@gmail.com>
+ <87tsr1m6y5.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 19 Jun 2026 11:53:45 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Sven Schuchmann <schuchmann@schleissheimer.de>
-Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>, Rengarajan
- Sundararajan <Rengarajan.S@microchip.com>, UNGLinuxDriver@microchip.com,
- Woojung.Huh@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: AW: AW: [PATCH net] net: usb: lan78xx: restore VLAN filter table
- after device reset
-In-Reply-To: <BEZP281MB2245422BB9FBFF4AFE081451D9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
-References: <20260618191109.4086598-1-nb@tipi-net.de>
- <BEZP281MB2245740AE8E3221DD076CE7DD9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <6d638042ad07a8bfb09ff3ee923e7b3f@tipi-net.de>
- <BEZP281MB2245422BB9FBFF4AFE081451D9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
-Message-ID: <4abfc9b1e8860da93c03639863bd0232@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tsr1m6y5.fsf@jogness.linutronix.de>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:schuchmann@schleissheimer.de,m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:Woojung.Huh@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-300672-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300673-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:john.ogness@linutronix.de,m:leitao@debian.org,m:peterz@infradead.org,m:kuba@kernel.org,m:bigeasy@linutronix.de,m:senozhatsky@chromium.org,m:vlad.wing@gmail.com,m:tglx@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:linux-rt-devel@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:frederic@kernel.org,m:mingo@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:kprateek.nayak@amd.com,m:vladwing@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[debian.org,infradead.org,kernel.org,linutronix.de,chromium.org,gmail.com,vger.kernel.org,davemloft.net,google.com,redhat.com,goodmis.org,lists.linux.dev,linaro.org,arm.com,amd.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,tipi-net.de:dkim,tipi-net.de:mid,tipi-net.de:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:dkim,suse.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 545A56A50F1
+X-Rspamd-Queue-Id: 685686A5109
 
-Hi Sven
-
-On 19.6.2026 11:18, Sven Schuchmann wrote:
-> Hello Nicolai,
+On Wed 2026-06-17 19:13:30, John Ogness wrote:
+> On 2026-06-17, Breno Leitao <leitao@debian.org> wrote:
+> > On Wed, Jun 17, 2026 at 01:19:58PM +0200, Peter Zijlstra wrote:
+> >> But anything using locking is not ->write_atomic() and should be driven
+> >> from a kthread, no?
+> >
+> > Good point. If that's the case, netconsole might not ever be able to drop
+> > CON_NBCON_ATOMIC_UNSAFE for any network-based console driver at all. 
 > 
-> my first opservation is that calling lan78xx_write_vlan_table()
-> at the end lan78xx_start_rx_path() fixes the problem. I was able
-> to do over 200 connect/disconnects without any problem.
+> It depends on what it needs to synchronize against. For example, the
+> UART consoles cannot write if the port lock is taken by another
+> context. And the port lock is the sole lock for writing to the UART. To
+> deal with this, we added wrappers [0] for acquiring/releasing the port
+> lock. The wrappers acquire the nbcon hardware after taking the port
+> lock.
+>
+> The write_atomic() implementations for UART consoles do not take the
+> port lock. Only the nbcon hardware is acquired (which can be done from
+> any context). This automatically provides the synchronization based on
+> the port lock.
+> 
+> > As far as I can tell, there isn't a network driver today whose transmit
+> > path is completely lockless, so, even if we make netpoll lockless.
+> >
+> > It's unlikely any NIC will ever achieve this, given that NIC TX
+> > fundamentally relies on a shared DMA ring and doorbell register, which
+> > inherently cannot be made lockless.
+> >
+> > So, is it correct to state that CON_NBCON_ATOMIC_UNSAFE will be part of
+> > netconsole forever-ish?
+> 
+> Is there some lock that can be taken to synchronize all writing of
+> packets to the network? If yes, the netconsole can use a similar
+> solution.
 
-Thanks, that's the right direction. For the final patch I'd move it
-to lan78xx_mac_link_up(), which is IMHO a bit "cleaner":
+We need to be careful here. If more locks depend on the nbcon
+ownership than it might become a kind of big kernel lock.
 
-[...]
-  static void lan78xx_rx_urb_submit_all(struct lan78xx_net *dev);
-+static int lan78xx_write_vlan_table(struct lan78xx_net *dev);
-[...]
-static void lan78xx_mac_link_up(struct phylink_config *config,
-[...]
-  	if (ret < 0)
-  		goto link_up_fail;
+It might suffer from lock contention.
 
-+	ret = lan78xx_write_vlan_table(dev);
-+	if (ret < 0)
-+		goto link_up_fail;
-+
-  	netif_start_queue(net);
-[...]
+Another complication is that it is supposed to be a tail lock.
 
-Could you give this version a quick test and confirm? Then I'll add
-your Tested-by.
+Finally, it might create tricky lockdep dependencies. But nbcon
+context locking is not tracked by locked so it is not easy to be sure.
 
-> [...]
+More details:
 
-Thanks
-Nicolai
+I always forget the details. But it seems that sleeping is allowed
+in the nbcon context, see cant_migrate() in nbcon_device_try_acquire().
+Which might break when someone tries to take it in atomic context.
+
+AFAIK, the motivation was to allow using the normal (sleeping)
+spin locks for serial console synchronization in RT. The nested nbcon
+context locking should not disable the preemption when called
+in NBCON_PRIO_NORMAL context.
+
+It would still allow to take the nbcon context in atomic context
+when called in NBCON_PRIO_EMERGENCY or _PANIC context because
+nbcon_context_try_acquire() is able to take over the ownership
+even from a sleeping NBCON_PRIO_NORMAL context.
+
+But we need to make sure that outer locks behave the same.
+In practice, they must be normal spin_locks. We could probably
+add some lockdep annotation to catch eventual problems.
+
+Sigh, I hope that I have got it right. I seem to be a bit lost
+this week.
+
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/serial_core.h?h=v7.1#n715
+
+Best Regards,
+Petr
 
