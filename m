@@ -1,182 +1,264 @@
-Return-Path: <netdev+bounces-300658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AGB3GXYHNWrImAYAu9opvQ
-	(envelope-from <netdev+bounces-300658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:10:14 +0200
+	id 6JHkJqUHNWrTmAYAu9opvQ
+	(envelope-from <netdev+bounces-300659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:11:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC6A6A4DE1
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:10:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA6B6A4E02
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:11:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=OS6GkCZY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300658-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300658-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=PFwqJugu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300659-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300659-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A0443003631
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:08:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB713302AD22
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EF4360EF0;
-	Fri, 19 Jun 2026 09:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438663612F4;
+	Fri, 19 Jun 2026 09:08:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E013603D7;
-	Fri, 19 Jun 2026 09:08:22 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781860103; cv=none; b=aeXMQfqj8d/O1F3/VfWuV2rxRmSiVjSEoVNo3mn0EfpaBgmfpEZMZdAZjGOA7SPO65WFQcEJKCvJiAX/Z+jURVmih89SYeLoZz9KH7R5xBHrdhP5LjAfTswlYXXHqskKOEANPVrBDcwKBHUS4rZfqaAR1tSo51iPHRyWqwl9J4E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781860103; c=relaxed/simple;
-	bh=bctLAr7e+rqnWX7szupANse/GMf9YprpkuKsuKWYcbk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D/2eh45eJBV2FP52FFAzJ9ZGYzvZNe4cjRIViaLQ+k58Aojo5LIU+WMnGZSTNZR4xGjzdzLIcAM/tDdL4rkYJcpuXHTsGAuyAgn8YpyTocyvydXcCNlCFCVzcTu4FGZ7+3v3NvqgXbAJ1OYNJCY0f/ZynUBVL+KoQDiIZIXxQoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=OS6GkCZY; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65J7Rqwo1671610;
-	Fri, 19 Jun 2026 02:08:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=M
-	4uQRQQY9x8ebzHPMlmrS7YdNNfEKKZoJVcSJHTZB4Q=; b=OS6GkCZY055vrrMYw
-	G+W5eoekfwSda0z42L7UO+Iq/y9KQMh6/GEctTboaCp2ZT1T4dLL3IIP0uvcfcun
-	7XZQsorghtYMqGqHIHRnNOxI4GeCS04tLB6dr2UJmQaBFoFb3CZMdv5jnI92r8CO
-	nUc4HThy1XUmRGpKtKD/+dvfSiLIQb0ciwLbHlJeor+995Sa+9fk1yCljDvNeYIB
-	0aPnjhsNnaqxF96hcoHp5cWsWJlgbLTjAglDA9ex4Cu9UOVTZ2qy8KqzEBBmq3KQ
-	DYjEgMvYoYnA0vv2Hrrlt5yXoYoGYlN3t04MU3jAvDiAtxKMCJsddJkZ2F1WTHF8
-	2Fj1Q==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4evtcb18ue-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Jun 2026 02:08:13 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 19 Jun 2026 02:08:12 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 19 Jun 2026 02:08:12 -0700
-Received: from kernel-ep2.caveonetworks.com (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with ESMTP id C075D5B6930;
-	Fri, 19 Jun 2026 02:08:07 -0700 (PDT)
-From: <nshettyj@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sbhatta@marvell.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <Sunil.Goutham@marvell.com>,
-        <naveenm@marvell.com>, <hkalra@marvell.com>,
-        Nitin Shetty J <nshettyj@marvell.com>
-Subject: [PATCH net 2/2] octeontx2-af: suppress kpu profile loading warning
-Date: Fri, 19 Jun 2026 14:37:46 +0530
-Message-ID: <20260619090746.1829416-3-nshettyj@marvell.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20260619090746.1829416-1-nshettyj@marvell.com>
-References: <20260619090746.1829416-1-nshettyj@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A80F35F5E1
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 09:08:47 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781860129; cv=pass; b=BQEWuxtz48aWEKSUImx0T0hwoHoXg2WKt8I0LIMU4x2eJpbCN41DYHiKdJAdyW8DdWQMNXa3G+y7iIGctzvgmzwcfhud0Sodr+MeeLWbLUPqZLXdd0ARS+1LVazm3+zuTXWvjrNlROWElKgwmkbxdEbRwluk+v+Tlrfmvf0aQzM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781860129; c=relaxed/simple;
+	bh=T/K5UlzDllbLEYYLehMYSn+//Xryze9YYv1LULQa/mM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lRGXO51BERFoWb+7ZOf1yHUy8kCq6UFhS/EDpnQzN/TB4Uyp5wBvhO+EA0O8DZPlKnup/M7lrVuOq2HBBPQ5fNNBkZ1X0nMbKOT97mC3Fyi6XK0ZEfesR5Bw59wNbFEWpG4Pr96HEPEkPCo5WXsDlTdGdiGD7VixJo76zVd5aI0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFwqJugu; arc=pass smtp.client-ip=209.85.128.178
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7dbcb505578so21879207b3.3
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 02:08:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781860126; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bR8I05ihNHzBJyPLjjucCNsj8gC/PqSJL4FGYAomRajgnTULHWLlK5n4TxdFUI0Awd
+         v2xIaIvdbRKW/p332ZF8LnNap2BHgy4M8T1tlMPq2eA5liTJ8cy9BzdP2L4bblzdEUQZ
+         Abmmp24Gf6pFAb5lCfgaky3YmD1M66QhbMlHaBQXc5CwnRYlYkSPP8r1cAyrpw+9oELn
+         x8jve0OnVvGZs6e6Z3Ef6subIET4Rc0g7hsDs+kgQn7JCLEMLFIed1JaMxPbxazbaD3G
+         VwDaILnQvrpfw/Z98grB89qgumXnAvCsbtIFqOa6ad+phNaFJPEazXWWntcfTctNNwsX
+         2GEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=T/K5UlzDllbLEYYLehMYSn+//Xryze9YYv1LULQa/mM=;
+        fh=p2jlLVuvXxQXo4i7c93IjwEqT8NqyuvMgd4kecpjUhs=;
+        b=VGTjmYKYd34+5cwb6RgSAENhpBWDSX8H7RzwMn0qNkn1hbigP73uwwQSqWIHPdIU6Q
+         UK60GeRB88H4Xw2fY73CnJzuabsn/yH0UmH56kS0QlDalpOyLWzBiWSbghP4tJj1r3M9
+         UFnaOA1MeCp4wj9/lwwufRrAWcfeU0e5r2meseYaAXiY25OvLa/6DaQyaNtC05Xung11
+         p4XKr/YvdXi4GE5/8EN/pSzqHH2U7zTrRVWQTj4sV4EeW4JE/AWWVOt7WMOH+B3LrK8/
+         Lwzv2P+l2M+cPn4XXJ/P+Mjcaz3ClxpcfX5MAU5TH9lm/d5BoGiII3jYt4eTkH1uKnB1
+         /p9Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781860126; x=1782464926; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T/K5UlzDllbLEYYLehMYSn+//Xryze9YYv1LULQa/mM=;
+        b=PFwqJuguw/X0MUQPzdQpu5Du8dVYZP2egHhfyM2XKAgtuc0MJzeJiwUKuXM3+wzlYR
+         3J7u8mlJBTUJ3gjoMCJwiMfoFBuVJyJVne7+yteAB/vBGxhPYroC2GigPQKHMtRhbO32
+         PMR2qW2I3UaD3n0/PNiWivNArf6goAbIF5t2w1i4Lxw3VPqJMB9CT7qSOzPdNfOKUVuS
+         28UUmHOI12RmR1XgOopLs/Aupz+GAEspuWALWsVQcmL2OEYpGjrd4pKjGFdFumU5g02L
+         GthAIqLH5KQ4ILMJ/gOsiu1Lap5eqBY2HVEbGTCmfZTddKw/KsJsNPJTL0wY4TG1Z8Bk
+         Rhog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781860126; x=1782464926;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=T/K5UlzDllbLEYYLehMYSn+//Xryze9YYv1LULQa/mM=;
+        b=qDx9/zrssNIfS3c6pzsRMsRQQNV1AsZr8psgiUtlxiHn3dD8/TQEweZp1MRcNtNVKJ
+         IV/raqXG5SvLenW9XRaIkwe98kCd+QIDFrMwAFWceqOHb/c38m7uFYVKhOGEvp2AyqMz
+         EdXRsRNT+j+L0U/LXLjSykoHMT052kD3Gz3zuGPnJFAf+or/SoD4R5B9796Gt8muk6xO
+         PkwfkGtco8KgAPO8mVaA/fKb++fjCA+ZNKRfOl6civcIAu0W1UTaVQeTLcFbp0coxTnw
+         mkg3jqzQAowm7+XbrGA73P95WaEWzcj4IpdSmTbbM7s+UyAV8ML0ZwK0WaHypkNyTdYO
+         8KFw==
+X-Forwarded-Encrypted: i=1; AFNElJ9Db9BmfWsn69EiET2TbJiR4uMkCnxBEXRaOVkEoX7A0TxAu24QuL95faiFEDTxjuHZtu45IkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyo2tOp1ZCO3HRxM+6fAV4tltqUUNG1yJqUpldO1C8uVHAwnqMF
+	enDQR3Jw8D/+83RSt67TveMv1ES6EHrjP8IvZJ1p+h052417Bbw1khKefyNYxSHJq68VuLrObvH
+	wZdqJtpMx0u438GGgpnRmgw7nk6b48TM=
+X-Gm-Gg: AfdE7cn4CXXjKysdYI3ZJFnw1IujsEA7APcql6+BGQAdO2IqfgGojBcdBI7tUFcHsLM
+	OUtRqUjzsfiSk7zybieKG5YWfVxmglUSNlu2KjZ2UvhzqxPWqeGQlaJQZO9xSDkEpI5koWq0jUo
+	IH/4pQpNzYMhpLlS7cMl5RONh2dUw7JT4eH5q7yzidmRLi2n1TD5uQqOhknLrkFBWGR1NxfBcFM
+	a01W7P0xxZHRlFmQqLqt7P1HrIVmV1sCcUqQ7jGPgKys2zyCuCEa3iSpqTNriY3KBzew4NihZiD
+	9hAxzyRN80n4Xec0JqPZp6FOc1QQj8uwumCvEkGx
+X-Received: by 2002:a05:690c:3705:b0:7dc:ca63:b0 with SMTP id
+ 00721157ae682-80132d3838dmr20841087b3.40.1781860126104; Fri, 19 Jun 2026
+ 02:08:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE5MDA4NCBTYWx0ZWRfXyhe0e2do7rcp
- 2B9pY7qYng7wHVQ735z1DgVEf8N2X+iuViiwXYigiwxGfgvnA3ByYsUXyrveCiFpW/7tkz00CpI
- s1ZkwLo/jnYg/+pcv36AOS67ILJqeg4=
-X-Proofpoint-GUID: W2ULtocGPFMhC15BcRBpqpOQwn2ZxdM1
-X-Proofpoint-ORIG-GUID: P-Phhgby7zkpBvcdJ2FtC3xNkItu3I62
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE5MDA4NCBTYWx0ZWRfX4wQRl1GNTyJy
- y6KtWKGFVROG23iXtdHAJT7D3DzMUl6CAG5coUAjfu1iqBRvkxoraAciKGj+nFZogZpyasDIcW6
- KdpvirBhQs3Xa0pl0nFqJWRTkmCDVsMPOBFGPlAqihQMmHf/L3QokvE4S4IzHMA142B/KPPxG+b
- noqeQNYXHpDvuhEFiZoQ346H6Zw6arNINK87P2vZguqhQOgztA1N7ofDh77g3hIbEM1vPRYw5ZL
- 2Pn63JANR/1viiPXR6PuqPAGl2ZMz2k0iKuy9oU9WRCs1vWV0sPWm32XQz60IuzjYVaZ+AHE10m
- 8P5Wztvefo6eQJ3jKWdu32KghWmHfv7+ZPULQ7vOd7hUX6L85qlCLUvnddhCcddj75EsE1XSth1
- EpCZ/YIcLG71xSYztDw8m88aIVNSNFsNZn70uWSAb7maCx9J3iJJKU+uNQSIrghHVLR2E+bj1Zn
- 7FehNqWdyInURF9GBoA==
-X-Authority-Analysis: v=2.4 cv=YM2vDxGx c=1 sm=1 tr=0 ts=6a3506fe cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=K-tenT1Ek76uFhoKguQA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-19_02,2026-06-18_03,2025-10-01_01
+References: <20260617093557.63880-3-sun.jian.kdev@gmail.com>
+ <2dad9b5c184fa101d7cffa1d8f5eea5b5df60f53533d98c68175c9e3ec5ee6ac@mail.kernel.org>
+ <CABFUUZFeh18OjQ6EhjD17ZwQKb1aiVNkYKv-hAkVGrHhPpjE4Q@mail.gmail.com>
+ <ajOv_oOd1zInaW1b@mail.gmail.com> <CABFUUZHCr=4kb7kSaaPGpc4nkyn32i-svD9v7ONF+TYrrQ-xaQ@mail.gmail.com>
+ <ajT3x2H0swzg4yhm@mail.gmail.com>
+In-Reply-To: <ajT3x2H0swzg4yhm@mail.gmail.com>
+From: sun jian <sun.jian.kdev@gmail.com>
+Date: Fri, 19 Jun 2026 17:08:35 +0800
+X-Gm-Features: AVVi8CcmPEP5XdoxB6X1yoIuhlHbMlAQ1h-E7WonW2hkMbAK-HKHfU53WVaNd10
+Message-ID: <CABFUUZE6uZDjaxa-ss9CYhjNTCt2Z_ND1S6-nGvCLg7hDLTEQg@mail.gmail.com>
+Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Cover partial copy of
+ non-linear test_run output
+To: Paul Chaignon <paul.chaignon@gmail.com>
+Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org, 
+	john.fastabend@gmail.com, sdf@fomichev.me, toke@redhat.com, 
+	lorenzo@kernel.org, martin.lau@kernel.org, clm@meta.com, 
+	ihor.solodrai@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300658-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:paul.chaignon@gmail.com,m:bot+bpf-ci@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:toke@redhat.com,m:lorenzo@kernel.org,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:paulchaignon@gmail.com,m:bot@kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Sunil.Goutham@marvell.com,m:naveenm@marvell.com,m:hkalra@marvell.com,m:nshettyj@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-300659-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me,meta.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AFC6A6A4DE1
+X-Rspamd-Queue-Id: 3EA6B6A4E02
 
-From: Harman Kalra <hkalra@marvell.com>
+On Fri, Jun 19, 2026 at 4:03=E2=80=AFPM Paul Chaignon <paul.chaignon@gmail.=
+com> wrote:
+>
+> On Thu, Jun 18, 2026 at 06:45:18PM +0800, sun jian wrote:
+> > On Thu, Jun 18, 2026 at 4:44=E2=80=AFPM Paul Chaignon <paul.chaignon@gm=
+ail.com> wrote:
+> > >
+> > > On Wed, Jun 17, 2026 at 10:19:52PM +0800, sun jian wrote:
+> > > > On Wed, Jun 17, 2026 at 6:31=E2=80=AFPM <bot+bpf-ci@kernel.org> wro=
+te:
+>
+> [...]
+>
+> > > > I tried reusing pkt_v4 and the existing TC program, but they do not=
+ fit
+> > > > the skb case this test is trying to cover.
+> > > >
+> > > > For skb test_run, IPv4/IPv6 inputs with a too-short L3 header in th=
+e
+> > > > linear area are rejected before bpf_test_finish(). With pkt_v4 and =
+a
+> > > > linear area of ETH_HLEN, the test fails with -EINVAL before reachin=
+g the
+> > > > partial copy-out path. If the linear area is increased enough to pa=
+ss the
+> > > > IPv4 check, pkt_v4 is too small to both trigger the old
+> > > > copy_size - frag_size path and verify that the copied prefix spans =
+the
+> > > > linear data and the first fragment. pkt_v6 has the same issue: afte=
+r
+> > > > making the IPv6 header linear, only 20 bytes remain in frags.
+> > > >
+> > > > The existing test_pkt_access program has its own packet-access cove=
+rage
+> > > > goals and is not just a pass-through carrier. With such a short lin=
+ear
+> > > > area or small packet fixture, it can fail before the test hits the
+> > > > bpf_test_finish()'s partial copy-out path. A pass-through TC progra=
+m is
+> > > > therefore a better fit, because it keeps the test focused on the
+> > > > bpf_test_finish() copy-out semantics.
+> > >
+> > > If we're keeping tc_pass_prog() then can't we use pkt_v4 and get rid =
+of
+> > > init_pkt?
+> > >
+> >
+> > pkt_v4 is too small to construct a meaningful nonlinear skb with a stab=
+le
+> > linear/frag split while still exercising the partial copy-out boundary =
+in
+> > bpf_test_finish().
+> >
+> > With pkt_v4, we either do not reach a fragmented layout, or lose contro=
+l over
+> > the linear/frag boundary needed to exercise the regression path.
+>
+> I think I'm missing something. Why can't we use pkt_v4 with
+> tc_pass_prog() and a linear area of ETH_HLEN? That would leave 42 bytes
+> of non-linear area, so a SHORT_OUT_LEN of 30 should work to trigger the
+> bug, no?
+>
 
-There are three ways in which a KPU profile can be loaded
-(in high to low priority order):
-1. profile image integrated in kernel image
-2. firmware database method
-3. default profile
+I should have made that part clearer. With a linear area of ETH_HLEN, the
+skb test_run path fails before reaching bpf_test_finish(). After
+eth_type_trans(), skb->data is advanced past the Ethernet header, so the
+remaining linear L3 area is 0. The short IPv4 input check then rejects the
+packet with -EINVAL.
 
-In most cases the profile is loaded using the 2nd method, which
-causes a spurious warning from the Linux firmware subsystem (method 1)
-due to the absence of firmware in the kernel image.
+To pass that check with pkt_v4, the linear area has to include the IPv4
+header as well, i.e. ETH_HLEN + sizeof(struct iphdr). That leaves only abou=
+t
+20 bytes in frags, so a SHORT_OUT_LEN of 30 no longer triggers the old
+copy_size - frag_size < 0 path.
 
-Replace request_firmware_direct() with firmware_request_nowarn() to
-suppress such warnings when no image is integrated into the kernel image.
-
-Fixes: cf2437626502 ("octeontx2-af: suppress external profile loading warning")
-Signed-off-by: Harman Kalra <hkalra@marvell.com>
-Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 4994385a822b..a2de7f1c6c22 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -1966,7 +1966,7 @@ void npc_load_kpu_profile(struct rvu *rvu)
- 	 * Firmware database method.
- 	 * Default KPU profile.
- 	 */
--	if (!request_firmware_direct(&fw, kpu_profile, rvu->dev)) {
-+	if (!firmware_request_nowarn(&fw, kpu_profile, rvu->dev)) {
- 		dev_info(rvu->dev, "Loading KPU profile from firmware: %s\n",
- 			 kpu_profile);
- 		rvu->kpu_fwdata = kzalloc(fw->size, GFP_KERNEL);
--- 
-2.48.1
-
+> >
+> > This test uses a 9000B packet so it does not depend on small-packet
+> > allocation details. Smaller packets might work depending on allocation
+> > state, but 9000B reliably gives us a non-linear skb with page frags and=
+ a
+> > stable linear/frag boundary for the copy-out regression.
+> >
+> > init_pkt() is needed to ensure deterministic byte content across both l=
+inear
+> > and fragmented regions so that the memcmp-based validation is stable.
+> >
+> > Thanks,
+> > Sun Jian
+> >
+> >
+> > > >
+> > > > For XDP, this object does not have an existing xdp.frags pass-throu=
+gh
+> > > > program, so the small XDP frags program is needed to cover the othe=
+r
+> > > > caller of the shared bpf_test_finish() path.
+> > > >
+> > > > Thanks,
+> > > > Sun Jian
 
