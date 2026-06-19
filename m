@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-300599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fYSYH2nZNGrziQYAu9opvQ
-	(envelope-from <netdev+bounces-300599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:53:45 +0200
+	id Ih7fA8LZNGoSigYAu9opvQ
+	(envelope-from <netdev+bounces-300600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:55:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 421A36A3FFD
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:53:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872216A4021
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:55:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=c9o4mGhN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300599-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300599-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	dkim=pass header.d=linux.microsoft.com header.s=default header.b=CVomVZZI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300600-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300600-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.microsoft.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B07E93025B80
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 05:53:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C99073098064
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 05:54:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE13345729;
-	Fri, 19 Jun 2026 05:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920A8344DAA;
+	Fri, 19 Jun 2026 05:54:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33923438A4;
-	Fri, 19 Jun 2026 05:53:35 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5DD344D8D;
+	Fri, 19 Jun 2026 05:53:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781848420; cv=none; b=Astl9+GYtnTypozooQ3npOzQNxxU77MeLjOadepA5M5x/KION9t99jWrWb5GwU1rxITWcUAhEuYCYDQ3oBmFia8ldk2EeKUM0Zh7ZyF7A0I7vnigbdIcVeFMkVLfjIPOwwl7Poj9ZmeHyRXV7SN7sHIK3jnYMgCbbgk3s3EZpPw=
+	t=1781848440; cv=none; b=knRDxJ2Qdtm4BRyRqjPCoCy8mjpXYO8Dbck2fmeijyrtfBSvg+nApQnWmUvpG3t5XlIwKF2JsENqJHa2cX8h4Y8IMUVi5fn62/KoWc/qWTHJ6BjgtWqO//waFWuPDStwVsrAvlHjjG76uQHxqSCFijBVZ3FPv8i8aze5fvipvHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781848420; c=relaxed/simple;
-	bh=pwU0m4lyd8j1X2A4VZl6+KScuVNCBF0yEhTZlNEn3+g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NLBxUg3Vk3lK3SALyhOvjSQMEx9GwAZN6ykFPhyFufQMLCR4uI2KuaeOlvwbaZGo/3ZDO7rmZ0VnusAXK7iHFiw8705LpxI+wlweeby+T2dMsZ+YOxh1FucjuA5j1st1LK6FYJxaKit4Sbvqhl0XjIxntfPQ2xKNZHnY6dyL+uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=c9o4mGhN; arc=none smtp.client-ip=45.254.49.197
-Received: from PC-202605011814.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 42ff5c258;
-	Fri, 19 Jun 2026 13:48:20 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Simon Horman <horms@kernel.org>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
+	s=arc-20240116; t=1781848440; c=relaxed/simple;
+	bh=/GYwtyj4OiwSnfQ1NkHHQpVoUWEX0p5XIzUtXUf6Fgw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ijG1aRlm2p9kO6V/SYSfTUeMa1pf5wuxIDxQagb18sUZUfcaG2xVd0MyHuOi9iE/mK3FABmWo0lZ025WLaHwVD9EuOhfpTqB/uQ7I5DhMwN4rKrJIUIoFn+0AioP5E6w02jHSiDwHHzGXozL55I/1tXKoOa6x9C/lQwcwf36T+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=CVomVZZI; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 7786820B7168; Thu, 18 Jun 2026 22:53:52 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7786820B7168
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1781848432;
+	bh=djzZlvhhSVxdzxt5Tfjo+wj0N0UWQ5SDaG8r7yyi7oQ=;
+	h=From:To:Subject:Date:From;
+	b=CVomVZZIgStxfhkcyelsx9ZfoAg2ofDMrPEhYWSHWom7owo3p61oBd2gr0gP4/nL/
+	 WgrexreV8oAx/lrUxeSAH5kloCBvk+TwuHrnTu9RLDrqbsm3LRYhEtoY/dORLIV8H8
+	 pEN93sDZvrjyJvXoWBx1Wl4EmWpPMI2JXwzNL/UA=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dipayanroy@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	jacob.e.keller@intel.com,
+	ernis@linux.microsoft.com,
+	horms@kernel.org,
+	gargaditya@linux.microsoft.com,
+	kees@kernel.org,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	runyu.xiao@seu.edu.cn,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] net/smc: avoid recursive sk_callback_lock in listen data_ready
-Date: Fri, 19 Jun 2026 13:48:15 +0800
-Message-Id: <20260619054815.176764-1-runyu.xiao@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260617152855.1039151-1-runyu.xiao@seu.edu.cn>
-References: <20260617152855.1039151-1-runyu.xiao@seu.edu.cn>
+	bpf@vger.kernel.org
+Subject: [PATCH net] net: mana: Fall back to standard MTU when PF reports adapter_mtu of 0
+Date: Thu, 18 Jun 2026 22:53:38 -0700
+Message-ID: <20260619055348.467224-1-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,142 +74,116 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9ede6c4ccc03a1kunm905fb605c0aad
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaH0tOVh5CT0saH0xJGEweTVYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSE
-	pPSExVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=c9o4mGhNnuIp1FH4m4iDWfO8zpzxV8lY6OnmEmhimTACoKeaJ8UmvJsqnqrokI+IvQeveSH8bVWEBwSwlex9k7fhA3Fe2M8y/ylW6xEhO9YQVSbaa8al2E4wshTiiInJdVuHxaQ7NlBoQEaBs8AvU0K9oh2oqARndIOdRP0Zpwg=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=y3r//VB8rHOFLln9YAyOG3ki0d6Mj/h1cPOiZugptRA=;
-	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300599-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:runyu.xiao@seu.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300600-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dipayanroy@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:jacob.e.keller@intel.com,m:ernis@linux.microsoft.com,m:horms@kernel.org,m:gargaditya@linux.microsoft.com,m:kees@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 421A36A3FFD
+X-Rspamd-Queue-Id: 872216A4021
 
-smc_listen() installs smc_clcsock_data_ready() as the underlying TCP
-listen socket's sk_data_ready callback.  The callback takes
-sk_callback_lock before looking up the SMC listener and queuing
-smc_tcp_listen_work().
+Commit d7709812e13d ("net: mana: hardening: Validate adapter_mtu from
+MANA_QUERY_DEV_CONFIG") rejected any adapter_mtu value smaller than
+ETH_MIN_MTU + ETH_HLEN, including 0, returning -EPROTO and failing
+mana_probe().
 
-This can recurse when the underlying TCP listen socket is being closed.
-The close/flush path may invoke the installed sk_data_ready callback with
-sk_callback_lock already held, so smc_clcsock_data_ready() tries to take
-the same rwlock again in the same thread.
+Some older PF firmware versions still in the field report
+adapter_mtu as 0 in the MANA_QUERY_DEV_CONFIG response. With the
+hardening check in place, the MANA VF driver now fails to load on
+those hosts, breaking networking entirely for guests.
 
-This issue was found by our static analysis tool and then manually
-reviewed against the current tree.  The reproducer keeps the SMC listen
-callback installation path:
+MANA hardware always supports the standard Ethernet MTU. Treat a
+reported adapter_mtu of 0 as "the PF did not advertise a value" and
+fall back to ETH_FRAME_LEN, the same value used for the pre-V2
+message version path. Only jumbo frames remain unavailable until
+the PF reports a valid MTU.
 
-  smc_listen()
-  smc_clcsock_replace_cb()
-  sk_data_ready = smc_clcsock_data_ready()
+Other small-but-nonzero bogus values are still rejected, preserving
+the original protection against the unsigned-subtraction wrap that
+would otherwise let ndev->max_mtu underflow to a huge value.
 
-It then models the close/flush carrier that invokes the installed
-sk_data_ready callback while sk_callback_lock is already held.  Lockdep
-reports the same-thread recursive acquisition:
-
-  WARNING: possible recursive locking detected
-  kworker/u4:3/39 is trying to acquire lock:
-    (sk_callback_lock) at smc_clcsock_data_ready+0xa/0x4d
-
-  but task is already holding lock:
-    (sk_callback_lock) at smc_close_flush_work+0xc/0x30
-
-  Possible unsafe locking scenario:
-
-        CPU0
-        ----
-        lock(sk_callback_lock);
-        lock(sk_callback_lock);
-
-  *** DEADLOCK ***
-
-  Workqueue: smc_close_wq smc_close_flush_work
-
-  Call Trace:
-    dump_stack_lvl
-    __lock_acquire
-    lock_acquire
-    _raw_read_lock_bh
-    smc_clcsock_data_ready
-    smc_close_flush_work
-    process_one_work
-    worker_thread
-    kthread
-    ret_from_fork
-
-The same pattern was fixed for nvmet TCP by checking TCP_LISTEN before
-taking sk_callback_lock:
-
-  commit 2fa8961d3a6a ("nvmet-tcp: fixup hang in
-  nvmet_tcp_listen_data_ready()")
-
-Do the same for SMC.  smc_clcsock_data_ready() is installed by
-smc_listen() on the underlying TCP listen socket and only queues
-smc_tcp_listen_work() for the SMC listen/accept path.  Once that socket is
-no longer in TCP_LISTEN, there is no listen accept work to queue from this
-callback, and avoiding sk_callback_lock also avoids the recursive locking
-path.
-
-Fixes: 0558226cebee ("net/smc: Fix slab-out-of-bounds issue in fallback")
-Cc: stable@vger.kernel.org
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Fixes: d7709812e13d ("net: mana: hardening: Validate adapter_mtu from MANA_QUERY_DEV_CONFIG")
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
 ---
-v2:
-- Include the fuller Lockdep stack from the grounded reproducer.
-- Add the related nvmet TCP fix reference.
-- Explain why the TCP_LISTEN check is valid for the SMC listen callback.
+ drivers/net/ethernet/microsoft/mana/mana_bpf.c |  3 ++-
+ drivers/net/ethernet/microsoft/mana/mana_en.c  | 16 ++++++++++++++--
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
- net/smc/af_smc.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 6421c2e1c84d..1af4e3c333ff 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -2631,6 +2631,9 @@ static void smc_clcsock_data_ready(struct sock *listen_clcsock)
- {
- 	struct smc_sock *lsmc;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_bpf.c b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+index b5e9bb184a1d..53308e139cbe 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+@@ -237,7 +237,8 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
+ 		bpf_prog_put(old_prog);
  
-+	if (READ_ONCE(listen_clcsock->sk_state) != TCP_LISTEN)
-+		return;
-+
- 	read_lock_bh(&listen_clcsock->sk_callback_lock);
- 	lsmc = smc_clcsock_user_data(listen_clcsock);
- 	if (!lsmc)
+ 	if (prog)
+-		ndev->max_mtu = MANA_XDP_MTU_MAX;
++		ndev->max_mtu = min_t(unsigned int, MANA_XDP_MTU_MAX,
++				      gc->adapter_mtu - ETH_HLEN);
+ 	else
+ 		ndev->max_mtu = gc->adapter_mtu - ETH_HLEN;
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 87862b0434c7..7438ea6b3f26 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1233,12 +1233,24 @@ int mana_gd_query_device_cfg(struct gdma_context *gc, u32 proto_major_ver,
+ 	*max_num_vports = resp.max_num_vports;
+ 
+ 	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V2) {
+-		if (resp.adapter_mtu < ETH_MIN_MTU + ETH_HLEN) {
++		if (resp.adapter_mtu == 0) {
++			/*
++			 * Some older PF firmware versions report an
++			 * adapter_mtu of 0. MANA hardware always supports the
++			 * standard Ethernet MTU, so fall back to ETH_FRAME_LEN.
++			 * Jumbo frames will not be available in this case.
++			 */
++			dev_info(dev,
++				 "PF reported adapter_mtu of 0, falling back to %u (jumbo frames disabled)\n",
++				 ETH_FRAME_LEN);
++			gc->adapter_mtu = ETH_FRAME_LEN;
++		} else if (resp.adapter_mtu < ETH_MIN_MTU + ETH_HLEN) {
+ 			dev_err(dev, "Adapter MTU too small: %u\n",
+ 				resp.adapter_mtu);
+ 			return -EPROTO;
++		} else {
++			gc->adapter_mtu = resp.adapter_mtu;
+ 		}
+-		gc->adapter_mtu = resp.adapter_mtu;
+ 	} else {
+ 		gc->adapter_mtu = ETH_FRAME_LEN;
+ 	}
 -- 
 2.34.1
+
 
