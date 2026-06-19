@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-300619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300622-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id queCKizpNGqfjwYAu9opvQ
-	(envelope-from <netdev+bounces-300619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:01:00 +0200
+	id k0cxJEbpNGqqjwYAu9opvQ
+	(envelope-from <netdev+bounces-300622-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:01:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 248626A430C
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:01:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFA786A431F
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:01:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=Xo4awvyM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300619-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300619-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=xih1w9Ds;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300622-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300622-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=simonwunderlich.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D23AD30053EB
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:00:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F91230547E3
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A67230BF66;
-	Fri, 19 Jun 2026 07:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D6634D4CE;
+	Fri, 19 Jun 2026 07:00:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FED40D59A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F6286331
 	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 07:00:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781852458; cv=none; b=X4j4TDYJJfQaqaQF7Un/KYfqcR19Bi6uKPLGeguzbA+tKKKhcu4jtaGqAWDXBNCgU2Ft64qf0IIgnsDdWvAsPb9Hm5mIr3H0M0poToSm2e4xCqWAT9yZVWooGg6uOcNHdMzqqJCrG1QaROoldJqi5BbjUMXvcGELVHObU2LtB64=
+	t=1781852459; cv=none; b=qvuvJk3QnbRI1A0HJTddM9NjMKbhinCIfNT3dQW+t3cLkrFjd+Ou3gvUxYR8NmzydRmDzgN9M2a1i3oY2GKsNnsF+XhFAh3kd3PdwccJnOfu91uhUzf+/y1yIbuxa8kZsohEa/DipOvwCR2JVHo52qbB8WvVbsavagkYY0IzJmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781852458; c=relaxed/simple;
-	bh=CAefpSvvnYNWW8ETWr/q3lSMNrR+IMo3pNludyMat0Q=;
+	s=arc-20240116; t=1781852459; c=relaxed/simple;
+	bh=jYxrVktz1DZnJkxTVW3GczDkrqYLzY/sUQ/BDMuiYz8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RdZknE39gvqC5yaC4WroOAaXL4+pg1EE2sttq+Q/Xd6he+JG/kIcXydRwu3yaixmLKNRkcuwlrH/15NfGHCWsdWF1BVx8vFqpD2bhMLtWj1pTKKCM3jmz5BTpX11S2k3TPQCUBc/qQA4LDriZXbQFuXC3kGCmVQ0GqpNZpWW3Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=Xo4awvyM; arc=none smtp.client-ip=23.88.38.48
+	 MIME-Version; b=ZFNOoJXA2oVF7UmGAALAOsObItjFYXPuSmfrx1PZapKO7ejSYYcj84HEZzec0u86HapwDlLDwv7UaqU0FXl+gaArELB0NSz0UkiRx5YrYmEL8oY3lebudyf8bfpbid0qPym3JQ+/0KmaEUyYJzZE58hyl6L1Buaz9+hL63AqydU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=xih1w9Ds; arc=none smtp.client-ip=23.88.38.48
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1781852451;
+	s=09092022; t=1781852452;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XuA1MAFUn/UG5BjiMRIG4JPFQHZyADK8pcBQ8VRiPsM=;
-	b=Xo4awvyMX0rGla0NA0uui5TQegMjLQsCyDiDVgqYBCl0FQFDJzRsZ4xh7B+RpAwE3Tai+e
-	jsgaShac/FcvsEcTmqN6g33SgLr64bfAVybiS61rZE2EvqXcGN3LwkqKA/5UIOqARfXFVm
-	BeExKIXhBzK/JDQOFFtFW4/MP8TzfT5p8lNt/RW3PcPuqsMTy9tFoWB5Wbl0dsLQE+zHYF
-	YADPXdOactoQoBPWC359GOEftNg/QiqCd/sN25e0OPXoJlIQNdjQxuLZg8KUUOHrQdGjnQ
-	JZoqZqX1LVZR+DwfXEs3Y+RjO9fAtYicxaqZdhMD/d/U8W39KoccVYfXupuJsA==
+	bh=2kBmYM7cKZK+VnBuVFOAYovV9CgsOEsRM5SEqnA1Xz0=;
+	b=xih1w9DscKlEeeP/K1YS57wWF1iTZZIASHTXIFui/mHEcuSr33VHknvnEuX+EkYzf6dJ9H
+	Zeu6KLHPENAv/a+SsW9ZMVhZnsJsVDbftxyeLMjYVbz6EoD0ORpTeOB1xZz7KxVG7X9jm2
+	4v2yY2XWmXVIYLvUBSeeqx1mE5MEfHpiuTkS1fZvSj4WQX14r3Vwayqbzvatn0nOjv6B1X
+	uhzn5ik68qCyzmfTVmPzMWoTWSdmwesu9zyEV+t5hfMhDivKfQg1TOW8wZtr3/1ADd3mNZ
+	jRK0GcyH9Resot8DUUyW3MfQebSz4FGVoR/FloEF2scA/VUQAhQFKbWnRQnAng==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -57,9 +57,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Sven Eckelmann <sven@narfation.org>,
 	stable@kernel.org,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 06/15] batman-adv: v: prevent OGM aggregation on disabled hardif
-Date: Fri, 19 Jun 2026 09:00:36 +0200
-Message-ID: <20260619070045.438101-7-sw@simonwunderlich.de>
+Subject: [PATCH net 07/15] batman-adv: tp_meter: restrict number of unacked list entries
+Date: Fri, 19 Jun 2026 09:00:37 +0200
+Message-ID: <20260619070045.438101-8-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260619070045.438101-1-sw@simonwunderlich.de>
 References: <20260619070045.438101-1-sw@simonwunderlich.de>
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300619-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300622-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:stable@kernel.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
@@ -103,102 +103,120 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 248626A430C
+X-Rspamd-Queue-Id: DFA786A431F
 
 From: Sven Eckelmann <sven@narfation.org>
 
-When an interface gets disabled, the worker is correctly disabled by
-batadv_hardif_disable_interface() -> ... -> batadv_v_ogm_iface_disable().
-In this process, the skb aggr_list is also freed.
+When the unacked_list is unbound, an attacker could send messages with
+small lengths and appropriated seqno + gaps to force the receiver to
+allocate more and more unacked_list entries. And the end either causing an
+out-of-memory situation or increase the management overhead for the (large)
+list that significant portions of CPU cycles are wasted in searching
+through the list.
 
-But batadv_v_ogm_send_meshif() can still queue new skbs (via
-batadv_v_ogm_queue_on_if()) to the aggr_list. This will only stop after all
-cores can no longer find the RCU protected list of hard interfaces. These
-queued skbs will never be freed or consumed by batadv_v_ogm_aggr_work.
-
-The batadv_v_ogm_iface_disable() function must block
-batadv_v_ogm_queue_on_if() to avoid leak of skbs.
+When limiting the list to a specific number, it is important to still
+correctly add a new entry to the list. But if the list became larger than
+the limit, the last entry of the list (with the highest seqno) must be
+dropped to still allow the earlier seqnos to finish and therefore to
+continue the process. Otherwise, the process might get stuck with too high
+seqnos which are not handled by batadv_tp_ack_unordered().
 
 Cc: stable@kernel.org
-Fixes: f89255a02f1d ("batman-adv: BATMAN_V: introduce per hard-iface OGMv2 queues")
+Fixes: 33a3bb4a3345 ("batman-adv: throughput meter implementation")
 Signed-off-by: Sven Eckelmann <sven@narfation.org>
 Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 ---
- net/batman-adv/bat_v.c     |  1 +
- net/batman-adv/bat_v_ogm.c | 12 ++++++++++++
- net/batman-adv/types.h     |  6 ++++++
- 3 files changed, 19 insertions(+)
+ net/batman-adv/tp_meter.c | 23 ++++++++++++++++++++++-
+ net/batman-adv/types.h    |  3 +++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/net/batman-adv/bat_v.c b/net/batman-adv/bat_v.c
-index fe7c0113d0df3..db6f5bdcaa985 100644
---- a/net/batman-adv/bat_v.c
-+++ b/net/batman-adv/bat_v.c
-@@ -817,6 +817,7 @@ void batadv_v_hardif_init(struct batadv_hard_iface *hard_iface)
+diff --git a/net/batman-adv/tp_meter.c b/net/batman-adv/tp_meter.c
+index 7e98cbfbbb70d..259ac8c307359 100644
+--- a/net/batman-adv/tp_meter.c
++++ b/net/batman-adv/tp_meter.c
+@@ -87,6 +87,11 @@
+ #define BATADV_TP_PLEN (BATADV_TP_PACKET_LEN - ETH_HLEN - \
+ 			sizeof(struct batadv_unicast_packet))
  
- 	hard_iface->bat_v.aggr_len = 0;
- 	skb_queue_head_init(&hard_iface->bat_v.aggr_list);
-+	hard_iface->bat_v.aggr_list_enabled = false;
- 	INIT_DELAYED_WORK(&hard_iface->bat_v.aggr_wq,
- 			  batadv_v_ogm_aggr_work);
- 	/* make sure it doesn't run until interface gets enabled */
-diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
-index 81926ef9c02c9..95efd8a43c79d 100644
---- a/net/batman-adv/bat_v_ogm.c
-+++ b/net/batman-adv/bat_v_ogm.c
-@@ -254,11 +254,18 @@ static void batadv_v_ogm_queue_on_if(struct batadv_priv *bat_priv,
++/**
++ * BATADV_TP_MAX_UNACKED - maximum number of packets a receiver didn't yet ack
++ */
++#define BATADV_TP_MAX_UNACKED 100
++
+ static u8 batadv_tp_prerandom[4096] __read_mostly;
+ 
+ /**
+@@ -1303,6 +1308,7 @@ static void batadv_tp_receiver_shutdown(struct timer_list *t)
+ 	list_for_each_entry_safe(un, safe, &tp_vars->common.unacked_list, list) {
+ 		list_del(&un->list);
+ 		kfree(un);
++		tp_vars->common.unacked_count--;
+ 	}
+ 	spin_unlock_bh(&tp_vars->common.unacked_lock);
+ 
+@@ -1416,6 +1422,7 @@ static bool batadv_tp_handle_out_of_order(struct batadv_tp_receiver *tp_vars,
+ 	/* if the list is empty immediately attach this new object */
+ 	if (list_empty(&tp_vars->common.unacked_list)) {
+ 		list_add(&new->list, &tp_vars->common.unacked_list);
++		tp_vars->common.unacked_count++;
+ 		goto out;
  	}
  
- 	spin_lock_bh(&hard_iface->bat_v.aggr_list.lock);
-+	if (!hard_iface->bat_v.aggr_list_enabled) {
-+		kfree_skb(skb);
-+		goto unlock;
+@@ -1446,12 +1453,24 @@ static bool batadv_tp_handle_out_of_order(struct batadv_tp_receiver *tp_vars,
+ 		 */
+ 		list_add(&new->list, &un->list);
+ 		added = true;
++		tp_vars->common.unacked_count++;
+ 		break;
+ 	}
+ 
+ 	/* received packet with smallest seqno out of order; add it to front */
+-	if (!added)
++	if (!added) {
+ 		list_add(&new->list, &tp_vars->common.unacked_list);
++		tp_vars->common.unacked_count++;
 +	}
 +
- 	if (!batadv_v_ogm_queue_left(skb, hard_iface))
- 		batadv_v_ogm_aggr_send(bat_priv, hard_iface);
++	/* remove the last (biggest) unacked seqno when list is too large */
++	if (tp_vars->common.unacked_count > BATADV_TP_MAX_UNACKED) {
++		un = list_last_entry(&tp_vars->common.unacked_list,
++				     struct batadv_tp_unacked, list);
++		list_del(&un->list);
++		kfree(un);
++		tp_vars->common.unacked_count--;
++	}
  
- 	hard_iface->bat_v.aggr_len += batadv_v_ogm_len(skb);
- 	__skb_queue_tail(&hard_iface->bat_v.aggr_list, skb);
-+
-+unlock:
- 	spin_unlock_bh(&hard_iface->bat_v.aggr_list.lock);
+ out:
+ 	spin_unlock_bh(&tp_vars->common.unacked_lock);
+@@ -1488,6 +1507,7 @@ static void batadv_tp_ack_unordered(struct batadv_tp_receiver *tp_vars)
+ 
+ 		list_del(&un->list);
+ 		kfree(un);
++		tp_vars->common.unacked_count--;
+ 	}
+ 	spin_unlock_bh(&tp_vars->common.unacked_lock);
  }
+@@ -1537,6 +1557,7 @@ batadv_tp_init_recv(struct batadv_priv *bat_priv,
  
-@@ -415,6 +422,10 @@ int batadv_v_ogm_iface_enable(struct batadv_hard_iface *hard_iface)
- {
- 	struct batadv_priv *bat_priv = netdev_priv(hard_iface->mesh_iface);
+ 	spin_lock_init(&tp_vars->common.unacked_lock);
+ 	INIT_LIST_HEAD(&tp_vars->common.unacked_list);
++	tp_vars->common.unacked_count = 0;
  
-+	spin_lock_bh(&hard_iface->bat_v.aggr_list.lock);
-+	hard_iface->bat_v.aggr_list_enabled = true;
-+	spin_unlock_bh(&hard_iface->bat_v.aggr_list.lock);
-+
- 	enable_delayed_work(&hard_iface->bat_v.aggr_wq);
- 
- 	batadv_v_ogm_start_queue_timer(hard_iface);
-@@ -432,6 +443,7 @@ void batadv_v_ogm_iface_disable(struct batadv_hard_iface *hard_iface)
- 	disable_delayed_work_sync(&hard_iface->bat_v.aggr_wq);
- 
- 	spin_lock_bh(&hard_iface->bat_v.aggr_list.lock);
-+	hard_iface->bat_v.aggr_list_enabled = false;
- 	batadv_v_ogm_aggr_list_free(hard_iface);
- 	spin_unlock_bh(&hard_iface->bat_v.aggr_list.lock);
- }
+ 	kref_get(&tp_vars->common.refcount);
+ 	timer_setup(&tp_vars->common.timer, batadv_tp_receiver_shutdown, 0);
 diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index 5fd5bd358a249..5e81c93b8217d 100644
+index 5e81c93b8217d..9fa8e73ff6e59 100644
 --- a/net/batman-adv/types.h
 +++ b/net/batman-adv/types.h
-@@ -145,6 +145,12 @@ struct batadv_hard_iface_bat_v {
- 	/** @aggr_list: queue for to be aggregated OGM packets */
- 	struct sk_buff_head aggr_list;
+@@ -1366,6 +1366,9 @@ struct batadv_tp_vars_common {
+ 	/** @unacked_lock: protect unacked_list */
+ 	spinlock_t unacked_lock;
  
-+	/**
-+	 * @aggr_list_enabled: aggr_list is active and new skbs can be
-+	 * enqueued. Protected by aggr_list.lock after initialization
-+	 */
-+	bool aggr_list_enabled:1;
++	/** @unacked_count: number of unacked entries */
++	size_t unacked_count;
 +
- 	/** @aggr_len: size of the OGM aggregate (excluding ethernet header) */
- 	unsigned int aggr_len;
+ 	/** @refcount: number of context where the object is used */
+ 	struct kref refcount;
  
 -- 
 2.47.3
