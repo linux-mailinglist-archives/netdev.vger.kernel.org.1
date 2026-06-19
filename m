@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-300746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300747-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LkcbFXCfNWqE1gYAu9opvQ
-	(envelope-from <netdev+bounces-300746-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:58:40 +0200
+	id r2YUOpqfNWqY1gYAu9opvQ
+	(envelope-from <netdev+bounces-300747-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:59:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27096A7976
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:58:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E9A6A7989
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:59:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=icloud.com header.s=1a1hai header.b="bcL/HJsz";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300746-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300746-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=icloud.com header.s=1a1hai header.b=giUBqQ25;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300747-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300747-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=icloud.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D93B8304DEAF
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 19:58:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 883A03064E2F
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 19:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349BA3ABD99;
-	Fri, 19 Jun 2026 19:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0087F3B27E9;
+	Fri, 19 Jun 2026 19:58:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.pv.icloud.com (pv-2005l-snip4-11.eps.apple.com [57.103.66.231])
+Received: from outbound.pv.icloud.com (pv-2005b-snip4-1.eps.apple.com [57.103.66.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06321345CA3
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 19:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03913749E3
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 19:58:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781899105; cv=none; b=TwQhlC2Y0922bVzvd4+doJD+UjHiQEUNfBwuwuqocU2wOUXawYGtDdHVgsivCk/Q+ccJrrN0yWs+Rz8wZQ6Pbl8PZbgCK915UDUtvmSP9EiCdBwib1+UU92z0x2fl23QI7OEZhFfz6Nu73x/DD28Gf7YV03xLHthzgCDVcTelfs=
+	t=1781899113; cv=none; b=hSejeLmo0DEDAe6679ZT6VuYHr2UtlY+YDmvqjEh7zCDZF40nl/LKH1sfNxwS+rj7U5PVa+fE6xiCFxcBYC2rwgT0kAVltNiifnfNpNSd/ZWQc0fswTxYtD0/gO5vkWNRWQ/oHi862cz7bd/dH5GncP6LditD1MDLUlJoLbcs5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781899105; c=relaxed/simple;
-	bh=abkzKRJ2ahL2DDAvpCD/1XKjeQzMX896bZFcUDKWunc=;
+	s=arc-20240116; t=1781899113; c=relaxed/simple;
+	bh=6uGn0GopFXIezIt1AfR5Ttqh7FWwt6oPkOUWciKbdCw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bsGzFR/k73i3Ql0qGihLX19cH/XCfWkvs3XgefJy7U+vnelOocsH3EyNYuH8nesqg8IUgHlzAs7tNA/i35pg0WXnYZVOVsfrJH76071mcPwsWCeCRbhfjl6m5xUeSSmE5y4RrTJeZIgxbS0Wfj7Cj5BBpjbc0LARJNXM+va0ohg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=bcL/HJsz; arc=none smtp.client-ip=57.103.66.231
+	 MIME-Version; b=B3oIEawhh6qMGKmg39ncepO5LMFo4JFKZlpcaKpKDspje67kKKVcSS7uyuYyG97NZKJqYEacLwIfMRvVg7XggKYGwJdIucQ0g/0UZVNzy7hX1089ZKkEtuJgrBAXV4It9GqVBhJX1X4oQIKOZ0QjQpsuMu5WI6SR/QwSVH9bcBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=giUBqQ25; arc=none smtp.client-ip=57.103.66.182
 Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-100-percent-11 (Postfix) with ESMTPS id ED2A2180010E;
-	Fri, 19 Jun 2026 19:58:20 +0000 (UTC)
-X-ICL-Out-Info: HUtFAUMEWwJACUgBTUQeDx5WFlZNRAJCTQpOHV8CXhxBAFYEWBcOVk1KEVcJXwpABFEbWg9eK1sTVRdGCRkIXR0ZHldQXgheH0wcHQ5YBhICWkUBXxcDVxxWRVwYQwldBVccHR1BRVsTVRdGCRkIXR0ZCEcfCjADQg5WA0MHRQAtGRxXUF4IXh9MHB0OWAYSHVAcDlEFWwBGCU4CVAZSB0cMQR1ZBlkHRBRKHh5eD1YYWApHBVQCUBl5EVABWB5WXloXXlMXH0sAXEVaDlsERxQ=
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1781899103; x=1784491103; bh=/JHpw/Y6YXDfEJ2X+/4MEbtrZiHImZ8h4NMn92pbpcU=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=bcL/HJsz6U4Y/HzlReDv/oO4H8oOxWx9KtlYcHT+f7qMEE4cTVcSuGXrR/w2MuDHvr6TlC68jX4uL52oymoyBhdQviYEdQffsltbqX2fP4QYWP/ALbd8MyMk84PKSYMVqOzpN6wTpJkqPpg9wH0Hw0JYVx07r+ecGUXJTB/Qf3C+jFANhecDc4sUFX0Uojq54nAQpOroCUG2fN9c5W0M8W3Ie2NUogKQ0jNKqh1hIr1aQTtc5NOcos8S/wAnw0s7Sd+Q8HGRDDgciZINZSts5vOI81QBQptzoUJnIb4hX21rvllN1YroO/EGdCtyIHNZ1xrpd5hY48jafQjq26voZA==
+	by p00-icloudmta-asmtp-us-west-1a-100-percent-11 (Postfix) with ESMTPS id 109F8180010D;
+	Fri, 19 Jun 2026 19:58:31 +0000 (UTC)
+X-ICL-Out-Info: HUtFAUMEWwJACUgBTUQeDx5WFlZNRAJCTQpOHV8CXhxBAFYEWBcOVk1KEVcJXwpABFEbWg9eK1sTVRdGCRkIXR0ZHldQXgheH0wcHQ5YBhICWkUBXBcDVxxWRVwYQwldBVccHR1BRVsTVRdGCRkIXR0ZCEcfCjADQg5WA0MHRQAtGRxXUF4IXh9MHB0OWAYSHVAcDlEFWwBGCU4CVAZSB0cMQR1ZBlkHRBRLHh5eD1YYWApHBVQCUBl5EVABWB5WXloXXlMXH0sAXEVaDlsERxQ=
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1781899112; x=1784491112; bh=uCzNyh9ez4ys8w28jvcLcpYoV8d+8g3nF2DPpTvrxL8=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=giUBqQ25koolVJBR+nXkdbkQNhd9Ibm/w5aNVnWZo/k5duQFaKW2fvI7VJe2U+VCnG0+UPUHwxuZllenpXgH1zYJIXmC+W/3lme3m1yHqAFOhDBaS1xV8FfXJtqwxeS6I2kJfiSaDXRz7PofSz8UsWnAeRzLLkZTDjhRpr+AamB9P7ngcT9cQC+Hr8931vH3ZtwQJcpvkNEdrarQRxnfcmoUYY9lgqLWogw6YPweJlem/qXNSUQScisDElmQ9zz0x4bxCYjtFNKCSPirDySqScYnP1wQTp8DeOOkycZ4N0qXjlQdEsFOBlGsuk9Ip8HsuuS0nNYd997L5T6+afgkLw==
 Received: from cibi (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-100-percent-11 (Postfix) with ESMTPSA id 8DE4E1800125;
-	Fri, 19 Jun 2026 19:58:14 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-west-1a-100-percent-11 (Postfix) with ESMTPSA id 3253E18000A9;
+	Fri, 19 Jun 2026 19:58:24 +0000 (UTC)
 From: Siddharth_Cibi <siddharthcibi@icloud.com>
 To: ast@kernel.org
-Cc: Siddharth C <siddharthcibi@icloud.com>,
+Cc: Siddharth_Cibi <siddharthcibi@icloud.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Stanislav Fomichev <sdf@fomichev.me>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Eduard Zingerman <eddyz87@gmail.com>,
 	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
@@ -62,12 +59,14 @@ Cc: Siddharth C <siddharthcibi@icloud.com>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	Jiri Olsa <jolsa@kernel.org>,
 	Emil Tsalapatis <emil@etsalapatis.com>,
+	Shuah Khan <shuah@kernel.org>,
 	netdev@vger.kernel.org (open list:XDP (eXpress Data Path)),
 	bpf@vger.kernel.org (open list:XDP (eXpress Data Path)),
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 1/2] bpf: preserve rx_queue_index across XDP redirects
-Date: Fri, 19 Jun 2026 19:57:57 +0000
-Message-ID: <20260619195759.41254-2-siddharthcibi@icloud.com>
+Subject: [PATCH 2/2] selftests/bpf: validate rx_queue_index in xdp_metadata
+Date: Fri, 19 Jun 2026 19:57:58 +0000
+Message-ID: <20260619195759.41254-3-siddharthcibi@icloud.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260619195759.41254-1-siddharthcibi@icloud.com>
 References: <20260619195759.41254-1-siddharthcibi@icloud.com>
@@ -78,14 +77,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE5MDE5MSBTYWx0ZWRfXz50Z1pmVn3Ir
- WkpKZHpg5JAR5uEqjhUaQaIrLXKzlVnFy4PKF1VZyodlhMbUIaOQGIbHUcExINvOgxG7TPjk1P1
- FNvAh/X9REAhq0XgW3O7KN6s1zD6Ecct3lQ1uVirjjcayfsSSakcvLq5jHm5eoRnAWTkB1VE364
- 9ciurTOqMGH0E/ydZYuBpcj1vr9JyH/55vNEe95vmhafNajCwIf7glpzDGURITcYfds2nEmFcUq
- S/KJsTJ+hTImnW1+fN0juDCGelm/1NDVKBTGhTnyDZmKwhvrVXIVUoECrRX2fdFTgxFxX+VuFPv
- M9j1QNGBj0ipD3up4Rn
-X-Proofpoint-ORIG-GUID: gsH6DdmmtnWjrESumUuan1cOtAplPPdq
-X-Proofpoint-GUID: gsH6DdmmtnWjrESumUuan1cOtAplPPdq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE5MDE5MSBTYWx0ZWRfX9Svem6twCxxP
+ 80KPU026J0U9zQLpjIO6SbsWQw9GFqIaIsRBMRiW3x6/BPOLVjRNf0sBlaSDoMhjPml3B92vqPd
+ APf+gf5zoCRfz2qpzsnBrB9nFLGjFHo0VsLoIvlKWMnKn/QzzK9Hg5A2PekoHdsJwF2yQ/KRMJs
+ Jj5BOZcWPRJ9/mWvLIGn2PGDgZ+inQsc6XVymDqwWoM6gbBmarnXxkWqbSKpJteoAxnxDXyYKaa
+ IZWvKF6W95YnzwpWh6W/VaHmm8OcT+fsECx+tSLMEfMwJ3WAXBpE7nwS4dfoqb/HDZqptV8rQtd
+ HNJgV1TB2UWX4Klvmow
+X-Proofpoint-ORIG-GUID: Db2CYb48ct3jrMupaRyZFvbMjivAXCot
+X-Proofpoint-GUID: Db2CYb48ct3jrMupaRyZFvbMjivAXCot
 X-Apple-Category-Label: MjA0NzgyOTUxNDY6JGNhdGVnb3J5JF9QZXJzb25hbCw=
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -94,18 +93,18 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300746-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300747-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[siddharthcibi@icloud.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[icloud.com,iogearbox.net,davemloft.net,kernel.org,gmail.com,fomichev.me,google.com,redhat.com,linux.dev,etsalapatis.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[icloud.com,iogearbox.net,davemloft.net,kernel.org,gmail.com,fomichev.me,linux.dev,etsalapatis.com,vger.kernel.org];
 	FREEMAIL_FROM(0.00)[icloud.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:siddharthcibi@icloud.com,m:daniel@iogearbox.net,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:siddharthcibi@icloud.com,m:daniel@iogearbox.net,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -118,102 +117,65 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[icloud.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,icloud.com:dkim,icloud.com:email,icloud.com:mid,icloud.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:dkim,icloud.com:email,icloud.com:mid,icloud.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A27096A7976
+X-Rspamd-Queue-Id: 83E9A6A7989
 
-From: Siddharth C <siddharthcibi@icloud.com>
+Extend xdp_metadata selftest coverage to validate that
+ctx->rx_queue_index is preserved and observable after XDP redirect
+execution.
 
-Store rx_queue_index in struct xdp_frame during xdp_buff to
-xdp_frame conversion and restore it when rebuilding xdp_rxq_info
-for cpumap and devmap execution paths.
-
-This preserves ingress RX queue information for XDP programs
-executed after redirect, allowing access to the original
-rx_queue_index instead of losing queue context.
-
-Also propagate rx_queue_index for zero-copy XDP frame conversion.
+Capture rx_queue_index in metadata and assert that it matches the
+expected queue during packet verification.
 
 Signed-off-by: Siddharth_Cibi <siddharthcibi@icloud.com>
 ---
- include/net/xdp.h   | 2 ++
- kernel/bpf/cpumap.c | 2 +-
- kernel/bpf/devmap.c | 5 ++++-
- net/core/xdp.c      | 1 +
- 4 files changed, 8 insertions(+), 2 deletions(-)
+ tools/testing/selftests/bpf/prog_tests/xdp_metadata.c | 3 ++-
+ tools/testing/selftests/bpf/progs/xdp_metadata.c      | 2 +-
+ tools/testing/selftests/bpf/xdp_metadata.h            | 1 +
+ 3 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index aa742f413c35..90318b2b76dc 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -301,6 +301,7 @@ struct xdp_frame {
- 	 */
- 	enum xdp_mem_type mem_type:32;
- 	struct net_device *dev_rx; /* used by cpumap */
-+	u32 rx_queue_index;
- 	u32 frame_sz;
- 	u32 flags; /* supported values defined in xdp_buff_flags */
- };
-@@ -441,6 +442,7 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+index 5c31054ad4a4..f8cabbbe7bb7 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+@@ -309,7 +309,8 @@ static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
  
- 	/* rxq only valid until napi_schedule ends, convert to xdp_mem_type */
- 	xdp_frame->mem_type = xdp->rxq->mem.type;
-+	xdp_frame->rx_queue_index = xdp->rxq->queue_index;
- 
- 	return xdp_frame;
+ 	if (!ASSERT_NEQ(meta->rx_hash, 0, "rx_hash"))
+ 		return -1;
+-
++	if (!ASSERT_EQ(meta->rx_queue_index, QUEUE_ID, "rx_queue_index"))
++        	return -1;
+ 	if (!sent_from_af_xdp) {
+ 		if (!ASSERT_NEQ(meta->rx_hash_type & XDP_RSS_TYPE_L4, 0, "rx_hash_type"))
+ 			return -1;
+diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
+index 09bb8a038d52..62ae83860d7f 100644
+--- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
++++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
+@@ -98,7 +98,7 @@ int rx(struct xdp_md *ctx)
+ 	bpf_xdp_metadata_rx_hash(ctx, &meta->rx_hash, &meta->rx_hash_type);
+ 	bpf_xdp_metadata_rx_vlan_tag(ctx, &meta->rx_vlan_proto,
+ 				     &meta->rx_vlan_tci);
+-
++	meta->rx_queue_index = ctx->rx_queue_index;
+ 	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
  }
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 5e59ab896f05..8f2d7013620f 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -197,7 +197,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
  
- 		rxq.dev = xdpf->dev_rx;
- 		rxq.mem.type = xdpf->mem_type;
--		/* TODO: report queue_index to xdp_rxq_info */
-+		rxq.queue_index = xdpf->rx_queue_index;
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
- 
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index dc7b859e8bbf..f419fa0e53e5 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -339,7 +339,7 @@ static int dev_map_bpf_prog_run(struct bpf_prog *xdp_prog,
- 				struct net_device *rx_dev)
- {
- 	struct xdp_txq_info txq = { .dev = tx_dev };
--	struct xdp_rxq_info rxq = { .dev = rx_dev };
-+	struct xdp_rxq_info rxq = { };
- 	struct xdp_buff xdp;
- 	int i, nframes = 0;
- 
-@@ -349,6 +349,9 @@ static int dev_map_bpf_prog_run(struct bpf_prog *xdp_prog,
- 		int err;
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
-+		rxq.dev = rx_dev;
-+		rxq.mem.type = xdpf->mem_type;
-+		rxq.queue_index = xdpf->rx_queue_index;
- 		xdp.txq = &txq;
- 		xdp.rxq = &rxq;
- 
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 9890a30584ba..9691d8dfadf3 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -606,6 +606,7 @@ struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp)
- 	xdpf->metasize = metasize;
- 	xdpf->frame_sz = PAGE_SIZE;
- 	xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
-+	xdpf->rx_queue_index = xdp->rxq->queue_index;
- 
- 	xsk_buff_free(xdp);
- 	return xdpf;
+diff --git a/tools/testing/selftests/bpf/xdp_metadata.h b/tools/testing/selftests/bpf/xdp_metadata.h
+index 87318ad1117a..1f0ae4c00091 100644
+--- a/tools/testing/selftests/bpf/xdp_metadata.h
++++ b/tools/testing/selftests/bpf/xdp_metadata.h
+@@ -49,4 +49,5 @@ struct xdp_meta {
+ 		__s32 rx_vlan_tag_err;
+ 	};
+ 	enum xdp_meta_field hint_valid;
++	__u32 rx_queue_index;
+ };
 -- 
 2.53.0
 
