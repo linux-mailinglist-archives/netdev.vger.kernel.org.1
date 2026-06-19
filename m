@@ -1,194 +1,183 @@
-Return-Path: <netdev+bounces-300708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300709-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vk1OGZUzNWp8ogYAu9opvQ
-	(envelope-from <netdev+bounces-300708-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 14:18:29 +0200
+	id X9xBMEg+NWo9pwYAu9opvQ
+	(envelope-from <netdev+bounces-300709-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 15:04:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E4C66A5A4C
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 14:18:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 188686A5ED0
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 15:04:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mEZTbgt2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300708-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300708-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=6wind.com header.s=google header.b=Dzhb3Z5k;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300709-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300709-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=6wind.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6CA353003817
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 12:18:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA7B03014DBE
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F025383C6B;
-	Fri, 19 Jun 2026 12:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C4B3839B9;
+	Fri, 19 Jun 2026 13:04:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848FD38239E;
-	Fri, 19 Jun 2026 12:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1987037E316
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 13:04:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781871502; cv=none; b=WHcj97NsjAT2V3h5jN7n6//pZf5i44jLxSi5zhtx4ztq96ADJ0HUFR+4ofpV+yKhr595tYZfG/9vR0TfRaYlXYU8q+wu7AVVYaCnMM4TNCtz8S0yr/0mk92VqQFRE1cshmk7b6zjCWL3ZyrJ+Jf8V7VJVFSfe1rLfKij7JdhFZU=
+	t=1781874245; cv=none; b=MBNUuKCUohFcwfGT5fPNWti0dxO/YvL9Qx+CVFR6SmchX3L2q4ifItrY5k1D/rRucWZV8KywZZz8vtt272OoPZ07gkRddXPjo9kvYt+KOs3LCAV/tARXEtDsYPxYdZ0zD255RY14mf5cZdu28yUCoVf9qJ98u7FkpthBpbjUwwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781871502; c=relaxed/simple;
-	bh=loXO152dCZ/8p/Q3pQSrnFMHeD/WGMH/2l+E9A6fAIU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uviGo7I7a6L9NKljw8dKYJs8RlXj89DIU3XrZ6Q9jMQfJTG1LOT1YsyPv3fkMPz6PFnDwxKqTXnHsw0MIMlQysuPS7OYmzXuzGkoj7d971wb8Xyu82sez+2CAgaPc5PMHgWA3phRXAlYrT3mXqqi0Wf4ark9aPONXlnhVZvILMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mEZTbgt2; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01EF41F000E9;
-	Fri, 19 Jun 2026 12:18:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781871499;
-	bh=Rq9fylMx8IUdw6G/VkTJPnm52IVP6IqHGRfVmafArTU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=mEZTbgt29HCkpzn5hlZeaxRuSnTmMZX6O1FFEkDvAcCKx+qREvM4OUTHba7Bl+MnQ
-	 y3GAiYkpHi3CnhSUnmaiURBBJegDv7fgBq9sOaNEkR9R6rAeCpiY9/pViSLnkhvSC9
-	 57nS/dJsQn1TQfeGvJTRy9uVt7GQgpfjEjTd3l6grjWSJUyOk4esAElXh5yNfyfg12
-	 Gdx+NKD+9kOjtyWS8EQvRDldTwLJeQSjMYowMGPucrorS3cL3OmXyPMcQKpCcbjJKu
-	 MNVl2mcac/jFQm90+ebscA+OrUrcuaaCkWoOyL6huRC+KVeOUTSxnvlaXbzlRHInFz
-	 h/OhzP9WkPvGg==
-From: Simon Horman <horms@kernel.org>
-To: zhaojinming@uniontech.com
-Cc: Simon Horman <horms@kernel.org>,
-	madalin.bucur@nxp.com,
-	sean.anderson@linux.dev,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: fman: fix clock and device node leak in probe error paths
-Date: Fri, 19 Jun 2026 13:13:30 +0100
-Message-ID: <20260619121328.922138-3-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260618075435.1262533-1-zhaojinming@uniontech.com>
-References: <20260618075435.1262533-1-zhaojinming@uniontech.com>
+	s=arc-20240116; t=1781874245; c=relaxed/simple;
+	bh=ZBpbbsWUFlyvu7VP+YrZv4wJ8Vf5XVvvTY6/lGa61Qg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kfie8Mg681b4/gsGv6R4roj2nu4yc+QAoNJrhNKAXgK9uI5MorqcmrNXnUfoviCuNBfhhflWaRXDdRYmuE5kzB0S1y10Krr1igSNoS/7U5ZAeqLH7FTdypGB4geewbocn1ccJnrs9O8Z4XiXSTUu2jVqnY+gn11NZYb2CN/lylI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Dzhb3Z5k; arc=none smtp.client-ip=209.85.128.50
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-490b1df16acso1798245e9.3
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 06:04:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1781874242; x=1782479042; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VDxXrwPz6AmvaNhK8pjhvQJCVmDB3Bue1bOTEogDoeM=;
+        b=Dzhb3Z5kkMinDPMysobpjM6cTohyOKgPlw7sUKmPaiEIC0WJnQxJK5cLLkyxqEOvbZ
+         CRxEQvF+UXBZ/RyBHVekZTLuzLlFoSWHtF7a3D3gZS6CS+VUnHja40enZEoTqwoxIDkn
+         pw4witEj2SKkrl2RwJwjJ2x0W12T3nP424wC5XyWxMl4AZvprXQM2LTQG1nWhIP9gMP6
+         PqfBwaUMnoYfkiuJj/qZ0PzsKGG/5D6t6nYC5wERsRzGT4ZvSe4GdIeFm3XCMO6k/Mez
+         twv75wfJngrs246sAX1pfrDSL/0lrLKavH66An98vH9nvwAee6TcbqBPSFwUj+ediCfw
+         feig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781874242; x=1782479042;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VDxXrwPz6AmvaNhK8pjhvQJCVmDB3Bue1bOTEogDoeM=;
+        b=RuMzeaBYQl765HW7NP80qdP6yMAlJSp4uTc0EXByX1t4atoFaPcbMSW+QE3o3NE0mm
+         +lsmWERr+M2f6HEsM8ZGkvkDHznTW2L4QXJlcE7C4QquOiWtr006yDQGnPohJJtWTHwn
+         tvw3sebyH2wR5Rx7YqFH+ZtJ08Ni4rQfayqnSPV2pz0PzoFw1fsOOiytaOm3vmRB+xmO
+         6VG/mJucambDiKeeLNYtHKuLtO1ZtTaS6FttUQvsRexl18W4UuVImnCF/EIOc1u6f7np
+         cvITr42Pfzw+epcp5QIVmJbGBRh99UQ1IDgkW8K2w536H92KXGj3iIP48BuPA/Z5otp5
+         bgMg==
+X-Forwarded-Encrypted: i=1; AFNElJ84eqeqGnmPJY69m8TW1SZKeL7CYym+wo+FS12SwMm8ubKGFgrWRHnRstfKbYXww9K4yb/Qh6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweHAwCrroipzUIEcYLU5UCw2INk/QXnZDJJOCkQUSan/oV+qjT
+	Z2qSRoQwZbMpgd4H2YbT2m1mBOE4Voxx31mG8GIElJJ808Ilk7nFdESUwMsJO1UgOBE=
+X-Gm-Gg: AfdE7cnaa/kYBz3vZHFzNKTlo8U39yXto8smnqgeV++ebkdqrauYuxfTujPKZ2ShtI6
+	pouXh923BUj/CfE9m7ps3mbcNvImJLu4+EisNo2vViHafliKyRoUOKqECQ76Na074a8w9Sqx5A5
+	cmxM3f+hoKbAYL+aa8JOfOz/wvfOH+p5zk3iuBx3ONdVs3kH/12C3YuvwQW/ZELiBFC7JdTJG9O
+	w4pfLiloHET5cP7kiZsja6an08CFzzlWTaIhHf0VLQKVj0J74rYwPDrKD6qSHEd0XgDkM9VYhIS
+	sqStw8/URAQGsOLeSYPvQA4dPr3qOaphv63Ayj9AJibUyccWCYoDGm3hXCqhng141ZPt69wcvVH
+	31KU7QfVtFo1HHyq+FMl1vNkKdXudIwBSHLGJaTW2JITs/GXjeU+7mybsirC8LFYZM19LDUGLuh
+	i7d2u+K6YRupSWjetJhNonT4yfids10wxl12yKjmfnFrDw+KKJzcgha1OdGhZ0X483Jg==
+X-Received: by 2002:a05:600c:4fd2:b0:490:ec79:3063 with SMTP id 5b1f17b1804b1-4923f57a10cmr29923105e9.3.1781874241454;
+        Fri, 19 Jun 2026 06:04:01 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:ab7:2110:6a1d:efff:fe52:1959? ([2a01:e0a:ab7:2110:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fd15535sm74418965e9.3.2026.06.19.06.04.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2026 06:04:00 -0700 (PDT)
+Message-ID: <4742976d-b8d5-4852-a8cb-783d2fa5b713@6wind.com>
+Date: Fri, 19 Jun 2026 15:04:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net 3/6] ipv6: fix error handling in forwarding sysctl
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: shemminger@vyatta.com, dforster@brocade.com, gospo@cumulusnetworks.com,
+ ddutt@cumulusnetworks.com, brian.haley@hp.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org
+References: <20260618162225.4588-1-fmancera@suse.de>
+ <20260618162225.4588-4-fmancera@suse.de>
+ <fa7cbedb-33f3-4a79-acff-2b23cf3f57d8@6wind.com>
+ <91d77512-f741-41d1-a799-5409690da5d7@suse.de>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <91d77512-f741-41d1-a799-5409690da5d7@suse.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300708-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:zhaojinming@uniontech.com,m:horms@kernel.org,m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
+	TAGGED_FROM(0.00)[bounces-300709-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:shemminger@vyatta.com,m:dforster@brocade.com,m:gospo@cumulusnetworks.com,m:ddutt@cumulusnetworks.com,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	TO_DN_SOME(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,6wind.com:from_mime,6wind.com:dkim,6wind.com:email,6wind.com:mid,6wind.com:replyto]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5E4C66A5A4C
+X-Rspamd-Queue-Id: 188686A5ED0
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Le 19/06/2026 à 12:28, Fernando Fernandez Mancera a écrit :
+> On 6/19/26 11:34 AM, Nicolas Dichtel wrote:
+>> Le 18/06/2026 à 18:22, Fernando Fernandez Mancera a écrit :
+>>> When writing to the forwarding sysctl, if proc_dointvec() fails to parse
+>>> the input, it returns a negative error code. The current implementation
+>>> is overwriting that error for write operations.
+>>>
+>>> This results in a silent failure, it returns a successful write although
+>>> the configuration was not modified at all. When modifying the "all"
+>>> variant it can also modify the configuration of existing interfaces to
+>>> the wrong value.
+>>>
+>>> Fix this by checking the return value of proc_dointvec() and returning
+>>> early on failure.
+>>>
+>>> Fixes: b325fddb7f86 ("ipv6: Fix sysctl unregistration deadlock")
+>> The bug existed before the git era.
+>> Maybe
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>>
+>>
+> 
+> 
+> Hm, not really, AFAICS b325fddb7f86 is the first commit overwriting the return
+> value from proc_dointvec(). See:
+> 
+> @@ -3983,7 +3986,7 @@ int addrconf_sysctl_forward(ctl_table *ctl, int write,
+> struct file * filp,
+>      ret = proc_dointvec(ctl, write, filp, buffer, lenp, ppos);
+> 
+>      if (write)
+> -        addrconf_fixup_forwarding(ctl, valp, val);
+> +        ret = addrconf_fixup_forwarding(ctl, valp, val);
+>      return ret;
+>  }
+Hmm, you're right.
 
-Simon says: I think the first issue below does warrant being investigated
-            within the context of this patch.
-
-	    The second one seems related to the intent of this patch,
-	    but I don't feel strongly about it needing to be fixed
-	    as part of this work.
-
-	    And the last one seems yet more weakly related.
----
-net: fman: fix clock and device node leak in probe error paths
-
-This patch aims to fix resource leaks in the error paths of
-read_dts_node(). It introduces a clk_put label to ensure the clock
-reference is properly released on probe failures.
-
-> diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-> index 013273a2de32f..734cbe8efd7e3 100644
-> --- a/drivers/net/ethernet/freescale/fman/fman.c
-> +++ b/drivers/net/ethernet/freescale/fman/fman.c
-[ ... ]
-> @@ -2757,7 +2757,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
->  		err = -EINVAL;
->  		dev_err(&of_dev->dev, "%s: could not find MURAM node\n",
->  			__func__);
-> -		goto fman_free;
-> +		goto clk_put;
->  	}
-
-[Severity: High]
-Will this cause a double-free of the device node on error paths?
-
-In read_dts_node(), the call to of_find_matching_node() drops the
-reference on its "from" argument, which is fm_node:
-
-muram_node = of_find_matching_node(fm_node, fman_muram_match);
-
-By redirecting the error paths after this point to the clk_put label,
-the code falls through to fman_node_put and calls of_node_put(fm_node).
-Since of_find_matching_node() already consumed the reference, does this
-second put lead to a reference count underflow and use-after-free?
-
-[ ... ]
-> @@ -2816,9 +2816,10 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
->  
->  	return fman;
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does this function leak the
-clock reference when returning successfully?
-
-While the patch correctly adds clk_put(clk) to the error paths, the
-success path shown above returns without releasing the reference acquired
-via of_clk_get(). Does the driver need to hold this reference throughout
-its lifetime, or should it be released here to prevent a memory leak
-during repeated driver binds and unbinds?
-
-> +clk_put:
-> +	clk_put(clk);
->  fman_node_put:
->  	of_node_put(fm_node);
-> -fman_free:
->  	kfree(fman);
->  	return ERR_PTR(err);
->  }
-
-[Severity: High]
-This is a pre-existing issue, but is it safe to manually free the fman
-structure here when devm-managed shared interrupts are still registered?
-
-The driver allocates fman using kzalloc_obj() and registers shared
-interrupt handlers using devm_request_irq(), passing fman as the dev_id.
-
-If initialization fails later in the function, the error path calls
-kfree(fman). However, the devm-managed interrupts are not unregistered
-until the probe function returns and devres cleanup runs.
-
-Because the interrupt is IRQF_SHARED, could another device trigger an
-interrupt during this window? If so, would the still-registered fman_irq
-handler attempt to access the already-freed fman structure?
+Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
