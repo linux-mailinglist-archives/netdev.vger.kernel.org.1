@@ -1,138 +1,195 @@
-Return-Path: <netdev+bounces-300565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KNRXGn6XNGoacQYAu9opvQ
-	(envelope-from <netdev+bounces-300565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:12:30 +0200
+	id fPu8OGyXNGoTcQYAu9opvQ
+	(envelope-from <netdev+bounces-300566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:12:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A843F6A3843
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:12:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6E56A383A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 03:12:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PUrONHy+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300565-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300565-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=proton.me header.s=protonmail header.b=bKmSPQh3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300566-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300566-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=proton.me;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78AFB3088E2F
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 01:10:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 62DC230221F1
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 01:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4A72D9EED;
-	Fri, 19 Jun 2026 01:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EA62D6E72;
+	Fri, 19 Jun 2026 01:12:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B66D2E7BD6
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 01:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2072D7D2E
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 01:12:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781831425; cv=none; b=M+fjwxvbWIWLELy+e7vzo6ZZzo2UtWybqG/Np8id1Q1g5qS5Qgy8dJ5NqPmnISiPwSJty9RlxycoY6PLHJfx6adzOaLRJJVfucqPcF8+v3Zr0Iw8hyaVRr0L8lWKElEwPEv61KQ/6I1EJ/P+622NBC+HA8WLQZZ4CdB9GgkfKlc=
+	t=1781831528; cv=none; b=MzcGISXq4dKFknQFCj/ckbMl7STp9eA8+X4aei1/HUM63kFA6Zxae79XsXRcfV9i4mqMR16WFE4oXhjrgnZo9JI5AR9ZgCgtlKxMWiKJOLcuRoiFouUYPlsPqLPwmKYiJ1mwUCAzXUEgTzqViwVif0r1y1QAEA1CgZ6BuMSQVP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781831425; c=relaxed/simple;
-	bh=xeUf5Fmw6QgO8dsPxVgIKo+zqTZdz1zP+nBJdPHZnrs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MWXTFH3SrHsrLV78kPCCm0BHs9ct1NPUIuHuKfAD3tOYRxZLPMjXMBZzp7K/g6UBZrec8tGdwgoyKiyg8FjU/7zuZyHXsF/MW0L20SSerPsLYCAqplBuGbLY5G91DIiRF6aziAOUj5loojJc/aM6f/sqZ6CmOF2ycGqvEHcKJE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUrONHy+; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 165311F000E9;
-	Fri, 19 Jun 2026 01:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781831424;
-	bh=JOln0UvL59U9cbeSPAanWAvcaPgZHKFV7CV3bDFVz6w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=PUrONHy+tIpQSiAZ/nV+RG94J+DrZh4UdL/3d5zY0yPex06I5FeHzOkgSmiA0Gueu
-	 LpMfRfaIDgZ0UHqMxm6UCUul0hBvOa40UuzSAec61Y66I0unfzbW+GBFbNE6n4lWbw
-	 PLoHKD+x7qExsuVTdagliZ4Fr/KbGdx9wZZvpGQhhcGhXXge0+hYXIxcg0RhlS/IUM
-	 cI5A9QMUGOGtIViQnQb5G4hbp/fEK59YZJpQmdmEjSw8byjPXGhpvdNNgYGjauRDf1
-	 5hBlQRLBBjdZHZFm0ow2I7emoNrpig3kAiZk51PZAiAOMmJjIl6TlqW50udhC71NzX
-	 TYmizxXY2Iezw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939D43A78A7C;
-	Fri, 19 Jun 2026 01:10:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781831528; c=relaxed/simple;
+	bh=UeM6pamAl4ywOpSLza3EOHnSPwbVt5s2v3DCHEFSi0k=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=DlwovXhuBOtDqBGlSdpmw64H6YOI6B8TL2DbCY6QySc8+x1nssXEdNkvNZMh9uTjgUg3bKQXcdAL37wHQTIneRjmVvNj57kjSLLP8pdckaaFr1O8WzeRFU1BjLYnh1WwFzXBmP4n/lqmo7NSgpYs7yQW2DjoJwdfooE1dnhILQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=bKmSPQh3; arc=none smtp.client-ip=79.135.106.121
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1781831517; x=1782090717;
+	bh=2XNCRhy4uaOiOmuU4tNaw0+tI3srLdlDb52wwhIwtyE=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=bKmSPQh3YFC7+VcvZjA1WkrEP+cR0Qm/TV9Bs+WD4GbfYmkUJesx9dQbpOxNCy6qG
+	 +FqeB/5z4MC9TJ+7vL1XLbL81Ky0dk9Y33nEnI4CdXtdfkItJBkD9AyopX26NOh00v
+	 1cHwDWnseWc6LA54CuAAh5CwTSd+7Zcb3+D/bwMAreJgPxsAQIlkRgXSmNSWtFKSQ8
+	 njnrng9zuSAAtG6tnCve30Djm9TnsRjyQNllQEJNa7SmhzxqfEP273HBcJdkj3pJem
+	 7M6v/wjaze6mAUG/Ny+Rk7X+4ciucPGNxhBd2sDjlf8WCguFpSuUad3cKhrADGi7Wk
+	 9W3pLKG4bhKSw==
+Date: Fri, 19 Jun 2026 01:11:45 +0000
+To: John Johansen <john.johansen@canonical.com>, linux-security-module@vger.kernel.org, apparmor@lists.ubuntu.com
+From: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, Mickael Salaun <mic@digikod.net>, Stephen Smalley <stephen.smalley.work@gmail.com>, Matthieu Buffet <matthieu@buffet.re>, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: AppArmor: TCP Fast Open bypasses connect mediation (last unaddressed LSM)
+Message-ID: <20260619011138.264578-1-hexlabsecurity@proton.me>
+Feedback-ID: 199661219:user:proton
+X-Pm-Message-ID: 07f0b31b3d290527fbe6492402348c1c56250175
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] [net] net: airoha: fix foe_check_time allocation size
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178183141720.3148637.275902636532056591.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Jun 2026 01:10:17 +0000
-References: <178161119471.2163752.14373384830691569758@gmail.com>
-In-Reply-To: <178161119471.2163752.14373384830691569758@gmail.com>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, lorenzo@kernel.org, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
- matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[proton.me:s=protonmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-300566-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300565-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:john.johansen@canonical.com,m:linux-security-module@vger.kernel.org,m:apparmor@lists.ubuntu.com,m:paul@paul-moore.com,m:jmorris@namei.org,m:serge@hallyn.com,m:mic@digikod.net,m:stephen.smalley.work@gmail.com,m:matthieu@buffet.re,m:ivanov.mikhail1@huawei-partners.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stephensmalleywork@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[proton.me:+];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[paul-moore.com,namei.org,hallyn.com,digikod.net,gmail.com,buffet.re,huawei-partners.com,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[proton.me:dkim,proton.me:mid,proton.me:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A843F6A3843
+X-Rspamd-Queue-Id: 5A6E56A383A
 
-Hello:
+Hello John, and LSM folks,
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I have been working on the Landlock TCP Fast Open connect bypass [1]. Steph=
+en
+Smalley's SELinux fix for the same issue [3] -- "Similar to Landlock, SELin=
+ux was
+not updated when TCP Fast Open support was introduced ..." -- made me go ba=
+ck and
+check the rest of the connect-mediating LSMs, since I had only been looking=
+ at
+Landlock. With Landlock [2], SELinux [3], and now TOMOYO [4] all getting fi=
+xes,
+AppArmor is the last one with the same gap and no fix yet.
 
-On Tue, 16 Jun 2026 19:52:36 +0800 you wrote:
-> foe_check_time is declared as u16 pointer but was allocated with
-> only ppe_num_entries bytes instead of ppe_num_entries * sizeof(u16).
-> 
-> When airoha_ppe_foe_verify_entry() is called with hash >= ppe_num_entries/2,
-> it writes beyond the allocated buffer, causing heap buffer overflow and
-> potential kernel crash.
-> 
-> [...]
+Root cause (shared with the others)
+-----------------------------------
+security_socket_connect() has a single call site, net/socket.c (the connect=
+(2)
+syscall). TCP Fast Open performs an implicit connect inside sendmsg:
 
-Here is the summary with links:
-  - [v2,net] net: airoha: fix foe_check_time allocation size
-    https://git.kernel.org/netdev/net/c/5c121ee63568
+  tcp_sendmsg -> tcp_sendmsg_fastopen -> __inet_stream_connect(..., is_send=
+msg=3D1)
+              -> sk->sk_prot->connect()                 net/ipv4/{tcp.c,af_=
+inet.c}
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This never calls security_socket_connect(); the only LSM hook on the path i=
+s
+security_socket_sendmsg(). mptcp_sendmsg_fastopen reaches the same code and=
+ is a
+second producer.
 
+AppArmor
+--------
+apparmor_socket_connect() requests AA_MAY_CONNECT; apparmor_socket_sendmsg(=
+) (via
+aa_sock_msg_perm) requests AA_MAY_SEND. These are distinct bits, and apparm=
+or_parser
+compiles them independently: "network send inet stream," yields accept mask=
+ 0x02
+while "network connect inet stream," yields 0x40. So an egress-restriction =
+profile
+that grants send but not connect is bypassed by MSG_FASTOPEN.
+
+Reproduced on 6.12.88 with apparmor active. Under a profile granting the in=
+et/inet6
+stream lifecycle except connect:
+
+  aa-exec -p egress_restricted -- ./probe
+  [TCP ] connect(2)=3DEACCES(blocked)  sendto(MSG_FASTOPEN)=3DOK(reached)  =
+=3D> connection established
+  [TCP6] connect(2)=3DEACCES(blocked)  sendto(MSG_FASTOPEN)=3DOK(reached)  =
+=3D> connection established
+
+(The coarse "network inet stream," idiom grants connect anyway, so this onl=
+y bites the
+fine-grained "allow send, deny connect" policy that the asymmetry is meant =
+to serve.)
+
+Fix
+---
+Same shape as the TOMOYO [4] and SELinux [3] fixes: in apparmor_socket_send=
+msg (or
+aa_sock_msg_perm), when MSG_FASTOPEN is set and msg_name carries a destinat=
+ion on a
+not-yet-connected stream socket, additionally require aa_sk_perm(OP_CONNECT=
+,
+AA_MAY_CONNECT, sk). I am happy to send that patch and the reproducer.
+
+(A single core check in __inet_stream_connect(), gated on is_sendmsg, would=
+ have
+covered all five LSMs and both the TCP and MPTCP producers in one place -- =
+the kernel
+already mediates the analogous implicit-connect-on-send for AF_UNIX via
+security_unix_may_send and for SCTP via security_sctp_bind_connect. But sin=
+ce the
+other four LSMs are taking per-hook fixes, AppArmor matching them is the co=
+nsistent
+move; mentioning the core option only in case it is preferred.)
+
+[1] Landlock: LANDLOCK_ACCESS_NET_CONNECT_TCP bypass via TCP Fast Open (rep=
+ort)
+    https://lore.kernel.org/r/20260616201615.275032-1-hexlabsecurity@proton=
+.me
+[2] landlock: fix TCP Fast Open connection bypass (Matthieu Buffet)
+    https://lore.kernel.org/r/20260617180526.15627-2-matthieu@buffet.re
+[3] selinux: check connect-related permissions on TCP Fast Open (Stephen Sm=
+alley)
+    https://lore.kernel.org/r/20260618175513.112443-2-stephen.smalley.work@=
+gmail.com
+[4] tomoyo: Enforce connect policy in TCP Fast Open (Matthieu Buffet)
+    https://lore.kernel.org/r/20260619002207.61104-1-matthieu@buffet.re
+
+Thanks,
+Bryam Vargas
 
 
