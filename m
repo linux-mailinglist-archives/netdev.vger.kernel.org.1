@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-300698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FU+rD2suNWpUoAYAu9opvQ
-	(envelope-from <netdev+bounces-300698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:56:27 +0200
+	id mpN9DaUuNWpsoAYAu9opvQ
+	(envelope-from <netdev+bounces-300700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:57:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBD06A589D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD4A16A58BE
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:57:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b="g/WzD1k9";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300698-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300698-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=vl1osgok;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300700-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300700-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B159930347C4
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:55:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2DE133043060
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674693839B4;
-	Fri, 19 Jun 2026 11:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823A5384CE2;
+	Fri, 19 Jun 2026 11:55:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F07358373;
-	Fri, 19 Jun 2026 11:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC6538332A;
+	Fri, 19 Jun 2026 11:55:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781870112; cv=none; b=bd/4QguDt4IeT+ToEq7cgqLKs7TWtxeUAEpA/1N5sE79RCt9jG8HGSr1kOB02J3DBBuNP9SIf6G101G91IofAHShfabeLbapftezh4ZeJN1nEv46RmR/XMyKTAiAIvOeVhKiMf/otXzG1IvyT1opt/qv+tOIfTkyeqOMZzsXGKo=
+	t=1781870113; cv=none; b=s/eptV3/NOECb0V1fMC5dI6end+mqyvJRQFUdxK3IF7mFCSKlKqUB7hl6/yX3tKv0VBkZ4xy1osjTcQvQq9b7Y6cmuwd3GsdfZ2JGU46MyqX4fOB1wT9RQlDTNJhc8ow7fWJXXJu72I/+Y/Ltz73fYT+Dj7ReTshMFZRTEqkRpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781870112; c=relaxed/simple;
-	bh=xOTCz2eEKk1cNmAJIH8oJTHtpOcF4/qvEfuRtiRngUI=;
+	s=arc-20240116; t=1781870113; c=relaxed/simple;
+	bh=Iujzt5heb9H8WLppDhY1E1rPktZleQ5dnFQhD90BUFc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r2ltrr5DdvTpdlLAOPQuyk3OAW1Mnq4/NncUrr0LhRV9u/TjrAfG/VoHWEZqJ9hbrE8jpNh6cu3htCeUFkt8JK1VI51dr1xhpsglvlc1fNA8whOap4v0DmO8NAD0W/dKAZA+ANBw8gqVIOOOEzDTTqeUTxVGCvpWoOCFHYh7Sb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=g/WzD1k9; arc=none smtp.client-ip=217.70.190.124
+	 MIME-Version; b=Hyn6lxZ82Cy/tOSOZZs8Le2UslDqqfxJJ62/yIdpOCwF0YK5BYLyouTTXDDBi5szWrndtbKaSYj4jP77/85BlqJ0dC2LH3cHHs6YYZXRpSD6XQhY9g4fZ7s7oBcUMDPrNlGVQmOydfjF6zB3or0vMmtseRBtaal1+/ziVbeiS3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=vl1osgok; arc=none smtp.client-ip=217.70.190.124
 Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 65923601C0;
-	Fri, 19 Jun 2026 13:55:08 +0200 (CEST)
+	by mail.netfilter.org (Postfix) with ESMTPSA id 783F4601C1;
+	Fri, 19 Jun 2026 13:55:09 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1781870108;
-	bh=6TS7DFy4fIY13Z9GYaoKRN4Y7nMyxSg/ESPd3aHpwMM=;
+	s=2025; t=1781870109;
+	bh=fUUW68ZRi9UR+MamkxJBulOTEpebj5NGu71sMmoSmRI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g/WzD1k9DGvZc+CMs/RV5SParMzn8nTBDm5NSGSste4HxF7vrEiAIV+ancgdjMrX8
-	 4RLlcl/M5HlXSTZs5HQSvhmv8Dcdo4l0AG2YD3Oce7z+F5Ge3Cu4W11e9l03lxveas
-	 NyrMUv2NWr8vsaEqX+m82NQhKAtMgZq5cp1KO5PXC8HdPYU736fmTZJZfZWMYjYgYL
-	 FcSVip1O7hgDiHxGIIWMgfUadyFBbn0+MCjY5OD8iazvH1F47qFlN/F0pF75TeVvl7
-	 4mH8wL/1OKWtHh7mSie2DZO4QR0tdDvAIiGiyNOdFeJv1TbjfN9MrjgQW6Dq1OFZaU
-	 JBzpK7m8OVGiw==
+	b=vl1osgokoqJnKmY05p2BEyQsltnnccySTHU/geK+Qhlt2YPm7Iw/W1Cfh/BAipt4v
+	 1QpYJoUa7ClsKsJ7vqXZQi8pIzK4cO+OvCvjEqRewTzhpvwXJgj7Yb/I/np9+ZJBq0
+	 So1gCcJ5mGxA5XhMCIz2x8C4VCP/5XLqxaFKG0S9oYvsmXgz/68APDFfzAFzqLBCpB
+	 /mCoBYCkANSG0jPaqD45pZqgGMO4jB6EIVrl3YND9D1d5ZrErfqWTtw/hDK7l87u1M
+	 Z16yrs9wQqNQ9aVpklM8yGn7ZSwYj0dITOYAhd+zHl8KWNtEEV4UXJ36A2asLcUzL2
+	 Oz5PuZaKXxtcQ==
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: netfilter-devel@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -56,9 +56,9 @@ Cc: davem@davemloft.net,
 	edumazet@google.com,
 	fw@strlen.de,
 	horms@kernel.org
-Subject: [PATCH net 08/16] netfilter: ipset: fix order of kfree_rcu() and rcu_assign_pointer()
-Date: Fri, 19 Jun 2026 13:54:43 +0200
-Message-ID: <20260619115452.93949-9-pablo@netfilter.org>
+Subject: [PATCH net 09/16] netfilter: ipset: make sure gc is properly stopped
+Date: Fri, 19 Jun 2026 13:54:44 +0200
+Message-ID: <20260619115452.93949-10-pablo@netfilter.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260619115452.93949-1-pablo@netfilter.org>
 References: <20260619115452.93949-1-pablo@netfilter.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300698-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300700-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	DMARC_NA(0.00)[netfilter.org];
@@ -101,47 +101,37 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,netfilter.org:dkim,netfilter.org:email,netfilter.org:mid,netfilter.org:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,netfilter.org:dkim,netfilter.org:email,netfilter.org:mid,netfilter.org:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9CBD06A589D
+X-Rspamd-Queue-Id: DD4A16A58BE
 
 From: Jozsef Kadlecsik <kadlec@netfilter.org>
 
-Sashiko pointed out that kfree_rcu() was called before
-rcu_assign_pointer() in handling the comment extension.
-Fix the order so that rcu_assign_pointer() called first.
+Sashiko noticed that when destroying a set,
+cancel_delayed_work_sync() was called while gc
+calls queue_delayed_work() unconditionally which
+can lead not to properly shutting down the gc.
 
-Fixes: b57b2d1fa53f ("netfilter: ipset: Prepare the ipset core to use RCU at set level")
+Fixes: f66ee0410b1c ("netfilter: ipset: Fix "INFO: rcu detected stall in hash_xxx" reports")
 Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- net/netfilter/ipset/ip_set_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/netfilter/ipset/ip_set_hash_gen.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
-index 3706b4a85a0f..a531b654b8d9 100644
---- a/net/netfilter/ipset/ip_set_core.c
-+++ b/net/netfilter/ipset/ip_set_core.c
-@@ -351,8 +351,8 @@ ip_set_init_comment(struct ip_set *set, struct ip_set_comment *comment,
+diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/ip_set_hash_gen.h
+index 00c27b95207f..dedf59b661dd 100644
+--- a/net/netfilter/ipset/ip_set_hash_gen.h
++++ b/net/netfilter/ipset/ip_set_hash_gen.h
+@@ -606,7 +606,7 @@ mtype_cancel_gc(struct ip_set *set)
+ 	struct htype *h = set->data;
  
- 	if (unlikely(c)) {
- 		set->ext_size -= sizeof(*c) + strlen(c->str) + 1;
--		kfree_rcu(c, rcu);
- 		rcu_assign_pointer(comment->c, NULL);
-+		kfree_rcu(c, rcu);
- 	}
- 	if (!len)
- 		return;
-@@ -393,8 +393,8 @@ ip_set_comment_free(struct ip_set *set, void *ptr)
- 	if (unlikely(!c))
- 		return;
- 	set->ext_size -= sizeof(*c) + strlen(c->str) + 1;
--	kfree_rcu(c, rcu);
- 	rcu_assign_pointer(comment->c, NULL);
-+	kfree_rcu(c, rcu);
+ 	if (SET_WITH_TIMEOUT(set))
+-		cancel_delayed_work_sync(&h->gc.dwork);
++		disable_delayed_work_sync(&h->gc.dwork);
  }
  
- typedef void (*destroyer)(struct ip_set *, void *);
+ static int
 -- 
 2.47.3
 
