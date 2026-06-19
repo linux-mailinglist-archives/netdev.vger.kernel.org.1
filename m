@@ -1,295 +1,162 @@
-Return-Path: <netdev+bounces-300743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300744-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ek9QFVqZNWrN0wYAu9opvQ
-	(envelope-from <netdev+bounces-300743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:32:42 +0200
+	id p7qzG7ybNWr41AYAu9opvQ
+	(envelope-from <netdev+bounces-300744-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:42:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E778C6A788D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:32:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D40CE6A790E
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 21:42:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.microsoft.com header.s=default header.b=axv1ytRK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300743-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300743-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.microsoft.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=c5jVUG8h;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300744-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300744-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4A2EC3063927
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 19:32:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DC877300A50A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 19:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E6E372B41;
-	Fri, 19 Jun 2026 19:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BBB3B27EC;
+	Fri, 19 Jun 2026 19:42:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD9E349B0D;
-	Fri, 19 Jun 2026 19:32:36 +0000 (UTC)
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB68138D68F
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 19:42:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781897557; cv=none; b=L640veypqBp/N1f2M7vWjMlU4mqMW0PYffvpNBBxhNYB9Qcz58XkstFWRs9csS5+vfNqmNrOk8cE2VOoCbZDOSqq5HAJcQHaNcI6a5SaegAx02wnACsG7eJq6vyd416qOriJPhFRqy65qNpE4Fh9jyCeCGCF/EhdfLCVUvJOBzY=
+	t=1781898167; cv=none; b=WmytcAuHdbgV7HuipsOjc1YA944ZmLB4ShETO2DcNC+v3DFXa0osTX4agfJjZb7QxRP01lH2NfodM58/6M8WLW0TUTEztWih5Rnkvv+WQ6Kkre9VxgkFpZe5N+4vV7w93SKy5Mxe1sO3b95shNkihmBrcHL/UqjUgj7jRhFealg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781897557; c=relaxed/simple;
-	bh=gHc8zi5miNpM28ukI1VhOAt03eXkjT0Uh8qx72KdouQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i2HHIcoqXGTzR4nef8D7PBzVyVkaf6mmMgvzi9XZaZ8sk0/FTD1WeGO6+ythhKRsgkfg/vxGXN6S0abES9xIgvMJGsqTy9gHSF0euqZ4C4hcogytSnHMSuYHaS9x7tSzeY4sgP/ThafCI+ZLbdYdhWLcqEsceKqT2EzqLJVSQxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=axv1ytRK; arc=none smtp.client-ip=13.77.154.182
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 3C65C20B7168; Fri, 19 Jun 2026 12:32:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3C65C20B7168
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1781897554;
-	bh=m2uMxxexDXuJiyEDGdvQW8jMxy4JG/jFpxhsKw2zxso=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=axv1ytRKW9J9dLaykB85E5RKw778VJTsAnGBgDm54K5ccP6TuM1idVXo84/+eHuA0
-	 rEC8iInJgqFqMKMf6s7++kxm8T936/8OoShGjH6mw/Xl4Bb8B3sMcaXsLnzJw+eHpX
-	 ZxXYnk/scEgxxjar87N3D8G9YDGhrBnCnlT+j+lw=
-Date: Fri, 19 Jun 2026 12:32:34 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
-	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
-	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
-	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
-	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
-	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	kees@kernel.org, ebadger@purestorage.com,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH rdma-next v7] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <ajWZUjSoUCTe0Pb7@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260606070735.2163063-1-ernis@linux.microsoft.com>
- <aigwONAwxQx6rLef@ashevche-desk.local>
+	s=arc-20240116; t=1781898167; c=relaxed/simple;
+	bh=m+b4fQy9zLt6qBxVNtMicZZhSVJtKAocJ60Ir7oCTbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QR1JjFCzDyvubHjyaVpek2Orm9qqE3w0MKiJLCTKRphWyYjGnRJi6jtnMaAgJuYvqW7rDwEBXOqpEjC5A/Cr3VXqJlTqIzpzvkfrhB+78cm0i3/NscTosrb5ySsnhWYg6Koap4YTvvDSFGSB1yRLlXXdq609z3xT/z2AoZkOzGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c5jVUG8h; arc=none smtp.client-ip=209.85.128.49
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490bb83a3f6so16461345e9.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 12:42:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781898164; x=1782502964; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l2FOt2xMVSD61mBdKIPdNZOLnnUXVz8M2JYOdHzDiWI=;
+        b=c5jVUG8hPaqNBC4hdbFaJn+zu0tTXmxG90bVeQVkHNktySwCW9aYLKHbrPcDnhj8tC
+         +MZEyyMZ1mazB7Gct3znU0yufejYCNU+EA8QaZDH8KquW2rjptoK/4fvePovI0QPdaJ4
+         /SoHXcXPHQ6upYVQF2bK9pkJF40cNbI4ZEMyI1P33SjJslni/ogex0coYJ1nW4qM4nbF
+         7v+T+Kfu7jeDNeJ+FeoNmySByirYOAhqAy4eeNMFApXeJi/8LlgWH3dFxzqO5kNIfJ1n
+         K/vatGePbAaJVYQWmWpqZZPgCxQKNbgL7O5B2/dQWdqaXWQMwR+a062/bQeNJKUODJJ8
+         mmzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781898164; x=1782502964;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l2FOt2xMVSD61mBdKIPdNZOLnnUXVz8M2JYOdHzDiWI=;
+        b=blyhuYUvcbvCsHy1RfGEQbzLTO9PWlVlMiCb5skBL5l8eugdtlrmdsZ+/DlIBzUZ+m
+         +bxzvTObhqXAYHTLs8tgyy8BXEnyMULIkBTK7tNomjmaoi+qfSUOH/73EwUFmhpYW7P7
+         nTG/6UtUapTStrKDOSB4lmKWglM9K9/8IFuTY42I6uc0lt41PMaeGyXU4nbdLVpCuZnA
+         1D3ittUOw3CxiRmMK7q925E6sRJAFH52L98I8gdr2D+AKtE2pHUOKKqnMn5IuLae9HdO
+         ZWNhOHEC/zTEVIlPJy6iFYhhjIr2AJk/V971h+h9e2Ps5njlMTt80Gg5kYv29pEM+K0I
+         5ZOw==
+X-Forwarded-Encrypted: i=1; AFNElJ+9wWZ2ljShWspb0D4TsHsNFIR8s9W7p5TAmjzXNv5G82F0l3Z0yw6Nzy7UplcqM/Oe//GdPGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxecrbwQtmq24hu1kWR6u+ksPWfxfGGgB54jQkiMrYOcbqMfhBS
+	rGkJ0Oi1UQjAynPctcnKKX8qbYsVXVFJj7nznEPOydgAhmNlkKNLVIkk
+X-Gm-Gg: AfdE7cmuRfmZwmYtIQ/2LJqlsjD3Ga/Xb+sq5yW73qdXHjbOJOy5pYpvLOqjhVANMFC
+	XRGDQIZYyI9Lt4RYrsyLwPsYT8/u/3v5kELCfWf6RagecT669J4DHjU3m+aCfovvihMaVyOsav9
+	IBGXVOmWCi2CROb1UgXOw0kfD9qC3VqRGp7In7XQo+1twA/j1SZ8Cu7p3ZJwg1llYHoN5MAGbkm
+	wZHGW47eYeEqYBF8Nz0noV+kiTx6DGc25S5mYuIFe5/KkTpcOf4wn50R/4SB1fbI6A5FFMkfKa6
+	aPTFYGnSOwwUtX+gtSH1luw9o5sIft9WhjSnQ8OSL4R7J4PtHi+S96R7PX51AHw91nV/6I82vlQ
+	mxZmJOZC2tzqNrlJ7gpjuXlLsppq5RYNjMRH7SwVJqUH3REvd9a1hyMvsWEuBjMijYWGJHe+l9o
+	9Jb3udmsGaAGFXPZziOkl0KaRoBUai57Vcf/iyE6zKtW+XeqP2zzAq6F5eiSi3lH206Dc=
+X-Received: by 2002:a05:600c:3550:b0:490:e913:6564 with SMTP id 5b1f17b1804b1-49249083bf1mr9671345e9.3.1781898164119;
+        Fri, 19 Jun 2026 12:42:44 -0700 (PDT)
+Received: from ?IPV6:2a02:a03f:a75e:9a00:29d8:afb1:8888:c7aa? ([2a02:a03f:a75e:9a00:29d8:afb1:8888:c7aa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fcdd08esm53293745e9.0.2026.06.19.12.42.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2026 12:42:43 -0700 (PDT)
+Message-ID: <0785bd89-fbde-45cc-9ade-6d769c57f418@gmail.com>
+Date: Fri, 19 Jun 2026 21:42:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aigwONAwxQx6rLef@ashevche-desk.local>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv6: ioam: fix type confusion of dst_entry
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org
+References: <20260618104336.48934-1-jiayuan.chen@linux.dev>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@gmail.com>
+In-Reply-To: <20260618104336.48934-1-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-300744-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andriy.shevchenko@linux.intel.com,m:mkalderon@marvell.com,m:jgg@ziepe.ca,m:leon@kernel.org,m:zyjzyj2000@gmail.com,m:sagi@grimberg.me,m:mgurtovoy@nvidia.com,m:haris.iqbal@ionos.com,m:jinpu.wang@ionos.com,m:bvanassche@acm.org,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:kch@nvidia.com,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:metze@samba.org,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:ebadger@purestorage.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:target-devel@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-cifs@vger.kernel.org,m:samba-technical@lists.samba.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:rds-devel@oss.oracle.com,m:jgg@nvidia.com,s:
- lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[43];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300743-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FORGED_SENDER(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[marvell.com,ziepe.ca,kernel.org,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.dk,lst.de,samba.org,talpey.com,oracle.com,brown.name,redhat.com,davemloft.net,google.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E778C6A788D
+X-Rspamd-Queue-Id: D40CE6A790E
 
-Hi Andy,
+On 6/18/26 12:43, Jiayuan Chen wrote:
+> IOAM uses a dummy dst_entry(null_dst) to mark that the destination should
+> not be changed after the transformation. This dst is stored in the IOAM lwt
+> state and may be passed to dst_cache_set_ip6().
+> 
+> However, the IPv6 dst cache path eventually calls rt6_get_cookie(), which
+> treats the dst_entry as part of a struct rt6_info. Since the null_dst was
+> embedded directly as a struct dst_entry in struct ioam6_lwt, this resulted
+> in an invalid cast and rt6_get_cookie() reading fields from the wrong
+> object.
+> 
+> In practice, the wrong cookie is not used while dst->obsolete is zero, but
+> rt6_get_cookie() may also access per-cpu value when rt->sernum is
+> zero. In this case, rt->sernum aliases ioam6_lwt::cache::reset_ts, which
+> can become zero, making this a potential invalid pointer access.
+> 
+> Fix this by embedding a full struct rt6_info for the dummy IPv6 route and
+> passing its dst member to the dst APIs.
 
-Sorry for delayed response.
+Good catch, thanks!
 
-> >  	attr->max_qp_init_rd_atom =
-> >  	    1 << (fls(qattr->max_qp_req_rd_atomic_resc) - 1);
-> 
-> FWIW, this one and below looks like reinvention of rounddown_pow_of_two().
+> Fixes: 47ce7c854563 ("net: ipv6: ioam6: fix double reallocation")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-Acked.
-> 
-> >  	attr->max_qp_rd_atom =
-> > -	    min(1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
-> > +	    min(1U << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
-> >  		attr->max_qp_init_rd_atom);
-> 
-> ...
-> 
-> >  int ipoib_cm_dev_init(struct net_device *dev)
-> >  {
-> >  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
-> > -	int max_srq_sge, i;
-> > +	int i;
-> > +	u32 max_srq_sge;
-> >  	u8 addr;
-> 
-> It seems the order is reversed xmas tree, why not preserving it?
-> 
-Right. I'll fix it in the next version.
-> ...
-> 
-> > --- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
-> 
-> >  		max_send_wr =
-> > -			min_t(int, wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
-> > +			min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
-> 
-> Now perfectly a single line
-> 
-> 		max_send_wr = min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
-> 
-> >  		max_recv_wr = max_send_wr;
-> 
-> ...
-> 
-> > -		max_send_wr = min_t(int, wr_limit,
-> > -			      /* QD * (REQ + RSP + FR REGS or INVS) + drain */
-> > -			      clt_path->queue_depth * 4 + 1);
-> > -		max_recv_wr = min_t(int, wr_limit,
-> > -			      clt_path->queue_depth * 3 + 1);
-> > +		max_send_wr = min_t(u32, wr_limit,
-> > +				    /* QD * (REQ + RSP + FR REGS or INVS) + drain */
-> > +				    clt_path->queue_depth * 4 + 1);
-> > +		max_recv_wr = min_t(u32, wr_limit,
-> > +				    clt_path->queue_depth * 3 + 1);
-> 
-> Can we rather update the type of one of them and use min() instead?
-> 
-I'll remove all the min_t usages in the next version.
-> ...
-> 
-> > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-> 
-> Ditto.
-> 
-> ...
-> 
-> > -static int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
-> > -module_param(srpt_srq_size, int, 0444);
-> > +static unsigned int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
-> > +module_param(srpt_srq_size, uint, 0444);
-> 
-> Theoretically this might break ABI (if somebody uses negative values for
-> anything. I don't think it's the case, but just be informed.
-> 
-Okay. Thankyou for the information. 
-
-> >  MODULE_PARM_DESC(srpt_srq_size,
-> >  		 "Shared receive queue (SRQ) size.");
-> 
-> ...
-> 
-> > --- a/drivers/nvme/target/rdma.c
-> > +++ b/drivers/nvme/target/rdma.c
-> 
-> > -	ndev->srq_size = min(ndev->device->attrs.max_srq_wr,
-> > -			     nvmet_rdma_srq_size);
-> > -	ndev->srq_count = min(ndev->device->num_comp_vectors,
-> > -			      ndev->device->attrs.max_srq);
-> > +	ndev->srq_size = min_t(u32, ndev->device->attrs.max_srq_wr,
-> > +			       nvmet_rdma_srq_size);
-> > +	ndev->srq_count = min_t(u32, ndev->device->num_comp_vectors,
-> > +				ndev->device->attrs.max_srq);
-> 
-> Same question, can we change type type of variables instead?
->
-Yes. I'll be doing it in the next version.
- 
-> >  	mutex_lock(&device_list_mutex);
-> 
-> ...
-> 
-> >  	inline_page_count = num_pages(nport->inline_data_size);
-> >  	inline_sge_count = max(cm_id->device->attrs.max_sge_rd,
-> > -				cm_id->device->attrs.max_recv_sge) - 1;
-> > +				cm_id->device->attrs.max_recv_sge);
-> > +	inline_sge_count = inline_sge_count ? inline_sge_count - 1 : 0;
-> 
-> Simple conditional might be better
-> 
-> 	if (inline_sge_count)
-> 		inline_sge_count--;
-> 	OR
-> 		inline_sge_count -= 1;
-Okay. I'll update all such instances.
-
-> 
-> ...
-> 
-> > +++ b/include/rdma/ib_verbs.h
-> 
-> > -	int			max_qp;
-> > -	int			max_qp_wr;
-> > +	u32			max_qp;
-> > +	u32			max_qp_wr;
-> 
-> Nice, but please check that none of these (and beyond) were not used in signed
-> multiplication or (which is more disasterous) division. Otherwise it might be
-> subtle issues that will be hard to debug.
-Yes I have checked that for all the variables I updated.
-
-> 
-> ...
-> 
-> >  	conn_param->responder_resources =
-> > -		min_t(u32, rds_ibdev->max_responder_resources, max_responder_resources);
-> > +		min3(rds_ibdev->max_responder_resources,
-> > +		     max_responder_resources, U8_MAX);
-> >  	conn_param->initiator_depth =
-> > -		min_t(u32, rds_ibdev->max_initiator_depth, max_initiator_depth);
-> > +		min3(rds_ibdev->max_initiator_depth,
-> > +		     max_initiator_depth, U8_MAX);
-> 
-> I believe we can go a few characters over and leave them to be single lines.
-> 
-Okay.
-
-> >  	conn_param->retry_count = min_t(unsigned int, rds_ib_retry_count, 7);
-> 
-> What about this one?
-Sorry. I missed this one, I'll update it.
-
-> 
-> >  	conn_param->rnr_retry_count = 7;
-> 
-> ...
-> 
-> >  int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
-> >  {
-> >  	const struct ib_device_attr *attrs = &device->attrs;
-> > -	int max_qp_wr, depth, delta;
-> > +	u32 max_qp_wr;
-> > +	int depth, delta;
-> >  	unsigned int max_sge;
-> 
-> Reversed xmas tree order.
-Okay
-
-Thankyou for all your suggestions.
-The next version will be incorporated with all these changes.
-
-- Vennela
-> 
-> -- 
-> With Best Regards,
-> Andy Shevchenko
-> 
+Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
 
