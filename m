@@ -1,257 +1,188 @@
-Return-Path: <netdev+bounces-300597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300598-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5ZyCHGvVNGp0iAYAu9opvQ
-	(envelope-from <netdev+bounces-300597-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:36:43 +0200
+	id GXP/JyzYNGqGiQYAu9opvQ
+	(envelope-from <netdev+bounces-300598-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:48:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107306A3F66
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:36:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C68B6A3FAF
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:48:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=b1IyDOAG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300597-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300597-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=B2wbxIFm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300598-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300598-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C12B6304D25A
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 05:36:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 15BB630205CE
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 05:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2853232B117;
-	Fri, 19 Jun 2026 05:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE82322768;
+	Fri, 19 Jun 2026 05:48:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823BB2F8EAF;
-	Fri, 19 Jun 2026 05:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8BF40D599
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 05:48:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781847399; cv=none; b=a3FHvPc/QRSpzyvj2VBFFMhrioMGbDM0yNdUV9KSCwVP/RGslKuAV7rJxVX2ztrkVj12hE1Qrbcmdep8Q4T+UO1OTDtQXJ3wx53CWHV0EQWOcuTLHJO6ZNhDJxtG9I5B7t9eD3Pxo9DUAKRI4sOFUNXaS4kXOh4kVYcu55iJyOE=
+	t=1781848104; cv=none; b=RJurmwHvDar+tx81lK6bmUgsYNYstJ8twx3dyPfZAHPoS2qxDNWDWXMELhEAParbdwUxkMivD9ii6mEnfW7kNfaQrOObAg0gVraV3wTbpSBBbHwS/QAlk0ZAY+gdkdQ+Pp1UphIQMG3qiLPm7LLXDuN9SsK23EYpn2lM7C+F6NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781847399; c=relaxed/simple;
-	bh=dCJcqAmKX7l6iyM+HnSqlTwV/ZtRKvVJxjugkfK5utU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iXrEdCjykYThXrexnlbKcBLq3Bkq1Ts7e6v3FIkgyiQ6QDSlrOMoAPGkrm79ljJGR5vmrTtipoxQKbLvyJds820yUTTmc3ExEsey8W6j11HbOlQptAlldH7XXWJnZkEQxlUr4BtjzbJJnL4XU/7Nkj6AQUS88yMMO/hsdDJLVVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=b1IyDOAG; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65J3J8Fs1284694;
-	Fri, 19 Jun 2026 05:36:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=vOvIfF
-	d9KMiDbk53cM7RiXs4Q+ExMtxcOHk+7CTxlyU=; b=b1IyDOAG1A579NenLYZjvG
-	QXJOEVoKvOrpDJBYHpvHtDUxlt+FP71Ra3Q2CJN315P0j82Mj1HRVP6nOnLsB9Ji
-	H/4tnzxZK57JR3ZVY3umwghjwZks5jzUrg5vpKRqyj3Xx/SBoeH0HUSO8xBucfiB
-	oKAjWfm87w9c7k3xbfw7c/tbawF2cWZwwj8OFPLTon+L4hEDVXBNXB/U85kNRFwj
-	s4dLDDgjVmZNEHgPMItQMrlNZ1r7kUjA1DiViAlZi1yZex03ZtrLODxxUm9Lx5DF
-	aHdYNHuoS9+VhrcsX2O/r32PzDf2loG6uv5m0qEpzqKNnSJOte35tl7cO7zh0T8Q
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4euequbvxh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Jun 2026 05:36:28 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65J5YbKH018574;
-	Fri, 19 Jun 2026 05:36:27 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ev172faj7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Jun 2026 05:36:27 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65J5aQ8664618970
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 19 Jun 2026 05:36:26 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5FC5158054;
-	Fri, 19 Jun 2026 05:36:26 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7B4145805D;
-	Fri, 19 Jun 2026 05:36:19 +0000 (GMT)
-Received: from [9.39.17.175] (unknown [9.39.17.175])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 19 Jun 2026 05:36:19 +0000 (GMT)
-Message-ID: <5f0b47ee-547e-4ba6-8032-2adb0686d019@linux.ibm.com>
-Date: Fri, 19 Jun 2026 11:06:17 +0530
+	s=arc-20240116; t=1781848104; c=relaxed/simple;
+	bh=cooLtirQK1VfrgbFbfezM8xLN8Z6EyEh9oqq/Ro0VMk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FgAGKlK+ZpMETRUBFTPQc0GZF1kThoh0TB4a0qJUI09pG2lUjReBBzFbeoxCxysVgZKVblEcEgpO11p22ktVqU3o/p8k81LWeRskAzAM+ruR3KZyKSznGy4ZWZi/eOnrhO8TXseLExYMs1eKzcEIpU0jtMZ4gS2VZbAFu1fEfZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B2wbxIFm; arc=none smtp.client-ip=209.85.214.175
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2c6d31bfc8aso12294145ad.2
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 22:48:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781848103; x=1782452903; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cooLtirQK1VfrgbFbfezM8xLN8Z6EyEh9oqq/Ro0VMk=;
+        b=B2wbxIFm5lLJ2uRNWe0MsLofoJS+xxQh8xlLjWSoWgIBsa9WPR4qR4zUWcmF1n4xBI
+         cRmOB1kwoBK5lks7nQCSK7noquqeWENEEuLusYvSRde03X9JjGr/o5jzgEQujfBeJ4qL
+         RLnxKOzUouiaVJQA+1DNyegmlat5sMiodB2lmLLug11rOxHyOJa6mgVh2Wdkf8lQBQnG
+         lHo5SqFrS6B0ztOP4QPPuwwMPQl0xoScQ7XGI9kCA8s5lgVM2aDpOinNo7fobEx12lH9
+         kwcPZByUw6J1NIKlFfwBV8cQ4f7ZacVEcogHKPwUGGftx4W1qstFwzRb5lXXUFLIlrKa
+         sSxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781848103; x=1782452903;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cooLtirQK1VfrgbFbfezM8xLN8Z6EyEh9oqq/Ro0VMk=;
+        b=i6DQ74tL0V7rDzVPFkcQa44cF4SGfl2J+w7sTomzPXaPaRJO3OHakk+fdjWBp5eblp
+         mpH34YgRMsv3MTbywk3XriysEburET0KqEnZyvT4Og6nuYyqHWUM+M8givWk7npcE5H2
+         jCx46Xl4Rr54vH0SXFhgjpAKTCatENpfLnYjNw9fRQ/KB5YsQ/4Wj4Nhp43M2NfYIFNr
+         AQAqKYwYMuxzs/oy1ki/CQYbuibwkFRBM8rHTusufT267AvOf0AgQUrTvJBB1dheR8se
+         oC+4vq/PqzmuRNRNWWTXXvt9Vjo7Xz5H8lLLdD3P4oehBMcp+Se2M+2kk1Ws9WBuwlGj
+         MDeg==
+X-Forwarded-Encrypted: i=1; AFNElJ/HQyAYqdLdMGZkTEgOzt93i/HSn1H/g4q7p66ekTCyg0yImTwuP/MRMU8lbIor0AI0qqOMPBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE/9juzKsD9TIcgx3vI+NUejBDbsyqBtap+PRep65xT7T2ucQd
+	1bGppz9MANN0LxbEzCSEVDvk+tsiAee261ZQhXo6zyu9O6/+LX/NZe4H
+X-Gm-Gg: AfdE7cnWOOCZZLGskizHqYEvnioAQWdBqZw2B8iFq4BYR8OR2nA8bC/KfVbDceKyN2U
+	89QmYTCweZOkjy0LDfbPzOKXJ4niX2i66oJfsplnLbbgr9rGh6KXFNxyQX3fyCYOXRpRfRRDD3p
+	Nr8InsQJ2uHkdtXZNJK59nn5jJp5chKYwGhTo/biru8WaQytT6LAWw30LBOLqnazD1hMf1GyZxo
+	63l/hEFq2FA6voVqASxm6xY6FpDyIqcCaGHqIo2pIiY0LUa1rRoBnt8xHHMP1xU2dN9Cls0EXTH
+	LSMv3MWaT5QdXXICIvv+ig9sqGGi0Ek4kMwVdpp7K7rvP+Js0QL9/40dkfOr4tFNN8q/UO1Gg2K
+	6OWA8jgCQv3tyJF90DSY7L6rRI1xQkUjzpXEgbbuYPGVh9zXZaNN/Btm2muHP+3KT8uBThuoiew
+	vp8JvDTw==
+X-Received: by 2002:a17:903:120c:b0:2c6:b40a:d0c7 with SMTP id d9443c01a7336-2c718f1f0ddmr26069695ad.7.1781848102997;
+        Thu, 18 Jun 2026 22:48:22 -0700 (PDT)
+Received: from dev ([163.43.103.131])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c72089a155sm10555245ad.8.2026.06.18.22.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 22:48:22 -0700 (PDT)
+From: Yuya Kusakabe <yuya.kusakabe@gmail.com>
+To: andrea@common-net.org
+Cc: Yuya Kusakabe <yuya.kusakabe@gmail.com>,
+	andrea.mayer@uniroma2.it,
+	davem@davemloft.net,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	justin.iurman@gmail.com,
+	shuah@kernel.org,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	stefano.salsano@uniroma2.it,
+	ahabdels@cisco.com
+Subject: Re: [PATCH v2 5/7] seg6: add End.M.GTP6.D.Di behavior
+Date: Fri, 19 Jun 2026 14:48:11 +0900
+Message-ID: <20260612032313.662-04-yuya.kusakabe@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260607160119.ed2022e8a358d700e1134318@common-net.org>
+References: <20260607160119.ed2022e8a358d700e1134318@common-net.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: avoid recursive sk_callback_lock in listen
- data_ready
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>,
-        "D. Wythe"
- <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Simon Horman <horms@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jianhao.xu@seu.edu.cn
-References: <f7e36176-d00a-4471-94ed-d385e579b43d@linux.ibm.com>
- <20260618141629.2904071-1-runyu.xiao@seu.edu.cn>
-Content-Language: en-US
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-In-Reply-To: <20260618141629.2904071-1-runyu.xiao@seu.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE5MDA0NiBTYWx0ZWRfX40iRtXs7il4p
- fdGewDk1QGjDEWQmehhe9DgPWhkdLwkCQw8SufhTo59VBAcpVCYvDL06Tjp5gcjaehnW1pBvKQx
- wxbYc4RnUd7I1Ur6qYc5L5/+RzMSHkM=
-X-Proofpoint-ORIG-GUID: W6YAka2TzTO5Ud8k8xWYYv1Kzt0y0SU8
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE5MDA0NiBTYWx0ZWRfX69ZA+GauPgvR
- RIRgqAGTv5lbt0u3z1/P3EHvWbJoRj3wTu+VF4CBkEJ9wTIuKQQD+X3OQzx+pxYDaV9n7POSTb/
- z9r65o6ClvBKoEs+cj0zD53Ivf9Hu7gFnI7/hhwhs5ritFCqEUqt8PfPICassVqnZpG1mEN3H5Q
- D2pGa/L56A98jtWA84KHEu4FDrVudquI7e7qEjC5y4I2eF8nx8iwNxd/9vg608mR1zzTUKkb0Lw
- SQ3s9SbDDOnHq8aEjtc6k+QNNsO2E2Ip69jvtEyTtzyaklpHkZEW0bnE/MbnLqg1k4Gp6f0Gvgc
- OZnyPTJkD1yI87hKYzlApO0FK/tOgM5h5slIpPTSumubPW6gb44KWIbB48Mf/QM4TO+CnXA/KFV
- J/pGUdrsLOn9olHGRAfgkPw3w/CW4sBpa350jBatWIH7RuwdQloAlMfuAXb82U+8txSRsg9Hw2F
- /WuGeFNX5jsKS3uVpbQ==
-X-Proofpoint-GUID: iZt7UvV7DdBSh4TMNeAVAFyxzIUOMY7m
-X-Authority-Analysis: v=2.4 cv=L9gtheT8 c=1 sm=1 tr=0 ts=6a34d55d cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
- a=UJ9qbeZmKaF5buNRxREA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-19_01,2026-06-18_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 malwarescore=0 clxscore=1015 adultscore=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606190046
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300597-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:runyu.xiao@seu.edu.cn,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.ibm.com:mid,linux.ibm.com:from_mime];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-300598-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrea@common-net.org,m:yuya.kusakabe@gmail.com,m:andrea.mayer@uniroma2.it,m:davem@davemloft.net,m:edumazet@google.com,m:dsahern@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:justin.iurman@gmail.com,m:shuah@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-doc@vger.kernel.org,m:stefano.salsano@uniroma2.it,m:ahabdels@cisco.com,m:yuyakusakabe@gmail.com,m:justiniurman@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,uniroma2.it,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,vger.kernel.org,cisco.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yuyakusakabe@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 107306A3F66
+X-Rspamd-Queue-Id: 0C68B6A3FAF
 
+Hi Andrea,
 
+Thank you for the review.
 
-On 18/06/26 7:46 pm, Runyu Xiao wrote:
-> Hi,
-> 
-> Thanks for taking a look.
-> 
-> The exact Lockdep stack I have is from the grounded reproducer, not from
-> a production SMC setup.  The reproducer keeps the same callback shape:
-> the close/flush side holds sk_callback_lock and invokes the installed
-> sk_data_ready callback, which re-enters smc_clcsock_data_ready() and tries
-> to take sk_callback_lock again.
-> 
-> The relevant Lockdep report is:
-> 
->   WARNING: possible recursive locking detected
->   kworker/u4:3/39 is trying to acquire lock:
->     (sk_callback_lock) at smc_clcsock_data_ready+0xa/0x4d
-> 
->   but task is already holding lock:
->     (sk_callback_lock) at smc_close_flush_work+0xc/0x30
-> 
->   Possible unsafe locking scenario:
-> 
->         CPU0
->         ----
->         lock(sk_callback_lock);
->         lock(sk_callback_lock);
-> 
->   *** DEADLOCK ***
-> 
->   Workqueue: smc_close_wq smc_close_flush_work
-> 
->   Call Trace:
->     dump_stack_lvl
->     __lock_acquire
->     lock_acquire
->     _raw_read_lock_bh
->     smc_clcsock_data_ready+0xa/0x4d
->     smc_close_flush_work+0x1f/0x30
->     process_one_work
->     worker_thread
->     kthread
->     ret_from_fork
+> The patch 4 review applies here, except for the parts where Section 6.4 is
+> implemented instead of Section 6.3 (which is incorrectly implemented in
+> patch 4).
 
-Thank you for addressing the feedback. My suggestion would be to reply
-to the original email thread where the review comments were given, so
-that the maintainers can follow the conversation.
+Answered in the patch 4 reply: the next version of End.M.GTP6.D will
+implement Section 6.3 (Args.Mob.Session stamped into SRH[0], no
+preserved D), leaving the original-DA preservation exclusive to this
+drop-in variant.
 
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html#respond-to-review-comments
+> input_action_end_m_gtp6_d_di() and its finish callback are largely
+> identical to the patch 4 functions (input_action_end_m_gtp6_d() and its
+> finish): the SRH check, GTP-U dispatch, outer strip, inner protocol
+> detection, and NF_HOOK invocation are identical. The duplication should be
+> reduced via shared helpers.
 
-Please include above call stack in your next version.
+Will do. The plan is one decap helper (SRH check, GTP-U dispatch,
+outer strip, inner protocol detection) shared between End.M.GTP6.D and
+End.M.GTP6.D.Di, and one SRv6-push helper (including the GSO offload
+setup) shared with H.M.GTP4.D as well, with the GTP-U parser common to
+all of them. The D.Di handler then reduces to the prepended-slot
+handling specific to the drop-in variant. (The NF_HOOK invocation goes
+away in the initial series per the cover letter thread.)
 
-> 
-> The nvmet change I referred to is:
-> 
->   2fa8961d3a6a ("nvmet-tcp: fixup hang in nvmet_tcp_listen_data_ready()")
+> D.Di does not use teid or qfi, so these variables and the (void) casts are
+> dead code and should be avoided. For example, seg6_mobile_parse_gtpu() could
+> accept NULL for teid and qfi so callers that do not need them can pass NULL
+> directly.
 
-Please include this info in your next version.
+Will do exactly that: the GTP-U parser (and the decap helper above)
+will accept NULL for teid/qfi, and the drop-in variant will pass NULL.
 
-> 
-> The stable/backport patch I originally used as the reference is:
-> 
->   1c90f930e7b4 ("nvmet-tcp: fixup hang in nvmet_tcp_listen_data_ready()")
-> 
-> Its commit message says that when the socket is closed while in
-> TCP_LISTEN, the flush callback can call nvmet_tcp_listen_data_ready()
-> with sk_callback_lock already held, so nvmet moved the TCP_LISTEN check
-> before taking sk_callback_lock.
-> 
-> For the TCP_LISTEN check: my reasoning was that smc_clcsock_data_ready()
-> is installed by smc_listen() on the underlying TCP listen socket and only
-> queues smc_tcp_listen_work() for the SMC listen/accept path.  Once that
-> underlying socket is no longer in TCP_LISTEN, there should be no SMC
-> listen accept work to queue from this callback.  TCP_SYN_RECV and
-> TCP_ESTABLISHED are not listen-socket states for this callback path, so I
-> did not intend the callback to queue listen work for those states.
-
-I understand. Please include this info in your next version.
-
-> 
-> That said, if SMC expects smc_clcsock_data_ready() to handle a non-LISTEN
-> state during fallback or another transition, then the proposed check is
-> too strict and I should rework the fix.
-> 
-> Thanks,
-> Runyu
-
+Thanks,
+Yuya
 
