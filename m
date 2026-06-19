@@ -1,134 +1,167 @@
-Return-Path: <netdev+bounces-300550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KAvnF/OHNGonagYAu9opvQ
-	(envelope-from <netdev+bounces-300550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 02:06:11 +0200
+	id 18qmH7uLNGq6awYAu9opvQ
+	(envelope-from <netdev+bounces-300551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 02:22:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B854E6A3253
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 02:06:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B0636A32EE
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 02:22:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=f5QFekeu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300550-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300550-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=buffet.re header.s=mx1 header.b="c/2R54vZ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300551-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300551-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=buffet.re;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C12D63024A3E
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 00:06:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 897563015863
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 00:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB5140D561;
-	Fri, 19 Jun 2026 00:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6958287E;
+	Fri, 19 Jun 2026 00:22:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D64510F0
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 00:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A4054654;
+	Fri, 19 Jun 2026 00:22:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781827567; cv=none; b=eWLEZvJlbnIl40O93K6BVohGhdMth4AbCLtCwe3QZGFeALX+cyp97QxR9ubkfmxf85k2a25CWSd2ZWW1xxteAo4De0qA3bxb8jihr4PZYJXWTj1ss7i7YJ6rNsh9tSQb8JaQzre/fexTVye/T/tv+j83KuIrl9ZViNYknBmzmOI=
+	t=1781828535; cv=none; b=jmIZDXrMUFyE8hLyWMhy4E4lInNHd+UEOyGUR7J2X8PY4PYz8f/GbzBPAdCrZcfKy0BchME5hG7jQLsKa+TIMX2BmGNocSB6guf77A9+0ySFeEBgqSpBfedMB+QErk0Igo4HgxjCnm6bAeiuwgaqh4jKWvKTy4SQEbpVXRMPV4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781827567; c=relaxed/simple;
-	bh=rYHqSmGsH4cbKSWk54QP1sTrqPfbU0FMq9rs35T482U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mOm61R4EgsxroQJVv8mE9Nqu/2xXii71WCkVGo7AkggJ9bNbJ58e6r3B2Ggg5JKpUDewKOhOkhT785Y/l5wdtPMbs9G8Xy38SsssIJJGAyKCTvifNtmGB3yFeN9ty+RZdswihiuW110TIbkPYNUiO/y5L5XhhvNX+STzU4YFYNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5QFekeu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54551F000E9;
-	Fri, 19 Jun 2026 00:06:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781827566;
-	bh=mFQ9tkYMs09gniDlAXC2Ca4YvMszBGigo8IziUjXlxw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=f5QFekeuScwVIKcJsGZEG5HvoyHnSvc8XERa5UfwpShqTINeMbnrk5YzI8pVUxxsV
-	 c1didLOkTmqZU07W3eqluQyY5HiRbgxat5ekMkxcVaXk37DtQ9WmW5/h16n5di2ZRH
-	 plBbhnqKCDN8Ix/WNLqcBjqxKKewQEFg2D9RxAJHKiuMpRGYzHBvbbIb2xRE69Wqg8
-	 STOwpCnJHqnVducG5rZh6jLhDRrhFWsJWUG26rZZ/G4nzHjSD/ImWvbxySPYaJnGax
-	 +eEWnfQJBsdhZ2HfaSaBKItbVmDfmL4xbveu809meunevLvH39qwDJ36CyRZuWQv03
-	 9MBl0sFSB3sEQ==
-Date: Thu, 18 Jun 2026 17:06:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thorsten Leemhuis <linux@leemhuis.info>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev
- <netdev@vger.kernel.org>, Riana Tauro <riana.tauro@intel.com>
-Subject: Re: building ynl afaics requires updating the UAPI headers first
-Message-ID: <20260618170605.0e2e4dd4@kernel.org>
-In-Reply-To: <ade91456-2f93-442c-b76c-28bd7157f074@leemhuis.info>
-References: <ade91456-2f93-442c-b76c-28bd7157f074@leemhuis.info>
+	s=arc-20240116; t=1781828535; c=relaxed/simple;
+	bh=nXyHwTLWPjAyiQcT8bDNyzKWJu7lPBvjuljCk6QgLPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CetTAqOYHKG9zdxL65YWiWnK/1DwHkNha6ehShjaJfXhaCTeJEKSxuRO2HTIymI7u/l0bDE7QUy6y8c9OKsXR7p1eiIn4M/lwGU4A0RLv5dQ2d3UjsH42eQ4DG1JO2nLIf3Wto+x2V0Xm7ymzv9RW7p+hqeM6gU+AyazonJDgLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=c/2R54vZ; arc=none smtp.client-ip=51.83.41.69
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
+	t=1781828523; bh=nXyHwTLWPjAyiQcT8bDNyzKWJu7lPBvjuljCk6QgLPo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=c/2R54vZqwYD4JZUdOV6Ip7XVopz4xSxtvTyM9TXhbNZctXDZBlgCFNe/JiLfRb4e
+	 w38SUqIOvP9UV7qAPWK2541Ll+XW/d16hGCsoXMOB4wAKKtjHdToSOaVT6BnDxmpg3
+	 NHIxorjKmqfeJQ887b+rgn0xXHFXHteB5Rewu86ov1kl6Hp+hDJfhYx8uNvLvaU5A4
+	 Ykd9K1UJrNqFVc1sKvqPTyszSSvIWLs59fZOudg3EkkwH9pEiAdgMEERBq/skuNC3O
+	 58MQ3NFnl5HQ8sfZ5X2Xmw7d4i9l51yfPktjA7M55CeBXnyuL7muQHYSoJ5AejI98F
+	 p6Qvsu4dqFGGA==
+Received: from localhost.localdomain (unknown [10.0.1.3])
+	by mx1.buffet.re (Postfix) with ESMTPSA id B2DEE1264EA;
+	Fri, 19 Jun 2026 02:22:03 +0200 (CEST)
+From: Matthieu Buffet <matthieu@buffet.re>
+To: Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: Bryam Vargas <hexlabsecurity@proton.me>,
+	=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	linux-security-module@vger.kernel.org,
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
+	Paul Moore <paul@paul-moore.com>,
+	Yuchung Cheng <ycheng@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	Matthieu Buffet <matthieu@buffet.re>
+Subject: [PATCH] tomoyo: Enforce connect policy in TCP Fast Open
+Date: Fri, 19 Jun 2026 02:22:07 +0200
+Message-ID: <20260619002207.61104-1-matthieu@buffet.re>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[buffet.re,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[buffet.re:s=mx1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300550-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300551-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:takedakn@nttdata.co.jp,m:penguin-kernel@I-love.SAKURA.ne.jp,m:hexlabsecurity@proton.me,m:mic@digikod.net,m:gnoack@google.com,m:linux-security-module@vger.kernel.org,m:ivanov.mikhail1@huawei-partners.com,m:paul@paul-moore.com,m:ycheng@google.com,m:edumazet@google.com,m:netdev@vger.kernel.org,m:matthieu@buffet.re,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:linux@leemhuis.info,m:donald.hunter@gmail.com,m:netdev@vger.kernel.org,m:riana.tauro@intel.com,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,intel.com];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[matthieu@buffet.re,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matthieu@buffet.re,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[buffet.re:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B854E6A3253
+X-Rspamd-Queue-Id: 1B0636A32EE
 
-On Thu, 18 Jun 2026 15:39:46 +0200 Thorsten Leemhuis wrote:
-> DRM_RAS_CMD_CLEAR_ERROR_COUNTER was introduced to mainline yesterday as
-> ee18d39a087792 ("drm/drm_ras: Add clear-error-counter netlink command to
-> drm_ras") [v7.1-post].
-> 
-> I finally looked closer today and noticed how to prevent this: update
-> the kernel's UAPI files (e.g. the stuff that lives in /usr/include/) on
-> the builder. Thing is: that's basically impossible to do from a srpm, as
-> those should not change the build environment and can't even when
-> working as non-root.
-> 
-> Note sure if relevant and just a shot in the dark, so maybe ignore the
-> following:
-> 
-> While investigating this I noticed this comment in
-> tools/net/ynl/Makefile.deps:
-> 
-> """
-> > # Try to include uAPI headers from the kernel uapi/ path.
-> > # Most code under tools/ requires the respective kernel uAPI headers
-> > # to be copied to tools/include. The duplication is annoying.
-> > # All the family headers should be self-contained. We avoid the copying
-> > # by selectively including just the uAPI header of the family directly
-> > # from the kernel sources.  
-> """
-> 
-> Is that maybe not the case anymore with the recent changes to ynl?
+Tomoyo restricted TCP connections in 2011 in commit
+059d84dbb389 ("TOMOYO: Add socket operation restriction support.")
+using the socket_connect() LSM hook.
 
-Can't repro for some reason, but we probably need something like 
-commit 46e9b0224475abc to add the explicit include rule.
+However, the MSG_FASTOPEN sendmsg() flag was added in 2012 to allow
+combining connect() and the first sendmsg(). Tomoyo was not updated to
+take this into account in its send hook.
+
+This resulted in a TCP connect policy bypass similar to that reported in
+Landlock in 2024 (see Link below), with the difference that Tomoyo was
+fine when originally merged, and the problem got introduced when adding
+fastopen support, possibly due to lack of synchronization between lsm
+and netdev worlds.
+
+Add MSG_FASTOPEN handling in Tomoyo's existing send hook.
+
+Link: https://github.com/landlock-lsm/linux/issues/41
+Link: https://lore.kernel.org/all/20260616201615.275032-1-hexlabsecurity@proton.me/
+Fixes: cf60af03ca4e ("net-tcp: Fast Open client - sendmsg(MSG_FASTOPEN)")
+Cc: stable@kernel.org
+Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
+---
+ security/tomoyo/network.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/security/tomoyo/network.c b/security/tomoyo/network.c
+index cfc2a019de1e..7d9ba7268dc2 100644
+--- a/security/tomoyo/network.c
++++ b/security/tomoyo/network.c
+@@ -764,11 +764,25 @@ int tomoyo_socket_sendmsg_permission(struct socket *sock, struct msghdr *msg,
+ 	struct tomoyo_addr_info address;
+ 	const u8 family = tomoyo_sock_family(sock->sk);
+ 	const unsigned int type = sock->type;
++	int ret;
+ 
++	address.protocol = type;
++
++	if ((msg->msg_flags & MSG_FASTOPEN) != 0 && msg->msg_name != NULL &&
++	    (sk_is_tcp(sock->sk) ||
++	     (sk_is_inet(sock->sk) && type == SOCK_STREAM &&
++	      sock->sk->sk_protocol == IPPROTO_MPTCP))) {
++		address.operation = TOMOYO_NETWORK_CONNECT;
++		ret = tomoyo_check_inet_address(
++			(struct sockaddr *)msg->msg_name, msg->msg_namelen,
++			sock->sk->sk_protocol, &address);
++		if (ret != 0)
++			return ret;
++	}
+ 	if (!msg->msg_name || !family ||
+ 	    (type != SOCK_DGRAM && type != SOCK_RAW))
+ 		return 0;
+-	address.protocol = type;
++
+ 	address.operation = TOMOYO_NETWORK_SEND;
+ 	if (family == PF_UNIX)
+ 		return tomoyo_check_unix_address((struct sockaddr *)
+-- 
+2.47.3
+
 
