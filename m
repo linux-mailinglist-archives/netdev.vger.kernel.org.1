@@ -1,96 +1,67 @@
-Return-Path: <netdev+bounces-300733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300734-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3PABBFtzNWrfwgYAu9opvQ
-	(envelope-from <netdev+bounces-300733-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 18:50:35 +0200
+	id yDySKnp3NWp+xAYAu9opvQ
+	(envelope-from <netdev+bounces-300734-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 19:08:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C5576A7247
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 18:50:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C5A6A7391
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 19:08:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uZCdXCV2;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=fvusH3Cj;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uZCdXCV2;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=fvusH3Cj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300733-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300733-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=suse.de;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=U7SllBfo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300734-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300734-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E12B301E22B
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 16:48:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9B00330095DA
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 17:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EAE93B42D3;
-	Fri, 19 Jun 2026 16:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDFB3BE174;
+	Fri, 19 Jun 2026 17:08:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C0F2D837C
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 16:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817543AA50B
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 17:08:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781887686; cv=none; b=e48SKrp4sZTjQEd+MLxiWm88fa69+AZf0y/veM+fBHnvha87owoZ3Z3UQKbG5E54Zq+e3U6i+V/RIL2VsR+Io7yJq1qmSMk7mCyXd/tV53O7E16P1pNHF2dzUSZ+I/RmBsywj5oWQdOrD5mYuvtn5CcTzYtiaPGWfOcYeElrlAc=
+	t=1781888884; cv=none; b=l8NmpTdkbLN2kBOCN9Y0aCJilQP/plgpv5HnGOkwaPZzz9Az0CtzRmmXoBhbPCs+pAzUhamFz/8rlVbFSiLqYJCiZP6i93B3CPlWwPaxbtg9IQhKMaxkRpJWk+zSSgXxex07fIohmDOAlOCeABCGIXSc/8Yo0EcxAlZrDnbuu68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781887686; c=relaxed/simple;
-	bh=RF9yKM7HdRUCLkef2ihnPa2GruMTDRe4TXbSuvEyt5E=;
+	s=arc-20240116; t=1781888884; c=relaxed/simple;
+	bh=JwBzNt1pRLXScFfJlJX0kNvrYWPr7ygrz2uW+r1cQvo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=clrzAJI7nNZ9IGWnSqF4Aln27mFa99SwwAk6ZbhnkTn5cDDD9qcpD0X07Hh9sXppAF678s98DNSw08OATH9L0DmRqTVdfqFvKSVjJQ3aeDsjZBt943wfKBLUlC7FxUDTs/BbN+SsYZwX7i0unJe+3q2geJjh2yd9gpftQTSffSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uZCdXCV2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fvusH3Cj; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uZCdXCV2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fvusH3Cj; arc=none smtp.client-ip=195.135.223.130
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	 In-Reply-To:Content-Type; b=VO1hJInUgBRuHn2+lxEMDA68+XM9bhO3LYXw/gNf0tq3tZhwVWVtHhjR1WcXuEx2uHJh7XJcb2MQNs8uncom+nUgMkb0dz9QIA4rA2YLVRv+rmETVqE4a6bWSQVSZmno/8KlqYag2+BUK0v6pwq3Gw9XTL+w2J9d25D5Wz5V4OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U7SllBfo; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781888881;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XK/CeMqmem80Crpw9c8ZDFloTdNmQjOEMCA9VprGvds=;
+	b=U7SllBfoa4t9fJaCAaL1s6oUVPw5IgULNwjmJzdCCSlbYTmQ9bwWf6B9HovECNOL5WWojK
+	0qeNtYygO91k6Q9uTu9P7cVD8zpzEmFcFYwdGfVJofxT0kpGwvxL8Kz5vF2oD38QW7yzOT
+	MKvR0ibOqvNIZVUl5GPL0pZpn7UjXyM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-623-pQnSoj2tNPKoz7bt8qEF-A-1; Fri,
+ 19 Jun 2026 13:08:00 -0400
+X-MC-Unique: pQnSoj2tNPKoz7bt8qEF-A-1
+X-Mimecast-MFC-AGG-ID: pQnSoj2tNPKoz7bt8qEF-A_1781888878
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0120A6DCD3;
-	Fri, 19 Jun 2026 16:42:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781887340; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iXQ3wtdV83d3xjwQk+9qyaGwpV9Wn1moUT/NnM6Vprc=;
-	b=uZCdXCV2CLgyNxUkwWUDryvasqnlxkuFCM+F4xE4ix4GYhXYmJvHhUCUGwNc7Mu3IOFgJH
-	jMkXU0nNn1HrPlKGAAKvkmY/qpoO8asYhJ9kHRYX0VadDlFT6JZpMcB7/rEkcP4ASc7vdb
-	y8AUOxl9BE4+1E09j+yQ3veSSBrLBJM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781887340;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iXQ3wtdV83d3xjwQk+9qyaGwpV9Wn1moUT/NnM6Vprc=;
-	b=fvusH3CjGDele0c4kACYrzFH4jaTZFVJegP+J+1hWH8KmybfzjkVozls8SU+aCQwZ3qfjr
-	tS9/pO/cYD9pT8CA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781887340; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iXQ3wtdV83d3xjwQk+9qyaGwpV9Wn1moUT/NnM6Vprc=;
-	b=uZCdXCV2CLgyNxUkwWUDryvasqnlxkuFCM+F4xE4ix4GYhXYmJvHhUCUGwNc7Mu3IOFgJH
-	jMkXU0nNn1HrPlKGAAKvkmY/qpoO8asYhJ9kHRYX0VadDlFT6JZpMcB7/rEkcP4ASc7vdb
-	y8AUOxl9BE4+1E09j+yQ3veSSBrLBJM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781887340;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iXQ3wtdV83d3xjwQk+9qyaGwpV9Wn1moUT/NnM6Vprc=;
-	b=fvusH3CjGDele0c4kACYrzFH4jaTZFVJegP+J+1hWH8KmybfzjkVozls8SU+aCQwZ3qfjr
-	tS9/pO/cYD9pT8CA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 384BA779A8;
-	Fri, 19 Jun 2026 16:42:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id RxPFCmtxNWqpIAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 19 Jun 2026 16:42:19 +0000
-Message-ID: <ce2dd6b5-5716-4ae7-8183-8a96642c6be4@suse.de>
-Date: Fri, 19 Jun 2026 18:42:18 +0200
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E1A571964CC3;
+	Fri, 19 Jun 2026 17:07:57 +0000 (UTC)
+Received: from [10.44.49.253] (unknown [10.44.49.253])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 70C5030002D6;
+	Fri, 19 Jun 2026 17:07:53 +0000 (UTC)
+Message-ID: <23e47140-f69f-451d-9154-29071130c11c@redhat.com>
+Date: Fri, 19 Jun 2026 19:07:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,133 +69,315 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/6] ipv6: fix sysctl error handling and missing
- notifications
-To: netdev@vger.kernel.org
-Cc: nicolas.dichtel@6wind.com, shemminger@vyatta.com, dforster@brocade.com,
- gospo@cumulusnetworks.com, ddutt@cumulusnetworks.com, brian.haley@hp.com,
- horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org
-References: <20260618162225.4588-1-fmancera@suse.de>
+Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ "Schmidt, Michal" <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ "Vaananen, Pasi" <pvaanane@redhat.com>, "Oros, Petr" <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Simon Horman <horms@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260531194423.383366-1-ivecera@redhat.com>
+ <20260531194423.383366-2-ivecera@redhat.com>
+ <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <b5853501-969a-4ac3-8aff-83c9da9c9834@redhat.com>
+ <CH0PR11MB53941698BDF5C3B8298CC0679B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <aifTFMZtWBgLzhCS@FV6GYCPJ69>
+ <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <99cebea4-156a-4379-922e-07c50f766fbe@redhat.com>
+ <BN9PR11MB5401F6BA29CBA6F0C78FDB119B1A2@BN9PR11MB5401.namprd11.prod.outlook.com>
+ <fcaa184b-f9e9-44c4-bae8-c4a9c6c41239@redhat.com>
+ <aiqkZhNdt-WhglDg@FV6GYCPJ69>
+ <ca33b9b8-aafa-40f0-9943-a6b6736af4e4@redhat.com>
+ <CH3PR11MB8749910F17977B951A8B12CA9BE42@CH3PR11MB8749.namprd11.prod.outlook.com>
 Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260618162225.4588-1-fmancera@suse.de>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <CH3PR11MB8749910F17977B951A8B12CA9BE42@CH3PR11MB8749.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -4.30
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[suse.de:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300733-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300734-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:arkadiusz.kubalewski@intel.com,m:jiri@resnulli.us,m:vadim.fedorenko@linux.dev,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,gmail.com,google.com,redhat.com,microchip.com,kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:nicolas.dichtel@6wind.com,m:shemminger@vyatta.com,m:dforster@brocade.com,m:gospo@cumulusnetworks.com,m:ddutt@cumulusnetworks.com,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:dkim,suse.de:mid,suse.de:from_mime,vger.kernel.org:from_smtp,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,resnulli.us:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C5576A7247
+X-Rspamd-Queue-Id: A0C5A6A7391
 
-On 6/18/26 6:22 PM, Fernando Fernandez Mancera wrote:
-> While working on a different IPv6 patch series I have spotted multiple
-> minor bugs around sysctl error handling and notifications. In general,
-> they are not serious issues.
+On 6/17/26 1:59 PM, Kubalewski, Arkadiusz wrote:
+>> From: Ivan Vecera <ivecera@redhat.com>
+>> Sent: Monday, June 15, 2026 2:00 PM
+>>
+>> On 6/11/26 2:09 PM, Jiri Pirko wrote:
+>>> Wed, Jun 10, 2026 at 05:45:46PM +0200, ivecera@redhat.com wrote:
+>>>> On 6/10/26 3:04 PM, Kubalewski, Arkadiusz wrote:
+>>>>>> From: Ivan Vecera <ivecera@redhat.com>
+>>>>>> Sent: Tuesday, June 9, 2026 4:59 PM
+>>>>>>
+>>>>>> On 6/9/26 4:00 PM, Kubalewski, Arkadiusz wrote:
+>>>>>>>> From: Jiri Pirko <jiri@resnulli.us>
+>>>>>>>> Sent: Tuesday, June 9, 2026 10:51 AM
+>>>>>>>>
+>>>>>>>> Mon, Jun 08, 2026 at 07:03:46PM +0200,
+>>>>>>>> arkadiusz.kubalewski@intel.com
+>>>>>>>> wrote:
+>>>>>>>>>> From: Ivan Vecera <ivecera@redhat.com>
+>>>>>>>>>> Sent: Monday, June 8, 2026 5:48 PM
+>>>>>>>>>>
+>>>>>>>>>> On 6/8/26 4:43 PM, Kubalewski, Arkadiusz wrote:
+>>>>>>>>>>>> From: Ivan Vecera <ivecera@redhat.com>
+>>>>>>>>>>>> Sent: Sunday, May 31, 2026 9:44 PM ...
+>>>>>>>>>>>>            -
+>>>>>>>>>>>>              name: gnss
+>>>>>>>>>>>>              doc: GNSS recovered clock
+>>>>>>>>>>>> +      -
+>>>>>>>>>>>> +        name: int-nco
+>>>>>>>>>>>> +        doc: |
+>>>>>>>>>>>> +          Device internal numerically controlled oscillator.
+>>>>>>>>>>>> +          When connected as a DPLL input, the DPLL enters NCO
+>>>>>>>>>>>> mode
+>>>>>>>>>>>> +          where the output frequency is adjusted by the host
+>>>>>>>>>>>> via
+>>>>>>>>>>>> +          the PTP clock interface.
+>>>>>>>>>>>
+>>>>>>>>>>> Hi Ivan!
+>>>>>>>>>>>
+>>>>>>>>>>> How would you control this in case of automatic mode dpll?
+>>>>>>>>>>> Automatic mode DPLL shall be controlled on HW level, such pin
+>>>>>>>>>>> brakes that rule and requires some driver magic to show it is
+>>>>>>>>>>> higher priority then the rest of the pins?
+>>>>>>>>>>
+>>>>>>>>>> The NCO pin can be connected only in manual mode. In other words
+>>>>>>>>>> a
+>>>>>>>>>> DPLL in automatic mode cannot select NCO pin (switch to NCO mode)
+>>>>>>>>>> by
+>>>>>>>>>> its own.
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Being picky on DPLL_MODE for enabling feature is not something we
+>>>>>>>>> can allow if it is not related to HW limitation, is it?
+>>>>>>>>> Could you please elaborate why it is not possible for AUTOMATIC
+>>>>>>>>> mode?
+>>>>>>>>
+>>>>>>>> In automatic mode, the pin selection logic is defined upon prio. I
+>>>>>>>> can imagine that if NCO pin has the highest prio of the available
+>>>>>>>> ones, it gets picked. I would be aligned 100% with automatic mode
+>>>>>>>> behaviour.
+>>>>>>>> Is there a real usecase for it?
+>>>>>>>>
+>>>>>>>> [..]
+>>>>>>>
+>>>>>>> This is not true. AUTOMATIC mode is HW solution, SW driver ONLY
+>>>>>>> configures priorities on the inputs, not manages the active inputs.
+>>>>>>> This brakes that behavior, the SW driver would have to manually
+>>>>>>> override the AUTMATIC mode to be fed from such NCO pin as it doesn't
+>>>>>>> exists on it's priority list, HW cannot pick or use it.
+>>>>>>
+>>>>>> Correct, AUTO mode is hardware feature and it should not be emulated
+>>>>>> by a
+>>>>>> driver. If the hardware does not support it then the switching
+>>>>>> between
+>>>>>> input references should be done by userspace (by monitoring ffo,
+>>>>>> phase_offset, operstate).
+>>>>>>
+>>>>>
+>>>>> Yes, exactly, so for AUTOMATIC mode HW it will not be possible to
+>>>>> create
+>>>>> such pin, which means that NCO pin would serve only a MANUAL mode
+>>>>> implementation.
+>>>>> Basically this is something we shall not allow to happen. DPLL API
+>>>>> should be designed to cover the case where AUTO mode is able to
+>>>>> implement
+>>>>> all features consistently.
+>>>>
+>>>> If you don't like the proposal from Jiri (NCO switch driven by NCO pin
+>>>> priority -> highest==enter_nco else leave_nco) then it could be
+>>>> possible
+>>>> to handle the switching by allowing the state 'connected' in AUTO mode
+>>>> for the NCO pin type. Then the implementation will be the same for both
+>>>> selection modes.
+>>>>
+>>>> Only difference would be that a user does not need to switch the device
+>>> >from the AUTO to MANUAL mode.
+>>>>
+>>>>>>> The real use case is that any DPLL can switch the mode to this one
+>>>>>>> instead of implementing MANUAL mode just to use the feature with a
+>>>>>>> 'virtual' pin.
+>>>>>>
+>>>>>> I don't expect this... but it is up to a driver. I don't plan such
+>>>>>> functionality in zl3073x as the NCO pin does not expose prio_get()
+>>>>>> and
+>>>>>> prio_set() callbacks - so it is clear that this pin cannot be part of
+>>>>>> the
+>>>>>> automatic selection.
+>>>>>>
+>>>>>> Ivan
+>>>>>
+>>>>> There is a difference between particular HW and API capabilities, with
+>>>>> the
+>>>>> proposed API we would disallow the possibility of such implementation
+>>>>> for
+>>>>> existing HW variants.
+>>>>>
+>>>>> DPLL NCO MODE would allow that but as pointed here by Ivan and by Jiri
+>>>>> in
+>>>>> the other email it would also require the extra implementation for
+>>>>> some
+>>>>> configuration - device level phase/ffo handling.
+>>>>>
+>>>>> To summarize it all, I don't have such simple solution for it.
+>>>>>
+>>>>> First thing that comes to my mind is to combine both approaches.
+>>>>> Make it possible for AUTMATIC mode to also set "CONNECTED" state
+>>>>> on certain kind of "OVERRIDE" pins, where it could be determined by
+>>>>> the type of PIN and embed that logic into the DPLL subsystem.
+>>>>
+>>>> The possible states for particual pins are now handled at a driver
+>>>> level
+>>>> so the driver decides if the requested state is correct or not. So it
+>>>> could be easy to implement this.
+>>>>
+>>>> For auto mode allowed states:
+>>>> - input references: selectable / disconnected
+>>>> - nco pin: connected / disconnected
+>>>>
+>>>>> Basically, if driver registers such NCO pin it would be always
+>>>>> selected
+>>>>> manually, and in such case all the other pins are going to
+>>>>> disconnected
+>>>>> state while DPLL mode is also a "OVERRIDE" or something like it.
+>>>>
+>>>> I would leave this decision on the driver level... Imagine the
+>>>> potential
+>>>> HW that would allow to switch NCO mode if there is no valid input
+>>>> reference.
+>>>>
+>>>> Example:
+>>>>
+>>>> REF0 (prio 0) -> +------+ -> OUT0
+>>>> REF1 (prio 1) -> | DPLL | -> ...
+>>>> NCO  (prio 2) -> +------+ -> OUTn
+>>>>
+>>>> Such HW would prefer REF0 or REF1 and lock to one of them if they are
+>>>> qualified. But if they are NOT, then it switches to NCO mode.
 > 
-> In addition, there is one more issue in forwarding sysctl as it does not
-> check for CAP_NET_ADMIN for the namespace. I am keeping that patch out
-> of this series and I am aiming it at the net-next tree once it re-opens.
+> Now you said yourself "NCO mode" ... I agree that it would be a mode in
+> that case. Where instead of running on regular/built in XO dpll would run
+> on NCO and user could select it, and this would be addition to regular
+> behavior.
 > 
-> Fernando Fernandez Mancera (6):
->    ipv6: fix error handling in disable_ipv6 sysctl
->    ipv6: fix error handling in ignore_routes_with_linkdown sysctl
->    ipv6: fix error handling in forwarding sysctl
->    ipv6: fix error handling in disable_policy sysctl
->    ipv6: reset value and position for proxy_ndp sysctl restart
->    ipv6: fix missing notification for ignore_routes_with_linkdown
+> I also agree that the pin approach might be better/easier to use, assuming
+> frequency offset for all the outputs given dpll drives, it makes more sense
+> to have it configurable on input side.
+
++1
+
+>>>>
+>>>> In this situation the relevant driver would allow to configure priority
+>>>> and state 'selectable' for this NCO pin.
+>>>>
+>>>>> Perhaps the pin type could include OVERRIDE in it's name to make it
+>>>>> less
+>>>>> confusing and needs some extra documentation.
+>>>>>
+>>>>> Thoughts?
+>>>> I think _INT_ is ok. In the case of TYPE_INT_OSCILLATOR it is also
+>>>> obvious that it is not a standard input reference.
+>>>>
+>>>> Jiri, Vadim, Arek, thoughts?
+>>>
+>>> I agree with you, the driver should have the flexibility to implement
+>>> this according to his/hw's needs/capabilities. If it implements prio
+>>> selection in AUTO mode, let it have it. If it implements manual NCO pin
+>>> selection in AUTO mode using connected/disconnected override, let it
+>>> have it.
 > 
->   net/ipv6/addrconf.c | 35 +++++++++++++++++++++++++++--------
->   1 file changed, 27 insertions(+), 8 deletions(-)
+> I don't know 'current' HW that is capable of using AUTO mode as a part of
+> HW-based priority source selection and use such NCO input..
+> But as already explained above, this is special mode of regular XO, which
+> allows DPLL's output frequency offset configuration.
+
+Lets keep this available for potential future HW. I can imagine a
+situation where a user will prefer an automatic switch to NCO mode
+if there is no qualified input reference - automatic switch means
+that HW will support this (not emulated by the driver).
+
+>>>
+>>> Moreover, I actually like the "override" capability for pins in AUTO
+>>> mode in general. It may be handy for other usecases as well.
+>>>
+>> Arek? Vadim?
+>>
+>> Thanks,
+>> Ivan
 > 
+> Agree, 'override' capability of a pin would be the way to go for this and
+> other similar further cases.
+> 
+> I believe a single approach on this would be best, I mean if AUTO mode
+> needs a capability, to switch from regular behavior to 'OVERRIDE', and
+> 'OVERRIDE' is only pin capability that allows such behavior for AUTO
+> mode, then similar approach should be used on MANUAL mode, to make
+> userspace know that such pin is always available to set "CONNECTED"
+> and make the userspace implementation consistent on enabling it no matter
+> if AUTO or MANUAL mode dpll.
 
-So I have checked the feedback from sashiko.dev [1]. In general, it is 
-real but I have doubts about this one. While it is real, I am not so 
-sure we actually care about this scenario. In any case, this is a 
-pattern around kernel code and it would require fixes everywhere 
-(IPv4/IPv6/other places (?)).
+Proposal:
+1) new pin capability
+    - name: state-connected-override
+    - doc: pin state can be changed to connected in any DPLL mode
 
-The easier thing to do is what Nicolas suggested about taking the lock 
-before parsing the value i.e before calling proc_dointvec().
+2) new NCO pin type to switch the DPLL to NCO mode when connected
 
-I also do wonder if I should fix them in individual commits or together 
-in the same commit as they have different fixes tag. Or maybe we can aim 
-this last part to net-next. Thoughts?
+3) automatic-only DPLL
+    - should expose NCO pin with state-connected-override capability
 
-Please, see the feedback attached below.
+4) manual-only DPLL
+   - does not need to expose NCO pin with state-connected-override cap
 
-Thanks!
+5) dual-mode DPLL (supporting mode switching)
+   - if it exposes NCO pin with the override cap then it has to support
+     switching to NCO mode directly from AUTO mode
+   - if does not expose NCO pin with the override cap then a user MUST
+     switch the DPLL mode from AUTO to MANUAL to be able to make NCO
+     pin connected to the DPLL
 
-[1] https://sashiko.dev/#/patchset/20260618162225.4588-1-fmancera%40suse.de
+Vadim, Jiri, Arek - thoughts?
 
- > diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
- > index 8ff015975e279..1cfb223476bd6 100644
- > --- a/net/ipv6/addrconf.c
- > +++ b/net/ipv6/addrconf.c
-[ ... ]
- > @@ -6493,8 +6494,12 @@ static int addrconf_sysctl_proxy_ndp(const 
-struct ctl_table *ctl, int write,
- >  	if (write && old != new) {
- >  		struct net *net = ctl->extra2;
- >
- > -		if (!rtnl_net_trylock(net))
- > +		if (!rtnl_net_trylock(net)) {
- > +			/* Restore the original values before restarting */
- > +			*valp = old;
- > +			*ppos = pos;
- >  			return restart_syscall();
- > +		}
- >
-
-Does this rollback introduce a race condition that can silently discard
-concurrent writes?
-The sysctl core does not serialize concurrent writes to the same sysctl
-parameter, and proc_dointvec() modifies the global sysctl memory pointed to
-by ctl->data directly.
-If Thread A and Thread B concurrently write to proxy_ndp, and Thread A fails
-to acquire the RTNL lock, setting *valp = old will unconditionally reset the
-global memory back to what Thread A observed before its write. This seems
-like it would clobber Thread B's concurrent update.
-If Thread B successfully acquires the RTNL lock, it will evaluate its local
-old != new stack variables as true and emit a RTM_NEWNETCONF netlink
-notification. However, the notification will read the corrupted *valp 
-memory,
-leaving the emitted event and internal sysctl state out of sync.
-Could this be avoided by duplicating the ctl_table, pointing the data field
-to a local stack variable, calling proc_dointvec() on the local variable,
-and only updating the global *valp after successfully acquiring the lock,
-similar to how it is handled in addrconf_sysctl_forward()?
+Thanks,
+Ivan
 
 
