@@ -1,187 +1,350 @@
-Return-Path: <netdev+bounces-300682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300683-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +jO9FdkZNWoPnAYAu9opvQ
-	(envelope-from <netdev+bounces-300682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 12:28:41 +0200
+	id 0GOUB1waNWoknAYAu9opvQ
+	(envelope-from <netdev+bounces-300683-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 12:30:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96CF6A5390
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 12:28:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 762A06A53AA
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 12:30:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=NIWSjaDr;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=GHSwQQxM;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="jRbx3Rs/";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="Z/LgTkA4";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300682-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300682-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=suse.de;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XtoHjbLM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300683-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300683-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22B1A3013791
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 10:28:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4706430048CC
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 10:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CD1372EE4;
-	Fri, 19 Jun 2026 10:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F242B372EEC;
+	Fri, 19 Jun 2026 10:30:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AD8372B39
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 10:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1758D369D40
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 10:30:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781864887; cv=none; b=t+ghQlPuP87nj0FYi9V7OVRjJHYJyBv0YUhZvnbUwA2uybrJxjxMz5g4IAdF2L/UXlm8x15JKqVFaYWWv0lV0zUyNCYR+AoCmh9cRaPMlVgiFSuzfwI5xCJXrX7p+EwZSBZyUZRL/TaEDu4MF9bvKH/d+lomD8wcLBfSPVfwZ7o=
+	t=1781865048; cv=none; b=plRtyrtk+OQdFkGq/VlTKdceTAKqQVcoUpKGS07olZF7VR5vH7ib9ZaeiiQs+xQuNEFvevxzt3rjG4l13SAylcyo2dive9wMZoYHyC5/dYli3/WmOVCpOdRTTN6GfEowJC5xMUibLo5d4ODmziiceZVuHbVv1oe1GalY9rMeRlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781864887; c=relaxed/simple;
-	bh=mahV54k5L5UoBXn8gXlwd4Yan9/Oi0mmKz/T8YnJpC0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YAEvfhEcJUT5wiSoJzVlPwz9v+4ZCYAvQE9SgEX224bDysfuewSQuWi4QI3Jh5giNgXc9vwFbbOscmO1cDRvhAKR+KQn8b/bTvTdI9BFg3icj6WGizLRFUDQvWuAfF0Y2JMkCMuNUaivAH/Yt7kBqIa3LpMtz3iVYlYpYff5Il8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NIWSjaDr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GHSwQQxM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jRbx3Rs/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Z/LgTkA4; arc=none smtp.client-ip=195.135.223.131
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id ED9A475851;
-	Fri, 19 Jun 2026 10:28:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781864882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cCqV2Y+IJp6VXKHqhrLwRSu2HPm/+yAJZPTjVXijng8=;
-	b=NIWSjaDrjcazST9NAjs3uIAbpoB0O5ENP9DlpFtueOiqXT9S+TmxwLl9WF16gYE3vYUbRz
-	RKq27I8TRJezTlqBkjalGkyhwW/n9XdWH4qjYm1SrMzc/9fy1q7Jhq4L7lMb6Asv13uNMF
-	3bDRPk4nvOTwWL2v+XBsvCLICQYljag=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781864882;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cCqV2Y+IJp6VXKHqhrLwRSu2HPm/+yAJZPTjVXijng8=;
-	b=GHSwQQxMDQj6r9BAVXHAw+6Qqi11lY5WrE4qHA3PTNXIUbEihYQPgYi1+qpHiaKth3Nu44
-	G61UzbzqFJs+ONDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781864881; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cCqV2Y+IJp6VXKHqhrLwRSu2HPm/+yAJZPTjVXijng8=;
-	b=jRbx3Rs/EHL68EbLR+TjAdArWV3LGbJwBV4vqo5bu28fcjvCPgZz2o0lMcZ7TDQgbhYOnZ
-	o+QE2GiuI0h201xISNBSMw0I9qhSM+w3sYehlKWnfI7igGUY4VQmZDmtovfJYYDaSnOl2n
-	3WNC5h+NvUcHFZ4HRta3NqPKg9p43Q0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781864881;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cCqV2Y+IJp6VXKHqhrLwRSu2HPm/+yAJZPTjVXijng8=;
-	b=Z/LgTkA4ro3bjzXNCpMC7iQs9FUNYZWa8XrTgCaszxYn383Mm/xlvsFv3p+l9ED0a9EexD
-	0rx83H0mMwDBnkAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 37A2E779A8;
-	Fri, 19 Jun 2026 10:28:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CpW+CrEZNWpNLQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Fri, 19 Jun 2026 10:28:01 +0000
-Message-ID: <91d77512-f741-41d1-a799-5409690da5d7@suse.de>
-Date: Fri, 19 Jun 2026 12:28:00 +0200
+	s=arc-20240116; t=1781865048; c=relaxed/simple;
+	bh=4K0dglllDz19oyxHnZnh9o8wSYaVxvzLGLnjgrAew2w=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=X9xdEVUSUSZQy8U8rMt3xmCssofJIpR6DiERovPVkas1j8iSYnGfshG3v1XLs2I/8MvwQX8ttXx86OAw33ynJ3XZ459nRVIsl4KCnU4yUS5ahhRUWmFpwTXuOko+r3OWkv1v4hW73nly1oQRtIXWkj+stK7MNkd7IKmOFm63fWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XtoHjbLM; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 280201F000E9;
+	Fri, 19 Jun 2026 10:30:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781865046;
+	bh=axhmsIVyXAx+zeh0tLgf+IueV3XZEbuWwxiEovhFxwY=;
+	h=From:Date:Subject:To:Cc;
+	b=XtoHjbLM8nlm4XVWJekkRKxmgvyiNXeyen0PHsoLIoRPBX9lYJ21ZlT2oWM8QDp5n
+	 mbshunc/Siir8Dh4KzKhnzF/Q8HQIiFC+SW0KrBSKXCDEOL/o03i53+bQw7hESayyZ
+	 ahF5t8tzCIThCbQAj0RjzwvmXPJFfgouNJkjE34Nb5i6lMmzxTweEXGRTKHHG9kgHD
+	 HuC2OiOFZ9MB2S7CbFU/HxrQ+VdYUlSgKk5OSgG1bAUMMlN7l4HAeLkBHE8be+PJNC
+	 TawDd8SZGTlIk8rTqdsMOeq/N6DsAk51tsW9ZyXpB37bUX2H18zLx+26a/MRYNPLNU
+	 8wsPjoCCkKUWQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Fri, 19 Jun 2026 12:30:28 +0200
+Subject: [PATCH net v2] net: airoha: fix BQL underflow and UAF in shared
+ QDMA TX ring
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/6] ipv6: fix error handling in forwarding sysctl
-To: nicolas.dichtel@6wind.com, netdev@vger.kernel.org
-Cc: shemminger@vyatta.com, dforster@brocade.com, gospo@cumulusnetworks.com,
- ddutt@cumulusnetworks.com, brian.haley@hp.com, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org
-References: <20260618162225.4588-1-fmancera@suse.de>
- <20260618162225.4588-4-fmancera@suse.de>
- <fa7cbedb-33f3-4a79-acff-2b23cf3f57d8@6wind.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <fa7cbedb-33f3-4a79-acff-2b23cf3f57d8@6wind.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260619-airoha-bql-fixes-v2-1-4351d6a24484@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNzQrCMBCEX6Xs2ZUk0jZ68j2kh/5smsWS6KYUp
+ fTdDbl7nPn4ZnZIJEwJbtUOQhsnjiEHc6pg9H2YCXnKGYwyjWq0xZ4l+h6H94KOP5TQ1e1gJq1
+ s3V4gay+hArL1gEArdLn0nNYo33Kz6YL+L24aNTo3mdEoe621vT9JAi3nKDN0x3H8ABbFUnG2A
+ AAA
+X-Change-ID: 20260618-airoha-bql-fixes-f57b2d108573
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Wayen Yan <win847@gmail.com>, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[suse.de:+];
+	TAGGED_FROM(0.00)[bounces-300683-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300682-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,lists.infradead.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:nicolas.dichtel@6wind.com,m:netdev@vger.kernel.org,m:shemminger@vyatta.com,m:dforster@brocade.com,m:gospo@cumulusnetworks.com,m:ddutt@cumulusnetworks.com,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:win847@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:dkim,suse.de:mid,suse.de:from_mime]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A96CF6A5390
+X-Rspamd-Queue-Id: 762A06A53AA
 
-On 6/19/26 11:34 AM, Nicolas Dichtel wrote:
-> Le 18/06/2026 à 18:22, Fernando Fernandez Mancera a écrit :
->> When writing to the forwarding sysctl, if proc_dointvec() fails to parse
->> the input, it returns a negative error code. The current implementation
->> is overwriting that error for write operations.
->>
->> This results in a silent failure, it returns a successful write although
->> the configuration was not modified at all. When modifying the "all"
->> variant it can also modify the configuration of existing interfaces to
->> the wrong value.
->>
->> Fix this by checking the return value of proc_dointvec() and returning
->> early on failure.
->>
->> Fixes: b325fddb7f86 ("ipv6: Fix sysctl unregistration deadlock")
-> The bug existed before the git era.
-> Maybe
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> 
+When multiple netdevs share a QDMA TX ring and one device is stopped,
+netdev_tx_reset_subqueue() zeroes that device's BQL counters while its
+pending skbs remain in the shared HW TX ring. When NAPI later completes
+those skbs via netdev_tx_completed_queue(), the already-zeroed
+dql->num_queued counter underflows.
+Moreover, in the airoha_remove() path, netdevs are unregistered
+sequentially while skbs from previously unregistered netdevs may still
+reference freed net_device memory via skb->dev, causing a use-after-free
+during BQL accounting.
+Fix both issues:
+- Remove netdev_tx_reset_subqueue() from airoha_dev_stop() so pending
+  skbs are completed naturally by NAPI with proper BQL accounting.
+- Introduce airoha_qdma_tx_flush() to stop NAPI and flush BQL counters
+  for all pending skbs while skb->dev references are still valid.
+- Guard airoha_dev_xmit() with DEV_STATE_FLUSH to drop packets during
+  teardown.
+- Move DMA engine start into probe and stop into airoha_qdma_cleanup().
 
+Fixes: a9c2ca61fec7 ("net: airoha: Support multiple net_devices for a single FE GDM port")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Introduce airoha_qdma_tx_flush() to account BQL in airoha_remove() or
+  airoha_probe() error path.
+- Fix possible NULL pointer dereference in airoha_qdma_cleanup().
+- Introduce DEV_STATE_FLUSH().
+- Move back airoha_hw_cleanup().
+- Set proper Fixes tag.
+- Link to v1: https://lore.kernel.org/r/20260618-airoha-bql-fixes-v1-1-ffd2c2089518@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 87 +++++++++++++++++++++++---------
+ drivers/net/ethernet/airoha/airoha_eth.h |  1 +
+ 2 files changed, 63 insertions(+), 25 deletions(-)
 
-Hm, not really, AFAICS b325fddb7f86 is the first commit overwriting the 
-return value from proc_dointvec(). See:
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 64dde6464f3f..e81cd806b57b 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1004,6 +1004,7 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
+ 
+ 		e = &q->entry[index];
+ 		skb = e->skb;
++		e->skb = NULL;
+ 
+ 		dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
+ 				 DMA_TO_DEVICE);
+@@ -1523,10 +1524,26 @@ static int airoha_qdma_init(struct platform_device *pdev,
+ 	return airoha_qdma_hw_init(qdma);
+ }
+ 
+-static void airoha_qdma_cleanup(struct airoha_qdma *qdma)
++static void airoha_qdma_cleanup(struct airoha_eth *eth,
++				struct airoha_qdma *qdma)
+ {
+ 	int i;
+ 
++	if (test_bit(DEV_STATE_INITIALIZED, &eth->state)) {
++		u32 status;
++
++		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
++				  GLOBAL_CFG_TX_DMA_EN_MASK |
++				  GLOBAL_CFG_RX_DMA_EN_MASK);
++		if (read_poll_timeout(airoha_qdma_rr, status,
++				      !(status & (GLOBAL_CFG_TX_DMA_BUSY_MASK |
++						  GLOBAL_CFG_RX_DMA_BUSY_MASK)),
++				      USEC_PER_MSEC, 50 * USEC_PER_MSEC, true,
++				      qdma, REG_QDMA_GLOBAL_CFG))
++			dev_warn(eth->dev,
++				 "QDMA DMA engine busy timeout\n");
++	}
++
+ 	for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
+ 		if (!qdma->q_rx[i].ndesc)
+ 			continue;
+@@ -1593,7 +1610,7 @@ static int airoha_hw_init(struct platform_device *pdev,
+ 	return 0;
+ error:
+ 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
+-		airoha_qdma_cleanup(&eth->qdma[i]);
++		airoha_qdma_cleanup(eth, &eth->qdma[i]);
+ 
+ 	return err;
+ }
+@@ -1603,7 +1620,7 @@ static void airoha_hw_cleanup(struct airoha_eth *eth)
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
+-		airoha_qdma_cleanup(&eth->qdma[i]);
++		airoha_qdma_cleanup(eth, &eth->qdma[i]);
+ 	airoha_ppe_deinit(eth);
+ }
+ 
+@@ -1637,6 +1654,35 @@ static void airoha_qdma_stop_napi(struct airoha_qdma *qdma)
+ 	}
+ }
+ 
++static void airoha_qdma_tx_flush(struct airoha_qdma *qdma)
++{
++	int i;
++
++	airoha_qdma_stop_napi(qdma);
++
++	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
++		struct airoha_queue *q = &qdma->q_tx[i];
++		int j;
++
++		if (!q->ndesc)
++			continue;
++
++		spin_lock_bh(&q->lock);
++		for (j = 0; j < q->ndesc; j++) {
++			struct airoha_queue_entry *e = &q->entry[j];
++			struct sk_buff *skb = e->skb;
++			struct netdev_queue *txq;
++
++			if (!skb)
++				continue;
++
++			txq = skb_get_tx_queue(skb->dev, skb);
++			netdev_tx_completed_queue(txq, 1, skb->len);
++		}
++		spin_unlock_bh(&q->lock);
++	}
++}
++
+ static void airoha_dev_get_hw_stats(struct airoha_gdm_dev *dev)
+ {
+ 	struct airoha_gdm_port *port = dev->port;
+@@ -1837,9 +1883,6 @@ static int airoha_dev_open(struct net_device *netdev)
+ 	}
+ 	port->users++;
+ 
+-	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
+-			GLOBAL_CFG_TX_DMA_EN_MASK |
+-			GLOBAL_CFG_RX_DMA_EN_MASK);
+ 	qdma->users++;
+ 
+ 	if (!airoha_is_lan_gdm_dev(dev) &&
+@@ -1880,12 +1923,9 @@ static int airoha_dev_stop(struct net_device *netdev)
+ 	struct airoha_gdm_dev *dev = netdev_priv(netdev);
+ 	struct airoha_gdm_port *port = dev->port;
+ 	struct airoha_qdma *qdma = dev->qdma;
+-	int i;
+ 
+ 	netif_tx_disable(netdev);
+ 	airoha_set_vip_for_gdm_port(dev, false);
+-	for (i = 0; i < netdev->num_tx_queues; i++)
+-		netdev_tx_reset_subqueue(netdev, i);
+ 
+ 	if (--port->users)
+ 		airoha_set_port_mtu(dev->eth, port);
+@@ -1893,19 +1933,7 @@ static int airoha_dev_stop(struct net_device *netdev)
+ 		airoha_set_gdm_port_fwd_cfg(qdma->eth,
+ 					    REG_GDM_FWD_CFG(port->id),
+ 					    FE_PSE_PORT_DROP);
+-
+-	if (!--qdma->users) {
+-		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
+-				  GLOBAL_CFG_TX_DMA_EN_MASK |
+-				  GLOBAL_CFG_RX_DMA_EN_MASK);
+-
+-		for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
+-			if (!qdma->q_tx[i].ndesc)
+-				continue;
+-
+-			airoha_qdma_cleanup_tx_queue(&qdma->q_tx[i]);
+-		}
+-	}
++	qdma->users--;
+ 
+ 	return 0;
+ }
+@@ -2191,6 +2219,9 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 	u16 index;
+ 	u8 fport;
+ 
++	if (test_bit(DEV_STATE_FLUSH, &dev->eth->state))
++		goto error;
++
+ 	qid = airoha_qdma_get_txq(qdma, skb_get_queue_mapping(skb));
+ 	tag = airoha_get_dsa_tag(skb, netdev);
+ 
+@@ -3413,8 +3444,12 @@ static int airoha_probe(struct platform_device *pdev)
+ 	if (err)
+ 		goto error_netdev_free;
+ 
+-	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
++	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++) {
+ 		airoha_qdma_start_napi(&eth->qdma[i]);
++		airoha_qdma_set(&eth->qdma[i], REG_QDMA_GLOBAL_CFG,
++				GLOBAL_CFG_TX_DMA_EN_MASK |
++				GLOBAL_CFG_RX_DMA_EN_MASK);
++	}
+ 
+ 	for_each_child_of_node(pdev->dev.of_node, np) {
+ 		if (!of_device_is_compatible(np, "airoha,eth-mac"))
+@@ -3437,8 +3472,9 @@ static int airoha_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ error_napi_stop:
++	set_bit(DEV_STATE_FLUSH, &eth->state);
+ 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
+-		airoha_qdma_stop_napi(&eth->qdma[i]);
++		airoha_qdma_tx_flush(&eth->qdma[i]);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
+ 		struct airoha_gdm_port *port = eth->ports[i];
+@@ -3474,8 +3510,9 @@ static void airoha_remove(struct platform_device *pdev)
+ 	struct airoha_eth *eth = platform_get_drvdata(pdev);
+ 	int i;
+ 
++	set_bit(DEV_STATE_FLUSH, &eth->state);
+ 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
+-		airoha_qdma_stop_napi(&eth->qdma[i]);
++		airoha_qdma_tx_flush(&eth->qdma[i]);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
+ 		struct airoha_gdm_port *port = eth->ports[i];
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 41d2e7a1f9fb..f6dce5e74e02 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -92,6 +92,7 @@ enum {
+ enum {
+ 	DEV_STATE_INITIALIZED,
+ 	DEV_STATE_REGISTERED,
++	DEV_STATE_FLUSH,
+ };
+ 
+ enum {
 
-@@ -3983,7 +3986,7 @@ int addrconf_sysctl_forward(ctl_table *ctl, int 
-write, struct file * filp,
-  	ret = proc_dointvec(ctl, write, filp, buffer, lenp, ppos);
+---
+base-commit: a887f2c7da66a805a55fd8706d45faec85f646db
+change-id: 20260618-airoha-bql-fixes-f57b2d108573
 
-  	if (write)
--		addrconf_fixup_forwarding(ctl, valp, val);
-+		ret = addrconf_fixup_forwarding(ctl, valp, val);
-  	return ret;
-  }
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
