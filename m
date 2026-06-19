@@ -1,192 +1,174 @@
-Return-Path: <netdev+bounces-300617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9YkhAOzlNGpnjgYAu9opvQ
-	(envelope-from <netdev+bounces-300617-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 08:47:08 +0200
+	id hViMAG3rNGpykAYAu9opvQ
+	(envelope-from <netdev+bounces-300633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:10:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6ADE6A42BE
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 08:47:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6564F6A43FD
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:10:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Zd5G0KnM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300617-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300617-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=h6ql4ZWx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300633-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300633-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=simonwunderlich.de;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 12106300B0B8
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 06:47:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84A53300916A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096A42F8E98;
-	Fri, 19 Jun 2026 06:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5B0351C3B;
+	Fri, 19 Jun 2026 07:10:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A819E40D579
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 06:47:01 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781851622; cv=pass; b=hruKsVMwaZxiWJBdattXjmeHZW+aZfTYJw3at+WE5ig+71zdAOvYSg8L3P4880kxaFW/nIDfoxQIVDKMhKzlR5rxPcPsJEA/YAWRqiJgR3/WGDST0sjA0yW+gwFCEvkgUSCsJ9zwWlylwhtBlt61FjKOmxHstMXYMPgDGSp+ynY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781851622; c=relaxed/simple;
-	bh=ATeP/BIwP6EgqPgiK5vYo7HtyaoiN0B6SAvCOXGCVbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K0aYkU8ANVj+c4iJ0bHTrhl+0h6wKA8FR+dHfBSrUrvaO6uBBvcWz4xcVTeNuhPgZHljjRCQO7pNIqHdbg5Rsiz4UHTVI2GEDUz+9iGY/QzJMNAKV2UwDb6w/Bdd/yy2nLcohfOsz07K1xxUExqbcGiKEtVq7ZVECJugQLamOkM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zd5G0KnM; arc=pass smtp.client-ip=209.85.167.175
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-486b93fc7c8so731958b6e.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 23:47:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781851621; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YtwCTxtTtFKyXE600vP8AFkDAU5P16QSbX0RMML0lgXihtTh7JtbmHk3064n08loVu
-         rasnHbI1wCpJicUNoB7D7tJE79/3PNIMdfq2gTAClPEqhTKbU5c583TgI8t/wBVtH4LR
-         Wt0D2vlPEY+xHm0/GLOHowEwZ8eY8QHIpwjzctKzZE6cK9INbF85KqQZxMNf/biEI588
-         E5dUr6hfX9Qxl3aKc5OYH6rDrU4qTBJMgxpZcfoEEjYNGdD1B9CGAi9Muos/xInxrUAn
-         P+CeA/bg4IZ+d+wzalxa+ZA9DzbAVmRiWltXEWFaiACtoTuxYnGkX1LQmm07cVUneLwN
-         kJJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ttemi/Fz+sxJasBpKSDCYgcaziGolwgbdDy2xiax/a8=;
-        fh=1ffhz1LCn+XjckKwJV4d58j3PNJFvGXtZYChy/J7jCo=;
-        b=hhmNH9x3ULcGNzM5Em2VjIpQm9vnSIPN5tW0dl4y+uDYcQWTANV7eBaTlNRwjb/ebb
-         Z1Xhv2w1Wyf8WYZqDPKywQSNER5N3I8WIvSqXw9aQh7wsUiN7gpPV1hsVcSeV8HkZucs
-         AZgksm/fFh153UbqnAcv407gmmWqPtY7DrS5QlMeeTZvCtneLmDdQhk+d4R2GUQwihPc
-         RaOLnc3sQu/o24QNBCFK7wK9Uf71bvtAGhY6smlS4dvBN6gSx5pyE8sORHb4RTHJ+owj
-         l4Ig9cKFsChkX0zPtsTS52g0EP/PHsFgK1SfcLyc+DX6OVZRiy28korewkRi3QmQEV7y
-         SKgg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781851621; x=1782456421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ttemi/Fz+sxJasBpKSDCYgcaziGolwgbdDy2xiax/a8=;
-        b=Zd5G0KnMk+0RA2DHWFhtUOEX55toO9twt5kA+YxVnrQoqfn4FuDifHLZKC1VrfmblC
-         kjhBKCv1i5/2UxHa7cKxNrufH/MvRpinKVZveWJ4GOJNdHm7ZuTgoweCp32EhKHmMuMF
-         0qf8jUd6cYYeCW2/S8tRciFGbmTmVW8otUFdUAzL7SfkkycYKWK3VfEbJ7YlyhEMWTa3
-         Z+mPux75TnT8edvec8qVW1TE+W9pSi8WKL54clZSEdYnuOvVQ7uWIshY04nnwqSHocln
-         8R3j/feGv9djXTPInsF6/VWONdTqKw4y+MWulEc9l0qrlwR6sNn/5YdU+8bYZS7woaCv
-         WaWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781851621; x=1782456421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ttemi/Fz+sxJasBpKSDCYgcaziGolwgbdDy2xiax/a8=;
-        b=gMzyVP6JHNaWIsl03BF8LY01qPAsHvuhzWJwedy/cr3Xqi3vA5lJS1vCIVwbAzFbab
-         DaDhk2TbB9VUaNXYjqHQGd6nDnpMjFVEBkpQd4m5y7E2RJ3WsRllyjkkTv5z/BWpvpnh
-         waASQ08repHRACBVbkkZ6Hfgscxr8PKsQaHWpZllom3mlWm0xEBNp0Vn2l96e/xqr33K
-         ut4Ml2zQF5hD1togk/A6GZWeVN/vH2IoGupyKriNvI+rIqrPVIXk2jodRGJ/ZrRmXRDY
-         KpnBQUSs1Rxo33vRGXyxiU7puo+fKLOicXIFv4C6Srq5zn+atiHKNPzHksIvxdAangBC
-         1fRQ==
-X-Gm-Message-State: AOJu0YxR7USClnKzbJTvvLw7BGUS/gJQa9tc98Tg1HIoV3P04i90mtZl
-	W8MQbKuSqezcyxtz9IkiSMw3CbUTxJ9okyjSNV8dJCW0T0MtyV3A5VS2HNnoPRATq5CMWo/6ztO
-	Qme4c3w523ionXxN8XJ5hZwX/n5WEUGA=
-X-Gm-Gg: AfdE7clpvFtt+av4tDbO95egJhk+XOy/+8Q9W2NUNDloZ02mbC9k2OzeNFybu44O9tK
-	HR54gsBxej0UxiY6LHK2zX5nY8F8viLAnCU3NfOQC6QqmH3Ld+gKdjwd7rNuaFzOSdNw+eBZsnN
-	f6fg10j8JhqYiVkkGLhcgskMGUAt0P9EE+oC3tWo0iFkBQB4y/1osgsLL7SXPUGTPvz5DtJSGdO
-	9juSCx7rlT0lvGOUUGBkAmYRTyJrjvby/SSfyz5E9sQ6EYxD+/0Oxu38sA3exP9THuOoREu7/mC
-	x5aM8rd2FItnxazZc11QrXXchKgY
-X-Received: by 2002:a05:6808:1c09:b0:468:6a2:897 with SMTP id
- 5614622812f47-4896a9b5286mr2137864b6e.6.1781851620553; Thu, 18 Jun 2026
- 23:47:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396E633E36A
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 07:10:31 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781853032; cv=none; b=e22Lcks0Fy8NqovAliUMxEo7l2o7IFYId5N7lt70I34wWdrlnSLA7hZDTe9+H0hcEDSa4LPr6wodFHGNIYDq+57Kb2krJUfvr9rLccZ8Cr85yF7GnN1GpRuhdxBrzcfFzULbGIlgKugOp5ahSgHkLtJvslIMZYDPFFw3hsKc2p0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781853032; c=relaxed/simple;
+	bh=a+oGRw41dh1HY1aj2eszImyS6m4/Gxab2Oaii5OlU3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jg0aWxs/jRu4jaavmYddzCvZ0KIP+blNAwRVFk2+aiAu+kOn80rIxZVqGZn7p2iSIUAJGuxbZ17w2ytPxZFaC1XoqbwLV9OIBecdiX05kISPowMw8JYoRrM3GN70HEGr3xsr7NB7iMPfVZIq1km47DZ9NSlT8r0WgBORvbEkCUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=h6ql4ZWx; arc=none smtp.client-ip=23.88.38.48
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
+	s=09092022; t=1781852446;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=i1TkLzyUd1JwPopxOLN6MeiT5+G1+YihcZtxk0na7ro=;
+	b=h6ql4ZWxeEWdYnFm1M3mQeM7XLANR3/OrTo0BibVg5XKaA2jrGcDTlCfhrKDHsCGM4eskA
+	a9GGheNn3gp+OsmVgfmuiebwqXbiI8kpxye54C3HydJeN4e3InzAHzSY2zT4zJenVSVB4K
+	x9oaLAI0T3zQckgdydd6ntHJayiEigiU4X5hbU6ds8yDF/154BdOV0kQiqXJKt1sgupeXi
+	Dei5CEQEAgYm93WS0Ix+pOzBLeqSnAXj/Pid0bz1/l/5a/mnKeqIW5agmHxiy/hPlNvYYJ
+	dGPfagCKL/JowiAPmRrqqIOXuQXWf1z3Du4PTzav9WqJARxfT/0QBDOO7DPlqw==
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH net 00/15] pull request: batman-adv 2026-06-19
+Date: Fri, 19 Jun 2026 09:00:30 +0200
+Message-ID: <20260619070045.438101-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260618202716.2166450-1-mmyangfl@gmail.com> <20260618202716.2166450-4-mmyangfl@gmail.com>
- <f9234e83-e9e1-488d-93f5-1f3c20634c87@lunn.ch>
-In-Reply-To: <f9234e83-e9e1-488d-93f5-1f3c20634c87@lunn.ch>
-From: David Yang <mmyangfl@gmail.com>
-Date: Fri, 19 Jun 2026 14:46:24 +0800
-X-Gm-Features: AVVi8CfKIZlzrVh3jgH_AT5_B3BpZ4AVH4mqi805e2mnKmOVx1ymoX1Y4QXKoP8
-Message-ID: <CAAXyoMN9a6nncr-C1UDuUQMf4i5FR-9s-sfhSpYLYs5nmh9Uhg@mail.gmail.com>
-Subject: Re: [RFC net-next 3/4] net: dsa: motorcomm: Dynamically allocate port structures
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[simonwunderlich.de,none];
+	R_DKIM_ALLOW(-0.20)[simonwunderlich.de:s=09092022];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300617-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-300633-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[simonwunderlich.de:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,lunn.ch:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,simonwunderlich.de:dkim,simonwunderlich.de:mid,simonwunderlich.de:from_mime,vger.kernel.org:from_smtp,open-mesh.org:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E6ADE6A42BE
+X-Rspamd-Queue-Id: 6564F6A43FD
 
-On Fri, Jun 19, 2026 at 2:06=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Fri, Jun 19, 2026 at 04:26:31AM +0800, David Yang wrote:
-> > With support for LED introduced later, struct yt921x_priv will be 17k
-> > which is not very good for a single kmalloc(). Convert the ports array
-> > to a array of pointers to stop bloating the priv struct.
-> >
-> > Signed-off-by: David Yang <mmyangfl@gmail.com>
-> > ---
-> >  drivers/net/dsa/motorcomm/chip.c | 95 ++++++++++++++++++++++++--------
-> >  drivers/net/dsa/motorcomm/chip.h |  3 +-
-> >  2 files changed, 75 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/drivers/net/dsa/motorcomm/chip.c b/drivers/net/dsa/motorco=
-mm/chip.c
-> > index 6dee25b6754a..d44f7749de02 100644
-> > --- a/drivers/net/dsa/motorcomm/chip.c
-> > +++ b/drivers/net/dsa/motorcomm/chip.c
-> > @@ -548,11 +548,14 @@ yt921x_mbus_ext_init(struct yt921x_priv *priv, st=
-ruct device_node *mnp)
-> >  /* Read and handle overflow of 32bit MIBs. MIB buffer must be zeroed b=
-efore. */
-> >  static int yt921x_read_mib(struct yt921x_priv *priv, int port)
-> >  {
-> > -     struct yt921x_port *pp =3D &priv->ports[port];
-> > +     struct yt921x_port *pp =3D priv->ports[port];
-> >       struct device *dev =3D to_device(priv);
-> >       struct yt921x_mib *mib =3D &pp->mib;
-> >       int res =3D 0;
-> >
-> > +     if (!pp)
-> > +             return -ENODEV;
-> > +
->
-> Are all these tests actually needed? If you cannot allocate the
-> memory, i would expect the probe to fail, so you can never get here.
->
->         Andrew
+Dear net maintainers,
 
-Dummy ports are no longer assigned control blocks (in yt921x_dsa_setup).
+here are some bugfixes for batman-adv which we would like to have integrated into net.
+
+Please pull or let me know of any problem!
+
+Thank you,
+      Simon
+
+The following changes since commit dad4d4b92a9b9f0edb8c66deda049da1b62f6089:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-06-11 14:33:35 -0700)
+
+are available in the Git repository at:
+
+  https://git.open-mesh.org/batadv.git tags/batadv-net-pullrequest-20260619
+
+for you to fetch changes up to edb557b2ba38fea2c5eb710cf366c797e187218c:
+
+  batman-adv: tvlv: avoid race of cifsnotfound handler state (2026-06-14 12:33:18 +0200)
+
+----------------------------------------------------------------
+Here are some batman-adv bugfixes, all by Sven Eckelmann:
+
+- gw: don't deselect gateway with active hardif
+
+- TTL fixes in bcast/mcast and fragmentation handling (4 patches)
+
+- BATMAN V: prevent OGM aggregation on disabled hardif
+
+- tp_meter: concurrency and range fixes, add cap to unacked list
+  (4 patches)
+
+- tt: fix unchecked VLAN ID in tt for local add and roam (2 patches)
+
+- dat: check VLAN ID in the hash
+
+- tvlv: enforce 2-byte alignment
+
+- tvlv: avoid race of cifsnotfound handler state
+
+----------------------------------------------------------------
+Sven Eckelmann (15):
+      batman-adv: gw: don't deselect gateway with active hardif
+      batman-adv: ensure bcast is writable before modifying TTL
+      batman-adv: fix (m|b)cast csum after decrementing TTL
+      batman-adv: frag: ensure fragment is writable before modifying TTL
+      batman-adv: frag: avoid underflow of TTL
+      batman-adv: v: prevent OGM aggregation on disabled hardif
+      batman-adv: tp_meter: restrict number of unacked list entries
+      batman-adv: tp_meter: annotate last_recv_time access with READ/WRITE_ONCE
+      batman-adv: tp_meter: prevent parallel modifications of last_recv
+      batman-adv: tp_meter: handle overlapping packets
+      batman-adv: tt: don't merge change entries with different VIDs
+      batman-adv: tt: track roam count per VID
+      batman-adv: dat: prevent false sharing between VLANs
+      batman-adv: tvlv: enforce 2-byte alignment
+      batman-adv: tvlv: avoid race of cifsnotfound handler state
+
+ net/batman-adv/bat_iv_ogm.c            | 11 ++++-
+ net/batman-adv/bat_v.c                 |  1 +
+ net/batman-adv/bat_v_ogm.c             | 23 ++++++++++-
+ net/batman-adv/distributed-arp-table.c | 12 ++++--
+ net/batman-adv/fragmentation.c         | 22 +++++++++-
+ net/batman-adv/fragmentation.h         |  3 +-
+ net/batman-adv/hard-interface.c        | 28 +------------
+ net/batman-adv/routing.c               | 73 +++++++++++++++++++++++++++++++--
+ net/batman-adv/tp_meter.c              | 74 ++++++++++++++++++++++------------
+ net/batman-adv/translation-table.c     | 12 +++++-
+ net/batman-adv/tvlv.c                  | 69 ++++++++++++++++++++++++++++---
+ net/batman-adv/types.h                 | 21 ++++++----
+ 12 files changed, 270 insertions(+), 79 deletions(-)
 
