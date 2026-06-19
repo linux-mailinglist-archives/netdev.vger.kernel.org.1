@@ -1,194 +1,272 @@
-Return-Path: <netdev+bounces-300690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cVkfLFwqNWo6nwYAu9opvQ
-	(envelope-from <netdev+bounces-300690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:39:08 +0200
+	id cbHzAiQuNWoooAYAu9opvQ
+	(envelope-from <netdev+bounces-300691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:55:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 136456A574F
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:39:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5B96A5849
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 13:55:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VVri5rZc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300690-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300690-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=QmqGl0+K;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300691-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300691-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6450301465C
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:39:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 373473000BB6
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA36380FD6;
-	Fri, 19 Jun 2026 11:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957A737BE6E;
+	Fri, 19 Jun 2026 11:55:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B9F40D59E
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 11:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B4C2ECD3A;
+	Fri, 19 Jun 2026 11:55:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781869146; cv=none; b=udIVF4LwI6qCFUU35cQp/Jzr/8/D6m6xY6n2qiLu8Kh9Mxe3OC4j4UMxOgQT8A72ocK5+/2k1HPyBLsxQleu10g9C7Gd88npY2BiwjmV39oGFZIk8Pk6aEUKadKMLq4ucVoqImRpoalJuHkAlsyHnTCNP4MoTFqgXbZcxjOlZh0=
+	t=1781870109; cv=none; b=kKP/JSQXpIlk612pEpRlDmXTH2yc2R8RjYFfF0T+Oj4G0WziM4KYvJoJYZr8+LmWKqdIzy7mtVhMXfbfy6wTjF0HKmVyoao4x09woLgWnL8Yy+clvQ+/Sm0/kVHY0IQsyHjSsslfnEUiowlKlM5MnE3eoMvdcz29/aRXZsTfO2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781869146; c=relaxed/simple;
-	bh=/At/aUE3doVEfljnJuE2qBKtSi2wRZ1sqKK6eQbUS4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AlIKbur7XyVqOZiQZhX0QcyN/dBpbQ8y3y0rlqyXbPXpEjHKqEG13RP3yopNMQr7+5NakMv/KgeXICwAy5La0CInpmSdlP4+irummj0znIMadn4cLeidQRmjU7hIHW2NkZqlIpA5d/EZXn7dyYdyfmtidxW0CsD0o71oj7QxvCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VVri5rZc; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714621F000E9;
-	Fri, 19 Jun 2026 11:39:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781869145;
-	bh=kpXWct/ksH4wphVNWjqFdoJ25adS8L/TJ0QkPKa90Ek=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VVri5rZca1NYzdVF7Jk2qeqaI4yYUI0BXeAeXmut2STe8wqQJFkRnpLEf/EFNGJSm
-	 LrgMwA0gJfyKyWzXk/12Xbfd9gQUOBNd/TxjUgJiWhIdkvVheTKEzTLe7eXFnjx8Zp
-	 LmXli67akG+9oNCDvDyfJuay1MKL1Zy5xSQEagGa9c/sAjp3kCabCj7YqAgHZxb+jc
-	 3nLKwiQtgmbYX8OdmAhjdqzhZ2RC3KSYcCp5hMhwBrOQquEMVB7wVOgtvoOumfeBXf
-	 X9wsz+6xWKfvHgTEmw1v1/f/iREfnC1r+pWXxNlmgI7EYn6St5e1mwWnQmkPB7IKbT
-	 euLgifYEyXk6A==
-Date: Fri, 19 Jun 2026 13:39:02 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v2] net: airoha: Fix TX scheduler queue mask loop
- upper bound
-Message-ID: <ajUqVknmRq-4GHkJ@lore-desk>
-References: <178185574223.2378148.13454900445528174929@gmail.com>
+	s=arc-20240116; t=1781870109; c=relaxed/simple;
+	bh=xz21iyidMDbsYFMAN+fxaCZ8AM0FT6OJZMmVNuyj+LA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K1Ptyj4NW+p3eZMHCBoik73VcBYhRg2vvANS7BjsgKw3t/1Td8IoBpJQ0Z9GhSCoJX6JRVC6p2QeDKc05v9ksrG+sBVm24yZXhThs41VsaNldfXcie8UKSrZy70c/u27Jj/0qBXW0s2eq53fx86joLUWidzBIh26Dvprc5YQHRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=QmqGl0+K; arc=none smtp.client-ip=217.70.190.124
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 2A74860196;
+	Fri, 19 Jun 2026 13:54:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1781870098;
+	bh=UEULA5419N+tdWVom9Zok1lnBky1PZWe5Kj4DoDDdlg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QmqGl0+KClYUML+0oRMmKr10sUp9D2Ap4d1tB2mIrirax2GWA190mb1lWGYXv2Ef4
+	 qBnmRWai4KDDGW+b+8zW22kWVJhC4bI6OeUvGNlOisI05dPfnh1En2W5AUVXCrhzyY
+	 NUr+SIU69YO1IFvW1+FdwP3J8OKdbTNHB3kFyvErzf41VOHauqUovLfJH7A67QX7ER
+	 zNpNhVCo2xlQTy+KgC3zXgEStS5kkc1r+DVoBOV9DIwGsjgu+DUSfO/6uy0e8LmL+L
+	 tmqnjxM0cqYM+D2WPpeACcpbZ48IV99mIX0ihb/WSVWjJ0/7SZRhOZ7A9wcQr5Xn15
+	 hL3o5/NYQtDAA==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 00/16] Netfilter fixes for net
+Date: Fri, 19 Jun 2026 13:54:35 +0200
+Message-ID: <20260619115452.93949-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wHUdDSUz+JkqUMMA"
-Content-Disposition: inline
-In-Reply-To: <178185574223.2378148.13454900445528174929@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300690-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300691-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lore-desk:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,netfilter.org:dkim,netfilter.org:mid,netfilter.org:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 136456A574F
+X-Rspamd-Queue-Id: EE5B96A5849
 
+Hi,
 
---wHUdDSUz+JkqUMMA
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The following patchset contains Netfilter fixes for net, this contains
+fixes for a few crash, but many of the patches are trivial/correctness
+fixes. There is too one rework of the conntrack expectation timeout
+strategy to deal with a possible race when removing an expectation.
 
-> In airoha_qdma_set_chan_tx_sched(), the loop clearing queue mask was
-> using AIROHA_NUM_TX_RING (32) instead of AIROHA_NUM_QOS_QUEUES (8).
->=20
-> Each channel has 8 queues, and TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i)
-> computes BIT(i + (channel * 8)). With i ranging 0..31, this causes:
-> - channel 0: clears bit 0..31 (all 4 channels) instead of 0..7
-> - channel 1: clears bit 8..31 (channels 1-3) instead of 8..15
-> - channel 2: clears bit 16..31 (channels 2-3) instead of 16..23
-> - channel 3: clears bit 24..31 (channel 3 only) - correct by accident
->=20
-> While BIT(32+) on arm64 produces 64-bit values truncated to 0 in u32
-> mask parameter, the loop still incorrectly clears queues within the
-> same channel beyond queue 7.
->=20
-> Even though this is functionally harmless (the register resets to 0
-> and is only ever cleared, never set =E2=80=94 so clearing extra bits is a
-> no-op), the loop bound is semantically wrong and should be fixed for
-> correctness and clarity.
->=20
-> Fix by using AIROHA_NUM_QOS_QUEUES (8) as the loop upper bound.
->=20
-> Fixes: ef1ca9271313 ("net: airoha: Add sched HTB offload support")
-> Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> Signed-off-by: Wayen Yan <win847@gmail.com>
-> ---
-> Changes in v2:
-> - Add Lorenzo's Acked-by tag.
-> - Clarify in commit message that this is semantically wrong but
->   functionally harmless (register resets to 0, only cleared), as
->   Lorenzo pointed out in review.
-> - Rebase on current net tree.
->=20
-> Link: https://lore.kernel.org/netdev/ajJIWMs4dVbfkHZ5@lore-desk/
-> Link: https://lore.kernel.org/netdev/CAL_ptrs6J3Ryw_4mVTq5VgzkB4RreF5S0hu=
-HyLvd9YwWr1m6jAA@mail.gmail.com/
->=20
->  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index d0c0c0ec8a..ca77747b44 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -2212,7 +2212,7 @@ static int airoha_qdma_set_chan_tx_sched(struct net=
-_device *dev,
->  	struct airoha_gdm_port *port =3D netdev_priv(dev);
+1) Fix the incorrect flowtable timeout extension for entries in
+   hw offload, from Adrian Bente. This is correcting a defect in
+   the functionality, no crash.
 
-it seems you have not rebased on top of net tree.
+2) Hold reference to device under the fake dst in br_netfilter,
+   from Haoze Xie. This is fixing a possible UaF if the device
+   is removed while packet is sitting in nfqueue.
 
-Regards,
-Lorenzo
+3) Reject template conntrack in xt_cluster, otherwise access to
+   uninitialize conntrack fields are possible leading to WARN_ON
+   due to unset layer 3 protocol. From Wyatt Feng.
 
->  	int i;
-> =20
-> -	for (i =3D 0; i < AIROHA_NUM_TX_RING; i++)
-> +	for (i =3D 0; i < AIROHA_NUM_QOS_QUEUES; i++)
->  		airoha_qdma_clear(port->qdma, REG_QUEUE_CLOSE_CFG(channel),
->  				  TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i));
-> =20
-> --=20
-> 2.51.0
->=20
+4) Make sure the IPv6 tunnel header is in the linear skb data
+   area before pulling. While at it remove incomplete NEXTHDR_DEST
+   support. From Lorenzo Bianconi. This possibly leading to crash
+   if IPv4 header is not linear, but GRO already guarantees this,
+   unlikely but still possible.
 
---wHUdDSUz+JkqUMMA
-Content-Type: application/pgp-signature; name=signature.asc
+5) Bail out immediately if ENOMEM is seen in a nfnetlink batch,
+   no further processing since this will accumulate more bogus
+   errors. From Florian Westphal. Functionally improvements
+   under memory stress, no crash.
 
------BEGIN PGP SIGNATURE-----
+6) Use test_bit_acquire in ipset hash set to avoid reordering
+   of subsequent memory access. This is addressing a LLM related
+   report, no crash has been observed. From Jozsef Kadlecsik.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajUqVgAKCRA6cBh0uS2t
-rP/SAPoDG+CtUOFublyI3uoCmooVJ0WP3YmpXBkAY+jo5hzPLgEAh9y8M9BQpUwj
-MfPZagIteB1QEb+rf7nFp8POMPVnEAc=
-=Abaq
------END PGP SIGNATURE-----
+7) Use test_bit_acquire in ipset bitmap set too, for the same
+   reason as in the previous patch, from Jozsef Kadlecsik.
 
---wHUdDSUz+JkqUMMA--
+8) Call kfree_rcu() after rcu_assign_pointer() to address a
+   possible UaF, very hard to trigger. Never observed in practise,
+   reported by LLM. Also from Jozsef Kadlecsik.
+
+9) Use disable_delayed_work_sync() instead cancel_delayed_work_sync()
+   to avoid that ipset GC handler re-queues work as reported by LLM.
+   From Jozsef Kadlecsik. This is for correctness.
+
+10) Restore the check in nft_payload for exceeding payloda offset
+    over 2^16. From Florian Westphal. This fixes a silent truncation,
+    not a big deal, but better be assertive and reject it.
+
+11) Validate NFT_META_BRI_IIFHWADDR can only run from bridge
+    prerouting. From Florian Westphal. Harmless but it could allow
+    to read bytes from skb->cb.
+
+12) Zero out destination hardware address during the flowtable
+    path setup, also from Florian. This is a correctness fix, LLM
+    points that possible infoleak can happen but topology to achieve
+    it is not clear.
+
+13) Skip IPv4 options if present when building the IPV4 reject reply.
+    Otherwise bytes in the IPv4 options header can be sent back to
+    origin where the ICMP header is being expected. Again from
+    Florian Westphal.
+
+14) Replace timer API for expectation by GC worker approach. This
+    is implicitly fixing a race between nf_ct_remove_expectations()
+    which might fail to remove the expectation due to timer_del()
+    returning false because timer has expired and callback is
+    being run concurrently. This fix is addressing a crash that has
+    been already reported with a reproducer.
+
+15) Store the master tuple in the expectation, since SLAB_TYPESAFE_BY_RCU
+    does not guarantee that accessing exp->master under rcu read lock
+    refer to the right master conntrack. Found by initial round of
+    fixes for expectation by LLM also found this.
+
+16) Check if br_vlan_get_pvid_rcu() fails to address a possible stack
+    infoleak of 4-bytes. From Florian Westphal.
+
+This is slightly over the 15 patch limit in batches, please, allow this
+round to exceed it by one.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-06-19
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 96e7f9122aae0ed000ee321f324b812a447906d9:
+
+  eth: fbnic: take netif_addr_lock_bh() around rx mode address programming (2026-06-18 18:36:26 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-06-19
+
+for you to fetch changes up to 05477f7a037c127854b58441f60b34210668f5c3:
+
+  netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak (2026-06-19 12:27:08 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 26-06-19
+
+----------------------------------------------------------------
+Adrian Bente (1):
+      netfilter: flowtable: fix offloaded ct timeout never being extended
+
+Florian Westphal (6):
+      netfilter: nfnetlink: make OOM conditions fatal
+      netfilter: nft_payload: reject offsets exceeding 65535 bytes
+      netfilter: nft_meta_bridge: add validate callback for get operations
+      netfilter: nft_flow_offload: zero device address for non-ether case
+      netfilter: nf_reject: skip iphdr options when looking for icmp header
+      netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak
+
+Haoze Xie (1):
+      netfilter: nf_queue: pin bridge device while NFQUEUE holds fake dst
+
+Jozsef Kadlecsik (4):
+      netfilter: ipset: Don't use test_bit() in lockless RCU readers in hash types
+      netfilter: ipset: Don't use test_bit() in lockless RCU readers in bitmap types
+      netfilter: ipset: fix order of kfree_rcu() and rcu_assign_pointer()
+      netfilter: ipset: make sure gc is properly stopped
+
+Lorenzo Bianconi (1):
+      netfilter: flowtable: fix and simplify IP6IP6 tunnel handling
+
+Pablo Neira Ayuso (2):
+      netfilter: nf_conntrack_expect: use conntrack GC to reap expectations
+      netfilter: nf_conntrack_expect: store master_tuple in expectation
+
+Wyatt Feng (1):
+      netfilter: xt_cluster: reject template conntracks in hash match
+
+ include/net/netfilter/nf_conntrack_expect.h        |  17 ++-
+ include/net/netfilter/nf_queue.h                   |   1 +
+ include/net/netfilter/nft_meta.h                   |   2 +
+ include/uapi/linux/netfilter/nf_conntrack_common.h |   1 +
+ net/bridge/netfilter/nft_meta_bridge.c             |  23 +++-
+ net/ipv4/netfilter/nf_reject_ipv4.c                |   2 +-
+ net/ipv6/ip6_tunnel.c                              |   7 +
+ net/netfilter/ipset/ip_set_bitmap_gen.h            |   4 +-
+ net/netfilter/ipset/ip_set_bitmap_ip.c             |   2 +-
+ net/netfilter/ipset/ip_set_bitmap_ipmac.c          |   2 +-
+ net/netfilter/ipset/ip_set_bitmap_port.c           |   2 +-
+ net/netfilter/ipset/ip_set_core.c                  |   4 +-
+ net/netfilter/ipset/ip_set_hash_gen.h              |  12 +-
+ net/netfilter/nf_conntrack_broadcast.c             |   1 +
+ net/netfilter/nf_conntrack_core.c                  |  33 ++++-
+ net/netfilter/nf_conntrack_expect.c                | 147 +++++++++++----------
+ net/netfilter/nf_conntrack_h323_main.c             |   4 +-
+ net/netfilter/nf_conntrack_helper.c                |  10 +-
+ net/netfilter/nf_conntrack_netlink.c               |  31 ++---
+ net/netfilter/nf_conntrack_sip.c                   |  13 +-
+ net/netfilter/nf_flow_table_core.c                 |  13 +-
+ net/netfilter/nf_flow_table_ip.c                   |  80 +++--------
+ net/netfilter/nf_flow_table_path.c                 |   4 +-
+ net/netfilter/nf_queue.c                           |  14 ++
+ net/netfilter/nfnetlink.c                          |   7 +
+ net/netfilter/nfnetlink_queue.c                    |   3 +
+ net/netfilter/nft_ct.c                             |   3 +-
+ net/netfilter/nft_meta.c                           |   5 +-
+ net/netfilter/nft_payload.c                        |  16 ++-
+ net/netfilter/xt_cluster.c                         |   2 +-
+ .../selftests/net/netfilter/nft_flowtable.sh       |   8 +-
+ 31 files changed, 268 insertions(+), 205 deletions(-)
 
