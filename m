@@ -1,215 +1,1115 @@
-Return-Path: <netdev+bounces-300647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /6sXK9P3NGrtlQYAu9opvQ
-	(envelope-from <netdev+bounces-300647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 10:03:31 +0200
+	id dPFOJbD5NGpMlgYAu9opvQ
+	(envelope-from <netdev+bounces-300648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 10:11:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF7D6A47F5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 10:03:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD9836A4886
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 10:11:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=n6+KcSfr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300647-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300647-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=schleissheimer.onmicrosoft.com header.s=selector1-schleissheimer-onmicrosoft-com header.b="Pw/ADzf5";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300648-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300648-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=schleissheimer.de (policy=none);
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B4DB630034BA
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 08:03:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2E6C3024A18
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 08:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAB935838F;
-	Fri, 19 Jun 2026 08:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9409135C1B0;
+	Fri, 19 Jun 2026 08:11:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BEUP281CU002.outbound.protection.outlook.com (mail-germanynorthazon11020075.outbound.protection.outlook.com [52.101.169.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD18631E842
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 08:03:24 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781856206; cv=none; b=Egzp1kn6GzrGwOb6jdkZFso/sDWNdvE1vQqT2z9Mzsd41Scg9x0DReiCnd/Wei21zTDnHsucqisDXFDQQM5pbgz6JfBoyyF/rTKfFRRrpjoOuPCdKcZinezHiDbiYQzgoCOEsSRDz73YRxZXg5UEsfbBKMLgkvbtsFQV5xIN5Xg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781856206; c=relaxed/simple;
-	bh=zB4TCxIDgStDFP1rlZaKRZHke2hrvj4RkhmGkk6WUC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sM0Bu/KODmu7z8KxwUmLwyXcJwT/pYXHGSvLhvC2jNDTu6oogKNSmnjZjjT8bEj1gjjCQcXxnq4snHN2Ns0KeAcvz8X5cm20mBaRbuKwoPDUaWaGniV14RO6psOn8hsXseZofqGQqOMGGrcCesSMAR6AtIeL3grzTIVX5BBTvY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n6+KcSfr; arc=none smtp.client-ip=209.85.128.47
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-492329c5514so7396795e9.1
-        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 01:03:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD67535AC2C;
+	Fri, 19 Jun 2026 08:11:12 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781856676; cv=fail; b=Kcus1TLWrUrdt47ZEcO6nMgrwqXln+0GBuhjLPDb9ckHhVyT26TCA0JseBpYH7S3DvJajLdTxVzYhLyA6HT4r5UNKReIqfgnjahgNPi4cbFqLOywVLjt+1/UEA/wK0hdwuz7f0pP72gCeAZSfJEHacPHV8/PFyxy5M4HXQR+euU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781856676; c=relaxed/simple;
+	bh=5lE8TeIHXDD/CLTlh9CqzPu7JcUpIg00DviePSbxGwA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=AFNw3QT/fMb3orWz6sK9m/zIxzSEQ21mKzGJR02tpuXhlwG0k5LglQyrGOulIYFPu+HzXNZW+8cUYKOiUwWV8Ed+MOQzhwr1a1kQnSCdgMiGaKu4598cQaPDuB0AETsYvA1Jy71ScwyffIVuWD/k9i7UwTc6VgQaAioEm12ms+4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=Pw/ADzf5; arc=fail smtp.client-ip=52.101.169.75
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YhDhdU79EuXYjWdgmrlSe+aaqkb+delZoDhqtxqbsJnZ+OFLNIHdzO5egKn1oiITNM+QPtCQxlpFq5Q/Xdm2yA7nbLa2u6xDPpXM3QzlilU+FYLJ111RScFdXwPFDZ5LmkjleQj2EjtW34enqAAJNfO8NOWWI2baAvX4trc/HeTwt2RqGbLAbMvKFN6wk4sBlFluzvXlOUJbWLVXj8n60QS2CDsC55C4g0LMxtB3bAaIZj4AaoZq1KLc1nzZ7kz+tGI2TgzcN4idG+mlUUWZouPnAUIK98N7Krs783tEZR2GDvZfa9728w3bEwUNdCIh9TECcAsyimwGW2Bl0fKZhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zdxdyZoAM5lyLkudNU3MQo7sQeldu5t7eYbcT1vDZVg=;
+ b=EdgmvT5msSKLzCIkWjqf7P/Rkctncu+1ovHL1Nf2+XPFGROUkfZ1h7xOYAdB/6hk1h4e4iFnfI7aVUj6jUkL1jOZEwrKySlc5Z1G9mKo0dVshjqPMBFkxMjTvbVVekYO3JIYkBRj/wtHvM4xv5wLdI465HYD1wqENS6ujd24IU1GYaxSEvJS5rwy86d0DVZNa6BICcbaBtSPvxlc9+mA5aDv8mvhnNz1LByWIs9Oo7Wf0r7jlha1TmJyzo74tOvCC8Apjkb27JSDeARQqKec3wUlwom2ihvMWJVV+kU3ycCQHC62l+9ctlis1Y7O9x17r6fKOntNrJE/T/nDbx/LKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=schleissheimer.de; dmarc=pass action=none
+ header.from=schleissheimer.de; dkim=pass header.d=schleissheimer.de; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781856203; x=1782461003; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kpJwL24GNas0k68J2nJFxWElqOxVpyI/1xu9RZENp00=;
-        b=n6+KcSfraEgMTfhU1nMSD52t73wf191Fox8ivGsan2CAFJJyh9JoolTMEusK23HO/I
-         lbT3xxPqErAZoARh39+fW6BZe5FK1LWAxy8jNJWCsB80dx1nxtIYTNeuiTdShj3NnYDz
-         ms1z8rIPfzZBT3hQfMw94hwfCYuxFTwCh7AbnL0vvRrASxxxq4NccP4YcSweBZklSdxy
-         muVGQVLMBHQhHfpumWoqVeTl/v+dkMbUxlPT7leVOKdzDTjDfzlZdQyBeJOQaKxfj35y
-         9g+9ykIn1c68jILcHdzqXtcre7ZuVoSf2CvkDI9L3ILlwpp8Xnc3Xgz1Y0b/xuxA9lVX
-         NKDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781856203; x=1782461003;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpJwL24GNas0k68J2nJFxWElqOxVpyI/1xu9RZENp00=;
-        b=aa0y83S3koSMCBAyMFt+vm2RyehZLoNqPESzhl1tGCSvdMJDbY5hCIgrVFedrLkHQz
-         7a26jZMf37NnDH3ykZ1pHRvzoUxYRQsHgovw3DHtonXkniQGu+hxpBGRw1nKjCclr+BN
-         X2sbIgSmWfUG3M4K2CFpkcgPfgiqEhBHKfJsNa8Yrs+/JAam8hxM9e6m6Gj0U4xFO6yI
-         g7Q45cAWTD17DJxA7rnnqa//qxH0cW2sx8p81MR0Tff6Pp8w/5Hb+970N5r+zwbwd3Zw
-         gO+ooMuxahcCZC0jp/4mtQTKJZC9tZVThOglr+ghNSu4ws/AZKS6qtCa9H7yYJjaILzW
-         ntjw==
-X-Forwarded-Encrypted: i=1; AFNElJ/4NJQvgujezRIUeNrlSiaE7dH0tUNaQrKlSEL5yQqucN20QIp+ChS/c8A+pX7PIhvfFXH3UsY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR+lMqj4SltkjJz3h64ggbUFp1zHI3xtP/T6JI8XZSPWomcpMg
-	s0/EAB9fTUp1RxGE1tkdspEYbLW4trTRW+jqE+ve1rAzbbOBmYA2nSHS
-X-Gm-Gg: AfdE7clk29p3+PKepwhgLWJYwrix75LJsKV5Vfyi8gzkMXdYSkz1XophBbWCcfmQAeg
-	KW54inOigylunbDcfuBzBfRdeIrJ5imYuezgrXHLlYe7EgR+sAhsqqwn6q1/jAZNX5aEpLywzNo
-	3F6BSk+hZFkJMOsaIicxAHZp0YNIFmmAcqYOv3uTEt4oXFqeugQvX985AR1SATafgo8ODBsUM2v
-	HOmly5ndiTmnD9JMKaYc/m5OejAmtXGe0rI3JybtxKuQPxf/eYJWfjmnrcF41vvVfaXQHUdj9wK
-	181mOLLEdQkuQD2RgQqfTfyFJwYDkyLE2L2rjWHutFcazu641xJQ1Def1GUUbkHGc/f+ORvSGpV
-	/w7La6L8umiQkJNCzyvV/D2o+Jn2UREs7kypjZSxLAUu/aOXcSDwTV17s22BveTfx9rMG3R5DSt
-	Fv/Xsw/OHWcTXLWND5Zqo7UFTvJVvbTqmLtEhKXM2XOva/gRiYlTZnqxlhuPyIg2ZZlaSES1Z6K
-	a3LybhOrfmY0yAUkGYDKXvJtqrpcDPrroyRD5SGU59pQpp7SGzTftfgDZhZio/8Yn+nTMYPLVtB
-	3DDcXs+BmJ0JzACJmNOu0nubHw6O95X8
-X-Received: by 2002:a05:600c:4583:b0:490:3cf0:8d81 with SMTP id 5b1f17b1804b1-49240a44b63mr31293065e9.13.1781856202842;
-        Fri, 19 Jun 2026 01:03:22 -0700 (PDT)
-Received: from mail.gmail.com (2a01cb0889497e002f165db642aa45e9.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:2f16:5db6:42aa:45e9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fd1fe8esm55234915e9.13.2026.06.19.01.03.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2026 01:03:21 -0700 (PDT)
-Date: Fri, 19 Jun 2026 10:03:19 +0200
-From: Paul Chaignon <paul.chaignon@gmail.com>
-To: sun jian <sun.jian.kdev@gmail.com>
-Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com,
-	song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
-	toke@redhat.com, lorenzo@kernel.org, martin.lau@kernel.org,
-	clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Cover partial copy of
- non-linear test_run output
-Message-ID: <ajT3x2H0swzg4yhm@mail.gmail.com>
-References: <20260617093557.63880-3-sun.jian.kdev@gmail.com>
- <2dad9b5c184fa101d7cffa1d8f5eea5b5df60f53533d98c68175c9e3ec5ee6ac@mail.kernel.org>
- <CABFUUZFeh18OjQ6EhjD17ZwQKb1aiVNkYKv-hAkVGrHhPpjE4Q@mail.gmail.com>
- <ajOv_oOd1zInaW1b@mail.gmail.com>
- <CABFUUZHCr=4kb7kSaaPGpc4nkyn32i-svD9v7ONF+TYrrQ-xaQ@mail.gmail.com>
+ d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zdxdyZoAM5lyLkudNU3MQo7sQeldu5t7eYbcT1vDZVg=;
+ b=Pw/ADzf5zS6jxTCOfBVk4+H2LoH5kPiZYdMsCuhm+ExPGA82/47n0YCk6pWoVglrm9xcUS2Ow212i3ix+oqxGstDcKXE8BLCVmzUOjvdgT+F6H9c4Mnzt8HMBfKlNxcM1js2rO7PvA9kSS0HkE768qW3OZWK62N92NwxiecTxWE=
+Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:52::10)
+ by FR2P281MB1429.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:91::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Fri, 19 Jun
+ 2026 08:11:06 +0000
+Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::2bc1:32a6:153:c3e9]) by BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::2bc1:32a6:153:c3e9%4]) with mapi id 15.21.0139.011; Fri, 19 Jun 2026
+ 08:11:06 +0000
+From: Sven Schuchmann <schuchmann@schleissheimer.de>
+To: Nicolai Buchwitz <nb@tipi-net.de>, Thangaraj Samynathan
+	<Thangaraj.S@microchip.com>, Rengarajan Sundararajan
+	<Rengarajan.S@microchip.com>, "UNGLinuxDriver@microchip.com"
+	<UNGLinuxDriver@microchip.com>, "Woojung.Huh@microchip.com"
+	<Woojung.Huh@microchip.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: AW: [PATCH net] net: usb: lan78xx: restore VLAN filter table after
+ device reset
+Thread-Topic: [PATCH net] net: usb: lan78xx: restore VLAN filter table after
+ device reset
+Thread-Index: AQHc/1ZL+dYj4wyIHkavMkZrzwxM9bZFg8XY
+Date: Fri, 19 Jun 2026 08:11:06 +0000
+Message-ID:
+ <BEZP281MB2245740AE8E3221DD076CE7DD9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+References: <20260618191109.4086598-1-nb@tipi-net.de>
+In-Reply-To: <20260618191109.4086598-1-nb@tipi-net.de>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BEZP281MB2245:EE_|FR2P281MB1429:EE_
+x-ms-office365-filtering-correlation-id: bb2dd9c2-7af7-4b97-3e95-08decdda503b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|1800799024|366016|376014|7416014|3023799007|56012099006|38070700021|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ c3OkYSw3KjT4JJ+ROy9JUct67iBSpZeqdOC1r2DQLXvWl9vXqompdU5Ci26pR+U6JbTj64ky37ZR5tA56Ea2Mhou4ap+I1lRthY1YbcBtHmymcEQOzrly50m49EKIhTd47cZLPC+l7HluyLGjEX1ZkMFd++FiOYQIZMNVp0EMHwpvYtG9IuPEtQuZd9bOK1lQxW7NAHNc9wXs5jKPcXvobV9bAENJllaOtllgGGESo+sloIC4k88dyJuAaWSQNJFhAf9JclDl3cAAWMfnRZjrYJGGc08cod33n+sf6/toBXRFDnUbnmdWyr6Oe9yNMqUkZyEZqX8jm6W3VUFGt6aWfi0ov85dBor7A557neVNnqasNBa+GDivsavLvnfTKOD5Sopq0mY1o0sDWWIGWi+ECpPg15O9lvGTbqUt868FJWF09BnYtL20qHsd3cB9aPrvEj02TBGdM4yB8spoyqZ68FFJ97ZwjRGxuW/GFFG4+jK/gQ1wXvNkRAB1VE4PsOujdigsMEFyprRTLOQV+IDK2+Ufdwo6vbAOmy1o9cIL/bUMH4MjIsIbPsiC9ccLk8InFTH705fGUzb51xz4VhK8XbEzMm3WPU+tsGQaS8v7eyfoxhG0NHSkiaLdt6nKGz3DQwaT7P+4uNBkB0kUWFKBcl7GFqunDtPv5wskdowglI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(366016)(376014)(7416014)(3023799007)(56012099006)(38070700021)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?+hqA25fGUdf83knpstH1LicAlEHEWITtAJA+BANtsqBGLs1jIZtJxu/+pz?=
+ =?iso-8859-1?Q?X2QBn+sw4Jfq8HelWXDe7AmIFiaR+YQBKsSxpiow3IbBWDITop/eneWLcr?=
+ =?iso-8859-1?Q?GmgVfkKH07xkUsCt7NFLOD4CWBp4cedgRuL0pzLEth+Jf5RTqjf5f02VTq?=
+ =?iso-8859-1?Q?1kg9kLRj5m1Q/6NEedF9Uanrnhr5+ywFp4muknLntAJVn2YVGJtuTIzjIa?=
+ =?iso-8859-1?Q?tW6E8MB39AR/+Yp/hXE56IYTuBuvtFAAm9sODd9/L2zBC/yC7+Y+KqeDaq?=
+ =?iso-8859-1?Q?+DZsWpV0X49HkMTZyx20Wm+y2rRDqAqWqz8yb568HscNNiaZ4lGi6VoK9d?=
+ =?iso-8859-1?Q?e8LIsYmFeiDVuvNIiXpUOsk9RxKz3m3UuoG5K9ZMDLsnU3Nn8XRemZa18E?=
+ =?iso-8859-1?Q?0b4CNco4K/cos0kojExbjcCwudydFiulB4xiW9evtkRBxkEcbDpYGG+AEe?=
+ =?iso-8859-1?Q?fK0GFQeucsHH4re6BMRrNo292wl+96Cr6ARlOPbgfwYKum3OsMjZOD5new?=
+ =?iso-8859-1?Q?iNufY/3dbxjkJvjbcZTfhyOC7bQSrHU/l7Di7J6+0Y4jOIB8wpqjn6R4J4?=
+ =?iso-8859-1?Q?D+cSAmkkSXNGPhuGTyMWUs0SlGABuO4OOM6JH/QeGUSwseTJoBiR4WceRi?=
+ =?iso-8859-1?Q?8kXXBn/S7r+xsDSPV2dJ8qL4mNT+lMdDOjeY3pfs9sf+D61YDaiVi1Jjdd?=
+ =?iso-8859-1?Q?KdCOhHTiboBAij742HSXtSWi2zXce7++mwf9Zo6fEXceFKmGkzYxHlMtYP?=
+ =?iso-8859-1?Q?jiCAAcvp27R5qH73v6jjcLZsJoiooJZUaX9sKqIn+oCKdDaY6AfKs+cEkA?=
+ =?iso-8859-1?Q?lTplkTGi7f7M8EqmxZArMIIx+9ffQzbLeHVKVaqK0xutpKGA+qORdyEJ82?=
+ =?iso-8859-1?Q?UWdbEPZ/5z2BRj9CQfmMcr09jf0ZiuxVpR/hyYT/tL3W4O4fdxAIs5Ghk0?=
+ =?iso-8859-1?Q?FUhYqtBqxKfD+GfdspHieSLDbADkh8c3b1t8bjteNTlpHRNJZiBAtCmQ8C?=
+ =?iso-8859-1?Q?MVVZZzFEaGSKXRnNSFpijgUqV3h7THrWETrBdvMlqjwZTwKgCBNTwlApyy?=
+ =?iso-8859-1?Q?dgGGFpqcLjSud0d6sprLiLSSMew5zW18pSaC0JC+wVLHC5JTvbQYOmJj6G?=
+ =?iso-8859-1?Q?ORHva/wYP2ghM4KxiqmqOD0nGpbGdrdTzjVppaPfR3V7ZbSJWKqg2lliSM?=
+ =?iso-8859-1?Q?+zgvOdh19vr76L69SG7rcJ/nxifrZ7Ot0f4Sq1cPzaiA2KZoAJ7DgJRa7C?=
+ =?iso-8859-1?Q?o2++YARmgOR8xpOxS4qne+rFe9vjqekRF6zBEWcJrgFz3tDBrh4y51fq+E?=
+ =?iso-8859-1?Q?YP27lLU7ev5zlbe8KXnh6u7OCL7cbtiQiwrKD/era5EstR+tHhd+6mTQCM?=
+ =?iso-8859-1?Q?n1zRAcmw+lHYF2WDNFMque+hwvke9h+uyP384T+FtmBZgdFHKhrt3oXyDq?=
+ =?iso-8859-1?Q?PrrU8KkBWGsu4a7e36rNpxz3AqyMkTUGZLvsWGUlTS3bcz/JmV3uMDh3jw?=
+ =?iso-8859-1?Q?8GvI4OiBE8hqN8oNN8GEKx6ylTlc37pKpNKXoKHxcqUowzPk4Z3tW2ySqz?=
+ =?iso-8859-1?Q?yov9/3Lgn2hnUHMsG/iikbR/+T9NLoWyyhQdtd/FBB3DwP1hsY47s27FCP?=
+ =?iso-8859-1?Q?J87Fx+Wvn4dxaOUYZCBQnLvq63j56VpPXEDjApkajeqE5VlGFhqeapTG3J?=
+ =?iso-8859-1?Q?ivxITnxxfuH4C87hcq+LJ66OO/+t9v9pN/Imxymo3gqtTPu+EH+PQbsocS?=
+ =?iso-8859-1?Q?XR940tntcCpC+6Q3S7bA8gBSiObloJP8dR89gUvN3v0lkNHBmOyyVRfngw?=
+ =?iso-8859-1?Q?UdWpYoZtdw=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABFUUZHCr=4kb7kSaaPGpc4nkyn32i-svD9v7ONF+TYrrQ-xaQ@mail.gmail.com>
+X-OriginatorOrg: schleissheimer.de
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb2dd9c2-7af7-4b97-3e95-08decdda503b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jun 2026 08:11:06.4601
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ba05321a-a007-44df-8805-c7e62d5887b5
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wbKW1PnsZjiy+MZYoiVtPPRha0WZeGSr0MyFqL6REruEGn5oH0V0NDZlVKLabQeFrXnLXHUAFQGpoAGlE+3QIZOlDeyD+rWnhCKRkiZ+OBQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR2P281MB1429
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.94 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300647-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sun.jian.kdev@gmail.com,m:bot+bpf-ci@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:toke@redhat.com,m:lorenzo@kernel.org,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:sunjiankdev@gmail.com,m:bot@kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[paulchaignon@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-300648-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:Woojung.Huh@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[paulchaignon@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,tipi-net.de:email,schleissheimer.onmicrosoft.com:dkim,schleissheimer.de:from_mime,schleissheimer.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9FF7D6A47F5
+X-Rspamd-Queue-Id: DD9836A4886
 
-On Thu, Jun 18, 2026 at 06:45:18PM +0800, sun jian wrote:
-> On Thu, Jun 18, 2026 at 4:44 PM Paul Chaignon <paul.chaignon@gmail.com> wrote:
-> >
-> > On Wed, Jun 17, 2026 at 10:19:52PM +0800, sun jian wrote:
-> > > On Wed, Jun 17, 2026 at 6:31 PM <bot+bpf-ci@kernel.org> wrote:
-
-[...]
-
-> > > I tried reusing pkt_v4 and the existing TC program, but they do not fit
-> > > the skb case this test is trying to cover.
-> > >
-> > > For skb test_run, IPv4/IPv6 inputs with a too-short L3 header in the
-> > > linear area are rejected before bpf_test_finish(). With pkt_v4 and a
-> > > linear area of ETH_HLEN, the test fails with -EINVAL before reaching the
-> > > partial copy-out path. If the linear area is increased enough to pass the
-> > > IPv4 check, pkt_v4 is too small to both trigger the old
-> > > copy_size - frag_size path and verify that the copied prefix spans the
-> > > linear data and the first fragment. pkt_v6 has the same issue: after
-> > > making the IPv6 header linear, only 20 bytes remain in frags.
-> > >
-> > > The existing test_pkt_access program has its own packet-access coverage
-> > > goals and is not just a pass-through carrier. With such a short linear
-> > > area or small packet fixture, it can fail before the test hits the
-> > > bpf_test_finish()'s partial copy-out path. A pass-through TC program is
-> > > therefore a better fit, because it keeps the test focused on the
-> > > bpf_test_finish() copy-out semantics.
-> >
-> > If we're keeping tc_pass_prog() then can't we use pkt_v4 and get rid of
-> > init_pkt?
-> >
-> 
-> pkt_v4 is too small to construct a meaningful nonlinear skb with a stable
-> linear/frag split while still exercising the partial copy-out boundary in
-> bpf_test_finish().
-> 
-> With pkt_v4, we either do not reach a fragmented layout, or lose control over
-> the linear/frag boundary needed to exercise the regression path.
-
-I think I'm missing something. Why can't we use pkt_v4 with
-tc_pass_prog() and a linear area of ETH_HLEN? That would leave 42 bytes
-of non-linear area, so a SHORT_OUT_LEN of 30 should work to trigger the
-bug, no?
-
-> 
-> This test uses a 9000B packet so it does not depend on small-packet
-> allocation details. Smaller packets might work depending on allocation
-> state, but 9000B reliably gives us a non-linear skb with page frags and a
-> stable linear/frag boundary for the copy-out regression.
-> 
-> init_pkt() is needed to ensure deterministic byte content across both linear
-> and fragmented regions so that the memcmp-based validation is stable.
-> 
-> Thanks,
-> Sun Jian
-> 
-> 
-> > >
-> > > For XDP, this object does not have an existing xdp.frags pass-through
-> > > program, so the small XDP frags program is needed to cover the other
-> > > caller of the shared bpf_test_finish() path.
-> > >
-> > > Thanks,
-> > > Sun Jian
+Hello Nicolai,=0A=
+thank you for the quick response and the quick patch!=0A=
+=0A=
+But actually it is not working for me... If I disconnect and connect=0A=
+the LAN Cable (I have setup an automated test already with two adapters=0A=
+connected to my RaspberryPi CM5) the lan78xx_reset() function is not called=
+.=0A=
+=0A=
+Here is a dmesg output from my test.=0A=
+I defined DEBUG at the beginning of the driver and added=0A=
+netdev_info(dev->net, "function()"); to nearly every function=0A=
+in the driver. Also I added my a VLAN compare function:=0A=
+=0A=
+static void lan78xx_check_vlan_table(struct net_device *netdev)=0A=
+{=0A=
+	struct lan78xx_net *dev =3D netdev_priv(netdev);=0A=
+	struct lan78xx_priv *pdata =3D (struct lan78xx_priv *)(dev->data[0]);=0A=
+=0A=
+	for (int i =3D 0; i < 1; i++) {=0A=
+		u32 buf;=0A=
+		lan78xx_dataport_read(dev, DP_SEL_RSEL_VLAN_DA_, i, 1, &buf);=0A=
+		if (pdata->vlan_table[i] !=3D buf) =0A=
+			netdev_err(dev->net, "VLAN TABLE %d: 0x%02x 0x%02x - ERROR", i, pdata->v=
+lan_table[i], buf);=0A=
+		else=0A=
+			netdev_info(dev->net, "VLAN TABLE %d: 0x%02x 0x%02x - Ok", i, pdata->vla=
+n_table[i], buf);=0A=
+	}=0A=
+}=0A=
+=0A=
+I call this at the end of lan78xx_start_rx_path() and lan78xx_mac_link_up()=
+.=0A=
+I now I get this output. The output ends after 16 disconnects and connects.=
+=0A=
+Then it is broken. What I am wondering is what is happening after =0A=
+lan78xx_start_rx_path() that destroys the table...=0A=
+=0A=
+[Fri Jun 19 09:40:25 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:40:27 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:40:27 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:40:29 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:40:29 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:40:31 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x00 - ERROR=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x00 - ERROR=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:40:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_terminat=
+e_urbs()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: configuring for =
+phy/rgmii-id link mode=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_conf=
+ig()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:01 2026] 8021q: adding VLAN 0 to HW filter on device 100B=
+ASE-T1-1=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+01 0x01 - Ok=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+01 0x01 - Ok=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:01 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_terminat=
+e_urbs()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: configuring for =
+phy/rgmii-id link mode=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_conf=
+ig()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:02 2026] 8021q: adding VLAN 0 to HW filter on device 100B=
+ASE-T1-2=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+01 0x01 - Ok=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+01 0x01 - Ok=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:02 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_terminat=
+e_urbs()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: configuring for =
+phy/rgmii-id link mode=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_conf=
+ig()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] 8021q: adding VLAN 0 to HW filter on device 100B=
+ASE-T1-1=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_terminat=
+e_urbs()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: configuring for =
+phy/rgmii-id link mode=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_conf=
+ig()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] 8021q: adding VLAN 0 to HW filter on device 100B=
+ASE-T1-2=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_write_vl=
+an_table()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:03 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: receive multicas=
+t hash filter=0A=
+[Fri Jun 19 09:43:04 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: deferred multica=
+st write 0x00007ca2=0A=
+[Fri Jun 19 09:43:06 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:08 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:09 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:11 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:11 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:13 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:14 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:15 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:15 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:17 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:18 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:19 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:19 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:20 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:21 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:22 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:24 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:24 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:26 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:26 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:28 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:28 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:30 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:31 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:32 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:32 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:34 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:35 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:36 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:37 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:38 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:39 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:41 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:41 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:43 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:43 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:45 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:45 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:47 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:48 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:49 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:49 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:51 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:52 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:53 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:54 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:56 2026] Disconnect LAN Cable=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop tx path=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: stop rx path=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Down=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_down()=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop tx path=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: stop rx path=0A=
+[Fri Jun 19 09:43:56 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Down=0A=
+[Fri Jun 19 09:43:58 2026] Connect LAN Cable=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start tx path=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: start rx path=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: VLAN TABLE 0: 0x=
+05 0x05 - Ok=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.2:1.0 100BASE-T1-2: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_mac_link=
+_up()=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_flowcontrol()=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: lan78xx_configur=
+e_usb()=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start tx path=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: start rx path=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x00 - ERROR=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: VLAN TABLE 0: 0x=
+05 0x00 - ERROR=0A=
+[Fri Jun 19 09:43:58 2026] lan78xx 1-1.1:1.0 100BASE-T1-1: Link is Up - 100=
+Mbps/Full - flow control off=0A=
+=0A=
+=0A=
+Regards,=0A=
+=0A=
+   Sven=0A=
+=0A=
+________________________________________=0A=
+Von:=A0Nicolai Buchwitz <nb@tipi-net.de>=0A=
+Gesendet:=A0Donnerstag, 18. Juni 2026 21:11=0A=
+An:=A0Thangaraj Samynathan <Thangaraj.S@microchip.com>; Rengarajan Sundarar=
+ajan <Rengarajan.S@microchip.com>; UNGLinuxDriver@microchip.com <UNGLinuxDr=
+iver@microchip.com>; Woojung.Huh@microchip.com <Woojung.Huh@microchip.com>=
+=0A=
+Cc:=A0Andrew Lunn <andrew+netdev@lunn.ch>; David S . Miller <davem@davemlof=
+t.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org=
+>; Paolo Abeni <pabeni@redhat.com>; Sven Schuchmann <schuchmann@schleisshei=
+mer.de>; netdev@vger.kernel.org <netdev@vger.kernel.org>; linux-usb@vger.ke=
+rnel.org <linux-usb@vger.kernel.org>; linux-kernel@vger.kernel.org <linux-k=
+ernel@vger.kernel.org>; Nicolai Buchwitz <nb@tipi-net.de>=0A=
+Betreff:=A0[PATCH net] net: usb: lan78xx: restore VLAN filter table after d=
+evice reset=0A=
+=0A=
+=0A=
+Configured VLANs stop receiving traffic after a USB autosuspend/resume=0A=
+cycle, e.g. when a cable is unplugged long enough for the device to=0A=
+suspend and then plugged back in. VLAN filtering stays enabled but all=0A=
+VLAN-tagged frames are dropped until a VLAN is added or removed again.=0A=
+=0A=
+The reset on resume clears the hardware VLAN filter table, but unlike=0A=
+the multicast and address filters it is never reprogrammed from the=0A=
+driver's shadow copy, so it stays empty.=0A=
+=0A=
+Restore the VLAN filter table as part of the reset sequence.=0A=
+=0A=
+Reported-by: Sven Schuchmann <schuchmann@schleissheimer.de>=0A=
+Closes: https://lore.kernel.org/netdev/BEZP281MB224501E38B30BFDC4BD3D364D9E=
+32@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM/T/#u=0A=
+Fixes: 55d7de9de6c3 ("Microchip's LAN7800 family USB 2/3 to 10/100/1000 Eth=
+ernet device driver")=0A=
+Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>=0A=
+---=0A=
+=A0drivers/net/usb/lan78xx.c | 21 ++++++++++++++++++---=0A=
+=A01 file changed, 18 insertions(+), 3 deletions(-)=0A=
+=0A=
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c=0A=
+index bcf293ea1bd3..52c76de64eb9 100644=0A=
+--- a/drivers/net/usb/lan78xx.c=0A=
++++ b/drivers/net/usb/lan78xx.c=0A=
+@@ -3065,14 +3065,20 @@ static int lan78xx_set_features(struct net_device *=
+netdev,=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0 return lan78xx_write_reg(dev, RFE_CTL, pdata->rfe_=
+ctl);=0A=
+=A0}=0A=
+=A0=0A=
++static int lan78xx_write_vlan_table(struct lan78xx_net *dev)=0A=
++{=0A=
++=A0=A0=A0=A0=A0=A0 struct lan78xx_priv *pdata =3D (struct lan78xx_priv *)(=
+dev->data[0]);=0A=
++=0A=
++=A0=A0=A0=A0=A0=A0 return lan78xx_dataport_write(dev, DP_SEL_RSEL_VLAN_DA_=
+, 0,=0A=
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 DP_SEL_VHF_VLAN_LEN, pdata->vlan_table=
+);=0A=
++}=0A=
++=0A=
+=A0static void lan78xx_deferred_vlan_write(struct work_struct *param)=0A=
+=A0{=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0 struct lan78xx_priv *pdata =3D=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 co=
+ntainer_of(param, struct lan78xx_priv, set_vlan);=0A=
+-=A0=A0=A0=A0=A0=A0 struct lan78xx_net *dev =3D pdata->dev;=0A=
+=A0=0A=
+-=A0=A0=A0=A0=A0=A0 lan78xx_dataport_write(dev, DP_SEL_RSEL_VLAN_DA_, 0,=0A=
+-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0 DP_SEL_VHF_VLAN_LEN, pdata->vlan_table);=0A=
++=A0=A0=A0=A0=A0=A0 lan78xx_write_vlan_table(pdata->dev);=0A=
+=A0}=0A=
+=A0=0A=
+=A0static int lan78xx_vlan_rx_add_vid(struct net_device *netdev,=0A=
+@@ -3353,6 +3359,15 @@ static int lan78xx_reset(struct lan78xx_net *dev)=0A=
+=A0=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0 lan78xx_set_multicast(dev->net);=0A=
+=A0=0A=
++=A0=A0=A0=A0=A0=A0 /* The chip reset above also clears the VLAN filter tab=
+le held in the=0A=
++=A0=A0=A0=A0=A0=A0=A0 * shared VLAN/DA hash RAM. The network stack does no=
+t re-add VLANs=0A=
++=A0=A0=A0=A0=A0=A0=A0 * after a silent device reset (e.g. on reset_resume =
+after USB=0A=
++=A0=A0=A0=A0=A0=A0=A0 * autosuspend), so restore the table from our shadow=
+ copy here.=0A=
++=A0=A0=A0=A0=A0=A0=A0 */=0A=
++=A0=A0=A0=A0=A0=A0 ret =3D lan78xx_write_vlan_table(dev);=0A=
++=A0=A0=A0=A0=A0=A0 if (ret < 0)=0A=
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return ret;=0A=
++=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0 /* reset PHY */=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D lan78xx_read_reg(dev, PMT_CTL, &buf);=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0 if (ret < 0)=0A=
+=0A=
+base-commit: 7d8297e26b4e20b5d1c3c3fe51fe81a1c7fbc823=0A=
+--=0A=
+2.53.0=0A=
+=0A=
 
