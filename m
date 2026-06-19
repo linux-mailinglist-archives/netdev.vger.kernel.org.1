@@ -1,266 +1,159 @@
-Return-Path: <netdev+bounces-300677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300664-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8K1XKhkTNWqomgYAu9opvQ
-	(envelope-from <netdev+bounces-300677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:59:53 +0200
+	id 4nVENgwNNWqvmQYAu9opvQ
+	(envelope-from <netdev+bounces-300664-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:34:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 265F06A5150
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:59:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09BB6A4F88
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:34:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=WyIWBXhZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300677-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300677-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=pass header.d=6wind.com header.s=google header.b=J8f8s31j;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300664-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300664-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=6wind.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D464301AF63
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:58:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D3DD9300602B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7075736E473;
-	Fri, 19 Jun 2026 09:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C154D291C10;
+	Fri, 19 Jun 2026 09:33:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1699536A03F
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 09:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3345424B28
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 09:33:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781863094; cv=none; b=h1oD0uImK+/HWerW7N66D1nIVP3RgQgeZOHpDQl7rv3ZdG+ZY6c8jbFZ9DzDG6M9vac4uQktwlO5XXibxyO1vSl2cIpqH0TGM5GiyG4WMs1LEzChkjTVLc9QwJgewoaF1aAcLyKTO6RkZruRgxl0l8CfX667IJ1dwdq4Fht7Rrw=
+	t=1781861637; cv=none; b=KWzSA6OGNFfbvt7p6sHX0j0GbN5ALXYnByNvH+mh3LVzwLdzIG3VpMB+VvsHbxYed3sPmZM26TQBGTaD/EHmMIyE+RCIIQ+ALpRmqCwNPzL0yu0Fy41VEm3iVIW6XKB3fopGiejDjOMPsag04jywHx7yTprv0D2WCiD9wFHrqO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781863094; c=relaxed/simple;
-	bh=uTQGVxJp6sa5nGg1fan4r/Fv6LYC2ueA0DG3l4AmA8E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KpPmKiDeqRoBur3BtXYIWv730vPkSo7W6WM98ywXXzuN8tEJCuNltzFFXEhAqKgUJRF2TJvlMzOMvnJ9wzznTsh0+GgtqVTYukT977ABM3KrkjyzI6ed4I8yj5A8ot+jNzbUrRcwKjhClYPmfCpRE2Ei1/hOldZtrvqsMWqqhg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WyIWBXhZ; arc=none smtp.client-ip=209.85.214.225
-Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2c0c3546924so15935995ad.3
-        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 02:58:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781863088; x=1782467888;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+BCE++6dnn9vpZ/E1d7WFQ8H+QlVa8C9fwXmSQekOc=;
-        b=D2v+6AM/z/pWAfXpuLNvUutWz8E04c8IvAkY/dpC/zSWxUjQPkrIKaDtn4j9+cEeHX
-         ATX9CSeF1tlI3M5H+/zxKDr/XEtv8H/15+Oj7EGWsa6TtHF3R+EaLnxCIokmeWT7yvf6
-         rJYlZAhD0bH7N0WNIuGXRfSp2VuE79GOrEWnDl+GSBf8+mlhq6pWsMSTl+M9AJomQDVj
-         kDWqX2TnJXejxYEg5bU5AgXH3eLzN2APGda4XtxfocD/frRLd0bVhmfEDU/ubuJ6Urcr
-         3cqb3fL7S0BuplHaYE/Ed5/6HcqJ785mzfmMRIwU3ldEmljYFOZ2QUW6hpCjOLGeaOn5
-         f5wg==
-X-Forwarded-Encrypted: i=1; AFNElJ9fMZgXl+O8c9l10qb53+sapxJHia/NtR9xqZ6+6ALgZfYV8xIq2EJ9+2SLglYr84ycxRVUKGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO59fANkYSC/wGso6Bfir3CLFW29HEoBTyDIwhFBeSxo057A8W
-	GLjaoJY58i6RxYGw9xfiVad+6BqCNoiFH5Otl9vLXGAUBr7lw8pyC1+CkVXRygLOx47YVu6yOiq
-	EPXbS+jawLm5Iab+Nb2tcaoWUMlZsQ4vbN1Gwp4ZIXlafvcfkGkESrCF14fBu9J3fUWnq8uN4tf
-	WAmu3t3xktQFkpnpEvi33pnNcqrwlUE3kWsp/fCH2OEbRWm2SPk53dd0N6YVqGQ0hY0qvyWvUN5
-	3+LTeb9m0Zek2dXNQ==
-X-Gm-Gg: AfdE7cmSQ4rkSCQRKOPlaqk7kZ9z3KRUTPCvpYdp3lTHaLpNhLr6Lcu21Y6STnD1Wwq
-	OGY7s4ak2g8uL288QI9quJEjdW0oyzGTuX6Rl08dJl1bnZPCRzFlX40ftYDGXtlO1MEHcAM5b33
-	9bR6YdZCPw5JgixAbGpLyzUR6hDBUrsyyliQmY1nLvK1OjV3ErEg2sc0ofFb2qK6iQ852bsDmFo
-	/mpXY9P22+Lv/QKy330+Hap3hKJdDe8JU9B8tvCe2B9HfYrlUh9QZ6MWiaDSQthFk7k0PBWL61J
-	/WBc7BGA9hhQCDNPEb77X8ZFOnbsWk113BA8FQ0jnj+FfILQeFMi4k0ihXC8l4A31V/yggWIUA5
-	l3wQDNNWCZLmATXS0y8LksIn7e0Yt//BSdp4auUafzsixQ6wPEvp8jmtqwWpYbchM32GowopqgO
-	LSTg+3HTpgULUIww/b7kzQBZPX8YGsgs9dPizeoQ8UozJ7h6uD2A==
-X-Received: by 2002:a17:902:e74d:b0:2c0:b932:867d with SMTP id d9443c01a7336-2c719017ce8mr33676765ad.29.1781863088150;
-        Fri, 19 Jun 2026 02:58:08 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-29.dlp.protect.broadcom.com. [144.49.247.29])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2c7209e2d16sm1102205ad.49.2026.06.19.02.58.07
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Jun 2026 02:58:08 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-30c13bb8ca9so206659eec.0
-        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 02:58:07 -0700 (PDT)
+	s=arc-20240116; t=1781861637; c=relaxed/simple;
+	bh=FwuoAY6HzfJ0FzCdMdS9cZpeQAWJhJAkarN81wPyVJ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IHF0D6TjlcwPSOv4VKVlLh5yiZWPS+g9IJbRbG04BHSjhcSWcpKetoKNVOsNhjdl/k+CkzyFcoqjWRUqw1BmcYRUjY+T/AKs7kdsLN69P8qwlIvBhOQXNEU70n5qum7MlueH1CeBFcvj8iSZxFI/Pm2m5Bb6iOEU/iQSMDew9Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=J8f8s31j; arc=none smtp.client-ip=209.85.221.54
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-46214219a18so319266f8f.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 02:33:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781863086; x=1782467886; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=6wind.com; s=google; t=1781861634; x=1782466434; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=12xf/Szl0P/rXX8258BMfV9P+pbbiVTjxZs4H9XX4F0=;
+        b=J8f8s31juJiJJDTTjeEts5pnKjEqxj90DhxsJfSu3kalsHHCkR3pBWepdUQ1hqi8Uk
+         yTiAqzeiloypZXxq+iBlR4SqVXXgpjZeBb74Adns9BZv4pTS7B36e4TojywOafQMW/XV
+         KFH0d2EnWEGLp8spRaUeLHyWbOe0V0/bwHGUI7zEPnoFBcfJlueLFbKoZS10nAV58609
+         szV4cIW9vMgG95XobU49a/LBaEyn53vZ35KDquq4//ao+ePM/AOFZJqWyCzQoy42nCO8
+         MtczupwCdLi0f7p6B/dq3Dh1q7xRmGBht4cpvJYW9VBfBt7pjmaS6fWP6sdzdXTbyJHG
+         5zOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781861634; x=1782466434;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K+BCE++6dnn9vpZ/E1d7WFQ8H+QlVa8C9fwXmSQekOc=;
-        b=WyIWBXhZupzBFdl1r8dQIqLHoIx7lcpk1uOHh8p4P+6Nwu4tyARNVP9EiDJbIEJutM
-         gfH4DdwDV36PILIutZIVEpHgFJaCIvGK2EGhsb+eIeVgsa3cGgwD/NlP95Xssbj4uIIm
-         hsjXbBK/xWIusy9F5RbiMiS5rusFFaQM/anY8=
-X-Forwarded-Encrypted: i=1; AFNElJ/CwaCmhWgADI5cSsHe/X2bfiCGX/h8jNAc3xVTEx1amhFaOo877lsar88x/gJU5au2RNLUQng=@vger.kernel.org
-X-Received: by 2002:a05:7301:4083:b0:2da:2ec2:64e5 with SMTP id 5a478bee46e88-30c070ee980mr1774506eec.18.1781863086290;
-        Fri, 19 Jun 2026 02:58:06 -0700 (PDT)
-X-Received: by 2002:a05:7301:4083:b0:2da:2ec2:64e5 with SMTP id 5a478bee46e88-30c070ee980mr1774490eec.18.1781863085710;
-        Fri, 19 Jun 2026 02:58:05 -0700 (PDT)
-Received: from shivania.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c06d5bec5sm1851910eec.26.2026.06.19.02.58.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2026 02:58:05 -0700 (PDT)
-From: Shivani Agarwal <shivani.agarwal@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: pablo@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	yin.ding@broadcom.com,
-	tapas.kundu@broadcom.com,
-	Inseo An <y0un9sa@gmail.com>,
-	Li hongliang <1468888505@139.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Shivani Agarwal <shivani.agarwal@broadcom.com>
-Subject: [PATCH v6.1 3/3] netfilter: nf_tables: unconditionally bump set->nelems before insertion
-Date: Fri, 19 Jun 2026 02:28:50 -0700
-Message-Id: <20260619092850.1274076-4-shivani.agarwal@broadcom.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260619092850.1274076-1-shivani.agarwal@broadcom.com>
-References: <20260619092850.1274076-1-shivani.agarwal@broadcom.com>
+        bh=12xf/Szl0P/rXX8258BMfV9P+pbbiVTjxZs4H9XX4F0=;
+        b=g+9R+YBluTOWhqgPjIrHSzPbMZvZ7hP0q9mvk92YRiwWWZUOMF4OSi7vQA6Pb+XGh8
+         nsleRbrDdlDXWwTT9tizUChqpTor8EEDrfS3xeCFz+LBzk1PY/WViWUtZFrZemsmBirl
+         XZsS0MWG3D3FaFXF3F5mYlgmawqJhuqpvIuy0yJQ9ZYxuwzP8Z51pSDVczt7eIy8/PZm
+         uLY2N9bWg2LLTsXU9ULLoTwysvLLCzI1nVAHqqGG2nvgpg0SXAawK3s+vZsnvEh05n6W
+         La7UFz9kuOXOPrIOqKIWyFSv9iVAn0B7rpQ423tV2MipD8cIpRdFFlMA0JImuH6BqQXm
+         NR4g==
+X-Forwarded-Encrypted: i=1; AFNElJ/mt5Gek4Aa/dDM6LHdIQKKIJrjkmUY7RoN9g9G389Ibr9xTea7pYi4+BRevRhM8M80jwqi93A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwORoJ4XTJcsUgK4XeNADJM+pvkja3iZKHx3Np/zcJs4cnmIXb5
+	dCUj2AJu+Kk++OfPsA4IKWSnH9AD04TVZwmN/6FrK9hsQUX0N8bwR3cTkP7bIq0aL/A=
+X-Gm-Gg: AfdE7cl/6909dCu8Dk1wOP4SscfwbMxzuy7SvWH7rsZDF7oslTKLOjaLJ/0/Un3fggZ
+	IRQulf+C0jvG4nvnd40MeHT6y/KcIVNObSX6oT/cMYn/W+WhMtIe4TQqugf/Ul32eg4L83cNIOK
+	H3MPOqHoDociE7Uzoza+/SVmChQgJob0yphAdLhKHQ4ZNnzEJo3zAXl9AbtWgUM+Z3/tb4c+/wA
+	pkjrAu2mZHhNkQG0x5Rd4DUIjEwudRkPISnU+hS6YVBDn3iqIQFsIlLbcKdIaNTI6jQ4Z+VhAQZ
+	lC2r4o2/pbH/UPyODpefhf06umfc/76dk+AErVPQvdsdFNEO0qj0x6lCLwsfO3tHCYxqIjhw6or
+	rvYnPl2bM/9mtCKIncNbh29mEjUKZMnJc9d8l3kHtGlPbNP6XGfpzHKccjGpSgV6SzpDZOLZ5v6
+	LEI+gFLkjum/SZAERjmcHNiiI3ZrgsIL0jFvvKWedBVsF4zNZUhGZIY2r5U94s1mXj0Q==
+X-Received: by 2002:a05:6000:4691:b0:465:767a:39fd with SMTP id ffacd0b85a97d-465767a3b3cmr830884f8f.3.1781861634414;
+        Fri, 19 Jun 2026 02:33:54 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:ab7:2110:6a1d:efff:fe52:1959? ([2a01:e0a:ab7:2110:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46508a04c15sm6616227f8f.3.2026.06.19.02.33.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2026 02:33:54 -0700 (PDT)
+Message-ID: <a195341a-4678-46d0-b84d-50c2365e01ef@6wind.com>
+Date: Fri, 19 Jun 2026 11:33:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net 1/6] ipv6: fix error handling in disable_ipv6 sysctl
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: shemminger@vyatta.com, dforster@brocade.com, gospo@cumulusnetworks.com,
+ ddutt@cumulusnetworks.com, brian.haley@hp.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, idosch@nvidia.com, dsahern@kernel.org
+References: <20260618162225.4588-1-fmancera@suse.de>
+ <20260618162225.4588-2-fmancera@suse.de>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20260618162225.4588-2-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	SEM_URIBL(3.50)[139.com:email];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300677-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,broadcom.com,gmail.com,139.com];
-	R_DKIM_ALLOW(0.00)[broadcom.com:s=google];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ajay.kaher@broadcom.com,m:alexey.makhalov@broadcom.com,m:vamsi-krishna.brahmajosyula@broadcom.com,m:yin.ding@broadcom.com,m:tapas.kundu@broadcom.com,m:y0un9sa@gmail.com,m:1468888505@139.com,m:sashal@kernel.org,m:shivani.agarwal@broadcom.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[shivani.agarwal@broadcom.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DMARC_POLICY_ALLOW(0.00)[broadcom.com,reject];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,vger.kernel.org:from_smtp,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,broadcom.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,139.com:email,strlen.de:email];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shivani.agarwal@broadcom.com,netdev@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
+	TAGGED_FROM(0.00)[bounces-300664-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:shemminger@vyatta.com,m:dforster@brocade.com,m:gospo@cumulusnetworks.com,m:ddutt@cumulusnetworks.com,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	TO_DN_SOME(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,6wind.com:from_mime,6wind.com:dkim,6wind.com:email,6wind.com:mid,6wind.com:replyto]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 265F06A5150
+X-Rspamd-Queue-Id: C09BB6A4F88
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-
-[ Upstream commit def602e498a4f951da95c95b1b8ce8ae68aa733a ]
-
-In case that the set is full, a new element gets published then removed
-without waiting for the RCU grace period, while RCU reader can be
-walking over it already.
-
-To address this issue, add the element transaction even if set is full,
-but toggle the set_full flag to report -ENFILE so the abort path safely
-unwinds the set to its previous state.
-
-As for element updates, decrement set->nelems to restore it.
-
-A simpler fix is to call synchronize_rcu() in the error path.
-However, with a large batch adding elements to already maxed-out set,
-this could cause noticeable slowdown of such batches.
-
-Fixes: 35d0ac9070ef ("netfilter: nf_tables: fix set->nelems counting with no NLM_F_EXCL")
-Reported-by: Inseo An <y0un9sa@gmail.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-[ Minor conflict resolved. ]
-Signed-off-by: Li hongliang <1468888505@139.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[ Shivani: Modified to apply on 6.1.y ]
-Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
----
- net/netfilter/nf_tables_api.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 15bfdf07c..196ac4e76 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -6388,6 +6388,7 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 	struct nft_data_desc desc;
- 	enum nft_registers dreg;
- 	struct nft_trans *trans;
-+	bool set_full = false;
- 	u64 timeout;
- 	u64 expiration;
- 	int err, i;
-@@ -6680,10 +6681,18 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 	if (err < 0)
- 		goto err_elem_free;
- 
-+	if (!(flags & NFT_SET_ELEM_CATCHALL)) {
-+		unsigned int max = nft_set_maxsize(set), nelems;
-+
-+		nelems = atomic_inc_return(&set->nelems);
-+		if (nelems > max)
-+			set_full = true;
-+	}
-+
- 	trans = nft_trans_elem_alloc(ctx, NFT_MSG_NEWSETELEM, set);
- 	if (trans == NULL) {
- 		err = -ENOMEM;
--		goto err_elem_free;
-+		goto err_set_size;
- 	}
- 
- 	ext->genmask = nft_genmask_cur(ctx->net);
-@@ -6715,23 +6724,16 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 		goto err_element_clash;
- 	}
- 
--	if (!(flags & NFT_SET_ELEM_CATCHALL)) {
--		unsigned int max = nft_set_maxsize(set);
--
--		if (!atomic_add_unless(&set->nelems, 1, max)) {
--			err = -ENFILE;
--			goto err_set_full;
--		}
--	}
--
- 	nft_trans_elem(trans) = elem;
- 	nft_trans_commit_list_add_tail(ctx->net, trans);
--	return 0;
- 
--err_set_full:
--	nft_setelem_remove(ctx->net, set, &elem);
-+	return set_full ? -ENFILE : 0;
-+
- err_element_clash:
- 	kfree(trans);
-+err_set_size:
-+	if (!(flags & NFT_SET_ELEM_CATCHALL))
-+		atomic_dec(&set->nelems);
- err_elem_free:
- 	nf_tables_set_elem_destroy(ctx, set, elem.priv);
- err_parse_data:
--- 
-2.53.0
-
+Le 18/06/2026 à 18:22, Fernando Fernandez Mancera a écrit :
+> When writing to the disable_ipv6 sysctl, if proc_dointvec() fails to
+> parse the input, it returns a negative error code. The current
+> implementation is overwriting that error for write operations.
+> 
+> This results in a silent failure, it returns a successful write although
+> the configuration was not modified at all. When modifying the "all"
+> variant it can also modify the configuration of existing interfaces to
+> the wrong value.
+> 
+> Fix this by checking the return value of proc_dointvec() and returning
+> early on failure.
+> 
+> Fixes: 56d417b12e57 ("IPv6: Add 'autoconf' and 'disable_ipv6' module parameters")
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
