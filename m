@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-300645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eAwJBP71NGpdlQYAu9opvQ
-	(envelope-from <netdev+bounces-300645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:55:42 +0200
+	id 9X4MMQ72NGpjlQYAu9opvQ
+	(envelope-from <netdev+bounces-300646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:55:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1726A4775
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EDEC6A4779
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:55:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=R5cGiEvQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300645-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300645-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dcb01x2s;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300646-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300646-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7ACAC3025A70
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:55:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CDC4E300AEC5
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 07:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7986E314D26;
-	Fri, 19 Jun 2026 07:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CF131D72E;
+	Fri, 19 Jun 2026 07:55:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398B21FA859
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 07:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B135E1FA859
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 07:55:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781855738; cv=none; b=KEYMRb7D5VQfxAYikltTI3UJRqsIUIz0aBsUUHhRXI3WTLRmI30Z6nQyUBaPK5X7H7Hq7qAlmiaTP/3ZzrDK/5R9qgQLUlgBokEuCzrGiVc5xD9a23nU00DKBbKYzytlICnKmThUA6sZXApEN4LAXXpROoi69V3yxuzMsoexfPw=
+	t=1781855748; cv=none; b=pEBVS0sJLw/jbfTzCQovfJHVufFBVR3W1DY1r4/oJijgBfI3YdyYwrYc7PeffPCnmz5N5D/trUNipk1Lp05MRT/9PjNx60Rh8Q/lzU0TEDcL53iwui4UkdDT3/wrZPDxahV2IroVua516voc3unrG8gi1fPYsWAZz9BuipKmyng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781855738; c=relaxed/simple;
-	bh=ITp5V4Wi5dZpM8U50GSdomX6kb1P/6r7ktj5hRsniiU=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NiG5IATU/733pkdT4bKO3TsXuihsIljbLiBEkgHg0yUdYaQ1Ho6yqq28O2ytQrb0cUh0Gf55jxP4OvEASMP8C35n+/01oeq3IwW63FnwDf52zvH9MaLUl3Z68bUOKUOGz02AIHpYpWxyY6qXp8kIa5vHWxC+wKOEaRJbDEEf0Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R5cGiEvQ; arc=none smtp.client-ip=209.85.214.172
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c6a97e1d1bso13447835ad.0
-        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 00:55:37 -0700 (PDT)
+	s=arc-20240116; t=1781855748; c=relaxed/simple;
+	bh=gQUr/rkEarrMSnvgduZt2Cb1BkgNLCpooiBPpcm1k48=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=QHUpLkfK3RLLrcnOZXyQ1tisVhPbkJWbFvvrM3odrnShptr0NlQiTMzGX9PtMxUWYuYJFFRzFPcC3DaMbG0YrHdXqN8k0VZV7j9whNAfq+aADkjZZbLChpaaIj/Ap4EakenM7HN3psNhToO6Gisjc9gkJec5sWTKF3BpFkrAvP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dcb01x2s; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c69921bd15so9173405ad.1
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 00:55:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781855736; x=1782460536; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781855747; x=1782460547; darn=vger.kernel.org;
         h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=+x0Q9vKRabtFjaGXApa4amcI6ZA0EEYg48FTUvCHSCM=;
-        b=R5cGiEvQXMpjnk2+nBtyOvQ6ay5CzK+pdEgWJ/+rOA8KsWHEdkiNFPmoB3xhyTcBEd
-         HCxhiFWkHpCKOouk2v+kgKlRBQ3/twoaWgaXO5P7OzDUaj1FpcGPW519NhZ1GLrs7lTk
-         vrDOZSEbZmb/a2Fp5YwqYFE1CBPDJTbCduTr0Op15jGHaqjRHiGW9lzpcykYBVYurvT0
-         FqOpYjGPhi6B+CgmyQNB+IzBT/gD4I3QNeh/NXSn4KZtpH/T+IVxw3ihAQ4DohaCFxKA
-         xR9Y1MHv6GfYGAtcHnAHgcerTEn80EocNJe0tTvh8/dptTpKzqSFs8f6pEfbCEdT/L/D
-         t6Lg==
+        bh=1ZZlyfradZl+5Bcnl/kI9msiyohlupRsBccnKU6QuBU=;
+        b=dcb01x2s6KffqLH5tcfe9sBqC2MzwAyaCXLDk+A4FQanETlpHYYMtdomRPDsuwDmDy
+         EB5kIOxf0WtsUX32cGIKp/gnpVIsAHXhNPmRm9P9SxCGrAQSweywR4Ks9vWLZUfgJqGR
+         mEFTTN/yAyU/uw9Jhn3nmUuvO3XazWJy2qJlQHCme6SCXYqLw1OD0oPdRTwsguzRH7f7
+         BjYhIXwY0tlQAryQGS0gWDD0sDkcL6V+5KXd2uMfB7yyptNioPwXXv3Ovk4tP5tPm0+5
+         4L3iqcMuqqSqzyGtcmmNl16Y6SQjjCBHmqlJkxjA+iHIDodOFSL/sHk9Z3otAJemtOVX
+         G9pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781855736; x=1782460536;
+        d=1e100.net; s=20251104; t=1781855747; x=1782460547;
         h=mime-version:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+x0Q9vKRabtFjaGXApa4amcI6ZA0EEYg48FTUvCHSCM=;
-        b=NfWV7H2hGAyF6Aqa3DbqkJQUROOkpoaPh6EUgM9D3qsfLetOJw8CgvXqWTeXCB8Lx4
-         3abcrs1e+2sjEYL3CyptaBVg+1CnMK64uuE/BYF32U/syxNuj9P7ByH58fDheVSGirlf
-         6VXHDCh9le9G2eQrPJodkyxjWn7dSBRz7yRtZ+dKYAgx1jGSX3AeSiwKNqX/hTQQhYlT
-         xKzkZtxRsXvLgdolZSkgIQ+gqRJnoSEu6PWLpI4ZcjV40X/jAIAvj4akSKEwS75i+lMo
-         tPt/PrYXU2n/ZvtPBhYWNLbScnd5JebVnYfDRCUTIHttEivgoo059gFYbuj+UKdFmLQP
-         Z/Kw==
-X-Gm-Message-State: AOJu0YzpDX7GeSFxF65xQD7oI6MKHtBzQwhTpIyzgjJMB/cz0kj9IfnO
-	IsX1U+FhdIB08FxcEvlq+FjNeKR2jaQCsE3qR8ori4N8dvWRmbVv9cCXv/9AIeB4LnA=
-X-Gm-Gg: AfdE7clsfOpJbgzV9Xj22jYmNOhmz/TfFIbORSRW4f5NuO/kZ47710KFPDCf9xy5VKC
-	NEMMTRtFmptC8Nryh+lVDH7iTOMk9aRCfRxK6aTiZWSlqjiF1CheUyOlo7/k3Yp5/HorcZNA4Nq
-	9aUP9ZjA1bvQia5jeToYmx5nOnA4xuICnc3iDwOLRXx5B0BkkvVy4MvKROqH8j2KZfWQvCiIK+y
-	66k3GuDMIA2xwdx0xmYKqvXTg8y7LeXPbPpWQGO6aJ+mCC39RLVjPkPC/hUeKvUlL8EZUPbeKqE
-	0zbE8XfrIiKgoWJ9xbU1ioPXnjOCtCT4CEiedys6unGsIBqhUfeJo1d8u/InD6dVgtmYkDXpjx9
-	NFEwX3Os2+pbWPWpQ3ukDjQ4CaDMMuObH9xefbSDq+RvPZO2Vg3aQ5PTbIpo0ONs+I6xedgD7xh
-	mElksOdmlNJKtaNU7G
-X-Received: by 2002:a17:902:cf06:b0:2c0:e5ee:f56c with SMTP id d9443c01a7336-2c718fe25a3mr28777415ad.20.1781855736340;
-        Fri, 19 Jun 2026 00:55:36 -0700 (PDT)
+        bh=1ZZlyfradZl+5Bcnl/kI9msiyohlupRsBccnKU6QuBU=;
+        b=azbBL7SxEC6ucHAYcHTLYVitV6fidS9C1FFfWh2nLmViVbrhPvHJn/+SVjo1du957Z
+         pA3idU+Z2q9rdysHLrdx/rp1VsHwpl/veRvf6LmXTopySXNVdgyw04EqqqJeBZGWBCDl
+         eDkeyHBtiizM8yUdi7jUgunLLCao/KFW6vZngBUgWzFJ6EDPYhfedpKYCJRLGFZMrqCc
+         mj/EqgTn6up4xxMgjf/bp4eiQbTOAxSQjHuzC8Nd3/d3ps8D+CgCbVZqFvnPFQWR2Q0a
+         ycX7y8u9yZvYh6I7rhiqYsYber9z8gjqEU5pMDqxVl+aJoSI4ZqO5NMdCndjOYKXLrbo
+         hmcg==
+X-Gm-Message-State: AOJu0Yzrp3Gy9yYWF9/QF7/cV8d7TErgDf2ampsvKM11mqzlJHgtWK7m
+	gihcBVJARhJD3Nj8TVRo7cqd5TqIYmv2yhpQtzSOASsRnD1EcFwxqi9GgprMLI7yc8o=
+X-Gm-Gg: AfdE7cnCN0G3KA0F89AY/uzCpp7KD9Vkt5e0WWKX3fXAtOMijI5aOD4P95OSw1pXn7X
+	M1iFc11X5mhqzmP/TDgytMeI5/VDEnW5N2N/LSpnv5SWbX20kreUv334CjqYz8GpRO7mrsZrCoV
+	XXJZ28pUl3tvaUhua4zhgul2CzEYzx16rP8lf7qDcCkrmwIVn77kqeAShRyJjLp51ZKWkGq0Tr+
+	vsR9VCnJu5jCkq2Nxh5OBcpDOIDEZ1yUVtyWtyWdq8aDh2eO6p1M8wDUJ/XKdKMYoE5bjDMlMjR
+	vBz8GgFzFhkHu2vqdwngF6QHdICSwOuG6Oykxp4fNZaiW1x1bR94XGGYCjWszXUR+bPFVyMffS2
+	PY+k0/K6mAF3UaYE2/lxeaoWJ0lJS+SfaTa0hlgriu3ZxIYgx6QKFPRcKP7GQ95c9GziO4mOM/U
+	R8hvJQDI1BdRfsNqn4
+X-Received: by 2002:a17:903:1ae4:b0:2c1:ed61:36ab with SMTP id d9443c01a7336-2c718fe57ffmr29966425ad.19.1781855746746;
+        Fri, 19 Jun 2026 00:55:46 -0700 (PDT)
 Received: from [127.0.1.1] ([47.253.114.73])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7209bc296sm15297755ad.49.2026.06.19.00.55.32
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c720a1968bsm14892245ad.72.2026.06.19.00.55.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2026 00:55:36 -0700 (PDT)
+        Fri, 19 Jun 2026 00:55:46 -0700 (PDT)
 From: Wayen Yan <win847@gmail.com>
 To: netdev@vger.kernel.org
 Cc: lorenzo@kernel.org, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: [PATCH net v4] net: airoha: Fix skb->priority underflow in airoha_dev_select_queue()
-Date: Fri, 19 Jun 2026 15:50:16 +0800
-Message-ID: <178185573207.2378135.3729126358670287878@gmail.com>
+Subject: [PATCH net v2] net: airoha: Fix TX scheduler queue mask loop upper bound
+Date: Fri, 19 Jun 2026 15:52:03 +0800
+Message-ID: <178185574223.2378148.13454900445528174929@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [0.39 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-300645-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
@@ -121,63 +121,62 @@ X-Spamd-Result: default: False [0.39 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama.to:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6D1726A4775
+X-Rspamd-Queue-Id: 4EDEC6A4779
 
-In airoha_dev_select_queue(), the expression:
+In airoha_qdma_set_chan_tx_sched(), the loop clearing queue mask was
+using AIROHA_NUM_TX_RING (32) instead of AIROHA_NUM_QOS_QUEUES (8).
 
-  queue = (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES;
+Each channel has 8 queues, and TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i)
+computes BIT(i + (channel * 8)). With i ranging 0..31, this causes:
+- channel 0: clears bit 0..31 (all 4 channels) instead of 0..7
+- channel 1: clears bit 8..31 (channels 1-3) instead of 8..15
+- channel 2: clears bit 16..31 (channels 2-3) instead of 16..23
+- channel 3: clears bit 24..31 (channel 3 only) - correct by accident
 
-implicitly converts to unsigned arithmetic: when skb->priority is 0
-(the default for unclassified traffic), (0u - 1u) wraps to UINT_MAX,
-and UINT_MAX % 8 = 7, routing default best-effort packets to the
-highest-priority QoS queue. This causes QoS inversion where the
-majority of traffic on a PON gateway starves actual high-priority
-flows (VoIP, gaming, etc.).
+While BIT(32+) on arm64 produces 64-bit values truncated to 0 in u32
+mask parameter, the loop still incorrectly clears queues within the
+same channel beyond queue 7.
 
-The "- 1" offset was a leftover from the ETS offload implementation
-that has since been removed. The correct mapping is a direct modulo:
+Even though this is functionally harmless (the register resets to 0
+and is only ever cleared, never set — so clearing extra bits is a
+no-op), the loop bound is semantically wrong and should be fixed for
+correctness and clarity.
 
-  queue = skb->priority % AIROHA_NUM_QOS_QUEUES;
+Fix by using AIROHA_NUM_QOS_QUEUES (8) as the loop upper bound.
 
-This maps priority 0 → queue 0 (lowest), priority 7 → queue 7
-(highest), with higher priorities wrapping around. This is the
-standard Linux sk_prio → HW queue mapping used by other drivers.
-
-Fixes: 2b288b81560b ("net: airoha: Introduce ndo_select_queue callback")
+Fixes: ef1ca9271313 ("net: airoha: Add sched HTB offload support")
 Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Reviewed-by: Joe Damato <joe@dama.to>
 Signed-off-by: Wayen Yan <win847@gmail.com>
 ---
-Changes in v4:
-- Remove the "- 1" offset entirely as suggested by Lorenzo and Jakub.
-  The offset was an ETS offload leftover; the correct mapping is a
-  direct modulo of skb->priority to AIROHA_NUM_QOS_QUEUES, matching
-  the standard Linux sk_prio → HW queue convention. (v3 used a
-  ternary guard which addressed the underflow but kept the unneeded
-  offset.)
+Changes in v2:
+- Add Lorenzo's Acked-by tag.
+- Clarify in commit message that this is semantically wrong but
+  functionally harmless (register resets to 0, only cleared), as
+  Lorenzo pointed out in review.
+- Rebase on current net tree.
 
-Link: https://lore.kernel.org/netdev/20260617164448.31e189bc@kernel.org/
-Link: https://lore.kernel.org/netdev/ajPCgH7E_ke6Fdur@lore-desk/
+Link: https://lore.kernel.org/netdev/ajJIWMs4dVbfkHZ5@lore-desk/
+Link: https://lore.kernel.org/netdev/CAL_ptrs6J3Ryw_4mVTq5VgzkB4RreF5S0huHyLvd9YwWr1m6jAA@mail.gmail.com/
 
  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index d0c0c0ec8a..9ec3f22754 100644
+index d0c0c0ec8a..ca77747b44 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1928,7 +1928,7 @@ static u16 airoha_dev_select_queue(struct net_device *dev, struct sk_buff *skb,
- 	 */
- 	channel = netdev_uses_dsa(dev) ? skb_get_queue_mapping(skb) : port->id;
- 	channel = channel % AIROHA_NUM_QOS_CHANNELS;
--	queue = (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES; /* QoS queue */
-+	queue = skb->priority % AIROHA_NUM_QOS_QUEUES;
- 	queue = channel * AIROHA_NUM_QOS_QUEUES + queue;
-
- 	return queue < dev->num_tx_queues ? queue : 0;
---
+@@ -2212,7 +2212,7 @@ static int airoha_qdma_set_chan_tx_sched(struct net_device *dev,
+ 	struct airoha_gdm_port *port = netdev_priv(dev);
+ 	int i;
+ 
+-	for (i = 0; i < AIROHA_NUM_TX_RING; i++)
++	for (i = 0; i < AIROHA_NUM_QOS_QUEUES; i++)
+ 		airoha_qdma_clear(port->qdma, REG_QUEUE_CLOSE_CFG(channel),
+ 				  TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i));
+ 
+-- 
 2.51.0
 
 
