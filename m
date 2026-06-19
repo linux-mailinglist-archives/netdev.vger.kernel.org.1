@@ -1,137 +1,223 @@
-Return-Path: <netdev+bounces-300654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5jZ9H6wGNWqzmAYAu9opvQ
-	(envelope-from <netdev+bounces-300654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:06:52 +0200
+	id Jr6CE68GNWq0mAYAu9opvQ
+	(envelope-from <netdev+bounces-300655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:06:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DDC6A4D9F
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:06:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29D66A4DA4
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 11:06:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=H+IESCsc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300654-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300654-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZJ1N5RJu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300655-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300655-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 582603055DE4
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:05:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BBE51301F489
+	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 09:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B84035E1AF;
-	Fri, 19 Jun 2026 09:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BA035C1AE;
+	Fri, 19 Jun 2026 09:06:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6610C2F8E98;
-	Fri, 19 Jun 2026 09:05:21 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781859922; cv=none; b=BGw/GZ69vRDONXnjVRmo7nBHaepi8G3B6VZZB5nEmYHdZK4hfd5huptjtM4lMvCABhRQ2S1rk99lwUlt+RZKvSNBFAVlTnnuN9pDk0vE6gRFvc3QmRJLNYp51HCNexY4lsch+qW6An79YDIZxEzS6xtgzqP0Ejx1C+rHKLLPC2U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781859922; c=relaxed/simple;
-	bh=Y6gJkW+SMdPt4P0WObWk8jXzSDQ8tLBAMqzt6Zwp6kI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=faSKyPf/oL8QMyOTfc6Z1t1F3jR6MmoLWALx9aFIv21YW8eBvxlih7m6xAITqWCglqrcKBhGY0naZnktHLy+yfI5fMU93B3m33w1bd9+x2EDtBsPCQM2GvlSEPn3xbQcwjAnHSOz/ZYqRCT5pdnNg3/r94ougw5sEOpzhVoTUDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H+IESCsc; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618791F00A3A;
-	Fri, 19 Jun 2026 09:05:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781859921;
-	bh=32w9dxrk/QVTrzVo27ewIaHHRflbbYBLF2NEwB58Tvc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=H+IESCscotb71bLxleLrr5NhbRv3opRbYRt6AbQJS/8NCONBqWVUM9jujZL64JVtg
-	 QAZcOcHMV/jf8NZYaMU6IdBaRY+yGusO0bxKCRai0jDganpc8w5aVWDmUXHkWYFr9x
-	 7PvhDXWiOuUCiqiHzGhHLv01X7yj+GQYjHfdwNoA32Oaa2vuTYhka2WYjhbTVuAKBx
-	 OvQOjXAe0XL6t8mZ356TuZrC3dsX5fvDimTWAcGDSLX6/eJEXiGmCMA+9Onf3Dx5oL
-	 jsIAAL8f/u8/CKEx6YuEA5X0wvf2inNwu4t1HtwPNW5sD1Mlxu/OhVFsVuaebCzH+K
-	 fD9fT0HisWwew==
-Date: Fri, 19 Jun 2026 10:05:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dexuan Cui <decui@microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	longli@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	kotaranov@microsoft.com, ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com, kees@kernel.org,
-	jacob.e.keller@intel.com, ssengar@linux.microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: mana: Sync page pool RX frags for CPU
-Message-ID: <20260619090514.GT827683@horms.kernel.org>
-References: <20260618035029.249361-1-decui@microsoft.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1353BB48
+	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 09:06:51 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781860013; cv=pass; b=pCkZsjF5WoXX8y3ZgrpmHJDEJwlcYW8/U2Ey8wpUNc1NREbxIbEKRafAihEvvimDCINB2K4q/IdPkdVzytOIi40930mZmRxaHMhKIURTj5s/wFFPAV1oYJgqBTprAO7inaSP82gxpjfJR54RjLb9WRe+HyBHmBKIviZhfA8LKNs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781860013; c=relaxed/simple;
+	bh=W3Oj3Xq0sqB1+K+I7OWN/YsDKmlnqCN7ebLffL2tcTc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TbNus7P2s/Le7SBC4LZ5YqLFy5HCxGy2Mf56QE6uN2pvjOZI9mISLvtFoUAfRLmbSmSfNKcKSIZoxx+NLQIcLffjZBZ3n6YshceV43ShFa90HIbxC3aA6+Cu8kRi+4loqcImyj0/pnKa2L5ohxJA1bDrG6X4Lw0NDhxrq/SJA5E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZJ1N5RJu; arc=pass smtp.client-ip=209.85.208.173
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-3967738c801so19694831fa.2
+        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 02:06:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781860010; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TGfhBfO9r0IwgUcxq1rG8QqQvLVscX8TCtyKhKbh6bxHT/rtijCmXwsmx4rolRVloq
+         pFJqrxay+XRvb7AFcX6/eph97KSol403JVJzjDsxiJ6wgOy8nwTrtwllBTJETkRA2yzl
+         BzL9kOBBafE+fPR0rSCQiiUlC5xlg3RxHxMsfzI4TjZgNnrmZC12P5HT8qPtM2KpIMZn
+         F0T7giAS/aH46M0hO3fetbaqoRtViQV1yb76/c2bbaxz6nYGPRgpTp1mCoAh38oC5NJg
+         pjXwaqNilV1Ofo24fpjlyKYzv5gHVWu5N3hAoPgzis1otoUhN+H6C+7UHWRBJbWibeVc
+         shdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UacI82GZ1TrwcIPOa1WAvWCBhpkSRdv0khLRx4rIDg0=;
+        fh=md7Q2maOEghtJPEXbCSvT0oD/44nj3wPhoRpL/PzvI0=;
+        b=irhHlVM+AJBSU2eDzAvCYqhvzHzT8n3YMAChpyvWy6HpmLgxQgsKF42fVRj0i6HEu7
+         oWdHRd3NtjO214zeuDhAXhQ2KruIFjDgEe86Km5CLeIfyF13oj/lLgBaLYwLJLk+nr2w
+         x/thp67+60qaBvp1pRZRBA6CNdimlRS8Esk0J1KNBaOhuY/Uw53UcyOY3uhCZrMTaGcQ
+         EF8pDj/j6iY0KkNonSCNN2ZbBjOHpccaMf/8Qbx4aK441i/zj6qmVMcw8W0eNGZ3n7wT
+         bbOGADuVDsHwdk+Ld1Yi3uByYvnV5xAZidlD0gGPhM5mF6cEUCa3C+sBkCGSzncqiNJO
+         513A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781860010; x=1782464810; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UacI82GZ1TrwcIPOa1WAvWCBhpkSRdv0khLRx4rIDg0=;
+        b=ZJ1N5RJuT+ufv61lVEHToE5TWt55jNyAx8y4/PAi16+mJ2DeHsXMZMKNOnTFtMvS07
+         9Ggio0vk/BiXchKDPUSfdEfPtg5YFWr6K/Sv76uOYkN3iDNiqZ0d2GHpaMpjDihK0cuy
+         DpXRuLcufm8GBot2K7mUKZ8S1cXJ3ZhSB5HPwilEcfqQn4NwLgTp7fXAE9IK98s/ddNP
+         eRmQjweBOSRIJTC+BS5S2xul30rb+61x02Zq+HZXYx7MCVAXul3vp8DyBgrdBLeC1c2X
+         19FlzLNgYV5AafT5o4U9KjJ86Wtf2cRhhVW5vEmi/QJz7HGpzh0qVFYAJaWsjPp02cf8
+         zSjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781860010; x=1782464810;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UacI82GZ1TrwcIPOa1WAvWCBhpkSRdv0khLRx4rIDg0=;
+        b=HCvNoHWHIMOwxAWkjFCZlHJUFThpKpz8kX5x70M7xmvhClLvSDUHzcgX6sDLPZXovM
+         Z4Ov7qoIt0EgoVC8kznEPtpYq42kcliwSZfgHXYlGTZoCbcQXP/VmyRAxrP6hctfQ7j+
+         4VDKSNv2R2qxw38v+pQHiSKpzYKBREbBBIFOMhMFqHzNh0UttEwlNB5O5OEjRZQJE80/
+         s8TIFQw6YiDIYCQqgPuEgNfZyYo3GcJQJrUYdiZ2vsPwBIDpB+Qj6C2ONqjx2crau6YR
+         74YlGWifkPXZH/HNI+uaEA3xLQqme+BjJMQDM3b+x/J7J/iaNdQideHMoPzOBuVHZotH
+         7k3Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+tF/KsojZbkxogvk3RrqeX+9ypO2FzHHD9uEhrOxgXjP7IdVC9JD4te7Zx6EkTDKsOHcKQTPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznugUvQkfs+KyNgM1T7+zu35FbCLwaJ2dYgf7s2DhBRtiTKKU7
+	yuRzPz+Wak+P/kK7rNUsTxhlkr5c3QoOoWByPr/njmNbnDmMiAML9uzMj3uLPgDRPSqOFX4c3Ze
+	/dbwN6nnYKbP5aN0rVNE1ZdRH7cWsi98=
+X-Gm-Gg: AfdE7ck0c/bx1BMms8LkjlG8ZtVc29E1jrKCQcmoMCpGBO0z00Cy0lK46DIFiZi4qPy
+	KJcbRgz/MynxwueEgRfUDPLmXXj1NfaHhFnbOYP73D1/d5rmNDc2ThxtcocCkXN1jQQJ6v5vVSy
+	x6xuHnnUb42uVFHFzYs9+ycZA6etH4Id5tBUgJqoMgG4kVYJBgpOW5H6CKAxj6xJ5+ysrW6J6dR
+	ElCDuipAMy+m6E3g6bbJk3Ka2wY12ObpKnrmPlZJK5neDw7R3ahmBqXiDX/UYPWHG+RjaY=
+X-Received: by 2002:a05:651c:160d:b0:399:87c9:4573 with SMTP id
+ 38308e7fff4ca-3998bee73e4mr6417491fa.22.1781860009524; Fri, 19 Jun 2026
+ 02:06:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260618035029.249361-1-decui@microsoft.com>
+References: <cover.1781788385.git.qianyuluo3@gmail.com> <46eb334399ce0e25e0897b42f21020541d159300.1781788385.git.qianyuluo3@gmail.com>
+ <CAHsH6Gvsf-JEQyetucAVT6mjaJDi=gMT1pDWFDagb1fhjmveGg@mail.gmail.com>
+In-Reply-To: <CAHsH6Gvsf-JEQyetucAVT6mjaJDi=gMT1pDWFDagb1fhjmveGg@mail.gmail.com>
+From: Qianyu Luo <qianyuluo3@gmail.com>
+Date: Fri, 19 Jun 2026 17:06:40 +0800
+X-Gm-Features: AVVi8Cd7CgmdIKU_a_M1Jph7bhsriy3x4t2YQF0PvSdLDyzd2Ok1NYafC-jAvcg
+Message-ID: <CAPOno=q0NxA_LOJ3QaM9Jgk1oM4ZQiW9igipGfxV7+yGvjr+0g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] xfrm: nat_keepalive: avoid double free on send error
+To: Eyal Birger <eyal.birger@gmail.com>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, steffen.klassert@secunet.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, yuantan098@gmail.com, 
+	bird@lzu.edu.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300654-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300655-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:decui@microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:jacob.e.keller@intel.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[qianyuluo3@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:eyal.birger@gmail.com,m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:eyalbirger@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lzu.edu.cn,vger.kernel.org,secunet.com,gondor.apana.org.au,davemloft.net,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qianyuluo3@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0DDC6A4D9F
+X-Rspamd-Queue-Id: B29D66A4DA4
 
-On Wed, Jun 17, 2026 at 08:50:29PM -0700, Dexuan Cui wrote:
-> MANA allocates RX buffers from page pool fragments when frag_count is
-> greater than 1. In that case the buffers remain DMA mapped by page pool
-> and the RX completion path does not call dma_unmap_single(). As a result,
-> the implicit sync-for-CPU normally performed by dma_unmap_single() is
-> missing before the packet data is passed to the networking stack.
-> 
-> This breaks RX on configurations which require explicit DMA syncing, for
-> example when booted with swiotlb=force.
-> 
-> Fix this by recording the page pool page and DMA sync offset when the RX
-> buffer is allocated, and syncing the received packet range for CPU access
-> before handing the RX buffer to the stack.
-> 
-> Also validate the packet length reported in the RX CQE before using it as
-> a DMA sync length or passing it to skb processing. The CQE is supplied
-> by the device and should not be blindly trusted by Confidential VMs.
+On Fri, Jun 19, 2026 at 1:21=E2=80=AFAM Eyal Birger <eyal.birger@gmail.com>=
+ wrote:
+>
+> On Thu, Jun 18, 2026 at 9:36=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+> >
+> > From: Qianyu Luo <qianyuluo3@gmail.com>
+> >
+> > nat_keepalive_send() frees the keepalive skb whenever the IPv4 or IPv6
+> > send helper reports an error.
+> >
+> > That cleanup is only correct before the skb is handed to the output
+> > path. Once ip_build_and_send_pkt() or ip6_xmit() takes ownership, the
+> > networking stack may already have consumed the skb before returning an
+> > error, so freeing it again is unsafe.
+> >
+> > Handle the pre-handoff failure cases inside nat_keepalive_send_ipv4()
+> > and nat_keepalive_send_ipv6(), where the caller still owns the skb, and
+> > keep nat_keepalive_send() responsible only for family dispatch and the
+> > unsupported-family cleanup path.
+>
+> Thanks for the fix!
+>
+> >
+> > Fixes: f531d13bdfe3 ("xfrm: support sending NAT keepalives in ESP in UD=
+P states")
+> > Cc: stable@vger.kernel.org
+> > Reported-by: Yuan Tan <yuantan098@gmail.com>
+> > Reported-by: Xin Liu <bird@lzu.edu.cn>
+> > Signed-off-by: Qianyu Luo <qianyuluo3@gmail.com>
+> > Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> > ---
+> >  net/xfrm/xfrm_nat_keepalive.c | 15 +++++++++------
+> >  1 file changed, 9 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/xfrm/xfrm_nat_keepalive.c b/net/xfrm/xfrm_nat_keepaliv=
+e.c
+> > index 458931062a04..f71328096f11 100644
+> > --- a/net/xfrm/xfrm_nat_keepalive.c
+> > +++ b/net/xfrm/xfrm_nat_keepalive.c
+> > @@ -55,8 +55,10 @@ static int nat_keepalive_send_ipv4(struct sk_buff *s=
+kb,
+> >                            ka->encap_sport, sock_net_uid(net, NULL));
+> >
+> >         rt =3D ip_route_output_key(net, &fl4);
+> > -       if (IS_ERR(rt))
+> > +       if (IS_ERR(rt)) {
+> > +               kfree_skb(skb);
+> >                 return PTR_ERR(rt);
+> > +       }
+> >
+> >         skb_dst_set(skb, &rt->dst);
+> >
+> > @@ -100,6 +102,7 @@ static int nat_keepalive_send_ipv6(struct sk_buff *=
+skb,
+> >         sock_net_set(sk, net);
+> >         dst =3D ip6_dst_lookup_flow(net, sk, &fl6, NULL);
+> >         if (IS_ERR(dst)) {
+> > +               kfree_skb(skb);
+> >                 local_unlock_nested_bh(&nat_keepalive_sk_ipv6.bh_lock);
+>
+> Any reason to do the kfree under lock?
+>
 
-I think this last part warrants being split out into a separate patch.
+Thank you for your reply! I did this without particular reason.
+Just to keep the pre-handoff cleanup in the same error path.
+kfree_skb() does not need the bh lock there, so I can move it after the
+unlock in v2 if you need!
 
-> 
-> Fixes: 730ff06d3f5c ("net: mana: Use page pool fragments for RX buffers instead of full pages to improve memory efficiency.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dexuan Cui <decui@microsoft.com>
-
-...
+> Eyal
 
