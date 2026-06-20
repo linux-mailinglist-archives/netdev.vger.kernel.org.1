@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-300859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Nh3zGLcUN2o8JAcAu9opvQ
-	(envelope-from <netdev+bounces-300859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 00:31:19 +0200
+	id hnQNCNQUN2pBJAcAu9opvQ
+	(envelope-from <netdev+bounces-300860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 00:31:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9DBD6A9D5C
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 00:31:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 666856A9D64
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 00:31:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b=jXsD8tNK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300859-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300859-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=NNwXCp7x;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300860-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300860-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E87D30439B3
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 22:28:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C0343047248
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 22:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C25A374A11;
-	Sat, 20 Jun 2026 22:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7580033C1BE;
+	Sat, 20 Jun 2026 22:28:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73DC347BD9;
-	Sat, 20 Jun 2026 22:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5D2351C1F;
+	Sat, 20 Jun 2026 22:27:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781994477; cv=none; b=ludvWGlv/nJGIlET8LwoDQgAUsM9mWXZCYWxrNm6tnL7igci//eU6NCpt6D0Fl+7+F/unfy37MfDvemWwEmMz/lpfg0Er5xj1exqlNCoMms6iY7qAuwRJv3n4spqPkMx3Hv8vcfI5Lg5+oqYTgzgQi0RcvmhpUNbiLUFMBMQDyU=
+	t=1781994485; cv=none; b=P3hthRsqGAsQtnauy82/Hk4ZDvJdAlrUQQUEe5QBS8UPvy8Va7EbrHQUqfduX15nUg0S+6bxVqnkNQ01CQ2cucYEqXxdo2BAF8uS6Yn5sTWeXcnMSWK8W0ZUTtFwVDw97Qz1pzHK+m6AOxkXR8W7s0B+kl7RvjXuUxlN1GauHVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781994477; c=relaxed/simple;
-	bh=RsDaxyPuvOrBmPdJ6FVONCDxwowu3uBw/KYyrv/aet4=;
+	s=arc-20240116; t=1781994485; c=relaxed/simple;
+	bh=k0+DmN2Twec3o4nbr0azlmPkFevxgpDWbOC8tWda470=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SzRGnQfqjoIPLeZRDSAJ6X6kKBmHfz7ThQaopr83KKdVsR0J1buAyCmYmuAFy5uMU47aL/ia+YS8KBckQVvq7okKMBK6FVhKb2pdaQ6tMS3sE0Ij/rbAXxG5ogNq7nE/YogPPR0GAVqr/gtrFHAknSlweRXACEfihNRTzYRcfuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=jXsD8tNK; arc=none smtp.client-ip=217.70.190.124
+	 MIME-Version; b=sjtnXcJVbFZwvwn95vrinXLu75TVtZske81ZYU4bNVxXok+BO7iXKHjs378xki5dYsFzUAZX3MlsJcXsPdp+ZDzLKw6lfEVveQo5w8PxE6qd6uqdnu+IxKXILf/X6PCqc3sq00ZjzOGsPa1ENSSzSpUaH+k8Jw4taOa18NxNWOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=NNwXCp7x; arc=none smtp.client-ip=217.70.190.124
 Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id EF64F60195;
-	Sun, 21 Jun 2026 00:27:54 +0200 (CEST)
+	by mail.netfilter.org (Postfix) with ESMTPSA id 037B16019B;
+	Sun, 21 Jun 2026 00:27:55 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1781994475;
-	bh=UBi8nAYVNxDOC9Fca/g+kEvutyyeLg3iui/uJTcXf3Q=;
+	s=2025; t=1781994476;
+	bh=bz8ud+BrLrB1cv+fCtki3n0k7zcth4plrPUSLRFy9Fc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jXsD8tNKLhkGaB5+PhkVY/suggDzRvj4ymkM0jt1I565Ib/rPPLsAMJ4gOhbRmRh7
-	 HZU8XZnhXAoVKymSNobxETV7hrn+WfhQvMYS/QSc/R+y5FdeFf9v0BZs5UYD/5DahY
-	 +XZDj2s9yUKO7ZidWP3ofIl82ebcqkL6qjzTOWASTltpQxJa6HUdN8RzbW0NBmsREI
-	 jrxkD/GNxOol/mr7UCAlkPDdeGm+flqBJf/rVZRb7TSA6cn+Km/nC5+Z5mQr9gqtjl
-	 /TOqGRDFIVRkkkSbYUMaSH2/RQQucKrbed1C91jYEpleJrdvuMbs2WKMUocz0A7Dea
-	 XZNKzCDVOdWSg==
+	b=NNwXCp7xPERuKXkgJP3p77iWJ/49tca/r1/nVR0EIm0+EZhKRrjHpBaCHJF+SLnOB
+	 bCubu2cDmKBSNOY5MVDYE1KKp116UPJYA417DEvILHzdsIuN0wLhOpQF529YOaMiz+
+	 v2Y/65xBlM1UQGTkeRBuUu1GcyH3HUXAAa/81Yr257YQMf5UtXR0tEkgOYI2GJwoBn
+	 XuFcUI6frcP1pyK/JVj0PiDAsvv8g4GO11YwFORU92kYi+v/afG5mgS90EcGsLDCUX
+	 77SRlVUZzhkPAu8mEbWu9J30WEXlAucnFewqS6BlVqSrf20ZbNfjAFXqI84/fYEH0f
+	 tb7zB+/H7Mcdg==
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: netfilter-devel@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -56,9 +56,9 @@ Cc: davem@davemloft.net,
 	edumazet@google.com,
 	fw@strlen.de,
 	horms@kernel.org
-Subject: [PATCH net 11/14] netfilter: nft_flow_offload: zero device address for non-ether case
-Date: Sun, 21 Jun 2026 00:27:35 +0200
-Message-ID: <20260620222738.112506-12-pablo@netfilter.org>
+Subject: [PATCH net 12/14] netfilter: nf_reject: skip iphdr options when looking for icmp header
+Date: Sun, 21 Jun 2026 00:27:36 +0200
+Message-ID: <20260620222738.112506-13-pablo@netfilter.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260620222738.112506-1-pablo@netfilter.org>
 References: <20260620222738.112506-1-pablo@netfilter.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300859-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300860-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	DMARC_NA(0.00)[netfilter.org];
@@ -101,41 +101,36 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,netfilter.org:dkim,netfilter.org:email,netfilter.org:mid,netfilter.org:from_mime,strlen.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nbd.name:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,netfilter.org:dkim,netfilter.org:email,netfilter.org:mid,netfilter.org:from_mime,strlen.de:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A9DBD6A9D5C
+X-Rspamd-Queue-Id: 666856A9D64
 
 From: Florian Westphal <fw@strlen.de>
 
-LLM points out that the skip causes unitialised stack array to
-propagate down into dev_fill_forward_path().  Its not clear to me that
-there is a guarantee that a later ctx.dev->netdev_ops->ndo_fill_forward_path()
-would always fix this up.
+Not a big deal but this hould have used the real ip header length and not the
+base header size.  As-is, if there are options then
+nf_skb_is_icmp_unreach() result will be random.
 
-Cc: Felix Fietkau <nbd@nbd.name>
-Fixes: 45ca3e61999e ("netfilter: nft_flow_offload: skip dst neigh lookup for ppp devices")
+Fixes: db99b2f2b3e2 ("netfilter: nf_reject: don't reply to icmp error messages")
 Signed-off-by: Florian Westphal <fw@strlen.de>
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- net/netfilter/nf_flow_table_path.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/ipv4/netfilter/nf_reject_ipv4.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
-index 1e7e216b9f89..98c03b487f52 100644
---- a/net/netfilter/nf_flow_table_path.c
-+++ b/net/netfilter/nf_flow_table_path.c
-@@ -53,8 +53,10 @@ static int nft_dev_fill_forward_path(const struct nf_flow_route *route,
- 	struct neighbour *n;
- 	u8 nud_state;
+diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+index fecf6621f679..4626dc46808f 100644
+--- a/net/ipv4/netfilter/nf_reject_ipv4.c
++++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+@@ -89,7 +89,7 @@ static bool nf_skb_is_icmp_unreach(const struct sk_buff *skb)
+ 	if (iph->protocol != IPPROTO_ICMP)
+ 		return false;
  
--	if (!nft_is_valid_ether_device(dev))
-+	if (!nft_is_valid_ether_device(dev)) {
-+		eth_zero_addr(ha);
- 		goto out;
-+	}
+-	thoff = skb_network_offset(skb) + sizeof(*iph);
++	thoff = skb_network_offset(skb) + ip_hdrlen(skb);
  
- 	n = dst_neigh_lookup(dst_cache, daddr);
- 	if (!n)
+ 	tp = skb_header_pointer(skb,
+ 				thoff + offsetof(struct icmphdr, type),
 -- 
 2.47.3
 
