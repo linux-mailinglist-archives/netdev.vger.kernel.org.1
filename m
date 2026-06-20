@@ -1,210 +1,246 @@
-Return-Path: <netdev+bounces-300769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id j43LDeHJNWrW4QYAu9opvQ
-	(envelope-from <netdev+bounces-300769-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:59:45 +0200
+	id cTeoItDfNWqM5gYAu9opvQ
+	(envelope-from <netdev+bounces-300770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 02:33:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C529D6A7F1E
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:59:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055896A8162
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 02:33:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300769-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300769-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=A7AfagWR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300770-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300770-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4B22E300D1DD
-	for <lists+netdev@lfdr.de>; Fri, 19 Jun 2026 22:59:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D9323031332
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 00:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC4F36C9C2;
-	Fri, 19 Jun 2026 22:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8F5487BE;
+	Sat, 20 Jun 2026 00:33:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6790133EB0E
-	for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 22:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B192B9B7
+	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 00:33:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781909981; cv=none; b=kGzg8M5GLju0t6P20em5AQEzIwXwlmIuHgQl8Rwj1tAxUeykQ1bwIICHuLwEC5E6aXhTNQXSiGzcSdY8ElPml83khzfjneuJzUlcJVQi5+6YOG1HHWBl6xUQCRV1eBBS86yfNddiuWSnwzHy5rbA89zaJ3N8GemmjCIltS3TnY8=
+	t=1781915596; cv=none; b=DRSAn1kv8C4rszpDIjo0OKQI2YkXkMahi1kq/5wD1C0gtBero0aEnosKoiQNIeOhSZV2acSLOubXJRB0QLViaOeiw3Zrc+yeONmkZoDV4gxvuksry73HvhrC0oXrUOGNnttCuowpZeRpTsc295Z1656JvY5GjLOzS0rbLpK40Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781909981; c=relaxed/simple;
-	bh=e/2Mln5D8xK8owW5EsqOW6UQeKNFdUiXUtf1I2RtIXM=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BY/PUP//diKFN61DMG9F0+wWcErRPNAwzjB8vlsukRL2uQts3tDuOVDBPDo3l6PXWYBWL0omNTng6u5KD+Pjz2aZk6+AHn2dX4IQyq76gvzzve8xwy1YIAyRD5lhlWCok+vv9oTGQVxmAF6sb0WDbU3L+vpjSnKWe+E8fyyXt/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.65
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-490b211ee6aso17198025e9.3
-        for <netdev@vger.kernel.org>; Fri, 19 Jun 2026 15:59:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781909979; x=1782514779;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yddd8uAv1z7sx4dK+pzC6v0s9Mw+xioH8fNF+U4EgkE=;
-        b=Rg4CQBRL9sPL4xV07G+NtlRsGrTBfEALpd9mJBlfjUPpo6FXmBL58UcEteSeifrUrH
-         GM/QFWvhHxM+xUUepn4/2VjzhGHdn3yk5HldVh2bdgWuElI3fN9+5n458al/4Fe714Ln
-         o2Y5pPBusQ3hipRmCoFS9nDBUV7Robxz2i88cn9Xt2kYkEs4Hj2pjEE8ziq+t0G8VZna
-         epSAclCjB1dvxAV/B9Hh03KvjNoA8rN3rFWwxRKwKSC647pUmu3M55P82XqFkbw3XdkU
-         cQ4OWcUckNzytOaese1PMCX4nc64Vcl742iyPt7sGAMZoeIggy+gdnUGKblS1nrLNbZB
-         zEug==
-X-Forwarded-Encrypted: i=1; AFNElJ8/UJpfvZh5+oLRwzqAC3VntsVJY8F1KSl4d/FyCLj23Q9X7H+tHrzsVo1/NCHV0ytBe3w9CYA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOl39bbvWWfOd6oTPAmOErUYgIGVlPBTYbRSdG09sP8V+EU+FS
-	ZHBJPJ9wphoMG8RXfujGyV5PCzgYnnTIJgoA5y4t2FKzKKpMYZK3k4qY
-X-Gm-Gg: AfdE7clY4QNZ+lOA6G4di4ekJCHgV7jSMAg0XYqkXO3G6/SsQhtCEnPvU/IcwzCrOgO
-	A6BIWTMwQewD22yvFRxAeI3pQ9Ia1dus6J9GJCkiPiui42xMH373DaZPekEFyDrTuVxi5ZN+ikR
-	3KROjisOBU3YSKrr25T3nNJWykKgxENk0s+xGHLck2oNuTRoeLtFcbd8uSf0fXROKnJo2vwYcdx
-	JwrWvJBubDxb0qCWFbzSbvSqMW5D8grhicPiui2PcwQh1afrIHqhdIaLAD0oFmC8vnGFa6hx+6/
-	Un+eVRS9I/TcGDMWQ7mSgM3VHGtd0dP5Nw8sqz1bnYDhK+uWOWrXtycALQhKfbu5g6B8Y0eYAO3
-	i0ccRHD0uqEhhqMkghprcuKKnFpRNAvrVWHSECXSpVPJJ40c7BaPdZjcVHefovLgiJ891oSlMqS
-	ZNl0UIhHzUvl5VQF5w8kBXvesPdvTCLvWtURtQfSaJHNig
-X-Received: by 2002:a05:600c:63c7:b0:492:3fcb:22fe with SMTP id 5b1f17b1804b1-49240e23d55mr63479655e9.1.1781909978827;
-        Fri, 19 Jun 2026 15:59:38 -0700 (PDT)
-Received: from [192.168.88.241] (89-24-48-145.nat.epc.tmcz.cz. [89.24.48.145])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4924923914fsm16164585e9.6.2026.06.19.15.59.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jun 2026 15:59:38 -0700 (PDT)
-Message-ID: <f6c22c4c-68fe-4bf8-96ab-97d191cbbd16@ovn.org>
-Date: Sat, 20 Jun 2026 00:59:36 +0200
+	s=arc-20240116; t=1781915596; c=relaxed/simple;
+	bh=Et3meODDERYLPcBSzvBMvXzLFG6dCmuyWHoTXDGfTyQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ew523JA84VF6GHCE98fuBmVKAXTwZLpnoVsvRG+/9cM6Huz5FEKcCwsLiVBTIBPa0MII9DDISk5hViy/rSz96MDvmragUE4RGDm8u43aTR2xpDYQw0E3LajdGBY32QUC6foqh/+or5sIAd+MH+iB/QA4GzhSnWy/qJD/WKUuPis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A7AfagWR; arc=none smtp.client-ip=95.215.58.170
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781915583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5LJfKS/Bhv+1VfMV3cw6Hh9fus6tl15FJIsSQ1Nye4c=;
+	b=A7AfagWRMVIKzGssJQmi39iDt6F8KUs166h3+zT0/3yQ5TtdmC0bYglqiZvYNHbGE3JdFM
+	N+S+mufk7kLr7pzpQlELo5E7EJXEPgdsAQeR7e0y2LMJSbaRLuI1bd03nEBeAhusyc4fRN
+	fsCw68G6m0oklhGaRbZ1sQAVszlVmyE=
+From: "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
+Date: Sat, 20 Jun 2026 00:32:21 +0000
+Subject: [PATCH bpf] bpf: tcp: Fix use-after-free in
+ bpf_iter_tcp_established_batch()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
- llvm@lists.linux.dev
-Subject: Re: [PATCH net] net: dst_metadata: fix false-positive memcpy overflow
- in tun_dst_unclone
-To: Johan Thomsen <write@ownrisk.dk>
-References: <20260616100332.1308294-1-i.maximets@ovn.org>
- <CAKv6aAMTqSo0qSng2Kv4=i6BSvJuUy9KSfeFRYx5JsYuo9=kqQ@mail.gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <CAKv6aAMTqSo0qSng2Kv4=i6BSvJuUy9KSfeFRYx5JsYuo9=kqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260620-bpf-iter-tcp-refcnt-v1-1-883bf9e69495@linux.dev>
+X-B4-Tracking: v=1; b=H4sIAJTfNWoC/yWMSw7CMAwFr1J5jUUSRPlcBbHIx22NRFrFASFVv
+ TsOLN/ozawgVJgErt0Khd4sPGcddtdBnHweCTnpBmdcb3p7wbAMyJUK1rhgoSHmitac0tEFdzg
+ nD2ouyvnzq95ABbj/obzCg2JtvXYLXghD8TlODc2FR877pxfNw7Z9AfRhFtacAAAA
+X-Change-ID: 20260619-bpf-iter-tcp-refcnt-107d52b238da
+To: Eric Dumazet <edumazet@google.com>, 
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, Ben Cressey <ben@cressey.dev>, 
+ "Jose Fernandez (Anthropic)" <jose.fernandez@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SEM_URIBL_FRESH15(3.00)[cressey.dev:email];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300769-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[ovn.org];
-	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:gustavoars@kernel.org,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,m:llvm@lists.linux.dev,m:write@ownrisk.dk,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[ovn.org,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300770-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrii@kernel.org,m:yonghong.song@linux.dev,m:martin.lau@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:ben@cressey.dev,m:jose.fernandez@linux.dev,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[jose.fernandez@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jose.fernandez@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,lkml];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ovn.org:mid,ovn.org:from_mime,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,cressey.dev:email,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C529D6A7F1E
+X-Rspamd-Queue-Id: 055896A8162
 
-On 6/18/26 1:43 PM, Johan Thomsen wrote:
->> Johan, if you can test this one in your setup as well, that would
->> be great.  Thanks.
->>
->>  include/net/dst_metadata.h | 7 +++++--
->>  1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
->> index 1fc2fb03ce3f..f45d1e3163f0 100644
->> --- a/include/net/dst_metadata.h
->> +++ b/include/net/dst_metadata.h
->> @@ -164,8 +164,11 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
->>         if (!new_md)
->>                 return ERR_PTR(-ENOMEM);
->>
->> -       memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
->> -              sizeof(struct ip_tunnel_info) + md_size);
->> +       /* Copy in two stages to keep the __counted_by happy. */
->> +       new_md->u.tun_info = md_dst->u.tun_info;
->> +       memcpy(ip_tunnel_info_opts(&new_md->u.tun_info),
->> +              ip_tunnel_info_opts(&md_dst->u.tun_info), md_size);
->> +
->>  #ifdef CONFIG_DST_CACHE
->>         /* Unclone the dst cache if there is one */
->>         if (new_md->u.tun_info.dst_cache.cache) {
-> 
-> Hi Ilya,
-> 
-> Sure. Just stressed it for 24 hours and - I cannot trigger the bug
-> with this patch applied.
+reqsk_queue_hash_req() publishes a TCP_NEW_SYN_RECV request_sock onto
+the ehash chain (via inet_ehash_insert(), which drops the bucket lock on
+return) and only afterwards refcount_set()s rsk_refcnt to 3.
 
-Thanks, Johan!
+Lockless readers such as __inet_lookup_established() account for this by
+using refcount_inc_not_zero(), but bpf_iter_tcp_established_batch() uses
+plain sock_hold() while holding the bucket lock, on the assumption that
+the lock guarantees sk_refcnt > 0. That assumption does not hold for
+request_sock:
 
-Best regards, Ilya Maximets.
+  CPU 0                                CPU 1
+  -----                                -----
+  tcp_conn_request()
+   reqsk_queue_hash_req()
+    inet_ehash_insert(req)
+     spin_lock(bucket)
+     __sk_nulls_add_node_rcu(req)      // rsk_refcnt == 0
+     spin_unlock(bucket)
+                                       bpf_iter_tcp_established_batch()
+                                        spin_lock(bucket)
+                                        sock_hold(req)   <-- addition on 0
+                                        spin_unlock(bucket)
+    refcount_set(&req->rsk_refcnt, 3)  // clobbers saturated value
+
+which surfaces as:
+
+  refcount_t: addition on 0; use-after-free.
+  WARNING: lib/refcount.c:25 at refcount_warn_saturate+0x48/0x90, CPU#1
+  Call Trace:
+   bpf_iter_tcp_established_batch+0x14e/0x170
+   bpf_iter_tcp_batch+0x53/0x200
+   bpf_iter_tcp_seq_next+0x27/0x70
+   bpf_seq_read+0x107/0x410
+   vfs_read+0xb9/0x380
+
+refcount_warn_saturate() then saturates the count, the publishing CPU's
+refcount_set() clobbers it, and the socket is left one reference short.
+When the last legitimate owner drops its reference the reqsk is freed
+while still reachable, leading to use-after-free panics in e.g.
+inet_csk_accept() or inet_csk_listen_stop().
+
+This reproduces in seconds with tcp_syncookies=0, a handful of threads
+doing connect()/close() to a local listener while others read an
+iter/tcp link in a tight loop.
+
+Use refcount_inc_not_zero() and skip the socket on failure, the same way
+every other ehash walker does. The listening hash is unaffected as
+listeners are always inserted into lhash2 with sk_refcnt >= 1, so
+bpf_iter_tcp_listening_batch() is left as-is.
+
+If every matching socket in a bucket is mid-init, end_sk can stay at 0;
+advance to the next bucket in that case rather than terminating the
+whole iteration on a stale batch[0].
+
+Fixes: 04c7820b776f ("bpf: tcp: Bpf iter batching and lock_sock")
+Reviewed-by: Ben Cressey <ben@cressey.dev>
+Assisted-by: Claude:unspecified
+Signed-off-by: Jose Fernandez (Anthropic) <jose.fernandez@linux.dev>
+---
+ net/ipv4/tcp_ipv4.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
+
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index fdc81150ff6c..92342dcc6892 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -3074,25 +3074,25 @@ static unsigned int bpf_iter_tcp_established_batch(struct seq_file *seq,
+ {
+ 	struct bpf_tcp_iter_state *iter = seq->private;
+ 	struct hlist_nulls_node *node;
+-	unsigned int expected = 1;
+-	struct sock *sk;
++	unsigned int expected = 0;
++	struct sock *sk = *start_sk;
+ 
+-	sock_hold(*start_sk);
+-	iter->batch[iter->end_sk++].sk = *start_sk;
+-
+-	sk = sk_nulls_next(*start_sk);
+ 	*start_sk = NULL;
+ 	sk_nulls_for_each_from(sk, node) {
+-		if (seq_sk_match(seq, sk)) {
+-			if (iter->end_sk < iter->max_sk) {
+-				sock_hold(sk);
+-				iter->batch[iter->end_sk++].sk = sk;
+-			} else if (!*start_sk) {
+-				/* Remember where we left off. */
+-				*start_sk = sk;
+-			}
+-			expected++;
++		if (!seq_sk_match(seq, sk))
++			continue;
++		if (iter->end_sk < iter->max_sk) {
++			/* reqsk_queue_hash_req() inserts with sk_refcnt == 0
++			 * and refcount_set()s it after the bucket lock drops.
++			 */
++			if (unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
++				continue;
++			iter->batch[iter->end_sk++].sk = sk;
++		} else if (!*start_sk) {
++			/* Remember where we left off. */
++			*start_sk = sk;
+ 		}
++		expected++;
+ 	}
+ 
+ 	return expected;
+@@ -3129,6 +3129,7 @@ static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
+ 	struct sock *sk;
+ 	int err;
+ 
++again:
+ 	sk = bpf_iter_tcp_resume(seq);
+ 	if (!sk)
+ 		return NULL; /* Done */
+@@ -3167,6 +3168,10 @@ static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
+ 	WARN_ON_ONCE(iter->end_sk != expected);
+ done:
+ 	bpf_iter_tcp_unlock_bucket(seq);
++	if (unlikely(!iter->end_sk)) {
++		++iter->state.bucket;
++		goto again;
++	}
+ 	return iter->batch[0].sk;
+ }
+ 
+
+---
+base-commit: 4549871118cf616eecdd2d939f78e3b9e1dddc48
+change-id: 20260619-bpf-iter-tcp-refcnt-107d52b238da
+
+Best regards,
+--  
+Jose Fernandez (Anthropic) <jose.fernandez@linux.dev>
+
 
