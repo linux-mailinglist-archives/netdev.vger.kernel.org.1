@@ -1,221 +1,224 @@
-Return-Path: <netdev+bounces-300813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300814-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vnl3EsKUNmrBBQcAu9opvQ
-	(envelope-from <netdev+bounces-300813-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:25:22 +0200
+	id PhfBHSuXNmouBgcAu9opvQ
+	(envelope-from <netdev+bounces-300814-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:35:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91A7E6A8EF5
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:25:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF57D6A8F2E
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:35:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=jHcV0dZI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300813-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300813-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b=wwNZUTbH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300814-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300814-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CDDD3010504
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 13:25:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F71D3019F1B
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 13:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E23C22579E;
-	Sat, 20 Jun 2026 13:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFB2367282;
+	Sat, 20 Jun 2026 13:35:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611FC18DB35
-	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 13:25:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781961919; cv=none; b=OXfqF2AeSvZWCd4YiWyr4By6TQex40COM+T/AIYMlpF6dPUzW+NtBe6ziecaMrCVjk/93CQt4TDjqQwrENN85Fc05aimquu2PHMQpqsjLavX1r/OWUbQ5f/iazyHjFUgDlEZIqRKsvaUcjwqiLb7yjrh/Xd0HyGtDaOffZgIGOA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781961919; c=relaxed/simple;
-	bh=Asuxszf/bAwC9ualoko64JrOS2xrhOR5jGL/gDpMV/c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OcNYS0fGp5KyJSUHGH244BLh8mO7Z2aDa38VjtxfB8QX5TMKyULypMRzus0wVMqvAs7zAFtBL3lC3wFsCtSgOI7NoIvs+Z/KfhpeCyzFtkVblbbRtw56EHS78AbGJ70Bn89E/7Gokg8qj0fknIkdz14rz/Nudm50vDbjKxQsXNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jHcV0dZI; arc=none smtp.client-ip=95.215.58.174
-Message-ID: <6f34efb8-c7e7-490c-bef1-c4c7da9a706e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781961915;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=afi4i6B2BdOEvMjupBy9U4sefc34AGzac9BLN7m560Q=;
-	b=jHcV0dZIrmogmx86GXkj6i17E67BCMvSa6cyRpNc4KlXMAYX27kdbi6PHog1WPauMz7Rdu
-	UtwvBrU2Dpc2yPJZcmAnxTJJlSu2cQN4jAh3qgdD/J6lTov9gVmYNVgtIBvQGSBpS5Pon1
-	f+/56RKU3j9aFs3d2/DvXynaIjF54gc=
-Date: Sat, 20 Jun 2026 21:24:50 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B2D346ADA
+	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 13:35:35 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781962536; cv=pass; b=Op6J4P2j0yryYHYJ3ancKNvevnW0fwIDzf7p9e79cLRKtlvogzU+rPPgs/6Dhmmf/kLu0+btqxN6AqAmXE41xBE7Twv7VSUw16tXMJa50dzhn+aIWR4lzXKjZAQGCGs5it4CuKLX+jTHNhu7kVeOaG32Mv/FpuYNm4Sa1jGkdz4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781962536; c=relaxed/simple;
+	bh=y3doYASW5ECQ4nHcNiLPC+9Ao8BMX93ek5uutFzUeIQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ugQK5olp+fPPHUrZ7MyD8IO4ELi+VNoIAqFFwOuXzOX32nguiTAdg452agixip+5WMQM1+uMp5Sg5KSFLOYpqhr8WK1TQm6sYgJ/XROrp3Di9FebAMx1m/g0l0Cr081rudXqRjjLykTEjx38zeifIdVkeUvdylOXTJkyug5Cc3Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=wwNZUTbH; arc=pass smtp.client-ip=74.125.224.47
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-66043ecf6b3so2754831d50.0
+        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 06:35:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781962534; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C4vM5WY4jd6N78hh+I5ooi/pUIGQSeMBUn6GZB2V9+yz8oIpTDsCVTLymCpe9HXN7Z
+         7R/bDw2DouoVCF8ZdaIcQf1AT9QjHQlYlVmhzBwXUeetHK4JtzLdZhmITb/1VMKlof3n
+         DB4/O5e64Q/u/gxwXI2tD9ITl6tsj983qEdtlqvIuA77nlgJuMrXOlUA1jNr2ADMrNyZ
+         ybVmUnhcJA59h4RB7m0+pUBBJePlfBSEUO01U6sNBQHtArmeJp23nKYr1/Dt/UzivbiU
+         GpcWplx1eHAVOYxWtlCk+2m8VJhVpJU319gkelCs65weoHXb2Zw+6symg2WSDtAYsYa7
+         mQVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yx+PTC/S7HbVkqI1ApnQaU5vb58oKN55FN9FqUeM7fA=;
+        fh=OaO+3kx0/721xRtdNa7POUbCKMzRu6bcovlF8EZJpek=;
+        b=X6xibjY8T6yxbN0OPDrKpPaqH3YlZkIVjJLWWZx/tlJJKK/NO1xRR/fc0XkvR2rL79
+         AjkePwjDS0iKTrwvpBNW9/klpY6fiB0BX9DkQCBASPkvRty6CJhiVQUQGxqQCyOsnZlq
+         xnekhVxa75UEYrPitgF0RtnKMBwvFXHxWNMGP811Bq1AKNcxq3Wzc2193P4NhVU9+4EN
+         y3ooyWEFbfeH5ESYQ32cM/jgFmtd39eBk14sZB74hvt0j+NnB9wHSIcGsE9tyrJWThxO
+         ZZfK7uvqYsuhAAaoDCWP5TLUMY/qsOCRAExmvr8RtbKZdZPDKsg8j+v3AejBYESH3ZDB
+         66Yw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1781962534; x=1782567334; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yx+PTC/S7HbVkqI1ApnQaU5vb58oKN55FN9FqUeM7fA=;
+        b=wwNZUTbH87bJdU8ccQ1ThL9vx+JKJo2SUgiGUpYF6iVOaPLs9AkfC1Ty9puMp8qBeM
+         KTdKD17kJ+tGHUmscJmlGk5DZEgR01TIJoegXftJ7Ct8w6pe0s5j+gE5qHS8btcVCQdD
+         C8f5o5y46K8ijk0OpsPK8Yw0avT1EwBQIMKEE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781962534; x=1782567334;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yx+PTC/S7HbVkqI1ApnQaU5vb58oKN55FN9FqUeM7fA=;
+        b=rPUxTQq5mabg0lkwZKy7dnoYmDi1Z2VLEY7+nkkAvLYjwwx/OZWSqHwCw7uOeKLnwz
+         KkWyFQtM96NZe5AMRUebFKGFY02Rg0HxJfO7WtHDMpDNnAvT7/xpoNZgSseTeX7/p3j2
+         +8PgYwpPI/6+BTj8Q+s7QVal4NBoV0H7AaFcvMTiB6gJoqVcZO3QEjCYEhdKlt1n93Z/
+         G4DucF7jLabTwUrQJQw4r66ioOr3l8PDAHPKL3BGErs/qtEyvPz7vMp+OngeELqmArJ8
+         ixAknL7lmqhFWQmhwtpsO43YjY0LmpHzW14axG27oRyV8mNoy+VKACoVoYwtEDIUnNe+
+         lXRw==
+X-Gm-Message-State: AOJu0YziIBqh+KVb9XfTKn1tojNIr3h2b5sqws6pDAorFMd4gum7fC/W
+	TiIftkO/xMLA8m+6P3sDLrGwpAnYDZlrkyRzuaFkkhcE5Oqt8qXjKyzvAGupEqWbiJuGi9kTkB9
+	CyWIPCtd0AD8BiXQDIrWOGiIA4d0NBo21NsyaLXil
+X-Gm-Gg: AfdE7cmulKYIKA1dDbJddjzqG01eYcrJqHW1/KezpS49IHaNcjJ9aJ7kbNE/BomCCDJ
+	q5n4FcwUX/G318G+XfHmmkx+CYgRb9POqLsAcQYTM1hmvZSfL7KsMjpCmOqhRWi0a8ziA9lXLGo
+	yfyk6Ccl6m9jFt3hX2/LYvCWUkrAkBnsX7n0gjsKcBM/hwT0/M1Y1S+fBPjbK6n0zFptb1XRTa/
+	iNar8B6yO+bEFQ05mXzvonR6USn2cLkBoSyrVtZ9g/ZH4gM4viBHgbkTY+PUb2tjovHsg==
+X-Received: by 2002:a05:690e:168d:b0:662:c587:4351 with SMTP id
+ 956f58d0204a3-663033dbe71mr5581711d50.55.1781962534607; Sat, 20 Jun 2026
+ 06:35:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2] bpf, sockmap: disallow update and delete from tc,
- xdp and flow_dissector
-To: Sechang Lim <rhkrqnwk98@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Eduard Zingerman <eddyz87@gmail.com>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Lorenz Bauer <lmb@cloudflare.com>,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20260620034632.2308-1-rhkrqnwk98@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260620034632.2308-1-rhkrqnwk98@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260619151447.223640-1-b1n@b1n.io>
+In-Reply-To: <20260619151447.223640-1-b1n@b1n.io>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sat, 20 Jun 2026 09:35:22 -0400
+X-Gm-Features: AVVi8CfaQz3apZiOvExxZflvS1CkQ5NK9ylZ237bnRCRWFgA4GQhV_B_m-t_Sps
+Message-ID: <CAM0EoMk7Ev6oXZ0MzYEbR2Ld2_mHsXv6u6J84=TcSJv9WJn-0Q@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] net/sched: dualpi2: fix GSO backlog accounting
+To: Xingquan Liu <b1n@b1n.io>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, 
+	Victor Nogueira <victor@mojatatu.com>, Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TAGGED_FROM(0.00)[bounces-300813-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net,davemloft.net];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:john.fastabend@gmail.com,m:eddyz87@gmail.com,m:memxor@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:sdf@fomichev.me,m:lmb@cloudflare.com,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:b1n@b1n.io,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:victor@mojatatu.com,m:chia-yu.chang@nokia-bell-labs.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300814-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 91A7E6A8EF5
+X-Rspamd-Queue-Id: BF57D6A8F2E
 
+On Fri, Jun 19, 2026 at 11:15=E2=80=AFAM Xingquan Liu <b1n@b1n.io> wrote:
+>
+> When DualPI2 splits a GSO skb into N segments, it propagates N
+> additional packets to its parent before returning NET_XMIT_SUCCESS.
+> The parent then accounts for the original skb once more, leaving its
+> qlen one larger than the number of packets actually queued.
+>
+> With QFQ as the parent, after all real packets are dequeued, QFQ still
+> has a non-zero qlen while its in-service aggregate has no active
+> classes. qfq_choose_next_agg() returns NULL and qfq_dequeue() passes
+> the result to qfq_peek_skb(), causing a NULL pointer dereference.
+>
+> Follow the same pattern used by tbf_segment() and taprio: count only
+> successfully queued segments, propagate the difference between the
+> original skb and those segments, and return NET_XMIT_SUCCESS whenever
+> at least one segment was queued.
+>
+> Fixes: 8f9516daedd6 ("sched: Add enqueue/dequeue of dualpi2 qdisc")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Xingquan Liu <b1n@b1n.io>
 
-On 6/20/26 11:46 AM, Sechang Lim wrote:
-> sock_map_update_common() and __sock_map_delete() hold stab->lock and call
-> sock_map_unref() -> sock_map_del_link(), which takes sk_callback_lock for
-> write. That gives the order stab->lock -> sk_callback_lock.
->
-> The reverse order comes from the SK_SKB stream parser.
-> sk_psock_strp_data_ready() holds sk_callback_lock for read, and after the
-> verdict tcp_bpf_strp_read_sock() acks the consumed data inline via
-> __tcp_cleanup_rbuf(). The ACK goes out egress, where a sched_cls program
-> deletes from the sockmap and takes stab->lock:
->
->    WARNING: possible circular locking dependency detected
->    7.1.0-rc6 Not tainted
->    ------------------------------------------------------
->    syz.9.8824 is trying to acquire lock:
->    (&stab->lock){+.-.}-{3:3}, at: __sock_map_delete net/core/sock_map.c:421
->    but task is already holding lock:
->    (clock-AF_INET){++.-}-{3:3}, at: sk_psock_strp_data_ready net/core/skmsg.c:1173
->
->    -> #1 (clock-AF_INET){++.-}-{3:3}:
->           _raw_write_lock_bh
->           sock_map_del_link net/core/sock_map.c:167
->           sock_map_unref net/core/sock_map.c:184
->           sock_map_update_common net/core/sock_map.c:509
->           sock_map_update_elem_sys net/core/sock_map.c:588
->           map_update_elem kernel/bpf/syscall.c:1805
->
->    -> #0 (&stab->lock){+.-.}-{3:3}:
->           _raw_spin_lock_bh
->           __sock_map_delete net/core/sock_map.c:421
->           sock_map_delete_elem net/core/sock_map.c:452
->           bpf_prog_06044d24140080b6
->           tcx_run net/core/dev.c:4451
->           sch_handle_egress net/core/dev.c:4541
->           __dev_queue_xmit net/core/dev.c:4808
->           ...
->           tcp_bpf_strp_read_sock net/ipv4/tcp_bpf.c:701
->           strp_data_ready net/strparser/strparser.c:402
->           sk_psock_strp_data_ready net/core/skmsg.c:1174
->           tcp_data_queue net/ipv4/tcp_input.c:5661
->
->    Possible unsafe locking scenario:
->
->           CPU0                    CPU1
->           ----                    ----
->      rlock(clock-AF_INET);
->                                   lock(&stab->lock);
->                                   lock(clock-AF_INET);
->      lock(&stab->lock);
->
->     *** DEADLOCK ***
->
-> A tc, xdp or flow_dissector program has no reason to update or delete a
-> sockmap, and redirect does not go through here. Drop them from
-> may_update_sockmap() so the verifier rejects it. It also closes the
-> matching sockhash inversion.
->
-> Fixes: 0126240f448d ("bpf: sockmap: Allow update from BPF")
-> Suggested-by: John Fastabend <john.fastabend@gmail.com>
-> Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+
+cheers,
+jamal
+
 > ---
+> v3:
+> - Move the UDP GSO sender into tdc_gso.py.
+>
 > v2:
->   - reject sockmap update/delete from tc, xdp and flow_dissector (John
->     Fastabend)
->   - fix the changelog (Jiayuan Chen)
+> - Change patch commit message.
+> - Add tdc test.
 >
-> v1:
->   - https://lore.kernel.org/all/20260616091153.2966617-1-rhkrqnwk98@gmail.com/
+>  net/sched/sch_dualpi2.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
 >
->   kernel/bpf/verifier.c | 4 ----
->   1 file changed, 4 deletions(-)
+> diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+> index d7c3254ef800..5434df6ca8ef 100644
+> --- a/net/sched/sch_dualpi2.c
+> +++ b/net/sched/sch_dualpi2.c
+> @@ -461,7 +461,7 @@ static int dualpi2_qdisc_enqueue(struct sk_buff *skb,=
+ struct Qdisc *sch,
+>                 if (IS_ERR_OR_NULL(nskb))
+>                         return qdisc_drop(skb, sch, to_free);
 >
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 7fb88e1cd7c4..94d225521b5a 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -8766,11 +8766,7 @@ static bool may_update_sockmap(struct bpf_verifier_env *env, int func_id)
->   			return true;
->   		break;
->   	case BPF_PROG_TYPE_SOCKET_FILTER:
-> -	case BPF_PROG_TYPE_SCHED_CLS:
-> -	case BPF_PROG_TYPE_SCHED_ACT:
-> -	case BPF_PROG_TYPE_XDP:
->   	case BPF_PROG_TYPE_SK_REUSEPORT:
-> -	case BPF_PROG_TYPE_FLOW_DISSECTOR:
->   	case BPF_PROG_TYPE_SK_LOOKUP:
->   		return true;
->   	default:
-
-CI failed.
-
-https://github.com/kernel-patches/bpf/actions/runs/27859622337/job/82454035306
-
-Please drop or change such trigger.
-
-
-Also, please drop Fixes tag and target to bpf-next for the same reason 
-in you another thread.
-
-
-Nit:
-
-You can also manually fork and create pull request against
-
-https://github.com/kernel-patches/bpf/ to run full test to run the full
-
-test and make sure all tests pass before you send patch.
-
+> -               cnt =3D 1;
+> +               cnt =3D 0;
+>                 byte_len =3D 0;
+>                 orig_len =3D qdisc_pkt_len(skb);
+>                 skb_list_walk_safe(nskb, nskb, next) {
+> @@ -488,16 +488,15 @@ static int dualpi2_qdisc_enqueue(struct sk_buff *sk=
+b, struct Qdisc *sch,
+>                                 byte_len +=3D nskb->len;
+>                         }
+>                 }
+> -               if (cnt > 1) {
+> +               if (cnt > 0) {
+>                         /* The caller will add the original skb stats to =
+its
+>                          * backlog, compensate this if any nskb is enqueu=
+ed.
+>                          */
+> -                       --cnt;
+> -                       byte_len -=3D orig_len;
+> +                       qdisc_tree_reduce_backlog(sch, 1 - cnt,
+> +                                                 orig_len - byte_len);
+>                 }
+> -               qdisc_tree_reduce_backlog(sch, -cnt, -byte_len);
+>                 consume_skb(skb);
+> -               return err;
+> +               return cnt > 0 ? NET_XMIT_SUCCESS : err;
+>         }
+>         return dualpi2_enqueue_skb(skb, sch, to_free);
+>  }
+>
+> base-commit: 96e7f9122aae0ed000ee321f324b812a447906d9
+> --
+> Xingquan Liu
+>
 
