@@ -1,94 +1,94 @@
-Return-Path: <netdev+bounces-300838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300837-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dEzZMP69NmrREAcAu9opvQ
-	(envelope-from <netdev+bounces-300838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 18:21:18 +0200
+	id FYc5COu9NmrMEAcAu9opvQ
+	(envelope-from <netdev+bounces-300837-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 18:20:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E3A76A938A
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 18:21:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CAA6A9386
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 18:20:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=KLHcbRw4;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=EpcLcs2B;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=KLHcbRw4;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=EpcLcs2B;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300838-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300838-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=iruF36wn;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="MzT/7PlQ";
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=iruF36wn;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="MzT/7PlQ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300837-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300837-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7302A3037162
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 16:19:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 709EF30179E6
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 16:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173B839A06D;
-	Sat, 20 Jun 2026 16:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FE6390CB4;
+	Sat, 20 Jun 2026 16:19:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C35348C65
-	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 16:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C453624D7
+	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 16:19:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781972373; cv=none; b=i3UsIRGjuRtnrYPqqNSXbEVB4oXvVRU8qADnfztKiYn1XC2LjiVfB/yHVge4QrtRIJSNhWAOhxT0jKyhyP7pTKsjwJUa8/zTT8IF9KEcmijrAAK3XJVxUX1aQ2qCxU8TGIJOzQta/p44FNSR1Ns0DDRErLU31mrZ7DUmJ1mbbgw=
+	t=1781972371; cv=none; b=m0aHS5K6uG2LzmQ1ivs10twO53xjrggEduqHI8UXnAkTEPfhRIfS4erjhU3Qe1kl0Hl7B3fPadWPbQeDqY7rWMwDD3QFpuh/XCljj5WIzalK+jNWE4iIuc6ce4AcA859DrxrLDVxfu0MsW2iYGCK5wsqGADMyS+9USd+WwZZxFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781972373; c=relaxed/simple;
-	bh=Wb17KUkJCUmLv3it19IfxsBne2r/P05MGGxuTsENHMw=;
+	s=arc-20240116; t=1781972371; c=relaxed/simple;
+	bh=/fUwFB1ZWMgGNHrFn0SC1xcutUrdwdSZaQZ3t5c89V0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tCDLIG7q/BMy0ohqNL1SdXAyJLf7dmOWeD64kiDVG5vs7nxayzOhU8b1vDxFq77oB8mw+2Uz5pYlFeNoCU8Aw/OpN5ktfYNJWHFBizq0BDG9nseMW0UIVcYDOtZ0fBIosE0iUgZxh2d0iPEQGicNYm451AdFbq1ySXdcmCnc4eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KLHcbRw4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EpcLcs2B; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KLHcbRw4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EpcLcs2B; arc=none smtp.client-ip=195.135.223.131
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	 MIME-Version; b=FUFZWOUdU9KNWzzG3xFsY2DnUDyZm4g6AZZiKAQbVHYUiifsMI2TeArOwnBjv1kmKEULs+PFSw2N7bWB/ZGDK+H1nCGH17BSncDx42jFFFfLxNoZgo7ozeBLv0xptQZV8Zu1270ardnYzaTiVyuRJI3wv4mdICVURPKaLVkbXoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iruF36wn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MzT/7PlQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iruF36wn; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MzT/7PlQ; arc=none smtp.client-ip=195.135.223.130
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2DF2B75AE1;
-	Sat, 20 Jun 2026 16:19:14 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 762096B6F7;
+	Sat, 20 Jun 2026 16:19:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781972354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1781972355; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=KLHcbRw4ywShrbLBxtpTh5BV7PLpEvVFvUAe3rJ4StbmvZUFi2c7LAFk/kJG2D6Or2osct
-	Pf54yq9+hUzjm8tfcMY8mGfYWiLnbNV1ei5msTtd9PwdoUR3wsSDaVREEAVUCgSn0A1fz1
-	fWC1Ynyw4cvOXDTuZJpBvGBcENrMi34=
+	bh=b/dHmpo8Xjum5KLfzyqAHntuLruMC1xvCYy5W/p8EzQ=;
+	b=iruF36wnn0ReOvgrYtNXwySfv3LKBqRaqo2Gk0dJvZRO9ODt5kPK5sgM4FYPGg98HSnzVO
+	+PC9//k7EsCLI3uqzUXFqs2Hw/wljbb6VAoduZdOMU06gblRwy4ELuIL1Hnrr/XaEzy+5c
+	9NN/5QRQOL/uiyLXNtinlqW2Sp2U3pA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781972354;
+	s=susede2_ed25519; t=1781972355;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=EpcLcs2BLdzOPJYI7NV/0I32UTw4NgZobKJiwX4UVtrlq9DCxh+NbiJ6P/4HTR6Qzmm7j/
-	dqQoo5uHCKjq0lAQ==
+	bh=b/dHmpo8Xjum5KLfzyqAHntuLruMC1xvCYy5W/p8EzQ=;
+	b=MzT/7PlQK8nJo+GQbBdR+YXYqZmfCOGTH0hBsJE9UPmR1VjXXJ7zpZHlCaEyQ78q1CO5Fy
+	cap55dwBr4Jx+2Cg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781972354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1781972355; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=KLHcbRw4ywShrbLBxtpTh5BV7PLpEvVFvUAe3rJ4StbmvZUFi2c7LAFk/kJG2D6Or2osct
-	Pf54yq9+hUzjm8tfcMY8mGfYWiLnbNV1ei5msTtd9PwdoUR3wsSDaVREEAVUCgSn0A1fz1
-	fWC1Ynyw4cvOXDTuZJpBvGBcENrMi34=
+	bh=b/dHmpo8Xjum5KLfzyqAHntuLruMC1xvCYy5W/p8EzQ=;
+	b=iruF36wnn0ReOvgrYtNXwySfv3LKBqRaqo2Gk0dJvZRO9ODt5kPK5sgM4FYPGg98HSnzVO
+	+PC9//k7EsCLI3uqzUXFqs2Hw/wljbb6VAoduZdOMU06gblRwy4ELuIL1Hnrr/XaEzy+5c
+	9NN/5QRQOL/uiyLXNtinlqW2Sp2U3pA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781972354;
+	s=susede2_ed25519; t=1781972355;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=EpcLcs2BLdzOPJYI7NV/0I32UTw4NgZobKJiwX4UVtrlq9DCxh+NbiJ6P/4HTR6Qzmm7j/
-	dqQoo5uHCKjq0lAQ==
+	bh=b/dHmpo8Xjum5KLfzyqAHntuLruMC1xvCYy5W/p8EzQ=;
+	b=MzT/7PlQK8nJo+GQbBdR+YXYqZmfCOGTH0hBsJE9UPmR1VjXXJ7zpZHlCaEyQ78q1CO5Fy
+	cap55dwBr4Jx+2Cg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6C900779A8;
-	Sat, 20 Jun 2026 16:19:13 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B36C4779A8;
+	Sat, 20 Jun 2026 16:19:14 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id KMppF4G9NmogRQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Sat, 20 Jun 2026 16:19:13 +0000
+	id UFytKIK9NmogRQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Sat, 20 Jun 2026 16:19:14 +0000
 From: Fernando Fernandez Mancera <fmancera@suse.de>
 To: netdev@vger.kernel.org
 Cc: nicolas.dichtel@6wind.com,
@@ -102,9 +102,9 @@ Cc: nicolas.dichtel@6wind.com,
 	idosch@nvidia.com,
 	dsahern@kernel.org,
 	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net v2 6/7] ipv6: fix missing notification for ignore_routes_with_linkdown
-Date: Sat, 20 Jun 2026 18:18:49 +0200
-Message-ID: <20260620161850.7114-7-fmancera@suse.de>
+Subject: [PATCH net v2 7/7] ipv6: reset position for force_forwarding sysctl restart
+Date: Sat, 20 Jun 2026 18:18:50 +0200
+Message-ID: <20260620161850.7114-8-fmancera@suse.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260620161850.7114-1-fmancera@suse.de>
 References: <20260620161850.7114-1-fmancera@suse.de>
@@ -116,8 +116,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
-X-Spam-Score: -3.01
 X-Spam-Level: 
+X-Spam-Score: -2.80
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -129,7 +129,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300838-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300837-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:nicolas.dichtel@6wind.com,m:stephen@networkplumber.org,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:fmancera@suse.de,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -150,65 +150,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:email,suse.de:dkim,suse.de:email,suse.de:mid,suse.de:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,suse.de:dkim,suse.de:email,suse.de:mid,suse.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1E3A76A938A
+X-Rspamd-Queue-Id: 80CAA6A9386
 
-When changing the ignore_routes_with_linkdown sysctl for a specific
-interface, the RTM_NEWNETCONF netlink notification was not being emitted
-to userspace. Fix this by emitting the notification when needed.
+When handling proxy_ndp, if rtnl_net_trylock() fails, the operation is
+retried but the position pointer was already advanced meaning that the
+restarted sysctl will read from an incorrect offset.
 
-In addition, fix bogus return value for successful "all" and specific
-interface write operation leading to a wrong reset of the position
-pointer.
+Fix this by restoring the original position pointer before restarting
+the syscall.
 
-Fixes: 35103d11173b ("net: ipv6 sysctl option to ignore routes when nexthop link is down")
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+In addition, remove the redundant position pointer restoration at the
+end of the function.
+
+Fixes: f24987ef6959 ("ipv6: add `force_forwarding` sysctl to enable per-interface forwarding")
 Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
- net/ipv6/addrconf.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ net/ipv6/addrconf.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 82b6f603faa0..cbe681de3818 100644
+index cbe681de3818..8c0741e9dfcc 100644
 --- a/net/ipv6/addrconf.c
 +++ b/net/ipv6/addrconf.c
-@@ -955,11 +955,7 @@ static int addrconf_fixup_linkdown(const struct ctl_table *table, int *p, int ne
- 						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 						     NETCONFA_IFINDEX_DEFAULT,
- 						     net->ipv6.devconf_dflt);
--		rtnl_net_unlock(net);
--		return 0;
--	}
--
--	if (p == &net->ipv6.devconf_all->ignore_routes_with_linkdown) {
-+	} else if (p == &net->ipv6.devconf_all->ignore_routes_with_linkdown) {
- 		WRITE_ONCE(net->ipv6.devconf_dflt->ignore_routes_with_linkdown, newf);
- 		addrconf_linkdown_change(net, newf);
- 		if ((!newf) ^ (!old))
-@@ -968,11 +964,21 @@ static int addrconf_fixup_linkdown(const struct ctl_table *table, int *p, int ne
- 						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 						     NETCONFA_IFINDEX_ALL,
- 						     net->ipv6.devconf_all);
-+	} else {
-+		if (!newf ^ !old) {
-+			struct inet6_dev *idev = table->extra1;
-+
-+			inet6_netconf_notify_devconf(net,
-+						     RTM_NEWNETCONF,
-+						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
-+						     idev->dev->ifindex,
-+						     &idev->cnf);
+@@ -6825,8 +6825,10 @@ static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int wri
+ 	ret = proc_douintvec_minmax(&tmp_ctl, write, buffer, lenp, ppos);
+ 
+ 	if (write && old_val != new_val) {
+-		if (!rtnl_net_trylock(net))
++		if (!rtnl_net_trylock(net)) {
++			*ppos = pos;
+ 			return restart_syscall();
 +		}
+ 
+ 		WRITE_ONCE(*valp, new_val);
+ 
+@@ -6851,8 +6853,6 @@ static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int wri
+ 		rtnl_net_unlock(net);
  	}
  
- 	rtnl_net_unlock(net);
- 
--	return 1;
-+	return 0;
+-	if (ret)
+-		*ppos = pos;
+ 	return ret;
  }
  
- #endif
 -- 
 2.54.0
 
