@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WboRMLFaNmqd+QYAu9opvQ
-	(envelope-from <netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:17:37 +0200
+	id ZHYpBg1bNmrT+QYAu9opvQ
+	(envelope-from <netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:19:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ECF76A8A81
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:17:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ED166A8A90
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:19:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PEW1qCez;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dNuUYd3g;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CC11F30078B3
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:17:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6ADC8302C92B
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B3F2F8EAF;
-	Sat, 20 Jun 2026 09:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128A33290DB;
+	Sat, 20 Jun 2026 09:17:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3382BCF46;
-	Sat, 20 Jun 2026 09:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBC53254B3;
+	Sat, 20 Jun 2026 09:17:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781947055; cv=none; b=QX2F0ihng+gIhQJiNar/HCp97RIUYeCXu5eKYeNm/5T9UczofF3Vj7vXIt9z1LE9dawtkeGCjznrztzk46Ak0kom0F21eHrhyx+7Jt3AE3Niw9iRhlZHTr1TTENeJM74yJk3NOBI9MGmZUOxJBd1vhKNDdWeyymQclhR8N3/4lM=
+	t=1781947066; cv=none; b=h4oGOViX2bygznpcRG6aMgaodvwZ+b2v/LyKdF9TFrGqD3h98ZEcN5tYYb5DStfiqP0DbZ5cAn62hxHyG5evatqTatQFuNnjTJK1wRuAiz7WdpdCrEdMEZtCDL/Dzc7AEg4hEbVLMXjgc9e9LvCKS0S+gV2MgWGGgq6v3VktoKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781947055; c=relaxed/simple;
-	bh=KWmsyD/X3k/8rcKVI53WRBWIl6lXavblj3hdYUQXJkA=;
+	s=arc-20240116; t=1781947066; c=relaxed/simple;
+	bh=fmO8Ugc0iyRTqFF+QGxReyHbIuFrpxhwdeElNAvrNMM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GTviMQ5zzyhdsUEy+sKmEXkWbVb0iTuRMEel0xsmvhkxdGGjSbu+vO6yz0rrsh68IJv9TCEEo1BJYTHxW2qqtNNPljW8u6sA+rY2wwjGFFkgvkyARzBCRA/2vFA4jtL00CC+O4Fsg0SDrIZEFSeetUhhLwVc8//ORBsseEyY/x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PEW1qCez; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24FAF1F000E9;
-	Sat, 20 Jun 2026 09:17:31 +0000 (UTC)
+	 MIME-Version; b=cUkXe8r/38cMxjxgEz9GQaP2uAcCqeTNxu5NVJ+HHEuN/MHmIBgmSgks9RO74XXlhMbIBE6tqHxRV6Hk+uiNQxSNrJ10VpaCsjTxa1MnFMHEK+8g+l1GaGZDNd5p0QsVzb/LznBbHIb5TX+KDe7wqinESh8S52eGne2nFuBw1/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dNuUYd3g; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47FDD1F000E9;
+	Sat, 20 Jun 2026 09:17:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781947054;
-	bh=52UGiw0pljVUCEtt+4CfSQ3Di7O6dhazHYVYTOXCYEk=;
+	s=k20260515; t=1781947064;
+	bh=3xX7OeBDIxD1X+S1oMgTF+KFAvOFKQhqFQZzenqeR+0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PEW1qCezRQmYJa99Do6+YMKwD9JkU3+OD53HC6MGsUGQG5eHFpkei0JbZCi1Yt6NC
-	 DljpsxfMw6pHkAGAOej1UZEnScxvVWObSg1OQCPa2dMFv3MVbY6LHw9n0A/fx1W1jf
-	 37ac5M/PcjJE/D5PBye443EX5B7+Kh9U3ogPY7ffTSOgw+2Eydx3AEyNmhJN4g1qOu
-	 oqEZgAjJDeHCAWLeAnTHoVaemtk0TApwT4PgI73LwP8h6v9rJdrTNf6E8JFd0lUgJB
-	 izjDbxN0et13m+Dvknqd+9xspEUuJe2ZED1pAostjE+1barOxchHcelLsq92FTxf0q
-	 7eQ3T4JGLQoAA==
+	b=dNuUYd3gYdhor2atPFx2bYBEV2qd4NcFITf9P/2v+Hzy9zTsbtm+OafL20kmvN3pV
+	 uiXI8J40DTIOLvylA2FLVJ0uR1Molh1Eqiu9Fy83DDVTZ3ccnQani5Qht4xjFRVuUh
+	 7J6OrjMEs0eqUSdDrg6Z6mVqvajIAJV9F5HMIDVrbCDTUxJDRcLhMD+RQqPLI9IYUR
+	 jOQWFUNKFT+9I7ov92rEii4Ywub0g45y7yaHPOjwDiEwzAeHrPOqo52aH4eE14Ch/j
+	 GS5qE5qC7wluHKKZMQb0siG4bnJqce3IGAXGapIZwQ5HeOmsvN8EczLa/dqSuALWO0
+	 +rPd+ZMPs5bxQ==
 From: Simon Horman <horms@kernel.org>
 To: dhowells@redhat.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -59,12 +59,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	jaltman@auristor.com,
 	stable@kernel.org
-Subject: Re: [PATCH net v2 06/10] rxrpc: Fix the reception of a reply packet before data transmission
-Date: Sat, 20 Jun 2026 10:17:27 +0100
-Message-ID: <20260620091727.969517-1-horms@kernel.org>
+Subject: Re: [PATCH net v2 07/10] rxrpc: Fix oob challenge leak in cleanup after notification failure
+Date: Sat, 20 Jun 2026 10:17:39 +0100
+Message-ID: <20260620091739.969563-1-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260618134802.2477777-7-dhowells@redhat.com>
-References: <20260618134802.2477777-7-dhowells@redhat.com>
+In-Reply-To: <20260618134802.2477777-8-dhowells@redhat.com>
+References: <20260618134802.2477777-8-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,13 +79,13 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300788-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300789-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -103,76 +103,133 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5ECF76A8A81
+X-Rspamd-Queue-Id: 5ED166A8A90
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev
 ---
-rxrpc: Fix the reception of a reply packet before data transmission
+rxrpc: Fix oob challenge leak in cleanup after notification failure
 
-This commit fixes rxrpc_receiving_reply() to handle the reception of an
-apparent reply DATA packet before rxrpc has had a chance to send any request
-DATA packets. It also adjusts rxrpc_rotate_tx_window() to handle an empty
-Tx queue by changing the do...while loop into a while loop.
+Fix rxrpc_notify_socket_oob() to return an indication of failure in the
+event that it failed to queue a packet and fix rxrpc_post_challenge() to
+clean up the connection ref in such an event.
 
 Link: https://sashiko.dev/#/patchset/20260616155749.2125907-1-dhowells%40redhat.com
 
-> diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
-> index 37881dffa898b..01ccd2d2fe92c 100644
-> --- a/net/rxrpc/input.c
-> +++ b/net/rxrpc/input.c
-> @@ -247,7 +247,7 @@ static bool rxrpc_rotate_tx_window(struct rxrpc_call *call, rxrpc_seq_t to,
->  		tq = call->tx_queue;
->  	}
->  
-> -	do {
-> +	while (before_eq(seq, to)) {
+> diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+> index c96ca615b787c..611c790bc6d0c 100644
+> --- a/net/rxrpc/conn_event.c
+> +++ b/net/rxrpc/conn_event.c
+> @@ -436,7 +436,7 @@ static bool rxrpc_post_challenge(struct rxrpc_connection *conn,
+>  	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+>  	struct rxrpc_call *call = NULL;
+>  	struct rxrpc_sock *rx;
+> -	bool respond = false;
+> +	bool respond = false, queued = false;
 
 [Severity: Critical]
-This is a pre-existing issue, but can this trigger a use-after-free write
-during a concurrent sendmsg() if the remote peer sends an early reply?
+This is a pre-existing issue, but can the lockless read of
+conn->channels[i].call in net/rxrpc/conn_event.c lead to a NULL pointer
+dereference?
 
-Right before this loop in rxrpc_rotate_tx_window(), the code unconditionally
-frees the active transmission queue buffer:
+Looking at rxrpc_post_challenge(), the code does:
 
-	if (seq == call->tx_qbase + RXRPC_NR_TXQUEUE) {
-		call->tx_qbase += RXRPC_NR_TXQUEUE;
-		call->tx_queue = tq->next;
-		...
-		kfree(tq);
-		tq = call->tx_queue;
-	}
+    if (conn->channels[i].call) {
+        call = conn->channels[i].call;
+        rx = rcu_dereference(call->socket);
 
-If a full block of 63 packets is transmitted and ACKed, call->tx_bottom
-reaches 63. If the remote peer then sends an early reply,
-rxrpc_receiving_reply() calls rxrpc_rotate_tx_window() with to = 63 and seq
-starting at 64.
+Without READ_ONCE(), the compiler could issue two separate loads. If a
+concurrent thread clears the channel's call pointer after the if-check but
+before the assignment, call becomes NULL.
 
-This triggers the condition above and frees the active block (tq) without
-verifying if it is still being written to. If it is still the tail
-(tq == call->tx_qtail), call->send_queue and call->tx_qtail are left as
-dangling pointers.
+Does this cause the subsequent rcu_dereference(call->socket) to panic by
+dereferencing NULL->socket?
 
-Concurrently, if the client is still sending data via sendmsg(), it might call
-rxrpc_alloc_txqueue() for the 64th packet:
+[Severity: High]
+This isn't a bug introduced by this patch, but does taking a connection
+reference here in rxrpc_post_challenge() lead to a leak if the packet is
+later discarded due to connection abort or teardown?
 
-net/rxrpc/sendmsg.c:rxrpc_alloc_txqueue() {
-	...
-	if (call->send_queue) {
-		tq->qbase = call->send_top + 1;
-		call->send_queue->next = tq;
-		call->send_queue = tq;
-	}
-	...
-}
+If rxrpc_process_event() in net/rxrpc/conn_event.c encounters 
+conn->state == RXRPC_CONN_ABORTED, it returns -ECONNABORTED early:
 
-Will call->send_queue->next = tq write a newly allocated pointer into the
-recently freed memory block?
+    if (conn->state == RXRPC_CONN_ABORTED)
+        return -ECONNABORTED;
+
+This bypasses the cleanup, and the skb is consumed by
+rxrpc_do_process_connection() without dropping the sp->chall.conn reference.
+
+Similarly, during teardown, rxrpc_purge_queue() in net/rxrpc/skbuff.c
+consumes skbs via:
+
+    while ((skb = skb_dequeue((list))) != NULL) {
+        ...
+        consume_skb(skb);
+    }
+
+Since it doesn't inspect the cb scratch space, doesn't this permanently leak
+the connection references stored in sp->chall.conn?
 
 [ ... ]
+
+>  	if (call)
+> -		rxrpc_notify_socket_oob(call, skb);
+> +		queued = rxrpc_notify_socket_oob(call, skb);
+
+[Severity: High]
+This is a pre-existing issue, but does failing to set skb->mark to
+RXRPC_OOB_CHALLENGE here in rxrpc_post_challenge() break OOB challenge
+processing?
+
+The skb->mark remains RXRPC_SKB_MARK_PACKET as set during ingress.
+When the application attempts to respond via rxrpc_respond_to_oob() or read
+via rxrpc_recvmsg_oob(), won't the operation fail with -EPROTO because it
+expects skb->mark == RXRPC_OOB_CHALLENGE?
+
+Additionally, when the OOB message is freed via rxrpc_kernel_free_oob(),
+doesn't the switch statement on oob->mark fail to match, bypassing
+rxrpc_put_connection() and leaking the connection reference stored in
+sp->chall.conn?
+
+>  	rcu_read_unlock();
+> +	if (call && !queued) {
+> +		rxrpc_put_connection(conn, rxrpc_conn_put_challenge_input);
+> +		sp->chall.conn = NULL;
+> +		return false;
+> +	}
+>  
+>  	if (!call)
+>  		rxrpc_post_packet_to_conn(conn, skb);
+> diff --git a/net/rxrpc/oob.c b/net/rxrpc/oob.c
+> index 3318c8bd82ad5..c80ee2487d094 100644
+> --- a/net/rxrpc/oob.c
+> +++ b/net/rxrpc/oob.c
+
+[ ... ]
+
+> @@ -49,6 +50,7 @@ void rxrpc_notify_socket_oob(struct rxrpc_call *call, struct sk_buff *skb)
+>  			skb->skb_mstamp_ns = rx->oob_id_counter++;
+>  			rxrpc_get_skb(skb, rxrpc_skb_get_post_oob);
+>  			skb_queue_tail(&rx->recvmsg_oobq, skb);
+> +			queued = true;
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does unbounded queuing of
+challenge packets onto recvmsg_oobq risk a kernel OOM?
+
+In net/rxrpc/oob.c, rxrpc_notify_socket_oob() uses skb_queue_tail() without
+checking memory limits (like sk_rmem_alloc vs sk_rcvbuf) or restricting the
+total number of challenges.
+
+Since rxrpc_encap_rcv() intercepts these packets before standard UDP memory
+accounting occurs, could a remote attacker flood the host with valid
+CHALLENGE packets?
+
+If the application is slow to process them or ignores them, will these
+accumulate infinitely in recvmsg_oobq and cause a Denial of Service?
 
