@@ -1,181 +1,167 @@
-Return-Path: <netdev+bounces-300826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id T4YKAdS3NmoeDwcAu9opvQ
-	(envelope-from <netdev+bounces-300826-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:55:00 +0200
+	id WyPVA1m4Nmo9DwcAu9opvQ
+	(envelope-from <netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:57:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66A756A929C
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:54:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9516A92C4
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:57:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=egpiAvWV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300826-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300826-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b=HDjo1vgq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6425E30234E6
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:53:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A25E7301980B
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E538E399036;
-	Sat, 20 Jun 2026 15:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7E9399374;
+	Sat, 20 Jun 2026 15:54:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3315399365
-	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 15:53:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781970813; cv=none; b=PHFelzB2he6r8JUA2IoJSr518mC2MGuw5yEEBfK2Z/vXMZUqW3HUiQQXBCuGxN/Jq3x0ffRzoEDK3Yj3gxxi8eM4Io1HxAMe7pgkM1LVn7x3yYKPrCIe1qlZild9GH3xLxgAdF3/p+na8eY1KYC2HXw8Y9U5Ecf/PRN+dpukrfk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781970813; c=relaxed/simple;
-	bh=27f18OOfD1wCLKfucVJgwaw2m6et21Q/k59tBorfEmY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pM7xpRIJ6VSMw3WGhfqkBSL8z13RauWntXNWjWXgsmxsdUikEjHI1x4p7GE+d1bZO3oTYX+yJoFQURz7pNJeJl1uuIecEbSlme7hfJ/e6PlMu+9822va29fuMfWZwJhURDWoQbknkvgtW12mpsJcHEQjao5yZvVnTjt7MmH9mbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egpiAvWV; arc=none smtp.client-ip=209.85.210.178
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-845537740ddso779975b3a.0
-        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 08:53:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04693438A8
+	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 15:54:38 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781970879; cv=pass; b=kLFkvTg2dEubALgfbWnIHjNaMHGOV2DyW4w7u7Z2OFRjMNcmVfy2JOUeyyPav58eY/ZnmFD44qe+RMhEVsg9P+ggD4Uv21hQDIn+EHJjGCY8eqjuJ5IRqVTsrnOmNEWbQQoonc1WUxAwK9ulZ4Nms1aAsB2J3tJnTaw1ktdrgeM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781970879; c=relaxed/simple;
+	bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AJ9+ZsssSAKw/CyBWE4bOKnAbiTle5NN7P1xKwUwZyWqUC1Qqwktz+cZdJx8EcMygYfOTgv3CpUQdOK+uNEQXq8NAQ2cQCL9AN6EY7w+BrpNIJ7+2lOzKzfXBMBSqWHpIyRbF2qbav9fvmQB4N9FzmUZhLOE28LNAxisrZITd24=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=HDjo1vgq; arc=pass smtp.client-ip=74.125.224.54
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-662bb4dc1d6so3417753d50.1
+        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 08:54:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781970878; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZNXaEmTmqw6BW3NEA1zxDO/4I9/q0fCQS1YTAF/eRcSBXtT8sp9z0JnhqeSj4m+SpE
+         lLFCQDFAQftIzb2BJyIydUGG3JGoecpudw6of6goeWmTjnvMCTGscI5q/3Hirro1tzBW
+         aY0QJCho7elq4C4ZAs1G0Rvo+JZeNjZtZguj7FcPhgFfJd3nbcCPWk2fUVmod4cBYWl+
+         5tldXs8YP3ESS4chofVzxEW2+IMoYxZg4W/xF8AKlCyY0hRbREk+F2hea7ygbalcgQgC
+         SlzGp1P27FxvVe+MkBeAE9SwUvvLg3DboVAqzoacrIT7991plmRhDvnRZKBM0k2/9huh
+         dRiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
+        fh=k3Uk8+ZUYdhIB3ZI7uWiB4hw7HG8WfPbBhKMAkRUC2I=;
+        b=DNRm7Ruh+o8bCZqeXbp22ZrH1qgRz6FrpzUwsCx+0XlK+UR2eATi9GsUdHkGTZHP6R
+         wa8rwSgy5vI6ZH00db45ee/QDcncq31Wdm2V0s0QF5Zr4KIkH3+N/Kd6P01edLFa/taQ
+         LgOu8u3rZ0H0w3EHOrx7C7LZakxMx5JSBxhdoKOzrD2+wLujS5f4Hp3SozI+XnMzUmAW
+         hloJB0QmXhxqPcCPxlpd/lcpBddNv2G/cXPMyEOv9UvrvMUFVWFMBcWeFRo2aUtthDRy
+         aHM7lEKOAKtysp8ZaHJ6CMFFWiyoYa8uZSn6MhK10m+pNO2pn2WWv+9ruO5ZRdrMtu6+
+         kesg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781970812; x=1782575612; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=enS82+dUPNj0lLplgn6nU4h7gPttfijjEVh4iX+6X1Y=;
-        b=egpiAvWVeKL1+HlZwS6Rxkl+HthOb/nfxCycvBYlT8/feNIa0LODwbEwF9Q31aGZvC
-         n+jMpCJ5dTjwrVp2k+LDZYAbHnmoaz3jcB54zDvlfXUiWj+HP5wzeXElUPX5k0r/t12C
-         yDS6kpJhNU5JTFETTiDZ34p7rblakFAWh42nAzTxUJVaxd7ORdsP77Uh+xIP2+k+AcSY
-         +NiEL0vWbDHvMeCMz85rMT8dKcTDkUP2pU+Yk2A1yr7CMD9vg3CjY05njt9xfLi9lt5t
-         8HzvZYS5phLIGdRnsTApYry1y44C3J4IqsXIDsh6ao1ByjEZ3XEeHCMlEuyXV8Qp/wor
-         VZhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781970812; x=1782575612;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu.com; s=google; t=1781970878; x=1782575678; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=enS82+dUPNj0lLplgn6nU4h7gPttfijjEVh4iX+6X1Y=;
-        b=n1kRZMFJUxYqoSNW99iy1vRnxRDvLqCF+eCHHFiKk+3mtf6HYMv3SvAQOehcEgaaly
-         ANMq0WdHZHrJYtg7EYEcn34WjO4Ojpu7XmQbXREx9DmIxtzJB7xyvgV0ut5NRdhmAwfn
-         1kkQciDiwfEty1KazWa1aT4kBBMnMLsj21udTG/brdMeDdu4oxZExiHwnwROehd91qLz
-         /7u/csWuS2IzujVPq3zXY9gCytcjzrK/M+rOvbQKAt3C8yXYyFpbl5p7vAelV5F3hn+r
-         B+0QQp2MtZWG+cFYALmcJWXP+BpGMgymyaeAdItVHLtJf5kgOxMw3z3CKt7xo8Al5RBy
-         kOEg==
-X-Gm-Message-State: AOJu0YxTwHT67XJInk9zeOPA3F7r2g3JzE747wK4Q2i1oI2JUgzHy4KQ
-	6xlF7YUpxLmc45be0db89fy6N3idNPkdBbxoAGtUkyLhEdermq3boUZC
-X-Gm-Gg: AfdE7cmKSZRQ5HRBY784h6LVHTPkrzDJCHalfb3sZhA6c+9xCDrrvIT90+F70PhfPcX
-	yzxrSMwejkDeUudGYWICbSIhtaq11A+IzYpg3ePapSsP/3Q10aAQTE7RrAvWa2eysBG6xT4BLUi
-	7hEr4F+jeh7dmur3Rg+YQUmEJnR897FeogEvisEPYfL9FxjCK2+IqeiDFdp1k6dB8uah2jtfZz5
-	ykPK5ZStGZ8pdDSN+O4JoSapd4g3hDpxGzzC7/MNNArF8BuSer+iAc9p/P9dV0igM6ZT1j6j5v6
-	ef6xd9ooS8E61ZCOSC1rGEKLv/C+8AgFvWYP3bcHosxT4EfUAIPkzVRLDpH1co783Qeyt0PCoy0
-	w5oHYlUTsWnb7Yq5XBCl8So1r/9MyprSI2xZb4RZooSs3QV0Yl+qMOIWeUeUofIqAs6cEt9+sww
-	J2gSse61LiHRLzi03cFCWbxCfKva3NlREP
-X-Received: by 2002:a05:6a00:882:b0:842:2382:a0ea with SMTP id d2e1a72fcca58-845507de690mr8534471b3a.14.1781970811867;
-        Sat, 20 Jun 2026 08:53:31 -0700 (PDT)
-Received: from haichao.tail057a43.ts.net ([2001:da8:e000:1206:8e0e:956e:b09c:23cd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84564ed9516sm2555118b3a.57.2026.06.20.08.53.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Jun 2026 08:53:31 -0700 (PDT)
-From: Ruoyu Wang <ruoyuw560@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ruoyu Wang <ruoyuw560@gmail.com>
-Subject: [PATCH] net: sungem: fix probe error cleanup
-Date: Sat, 20 Jun 2026 23:53:26 +0800
-Message-ID: <20260620155326.80582-1-ruoyuw560@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
+        b=HDjo1vgqCyQyMY9iSSxQk9BAzcnk6t74x+hZGqpe2RZ1wS7sI7LqbzRFepmJPcGj/w
+         5BsnOVO/+Kg/0IWD+7iXOaEOPrWDHK6rQJS/s6lx7lAz2/XZ0PJXZKqjForf8A66Yhsy
+         CIpECxztFUM+HtYu/tDzzRMk2EWcU0vM+8tVw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781970878; x=1782575678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
+        b=LVK2lFzXYPxnF87igFcjE/F4GpEkz5Q8zB8U72bT341fNGY8I6b7Y+bVPCmy2Trbqy
+         GzoLFkWpA8Hc7bDP94LwlPeypxOattabXsYY21Z5rPST2t0XkpWb62Tx/KknqYgq5fAm
+         Rz59vZaCXV27lWXdo9vmdVN+STnpTEBxR/WV7S6ul+09qC8cJio6no2vBNImrFJfHlnl
+         dcw3EYRTDcnMPuxSDzobkNhvtXN/75RxAWHVF5HqmBrf3Y50PY5sKRf4aMyU0H5qwlET
+         82zzd3gXDyTW8Wg9N83a/xLSFwxw90eqXMogBT0+h9oc0ASnZq3+FRXXvjKugPYB7OKN
+         Qh0g==
+X-Forwarded-Encrypted: i=1; AHgh+RrzZn0GXO0nCA7bpEepwAUmis9YR1tAHGFRN8eh4PCOp9qQ1th9iEJJk9NqiAn4+4aySLTO3qQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz/OHFEEHN3hgBsO/9KmRRWZyDy2/nHHrdSec+vofgA+KF3NsP
+	NPvn8Ngyra/O5TcbDt68OWaD+4LuP41CNxbZXjDdt0J/aqqcgqGr3tBSm76pVori2dkrQRyX9uK
+	98R9VNOSiWBQt3LwRLM4OMpaBMzAkrd3f8YbCX/WyRUXS1Y/vCtY=
+X-Gm-Gg: AfdE7cmqHYPYqFgl0sikGLQ+oieGHDVSiuTMEAriBEMB3blVnN9jn6k40xCQpv30LrI
+	K4cqC2K/3xl4ZBT2pJVmUpefeVvFgPOQTAYoy2iqWNdDyWXW/wrTvoUeZM7JWe3wvQRLQAbR7e+
+	flSiEGDNC53yWo3o7m1waGue+y+lrCcNvuUqzQDTkgbMs5CwXbzeTv8gGNaHWlU48CjFuwRxO9L
+	iIDZLlLT1tqaqzMLaU9sk7+LMbO4ZDC6gmemKxmKK84SkT7bKdHNYNDmmGssOuwmGJduAlvmkAQ
+	jFNjXMNIu2jQR1Cx/dFb0mwd/ek=
+X-Received: by 2002:a05:690e:120d:b0:660:5e32:b2a2 with SMTP id
+ 956f58d0204a3-662fff62c0cmr7294649d50.49.1781970877733; Sat, 20 Jun 2026
+ 08:54:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260619151447.223640-1-b1n@b1n.io>
+In-Reply-To: <20260619151447.223640-1-b1n@b1n.io>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Sat, 20 Jun 2026 12:54:26 -0300
+X-Gm-Features: AVVi8CfVQ16Dt4Z149BETVATIkTE4DSBRfU8VpglrjahZRBgNf1eldVvT-bLElE
+Message-ID: <CA+NMeC8-_LzTU_e+MA0-p72-=-P0NozcuaORsYGpyjMuAj957g@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] net/sched: dualpi2: fix GSO backlog accounting
+To: Xingquan Liu <b1n@b1n.io>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, 
+	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300826-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ruoyuw560@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS(0.00)[m:b1n@b1n.io,m:jhs@mojatatu.com,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:chia-yu.chang@nokia-bell-labs.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300828-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:from_mime,b1n.io:email,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 66A756A929C
+X-Rspamd-Queue-Id: 5C9516A92C4
 
-gem_init_one() calls gem_remove_one() when register_netdev() fails.
-That path unregisters and frees resources owned by the net_device,
-then probe continues into its own cleanup labels and touches the same
-state again.
+On Fri, Jun 19, 2026 at 12:15=E2=80=AFPM Xingquan Liu <b1n@b1n.io> wrote:
+>
+> When DualPI2 splits a GSO skb into N segments, it propagates N
+> additional packets to its parent before returning NET_XMIT_SUCCESS.
+> The parent then accounts for the original skb once more, leaving its
+> qlen one larger than the number of packets actually queued.
+>
+> With QFQ as the parent, after all real packets are dequeued, QFQ still
+> has a non-zero qlen while its in-service aggregate has no active
+> classes. qfq_choose_next_agg() returns NULL and qfq_dequeue() passes
+> the result to qfq_peek_skb(), causing a NULL pointer dereference.
+>
+> Follow the same pattern used by tbf_segment() and taprio: count only
+> successfully queued segments, propagate the difference between the
+> original skb and those segments, and return NET_XMIT_SUCCESS whenever
+> at least one segment was queued.
+>
+> Fixes: 8f9516daedd6 ("sched: Add enqueue/dequeue of dualpi2 qdisc")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Xingquan Liu <b1n@b1n.io>
 
-Clear the driver data and remove the NAPI instance on this error path,
-then let the existing probe cleanup labels release the resources once.
-
-Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
----
- drivers/net/ethernet/sun/sungem.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/sun/sungem.c b/drivers/net/ethernet/sun/sungem.c
-index 8e69d917d827..26974ee71352 100644
---- a/drivers/net/ethernet/sun/sungem.c
-+++ b/drivers/net/ethernet/sun/sungem.c
-@@ -2986,10 +2986,10 @@ static int gem_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	dev->max_mtu = GEM_MAX_MTU;
- 
- 	/* Register with kernel */
--	if (register_netdev(dev)) {
-+	err = register_netdev(dev);
-+	if (err) {
- 		pr_err("Cannot register net device, aborting\n");
--		err = -ENOMEM;
--		goto err_out_free_consistent;
-+		goto err_out_clear_drvdata;
- 	}
- 
- 	/* Undo the get_cell with appropriate locking (we could use
-@@ -3003,8 +3003,13 @@ static int gem_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		    dev->dev_addr);
- 	return 0;
- 
-+err_out_clear_drvdata:
-+	pci_set_drvdata(pdev, NULL);
-+	netif_napi_del(&gp->napi);
-+
- err_out_free_consistent:
--	gem_remove_one(pdev);
-+	dma_free_coherent(&pdev->dev, sizeof(struct gem_init_block),
-+			  gp->init_block, gp->gblock_dvma);
- err_out_iounmap:
- 	gem_put_cell(gp);
- 	iounmap(gp->regs);
+Reviewed-by: Victor Nogueira <victor@mojatatu.com>
 
