@@ -1,168 +1,199 @@
-Return-Path: <netdev+bounces-300791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300792-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CL3pACZfNmpL+wYAu9opvQ
-	(envelope-from <netdev+bounces-300791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:36:38 +0200
+	id CkASLKxgNmoE/AYAu9opvQ
+	(envelope-from <netdev+bounces-300792-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:43:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46DF36A8AED
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:36:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C186A8B22
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:43:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=j+40fQog;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300791-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300791-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=a3MT9u3D;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300792-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300792-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E706E30226AF
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:36:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 76E4F3004C88
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546E43403F1;
-	Sat, 20 Jun 2026 09:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF723438BE;
+	Sat, 20 Jun 2026 09:43:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065919CCF7
-	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 09:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040E932AACB;
+	Sat, 20 Jun 2026 09:42:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781948195; cv=none; b=Gq7B79xB/1lSkcUSOwyQ0I2oOwdBJZe37fuhS9ZywfVD4fgL7uOqHQDLATHI91mrsWyIwIujoiCTLEZAF4fEC4mgF+MQRvkCvd8RuTuwjDr4mMWcYxp2s+eh56eHEDzmABez9S6fKtfSxLY0IkVkbj/pXuHaP/7c2pXDxBmOr4g=
+	t=1781948582; cv=none; b=uYHHw+zkch5D1cHwacl5P2hv65TyouT94J2kjSQ2W/JjEL44kaCBE+Gu7kNHMMTN1n1Ic5PaPRBkMGQwplIPmaBbMlFTLocyODkf6WFonygYxHYRBi7pYVmQKbfzglkj05Hlgpi6fXrZ0hINgUBRHi4CcFzyFqtbW8mxkuhBJdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781948195; c=relaxed/simple;
-	bh=bU4r3vVkW8mrONjfwTJWC9BvWthCSpu4DsLPxMaedmI=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=n7LnCdIL9qwkXxeMF9+YlO+7JybS217zwkDr2bkqql5yGyyo9dCaAttTnYgNRfbPnrbPeBWlwi7v5l7UvKFhkc38DeS6Nxya6bCZcF1psKwWwuzNvPASuCgp1F6ppv8+EgeAGlXfUyn67CdJYwWo0FsZOPupUzESMP1ZMrb1BLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j+40fQog; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4905529b933so26937765e9.0
-        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 02:36:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781948192; x=1782552992; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fq7/gXiRYl+tPp5LSIPTHcs/K7+qpSBcoeo/PpCpVqw=;
-        b=j+40fQogpp6CphwuvtHzstkmHzSnqpL1QbKyT9TBbYYH81SkWPV9EjFzAwE/Ohk9lC
-         jd9/2kGraa6+02AnWaTVFKYZ4pwDm9dl/3Wqsl8V7HKNMw9MNLJJBe6DIyIv7zfMXF6f
-         RjX+gSKi+rEol/uMnYPUNN1Oguy+zM1hVS5WYOFMmAt4CvKkepbKncgKXAPKDJjrQW3i
-         AEzSV2RJgGJrKL+gwk8s7wilnrs4GqnzL+6TqVBkJA9ozajgZ/pGo1RUKCapZBTHQt5s
-         AxQg2OFeFl8ZG425Hw0GCF0ociLa+T1EPxfMD4/p3s3zptyYmTooVabZAoFTuuNnV2u1
-         4cTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781948192; x=1782552992;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fq7/gXiRYl+tPp5LSIPTHcs/K7+qpSBcoeo/PpCpVqw=;
-        b=KisqJGTIXksgW0Q962GrEFALdfPbYIMfAw3vJSD4QbYN5FJ5bvnf2xfYy2qwDllRJl
-         hpx2quzYLgkPk04BZ2mivCunzKYT2X0wPfPyaX9tbllkeZvEJltC+CXSHYYIRnVhbtTj
-         eWCiPaIvByZ5kbpMTt1vq4zt33Qpy3iq/GQV7AUi65rJKUqBK4QR3tD4JHOyFQPOOj5f
-         mzjUxQz0InrMvvXlRhH8yJhgh7WdJjK/xGHRpF9I+/DJxwFHAcSJQ4Vzn6piThKVzohB
-         eeGMH+jcxG1mUiMBmqMuoJtgsK0BHQ+VjfriI62wvvMn4IeYsaBfrcvty0mXbemFFkzl
-         VDew==
-X-Gm-Message-State: AOJu0Ywz+B8aZUsiTXZaT8dR3aSnRGwruqLYkX4jYDqhc6UdTFyCO6os
-	BkMvt26YlPXE4EPA/FVGmnnQLnV2INvrFi6E2BpeY7CpqraZ5ZHUZ5Yy04szaw==
-X-Gm-Gg: AfdE7ckzZDyi1FNfmw35HEFZ9DOJRh82jAykQQbSmD9EIR+5LeBk0gEVod9JzytlBJg
-	Og2/zsBZybwTfD8nUZpIRk7k4/T0+Oz/4MrXZhwIdRDwIVzOrK0ZUVXQ/HBGgceu6dNYQ23eMo4
-	m6B3xv6ZYJIygVs3AbAvaRwakJhb7Jc5zkVwYz9JQOc9OohdY+YQiJhIjrMJjG5uKLvBveHCrzT
-	zLcgNd995YAgChRgSAjsqtmOijMP+80hxgvnzLpN2320B1dxuyaQE1xaXDoRmhd1tE8co7gG7gn
-	QRA4xWTwq0+x6r+PuBZQ/dSSBf8xtkEUxfMksXBaxT+q0l7NjesULPpYkpDv52W4IIZdcwCKqt0
-	pMEsegwYeIfO46pPzI5w3Ss+ROVBTfYxatKsWucLIkxHe6Ra//avHP3kcEaOxGe3CDHbR3wFeXS
-	wxFyTZypETBV7Jc9GzxYJi660sl27PYhpS1zsoGI5xZVkfa0QwIPO7qNo=
-X-Received: by 2002:a05:600c:3baa:b0:492:42e1:1b6a with SMTP id 5b1f17b1804b1-49242e11d31mr99118375e9.25.1781948192290;
-        Sat, 20 Jun 2026 02:36:32 -0700 (PDT)
-Received: from ?IPV6:2001:bb6:1b96:9200:cf2e:dbb6:5a08:1ea4? ([2001:bb6:1b96:9200:cf2e:dbb6:5a08:1ea4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49249207dabsm83771655e9.0.2026.06.20.02.36.31
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Jun 2026 02:36:31 -0700 (PDT)
-Message-ID: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
-Date: Sat, 20 Jun 2026 10:36:31 +0100
+	s=arc-20240116; t=1781948582; c=relaxed/simple;
+	bh=8fMNRF0SqSKtMYIVnbt9RS7ifbrZk0Ewvn6V0lL10A4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ddO+FWRVFkCE2WRWm4c7DHbbzi7SOT3R2JgrQakWyHpOESPdnlR8rgLy+acKOiaRtnV4Nol2AS13jBywmDy0Ik1/vU1HOufxJlgb5v1XtPw4gXAXVKrPonW6Xz1ZK6S4/KeNX9NZvWN15CohD/ThRqfZSzm0xJFuVHjjQ9+ez/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=a3MT9u3D; arc=none smtp.client-ip=45.254.49.197
+Received: from PC-202605011814.localdomain (unknown [222.191.246.242])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 43192ae6e;
+	Sat, 20 Jun 2026 17:37:46 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: Taras Chornyi <taras.chornyi@plvision.eu>,
+	netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Oleksandr Mazur <oleksandr.mazur@plvision.eu>,
+	Andrii Savka <andrii.savka@plvision.eu>,
+	Vadym Kochan <vadym.kochan@plvision.eu>,
+	Volodymyr Mytnyk <volodymyr.mytnyk@plvision.eu>,
+	linux-kernel@vger.kernel.org,
+	Runyu Xiao <runyu.xiao@seu.edu.cn>,
+	Jianhao Xu <jianhao.xu@seu.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: marvell: prestera: use unaligned accessors for DSA tag
+Date: Sat, 20 Jun 2026 17:37:39 +0800
+Message-Id: <20260620093739.2164921-1-runyu.xiao@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Dmitri Seletski <drjoms@gmail.com>
-Subject: "ip help" output is an error
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9ee464b63203a1kunme267ed1df294f
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaHUpNVksfS0IdHkgZHhkYHlYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUpLSE
+	pPSExVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=a3MT9u3DUyshn2ClhviuzzlH1+nQSFyiCps84FafLHUoYANG6J7JZaTBNYz1wCfT0fnFwk26PUhGA6KVxw3umGe1KAznznN+IE96+RCcbFA2/gCm0xIDP2q7eIKdZSv3cZSUgEuO3e3UAXPrDb3VOyqxcvaZXUjNVlE/HAZGRMA=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=MgB0X53jUypkv0f8t6Xh88X4qD70o0a+demyhV9n3tY=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300791-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCPT_COUNT_ONE(0.00)[1];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[drjoms@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:taras.chornyi@plvision.eu,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:oleksandr.mazur@plvision.eu,m:andrii.savka@plvision.eu,m:vadym.kochan@plvision.eu,m:volodymyr.mytnyk@plvision.eu,m:linux-kernel@vger.kernel.org,m:runyu.xiao@seu.edu.cn,m:jianhao.xu@seu.edu.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300792-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[drjoms@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 46DF36A8AED
+X-Rspamd-Queue-Id: A0C186A8B22
 
+Prestera parses and builds its 16-byte DSA tag from an skb byte buffer.
+The current code casts the tag pointer to __be32 * and then reads or
+writes the four tag words through that typed pointer.
 
-Hello iproute2 maintainers,
+The tag pointer is derived from skb data, but that only identifies the
+protocol tag location inside the packet buffer. It does not make the tag
+a naturally aligned __be32 array. Use the unaligned big-endian helpers
+for both parsing and building the tag.
 
-I am reporting an inconsistency regarding the exit status of the ip help 
-command.
+This issue was detected by our static analysis tool and confirmed by
+manual audit. The same access pattern was validated with UBSAN alignment
+instrumentation by keeping the original cast from a u8 DSA tag buffer to
+__be32 * and reading dsa_words[i] from a deliberately misaligned tag
+buffer. UBSAN reported misaligned-access loads of type '__be32' in
+prestera_dsa_parse().
 
-Current Behavior:
-When running ip help, the command prints the help documentation to 
-stdout, but exits with a non-zero status (error). This causes issues in 
-shell scripts that rely on exit codes for control flow.
+The driver has the same source-level issue: the RX path parses bytes at
+skb->data - ETH_TLEN, and the TX path writes the tag at skb->data +
+2 * ETH_ALEN. Those offsets identify the DSA tag bytes, but they do not
+establish a __be32 object or a 4-byte alignment guarantee for typed loads
+and stores.
 
-Steps to reproduce:
-bash
+Fixes: 501ef3066c89 ("net: marvell: prestera: Add driver for Prestera family ASIC devices")
+Cc: stable@vger.kernel.org
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+---
+ .../ethernet/marvell/prestera/prestera_dsa.c  | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-# This returns "FAIL" because the exit code is non-zero
-if ip help > /dev/null; then
-     echo "SUCCESS"
-else
-     echo "FAIL"
-fi
-
-Expected Behavior:
-Since the command successfully performs the requested task (displaying 
-help information) and does not encounter a system error, it should 
-return an exit code of 0.
-
-Context:
-This behavior breaks standard Bash logic for automation. For example:
-ip help && echo "This will not execute"
-
-"ip help |grep br" - this will bring no result.
-
-Current version tested: iproute2-6.19.0
-
-Thank you for your time and for maintaining this tool.
-
-Regards,
-Dmitri Seletski
+diff --git a/drivers/net/ethernet/marvell/prestera/prestera_dsa.c b/drivers/net/ethernet/marvell/prestera/prestera_dsa.c
+index b7e89c0ca5c0..276f98cbd50e 100644
+--- a/drivers/net/ethernet/marvell/prestera/prestera_dsa.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_dsa.c
+@@ -4,6 +4,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/bitops.h>
+ #include <linux/errno.h>
++#include <linux/unaligned.h>
+ #include <linux/string.h>
+ 
+ #include "prestera_dsa.h"
+@@ -33,15 +34,14 @@
+ 
+ int prestera_dsa_parse(struct prestera_dsa *dsa, const u8 *dsa_buf)
+ {
+-	__be32 *dsa_words = (__be32 *)dsa_buf;
+ 	enum prestera_dsa_cmd cmd;
+ 	u32 words[4];
+ 	u32 field;
+ 
+-	words[0] = ntohl(dsa_words[0]);
+-	words[1] = ntohl(dsa_words[1]);
+-	words[2] = ntohl(dsa_words[2]);
+-	words[3] = ntohl(dsa_words[3]);
++	words[0] = get_unaligned_be32(dsa_buf);
++	words[1] = get_unaligned_be32(dsa_buf + 4);
++	words[2] = get_unaligned_be32(dsa_buf + 8);
++	words[3] = get_unaligned_be32(dsa_buf + 12);
+ 
+ 	/* set the common parameters */
+ 	cmd = (enum prestera_dsa_cmd)FIELD_GET(PRESTERA_DSA_W0_CMD, words[0]);
+@@ -82,7 +82,6 @@ int prestera_dsa_parse(struct prestera_dsa *dsa, const u8 *dsa_buf)
+ 
+ int prestera_dsa_build(const struct prestera_dsa *dsa, u8 *dsa_buf)
+ {
+-	__be32 *dsa_words = (__be32 *)dsa_buf;
+ 	u32 dev_num = dsa->hw_dev_num;
+ 	u32 words[4] = { 0 };
+ 
+@@ -98,10 +97,10 @@ int prestera_dsa_build(const struct prestera_dsa *dsa, u8 *dsa_buf)
+ 	words[1] |= FIELD_PREP(PRESTERA_DSA_W1_EXT_BIT, 1);
+ 	words[2] |= FIELD_PREP(PRESTERA_DSA_W2_EXT_BIT, 1);
+ 
+-	dsa_words[0] = htonl(words[0]);
+-	dsa_words[1] = htonl(words[1]);
+-	dsa_words[2] = htonl(words[2]);
+-	dsa_words[3] = htonl(words[3]);
++	put_unaligned_be32(words[0], dsa_buf);
++	put_unaligned_be32(words[1], dsa_buf + 4);
++	put_unaligned_be32(words[2], dsa_buf + 8);
++	put_unaligned_be32(words[3], dsa_buf + 12);
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
 
 
