@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-300787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gXOcAahaNmqW+QYAu9opvQ
-	(envelope-from <netdev+bounces-300787-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:17:28 +0200
+	id WboRMLFaNmqd+QYAu9opvQ
+	(envelope-from <netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:17:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3B56A8A7D
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:17:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ECF76A8A81
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:17:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=GrlpPCsE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300787-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300787-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PEW1qCez;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300788-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E53D33006832
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:17:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CC11F30078B3
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004502BCF46;
-	Sat, 20 Jun 2026 09:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B3F2F8EAF;
+	Sat, 20 Jun 2026 09:17:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D671A683C;
-	Sat, 20 Jun 2026 09:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3382BCF46;
+	Sat, 20 Jun 2026 09:17:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781947042; cv=none; b=lrRs9uM7eoXM1jN5ezRVUyrKW8eGoVBGTvu9BzHEGklg8eZA0WXREiPWlfA+rWy25xHUw0IWwBWbHeFahBktK78LXaoUC+BiJ3HVZWO91vaTXRDp1hzvPK1C4wxpuB8qdYgUnwyqrj1sl+ywMt7MJYytBXFgDhLl7XXoPcafUvE=
+	t=1781947055; cv=none; b=QX2F0ihng+gIhQJiNar/HCp97RIUYeCXu5eKYeNm/5T9UczofF3Vj7vXIt9z1LE9dawtkeGCjznrztzk46Ak0kom0F21eHrhyx+7Jt3AE3Niw9iRhlZHTr1TTENeJM74yJk3NOBI9MGmZUOxJBd1vhKNDdWeyymQclhR8N3/4lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781947042; c=relaxed/simple;
-	bh=EOCB8xo3rVILzW1qjjgMgKPftgbH7tnb6gWpGc+zsmc=;
+	s=arc-20240116; t=1781947055; c=relaxed/simple;
+	bh=KWmsyD/X3k/8rcKVI53WRBWIl6lXavblj3hdYUQXJkA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mluEGoyFViPVPsRfxIF7SvXwzvdYbfsN5kh/zqHZ1HJ+ORg0CTUmvoZtxar+JTvrwDmJAYc92Oee8FzYrsR5yj2mJW54eLbjStC9PLgE5tGv+hAU2xYo8mT7u22UdTliHhiSN0fJNMn6zKL2eK9/8Bs30614fH1kl4uiEYc47ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrlpPCsE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DAD01F000E9;
-	Sat, 20 Jun 2026 09:17:19 +0000 (UTC)
+	 MIME-Version; b=GTviMQ5zzyhdsUEy+sKmEXkWbVb0iTuRMEel0xsmvhkxdGGjSbu+vO6yz0rrsh68IJv9TCEEo1BJYTHxW2qqtNNPljW8u6sA+rY2wwjGFFkgvkyARzBCRA/2vFA4jtL00CC+O4Fsg0SDrIZEFSeetUhhLwVc8//ORBsseEyY/x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PEW1qCez; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24FAF1F000E9;
+	Sat, 20 Jun 2026 09:17:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781947041;
-	bh=r7geqYyv8+f3DiaKGtDrb/gnvNARRDuyFbnRUDWByfg=;
+	s=k20260515; t=1781947054;
+	bh=52UGiw0pljVUCEtt+4CfSQ3Di7O6dhazHYVYTOXCYEk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GrlpPCsEgtzT6AnYYQu3TYDofzeGoVb42iFqvsPrT2QxvxjmnRvT+YhzbxQmNMIYz
-	 +YIjQ2/ryF3LW+KenfxEdgZQ/lxoRCAGma3dsjNqL9f8w/mWx5eePOkol1tn5OgRwI
-	 3uht1LnWe0dcoEssKkyfdwCHn0SDXZLCRslQikjy4/+h7RwQsB6BggBluik1icLmZl
-	 nP3Xupi56R7/VDpgREXMekORDnby9Ytp9jtfjv0+jxlkBLo9JCYEx9xdzTsfGZRwq9
-	 MEcdPVlSKqsGGsHmO7IqtUNGy/Wwg+VHzxteJa+oqlI/5Dkprc35JUYB1IN4FnJGVx
-	 eDF1M8MbvlIRg==
+	b=PEW1qCezRQmYJa99Do6+YMKwD9JkU3+OD53HC6MGsUGQG5eHFpkei0JbZCi1Yt6NC
+	 DljpsxfMw6pHkAGAOej1UZEnScxvVWObSg1OQCPa2dMFv3MVbY6LHw9n0A/fx1W1jf
+	 37ac5M/PcjJE/D5PBye443EX5B7+Kh9U3ogPY7ffTSOgw+2Eydx3AEyNmhJN4g1qOu
+	 oqEZgAjJDeHCAWLeAnTHoVaemtk0TApwT4PgI73LwP8h6v9rJdrTNf6E8JFd0lUgJB
+	 izjDbxN0et13m+Dvknqd+9xspEUuJe2ZED1pAostjE+1barOxchHcelLsq92FTxf0q
+	 7eQ3T4JGLQoAA==
 From: Simon Horman <horms@kernel.org>
 To: dhowells@redhat.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -59,12 +59,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	jaltman@auristor.com,
 	stable@kernel.org
-Subject: Re: [PATCH net v2 05/10] afs: Fix uncancelled rxrpc OOB message handler
-Date: Sat, 20 Jun 2026 10:13:46 +0100
-Message-ID: <20260620091345.967317-2-horms@kernel.org>
+Subject: Re: [PATCH net v2 06/10] rxrpc: Fix the reception of a reply packet before data transmission
+Date: Sat, 20 Jun 2026 10:17:27 +0100
+Message-ID: <20260620091727.969517-1-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260618134802.2477777-6-dhowells@redhat.com>
-References: <20260618134802.2477777-6-dhowells@redhat.com>
+In-Reply-To: <20260618134802.2477777-7-dhowells@redhat.com>
+References: <20260618134802.2477777-7-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,13 +79,13 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300787-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300788-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -103,114 +103,76 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DD3B56A8A7D
+X-Rspamd-Queue-Id: 5ECF76A8A81
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev
 ---
-afs: Fix uncancelled rxrpc OOB message handler
+rxrpc: Fix the reception of a reply packet before data transmission
 
-This patch modifies AFS to cancel its OOB message processing during
-shutdown. It moves OOB message processing to afs_wq and adds checks
-for the net namespace's live state to prevent processing when no
-longer live.
+This commit fixes rxrpc_receiving_reply() to handle the reception of an
+apparent reply DATA packet before rxrpc has had a chance to send any request
+DATA packets. It also adjusts rxrpc_rotate_tx_window() to handle an empty
+Tx queue by changing the do...while loop into a while loop.
 
-Link: https://sashiko.dev/#/patchset/20260609140911.838677-1-dhowells%40redhat.com
+Link: https://sashiko.dev/#/patchset/20260616155749.2125907-1-dhowells%40redhat.com
 
-> diff --git a/fs/afs/cm_security.c b/fs/afs/cm_security.c
-> index edcbd249d2024..103168c70dd4d 100644
-> --- a/fs/afs/cm_security.c
-> +++ b/fs/afs/cm_security.c
-
-[ ... ]
-
-> @@ -101,7 +101,8 @@ void afs_process_oob_queue(struct work_struct *work)
->  	struct sk_buff *oob;
->  	enum rxrpc_oob_type type;
+> diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+> index 37881dffa898b..01ccd2d2fe92c 100644
+> --- a/net/rxrpc/input.c
+> +++ b/net/rxrpc/input.c
+> @@ -247,7 +247,7 @@ static bool rxrpc_rotate_tx_window(struct rxrpc_call *call, rxrpc_seq_t to,
+>  		tq = call->tx_queue;
+>  	}
 >  
-> -	while ((oob = rxrpc_kernel_dequeue_oob(net->socket, &type))) {
-> +	while (READ_ONCE(net->live) &&
-> +	       (oob = rxrpc_kernel_dequeue_oob(net->socket, &type))) {
->  		switch (type) {
->  		case RXRPC_OOB_CHALLENGE:
->  			afs_respond_to_challenge(oob);
+> -	do {
+> +	while (before_eq(seq, to)) {
 
 [Severity: Critical]
-This isn't a bug introduced by this patch, but can afs_respond_to_challenge()
-cause a null pointer dereference or use-after-free here?
+This is a pre-existing issue, but can this trigger a use-after-free write
+during a concurrent sendmsg() if the remote peer sends an early reply?
 
-When afs_respond_to_challenge() queries peer_data and casts it to an
-afs_server pointer, it unconditionally dereferences it and locks its mutex:
+Right before this loop in rxrpc_rotate_tx_window(), the code unconditionally
+frees the active transmission queue buffer:
 
-fs/afs/cm_security.c:afs_respond_to_challenge() {
-    ...
-    server = (struct afs_server *)peer_data;
-    if (!server->cm_rxgk_appdata.data) {
-        mutex_lock(&server->cm_token_lock);
-    ...
+	if (seq == call->tx_qbase + RXRPC_NR_TXQUEUE) {
+		call->tx_qbase += RXRPC_NR_TXQUEUE;
+		call->tx_queue = tq->next;
+		...
+		kfree(tq);
+		tq = call->tx_queue;
+	}
+
+If a full block of 63 packets is transmitted and ACKed, call->tx_bottom
+reaches 63. If the remote peer then sends an early reply,
+rxrpc_receiving_reply() calls rxrpc_rotate_tx_window() with to = 63 and seq
+starting at 64.
+
+This triggers the condition above and frees the active block (tq) without
+verifying if it is still being written to. If it is still the tail
+(tq == call->tx_qtail), call->send_queue and call->tx_qtail are left as
+dangling pointers.
+
+Concurrently, if the client is still sending data via sendmsg(), it might call
+rxrpc_alloc_txqueue() for the 64th packet:
+
+net/rxrpc/sendmsg.c:rxrpc_alloc_txqueue() {
+	...
+	if (call->send_queue) {
+		tq->qbase = call->send_top + 1;
+		call->send_queue->next = tq;
+		call->send_queue = tq;
+	}
+	...
 }
 
-If a challenge is received for an unknown peer, or if afs_server_destroyer()
-concurrently clears the peer app_data to null during teardown, could 
-peer_data be null?
-
-If the pointer was read just before being cleared, could the server object
-be freed concurrently since no RCU read lock or refcount is held?
-
-> diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-> index 6714a189d58fb..e8af2a6614405 100644
-> --- a/fs/afs/rxrpc.c
-> +++ b/fs/afs/rxrpc.c
+Will call->send_queue->next = tq write a newly allocated pointer into the
+recently freed memory block?
 
 [ ... ]
-
-> @@ -989,5 +991,6 @@ static void afs_rx_notify_oob(struct sock *sk, struct sk_buff *oob)
->  {
->  	struct afs_net *net = sk->sk_user_data;
->  
-> -	schedule_work(&net->rx_oob_work);
-> +	if (net->live)
-> +		queue_work(afs_wq, &net->rx_oob_work);
->  }
-
-[Severity: Medium]
-Should net->live be read with READ_ONCE() here?
-
-Since net->live can be modified concurrently by namespace teardown code
-such as afs_close_socket() or afs_net_exit(), reading it without READ_ONCE()
-might allow the compiler to optimize the read, leading to a stale evaluation.
-
-The updated afs_process_oob_queue() function correctly uses READ_ONCE().
-Should afs_rx_notify_oob() do the same to prevent data races?
-
-[Severity: High]
-This isn't a bug introduced by this patch, but there appears to be a similar
-issue in fs/afs/server.c when retrieving the server pointer.
-
-Can afs_find_server() increment the refcount of a freed object?
-
-afs_find_server() fetches the pointer and increments its refcount:
-
-fs/afs/server.c:afs_find_server() {
-    ...
-    struct afs_server *server = (struct afs_server *)rxrpc_kernel_get_peer_data(peer);
-    
-    if (!server)
-        return NULL;
-    return afs_use_server(server, false, afs_server_trace_use_cm_call);
-    ...
-}
-
-If afs_server_destroyer() runs concurrently, unbinds the peer, and frees
-the server, could afs_find_server() fetch the pointer just before it is
-cleared?
-
-If preempted, it seems this operation lacks RCU read lock protection and
-could increment the refcount of a freed object without using
-refcount_inc_not_zero().
 
