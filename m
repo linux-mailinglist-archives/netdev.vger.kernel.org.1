@@ -1,271 +1,203 @@
-Return-Path: <netdev+bounces-300823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pjAcMKetNmpGDAcAu9opvQ
-	(envelope-from <netdev+bounces-300823-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:11:35 +0200
+	id l+NjOii0NmpODgcAu9opvQ
+	(envelope-from <netdev+bounces-300824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:39:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7DF6A90F9
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:11:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E5326A9215
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:39:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=AVt2OHj0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300823-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300823-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=jByZMLtQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300824-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300824-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F347302802D
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:11:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17993300AB28
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C13396B6F;
-	Sat, 20 Jun 2026 15:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5CC3B1B4;
+	Sat, 20 Jun 2026 15:39:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D61394499
-	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 15:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C605846F;
+	Sat, 20 Jun 2026 15:39:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781968260; cv=none; b=AMiTI/YhQSiP8czYW6jHCvoIIy8Xi23fHMjv07Fky86UzVyfNQhM+tUhnxbiinlpXx/UcC0TH93LR4jntXyU5tdjxa3JO6SKlFCOTcl9xlzRZLHl+BnxpysMn/d5XlqZ23sl3TQxhmhn07le0r/bpf0GsNqsPu5Ut0okG+du6Hg=
+	t=1781969958; cv=none; b=qXibxE21c0wQFZXb0Gcdc6Km601LKoEoGdhkFmmefHf/mKt5yWcu93JuRPbHHOiqEH5pmTJzLi2H6s8N2UvkWRYq6JU/o7aElhBduCendVVncdgciTKYEtdXn8vm0ZOuC/8peS6RZ1fLqvqjSbFAkDDsTNUBynQp5Bg2iE9YlZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781968260; c=relaxed/simple;
-	bh=ZLbPKmVKhX6MOQ3dIoRI7E4oZoryAPwi5qjuGUD5F3c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O8oC/O+TKoWAkpKJnQ2Qh0FunFV8YhQu4a/ZY6cRqfWN/2LRot48T0SFFQEiMopHEeqTK94HHjI+f69aJ7g5mfnWTYxm21J+7pUVrtt90WpvBLNbPBLDrn2hWLk6qxulZpLwB8+DNt1sfmf0iceOO9WT5OZf/8KiKgVBLLiHP28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVt2OHj0; arc=none smtp.client-ip=209.85.219.46
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8de4dd10a61so20777616d6.1
-        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 08:10:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781968258; x=1782573058; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=byuE27fTQJHJEwPQRix+4FdNUy308GekTADTdRnmiRU=;
-        b=AVt2OHj0MDiV18KDIukReAIhhTWxkLxuYAZfDIuSVi6DVVFdDqtKdRXgR8v+nRS5DR
-         3mzR7wiiDRnW7NBjISKNoXntayc8MclXkYMAZywyEUP1kBNcXY5EzZbB0GTDPpD3a/Hc
-         ZmUhalChkYy6C/KTplVPKWXeqwqsDfKr/yuB5AwwXoYQMWa8LpMEXxKHnabVOotSixc1
-         cD8VSTYNvBydcrR8T7zRW7xH+wzST3nMq04ucA9P1rmpoZ5rlPKDTNchzbVpYgBD9kB7
-         Rrcszi97PGhPcerNHHhMOiGPkfmgpuETpbp2BdfNcaVEUhLqNKPXgka5V1SKKkRt3IHK
-         f2/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781968258; x=1782573058;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=byuE27fTQJHJEwPQRix+4FdNUy308GekTADTdRnmiRU=;
-        b=Ju0wR6zxkNv2s7WPvyy7bb/Oik5JtHuxRSmyKeZ5bMtlqg9ANn8/OAs8j2VyOQmzM8
-         agAl6Ofh6Tpuv93eVGRUz9nxNBTpV+6cIIeNMqCk7ggXmlfBnF1ZaH3wrn8aBTeqTFZE
-         iN/HmaMeXsIOV9DheUG3gTwZwVXYQc0yUS48row8sy8n0j6hT22BuSVphvlCavq8J8qb
-         aS0QWqCBfO53+ALULSxiNSg8Mz2NYtm6bxW1ma/OY0Or/92HlkF9QMpO+1/gplrCIqHU
-         TrZxMs+IxKKoU0kL0u9oeIg4nkgRQRniDle160Pofg9MYTC+r4YLuhwrGWrMNYQoY7jD
-         QMig==
-X-Gm-Message-State: AOJu0YwPmel/tK4exLZkmp+NZpajLcZXq4UYHQLeayhW8ZSfIwNj9eBS
-	6BFSgtAL2FsSR3HRFehY0KW3skxBe3ad+eUzB1iRbsgk0FUUELe9YvMuHZdTozb3
-X-Gm-Gg: AfdE7ck2uPvj1MkY7vpaikbnSiKbc4p6Phq1SrXwj5hpMRFo3bhvuZmveWCwZ5uXbkH
-	7LbFioNieHYQkoxeobztAAv98EC1p5VYkPEQoH8fFZfNrp0/+wVHTpMc6bksMMPR+xHHK7ytuM7
-	jjHAHyr/giKa7E3+wksNxofLdLT+1SiH9Q0TcgWMwkWRnMLpQqNfOilARP3oE1fV5UCGLKjBrQT
-	GlidHhPykEbJpvLgmhtClGrpFp50pLubvrdlL2zOQZox81V30mf5u2epYCwFVm+klUF4FL0mBJo
-	evJiackonmnyqef052RyPGZGBN+OoQcXFATiUyDBN1aSzO050qubQnGAzp6Pqp5VvLoF5hH0HTZ
-	I8dsjru6Anvip4X8oZPkdNTj0YIL/eHDqItUWBkuAS8KENp+DhHATmD3NFzy7P9dn0MdLZo1/20
-	4//DgkJLpuSTVi16bx/8LUjAZgHtCMheF90zp4vG+V8vhJk9wBWfgYA/7kF/pO33cSWjaptW00w
-	ORAT2TKJZp8wJ2HZ9YTMZWAgsImuGk2DXIV+MCx5E5EJglBLv67QRI=
-X-Received: by 2002:a05:6214:2484:b0:8dc:9054:d63e with SMTP id 6a1803df08f44-8dea263ac19mr115588336d6.11.1781968258245;
-        Sat, 20 Jun 2026 08:10:58 -0700 (PDT)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8df81cde21csm34402146d6.26.2026.06.20.08.10.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Jun 2026 08:10:56 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: [PATCH net v2 2/2] sctp: add INIT verification after cookie unpacking
-Date: Sat, 20 Jun 2026 11:09:22 -0400
-Message-ID: <c34fee6105f9051a52f8e774fe4c35f0e6ba0afc.1781968162.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1781968162.git.lucien.xin@gmail.com>
-References: <cover.1781968162.git.lucien.xin@gmail.com>
+	s=arc-20240116; t=1781969958; c=relaxed/simple;
+	bh=Oql8fv3mFJtUrXq7QayK6tyFulBHq6855VeskzWzCI4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uwQymxg8r0VXc93/zBOfNMiG0FABqv2R1g47YM4GqoSApB2cG98KeSaFaasqwuo5xaUtU/jM+AB7iuWFco7u7BX65lOdJTWGLsef7YdomtjjQgC0SoMwqs1dyj5eCqbZMm+D/4YEr/jHN7Jacj8+uSpgVe7L9CjJPcJWLFPgofU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jByZMLtQ; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 81263C653F5;
+	Sat, 20 Jun 2026 15:39:19 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0E222601B7;
+	Sat, 20 Jun 2026 15:39:13 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2A763106C88F0;
+	Sat, 20 Jun 2026 17:39:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781969952; h=from:subject:date:message-id:to:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=WcvKsOadaZ5TWyzFgIVzgmz4m6DJ/Dw1ihvYTIWU4AI=;
+	b=jByZMLtQxxnUOXnc5AVtkUBcl3Dvez7uo/i2SjpJuvLwSMdM4DaYuktJaNcr/irTel0fn/
+	VEj7SjLUSw4LnczBHbNaMfb1kxkDPR45qB/VvZXAekOW1qxtXJd7NC7yBHrHlRl1CI/At1
+	NSXEjFlCLsawA3Mh8V6uhljWGpMBrsbKl7zhA2xQ3psLx1zK2j5VpPISnRLSKtpTWvXFa2
+	FWhuZfvHTXXWUI6sU4/B2PEr+5Kwz+Krp/j3dhLixi/FRe9ptGtPWTT2/XUS66s4gWVu0A
+	ZI/AgfyekNQUWyNITvszm/xgMBBVKlWDdm55ravToDnUpm/w6vLicS13YxzoSg==
+Message-ID: <54769f58-ac83-4c5b-bd0d-3c0e83c1ab31@bootlin.com>
+Date: Sat, 20 Jun 2026 17:39:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phylink: print correct c45 phy id when missing
+ PHY driver
+To: Aleksander Jan Bajkowski <olek2@wp.pl>, linux@armlinux.org.uk,
+ andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ rmk+kernel@armlinux.org.uk, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260620131130.949298-1-olek2@wp.pl>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260620131130.949298-1-olek2@wp.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300823-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300824-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[wp.pl,armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nxp.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:olek2@wp.pl,m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:rmk+kernel@armlinux.org.uk,m:vladimir.oltean@nxp.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,wp.pl:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1E7DF6A90F9
+X-Rspamd-Queue-Id: 3E5326A9215
 
-In SCTP handshake, the INIT chunk is initially processed by the server
-and embedded into the cookie carried in INIT-ACK. The client then
-returns this cookie via COOKIE-ECHO, where the server unpacks it and
-reconstructs the original INIT chunk.
+Hi Aleksander,
 
-When cookie authentication is enabled, the cookie contents are protected
-against tampering, so reusing the unpacked INIT without re-verification
-is safe.
+On 6/20/26 15:11, Aleksander Jan Bajkowski wrote:
+> If no PHY driver is found, `phy_id` is returned. `phy_id` holds the c22 ID.
+> Modules with a rollball bridge support only c45 transfers. The c45 IDs are
+> stored in the `c45_ids` structure. In the current code these modules report
+> an ID 0x00000000. This may lead users to mistakenly conclude that the
+> rollball bridge isn't properly implemented in their SFP module. This patch
+> fixes the wrong IDs for c45 modules when a driver cannot be found.
+> 
+> Tested on Fiberstore SFP-GB-BE-T (C22) and ONTi ONT-C1TE-R05 (Rollball).
+> 
+> Before:
+> [ 2440.373985] mtk_soc_eth 15100000.ethernet sfp-lan: PHY i2c:sfp2:11 (id 0x00000000) has no driver loaded
+> [ 2440.383385] mtk_soc_eth 15100000.ethernet sfp-lan: Drivers which handle known common cases: CONFIG_BCM84881_PHY, CONFIG_MARVELL_PHY
+> [ 2440.395274] sfp sfp2: sfp_add_phy failed: -EINVAL
+> 
+> After:
+> [   82.573700] mtk_soc_eth 15100000.ethernet sfp-lan: PHY i2c:sfp2:11 (id 0x001cc898) has no driver loaded
+> [   82.583098] mtk_soc_eth 15100000.ethernet sfp-lan: Drivers which handle known common cases: CONFIG_BCM84881_PHY, CONFIG_MARVELL_PHY
+> [   82.594996] sfp sfp2: sfp_add_phy failed: -EINVAL
+> 
+> Fixes: ffcbfb5f9779 ("net: phylink: improve phylink_sfp_config_phy() error message with missing PHY driver")
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 
-However, when cookie authentication is disabled, the reconstructed INIT
-can no longer be trusted. In this case, the INIT must be explicitly
-validated after unpacking to avoid processing potentially tampered data.
+TBH I'm not convinced this counts as a net-worthy fix, I'd send that
+to net-next when it reopens instead. Sure this is useful debug info,
+but when you hit that error message you're already in for some digging
+around in the code/config :)
 
-Add sctp_verify_init() checks after cookie unpacking in COOKIE-ECHO
-processing paths (sctp_sf_do_5_1D_ce() and sctp_sf_do_5_2_4_dupcook())
-when cookie_auth_enable is disabled. On failure, the association is
-freed and an ABORT is generated via sctp_abort_on_init_err().
+> ---
+>  drivers/net/phy/phylink.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 087ac63f9193..7d7595158bf9 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -3917,13 +3917,30 @@ static void phylink_sfp_link_up(void *upstream)
+>  	phylink_enable_and_run_resolve(pl, PHYLINK_DISABLE_LINK);
+>  }
+>  
+> +static u32 phylink_get_phy_id(struct phy_device *phy)
+> +{
+> +	if (phy->is_c45) {
+> +		const int num_ids = ARRAY_SIZE(phy->c45_ids.device_ids);
+> +		int i;
+> +
+> +		for (i = 1; i < num_ids; i++) {
+> +			if (phy->c45_ids.mmds_present & BIT(i))
+> +				return (phy->c45_ids.device_ids[i]);
+> +		}
+> +
+> +		return 0;
+> +	} else {
+> +		return phy->phy_id;
+> +	}
+> +}
 
-Also update sctp_verify_init() to validate parameter bounds against the
-actual peer_init length rather than chunk->chunk_end, since peer_init
-may not span the full chunk buffer in COOKIE-ECHO.
+The function name is misleading, you don't really get the id, you get either
+the c22 id or the first non-zero C45 id.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
-v2:
-  - Because of sctp_abort_on_init_err() param change in patch 1/2,
-    pass cid and not chunk.
-  - Use SCTP_PAD4() around ntohs(peer_init->chunk_hdr.length) when
-    checking param.v in sctp_verify_init() to make Sashiko happy.
----
- net/sctp/sm_make_chunk.c |  3 ++-
- net/sctp/sm_statefuns.c  | 33 ++++++++++++++++++++++++++++++---
- 2 files changed, 32 insertions(+), 4 deletions(-)
+> +
+>  static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
+>  {
+>  	struct phylink *pl = upstream;
+>  
+>  	if (!phy->drv) {
+> -		phylink_err(pl, "PHY %s (id 0x%.8lx) has no driver loaded\n",
+> -			    phydev_name(phy), (unsigned long)phy->phy_id);
+> +		phylink_err(pl, "PHY %s (id 0x%.8x) has no driver loaded\n",
 
-diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
-index 41958b8e59fd..d5ee81934d93 100644
---- a/net/sctp/sm_make_chunk.c
-+++ b/net/sctp/sm_make_chunk.c
-@@ -2298,7 +2298,8 @@ int sctp_verify_init(struct net *net, const struct sctp_endpoint *ep,
- 	 * VIOLATION error.  We build the ERROR chunk here and let the normal
- 	 * error handling code build and send the packet.
- 	 */
--	if (param.v != (void *)chunk->chunk_end)
-+	if (param.v != (void *)peer_init +
-+		       SCTP_PAD4(ntohs(peer_init->chunk_hdr.length)))
- 		return sctp_process_inv_paramlength(asoc, param.p, chunk, errp);
- 
- 	/* The only missing mandatory param possible today is
-diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
-index 8c636f045e45..6967e889d1bd 100644
---- a/net/sctp/sm_statefuns.c
-+++ b/net/sctp/sm_statefuns.c
-@@ -650,11 +650,12 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
- 					 struct sctp_cmd_seq *commands)
- {
- 	struct sctp_ulpevent *ev, *ai_ev = NULL, *auth_ev = NULL;
-+	struct sctp_chunk *err_chk_p = NULL;
- 	struct sctp_association *new_asoc;
- 	struct sctp_init_chunk *peer_init;
- 	struct sctp_chunk *chunk = arg;
--	struct sctp_chunk *err_chk_p;
- 	struct sctp_chunk *repl;
-+	enum sctp_cid cid;
- 	struct sock *sk;
- 	int error = 0;
- 
-@@ -728,6 +729,18 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
- 		}
- 	}
- 
-+	peer_init = (struct sctp_init_chunk *)(chunk->subh.cookie_hdr + 1);
-+	cid = peer_init->chunk_hdr.type;
-+	if (!sctp_sk(sk)->cookie_auth_enable &&
-+	    !sctp_verify_init(net, ep, asoc, cid, peer_init, chunk,
-+			      &err_chk_p)) {
-+		sctp_association_free(new_asoc);
-+		return sctp_abort_on_init_err(net, ep, asoc, cid, arg, commands,
-+					      err_chk_p);
-+	}
-+	if (err_chk_p)
-+		sctp_chunk_free(err_chk_p);
-+
- 	if (security_sctp_assoc_request(new_asoc, chunk->head_skb ?: chunk->skb)) {
- 		sctp_association_free(new_asoc);
- 		return sctp_sf_pdiscard(net, ep, asoc, type, arg, commands);
-@@ -741,7 +754,6 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
- 	/* This is a brand-new association, so these are not yet side
- 	 * effects--it is safe to run them here.
- 	 */
--	peer_init = (struct sctp_init_chunk *)(chunk->subh.cookie_hdr + 1);
- 	if (!sctp_process_init(new_asoc, chunk,
- 			       &chunk->subh.cookie_hdr->c.peer_addr,
- 			       peer_init, GFP_ATOMIC))
-@@ -2133,10 +2145,12 @@ enum sctp_disposition sctp_sf_do_5_2_4_dupcook(
- 					void *arg,
- 					struct sctp_cmd_seq *commands)
- {
-+	struct sctp_chunk *err_chk_p = NULL;
- 	struct sctp_association *new_asoc;
-+	struct sctp_init_chunk *peer_init;
- 	struct sctp_chunk *chunk = arg;
- 	enum sctp_disposition retval;
--	struct sctp_chunk *err_chk_p;
-+	enum sctp_cid cid;
- 	int error = 0;
- 	char action;
- 
-@@ -2205,6 +2219,19 @@ enum sctp_disposition sctp_sf_do_5_2_4_dupcook(
- 	switch (action) {
- 	case 'A': /* Association restart. */
- 	case 'B': /* Collision case B. */
-+		peer_init = (struct sctp_init_chunk *)
-+				(chunk->subh.cookie_hdr + 1);
-+		cid = peer_init->chunk_hdr.type;
-+		if (!sctp_sk(ep->base.sk)->cookie_auth_enable &&
-+		    !sctp_verify_init(net, ep, asoc, cid, peer_init, chunk,
-+				      &err_chk_p)) {
-+			sctp_association_free(new_asoc);
-+			return sctp_abort_on_init_err(net, ep, asoc, cid, arg,
-+						      commands, err_chk_p);
-+		}
-+		if (err_chk_p)
-+			sctp_chunk_free(err_chk_p);
-+		fallthrough;
- 	case 'D': /* Collision case D. */
- 		/* Update socket peer label if first association. */
- 		if (security_sctp_assoc_request((struct sctp_association *)asoc,
--- 
-2.47.1
+Why change the printk format from 0x%.8lx to 0x%.8x ?
 
+> +			    phydev_name(phy), phylink_get_phy_id(phy));
+>  		phylink_err(pl, "Drivers which handle known common cases: CONFIG_BCM84881_PHY, CONFIG_MARVELL_PHY\n");
+>  		return -EINVAL;
+>  	}
+
+
+After reading all that, I'm actually not really convinced the overall patch
+is the best approach. It's a lot of logic for a very niche case. This is really for
+debug purposes, so why not instead print either the phy_id for a C22 PHY, or
+just "C45 PHY" and no id at all for C45 ? This removes the confusion about the
+id being 0, while still being cleat that the user needs to figure-out what's
+going on with their module...
+
+Maxime
 
