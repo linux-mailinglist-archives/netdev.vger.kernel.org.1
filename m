@@ -1,235 +1,219 @@
-Return-Path: <netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZHYpBg1bNmrT+QYAu9opvQ
-	(envelope-from <netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:19:09 +0200
+	id Y0ivA3VdNmr0+gYAu9opvQ
+	(envelope-from <netdev+bounces-300790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:29:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED166A8A90
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:19:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1576A8AC6
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 11:29:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dNuUYd3g;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300789-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZCRTghDU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300790-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300790-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6ADC8302C92B
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:17:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0FD993002B0C
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 09:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128A33290DB;
-	Sat, 20 Jun 2026 09:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C443340DB0;
+	Sat, 20 Jun 2026 09:29:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBC53254B3;
-	Sat, 20 Jun 2026 09:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93421A7264
+	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 09:29:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781947066; cv=none; b=h4oGOViX2bygznpcRG6aMgaodvwZ+b2v/LyKdF9TFrGqD3h98ZEcN5tYYb5DStfiqP0DbZ5cAn62hxHyG5evatqTatQFuNnjTJK1wRuAiz7WdpdCrEdMEZtCDL/Dzc7AEg4hEbVLMXjgc9e9LvCKS0S+gV2MgWGGgq6v3VktoKY=
+	t=1781947763; cv=none; b=mp68ugjUa1oe707SjWh4ak+xlJmow26qmP2tUNinaXdaHPcLGm33jqXUpEdm4c9hrEDDX2xU4p7SpRW8ABiCKEQfeAKhWPCFgw7ZOgPs5TjY0lFbIARldBrOGNJaykue+ZLl726zoppC+Do1BtpfGcVrZVAhEh72EgRL5T1MK6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781947066; c=relaxed/simple;
-	bh=fmO8Ugc0iyRTqFF+QGxReyHbIuFrpxhwdeElNAvrNMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cUkXe8r/38cMxjxgEz9GQaP2uAcCqeTNxu5NVJ+HHEuN/MHmIBgmSgks9RO74XXlhMbIBE6tqHxRV6Hk+uiNQxSNrJ10VpaCsjTxa1MnFMHEK+8g+l1GaGZDNd5p0QsVzb/LznBbHIb5TX+KDe7wqinESh8S52eGne2nFuBw1/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dNuUYd3g; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47FDD1F000E9;
-	Sat, 20 Jun 2026 09:17:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781947064;
-	bh=3xX7OeBDIxD1X+S1oMgTF+KFAvOFKQhqFQZzenqeR+0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=dNuUYd3gYdhor2atPFx2bYBEV2qd4NcFITf9P/2v+Hzy9zTsbtm+OafL20kmvN3pV
-	 uiXI8J40DTIOLvylA2FLVJ0uR1Molh1Eqiu9Fy83DDVTZ3ccnQani5Qht4xjFRVuUh
-	 7J6OrjMEs0eqUSdDrg6Z6mVqvajIAJV9F5HMIDVrbCDTUxJDRcLhMD+RQqPLI9IYUR
-	 jOQWFUNKFT+9I7ov92rEii4Ywub0g45y7yaHPOjwDiEwzAeHrPOqo52aH4eE14Ch/j
-	 GS5qE5qC7wluHKKZMQb0siG4bnJqce3IGAXGapIZwQ5HeOmsvN8EczLa/dqSuALWO0
-	 +rPd+ZMPs5bxQ==
-From: Simon Horman <horms@kernel.org>
-To: dhowells@redhat.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	marc.dionne@auristor.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	jaltman@auristor.com,
-	stable@kernel.org
-Subject: Re: [PATCH net v2 07/10] rxrpc: Fix oob challenge leak in cleanup after notification failure
-Date: Sat, 20 Jun 2026 10:17:39 +0100
-Message-ID: <20260620091739.969563-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260618134802.2477777-8-dhowells@redhat.com>
-References: <20260618134802.2477777-8-dhowells@redhat.com>
+	s=arc-20240116; t=1781947763; c=relaxed/simple;
+	bh=5APvOQGjBXdDnIo4nhOU+JqLJI07zTuCW2waT0JM4lY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sAJhvgvLzAc8VZcuWK6w9zGuRdxbNIsOlSPfvZdrqmypUo15TPMMHug3p8tKvtEO7d49XGLKlBIbXUKCWDoR0f7YYMKzBSOxLBpHPr+OYzKXhH0OfQ5EBJB74Fmhcs37sF9epiyhl+GFQs7xso1QUtUXLwXTc0aZPvd6CMzs3ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZCRTghDU; arc=none smtp.client-ip=209.85.128.44
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so20715045e9.1
+        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 02:29:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781947760; x=1782552560; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3G7AUd5H2ycf67BaRCEhRwe9JqDuDQY8lDx0k8sMpCM=;
+        b=ZCRTghDUuZAPU1FrQTp7UbR0QkBJAbCzeenXF1xqpORz+jtn+HLfGUBWTYM2b44Vt3
+         u0+2GctwQkmdy0Gmk6Ou+6zSEg0dBi0VG6U3UfzAl4yGt2ThcP167lUtwmF/72sMrzpE
+         qtb4KeGHWCVmn+EMIMM1Fs/nx5IEbBcVzFxpB9lRANy8z8iQzUJa0QpHGKbn9e/KEJL9
+         lW9yvtoktEpIEcVJPzOxoVfiClrW6y0kGksLjjJm+MksdDT+zvCk8A1All7Wb13ObWkB
+         VZ2ZFkIlOd6l0YWU1gLqe06Jlj0XEWr7q3uWRfRX5/ncX3Sf3fEEVRfBr/Q2BHjr49qb
+         Nxow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781947760; x=1782552560;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3G7AUd5H2ycf67BaRCEhRwe9JqDuDQY8lDx0k8sMpCM=;
+        b=pIsdM4W/92QlYWuNNhPj5DxvUtJtTlx43whMgm7Mfg24dwUyIYUaZJdLVBWT6DaGU8
+         wIyNxyJQdLRlSMbWWizrRvAV3SaUx20iF9p+NDBdGb24P1LGb1EYzTWjzbemtFRoz0OZ
+         v7SHhtrjZYJ5kjOITh1YalHbSZReN/JaawxoevNhggx22RK7G3CkAqANvccGCnkVgs37
+         2q0YiZDYaNwhmjRm8YWhR0CV2kq9+mKa1kxkHFnsgH1X7KiElgR9J7eTuNrzKlCbY2rX
+         kWd7yUeunSyqs3aA3QSBgvb0Si0uBe+5vHWSH4hADme7uxv0UrMPQw4O8iHv5hWTnFjg
+         t2jQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/ooFR3TFSGNaWB/FVgM3SLaKGntmh9sA9xbe1+2bI8N2DeRFswV9fT+ILAXVa+w2P4ZU0IcSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKymbrehyyVE6U+0gj+08PnC+/4lvDNnBzlBB3qWMVTe+YBljP
+	RVVrD++4bvQkgW0G41jDTWwHotSopBrLPdAzsgU8BOWJkq+Sc+6IZMId
+X-Gm-Gg: AfdE7ckq8CISDuvn+RF3fbnFbDlU9uC6aMH4usuLYkWWi+gUa0DY7rdcNfkPLMvtlJO
+	nDeUxOnT58ZjYjpqdnwjWL91KkP9JVJPcPhFURLqq61z4NisR4x6OYCc7AFEAJIzKWFvWVEbtN9
+	OyLpWcZ3hMuDn3DggCKaRlUDolHCSkqxtHhkqw2cYHgOeO/8eQjTwwsB/73jRJ8oLBPecQbXl5r
+	yTzLGmjBoGj7AEPdfKwgk5tsR6pZgTanw0hA1jwxq0kQGxtJS0q6si5t8lOZUuJZyR3N4ojPPMF
+	aq8fBDt2gdj+YOiiI9o2LtnAIGyHgDT/fpJAxR4pLwASxqlBjxk5Dvawtmy4njbNn6aXhK56fmp
+	nNkIfvTndc6dej/OzpdBrIBk3zEh9KMWRTjU7uao0WKBunvF4zvadbymeQUSTlwoCTlGWeig3jA
+	XVFmM4WZORlVE3hV7Fy3PPkyvD2/wdAg8xUj6260/rStBdvnDZ31JgT7T/7NAJ
+X-Received: by 2002:a05:600c:45d5:b0:490:bb3e:30c2 with SMTP id 5b1f17b1804b1-4923f56c0bbmr114244515e9.18.1781947759946;
+        Sat, 20 Jun 2026 02:29:19 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-466667881bfsm6721948f8f.22.2026.06.20.02.29.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Jun 2026 02:29:19 -0700 (PDT)
+Date: Sat, 20 Jun 2026 10:29:18 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org, Samuel
+ Ortiz <sameo@linux.intel.com>, Christophe Ricard
+ <christophe.ricard@gmail.com>, linux-kernel@vger.kernel.org, Jianhao Xu
+ <jianhao.xu@seu.edu.cn>, stable@vger.kernel.org
+Subject: Re: [PATCH net] nfc: st-nci: use unaligned accessors for frame
+ length
+Message-ID: <20260620102918.7f3e0eb9@pumpkin>
+In-Reply-To: <20260620090536.1701282-1-runyu.xiao@seu.edu.cn>
+References: <20260620090536.1701282-1-runyu.xiao@seu.edu.cn>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-300790-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300789-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:jaltman@auristor.com,m:stable@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:runyu.xiao@seu.edu.cn,m:krzk@kernel.org,m:netdev@vger.kernel.org,m:sameo@linux.intel.com,m:christophe.ricard@gmail.com,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:stable@vger.kernel.org,m:christophericard@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,linux.intel.com,gmail.com,seu.edu.cn];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,seu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5ED166A8A90
+X-Rspamd-Queue-Id: 9A1576A8AC6
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-rxrpc: Fix oob challenge leak in cleanup after notification failure
+On Sat, 20 Jun 2026 17:05:36 +0800
+Runyu Xiao <runyu.xiao@seu.edu.cn> wrote:
 
-Fix rxrpc_notify_socket_oob() to return an indication of failure in the
-event that it failed to queue a packet and fix rxrpc_post_challenge() to
-clean up the connection ref in such an event.
+> The ST NCI I2C and SPI transports parse a frame length from bytes
+> received from the controller. Both paths first read the frame header into
+> a local u8 buffer and then cast buf + 2 to __be16 * before converting it
+> from big endian.
 
-Link: https://sashiko.dev/#/patchset/20260616155749.2125907-1-dhowells%40redhat.com
+Then align the local buffer.
 
-> diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-> index c96ca615b787c..611c790bc6d0c 100644
-> --- a/net/rxrpc/conn_event.c
-> +++ b/net/rxrpc/conn_event.c
-> @@ -436,7 +436,7 @@ static bool rxrpc_post_challenge(struct rxrpc_connection *conn,
->  	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
->  	struct rxrpc_call *call = NULL;
->  	struct rxrpc_sock *rx;
-> -	bool respond = false;
-> +	bool respond = false, queued = false;
+	David
 
-[Severity: Critical]
-This is a pre-existing issue, but can the lockless read of
-conn->channels[i].call in net/rxrpc/conn_event.c lead to a NULL pointer
-dereference?
-
-Looking at rxrpc_post_challenge(), the code does:
-
-    if (conn->channels[i].call) {
-        call = conn->channels[i].call;
-        rx = rcu_dereference(call->socket);
-
-Without READ_ONCE(), the compiler could issue two separate loads. If a
-concurrent thread clears the channel's call pointer after the if-check but
-before the assignment, call becomes NULL.
-
-Does this cause the subsequent rcu_dereference(call->socket) to panic by
-dereferencing NULL->socket?
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does taking a connection
-reference here in rxrpc_post_challenge() lead to a leak if the packet is
-later discarded due to connection abort or teardown?
-
-If rxrpc_process_event() in net/rxrpc/conn_event.c encounters 
-conn->state == RXRPC_CONN_ABORTED, it returns -ECONNABORTED early:
-
-    if (conn->state == RXRPC_CONN_ABORTED)
-        return -ECONNABORTED;
-
-This bypasses the cleanup, and the skb is consumed by
-rxrpc_do_process_connection() without dropping the sp->chall.conn reference.
-
-Similarly, during teardown, rxrpc_purge_queue() in net/rxrpc/skbuff.c
-consumes skbs via:
-
-    while ((skb = skb_dequeue((list))) != NULL) {
-        ...
-        consume_skb(skb);
-    }
-
-Since it doesn't inspect the cb scratch space, doesn't this permanently leak
-the connection references stored in sp->chall.conn?
-
-[ ... ]
-
->  	if (call)
-> -		rxrpc_notify_socket_oob(call, skb);
-> +		queued = rxrpc_notify_socket_oob(call, skb);
-
-[Severity: High]
-This is a pre-existing issue, but does failing to set skb->mark to
-RXRPC_OOB_CHALLENGE here in rxrpc_post_challenge() break OOB challenge
-processing?
-
-The skb->mark remains RXRPC_SKB_MARK_PACKET as set during ingress.
-When the application attempts to respond via rxrpc_respond_to_oob() or read
-via rxrpc_recvmsg_oob(), won't the operation fail with -EPROTO because it
-expects skb->mark == RXRPC_OOB_CHALLENGE?
-
-Additionally, when the OOB message is freed via rxrpc_kernel_free_oob(),
-doesn't the switch statement on oob->mark fail to match, bypassing
-rxrpc_put_connection() and leaking the connection reference stored in
-sp->chall.conn?
-
->  	rcu_read_unlock();
-> +	if (call && !queued) {
-> +		rxrpc_put_connection(conn, rxrpc_conn_put_challenge_input);
-> +		sp->chall.conn = NULL;
-> +		return false;
-> +	}
+> 
+> These are transport byte buffers, not __be16 objects. Use
+> get_unaligned_be16() for the NCI frame length field in both the I2C and
+> SPI transports.
+> 
+> This issue was detected by our static analysis tool and confirmed by
+> manual audit. A focused UBSAN alignment validation kept the original
+> access shape, be16_to_cpu(*(__be16 *)(buf + 2)), and ran it on an NCI
+> frame byte buffer with buf + 2 at an odd address. UBSAN reported a
+> misaligned-access load of type '__be16', and the trace contained
+> st_nci_i2c_read().
+> 
+> The driver has the same source-level issue: the transport helpers fill
+> u8 buffers, and the length checks only prove that the bytes are present.
+> They do not establish a __be16 object at buf + 2 or a 2-byte alignment
+> guarantee before the typed load.
+> 
+> Fixes: ed06aeefdac3 ("nfc: st-nci: Rename st21nfcb to st-nci")
+> Fixes: 2bc4d4f8c8f3 ("nfc: st-nci: Add spi phy support for st21nfcb")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+> ---
+>  drivers/nfc/st-nci/i2c.c | 3 ++-
+>  drivers/nfc/st-nci/spi.c | 3 ++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nfc/st-nci/i2c.c b/drivers/nfc/st-nci/i2c.c
+> index 9ae839a6f5cc..29fdb4ae56e0 100644
+> --- a/drivers/nfc/st-nci/i2c.c
+> +++ b/drivers/nfc/st-nci/i2c.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/delay.h>
+>  #include <linux/nfc.h>
+>  #include <linux/of.h>
+> +#include <linux/unaligned.h>
 >  
->  	if (!call)
->  		rxrpc_post_packet_to_conn(conn, skb);
-> diff --git a/net/rxrpc/oob.c b/net/rxrpc/oob.c
-> index 3318c8bd82ad5..c80ee2487d094 100644
-> --- a/net/rxrpc/oob.c
-> +++ b/net/rxrpc/oob.c
+>  #include "st-nci.h"
+>  
+> @@ -120,7 +121,7 @@ static int st_nci_i2c_read(struct st_nci_i2c_phy *phy,
+>  	if (r != ST_NCI_I2C_MIN_SIZE)
+>  		return -EREMOTEIO;
+>  
+> -	len = be16_to_cpu(*(__be16 *) (buf + 2));
+> +	len = get_unaligned_be16(buf + 2);
+>  	if (len > ST_NCI_I2C_MAX_SIZE) {
+>  		nfc_err(&client->dev, "invalid frame len\n");
+>  		return -EBADMSG;
+> diff --git a/drivers/nfc/st-nci/spi.c b/drivers/nfc/st-nci/spi.c
+> index 169eacc0a32a..1326c20e43fc 100644
+> --- a/drivers/nfc/st-nci/spi.c
+> +++ b/drivers/nfc/st-nci/spi.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/delay.h>
+>  #include <linux/nfc.h>
+>  #include <linux/of.h>
+> +#include <linux/unaligned.h>
+>  #include <net/nfc/nci.h>
+>  
+>  #include "st-nci.h"
+> @@ -130,7 +131,7 @@ static int st_nci_spi_read(struct st_nci_spi_phy *phy,
+>  	if (r < 0)
+>  		return -EREMOTEIO;
+>  
+> -	len = be16_to_cpu(*(__be16 *) (buf + 2));
+> +	len = get_unaligned_be16(buf + 2);
+>  	if (len > ST_NCI_SPI_MAX_SIZE) {
+>  		nfc_err(&dev->dev, "invalid frame len\n");
+>  		phy->ndlc->hard_fault = 1;
 
-[ ... ]
-
-> @@ -49,6 +50,7 @@ void rxrpc_notify_socket_oob(struct rxrpc_call *call, struct sk_buff *skb)
->  			skb->skb_mstamp_ns = rx->oob_id_counter++;
->  			rxrpc_get_skb(skb, rxrpc_skb_get_post_oob);
->  			skb_queue_tail(&rx->recvmsg_oobq, skb);
-> +			queued = true;
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does unbounded queuing of
-challenge packets onto recvmsg_oobq risk a kernel OOM?
-
-In net/rxrpc/oob.c, rxrpc_notify_socket_oob() uses skb_queue_tail() without
-checking memory limits (like sk_rmem_alloc vs sk_rcvbuf) or restricting the
-total number of challenges.
-
-Since rxrpc_encap_rcv() intercepts these packets before standard UDP memory
-accounting occurs, could a remote attacker flood the host with valid
-CHALLENGE packets?
-
-If the application is slow to process them or ignores them, will these
-accumulate infinitely in recvmsg_oobq and cause a Denial of Service?
 
