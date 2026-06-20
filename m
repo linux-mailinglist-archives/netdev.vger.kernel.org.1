@@ -1,167 +1,173 @@
-Return-Path: <netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WyPVA1m4Nmo9DwcAu9opvQ
-	(envelope-from <netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:57:13 +0200
+	id EJltCZy4NmpWDwcAu9opvQ
+	(envelope-from <netdev+bounces-300829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:58:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C9516A92C4
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:57:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B60F6A92DC
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 17:58:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=HDjo1vgq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300828-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="j6dgkj m";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300829-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300829-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A25E7301980B
-	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:54:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 963373009FBA
+	for <lists+netdev@lfdr.de>; Sat, 20 Jun 2026 15:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7E9399374;
-	Sat, 20 Jun 2026 15:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE1B37BE96;
+	Sat, 20 Jun 2026 15:56:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04693438A8
-	for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 15:54:38 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781970879; cv=pass; b=kLFkvTg2dEubALgfbWnIHjNaMHGOV2DyW4w7u7Z2OFRjMNcmVfy2JOUeyyPav58eY/ZnmFD44qe+RMhEVsg9P+ggD4Uv21hQDIn+EHJjGCY8eqjuJ5IRqVTsrnOmNEWbQQoonc1WUxAwK9ulZ4Nms1aAsB2J3tJnTaw1ktdrgeM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781970879; c=relaxed/simple;
-	bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AJ9+ZsssSAKw/CyBWE4bOKnAbiTle5NN7P1xKwUwZyWqUC1Qqwktz+cZdJx8EcMygYfOTgv3CpUQdOK+uNEQXq8NAQ2cQCL9AN6EY7w+BrpNIJ7+2lOzKzfXBMBSqWHpIyRbF2qbav9fvmQB4N9FzmUZhLOE28LNAxisrZITd24=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=HDjo1vgq; arc=pass smtp.client-ip=74.125.224.54
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-662bb4dc1d6so3417753d50.1
-        for <netdev@vger.kernel.org>; Sat, 20 Jun 2026 08:54:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781970878; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZNXaEmTmqw6BW3NEA1zxDO/4I9/q0fCQS1YTAF/eRcSBXtT8sp9z0JnhqeSj4m+SpE
-         lLFCQDFAQftIzb2BJyIydUGG3JGoecpudw6of6goeWmTjnvMCTGscI5q/3Hirro1tzBW
-         aY0QJCho7elq4C4ZAs1G0Rvo+JZeNjZtZguj7FcPhgFfJd3nbcCPWk2fUVmod4cBYWl+
-         5tldXs8YP3ESS4chofVzxEW2+IMoYxZg4W/xF8AKlCyY0hRbREk+F2hea7ygbalcgQgC
-         SlzGp1P27FxvVe+MkBeAE9SwUvvLg3DboVAqzoacrIT7991plmRhDvnRZKBM0k2/9huh
-         dRiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
-        fh=k3Uk8+ZUYdhIB3ZI7uWiB4hw7HG8WfPbBhKMAkRUC2I=;
-        b=DNRm7Ruh+o8bCZqeXbp22ZrH1qgRz6FrpzUwsCx+0XlK+UR2eATi9GsUdHkGTZHP6R
-         wa8rwSgy5vI6ZH00db45ee/QDcncq31Wdm2V0s0QF5Zr4KIkH3+N/Kd6P01edLFa/taQ
-         LgOu8u3rZ0H0w3EHOrx7C7LZakxMx5JSBxhdoKOzrD2+wLujS5f4Hp3SozI+XnMzUmAW
-         hloJB0QmXhxqPcCPxlpd/lcpBddNv2G/cXPMyEOv9UvrvMUFVWFMBcWeFRo2aUtthDRy
-         aHM7lEKOAKtysp8ZaHJ6CMFFWiyoYa8uZSn6MhK10m+pNO2pn2WWv+9ruO5ZRdrMtu6+
-         kesg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E68E39A4A4;
+	Sat, 20 Jun 2026 15:56:11 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781970976; cv=none; b=l3779hv5pEYQDGNaQVaMPbrEI02HZoHMUS0o9HAzX+VZTILpIWeYElks+YgU9rur0h1FkQvyVVuxaeJM/sYx/BMh9uh6+cNIv1ntK7a3KSDe4ojSPUcyDRZjxPAva9i5CRXdhhwxVm2hFGxqzd6AF/9Z30qq5RrXe2mD6d6I2gU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781970976; c=relaxed/simple;
+	bh=mREn7aMvhQtSFuMpN5QJnDkICANt9vZVAK6NJo0cBdk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=p6YoeesWzNE7CAW+IlSUNZEczHhqsFI6FhKchY2vGWPtJ16j/afQkCTseMz4RTTih/bwJD10dFZBBp3+E49XmnhtK+BQrYCR7pfFDF2tUsP0hWBZxVakmjRChb41DjvEolzwOXxC657qGkXioZTGcNM0NvLLLxireBs3tPo0MKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=j6dgkjmW; arc=none smtp.client-ip=209.97.182.222
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1781970878; x=1782575678; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
-        b=HDjo1vgqCyQyMY9iSSxQk9BAzcnk6t74x+hZGqpe2RZ1wS7sI7LqbzRFepmJPcGj/w
-         5BsnOVO/+Kg/0IWD+7iXOaEOPrWDHK6rQJS/s6lx7lAz2/XZ0PJXZKqjForf8A66Yhsy
-         CIpECxztFUM+HtYu/tDzzRMk2EWcU0vM+8tVw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781970878; x=1782575678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uR2dpDSOv9CIo+MDbzX0/F3NMgOJ01Uve4ugPph41ZU=;
-        b=LVK2lFzXYPxnF87igFcjE/F4GpEkz5Q8zB8U72bT341fNGY8I6b7Y+bVPCmy2Trbqy
-         GzoLFkWpA8Hc7bDP94LwlPeypxOattabXsYY21Z5rPST2t0XkpWb62Tx/KknqYgq5fAm
-         Rz59vZaCXV27lWXdo9vmdVN+STnpTEBxR/WV7S6ul+09qC8cJio6no2vBNImrFJfHlnl
-         dcw3EYRTDcnMPuxSDzobkNhvtXN/75RxAWHVF5HqmBrf3Y50PY5sKRf4aMyU0H5qwlET
-         82zzd3gXDyTW8Wg9N83a/xLSFwxw90eqXMogBT0+h9oc0ASnZq3+FRXXvjKugPYB7OKN
-         Qh0g==
-X-Forwarded-Encrypted: i=1; AHgh+RrzZn0GXO0nCA7bpEepwAUmis9YR1tAHGFRN8eh4PCOp9qQ1th9iEJJk9NqiAn4+4aySLTO3qQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyz/OHFEEHN3hgBsO/9KmRRWZyDy2/nHHrdSec+vofgA+KF3NsP
-	NPvn8Ngyra/O5TcbDt68OWaD+4LuP41CNxbZXjDdt0J/aqqcgqGr3tBSm76pVori2dkrQRyX9uK
-	98R9VNOSiWBQt3LwRLM4OMpaBMzAkrd3f8YbCX/WyRUXS1Y/vCtY=
-X-Gm-Gg: AfdE7cmqHYPYqFgl0sikGLQ+oieGHDVSiuTMEAriBEMB3blVnN9jn6k40xCQpv30LrI
-	K4cqC2K/3xl4ZBT2pJVmUpefeVvFgPOQTAYoy2iqWNdDyWXW/wrTvoUeZM7JWe3wvQRLQAbR7e+
-	flSiEGDNC53yWo3o7m1waGue+y+lrCcNvuUqzQDTkgbMs5CwXbzeTv8gGNaHWlU48CjFuwRxO9L
-	iIDZLlLT1tqaqzMLaU9sk7+LMbO4ZDC6gmemKxmKK84SkT7bKdHNYNDmmGssOuwmGJduAlvmkAQ
-	jFNjXMNIu2jQR1Cx/dFb0mwd/ek=
-X-Received: by 2002:a05:690e:120d:b0:660:5e32:b2a2 with SMTP id
- 956f58d0204a3-662fff62c0cmr7294649d50.49.1781970877733; Sat, 20 Jun 2026
- 08:54:37 -0700 (PDT)
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:Date:Subject:
+	MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
+	To:Cc; bh=NChoqlksllFYffaZiR5WyUkVWdR1IVof5odJETtw+70=; b=j6dgkj
+	mWMAnWAnWzURKCPhnQPWwzaFnQJqp7mrmHVHB1Pq3Ftb8Le1RMrMYIHrP9tISKES
+	qS1WGJwZOWRzTTDor4Tq8y5dXcFAhqqwKvcDRWvC2yCzUIcoG0F/tFZDK33/20V4
+	rik1m3COkbSrEg8YRKgeQtAfTvpL0ZCA5i8g0=
+Received: from [127.0.0.1] (unknown [101.6.30.195])
+	by web2 (Coremail) with SMTP id yQQGZQAX8JcHuDZqT9ptAg--.25215S2;
+	Sat, 20 Jun 2026 23:55:51 +0800 (CST)
+From: Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
+Date: Sat, 20 Jun 2026 23:55:51 +0800
+Subject: [PATCH net] seg6: validate SRH length before reading fixed fields
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260619151447.223640-1-b1n@b1n.io>
-In-Reply-To: <20260619151447.223640-1-b1n@b1n.io>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Sat, 20 Jun 2026 12:54:26 -0300
-X-Gm-Features: AVVi8CfVQ16Dt4Z149BETVATIkTE4DSBRfU8VpglrjahZRBgNf1eldVvT-bLElE
-Message-ID: <CA+NMeC8-_LzTU_e+MA0-p72-=-P0NozcuaORsYGpyjMuAj957g@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] net/sched: dualpi2: fix GSO backlog accounting
-To: Xingquan Liu <b1n@b1n.io>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, 
-	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260620-f01-17-seg6-srh-len-v1-1-36cbb29c12f1@mails.tsinghua.edu.cn>
+X-B4-Tracking: v=1; b=H4sIAAa4NmoC/yWMzQ6CMBAGX4Xs2U3aKgV9FeOBn6+wxFTTRUJCe
+ HerHGeSmY0USaB0KzZKWETlFTPYU0Hd2MQBLH1mcsZ54+2Vg7FsK1YMnjWN/ETkpi7Duby4Cqa
+ lXL4Tgqz/650iZnocUj/thG7+/Wjfv8dnB/98AAAA
+X-Change-ID: 20260619-f01-17-seg6-srh-len-a85f35427e0b
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781970953; l=1611;
+ i=gnq25@mails.tsinghua.edu.cn; s=20260605; h=from:subject:message-id;
+ bh=mREn7aMvhQtSFuMpN5QJnDkICANt9vZVAK6NJo0cBdk=;
+ b=QF7me+lqK7ri0//msrqYpBtXqOFI2RKAHhoGaT4z46WecpCPPzY5tumOHil9gW//BWc+BSgpX
+ nnLPFgzTMWmC+zncx18RwDCQNt1v9RmuLnkDbO8lqX3VEGD3rzlV/ff
+X-Developer-Key: i=gnq25@mails.tsinghua.edu.cn; a=ed25519;
+ pk=nqQ48fAxVTDp3z/IUmqv6BB+agXPpd8tQjDOBxwlgZo=
+X-CM-TRANSID:yQQGZQAX8JcHuDZqT9ptAg--.25215S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFy7ZryrJFy7JryxWF47XFb_yoW8WF1UpF
+	yrKw1xtFyUGrWIkF1Iya18t34Y9398WFy8XrnYvas2krn0qw1ktF48Kw1YgFZ0yrW0grsa
+	kay8tFZxZFyDZaDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9G1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l
+	84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcx
+	kEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x8ErcxFaVAv8VW8
+	Ww4UJr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6I
+	AqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xS
+	Y4AK67AK6ryrMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_GrWkJr1UJwCFx2
+	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
+	6r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
+	AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8I
+	cIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r
+	4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VU8EAp5UUUUU==
+X-CM-SenderInfo: xjqtjko6pdxz3vow2x5qjk3toohg3hdfq/1tbiAQIEA2o1wTCydAAGsq
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:b1n@b1n.io,m:jhs@mojatatu.com,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:chia-yu.chang@nokia-bell-labs.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrea.mayer@uniroma2.it,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gnq25@mails.tsinghua.edu.cn,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[gnq25@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-300829-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-300828-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:from_mime,b1n.io:email,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gnq25@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime,tsinghua.edu.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C9516A92C4
+X-Rspamd-Queue-Id: 7B60F6A92DC
 
-On Fri, Jun 19, 2026 at 12:15=E2=80=AFPM Xingquan Liu <b1n@b1n.io> wrote:
->
-> When DualPI2 splits a GSO skb into N segments, it propagates N
-> additional packets to its parent before returning NET_XMIT_SUCCESS.
-> The parent then accounts for the original skb once more, leaving its
-> qlen one larger than the number of packets actually queued.
->
-> With QFQ as the parent, after all real packets are dequeued, QFQ still
-> has a non-zero qlen while its in-service aggregate has no active
-> classes. qfq_choose_next_agg() returns NULL and qfq_dequeue() passes
-> the result to qfq_peek_skb(), causing a NULL pointer dereference.
->
-> Follow the same pattern used by tbf_segment() and taprio: count only
-> successfully queued segments, propagate the difference between the
-> original skb and those segments, and return NET_XMIT_SUCCESS whenever
-> at least one segment was queued.
->
-> Fixes: 8f9516daedd6 ("sched: Add enqueue/dequeue of dualpi2 qdisc")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Xingquan Liu <b1n@b1n.io>
+seg6_validate_srh() reads fixed SRH fields such as srh->type and
+srh->hdrlen before checking that the supplied length covers the fixed
+struct ipv6_sr_hdr fields.  Callers that pass a length smaller than
+sizeof(struct ipv6_sr_hdr) therefore expose those reads to memory
+outside the validated range.
 
-Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+The BPF SEG6 encap path (bpf_lwt_push_encap() -> bpf_push_seg6_encap())
+is one such caller: it forwards a BPF program-supplied pointer and
+length straight to seg6_validate_srh() with no minimum-size guard, so a
+2-byte SEG6 encap header lets the validator read srh->type at offset 2
+beyond the caller-supplied buffer.
+
+Reject lengths shorter than the fixed SRH at the top of
+seg6_validate_srh(), before any field is read.  This fixes the BPF helper
+path and hardens the common validator for any other caller that reaches it
+with a too-short SRH.
+
+Fixes: fe94cc290f53 ("bpf: Add IPv6 Segment Routing helpers")
+Signed-off-by: Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
+---
+ net/ipv6/seg6.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
+index 1c3ad25700c4c..d2cb32a1058af 100644
+--- a/net/ipv6/seg6.c
++++ b/net/ipv6/seg6.c
+@@ -29,6 +29,9 @@ bool seg6_validate_srh(struct ipv6_sr_hdr *srh, int len, bool reduced)
+ 	int max_last_entry;
+ 	int trailing;
+ 
++	if (len < (int)sizeof(*srh))
++		return false;
++
+ 	if (srh->type != IPV6_SRCRT_TYPE_4)
+ 		return false;
+ 
+
+---
+base-commit: 96e7f9122aae0ed000ee321f324b812a447906d9
+change-id: 20260619-f01-17-seg6-srh-len-a85f35427e0b
+
+Best regards,
+--  
+Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
+
 
