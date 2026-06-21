@@ -1,457 +1,266 @@
-Return-Path: <netdev+bounces-300880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300881-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id s2c6GdTfN2ojVAcAu9opvQ
-	(envelope-from <netdev+bounces-300880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 14:57:56 +0200
+	id lVCfGrrlN2pgVQcAu9opvQ
+	(envelope-from <netdev+bounces-300881-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 15:23:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9ED86AAC8C
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 14:57:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BCBB6AAE00
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 15:23:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=eW+4ekZt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300880-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300880-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=GXEKbyl2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300881-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300881-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF8C930099A5
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:57:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 40628300574F
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 13:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC728366074;
-	Sun, 21 Jun 2026 12:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440593D994;
+	Sun, 21 Jun 2026 13:23:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266953655C2
-	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 12:57:49 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782046671; cv=none; b=PLzLOUvUhZN+CsdJY4TEgrXYBDvXuxBLtfXV+dlWaIV4O9/joUvkT+1DRMOidX11G69wBFXZX9IP2czmvk2S0YSzWE1PfhZHzdKok9wj+D0d5gla98N71Fa2tO21OkbZlIH+VezKAxrKQbjq5x5KZkI4utxGIsgc6dXc+uVgiSk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782046671; c=relaxed/simple;
-	bh=DTx1JGjHiJOA7xSL0FFkS6DTE6JfRpUgcHjQWBQeKkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JV7Z0lFy8pA5C2CPf7af6Le6oFVVmrMZ2IriX//UBeAvBnIUQt5PM0UsIKOhFvilp4R22nd12ciNWswSrwWBgToQHazOg6Oni0nR1LvUtx6BRhw45yjmlxjkGW+MVlwEH+mmYlAVoFsk6HXAJrzzMiqCiBkxD72/XZvzZbQV/c0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eW+4ekZt; arc=none smtp.client-ip=209.85.128.49
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490b613a17bso27785005e9.3
-        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 05:57:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782046668; x=1782651468; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xTfFX8AhgJIDIIDkQTTlRUQxHBspdzZ+v0whf6RTaaw=;
-        b=eW+4ekZt/nQYF1udvteXmiylNHsxIW2AUY2fSAy4bWmxUNMNupSBnlszar2li8Swd0
-         ktOhqo5pBRb5to2Keu6XeAGRsV5bGGFotb80LNgGpwRi4TPSg0lb/jMWYsohIUa06lzN
-         AeZCO35CEdXxVWmKh6GP2n5tJjIIY9VBm4I4/vK7mhNVCv4QdQgL9FZSeVLizXkCHlF4
-         UF8SsJ4X0Pi8BpyuftTY2j07OaF0TKEtnHuMkyKJwlCSjYy7ZTunqkMaZZKyyzDl//Ex
-         IiWL5GCqQFQw+rjkAMJ6HJNw/muC27MtmSzfUg1GJz/hGAQwTBZ7ofBHBm0T9PE5ZZCi
-         mjuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782046668; x=1782651468;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xTfFX8AhgJIDIIDkQTTlRUQxHBspdzZ+v0whf6RTaaw=;
-        b=pGUSy/QIVhfsn15mIlQQH1vei/eu8D5Fk5qLciclfjLJ5iR2gGYbMexa+NbHrPaHw+
-         yX6Kdl14PWc1VNcbvR8EoybXR5og179rd4SICFGx0d58CU1DkWS/RiD2jpE1RtJuyK0u
-         xd6/ZgpHukVPI54BfrLYgSNnjWwf60k6a4a9ozKlTDyOwwErYgQJE0IaNtTw9Q5InYwf
-         OAUIMVz+MUrnFGPLHJROOFyIG75ykEZA6WvQkZBW+Rfuw6RTsjDP0SrvpFTpjIkvWAHg
-         mda81dCNJRLIMHAHU3Bq1EZpT6dbrBoyYzUR5NGCIBXnjN5Qjdg54OKwHCoUCA/ffebd
-         E/Uw==
-X-Forwarded-Encrypted: i=1; AFNElJ/neSr9ufMXBHbLXtFH56lypi/ZHg+LrhZ46YH+9L9fueUKckj1F6H0AUmlmf7IzcF8XcqpPZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0GsqJXSxWerP/16M+q968G4kyusV4uPf+eLKpVKomeRGT1WdH
-	TBqPbgMoxtRqpftUg/yvmVG0W4ZUzcaCmEbsmagfO1ckiTjkedXSJgEn
-X-Gm-Gg: AfdE7cmtaJZoOJPQxaVgGiVROdTgZaa6IuObOn/oyRiqvY7E06szK3K5Ycr9OMhbB31
-	1iTKZi6twVpheI4R0c0SSilWVl62fbhfv2oq5KwuaUlGSCqmbJbkWfTc8CJxZ3uldUBFtKSPByv
-	yLBn1j0bO0LXKARZSo+CThW1b9J/S1BRi/8OWGDZmWh4FMWlVxzmh2W82SCpDzWmEd1diC2j948
-	idmNiYCxmPVZbSj3LgaPhRByKhbQ8se5WLsJYgt0gWJpU+fbfw57fXfuSHP+9FcqOLJYa1+QJoC
-	I40UxIh6uzaeIl2Vqb7oilGgG9vV+cMeNqhVA7LX+krZ6PT5AZfjGiwFczdT3SdhJVhqyQDhh86
-	nznBVZCWQnmbtuhCC/0olAzU0ozXdVwLctafqnJ/1atVJbE0de46IOyRvVyQG528gbuLMGqClzz
-	drtwz6UuBXIfcswiXTKbqOwmEbI1AOc2qh0f99M7SkWsPaW5anFQ==
-X-Received: by 2002:a05:600c:4694:b0:492:4717:59fb with SMTP id 5b1f17b1804b1-492490a77a4mr99978575e9.17.1782046668224;
-        Sun, 21 Jun 2026 05:57:48 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49245a69f81sm177754515e9.1.2026.06.21.05.57.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 05:57:47 -0700 (PDT)
-Date: Sun, 21 Jun 2026 13:57:46 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Alex Goltsev <sasha.goltsev777@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v2] net: add sock_open() with flags for socket creation
-Message-ID: <20260621135746.067a93be@pumpkin>
-In-Reply-To: <CAEKmD4K-v_srabQDJCfqaqA6vssk-Hg-mLHEdTsphTBLmQVjnw@mail.gmail.com>
-References: <CAEKmD4KSvAGWEod3h8mPKQ-UYhKqakxfakt4gXrsU8sWuAO77g@mail.gmail.com>
-	<CAEKmD4K-v_srabQDJCfqaqA6vssk-Hg-mLHEdTsphTBLmQVjnw@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78C14C6D
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 13:23:00 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782048183; cv=fail; b=c7wVMFMfGl9c8kmeqrznakLB7XmqMs1ABVZsAhvA8D9gdCU6JAOwHZDkr8XPxXhsc1yWKrTnkuthrnGcedjX7Ars/HBYZUSwVkt6YCcCjpwqdGBhlvLsnnsm0E5niwW2jBK1dIjKAPGDKRq23EVkWbTQRW7zOk0hH4Be1lUH4dA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782048183; c=relaxed/simple;
+	bh=vPatZRrD0dqBJzy1SWGWBRMNuEMPUVRQHLxTPVBgZiU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Em48qQGTG9xc/Z4JJsuu7qecAPKpmLZFnJHA5zW3O9wsukHIPm8r845gEWaEef0OrZ91ihKLaVa6vh5pMB7WrJiT/AA6Cl5F+O0+gsl8h0yPLLSc3Ota1gY+bqYReU7tcOHT93DUlfFVkUPnQ/iAYtBIk0BrXb1f6Yj05XQHYGc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GXEKbyl2; arc=fail smtp.client-ip=198.175.65.12
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782048180; x=1813584180;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vPatZRrD0dqBJzy1SWGWBRMNuEMPUVRQHLxTPVBgZiU=;
+  b=GXEKbyl2w1jOtnTvXb/LTWuSQTgj4feDVC5Z2LcjR1nDAkrwH9BR+G0x
+   aGp3wPl/HKvo+7DVpidMPg50FjEbk6KPmugNhIo5oOFPH/3RVYUkZQeV9
+   yKScsRScv1OjuW+SAtWxZityA7QiM6oxUKFf12/AG3gdVchAm8UKquagM
+   afNceabEOemISdwU/KFDRdqnwKNTN1/1elSPAOPfnNkxpc7q64yh6fS2H
+   Xg/mRuLHi2O2VfRZwhDvIR9vVb4pBgQDojsOuZ2CfrPP4Gnr/9FTa1x52
+   m+uEx1VdAW/UXokhK7YDDX9hL9i2fUeBcrJnbtVWlWEGN3hrequeyGFj1
+   A==;
+X-CSE-ConnectionGUID: ut8qD2/+T/OsHftE0xHZug==
+X-CSE-MsgGUID: P1ijlA7mR+aqMomcQE29fw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="94300997"
+X-IronPort-AV: E=Sophos;i="6.24,217,1774335600"; 
+   d="scan'208";a="94300997"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2026 06:23:00 -0700
+X-CSE-ConnectionGUID: tcgN6j5eT8CnkTmJZnsX3g==
+X-CSE-MsgGUID: LLxj0Vo+Tf6kSyEfXdWepA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,217,1774335600"; 
+   d="scan'208";a="246676638"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2026 06:23:00 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Sun, 21 Jun 2026 06:22:59 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Sun, 21 Jun 2026 06:22:59 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.9) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Sun, 21 Jun 2026 06:22:59 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U8nNCgE6oUPN74KQ8mGZezirveKcG0LlP071udrvVpo0HuAqwDeLkkXd301Bcngg3qGJIWEY+JlvAjvaZsfMD15wigFBCghK0X4d9ePvCeCrjGBspwKHY9NcEb67iG0JU4Rz/QSoNv/Z8D40Mmn5dqfRjmm82YbuuvUkWoqTHI96miJQfsxfechwbGTNP4E2h/23VHCfEqMj0+kaOakNIkdwlq7OJDPaTmHlMeEJwJnwdF34nlEQYY4NpbDADBpbSkerBb/ovLPlHyAAOfekbtS10ePYnoHT1CKV3+YIRtVe63q+8YvEYkHuQIW8iL12TxmUD+mgs7cY6nr8owPn8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qMlib/P1GJt52WwbiEIXOSNQN9+Ub88R7r2hFbv/6xo=;
+ b=wbADiyEQsH2OQ1uXp/7jDJB9PuX2yNyPdeIIyPqJsE2CFCFJevRE9Y75+MlmaoyoGD+va0V/fyWHxmkOvp5kU41I8K2FLHJSaM0JkxYRBNyowC97hFekfqDiFeTUMTXsA8v6smH6qH5c70oS2S2DirirDmSuHpxoCZFNJrWC/mEVGBQjR1AeU2ZEEY/ZTK0HKbARaJEfrRf1YPewuLNYq91VtCUf8TGSa4LzNAreWIQ3m3ekG1liuqgRYfOXinXA3OFx2YcmIXXsH4OJSqukI5K61qAptxvxQO3V7TDlQjcxHFSd58G+CGVlejYysWUHjZQEDO2UsVrsEU1NiQue4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS7PR11MB9498.namprd11.prod.outlook.com (2603:10b6:8:261::10)
+ by DS3PR11MB9645.namprd11.prod.outlook.com (2603:10b6:8:38c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Sun, 21 Jun
+ 2026 13:22:57 +0000
+Received: from DS7PR11MB9498.namprd11.prod.outlook.com
+ ([fe80::e3fc:2bca:409f:b925]) by DS7PR11MB9498.namprd11.prod.outlook.com
+ ([fe80::e3fc:2bca:409f:b925%5]) with mapi id 15.21.0139.018; Sun, 21 Jun 2026
+ 13:22:57 +0000
+Message-ID: <dce2391f-8e8d-4eeb-97e1-c7070f340d64@intel.com>
+Date: Sun, 21 Jun 2026 16:22:53 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] e1000e: Report link down after "Detected
+ Hardware Unit Hang" ?
+To: Andrew Lunn <andrew@lunn.ch>, Helge Deller <deller@gmx.de>, Helge Deller
+	<deller@kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>
+References: <ai8hmGQmXQu64Ld3@carbonx1>
+ <e78576e0-9b55-446f-9d10-da3b7aec9b31@lunn.ch>
+ <9d80ed59-5483-4c33-9d27-52fdf24aac6e@gmx.de>
+ <51828156-e859-44db-9926-c076796d0f75@intel.com>
+ <d86c0dd8-8bd8-495a-b750-2a0036fbbee4@lunn.ch>
+Content-Language: en-US
+From: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>
+In-Reply-To: <d86c0dd8-8bd8-495a-b750-2a0036fbbee4@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0012.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::16) To DS7PR11MB9498.namprd11.prod.outlook.com
+ (2603:10b6:8:261::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB9498:EE_|DS3PR11MB9645:EE_
+X-MS-Office365-Filtering-Correlation-Id: feb7f78f-1b6a-4043-7c86-08decf9835ac
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|376014|1800799024|366016|11063799006|56012099006|6133799003|4143699003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info: 8EOuU5CNJas940KGtYX/ZHlGQCGHdyng/wIH4fRCpN1wdgfORiKwl7bH4dju4Astj+8aqvEKYAH0qFcHL24gbIuK1WRBTm0edmLnX2lqJBDnnStj65KDI4mWLtHCM1ArarXTclInUy9t23IHQ98Deud3hlRm5HsIiG5HP7/vhhokTqjYfcsR+XbVfCQ9ljdZBwVCHZB9cXClDLR42SHHMMT6D91S2Ti77UTxFO8/lxOv0XPKLcjqV4iqetzbsLu1RS9aBrtLiqRJcWdhlF5Yg/IzpS61O9bZrvkmN+XHJP3tQ+nKpIZdsl6H9CxeWjLO4cw+toRPPpJXCZ6qRv9Q+7MnGCBgY+ufyKJPCNMQeyJ5pgvfnF+AhyBxbEiC/gru+orQj/JSbe/65AyZ3tBq2iSvLmSzPlJkx3PC7BTgpVb4/fGcqkvJcaRmqkAzKwTgMMmq5TRZZKvwBeoOVzXbHJXLB8QjIvZzyNnQB3pAn/0HzIcdSFx6MYJ8IbjRAWzCx7BXCSm5rBvfIFP+BE0HBxo+paaz/oFoDhK4o1uBy6tLMzburSvYPoZDSHPoslxmp5Dt1N5zZjfd9K/zdJcL5bGXhyj43KtNQlRNKibcz3otr5M/Ts6aWFfYnlce9OW5XnijW+koj6gwJtd+v0ctv+OVTuI62xTz7LOOtjoAKW8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB9498.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(366016)(11063799006)(56012099006)(6133799003)(4143699003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K095Qno2QTFVc3RURURFNnhDcE90TnBPc1R6dGE4K2JYNHozOFB1Qzhack04?=
+ =?utf-8?B?ejFmT3V0UGtnMG9XdlJMMkRXQlJyMzFYMUhVWk5JaHE5YXRCZEJuQWxYSFVu?=
+ =?utf-8?B?cFVIbkpxVGEzZFp6ZGsxb05FZVhQZmhGc0VtaEhMd3lYeVZ2NlFqVDl3SWVx?=
+ =?utf-8?B?Y29ueG1pU01BTmQwQlhJS1Ftdy8rQzlScTNqNThWUUtvVUsyQXRSNDd5eCts?=
+ =?utf-8?B?TE9FRWg4V1JmVDlUNmRWSGw1SEdsUmlmRVBzV1BXckYwazVFTzZsR24xYWxW?=
+ =?utf-8?B?U0o0QmxzNksvZC9GRzhWMjBKTUw2TVZCQk5KWTFnODcyZHA2VWpjWW04MjF1?=
+ =?utf-8?B?eEsxNndBYWNENzFHeGpvZXhBa3ZMbDBJbnBTTHM5dFJwUFNBcmdEdy9PSk1Z?=
+ =?utf-8?B?RWpJWUplV2FJdzZOcTJCR1lHZjBUMGhSOC9FcFhzMUNEZ2F6MlRid0FFdi90?=
+ =?utf-8?B?dUdab3R4WWFKcWVxZ0NyWis2TzFWYzN4UVEwaFVTK0oyUVoxUTNGNTloQUlw?=
+ =?utf-8?B?UXRwRDZzTk1NalE5NmswRzRXaTJoQktyeHIvNWxrL1JGMTRyclhrVzBCWHFu?=
+ =?utf-8?B?cU1paXRxNXNmM0lFUTJybHRpNWNtVzJRVHBpTVlvVlZLSGQ3NGlkcnEwZ08w?=
+ =?utf-8?B?UFBTZzg5eDVhZXM3a2lNem45MHJOa2YxNlRUUnBSNkNUaHhKSjE3YXNuYmpq?=
+ =?utf-8?B?azB2ZjFRc3MvYzY4SE01U2Zabm5jQ2JLS1ZrU2psMzdUQTF2K2dLQmRSSnYv?=
+ =?utf-8?B?bENjRE9RaDVhcjZSdkJKZTVRa3prM25CSUZlMTJUU0ovUEZ6U2RIMU9rZHNI?=
+ =?utf-8?B?Sm5TQVBqRE12QU5FNDgrN0RyQmc0ZGJaRUNLQUZ1TlN4dFA3MlZLdjVQNnNn?=
+ =?utf-8?B?YWR0RjR2MkJXRnpvLzVtc1oxTXpSMy9pbFlSMFpkT1BiazVmK0Q4NHNpM1dU?=
+ =?utf-8?B?eG0wSnlXTUFPQzlkOURQRlloNzA5U29qWjJjUytsa0hrVUNiWEpoTlF4YjIr?=
+ =?utf-8?B?dVhiYnVuUC9XVmpTMnphOEs2enZwbHhDcy9KbGpGaHliOEFRNitpQk10eHlF?=
+ =?utf-8?B?TUY5bzdUTVcyblRNU0toWk1hT0ROZ2QzT0Vjb3lGSjQySEl2VEpHb1M5TlU3?=
+ =?utf-8?B?UjVSbWVhVURQb0x4Tm1iYmhDZ0M5UVo3b1VTOEZYOFo0NlZjR1hYVG53WW91?=
+ =?utf-8?B?UjFhYWw3VmtTQzJDOUZhd1VndUtwUHlIM0IwNnFYam5zTkUvZFAxTkdTWmQv?=
+ =?utf-8?B?S3ZCMHdEWjhQOHJacGovQWVHc2JtRk9RM2YzUUpmL1VQZDBQNGRRRmZiRlN1?=
+ =?utf-8?B?K3dzdmpXN091WHFPYndLNHl1cUlLUjJzOGJoZWhpazJPT3hoVDI2c2RPWUZ6?=
+ =?utf-8?B?T25XclhSWEx3YUFHTzVLOGh4WU1jbUlOd1UvMDQ5T2laYjVBK1d2RE1Kd3pm?=
+ =?utf-8?B?NHEweDBFbkZHZW9QNDdTQnp5QXB3WCtLUy9YbW9peDgrZGliYU9aR0g3ZU1W?=
+ =?utf-8?B?MXRlNndYZDJxVldtbXNQdXRuOW8yTzgxMDI3MEpPSmQ0SUpSUk5PSEZMbG9I?=
+ =?utf-8?B?OENIeGJVZGZhYnJNTk1IbEloRlFYSkZkZXBNNkR0UllsNEVOOWt4RVRRby9K?=
+ =?utf-8?B?bHYzeldxclVZV1ZZSEFPVXByK0c4Zm9JaTkzVndqM3c4YVBZdklMVTZsOTB4?=
+ =?utf-8?B?ZzV1SlczSC9tUFlQODFRTjZlNWxPbXQwUjRVOExLVmc1U3gyWE83TkNxUmRU?=
+ =?utf-8?B?aEhORnVlQ0dzakh6RWJtUmxxNzJKaGJVR2FhRW1VbE1RNytWRXdVaXRNMzR2?=
+ =?utf-8?B?L3hOWUdZU0pjUXVDSHJBbzQ0TWtycVQvcWdOYTdXZXpzamhweEpzaWV5QXUx?=
+ =?utf-8?B?R1EzcURwOTFpeXJLSXRtZHgxdFZjN1ZEckdnYmNaSWl6am1FOFhFU0U5RHor?=
+ =?utf-8?B?elNUZUpGZkhpMys3VC9LN2VuWk9IblRLK1N0QjRxbm5DV2RhY2F3bXQ0djVD?=
+ =?utf-8?B?SndRVzdwOEZLdG4rMTZPS2FDK2ZTQ1BjY2FDL1ZjRWNJaWRhd00rbzQxbnZL?=
+ =?utf-8?B?cjlpUEFEK09IRW5NWUZhbHdUV0hNTUVrZEhQdEJ0K1FIcVdvQU9HKzJrcnlj?=
+ =?utf-8?B?ZmF5L3Q1SDM1TnBWNk9hdUlnMWFBTTBjSXFHNzlVcFFNZjRNMitUOU9kUG1i?=
+ =?utf-8?B?YW9teGtiOHg3bm92VUJxNXQxL3RrZUtRdGxUQ0NLb2RjcENUZFNlTzNBSW03?=
+ =?utf-8?B?RW9PRkJyWEw0TXRkLzIwNXBOelVhYXhJdWIvY1BHWEFXcW9iVVNGTmU5bkhl?=
+ =?utf-8?B?QTQvL045UzZVOTN3Ti9yWEVQQmlEMlUrT0xORGQ5Wno2OXdSS3V4QzFtZVBS?=
+ =?utf-8?Q?e1WKN8NgD6P545ek=3D?=
+X-Exchange-RoutingPolicyChecked: NK4EwFvS82kXxg67CDlU41cJq6vu6qjYB0fxEwyF5vDLiAF3sgtdbEcfsy/2Y/8WJAELy1aifi50fVlmRrQwpeRIQBKmCYGTYdYxSJBX4Zy1P+nmIWmAEXVSVp0Ugx+CTEkR2Nh5BQZKqqcJ0hWtwf6WdAKrgS/RLLhzxWF7Uzddz0cmATUWPQlsStucUQoE693NgB1dS/2eHpQ/ABhCfHq1zn7xrBJHefwk7jcTY3dGLsilEWxzoF1MAe6XjA9lAyL4o5dbNBIPjjOMshJDKePD4nPZTFRGMG5o/5jUNkuFVzd9zfC2o7eFK6gI/20H8cO/dNa/DwjTKVVZn42rPQ==
+X-MS-Exchange-CrossTenant-Network-Message-Id: feb7f78f-1b6a-4043-7c86-08decf9835ac
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB9498.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2026 13:22:57.7818
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FBYZNox03W9MvsFS47o1/CcUwzteqjWCwzqhvUehJ2Q70ib2UJsPwR303+cHs9yzFJ09yNMZ8WaqJU5tdJ8rIA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS3PR11MB9645
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-300881-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sasha.goltsev777@gmail.com,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:viro@zeniv.linux.org.uk,m:sashagoltsev777@gmail.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[dima.ruinskiy@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:deller@gmx.de,m:deller@kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,gmx.de,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300880-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,pumpkin:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dima.ruinskiy@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C9ED86AAC8C
+X-Rspamd-Queue-Id: 9BCBB6AAE00
 
-On Sun, 21 Jun 2026 14:05:40 +0300
-Alex Goltsev <sasha.goltsev777@gmail.com> wrote:
+On 17/06/2026 0:59, Andrew Lunn wrote:
+>> This does not seem like the right direction to me.
+>>
+>> The "Detected Hardware Unit Hang" print does not indicate that the interface
+>> is dead, but that the transmitter is stalled.
+>>
+>> This can be due to an unusually high load, or a HW fault / race condition
+>> with another component, etc.
+>>
+>> When a hang is detected, the transmitter is stopped with netif_stop_queue()
+>> and eventually ndo_tx_timeout triggers a full reset to the device, which in
+>> many cases recovers it from the hang.
+> 
+> Does a full reset cause the link to be negotiated again? If so, there
+> is no harm in setting the carrier down. If the reset is successful,
+> the carrier will be restored. However, if the reset does not recover
+> the system, does the carrier say down?
+> 
+>      Andrew
+> 
 
-> From a9316957e594708dfb4258ad968fe88666c9b736 Mon Sep 17 00:00:00 2001
-> From: 0-x-0-0 <sasha.goltsev777@gmail.com>
-> Date: Sun, 21 Jun 2026 13:24:29 +0300
-> Subject: [PATCH v2] net: add sock_open() with flags for socket creation
+The way it is written - a reset triggered by the Tx timeout path will go 
+through e1000e_reinit_locked(), which calls e1000e_down() followed by 
+e1000e_up().
 
-A) There is no info here.
-B) You've not said why this is of any use.
-C) It isn't a bug fix so would go into net-next
-D) net-next is closed.
+e1000e_down() calls netif_carrier_off() at the start, and e1000e_reset() 
+later. e1000e_up() triggers a link state recheck, which should restore 
+the carrier.
 
-	David
+So if everything works as it should, the change proposed here would be 
+both redundant and unnecessary. However, we have been getting reports of 
+these unrecoverable hangs from time-to-time, so I suspect things do not 
+always work as they should.
 
-> 
-> ---
-> Changes in V2:
-> - Replaced the use of plain integer constants for flags with proper
-> enums to improve readability and type safety.
-> - `sock_open` is intentionally left as a regular exported symbol rather
-> than being moved to a header as `static inline`. This is because it
-> dereferences `current->nsproxy->net_ns`, which would require pulling
-> in heavy headers like <linux/sched.h> and <linux/nsproxy.h> into the
-> already widely-used <linux/net.h>, causing unnecessary header bloat
-> and potential circular dependencies.
-> - Introduced two new creation flags for specialized use cases within
-> kernel modules:
-> 
-> * SOCK_CREATE_NOLSM: This flag allows a kernel module to bypass
-> LSM hooks during socket creation. This
-> enables a micro-optimization for kernel-internal sockets where
-> the security check is known *a priori* to be a no-op (e.g., for
-> specific configurations or high-performance paths).
-> This is safe because the API is restricted to in-kernel (LKM)
-> contexts only, and does not weaken the security boundary for
-> user-triggered socket creation.
-> 
-> * SOCK_CREATE_NOWARN: This flag suppresses the standard warning
-> messages on creation failure. This is useful for callers in the
-> kernel that probe for protocol support and handle the error
-> gracefully, without wanting to pollute the kernel log with
-> misleading warnings.
-> 
-> Signed-off-by: Alexander Goltsev <sasha.goltsev777@gmail.com>
-> ---
-> include/linux/net.h | 22 ++++++++
-> net/socket.c | 133 +++++++++++++++++++++++++++++++++++++-------
-> 2 files changed, 134 insertions(+), 21 deletions(-)
-> 
-> diff --git a/include/linux/net.h b/include/linux/net.h
-> index f268f395c..6367c00db 100644
-> --- a/include/linux/net.h
-> +++ b/include/linux/net.h
-> @@ -116,6 +116,22 @@ enum sock_shutdown_cmd {
-> SHUT_RDWR,
-> };
-> +/**
-> + * enum sock_create_flags - socket creation flags
-> + * @SOCK_CREATE_KERN: creates a kernel socket
-> + * @SOCK_CREATE_USER: creates a regular socket
-> + * @SOCK_CREATE_LITE: creates a lite socket
-> + * @SOCK_CREATE_NOLSM: disables LSM
-> + * @SOCK_CREATE_NOWARN: disables warning
-> + */
-> +enum sock_create_flags {
-> + SOCK_CREATE_KERN = BIT(0),
-> + SOCK_CREATE_USER = BIT(1),
-> + SOCK_CREATE_LITE = BIT(2),
-> + SOCK_CREATE_NOLSM = BIT(3),
-> + SOCK_CREATE_NOWARN = BIT(4),
-> +};
-> +
-> struct socket_wq {
-> /* Note: wait MUST be first field of socket_wq */
-> wait_queue_head_t wait;
-> @@ -275,6 +291,12 @@ void sock_unregister(int family);
-> bool sock_is_registered(int family);
-> int __sock_create(struct net *net, int family, int type, int proto,
-> struct socket **res, int kern);
-> +int __sock_create_flags(struct net *net, int family, int type, int protocol,
-> + struct socket **res, int kern, int flags);
-> +int __sock_create_lite_flags(int family, int type, int protocol,
-> + struct socket **res, int flags);
-> +int sock_open(struct net *net, int family,
-> + int type, int protocol, struct socket **res, int flags);
-> int sock_create(int family, int type, int proto, struct socket **res);
-> int sock_create_kern(struct net *net, int family, int type, int proto,
-> struct socket **res);
-> int sock_create_lite(int family, int type, int proto, struct socket **res);
-> diff --git a/net/socket.c b/net/socket.c
-> index 63c69a0fa..2359fd5bf 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -1425,26 +1425,28 @@ static long sock_ioctl(struct file *file,
-> unsigned cmd, unsigned long arg)
-> }
-> /**
-> - * sock_create_lite - creates a socket
-> + * __sock_create_lite_flags - creates a socket (with flags)
-> * @family: protocol family (AF_INET, ...)
-> * @type: communication type (SOCK_STREAM, ...)
-> * @protocol: protocol (0, ...)
-> * @res: new socket
-> + * @flags: defines socket creation flags
-> *
-> * Creates a new socket and assigns it to @res, passing through LSM.
-> * The new socket initialization is not complete, see kernel_accept().
-> * Returns 0 or an error. On failure @res is set to %NULL.
-> * This function internally uses GFP_KERNEL.
-> */
-> -
-> -int sock_create_lite(int family, int type, int protocol, struct socket **res)
-> +int __sock_create_lite_flags(int family, int type, int protocol,
-> struct socket **res, int flags)
-> {
-> int err;
-> struct socket *sock = NULL;
-> - err = security_socket_create(family, type, protocol, 1);
-> - if (err)
-> - goto out;
-> + if (!(flags & SOCK_CREATE_NOLSM)) {
-> + err = security_socket_create(family, type, protocol, 1);
-> + if (err)
-> + goto out;
-> + }
-> sock = sock_alloc();
-> if (!sock) {
-> @@ -1453,9 +1455,11 @@ int sock_create_lite(int family, int type, int
-> protocol, struct socket **res)
-> }
-> sock->type = type;
-> - err = security_socket_post_create(sock, family, type, protocol, 1);
-> - if (err)
-> - goto out_release;
-> + if (!(flags & SOCK_CREATE_NOLSM)) {
-> + err = security_socket_post_create(sock, family, type, protocol, 1);
-> + if (err)
-> + goto out_release;
-> + }
-> out:
-> *res = sock;
-> @@ -1465,6 +1469,25 @@ int sock_create_lite(int family, int type, int
-> protocol, struct socket **res)
-> sock = NULL;
-> goto out;
-> }
-> +EXPORT_SYMBOL(__sock_create_lite_flags);
-> +
-> +/**
-> + * sock_create_lite - creates a socket
-> + * @family: protocol family (AF_INET, ...)
-> + * @type: communication type (SOCK_STREAM, ...)
-> + * @protocol: protocol (0, ...)
-> + * @res: new socket
-> + *
-> + * Creates a new socket and assigns it to @res, passing through LSM.
-> + * The new socket initialization is not complete, see kernel_accept().
-> + * Returns 0 or an error. On failure @res is set to %NULL.
-> + * This function internally uses GFP_KERNEL.
-> + */
-> +
-> +int sock_create_lite(int family, int type, int protocol, struct socket **res)
-> +{
-> + return __sock_create_lite_flags(family, type, protocol, res, 0);
-> +}
-> EXPORT_SYMBOL(sock_create_lite);
-> /* No kernel lock held - perfect */
-> @@ -1563,22 +1586,23 @@ int sock_wake_async(struct socket_wq *wq, int
-> how, int band)
-> EXPORT_SYMBOL(sock_wake_async);
-> /**
-> - * __sock_create - creates a socket
-> + * __sock_create_flags - creates a socket (with flags)
-> * @net: net namespace
-> * @family: protocol family (AF_INET, ...)
-> * @type: communication type (SOCK_STREAM, ...)
-> * @protocol: protocol (0, ...)
-> * @res: new socket
-> * @kern: boolean for kernel space sockets
-> + * @flags: defines socket creation flags
-> *
-> * Creates a new socket and assigns it to @res, passing through LSM.
-> * Returns 0 or an error. On failure @res is set to %NULL. @kern must
-> * be set to true if the socket resides in kernel space.
-> * This function internally uses GFP_KERNEL.
-> */
-> -
-> -int __sock_create(struct net *net, int family, int type, int protocol,
-> - struct socket **res, int kern)
-> +int __sock_create_flags(struct net *net, int family,
-> + int type, int protocol, struct socket **res,
-> + int kern, int flags)
-> {
-> int err;
-> struct socket *sock;
-> @@ -1598,14 +1622,18 @@ int __sock_create(struct net *net, int family,
-> int type, int protocol,
-> deadlock in module load.
-> */
-> if (family == PF_INET && type == SOCK_PACKET) {
-> - pr_info_once("%s uses obsolete (PF_INET,SOCK_PACKET)\n",
-> + if (!(flags & SOCK_CREATE_NOWARN)) {
-> + pr_info_once("%s uses obsolete (PF_INET,SOCK_PACKET)\n",
-> current->comm);
-> + }
-> family = PF_PACKET;
-> }
-> - err = security_socket_create(family, type, protocol, kern);
-> - if (err)
-> - return err;
-> + if (!(flags & SOCK_CREATE_NOLSM)) {
-> + err = security_socket_create(family, type, protocol, kern);
-> + if (err)
-> + return err;
-> + }
-> /*
-> * Allocate the socket and allow the family to set things up. if
-> @@ -1614,7 +1642,8 @@ int __sock_create(struct net *net, int family,
-> int type, int protocol,
-> */
-> sock = sock_alloc();
-> if (!sock) {
-> - net_warn_ratelimited("socket: no more sockets\n");
-> + if (!(flags & SOCK_CREATE_NOWARN))
-> + net_warn_ratelimited("socket: no more sockets\n");
-> return -ENFILE; /* Not exactly a match, but its the
-> closest posix thing */
-> }
-> @@ -1671,9 +1700,12 @@ int __sock_create(struct net *net, int family,
-> int type, int protocol,
-> * module can have its refcnt decremented
-> */
-> module_put(pf->owner);
-> - err = security_socket_post_create(sock, family, type, protocol, kern);
-> - if (err)
-> - goto out_sock_release;
-> +
-> + if (!(flags & SOCK_CREATE_NOLSM)) {
-> + err = security_socket_post_create(sock, family, type, protocol, kern);
-> + if (err)
-> + goto out_sock_release;
-> + }
-> *res = sock;
-> return 0;
-> @@ -1691,6 +1723,28 @@ int __sock_create(struct net *net, int family,
-> int type, int protocol,
-> rcu_read_unlock();
-> goto out_sock_release;
-> }
-> +EXPORT_SYMBOL(__sock_create_flags);
-> +
-> +/**
-> + * __sock_create - creates a socket
-> + * @net: net namespace
-> + * @family: protocol family (AF_INET, ...)
-> + * @type: communication type (SOCK_STREAM, ...)
-> + * @protocol: protocol (0, ...)
-> + * @res: new socket
-> + * @kern: boolean for kernel space sockets
-> + *
-> + * Creates a new socket and assigns it to @res, passing through LSM.
-> + * Returns 0 or an error. On failure @res is set to %NULL. @kern must
-> + * be set to true if the socket resides in kernel space.
-> + * This function internally uses GFP_KERNEL.
-> + */
-> +
-> +int __sock_create(struct net *net, int family, int type, int protocol,
-> + struct socket **res, int kern)
-> +{
-> + return __sock_create_flags(net, family, type, protocol, res, kern, 0);
-> +}
-> EXPORT_SYMBOL(__sock_create);
-> /**
-> @@ -1710,6 +1764,43 @@ int sock_create(int family, int type, int
-> protocol, struct socket **res)
-> }
-> EXPORT_SYMBOL(sock_create);
-> +/**
-> + * sock_open - creates a socket (with flags)
-> + * @net: net namespace (may be NULL in non-SOCK_CREATE_KERN modes)
-> + * @family: protocol family (AF_INET, ...)
-> + * @type: communication type (SOCK_STREAM, ...)
-> + * @protocol: protocol (0, ...)
-> + * @res: new socket
-> + * @flags: socket creation flags
-> + *
-> + * Unified entry point for socket creation with flags.
-> + * Returns 0 or an error. This function internally uses GFP_KERNEL.
-> + */
-> +int sock_open(struct net *net, int family,
-> + int type, int protocol, struct socket **res,
-> + int flags)
-> +{
-> + int type_bits = flags & (SOCK_CREATE_KERN | SOCK_CREATE_USER |
-> SOCK_CREATE_LITE);
-> + int optional_flags = flags & ~(SOCK_CREATE_KERN | SOCK_CREATE_USER |
-> SOCK_CREATE_LITE);
-> +
-> + if (type_bits == 0 || (type_bits & (type_bits - 1)) != 0)
-> + return -EINVAL;
-> +
-> + if (optional_flags & ~(SOCK_CREATE_NOLSM | SOCK_CREATE_NOWARN))
-> + return -EINVAL;
-> +
-> + switch (type_bits) {
-> + case SOCK_CREATE_KERN: return __sock_create_flags(net, family, type, protocol,
-> + res, 1, optional_flags);
-> + case SOCK_CREATE_USER: return __sock_create_flags(current->nsproxy->net_ns,
-> + family, type, protocol, res, 0, optional_flags);
-> + case SOCK_CREATE_LITE: return __sock_create_lite_flags(family,
-> + type, protocol, res, optional_flags);
-> + default: return -EINVAL;
-> + }
-> +}
-> +EXPORT_SYMBOL(sock_open);
-> +
-> /**
-> * sock_create_kern - creates a socket (kernel space)
-> * @net: net namespace
+There is one issue under investigation at present, where a persistent 
+hang was reported following an aborted hibernation attempt. We are 
+testing a patch against it.
+
+I did not see anything in the original description of this report tying 
+the hang to a power state change, but I will happily share the patch 
+once we get preliminary positive results.
+
+--Dima
 
 
