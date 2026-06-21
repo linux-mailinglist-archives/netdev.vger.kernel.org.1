@@ -1,185 +1,164 @@
-Return-Path: <netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300875-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QlveEg63N2rLQAcAu9opvQ
-	(envelope-from <netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:03:58 +0200
+	id tpCSKq+3N2oLQQcAu9opvQ
+	(envelope-from <netdev+bounces-300875-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:06:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99C4D6AA903
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:03:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4DE6AA90B
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:06:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=m9y1pVFh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Msg25TWz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300875-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300875-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 050E4301691E
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 10:03:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91CDE300BD8A
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 10:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9230528BAB9;
-	Sun, 21 Jun 2026 10:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C6E26C385;
+	Sun, 21 Jun 2026 10:06:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8CC27280A
-	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 10:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6467B281525
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 10:06:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782036214; cv=none; b=ZEmJzE142OLjCYlVVbKPJC4oYvXqcE8YnsQZhcyPyPr4wutYxUHXKhT+njEalxoNNaYLVp4Re1owvAz0sypJaJ4gtf6YKhb0kiWXCe/8AjBb5RthKAfDLY1e7pmcL8/FQ9XwbezLmQoIumEjR+6KMP2vKG5zviHpCwIwiACDJaM=
+	t=1782036395; cv=none; b=RYPUrjc6CPI3nklMFkRWODQ28Uum3HxM1VxWG0wB72KQ/xD+8JttN/ncq97uGDaHfp/Z41fgqEh8JfRnO+0CBgvl8aBudCpxHQPM9t7tfWN5TSTFJWnUgOMnI2JliU8NXGMPeoIMYEL5BSuvRpAWnCRk5Rj8uVgDcfhzVa1M+i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782036214; c=relaxed/simple;
-	bh=6CEbWy33VQ653DeO6SgR9Jnu4uEbZ3wkIcMoSTq+82E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hPaCw9Z/0K5gJ53Ow71lJqxrmDU9uwMlWDnit60wfOYtotsY89GSqjLCQlkbHRpOmOQdK0Yaf/ioYXN+mLGCVIp9Ky6FlZ0tp7dki808u8HncBPf7bNY7kVwkusE10KvXZj9i37Tl7yVl/1pvXh8B6EitKFjK1Ao2C25Nf9Ql5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m9y1pVFh; arc=none smtp.client-ip=209.85.128.43
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490b3637b90so25793675e9.3
-        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 03:03:33 -0700 (PDT)
+	s=arc-20240116; t=1782036395; c=relaxed/simple;
+	bh=CUm3SfbpfNlkqEh8WWobdOtndg3TnSbH/Ikr/MnEhgo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 Content-Type:MIME-Version; b=Kq1yjHtisMwKdtcsZLg7snUTdfcOfH55P/QFQFAuomRteWW9+TcwnFHhVNtZF+mCGkrykqnjuoCvVqdEX6hVWrJVG6oeIERZzbStFHP8g68J4/JTuZT84r2erMbeFB0sWO3UjJwXg5UTPSGXGb0Z4AHI/Nl+hG5jHFesl99+lpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Msg25TWz; arc=none smtp.client-ip=209.85.128.47
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-49222b6e871so28865625e9.3
+        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 03:06:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782036212; x=1782641012; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kbaqv0SFZQJBjRBPKXCNne2CJMpBAx0iotepDfutYis=;
-        b=m9y1pVFhjR8wrSQXdpXVTXDcxpJA8iErIqV7s4nUXQqk4Al+Mi/midGC6BPkp7YXro
-         VgxXj2O2zRO+F0A7bdUhpIc8PxAY8A/UxUM12qSjW5FRuDUpV3+DWZ3hh4qZwhd9UNEO
-         cdKrgH1GDgoNrVs2dfGwPPxOUcOq+gtljFEhBV4eEbULI4usg5M1BbJZHrOuLYun7Jf9
-         MP2G6FA8oKq5QUGDKu3UHWegmpkRBTmfhjQGOwf3C8xU0euYMnvHchIP4zyZWG1QOeEN
-         3uEmKcAU1Dspx0rGXq8YEBs+kIKR7pyvmW6gSG7a0c/GX9XmwaaBXdarjqUcOYB0036o
-         xg4w==
+        d=gmail.com; s=20251104; t=1782036393; x=1782641193; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5Ft9pji/XjdaUg56iUWbgZ4zMhyWSHIT+R3/5oq6GRM=;
+        b=Msg25TWzOJeiIody7cW/bWQpJWtHJdAR7oBejdUxVKV0APiwQqAKfpqinL1acpluiO
+         gbz6bN3b/RO3NnNKHxHgbag1L5+rwq1oNlsDY6siXx5Sn3FHcgoDqySa3izVvu2nHYBW
+         OZuTw0d1w69xoXoTga6dwKgb8DhxUE+HwzcGfDq1yXVftHvIwHMKofXjclWX9aVSlOLy
+         ujlDnaZlA3C2BDREdEZq5r4nK+WBNoA5X3AX7N2vbG3q8Oj8UlzBn+S9TrqFHvC475UV
+         KdN1nRnLTojne+RfwiMAzHpNlwkb86GJ2mYI1jMYLQERk6G3Ij43tjSsYVfgGhbCI7pp
+         6UTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782036212; x=1782641012;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kbaqv0SFZQJBjRBPKXCNne2CJMpBAx0iotepDfutYis=;
-        b=O4w5niXnuxO6y7WVvbtL+hBxYBCMIXZt6IUBabC/K+m3HOEYTW6msbuzMeFxGDgDMv
-         t7ZAHHZ7vNT/tsuyBqQnP3g+q/0fy/cFGKeF7XrHBN9XaKqCq9pxp7xdN1luZGU0HBby
-         lcrVJQE6FfgWl5rjUekDKUTuxhmoZ1gNu9Ehqq/+QPc9xHJ3NnN5UC8jqRDgESWJL5av
-         cOSxAs9x3C/tyC2ShTDSHYipIu95g1vx84R2WaD3KlpntRO3DHqLcbyXZSxH9xNurApD
-         KFQhNxL2cTiX5IkwSHAo7mPpE6/wqYnyfePHduaYZLWqIt7Xx9yKXi0GgOVDvASvp6W+
-         q3NA==
-X-Gm-Message-State: AOJu0YzunFLlnD9OBC4fjNiLtEv/qGXhbZ21KJ0kt9I4ex1GG6rjDPON
-	QNoNiVapvE3vnQYQUpwhQvFHbx3r2SyEXY+e8yTu7vbgw08KA+FCLn6iE3fEDeTY
-X-Gm-Gg: AfdE7clkkFJuHrfN+ZF9VLqhsKEWmWMMk1yvDDIsgpebTEFsdBhIc1dkp+uZYl0/22t
-	t3C0Y65kORu1KQtnXU1gpVnBLTZW5xtwIyKM/Qd3pRNITcweb+AsRzL70SZGCK/Unsf/H3S72Sq
-	HH0r5IBdYHnUY1hnnxRCCguuA35Gk/JY1FYXlUBUmTgo0oYvP78SABxKOLINkXfNdpJ8MWyZmnE
-	EuSPIso/IIsUO+MlEQynmS6Tx/QRtfCepzzMIlZpWlXfKSHuTTKtUOreLpdwVgN1rqO84JdlEL7
-	WlGOFF1Llyiz5Hd1Pp5/i2FJyBT3pk4fRPR1p/cWI2x00sZ6FSe2eELioA3k60LyYjAbZEqvy16
-	zEhxiLoaKbzszcAP4xmvilTkw4JQNAiH7K64m/V7O4AdNzc7uAUukH8NukZDx4OLK1mhgElFWDD
-	S0FRlA33xrN0S+7vqXF4xHPD4/cF3UgJ7iVq6YeQVvYEveEcJ6MOCsAAysFkmHzEElLZseuDPdr
-	YHUZ5s=
-X-Received: by 2002:a05:600c:628f:b0:490:9804:afdc with SMTP id 5b1f17b1804b1-4923f56c067mr170228675e9.23.1782036211668;
-        Sun, 21 Jun 2026 03:03:31 -0700 (PDT)
-Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-466643f563dsm14400283f8f.3.2026.06.21.03.03.30
+        d=1e100.net; s=20251104; t=1782036393; x=1782641193;
+        h=mime-version:content-transfer-encoding:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5Ft9pji/XjdaUg56iUWbgZ4zMhyWSHIT+R3/5oq6GRM=;
+        b=OX3zHYazLRbwb6DwM4R4axkbmrPbwB7tsx9O4lNlKAnPUOHyVXpXZ4ZAXPaDN1e2xv
+         tfIPnq7u+mir6rOglMyPP+dmlkopzJLbwNc4v8v0InXZeVpnxQgb83+HCQ6VfeqtJ4fi
+         B9W7UFR9J8H9UDnqNM2q799hpqg9ZYUNBQp1jEOZ8LgTwkpRHJB82S0JcZuthP6M027b
+         ArxupMY5XyHbije6rg2J6zy0ukA3Nu/tKm8SWyfchKCUQzmR2eZ16M67UC0G2GEWiE5g
+         edWVMs4Ke7TFmc4+2mteXRfzp/46UjrW25ytwrr3HJmno9Wlm3O4cng8kC4bKC6OTKNx
+         4F5A==
+X-Gm-Message-State: AOJu0Yzzmoo2D+or2ZbOhLIV5J102mA3diS3cm+wnuwnhHtI1CMRlwKO
+	4vvpqDnn9lah70pPeKa64Y1GjV6k3UVm1kRuOjxG1wCdJ2GYvUaNWVNNe2z8Y7fF
+X-Gm-Gg: AfdE7ckOrdvU5V6kFLOTmRLrtgSkoJXCAPJgd812SAE5IaHTyaOBkQZMNaY00ErzIsM
+	Jc1/OxZuJG2h54bXE+a00n82qhRoNGHmplWmDU2LLE3VdcMnprRAbv3FpFR8cuXraQ4SeLM0FR8
+	zxDr3/y87sr+Fp4TzXsfbXPVdyXrKlGV3AMR2Ld1TDM087MvTulxCJKEEbtc510u+J20wJrBf1J
+	o62gM367TfHxucPc06W1ugoteprVwa0nGCwPO69TTx+VLvYVcGWYSS1y4K71ktI0VZm+CCdKuLj
+	kjvTOOoeu4xi/nxH8KvP/or+R/MrQvyLjhAKzz30qhqTKWZkOhJ2SzIiIlGjyToTihwEEJYugDg
+	zW+KjkPL3cmW0ZbfIr/5AXOaVL/goQ/PzQEe40wWQQbBe03DkZgsSL8wa2DuFKhIBwWynOJm4/A
+	sKkMXbt7BFInbjcQHonBiig1kstdBK4mKWL2W8CaShmW8jI9P4UafPtv+2FIsbSrNfXp3zcmD/
+X-Received: by 2002:a05:600c:1d29:b0:492:3fc4:bd6b with SMTP id 5b1f17b1804b1-49242314120mr149767185e9.7.1782036392791;
+        Sun, 21 Jun 2026 03:06:32 -0700 (PDT)
+Received: from Petrs-iMac.local (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46666788226sm15848988f8f.23.2026.06.21.03.06.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 03:03:31 -0700 (PDT)
+        Sun, 21 Jun 2026 03:06:32 -0700 (PDT)
 From: Petr Wozniak <petr.wozniak@gmail.com>
-To: netdev@vger.kernel.org
-Cc: sd@queasysnail.net,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	kuba@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	davem@davemloft.net,
-	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: [PATCH net v5 2/2] xfrm: fix stale skb->prev after async crypto steals a GSO segment
-Date: Sun, 21 Jun 2026 12:03:27 +0200
-Message-ID: <20260621100327.40203-3-petr.wozniak@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260621100327.40203-1-petr.wozniak@gmail.com>
+To: netdev@vger.kernel.org, sd@queasysnail.net
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, kuba@kernel.org,
+ horms@kernel.org, pabeni@redhat.com, edumazet@google.com, davem@davemloft.net
+Subject:
+ Re: [PATCH net v4] xfrm: propagate -EINPROGRESS from validate_xmit_xfrm()
+In-Reply-To: <20260603064659.3867-1-petr.wozniak@gmail.com>
 References: <20260603064659.3867-1-petr.wozniak@gmail.com>
- <20260621100327.40203-1-petr.wozniak@gmail.com>
+Date: Sun, 21 Jun 2026 12:06:31 +0200
+Message-ID: <178203639130.40316.5573016895988206218@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[queasysnail.net,secunet.com,gondor.apana.org.au,kernel.org,redhat.com,google.com,davemloft.net,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300874-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:kuba@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:petr.wozniak@gmail.com,m:petrwozniak@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300875-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:kuba@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 99C4D6AA903
+X-Rspamd-Queue-Id: EB4DE6AA90B
 
-skb_gso_segment() leaves the segment list head with ->prev pointing at
-the last segment, an invariant validate_xmit_skb_list() relies on when
-it sets its tail pointer (tail = skb->prev).
+Reposting on the list, as you asked.
 
-When validate_xmit_xfrm() walks a GSO list and some segments are stolen
-by async crypto (->xmit() returns -EINPROGRESS), those segments are
-unlinked from the list but the head ->prev is never updated.  If the
-last segment is the one stolen, the returned head still has ->prev
-pointing at it, even though it is now owned by the crypto engine and may
-be freed.  validate_xmit_skb_list() later does tail->next = skb, writing
-through that stale pointer -- a use-after-free.
+Apologies for missing your comment about the 2nd x->type_offload->xmit()
+call across several versions -- entirely my fault.
 
-Repoint skb->prev at the last retained segment before returning.
+You're right: in the skb_list_walk_safe() loop, if all GSO segments
+return -EINPROGRESS, skb is advanced to NULL and the function returns
+NULL instead of ERR_PTR(-EINPROGRESS).  v5 1/2 fixes it:
 
-Fixes: f53c723902d1 ("net: Add asynchronous callbacks for xfrm on layer 2.")
-Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
----
- net/xfrm/xfrm_device.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+	-	return skb;
+	+	return skb ? skb : ERR_PTR(-EINPROGRESS);
 
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 19c77f09acc9..aec1e1184a71 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -224,6 +224,14 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
- 		pskb = skb2;
- 	}
- 
-+	/* skb_gso_segment() set skb->prev to the last segment, but async
-+	 * crypto may have stolen it above without updating ->prev.  Repoint
-+	 * it at the last retained segment so validate_xmit_skb_list() does
-+	 * not chain onto a segment now owned by the crypto engine.
-+	 */
-+	if (skb)
-+		skb->prev = pskb;
-+
- 	return skb ? skb : ERR_PTR(-EINPROGRESS);
- }
- EXPORT_SYMBOL_GPL(validate_xmit_xfrm);
--- 
-2.51.0
+At that point NULL can only mean all segments were stolen -- the error
+path (err != -EINPROGRESS) returns NULL directly from inside the loop.
 
+v5 1/2 also restores the blank line in validate_xmit_skb_list() and adds
+the missing maintainers to Cc.
+
+For the use-after-free I mentioned: I confirmed it.  validate_xmit_xfrm()
+unlinks async-stolen segments but never updates the list head ->prev, so
+when the last segment is stolen, validate_xmit_skb_list() chains onto it
+via tail->next.  v5 2/2 fixes it by repointing skb->prev at the last
+retained segment.  As you suggested, the two fixes go as a series.
+
+I could not confirm the head-list leak on a closer look, so I left it
+out; I'll send a separate patch if I find it.
+
+The v5 series has been sent.
+
+Thanks,
+Petr
 
