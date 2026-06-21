@@ -1,125 +1,176 @@
-Return-Path: <netdev+bounces-300882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jyKtGInuN2oJVwcAu9opvQ
-	(envelope-from <netdev+bounces-300882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 16:00:41 +0200
+	id vEleEmsBOGoRXAcAu9opvQ
+	(envelope-from <netdev+bounces-300883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 17:21:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6F196AB056
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 16:00:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BDF36AB2A0
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 17:21:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=NoKc6DJN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300882-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300882-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=dOcAFIjZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300883-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300883-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BE9F3023F85
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 13:59:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DCEE300D30A
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 15:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922AA368D6D;
-	Sun, 21 Jun 2026 13:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66FB23FC41;
+	Sun, 21 Jun 2026 15:21:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C79B367F4A;
-	Sun, 21 Jun 2026 13:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B86244692
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 15:21:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782050392; cv=none; b=J7TRBFSOeI+/h9mdaB0NWwRbGQY3yD0QCj3hdRYvQIZ/Vld/SRULgsoCj5DA1PsqtYn8joxX8E735Q+/ess+kC94hvB1S5Kl5iaJIq8U+68lEBfTcqyXVXPTVc3J9gNjcVuBuswQeHVA9jZEE7FEeDC7R4mKZOpkAxr7CGZIdC8=
+	t=1782055271; cv=none; b=keYQb1CghqXw6Ws5z4jn3MZSRDNdu03+q/wUBRx3fd59V4ZDRmON7CzdybePa7A6r0+fkUZFieoHDwSkEInVy1Qgrp6o3W9OAHTf4h/vQlYNAPqqrEEXlKVzeWEphmD9G/9o1wS+SE7sLkI8uG32BbiiFjomwEjrYKlB9XusfLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782050392; c=relaxed/simple;
-	bh=kH/kGCqefwSe47atd5O5sa9mZkV0xFM8OlsdojUVE9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZ7NNC8UhkIosgbn3n8OJPci6O/iPQP8GEhW7zOuCQDeqmvbmAvqKCQoJSYQEsxcu/ELl/TxwjHdNK9svag5YV7/O04n6mB+RfmJ6C7i9vzL9iPUpP0MEeWY2NZEDH5borKMQRub+vj//5wvbIsCTryS7udPG2VjIZtu7I8sSX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NoKc6DJN; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9kh0Ruqth9Ny9QfjccDd8uZuGtEiQrI7payt1+r06vY=; b=NoKc6DJNtSPtbjX+7vWnRdibZr
-	hvh1e2TfCkrG/nJGrWIOKfqn4NSWPPfUmqmVRsCm779cGV4/rxU/VEqOksEtsxwxWVFrFdmT6wcNx
-	WfBtk+xtKAJFbuO7tf7mS0gLo8/u0wRA6fkOqU31Wn+vPq9ka2HqoAbjb29Cy+XtWbcQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wbIhu-008ifL-J5; Sun, 21 Jun 2026 15:59:30 +0200
-Date: Sun, 21 Jun 2026 15:59:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Alex Goltsev <sasha.goltsev777@gmail.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v2] net: add sock_open() with flags for socket creation
-Message-ID: <b057ea36-9810-40c1-9154-859eb9e0da5e@lunn.ch>
-References: <CAEKmD4KSvAGWEod3h8mPKQ-UYhKqakxfakt4gXrsU8sWuAO77g@mail.gmail.com>
- <CAEKmD4K-v_srabQDJCfqaqA6vssk-Hg-mLHEdTsphTBLmQVjnw@mail.gmail.com>
- <20260621135746.067a93be@pumpkin>
+	s=arc-20240116; t=1782055271; c=relaxed/simple;
+	bh=V6bJc2kKXX5RxIaafBtpZR7kWXGPc0bhlLETGpoTTV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CJeM5wz/sbUxMpcNvAuxLt7/FWXhx++k6QC2YJ46Q+jhxJyH791YHicIL6b/NN9+I7bQhvUiwWWU0Sex2WEk2kCbSnDOwfVpS81C80KAhj46ekcAcovyHaEU3srEA0L0iOnLhAlXA0IsSn5kDtbXNw/CPoRC7hcsnCjJaSVzRZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=dOcAFIjZ; arc=none smtp.client-ip=74.125.82.174
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-3078e0dcd67so3921027eec.0
+        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 08:21:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1782055269; x=1782660069; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C61TURbcQyA/q/iVOI2U9fMYP3vw9DJBaLH5sK2OR6o=;
+        b=dOcAFIjZFsD5OfctnYNRmt3ACaZvT2AXdrJLUqiECSzZfh0QGp5Qs2fJF5KvP335J1
+         GUy/ROJyaFW3meLRFfsCis8gylyUbXCkvNWEEMGqGwZPHR/JUP0jnH/rlTG49W2PnLQr
+         G6LK7l+sHYsUHr5Q4yeyyaZvd+74R4DLZAJ4KohuEOcJ1KD1bX9DeaRjCwdfY3YzyTsq
+         tWj99/VHsvglZC7b8ZVQQD703+uhOcvLClBl9NXjdSkig+12wx4kNEjZzF9sZyIe+Qox
+         1TK8zXvQkiCx8/TLH6lKUcTYJJEtf5q05xvTUAj0uX/2+mX+p8JW+jikxAnJy3BEtj6D
+         pv2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782055269; x=1782660069;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=C61TURbcQyA/q/iVOI2U9fMYP3vw9DJBaLH5sK2OR6o=;
+        b=c86wuyB9HiSpu+MlJGbKb14SXdaIa7X93d8Kvom3RqbKO/toVV4prLI7OWkQroktL/
+         qRRHMwHa5o/Xxx81P+eA5uMURaZ+fbux/fm4ZmAYCbY7DhIEXeR+3ImefCDaftp70e1A
+         QAKdriwCotB/cjfw/V3W5KbxZaVq3NBFKfvIEACRfuFWzabuAH2MQzgClcGt+yXN5b/9
+         Q39c5PJJiSWpOSCmRzbQNynPSUpI7gUPQMUNi4SyOyPdpojqhkI+zM4bZOZMnyfMzat+
+         h2bDe9BT7DHyYSGcJv2ENQ61zJUaf33uaH3/aKEkh8tR+VFdQHDBCwQsq6qCJGpdK2vo
+         NcpA==
+X-Gm-Message-State: AOJu0YxxhhRwG3DFgJXkIDYpDn6EAqVtcZjOl4sjcaFblxPW9Wby8ZWS
+	7JxRd8XomFOUgu2IGaVld6ICgBsQwlUehc94ua+uKFvuiEN6kf/YlO7D1+L0IcVz11Y=
+X-Gm-Gg: AfdE7cklB8jFHaMYLyQAxa0jKkKKNrQ5I3nKp3aGdoh7KAm7+ktAbxBc3F7MQlykAk+
+	F4GBVXQcvZn5kTWnnIv5VInvfkCmDhjKAvfgz03Jnb5Dv9t4V7idu+mPdxJoTOqwNYtqe9Fjd0x
+	yUhGmy0hBHwiWGJMDL1CEBQV1EteizNmWT1t+vVh+q8P2eiy/36ASCY3Q86gdBzekJNCgW9dGZ9
+	/sK+RlgGBXVY2TRopwv6Uv9J0B57jlhyTDlmMI0d+sput0O7Bdasss5MWwJNdmdGPIbzNwH3Jzv
+	p768i/B8u5QquUBiPsPUgdF0vEitccqpl+q6vJoYeT7LPxl+iFAl/xN0iSlpbeP63cY2sf+SSja
+	CDMGR52CKPBXY8/Md05B0xdnNo1SymPS2XK2B/aVXyYvvDgccnhhDKFG8DYS3qeS2bdV3BGV3Y9
+	pMaCIoMwHZlyyM1ixWDb3i349YICHqZi+lTBWlQdiEte7qapwcB7xE7A==
+X-Received: by 2002:a05:7300:6c9f:b0:2ea:c085:44b1 with SMTP id 5a478bee46e88-30c071533c3mr7595373eec.19.1782055268963;
+        Sun, 21 Jun 2026 08:21:08 -0700 (PDT)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c1bd8d78esm6440699eec.18.2026.06.21.08.21.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Jun 2026 08:21:08 -0700 (PDT)
+Date: Sun, 21 Jun 2026 08:21:05 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Dmitri Seletski <drjoms@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: "ip help" output is an error
+Message-ID: <20260621082105.1196ef72@phoenix.local>
+In-Reply-To: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
+References: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260621135746.067a93be@pumpkin>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:drjoms@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300882-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:sasha.goltsev777@gmail.com,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:viro@zeniv.linux.org.uk,m:davidlaightlinux@gmail.com,m:sashagoltsev777@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-300883-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,vger.kernel.org,zeniv.linux.org.uk];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,phoenix.local:mid,networkplumber-org.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A6F196AB056
+X-Rspamd-Queue-Id: 8BDF36AB2A0
 
-On Sun, Jun 21, 2026 at 01:57:46PM +0100, David Laight wrote:
-> On Sun, 21 Jun 2026 14:05:40 +0300
-> Alex Goltsev <sasha.goltsev777@gmail.com> wrote:
-> 
-> > From a9316957e594708dfb4258ad968fe88666c9b736 Mon Sep 17 00:00:00 2001
-> > From: 0-x-0-0 <sasha.goltsev777@gmail.com>
-> > Date: Sun, 21 Jun 2026 13:24:29 +0300
-> > Subject: [PATCH v2] net: add sock_open() with flags for socket creation
-> 
-> A) There is no info here.
-> B) You've not said why this is of any use.
-> C) It isn't a bug fix so would go into net-next
-> D) net-next is closed.
+On Sat, 20 Jun 2026 10:36:31 +0100
+Dmitri Seletski <drjoms@gmail.com> wrote:
 
-E) The patch has had all its whitespace corrupted.
+> Hello iproute2 maintainers,
+>=20
+> I am reporting an inconsistency regarding the exit status of the ip help=
+=20
+> command.
+>=20
+> Current Behavior:
+> When running ip help, the command prints the help documentation to=20
+> stdout, but exits with a non-zero status (error). This causes issues in=20
+> shell scripts that rely on exit codes for control flow.
+>=20
+> Steps to reproduce:
+> bash
+>=20
+> # This returns "FAIL" because the exit code is non-zero
+> if ip help > /dev/null; then
+>  =C2=A0 =C2=A0 echo "SUCCESS"
+> else
+>  =C2=A0 =C2=A0 echo "FAIL"
+> fi
+>=20
+> Expected Behavior:
+> Since the command successfully performs the requested task (displaying=20
+> help information) and does not encounter a system error, it should=20
+> return an exit code of 0.
+>=20
+> Context:
+> This behavior breaks standard Bash logic for automation. For example:
+> ip help && echo "This will not execute"
+>=20
+> "ip help |grep br" - this will bring no result.
+>=20
+> Current version tested: iproute2-6.19.0
+>=20
+> Thank you for your time and for maintaining this tool.
+>=20
+> Regards,
+> Dmitri Seletski
+>=20
+>=20
 
-Please "submit" the patch to yourself and ensure you can cleanly apply
-it.
-
-   Andrew
+Yes iproute2 doesn't do a great job of handling error codes
+with usage vs help. Its a bug and no one has bothered to fix it.
 
