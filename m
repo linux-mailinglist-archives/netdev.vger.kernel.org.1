@@ -1,299 +1,258 @@
-Return-Path: <netdev+bounces-300897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300898-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lT20EPo1OGpDZwcAu9opvQ
-	(envelope-from <netdev+bounces-300897-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 21:05:30 +0200
+	id 5pgVJ4U6OGplaAcAu9opvQ
+	(envelope-from <netdev+bounces-300898-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 21:24:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8426AB7AA
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 21:05:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0FE06AB818
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 21:24:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=TDrk2GSc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300897-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300897-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=jEVaF73r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300898-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300898-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E113A300A119
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 19:04:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E770300A625
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 19:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CB6274B2A;
-	Sun, 21 Jun 2026 19:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A912882D7;
+	Sun, 21 Jun 2026 19:24:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012042.outbound.protection.outlook.com [52.101.43.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FA81F151C
-	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 19:04:56 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782068699; cv=none; b=NHdNskAVUmn/bE5EQEIszxbKJuqDIrK++HRKOB/OB+zs+hxRn3giXbYl/wKTzRLe9fh8/7AGajCBg4tB6ShOCCTtRl/UY7nphj2C/0ntFuVY/PLPwYAW/CTjRUDmZeB2NMsXl4YsUGYiAZJOyLXe6hWqsiwgNOvvR0hPnIG/iwo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782068699; c=relaxed/simple;
-	bh=aXRM6rleMtmqAGpHOgyjB5R1SPGt0HQzOmTZSePQYyk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V71L7BR6ifXAA6m+GUu0ApQ5dLdAF6UHAqwyO1Qk+rMP+Y4wv/gkfMTYZ/Gtc4D9Bxih+L2Jq+n+/qLXp3hY8yk9idpW//fJPXmvaQGZWDLks1fs5539dsye5MdMSpb7s06lrvBpQC8cp5lyXl2ub64rCYbVWmOFuEdQhFSPgBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TDrk2GSc; arc=none smtp.client-ip=209.85.208.41
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-697ad7f663cso363151a12.1
-        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 12:04:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782068695; x=1782673495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2Vd217j9BX8Lq/p1KnSze+ojMBVOwOcfGoPl0hFkSxs=;
-        b=TDrk2GScixZ8fmReWUDeY/s7vMVWHhN81yKK5WccjYZ2HkMCxqJAcJeXxa9AgulqYh
-         0K5pdzMEVcU/54rnDQtBtGZJMslqsjCcazs/IvqhdKV9tAesj9vt9UKgiQ27v3bsRCvK
-         zTg3PjJ3qQtR9dUVZTYRkNAIH5jO34UvO32xXtA+r9i+k7TsQTpbheqUQ/y0WJbSyufi
-         +wN9KV6DeroDvcdhU5DRg6B7Ya0xUiuYDN0Te+qLNXcriDzwa6sNFtURHYolc7pU50e6
-         aAkuXdOrTwUzo7bfcwgRCt/NCsS4t1qrdHWFm+euzJqcRSdekFKoS0eJ9nzhhY9oTWgf
-         N99A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782068695; x=1782673495;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2Vd217j9BX8Lq/p1KnSze+ojMBVOwOcfGoPl0hFkSxs=;
-        b=GRWuTDAIGUR6i85P2c9Fyu16h0IWLCjl54VuxBj5NZk4KAf3ZqTTN4i0Za4wPBMeNI
-         Lhv5TbTOprE2XbhzmQrhBNE9lC/wExkWQWGjQBZ9HZaSauzZRe+MskRO4FzgrYj/LiEo
-         zsf5xsiutuX7SEes+FGLdaiyhdvpmQ0GqSDuAIBR5D8WmXhwE8ZvL/vAo/bcNS6LGP64
-         9EEc8ASqidQvB1HNgP4zzZLjACkoQ2FAPDgCHoqnOw/q3wB5ijB9iiw6UPOW/h9ViO79
-         9VH+rienWeMpdB531Szo9tdPhxLWiHiPWHrMRWA3dhygsysVaC8+tQrNwBD0lQvOVGDB
-         gLrA==
-X-Gm-Message-State: AOJu0YzjEjXhJkcHP32YAiN4eoLxdpCduoZH3xZ9gOBnlkMf1/4EIXt5
-	waijuw1oDF1Ds5Mi77UG/g9tEQMcZNSSbPJzg+LCzvBMkrJVi+dSOOK8/kNPLKvF
-X-Gm-Gg: AfdE7cnA4otfMVfSnRcPDh/mUEI1s76PnezXTDAxDZqnjJ07YnM/oVoRooisR4nytdz
-	h0gvxCkxzirQ3E4qIGm1npwV11P09/hH0cJ2cyl8FQYoTUen496X1p0U80lVH9dIYT3ayQYLUcV
-	BNkIj8zqMrSHn5tjt8VGAfnF7cCEJPaXZPWWTQf+xsPM+giAKsY2UWf39EV12fAI71QQXzV/lgy
-	4gDVqSLKmNYUvkWV6M8hcdOEvoaHtY+jB5HiRlB+ue2U1vZxJMbNJfxDgQqRNoLIgC2Vuyfla47
-	goGOPfn+giDHRnfa5KkY2i2RnefbbeMDhK3sNzoexNwdBNvIuE+uEKaKgqZFMOvE3eSLxtDvYQ8
-	DCBaYJG0Yy9PofGtnn/cYvA06dBIQWHzDA5elFZ1sjV0xKfpsusjdgyEBSogf0MLhrhC4Z1snSb
-	9zpSqLukgWuZTSzLidYSdswPMfJFvGte+ZZrxl/jE1rWmkBmVzv+klxbQfjVEaUcM5lzyo32O2o
-	dfMgw==
-X-Received: by 2002:a17:906:7944:b0:c0e:5a63:85df with SMTP id a640c23a62f3a-c0e5a642b5emr88280366b.30.1782068694741;
-        Sun, 21 Jun 2026 12:04:54 -0700 (PDT)
-Received: from dau-home-pc.megasoftware.org ([95.164.115.35])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c5e99977fsm230558266b.20.2026.06.21.12.04.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 12:04:53 -0700 (PDT)
-From: Anton Danilov <littlesmilingcloud@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemb@google.com>,
-	davem@davemloft.net,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next RESEND v3 2/2] selftests: net: add FOU multicast encapsulation resubmit test
-Date: Sun, 21 Jun 2026 22:04:12 +0300
-Message-ID: <d453a15be455920b57b0da000a91ace4d01a0596.1782067871.git.littlesmilingcloud@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1782067871.git.littlesmilingcloud@gmail.com>
-References: <cover.1782067871.git.littlesmilingcloud@gmail.com> <cover.1777934869.git.littlesmilingcloud@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA001E5B63;
+	Sun, 21 Jun 2026 19:24:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782069891; cv=fail; b=BO5OaCkhFzwIOH2bFCWzBZWojR8Z/IZ6HgVmUjc37uCMpYV5JR82wUYpY1Nw/iq364AVGseLBfLoa8K7qAESZEiKr8jOj+Q+eLYfD5zPZm4ZX0uOYDiZBgNQt3z5V3ksK9S6BJZTaq92MtwRN7vHZXek17ar2qpoOx1M60QXvOU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782069891; c=relaxed/simple;
+	bh=EJnJB4TNexEs66rIDKQIdjxhkrMy/ZQjAHO/SqorZ8k=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=FARfmiJn73lS84I6nYQMvIRQHCMQk9NJGFg54ZKvkhXQWsdzIxs6eQU/PEvyOnCes3vj5VRmEaGsNmRR2m1aQITjs846Po8JoNTO4nk/mWsmJADC8/sFpcNtl/V//4IZAuLTFRJyhwwGXNs37JBByKO6pip86RphOYVFQ2hIOWY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jEVaF73r; arc=fail smtp.client-ip=52.101.43.42
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Dkv9UDcHp3fh/k6pUSbpuTPMZDlm+1/AD3vjvcCBwHCaGakknqssV6UrD4O9CZKu3JDuxH/TXZ+FkoNlbVrTno24RYn832Q7wdAYrx+YDR4rIu0g7HPxW93zsF3soW8GX7jap12DDt2nQI3l+uWy0baAFYxEFYOjU3V8I+HbbKjaKq4FjsVLk3g1xjDH8ywOnpnDstjLNWcSxUaO2oXJR/srb1/aRkOHavMOdwI78zAuoOsuR+j6Um0Gb18VUIAjTD/skvh/1ODtU/sY/FJTPt7LJxQ3BMFH4huzU0SDWLaI42Rin+iza/jEyTnS6YcBabJJcJQauDJQ+P36YmsY8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LD9HUo7Ky0rdYDmYW35G6Gh64vhqna4KrRMkmO6Hlfk=;
+ b=gzl1KC6lb3ZlXg0xNVb1aYJiQQPYMoS/+gjTq9pfQ3otD1pOl2tSCBzt9LJvvFBceZAldKr1zWQ5XUsDu3nH3Ot7px+WFlKRpVt1TKX1UxPTq4FMXxf97yhhAHxvneuy2Uisc2Ies4ABxBZ7UhJUGIZPwHTGxcBlN6Flq55XNUs86v2wfu96m1Uxhka73rWB0IehXV+gVeQLcRG5MT9sDa+A9J2SAT6UMNG5kbSzUsYngMl0KWz9jHngrqxuYE0lBK7rnAKgWkNAI0xh+q5aQOLc3f9OlmA12bYjjT7mRblfIVO5YOLDKrXxRyUsWfafNUvNck/Obth9WJF4uNoO9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LD9HUo7Ky0rdYDmYW35G6Gh64vhqna4KrRMkmO6Hlfk=;
+ b=jEVaF73rpBx+4VJFtIvRpCCYgbmXvI1I91yNE9Anl5DCfk4UFHVPfSqHFh2NalSja+J/7Fww5nZlnzobwm7PAK7wJ7sis5kowvCoD8oqQq7vhaaFd+kSzVR1+m+EeQ34qGukoDFKobjvryeteHj3f9oqIt4QJhD4Qz4PNZ2l3OM=
+Received: from PH8PR12MB6914.namprd12.prod.outlook.com (2603:10b6:510:1cb::21)
+ by BL1PR12MB5851.namprd12.prod.outlook.com (2603:10b6:208:396::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Sun, 21 Jun
+ 2026 19:24:44 +0000
+Received: from PH8PR12MB6914.namprd12.prod.outlook.com
+ ([fe80::2893:177a:72b0:6000]) by PH8PR12MB6914.namprd12.prod.outlook.com
+ ([fe80::2893:177a:72b0:6000%6]) with mapi id 15.21.0139.009; Sun, 21 Jun 2026
+ 19:24:44 +0000
+Message-ID: <1ad46724-18a6-4cc1-9c40-f34fbf0f0b7c@amd.com>
+Date: Sun, 21 Jun 2026 12:24:42 -0700
+User-Agent: Mozilla Thunderbird
+Subject: =?UTF-8?Q?Re=3A_=5BREGRESSION_6=2E16=5D_r8169_RTL8168h/8111h_fails_?=
+ =?UTF-8?Q?to_probe_=E2=80=94_=22Unable_to_change_power_state_from_D3cold_to?=
+ =?UTF-8?Q?_D0=22_=E2=80=94_bisected_to_4d4c10f763d7?=
+Content-Language: en-US
+To: Thorsten Leemhuis <regressions@leemhuis.info>, Josh Perry
+ <josh@6bit.com>, bhelgaas@google.com
+Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, rafael@kernel.org,
+ linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+ regressions@lists.linux.dev
+References: <d4aaa5e8-7366-461c-94b1-ccf3631c8bf9@6bit.com>
+ <e8acc151-19f3-4823-83a1-e0906dd9f0f0@leemhuis.info>
+From: Mario Limonciello <mario.limonciello@amd.com>
+In-Reply-To: <e8acc151-19f3-4823-83a1-e0906dd9f0f0@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH8PR20CA0015.namprd20.prod.outlook.com
+ (2603:10b6:510:23c::8) To PH8PR12MB6914.namprd12.prod.outlook.com
+ (2603:10b6:510:1cb::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR12MB6914:EE_|BL1PR12MB5851:EE_
+X-MS-Office365-Filtering-Correlation-Id: e6213ddb-de95-4084-2a7b-08decfcabf9a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|18002099003|22082099003|4143699003|11063799006|3023799007|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	0UtYse08/d08dyoH0uvIugx4l9QLYMtPQuD74Map1dEyLO1RBziFC2Yxw6jfSRrYSowgCCAx04vfUn5I1Rcpfy8hmXwZ01H1xl+bxIxPrtqcxLUYq3TtU2fDLIpCBnVG9pI+2mPRJec74OZU4XxcjO95ixqcytovKLu0pEDUiKxiqqUAd7RrEvy2sGOV9jTLvnDXQcMyg19+8hZAJ9A9MEsKRZLg0ptdmJjyATku84QtMktWiMR8YV/mEhvDAwjGnnDgZoOoTp7JauBcP7V/02N8zplDP9Y/CuvA17jQwNx2CS3racUj4nrnRGTZgXmt/ScIcq2IZNrRe/P3gW02ba7oO60I1E7vCVZlee3JxFhHjN1b7+Fnml4+G4Mna0eZ/G3HzoFGpN29DevOL4H6P9XVqHi9HR1Uk+8zmatQ+T5vXppHocbq4gYhhAZokUopDQuCR5AYJg/7O9zMkVJoqDy7vvRXMoiej6HBWbNFWbL4g1Q+48rXYVZcgN2aKu7N5o6ScsTb5jVayJOwBJtiYQ77x1+QASMs2a1BNxAnV67nWzyCTihMff/rxEDaHJ6TtX1mNoDPqJcFz7SbE/DSu9uFW1gEA9JMsKkTgAv17aGF+HnoyVsOB8KQhzVeMnEjd25PtUSLgcYksaAGtg/xE6+Sg8FwPl0v89FACxMwK4M=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB6914.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(18002099003)(22082099003)(4143699003)(11063799006)(3023799007)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dXhyTVd3WWdWaG5NdlQ0MTR4UWM1dDhnd2JvdEgrMTBVYUs1cU11ZS9iQUQx?=
+ =?utf-8?B?Vk5iK3cxd215RUxHZm9mdU5TTVNjNmhVUEt0NS9BVEx1WGJ6aDM3dVhLUTlk?=
+ =?utf-8?B?a3hxNE43dHdhVHBqdEhZdG4xWEM2eTFpaEtFaU83WTdscE5lY01DUWFtSSto?=
+ =?utf-8?B?djhsNXQ3STJFZXNhT0RKTHJLNzIrb1JXeXJQajgvbEpjeDcwdk9aTWdIbWVt?=
+ =?utf-8?B?Wk1IWTJGekVoNFlXZmhBOUg2MVJzQXRJdGo3MkFFK2E5WS9CR0tFRHBCUXVn?=
+ =?utf-8?B?QkEvVVdXUFIzdGlobXNtWThsWUIzTmpqMUNqSDBUQnI0Rmp3U1lkbmN6SU9t?=
+ =?utf-8?B?NEpyUm5iakovblNpWGM3bVFXV1JVWXo1citXV0JIY0dPL0p1dU5ONWoyUWg5?=
+ =?utf-8?B?QkcrUzdpOWVGeFhuNXp5YzJWdURYSEU2NG8wR3RrQWtEdVlTV2JVSWpYQWtK?=
+ =?utf-8?B?OVQ1OGJHR2xBVENQRlM2eFBIa0NIS2xWTElGdGlLeTZZVy9PMlhIS0drTmRy?=
+ =?utf-8?B?R2ord2RDemRRdHdwZ3dZTlEyay9ZbzZuK1ZaY0QwUHhyTHhXZkJMTXB4RU94?=
+ =?utf-8?B?bkJqbFJUMGV3RHNxcDRjdzdleTN6MWZuU2tuOVNEdjhXcWFLVVlLcXZMTVhT?=
+ =?utf-8?B?OHhITVZEK1NWU0djRFUwRG5lbUljenl6ZjBxNEt0N0RiZzJTY2kyTlRXRkor?=
+ =?utf-8?B?eE84aWVWM0V4VGdzWndsWHRqa2VRME1YTUpqWEZhd3BSQnFwSDZMNnA3aG1s?=
+ =?utf-8?B?UlFMMy9jdVV2cmkrdlVjRk5mNXp4dnRIYWQzb3hhU2w4Y0I4bmZtbEl2TjBB?=
+ =?utf-8?B?MDN3anlMRm8rRFFSdzlORllTM2EwSDNrTzNQc29oK2tWR3loTW9EUWdReEJJ?=
+ =?utf-8?B?VENScmJ5aXJxbUdCZDVYenRHUXNWUFlTQmlSNDAxQkdBR2Y5RnZvbHFlL2k0?=
+ =?utf-8?B?UXIrdzNIcitQRHFJR1FLQldaTjQyczVHbDFDditZQW8ra0pFdGdmMnhvMGZZ?=
+ =?utf-8?B?blliVGI4RjlCSmRNUzkzWkFKN251RWVyc3B0N0l1dGVFWkQxc2xqYm05RUZj?=
+ =?utf-8?B?dStwTUUvQXZTOUpRcFl4a2ZYQmtNeE5kMHJadExXbVNZYlMrc0pEUzBLZmE1?=
+ =?utf-8?B?UFdsSW9NOUw4WUR6Ymw3a3RUQXVtbXhxZHJodTBSOEN1cHVCcVJXWHZ5OFV1?=
+ =?utf-8?B?YUlKUHRjZFJoUXdjbnA3RWJPa3NmUlZaK1E1MytmbGc4MjJoNWo3RFIxSEFU?=
+ =?utf-8?B?WGRKekV4UlgrUm1idnd5NytUTWh2K3l5ZUpSZXgwVzUvV3h3SytWVHRxMVVR?=
+ =?utf-8?B?Q3FvbS8rdGdXbnViYkhsMFRoaUNVT2ZaczRKL1Mwc241MFJ5eGdWdGdRd1Jw?=
+ =?utf-8?B?Y21PRzVFVXNlMlRXc1MrS1RUNkllNlhoNm9GRXMvcm9xQS9LVVdxR25ickFF?=
+ =?utf-8?B?RDg2UGNKQWR5aG1lV2xYTWNhUjRPbFlVV0VjVThhdCtvVXlmWWpnWVJUYXh3?=
+ =?utf-8?B?bkFVaFcxUStoc1FyMmlpbXd2Z1JiY3g5c2xJM09yL0ZuVit2Vjdnbng0WG5P?=
+ =?utf-8?B?dE9OQ2NSalY0elRkZStIcHVGR2xNUXgrc3pLUStwZGR6ZXNTaGl6eHBSTWRZ?=
+ =?utf-8?B?WDdwNzI2REV2a0RtakRtSGdOc1F4Qi81VzJ0dnoyRFNTV01EZ3M0T1VzNFN6?=
+ =?utf-8?B?VU1CRDVzc0sxSmlTV24rSjdGNkpzMEVaUm43NDNOQWRmTWtZRVhHN2NXMGFM?=
+ =?utf-8?B?dllhTUJ3R3ZrYjlkRU14amVsYlQwcHNwQjhpMGJqYkN5dGZFc1ZFWUJJT0tn?=
+ =?utf-8?B?WWR3TGdEcmpOWFFhRFZ3aHhBVXRwNDhhc0dnQWJyK2VzYURET1Axb3kreng1?=
+ =?utf-8?B?U2YyUGQ1MUY3M2hxSG9tWkk4N3VTME1oNzAvd0ZXclczWmlDOE9RWDQxblBk?=
+ =?utf-8?B?a3F1a1JDUkhBL2h5L0RKalFKam1IVzg5ZDdVR0V6V1A5MFE2OEpsSUM1YjZ0?=
+ =?utf-8?B?Q3Q3Yk1hZ1d2cDZnbDFXOXJaVytZcFRGS0crNTcvOUoxMG5UQ2lBL0wvTlFl?=
+ =?utf-8?B?SEJFei8vcXYvZ0JFME5Ja2VEZVUzK2ljajZDTlUzc1A5SVRLL1BMWjdrQXZ3?=
+ =?utf-8?B?T05oanpSRmlmWHc5aTQ2TENIVWdrWGFSek44clBSdUkwbW9FdW5lQkcwcFNP?=
+ =?utf-8?B?R0FFcHpJRDFFdm1veGI0VWVwWHFxZ3RGb20xL3c3RForR3B2alQ0a0lyOFFK?=
+ =?utf-8?B?ZWJnOXV2MlZXUHFURktYbzRoWlJ1SEZ5djdCdVhMSzNvY2loNWtUNDQ0OEZR?=
+ =?utf-8?B?enlKT2MwUExSR0NSR3kySUM0RUlkSG5KTUxINmw4cURUbThSQXNXQT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6213ddb-de95-4084-2a7b-08decfcabf9a
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB6914.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2026 19:24:43.9762
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OxCgCH9w3NdrYOZkjjfgOAikP7iAfA47TYAn0QUsHb1rocKv8qzwBx30bbJONJ59Xv0JytgILefqGGA+b+yvOQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5851
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,kernel.org,vger.kernel.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300897-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:willemb@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuniyu@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300898-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[littlesmilingcloud@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[mario.limonciello@amd.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:regressions@leemhuis.info,m:josh@6bit.com,m:bhelgaas@google.com,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:rafael@kernel.org,m:linux-pci@vger.kernel.org,m:netdev@vger.kernel.org,m:regressions@lists.linux.dev,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[littlesmilingcloud@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mario.limonciello@amd.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fou_mcast_encap.sh:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8B8426AB7AA
+X-Rspamd-Queue-Id: F0FE06AB818
 
-Add a selftest to verify that FOU-encapsulated packets addressed to a
-multicast destination are correctly resubmitted to the inner protocol
-handler (GRE) via the UDP multicast delivery path.
 
-The test creates two network namespaces connected by a veth pair with
-a FOU/GRETAP tunnel using a multicast remote address (239.0.0.1).
-Ping is sent through the tunnel and received packets are counted on
-the receiver's tunnel interface.
 
-A static neighbor entry is configured on the sender because ARP
-replies from the receiver cannot traverse the unidirectional multicast
-tunnel back to the sender.
+On 6/17/26 01:32, Thorsten Leemhuis wrote:
+> On 6/12/26 03:07, Josh Perry wrote:
+>> #regzbot introduced: 4d4c10f763d7
+>>
+>> Since v6.16 one of two onboard RTL8168h/8111h NICs on this board fails
+>> to probe on boot; the device drops to D3cold and the driver can't bring
+>> it back:
+> 
+> FWIW, that commit is 4d4c10f763d780 ("PCI: Explicitly put devices into
+> D0 when initializing") [v6.16-rc1] from Mario, who is already CCed, but
+> looks like might be on holiday or something due to inactivity on the
+> lists in the recent days. So it might take a few days before this moves on.
+> 
+> Josh, this is not my area of expertise, but there are two things I guess
+> might be helpful:
+> 
+> * retry with 7.1
+> * upload "dmesg" and "sudo lspci -vvv" output from working and broken
+> kernels somewhere (like bugzilla.kernel.org).
 
-The early demux optimization (net.ipv4.ip_early_demux) is disabled on
-the receiver to force packets through __udp4_lib_mcast_deliver(),
-which is the code path being tested.
+Yes; please retry with mainline.  We already had multiple regressions 
+from that commit fixed, so if you bisected down to this commit then it's 
+plausible that there is already a fix.
 
-Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
-Assisted-by: Claude:claude-opus-4-6
----
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/fou_mcast_encap.sh  | 112 ++++++++++++++++++
- 2 files changed, 113 insertions(+)
- create mode 100755 tools/testing/selftests/net/fou_mcast_encap.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 708d960ae07d..7e9ae937cffa 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -39,6 +39,7 @@ TEST_PROGS := \
- 	fib_rule_tests.sh \
- 	fib_tests.sh \
- 	fin_ack_lat.sh \
-+	fou_mcast_encap.sh \
- 	fq_band_pktlimit.sh \
- 	gre_gso.sh \
- 	gre_ipv6_lladdr.sh \
-diff --git a/tools/testing/selftests/net/fou_mcast_encap.sh b/tools/testing/selftests/net/fou_mcast_encap.sh
-new file mode 100755
-index 000000000000..8db9633f4c28
---- /dev/null
-+++ b/tools/testing/selftests/net/fou_mcast_encap.sh
-@@ -0,0 +1,112 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Test that UDP encapsulation (FOU) correctly handles packet resubmit
-+# when packets are delivered via the multicast UDP delivery path.
-+#
-+# When a FOU-encapsulated packet arrives with a multicast destination IP,
-+# __udp4_lib_mcast_deliver() must resubmit it to the inner protocol
-+# handler (e.g., GRE) rather than consuming it. This test verifies that
-+# by creating a FOU/GRETAP tunnel with a multicast remote address and
-+# sending ping through it.
-+#
-+# The early demux optimization can mask this issue by routing packets via
-+# the unicast path (udp_unicast_rcv_skb), so we disable it to force
-+# packets through __udp4_lib_mcast_deliver().
-+
-+source lib.sh
-+
-+NSENDER=""
-+NRECV=""
-+
-+cleanup() {
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+setup() {
-+	setup_ns NSENDER NRECV
-+
-+	ip link add veth_s type veth peer name veth_r
-+	ip link set veth_s netns "$NSENDER"
-+	ip link set veth_r netns "$NRECV"
-+
-+	ip -n "$NSENDER" addr add 10.0.0.1/24 dev veth_s
-+	ip -n "$NSENDER" link set veth_s up
-+
-+	ip -n "$NRECV" addr add 10.0.0.2/24 dev veth_r
-+	ip -n "$NRECV" link set veth_r up
-+
-+	# Disable early demux to force multicast delivery path
-+	ip netns exec "$NRECV" sysctl -wq net.ipv4.ip_early_demux=0
-+
-+	# Join multicast group on receiver
-+	ip -n "$NRECV" addr add 239.0.0.1/32 dev veth_r autojoin
-+
-+	# Multicast routes
-+	ip -n "$NRECV" route add 239.0.0.0/8 dev veth_r
-+	ip -n "$NSENDER" route add 239.0.0.0/8 dev veth_s
-+
-+	# Sender: GRETAP with FOU encap (no FOU listener needed on TX side)
-+	ip -n "$NSENDER" link add eoudp0 type gretap \
-+		remote 239.0.0.1 local 10.0.0.1 \
-+		encap fou encap-sport 4797 encap-dport 4797 \
-+		key 239.0.0.1
-+	ip -n "$NSENDER" link set eoudp0 up
-+	ip -n "$NSENDER" addr add 192.168.99.1/24 dev eoudp0
-+
-+	# Receiver: FOU listener + GRETAP
-+	ip netns exec "$NRECV" ip fou add port 4797 ipproto 47
-+	ip -n "$NRECV" link add eoudp0 type gretap \
-+		remote 239.0.0.1 local 10.0.0.2 \
-+		encap fou encap-sport 4797 encap-dport 4797 \
-+		key 239.0.0.1
-+	ip -n "$NRECV" link set eoudp0 up
-+	ip -n "$NRECV" addr add 192.168.99.2/24 dev eoudp0
-+
-+	# Static neigh entry on sender: ARP replies cannot traverse the
-+	# multicast tunnel back, so pre-populate the neighbor cache.
-+	local recv_mac
-+	recv_mac=$(ip -n "$NRECV" link show eoudp0 | awk '/ether/{print $2}')
-+	ip -n "$NSENDER" neigh add 192.168.99.2 lladdr "$recv_mac" dev eoudp0
-+}
-+
-+get_rx_packets() {
-+	ip -n "$NRECV" -s link show eoudp0 | awk '/RX:/{getline; print $2}'
-+}
-+
-+test_fou_mcast_encap() {
-+	local count=100
-+	local rx_before
-+	local rx_after
-+	local rx_delta
-+
-+	# Warmup: let any initial broadcast/ARP traffic settle
-+	ip netns exec "$NSENDER" ping -c 1 -W 1 192.168.99.2 >/dev/null 2>&1
-+	sleep 1
-+
-+	rx_before=$(get_rx_packets)
-+	ip netns exec "$NSENDER" ping -c $count -W 1 192.168.99.2 >/dev/null 2>&1
-+	sleep 1
-+	rx_after=$(get_rx_packets)
-+
-+	rx_delta=$((rx_after - rx_before))
-+
-+	if [ "$rx_delta" -ge "$count" ]; then
-+		echo "PASS: received $rx_delta/$count packets via multicast FOU/GRETAP"
-+		return "$ksft_pass"
-+	elif [ "$rx_delta" -gt 0 ]; then
-+		echo "FAIL: only $rx_delta/$count packets received (partial delivery)"
-+		return "$ksft_fail"
-+	else
-+		echo "FAIL: 0/$count packets received (multicast encap resubmit broken)"
-+		return "$ksft_fail"
-+	fi
-+}
-+
-+echo "TEST: FOU/GRETAP multicast encapsulation resubmit"
-+
-+setup
-+test_fou_mcast_encap
-+exit $?
--- 
-2.47.3
+> 
+> Ciao, Thorsten
+> 
+>>    r8169 0000:02:00.0 eth0: RTL8168h/8111h, 00:2b:67:48:40:01, XID 541,
+>> IRQ 137
+>>    r8169 0000:04:00.0: Unable to change power state from D3cold to D0,
+>> device inaccessible
+>>    r8169 0000:04:00.0: Mem-Wr-Inval unavailable
+>>    r8169 0000:04:00.0: error -EIO: PCI read failed
+>>    r8169 0000:04:00.0: probe with driver r8169 failed with error -5
+>>
+>> The board has two identical RTL8168h NICs (both XID 541): 0000:02:00.0
+>> and 0000:04:00.0. Only 04:00.0 fails — its sibling 02:00.0, on a
+>> different root port, probes and works normally on the very same kernel
+>> and boot. The failing NIC then does not appear (no enp4s0), taking the
+>> machine's WAN offline. This strongly suggests the problem is port/
+>> topology-specific rather than device- or driver-specific: the upstream
+>> port behind 04:00.0 is placed in D3cold and the endpoint cannot be
+>> resumed to D0.
+>>
+>> Hardware: RTL8168h/8111h, XID 541, PCI 04:00.0 (onboard 1GbE).
+>> Platform: Lenovo ThinkCentre M90n-1 (11AHS0B200), BIOS M2AKT49A
+>> (2026-03-25, latest available). Firmware is current, so this is not a
+>> platform-firmware issue.
+>>
+>> Bisection: v6.15 good, v6.16 bad (verified by booting both). I then
+>> reverted 4d4c10f763d7 ("PCI: Explicitly put devices into D0 when
+>> initializing") together with its follow-up 907a7a2e5bf4 ("PCI/PM: Set up
+>> runtime PM even for devices without PCI PM") on top of 6.16.7: the NIC
+>> probes and links at 1Gbps/Full normally, with no workaround:
+>>
+>>    r8169 0000:04:00.0 eth1: RTL8168h/8111h, 00:2b:67:48:40:02, XID 541,
+>> IRQ 138
+>>    r8169 0000:04:00.0 enp4s0: Link is Up - 1Gbps/Full - flow control rx/tx
+>>
+>> Workaround: booting an unmodified v6.16+ kernel with pcie_port_pm=off
+>> also restores the NIC, which is consistent with the upstream port being
+>> placed in D3cold and the device failing to resume to D0 after the
+>> explicit-D0 init change.
+>>
+>> The follow-up 907a7a2e5bf4 does not fix this resume case: v6.18.33 is
+>> still affected (retested today on current firmware).
+>>
+>> Happy to test patches or provide full dmesg / lspci.
+>>
+> 
 
 
