@@ -1,122 +1,198 @@
-Return-Path: <netdev+bounces-300901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6DDXEBVIOGrPagcAu9opvQ
-	(envelope-from <netdev+bounces-300901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 22:22:45 +0200
+	id C+HPMTFXOGr+bAcAu9opvQ
+	(envelope-from <netdev+bounces-300902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 23:27:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8263E6AB8B4
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 22:22:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB1D6AB984
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 23:27:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=II+sHAPj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300901-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300901-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QXQsycIo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300902-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300902-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 18D023008D2A
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 20:22:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C75923018D75
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 21:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFE12848BE;
-	Sun, 21 Jun 2026 20:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB179370D49;
+	Sun, 21 Jun 2026 21:27:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F43234994;
-	Sun, 21 Jun 2026 20:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5F840D588
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 21:27:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782073362; cv=none; b=sqRTaJDKDZiV4rpUhs/tBKjw6giFPWgjAQYXfFByddJ1dba6+OYsUp1sa8aUGcrStHW7Y9z/3kabb4MAPuuQgunDCVxPmkVSIIe2aGV4Ipay6pGrD0j1+Dhv9lf/T+y+Z6BLyr/ueeUPe45NlDNU2XptySe7cvNNne0sfrjIW4g=
+	t=1782077229; cv=none; b=U5SbFiCRAexphRegKnWs/synwVpOu1uHhjPU+WOOBnNUoN48hrsTxeJVMKeGJZOkeTaxfYTthmGqtmsiggO91FUBilGMLJIqBMYsHQw8whM2cMXBFKIM04U20NaD/lsUeSPJz/GqwtBnlUvB3cXcMt6DnpeWR1dOoagwKjEfFmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782073362; c=relaxed/simple;
-	bh=KancFRHJ6mUiJmokl5do0uC7J0HhqofDFYuyZ4ujAcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gESaqQIIp/UR2+fljVEkkEuoF+S5gSbJOXI2c+Pq5x+0eoiZnLpXHLCqBClTSNPBDjv3yyuW27glVKhV631j6+pgjypDrN3v6vMoBiOqM+9WbP7mWFlhY0TsSegZ+b6AsaQVJxZSq71QYGlUZTdsTvKZ0azThD8Do0ffl+4ls/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=II+sHAPj; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E6BD1F000E9;
-	Sun, 21 Jun 2026 20:22:40 +0000 (UTC)
+	s=arc-20240116; t=1782077229; c=relaxed/simple;
+	bh=526F1KvQO3Mut0dFOLt8cGSnjb8xmlNtdZcn5SLW7QI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gTbWsHYs2s1g6wvu/Ws/EiF0//6FEsk1uPzMmmHFUIxsV34ujnwzPt5JhLRRjLQ7OHIT5CZ24P6/lYJ69zSUf6HWNvJHxS5iKiPPa1MSxjGWtjOsDTkA6Ms128gpm4m6/YmUMPYZITFxovAyi6qxbJxCZ/GRsW2oRhfaLi58iBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QXQsycIo; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EDAA1F000E9;
+	Sun, 21 Jun 2026 21:27:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782073361;
-	bh=KancFRHJ6mUiJmokl5do0uC7J0HhqofDFYuyZ4ujAcs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=II+sHAPjfYsbR9RUeQP/GeJJIC5XHYZ5nL+r1PyiefjgrtYZi4lkswmOElbFH8UJK
-	 2zCknG/OV8Eb54zJrRYg0pgeObE1yu4KhyPP+tY+MQKsnB0W4aplLsgp01OgCeSJKd
-	 mfv8ONyvnS2VqoWCZdvb0Iqn9v1u6KiJgDfQfEfSu6gP0VSA5jl+M57Fzv8q/HJW0E
-	 +RTChcKH+xQWO+J/lreiZWDEekBpzjl0FKp6WDrbD1w7H2BAuB6ofauW0Ydn9vgQyE
-	 mnNlz3oOGaXoK6Jjpi+2cRLUZPVr71kRphVXmlSOcT/IE+OEsYKILt8jpD5sexNbYZ
-	 jji7YE3v4ebyg==
-Date: Sun, 21 Jun 2026 13:22:39 -0700
+	s=k20260515; t=1782077228;
+	bh=flpt6FA9/2PLqKaiTA12PHqetWmdZ2xWAk/dnpP6Yio=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=QXQsycIob4WzkVoy6kRPUggnkQnFkUosVXynk1wEdezq1tYDVYCMRCeok4PMcr/gW
+	 wyHCmzNgUHJFyt8hd6yQb45voFOPPXoAeBAOElskh8mk7tsD1L8cHRA28RGdjPZz0T
+	 VWyyKjs4mqKw313VTo50buF/E7tuGouXI5rc1FEm14akbhZyYn8LfLY74YrMMi7LC/
+	 fdyvhPgQGCKviH1WcluWHnsli/CwecE1guHbbWi1Df6RtGNWqAKzhKTRw7hQ/++joz
+	 5JojhUB7FpBxdod2uT43Ts9ReOGWMtnBMvmm+QmEZvO1lz+SpbfjLf1JEVLN/3Xlqi
+	 Um3tRQWnj72aQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?5ZGC6Iqz6aiw?= <wellslutw@gmail.com>
-Cc: Shitalkumar Gandhi <shital.gandhi45@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-Subject: Re: [PATCH net v2 0/2] net: ethernet: sunplus: spl2sw: fix of_node
- refcount leaks
-Message-ID: <20260621132239.79000dae@kernel.org>
-In-Reply-To: <CAFnkrs=kE3thiFLaOULGv3n_KgR-r5T4vB7hxJsZL4iAihO31g@mail.gmail.com>
-References: <cover.1781552725.git.shitalkumar.gandhi@cambiumnetworks.com>
-	<20260618175619.671a4025@kernel.org>
-	<CAFnkrs=kE3thiFLaOULGv3n_KgR-r5T4vB7hxJsZL4iAihO31g@mail.gmail.com>
+To: linusw@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	florian.fainelli@broadcom.com,
+	jonas.gorski@gmail.com,
+	hauke@hauke-m.de,
+	kurt@linutronix.de,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	chester.a.unal@arinc9.com,
+	daniel@makrotopia.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	wei.fang@nxp.com,
+	xiaoning.wang@nxp.com,
+	clement.leger@bootlin.com,
+	george.mccollister@gmail.com,
+	mmyangfl@gmail.com,
+	netdev@vger.kernel.org,
+	sashiko-bot@kernel.org
+Subject: Re: [PATCH net-next v3] net: dsa: Fix skb ownership in taggers
+Date: Sun, 21 Jun 2026 14:27:04 -0700
+Message-ID: <20260621212704.606595-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260617-dsa-fix-free-skb-v3-1-cdd4e0778a39@kernel.org>
+References: <20260617-dsa-fix-free-skb-v3-1-cdd4e0778a39@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300901-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-300902-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,cambiumnetworks.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:shital.gandhi45@gmail.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,m:shitalgandhi45@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:kuba@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:florian.fainelli@broadcom.com,m:jonas.gorski@gmail.com,m:hauke@hauke-m.de,m:kurt@linutronix.de,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:chester.a.unal@arinc9.com,m:daniel@makrotopia.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:wei.fang@nxp.com,m:xiaoning.wang@nxp.com,m:clement.leger@bootlin.com,m:george.mccollister@gmail.com,m:mmyangfl@gmail.com,m:netdev@vger.kernel.org,m:sashiko-bot@kernel.org,m:jonasgorski@gmail.com,m:matthiasbgg@gmail.com,m:georgemccollister@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,broadcom.com,hauke-m.de,linutronix.de,microchip.com,arinc9.com,makrotopia.org,collabora.com,nxp.com,bootlin.com,vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8263E6AB8B4
+X-Rspamd-Queue-Id: 1BB1D6AB984
 
-On Sun, 21 Jun 2026 12:38:06 +0800 =E5=91=82=E8=8A=B3=E9=A8=B0 wrote:
-> I'm sorry that I can't test the fix.
-> I've left from Suplus and don't have the relevant hardware.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net: dsa: Fix skb ownership in taggers
 
-That makes things harder.. but you don't necessarily need HW to review
-most of the patches. If you don't intend to serve as a maintainer of
-the sunplus driver please sense a patch to MAINTAINERS and step down.
-Right now you are listed but don't seem to be fulfilling the duties.
-Or please review the patches to the best of your ability without
-testing.
+This patch moves SKB drop responsibility from dsa_user_xmit() and
+dsa_switch_rcv() into the per-tagger ->xmit() and ->rcv() callbacks, so
+that taggers consume the skb on their own error paths and the call sites
+no longer free a returned NULL skb.
+
+Closes: https://lore.kernel.org/r/20260610153952.1685895-1-kuba@kernel.org/
+
+> diff --git a/net/dsa/tag.c b/net/dsa/tag.c
+> index 79ad105902d9..cfc8f5a0cbd9 100644
+> --- a/net/dsa/tag.c
+> +++ b/net/dsa/tag.c
+> @@ -84,10 +84,8 @@ static int dsa_switch_rcv(struct sk_buff *skb, struct net_device *dev,
+>  		nskb = cpu_dp->rcv(skb, dev);
+>  	}
+>  
+> -	if (!nskb) {
+> -		kfree_skb(skb);
+> +	if (!nskb)
+>  		return 0;
+> -	}
+>  
+>  	skb = nskb;
+>  	skb_push(skb, ETH_HLEN);
+
+[High]
+Does the new contract that taggers consume the skb on error cover the
+inline METADATA_HW_PORT_MUX branch in dsa_switch_rcv() as well?  That
+branch is not a tagger callback, it is open-coded in dsa_switch_rcv():
+
+	if (md_dst && md_dst->type == METADATA_HW_PORT_MUX) {
+		unsigned int port = md_dst->u.port_info.port_id;
+
+		skb_dst_drop(skb);
+		if (!skb_has_extensions(skb))
+			skb->slow_gro = 0;
+
+		skb->dev = dsa_conduit_find_user(dev, 0, port);
+		if (likely(skb->dev)) {
+			dsa_default_offload_fwd_mark(skb);
+			nskb = skb;
+		}
+	} else {
+		nskb = cpu_dp->rcv(skb, dev);
+	}
+
+	if (!nskb)
+		return 0;
+
+When dsa_conduit_find_user() returns NULL (for example a port_id that
+does not match any registered DSA user, such as the CPU port index, an
+invalid id from the conduit driver, or a port being torn down), nskb
+stays NULL and skb is not freed anywhere, so the new
+
+	if (!nskb)
+		return 0;
+
+path looks like it leaks the skb on every such packet.
+
+Pre-patch, the removed kfree_skb(skb) at the !nskb site covered this
+case.  Should the metadata-mux branch free the skb itself when
+skb->dev is NULL, or should the unconditional kfree_skb(skb) at the
+!nskb site be kept for this path?
+
+[ ... ]
+-- 
+pw-bot: cr
 
