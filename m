@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-300873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vt3rFvq2N2rAQAcAu9opvQ
-	(envelope-from <netdev+bounces-300873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:03:38 +0200
+	id QlveEg63N2rLQAcAu9opvQ
+	(envelope-from <netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:03:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B0D6AA900
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:03:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C4D6AA903
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 12:03:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="AW/8OV6O";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300873-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300873-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=m9y1pVFh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300874-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8EF1B300B3F0
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 10:03:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 050E4301691E
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 10:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115B6288530;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9230528BAB9;
 	Sun, 21 Jun 2026 10:03:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8634F1E885A
-	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 10:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8CC27280A
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 10:03:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782036214; cv=none; b=TLwMFbYkOyNGWxZHMDEbKbAVDNG4FZT8o38vVgmc0icPc0EMzYewOYa9URrjgfTW6jHMP/PNjBDeXGDxkvJZR1Rg9eudoxh5pUJUu/M0IluvbHcEVoXDsK3Fk3oKBUOAbauH+zMY5hZM3SWyqrCNbfwQGaN7W6fPNTLQoioZAHc=
+	t=1782036214; cv=none; b=ZEmJzE142OLjCYlVVbKPJC4oYvXqcE8YnsQZhcyPyPr4wutYxUHXKhT+njEalxoNNaYLVp4Re1owvAz0sypJaJ4gtf6YKhb0kiWXCe/8AjBb5RthKAfDLY1e7pmcL8/FQ9XwbezLmQoIumEjR+6KMP2vKG5zviHpCwIwiACDJaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782036214; c=relaxed/simple;
-	bh=u2YeirNNp694xOrA7GnHYixwSCMGKBPcKnxfgH+NST4=;
+	bh=6CEbWy33VQ653DeO6SgR9Jnu4uEbZ3wkIcMoSTq+82E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kqo2ieG4Te6Pjx3KVjM8sH36c3ibt6LFANQn37dBEwrgpTLypGF5d2m/R2izjaTW2DbgnZ6LPKQY1vjR3zP2nW6AUFIVRuo498hyV06bjn/8tyn1H8CyOz4yHtQ2Px1FiqtWP77P1YVP0fBF8iVpzePdfGgr6neEd+HB9M8uFS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AW/8OV6O; arc=none smtp.client-ip=209.85.221.48
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-45fd464d51fso1998896f8f.3
-        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 03:03:32 -0700 (PDT)
+	 MIME-Version; b=hPaCw9Z/0K5gJ53Ow71lJqxrmDU9uwMlWDnit60wfOYtotsY89GSqjLCQlkbHRpOmOQdK0Yaf/ioYXN+mLGCVIp9Ky6FlZ0tp7dki808u8HncBPf7bNY7kVwkusE10KvXZj9i37Tl7yVl/1pvXh8B6EitKFjK1Ao2C25Nf9Ql5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m9y1pVFh; arc=none smtp.client-ip=209.85.128.43
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490b3637b90so25793675e9.3
+        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 03:03:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782036211; x=1782641011; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782036212; x=1782641012; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QCskOvtha3WSz520YJDlSo06sskkak2HetR13aVf5p8=;
-        b=AW/8OV6OX+TX7jPyFRcpUFoTJK1MRKl7fyeY098F3g5nt4H8+PRiV1+0KTFoz2QkIT
-         u9VeWyMu19AbIJ8Ry+mt0Uu3Rl32aX8sQ2c1tZGBSfsePJ7KMp3L23y3H61WgAZnDo/R
-         OhHbKbkZn4tg8grxSz9CE/XhTgyU66hy0D2Xyjx3ODa227Go6GBK3aS6nArB/08v+6EJ
-         EttbbpZTg08nDtlaUB0X6GpORUMRI8kc0/Qi8xM/r7wBbJ4IUl3Te479VsqlIhyqIzwb
-         3v+IDatv5L3rDqCMt/7BKgT4IAr5Ei4LUWWS8qeR+Zl9p1prizwD6a/yUmhXm6CzMr4B
-         qJ8w==
+        bh=kbaqv0SFZQJBjRBPKXCNne2CJMpBAx0iotepDfutYis=;
+        b=m9y1pVFhjR8wrSQXdpXVTXDcxpJA8iErIqV7s4nUXQqk4Al+Mi/midGC6BPkp7YXro
+         VgxXj2O2zRO+F0A7bdUhpIc8PxAY8A/UxUM12qSjW5FRuDUpV3+DWZ3hh4qZwhd9UNEO
+         cdKrgH1GDgoNrVs2dfGwPPxOUcOq+gtljFEhBV4eEbULI4usg5M1BbJZHrOuLYun7Jf9
+         MP2G6FA8oKq5QUGDKu3UHWegmpkRBTmfhjQGOwf3C8xU0euYMnvHchIP4zyZWG1QOeEN
+         3uEmKcAU1Dspx0rGXq8YEBs+kIKR7pyvmW6gSG7a0c/GX9XmwaaBXdarjqUcOYB0036o
+         xg4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782036211; x=1782641011;
+        d=1e100.net; s=20251104; t=1782036212; x=1782641012;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QCskOvtha3WSz520YJDlSo06sskkak2HetR13aVf5p8=;
-        b=juZFZSaUB6eAnfNTmBXJoky94N9NFgjqvV5Afx0bBprb9iOPSPhpD/UlEiYFEftmv4
-         rquw+KRMY3r4mLfFnYD/7UN67cW9M1orY+AOwa6RlZYkTaET8/Eibb/EU5TS3XIBrOg2
-         Ib7Prseixcjnj1AkFGpRxtGa03MOk7doGN7o1xszt2pZUxb358tJoSqeCGYf94SVzuuU
-         n3DeHoIBY3sFZQ6X+9ZKIJvJ/aQ1WyzZbKd61Po5dpgZtV0iEN/kvh70zeYlz3sur/g4
-         7jxOpjDMw3L8SL4Us7WQA7dVI2aenD42qp+IPqpEcRDr1xt3anWN6qG1WxnU2iDyaPZQ
-         QLrw==
-X-Gm-Message-State: AOJu0YzY5exkW6XUAyu1N6h1D8rpklcdBb9fqMgmOUmT9sUKqYst7jFS
-	rK1Venx87TCbhFzStW9560tHLgrsdKIx76qAZiD1Umuf7RFvtAFbcltgfJygNLNS
-X-Gm-Gg: AfdE7ckbcxj3kXF2x28p/T52AzmeNQ8DrvURRO8KrWadBocClKjxopq6slJ7WkVyCWP
-	fPJ8NaaL+qmWTZr0eP6ceetcXrbn5ke9o9Fcww8+WJmoar880KhEAelSPLVuytOFH1y5Po7UYh6
-	k7mqOCJ+NOeOnAOVlBZXzfWdQwDzS5h/CfwNpX/0JK9qq3HS5mzZEJ8vMDZsVbm7qIBN3unfq5N
-	SPhW1rxcK63Okr7py64G5VaO/+wvzG19sdh3c7y3A1MPe3D7+/yfmIQeh3EM9jh0kz12i4CWOm9
-	aJRDwzH+KeTbvkASUInrN222fqoPAmdra8U5xAQCqWd4Hno3w7O2RZEozXZi9F0jxC9gk1NnBh2
-	3KNiRnQ29efJxknCHI/XQnWOmeUP0VZ7R9OVmVe9kW5H6CL0hjOfDgk9QN7ctuv6MWYLrAoL8Pp
-	dL3EMGsnJNaEEPkFc2MnxWgEiESADfw50MQ9vNZoYYL4ihc0ms+iRzG/uR3x4JVM9bWthNd7FGw
-	vE6mV0=
-X-Received: by 2002:a05:6000:2892:b0:467:222a:a6c9 with SMTP id ffacd0b85a97d-467222aa754mr6573104f8f.40.1782036210648;
-        Sun, 21 Jun 2026 03:03:30 -0700 (PDT)
+        bh=kbaqv0SFZQJBjRBPKXCNne2CJMpBAx0iotepDfutYis=;
+        b=O4w5niXnuxO6y7WVvbtL+hBxYBCMIXZt6IUBabC/K+m3HOEYTW6msbuzMeFxGDgDMv
+         t7ZAHHZ7vNT/tsuyBqQnP3g+q/0fy/cFGKeF7XrHBN9XaKqCq9pxp7xdN1luZGU0HBby
+         lcrVJQE6FfgWl5rjUekDKUTuxhmoZ1gNu9Ehqq/+QPc9xHJ3NnN5UC8jqRDgESWJL5av
+         cOSxAs9x3C/tyC2ShTDSHYipIu95g1vx84R2WaD3KlpntRO3DHqLcbyXZSxH9xNurApD
+         KFQhNxL2cTiX5IkwSHAo7mPpE6/wqYnyfePHduaYZLWqIt7Xx9yKXi0GgOVDvASvp6W+
+         q3NA==
+X-Gm-Message-State: AOJu0YzunFLlnD9OBC4fjNiLtEv/qGXhbZ21KJ0kt9I4ex1GG6rjDPON
+	QNoNiVapvE3vnQYQUpwhQvFHbx3r2SyEXY+e8yTu7vbgw08KA+FCLn6iE3fEDeTY
+X-Gm-Gg: AfdE7clkkFJuHrfN+ZF9VLqhsKEWmWMMk1yvDDIsgpebTEFsdBhIc1dkp+uZYl0/22t
+	t3C0Y65kORu1KQtnXU1gpVnBLTZW5xtwIyKM/Qd3pRNITcweb+AsRzL70SZGCK/Unsf/H3S72Sq
+	HH0r5IBdYHnUY1hnnxRCCguuA35Gk/JY1FYXlUBUmTgo0oYvP78SABxKOLINkXfNdpJ8MWyZmnE
+	EuSPIso/IIsUO+MlEQynmS6Tx/QRtfCepzzMIlZpWlXfKSHuTTKtUOreLpdwVgN1rqO84JdlEL7
+	WlGOFF1Llyiz5Hd1Pp5/i2FJyBT3pk4fRPR1p/cWI2x00sZ6FSe2eELioA3k60LyYjAbZEqvy16
+	zEhxiLoaKbzszcAP4xmvilTkw4JQNAiH7K64m/V7O4AdNzc7uAUukH8NukZDx4OLK1mhgElFWDD
+	S0FRlA33xrN0S+7vqXF4xHPD4/cF3UgJ7iVq6YeQVvYEveEcJ6MOCsAAysFkmHzEElLZseuDPdr
+	YHUZ5s=
+X-Received: by 2002:a05:600c:628f:b0:490:9804:afdc with SMTP id 5b1f17b1804b1-4923f56c067mr170228675e9.23.1782036211668;
+        Sun, 21 Jun 2026 03:03:31 -0700 (PDT)
 Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-466643f563dsm14400283f8f.3.2026.06.21.03.03.29
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-466643f563dsm14400283f8f.3.2026.06.21.03.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 03:03:30 -0700 (PDT)
+        Sun, 21 Jun 2026 03:03:31 -0700 (PDT)
 From: Petr Wozniak <petr.wozniak@gmail.com>
 To: netdev@vger.kernel.org
 Cc: sd@queasysnail.net,
@@ -87,9 +87,9 @@ Cc: sd@queasysnail.net,
 	edumazet@google.com,
 	davem@davemloft.net,
 	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: [PATCH net v5 1/2] xfrm: propagate -EINPROGRESS from validate_xmit_xfrm()
-Date: Sun, 21 Jun 2026 12:03:26 +0200
-Message-ID: <20260621100327.40203-2-petr.wozniak@gmail.com>
+Subject: [PATCH net v5 2/2] xfrm: fix stale skb->prev after async crypto steals a GSO segment
+Date: Sun, 21 Jun 2026 12:03:27 +0200
+Message-ID: <20260621100327.40203-3-petr.wozniak@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260621100327.40203-1-petr.wozniak@gmail.com>
 References: <20260603064659.3867-1-petr.wozniak@gmail.com>
@@ -108,7 +108,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -116,13 +116,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FREEMAIL_CC(0.00)[queasysnail.net,secunet.com,gondor.apana.org.au,kernel.org,redhat.com,google.com,davemloft.net,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300873-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300874-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:kuba@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:petr.wozniak@gmail.com,m:petrwozniak@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -136,94 +136,49 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,queasysnail.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C6B0D6AA900
+X-Rspamd-Queue-Id: 99C4D6AA903
 
-validate_xmit_xfrm() returns NULL both when a packet is dropped and
-when it is stolen by async crypto (-EINPROGRESS from ->xmit()).
-Callers cannot distinguish the two cases.
+skb_gso_segment() leaves the segment list head with ->prev pointing at
+the last segment, an invariant validate_xmit_skb_list() relies on when
+it sets its tail pointer (tail = skb->prev).
 
-f53c723902d1 ("net: Add asynchronous callbacks for xfrm on layer 2.")
-changed the semantics of a NULL return from "dropped" to "stolen or
-dropped", but __dev_queue_xmit() was not updated.  On virtual/bridge
-interfaces (noqueue qdisc) __dev_queue_xmit() initialises rc=-ENOMEM
-and jumps to out: when skb is NULL, returning -ENOMEM to the caller
-even though the packet will be delivered correctly via xfrm_dev_resume().
+When validate_xmit_xfrm() walks a GSO list and some segments are stolen
+by async crypto (->xmit() returns -EINPROGRESS), those segments are
+unlinked from the list but the head ->prev is never updated.  If the
+last segment is the one stolen, the returned head still has ->prev
+pointing at it, even though it is now owned by the crypto engine and may
+be freed.  validate_xmit_skb_list() later does tail->next = skb, writing
+through that stale pointer -- a use-after-free.
 
-Return ERR_PTR(-EINPROGRESS) from validate_xmit_xfrm() for the async
-case so callers can tell it apart from a real drop.  Update
-__dev_queue_xmit() to handle ERR_PTR(-EINPROGRESS) from
-validate_xmit_skb() correctly.  Update validate_xmit_skb_list() to
-use IS_ERR_OR_NULL() so that ERR_PTR(-EINPROGRESS) is not mistakenly
-added to the transmitted list.
+Repoint skb->prev at the last retained segment before returning.
 
 Fixes: f53c723902d1 ("net: Add asynchronous callbacks for xfrm on layer 2.")
-Suggested-by: Sabrina Dubroca <sd@queasysnail.net>
 Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
 ---
- net/core/dev.c         | 10 ++++++++--
- net/xfrm/xfrm_device.c |  4 ++--
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ net/xfrm/xfrm_device.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 5c01dfaa6c44..f7ffc4d29597 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4018,6 +4018,9 @@ static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
- 	return NULL;
- }
- 
-+/* Returns the skb on success, NULL if dropped, or ERR_PTR(-EINPROGRESS)
-+ * if stolen by async xfrm crypto (delivered via xfrm_dev_resume()).
-+ */
- static struct sk_buff *validate_xmit_skb(struct sk_buff *skb, struct net_device *dev, bool *again)
- {
- 	netdev_features_t features;
-@@ -4089,7 +4092,7 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
- 		skb->prev = skb;
- 
- 		skb = validate_xmit_skb(skb, dev, again);
--		if (!skb)
-+		if (IS_ERR_OR_NULL(skb))
- 			continue;
- 
- 		if (!head)
-@@ -4860,8 +4863,11 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- 			goto recursion_alert;
- 
- 		skb = validate_xmit_skb(skb, dev, &again);
--		if (!skb)
-+		if (IS_ERR_OR_NULL(skb)) {
-+			if (PTR_ERR(skb) == -EINPROGRESS)
-+				rc = NET_XMIT_SUCCESS;
- 			goto out;
-+		}
- 
- 		HARD_TX_LOCK(dev, txq, cpu);
- 
 diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 630f3dd31cc5..19c77f09acc9 100644
+index 19c77f09acc9..aec1e1184a71 100644
 --- a/net/xfrm/xfrm_device.c
 +++ b/net/xfrm/xfrm_device.c
-@@ -182,7 +182,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
- 		err = x->type_offload->xmit(x, skb, esp_features);
- 		if (err) {
- 			if (err == -EINPROGRESS)
--				return NULL;
-+				return ERR_PTR(-EINPROGRESS);
- 
- 			XFRM_INC_STATS(xs_net(x), LINUX_MIB_XFRMOUTSTATEPROTOERROR);
- 			kfree_skb(skb);
-@@ -224,7 +224,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
+@@ -224,6 +224,14 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
  		pskb = skb2;
  	}
  
--	return skb;
-+	return skb ? skb : ERR_PTR(-EINPROGRESS);
++	/* skb_gso_segment() set skb->prev to the last segment, but async
++	 * crypto may have stolen it above without updating ->prev.  Repoint
++	 * it at the last retained segment so validate_xmit_skb_list() does
++	 * not chain onto a segment now owned by the crypto engine.
++	 */
++	if (skb)
++		skb->prev = pskb;
++
+ 	return skb ? skb : ERR_PTR(-EINPROGRESS);
  }
  EXPORT_SYMBOL_GPL(validate_xmit_xfrm);
- 
 -- 
 2.51.0
 
