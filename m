@@ -1,188 +1,321 @@
-Return-Path: <netdev+bounces-300887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Qs+BDNwWOGpfXwcAu9opvQ
-	(envelope-from <netdev+bounces-300887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:52:44 +0200
+	id yYelGW8fOGqEYQcAu9opvQ
+	(envelope-from <netdev+bounces-300888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 19:29:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 917CC6AB4C3
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:52:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE1C96AB57A
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 19:29:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ixit.cz header.s=dkim header.b=l9cQJcv3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300887-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300887-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=ixit.cz;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="I/6q6Y7p";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300888-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300888-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9947C3008891
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 16:52:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D02B3015465
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 17:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119322D1916;
-	Sun, 21 Jun 2026 16:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4382DECBA;
+	Sun, 21 Jun 2026 17:29:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ixit.cz (ixit.cz [185.100.197.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39AC299A82;
-	Sun, 21 Jun 2026 16:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95117299A82
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 17:29:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782060762; cv=none; b=s/dP4deciKqoPMR4m8eq+SqU9s86or0neE+VzECIwa3gXJkIT9iv6BRBVx3x56DY8B1AUTyABadhfnWBsAdtiZFhwBS0uQ3zWx9qLkhTLRfkjfnIcl9itfC4hmkSMUMqRhxruQeqlo3jRFNwBbmvHDXb3Ax5Lq1tpaQH+wr9whs=
+	t=1782062953; cv=none; b=kYkHDYJbZJmO0OzpthksR/Lcql0S2HtGVJ9rlylAF+T9egdiEa6MlX9SegLRJOFDNsdn3G/ozHqvdrDgjH4yCLItmx09SLliTKPI7N35dFxls6y8TdT8ifdg9g6cD7W2YItxO0P3+tovN/IyZTayAT6Pmk4JBGVQEBIAwyXRm/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782060762; c=relaxed/simple;
-	bh=n4DcqULpgEwZKzd8ONh1Wqzj8GN39eT8cmfx5gOs3LM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mnkE+1u0Gm4/tVclM0BQcIeqKg7XOac3nDRakU3AVtHFavR3inSPJGai8yDPghaVOlcuao2gGJP4a79hyyPne3g5C+qfnjaA6BNteKFAlpylc5gIOmGG3L1X9q3G6BBtx0DICxB/4hwzUzbfnPVu37SIWQRHMe4TkaDV1EEddx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=l9cQJcv3; arc=none smtp.client-ip=185.100.197.86
-Received: from [10.0.0.200] (unknown [10.88.125.21])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 084E8534104B;
-	Sun, 21 Jun 2026 18:52:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1782060757;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DtDjWThKqvc8sJv6EzLWSNbPDb1sKWisRU5mxG2pIjQ=;
-	b=l9cQJcv3pC0Qgw5M2FQbd6JnlYU6RwsK8+M9gep2Xru3BqB6ntBtfmt+eHcJowUk/XflyI
-	4+N17tdfJoKrh0iAt+B1IflEe3FlZHlJZdsS0dTQLnu/uCZM/MetO0NaHs/BTT6SiK8Z6V
-	5lcF32vGPFu3Vdl6aonJPCctdQJ6v+k=
-Message-ID: <78e283f0-1493-4d72-92fe-e6444458fb91@ixit.cz>
-Date: Sun, 21 Jun 2026 18:52:36 +0200
+	s=arc-20240116; t=1782062953; c=relaxed/simple;
+	bh=ooKs+tObdJQYcUiMrUCinsxvErsdtsBaWgUuYc7y9dk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HxcGIFWcGNij+diSG4U0KMorNyBip8NdgjjeaGYiPAocIiTZwExLgcN05Z2TIv4V31nDkTw3ZmkdmOpcQ3mTx6T9r0fouQvqkS0ziXc2BSiK65Nn5JRhMiZ0PUz+Iuz+WZgtWM+inzwLnzy0bsqsf6TVDn4ZKominjElUq/9qWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/6q6Y7p; arc=none smtp.client-ip=74.125.82.48
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1397e093f90so9521820c88.1
+        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 10:29:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782062951; x=1782667751; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=odj0L/R/VEGOCXSJvy9yUhx0KC/Mishkz8wmOHK4I/M=;
+        b=I/6q6Y7p86wki6uXqclxNjIklFd359yXbffckpDH0NwIi/rMhDKZPT4126VGs4IXoR
+         SB0aoPlQkUAlpLK5CPWx2AM8pI8WhfOFDbHaQ+BX6O95fjjXGBAGuqDWfq6fnZa9jIT/
+         8YAyk0ly2RXUwjKd/nHSR6cN8viVgOt286ZCQT7j950fAlkfGI+NjhhNnl81+bzJQbu1
+         ogESh1YLo72lye8cLERcet4Zzp1cRGDBnPQaVN73Z5qzCl6qSye4Wft4B4dlsAtnq7QG
+         gHEaA90O1Shh1RicXnPFiT65sO8DZYo8tz7v7bKnppI7F/ClOrFcPA9bqFl49OA7WpEL
+         2YVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782062951; x=1782667751;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=odj0L/R/VEGOCXSJvy9yUhx0KC/Mishkz8wmOHK4I/M=;
+        b=KBeN9idquTJFbc4gdHRTDQP5wsBNsWu0BNezr2ZEnbVgibgZpewzyTvDE1bsRYfBWL
+         yWcBOUEHVXY4uf7yQD3JuwZrcZJy2mvft/LZ42gNjwxd+ngwBmDL9ESrtYnldupI5Xnr
+         sIx08gBGqK0F8mqIjP96pcMgytj1vpWBZmyvLDPbpAMDCEY+PcNHjCPOOZsLuyze2Sqq
+         n8S3OeWIOdjUlvKbsN1fUxdBZEh3kDM/XNBeLOo7LFQNGw1hEd/7SpMvPKhfVguPBUUM
+         7Vf9c7qZdzDKCBzB6ga/z8mIz3t0DMoS4Tfm02B1Ivvh+ovEY0fv/qi9/FB6Zu5Yjh/G
+         fAXQ==
+X-Gm-Message-State: AOJu0Yz5mBLbN7VCA9tZdk3Uc+n2MUsBplxQJfj218Xfgdm3O4HkU1S/
+	6lkSRGJwDE9zQ9+VP3IAZEzAtnZH55qaDfkuiYaUrFg531ULuCVf7l1n
+X-Gm-Gg: AfdE7cl+vWauwL2Hc+2IKXsbYUFpZ/Ohgyy0SsWpJ6kgAndlu/9VS0g1+89CSKcQlF7
+	5JveHtZiTPOGy7TsW9xONPywIZEESS7dB6MebY2xlZkeUP2CdUEOwgTKBba3rsY0//GWzM67zTL
+	Dr2/j1HuOpUcuxVjPdtbebZhKO4XtpKcaKiKDciPrny/8KWKGw2eNWlqt11fH9bG2QJy+3g3uV6
+	rIzMEOyqmWEUWjF/lhM1/jc8WSP8GXY/oJdLfWHMeL5/cGw+bkpcBzAhzkFxLP1Ki4XXeWQKn/t
+	AAqJEjipe7k5Wm11vTIeIr7p8SsXXAmwjVHGCo8Nz7s2zFc7bpKp4hXXPfc/n9JrrsU1F3LJLmS
+	uN0SMSIEvb4ZKOAShwTzGNCeb2GY8J/ooCE5wafgADAai84qDSPlf1kq2bbQUhDD1h3tXIQ/9/N
+	kbwKQLT06Pc8/F21pWQRoc+wA=
+X-Received: by 2002:a05:7022:6988:b0:136:e42d:2c2b with SMTP id a92af1059eb24-139a36740femr6948564c88.17.1782062950394;
+        Sun, 21 Jun 2026 10:29:10 -0700 (PDT)
+Received: from localhost.localdomain ([188.253.121.152])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139add6d76dsm5495591c88.12.2026.06.21.10.28.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Jun 2026 10:29:09 -0700 (PDT)
+From: Zhenzhong Wu <jt26wzz@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	menglong8.dong@gmail.com,
+	eddyz87@gmail.com,
+	shung-hsi.yu@suse.com,
+	stable@vger.kernel.org,
+	mykolal@fb.com,
+	tamird@kernel.org
+Subject: [PATCH stable 6.6.y v4 0/4] bpf: linked scalar precision fixes
+Date: Mon, 22 Jun 2026 01:27:31 +0800
+Message-ID: <20260621172735.409355-1-jt26wzz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/2] nfc: llcp: fix OOB reads and integer bugs in TLV
- parsers
-To: Muhammad Bilal <meatuni001@gmail.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, oe-linux-nfc@lists.linux.dev,
- david+nfc@ixit.cz, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org
-References: <20260519011937.12903-1-meatuni001@gmail.com>
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Autocrypt: addr=david@ixit.cz; keydata=
- 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
-In-Reply-To: <20260519011937.12903-1-meatuni001@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300887-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:meatuni001@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oe-linux-nfc@lists.linux.dev,m:david+nfc@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:stable@vger.kernel.org,m:david@ixit.cz,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ixit.cz:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,google.com,suse.com,fb.com];
+	TAGGED_FROM(0.00)[bounces-300888-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:haoluo@google.com,m:jolsa@kernel.org,m:menglong8.dong@gmail.com,m:eddyz87@gmail.com,m:shung-hsi.yu@suse.com,m:stable@vger.kernel.org,m:mykolal@fb.com,m:tamird@kernel.org,m:johnfastabend@gmail.com,m:menglong8dong@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 917CC6AB4C3
+X-Rspamd-Queue-Id: DE1C96AB57A
 
-On 19/05/2026 03:19, Muhammad Bilal wrote:
-> This series fixes memory safety bugs in the NFC LLCP TLV parsing code,
-> reachable from a remote NFC peer via crafted LLCP frames.
-> 
-> Patch 1 fixes nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv():
->    - u8 offset wraps to zero after 255 (widened to u16)
->    - OOB read of TLV header on truncated buffer
->    - OOB read of value field via attacker-controlled length byte
-> 
-> Patch 2 fixes nfc_llcp_recv_snl():
->    - OOB read of TLV header when tlv_len - offset == 1
->    - OOB read of SDREQ value via attacker-controlled length
->    - SIZE_MAX underflow when length == 0 in service_name_len,
->      bypassing the sn_len == 0 guard in nfc_llcp_sock_from_sn()
-> 
-> Previously reported to security@kernel.org on 2026-05-15. Willy Tarreau
-> advised posting to public lists as NFC is currently orphaned.
-> 
-> Muhammad Bilal (2):
->    nfc: llcp: fix OOB read and u8 offset wrap in TLV parsers
->    nfc: llcp: add missing bounds checks in nfc_llcp_recv_snl()
-> 
->   net/nfc/llcp_commands.c | 28 ++++++++++++++++++++++++++--
->   net/nfc/llcp_core.c     | 23 +++++++++++++++++++++--
->   2 files changed, 47 insertions(+), 4 deletions(-)
-> 
+Hi,
 
-Hello Muhammad,
+This v4 targets 6.6.y and keeps the v3 backport strategy: use the full
+upstream linked-scalar precision-tracking series, instead of the earlier
+d028f87517d6/9e314f5d8682 not-equal refinement backport path.
 
-could I ask for the patches rebase against for-next [1]?
+The original observed failure was found in Rust/Aya-generated eBPF
+around helper calls. Rust match lowering can keep a helper return value
+and a scalar filled through a by-reference helper argument in the same
+enum-style control flow. That makes it easy for the verifier-visible
+scalar values to become linked by scalar id.
 
-Thank you much for your work!
-David
+The relevant verifier-log bytecode from the original reproducer is
+below. The later instructions only store r7 into a map so user space can
+observe which branch the verifier kept.
 
-[1] https://codeberg.org/linux-nfc/linux
+  15: (85) call bpf_get_func_ret#184    ; R0_w=scalar() fp-8_w=mmmmmmmm
+  16: (79) r7 = *(u64 *)(r10 -8)        ; R7_w=scalar() R10=fp0
+  17: (15) if r0 == 0x0 goto pc+1       ; R0_w=scalar()
+  18: (bf) r7 = r0                    ; R0=scalar(id=1) R7=scalar(id=1)
+  19: (55) if r0 != 0x0 goto pc+6       ; R0=0
+  20: (67) r7 <<= 32                    ; R7_w=0
+  21: (77) r7 >>= 32                    ; R7_w=0
+  22: (b7) r1 = 1                       ; R1_w=1
+  23: (55) if r7 != 0xf goto pc+1
+
+The important verifier state shape is:
+
+  1. The program checks "if r0 == 0". The jump target is the success
+     path, and the fallthrough path is the failure path.
+
+  2. On the failure path, "r7 = r0" gives r0 and r7 the same scalar id.
+     The real success path skips that assignment, so r7 is independent
+     there.
+
+  3. At the later "if r0 != 0" check, an affected verifier can explore
+     an impossible continuation where r0 is zero and r7 is narrowed
+     through the shared scalar id as well.
+
+  4. That impossible continuation reaches the return-value comparison
+     with the wrong r7 value. When the real success path is analyzed
+     later, state pruning can consider it safe against the earlier
+     cached verifier state and skip the real continuation.
+
+The root cause is verifier scalar state tracking, not helper-specific
+behavior. A helper return value in r0 and another scalar can become
+linked by scalar id on one branch. The real success path can skip that
+assignment, so the two verifier states are not equivalent.
+
+The relevant pruning point is that regsafe()/states_equal() accepted
+the real success-path state against an earlier cached state where r0 was
+an imprecise scalar and r7 constraints were loose enough to cover the
+current r7. In the impossible path, r0 and r7 are linked by scalar id
+after instruction 18. In the real success path, instruction 18 is
+skipped and that scalar-id relationship does not exist. These states
+should therefore not be treated as equivalent for pruning.
+
+The upstream linked-scalar precision series fixes that root cause by
+recording, in jmp_history, which linked registers were synchronized at
+each conditional jump and by using that per-instruction history during
+precision backtracking. This covers both the original r0 == 0 /
+r0 != 0 shape and the r0 == 1 / r0 != 1 shape used by the separate
+runtime selftest.
+
+A Rust/Aya-specific runtime reproducer/selftest discussed in the v2
+thread has been submitted separately to bpf-next for review:
+
+  https://lore.kernel.org/bpf/20260611160749.391279-1-jt26wzz@gmail.com/
+
+That reproducer keeps the same helper-return/control-flow shape but
+shifts the success value to 1 before branching. This avoids depending
+on the not-equal-zero refinement and exercises linked scalar precision
+during state pruning directly. It uses bpf_skb_load_bytes() in the
+normal tc test-run path and does not require fexit attach or
+bpf_get_func_ret(). It is not included in this stable series because
+per review feedback it should go through bpf-next first before being
+considered for stable.
+
+Targeted results for that separate helper-status runtime reproducer are:
+
+  v6.6.142 + reproducer:                                  FAIL
+  v6.6.142 + v2 d028/9e backport path + reproducer:      FAIL
+  v6.6.142 + this linked-scalars series + reproducer:    PASS
+  bpf-next + reproducer:                                  PASS
+
+Changes since v3:
+  - add the tools/testing/selftests/bpf/verifier/precise.c expected-log
+    update for "precise: test 1";
+  - drop the v3-only collect_linked_regs() singleton cleanup and use
+    the final upstream linked_regs.cnt > 1 history-recording check in
+    patch 1.
+
+v3:
+  https://lore.kernel.org/r/cover.1781194510.git.jt26wzz@gmail.com/
+
+v2:
+  https://lore.kernel.org/r/20260607170959.823755-1-jt26wzz@gmail.com/
+
+RFC v1:
+  https://lore.kernel.org/r/20260601180400.1381736-1-jt26wzz@gmail.com/
+
+Backport details:
+
+This series is based on v6.6.142 / stable/linux-6.6.y commit
+924b4a879cbb ("Linux 6.6.142"). I would like it applied to 6.6.y first.
+The same issue is reproducible on 6.1.y, 5.15.y, and 5.10.y, but those
+trees need separate older-layout adaptations.
+
+Instead of backporting the d028f87517d6 not-equal refinement plus the
+9e314f5d8682 range-combining prerequisite, this series backports the
+full upstream linked-scalar precision-tracking series:
+
+  4bf79f9be434
+    bpf: Track equal scalars history on per-instruction level
+  842edb5507a1
+    bpf: Remove mark_precise_scalar_ids()
+  bebc17b1c03b
+    selftests/bpf: Tests for per-insn sync_linked_regs() precision
+    tracking
+  cfbf25481d6d
+    selftests/bpf: Update comments find_equal_scalars->sync_linked_regs
+
+Upstream series:
+  https://lore.kernel.org/r/20240718202357.1746514-1-eddyz87@gmail.com/
+
+Patches 1 and 2 are the verifier changes from that upstream series. The
+main 6.6.y-specific verifier adaptation is in patch 1: 6.6.y does not
+yet have the newer BPF_ADD_CONST scalar-id representation, so
+sync_linked_regs() is adapted to the older scalar-id layout. Patch 1
+otherwise keeps the upstream linked_regs.cnt > 1 history-recording
+condition.
+
+Patch 1 also carries the matching upstream test_verifier expected-log
+change for tools/testing/selftests/bpf/verifier/precise.c that v3
+missed. On 6.6.y this is a one-line update to the "precise: test 1"
+parent-state log, from regs=r2 to regs=r2,r9. Patch 2 then follows on
+top of the adapted layout.
+
+Patches 3 and 4 bring the upstream verifier selftests and comment
+updates. Patch 3 has one 6.6.y-specific log adaptation:
+linked_regs_broken_link_2 keeps the "div by zero" reject check, but
+drops the upstream mark_precise log expectations because 6.6.y does not
+derive the scalar-vs-scalar range for that non-constant JMP_X
+comparison. Patch 4 only updates the two pre-existing comments that are
+present in 6.6.y.
+
+Relevant selftest results on 6.6.y with this v4 backport:
+
+  test_verifier:
+    788 PASSED, 0 SKIPPED, 0 FAILED
+
+  test_progs -t verifier_scalar_ids:
+    all 18 verifier_scalar_ids subtests passed
+
+Thanks to Shung-Hsi Yu for reviewing v2/v3 and suggesting the upstream
+linked-scalar precision series as the preferred backport direction.
+
+Eduard Zingerman (4):
+  bpf: Track equal scalars history on per-instruction level
+  bpf: Remove mark_precise_scalar_ids()
+  selftests/bpf: Tests for per-insn sync_linked_regs() precision
+    tracking
+  selftests/bpf: Update comments find_equal_scalars->sync_linked_regs
+
+ include/linux/bpf_verifier.h                  |   4 +
+ kernel/bpf/verifier.c                         | 364 +++++++++++-------
+ .../selftests/bpf/progs/verifier_scalar_ids.c | 253 ++++++++----
+ .../selftests/bpf/progs/verifier_spill_fill.c |   4 +-
+ .../bpf/progs/verifier_subprog_precision.c    |   2 +-
+ .../testing/selftests/bpf/verifier/precise.c  |   4 +-
+ 6 files changed, 415 insertions(+), 216 deletions(-)
+
+
+base-commit: 924b4a879cbb75aef37c160b955b92f6894b11a4
+-- 
+2.43.0
 
