@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-300885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fzaeMoYSOGqbXgcAu9opvQ
-	(envelope-from <netdev+bounces-300885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:34:14 +0200
+	id bhrxDoIVOGoiXwcAu9opvQ
+	(envelope-from <netdev+bounces-300886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:46:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1956AB45F
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:34:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A536AB491
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:46:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ixit.cz header.s=dkim header.b=bvj7GHuZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300885-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300885-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=ixit.cz header.s=dkim header.b=BUrFzYSf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300886-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300886-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=ixit.cz;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 838AA3002892
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 16:34:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 59AB23009B0D
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 16:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491AE280CD5;
-	Sun, 21 Jun 2026 16:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6E122D7B9;
+	Sun, 21 Jun 2026 16:46:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED86F45039;
-	Sun, 21 Jun 2026 16:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711EC25A2A2;
+	Sun, 21 Jun 2026 16:46:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782059652; cv=none; b=VJTpgkG5C352bQ1an2Mr/iOtyq9CSl9hqtqh2SKX6dNP3crbGl2LuVcL7Dhd6cWNSzFguTh0uWJqO5Dezak8+cJmzSvO+M7lnBpcV62aTFIe7m2toQb9e20YATSHDpMkSGchZh/wQWrx4+b2si6m8Ubi+UBMWJ1Q0wb2zx9BCM8=
+	t=1782060415; cv=none; b=nFZM4K9z/kVz05NMi3nY+raKW8T5fGwUySQ05ih9qA3i9rr/t6v41UnODzMhVt7RTSVj4yCbQ0X7CgoZw4KaLzV1bq3paje86bWmSsWOjaQ4uOsgz7MFI1iBIW1P9rowgKBndCXulEOFcan2y0lHMkf5YiuYJU0kKlZnSyoH4gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782059652; c=relaxed/simple;
-	bh=Hihc0d25ofkCGXe1rFyi4MjJFjKA06I0KsLZ79DtpUY=;
+	s=arc-20240116; t=1782060415; c=relaxed/simple;
+	bh=STXvpeu7nQOPue5B6sSF92suZAxf9Rv5L2bRXa9ouAo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qz6QokOgthvtooNPzdZIu7udIzpSDdC7DmPOiZ67yQFA6rb/aU4Iuix/q34Yh6ydFpwlQNfEba4Id11PbAnf23V+hHtFGo1Ib1rBe2yiDg/KMwb/lJzGWvyvd8hiN/OXMEPuL2peVuICH3naeOBiBMC5uTOmDeyefjjBDfSimlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=bvj7GHuZ; arc=none smtp.client-ip=185.100.197.86
+	 In-Reply-To:Content-Type; b=MgrtWlI1eh+0ka162mQ7kluJHkuKMuO42imOO2HnpeZsbKTAOLbDl2fhN6IYGEYq6FwCasBfRtmnMgbwgUvtkStNbrtWtVn9vkZULSPUq6uk8B/lAtkkxdOTgSKrF5JleaNQHn9C9qBaMQP9noY2P8CrtUXhEPQRnU1XfGlG1GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=BUrFzYSf; arc=none smtp.client-ip=185.100.197.86
 Received: from [10.0.0.200] (unknown [10.88.125.21])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange x25519)
 	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 30F435340D13;
-	Sun, 21 Jun 2026 18:34:07 +0200 (CEST)
+	by ixit.cz (Postfix) with ESMTPSA id F38655340EE1;
+	Sun, 21 Jun 2026 18:46:49 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1782059647;
+	t=1782060410;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kYUDKNSX/9JYnl1+UGKEb9+rQ0lzioxAB2ameWxhEbU=;
-	b=bvj7GHuZQgNAgGeycZmoiPHG6JK9RfpgAaOH6NlcZ66duBG4KMugMr1IuFJY0mq5C+MxhD
-	10w76OcX7wbmcBsE3TmhDumHxDRlex6ZU7/Nq/N0L+K71oV4aqJaq7hzjtS7QVfenq6zP7
-	sfie7BzpGxQuCIi4npwU3bIZjSqaS4g=
-Message-ID: <404c1325-78c8-4f7c-98d6-63709f3e5895@ixit.cz>
-Date: Sun, 21 Jun 2026 18:34:06 +0200
+	bh=QB4kZzq0d7QARlHOMNAX0CIwDMajl4yKzadziq8ERbs=;
+	b=BUrFzYSfH8uZgw2BLqsXO02B28Ees4sWKW6eM6lu3xxx4TIwSbqIMY22cvYdqnBVodAHKu
+	dLt9BYndBTFX4FLqAzt3ZMj7CbFPKf0ujuX/F+AcY1J5mDrvioQujA+pkuRqiedgWs7uDf
+	ivohex+RYD95g11eQ8VfPQC1jzw/NoA=
+Message-ID: <415b6372-9bb5-4488-b7e2-3873066ff912@ixit.cz>
+Date: Sun, 21 Jun 2026 18:46:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,12 +59,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] nfc: llcp: bound SNL TLV parsing to the skb and
- add length checks
-To: Doruk Tan Ozturk <doruk@0sec.ai>, oe-linux-nfc@lists.linux.dev
-Cc: david.laight.linux@gmail.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260609202543.42282-1-doruk@0sec.ai>
+Subject: Re: [PATCH net] nfc: nci: validate packet length when parsing NCI 2.x
+ RF interfaces
+To: Zijing Yin <yzjaurora@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260611162718.2301552-1-yzjaurora@gmail.com>
 Content-Language: en-US
 From: David Heidelberg <david@ixit.cz>
 Autocrypt: addr=david@ixit.cz; keydata=
@@ -110,55 +113,91 @@ Autocrypt: addr=david@ixit.cz; keydata=
  zRKcgRumz2Tc1ouHj6qINlzEe3a5ldctIn/dvR1l2Ko7GBTG+VGp9U5NOAEkGpxHG9yg6eeY
  fFYnMme51H/HKiyUlFiE3yd5LSmv8Dhbf+vsI4x6BOOOq4Iyop/Exavj1owGxW0hpdUGcCl1
  ovlwVPO/6l/XLAmSGwdnGqok5eGZQzSst0tj9RC9O0dXO1TZocOsf0tJ8dR2egX4kxM=
-In-Reply-To: <20260609202543.42282-1-doruk@0sec.ai>
+In-Reply-To: <20260611162718.2301552-1-yzjaurora@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-300886-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300885-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:oe-linux-nfc@lists.linux.dev,m:david.laight.linux@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:yzjaurora@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ixit.cz:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4D1956AB45F
+X-Rspamd-Queue-Id: 86A536AB491
+
+On 11/06/2026 18:27, Zijing Yin wrote:
+> nci_core_init_rsp_packet_v2() parses the variable-length list of
+> supported RF interfaces carried in an NCI 2.x CORE_INIT_RSP without ever
+> validating the controller-supplied lengths against the size of the
+> received packet.
+> 
+> Each list entry is a (RF interface, RF extension count, RF extensions[])
+> tuple. The loop walks the list using the per-entry extension count
+> (rf_extension_cnt, up to 255) taken straight from the packet, so a
+> malformed CORE_INIT_RSP can advance the read pointer far past the end of
+> the skb data buffer. The stored interface count is clamped to
+> NCI_MAX_SUPPORTED_RF_INTERFACES so the write side is bounded, but the
+> read side runs off the end of the buffer.
+> 
+> A malformed CORE_INIT_RSP from the controller, also reachable from user
+> space through the virtual NCI device (CONFIG_NFC_VIRTUAL_NCI) once the
+> device has entered NCI 2.x mode, therefore makes the parser read past the
+> end of the response buffer while walking the interface list, copying the
+> out-of-bounds bytes into ndev->supported_rf_interfaces[].
+> 
+> Reject responses shorter than the fixed part of the structure, and make
+> sure each interface entry and its extension bytes lie within the received
+> packet before dereferencing them. A truncated or malformed list is
+> treated as a syntax error, which fails the CORE_INIT request instead of
+> reading out of bounds.
+> 
+> Fixes: bcd684aace34 ("net/nfc/nci: Support NCI 2.x initial sequence")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Zijing Yin <yzjaurora@gmail.com>
+> ---
+>   net/nfc/nci/rsp.c | 18 +++++++++++++++++-
+>   1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+
+Hello Zijing,
+
+in meanwhile [1] got merged earlier patch, which also seems to address the issue.
+
+Could you review that the issue is now fixed for you?
+
+The NFC tree is here [2].
+
+Thank you and sorry for the late reply
+David
 
 
-On Tue, 09 Jun 2026 22:25:43 +0200, Doruk Tan Ozturk wrote:
- > nfc: llcp: bound SNL TLV parsing to the skb and add length checks
 
-Applied, thanks!
-
-[1/1] nfc: llcp: bound SNL TLV parsing to the skb and add length checks
-       commit: ed85d4cbbfaa4e630c5aa0d607348b42620d976b
-
-Best regards,
--- 
-David Heidelberg <david@ixit.cz>
+[1] https://lore.kernel.org/all/20260527052625.3309581-1-yun.zhou@windriver.com/
+[2] https://codeberg.org/linux-nfc/linux
 
