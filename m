@@ -1,106 +1,86 @@
-Return-Path: <netdev+bounces-300892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8nfkGlkgOGrVYQcAu9opvQ
-	(envelope-from <netdev+bounces-300892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 19:33:13 +0200
+	id xw3oDJInOGrBYwcAu9opvQ
+	(envelope-from <netdev+bounces-300893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 20:04:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96086AB5C1
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 19:33:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 699D76AB667
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 20:04:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Bb45bJJO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300892-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300892-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=eJlJYdUu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300893-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300893-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5069301326A
-	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 17:33:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0732300A8F1
+	for <lists+netdev@lfdr.de>; Sun, 21 Jun 2026 18:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A162F6931;
-	Sun, 21 Jun 2026 17:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373FF1F151C;
+	Sun, 21 Jun 2026 18:03:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC85B244665
-	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 17:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E002C42050
+	for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 18:03:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782063187; cv=none; b=sbXoJThJvlAE84zbqmO0p5dU1tGkDdBxE2UuMeJlLKg3Jp+T6JSMZ6riDeviriy6RnLCl35ZgjLuJKuBUfqp/YDTnXDkSD9IpgEauKWYZZdwgsP+RCVTU24OkfS1hkGaNxzGFRUm0fn1tR/34roDUmSbVFIx2hnAFsGlT/AF1/Y=
+	t=1782065039; cv=none; b=XrXWQK6CVLi5n26qX5ln9EE5MeM/IwaggfDqirPPzKXlSSKGe74AGSWNheDaxiYymwaiPUF72ohB/F7iY6vxcw6UWvUD/qyC1jn3R9i76qwZa3KBQZLS6fyH8PKmVDN03MvSflCStzgZt0wh0aRyIXuszrHEOlgyXXb6Y8UISYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782063187; c=relaxed/simple;
-	bh=gzrrEiwtcJ9ivwLoJnL+m8n0FS7ubVze2VOLPpakTLw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cNtRJowedFa5jgV+tEGxdvuh7s+OFsdpRbm5mlqNjtdzzOK8/CNdRUCm/Du0Uy6FZ4RqDMqisP+iue9qfsAZD2vWh6oZ8ZAixjMY4LUhRxS87hwp8AFqsd1M8jAVyvCVLy0LCZctYiqsEyWPxWQbEO3TIu4yTYJCwT51/A528i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bb45bJJO; arc=none smtp.client-ip=74.125.82.54
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-139a5f4ca15so2066894c88.1
-        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 10:33:05 -0700 (PDT)
+	s=arc-20240116; t=1782065039; c=relaxed/simple;
+	bh=nqTXG96TwicbWT2+ycxrvD2KdRK4W6MkNw8m3usCob4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JdlsqN9LtuKArX4s/7VR5M7HESJObOr+WpElNFSFqjVXo64q0aajjbC4XprVfOZPo1ENrB1zU9J7U4B+so5VWcw6d3GLryp1u5prXBMcDMvsoM4vsTuyY3R8Bqf+CTYO0uD1HsR9+ae4cNM/eH3B/vIuPlc/SbvuuHs2LnxMIik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJlJYdUu; arc=none smtp.client-ip=209.85.161.47
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-69e1f777bcaso3238280eaf.1
+        for <netdev@vger.kernel.org>; Sun, 21 Jun 2026 11:03:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782063185; x=1782667985; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8/VThkN0DzvQ1cJGYXECCnKHRSweermGUmHPNf82Maw=;
-        b=Bb45bJJOnW2gZI/MoOH2aN6SFbgp+FgFBKX92TLNsDLD2NeNUy9T0FpU5kbAQvQJQa
-         d6JZWpJD+IOGQzvaifzCalDgOanoH5IUXpHBVd4EMz69EadslkOwg0oDNW9CG2RQc5WK
-         2+2O2w23mC2EtLJ2ui5ryuk+HfgWhIKdLN/+ME1PB2FWgDCZXf+k+W93ESqUMtE9CPh2
-         SykioqLqsTdTx+6ezE5CcXiUlSPzjmOZcwRd9hOnI3pAxQbRqmD+VcnbxUKJVVcLBI3q
-         hXhBWBybOGdFIw67KHUco4InnoG2xox5HiKx3v9ZeGrNkilFYCLGKanzvmF19RWZksSP
-         fkHA==
+        d=gmail.com; s=20251104; t=1782065037; x=1782669837; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+BhuQIQObpKBP/rKiRmJIu1e7WC00kVjrFFSWiSEAvs=;
+        b=eJlJYdUuIKJX0SRR4QVZDkkDvKDTb0HR/3LRqdJq9dWlz4HzyMqj6ambg/sO9lVYSZ
+         whGAT2lrtzJEFSRtpGVk/dWysG9WKGuVTLT2ThEulHUZpZPL0GE978MnXTWeZBqFjNZn
+         5eA7rx0YodtnH4bEawz62JFVSpCx0E29+X+mdfNhAGYkx6dCnHtYSVyK1jHXszTD8mzV
+         xK7WPI3k6eaZoRajGomE+ski2+BoRruiMw1vh263o7SRCC8MEzrfyWlCNfGSki6Finav
+         uaJmY4qWOwhVi9tiQcn4F2+LPBFBx2oQLjGqdvmaWVEP7VhlbAtR4dPqPZgmK92vbmmX
+         xuOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782063185; x=1782667985;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8/VThkN0DzvQ1cJGYXECCnKHRSweermGUmHPNf82Maw=;
-        b=U28IYzeeXzSMqnwXss8UJxGvekB8b0HJQPhpPf654w+fo79ZU42kJYEynwKRf3X+sF
-         Ea8ZBtX+DBf8OjIVmiWq+yqZMOtz7s5aULm1jzC3V6qf20uJqbR/rVfsFyPa7/PgB5gQ
-         /iiMrT/JFo56hSNS2iRt/HdBtV0MBoNSlDbnKD4h/f6nloP9DTMvwljfe7yqGmHP1dLr
-         YFaxqSInQQuytixVfTnVOODxWuFNzIrFZKfSPhjfR7IrhTKE9O1Fp2GtJIiplefAt3SL
-         NLpAlQ8lZ6yOhrWYnJwSx1lxM6dX0l+mo7XQlMPj2m9eLcnN0tzXl/V1Vod0xz+qf79l
-         FF4w==
-X-Gm-Message-State: AOJu0YxZR/FSApbkmG+9f5ZkZxIfwfbrJ76dd+9bDQJyf9/cZmXOE3w6
-	CvdUGzPbs/CWOuITGPnMrfGwrFYiu7vQLn/ca+OF26g1pt/AEAMkwZgJ
-X-Gm-Gg: AfdE7cmSowDvJN/rUaal8bU55ymqDuS4N8Q05olEqutGZ/BMZ3q3WlTZIwfYms2x7ao
-	xH/D7+auMEKUPEDBAHZ74/m8/4p1QwWv6HUqIsxdyhzFxfW/vRxKrrpNpE7cN/r1ja+eAewst4J
-	8o5r1t0/8/oJZ1wGQIPmKV6EEgIH6/6fOFMT4eQtC8UEzjRHJQn53fEQ9pzm38cUvdUlN51jfGB
-	cw1jQAglESQXu/bG5saIyz6IyvuHWGjj7cuvvtMtvF3VfDGy8O8AlPbQnmyOZT9eqbBZeg0RjDs
-	NJLVzi3+89JnFReJVvb7YtF6mYTGz6Gc3rlAl1zElwOSGVyak5AIKqjAxpyXf8v75tJdy+Jt9PA
-	bWBwUci0nAZTmkY8y5rn5Lm24RPyjl6ylpKGQm5HW2Vn4Er+37yetYsATJ1xUR4C74bJrabHDNV
-	CsiJXix9Au5lfWODsJ3lT0FIBOk+Asr6REmg==
-X-Received: by 2002:a05:7022:608:b0:137:fad9:3a30 with SMTP id a92af1059eb24-139a365c5a0mr5970356c88.19.1782063184980;
-        Sun, 21 Jun 2026 10:33:04 -0700 (PDT)
-Received: from localhost.localdomain ([188.253.121.152])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139add6d76dsm5495591c88.12.2026.06.21.10.32.21
+        d=1e100.net; s=20251104; t=1782065037; x=1782669837;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+BhuQIQObpKBP/rKiRmJIu1e7WC00kVjrFFSWiSEAvs=;
+        b=DY4RJ+g9JjguLF3I3URAI96ZX8njMdhI61lCf6mADnxQC+Q3JjYHCJ5DZ2yNwCGi7O
+         xtOheWK7uQBkTFiwFU+3PX/Go93BSslTeNzX0F8I3KS03zsSsNQM4mQqjt9AsHgdeTjt
+         9ZXdvMXFyWFjo6aq78FXaPKrEJS6dxypyhSJdtyO6Zz+qB7d053i8VyrTR0AiwM4agHK
+         pvTDTr/L7ndQKUL2VVTCN5Jeu20ijGhsapS0UInXZIonmP2hpQL2ln9pEmrk+elwUh/+
+         hAOx6qSoc878lUTwTtdj141FoFd8lRJUgvKsnDLojAmF9/hcwHQ7pprq0tQnQ4irY9wz
+         J8rw==
+X-Gm-Message-State: AOJu0Yx33PiYDhE5EsvWQy/VpHV+B3pDP6BU2kEHEyBQohsXsKaSo7OR
+	D+CSu8tl2bzV9ekbDk57+TgCpYWxHzJBdrPIQ2N3MPL5YDL1NPXPU8O/3Lo1YALk
+X-Gm-Gg: AfdE7cnkv8wsIPHJSkSXMLUsA5u9QJKuUW3tSglwK09aPe1D28Nm8vBr9IIP2K4/0qz
+	Uv3tj9HwTTIM6xa+8aAJqwFO+vgsKtOba8h92t5KuxHemEWdrbfwW5MLN6lMcEr9jTWgdrBlAUA
+	f6yFm1sL0I+WW7Ctfpt/CkN09Gz8tz9ToNeULjgO7oFHXLsR0S+wPxV0JKx0USp8+kQ+xJBJ+Y7
+	ew0VlAEHvIsjNpkdoQ3SMbAm1DHtYA37TpIXCpXBEmfrikZrXGq8D/QRYCSOHAqSC9p1WBxWB5d
+	+DgF2OLSYzMFGwh4VxsNUOs54KPr8ZVWKUl/xXSE26kkxcKC0Vpy6sgdfojTdMBFTjtXgSrP+wY
+	AN2KfdwlbOQ9fFKThw+n9T3hZQJ5se2KBUhBrEQaWjbwIGgkvjnDXDvjaqCZGXU+94Cj8dI4X9j
+	R2838DfHkVx97u2ob9fBYD0RFYbELgc/bQLA0x
+X-Received: by 2002:a05:6820:81c3:b0:694:85da:3f92 with SMTP id 006d021491bc7-6a0da01ef3emr7382482eaf.17.1782065036942;
+        Sun, 21 Jun 2026 11:03:56 -0700 (PDT)
+Received: from 94d39335bfd1 ([147.126.81.13])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4472f0475e3sm4338150fac.16.2026.06.21.11.03.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 10:33:02 -0700 (PDT)
-From: Zhenzhong Wu <jt26wzz@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	menglong8.dong@gmail.com,
-	eddyz87@gmail.com,
-	shung-hsi.yu@suse.com,
-	stable@vger.kernel.org,
-	mykolal@fb.com,
-	tamird@kernel.org
-Subject: [PATCH stable 6.6.y v4 4/4] selftests/bpf: Update comments find_equal_scalars->sync_linked_regs
-Date: Mon, 22 Jun 2026 01:27:35 +0800
-Message-ID: <20260621172735.409355-5-jt26wzz@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260621172735.409355-1-jt26wzz@gmail.com>
-References: <20260621172735.409355-1-jt26wzz@gmail.com>
+        Sun, 21 Jun 2026 11:03:56 -0700 (PDT)
+From: Rose Wright <rosesophiewright@gmail.com>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	Rose Wright <rosesophiewright@gmail.com>
+Subject: [PATCH iproute2] ip: return correct status from help command
+Date: Sun, 21 Jun 2026 18:03:11 +0000
+Message-ID: <20260621180311.8374-1-rosesophiewright@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,83 +89,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,google.com,suse.com,fb.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300892-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:haoluo@google.com,m:jolsa@kernel.org,m:menglong8.dong@gmail.com,m:eddyz87@gmail.com,m:shung-hsi.yu@suse.com,m:stable@vger.kernel.org,m:mykolal@fb.com,m:tamird@kernel.org,m:johnfastabend@gmail.com,m:menglong8dong@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[networkplumber.org,gmail.com];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300893-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[rosesophiewright@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:stephen@networkplumber.org,m:rosesophiewright@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rosesophiewright@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B96086AB5C1
+X-Rspamd-Queue-Id: 699D76AB667
 
-From: Eduard Zingerman <eddyz87@gmail.com>
+Currently, "ip help" or "ip -help" always returns an error code because usage() is used as a fall through on "ip" and defaults to stderr with -1.
 
-[ Upstream commit cfbf25481d6dec0089c99c9d33a2ea634fe8f008 ]
+This is a minor bug that breaks "ip help | grep" and other scripts that rely on standard exit codes. The fix is to pass the status code as a parameter into usage() and change stderr to stdout when needed.
 
-find_equal_scalars() is renamed to sync_linked_regs(),
-this commit updates existing references in the selftests comments.
-
-Signed-off-by: Eduard Zingerman <eddyz87@gmail.com>
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-Link: https://lore.kernel.org/bpf/20240718202357.1746514-5-eddyz87@gmail.com
-[ zhenzhong: only two pre-existing comments still needed updating in 6.6.y. ]
-Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
+Signed-off-by: Rose Wright <rosesophiewright@gmail.com>
 ---
- tools/testing/selftests/bpf/progs/verifier_spill_fill.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ ip/ip.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/progs/verifier_spill_fill.c b/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
-index 1f71f596d33f..07a2527a8f47 100644
---- a/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
-@@ -392,7 +392,7 @@ __naked void spill_32bit_of_64bit_fail(void)
- 	*(u32*)(r10 - 8) = r1;				\
- 	/* 32-bit fill r2 from stack. */		\
- 	r2 = *(u32*)(r10 - 8);				\
--	/* Compare r2 with another register to trigger find_equal_scalars.\
-+	/* Compare r2 with another register to trigger sync_linked_regs.\
- 	 * Having one random bit is important here, otherwise the verifier cuts\
- 	 * the corners. If the ID was mistakenly preserved on spill, this would\
- 	 * cause the verifier to think that r1 is also equal to zero in one of\
-@@ -431,7 +431,7 @@ __naked void spill_16bit_of_32bit_fail(void)
- 	*(u16*)(r10 - 8) = r1;				\
- 	/* 16-bit fill r2 from stack. */		\
- 	r2 = *(u16*)(r10 - 8);				\
--	/* Compare r2 with another register to trigger find_equal_scalars.\
-+	/* Compare r2 with another register to trigger sync_linked_regs.\
- 	 * Having one random bit is important here, otherwise the verifier cuts\
- 	 * the corners. If the ID was mistakenly preserved on spill, this would\
- 	 * cause the verifier to think that r1 is also equal to zero in one of\
+diff --git a/ip/ip.c b/ip/ip.c
+index e4b71bde..ee4595e8 100644
+--- a/ip/ip.c
++++ b/ip/ip.c
+@@ -52,11 +52,12 @@ const char *get_ip_lib_dir(void)
+ 	return lib_dir;
+ }
+ 
+-static void usage(void) __attribute__((noreturn));
++static void usage(int status) __attribute__((noreturn));
+ 
+-static void usage(void)
++static void usage(int status)
+ {
+-	fprintf(stderr,
++	FILE *out = status == 0 ? stdout : stderr;
++	fprintf(out,
+ 		"Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }\n"
+ 		"       ip [ -force ] -batch filename\n"
+ 		"where  OBJECT := { address | addrlabel | fou | help | ila | ioam | l2tp | link |\n"
+@@ -72,12 +73,12 @@ static void usage(void)
+ 		"                    -o[neline] | -t[imestamp] | -ts[hort] | -b[atch] [filename] |\n"
+ 		"                    -rc[vbuf] [size] | -n[etns] name | -N[umeric] | -a[ll] |\n"
+ 		"                    -c[olor]}\n");
+-	exit(-1);
++	exit(status);
+ }
+ 
+ static int do_help(int argc, char **argv)
+ {
+-	usage();
++	usage(0);
+ 	return 0;
+ }
+ 
+@@ -279,7 +280,7 @@ int main(int argc, char **argv)
+ 			rcvbuf = size;
+ 		} else if (matches_color(opt, &color)) {
+ 		} else if (matches(opt, "-help") == 0) {
+-			usage();
++			usage(0);
+ 		} else if (matches(opt, "-netns") == 0) {
+ 			NEXT_ARG();
+ 			if (netns_switch(argv[1]))
+@@ -321,5 +322,5 @@ int main(int argc, char **argv)
+ 		return do_cmd(argv[1], argc-1, argv+1, true);
+ 
+ 	rtnl_close(&rth);
+-	usage();
++	usage(-1);
+ }
 -- 
-2.43.0
+2.54.0
 
 
