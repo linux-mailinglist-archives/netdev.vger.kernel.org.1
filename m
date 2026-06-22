@@ -1,177 +1,170 @@
-Return-Path: <netdev+bounces-300997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vTwSCAf1OGpJkgcAu9opvQ
-	(envelope-from <netdev+bounces-300997-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:40:39 +0200
+	id 5fQZBMD1OGplkgcAu9opvQ
+	(envelope-from <netdev+bounces-301000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:43:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 752F66ADD0E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:40:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC2B6ADD57
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:43:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=lwi+leCq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300997-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300997-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=KyC0oplx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301000-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301000-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B92D304DBB4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:37:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C997300A11C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869B1393DC8;
-	Mon, 22 Jun 2026 08:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11999392819;
+	Mon, 22 Jun 2026 08:38:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095D1238159;
-	Mon, 22 Jun 2026 08:37:48 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782117471; cv=none; b=Qf/0kATbivMuVZTC6NRp2yVNhBpSATd8UW97WNTco9HX1Vnr66h+qf/rKmEYtJSoNhSlrdxZqR/4BgBfZveqjWWGbFFp13a65rYd0ifw15wgWQItntZCeFzTa/FI4QcnIp9IO1Hh2RP3AqPgdowisEb+rCmTsMZff1bZBexCAB0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782117471; c=relaxed/simple;
-	bh=o0XPey02pNHXumHWa6TQBgjgCeS/R84YiOVlMcvQRTw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kdsgHnVGCzUbVL9DRipZrLUJnChZekP9N+jzeqr/olTe2w18p91Hmi9jWv+qibOuHS32MTpVtRMM4VQ8JRah1snf3S7sR+7kCw94jccFu7cakKpp6WTQgRT4wbX8aImb3bj9j8yTyTEHqLYrq0il7V0AGWb3j2nF6YcGm0Tks/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lwi+leCq; arc=none smtp.client-ip=198.175.65.17
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782117469; x=1813653469;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=o0XPey02pNHXumHWa6TQBgjgCeS/R84YiOVlMcvQRTw=;
-  b=lwi+leCqmYWmuFst6FQBZ5DAHNBzvjzKOvdFm9YAWYeck1lFLPstlLLE
-   HfvGplF7vI7ppon4Tfz83R0sJ7Q6UnhkB/puK65jNkqLWlw+oi1UKW+D2
-   dmHcxGUFHvd15Dc0mMhfGhhAkaz7ESnKhl+LjgjHZNbe03xX5s2/kyNKX
-   T2bQkviWBa+gpSAAvQYc38+tPbNSKQi5BFa0ScUd3NRX/apt0d888B4Lh
-   XD1X3LFU5Ma16ZgS00f+GAY92w+Y1DarSdKVL2ZmHgWSG3tOfzLz3BQvQ
-   ft49GdYMp53Vh5tvIMO+kqgJGdj8W04FzLYd7CsN+FVf6+Cmg2mV7j/HT
-   A==;
-X-CSE-ConnectionGUID: MUrLK/3DQ/+jOxbEeduDLw==
-X-CSE-MsgGUID: jN0ZpEg6Tg+TQc4Ge4NM4g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="82844719"
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="82844719"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:37:48 -0700
-X-CSE-ConnectionGUID: 51x2ahlxRfadoXyoUtL0hA==
-X-CSE-MsgGUID: PGIuZ8mzSP2g3MT4S82HXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="254255860"
-Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.82])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:37:33 -0700
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: Kaitao Cheng <kaitao.cheng@linux.dev>, Andrew Morton
- <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, Jens
- Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Juri Lelli
- <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, Christian
- =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: David Howells <dhowells@redhat.com>, Simona Vetter
- <simona.vetter@ffwll.ch>, Randy Dunlap <rdunlap@infradead.org>, Luca
- Ceresoli <luca.ceresoli@bootlin.com>, Philipp Stanner <phasta@kernel.org>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
- linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
- audit@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-perf-users@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, kexec@lists.infradead.org,
- live-patching@vger.kernel.org, linux-modules@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
- rcu@vger.kernel.org, sched-ext@lists.linux.dev, linux-mm@kvack.org,
- virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, chengkaitao <chengkaitao@kylinos.cn>
-Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
- state
-In-Reply-To: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
- 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-Date: Mon, 22 Jun 2026 11:37:29 +0300
-Message-ID: <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1AA3911CE
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 08:38:55 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782117538; cv=pass; b=o9Et3Aqk7CvGlfjPx0tIyqhZ83xCFDAgIvB0Jdh0YGCBNVSoNhNwqeOaE9NiDJKBgPAegFQQnXiwGWGPAfv3fmVzpuBScNaDyf5E22FRvoUqW7Lcdb7eyuVPnABiaXWB7BIFXJG5SAyvVsNcb50oY1H7gPDhx4AwkJ003qj0Rto=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782117538; c=relaxed/simple;
+	bh=HmEH2nszAumXCjlaWRxT0WmD37sfxnZ3srp9sfkifrw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aiGLMouytCrxFGvdUv10Ia5CKH5mcdqsrnCSgqkvnmef5XDTwSYV/JsGSTwPdgpO0oJm5YrFOFreqO20K9DloZuKYg1xqs/pGZq1uAHzEV9XIfreyslaZYAGROmsb9noTes8vJg+mpQyl+FFZKqkjceY45EvOL5CyW21LLAF0EY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KyC0oplx; arc=pass smtp.client-ip=209.85.219.52
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-8dd3fe9cf10so37859186d6.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 01:38:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782117535; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MSPsdW3sp8IDx9NdVh5nx+MD4dkoORgdmxS04nnKwsaBaZSO9Haiq+XYp5kh0zbCvN
+         al7+q+x5a9aKsq6O+pV+1ichLqVaMaNh0QBta0antm3Dj4oa07nUdA/nvdHQeZ/Eg5DE
+         gUkfmxVij/22R968AJysobKzjw+KuLK6EslSFbIiyJ3uKEj/GfNV1SeVkatNSBVufHzN
+         OK8JDF22OxZCN/KC6LJFiJY0zngkUkg0BlaJadS0Vu83LKi2/7dZni2UafuFNb/wXIQE
+         LcR7pjzaUvAtfaMfX9v4Zp6MUjy1jezyMtZ2GMEnCAPoI3qgWjFLqXC0I5g2ZwJQCyLu
+         sJxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HmEH2nszAumXCjlaWRxT0WmD37sfxnZ3srp9sfkifrw=;
+        fh=3l3knvj0ELDDHXnQQ+vfALQwxBmtyeEPlUWurqJXjFo=;
+        b=NPw46wa/8KBiSJ4DP22bNPQLaTcPONspdHxokHZ1ZfHHeo32+LSqS1Mc52UFVWovQg
+         Ezn0uIzq61WgKWRoBBCc1lbyuT67VIse2S3MZ0bbDgAR0KxW9iwwGZxeOhYgx8RMW/u3
+         56/J8pzLw5g0ApfTI51TANjhD17cJdJMya8EwFtVCbyDKdAC2Rw5UJhVbz2bUHdZNiXe
+         2eIV6J/0avBobRiVSRiGzbQcxN2vPSQkIceRiuqaMnLTiWN3RKaUM6EuBsxqqmTvN4JW
+         xnJX4HWv5I+tT3IjR5IwaYOCae6+RPAKk/qWyVBMHTYFEW1ywxccKVUjlizw28TI5mGh
+         09lw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782117535; x=1782722335; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HmEH2nszAumXCjlaWRxT0WmD37sfxnZ3srp9sfkifrw=;
+        b=KyC0oplxMR3RmeIsMaeXWW97E7mASypYYAMmJ2c62aWQAaNgpPBhMv+ks9aB97xu/T
+         mXzjUwGtpbH2H1/j10eD2JET4J08KiUi5/cwa9tM64l/Gi8OmFcevFFUZhhiz67XKvhe
+         uPzbWH9mtNU5az+E+MMdpvp8zZyp1iFlXSALM/l7cfipDnurfiGEQBj3u+wi4C3dX55w
+         fBRL1AF2sLxSBsAkRriml6f/JXWnIyx+LnfAJigsaWkzVt/DPq9aQIuYtYxryOLo+b56
+         Z35pdpl8bZXIMzatiTe1jr2L4iIbGuPzuk4VoQ4jewtRdTeLsseEQtb7lI/l24iWmsGl
+         FoLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782117535; x=1782722335;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HmEH2nszAumXCjlaWRxT0WmD37sfxnZ3srp9sfkifrw=;
+        b=UTgzHUFrhwfPYvRnUHPUM5SNZz74l0QETcRcUMD4Y5UT3bG2IwHHPT3c/rXzKGcO2w
+         MDR9eusfjPYxIiRc2EI2BusLw9Uf2sqAdvFcoIicHcrXdVOMkr6dWXQNxa3oafsQqccn
+         uqnE0nftn5JXQJpyENKRG1pwXF2w3D75mk5ObtbDsV0JMPN7cZe4ENxqFExW9MeeTXZt
+         7uzUh8B9V+SuGpYguHdcWjF+KFxbLBpRH/DCX3wvxPHbkgGvqxLWeuNf0Ygp6kuAqjzz
+         466VXGMHEfFBvYjR6w5XmjlnxHSrqY2X0ao7eg4OO+mMKlRuhIkakG5VSCcFgV6t5n+E
+         BqWg==
+X-Forwarded-Encrypted: i=1; AFNElJ8gJUgS2rwj0oL83/C44kYjbmVMhQhM98UvPVjivQ06pS9nyk1CI4UTdzNCskMThwY9P8vILkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPakFXOuTxvOcKMimoSGrYfV3nois0e7cZWrYRqW/xXBjkWBw2
+	NkPRkN2rQrJXJfmRvbtrIdOEgwhN/N4mt47ops8xLtRn8ZbvjuMx7dTllWaN33b2/40dW+F4dlg
+	twJO5ldPegfUhQZZOjN1KaX4CExco3D/QRbVMlX+R
+X-Gm-Gg: AfdE7cmPDBTVe+xVPxONaR81fhIBlvnS40oMbyr1qhCuGUQAR9E5XhPwl4MoKYtoKvo
+	18OCtl73CKuJcpoTl26pP09/AD06VmNN/O03nIW8183i9+DL42cb4C+H/eBtRscYoylVQdGv9KE
+	4uvpNVQHAa+60PUNDjU0pTxxGZngm7+deZGXR7ejLKjC1u6f7CFInAWYWSONrFHiHYFWAk65M3L
+	1uW8fGyTKn6bnMvkTm/J/Kw5b9ut8na0eQIgRLtYsObXcPZB5g/jluJxUQVLpobyhF+L0YJV7NX
+	Ye7NaqHFOJYnEjJ/sTrJK50HM5haSv2Z/I2xlsGJ9rbRiAMmbPiR4ckkctzw/d2x8q8vJq0in7X
+	DRyeQ/jg4
+X-Received: by 2002:a05:622a:244:b0:517:a9ef:ce30 with SMTP id
+ d75a77b69052e-519e4a74ef3mr202106541cf.17.1782117534195; Mon, 22 Jun 2026
+ 01:38:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260621-fix-race-condition-and-crash-v1-0-87e290d9357f@onsemi.com>
+ <20260621-fix-race-condition-and-crash-v1-1-87e290d9357f@onsemi.com>
+In-Reply-To: <20260621-fix-race-condition-and-crash-v1-1-87e290d9357f@onsemi.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 22 Jun 2026 01:38:42 -0700
+X-Gm-Features: AVVi8Cd-kQTIhONXZohiE0GOWgCKvtvVmnz-Gj_HaUqcTRndhREIEe1fNalfyow
+Message-ID: <CANn89iLLrOZ4Ep=dBgs0sC0tWsrZHy8DnCPLw_Em+7v2UtE9tA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Protect skb pointer used by two different kernel instances
+To: Selvamani.Rajagopal@onsemi.com
+Cc: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Piergiorgio Beruto <pier.beruto@onsemi.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300997-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301000-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kaitao.cheng@linux.dev,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:linux-tra
- ce-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jani.nikula@linux.intel.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:Selvamani.Rajagopal@onsemi.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:pier.beruto@onsemi.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jani.nikula@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[52];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:from_mime,linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,intel.com:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,onsemi.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 752F66ADD0E
+X-Rspamd-Queue-Id: 9AC2B6ADD57
 
-On Mon, 22 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
-> Add *_mutable() iterator variants for list, hlist and llist.  The new
-> helpers are variadic and support both forms.  In the common case, the
-> caller omits the temporary cursor and the macro creates a unique internal
-> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
-> explicit temporary cursor, the caller can still pass it and the helper
-> keeps the existing *_safe() behaviour.
+On Sun, Jun 21, 2026 at 9:33=E2=80=AFPM Selvamani Rajagopal via B4 Relay
+<devnull+Selvamani.Rajagopal.onsemi.com@kernel.org> wrote:
 >
-> For example, a call site may use the shorter form:
+> From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 >
->   list_for_each_entry_mutable(pos, head, member)
+> Threaded IRQ uses waiting_tx_skb. Transmit path also uses
+> this pointer without any mutual exclusion protection. As a
+> result, it might leak skb buffer, particularly threaded IRQ
+> runs in the middle of tranmsmit path, near skb_linearize.
 >
-> or keep the explicit temporary cursor form:
->
->   list_for_each_entry_mutable(pos, tmp, head, member)
+> Fixes: b542d13fab0f ("net: ethernet: oa_tc6: Interrupt is active low, lev=
+el triggered.")
+> Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+> ---
 
-I'm unconvinced it's a good idea to allow two forms with macro trickery,
-*especially* when it's not the last argument you can omit. I think it's
-a footgun.
-
-IMO stick with the first form only, and there'll always be the _safe
-variant that can be used when the temp pointer is needed.
-
-
-BR,
-Jani.
-
-
--- 
-Jani Nikula, Intel
+OK but please use "net: ethernet: oa_tc6:" prefix in the patch title.
 
