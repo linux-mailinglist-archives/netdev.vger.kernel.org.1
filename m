@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301040-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Pk9CNhkSOWpGmQcAu9opvQ
-	(envelope-from <netdev+bounces-301039-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:44:41 +0200
+	id PB3kCi0SOWpImQcAu9opvQ
+	(envelope-from <netdev+bounces-301040-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:45:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 759346AECD1
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BACAD6AECDD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:45:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VHLZJPif;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301039-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301039-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YGe9Etx6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301040-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301040-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 07D873011352
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 01DFE3015859
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFBE3A257A;
-	Mon, 22 Jun 2026 10:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7723A6B7F;
+	Mon, 22 Jun 2026 10:44:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CE6396B79;
-	Mon, 22 Jun 2026 10:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACD63A257A;
+	Mon, 22 Jun 2026 10:44:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125067; cv=none; b=qlRKhTLG07A+gbusRmReNH3VdwNAXb69WEgmwjiaNPfDFVts0hxKKylqmhG82Jm7SAQbuMYT6nHnmwI6JkkLOZ9AqJH1vuHyP/mZCATzqMe0yi90+XC+hhGYW96Pjzoi2vjnuaqrQENj8u8EIrZzTxioegui6V14DafJOdySsVM=
+	t=1782125073; cv=none; b=Mr5SNKcfxgk1RVU3CmfYvVQfuUuirsFSNxrMiJG9ke1kotMlRggoQ+1rbKwrAywghV1+bm5JhNv91oqPO+JXirl9i/Ctzq+Ei0Ue5hPgXWX+dqW8fEFJqPDOkI2tTjOCIxWPIdnKr5cap7WR/QC5vGhWDN0nqFtvpw06pI8vBvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125067; c=relaxed/simple;
-	bh=XBYv5zz3sOwlsm9ckbexl4pEDfCTMycnVQDACpe4atQ=;
+	s=arc-20240116; t=1782125073; c=relaxed/simple;
+	bh=23FfBzvwf6vtsX+bSKDkY+fTzHFGvyIE3g3cW17zKO4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wvqdl771UhhBnw/ESTXcJn3d/XEEGj8CHe8uPZFyeSoYIVPNMkGsYBGfbuJUAzGiVmOkTkeEjMPpdkMaZXdYZIBM66HkHpit/JEqc+mcM1njHkPYuwyoThA0P1GXbYGUYMcmg2Tj+cRUM2EfdYp8kDkFBSnCupTQ3OP//iwmTCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHLZJPif; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E77C21F000E9;
-	Mon, 22 Jun 2026 10:44:19 +0000 (UTC)
+	 MIME-Version; b=Kdk16exAbd+2NdgN6GUI9U9BUa2I5WfXW9KcBpzisV1B9H6o0kROSX69GYT9wuNiq3nThhLdJSlQ0heIODIAi5yTIebD0oFSuv7VWXWLKqoS1NVvz5B7RLgQ4za93TUlxtW9N+lyXT2XavkPmkAArFVYKhr2g9v5r2ye0D2j/eI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YGe9Etx6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACDD71F00A3A;
+	Mon, 22 Jun 2026 10:44:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125066;
-	bh=NICoJhyso/xKwA0V9BHghdzw8uXRKsBqUsvBGmFqrNg=;
+	s=k20260515; t=1782125072;
+	bh=nx6CQtZhvOWCiVH7CrMligEOnt7OJLAqPhhVMvzVfxo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VHLZJPifVrl03prN+KWe2+bHWPLEtRk3bauElubabnGTUnWNEXR/pYnm359flu9l6
-	 8zLLBASimj5pCC+nxL9vO2NNa9mSB9B1U+ppH66etajQq42Dw0MHTHqbEOGV89ERtm
-	 VRX7uRYP8u5Tqq612M89qYsIMerr8mXdO918hKIQbFUz8g/9hKTcZertAZVXmyGEDB
-	 di0utKFzj6iRDMggl0dyfGWKuQajCOPDZ0bPVwcbEjj1b8QZ4GyCu/4gXP8TtEg7Tc
-	 V9++7tLWDh5+h2XQKrg0ncXyQp/XtMX/AK3lA33yMhkNNlUteT7sVfc8YjArpe8xlQ
-	 U49dybBsmVKbQ==
+	b=YGe9Etx61dt8m5ckWv9Xp9GSxVxWKxaL8poHaboZCZRwe1279nQB0XsVY5Orp1oi5
+	 JbzYDSaAu64mMA2hgSp7LiSITPjG2b1KuEMuHmjtsfjlhWagikxtuh+w50vpabxVMy
+	 5u1ekU9/8SCjTlTG/XU6DYgl/SdS2bk9/wte2XcneMs+JaXgvzrevE7Gbrm4EIgCQn
+	 7Ki7QF03z8c7S093VSD90MkfPADumACZh9LlffduObFAkJ6DvsN+3uXfbMG8eXr7MD
+	 7oUx2z/83cC3bsd34ouZweKzCMLBm4XMFOvTwRiUOfXoGIA+OMwS6mwcwJiDOZul3l
+	 slwFsuwHn5XaQ==
 From: Geliang Tang <geliang@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>,
 	Mat Martineau <martineau@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	mptcp@lists.linux.dev,
 	Gang Yan <yangang@kylinos.cn>,
 	Zqiang <qiang.zhang@linux.dev>
-Subject: [RFC net-next 03/17] tls: add protocol dimension to tls operation cache
-Date: Mon, 22 Jun 2026 18:43:23 +0800
-Message-ID: <1d024f02806622ab3ad467e90ea7311dd5810073.1782123118.git.tanggeliang@kylinos.cn>
+Subject: [RFC net-next 04/17] mptcp: add sendmsg_locked to proto_ops
+Date: Mon, 22 Jun 2026 18:43:24 +0800
+Message-ID: <eca266ea582a24687504476704c317e7ff0d5eba.1782123118.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
 References: <cover.1782123118.git.tanggeliang@kylinos.cn>
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301039-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301040-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
@@ -113,26 +113,20 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 759346AECD1
+X-Rspamd-Queue-Id: BACAD6AECDD
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-The current TLS operation cache is indexed solely by IP version
-(IPv4/IPv6). This was sufficient when only TCP was supported.
-Rename TLS_NUM_PROTS to TLS_NUM_FAMILY to accurately reflect that it
-represents the number of address families.
+MPTCP currently provides a standard sendmsg() implementation which
+acquires and releases the socket lock internally. However, certain
+upper layers (e.g., TLS) need to call the sendmsg method while the
+socket lock is already held.
 
-With the introduction of MPTCP, both TCP and MPTCP sockets within the
-same IP version now share the same cache entries. When an MPTCP socket
-enables TLS, it overwrites the cache with MPTCP-specific operations,
-causing existing TCP TLS sockets to use the wrong ops, leading to type
-confusion and kernel panics.
+Split the existing mptcp_sendmsg() into mptcp_sendmsg_locked() which
+assumes the caller holds the socket lock, and a tiny wrapper
+mptcp_sendmsg() that acquires the lock and calls the locked version.
 
-Fix by extending the cache arrays with a protocol dimension to separate
-TCP and MPTCP. Introduce TLSTCP and TLSMPTCP enum values, along with
-separate saved protocol pointers and mutexes for MPTCP. update_sk_prot()
-and __tls_build_proto() now select the appropriate cache based on
-sk->sk_protocol.
+Expose .sendmsg_locked in both mptcp_stream_ops and mptcp_v6_stream_ops.
 
 Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
@@ -140,104 +134,73 @@ Co-developed-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- net/tls/tls_main.c | 40 +++++++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ net/mptcp/protocol.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index be824affd1b1..94133d62f73e 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -53,7 +53,13 @@ MODULE_ALIAS_TCP_ULP("tls");
- enum {
- 	TLSV4,
- 	TLSV6,
--	TLS_NUM_PROTS,
-+	TLS_NUM_FAMILY,
-+};
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index a4f7e99b30db..7f0c560f6b7e 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -1967,7 +1967,7 @@ static void mptcp_rps_record_subflows(const struct mptcp_sock *msk)
+ 	}
+ }
+ 
+-static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
++static int mptcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t len)
+ {
+ 	struct mptcp_sock *msk = mptcp_sk(sk);
+ 	struct page_frag *pfrag;
+@@ -1979,8 +1979,6 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	msg->msg_flags &= MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
+ 			  MSG_FASTOPEN | MSG_EOR;
+ 
+-	lock_sock(sk);
+-
+ 	mptcp_rps_record_subflows(msk);
+ 
+ 	if (unlikely(inet_test_bit(DEFER_CONNECT, sk) ||
+@@ -2096,7 +2094,6 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	}
+ 
+ out:
+-	release_sock(sk);
+ 	return copied;
+ 
+ do_error:
+@@ -2107,6 +2104,17 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	goto out;
+ }
+ 
++static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
++{
++	int ret;
 +
-+enum {
-+	TLSTCP,
-+	TLSMPTCP,
-+	TLS_NUM_PROTO,
++	lock_sock(sk);
++	ret = mptcp_sendmsg_locked(sk, msg, len);
++	release_sock(sk);
++
++	return ret;
++}
++
+ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied);
+ 
+ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
+@@ -4703,6 +4711,7 @@ static const struct proto_ops mptcp_stream_ops = {
+ 	.set_rcvlowat	   = mptcp_set_rcvlowat,
+ 	.read_sock	   = mptcp_read_sock,
+ 	.splice_read	   = mptcp_splice_read,
++	.sendmsg_locked	   = mptcp_sendmsg_locked,
  };
  
- #define CHECK_CIPHER_DESC(cipher,ci)				\
-@@ -117,23 +123,30 @@ CHECK_CIPHER_DESC(TLS_CIPHER_SM4_CCM, tls12_crypto_info_sm4_ccm);
- CHECK_CIPHER_DESC(TLS_CIPHER_ARIA_GCM_128, tls12_crypto_info_aria_gcm_128);
- CHECK_CIPHER_DESC(TLS_CIPHER_ARIA_GCM_256, tls12_crypto_info_aria_gcm_256);
+ static struct inet_protosw mptcp_protosw = {
+@@ -4815,6 +4824,7 @@ static const struct proto_ops mptcp_v6_stream_ops = {
+ 	.set_rcvlowat	   = mptcp_set_rcvlowat,
+ 	.read_sock	   = mptcp_read_sock,
+ 	.splice_read	   = mptcp_splice_read,
++	.sendmsg_locked	   = mptcp_sendmsg_locked,
+ };
  
-+static const struct proto *saved_mptcpv6_prot;
-+static DEFINE_MUTEX(mptcpv6_prot_mutex);
- static const struct proto *saved_tcpv6_prot;
- static DEFINE_MUTEX(tcpv6_prot_mutex);
-+static const struct proto *saved_mptcpv4_prot;
-+static DEFINE_MUTEX(mptcpv4_prot_mutex);
- static const struct proto *saved_tcpv4_prot;
- static DEFINE_MUTEX(tcpv4_prot_mutex);
--static struct proto tls_prots[TLS_NUM_PROTS][TLS_NUM_CONFIG][TLS_NUM_CONFIG];
--static struct proto_ops tls_proto_ops[TLS_NUM_PROTS][TLS_NUM_CONFIG][TLS_NUM_CONFIG];
-+static struct proto
-+tls_prots[TLS_NUM_FAMILY][TLS_NUM_PROTO][TLS_NUM_CONFIG][TLS_NUM_CONFIG];
-+static struct proto_ops
-+tls_proto_ops[TLS_NUM_FAMILY][TLS_NUM_PROTO][TLS_NUM_CONFIG][TLS_NUM_CONFIG];
- static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 			 const struct proto *base);
- 
- static void update_sk_prot(struct sock *sk, struct tls_context *ctx)
- {
-+	int proto = sk->sk_protocol == IPPROTO_MPTCP ? TLSMPTCP : TLSTCP;
- 	int ip_ver = sk->sk_family == AF_INET6 ? TLSV6 : TLSV4;
- 
- 	WRITE_ONCE(sk->sk_prot,
--		   &tls_prots[ip_ver][ctx->tx_conf][ctx->rx_conf]);
-+		   &tls_prots[ip_ver][proto][ctx->tx_conf][ctx->rx_conf]);
- 	WRITE_ONCE(sk->sk_socket->ops,
--		   &tls_proto_ops[ip_ver][ctx->tx_conf][ctx->rx_conf]);
-+		   &tls_proto_ops[ip_ver][proto][ctx->tx_conf][ctx->rx_conf]);
- }
- 
- int wait_on_pending_writer(struct sock *sk, long *timeo)
-@@ -971,18 +984,19 @@ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
- static void __tls_build_proto(struct sock *sk,
- 			      const struct proto *saved_prot,
- 			      struct mutex *prot_mutex,
--			      int family)
-+			      int family, int protocol)
- {
-+	int proto = sk->sk_protocol == IPPROTO_MPTCP ? TLSMPTCP : TLSTCP;
- 	int ip_ver = sk->sk_family == AF_INET6 ? TLSV6 : TLSV4;
- 	struct proto *prot = READ_ONCE(sk->sk_prot);
- 
--	if (ip_ver == family) {
-+	if (ip_ver == family && proto == protocol) {
- 		/* smp_load_acquire pairs with smp_store_release below */
- 		if (unlikely(prot != smp_load_acquire(&saved_prot))) {
- 			mutex_lock(prot_mutex);
- 			if (likely(prot != saved_prot)) {
--				build_protos(tls_prots[family], prot);
--				build_proto_ops(tls_proto_ops[family],
-+				build_protos(tls_prots[family][protocol], prot);
-+				build_proto_ops(tls_proto_ops[family][protocol],
- 						sk->sk_socket->ops);
- 				/* pairs with smp_load_acquire above */
- 				smp_store_release(&saved_prot, prot);
-@@ -995,10 +1009,14 @@ static void __tls_build_proto(struct sock *sk,
- static void tls_build_proto(struct sock *sk)
- {
- 	/* Build IPv6 TLS whenever the address of tcpv6 _prot changes */
-+	__tls_build_proto(sk, saved_mptcpv6_prot, &mptcpv6_prot_mutex,
-+			  TLSV6, TLSMPTCP);
- 	__tls_build_proto(sk, saved_tcpv6_prot, &tcpv6_prot_mutex,
--			  TLSV6);
-+			  TLSV6, TLSTCP);
-+	__tls_build_proto(sk, saved_mptcpv4_prot, &mptcpv4_prot_mutex,
-+			  TLSV4, TLSMPTCP);
- 	__tls_build_proto(sk, saved_tcpv4_prot, &tcpv4_prot_mutex,
--			  TLSV4);
-+			  TLSV4, TLSTCP);
- }
- 
- static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
+ static struct proto mptcp_v6_prot;
 -- 
 2.53.0
 
