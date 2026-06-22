@@ -1,150 +1,181 @@
-Return-Path: <netdev+bounces-300982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300983-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TCA2AjjsOGpzkAcAu9opvQ
-	(envelope-from <netdev+bounces-300982-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:03:04 +0200
+	id YWDzGwfsOGpqkAcAu9opvQ
+	(envelope-from <netdev+bounces-300983-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:02:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 521876AD7B0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:03:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69606AD7A4
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:02:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b="ok k9t4D";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300982-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300982-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=nZ9RAtJy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300983-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300983-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E20D3012E94
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:02:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5695D300E3E1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A7938E5D7;
-	Mon, 22 Jun 2026 08:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B20738E5D7;
+	Mon, 22 Jun 2026 08:02:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE08436EAA6;
-	Mon, 22 Jun 2026 08:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0714938E5F9
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 08:02:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782115323; cv=none; b=b413aUKD4QuGoRadXWO1lXywPvERS4N1XjKSLczXBi6NvcpuZY/5L4SPUP5WkaLi8bBgVJMTSLibvWsoOyCJV54Crhe2JLdCXpCZslyrD+JYHB/49+ANZ79wfiMorxCeSVqvIYeX3SfTxQnX9brNw2Hjoop/HZtJAoWhKdauiU4=
+	t=1782115327; cv=none; b=ien2JHBBvPw57w/ka90zY5TeEbcuvGfGny+pGJk2IQMxHxauzrDuOFrjIp1iTXRsLnLwt4Q4tPMSNt84KAEE7ySYR4F433Y4Mz1zmOCJMMx8gpuKe0JsXSQzyFyLSnb6beJLOoUGJWeOKqrfgIDpA3GKlnoVQiIQp5ZRsSqdhpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782115323; c=relaxed/simple;
-	bh=9YcSQDgiIdeeJ5Q6A5OyXgluQjm6S2yxNJeBrtelcm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vDr3IEms3rgX5Oqg72q2Gf9cOWBXcn2e8AH0fjjOa6CdNbDl6WVmfOIC3kvu0U8ay1s52RysciI+FEukg79Kj1AKQZBCrgtMrGnti/o6uWCWcAei5BQNtglO0HG/ZMgEo42AWGIpO3XjeKzouUYmBaHXM5yhbpbtDybm1j1nZ64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=okk9t4Df; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=aTh+kVZB6+gAPWFNfzyuI+EJqNKK1a/lt3CUQPy9Nng=; b=ok
-	k9t4DfJzBHbCvaiZX0urkEZrmrub1EWvQw35Zan6erjLzqSodanFfjZ5MXgaOmCsc2CTj1I/Dcr5H
-	GAW10W6sucnnIKyCYZ3JsqrI/gsiJjwacrsi1y7BK3E6rfRM1q7TaJpIIu73fF1NvQtusGxiB3HSW
-	LzPvMlnDd4l/TRE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wbZbI-008nRY-9V; Mon, 22 Jun 2026 10:01:48 +0200
-Date: Mon, 22 Jun 2026 10:01:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: Haoxiang Li <haoxiang_li2024@163.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] net: meth: check skb allocation in meth_init_rx_ring()
-Message-ID: <d4b8eedd-5be4-46a8-a887-a06f80f1a293@lunn.ch>
-References: <20260622044914.664749-1-haoxiang_li2024@163.com>
- <CALs4sv2dr2QsFU_DUDNAMgr4MDxHcRrHqer+Kdm7dP+4TUT0eg@mail.gmail.com>
+	s=arc-20240116; t=1782115327; c=relaxed/simple;
+	bh=XtlAZCp5/3F/xwVUnuePPqRADO4ZsJiWAhJuz4RSiB0=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Mia0GveQdeFA39qJM7imXVJ7geg4O6S1SEpB9wnXBHoKBVu1ABnJKW7+BvGgohCc/WAZQu0LrA1WdA/zV7IGJFcWx20mC2TA2689edPpggEibC04+zoeA/Nie5oLs/hgOQdNRCMQwY5YjiblBVedK2F6gCOKWaHtIihjgu5CpkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nZ9RAtJy; arc=none smtp.client-ip=209.85.215.169
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c85d4b4245aso2897577a12.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 01:02:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782115325; x=1782720125; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QIY8NrKQY33GiAZXeNgSrvmyjQBHSuRv6lsLBuV2R68=;
+        b=nZ9RAtJyGf12YTxGAK4GPun5ZkVDAQQ5986MRkF0IHgJ0JJj/4vkC3XMa5jOtJFzfE
+         fJmec0g+sX/9plfJg80/kMEZRiy64SSxyAv4ug8vw3CRglV/Gf8IgFGObvPxPW0zEg1i
+         39V4cSR2HTsIYLRbrSzID32J5YxriwpHqDpZVwKO5t0Z0YQsBYVi6dEAr72r/FEQcW9w
+         kiDDXx4nmZPbjR/1+3fgwUi/PNFNItBBC9emPncxNsNSmcYDObqfOhZtzMJ5XDNfDbba
+         sObBTk/nJKqcZ4rrHmg64aUXLSYAc9xkpvYU+cWZfXWqJ5Zee93NsN4ruTFnPbOcWyKK
+         LWSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782115325; x=1782720125;
+        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QIY8NrKQY33GiAZXeNgSrvmyjQBHSuRv6lsLBuV2R68=;
+        b=qpVgCO77eH0JZFmKdzs9FpazN+jCXv8uS4W8NBlTmloYPCbUM7tMp3qdCrAuNKyGeD
+         xv/V2K1330BrTj8/eORBx3SSSxZU5Px074q7tA+kGOaOuRaYN0NWGAvUyxPc1vG5nypr
+         X1PjQodoj7iqdm38fIsJyqs1cJMW+BmBOYxnx6liu5W3PDOANlkRGw5gf8RLC0vpYrx3
+         cv7adJvTqV5SPRjhBzaTZsqz0vxT6o253Zu4KPxl26SiBxfG27uUa7jzgrGFnSDbqn1B
+         b9Cy9ULV+ZCQx1hnumvYXsNPVSDE6ydPoRc4qgeFNdhf6793LY213NwBU8/8e10Rut2l
+         3iwg==
+X-Forwarded-Encrypted: i=1; AFNElJ9Wxh3YbasRKgZEqwILauC480MAzBYkM1OIe/tTiphXimAT9WhyqLqkFGBy+JGPcPRuRFJCpG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywh6cy9gGVD6/El1iOh29jVQuV4ZD7MAxHfBghRnUlJovhqWq9B
+	1pTYsRVzLJCXPBSsl2WD4fSoE+asZvV9c46FZQq4mgtV9giVbme95Gf7
+X-Gm-Gg: AfdE7cmC2U4/zwW1Hug3XNfqUhF4eoxeYfm2bN21uEALmfadg6j1MWHo+7wnZ2jStVK
+	ylzmUtcE70wJb7ElU0xrRRxcAxKnBI0Ok5b79gAd+c7PbJv0LRudEH4fPbJlNKIFH6c1JunsQKP
+	fid6d4KNSQI86ndFjIef1ldDLXsvF0fjtkOumIDLIqpEB4lNRbOzr0WdfNDDOYckffvinyvOMTb
+	iIXzULXFP2sT3HWvidEaUu0qP3M/BF3RIKPejSP/UYIv8tf42nQrmeKPP6R/Lby2m+SUB6O5IVb
+	tiwxxvFjEuOpqtju7i+kppvSC+plfx+OPxr8owgO/zm2+r5ObfwjpFtjh/z8AoyNV8g1f/IWhkM
+	SgkRU4FBTi04Q3+lLIv/26SpbnmaXznO5a4jB1jjAOXbiSBTrFl6UMgEqnktreCx1tW7no02RxI
+	d+SLcBqRbGko6kolo8G9jvnsRTMkB9vxinNpdEyw==
+X-Received: by 2002:a05:6a21:7105:b0:3b1:cce5:9140 with SMTP id adf61e73a8af0-3bb346583d8mr15583404637.33.1782115324909;
+        Mon, 22 Jun 2026 01:02:04 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8bc374375csm6564925a12.13.2026.06.22.01.01.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 01:02:03 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject:
+ [PATCH net] net: usb: kalmia: bound RX frame length in kalmia_rx_fixup()
+Date: Mon, 22 Jun 2026 16:01:57 +0800
+Message-ID: <178211531778.2216480.12637613349790980750@maoyixie.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALs4sv2dr2QsFU_DUDNAMgr4MDxHcRrHqer+Kdm7dP+4TUT0eg@mail.gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300982-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300983-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[163.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:pavan.chebbi@broadcom.com,m:haoxiang_li2024@163.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:oneukum@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,maoyixie.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 521876AD7B0
+X-Rspamd-Queue-Id: C69606AD7A4
 
-On Mon, Jun 22, 2026 at 11:27:41AM +0530, Pavan Chebbi wrote:
-> On Mon, Jun 22, 2026 at 10:20 AM Haoxiang Li <haoxiang_li2024@163.com> wrote:
-> >
-> > meth_init_rx_ring() does not check the return value of alloc_skb().
-> > If the allocation fails, the NULL skb is passed to skb_reserve() and
-> > then dereferenced through skb->head.
-> >
-> > Add check for alloc_skb() to prevent potential null pointer dereference.
-> >
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
-> > ---
-> >  drivers/net/ethernet/sgi/meth.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/sgi/meth.c b/drivers/net/ethernet/sgi/meth.c
-> > index f7c3a5a766b7..ceff3cc937ad 100644
-> > --- a/drivers/net/ethernet/sgi/meth.c
-> > +++ b/drivers/net/ethernet/sgi/meth.c
-> > @@ -228,6 +228,9 @@ static int meth_init_rx_ring(struct meth_private *priv)
-> >
-> >         for (i = 0; i < RX_RING_ENTRIES; i++) {
-> >                 priv->rx_skbs[i] = alloc_skb(METH_RX_BUFF_SIZE, 0);
-> > +               if (!priv->rx_skbs[i])
-> > +                       return -ENOMEM;
-> > +
-> 
-> I think the fix is not complete. The caller meth_open() will not free
-> any successfully allocated skbs if the function ever returns -ENOMEM.
+kalmia_rx_fixup() computes usb_packet_length = skb->len - (2 *
+KALMIA_HEADER_LENGTH) as a u16, guarded only by a pre-loop check that
+skb->len is at least KALMIA_HEADER_LENGTH, which is 6. A device can
+deliver a short bulk-IN frame with skb->len in the 6 to 11 range, or
+leave a short trailing remainder on a later loop iteration. Either case
+underflows usb_packet_length to about 65530.
 
-There is also the question, does anybody care? Are SGI machines still
-used? This is a Fast Ethernet driver, written in 2003. It has no
-Maintainer. Maybe it would be better to just remove the driver?
+That bypasses the usb_packet_length < ether_packet_length truncation path.
+The device-supplied ether_packet_length, a le16 up to 65535 read from
+header_start[2], then drives a memcmp() and the following skb_trim() and
+skb_pull() past the end of the rx buffer. The rx buffer is hard_mtu * 10,
+which is 14000 bytes. That is an out of bounds read.
 
-At least drop the Fixes: tag, it does not fit the Stable rules.
+Require both the start and end framing headers to be present before
+subtracting them, on every loop iteration.
 
-https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-
-    Andrew
-
+Fixes: d40261236e8e ("net/usb: Add Samsung Kalmia driver for Samsung GT-B3730")
+Cc: stable@vger.kernel.org
+Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
 ---
-pw-bot: cr
+I asked about this on linux-usb on 2026-06-15 and got no reply, so I
+am sending the fix.
+
+ drivers/net/usb/kalmia.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/net/usb/kalmia.c b/drivers/net/usb/kalmia.c
+index ee9c48f7f68f..0dd0a30c3db4 100644
+--- a/drivers/net/usb/kalmia.c
++++ b/drivers/net/usb/kalmia.c
+@@ -276,6 +276,14 @@ kalmia_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+ 				"Received header: %6phC. Package length: %i\n",
+ 				header_start, skb->len - KALMIA_HEADER_LENGTH);
+ 
++		/* both framing headers must be present before we subtract
++		 * them, otherwise usb_packet_length underflows and the
++		 * device-supplied ether_packet_length drives an out of bounds
++		 * access below
++		 */
++		if (skb->len < 2 * KALMIA_HEADER_LENGTH)
++			return 0;
++
+ 		/* subtract start header and end header */
+ 		usb_packet_length = skb->len - (2 * KALMIA_HEADER_LENGTH);
+ 		ether_packet_length = get_unaligned_le16(&header_start[2]);
+-- 
+2.34.1
+
 
