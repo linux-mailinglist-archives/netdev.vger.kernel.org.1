@@ -1,301 +1,336 @@
-Return-Path: <netdev+bounces-300945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tCNyEEevOGrBfwcAu9opvQ
-	(envelope-from <netdev+bounces-300945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 05:43:03 +0200
+	id KyFVGFu1OGoTggcAu9opvQ
+	(envelope-from <netdev+bounces-300946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 06:08:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84F406AC519
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 05:43:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 162CA6AC72F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 06:08:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=gz60gyNy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300945-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300945-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=oHrwj+Sj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300946-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300946-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3C66D300BDA0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 03:43:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0BB08300427E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 04:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03963385BE;
-	Mon, 22 Jun 2026 03:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE8C351C2D;
+	Mon, 22 Jun 2026 04:06:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0FE126BF7;
-	Mon, 22 Jun 2026 03:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21588351C14
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 04:06:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782099780; cv=none; b=DYVDzL/CInwQ690uNsaxYpyLisYVmADn4f5m12aKVPzvK5Da5lH+JSNCr40CRkoC6xU7LUZhIOEzaUHjKOFWHeq2nm9Z/o0o0+/RZxCe2277dkc4Way12IpoWvp8hQw15mCKtQBpCGzl5HIRL0HxTT5aW3uakVnCiF1SWMma2Wo=
+	t=1782101203; cv=none; b=ONGlydbYrAlWdu83ByXuvC18cWnAexlnMzd/TDQPilzj0UGEALKkzF71M7xJZZnimQZ2lZHFZsPZniMJpnbQDODj9KMYXKdjwZIWbeCesCWhYqTFMNK3OT5QjggTogCyjRLSwqk/kfkNGY+Hrw3NtVDty8B44GTLxUn6z/cc9Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782099780; c=relaxed/simple;
-	bh=PXeeo3T6RhZ0LynB31ujkqcOdo+kGOxkEynHKrn0xXs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=da+FcSinDmFs8CFn2t319BAMhCALVKLKnUG/18Jp/zxwLuSNyH9BmYautpciqi09f/uQlTQcrXDmwFVcMyb0VyoIIUby577KfbxoXuHwqdZ1tKa6/Tq8rNIEXXOc7aCuZaXEVBeTEBONbNmIEkYRfyPc5YcvFJ/63ex88C3fKF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gz60gyNy; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65LLti2Z1055769;
-	Sun, 21 Jun 2026 20:42:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=ISjx4fIlRNIV9DBQ8H4bu6R
-	5aZqTJuKWZdj0giCNa8U=; b=gz60gyNyuA1NVmxot7gFo/+HjhJimA8p4Kt4rCZ
-	LoxCwY7agDZNp632GP5eV6d4AuF+sSlN603e4R3qhl9q16emJuswbXK1djFofcEj
-	7/zjSiF4dLr+cR3nGTLUx0SJnWq0KuSIwgttdAUe7JnD0bOuJmJztL87WP95uVQV
-	5747e9Txes1dseslUREM3+eL0xF/pUvBv6Gn7eUgA14FtIT4YwAKYFVxJtvst/vh
-	EY4ZEeEymnUl2QT2YhUdZojGY0uTkOUM/dCPI5cS9EQMOQTpf5i6Zy2YKywa8C8s
-	+2K3MZB8CJIQD81tPLtxt2NfraxJ6MNtUbhaVdDgMDDIIfg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4ewr7hc3r8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 21 Jun 2026 20:42:36 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 21 Jun 2026 20:42:36 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 21 Jun 2026 20:42:35 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id E3B213F7061;
-	Sun, 21 Jun 2026 20:42:31 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <davem@davemloft.net>, <hkelam@marvell.com>, <lcherian@marvell.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        Ratheesh Kannoth <rkannoth@marvell.com>,
-        Yuho Choi <dbgh9129@gmail.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net v2] octeontx2-af: fix CGX debugfs RVU AF PCI reference leaks
-Date: Mon, 22 Jun 2026 09:12:29 +0530
-Message-ID: <20260622034229.2254145-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782101203; c=relaxed/simple;
+	bh=sI2dRrm2rYzC5hsq52tWdXiGHIDaT9AxOFi7X+Rlza0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s5J/xG2NdHLqFqRUSmLqIU/zS2UL5GJcu40GHEAKX9nia5nzVM/G44CpX1tgX1/SibT6nS7kFY6Ib8YWraHtF1ClcWZ3SouJkq8aY/nsVGvHV336p5gcoTEvibqomYq+6xSEOHQrChK9MzFN4c+Kf+fYkGdig0trHc3y9PRfKeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oHrwj+Sj; arc=none smtp.client-ip=91.218.175.184
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782101196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZUWyFEvXeVLfLgRyqSt5dzUpDWIXdvcmv/YrGiPhDm0=;
+	b=oHrwj+SjzLCSYGSoHMsBlTyi/BPO1LYEAowZCiJy/BgfowxK1Nhv4wBnxGATzNJAQy2Usu
+	3Aui+a8Xl2VwYnUg4vaKt1jLEunHuuM12PdPzSO2e5i/XDE+X1RLFq1HeiZLctcF2EtPOU
+	pEKF/++lDxrY0G4TuBJvKoXJ/NqYwTU=
+From: Kaitao Cheng <kaitao.cheng@linux.dev>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Simona Vetter <simona.vetter@ffwll.ch>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Philipp Stanner <phasta@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-ntfs-dev@lists.sourceforge.net,
+	linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	audit@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-perf-users@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	kexec@lists.infradead.org,
+	live-patching@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	rcu@vger.kernel.org,
+	sched-ext@lists.linux.dev,
+	linux-mm@kvack.org,
+	virtualization@lists.linux.dev,
+	damon@lists.linux.dev,
+	llvm@lists.linux.dev,
+	chengkaitao <chengkaitao@kylinos.cn>
+Subject: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor state
+Date: Mon, 22 Jun 2026 12:05:30 +0800
+Message-ID: <20260622040533.29824-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIyMDAzMiBTYWx0ZWRfX2CRTJ/FhV+v+
- 1NHDV4ljWRWHzoYHjKtzELhNHFn8Mk88T0WdnL+CpNDcanfiuMZFQFTyoBNB9u202ao7GhpNvp9
- 64udeLy+C7ZzIeB0zqlKs4Ws10ayzQysbnL/iAg8wd4ThByVAPxRznYl6UufCoH5sUpY08LfMb9
- d2LMvFd9Hcu75IPEoEAPSBTwjbWej2MLuE3R4gACiwwGP4es3FyJUnM+1eU/cDAz1gnW0uKyT7M
- biCRTrVA02GD3q+8PwY72EkbGUWiIzeMlH0OBFi263v/FzCpz+L47Dnsoy5chH/v/PCo891dopn
- xBEXH3L6WEaAZDp++lzisaWzhDMp9ECF9T8aQPVKyL/ehDN70tDhU17czKJqrv8LUxf94GT3Rmq
- HXqzFYKx3yUzRoBgiL+Rs3oWOl9XAXy9aEaBOhny85dFIqrviW9FQ91NdwjT2hQef2kSGHPccfc
- YXjZTh73jHZVQq2Ki0w==
-X-Proofpoint-ORIG-GUID: eUN4K8TWFn7K3kuzRID6WlgXR3FaLwzB
-X-Authority-Analysis: v=2.4 cv=aJTAb79m c=1 sm=1 tr=0 ts=6a38af2c cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=pGLkceISAAAA:8
- a=a4YZzIsXFeaM3Y4ekB4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIyMDAzMiBTYWx0ZWRfXy1ydW6bYHPSq
- Unrk3O6VEq0wqIqxNHF7IA/9AbPkiMdK4FDhh6ldvq1i67ojSvQYrcQVV0bEzkrXpRSQYnEQ/kq
- 6OrKAWTo2YmB+JrD1p8bKxAnDKRbBpU=
-X-Proofpoint-GUID: eUN4K8TWFn7K3kuzRID6WlgXR3FaLwzB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-21_02,2026-06-18_03,2025-10-01_01
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300945-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[lunn.ch,google.com,kernel.org,marvell.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-300946-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org
+ ,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:hkelam@marvell.com,m:lcherian@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:rkannoth@marvell.com,m:dbgh9129@gmail.com,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[51];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,linux.dev:from_mime,kylinos.cn:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 84F406AC519
+X-Rspamd-Queue-Id: 162CA6AC72F
 
-CGX per-lmac debugfs seq readers obtained struct rvu via
-pci_get_drvdata(pci_get_device(..., PCI_DEVID_OCTEONTX2_RVU_AF, ...)),
-which leaks a PCI device reference on every read. Store rvu and the CGX
-handle in debugfs inode private data when creating stats, mac_filter,
-and fwdata files (one context per CGX), and use debugfs aux numbers for
-fwdata so lmac_id matches the other CGX debugfs entries.
+From: chengkaitao <chengkaitao@kylinos.cn>
 
-Fixes: f967488d095e ("octeontx2-af: Add per CGX port level NIX Rx/Tx counters")
-Fixes: dbc52debf95f ("octeontx2-af: Debugfs support for DMAC filters")
-Fixes: 49f02e6877d1 ("Octeontx2-af: Debugfs support for firmware data")
-Cc: Linu Cherian <lcherian@marvell.com>
-Reported-by: Yuho Choi <dbgh9129@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+The list_for_each*_safe() helpers are used when the loop body may remove
+the current entry.  Their current interface, however, forces every caller
+to define a temporary cursor outside the macro and pass it in, even when
+the caller never uses that cursor directly.  For most call sites this
+extra cursor is just boilerplate required by the macro implementation.
 
---
-v1 -> v2: Addressed Simon/Jakub comments
-	https://lore.kernel.org/netdev/20260621144405.0abfc627@kernel.org/
----
- .../marvell/octeontx2/af/rvu_debugfs.c        | 76 ++++++++++---------
- 1 file changed, 41 insertions(+), 35 deletions(-)
+This is awkward because the saved next pointer is an internal detail of
+the iteration.  Callers that only remove or move the current entry do not
+need to spell it out.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index ca2704b188a5..5f4679604a53 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2810,6 +2810,14 @@ static void rvu_dbg_npa_init(struct rvu *rvu)
- 			    &rvu_dbg_npa_ndc_hits_miss_fops);
- }
- 
-+/* Per-lmac CGX debugfs files need both RVU and CGX handle; inode->i_private
-+ * points here so seq_file ops avoid pci_get_device(PCI_DEVID_OCTEONTX2_RVU_AF).
-+ */
-+struct rvu_cgx_lmac_dbgfs_ctx {
-+	struct rvu	*rvu;
-+	void		*cgxd;
-+};
-+
- #define PRINT_CGX_CUML_NIXRX_STATUS(idx, name)				\
- 	({								\
- 		u64 cnt;						\
-@@ -2832,18 +2840,14 @@ static void rvu_dbg_npa_init(struct rvu *rvu)
- 
- static int cgx_print_stats(struct seq_file *s, int lmac_id)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *dctx = s->private;
- 	struct cgx_link_user_info linfo;
-+	struct rvu *rvu = dctx->rvu;
- 	struct mac_ops *mac_ops;
--	void *cgxd = s->private;
-+	void *cgxd = dctx->cgxd;
- 	u64 ucast, mcast, bcast;
- 	int stat = 0, err = 0;
- 	u64 tx_stat, rx_stat;
--	struct rvu *rvu;
--
--	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
--					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
--	if (!rvu)
--		return -ENODEV;
- 
- 	mac_ops = get_mac_ops(cgxd);
- 	/* There can be no CGX devices at all */
-@@ -2950,20 +2954,16 @@ RVU_DEBUG_SEQ_FOPS(cgx_stat, cgx_stat_display, NULL);
- 
- static int cgx_print_dmac_flt(struct seq_file *s, int lmac_id)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *dctx = s->private;
-+	struct rvu *rvu = dctx->rvu;
- 	struct pci_dev *pdev = NULL;
--	void *cgxd = s->private;
-+	void *cgxd = dctx->cgxd;
- 	char *bcast, *mcast;
- 	u16 index, domain;
- 	u8 dmac[ETH_ALEN];
--	struct rvu *rvu;
- 	u64 cfg, mac;
- 	int pf;
- 
--	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
--					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
--	if (!rvu)
--		return -ENODEV;
--
- 	pf = cgxlmac_to_pf(rvu, cgx_get_cgxid(cgxd), lmac_id);
- 	domain = 2;
- 
-@@ -3010,17 +3010,13 @@ RVU_DEBUG_SEQ_FOPS(cgx_dmac_flt, cgx_dmac_flt_display, NULL);
- 
- static int cgx_print_fwdata(struct seq_file *s, int lmac_id)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *dctx = s->private;
- 	struct cgx_lmac_fwdata_s *fwdata;
--	void *cgxd = s->private;
-+	struct rvu *rvu = dctx->rvu;
-+	void *cgxd = dctx->cgxd;
- 	struct phy_s *phy;
--	struct rvu *rvu;
- 	int cgx_id, i;
- 
--	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
--					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
--	if (!rvu)
--		return -ENODEV;
--
- 	if (!rvu->fwdata)
- 		return -EAGAIN;
- 
-@@ -3101,6 +3097,7 @@ RVU_DEBUG_SEQ_FOPS(cgx_fwdata, cgx_fwdata_display, NULL);
- 
- static void rvu_dbg_cgx_init(struct rvu *rvu)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *ctx;
- 	struct mac_ops *mac_ops;
- 	unsigned long lmac_bmap;
- 	int i, lmac_id;
-@@ -3127,20 +3124,29 @@ static void rvu_dbg_cgx_init(struct rvu *rvu)
- 		rvu->rvu_dbg.cgx = debugfs_create_dir(dname,
- 						      rvu->rvu_dbg.cgx_root);
- 
--		for_each_set_bit(lmac_id, &lmac_bmap, rvu->hw->lmac_per_cgx) {
--			/* lmac debugfs dir */
--			sprintf(dname, "lmac%d", lmac_id);
--			rvu->rvu_dbg.lmac =
--				debugfs_create_dir(dname, rvu->rvu_dbg.cgx);
--
--			debugfs_create_file_aux_num("stats", 0600, rvu->rvu_dbg.lmac,
--					    cgx, lmac_id, &rvu_dbg_cgx_stat_fops);
--			debugfs_create_file_aux_num("mac_filter", 0600,
--					    rvu->rvu_dbg.lmac, cgx, lmac_id,
--					    &rvu_dbg_cgx_dmac_flt_fops);
--			debugfs_create_file("fwdata", 0600,
--					    rvu->rvu_dbg.lmac, cgx,
--					    &rvu_dbg_cgx_fwdata_fops);
-+		{
-+			ctx = devm_kzalloc(rvu->dev, sizeof(*ctx), GFP_KERNEL);
-+			if (!ctx)
-+				continue;
-+
-+			ctx->rvu = rvu;
-+			ctx->cgxd = cgx;
-+
-+			for_each_set_bit(lmac_id, &lmac_bmap, rvu->hw->lmac_per_cgx) {
-+				/* lmac debugfs dir */
-+				sprintf(dname, "lmac%d", lmac_id);
-+				rvu->rvu_dbg.lmac =
-+					debugfs_create_dir(dname, rvu->rvu_dbg.cgx);
-+
-+				debugfs_create_file_aux_num("stats", 0600, rvu->rvu_dbg.lmac,
-+							    ctx, lmac_id, &rvu_dbg_cgx_stat_fops);
-+				debugfs_create_file_aux_num("mac_filter", 0600,
-+							    rvu->rvu_dbg.lmac, ctx, lmac_id,
-+							    &rvu_dbg_cgx_dmac_flt_fops);
-+				debugfs_create_file_aux_num("fwdata", 0600,
-+							    rvu->rvu_dbg.lmac, ctx,
-+							    lmac_id, &rvu_dbg_cgx_fwdata_fops);
-+			}
- 		}
- 	}
- }
+The _safe() suffix has also caused confusion.  Christian Koenig pointed
+out that the name is easy to read as a thread-safe variant, especially
+for beginners, even though it only means that the iterator keeps enough
+state to tolerate removal of the current entry.  He suggested _mutable()
+as a clearer description of what the loop permits.
+
+Add *_mutable() iterator variants for list, hlist and llist.  The new
+helpers are variadic and support both forms.  In the common case, the
+caller omits the temporary cursor and the macro creates a unique internal
+cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
+explicit temporary cursor, the caller can still pass it and the helper
+keeps the existing *_safe() behaviour.
+
+For example, a call site may use the shorter form:
+
+  list_for_each_entry_mutable(pos, head, member)
+
+or keep the explicit temporary cursor form:
+
+  list_for_each_entry_mutable(pos, tmp, head, member)
+
+The existing *_safe() helpers remain available for compatibility.  This
+series only converts users in mm, block, kernel, init and io_uring.  If
+this approach looks acceptable, the remaining users can be converted in
+follow-up series.
+
+Changes in v3 (Christian König, Andy Shevchenko):
+- Convert safe list walks to mutable iterators
+
+Changes in v2 (Muchun Song, Andy Shevchenko):
+- Drop the list_for_each_entry_mutable*() helpers from v1 and make the
+  cursor change directly in the existing list_for_each_entry*() helpers.
+- Open-code special list walks that rely on updating the loop cursor in
+  the body, preserving their existing traversal semantics.
+
+Link to v2:
+https://lore.kernel.org/all/20260609061347.93688-1-kaitao.cheng@linux.dev/
+
+Link to v1:
+https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+
+Kaitao Cheng (7):
+  list: Add mutable iterator variants
+  llist: Add mutable iterator variants
+  mm: Use mutable list iterators
+  block: Use mutable list iterators
+  kernel: Use mutable list iterators
+  initramfs: Use mutable list iterator
+  io_uring: Use mutable list iterators
+
+ block/bfq-iosched.c                 |  17 +-
+ block/blk-cgroup.c                  |  12 +-
+ block/blk-flush.c                   |   4 +-
+ block/blk-iocost.c                  |  18 +-
+ block/blk-mq.c                      |   8 +-
+ block/blk-throttle.c                |   4 +-
+ block/kyber-iosched.c               |   4 +-
+ block/partitions/ldm.c              |   8 +-
+ block/sed-opal.c                    |   4 +-
+ include/linux/list.h                | 269 ++++++++++++++++++++++++----
+ include/linux/llist.h               |  81 +++++++--
+ init/initramfs.c                    |   5 +-
+ io_uring/cancel.c                   |   6 +-
+ io_uring/poll.c                     |   3 +-
+ io_uring/rw.c                       |   4 +-
+ io_uring/timeout.c                  |   8 +-
+ io_uring/uring_cmd.c                |   3 +-
+ kernel/audit_tree.c                 |   4 +-
+ kernel/audit_watch.c                |  16 +-
+ kernel/auditfilter.c                |   4 +-
+ kernel/auditsc.c                    |   4 +-
+ kernel/bpf/arena.c                  |  10 +-
+ kernel/bpf/arraymap.c               |   8 +-
+ kernel/bpf/bpf_local_storage.c      |   3 +-
+ kernel/bpf/bpf_lru_list.c           |  25 ++-
+ kernel/bpf/btf.c                    |  18 +-
+ kernel/bpf/cgroup.c                 |   7 +-
+ kernel/bpf/cpumap.c                 |   4 +-
+ kernel/bpf/devmap.c                 |  10 +-
+ kernel/bpf/helpers.c                |   8 +-
+ kernel/bpf/local_storage.c          |   4 +-
+ kernel/bpf/memalloc.c               |  16 +-
+ kernel/bpf/offload.c                |   8 +-
+ kernel/bpf/states.c                 |   4 +-
+ kernel/bpf/stream.c                 |   4 +-
+ kernel/bpf/verifier.c               |   6 +-
+ kernel/cgroup/cgroup-v1.c           |   4 +-
+ kernel/cgroup/cgroup.c              |  54 +++---
+ kernel/cgroup/dmem.c                |  12 +-
+ kernel/cgroup/rdma.c                |   8 +-
+ kernel/events/core.c                |  44 +++--
+ kernel/events/uprobes.c             |  12 +-
+ kernel/exit.c                       |   8 +-
+ kernel/fail_function.c              |   4 +-
+ kernel/gcov/clang.c                 |   4 +-
+ kernel/irq_work.c                   |   4 +-
+ kernel/kexec_core.c                 |   4 +-
+ kernel/kprobes.c                    |  16 +-
+ kernel/livepatch/core.c             |   4 +-
+ kernel/livepatch/core.h             |   4 +-
+ kernel/liveupdate/kho_block.c       |   4 +-
+ kernel/liveupdate/luo_flb.c         |   4 +-
+ kernel/locking/rwsem.c              |   2 +-
+ kernel/locking/test-ww_mutex.c      |   2 +-
+ kernel/module/main.c                |  11 +-
+ kernel/padata.c                     |   4 +-
+ kernel/power/snapshot.c             |   8 +-
+ kernel/power/wakelock.c             |   4 +-
+ kernel/printk/printk.c              |  11 +-
+ kernel/ptrace.c                     |   4 +-
+ kernel/rcu/rcutorture.c             |   3 +-
+ kernel/rcu/tasks.h                  |   9 +-
+ kernel/rcu/tree.c                   |   6 +-
+ kernel/resource.c                   |   4 +-
+ kernel/sched/core.c                 |   4 +-
+ kernel/sched/ext.c                  |  22 +--
+ kernel/sched/fair.c                 |  28 +--
+ kernel/sched/topology.c             |   4 +-
+ kernel/sched/wait.c                 |   4 +-
+ kernel/seccomp.c                    |   4 +-
+ kernel/signal.c                     |  11 +-
+ kernel/smp.c                        |   4 +-
+ kernel/taskstats.c                  |   8 +-
+ kernel/time/clockevents.c           |   6 +-
+ kernel/time/clocksource.c           |   4 +-
+ kernel/time/posix-cpu-timers.c      |   4 +-
+ kernel/time/posix-timers.c          |   3 +-
+ kernel/torture.c                    |   3 +-
+ kernel/trace/bpf_trace.c            |   4 +-
+ kernel/trace/ftrace.c               |  49 +++--
+ kernel/trace/ring_buffer.c          |  25 ++-
+ kernel/trace/trace.c                |  12 +-
+ kernel/trace/trace_dynevent.c       |   6 +-
+ kernel/trace/trace_dynevent.h       |   5 +-
+ kernel/trace/trace_events.c         |  35 ++--
+ kernel/trace/trace_events_filter.c  |   4 +-
+ kernel/trace/trace_events_hist.c    |   8 +-
+ kernel/trace/trace_events_trigger.c |  17 +-
+ kernel/trace/trace_events_user.c    |  16 +-
+ kernel/trace/trace_stat.c           |   4 +-
+ kernel/user-return-notifier.c       |   3 +-
+ kernel/workqueue.c                  |  16 +-
+ mm/backing-dev.c                    |   8 +-
+ mm/balloon.c                        |   8 +-
+ mm/cma.c                            |   4 +-
+ mm/compaction.c                     |   4 +-
+ mm/damon/core.c                     |   4 +-
+ mm/damon/sysfs-schemes.c            |   4 +-
+ mm/dmapool.c                        |   4 +-
+ mm/huge_memory.c                    |   8 +-
+ mm/hugetlb.c                        |  56 +++---
+ mm/hugetlb_vmemmap.c                |  16 +-
+ mm/khugepaged.c                     |  14 +-
+ mm/kmemleak.c                       |   7 +-
+ mm/ksm.c                            |  25 +--
+ mm/list_lru.c                       |   4 +-
+ mm/memcontrol-v1.c                  |   8 +-
+ mm/memory-failure.c                 |  12 +-
+ mm/memory-tiers.c                   |   4 +-
+ mm/migrate.c                        |  23 ++-
+ mm/mmu_notifier.c                   |   9 +-
+ mm/page_alloc.c                     |   8 +-
+ mm/page_reporting.c                 |   2 +-
+ mm/percpu.c                         |  11 +-
+ mm/pgtable-generic.c                |   4 +-
+ mm/rmap.c                           |  10 +-
+ mm/shmem.c                          |   9 +-
+ mm/slab_common.c                    |  14 +-
+ mm/slub.c                           |  33 ++--
+ mm/swapfile.c                       |   4 +-
+ mm/userfaultfd.c                    |  12 +-
+ mm/vmalloc.c                        |  24 +--
+ mm/vmscan.c                         |   7 +-
+ mm/zsmalloc.c                       |   4 +-
+ 124 files changed, 875 insertions(+), 681 deletions(-)
+
 -- 
 2.43.0
 
