@@ -1,188 +1,368 @@
-Return-Path: <netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301012-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +qLHK2D9OGoplAcAu9opvQ
-	(envelope-from <netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:16:16 +0200
+	id +vrPArMAOWr6lAcAu9opvQ
+	(envelope-from <netdev+bounces-301012-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:30:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 244E96AE1BD
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:16:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 698036AE3B4
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:30:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=G1B1K+pL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=nxp.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301012-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301012-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47235305FADF
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:09:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8E1C830254BC
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDE9364EA6;
-	Mon, 22 Jun 2026 09:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C26362153;
+	Mon, 22 Jun 2026 09:20:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA24369970;
-	Mon, 22 Jun 2026 09:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA9F368D51;
+	Mon, 22 Jun 2026 09:20:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782119298; cv=none; b=kbFPLiVXbBUF738wNKtVgQbdA5t287KTjz5YPGaTqsnsScb0SqdY6Sj/HPgVI2YSgGTRkaixESEQWAuBErTsntPR48DUfPQARbG8HbGbYVDlWLf4BCb3FoxjT27RKjR8PpKyBGKH4Jolx71LT95OfAeQPI0BxG+hPNzc+qj1gCI=
+	t=1782120016; cv=none; b=KVZYtZolfP3tVhf6xdhNlel7tyFW6DDUQkBiARP4QyNCDfzp1OlzfkLq9xTyJcBrJZX67ZtBvmJnmzO83alrUVeFYvWxDh2vVFR2yW5Nsi4FFlfUkHTxhMeQNHHG6+AHougt9JhGfBX9z5J/oKN303Q75IDw5Ah9xfcImOOnhRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782119298; c=relaxed/simple;
-	bh=eCHssKVV2pJxL1MZXNEcttSU7Bm5ic3nvRkwWPlZf5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hWA6/JNroR1nolbIDLAxHYXlTC8xuoiMSRbyeEQ01kjigdl+2K/N1IRPB7K8NdVfd+tnpviPhqrohEbrdQsNdLWcV7yOZjQT62v8Y2MOBuyUv2tf8QyLEycgRltlS+aAKKouE12rKfKfkSvsVISjydCLrXYAi66gU525WCGOmLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1B1K+pL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64B0F1F000E9;
-	Mon, 22 Jun 2026 09:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782119294;
-	bh=oMLg+Sr/y5FDapu46bskmirKujQ32N1+2dZN0r1E5GY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=G1B1K+pL0YgcSkF9lt16MUlpIGOSpE0OQoc0ejByA1kBy6EcYPpmvpPFyxXW3QQGd
-	 XTS9JJ7Ilhxkl/7oE1Eqwjfm44/Lttayqjg1LGCnT0BDoXkzx5S6aqO397J7jwBfO4
-	 GqtnM/kB5xJlj8Uft0y12T+3mj5j5lzy6gWaxb4noi6kk0yU4KYyLD5UBXfS1eC0dd
-	 xXDtlemnG1rfWAtd5v0Bok/1PkbZua4Qwb428rve79Xe5kWLE3GKufXsY3iXa2hNuK
-	 s/ugVOYZXOhO48oiuNPRFwm0dq9UIW2sKyeIihaeX5KpAap5diinMI3aL4VvntcfgD
-	 5v0XqsW51cxxg==
-Date: Mon, 22 Jun 2026 11:08:10 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: ricardo@pardini.net, nic_swsd@realtek.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiko Stuebner <heiko@sntech.de>, Sebastian Reichel <sebastian.reichel@collabora.com>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v4 1/3] dt-bindings: net: add Realtek RTL8125 PCIe
- Ethernet
-Message-ID: <20260622-sympathetic-inscrutable-macaque-f3bffc@quoll>
-References: <20260617-rk3588-dts-rtl-eth-describe-dt-alias-v4-0-2bd38922d129@pardini.net>
- <20260617-rk3588-dts-rtl-eth-describe-dt-alias-v4-1-2bd38922d129@pardini.net>
- <876a38f8-75ea-4b32-bb65-216cb3adb436@gmail.com>
+	s=arc-20240116; t=1782120016; c=relaxed/simple;
+	bh=0b9JyH16JqUW7ieXM2+9d/GSfTdn//+UMpwrvvlHncw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Y2nh8DEoarB2sKRnOtJfN3vLVKk1OSauG2lqYW5PX/NwiteNjBHQ6GJEehauc341GOVOitH+COwnl6tSuvYqBFgPcOSQpQ59Q2dnTju5mZfoppUaHNrQpkm1CYNrX45V0B3Uj4l3c7IzoOYwboEkIncEHJeI4NwKG9gHSES5Cpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id E2C8E200306;
+	Mon, 22 Jun 2026 11:20:02 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id B64A1200303;
+	Mon, 22 Jun 2026 11:20:02 +0200 (CEST)
+Received: from localhost.localdomain (mega.ap.freescale.net [10.192.208.232])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 7E3C91800071;
+	Mon, 22 Jun 2026 17:20:00 +0800 (+08)
+From: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	shuah@kernel.org,
+	vladimir.oltean@nxp.com,
+	vinicius.gomes@intel.com,
+	fejes@inf.elte.hu,
+	xiaoliang.yang_1@nxp.com
+Subject: [PATCH net-next 0/6] tc: introduce FRER action (IEEE 802.1CB)
+Date: Mon, 22 Jun 2026 17:21:12 +0800
+Message-Id: <20260622092118.6846-1-xiaoliang.yang_1@nxp.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <876a38f8-75ea-4b32-bb65-216cb3adb436@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:ricardo@pardini.net,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:sebastian.reichel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[xiaoliang.yang_1@nxp.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:horms@kernel.org,m:shuah@kernel.org,m:vladimir.oltean@nxp.com,m:vinicius.gomes@intel.com,m:fejes@inf.elte.hu,m:xiaoliang.yang_1@nxp.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301011-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301012-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,quoll:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devicetree.org:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xiaoliang.yang_1@nxp.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 244E96AE1BD
+X-Rspamd-Queue-Id: 698036AE3B4
 
-On Wed, Jun 17, 2026 at 06:43:42PM +0200, Heiner Kallweit wrote:
-> On 17.06.2026 14:58, Ricardo Pardini via B4 Relay wrote:
-> > From: Ricardo Pardini <ricardo@pardini.net>
-> > 
-> > Add a binding for fixed/soldered Realtek RTL8125 PCIe Ethernet
-> > controller.
-> > 
-> > The "pciVVVV,DDDD" compatibles are the Open Firmware PCI Bus Binding
-> > spelling, auto-derived from PCI-SIG vendor/device IDs, but they still
-> > need a binding when used in a board DT - analogous to "usbVVVV,PPPP"
+This series introduces a new TC action implementing
+Frame Replication and Elimination for Reliability (FRER)
+as defined in IEEE 802.1CB.
 
-Ricardo,
+The FRER action enables:
+- Frame replication (push)
+- Sequence numbering via R-TAG
+- Frame elimination based on sequence recovery
 
-No, they do not need. They are already documented, they already have a
-binding, see: dtschema/schemas/pci/pci-device.yaml
+Patch overview:
+ 1. Add ETH_P_RTAG definition
+ 2. Introduce TCA_ID_FRER
+ 3. Add tc_frer uAPI
+ 4. Implement act_frer kernel module
+ 5. Add tc-testing selftest JSON coverage
+ 6. Add kselftest integration test
 
+The implementation currently focuses on software datapath.  Hardware
+offload is exposed through the flow offload API (FLOW_ACTION_FRER);
+driver-side support for specific hardware will be submitted separately.
 
-> > compatibles documented in their own bindings (e.g. microchip,lan95xx)
-> > so board DTs attaching properties (fixed MAC, nvmem cell, ...) to
-> > these PCI function nodes can be validated.
-> > 
-> > Suggested-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-> > Signed-off-by: Ricardo Pardini <ricardo@pardini.net>
-> > ---
-> >  .../devicetree/bindings/net/realtek,rtl8125.yaml   | 43 ++++++++++++++++++++++
-> >  MAINTAINERS                                        |  1 +
-> >  2 files changed, 44 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/realtek,rtl8125.yaml b/Documentation/devicetree/bindings/net/realtek,rtl8125.yaml
-> > new file mode 100644
-> > index 0000000000000..eee13fbc1e6a6
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/realtek,rtl8125.yaml
-> > @@ -0,0 +1,43 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/realtek,rtl8125.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Realtek RTL8125 2.5 Gigabit PCIe Ethernet Controller
-> > +
-> > +maintainers:
-> > +  - Heiner Kallweit <hkallweit1@gmail.com>
-> > +
-> > +description:
-> > +  The Realtek RTL8125 is a 2.5GBASE-T Ethernet controller with a PCIe host
-> > +  interface.
-> > +
-> > +allOf:
-> > +  - $ref: ethernet-controller.yaml#
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: pci10ec,8125
-> 
-> IIRC we came to the conclusion that the compatible string isn't used in the
-> relevant code path. Then why add it here? Is there an alignment on this?
+Usage scenarios:
 
-Heiner, it is used - in the DTS.
+=== Scenario 1a: Talker End - single port (no replication) ===
 
-> If it should be added here, then an explaining comment would be helpful.
+  The simplest case: a single egress path.  The frer push action
+  inserts an R-TAG on the egress of the physical interface.  No
+  mirror or virtual interface is needed.
 
-Commit msg should explain that.  The compatible is used, so it
-must be documented and in fact already is, so you need to specify them
-ONLY if device nodes have some other properties, like being an ethernet
-controller.
+    CPU
+     |
+    eth0 egress clsact:
+         action frer push index 1  <- insert R-TAG seq=N
+         |
+        eth0
+    [R-TAG seq=N | payload]
+      Path A --> network
 
-I assume that this is the case here, although that should be mentioned
-in the commit msg.
+  Configuration:
 
-Best regards,
-Krzysztof
+    tc qdisc add dev eth0 clsact
+    tc filter add dev eth0 egress protocol ip flower skip_hw \
+        action frer push index 1
+
+=== Scenario 1b: Talker End - dual port replication via bond + cross-mirror ===
+
+  A bond interface (balance-rr) aggregates both physical ports.  The
+  frer push action is placed on each slave's egress; each slave also
+  mirrors every outgoing frame to the other slave.  This cross-mirror
+  ensures that every frame transmitted by the bond (regardless of which
+  slave the round-robin selects) carries an R-TAG and reaches both
+  physical links.  If one link goes down, the bond continues on the
+  remaining slave without any traffic interruption.
+
+    CPU (socket on bond0)
+         |
+        bond0 (balance-rr)
+        /          \
+     eth0            eth1
+    egress clsact:   egress clsact:
+    action frer push index 1   action frer push index 1
+    action mirred egress       action mirred egress
+        mirror dev eth1            mirror dev eth0
+         |                              |
+        eth0                          eth1
+    [R-TAG seq=N | payload]   [R-TAG seq=N | payload]
+      Path A --> network         Path B --> network
+
+  Configuration:
+
+    ip link add bond0 type bond mode balance-rr miimon 100
+    ip link set eth0 master bond0
+    ip link set eth1 master bond0
+    ip link set eth0 up
+    ip link set eth1 up
+    ip link set bond0 up
+    ip addr add 192.0.2.1/24 dev bond0
+
+    tc qdisc add dev eth0 clsact
+    tc filter add dev eth0 egress protocol ip flower skip_hw \
+        action frer push index 1 \
+        action mirred egress mirror dev eth1
+
+    tc qdisc add dev eth1 clsact
+    tc filter add dev eth1 egress protocol ip flower skip_hw \
+        action frer push index 1 \
+        action mirred egress mirror dev eth0
+
+=== Scenario 2: Listener End - shared sequence recovery via bond ===
+
+  Both physical ports are bonded (balance-rr).  Each port's ingress
+  references the same recover action by index.  The first copy of each
+  sequence number passes (R-TAG stripped by tag-pop) and is delivered
+  directly to the bond's IP stack; the duplicate is discarded.  No
+  separate convergence interface is needed because the bond already
+  provides a single IP address over both slaves.
+
+    eth0 (Path A in)            eth1 (Path B in)
+    [R-TAG seq=N | payload]     [R-TAG seq=N | payload]
+          |                           |
+    ingress clsact              ingress clsact
+    flower: match stream        flower: match stream
+    action frer recover   <-->  action frer recover
+        index 10 (shared,           index 10 (shared,
+        tag-pop, spinlock           same action object)
+        protected)
+          |                           |
+          +-----------+---------------+
+                      |
+                   bond0 (IP_DST) ----> IP stack / CPU
+                              [payload, R-TAG removed by tag-pop]
+
+  Configuration:
+
+    ip link add bond0 type bond mode balance-rr miimon 100
+    ip link set eth0 master bond0
+    ip link set eth1 master bond0
+    ip link set eth0 up
+    ip link set eth1 up
+    ip link set bond0 up
+    ip addr add 192.0.2.2/24 dev bond0
+
+    tc qdisc add dev eth0 clsact
+    tc filter add dev eth0 ingress protocol all flower skip_hw \
+        action frer recover alg vector history-length 16 \
+            reset-time 2000 tag-pop index 10
+
+    tc qdisc add dev eth1 clsact
+    tc filter add dev eth1 ingress protocol all flower skip_hw \
+        action frer recover index 10
+
+=== Scenario 3a: Relay System - ingress sequence recovery ===
+
+  A relay node receives redundant streams on two ingress ports and
+  eliminates duplicates before forwarding.  The two ingress ports
+  share the same recover action by index.  The surviving frame is
+  redirected to an egress port and forwarded to the next segment.
+
+    upstream
+      
+    Path A --> swp0 (ingress)   Path B --> swp1 (ingress)
+                 |                          |
+           ingress clsact        ingress clsact
+           flower: match stream  flower: match stream
+           action frer recover   action frer recover
+               index 10          index 10 (shared)
+           action mirred         action mirred
+               redirect              redirect
+               dev swp2              dev swp2
+                 |                     |
+                 +----------+----------+
+                            |
+                         swp2 --> downstream
+
+  Configuration:
+
+    tc qdisc add dev swp0 clsact
+    tc filter add dev swp0 ingress protocol all flower skip_hw \
+        action frer recover alg vector history-length 16 \
+            reset-time 2000 tag-pop index 10 \
+        action mirred egress redirect dev swp2
+
+    tc qdisc add dev swp1 clsact
+    tc filter add dev swp1 ingress protocol all flower skip_hw \
+        action frer recover index 10 \
+        action mirred egress redirect dev swp2
+
+=== Scenario 3b: Relay System - ingress frame replication (push) ===
+
+  A relay node receives frames from a talker on swp0 ingress, inserts
+  an R-TAG, and replicates them onto two egress ports towards the next
+  network segment.  FDB learning and flooding are disabled on all relay
+  ports; MAC forwarding entries are configured statically to prevent
+  duplicate frames from looping through the bridge.
+
+    upstream
+         |
+        swp0 ingress clsact:
+         action frer push index 1         <- insert new R-TAG seq=M
+         action mirred egress mirror dev swp2 <- copy to Path B'
+         action mirred egress redirect dev swp1 <- to Path A'
+         |                                      |
+        swp1                                  swp2
+    [R-TAG seq=M | payload]           [R-TAG seq=M | payload]
+      Path A' --> downstream            Path B' --> downstream
+
+  Configuration:
+
+    tc qdisc add dev swp0 clsact
+    tc filter add dev swp0 ingress protocol ip flower skip_hw \
+        action frer push index 1 \
+        action mirred egress mirror dev swp2 \
+        action mirred egress redirect dev swp1
+
+    # Disable FDB learning and flooding on all relay ports to prevent
+    # duplicate frames from looping back through the bridge.
+    bridge link set dev swp0 learning off flood off
+    bridge link set dev swp1 learning off flood off
+    bridge link set dev swp2 learning off flood off
+    bridge fdb add DST_MAC dev swp1 master static
+    bridge fdb add DST_MAC dev swp2 master static
+
+Known limitations:
+
+  1. Only R-TAG (EtherType 0xF1C1, IEEE 802.1CB Section 7.8) is
+     currently supported as the redundancy tag type.  HSR
+     (IEC 62439-3) and PRP (IEC 62439-3) tag formats are defined in
+     the UAPI (TCA_FRER_TAG_HSR, TCA_FRER_TAG_PRP) but not yet
+     implemented; attempts to use them are rejected with -EOPNOTSUPP.
+     Support for HSR and PRP tags will be added in a follow-up series.
+
+Changes since RFC (https://lkml.org/lkml/2021/9/28/535):
+
+  1. The frer action can now be attached to either ingress or egress
+     clsact.  For talker-end frame replication the action is placed on
+     the egress of the outgoing interface. For relay-system replication
+     the action is placed on the ingress of the receiving interface,
+     followed by mirred redirect to the egress ports.
+
+  2. Reset timer reworked following Vinicius Costa Gomes' review.
+
+  3. Vector recovery algorithm corrected following Ferenc Fejes' review.
+
+  4. A bond is used on the end system to aggregate two device interfaces.
+     addressing Vladimir’s comment that TC-FRER is not applicable to end
+     systems. See Scenario 1b(talker end) and Scenario 2(listener end).
+     The kselftest script (frer_test.sh) test this on TEST 2.
+
+  5. Added detailed usage scenario descriptions with ASCII topology
+     diagrams.  Added tc-testing JSON test cases (32 cases) and a
+     TAP-format kselftest script (frer_test.sh) with five end-to-end
+     functional tests and one relay bridge topology test.
+
+Xiaoliang Yang (6):
+  uapi: if_ether: add ETH_P_RTAG for IEEE 802.1CB R-TAG
+  uapi: pkt_cls: add TCA_ID_FRER action identifier
+  uapi: tc_act: add tc_frer UAPI header
+  net: sched: act_frer: add FRER tc action
+  selftest: add tc-testing JSON test cases for act_frer
+  selftests: net: add kselftest for IEEE 802.1CB FRER tc action
+
+ include/net/flow_offload.h                    |   11 +
+ include/net/tc_act/tc_frer.h                  |   71 ++
+ include/uapi/linux/if_ether.h                 |    1 +
+ include/uapi/linux/pkt_cls.h                  |    1 +
+ include/uapi/linux/tc_act/tc_frer.h           |   89 ++
+ net/sched/Kconfig                             |   16 +
+ net/sched/Makefile                            |    1 +
+ net/sched/act_frer.c                          |  835 ++++++++++++++
+ tools/testing/selftests/net/Makefile          |    1 +
+ tools/testing/selftests/net/frer_test.sh      | 1013 +++++++++++++++++
+ .../tc-testing/tc-tests/actions/frer.json     |  785 +++++++++++++
+ 11 files changed, 2824 insertions(+)
+ create mode 100644 include/net/tc_act/tc_frer.h
+ create mode 100644 include/uapi/linux/tc_act/tc_frer.h
+ create mode 100644 net/sched/act_frer.c
+ create mode 100755 tools/testing/selftests/net/frer_test.sh
+ create mode 100644 tools/testing/selftests/tc-testing/tc-tests/actions/frer.json
+
+-- 
+2.17.1
 
 
