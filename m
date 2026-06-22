@@ -1,258 +1,208 @@
-Return-Path: <netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301191-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H+9QL42EOWrLugcAu9opvQ
-	(envelope-from <netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:53:01 +0200
+	id IY4RHFuHOWpiuwcAu9opvQ
+	(envelope-from <netdev+bounces-301191-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 21:04:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6158A6B1E7E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:53:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BBAC6B1FAB
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 21:04:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="s/Fxb79f";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=LFiZE21b;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301191-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301191-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8BF3A3008D76
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:52:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73EA3303DAF4
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CC2346E5E;
-	Mon, 22 Jun 2026 18:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F163348C65;
+	Mon, 22 Jun 2026 19:03:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C8C346E5D
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 18:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1320334752E
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 19:03:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782154376; cv=none; b=YafBIzJtdI16qDoWd06CujlcMyMRcN2P0TTxDw1TQhEGlrwXKftYtRp0T/obaz1+uD1aA9mxY6X+G7cmJ0f3hZjxkZPhuLACV04qQ2Iu7SzSOif8df/3beMtvh19m+l+FhO6XVsUWdsnOx2Jk9XK0oUQK1myKDAdIm7Luoza4Qg=
+	t=1782155035; cv=none; b=O+kQ3XPhLk/f+9mLurHsXwR+wDY0A4MP5CJ+z+SUe6HLCITtURq3idvf+czMEG9EHlPhd12Y9/9aUkdBAlFTBWW19S9hFz+PrD+7GyBXJg1vrCDPSTjyOVW80EHGv5AyRi1vdKxVt95BBohEbUasT6cR/JcL97OBEKuWwZuQJmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782154376; c=relaxed/simple;
-	bh=yPa7NOHrj92YRaj3+nvIHEjTFD+2RQLrQIgmZdskk+g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MkkoSll35CJ3zsOli6ECYX/KFLDq3zb3q0iZpwbP4xGTaCo5q2HiRu0vhLaA9ejqSCwewbwBkV6aFZRbPvejh3DXyDZtf11U/ZH+kUr2hmqTx/C64SGaYvWoG0RJ+tRVGr+6lcRwLSV3yCTRLoGI8Schj9l95zle6OP5jWnOhEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s/Fxb79f; arc=none smtp.client-ip=209.85.160.202
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-519fd49d101so3985941cf.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:52:54 -0700 (PDT)
+	s=arc-20240116; t=1782155035; c=relaxed/simple;
+	bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=F8XfVL0JZ538CgPlZZ6gTwgXnmVB9ai4mZT3t1gMO6BPYUtw2388vIUWmpZznH1Dj0dJogIn7puvJzwM7ArdqI14JFbleRUG40v5PtlDBJDSbFM/mh/AiYWjjSf/czbsoV88jOVeZmoTT46RlJfsfymDWqgeShcCXivAPi2Q/gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFiZE21b; arc=none smtp.client-ip=74.125.82.171
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-30c0a352e33so197583eec.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 12:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782154374; x=1782759174; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mUYiga/rA61F6GfSKny16M3WpKqYKTvbN+XI5uTufgM=;
-        b=s/Fxb79fTnZYmC9eS8m3jtkLABOv2sgZuJIL172nzMtGAzRiFnuEbc1wFzdsUlDNoy
-         d5UEucEOHdFflB60tWMNpuFc4pJ6r2CL5YxYcBEMLzEvaJzDUtRrXjvLc+8P8teVvawd
-         cOp95RhHgkGK+1TlWgfX2tD14ECs1blvQoW/N/2vMN+uS5j0ge4cv25Uf/+M7j0G57Yj
-         Eitz7nMbafbys4GR+Dggd4LYzyUQZiYCWrlQn47tGeRrEQbFINjiNEWLQGdM30CSNmeU
-         p8YAHWj5mWGtqls+Jo/o4Xd1aE4cXcIN/tLuDuiw9+Zn3qJ00L7hY16ft3dq3WGsabys
-         IPwQ==
+        d=gmail.com; s=20251104; t=1782155033; x=1782759833; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
+        b=LFiZE21bJOd27mvhUeQY65zQorGfroSNylZhnl5pr3qjxqG/eN1p6cReYMi7Y8XHb0
+         7P2yUKScTc7SL9KBMwdl8WT1nEKnGZf9ur45NKJJuEmRNsVr4TarSwghnJCBC39U5FT/
+         hbLMbAuZB7Uhid7P768tqQ5oB5rNa0UgEghjqL8I6E/OiecFdkW7XXJUCVzAvM2Bcvqj
+         aAAg70ofC8G+A3+uW7Vx2nk3e0tc12ATFJvEbWA6+4EjPe4CrUqJXP2Emg2HT57KZ67b
+         LsX6aiKqdjYFThFXLMKvM5eHENHiOf+kS4D8rdkQabgcObx3aWN/R9FVWrU0LGgqTlRe
+         mYGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782154374; x=1782759174;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mUYiga/rA61F6GfSKny16M3WpKqYKTvbN+XI5uTufgM=;
-        b=dhgPzuCRN6TdBAQwhCGdE6rUL1CQ5w6/PuBHQaM7Z1krHIC4oSlODGsFxsoUxz23Lu
-         yYTQskwazoc5S3iykDgNkqhfnB5GFHTLgNznqCD0WHsEqMJKECKQIqxGLbaChlAvZnoW
-         IxMzl2hD3J8+Ril7mNxWwwsI5UoGjUHe3t94HSaIQ0K/BIdE5dOk8wkIkkEjfQKty9Mh
-         nJ3U4tQfvDRgMNMWUkj6C3xMOZuznUWpGvCmmYWxgL8l1FCbs7ARIE0s4HapNJ8mbBHz
-         2hKh6tWgtP5PlR06ikbDgnnzJCHSTILQotUFMErcNj6zxlvOsEfm1u8QJnAdPhLM+T+K
-         7dYw==
-X-Forwarded-Encrypted: i=1; AFNElJ/Jhc0NSy8MpOLLjWLCiCzgudhEkUe3rsGP26aiOvUUFfE6cZi6MfnWuDvALgSuLTZqeqz18LA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWAGzPHHsotlchWglEXgeJKYDAt1lTza5vuCW3KYt8gOvBaG74
-	PXdJLX9A+9cY8Tn2MJhnUbGsa+dmwjicKzSx+iijKMJX8eEsd9XpBP4k3jZyHpW+NELV2UlKU8D
-	GRL6H67+2HBaMkg==
-X-Received: from qtbdq1.prod.google.com ([2002:a05:622a:5201:b0:517:d786:16e1])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5e0b:0:b0:50b:3429:a10b with SMTP id d75a77b69052e-51a51aa74d9mr10172291cf.12.1782154373399;
- Mon, 22 Jun 2026 11:52:53 -0700 (PDT)
-Date: Mon, 22 Jun 2026 18:52:48 +0000
-In-Reply-To: <20260622185248.1717846-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1782155033; x=1782759833;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
+        b=d/puUNOKzoqT+3kY2PoLyOTq+6hl/Su+oT5rzbl8OxZ8yhd8v6B4XwyqNJnv8PhjIc
+         VZn4oPQ8V88YFXL0QVP3Z5eeS4xlrwmgx3/I7rwrBORjJAKMiHUX8RsiCLjbwSm/xMmB
+         JwUdxBnlchG+c4PF6dqrheeK2MVNY4VQ6AqwiC6hV2sufZ9GMlui8caY0Yfhe4VLDdsK
+         +FemdDPa8njiluKokGLwIGE5mg5ez99hBmzKSCmOnz7tHtludGF5vwiz7Tp2Q9I4sx2h
+         ejxoJImhACUif+zj2mO8x7bgXtgYvb74zpALKGQYGECieUjNR4hathnk47Wfgqce/KsS
+         Y1SQ==
+X-Forwarded-Encrypted: i=1; AHgh+RraJqCQIE0ctagFuWfRlqMrcc4JkXe8p5DMM9dE9ZWkARDjnUnBXL7OsOOaBfXF7yTAAyBcORQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywwp+NmBPdDioHdtoYQR6fuISXcKA7nbB/2HdkTX5zcVtcmVLse
+	lHworxpk8tL34+lAvNpoTDYPaBBdBkGIOgfycpteeGP/n3Z8HfQmo6Lb
+X-Gm-Gg: AfdE7cmbfysuYkwQuISN+GQgNHEdGq10HwugV8d3ka0IrIl+QtQmVfNrfr+UCJbqxb+
+	mgFse3scnSbfziRyUMbvtIC7coBg9f+8Cb/8EniYQpb1y9qYBX2nDwzEOizw6uQ3nYr+5dU0dCL
+	NTTyNuxt8s1HMGDsFyHoCfU49WVIQM6Rm1mVEkZUlY3NCxudBGZqv2HmJtAbqJm1cgTqR7ZqJSt
+	P1NhqpzWddKozjZlywWGLrKKsqLmTNBlg/vqEQtafLLZmjh1n+lFEw7qopGVzS66WC7+ZWgEC/N
+	yF8vINY8uGQieQPQBnJaaDFJFrLBBE7jxrSobZ78aMSyeo8u4d7Y/Xs9oMmc3QGAC2WYhZr5qCx
+	3ONUD9EdfXCaMy1LhDJZWTJRH+owHlRXEwXEutbcf/+35PlkvQ8yFFqtyM3y8rOQJU1au7B0R0D
+	8yMtAJn0bsrB7KT8rSUq6PEZNB5Zi1pcb6WqIqM26mVFEb+NeS0vljw4BrY9+dWMQ9xM4=
+X-Received: by 2002:a05:693c:2887:b0:30b:cc4e:6396 with SMTP id 5a478bee46e88-30c5553b105mr382073eec.7.1782155033135;
+        Mon, 22 Jun 2026 12:03:53 -0700 (PDT)
+Received: from ?IPv6:2a03:83e0:115c:1:6e2:c699:67c:63fe? ([2620:10d:c090:500::1:5387])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c1be4967fsm10549199eec.26.2026.06.22.12.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 12:03:52 -0700 (PDT)
+Message-ID: <1979fc81ae7bdaabda8616cd9698a40ef8bbfaee.camel@gmail.com>
+Subject: Re: [PATCH v3 5/7] kernel: Use mutable list iterators
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Kaitao Cheng <kaitao.cheng@linux.dev>, Paul Moore <paul@paul-moore.com>,
+  Eric Paris <eparis@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann	 <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski	 <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend	
+ <john.fastabend@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner	
+ <hannes@cmpxchg.org>, Michal =?ISO-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>, 
+ Maarten Lankhorst	 <dev@lankhorst.se>, Maxime Ripard <mripard@kernel.org>,
+ Natalie Vock	 <natalie.vock@gmx.de>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar	 <mingo@redhat.com>, Arnaldo Carvalho de Melo
+ <acme@kernel.org>, Namhyung Kim	 <namhyung@kernel.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Oleg Nesterov	 <oleg@redhat.com>, Peter
+ Oberparleiter <oberpar@linux.ibm.com>, Andrew Morton	
+ <akpm@linux-foundation.org>, Baoquan He <baoquan.he@linux.dev>, Mike
+ Rapoport	 <rppt@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Pratyush Yadav	 <pratyush@kernel.org>, Naveen N Rao <naveen@kernel.org>,
+ Josh Poimboeuf	 <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+ Miroslav Benes	 <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Will
+ Deacon <will@kernel.org>,  Boqun Feng <boqun@kernel.org>, Luis Chamberlain
+ <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,  Daniel Gomez
+ <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Steffen
+ Klassert	 <steffen.klassert@secunet.com>, Daniel Jordan
+ <daniel.m.jordan@oracle.com>,  "Rafael J. Wysocki"	 <rafael@kernel.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, "Paul E. McKenney"	
+ <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>, Frederic
+ Weisbecker <frederic@kernel.org>, Neeraj Upadhyay
+ <neeraj.upadhyay@kernel.org>, Joel Fernandes	 <joelagnelf@nvidia.com>,
+ Uladzislau Rezki <urezki@gmail.com>, Juri Lelli	 <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Kees Cook <kees@kernel.org>,
+ Balbir Singh <bsingharora@gmail.com>, Anna-Maria Behnsen	
+ <anna-maria@linutronix.de>, Thomas Gleixner <tglx@kernel.org>, John Stultz	
+ <jstultz@google.com>, KP Singh <kpsingh@kernel.org>, Matt Bobrowski	
+ <mattbobrowski@google.com>, Nathan Chancellor <nathan@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>,  Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Dietmar Eggemann
+ <dietmar.eggemann@arm.com>, David Vernet	 <void@manifault.com>, Steven
+ Rostedt <rostedt@goodmis.org>
+Cc: audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, 	netdev@vger.kernel.org, cgroups@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, 	linux-perf-users@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, 	kexec@lists.infradead.org,
+ live-patching@vger.kernel.org, 	linux-modules@vger.kernel.org,
+ linux-crypto@vger.kernel.org, 	linux-pm@vger.kernel.org,
+ rcu@vger.kernel.org, sched-ext@lists.linux.dev, 	llvm@lists.linux.dev,
+ Kaitao Cheng <chengkaitao@kylinos.cn>
+Date: Mon, 22 Jun 2026 12:03:46 -0700
+In-Reply-To: <20260622042811.31684-1-kaitao.cheng@linux.dev>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+	 <20260622042811.31684-1-kaitao.cheng@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260622185248.1717846-1-edumazet@google.com>
-X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260622185248.1717846-3-edumazet@google.com>
-Subject: [PATCH net 2/2] selftests/net: Add TCP-AO key shadowing test
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-301191-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301190-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kaitao.cheng@linux.dev,m:paul@paul-moore.com,m:eparis@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:memxor@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:tj@kernel.org,m:hannes@cmpxchg.org,m:mkoutny@suse.com,m:dev@lankhorst.se,m:mripard@kernel.org,m:natalie.vock@gmx.de,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:mhiramat@kernel.org,m:oleg@redhat.com,m:oberpar@linux.ibm.com,m:akpm@linux-foundation.org,m:baoquan.he@linux.dev,m:rppt@kernel.org,m:pasha.tatashin@soleen.com,m:pratyush@kernel.org,m:naveen@kernel.org,m:jpoimboe@kernel.org,m:jikos@kernel.org,m:mbenes@suse.cz,m:pmladek@suse.com,m:will@kernel.org,m:boqun@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:steffen.klassert@secunet.com,m:daniel.m.jordan@oracle.com,m:rafael@kernel.org,m:dave@stgolabs.net,m:paulmck@kernel.org,m:josh@joshtri
+ plett.org,m:frederic@kernel.org,m:neeraj.upadhyay@kernel.org,m:joelagnelf@nvidia.com,m:urezki@gmail.com,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:kees@kernel.org,m:bsingharora@gmail.com,m:anna-maria@linutronix.de,m:tglx@kernel.org,m:jstultz@google.com,m:kpsingh@kernel.org,m:mattbobrowski@google.com,m:nathan@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:mark.rutland@arm.com,m:mathieu.desnoyers@efficios.com,m:dietmar.eggemann@arm.com,m:void@manifault.com,m:rostedt@goodmis.org,m:audit@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:cgroups@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,m:johnfastabend
+ @gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:0x7f454c46@gmail.com,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,google.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[linux.dev,paul-moore.com,redhat.com,kernel.org,iogearbox.net,gmail.com,davemloft.net,cmpxchg.org,suse.com,lankhorst.se,gmx.de,infradead.org,linux.ibm.com,linux-foundation.org,soleen.com,suse.cz,google.com,secunet.com,oracle.com,stgolabs.net,joshtriplett.org,nvidia.com,linaro.org,linutronix.de,arm.com,efficios.com,manifault.com,goodmis.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[84];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6158A6B1E7E
+X-Rspamd-Queue-Id: 0BBAC6B1FAB
 
-Add a new selftest shadowing.c to tools/testing/selftests/net/tcp_ao
-to verify that more specific keys are correctly preferred over less
-specific ones (shadowing prevention), regardless of their insertion order.
+On Mon, 2026-06-22 at 12:28 +0800, Kaitao Cheng wrote:
+> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+>=20
+> The safe list iteration helpers require callers to provide a temporary
+> cursor even when the cursor is only used internally by the loop. This
+> leaves many functions with otherwise unused variables whose only purpose
+> is to satisfy the old iterator interface.
+>=20
+> Use the mutable list iteration helpers for those cases. The mutable
+> helpers keep the same removal-safe traversal semantics, while allowing
+> the temporary cursor to be internal to the macro when the caller does
+> not need to observe it.
+>=20
+> Convert list, hlist and llist users under kernel/ where the temporary
+> cursor is not used outside the iteration. Keep the explicit cursor form
+> where the next entry is still needed by the surrounding code.
+>=20
+> No functional change intended.
+>=20
+> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+> ---
 
-The test configures a server with a specific host key, and a client with
-both a specific host key and a wildcard subnet key, inserted in the
-"wrong" order (wildcard last, which would shadow the specific one under
-the bug). It then verifies that the client can still successfully
-connect to the server, which only succeeds if the client correctly
-selects the more specific key for the outbound connection.
+Beside the fact that this does not apply,
+I don't see a reason why is this needed for BPF sub-tree.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Assisted-by: Gemini:gemini-3.1-pro
----
- tools/testing/selftests/net/tcp_ao/Makefile   |  1 +
- .../testing/selftests/net/tcp_ao/shadowing.c  | 93 +++++++++++++++++++
- 2 files changed, 94 insertions(+)
- create mode 100644 tools/testing/selftests/net/tcp_ao/shadowing.c
-
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 5b0205c70c3983815315048c0ec1275525b7a29a..0c601d7049320be2310f9ff32988ae229584222e 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -2,6 +2,7 @@
- TEST_BOTH_AF := bench-lookups
- TEST_BOTH_AF += connect
- TEST_BOTH_AF += connect-deny
-+TEST_BOTH_AF += shadowing
- TEST_BOTH_AF += icmps-accept icmps-discard
- TEST_BOTH_AF += key-management
- TEST_BOTH_AF += restore
-diff --git a/tools/testing/selftests/net/tcp_ao/shadowing.c b/tools/testing/selftests/net/tcp_ao/shadowing.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..da14b13e032d5a0632f398b7eaa72b8045e61ffe
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/shadowing.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <inttypes.h>
-+#include "aolib.h"
-+
-+static void *server_fn(void *arg)
-+{
-+	int sk, lsk;
-+	ssize_t bytes;
-+
-+	lsk = test_listen_socket(this_ip_addr, test_server_port, 1);
-+
-+	/* Server only has the specific key for the client.
-+	 * It expects KeyID 100, signed with "pass_specific".
-+	 */
-+	if (test_add_key(lsk, "pass_specific", this_ip_dest, -1, 100, 100))
-+		test_error("setsockopt(TCP_AO_ADD_KEY)");
-+
-+	synchronize_threads(); /* 1: Server ready and key added */
-+
-+	if (test_wait_fd(lsk, TEST_TIMEOUT_SEC, 0))
-+		test_error("test_wait_fd()");
-+
-+	sk = accept(lsk, NULL, NULL);
-+	if (sk < 0)
-+		test_error("accept()");
-+
-+	synchronize_threads(); /* 2: Connection accepted */
-+
-+	/* Verify we can receive data from the client */
-+	bytes = test_server_run(sk, 0, 0);
-+	if (bytes < 0) {
-+		test_fail("server: failed to receive data");
-+	} else {
-+		test_ok("server: connection authenticated successfully");
-+	}
-+
-+	close(sk);
-+	close(lsk);
-+	return NULL;
-+}
-+
-+static void *client_fn(void *arg)
-+{
-+	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+	union tcp_addr wildcard_addr = {};
-+
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	/* Client adds keys in the "wrong" order (wildcard last) to trigger shadowing.
-+	 * 1. Specific key (Key B, ID 100)
-+	 * 2. Wildcard key (Key A, ID 101)
-+	 *
-+	 * Without the fix, the wildcard key will be at the head of the list
-+	 * and will shadow the specific key during outbound lookup, causing
-+	 * the client to send a SYN with KeyID 101 (which the server doesn't have).
-+	 */
-+
-+	/* 1. Add specific key */
-+	if (test_add_key(sk, "pass_specific", this_ip_dest, -1, 100, 100))
-+		test_error("setsockopt(TCP_AO_ADD_KEY) specific");
-+
-+	/* 2. Add wildcard key (any address, prefix 0) */
-+	if (test_add_key(sk, "pass_wildcard", wildcard_addr, 0, 101, 101))
-+		test_error("setsockopt(TCP_AO_ADD_KEY) wildcard");
-+
-+	synchronize_threads(); /* 1: Client ready and keys added => connect() */
-+
-+	if (test_connect_socket(sk, this_ip_dest, test_server_port) <= 0) {
-+		test_fail("client: failed to connect (shadowing bug present?)");
-+		close(sk);
-+		return NULL;
-+	}
-+
-+	synchronize_threads(); /* 2: Connection established */
-+
-+	/* Send some data to verify the connection works */
-+	if (test_client_verify(sk, 100, 20)) {
-+		test_fail("client: verify failed");
-+	} else {
-+		test_ok("client: connection established and verified (precedence correct)");
-+	}
-+
-+	close(sk);
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	/* We expect 2 test results: 1 from server, 1 from client */
-+	test_init(2, server_fn, client_fn);
-+	return 0;
-+}
--- 
-2.55.0.rc0.799.gd6f94ed593-goog
-
+[...]
 
