@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id z9ciF5ASOWpcmQcAu9opvQ
-	(envelope-from <netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:40 +0200
+	id G/JLAZcSOWpgmQcAu9opvQ
+	(envelope-from <netdev+bounces-301044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72DA46AED19
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8C86AED21
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jplHGzm+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=P3Y1fIq9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301044-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301044-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 66532300A589
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 85372301CC5C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817DE39EB5B;
-	Mon, 22 Jun 2026 10:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874643A1A29;
+	Mon, 22 Jun 2026 10:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C44D396B79;
-	Mon, 22 Jun 2026 10:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743013911AB;
+	Mon, 22 Jun 2026 10:44:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125091; cv=none; b=cdl+RoSmZwkQ38eWTRHwJoj6nQDXyPqL3DN6V96yqsBt+BkyZ2/fwWVg0v34+7wBrT4x8XebdJWfrL6cZfBrEpJYm7k80blaIznPVqUUcwWVpwnp44n7pAg2i0pI1rEzQOGw31TbQ49m9NJ/PWXYpZXz9i9gS16K3gxVXMfvQSA=
+	t=1782125098; cv=none; b=G0D9h8qnsO+MubWDq8wW/93Ea9R/u8ewHbguQTrfRmXNY4lGdaOS1AER/bwtxdpiCjPtl86V/IPk+r+9VuvvlI5YQQJRWCbfuK+XIOI6ZYhCzqQ6e19TWx1pPY6JZyln0HyAzhCZcawNLX6Xy112hxM8vz0gmScD/tR5HWQN86Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125091; c=relaxed/simple;
-	bh=uUAz00WkmvKE4Pw3KMgKRpIyOHXUaewfiwq3ELCxz6c=;
+	s=arc-20240116; t=1782125098; c=relaxed/simple;
+	bh=8MUhb382d/R1PCu+tdHK8NlDjZwLDeCDY5OQYjc9EpU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uXi5RSTHz17kh4WJfRiVg5+3CyFEE4JwhHXmdVlbl3MLgRb9j5K01X5qVdeEYanpagecX7mblakale9KcUL3/tJ1jrrAM3rw4XlDmusAQhVnQrGrjfo8Q6Ye0iQSyWKNhzAWwys0V9XW6/0tohJY+EHwLm8+iECpuh8f37Yiaj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jplHGzm+; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D0851F000E9;
-	Mon, 22 Jun 2026 10:44:45 +0000 (UTC)
+	 MIME-Version; b=c0z8SaaZ4p6C1Kl3aFJEYBpmzA9p3HomS0ZN6kDeYY+e4cgg5DjPaq4zATuEMLnRzKprQWOcXADdCYNlkQ8IUszu5Jdpq/ywuH97nZvbVqFEt7PnoKOP2JidzNs4q9weIoTGcNkclpv7vmBAd4QyN6xX+AEKbaq9tpwA4um29W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3Y1fIq9; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB101F00A3D;
+	Mon, 22 Jun 2026 10:44:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125090;
-	bh=5U39BmXz5gXJhw1YQj428YGYFBW5iG5GsyNCDasB+xI=;
+	s=k20260515; t=1782125097;
+	bh=soDiR3RUZ9V+2GK/1ZPqifI1nKWagFi1KoWspkiO5mM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jplHGzm+Ngni6xtBTDItq7x30P7LqXB+nL20Thk4rnreYKLYZSytvca2QPwUnB0Lq
-	 /wdP5BaArDkf0ZlZi3Fup10+6Ig/vhTeZYTv4EzKUMFTPv0ORF6q77ueTw+ZYpRvga
-	 wLMq/kBeFuMDpJxHqUKP+gWxyMysygFx16zZ3FPJsPl6pTU+f4B9duUM7+eNV8KSd9
-	 By3XjHnxRgH2bJQSPbsn91Ey1F4j5fYYRvjVf9UyJov7YiQFPzfto0NbnkHJa/qvx8
-	 7RWIwdbHmXV82nj3OUHmpYgVykibvC74wcOeoSKE62OL8sgVYetxp3YRiwTbZcP8/y
-	 MgM0E869VLYMg==
+	b=P3Y1fIq9rFsWLiEd2siAIKgxDJtDdPWZpuzTRLP3kYvv5R2cZ6ZKI79Ajm2fsZ4K/
+	 HqF3vil6YGUuwgVFTuUGiBxbIUTZsq0qkZ6K29HY45Oqd4kSpTm2fppwVZw+MDp5Wo
+	 YESRoHvQVpgAQfw2ZRxvEIJl3Y5tH66c8MVtrHfmpbdbo/2DwTliVUldsJnfztQgG3
+	 VjOnDtBGrekRrP8i47E6aNRvT5TNGguUXmzUECBpJMjNSHzXYwpJTPjZEy5qWz8d/F
+	 xuV6cjxUW7G4BmkdntHWlQ1v2ji1tbXaOxjd/kCG6OSOvobhfF0owgtaho5RMznG5m
+	 ZU+stnIZ37msg==
 From: Geliang Tang <geliang@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>,
 	Mat Martineau <martineau@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	mptcp@lists.linux.dev,
 	Gang Yan <yangang@kylinos.cn>,
 	Zqiang <qiang.zhang@linux.dev>
-Subject: [RFC net-next 07/17] tls: replace tcp_inq with socket peek_len
-Date: Mon, 22 Jun 2026 18:43:27 +0800
-Message-ID: <2c96084e62a7b48733443b70ca2e540bd095bf51.1782123118.git.tanggeliang@kylinos.cn>
+Subject: [RFC net-next 08/17] tls: store original read_sock for non-tcp sockets
+Date: Mon, 22 Jun 2026 18:43:28 +0800
+Message-ID: <f4a199f216cb5eeca3d25110a8cfdb080df59d22.1782123118.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
 References: <cover.1782123118.git.tanggeliang@kylinos.cn>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -105,30 +105,30 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301043-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301044-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 72DA46AED19
+X-Rspamd-Queue-Id: 6D8C86AED21
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-TLS (device, strparser, and software) calls tcp_inq() directly to
-determine how much data is still pending in the socket receive queue.
-This breaks when the underlying socket is not TCP (e.g., MPTCP).
+TLS strparser uses tcp_read_sock() to copy data from the underlying
+socket. This assumes the socket is always TCP, which fails when TLS
+is used over MPTCP.
 
-Switch all occurrences of tcp_inq(sk) to sk->sk_socket->ops->
-peek_len(sk->sk_socket). This operation is implemented for both TCP
-and MPTCP (after the previous commits), making TLS transparently
-usable over MPTCP connections.
+Store the original socket's read_sock method (sk->sk_socket->ops->
+read_sock) in a new .sk_read_sock callback inside struct tls_context.
+Then in tls_strp_read_copyin(), call this stored callback instead of
+the hard-coded tcp_read_sock().
 
-The change is straightforward: every place where TLS needed the
-available in-queue bytes now uses the protocol-specific peek_len
-method instead of assuming a TCP socket.
+With this change, TLS strparser works transparently over any socket
+that implements .read_sock (including MPTCP, which already provides
+mptcp_read_sock). Behavior for plain TCP remains unchanged.
 
 Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
@@ -136,82 +136,57 @@ Co-developed-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- net/tls/tls_device.c | 4 ++--
- net/tls/tls_strp.c   | 6 ++++--
- net/tls/tls_sw.c     | 4 +++-
- 3 files changed, 9 insertions(+), 5 deletions(-)
+ include/net/tls.h  | 2 ++
+ net/tls/tls_main.c | 1 +
+ net/tls/tls_strp.c | 3 ++-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 741aef09bfd3..c44a59d9d715 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -805,7 +805,7 @@ void tls_device_rx_resync_new_rec(struct sock *sk, u32 rcd_len, u32 seq)
- 		/* head of next rec is already in, note that the sock_inq will
- 		 * include the currently parsed message when called from parser
- 		 */
--		sock_data = tcp_inq(sk);
-+		sock_data = sk->sk_socket->ops->peek_len(sk->sk_socket);
- 		if (sock_data > rcd_len) {
- 			trace_tls_device_rx_resync_nh_delay(sk, sock_data,
- 							    rcd_len);
-@@ -864,7 +864,7 @@ static void tls_device_core_ctrl_rx_resync(struct tls_context *tls_ctx,
- 	rxm = strp_msg(skb);
+diff --git a/include/net/tls.h b/include/net/tls.h
+index e57bef58851e..aee4f74dc3d9 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -262,6 +262,8 @@ struct tls_context {
+ 	struct sock *sk;
  
- 	/* head of next rec is already in, parser will sync for us */
--	if (tcp_inq(sk) > rxm->full_len) {
-+	if (sk->sk_socket->ops->peek_len(sk->sk_socket) > rxm->full_len) {
- 		trace_tls_device_rx_resync_nh_schedule(sk);
- 		ctx->resync_nh_do_now = 1;
- 	} else {
+ 	void (*sk_destruct)(struct sock *sk);
++	int (*sk_read_sock)(struct sock *sk, read_descriptor_t *desc,
++			    sk_read_actor_t recv_actor);
+ 
+ 	union tls_crypto_context crypto_send;
+ 	union tls_crypto_context crypto_recv;
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index b6adfa67491b..c9499bfd7a1d 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -1086,6 +1086,7 @@ static int tls_init(struct sock *sk)
+ 	ctx->tx_conf = TLS_BASE;
+ 	ctx->rx_conf = TLS_BASE;
+ 	ctx->tx_max_payload_len = TLS_MAX_PAYLOAD_SIZE;
++	ctx->sk_read_sock = sk->sk_socket->ops->read_sock;
+ 	update_sk_prot(sk, ctx);
+ out:
+ 	write_unlock_bh(&sk->sk_callback_lock);
 diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
-index 61b10c697ecc..82a5b64b5f48 100644
+index 82a5b64b5f48..9945d17b2f8c 100644
 --- a/net/tls/tls_strp.c
 +++ b/net/tls/tls_strp.c
-@@ -484,12 +484,14 @@ bool tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh)
+@@ -375,6 +375,7 @@ static int tls_strp_copyin(read_descriptor_t *desc, struct sk_buff *in_skb,
+ 
+ static int tls_strp_read_copyin(struct tls_strparser *strp)
  {
- 	struct strp_msg *rxm;
- 	struct tls_msg *tlm;
-+	int inq;
++	struct tls_context *ctx = tls_get_ctx(strp->sk);
+ 	read_descriptor_t desc;
  
- 	DEBUG_NET_WARN_ON_ONCE(!strp->msg_ready);
- 	DEBUG_NET_WARN_ON_ONCE(!strp->stm.full_len);
+ 	desc.arg.data = strp;
+@@ -382,7 +383,7 @@ static int tls_strp_read_copyin(struct tls_strparser *strp)
+ 	desc.count = 1; /* give more than one skb per call */
  
- 	if (!strp->copy_mode && force_refresh) {
--		if (unlikely(tcp_inq(strp->sk) < strp->stm.full_len)) {
-+		inq = strp->sk->sk_socket->ops->peek_len(strp->sk->sk_socket);
-+		if (unlikely(inq < strp->stm.full_len)) {
- 			WRITE_ONCE(strp->msg_ready, 0);
- 			strp->msg_announced = 0;
- 			memset(&strp->stm, 0, sizeof(strp->stm));
-@@ -513,7 +515,7 @@ static int tls_strp_read_sock(struct tls_strparser *strp)
- {
- 	int sz, inq;
+ 	/* sk should be locked here, so okay to do read_sock */
+-	tcp_read_sock(strp->sk, &desc, tls_strp_copyin);
++	ctx->sk_read_sock(strp->sk, &desc, tls_strp_copyin);
  
--	inq = tcp_inq(strp->sk);
-+	inq = strp->sk->sk_socket->ops->peek_len(strp->sk->sk_socket);
- 	if (inq < 1)
- 		return 0;
- 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 9324e4ed20a3..35fb0c3c965a 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1706,12 +1706,14 @@ tls_read_flush_backlog(struct sock *sk, struct tls_prot_info *prot,
- 		       size_t *flushed_at)
- {
- 	size_t max_rec;
-+	int inq;
- 
- 	if (len_left <= decrypted)
- 		return false;
- 
-+	inq = sk->sk_socket->ops->peek_len(sk->sk_socket);
- 	max_rec = prot->overhead_size - prot->tail_size + TLS_MAX_PAYLOAD_SIZE;
--	if (done - *flushed_at < SZ_128K && tcp_inq(sk) > max_rec)
-+	if (done - *flushed_at < SZ_128K && inq > max_rec)
- 		return false;
- 
- 	*flushed_at = done;
+ 	return desc.error;
+ }
 -- 
 2.53.0
 
