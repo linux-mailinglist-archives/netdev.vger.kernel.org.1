@@ -1,317 +1,241 @@
-Return-Path: <netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MMNHOd92OWr4tgcAu9opvQ
-	(envelope-from <netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:54:39 +0200
+	id 2MorDMR3OWpmtwcAu9opvQ
+	(envelope-from <netdev+bounces-301182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:58:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE0D6B1A11
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:54:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76C3A6B1A33
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:58:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=c127.dev header.s=resend header.b=rnwijDLv;
-	dkim=pass header.d=amazonses.com header.s=224i4yxa5dv7c2xz3womw6peuasteono header.b=pd80Oacw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=virtuozzo.com header.s=selector2 header.b=WxYff+vm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301182-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301182-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=virtuozzo.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 69212303F2B0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:53:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B9023020ABB
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6B3343885;
-	Mon, 22 Jun 2026 17:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB15343896;
+	Mon, 22 Jun 2026 17:58:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a10-132.smtp-out.amazonses.com (a10-132.smtp-out.amazonses.com [54.240.10.132])
-	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11021137.outbound.protection.outlook.com [52.101.65.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8CD221FB6;
-	Mon, 22 Jun 2026 17:53:29 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782150811; cv=none; b=Q39z1K6TruDOE5MZqR3jukr6Sk7MoI4CnDzFZFPz0Q4B5V5GOIj0SfhMsYlhuZURY7+4Xv/xqZ9r+KaL2l0lYLoY/OzUYQIT7HunPaDiNE948901hs4bjO477rl3JkcOdDwVoFZjiiW5DtPRuqErP4BuseCIq/2aziqOBabwRFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782150811; c=relaxed/simple;
-	bh=q0erdvXJ/SvDcWyTPwCHeC1TObRF5J4+xgcG7pWtgPw=;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Date:MIME-Version:
-	 Content-Type; b=uSKI4Ii3FtUMdxb96TD6aIc5tUGtqhVUiD12hTo3IOVC+hC7uwjX74p03RoqOZ9ZUQKnbbZR3Qk+EOLx8dxKBhj9MUCMXbo3pEzba6AgCtkJhzXQjNg9VIHLcuYgcmke1X0fY9TCJ1F1PFTT9VZniI1POpqxSJxBKi3FMMnzlCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=send.c127.dev; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=rnwijDLv; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=pd80Oacw; arc=none smtp.client-ip=54.240.10.132
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple; s=resend;
-	d=c127.dev; t=1782150808;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type;
-	bh=q0erdvXJ/SvDcWyTPwCHeC1TObRF5J4+xgcG7pWtgPw=;
-	b=rnwijDLvCZNPra8SpDtuqxZK8Z6B+CL0AqvHYKOwwgSvXkkgVpEwO9aZ5laIB165
-	OiOLp4ABHl6mEB+kg/Tpw++iTAqRTnLlRAv26FMGkD6iGpZSY1XfpCmzcTYn7jJKEAE
-	+W+lgN4f9Q6mRANQEAPM6AX39d7W3u/pjNersnsU=
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1782150808;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type:Feedback-ID;
-	bh=q0erdvXJ/SvDcWyTPwCHeC1TObRF5J4+xgcG7pWtgPw=;
-	b=pd80OacweoLqeeuGsJBHUBKI72srhnD3EwOtz7R+we/inBBL/r9XiFjR+0hZDj0p
-	1S6R4ys5eFLitwAEIi+3JXJNLERFDgz7+P+Em+JSX5Sd9qmIhRug6KNIBPtQ5HDydGS
-	kaOBUZCrgw0Bwa2tWQR7+0dX1P1aG/AMCruA20uU=
-In-Reply-To:
- <CAJq09z4cVBuRUMyCt8NopNePmjbcj=ycvq95gSXgh581kk4zDw@mail.gmail.com>
-From: Johan Alvarado <contact@c127.dev>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linusw@kernel.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux@armlinux.org.uk, maxime.chevallier@bootlin.com, 
-	namiltd@yahoo.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/2] net: dsa: realtek: rtl8365mb: add
- SGMII support for RTL8367S
-Message-ID: <0100019ef0774191-97f957d1-76b2-427b-8a7a-24ae055f3ce0-000000@email.amazonses.com>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 Jun 2026 17:53:27 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C4D343885;
+	Mon, 22 Jun 2026 17:58:21 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782151103; cv=fail; b=MPUxbAm7OxpJ758RPueYHvUukqc+CNNWZj0ycyuxgZlFrWy4ESabr9ntERGkR0vWW0l1yQITFkYRx3XzIA8RZ4anOKzAMNRvQr2d8Dv83wOLN6TXozcMaW1FNJF1h8QQGmEY9Zt6ehfxOZM0B4S1vQHFkVGQ2hYzPWvYQbK+ZZw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782151103; c=relaxed/simple;
+	bh=CzE+kCBXxLU6z465GAQOgb0QAq8awcHFVQbr2PQe0Ak=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=dXS90mxlOH6YRqqf6VinmF+R1wK9E9M5UpHZF/hjwSPEpE2F3S41OYqEfuqJumBIF9c1QNgO9UJlui0iLrg3k5aTJx/PY3B3uJfWaMnx6DpLxv00SMdrJhadf2cMymJsrg/B7Cl2aQrrM+n+6xP7b3cQNgKXFovRmB0nsjehCgw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=WxYff+vm; arc=fail smtp.client-ip=52.101.65.137
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Go88Fx5kKH/cj2/NNx8ghJfdLv4AlDwrxqow1CwfrC5mLxlNgXB8Cs+M/iQXstvcydUX1k/pV56Y0U+zlGyHnnj3/a8sGBCAdwmnZApfyRWS/W+JnQmSK5I78d14PQnkEvFP3fHgYWlccOpqsMNs4wPFaJ/AC/wIhqGkIeOpqRdRH+4w69EMwKa19KG3Aw+ggAFnjyW2gwh4mzeuqeK0Rb1p85DoXwKL44buwSyhqH2AJKBgjUv/0Nvit0yqCsMfeai+qvTNTXZkogAyxGhIT5+g6lXiSTI2P2qY27R+Z9C1/pxcDrMesY4j/fBBWbLAZg6h4glPqQ1norco6SxgCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mo5zTAxteDAcCew6voc2dC5jew5kr2Jn1w1zPT0fetI=;
+ b=Bp6oNT4kJtqYWXEacbPYdvHhPtIBS/X0JWx5SZ3+AHEOB28T0RIdHXF07OFL7eCtq5EnMqsAjLO71cU7hQ0UFf1mIc8WnJOgk6aarwitvCS0ISrPQUflOoXTJXBibb4wDBtjfeNF9brVARemWx2/ACBQvq8rrPQ5LI4mj4MaOK4NV1Nvt6KvhF47DjIKKqLic6UXgR10fdF6cmx/jI/ES6Xaj95O6xH95mbl3XXiP7AlOvm5SO1M6PNG5akprOVFrC6ObVPT5qlISGmfQBukKtlH3OnoGUK0hXenqFP8TAze3sPs5s3nQeRcvLDFZ9s1qZH0ky4a9soXYsGfl51KDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mo5zTAxteDAcCew6voc2dC5jew5kr2Jn1w1zPT0fetI=;
+ b=WxYff+vmoggbYF6s0MD3/pxIZbuNsIzF4m7jLZTp4smU8D9ix/jmaToKHz/RIa7UTiVlZjFmAzCXvuG3gxjZxunYrGvsC4NrKxnQ83zspiTT/y74/ANChVPsYFj5NUKn1EpIKX2al7vTGZfH19E0VdLpQdL62SsKTxGBLPBpb0mY1GS07F50MbZHAp/O9z31/5cBRmQDKhDI4ROZG3bBarfbDREoZJUis8/Lt+35vV56C0X2UPwrOBM/susXgvjCOHDkrPi6RkKQxvmw1GAH3XlKBcnq3aRPX0m2IVOvWVyAF3YvB75PZO/Bdad2MGkKgcEC0gN6IWdDl9ygzWCT9g==
+Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
+ (2603:10a6:800:20a::12) by DU2PR08MB7375.eurprd08.prod.outlook.com
+ (2603:10a6:10:2f3::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.13; Mon, 22 Jun
+ 2026 17:58:18 +0000
+Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
+ ([fe80::4e37:b189:ddcd:3dd8]) by VI0PR08MB10656.eurprd08.prod.outlook.com
+ ([fe80::4e37:b189:ddcd:3dd8%5]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
+ 17:58:18 +0000
+From: Andrey Drobyshev <andrey.drobyshev@virtuozzo.com>
+To: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	sgarzare@redhat.com,
+	mst@redhat.com,
+	stefanha@redhat.com,
+	dongli.zhang@oracle.com,
+	maciej.szmigiero@oracle.com,
+	bchaney@akamai.com,
+	mark.kanda@oracle.com,
+	ptikhomirov@virtuozzo.com,
+	den@openvz.org,
+	andrey.drobyshev@virtuozzo.com
+Subject: [PATCH v2 0/4] vhost/vsock: add support for VHOST_RESET_OWNER and CPR migration
+Date: Mon, 22 Jun 2026 20:58:04 +0300
+Message-ID: <20260622175808.508084-1-andrey.drobyshev@virtuozzo.com>
+X-Mailer: git-send-email 2.47.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VIUP296CA0012.AUTP296.PROD.OUTLOOK.COM
+ (2603:10a6:800:34f::12) To VI0PR08MB10656.eurprd08.prod.outlook.com
+ (2603:10a6:800:20a::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Feedback-ID: :1.us-east-1.z4rHY0qbNtjoW80ZyzVy+DEul17RQEOMT7FC66S60ffkhLWkV35D8ZWXVyxJY1/89bAuLCem4GFJq1VXsxM0u6ZfZbvT1qSjDUeuZG9/Lxk1uINIqi7CenEa93u+fNllqnJMZ0quaBrclhnmtzdFllG4KHSjZOEcaGLa1BWoSpA=:1.us-east-1.epbACCJLarUaEI78XZoGREJ9LamRjxMH5pM2kZb64rA=:AmazonSES
-X-SES-Outgoing: 2026.06.22-54.240.10.132
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI0PR08MB10656:EE_|DU2PR08MB7375:EE_
+X-MS-Office365-Filtering-Correlation-Id: bff7e6a9-ab86-49b3-32d0-08ded087d6e9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|366016|52116014|7416014|376014|1800799024|18002099003|38350700014|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	nOBaUfevcC3GhOga5JoQp944dRRtO/N6elXCABmARHuqdb4jHxY3aePMHi+HyYVGZPfdplvTArbN6l6jyz5oBTgx90CZjqS40bYb9UYkzEV7Uk8UG0YAHOK4SGfAeeddLs+Zn+i1mCV3npAKvfaFbky55rz7hhz5R0v5p76Cjt4jlSr3EHNyQJ5ySTvS8w3RRQRu5awe0iRt/0m4DrsrfB+/ywSvvlvUNj3yiqaMMXLXAlrrklllEkHjqLLHVpjXs6OIWSclG135IC5kajd+lMLAfwLblgm4QmMCh1H7nFC21BX01R+8uxUtJR7+xmJ6YQt6o6vWKcThOu7h7h6oZmjciE+yneDpIGhDL+cNC3CFRL3VQEdL/iZlB6DsFO+XNDZJ4zekv4KOFg5vp+ByUr7vEB8plMHl3vV6Bkxb+niyzx7b0WlAZOlhz4LNZxrZjqQE74XY8NVZYzBf5JE7wDFkPrEnnQHtOX2cB2l5KAbbH4wKH+Fo+O3YsJ3heXbEscjAdtwNQF+vxhFkfUjQ8nCxBVILCUFHNArE4qjaPFXkTooOtyd36AbfIrSAWq9vmFNV/G1vHA5ZgNmUkrWZ1AjIz7diVFuKh+RHl/9unufMkRGKGrLBx4qFmhiSNWr34KScZpicWccMDYX9JNbHCbErgGiRSLjGQ3ggfnREoyrxicqcUfGAMzJsZ49KEBxp4PA+QKtSIpY5A54cbxhrnh1HDZZCAlCuCenRn+gTHoc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR08MB10656.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(52116014)(7416014)(376014)(1800799024)(18002099003)(38350700014)(56012099006);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gwu6Ega8NnBGe4lvgvHl8St9HbhmWeFTZOGKi0BnkEi4bcfznnnpCDs1h7EN?=
+ =?us-ascii?Q?GCFW8Sa3vkZ+dMScUTjFkFHOFMPZIcVLe+MXvha76SbV1zhsX0k2B9Of7sgH?=
+ =?us-ascii?Q?WPUe86nh4sv4FhQOSEZ7zV4B505G3oK+EOTjCuqL3isTVIRqOOswpaaW0GGg?=
+ =?us-ascii?Q?3j/sv1a6tE6HsQLJIVAUUqH6SMPcjx+t/oYFZtfT46GR4uIdSbqAMNGEPJUT?=
+ =?us-ascii?Q?bxj3seorJ0QK/lUDp7app3yWXlnmx162Na4BKG4hTEcd7g1loH3DrHMyK+s5?=
+ =?us-ascii?Q?cLR+0ni6hLpd3Q/eulFM2d/6JvhEvsQhTV6za4Z8V/ea5S6QR+X6l9UixROG?=
+ =?us-ascii?Q?07KZu4raLe7k+PPHRXExKxjNGvfN3tO+aTlolnvRFGveyTPgQpUGG3vAHLSV?=
+ =?us-ascii?Q?jWXp7OyE61xy6+e625pZuIsyt8yVGD15GRuy9oyFBfmmVNTJpTq6WHo4kbel?=
+ =?us-ascii?Q?K7i7kZyAOvdV0dvzAMjiKsWBHvNBjrpD400BQUcq2sqPa0REuhF2BsXPnpNU?=
+ =?us-ascii?Q?AUBxA2gsAXvFiJC34MrwoKEShRnODQYGCb662DR3Z8FqVEEQNufOHJdHwOgl?=
+ =?us-ascii?Q?XFv/O92CC03qR4bexUsTUn+9dnzP+5SQNFBkbvXM3dpKgSNrrJ8RB/Y9s6wX?=
+ =?us-ascii?Q?poBlo1mcyDDKrHjEelUeOalmbssCQemBImWviE1jJMKckoOGrThjhr9KB+em?=
+ =?us-ascii?Q?XE9ywidQk+QnOSKLZxyezDR+IigiHhe+VkB2Yxo8VCHYjJpQQPeKyc9rRVGR?=
+ =?us-ascii?Q?UP0smdM3kpOg7tIJD+KL4Gja9zT28WfrSzoOgu0ClCxy+Lqjofk4fXcvv0u8?=
+ =?us-ascii?Q?EvUAF6sYXhLINwiWOR4rELB/GmsskfY2b0QnYsp6uD86PLZF8j7GSZeEWNLV?=
+ =?us-ascii?Q?WNHi+97F3TB/RgbY5N/HNKWyiy1EeCk4WToDu8nta9x83+EoYXbdl47wTmat?=
+ =?us-ascii?Q?YPg5CbT1xYH1lCPLw2x1AxcElY/cMrfpjIV0muQxcwoLY4/2V6lAQNCbjICA?=
+ =?us-ascii?Q?G+XoeO1t8aNB/gxswJGUIWTmPpEAm13fJil1VuFfkciajaVVvO0nsHmUEwVL?=
+ =?us-ascii?Q?c+h4USWB2lnHdNwlFsZZEOMKxVxX1LSdV63pbpYzj0Sa5UX0p4IkpFmxVyF3?=
+ =?us-ascii?Q?8iwhQz8+StxpnXnGEY6rApFdm5odaucT/KDjfUEgeznJzFXyOv9wweIDkpuQ?=
+ =?us-ascii?Q?E0tr2nSAeeTz+cLwLh/8zaiW4mRlKY3I6Y1votyN+Y7Z2A7vnB0rLox7rbmd?=
+ =?us-ascii?Q?mRTfI+Gh7LBKuBW9EbXjjKmvBEiFeE8lCrA2kUHqiPlSlvJgeioxL+jcyKs9?=
+ =?us-ascii?Q?Tc4dtr+MNfAWzYBKX4nGasSGsOd4gir56B0h8IyeDU4RERfEP28O47xetyaL?=
+ =?us-ascii?Q?EvG5n2CRg+Oi6tpEee26ZZyB5bjw3pa79Vb0ldy8VUOHJcm9zENt6nlns9QM?=
+ =?us-ascii?Q?a+WMZGV4Jcy3abbGqF386m+AVDnh/TXwUayHNt7UiEB3GRs478hw0H5c2R9J?=
+ =?us-ascii?Q?QhH006SPK1WUx7ARv8uCs0L52KzoIMM3hHm+38/va/yxzeoHUIeQA3+fs/uJ?=
+ =?us-ascii?Q?AdkIKvbPfveFjDu0spx328MHZhsJXR/9u6s5NOl7V7gItG2YoB5kZ5utMdfd?=
+ =?us-ascii?Q?LjdtJreValtuZgFcfbkkE4u/a4JOz7x7M05hq6FvZ9rUvZdZ1sKK8FxvUaHX?=
+ =?us-ascii?Q?xPBebp98am0VwKntKwkrihhyCGU6/I3shgj56gz3lmg7UilxXBtJYQKwdtXV?=
+ =?us-ascii?Q?Ad8rq/1R/R42FKGbrGq0Wn8IIba0aZA=3D?=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bff7e6a9-ab86-49b3-32d0-08ded087d6e9
+X-MS-Exchange-CrossTenant-AuthSource: VI0PR08MB10656.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 17:58:17.9726
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kfFOGkhEJ57xsoFEdD4KsXSMPqVpHVuGXODXSXa8d6pSRoJSo3QmgXpQb/gXIyGgtVjV9IY00ka79ObDUzCcCHW24ZkprqOAp4xgJ9VUpwk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR08MB7375
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[c127.dev:s=resend,amazonses.com:s=224i4yxa5dv7c2xz3womw6peuasteono];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[c127.dev];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS(0.00)[m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:namiltd@yahoo.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301181-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[c127.dev:+,amazonses.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,bootlin.com,yahoo.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:sgarzare@redhat.com,m:mst@redhat.com,m:stefanha@redhat.com,m:dongli.zhang@oracle.com,m:maciej.szmigiero@oracle.com,m:bchaney@akamai.com,m:mark.kanda@oracle.com,m:ptikhomirov@virtuozzo.com,m:den@openvz.org,m:andrey.drobyshev@virtuozzo.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301182-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,email.amazonses.com:mid,c127.dev:dkim,c127.dev:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amazonses.com:dkim]
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,virtuozzo.com:dkim,virtuozzo.com:mid,virtuozzo.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3BE0D6B1A11
+X-Rspamd-Queue-Id: 76C3A6B1A33
 
-Hi Luiz,
+v1 -> v2:
 
-Sorry for the slow reply =E2=80=94 I wanted to test the changes =
-on hardware
-before answering rather than reply blind. I'm also adding the =
-list
-back to CC, since this is review of an on-list patch and the
-discussion is useful for the archive; hope that's OK.
+  * Patch 2 (suppress EHOSTUNREACH): replace 'cpr_paused' + backend check
+    with a single 'started' latch;
+  * Patch 3 (re-scan TX virtqueue): reword commit message;
+  * Patch 4 (VHOST_RESET_OWNER):
+      - fix a vhost_worker use-after-free / stuck VHOST_WORK_QUEUED stall
+        against the lockless send path;
+      - drop the no-op vsock_for_each_connected_socket() iteration;
+  * Shuffle the patches, keep RESET_OWNER implementation last to preserve
+    bisectability;
+  * Reword the cover letter.
 
-Thanks for the very thorough review. Almost everything is addressed in
-v4, which I'll post once net-next reopens. Replies inline.
+v1: https://lore.kernel.org/virtualization/20260612165718.433546-1-andrey.drobyshev@virtuozzo.com
 
-> You might want to omit any specific model as there are multiple
-> possible supported models that have SGMII. Just use "only the RGMII
-> and SGMII interface...". Determining which device supports what is a
-> job for chip_info.
+Host<-->guest connections via AF_VSOCK sockets aren't supposed to
+outlive VM migration, since VM is moving to another host.  However
+there's a special case, which is QEMU live-update, or CPR
+(checkpoint-restore) migration.  In this case, VM remains on the same
+host, and we'd like such connections to persist.
 
-Done =E2=80=94 the NOTE comment no longer names a =
-model, it just lists the
-implemented interfaces.
+For this to work, we need to be able to transfer device ownership from
+source QEMU to dest QEMU.  Namely, source needs to reset ownership by
+issuing VHOST_RESET_OWNER ioctl, and then target has to claim it by
+calling VHOST_SET_OWNER.
 
-> > +#define   =
-RTL8365MB_SDS_INDACS_CMD_INDEX_MASK  0x0007
->
-> Isn't this MASK larger? I =
-was expecting 0x003F.
->
-> Please use GENMASK/BIT whenever possible. It =
-makes it clearer when
-> there are holes or overlaps in the reg.
-> Once a register macro is added with a bunch of bits described, I think
-> it is better to describe all bits we can, even if not in use in this
-> driver. Realtek normally maps bits sequentially and, with GENMASK/BIT,
-> it is visually easier to spot errors.
+Since VHOST_RESET_OWNER isn't yet implemented for vhost-vsock, let's add
+such implementation.  Patch 1 is a preliminary helper.  Patches 2 and 3
+fix the pre-existing issues which do manifest during CPR / RESET_OWNER.
+Patch 4 is the ioctl's implementation itself - we keep it last to
+preserve bisectability.
 
-The CMD index field is gone in v4:=
- I dropped the always-zero SerDes
-index argument, so that mask was removed =
-with it.
+There's a complementary series for QEMU [0] adding support of vhost-vsock
+devices during CPR migration.
 
-On GENMASK/BIT and documenting all bits: agreed in principle, but=
- the
-driver currently uses raw hex masks almost everywhere (~75 raw _MASK
-defines vs ~22 BIT/GENMASK), so converting only the new SDS defines
-would make the file more inconsistent rather than less. Options as I
-see them: (1) convert just the new defines, (2) keep raw hex to match
-the surrounding style, or (3) a separate file-wide cleanup patch on
-top of this series. I'd lean towards 3, keeping this series focused on
-the feature and doing the style modernization as its own patch, but
-I'm happy to do 1 if you'd rather the new code lead by example. Same
-question for documenting currently-unused bits. Which would you prefer?
+I've tested this (patched QEMU + patched kernel) approximately as follows:
 
-> > +#define RTL8365MB_SDS_INDACS_ADR_REG           0x6601
->
-> This reg is formed by two parts but, in this case, it might be
-> pedantic to add the descriptions as well.
-> PAGE_MASK    0x7E0
-> REGAD_MASK    0x1F
+  * Run listener in the guest:
+  socat -u VSOCK-LISTEN:9999 - >/tmp/recv.bin
 
-Noted. Since the addresses are passed as whole values=
- and the page/reg
-split isn't used in the driver, I've left it as a single =
-address for
-now, but I can add the sub-field masks if you'd prefer them =
-documented.
+  * Run data transfer from host to guest:
+  socat -u FILE:/root/bigfile.bin VSOCK-CONNECT:CID:9999
 
-> > +#define   RTL8365MB_SDS_BMCR_DPRST_PHASE1      0x1401
-> > +#define   RTL8365MB_SDS_BMCR_DPRST_PHASE2      0x1403
->
-> I do not like magic numbers. You could do the BMCR_ANENABLE |
-> BMCR_ISOLATE in the macro or code instead of just keeping it in a
-> comment. It would give more semantics to the code.
+  * Perform CPR migration during transfer (either cpr-exec or cpr-transfer)
+  * Check that file hash sum matches
 
-Done =E2=80=94 the phase values are now built from the standard bits:
+[0] https://lore.kernel.org/qemu-devel/20260619105514.128812-1-andrey.drobyshev@virtuozzo.com
 
-  #define RTL8365MB_SDS_BMCR_DPRST_PHASE1 (BMCR_ANENABLE | BMCR_ISOLATE | =
-0x1)
-  #define RTL8365MB_SDS_BMCR_DPRST_PHASE2 (BMCR_ANENABLE | =
-BMCR_ISOLATE | 0x3)
+Andrey Drobyshev (2):
+  vhost/vsock: suppress EHOSTUNREACH fast-fail during CPR pause
+  vhost/vsock: re-scan TX virtqueue on device start
 
-> > +static const struct rtl8365mb_jam_tbl_entry =
-rtl8365mb_sds_jam_sgmii[] =3D {
->
-> I guess you got this from vendor's =
-redData. However, that sequence is
-> for the case when =
-RTL8365MB_CHIP_OPTION_REG(0x13C1) =3D=3D 0. In my tests,
-> rtl8367s returns 1 for that reg, which would select the redDataSB
-> variant in the vendor's code. Did you test both or check register
-> 0x13C1 [...] HSGMII also has a similar test in vendor's code.
+Pavel Tikhomirov (2):
+  vhost/vsock: split out vhost_vsock_drop_backends helper
+  vhost/vsock: add VHOST_RESET_OWNER ioctl
 
-Good catch. I checked 0x13C1 on the MR80X (with the magic
-unlock/relock via 0x13C0): it reads option =3D 1, so the committed
-tables are already the SB/HB variants. For SGMII the only difference
-between redData and redDataSB is reg 0x482 (0x21A2 for option 0 vs
-0x2420 for option 1), and my table has 0x2420; the HSGMII table
-matches redDataHB likewise. I captured the full vendor write sequence
-on hardware by chainloading a patched U-Boot, so both tables are
-confirmed against the live silicon.
+ drivers/vhost/vsock.c | 96 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 76 insertions(+), 20 deletions(-)
 
-v4 reads 0x13C1 at runtime and returns=
- -EOPNOTSUPP for the option-0
-variant rather than driving the SerDes with =
-values I cannot verify on
-available hardware.
+-- 
+2.47.1
 
-> > +       if (extint->id !=
-=3D 1)
-> > +               return -EOPNOTSUPP;
->
-> The model RTL8370MB is =
-also a member of RTL8367C [...] Can't you just
-> check extint =
-supported_interfaces? [...] This type of hardcoded
-> assumption just makes =
-the job harder.
-
-In v4 this hardcoded check is gone. With the phylink_pcs =
-conversion
-(see below), the SerDes is gated through supported_interfaces in
-get_caps() and mac_select_pcs(), so whether a port uses the SerDes is
-driven by chip_info rather than a hardcoded id.
-
-> > +       ret =3D =
-regmap_update_bits(priv->map, RTL8365MB_BYPASS_LINE_RATE_REG,
-> > +                                BIT(extint->id), 0);
->
-> BYPASS_LINE_RATE is actually indexed by port number starting at 5
-> [...] Describe [it] with a parametric macro, receiving the port number
-> and returning the BIT(5-port) as mask [...] For RTL8367R [...] it uses
-> bit 0 for int 1 and bit 1 for int 0 or 2.
-
-Done =E2=80=94 it's now a =
-parametric macro:
-
-  #define RTL8365MB_BYPASS_LINE_RATE_MASK(_port)  =
-BIT((_port) - 5)
-
-with a comment noting port 5 is the base and that other =
-families (e.g.
-the RTL8367R's (id + 1) % 2) index it differently, so this =
-mapping
-only holds for the RTL8367C-style parts the driver supports. One =
-small
-thing: your mail had BIT(5 - port), which inverts it (port 6 would be
-BIT(-1)); I used BIT(port - 5) so port 5 maps to bit 0 =E2=80=94 let me =
-know if
-you meant something different.
-
-> > +       usleep_range(10, 50);
->
-> An arbitrary wait is not ideal but Mieczyslaw already suggested a
-> better solution.
-
-Done =E2=80=94 the usleep is gone. Writes are =
-fire-and-forget and reads poll
-the self-clearing BUSY bit with =
-regmap_read_poll_timeout(), matching
-the vendor's getAsicSdsReg. I =
-instrumented it on the MR80X: the BUSY
-bit is never even observed set (the =
-access completes within the
-register transaction over MDIO), so no sleep is=
- needed.
-
-> > +       ret =3D regmap_update_bits(
-> > +               =
-priv->map, RTL8365MB_DIGITAL_INTERFACE_SELECT_REG(extint->id),
-> > +               [...]
->
-> Sometimes it is just easier to use a temp =
-variable instead of fighting
-> with the 80-col limit.
-
-Done, the mode value goes into a temporary now.
-
-> The lack of test devices=
- is holding me back from making further
-> improvements. [...] I think that,=
- with some limitations, the rtl8365mb
-> driver [...] could support the full=
- range from RTL8370/RTL8367 up to
-> RTL8367D.
-
-Makes sense, and I tried to =
-keep v4 from baking in RTL8367S-specific
-assumptions where I could (the =
-SerDes gating and the bypass macro
-above). I can only test on the MR80X =
-(RTL8367S) myself, so I've kept
-the scope to what I can verify, but I'm =
-happy to keep the code friendly
-to that wider range.
-
-One more thing from the wider discussion: following Maxime's review I
-converted the whole SerDes path to a phylink_pcs in v4, so the SerDes
-handling now lives in pcs_config()/pcs_get_state()/pcs_link_up() rather
-than the ext/sds split in mac_link_up/down you saw in v3. pcs_get_state()
-now reads the real SerDes link status (reg 0x3d) instead of reporting
-the forced value.
-
-Thanks again =E2=80=94 this review made the series =
-substantially better.
-
-Best regards,
-Johan
 
