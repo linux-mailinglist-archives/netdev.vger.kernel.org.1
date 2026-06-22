@@ -1,304 +1,173 @@
-Return-Path: <netdev+bounces-301059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fTu/A1MXOWrBmgcAu9opvQ
-	(envelope-from <netdev+bounces-301059-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:06:59 +0200
+	id G1sBBPsVOWpomgcAu9opvQ
+	(envelope-from <netdev+bounces-301058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:01:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDDF56AEF10
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:06:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2AF96AEEB3
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:01:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realtek.com header.s=dkim header.b=GDgitpaR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301059-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301059-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realtek.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=b6gsrZS7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301058-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301058-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 03971300846E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:06:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 11FB9300B5B7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811DC379C3C;
-	Mon, 22 Jun 2026 11:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C193119CCFA;
+	Mon, 22 Jun 2026 11:01:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-yx1-f73.google.com (mail-yx1-f73.google.com [74.125.224.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D523783BE;
-	Mon, 22 Jun 2026 11:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B6E3546DF
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:01:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782126412; cv=none; b=qv9L/c5PUvn8SnFATTcBZL6lHgFdEDJI4yYdKc6GLspF13HrybtTCFflNA5Jdv73JtSb72o8J9JUgUoseKpqYjKwnnoL8g4ykC12YvtIHKrzyxw0zgMhPDPZWqNagkZZbfv4YVN8uUGfHcJMcotQXIzpC1wd4FBIzPOclql5h/g=
+	t=1782126072; cv=none; b=KNSyvHlxzMN+gadOh+Poj/yIqSgJ2NXERPQndZwYEmcs+LOE64G5JiWTJpO/5CxyUzAq01wrXJrKHVxcKEMEtVVccYUhjElhfjBSmIZD9HUnfIRcMLfZYSCvUfeIFTCywkm9VLGq/7LfvYy7kpSQqKrQsenmN71pYxkAxUg20l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782126412; c=relaxed/simple;
-	bh=S4t7knOEyAEnRPoAGDPAFDafyWVIJvVclnF9cmeZyaM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uion6bHUvkyX8LqaHqIme2EqQ4fILo8Htt6Ju8b31jmK/YDL9qms7b5BKe8EDCHO/83f9hVgqzILv0tNFXit+J1Dbxj7ba9iqiam0j12/cUGyDs4A6tMYBwAy+eMoJH5+ojPRfBmmjCXI+KMOg9Y0ZJ/ajjYOwiVWGokI7OlNe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=GDgitpaR; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65MAuRbA52486224, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1782125787; bh=MsSe1SF/uIbh6o12XSI2mniba15A+fRCte2j+2lUt7k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=GDgitpaRGYlNM/6IbC/Rfo74HJbrliPGaJLV6xmJOIgDi+EPKCaK5PUuUGP6YZQoW
-	 RvwJcnpNdknC/NgjLIWi8Fp/F0BfD9eEk6P5wwp8gB4enpqQ9niVbTS764jRatwRmr
-	 NLC3cYuo9RvMPt0Y1+fDDBiJxPmFJ07AYfrhFTgsS6ns6Z7/hNpOVqj198zfd2BgM2
-	 0vjBI4FZ1ZdkUmi8vuGp4Oc6btWmRemNHccUsBL4CFGX3IwxZXUdNixxQBgpII5Nuw
-	 evZGFYJx75aoikRq6idMbH+rYHlr4ZcgWaDZOEUGKjSHbJoVch7Ym0oTl7Th/1o454
-	 QQRrFiKRHNKFg==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65MAuRbA52486224
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 22 Jun 2026 18:56:27 +0800
-Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 22 Jun 2026 18:56:27 +0800
-Received: from RTKEXHMBS04.realtek.com.tw ([::1]) by
- RTKEXHMBS04.realtek.com.tw ([fe80::552f:8b32:656c:c395%6]) with mapi id
- 15.02.2562.017; Mon, 22 Jun 2026 18:56:27 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"david.laight.linux@gmail.com" <david.laight.linux@gmail.com>,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>, Ping-Ke Shih
-	<pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net v3] rtase: Workaround for TX hang caused by short UDP
- packets entering hardware PTP parsing
-Thread-Topic: [PATCH net v3] rtase: Workaround for TX hang caused by short UDP
- packets entering hardware PTP parsing
-Thread-Index: AQHc/Mk9ctTr65FPK0GOwiW0nIIMYrZB75eAgAh/vtA=
-Date: Mon, 22 Jun 2026 10:56:27 +0000
-Message-ID: <23922667b00c4ec7aba7efca227f85b1@realtek.com>
-References: <20260615131653.15730-1-justinlai0215@realtek.com>
- <20260617085942.843250-2-horms@kernel.org>
-In-Reply-To: <20260617085942.843250-2-horms@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1782126072; c=relaxed/simple;
+	bh=hOqf5zMjMvMssmzv74ucGsF8JY6cSQNFPJXc1TK9WRo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=reu/qHHj591iD2SE7hcG0w6MPrsVfVU1L2Sjs2Sq3/Jrb6f/sme6ajDDSYmaEkYbuj7GZuZxJg3CQV6zvECifcUX42ESsrimeRMIFXN+sDzy680RmvlpCyu684vnhOdzlpBKF2t/rlkLtglOBRyVN5JAK//jK/q5m8S+cAWMrzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b6gsrZS7; arc=none smtp.client-ip=74.125.224.73
+Received: by mail-yx1-f73.google.com with SMTP id 956f58d0204a3-660f247c238so6614814d50.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 04:01:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782126070; x=1782730870; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fYBo1lFbyMKhv37YpAQVQ0c0jZzJaXmsQ9e4aJRcgZk=;
+        b=b6gsrZS7JojxUdvCpnHsVbxZRJcLHVaCokkv1TbqL4ZRl2mbUJOiae/8Up7vCMqb4H
+         esWfe+N/H9Voj4xEZ+BiSp2o39xr9lxrNRqGWLFnTCdJHA/jptsbn6F2wQJ467m5qEJ2
+         E2KTOdURzLHgRgzYOLogQoM3Tn1RAZDGcp2dPuKqpVXR+wpcYMkj/BNE6q6CuX8Qh9aF
+         LWRmg0miIZbVgDqZozC84BCA9V/i6gAX1qrCZ0NuRFwUXX5jh63gruvjCS86ykkbAWkb
+         +8SaDudyHQP9S8v5UnnZ4MdUyNHj6LCRUFnO0PM8RzULAsTry7qAdJdNnGAY3DAHpjml
+         Xjfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782126070; x=1782730870;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fYBo1lFbyMKhv37YpAQVQ0c0jZzJaXmsQ9e4aJRcgZk=;
+        b=cjBfJo/DlKL4VfgSZ1m9y7pXkx/ttShwqBrDrjGRX3+u2HdGUwF6JgRpteh8EZ8U5y
+         Pr0xsQmFHCIPXu+N09hhC2anl6sGiTZEDX+8Ug4rQ20UEFF3YwR74MjIAeOEyvc5yapS
+         4N3WEvdI/mjFzmsKNucYZQK0jb2QHK+gpEDCalMYj7Gt+cccRht5+6jcO5KzaDc8qYAl
+         hpS1Oj7s0hfr5FyIGh2vOlCE9bGUhaEOYeJesf+JU2TYz0n2IP9CmUGr0BkC3NkhgXw6
+         x/VGZ5OuoOpB8pcRB5qdNvw8AazrKHY7qbVoMncPYfmt00cnTfmoQJcxQ2LGWZgYGfRG
+         DtQQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpoVZWmIpDsdVVkhfJtiZPMA4hBDwBlNlHYBtNENAprTBMMnRmE7CgwXN7qAY7bXr4RKBJJgi8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhkzTNHBlx1+cmQ/pl++1AO6ZCk+iw347XBl6dwjoakvX+Q8mq
+	mYhzSJbHgGetFaT4yv6GsFMLV7pza2snMu1DuFnqJ6guqCSXtbnytTFePoAZQE55johfTKQVeqJ
+	tnk6Kms7t3fzjdw==
+X-Received: from qvbkc30.prod.google.com ([2002:a05:6214:411e:b0:8dc:9bcb:85a2])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690e:168d:b0:660:7ced:55cb with SMTP id 956f58d0204a3-662ffba0dc6mr10943928d50.1.1782126070084;
+ Mon, 22 Jun 2026 04:01:10 -0700 (PDT)
+Date: Mon, 22 Jun 2026 11:01:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.rc0.786.g65d90a0328-goog
+Message-ID: <20260622110108.69541-1-edumazet@google.com>
+Subject: [PATCH net] net: do not acquire dev->tx_global_lock in netdev_watchdog_up()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,vger.kernel.org,gmail.com,intel.com,realtek.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301059-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:richardcochran@gmail.com,m:david.laight.linux@gmail.com,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:andrew@lunn.ch,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,samsung.com];
+	TAGGED_FROM(0.00)[bounces-301058-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:m.szyprowski@samsung.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[realtek.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EDDF56AEF10
+X-Rspamd-Queue-Id: A2AF96AEEB3
 
-Simon Horman <horms@kernel.org> wrote:
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> rtase: Workaround for TX hang caused by short UDP packets entering
-> hardware PTP parsing
->=20
-> The patch adds a workaround for a hardware bug in rtase where short UDP
-> packets triggering PTP parsing can cause a TX hang due to out-of-bounds
-> reads.
-> It pads affected packets so the transport data reaches a minimum length.
->=20
-> Cc: stable@vger.kernel.org
->=20
-> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > index 55105d34bc797..4c295a39c7a0c 100644
-> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> [ ... ]
-> > @@ -1249,6 +1250,81 @@ static u32 rtase_tx_csum(struct sk_buff *skb,
-> const struct net_device *dev)
-> >       return csum_cmd;
-> >  }
-> >
-> > +static bool rtase_get_udp_offset(struct sk_buff *skb, u32 *udp_offset)
-> > +{
-> > +     int no =3D skb_network_offset(skb);
-> > +     struct ipv6hdr *i6h, _i6h;
-> > +     struct iphdr *ih, _ih;
-> > +
-> > +     switch (vlan_get_protocol(skb)) {
-> > +     case htons(ETH_P_IP):
->=20
-> [Severity: High]
-> Does relying on vlan_get_protocol(skb) allow an unprivileged user to bypa=
-ss
-> this workaround?
->=20
-> If an attacker uses an AF_PACKET/SOCK_RAW socket to inject a raw Ethernet
-> frame containing an IPv4/UDP packet, they could set skb->protocol to an
-> arbitrary value like htons(ETH_P_ALL). The switch statement will fall
-> through to the default case and return false, causing rtase_skb_pad() to
-> skip the padding.
->=20
-> Since the hardware independently parses the raw frame based on the
-> EtherType,
-> could it still process the unpadded packet and trigger the TX hang?
->=20
+Marek Szyprowski reported a deadlock during system resume when virtio_net
+driver is used.
 
-Thanks for pointing this out.
-=20
-Since the hardware parser operates on the actual Ethernet frame
-contents, relying on skb protocol metadata is not ideal for this
-workaround.
-=20
-I'll update the code to derive the L3 protocol and network offset from
-the Ethernet/VLAN headers in the skb data before parsing IPv4/IPv6.
-This makes the software check match what the hardware parser sees and
-avoids depending on skb protocol metadata.
+The deadlock occurs because netif_device_attach() is called while holding
+dev->tx_global_lock (via netif_tx_lock_bh() in virtnet_restore_up()).
+netif_device_attach() calls __netdev_watchdog_up(), which now also tries
+to acquire dev->tx_global_lock to synchronize with dev_watchdog().
 
-> > +             ih =3D skb_header_pointer(skb, no, sizeof(_ih), &_ih);
-> > +             if (!ih)
-> > +                     return false;
-> [ ... ]
-> > +static bool rtase_skb_pad(struct sk_buff *skb)
-> > +{
-> > +     __be16 *dest, _dest;
-> > +     u32 trans_data_len;
-> > +     u32 udp_offset;
-> > +     u16 dest_port;
-> > +     u32 pad_len;
-> > +
-> > +     if (!rtase_get_udp_offset(skb, &udp_offset))
-> > +             return true;
-> > +
-> > +     trans_data_len =3D skb->len - udp_offset;
-> > +     if (trans_data_len < offsetof(struct udphdr, len) ||
-> > +         trans_data_len >=3D RTASE_MIN_PAD_LEN)
-> > +             return true;
->=20
-> [Severity: High]
-> Does this logic inadvertently skip padding for underflowed lengths and ti=
-ny
-> payloads?
->=20
-> If the IP header is malformed such that skb->len < udp_offset, the unsign=
-ed
-> subtraction for trans_data_len will underflow to a large positive value.
-> This causes trans_data_len >=3D RTASE_MIN_PAD_LEN to be true, bypassing t=
-he
-> padding.
->=20
-> Additionally, if the packet has fewer than 4 bytes of UDP payload, meanin=
-g
-> trans_data_len < offsetof(struct udphdr, len), it explicitly returns true=
-.
->=20
-> Since the hardware blindly fetches the UDP destination port at
-> udp_offset + 2 via DMA, won't transmitting these short or malformed packe=
-ts
-> without padding still expose the hardware to out-of-bounds reads?
->=20
+This recursive lock acquisition results in a deadlock.
 
-Thanks for the review.
-=20
-I'll add a check for udp_offset > skb->len before calculating
-trans_data_len to avoid the potential underflow.
-=20
-If the computed UDP offset is beyond the packet length, the packet is
-malformed and cannot be safely handled by this workaround, so it should
-not be transmitted.
-=20
-The out-of-bounds access occurs after the packet has already matched
-the PTP classification criteria (UDP destination port 319/320) and
-enters the hardware PTP parsing path.
-=20
-If the transport data is shorter than the destination port field
-itself, the packet cannot match the affected PTP classification path.
+Fix this by removing the tx_global_lock acquisition from netdev_watchdog_up().
 
-> > +
-> > +     dest =3D skb_header_pointer(skb,
-> > +                               udp_offset + offsetof(struct udphdr,
-> dest),
-> > +                               sizeof(_dest), &_dest);
-> [ ... ]
-> > @@ -1362,6 +1438,9 @@ static netdev_tx_t rtase_start_xmit(struct sk_buf=
-f
-> *skb,
-> >               opts2 |=3D rtase_tx_csum(skb, dev);
-> >       }
-> >
-> > +     if (!rtase_skb_pad(skb))
-> > +             goto err_dma_0;
-> > +
-> >       frags =3D rtase_xmit_frags(ring, skb, opts1, opts2);
-> >       if (unlikely(frags < 0))
-> >               goto err_dma_0;
->=20
-> [Severity: High]
-> This is a pre-existing issue, but does the err_dma_1 error path in
-> rtase_start_xmit() contain a double free of the skb?
->=20
-> When transmitting a fragmented packet, rtase_xmit_frags() maps the
-> fragments and assigns ring->skbuff[entry] =3D skb for the last fragment
-> descriptor. Back in rtase_start_xmit(), if dma_map_single() fails for the
-> linear part, it jumps to err_dma_1:
->=20
-> err_dma_1:
->         ring->skbuff[entry] =3D NULL;
->         rtase_tx_clear_range(ring, ring->cur_idx + 1, frags);
->=20
-> err_dma_0:
->         tp->stats.tx_dropped++;
->         dev_kfree_skb_any(skb);
->         return NETDEV_TX_OK;
->=20
-> rtase_tx_clear_range() iterates over the mapped fragments and calls
-> dev_kfree_skb_any() when it finds the skb pointer. Execution then falls
-> through to err_dma_0, which unconditionally calls dev_kfree_skb_any(skb) =
-a
-> second time on the same skb pointer.
+The critical state (watchdog_timer and watchdog_ref_held) is already
+protected by dev->watchdog_lock, which was introduced in the blamed commit.
 
-Thanks for pointing this out.
+Fixes: 8eed5519e496 ("net: watchdog: fix refcount tracking races")
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Closes: https://lore.kernel.org/netdev/a443376e-5187-4268-93b3-58047ef113a8@samsung.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+---
+ net/sched/sch_generic.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-This appears to be a pre-existing issue and is unrelated to the change
-in this patch.
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 3f1c510df850dbdbaf10d483547c7b1f3a5d5482..ef2b4bf51564173751c74fefe17e3913ed2fa056 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -594,9 +594,8 @@ void netdev_watchdog_up(struct net_device *dev)
+ 		return;
+ 	if (dev->watchdog_timeo <= 0)
+ 		dev->watchdog_timeo = 5*HZ;
+-	spin_lock_bh(&dev->tx_global_lock);
+ 
+-	spin_lock(&dev->watchdog_lock);
++	spin_lock_bh(&dev->watchdog_lock);
+ 	if (!mod_timer(&dev->watchdog_timer,
+ 		       round_jiffies(jiffies + dev->watchdog_timeo))) {
+ 		if (!dev->watchdog_ref_held) {
+@@ -605,9 +604,7 @@ void netdev_watchdog_up(struct net_device *dev)
+ 			dev->watchdog_ref_held = true;
+ 		}
+ 	}
+-	spin_unlock(&dev->watchdog_lock);
+-
+-	spin_unlock_bh(&dev->tx_global_lock);
++	spin_unlock_bh(&dev->watchdog_lock);
+ }
+ EXPORT_SYMBOL_GPL(netdev_watchdog_up);
+ 
+-- 
+2.55.0.rc0.786.g65d90a0328-goog
 
-I'll investigate the reported double free scenario further and address
-it separately if a fix is needed.
-
-Thanks,
-Justin
 
