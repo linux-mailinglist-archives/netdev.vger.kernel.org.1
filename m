@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4FEzC4wSOWpbmQcAu9opvQ
-	(envelope-from <netdev+bounces-301047-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:36 +0200
+	id fx83BxkTOWqTmQcAu9opvQ
+	(envelope-from <netdev+bounces-301048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:48:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88D16AED15
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A429E6AEDA1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:48:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="iBnP2/gy";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301047-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301047-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=O26V+GNv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301048-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301048-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CE42D303DD2D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:45:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C93F030699D2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC442C08BB;
-	Mon, 22 Jun 2026 10:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD102D8379;
+	Mon, 22 Jun 2026 10:45:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5249A29DB9A;
-	Mon, 22 Jun 2026 10:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7513222425B;
+	Mon, 22 Jun 2026 10:45:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125117; cv=none; b=Y/lOpIC/JyIeg3hj6lHYgNMBp+damIKkHDY0t9j2dvz9QlRlCogPwrdCgQt7qWMABVobKwUO/H5z+7jnybB0vZd7UqAfXjGwmt0nMSdlCjA9xuVLm2xkiQWRcEoEbVvvXLZwZgPM/cJv0YxEmuj6H6W3ZTHauczZX2b5uitwQvk=
+	t=1782125123; cv=none; b=kHMN/p7Ydj9wVmzUpxZlRe1sVufT7ZoJelDU3agPSuthIQ2SQ2P7H5WaIJJgTEoVzXvvkV2PZKNyOCLw1CZiud1X5zenTPfumOpaX0XAYEFMx/1guR32j3sS4pFvfdzRIvMdv3zifslXrza1w074se61EMis8/NRgF5GV6ODtIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125117; c=relaxed/simple;
-	bh=Tr4oW7UO0sW/fQVPPy0YeoSrDki/XK4SVSEqmGO2sUM=;
+	s=arc-20240116; t=1782125123; c=relaxed/simple;
+	bh=N/6VknjjXpbN1MD/FqnHTdAkw9Tm/5ZBaUYYE2rQ+nA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p81DINzXdYwDhnk7mZqZIhjRQETrQ72jxnkYblBebwR63pOIHTz4LSPFNlMblmcfs4IFhWKJguKOnuGeNsUQaL17lTwTm54l29IGelSXlPzjRpGwSy1O++jv4ksn+sxTq4iDq7f2PxOOEG40VzE/ol+A1jeqXfbVfzRj1d6DPhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBnP2/gy; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50E201F00A3D;
-	Mon, 22 Jun 2026 10:45:10 +0000 (UTC)
+	 MIME-Version; b=YTTz4SS6Yem6UhwiNU3RCx2ccwnSQRd3ew2TLhO11B8G5W9PBNpJHtRvlQjr+DnTq7SLTCT09nYxxCDj9XHGvHIUFdYJbD8WbuhzWt0FCYMEI18JMQaXjL5bFqKlmKduJiyrozZE3YmG3MM0cs9SJGzkK0n3P6VKrpOFX4Otj+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O26V+GNv; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B4A1F00A3A;
+	Mon, 22 Jun 2026 10:45:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125116;
-	bh=3bBqNZaZV2OEMX+X5K6tu2Jo8UwlRKjp7hC3OW6PrVU=;
+	s=k20260515; t=1782125122;
+	bh=3nAMPLkbHtZkUggX5mvXpgfHri8dhjwekxzXl9N1Kro=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iBnP2/gyXY7PXgc62No3bnpCdLP8wv2BFAJhAMQjvtbHTZuI8krG3fQaXJ2SM0ikg
-	 usenvIfRfEjJE7MuVo34hChVPsBeVQl9UpnWpg8A0bFsh7MtSk0bYbPj/FarzG3/PZ
-	 KgVNsUjmECUlvl0o31jR060S8FD7lFqXKWoTipnaiD2XAE7AupUV4ME+t78GvYjBP6
-	 5K8MEG38Udrekgnf4Ubi/4qvMhjLrBTJ8ko+oR1vTNmJVIcXqDes7HfkL78Z7WtDND
-	 VWcuSpa6l3qvr6lETY5mEXbbKKaks9nKyKUaidAgDqvxkCpyThpcTeb+zrPGu1QvMQ
-	 NFPcJVNWCMy3A==
+	b=O26V+GNvu+PIgRGPM32bn7o4/c2iFMNS4z7TvamYqFbZihAaJmEmi+Rvgy+bi+V5s
+	 b8APqHraU69Dl+lJBCjGCclv9JVF6WHf8YleaUWYOHe58YeZFTbmGk3M5NuhqBml1o
+	 xdiWLIaknxSMbqDjigFDKNCq/CQSEC4MObc29DyoErQ4TvMLoDdc6oWlrNhdpmBtsz
+	 8SkpMEZHeDYalk+Do/00cmGYGF7ERt2IUIchZSeSEItS1lhJjd3R63bk/D6f1sISyI
+	 gaOFkEUhu4IHn9n1IIuTnHCiIkNCm+SP9UPSqlcWT4Yh/WJiWwcKU6UwwbkgcvxBNi
+	 5z/gprzQhPQmw==
 From: Geliang Tang <geliang@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>,
 	Mat Martineau <martineau@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	mptcp@lists.linux.dev,
 	Gang Yan <yangang@kylinos.cn>,
 	Zqiang <qiang.zhang@linux.dev>
-Subject: [RFC net-next 11/17] mptcp: implement mptcp-specific tls protocol ops
-Date: Mon, 22 Jun 2026 18:43:31 +0800
-Message-ID: <447fc4384ba0d4b0f78c452239dbb3e87e021578.1782123118.git.tanggeliang@kylinos.cn>
+Subject: [RFC net-next 12/17] tls: add mptcp support for sk_poll
+Date: Mon, 22 Jun 2026 18:43:32 +0800
+Message-ID: <57bd0d017b79b2dd63ae71ed071dc946a00b63a2.1782123118.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
 References: <cover.1782123118.git.tanggeliang@kylinos.cn>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -105,51 +105,28 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301047-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301048-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B88D16AED15
+X-Rspamd-Queue-Id: A429E6AEDA1
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-This patch implements the MPTCP-specific struct tls_prot_ops, named
-'tls_mptcp_ops'.
+The tls_sk_poll() function currently uses tcp_poll() unconditionally
+to obtain the base poll mask, which works only for TCP. This prevents
+TLS over MPTCP from working correctly with poll().
 
-Passing an MPTCP socket to tcp_sock_rate_check_app_limited() can
-trigger a crash. Here, an MPTCP version of check_app_limited() is
-implemented, which calls tcp_sock_rate_check_app_limited() for each
-subflow.
+Make the poll function protocol-aware by selecting the appropriate
+poll function based on sk->sk_protocol. For TCP it calls tcp_poll(),
+for MPTCP it calls mptcp_poll() (guarded by CONFIG_MPTCP). Any other
+protocol returns 0.
 
-When MPTCP implements lock_is_held interface, it not only checks
-sock_owned_by_user_nocheck(sk) as TCP does, but also needs to check
-whether the MPTCP data lock is held. This is required because TLS
-may call lock_is_held from softirq context with bh_lock_sock held.
-Checking both conditions ensures TLS always defers to workqueue when
-the MPTCP data lock is held, avoiding deadlock.
-
-Implement mptcp_skb_get_header() to handle fragmented MPTCP skbs when
-copying TLS record headers.
-
-In tls_strp_read_sock(), tls_strp_load_anchor_with_queue() first
-attaches the skbs from TCP/MPTCP to the frag_list of strp->anchor.
-In TCP, this is fine because the skb data is contiguous; however,
-in MPTCP, each skb has its own offset, causing the data to be
-non-contiguous. As a result, during the subsequent tls_rx_msg_size()
-process, skb_copy_bits() may access across skbs. In MPTCP, the offset
-of the second skb is ignored, leading to data access errors.
-Therefore, mptcp_skb_get_header() can effectively handle this
-problem and obtain the correct TLS header.
-
-In the later process, tls_strp_check_queue_ok() handles the copy_mode
-scenario. When an MPTCP skb has a non-zero offset, it falls back to
-copy_mode, copying the valid data from each skb one by one into
-anchor->frag_list, thus resolving the offset issue. Hence, the impact
-of the offset within the TLS module is completely eliminated.
+Also export mptcp_poll() symbol so that the TLS module can use it.
 
 Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
@@ -157,245 +134,96 @@ Co-developed-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- include/net/mptcp.h  |   2 +
- include/net/tcp.h    |   1 +
- net/ipv4/tcp.c       |   9 +++-
- net/mptcp/protocol.c | 113 +++++++++++++++++++++++++++++++++++++++++++
- net/mptcp/protocol.h |   1 +
- net/tls/tls_main.c   |  13 +++++
- 6 files changed, 137 insertions(+), 2 deletions(-)
+ include/net/mptcp.h  |  9 +++++++++
+ net/mptcp/protocol.c |  5 +++--
+ net/tls/tls_main.c   | 17 ++++++++++++++++-
+ 3 files changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/mptcp.h b/include/net/mptcp.h
-index 333bde2a0b76..ba2257986b13 100644
+index ba2257986b13..b0a172c38891 100644
 --- a/include/net/mptcp.h
 +++ b/include/net/mptcp.h
-@@ -132,6 +132,8 @@ struct mptcp_pm_ops {
- 	void (*release)(struct mptcp_sock *msk);
- } ____cacheline_aligned_in_smp;
- 
-+extern struct tls_prot_ops tls_mptcp_ops;
-+
- #ifdef CONFIG_MPTCP
- void mptcp_init(void);
- 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6d376ea4d1c0..ac823492d3e4 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -849,6 +849,7 @@ static inline int tcp_bound_to_half_wnd(struct tcp_sock *tp, int pktsize)
- 
- /* tcp.c */
- void tcp_get_info(struct sock *, struct tcp_info *);
-+void tcp_sock_rate_check_app_limited(struct tcp_sock *tp);
- void tcp_rate_check_app_limited(struct sock *sk);
- 
- /* Read 'sendfile()'-style from a TCP socket */
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index b427f924608c..b875be6ae5bc 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1096,9 +1096,9 @@ int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
+@@ -239,6 +239,9 @@ static inline __be32 mptcp_reset_option(const struct sk_buff *skb)
  }
  
- /* If a gap is detected between sends, mark the socket application-limited. */
--void tcp_rate_check_app_limited(struct sock *sk)
-+void tcp_sock_rate_check_app_limited(struct tcp_sock *tp)
- {
--	struct tcp_sock *tp = tcp_sk(sk);
-+	struct sock *sk = (struct sock *)tp;
- 
- 	if (/* We have less than one packet to send. */
- 	    tp->write_seq - tp->snd_nxt < tp->mss_cache &&
-@@ -1111,6 +1111,11 @@ void tcp_rate_check_app_limited(struct sock *sk)
- 		tp->app_limited =
- 			(tp->delivered + tcp_packets_in_flight(tp)) ? : 1;
- }
+ void mptcp_active_detect_blackhole(struct sock *sk, bool expired);
 +
-+void tcp_rate_check_app_limited(struct sock *sk)
++__poll_t mptcp_poll(struct file *file, struct socket *sock,
++		    struct poll_table_struct *wait);
+ #else
+ 
+ static inline void mptcp_init(void)
+@@ -316,6 +319,12 @@ static inline struct request_sock *mptcp_subflow_reqsk_alloc(const struct reques
+ static inline __be32 mptcp_reset_option(const struct sk_buff *skb)  { return htonl(0u); }
+ 
+ static inline void mptcp_active_detect_blackhole(struct sock *sk, bool expired) { }
++
++static inline __poll_t mptcp_poll(struct file *file, struct socket *sock,
++				  struct poll_table_struct *wait)
 +{
-+	tcp_sock_rate_check_app_limited(tcp_sk(sk));
++	return 0;
 +}
- EXPORT_SYMBOL_GPL(tcp_rate_check_app_limited);
+ #endif /* CONFIG_MPTCP */
  
- int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ #if IS_ENABLED(CONFIG_MPTCP_IPV6)
 diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 18c8b6c64c3f..f4cd7a6e5770 100644
+index f4cd7a6e5770..169bd468f212 100644
 --- a/net/mptcp/protocol.c
 +++ b/net/mptcp/protocol.c
-@@ -24,6 +24,7 @@
- #include <net/mptcp.h>
- #include <net/hotdata.h>
- #include <net/xfrm.h>
-+#include <net/tls.h>
- #include <asm/ioctls.h>
- #include "protocol.h"
- #include "mib.h"
-@@ -4894,3 +4895,115 @@ int __init mptcp_proto_v6_init(void)
- 	return err;
+@@ -4446,8 +4446,8 @@ static __poll_t mptcp_check_writeable(struct mptcp_sock *msk)
+ 	return 0;
  }
- #endif
-+
-+static bool mptcp_lock_is_held(struct sock *sk)
-+{
-+	return sock_owned_by_user_nocheck(sk) ||
-+	       mptcp_data_is_locked(sk);
-+}
-+
-+static void mptcp_read_done(struct sock *sk, size_t len)
-+{
-+	struct mptcp_sock *msk = mptcp_sk(sk);
-+	struct sk_buff *skb;
-+	size_t left;
-+	u32 offset;
-+
-+	msk_owned_by_me(msk);
-+
-+	if (sk->sk_state == TCP_LISTEN)
-+		return;
-+
-+	left = len;
-+	while (left && (skb = mptcp_recv_skb(sk, &offset)) != NULL) {
-+		int used;
-+
-+		used = min_t(size_t, skb->len - offset, left);
-+		msk->bytes_consumed += used;
-+		MPTCP_SKB_CB(skb)->offset += used;
-+		MPTCP_SKB_CB(skb)->map_seq += used;
-+		left -= used;
-+
-+		if (skb->len > offset + used)
-+			break;
-+
-+		mptcp_eat_recv_skb(sk, skb);
-+	}
-+
-+	mptcp_rcv_space_adjust(msk, len - left);
-+
-+	/* Clean up data we have read: This will do ACK frames. */
-+	if (left != len)
-+		mptcp_cleanup_rbuf(msk, len - left);
-+}
-+
-+static u32 mptcp_get_skb_seq(struct sk_buff *skb)
-+{
-+	return MPTCP_SKB_CB(skb)->map_seq - MPTCP_SKB_CB(skb)->offset;
-+}
-+
-+static int mptcp_skb_get_header(const struct sk_buff *skb, int off,
-+				void *buf, int len)
-+{
-+	const struct sk_buff *iter = skb_shinfo(skb)->frag_list;
-+	int copied = 0;
-+	int ret = 0;
-+
-+	if (!iter)
-+		return skb_copy_bits(skb, off, buf, len);
-+
-+	/* Make absolute to positive */
-+	off -= MPTCP_SKB_CB(iter)->offset;
-+
-+	while (iter && copied < len) {
-+		int skb_off  = MPTCP_SKB_CB(iter)->offset;
-+		int data_len = iter->len - skb_off;
-+		int count;
-+
-+		if (off >= data_len) {
-+			off -= data_len; /* MPTCP skb avail data */
-+			iter = iter->next;
-+			continue;
-+		}
-+
-+		count = min((int)(data_len - off), len - copied);
-+		ret = skb_copy_bits(iter, skb_off + off, buf + copied, count);
-+		if (ret)
-+			break;
-+		copied += count;
-+		off = 0;
-+		iter = iter->next;
-+	}
-+
-+	if (copied < len && !ret)
-+		ret = -EFAULT;
-+	return ret;
-+}
-+
-+static void mptcp_check_app_limited(struct sock *sk)
-+{
-+	struct mptcp_sock *msk = mptcp_sk(sk);
-+	struct mptcp_subflow_context *subflow;
-+
-+	mptcp_for_each_subflow(msk, subflow) {
-+		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
-+		bool slow;
-+
-+		slow = lock_sock_fast(ssk);
-+		tcp_sock_rate_check_app_limited(tcp_sk(ssk));
-+		unlock_sock_fast(ssk, slow);
-+	}
-+}
-+
-+struct tls_prot_ops tls_mptcp_ops = {
-+	.owner			= THIS_MODULE,
-+	.protocol		= IPPROTO_MPTCP,
-+	.recv_skb		= mptcp_recv_skb,
-+	.lock_is_held		= mptcp_lock_is_held,
-+	.read_done		= mptcp_read_done,
-+	.get_skb_seq		= mptcp_get_skb_seq,
-+	.skb_get_header		= mptcp_skb_get_header,
-+	.epollin_ready		= mptcp_epollin_ready,
-+	.check_app_limited	= mptcp_check_app_limited,
-+};
-+EXPORT_SYMBOL(tls_mptcp_ops);
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index da40c6f3705f..6dea626348d9 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -380,6 +380,7 @@ struct mptcp_sock {
  
- #define mptcp_data_lock(sk) spin_lock_bh(&(sk)->sk_lock.slock)
- #define mptcp_data_unlock(sk) spin_unlock_bh(&(sk)->sk_lock.slock)
-+#define mptcp_data_is_locked(sk) spin_is_locked(&(sk)->sk_lock.slock)
+-static __poll_t mptcp_poll(struct file *file, struct socket *sock,
+-			   struct poll_table_struct *wait)
++__poll_t mptcp_poll(struct file *file, struct socket *sock,
++		    struct poll_table_struct *wait)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct mptcp_sock *msk;
+@@ -4494,6 +4494,7 @@ static __poll_t mptcp_poll(struct file *file, struct socket *sock,
  
- #define mptcp_for_each_subflow(__msk, __subflow)			\
- 	list_for_each_entry(__subflow, &((__msk)->conn_list), node)
+ 	return mask;
+ }
++EXPORT_SYMBOL_GPL(mptcp_poll);
+ 
+ static struct sk_buff *mptcp_recv_skb(struct sock *sk, u32 *off)
+ {
 diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index b45890e75c9e..170ccbb9d36d 100644
+index 170ccbb9d36d..fa9fda3480da 100644
 --- a/net/tls/tls_main.c
 +++ b/net/tls/tls_main.c
-@@ -1366,6 +1366,12 @@ static int __init tls_register(void)
- 	if (err)
- 		goto err_strp;
+@@ -416,6 +416,21 @@ static void tls_sk_proto_close(struct sock *sk, long timeout)
+ 		tls_ctx_free(sk, ctx);
+ }
  
++static __poll_t tls_proto_poll(struct file *file, struct socket *sock,
++			       struct poll_table_struct *wait)
++{
++	switch (sock->sk->sk_protocol) {
++	case IPPROTO_TCP:
++		return tcp_poll(file, sock, wait);
 +#ifdef CONFIG_MPTCP
-+	err = tls_register_prot_ops(&tls_mptcp_ops);
-+	if (err)
-+		goto err_tcp;
++	case IPPROTO_MPTCP:
++		return mptcp_poll(file, sock, wait);
 +#endif
++	default:
++		return 0;
++	}
++}
 +
- 	err = tls_device_init();
- 	if (err)
- 		goto err_ops;
-@@ -1374,6 +1380,10 @@ static int __init tls_register(void)
- 
- 	return 0;
- err_ops:
-+#ifdef CONFIG_MPTCP
-+	tls_unregister_prot_ops(&tls_mptcp_ops);
-+err_tcp:
-+#endif
- 	tls_unregister_prot_ops(&tls_tcp_ops);
- err_strp:
- 	tls_strp_dev_exit();
-@@ -1385,6 +1395,9 @@ static int __init tls_register(void)
- static void __exit tls_unregister(void)
+ static __poll_t tls_sk_poll(struct file *file, struct socket *sock,
+ 			    struct poll_table_struct *wait)
  {
- 	tcp_unregister_ulp(&tcp_tls_ulp_ops);
-+#ifdef CONFIG_MPTCP
-+	tls_unregister_prot_ops(&tls_mptcp_ops);
-+#endif
- 	tls_unregister_prot_ops(&tls_tcp_ops);
- 	tls_strp_dev_exit();
- 	tls_device_cleanup();
+@@ -426,7 +441,7 @@ static __poll_t tls_sk_poll(struct file *file, struct socket *sock,
+ 	u8 shutdown;
+ 	int state;
+ 
+-	mask = tcp_poll(file, sock, wait);
++	mask = tls_proto_poll(file, sock, wait);
+ 
+ 	state = inet_sk_state_load(sk);
+ 	shutdown = READ_ONCE(sk->sk_shutdown);
 -- 
 2.53.0
 
