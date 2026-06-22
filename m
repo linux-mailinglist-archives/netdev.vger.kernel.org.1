@@ -1,232 +1,228 @@
-Return-Path: <netdev+bounces-301089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dpIhEuknOWpXngcAu9opvQ
-	(envelope-from <netdev+bounces-301089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:17:45 +0200
+	id nevkNnQoOWp3ngcAu9opvQ
+	(envelope-from <netdev+bounces-301091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:20:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1E06AF5F9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:17:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF446AF63B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:20:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301089-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301089-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=jqoeueEF;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=U3RfeZ++;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=jqoeueEF;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=U3RfeZ++;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301091-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301091-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BFEEB3046526
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:15:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E6237300D761
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504762BCF46;
-	Mon, 22 Jun 2026 12:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7E11F0E29;
+	Mon, 22 Jun 2026 12:20:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A24175A66
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 12:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E762E11D2
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 12:20:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782130526; cv=none; b=F6Oh2PPnqWrzbLVbuyxIJFB/Kbr2u7bimudVKdtCOy6X5YW+Ojo1mguG+54YiYMA6qZ518DgK5qPeCntSu5Jl4LlrFWdTj1bBjFw4PpA3LMFuao++onstfwIbj7u/2M+A7a54/JS7g+J81XSA4LL/uIeOymxade2P1wSJidd0uU=
+	t=1782130802; cv=none; b=Oyg6v85XVaMvoROoNlelsokoalzhC24SyZ6Cr8C/ehjKCHPgrkXM8pj4QSbQ3nD6thczXhN+tOCVFVSEZ5FRH6mmmbuy3MqEl7D0C05abjyLVwUi7AVcaFxihmbVPIBQpZIwQLsF0qMvXKCOLEDo0xcJigGY/wm2kzrmYmpnUSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782130526; c=relaxed/simple;
-	bh=WKpGS9JSJbK0ZzMQsOn+ipFHr1d2DVPDrp1OyoJaLwY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=C3an4KfJ+Xq7wkHs18K3BpxwBQ2u508ouFtExB0FR9FmcMeiMz0vIz7SMiNSqVdByNhbrbWF2hMduRCm8zxlv5Qik3UoEPcH1o5arGpeZJst8d3Hnyn5eb9aPldI3v1zjm5LnFjLQM6UDKfRjSrMZbHZD602MmCS/owp8Is6ylw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.206
-Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-486660d2abaso7104870b6e.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 05:15:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782130524; x=1782735324;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oNgP9SBR5rvPWzeZce32iGMVrc3C61O1viJd6KKeyOs=;
-        b=k689XcONv8x0M42lk9yAwp1rk4cWWQn4d2Hxsom8byxgeGoJowWMuJQ6EUj05zhA5D
-         RXMohSpKKSG4jAjSTQmVQlHxM2rooamBW6jZh2vDaZP/qKVLhw/ph4HTcq34w6F/wxcw
-         1OMDYB8Yyf88NJSjUEXqSfkE9txKzm9tcvdBcmupAuN+dfPnkhDnC5LuPzy/8+iH+Cfz
-         rjpsZeV+ULYWCdxM3KVzjyTNZ6qfna+n4uNfFTA/UCbUHh0W6biGNh95Hldc9Lc11SrQ
-         BfiGze+MppRPSFndUf2N7ekc0objJzhk7q57PKRLB2FroBY/ys6GJjQtx6m1N4ppvaME
-         J7xA==
-X-Forwarded-Encrypted: i=1; AFNElJ/B7mpBD6mpOpH1xyCGto60C4Eqhj7u8W1XNJInnlti7lvmAmXiYvWGY36Qs4ETFPMOVhkmqXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy24fl0E0SNnWRbQyqFffbYglEzc/OO9Wm0i/w3syEYFCw2A9mI
-	5kzktZid8wy9lWMfHUIMi0bmrsR43Ky+8UWs/HFTqLDq3bmYyUNWUm5OJ3TDl8CYNXaDts4M/EL
-	61kMxI9HP5vN3nLx+uc/7PQ/6fZU/zgLCy5K9cXwQGgvJqD9f3lhANyrdXVA=
+	s=arc-20240116; t=1782130802; c=relaxed/simple;
+	bh=0VevDQVTDaErw8iSWjbcNXbDaAtDjLJbzkmyX9pzlWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BB/XNhirzVEKBNjrQADv8TiprgrW0aMYrOqNS1yyhajkaVmaDFNTc5MpJvslnQe97O70lnDLxMcgf5G2yq3GJr/wnJ9pFqoK+L6FpqUw6a3W1O60O+l3L1g0zbmTfrfipl+hxsUktA3Y7zKjBdkF3H5j9vhD1NvpYwjwsqZc7BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jqoeueEF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=U3RfeZ++; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jqoeueEF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=U3RfeZ++; arc=none smtp.client-ip=195.135.223.131
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5146C758EB;
+	Mon, 22 Jun 2026 12:19:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1782130799; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ohf9ubqdDTE4+SiZNzzPsJ/5S73zeXWMQQIAR1OJgU=;
+	b=jqoeueEFaWbTzRfb/VpkWvTyS9AMGVQpoJtOJiQvOrwpLflflMZcJfHGXLGo2aLVdkR8tD
+	+VotYY6YdcAXHQPny+fEhVLrgoMMcOEPB09GxumhZ3MFPZUPN527vIJLY9JvP+qgV9hRbG
+	7eP9vbw7nJWWyMkv2yjH71SsMhlfDcY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1782130799;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ohf9ubqdDTE4+SiZNzzPsJ/5S73zeXWMQQIAR1OJgU=;
+	b=U3RfeZ++6Ix1706n6ETN1Z6qkYiiyWtTwmBcWh+G1Sm6+An5sp0NOK6ywxk1+aZ+xtqN9L
+	Dkf6Wn2tBr8OJJAg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1782130799; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ohf9ubqdDTE4+SiZNzzPsJ/5S73zeXWMQQIAR1OJgU=;
+	b=jqoeueEFaWbTzRfb/VpkWvTyS9AMGVQpoJtOJiQvOrwpLflflMZcJfHGXLGo2aLVdkR8tD
+	+VotYY6YdcAXHQPny+fEhVLrgoMMcOEPB09GxumhZ3MFPZUPN527vIJLY9JvP+qgV9hRbG
+	7eP9vbw7nJWWyMkv2yjH71SsMhlfDcY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1782130799;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ohf9ubqdDTE4+SiZNzzPsJ/5S73zeXWMQQIAR1OJgU=;
+	b=U3RfeZ++6Ix1706n6ETN1Z6qkYiiyWtTwmBcWh+G1Sm6+An5sp0NOK6ywxk1+aZ+xtqN9L
+	Dkf6Wn2tBr8OJJAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A17DE779A8;
+	Mon, 22 Jun 2026 12:19:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id F1JPJG4oOWpyXwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 22 Jun 2026 12:19:58 +0000
+Message-ID: <05b42695-82a8-45c4-8f99-074a9767ceb5@suse.de>
+Date: Mon, 22 Jun 2026 14:19:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:bd3:b0:487:4d3f:7364 with SMTP id
- 5614622812f47-4896a79e01dmr12059027b6e.0.1782130523702; Mon, 22 Jun 2026
- 05:15:23 -0700 (PDT)
-Date: Mon, 22 Jun 2026 05:15:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a39275b.5031c61f.34f2da.0002.GAE@google.com>
-Subject: [syzbot] [wireless?] divide error in mac80211_hwsim_write_tsf
-From: syzbot <syzbot+21629c14aa749636db9d@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 7/7] ipv6: reset position for force_forwarding
+ sysctl restart
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, nicolas.dichtel@6wind.com,
+ stephen@networkplumber.org, brian.haley@hp.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, dsahern@kernel.org
+References: <20260620161850.7114-1-fmancera@suse.de>
+ <20260620161850.7114-8-fmancera@suse.de> <20260622114223.GA233619@shredder>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260622114223.GA233619@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.51
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=8deb4438448ed47a];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301089-lists,netdev=lfdr.de,21629c14aa749636db9d];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,goo.gl:url,storage.googleapis.com:url,vger.kernel.org:from_smtp,appspotmail.com:email,syzkaller.appspot.com:url,googlegroups.com:email];
-	FORGED_RECIPIENTS(0.00)[m:johannes@sipsolutions.net,m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301091-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:nicolas.dichtel@6wind.com,m:stephen@networkplumber.org,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DA1E06AF5F9
+X-Rspamd-Queue-Id: 7DF446AF63B
 
-Hello,
+On 6/22/26 1:42 PM, Ido Schimmel wrote:
+> On Sat, Jun 20, 2026 at 06:18:50PM +0200, Fernando Fernandez Mancera wrote:
+>> When handling proxy_ndp, if rtnl_net_trylock() fails, the operation is
+> 
+> s/proxy_ndp/force_forwarding/
+> 
+>> retried but the position pointer was already advanced meaning that the
+>> restarted sysctl will read from an incorrect offset.
+>>
+>> Fix this by restoring the original position pointer before restarting
+>> the syscall.
+>>
+>> In addition, remove the redundant position pointer restoration at the
+>> end of the function.
+>>
+>> Fixes: f24987ef6959 ("ipv6: add `force_forwarding` sysctl to enable per-interface forwarding")
+>> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+>> ---
+>>   net/ipv6/addrconf.c | 6 +++---
+>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+>> index cbe681de3818..8c0741e9dfcc 100644
+>> --- a/net/ipv6/addrconf.c
+>> +++ b/net/ipv6/addrconf.c
+>> @@ -6825,8 +6825,10 @@ static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int wri
+>>   	ret = proc_douintvec_minmax(&tmp_ctl, write, buffer, lenp, ppos);
+>>   
+>>   	if (write && old_val != new_val) {
+>> -		if (!rtnl_net_trylock(net))
+>> +		if (!rtnl_net_trylock(net)) {
+>> +			*ppos = pos;
+>>   			return restart_syscall();
+>> +		}
+> 
+> Are you sure that this is needed?
+> 
+> AFAICT, the position pointer is only advanced if the return value is
+> positive. From new_sync_write():
+> 
+> kiocb.ki_pos = (ppos ? *ppos : 0);
+> [...]
+> ret = filp->f_op->write_iter(&kiocb, &iter);
+> [...]
+> if (ret > 0 && ppos)
+>          *ppos = kiocb.ki_pos;
+> 
+> And restart_syscall() returns '-ERESTARTNOINTR'.
+> 
 
-syzbot found the following issue on:
+Hm, I think you are right. I was not aware of this check, thanks for 
+pointing it out. That means we can get rid of position pointer reset 
+from the rest of the code.. the are plenty of sysctl following this 
+pattern. I will prepare a batch for net-next.
 
-HEAD commit:    83f1454877cc Merge tag 'ext4_for_linus-7.2-rc1' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17956aae580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8deb4438448ed47a
-dashboard link: https://syzkaller.appspot.com/bug?extid=21629c14aa749636db9d
-compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+I am sending a v3 dropping this patch.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thank you Ido!
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-83f14548.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/06b66919e887/vmlinux-83f14548.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3dedd791b7cd/bzImage-83f14548.xz
+>>   
+>>   		WRITE_ONCE(*valp, new_val);
+>>   
+>> @@ -6851,8 +6853,6 @@ static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int wri
+>>   		rtnl_net_unlock(net);
+>>   	}
+>>   
+>> -	if (ret)
+>> -		*ppos = pos;
+>>   	return ret;
+>>   }
+>>   
+>> -- 
+>> 2.54.0
+>>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+21629c14aa749636db9d@syzkaller.appspotmail.com
-
-Oops: divide error: 0000 [#1] SMP KASAN NOPTI
-CPU: 0 UID: 0 PID: 5321 Comm: syz.0.0 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:mac80211_hwsim_write_tsf+0x3a3/0x590 drivers/net/wireless/virtual/mac80211_hwsim_main.c:1628
-Code: 81 c4 e8 49 00 00 4c 89 e0 48 c1 e8 03 42 80 3c 30 00 74 08 4c 89 e7 e8 1b bb 22 fb 48 8b 34 24 41 03 34 24 66 b8 20 03 31 d2 <66> f7 f5 0f b7 d8 4d 8d 65 0a 49 83 c5 0d 4c 89 e0 48 c1 e8 03 42
-RSP: 0018:ffffc900037aedf0 EFLAGS: 00010246
-RAX: 1ffff110080a0320 RBX: 000000000000001c RCX: 0000000000100000
-RDX: 0000000000000000 RSI: 0000000005e6b00c RDI: 0000000000000230
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff520006f5dac R12: ffff888040547c08
-R13: ffff88803d7fadda R14: dffffc0000000000 R15: 0000000000000020
-FS:  00007f2f6aff66c0(0000) GS:ffff88808c852000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002280 CR3: 0000000013282000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- mac80211_hwsim_tx_frame_no_nl+0x16b/0x1760 drivers/net/wireless/virtual/mac80211_hwsim_main.c:1902
- mac80211_hwsim_tx+0x1784/0x2500 drivers/net/wireless/virtual/mac80211_hwsim_main.c:2261
- drv_tx net/mac80211/driver-ops.h:38 [inline]
- ieee80211_tx_frags+0x3df/0x890 net/mac80211/tx.c:1746
- __ieee80211_tx+0x267/0x580 net/mac80211/tx.c:1801
- ieee80211_tx+0x312/0x4b0 net/mac80211/tx.c:1984
- ieee80211_monitor_start_xmit+0xb33/0x1280 net/mac80211/tx.c:2479
- __netdev_start_xmit include/linux/netdevice.h:5387 [inline]
- netdev_start_xmit include/linux/netdevice.h:5396 [inline]
- xmit_one net/core/dev.c:3889 [inline]
- dev_hard_start_xmit+0x2cd/0x830 net/core/dev.c:3905
- __dev_queue_xmit+0x1435/0x37f0 net/core/dev.c:4872
- packet_snd net/packet/af_packet.c:3082 [inline]
- packet_sendmsg+0x3d95/0x5040 net/packet/af_packet.c:3114
- sock_sendmsg_nosec net/socket.c:775 [inline]
- __sock_sendmsg net/socket.c:790 [inline]
- __sys_sendto+0x626/0x6c0 net/socket.c:2252
- __do_sys_sendto net/socket.c:2259 [inline]
- __se_sys_sendto net/socket.c:2255 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2255
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f2f6a19ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f2f6aff5fe8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f2f6a415fa0 RCX: 00007f2f6a19ce59
-RDX: 0000000000000026 RSI: 0000200000000640 RDI: 0000000000000007
-RBP: 00007f2f6a232e6f R08: 0000200000000380 R09: 0000000000000014
-R10: 0000000004000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f2f6a416038 R14: 00007f2f6a415fa0 R15: 00007ffff9cddab8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:mac80211_hwsim_write_tsf+0x3a3/0x590 drivers/net/wireless/virtual/mac80211_hwsim_main.c:1628
-Code: 81 c4 e8 49 00 00 4c 89 e0 48 c1 e8 03 42 80 3c 30 00 74 08 4c 89 e7 e8 1b bb 22 fb 48 8b 34 24 41 03 34 24 66 b8 20 03 31 d2 <66> f7 f5 0f b7 d8 4d 8d 65 0a 49 83 c5 0d 4c 89 e0 48 c1 e8 03 42
-RSP: 0018:ffffc900037aedf0 EFLAGS: 00010246
-RAX: 1ffff110080a0320 RBX: 000000000000001c RCX: 0000000000100000
-RDX: 0000000000000000 RSI: 0000000005e6b00c RDI: 0000000000000230
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff520006f5dac R12: ffff888040547c08
-R13: ffff88803d7fadda R14: dffffc0000000000 R15: 0000000000000020
-FS:  00007f2f6aff66c0(0000) GS:ffff88808c852000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002280 CR3: 0000000013282000 CR4: 0000000000352ef0
-----------------
-Code disassembly (best guess):
-   0:	81 c4 e8 49 00 00    	add    $0x49e8,%esp
-   6:	4c 89 e0             	mov    %r12,%rax
-   9:	48 c1 e8 03          	shr    $0x3,%rax
-   d:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1)
-  12:	74 08                	je     0x1c
-  14:	4c 89 e7             	mov    %r12,%rdi
-  17:	e8 1b bb 22 fb       	call   0xfb22bb37
-  1c:	48 8b 34 24          	mov    (%rsp),%rsi
-  20:	41 03 34 24          	add    (%r12),%esi
-  24:	66 b8 20 03          	mov    $0x320,%ax
-  28:	31 d2                	xor    %edx,%edx
-* 2a:	66 f7 f5             	div    %bp <-- trapping instruction
-  2d:	0f b7 d8             	movzwl %ax,%ebx
-  30:	4d 8d 65 0a          	lea    0xa(%r13),%r12
-  34:	49 83 c5 0d          	add    $0xd,%r13
-  38:	4c 89 e0             	mov    %r12,%rax
-  3b:	48 c1 e8 03          	shr    $0x3,%rax
-  3f:	42                   	rex.X
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
