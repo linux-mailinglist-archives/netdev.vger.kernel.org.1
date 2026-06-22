@@ -1,162 +1,317 @@
-Return-Path: <netdev+bounces-301180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JGLKKEF2OWqhtgcAu9opvQ
-	(envelope-from <netdev+bounces-301180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:52:01 +0200
+	id MMNHOd92OWr4tgcAu9opvQ
+	(envelope-from <netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:54:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D306B19D4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:52:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE0D6B1A11
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:54:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=bjPgB5lx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301180-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301180-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=c127.dev header.s=resend header.b=rnwijDLv;
+	dkim=pass header.d=amazonses.com header.s=224i4yxa5dv7c2xz3womw6peuasteono header.b=pd80Oacw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301181-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 739163019B92
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:51:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69212303F2B0
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E9BC342C80;
-	Mon, 22 Jun 2026 17:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6B3343885;
+	Mon, 22 Jun 2026 17:53:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from a10-132.smtp-out.amazonses.com (a10-132.smtp-out.amazonses.com [54.240.10.132])
+	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4482C8EB;
-	Mon, 22 Jun 2026 17:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8CD221FB6;
+	Mon, 22 Jun 2026 17:53:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782150712; cv=none; b=WP0PjSq2lzHBUPj2ijkeoU7myXDQoRjPN3Y/YqDJwHoMQX1EGqdF18VJeIlXsFjFZyAfyMA7DvmodR4Bxktz6yEXGnBQZzg9KgI7yxPxLy15CpfHffEtyNoglgXhNfgErztPZw9+zJNex737KWojfKh3fxFAn7FC8GXdbP6I2PU=
+	t=1782150811; cv=none; b=Q39z1K6TruDOE5MZqR3jukr6Sk7MoI4CnDzFZFPz0Q4B5V5GOIj0SfhMsYlhuZURY7+4Xv/xqZ9r+KaL2l0lYLoY/OzUYQIT7HunPaDiNE948901hs4bjO477rl3JkcOdDwVoFZjiiW5DtPRuqErP4BuseCIq/2aziqOBabwRFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782150712; c=relaxed/simple;
-	bh=/c4S6PZa53h4GR1K7aD8CQ0ligLDORnOPwMEi663BtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=tAufJPNBTtsMeSq6yiBaufAP3OynZbWmGSfEb63JxYCD7XnhvgUlhzNqzCUU2qBDn4N6VAAPlIBct7jBK+5wUecY3ZDlnmyAt4xsZElS/DN6GvjxiCMpFEOteZZ7QOA0KBgdwRNLUAVQ8X7FDrlODxxIt/IVOtsMZFnloPbBCa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bjPgB5lx; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 20BD11A07C5;
-	Mon, 22 Jun 2026 17:51:48 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D1B1A601BB;
-	Mon, 22 Jun 2026 17:51:47 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 88B5D106C89C5;
-	Mon, 22 Jun 2026 19:51:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782150706; h=from:subject:date:message-id:to:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=S5YU1ek1hKhtc/CewB+hEaa4quwElWgeX+xAF+JI5qg=;
-	b=bjPgB5lx1B2g1DC1fdAc26ERdrpILHyBKZ/vz7hWq4rjx81UACjgdxgnp4MysBAJiBXDKC
-	UWEpN8G1MT1EZWyQnSKIiA8giPvjQETsoZ0kzs9XdnW4csn9Ai6mnx4dPZKwjsG5RVi16v
-	6OtbV3S6hxkz+gnmaMp3cILta5hbTOjFwklOhRM4OuUC9ohDnF7V6Kns4nE0hxeWo1c1Mk
-	0D1uQbn+zWUo1YUYx6PeAKLsECC78QYEFQbO33F1jpFgq+iptY48QaC25FM7Q5uLg6w2RZ
-	+UAmmDl3pVd60pM35c+JFMS6ZmIR8lwAovj/4EPiaWFzZBrLoaiV1oWFmDSVsg==
-Message-ID: <b375d36c-112e-4662-b538-fd10fa927ecc@bootlin.com>
-Date: Mon, 22 Jun 2026 19:51:39 +0200
+	s=arc-20240116; t=1782150811; c=relaxed/simple;
+	bh=q0erdvXJ/SvDcWyTPwCHeC1TObRF5J4+xgcG7pWtgPw=;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Date:MIME-Version:
+	 Content-Type; b=uSKI4Ii3FtUMdxb96TD6aIc5tUGtqhVUiD12hTo3IOVC+hC7uwjX74p03RoqOZ9ZUQKnbbZR3Qk+EOLx8dxKBhj9MUCMXbo3pEzba6AgCtkJhzXQjNg9VIHLcuYgcmke1X0fY9TCJ1F1PFTT9VZniI1POpqxSJxBKi3FMMnzlCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=send.c127.dev; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=rnwijDLv; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=pd80Oacw; arc=none smtp.client-ip=54.240.10.132
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple; s=resend;
+	d=c127.dev; t=1782150808;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type;
+	bh=q0erdvXJ/SvDcWyTPwCHeC1TObRF5J4+xgcG7pWtgPw=;
+	b=rnwijDLvCZNPra8SpDtuqxZK8Z6B+CL0AqvHYKOwwgSvXkkgVpEwO9aZ5laIB165
+	OiOLp4ABHl6mEB+kg/Tpw++iTAqRTnLlRAv26FMGkD6iGpZSY1XfpCmzcTYn7jJKEAE
+	+W+lgN4f9Q6mRANQEAPM6AX39d7W3u/pjNersnsU=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1782150808;
+	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type:Feedback-ID;
+	bh=q0erdvXJ/SvDcWyTPwCHeC1TObRF5J4+xgcG7pWtgPw=;
+	b=pd80OacweoLqeeuGsJBHUBKI72srhnD3EwOtz7R+we/inBBL/r9XiFjR+0hZDj0p
+	1S6R4ys5eFLitwAEIi+3JXJNLERFDgz7+P+Em+JSX5Sd9qmIhRug6KNIBPtQ5HDydGS
+	kaOBUZCrgw0Bwa2tWQR7+0dX1P1aG/AMCruA20uU=
+In-Reply-To:
+ <CAJq09z4cVBuRUMyCt8NopNePmjbcj=ycvq95gSXgh581kk4zDw@mail.gmail.com>
+From: Johan Alvarado <contact@c127.dev>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linusw@kernel.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux@armlinux.org.uk, maxime.chevallier@bootlin.com, 
+	namiltd@yahoo.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] net: dsa: realtek: rtl8365mb: add
+ SGMII support for RTL8367S
+Message-ID: <0100019ef0774191-97f957d1-76b2-427b-8a7a-24ae055f3ce0-000000@email.amazonses.com>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 22 Jun 2026 17:53:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: fix missed le32_to_cpu()
-To: Ben Dooks <ben.dooks@codethink.co.uk>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20260622143707.497198-1-ben.dooks@codethink.co.uk>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260622143707.497198-1-ben.dooks@codethink.co.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Feedback-ID: :1.us-east-1.z4rHY0qbNtjoW80ZyzVy+DEul17RQEOMT7FC66S60ffkhLWkV35D8ZWXVyxJY1/89bAuLCem4GFJq1VXsxM0u6ZfZbvT1qSjDUeuZG9/Lxk1uINIqi7CenEa93u+fNllqnJMZ0quaBrclhnmtzdFllG4KHSjZOEcaGLa1BWoSpA=:1.us-east-1.epbACCJLarUaEI78XZoGREJ9LamRjxMH5pM2kZb64rA=:AmazonSES
+X-SES-Outgoing: 2026.06.22-54.240.10.132
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[c127.dev:s=resend,amazonses.com:s=224i4yxa5dv7c2xz3womw6peuasteono];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_NA(0.00)[c127.dev];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:namiltd@yahoo.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301180-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:ben.dooks@codethink.co.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_TO(0.00)[codethink.co.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301181-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[c127.dev:+,amazonses.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,bootlin.com,yahoo.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[212.83.136.155:received,100.90.174.1:received,185.246.84.56:received,212.83.139.233:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,codethink.co.uk:email,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,email.amazonses.com:mid,c127.dev:dkim,c127.dev:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amazonses.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01D306B19D4
+X-Rspamd-Queue-Id: 3BE0D6B1A11
 
-Hi Ben,
+Hi Luiz,
 
-On 6/22/26 16:37, Ben Dooks wrote:
-> The print in ndesc_display_ring() sends the des2 and des3
-> to the pr_info() without passing them through the relevant
-> conversion to cpu order.
-> 
-> Fix the (prototype) sparse warnings by using le32_to_cpu():
-> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorrect type in argument 6 (different base types)
-> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected unsigned int
-> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restricted __le32 [usertype] des2
-> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorrect type in argument 7 (different base types)
-> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected unsigned int
-> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restricted __le32 [usertype] des3
-> 
-> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+Sorry for the slow reply =E2=80=94 I wanted to test the changes =
+on hardware
+before answering rather than reply blind. I'm also adding the =
+list
+back to CC, since this is review of an on-list patch and the
+discussion is useful for the archive; hope that's OK.
 
-I agree on the principle, but this isn't a fix so this'll have to wait
-until net-next re-opens :)
+Thanks for the very thorough review. Almost everything is addressed in
+v4, which I'll post once net-next reopens. Replies inline.
 
-Thanks,
+> You might want to omit any specific model as there are multiple
+> possible supported models that have SGMII. Just use "only the RGMII
+> and SGMII interface...". Determining which device supports what is a
+> job for chip_info.
 
-Maxime
+Done =E2=80=94 the NOTE comment no longer names a =
+model, it just lists the
+implemented interfaces.
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/norm_desc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/norm_desc.c b/drivers/net/ethernet/stmicro/stmmac/norm_desc.c
-> index c4b613564f87..74c9b7b1fe8f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/norm_desc.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/norm_desc.c
-> @@ -258,7 +258,7 @@ static void ndesc_display_ring(void *head, unsigned int size, bool rx,
->  		pr_info("%03d [%pad]: 0x%x 0x%x 0x%x 0x%x",
->  			i, &dma_addr,
->  			(unsigned int)x, (unsigned int)(x >> 32),
-> -			p->des2, p->des3);
-> +			le32_to_cpu(p->des2), le32_to_cpu(p->des3));
->  		p++;
->  	}
->  	pr_info("\n");
+> > +#define   =
+RTL8365MB_SDS_INDACS_CMD_INDEX_MASK  0x0007
+>
+> Isn't this MASK larger? I =
+was expecting 0x003F.
+>
+> Please use GENMASK/BIT whenever possible. It =
+makes it clearer when
+> there are holes or overlaps in the reg.
+> Once a register macro is added with a bunch of bits described, I think
+> it is better to describe all bits we can, even if not in use in this
+> driver. Realtek normally maps bits sequentially and, with GENMASK/BIT,
+> it is visually easier to spot errors.
 
+The CMD index field is gone in v4:=
+ I dropped the always-zero SerDes
+index argument, so that mask was removed =
+with it.
+
+On GENMASK/BIT and documenting all bits: agreed in principle, but=
+ the
+driver currently uses raw hex masks almost everywhere (~75 raw _MASK
+defines vs ~22 BIT/GENMASK), so converting only the new SDS defines
+would make the file more inconsistent rather than less. Options as I
+see them: (1) convert just the new defines, (2) keep raw hex to match
+the surrounding style, or (3) a separate file-wide cleanup patch on
+top of this series. I'd lean towards 3, keeping this series focused on
+the feature and doing the style modernization as its own patch, but
+I'm happy to do 1 if you'd rather the new code lead by example. Same
+question for documenting currently-unused bits. Which would you prefer?
+
+> > +#define RTL8365MB_SDS_INDACS_ADR_REG           0x6601
+>
+> This reg is formed by two parts but, in this case, it might be
+> pedantic to add the descriptions as well.
+> PAGE_MASK    0x7E0
+> REGAD_MASK    0x1F
+
+Noted. Since the addresses are passed as whole values=
+ and the page/reg
+split isn't used in the driver, I've left it as a single =
+address for
+now, but I can add the sub-field masks if you'd prefer them =
+documented.
+
+> > +#define   RTL8365MB_SDS_BMCR_DPRST_PHASE1      0x1401
+> > +#define   RTL8365MB_SDS_BMCR_DPRST_PHASE2      0x1403
+>
+> I do not like magic numbers. You could do the BMCR_ANENABLE |
+> BMCR_ISOLATE in the macro or code instead of just keeping it in a
+> comment. It would give more semantics to the code.
+
+Done =E2=80=94 the phase values are now built from the standard bits:
+
+  #define RTL8365MB_SDS_BMCR_DPRST_PHASE1 (BMCR_ANENABLE | BMCR_ISOLATE | =
+0x1)
+  #define RTL8365MB_SDS_BMCR_DPRST_PHASE2 (BMCR_ANENABLE | =
+BMCR_ISOLATE | 0x3)
+
+> > +static const struct rtl8365mb_jam_tbl_entry =
+rtl8365mb_sds_jam_sgmii[] =3D {
+>
+> I guess you got this from vendor's =
+redData. However, that sequence is
+> for the case when =
+RTL8365MB_CHIP_OPTION_REG(0x13C1) =3D=3D 0. In my tests,
+> rtl8367s returns 1 for that reg, which would select the redDataSB
+> variant in the vendor's code. Did you test both or check register
+> 0x13C1 [...] HSGMII also has a similar test in vendor's code.
+
+Good catch. I checked 0x13C1 on the MR80X (with the magic
+unlock/relock via 0x13C0): it reads option =3D 1, so the committed
+tables are already the SB/HB variants. For SGMII the only difference
+between redData and redDataSB is reg 0x482 (0x21A2 for option 0 vs
+0x2420 for option 1), and my table has 0x2420; the HSGMII table
+matches redDataHB likewise. I captured the full vendor write sequence
+on hardware by chainloading a patched U-Boot, so both tables are
+confirmed against the live silicon.
+
+v4 reads 0x13C1 at runtime and returns=
+ -EOPNOTSUPP for the option-0
+variant rather than driving the SerDes with =
+values I cannot verify on
+available hardware.
+
+> > +       if (extint->id !=
+=3D 1)
+> > +               return -EOPNOTSUPP;
+>
+> The model RTL8370MB is =
+also a member of RTL8367C [...] Can't you just
+> check extint =
+supported_interfaces? [...] This type of hardcoded
+> assumption just makes =
+the job harder.
+
+In v4 this hardcoded check is gone. With the phylink_pcs =
+conversion
+(see below), the SerDes is gated through supported_interfaces in
+get_caps() and mac_select_pcs(), so whether a port uses the SerDes is
+driven by chip_info rather than a hardcoded id.
+
+> > +       ret =3D =
+regmap_update_bits(priv->map, RTL8365MB_BYPASS_LINE_RATE_REG,
+> > +                                BIT(extint->id), 0);
+>
+> BYPASS_LINE_RATE is actually indexed by port number starting at 5
+> [...] Describe [it] with a parametric macro, receiving the port number
+> and returning the BIT(5-port) as mask [...] For RTL8367R [...] it uses
+> bit 0 for int 1 and bit 1 for int 0 or 2.
+
+Done =E2=80=94 it's now a =
+parametric macro:
+
+  #define RTL8365MB_BYPASS_LINE_RATE_MASK(_port)  =
+BIT((_port) - 5)
+
+with a comment noting port 5 is the base and that other =
+families (e.g.
+the RTL8367R's (id + 1) % 2) index it differently, so this =
+mapping
+only holds for the RTL8367C-style parts the driver supports. One =
+small
+thing: your mail had BIT(5 - port), which inverts it (port 6 would be
+BIT(-1)); I used BIT(port - 5) so port 5 maps to bit 0 =E2=80=94 let me =
+know if
+you meant something different.
+
+> > +       usleep_range(10, 50);
+>
+> An arbitrary wait is not ideal but Mieczyslaw already suggested a
+> better solution.
+
+Done =E2=80=94 the usleep is gone. Writes are =
+fire-and-forget and reads poll
+the self-clearing BUSY bit with =
+regmap_read_poll_timeout(), matching
+the vendor's getAsicSdsReg. I =
+instrumented it on the MR80X: the BUSY
+bit is never even observed set (the =
+access completes within the
+register transaction over MDIO), so no sleep is=
+ needed.
+
+> > +       ret =3D regmap_update_bits(
+> > +               =
+priv->map, RTL8365MB_DIGITAL_INTERFACE_SELECT_REG(extint->id),
+> > +               [...]
+>
+> Sometimes it is just easier to use a temp =
+variable instead of fighting
+> with the 80-col limit.
+
+Done, the mode value goes into a temporary now.
+
+> The lack of test devices=
+ is holding me back from making further
+> improvements. [...] I think that,=
+ with some limitations, the rtl8365mb
+> driver [...] could support the full=
+ range from RTL8370/RTL8367 up to
+> RTL8367D.
+
+Makes sense, and I tried to =
+keep v4 from baking in RTL8367S-specific
+assumptions where I could (the =
+SerDes gating and the bypass macro
+above). I can only test on the MR80X =
+(RTL8367S) myself, so I've kept
+the scope to what I can verify, but I'm =
+happy to keep the code friendly
+to that wider range.
+
+One more thing from the wider discussion: following Maxime's review I
+converted the whole SerDes path to a phylink_pcs in v4, so the SerDes
+handling now lives in pcs_config()/pcs_get_state()/pcs_link_up() rather
+than the ext/sds split in mac_link_up/down you saw in v3. pcs_get_state()
+now reads the real SerDes link status (reg 0x3d) instead of reporting
+the forced value.
+
+Thanks again =E2=80=94 this review made the series =
+substantially better.
+
+Best regards,
+Johan
 
