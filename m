@@ -1,263 +1,181 @@
-Return-Path: <netdev+bounces-301149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zFLkHFlWOWozqwcAu9opvQ
-	(envelope-from <netdev+bounces-301149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:35:53 +0200
+	id IcvmKaFXOWpyqwcAu9opvQ
+	(envelope-from <netdev+bounces-301150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:41:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C76B16B0C7F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:35:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18F66B0D0A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:41:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=jCQ2EFzm;
-	dkim=pass header.d=redhat.com header.s=google header.b=H3iWbVwP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301149-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301149-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=uJEoGpgz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301150-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301150-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E55730053FB
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:30:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 775D73073724
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5DA2FBE1F;
-	Mon, 22 Jun 2026 15:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2945E3C0A12;
+	Mon, 22 Jun 2026 15:36:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011032.outbound.protection.outlook.com [52.101.52.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21E81F151C
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 15:30:46 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782142248; cv=none; b=IFBnqCXrk0IS+AnzOe7UgOim7PMnA6YbtPZIK2xYHxv5lymQOd8uFR04ok85/0UQqiwS1+ixOawH4DrCDRA94z1Zzd2MnbonmhDMpH7qkZFWP8+w8i/srMLSecOBjrTuyPz7R/6xLsMABH2zUrxoZywoMeH0nMl+OvZRfEFVX+0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782142248; c=relaxed/simple;
-	bh=KZReCBBbLPwYuR8X8Oxf6kb/nsr8OJG1g9lSh2phYz4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NbbpO6RBd1Bh92/LDGiuQHfo6CkOJEJLk/rjwiME4qUwcfKLYMZVMF08VJkAeQ8tCTw9wkU+1mcvMsLral9MxcgcDmm0QJTBKgVw+ZON5x2s2A7HgxFiHpHjnQvm5LA3Tjm/Ax6G92d31zLNZyFJNLsz0CeLXcn1j79TnpaYqj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jCQ2EFzm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=H3iWbVwP; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782142245;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+BSJeeMyYcuKSEwdVpAPNISat771zywrHCdgKCUDl20=;
-	b=jCQ2EFzmkTSxTxgVYo0ZCcM0whFhhSqve2wOU8S+Mw0wSFZGjOXGoBjU9MVRHg/LNdJ8BK
-	PSHi87wDJODwZoFLEotCBik8SqZgHuLcKnHaKT+LGt0PSS5KZx6IrGn7t1urDNzIpMeGHY
-	c/z2szlR2WCF+b+No73stpIvXS713Rg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-319-z-PS_4fRPjmcpXV87ZScnQ-1; Mon, 22 Jun 2026 11:30:44 -0400
-X-MC-Unique: z-PS_4fRPjmcpXV87ZScnQ-1
-X-Mimecast-MFC-AGG-ID: z-PS_4fRPjmcpXV87ZScnQ_1782142242
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-469675e37e8so582496f8f.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 08:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782142242; x=1782747042; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+BSJeeMyYcuKSEwdVpAPNISat771zywrHCdgKCUDl20=;
-        b=H3iWbVwP8NhD6QKyalB3SqU0kqhzzOB5aD/M1xTdfCAOBJ/5yTSSVnNeLPDj31cU0Q
-         /9JLbA5ByTQagNA9yst0dp4MqPWjJxaquNUPE6JfLt3+9grwS2LJ5JZ29duUgvMydmBM
-         332+hvSnn+jX1sd3p0tGdBsC+M2ND+/0k/wT4q7xnecLmEo25mLf29wkvVASAN4s1rOu
-         ocRyy0KmJYJdj5HD6rxS2jpl9ij7MF85PGHGqKXP1Dx/T2zzKfPZ7fIxu+Oh2TTVrMJZ
-         s7BM40SRnmi91J1LsPeVbIMrt1SmLiIN7myy+auoIayTC4mb+piW/Zva5IUgSaZZthPv
-         Il4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782142242; x=1782747042;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+BSJeeMyYcuKSEwdVpAPNISat771zywrHCdgKCUDl20=;
-        b=Xi0FFaFYbMlTJQ0P+OOQOPpe2D/ItNjuuoZ+SMTB7PEEYwIUmGvuD3vQlhGmqVBxIx
-         nrk7FXqNBcUBwOI5u29nV/bflgJeWClW3I/SqoInejP6dI41Oxpp+T4dSJ/BJffKQ04s
-         Q8QqLIrMdF672MYW7cvPm7YsorNbDWRk+v/YLUJRro4taeuDhk1SkxKvymT9pzPvgX1Z
-         RTPlvJLYx0w5vO79rhnwPLIKeb1sTXVxzA965O3DG5oAIc/Stna3t00er+sP3LGZ/HEH
-         /vgycyXWC1Xsp4RbRRH4i2+84i0dTjF+Z26fOsGeXKO2ORjtjgJnC3R4S26vIo3Mjujd
-         mSPw==
-X-Forwarded-Encrypted: i=1; AHgh+Rpod/30hnmNiW3VgCcpCBTOiXUbykupQObk8WXyByGDqPJQh5+h76rRWg+ggNS6vrBnyjTWjw4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU6UbGS3Z2Bk8tio/CXeIzZVqQezMvHSZlYnCbJSRqMb/8mlQY
-	eax0dpNZJTltEyNHL+HV6KC4z8WKd0/hZb3IOtbKSlEAXQydmrv+Vn+o0WhmZVI0wX34R/eKn/Q
-	fr0B7hC96psCfOvNjFYRZdvTVk/niXYPafqae8BMMtP1zRq1brvqk4Y5Aow==
-X-Gm-Gg: AfdE7cnx++cGV89Ui/Pr7VQrEg4xxTiPJsEvpMi9zjJuAy8OPfi2m3S+wBBqawSN8rg
-	d6f586nEcoZgleWIVcJ5FTA6+dOsVx1IcWjDXkJrQ+XrMZMHB/I5UMpgQ08/U8ld9WVrMe2P20o
-	3UOAZCKLemHuxMD3U8bkLVAJ8zajToCV1ElN3zILjNlcFuWHIhA/3WB09vEsLs/jWIt00LObZwx
-	hfD9ItjkaE31FtFWzuSU6sn0tGiEQgQ+gJpNjiV4Rj75dg5F4yLoe3bLT+muERIyXr5rQCV3VFH
-	oXhSqm3B1RD41lfji1S6wF50uBce19gyAoakaAmG65k6TImYOviyuRnF3Osc7fODsHGwgHgkKF6
-	BUYIOcEXDaQ==
-X-Received: by 2002:a05:6000:4918:b0:469:763f:942d with SMTP id ffacd0b85a97d-469763f96e8mr5560537f8f.5.1782142241996;
-        Mon, 22 Jun 2026 08:30:41 -0700 (PDT)
-X-Received: by 2002:a05:6000:4918:b0:469:763f:942d with SMTP id ffacd0b85a97d-469763f96e8mr5560420f8f.5.1782142241255;
-        Mon, 22 Jun 2026 08:30:41 -0700 (PDT)
-Received: from [192.168.2.83] ([46.175.183.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46666c57afasm27778756f8f.29.2026.06.22.08.30.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jun 2026 08:30:40 -0700 (PDT)
-Message-ID: <e85d04b5-9108-4a5a-85e7-81178b6ef679@redhat.com>
-Date: Mon, 22 Jun 2026 17:30:37 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D713C0626
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 15:35:58 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782142560; cv=fail; b=YVFzj+6mePHG0edTKtf5hijISoR+kyuISqIfJbBtE5gy9bDTtQ1BJJAArlSxjCoBZCIsZJSReFmAvobB5iDeQ55pgwZuanBMDkTyoMe10V0ehvrk+C7E6PbCwFkEWop9/eXMEgO0bdw/MGe003FPcyTplT8UNkFKRii5ZgLdZno=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782142560; c=relaxed/simple;
+	bh=Nu7spyszUeH1o0cIR0hEujtfZpzM2RKzhQ2qMYicNHI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=pZMWIHDL3E9UW+oG2mrpW6pjx/2Cc4XKc2AQp0Wzp9y3eBb2+MS7omoZmNlfkTleliQFIIZlLgXj3pdVhTIUQPJoaNh8SRH+ANtqCPhjpcztB7iYWgYx+7C6RW6ioJ7qg6SF0iNJ2rxZsKIfLKen6Hx3FCZuT0+ZuRdVxYAJ15E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uJEoGpgz; arc=fail smtp.client-ip=52.101.52.32
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CVJyV6c9XXeCvFqnTsmaOmt5dgav1G2xC2q5CiG6izaIAy95+mglusw61KZ4SPumUhBeLqWksSCmHNVU+JP3z25AGQbnqffwUXrNj8hqfuXMxvvQo5D5/2Zisl0hWOyWTICqobQAbe2TnzTRonk9IIV61H6yJ1SnYPz7Ms8bgA9x/dv8cnF7iovOrU4EzbY5Qsk3dwbbvNw0x7vn2z1zxvkvy/bcMxPDkjSYqNURVFfXxDGHwAIvDa1TKWDl2QzTn6n0zun8EdZPg75NrUMNhhN1vW02wNGnCESmeGRN/FYoNZVicRJQoNjSdAaZfPe1yH2ireESYrkwnWz5uMtLfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Nu7spyszUeH1o0cIR0hEujtfZpzM2RKzhQ2qMYicNHI=;
+ b=Qc03CcmN1K52VHFyskAAq7XIzKbXKtKCyoSDrNDHDGf1ZoCq73zqNphct1AMB+e1pJuxrCScIbu/fo0wfn9WbcIoVASuTtO66Ni4N2kVkbXXVrd2kBUdYHCykoeP9yDphwkdFgwVVv+sVZt1dE+aUTNVP3jTru3DXDAHAXxwGkGnEoeARJpjWlK7MHkC8hpIXk3op5Z5QDBcUHyGNhYYPOH9PUuKiQumWJG1p6vPG44aBXmWxhnIOs4IHdfpYfN60Sdc8Sgr23UY22XtyS0/dvSl8Jq97CoGOOdkEA3Zj8+1O7uH/VVJHN/dgEDi5mJ7kH/ifUXdpyd7WgdPogcyZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Nu7spyszUeH1o0cIR0hEujtfZpzM2RKzhQ2qMYicNHI=;
+ b=uJEoGpgzd0W//jxUXARKr2GIUyZwIh6ZXkP98x8m7wm3qVDp3xBOiByzXudKfmwPeW3Yklb2bY4Nso4h8JpV9/e/Io096pvJfOmjuAh/B2PpDfWS+LaXTMH+01VmxcXk7RSpajWyzl1DcVRedxmIwZReCoQgZ1jt/GGbYmUmnUT8WWL5lEG2SPVwI8Gkk7g98rMptXfLrbFFsx47G+2eZRHdJ+l4WODDMnInko5a6auqnh5QqKar/jvuZG1axc0LWT/+jRjJEPgA3xfHU1W/pdsCLVGMezzeeF4xiTpv81i60I7QktcsEU3CQUqD/YYOGo64SIMy0u3VeaGGCFti8g==
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by MN0PR12MB6245.namprd12.prod.outlook.com (2603:10b6:208:3c3::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Mon, 22 Jun
+ 2026 15:35:53 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
+ 15:35:53 +0000
+Date: Mon, 22 Jun 2026 18:35:42 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: netdev@vger.kernel.org, nicolas.dichtel@6wind.com,
+	stephen@networkplumber.org, horms@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	dsahern@kernel.org
+Subject: Re: [PATCH net v3 0/6] ipv6: fix error handling in disable_ipv6
+ sysctl
+Message-ID: <20260622153542.GA354968@shredder>
+References: <20260622130857.5115-1-fmancera@suse.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260622130857.5115-1-fmancera@suse.de>
+X-ClientProxiedBy: FR4P281CA0021.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c9::12) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: clear the default
- forwarding VSI rule when releasing a VSI
-To: Marcin Szycik <marcin.szycik@linux.intel.com>, netdev@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, Tony Nguyen
- <anthony.l.nguyen@intel.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- intel-wired-lan@lists.osuosl.org
-References: <20260622081030.2312129-1-poros@redhat.com>
- <4dc1eb2d-e69f-4f13-ab08-ed0077305098@linux.intel.com>
-Content-Language: en-US
-From: Petr Oros <poros@redhat.com>
-In-Reply-To: <4dc1eb2d-e69f-4f13-ab08-ed0077305098@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MN0PR12MB6245:EE_
+X-MS-Office365-Filtering-Correlation-Id: 50a2da99-a8d4-4438-0519-08ded073f1b1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|23010399003|1800799024|366016|56012099006|11063799006|6133799003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	vX0RZjCBMxTHCZwun2rVOCqWWFME4BqOamkDkVWVy1YC9veNkg7p8hpd/xAzB/U1OgRdlWV8Zf6e+/BHy2DltihXgKqEcVMzDX9w8Zj87YKcOtBp7LST6OOYp2EeiqeAPgBaFPfgrDOvxoWk44aVeBUgdVCYF41Bj8I1MjNNq8tqk/AYz4HKqyfE0wopHRCAfKMONKfIuKbaXuOa008bUqsrJ2HqoXRvjbtftcn9hchpq+zCqO2awqquIpN+LTbc7jV25sTotE2MNy1bEWKoX74jMcxhW7EWKTsUeMnvKStmZgLpOi/gCZN2heTwzKoCnUaPmR+d5zqsBFJlm6ENJomIEjseEmuyR8W3jnYVIojPPdjQKNZL7ONrP3lOTTAa1iK6nriPoW50wxOqxyVdx/FIj5NJmjVJXxoWKPWL1lT60kLfLwX23myODUlSMCEBwoD2bxoPha/Bq1AGDSZHm6Ejq+Jwmvia9qZEjSPbCa3CARfrgLRD/Dfp0JrQKWvrwFYNtgiRpIn476yHMNXyyCkMnwbo5OYEsbm7FzHHcU1XpDKV47yK5EhyCoKTH5HtB4iYM+NuTXgSKas5Y/e+dE5ieLOBCWGjEGv1MtscOOKYZe92KEGsSfCNHpNmRgzulkYUMpmprx7gkCfMOKcVvAs0+wrWGAl2AX4aaVTH38I=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(23010399003)(1800799024)(366016)(56012099006)(11063799006)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?iyAVWBzwFC673QDnHqbJKk5FR8QvMoa+UY4X+syQYmozEmBlTGU50GvfY03S?=
+ =?us-ascii?Q?MRYdVczRKuotXet//m89Fe/i5i8GPZ/wvwQklRkftR5BoGpaGELeh9m7AI7V?=
+ =?us-ascii?Q?LZKUB/hYjD4DoqZRRqKoQm4a/ABBqISgPahgGZqbMEk0UW8TW31HSrlPIV7j?=
+ =?us-ascii?Q?MaXr5N5ECv0hftfhbL1oe7InernZjnX124DsMlUrdOShLhoC7hyT2cdNCBdi?=
+ =?us-ascii?Q?GtyMW4asWBZsyX1leYwGUNcEwyWtjbMRW9XKSHfsOnM9/rks23K/9PqRzVaE?=
+ =?us-ascii?Q?2hxetFjJhWYpzTh2Z/doFhrpWcOqb4Ca8fZOlw3LVT+mGhWlFnrSuzYr4l3L?=
+ =?us-ascii?Q?iMijJGdwGwhIc9U4aBoNfWE/XHP6rHYglYigJst1+mOOjZShVlLlSy6W2ZIa?=
+ =?us-ascii?Q?zRZy0XQ8S+gTRscT07grIDi4L1vTILi3hUp/FclT3WG6A7rl4MLYhD2T5S7+?=
+ =?us-ascii?Q?6v5Dq8AsRX/vaZZcfnZkBjcOHIxZckpTy+4PH+fhJ8ETgC5Y29U6ngeVheOr?=
+ =?us-ascii?Q?tSZDd2H2S9OO7YeufiIG4SHhpYGWN7POdJw/umxTEggs4nHH9OFbQbx3pO8D?=
+ =?us-ascii?Q?4L5D68qGC++fnBxnCpfEiZw4voi5KCKBoL4wSDWa74P9RXeMv5bsK5cHxzSd?=
+ =?us-ascii?Q?52MVLKj0PqKZ1GiT0D8p3awFfdbfczMLv9TfY+h6+DvC7GI7j6IkcI55mH8X?=
+ =?us-ascii?Q?/x5Z1RaENtELXl56eOTssQlJEfIGXPqizBlUJ9dkHhAQ/6clPgCsrQymKLBO?=
+ =?us-ascii?Q?/fQucUUqL5ToCTQk4pO5bD25LMdlIrTEDgQXQ2hkByOvj6k15N9a7OigLacj?=
+ =?us-ascii?Q?svkfYBhiwSwBH3YNMLU2J+AnCYmHyWfdPTXdcEIgiI4+3IfLFvasVtc0K7E/?=
+ =?us-ascii?Q?DUECvqgkdS/8d0DmeRwyxZd5rqNJ/Yc/tYCuKNcdlSS9RUSZfB/Rb5q3V3Wb?=
+ =?us-ascii?Q?QCrNjdbhGtPx4+2ZSIRtGX1z1AFifKzs7jW/SLN+pMdMBGvR5lI2EW/JG4tv?=
+ =?us-ascii?Q?JsbSpnQp3goR6PSeyY2GbvH1kfS6r0wpfYfeJTNukhRJ6Y1ndlNsadYG652F?=
+ =?us-ascii?Q?xVSq36YoTP6yJ9EaSiZdEhr5nFOcsMKy9A/cSbO8NOrDbNl2TVpAwxQxjEVd?=
+ =?us-ascii?Q?1ZfqghnZQxCPcZF1NuJUbaE4shGwd+z0Ch8Pov4Dgsjnmzn+c6893KsNTRZg?=
+ =?us-ascii?Q?hW2yi9Jr4IVwqn2VuxaEP5X2mla1j1nzP7OAvagQsjF/9YkwusESY5e0Ssa6?=
+ =?us-ascii?Q?IwkM0Zvyoe3oh9tu7rNEPT96JBB3R+qxQP85rYaZIvZV0EnGRkvq+nw0pps+?=
+ =?us-ascii?Q?lIlKmUYR2rtwwDa1nafvhxdc1hSLgiih2NtNCsyadqcGJGUVYTbCvpV2ZkUL?=
+ =?us-ascii?Q?aJGBjRjSIiytV4yNnYVejYEHfLLTm30OcCyiQXx0jWHbgKlWH08UmIav5G4z?=
+ =?us-ascii?Q?Dj0eaytBZkhm1FXVVuvv5LNTm4PRraAJDU2F3R+CVd2iLoofzJY+ItTIv5Qn?=
+ =?us-ascii?Q?j9F21YQc6d9m7mawPGY5xELk5iLUYUtaNl5uVwT6FsiKKHqFw9HDDRmq5l9X?=
+ =?us-ascii?Q?UwX6KTP4eJd7GzZzk9zhWUHdb5LFnoV8PlvSVwrLahwu+O/NAc1hUX7UDwgM?=
+ =?us-ascii?Q?+PmpH0HRFD3KaiKg27N/e80jdziVZ8nU9cMsQm/Nk1+/tzkG00t2rJg+4RFe?=
+ =?us-ascii?Q?POKU0FBT3y193WD3wSPjKGm7ZlfbwyPfNCm0ZERxoKjTZOA/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50a2da99-a8d4-4438-0519-08ded073f1b1
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 15:35:52.9402
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 72eTV0DImNDJLqvJBX4XFV6ZrcfUSuIo35zox9akhq9wcf8dH90lsnWj4fXEtVj02W2za9pmpR32vsufxTxTTg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6245
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-6.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301149-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301150-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:marcin.szycik@linux.intel.com,m:netdev@vger.kernel.org,m:przemyslaw.kitszel@intel.com,m:edumazet@google.com,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:anthony.l.nguyen@intel.com,m:michal.swiatkowski@linux.intel.com,m:jacob.e.keller@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:intel-wired-lan@lists.osuosl.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:nicolas.dichtel@6wind.com,m:stephen@networkplumber.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,vger.kernel.org:from_smtp,nvidia.com:from_mime,nvidia.com:email,shredder:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C76B16B0C7F
+X-Rspamd-Queue-Id: F18F66B0D0A
 
+On Mon, Jun 22, 2026 at 03:08:51PM +0200, Fernando Fernandez Mancera wrote:
+> While working on a different IPv6 patch series I have spotted multiple
+> minor bugs around sysctl error handling and notifications. In general,
+> they are not serious issues.
 
-On 6/22/26 15:52, Marcin Szycik wrote:
->
-> On 22/06/2026 10:10, Petr Oros wrote:
->> When a VSI is configured as the switch's default forwarding VSI
->> (ICE_SW_LKUP_DFLT) and is then torn down, the rule is left behind in
->> the switch. ice_vsi_release() no longer removes it, and the SR-IOV VF
->> free path (ice_free_vfs() -> ice_free_vf_res() -> ice_vf_vsi_release()
->> -> ice_vsi_release()) does not disable promiscuous mode either, which
->> only happens on VF reset in ice_vf_clear_all_promisc_modes().
->>
->> A trusted VF that enters unicast promiscuous mode becomes the default
->> forwarding VSI (this is the default mode, when the PF does not have VF
->> true-promiscuous mode enabled). If the VFs are then destroyed without
->> the VF first leaving promiscuous mode, the ICE_SW_LKUP_DFLT rule for
->> the now-freed VSI is leaked. When VFs are recreated, a VSI reuses the
->> freed hw_vsi_id. If it is assigned a different VSI handle than the
->> leaked rule holds, ice_set_dflt_vsi() does not recognize it as
->> already-default, and ice_add_update_vsi_list() folds the dangling
->> (freed) handle into a VSI list, which the firmware rejects. The VSI
->> handle assigned on re-creation varies, so the failure is intermittent
->> rather than every cycle.
->>
->> Reproduce by repeatedly running the cycle below on the two ports of the
->> same card, where $VF0 and $VF1 are the netdevs of vf 15 once they
->> appear. The VF must be brought up so iavf actually pushes the unicast
->> promiscuous request, and the rule must settle before the VFs are torn
->> down again:
->>
->>    echo 16 > /sys/class/net/$PF0/device/sriov_numvfs
->>    echo 16 > /sys/class/net/$PF1/device/sriov_numvfs
->>    ip link set $PF0 vf 15 trust on
->>    ip link set $PF1 vf 15 trust on
->>    ip link set $VF0 up
->>    ip link set $VF1 up
->>    ip link set $VF0 promisc on
->>    ip link set $VF1 promisc on
->>    sleep 1
->>    echo 0 > /sys/class/net/$PF0/device/sriov_numvfs
->>    echo 0 > /sys/class/net/$PF1/device/sriov_numvfs
->>
->> Within a few cycles the ice PF and iavf VF log:
->>
->>    Failed to set VSI 25 as the default forwarding VSI, error -22
->>    Turning on/off promiscuous mode for VF 63 failed, error: -22
->>    PF returned error -53 (IAVF_ERR_ADMIN_QUEUE_ERROR) to our request 14
->>
->> This cleanup used to live in ice_vsi_release() but was dropped by the
->> referenced refactor. Restore it. Clear the default forwarding VSI rule
->> in ice_vsi_release() when this VSI owns it, which covers every teardown
->> path.
->>
->> Fixes: 6624e780a577 ("ice: split ice_vsi_setup into smaller functions")
->> Signed-off-by: Petr Oros <poros@redhat.com>
->> ---
->>   drivers/net/ethernet/intel/ice/ice_lib.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
->> index 2717cc31bff8fe..408464434506ef 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
->> @@ -2872,6 +2872,9 @@ int ice_vsi_release(struct ice_vsi *vsi)
->>   		return -ENODEV;
->>   	pf = vsi->back;
->>   
->> +	if (ice_is_vsi_dflt_vsi(vsi))
->> +		ice_clear_dflt_vsi(vsi);
-> In the referenced commit, the chunk of code that contained these missing 2 lines
-> was moved to ice_vsi_decfg(). It also sounds like a good place for them and will
-> be called from ice_vsi_release(). Are you sure we should place them directly in
-> ice_vsi_release() instead?
-No, ice_vsi_decfg() is not a good place for them because it is not
-release only. It also runs on the rebuild and reconfig paths
-(ice_vsi_rebuild(), ice_vf_reconfig_vsi(), the ice_vsi_cfg() error
-path), where the VSI is reconfigured in place and stays alive, so it
-can still be the default VSI afterwards.
+For the series:
 
-Before the refactor the release-path clear lived only in
-ice_vsi_release() and the old ice_vsi_rebuild() never cleared it.
-Putting it in ice_vsi_decfg() would also clear the default VSI whenever
-the default VSI itself is reset or reconfigured, which the original
-code never did. ice_vsi_release() keeps it to the case where the owning
-VSI is actually torn down, and the ice_is_vsi_dflt_vsi() guard makes it
-a no-op everywhere else.
-
-So I would prefer to keep it in ice_vsi_release().
-
-Regards,
-
-Petr
-
-> Thanks,
-> Marcin
->
->> +
->>   	if (test_bit(ICE_FLAG_RSS_ENA, pf->flags))
->>   		ice_rss_clean(vsi);
->>   
->
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
