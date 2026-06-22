@@ -1,141 +1,134 @@
-Return-Path: <netdev+bounces-301032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZOvaMCgQOWrcmAcAu9opvQ
-	(envelope-from <netdev+bounces-301032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:36:24 +0200
+	id A+MXGj0QOWrimAcAu9opvQ
+	(envelope-from <netdev+bounces-301033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:36:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176FB6AEBF4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:36:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D13E16AEC05
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:36:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=vSbDrnBP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301032-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301032-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=m+MULcED;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301033-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301033-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED1BE3055DE2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:34:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DBD7F3020126
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B00F371D13;
-	Mon, 22 Jun 2026 10:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C769370D7D;
+	Mon, 22 Jun 2026 10:36:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C97D3491D0;
-	Mon, 22 Jun 2026 10:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5699233953;
+	Mon, 22 Jun 2026 10:36:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782124445; cv=none; b=Zv3f5T2mYWuEy+LvJc2GufnbFVKwKS5OKvPWd9sBCwP+sLuuZCuOMq0yW5xVDLBEu6hTk6DeyJEk5yBNCiSbuYjZHT20KuFDQzfv6nouJ/xQ0rRQldvpz6WZZPoMo9Jta5m6JvUKAE/4XG0Q8hzBdQ05Ovr962KUAUcrzOLTUhU=
+	t=1782124575; cv=none; b=AS/NCL78ng3UFqQuc+hBv3yQ3ID9F7lRLiGhw+nvqCC000UrQGnvPHAQOatbC144OkpiZ8ylJ7TuNfZG4biDwPGcImPnqhbsc8DWc1JGoy1OdyKVqkYsu1ftb5AgQU7Vtt9pS9CMqv24m/JLkh2PRj6GN4nSTdLHJh7Sz4PNM0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782124445; c=relaxed/simple;
-	bh=dLWCFMXElJAimOVvnulujwYsPKAab/rtBHijkyJGNfM=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=aJGz+HahUT/2Jcabc+5Yjw/LB3819gUbcp7FXuly1cvaHlRPIafmvPP/qynYYiDioFG4GvEMs8nFyTlwzXHpxLDlrJAMeYq9SXWnKbt06TDBF2BSfVT9S6P9r15MF+tgcH9/0cci4IhQttk601/+StZs2RiVIGY2KH1MklF6g+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=vSbDrnBP; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AD3BAA02DF;
-	Mon, 22 Jun 2026 12:34:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1782124441; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=dx/B2m4epnkAcHaC7egWzuokCQWHPyJnQKfGd2yfeTY=;
-	b=vSbDrnBPqo5QeqIpa+C+G7d7FrD6k2Ox/Xymoys4Zuq8QzL5wFxjOw8SO0I2VXLMf8gJly
-	JPluI1++N1vVPhcqr2BS2me6QTORRUkrL8yvUYNTpKvueFDwDl4LehXeurCtbywV37BpCl
-	STaQhm6AZu+ubiFr8Tmaqb+ZkEvddyv1s57QWfqKQFhA+81yt3zpGa+ZZnaufjXROzwtyM
-	B19zaTfQBo+I+FIsSZee7IKlF0ZK0gm9NwE95PmoiSygtuGsj+HuYFOyl2k4y+szQt5P8t
-	1jBxpPkxuOi+GqEhhbtPYsMM3HFX2xs5Dz2UZN8QI0VuY9jaGir/Dn6GwD1Aag==
+	s=arc-20240116; t=1782124575; c=relaxed/simple;
+	bh=p+P6k40v6POcdPcPItQjOXliIhbq4DSDEPWa/3S580I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bWWQ9YCEtjikGvcb+LezVCmC+jg5WRJqYVWNbkj4mluY4V0o4y1WO0fYudVD7n6Ct9EaUeJiZwcUQyVjJ6gvp3JgA9Uu5FWl8TEkvhNs2Z5e05YisyjXvcabxew5162s+ef+EqUHPXvBoPNDCUQtI1pRXksfBWCGBfhRLxa6iSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=m+MULcED; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=id/hH3roivukEKrMQFRL72o3+KlR8rCe5EpGyffEesA=; b=m+MULcEDHYVEi811nM/inW0Avy
+	MxJfQ+D2TqmEm7YKdv9whLy430MAT8+59aFzeKH1ZvS2iZWMZIsMIN+GqSfIE96sOJb6wmOMy7whO
+	yl3zH4VUpOwk9YhXzNBHYvouSmwj+a0tdXM9sQqXMjFHi/fT425K8fURM0NGe7bFBaiM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wbc0a-008oQg-WB; Mon, 22 Jun 2026 12:36:05 +0200
+Date: Mon, 22 Jun 2026 12:36:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: ZhaoJinming <zhaojinming@uniontech.com>
+Cc: horms@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	madalin.bucur@nxp.com, netdev@vger.kernel.org, pabeni@redhat.com,
+	sean.anderson@linux.dev
+Subject: Re: [PATCH v2 2/2] net: fman: use devm_kzalloc() for fman and rely
+ on devres
+Message-ID: <4692dda4-657a-4c00-9e65-cff4b79d19be@lunn.ch>
+References: <20260619121328.922138-3-horms@kernel.org>
+ <20260622090505.2418478-1-zhaojinming@uniontech.com>
+ <20260622090505.2418478-2-zhaojinming@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 22 Jun 2026 12:34:00 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Sven Schuchmann <schuchmann@schleissheimer.de>
-Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>, Rengarajan
- Sundararajan <Rengarajan.S@microchip.com>, UNGLinuxDriver@microchip.com,
- Woojung.Huh@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: AW: AW: AW: AW: [PATCH net] net: usb: lan78xx: restore VLAN
- filter table after device reset
-In-Reply-To: <BEZP281MB22457C80F9D1AC7F788EC008D9EF2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
-References: <20260618191109.4086598-1-nb@tipi-net.de>
- <BEZP281MB2245740AE8E3221DD076CE7DD9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <6d638042ad07a8bfb09ff3ee923e7b3f@tipi-net.de>
- <BEZP281MB2245422BB9FBFF4AFE081451D9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <4abfc9b1e8860da93c03639863bd0232@tipi-net.de>
- <BEZP281MB224523ADACDB48D8E3974D4AD9E22@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
- <f76711d2f45c527f9ce0f5d288631bc6@tipi-net.de>
- <BEZP281MB22457C80F9D1AC7F788EC008D9EF2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
-Message-ID: <3964f6655b98681b9aab92593b5ed3ca@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260622090505.2418478-2-zhaojinming@uniontech.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_RECIPIENTS(0.00)[m:schuchmann@schleissheimer.de,m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:Woojung.Huh@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-301032-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301033-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:zhaojinming@uniontech.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:madalin.bucur@nxp.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:sean.anderson@linux.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,tipi-net.de:dkim,tipi-net.de:mid,tipi-net.de:from_mime]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 176FB6AEBF4
+X-Rspamd-Queue-Id: D13E16AEC05
 
-Hi Sven
-
-On 22.6.2026 12:07, Sven Schuchmann wrote:
-
-> [...]
-
->> > looks good from my point of view
->> > (Calling the lan78xx_write_vlan_table() from
->> > lan78xx_mac_link_up() and from lan78xx_reset()).
->> 
->> Thanks.
+On Mon, Jun 22, 2026 at 05:05:05PM +0800, ZhaoJinming wrote:
+> The driver now allocates the top-level struct fman with devm_kzalloc()
+> so that its lifetime is bound to the device and resources are released
+> automatically by the driver core on probe failure or device removal.
 > 
-> Just to be clear I used this patch which is looking good:
+> Remove the explicit kfree(fman) from the error paths in fman_config()
+> and read_dts_node() to avoid double-free/use-after-free and to follow
+> the devm_ allocation convention.
+> 
+> After of_find_matching_node() consumes fm_node's reference via
+> of_node_put(from), the post-muram error paths no longer need to clean
+> up fm_node, so replace goto fman_free with direct return ERR_PTR(err).
+> 
+> This change complements the existing use of devm_* resources (irq,
+> ioremap, etc.) and simplifies the error handling paths.
+> 
+> Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
 
-> [...]
+Please take a read of:
 
-Thanks for testing! I've sent a v2 of my patch with your t-b:
-https://lore.kernel.org/netdev/20260622102911.484045-1-nb@tipi-net.de/
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-Regards
-Nicolai
+Please read it all, but see section 1.7.4.
 
+    Andrew
+
+---
+pw-bot: cr
 
