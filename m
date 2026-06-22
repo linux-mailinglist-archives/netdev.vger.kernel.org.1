@@ -1,273 +1,457 @@
-Return-Path: <netdev+bounces-301007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301008-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QbiUC0b7OGqukwcAu9opvQ
-	(envelope-from <netdev+bounces-301007-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:07:18 +0200
+	id fiOBAMz7OGrLkwcAu9opvQ
+	(envelope-from <netdev+bounces-301008-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:09:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2546AE0CB
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:07:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1C06AE10D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:09:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=aGMmzOhF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301007-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301007-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=infradead.org header.s=casper.20170209 header.b=Ht2lyFaM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301008-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301008-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A032304EBB5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:01:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85A0430610B1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB95395ACB;
-	Mon, 22 Jun 2026 09:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471F139A805;
+	Mon, 22 Jun 2026 09:04:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013055.outbound.protection.outlook.com [40.107.201.55])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09613955F4;
-	Mon, 22 Jun 2026 09:01:47 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782118909; cv=fail; b=jrFzhKixdAmjkroW0sfym0MUDvPTBAz+YekKnyLRiUBZeiHLOwXqLxIhsL+gSqU8a+4poUVc2VjN7oQN0ljkfiXBm94mLhYbmedxmLwYLYYnM0S7M/AeWUfm9fE+fhqQYBqLw4rQbJgCi+p6tAme6fjslapOb4IQ8SKacM64GJk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782118909; c=relaxed/simple;
-	bh=YWO9FCs+3h2mbRpJ5xPaNG5kJCbkZrMSy3zuoq2N2To=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HGpIfiP/MwMfRylh4AwlD9Af8utD95ht0fUj2H3J5wlvD1vWIUDmV86kNPdl723C90g8Et9oN8fNhH4jTX+4DAyI3WVnxRryPLcRZTwtKnYRmnt7kt+7hDFBochCMw+LXI2g98QcL2ytftK/AhMEi88x+2/8G13bytFkCyhMAHo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aGMmzOhF; arc=fail smtp.client-ip=40.107.201.55
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vuMKmqFoRZE5kv4lPvn4vLLjzqI7//wOgcaA4NCQkMh11AXzcCSBVzdrIs67eXSAkU5coLSIs+lNwYnCilKqQ+rl0Q68EgeklcroQTz88M+vOUZvqKQ5w1SEUZAf123tQZ2LGAO5FjMDm3QPVuveUlDMGKfTnnY5rJZRYskvOoCt1MZArWKqdK6gCcYtuJAENEr26pQEKcBiCtsV0NTPFfVcnphDRjA3zSpGgZVGKyJ4do2VjbDLB/VGw5c2mkTBjpVY0FGQxiXNQIUM+8WNdtqKHfx0AblufuLm9E8eYPTmFTFlkfYlqQZ3RasRKLQW97hEKYuXY03ahzmYs2YeqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fM3N+Of2MvR2Qh/K5xlqvmbpI0WS9m9uPHk3xbeAp8w=;
- b=KhZJSxNQ9Zw08TOCHzVVwDXsl9WrBtwRS6kaD6FSdGNqaHiGIAgwYGCdmqgRUHy6CDhlqPqvu7DQWxvY4T7XAZb65I21+li1zFpuU5B9bGa4FYTJPaCxqIsykEYYXE7eqNRoDCv50Wvo3y6MEyAGVNkZukXPP1nB0LQIRpiA+HHBi6L4k2Y504fadyBYUb0msHN2T4G78Zzt1sVx/tM1MfvwhhGl2Ru2YDlKEFhwr1fqd+q/ZuF/piP1k4u8XcIvtQl4HWbI78CE6Y1v5B8jxRCGXSbzJQzuQNhRktLqQzmD+GSfEdOpFrdOO3eCtC0HtCqwZDG6nu6chMbYdGTH8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fM3N+Of2MvR2Qh/K5xlqvmbpI0WS9m9uPHk3xbeAp8w=;
- b=aGMmzOhFuAF8RV5XYpF/NILm3KS5/dsiMGe7jXphwLo3eGl1xvld3qdEVciqeoqqHaizrq652qMbYrnXlX3l46AL3oBm036s2VGRUJ0FPwUHGAKVw+6rkHtgWASW6GBWbs24s4Mk6dTnVSUGdOxitwa9zBxpyN/zq65ff/YzV/PdAo6sLfegaXgrv2NOX3u/1NISxhk2wZyaRUXFZ+GAxHUFGtWH6VL56capBBl9MYEUh8SWmhNneUis8qX2gu6VFC8Z8Qsre6yhI63J3ZRKT4YBFuvFRCbhbFMv+Z7/YvVTPXx09oRuWmSrcv0zRdlnY65ap/TDJxwHvBHHJklMEQ==
-Received: from MW6PR12MB7086.namprd12.prod.outlook.com (2603:10b6:303:238::20)
- by MN2PR12MB4318.namprd12.prod.outlook.com (2603:10b6:208:1d8::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Mon, 22 Jun
- 2026 09:01:44 +0000
-Received: from MW6PR12MB7086.namprd12.prod.outlook.com
- ([fe80::4eb8:7fcb:fe8d:e95e]) by MW6PR12MB7086.namprd12.prod.outlook.com
- ([fe80::4eb8:7fcb:fe8d:e95e%3]) with mapi id 15.21.0139.011; Mon, 22 Jun 2026
- 09:01:43 +0000
-Message-ID: <293db0b4-f308-469e-99c1-ef1b57d41451@nvidia.com>
-Date: Mon, 22 Jun 2026 12:01:35 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: Use sender devcom for MPV master-up
-To: Manjunath Patil <manjunath.b.patil@oracle.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Patrisious Haddad <phaddad@nvidia.com>,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20260610173915.4053423-1-manjunath.b.patil@oracle.com>
-Content-Language: en-US
-From: Tariq Toukan <tariqt@nvidia.com>
-In-Reply-To: <20260610173915.4053423-1-manjunath.b.patil@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0196.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e5::18) To MW6PR12MB7086.namprd12.prod.outlook.com
- (2603:10b6:303:238::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FE03976A9;
+	Mon, 22 Jun 2026 09:04:19 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782119063; cv=none; b=TxuFacbulCFiuWJ2GNx39AF2BlnTsaU5yL1CjJVPDZXG1tLY/CsSgJnV/W5Znn7qs5Sb7/lJYT6qKx7QuVz4uvvT4u8Sd6WWOxqbqlw4ehj/Txlz9wFlCg7bjwONIYBAnLz148qcKWuZHrHFfKgxZE3Jos15UY5S9ItH9WNUJtc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782119063; c=relaxed/simple;
+	bh=3hjWglHfSljhPOd/KvcczoPtK3bNrdWdEtX0URalaSI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qlFpjZCq407Uu8QwC6cQyuSwyLmDugv2SXMpl9PHp60TJNcYcw87T5M4VF0Gc3nh6+W5ViK4ObDdpGBroCDMtUboqh1ZJMice3S7D1TIcDhQT7ZPYY0xDize0jDOFXZh5wxRepRnphfHms+YQ+vunCG7OzNkKYFEopfWc7DmMz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ht2lyFaM; arc=none smtp.client-ip=90.155.50.34
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=yasKb5W57OYgDjTdoL+qW578UUtpnhFARQvgvno1ejw=; b=Ht2lyFaM+zdnEwULFhcA9HVWuj
+	IKC1N7xu8ERo0ujtaYSlx/YufdsnAzTwutKe4jHhzEgFzH8dmhjLk2eV1LITp/p1Ztcm4xEhWQ3bs
+	dnKm5/QG6Oi8tnfXA5uNPQMc6aTUj6Rh3nu5cx9pplg/GNHvJR/qPb1/OIKkuQ4o874yECThrdWjt
+	WLCdC3cHH96GwFcfkhbuamuTDxG0h3nxa3cwY3ugzUu1dpBngDSlEbTRnEBoa+3k8sNobQrxIZD24
+	hIpbmQh5H2E+e0iXHJdkB/w4oZD9B5BkB/TkmeFyalKwpJWFk2oKH3WFuEt2INBv2I4MsWHtdxhtm
+	CMGdMzug==;
+Received: from [2001:8b0:10b:5:9b49:795b:48f5:139a] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wbaZl-00000003www-0nrv;
+	Mon, 22 Jun 2026 09:04:17 +0000
+Message-ID: <fea6f61960132ffafc94a8b74adc37d8dd2f79be.camel@infradead.org>
+Subject: Re: [RFC v2] Enabling CONFIG_NTP_PPS for NOHZ by adding ntp_error
+ to system_time_snapshot
+From: David Woodhouse <dwmw2@infradead.org>
+To: Thomas Gleixner <tglx@kernel.org>, John Stultz <jstultz@google.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Miroslav Lichvar <mlichvar@redhat.com>,
+ Richard Cochran	 <richardcochran@gmail.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Cc: Rodolfo Giometti <giometti@enneenne.com>, Alexander Gordeev
+	 <agordeev@linux.ibm.com>
+Date: Mon, 22 Jun 2026 10:04:17 +0100
+In-Reply-To: <3b10d2e91b18f49d8a3e6226b08ac8cd9cb49aa6.camel@infradead.org>
+References: <3b10d2e91b18f49d8a3e6226b08ac8cd9cb49aa6.camel@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Q3Q2zOmnLo31GFPkE090"
+User-Agent: Evolution 3.60.3-0ubuntu1~ppa6 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB7086:EE_|MN2PR12MB4318:EE_
-X-MS-Office365-Filtering-Correlation-Id: 285c296c-74c5-40eb-39f3-08ded03ce133
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|7416014|23010399003|1800799024|11063799006|6133799003|56012099006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	4qlJYGM5iSW/XXLOSeXFjEFeTl0LKRqPYjK4Yo7vY+KcXOwwy0s9/YgW6RgzlgP27egmFejZUxKpKzaIdS4EYHgTX70hUxHZYwe9ScfHHIaE7xCqMTDZ/NOaRrqycJQ48UaqF1lA2+26sAH/L096G1mBA9GuoB6DFIocKE8kfZX8d6/2CzQypGJjpQ7/Uvg7ZlVKDbuHXwTHxtxW13BnpTLEaX5SF5LWmOKC9faKpKCF8Albwml1GTes8uKK9rv/ZkhoinVLwcP/mZLzE1A26+uCVr7r9dc0uYIELIKoV6bHE23Mm6T8KNPLHiqN83LHFv0525ipjCP8UiJlWl07HaTXs94hMRk9vaL5rYAx0XjEsUVb0FroT7tTUEujDhcQwPQi6nhDAYCocCLrcP2VtmkUzudQl96e7DH2+4wL+J6dXXum1UVqVds1eLD/P0xKLVXxkUrEgXbQ5EuMC3cMx5Jxbftkzu4FaOnW24KumiSar452Sfog6Ww0j53KLyPKmkAENI4/S8M2k4rS/rKmdQ8uGPhyybHquNGFzpQ7DwZx32aYYVr38AZ3thbVPRHLGca8DrdhI971+WMl29JiwXaR7x85Ho4JWVUmwI/JIMS9K5A/DJWHBSw0/AP1QCKtVioBFqpmQrKXxBZ6E5UZumvzDhixVKyBuzXx7ni7N8g=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB7086.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(23010399003)(1800799024)(11063799006)(6133799003)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Sk4wSEZYZ3I5R21VOUNJTEY3SHdkRmV6L2U1QnM2VWk0MFRCUFl5YTZrNnZ5?=
- =?utf-8?B?cFkvR1ZXY0FkQTBYeGx5L1NFYUpMSHhITEtsWTJKT1BzaW1NRzZDaHlmQUNB?=
- =?utf-8?B?eHhrWmx6cHp5RU5DNC9oNmpDbVYxL2ZIRE8zZkRXMkQxbEZBT2YrK2lzd1Bh?=
- =?utf-8?B?RDJ2dVU3cVU5UmJMRVlBTkk2MGZKQzlvU2h2ZXJ0SUowd1FjL0xXaklMM1M0?=
- =?utf-8?B?NEsvOVI4QVVTVnphc05LMmg1MUpucmU5OUIyWjVvY1U0WWtLOVQvazFEbjg3?=
- =?utf-8?B?L0FTZGVRdFNFeW5naWlicCtIZWFTZXhtbWpKUWtFby9qZmVPbmp3ZUNzM29Q?=
- =?utf-8?B?Umwyd2pOTEVyUFZucWlySkFrTHMxNU9RTzdyOEZTR3RjbEE2VXZPUzNJLzVw?=
- =?utf-8?B?ZlY1RGJ6UFVjZUhWK1V3SUswZFp6N2FDc21yTTNLaXJIRGh3eldXanBGN3lI?=
- =?utf-8?B?WHFMZURQamFXOXZEVDVQUGRTNDN4RTBocmdoYWR3UHd6b05LZ2pKWGpNTVpq?=
- =?utf-8?B?Z0x6SnZ6REtrNnpVQ0locTBpUG5xZjlCbUZXT0JmSVlTQjFPdDZUUGl4ZGNK?=
- =?utf-8?B?VnVDb3pUZUY0clp5dXYwQU1RYkNBL0dDdWxodFBweWZuRThCdlg0a3JMQmRy?=
- =?utf-8?B?VjVHM3Vld2FsRWQzZEphZU5vZ24zWXEzNVowRzhObWp0OERXcDQ2ZXJMd1RZ?=
- =?utf-8?B?aUQ1MkZ0SWwwcXBWYjNyQ3Y3UEtKUDlYSDJCRlJic2Z4OFJ1M0Y4M25lMVg5?=
- =?utf-8?B?TW1waVlkYU9EZ2szKzkxMFNSTCt2U1d0d0VQRkMxWmhiY1NJeXJsK21ROHo0?=
- =?utf-8?B?K1M5U3pJRXFlVW1FYkNBUVZjT05UOE5IY0JBSmN5aHpwQWZkZk5MNEJSTUtO?=
- =?utf-8?B?bmV1ekp2N1RkeGVtRFBPMkI5RFBDdk9ST3paTUNPUFVrWHlkSURLUU50c3Zl?=
- =?utf-8?B?bFl1M2orVEJ6dk8zTTdBaG5WcThnQlQ5RjRoeGd6NWdYbzdOTkF5eW9wWW1G?=
- =?utf-8?B?N1dKK2llNzYvOUloY2xzb1cvOTZrRkcxOXJ0S3FuWC9EdFM5Qms2dnpZbkk3?=
- =?utf-8?B?RzNUUUxyR1FKQnQzTE1pL2llOThOWStQVlJtSURjOU15dGhFRmxMaFY3eTdk?=
- =?utf-8?B?WllKTHAvOVgvYVoySzhHWUs3RDd2bkxncjZVNHpvbklUbVpxNWc2M1AzSDlO?=
- =?utf-8?B?d3dOYUlLN0QyS1cxazY5d2ZIaDZPUUY4NnNTVmJyMm5VWVpyT0RwZkZmdVNX?=
- =?utf-8?B?R2dDVDBDZDJGc25jaEE1WFhaM01IRjA5UHoyaFhveUJEUHdrYnFnWERtZzBv?=
- =?utf-8?B?TkwxVFNuVkdlak1ORzdwU25YZnRzQ1UyUzF2c0Q3WXoxMjc5Rng1Z2lWY1FW?=
- =?utf-8?B?SEZBWHBGelBqRjJlemtEYW9GM1ZlR3pZeGNLVXhPeC96L2g0dVh1TzVPSWRo?=
- =?utf-8?B?aCtQSzlhMTNOclJ5eXRWSjBiYTFESVltWHhWTkRyQlF3K2hUU2pKK05leEhT?=
- =?utf-8?B?dUlnQnhCRWFBZlFFWmpLcWZSeU5yQ2IrWUlGRUh6MnM3QmxSMTBkSHNYU01s?=
- =?utf-8?B?MHgxNGVDbjZCdFFFaUFEV1poMnVmcU0wdmZxQUhBZHR6dTNWSnliMXRPK00y?=
- =?utf-8?B?L1FzYVJIN09GQzFzQnMwVW4zNVJMa3dWbDhCc29MWHRzRXE5QnptNE96NUlK?=
- =?utf-8?B?N0tCUTFqOGdXa1JvZkc5akJWOERoOG02VTM3c01SQlFPRXhuOWhNazNTUTZ6?=
- =?utf-8?B?dm02elp6QTFnNXhIbGtMQ2dscnVFK1Q1VjA2Znp0cjNTYjZNd3MyMHlxZG1n?=
- =?utf-8?B?S3pPbXptcnZscERhYlRaK3hyTDl1Q01yajdBb1RVcUZqTWYydzlrS3hRN3VS?=
- =?utf-8?B?dzhscis3NmdLZlEwVXVJSFJPYkhLVFVTME85NWhMSjZQMWZ6cWg0VWpRaC9u?=
- =?utf-8?B?UGFiNjh5dW42N1FTNDdGNlkybkpuWXlVbzM5d1pZUm8yQzZHVzMvUkhjRTFX?=
- =?utf-8?B?WThGQjQ5MFBIU0lrVGFGdDdkTEFJOUZRWlFnUnBZNkhNWHJiejJYYjRSeUJm?=
- =?utf-8?B?Y1JHTDZzak5HK2JnVHp3azZZQ1BkNjFQTXQ5OWJiV0hHTUg1eThDM1NuZFgw?=
- =?utf-8?B?SExPRlpsV25tZG8wVFVwUFl1c1FDSko4aEJqUk1iZlplUmNOR2N3OWhHZXpp?=
- =?utf-8?B?ckphQkRCOVZKNURSRXFHRVBWM1RGRTJHVGNSSUdmQ09PV0x5d3EwZFJFS2ZC?=
- =?utf-8?B?U0dicWlscXk5SHBGR0hDZ1ZYNE5tV1VIUzI1d2VzS2oyRmlwOTRFbVQya0pO?=
- =?utf-8?B?NFpGMm83MUI3YWRaMWl0bTNkRWlVb0xrSTNJSFhOa1Y0bjF3dVVFUT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 285c296c-74c5-40eb-39f3-08ded03ce133
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB7086.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 09:01:43.0499
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dg8K0Zv/zfVOQHjGpnybB+QtR2HtZ+AdWwBKgcdspiD0NzQV8VIhS3xANIjDlkdE7xEWqotzMk6Ys1/lM1y0ZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4318
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_SMIME(-2.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301007-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:manjunath.b.patil@oracle.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:phaddad@nvidia.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:tglx@kernel.org,m:jstultz@google.com,m:sboyd@kernel.org,m:mlichvar@redhat.com,m:richardcochran@gmail.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:giometti@enneenne.com,m:agordeev@linux.ibm.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301008-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oracle.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,infradead.org:dkim,infradead.org:mid,infradead.org:from_mime,amazon.co.uk:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7E2546AE0CB
+X-Rspamd-Queue-Id: 6B1C06AE10D
 
 
+--=-Q3Q2zOmnLo31GFPkE090
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/06/2026 20:39, Manjunath Patil wrote:
-> After PCIe DPC recovery, mlx5 reloads the affected functions and
-> replays multiport affiliation events. In the reported failure, the
-> first relevant device error was:
-> 
->    pcieport 0000:10:01.1: DPC: containment event
->    pcieport 0000:10:01.1: PCIe Bus Error: severity=Uncorrected (Fatal)
->    pcieport 0000:10:01.1:    [ 5] SDES                   (First)
-> 
-> mlx5 recovered the PCI functions and resumed 0000:11:00.1. During
-> that resume, RDMA multiport binding replayed
-> MLX5_DRIVER_EVENT_AFFILIATION_DONE and mlx5e sent
-> MPV_DEVCOM_MASTER_UP. The host then panicked with:
-> 
->    BUG: kernel NULL pointer dereference, address: 0000000000000010
->    RIP: mlx5_devcom_comp_set_ready+0x5/0x40 [mlx5_core]
->    RDI: 0000000000000000
-> 
-> Call trace included:
-> 
->    mlx5_devcom_comp_set_ready
->    mlx5e_devcom_event_mpv
->    mlx5_devcom_send_event
->    mlx5_ib_bind_slave_port
->    mlx5r_mp_probe
->    mlx5_pci_resume
-> 
-> MPV devcom registration publishes mlx5e private data to the component
-> peer list before mlx5e_devcom_init_mpv() stores the returned component
-> device in priv->devcom. A concurrent master-up event can therefore
-> reach a peer whose private data is visible but whose priv->devcom
-> backpointer is still NULL.
-> 
-> MPV_DEVCOM_MASTER_UP already carries the sender/master mlx5e private
-> data as event_data. The ready bit is stored on the shared devcom
-> component, not on an individual peer. Use the sender devcom when
-> marking the MPV component ready.
-> 
-> This preserves the readiness transition while avoiding a NULL
-> dereference of the peer devcom pointer during affiliation replay after
-> PCI error recovery.
-> 
-> Fixes: bf11485f8419 ("net/mlx5: Register mlx5e priv to devcom in MPV mode")
-> Assisted-by: Codex:gpt-5
-> Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
-> Cc: stable@vger.kernel.org # 6.7+
-> ---
+On Sun, 2026-06-21 at 23:30 +0100, David Woodhouse wrote:
+> Open question: *how* should this be exposed? It's all very well putting
+> it into ktime_get_snapshot_id() like this, and we could easily make an
+> argument that pps_get_ts() should just add it unconditionally, because
+> *not* doing so makes no sense.
 
-Thanks for your patch and sorry for the late response.
+Hm, I'm leaning towards adding it unconditionally in
+ktime_get_snapshot_id() and get_device_system_crosststamp(), and not
+adding the extra field to the system_time_snapshot at all...
 
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 8f2b3abe0092..f7ff20b97e8c 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -211,11 +211,14 @@ static void mlx5e_disable_async_events(struct mlx5e_priv *priv)
->   
->   static int mlx5e_devcom_event_mpv(int event, void *my_data, void *event_data)
->   {
-> -	struct mlx5e_priv *slave_priv = my_data;
-> +	struct mlx5e_priv *master_priv = event_data;
->   
+From: David Woodhouse <dwmw@amazon.co.uk>
+Date: Fri, 19 Jun 2026 00:00:29 +0100
+Subject: [PATCH] timekeeping: Apply extrapolated ntp_error to clock snapsho=
+ts
 
-makes sense.
+The time reported in ::systime of a system_time_snapshot is known to be
+slightly inaccurate because of the way that the reported realtime clock
+sawtooths around the *intended* time series, limited by the integer mult
+value used to calculate the inter-tick times, and designed to ensure
+smoothness and monotonicity for its consumers.
 
->   	switch (event) {
->   	case MPV_DEVCOM_MASTER_UP:
-> -		mlx5_devcom_comp_set_ready(slave_priv->devcom, true);
-> +		if (!master_priv || !master_priv->devcom)
-> +			return -EINVAL;
+It is particularly inaccurate in a tickless kernel, where ntp_err_mult
+is not adjusted on each tick, allowing the reported clock to diverge
+from the intended time for a large number of ticks before re-converging.
 
-is this currently possible? or just being defensive?
-if this return is unreachable I'd drop it.
+This appears to be the reason why CONFIG_NTP_PPS is not enabled on
+tickless kernels =E2=80=94 because at that scale of precision, the realtime
+snapshot at the time of the pulse bears little relation to the time the
+kernel *actually* believes it to be, thus introducing random errors into
+the PPS phase correction.
 
-> +
-> +		mlx5_devcom_comp_set_ready(master_priv->devcom, true);
->   		break;
->   	case MPV_DEVCOM_MASTER_DOWN:
->   		/* no need for comp set ready false since we unregister after
+It would be better for callers of get_device_system_crosststamp() and
+ktime_get_snapshot_id() to receive the *accurate* time, not the
+sanitized version provided to gettimeofday().
 
+Compute the deviation in snapshot_ntp_error() and add it to the returned
+::systime so the snapshot lands on the ideal line. It sums four terms in
+ns << NTP_SCALE_SHIFT before converting to signed ns:
+
+  - tk->ntp_error, the deviation as of the last update;
+  - (cycle_delta * ntp_err_frac), the fractional-mult drift accrued
+    since then (cycle_delta is at most a tick on a tickful kernel, but
+    many ticks' worth under NO_HZ);
+  - (cycle_delta * ntp_err_mult), subtracting the applied +1 mult dither
+    over the same span;
+  - the sub-nanosecond fraction dropped when the read was truncated to
+    whole ns (low shift bits, exact despite the multiply overflowing).
+
+The helper uses the timekeeper selected for the requested clock id, so
+all NTP-disciplined clocks are corrected, including the AUX clocks (each
+has its own NTP instance); only CLOCK_MONOTONIC_RAW is undisciplined and
+gets no correction. The residual is then a single clocksource cycle, the
+same bound as a tickful kernel.
+
+Note that this *unconditionally* changes the ::systime returned by all
+snapshot and cross timestamp consumers (PTP SYS_OFFSET_PRECISE/EXTENDED,
+etc.): it is now the ideal NTP-disciplined time rather than the raw
+accumulated clock.
+
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Assisted-by: Kiro:claude-opus-4.8
+---
+ include/linux/timekeeper_internal.h |  6 +++
+ kernel/time/timekeeping.c           | 71 +++++++++++++++++++++++++++--
+ 2 files changed, 73 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/timekeeper_internal.h b/include/linux/timekeeper=
+_internal.h
+index 5dc7f8bf2740..b487e7d925fe 100644
+--- a/include/linux/timekeeper_internal.h
++++ b/include/linux/timekeeper_internal.h
+@@ -97,6 +97,11 @@ struct tk_read_base {
+  * @ntp_error_shift:		Shift conversion between clock shifted nano seconds =
+and
+  *				ntp shifted nano seconds.
+  * @ntp_err_mult:		Multiplication factor for scaled math conversion
++ * @ntp_err_frac:		Fractional part of the per-cycle NTP-ideal mult that th=
+e
++ *				integer @mult truncates, as a fraction of 2^32 in
++ *				clock-shifted nanoseconds per cycle. Used to
++ *				extrapolate @ntp_error to an arbitrary cycle count in
++ *				the lockless snapshot readers (ktime_get_snapshot_id).
+  * @cs_tick_adj:		Per-second adjustment handed to NTP via ntp_clear()
+  *				accounting for the difference between the nominal
+  *				NTP interval and the real time taken by the
+@@ -187,6 +192,7 @@ struct timekeeper {
+ 	s64			ntp_error;
+ 	u32			ntp_error_shift;
+ 	u32			ntp_err_mult;
++	u64			ntp_err_frac;
+ 	s64			cs_tick_adj;
+ 	u32			skip_second_overflow;
+ 	s64			skew_delta;
+diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+index de07ef65da32..56f4a22d13d7 100644
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -422,6 +422,7 @@ static void tk_setup_internals(struct timekeeper *tk, s=
+truct clocksource *clock)
+ 	tk->tkr_mono.mult =3D clock->mult;
+ 	tk->tkr_raw.mult =3D clock->mult;
+ 	tk->ntp_err_mult =3D 0;
++	tk->ntp_err_frac =3D 0;
+ 	tk->skip_second_overflow =3D 0;
+ 	tk->skew_delta =3D 0;
+=20
+@@ -1226,6 +1227,51 @@ static inline u64 tk_clock_read_snapshot(const struc=
+t tk_read_base *tkr,
+ 	return clock->read(clock);
+ }
+=20
++/*
++ * snapshot_ntp_error - record how far a snapshot's ::systime is from the
++ * ideal NTP-disciplined time at @now, in signed nanoseconds, so a caller
++ * can land exactly on the ideal line by adding it to ::systime.
++ *
++ * The value is summed in ns << NTP_SCALE_SHIFT from four parts:
++ *
++ *  - tk->ntp_error, the deviation accumulated as of the last timekeeping
++ *    update (tkr_mono.cycle_last);
++ *  - (cycle_delta * ntp_err_frac), the fractional-mult drift accrued over
++ *    the cycles read since then -- at most a tick on a tickful kernel, bu=
+t
++ *    potentially many ticks' worth under NO_HZ;
++ *  - (cycle_delta * ntp_err_mult), subtracting the applied +1 mult dither
++ *    over the same span;
++ *  - the sub-nanosecond fraction that ::systime dropped when the read was
++ *    truncated to whole ns (the low @shift bits, exact even though the
++ *    multiply overflows).
++ *
++ * CLOCK_MONOTONIC_RAW is not NTP-disciplined and carries no error. Every
++ * other clock id uses its own timekeeper @tk -- including the AUX clocks,
++ * which each have their own NTP instance.
++ */
++static s64 snapshot_ntp_error(const struct timekeeper *tk, clockid_t clock=
+_id,
++			      u64 now)
++{
++	u64 cycle_delta;
++	u32 nes;
++	s64 tmp, err;
++
++	if (clock_id =3D=3D CLOCK_MONOTONIC_RAW)
++		return 0;
++
++	cycle_delta =3D (now - tk->tkr_mono.cycle_last) & tk->tkr_mono.mask;
++	nes =3D tk->ntp_error_shift;
++
++	err =3D tk->ntp_error;
++	err +=3D ((s64)mul_u64_u64_shr(cycle_delta, tk->ntp_err_frac, 32) -
++		(s64)(cycle_delta * tk->ntp_err_mult)) << nes;
++
++	tmp =3D (s64)(cycle_delta * tk->tkr_mono.mult + tk->tkr_mono.xtime_nsec);
++	tmp &=3D (1ULL << tk->tkr_mono.shift) - 1;
++	err +=3D tmp << nes;
++
++	return (err + (1LL << (NTP_SCALE_SHIFT - 1))) >> NTP_SCALE_SHIFT;
++}
+=20
+ /**
+  * ktime_get_snapshot_id -  Simultaneously snapshot a given clock ID with
+@@ -1238,6 +1284,7 @@ void ktime_get_snapshot_id(clockid_t clock_id, struct=
+ system_time_snapshot *syst
+ {
+ 	ktime_t base_raw, base_sys, offs_sys, *offs, offs_zero =3D 0;
+ 	u64 nsec_raw, nsec_sys, now;
++	s64 ntp_error;
+ 	struct timekeeper *tk;
+ 	struct tk_data *tkd;
+ 	unsigned int seq;
+@@ -1300,10 +1347,12 @@ void ktime_get_snapshot_id(clockid_t clock_id, stru=
+ct system_time_snapshot *syst
+=20
+ 		nsec_sys =3D timekeeping_cycles_to_ns(&tk->tkr_mono, now);
+ 		nsec_raw =3D timekeeping_cycles_to_ns(&tk->tkr_raw, now);
++
++		ntp_error =3D snapshot_ntp_error(tk, clock_id, now);
+ 	} while (read_seqcount_retry(&tkd->seq, seq));
+=20
+ 	systime_snapshot->cycles =3D now;
+-	systime_snapshot->systime =3D ktime_add_ns(base_sys, offs_sys + nsec_sys)=
+;
++	systime_snapshot->systime =3D ktime_add_ns(base_sys, offs_sys + nsec_sys)=
+ + ntp_error;
+ 	systime_snapshot->monoraw =3D ktime_add_ns(base_raw, nsec_raw);
+=20
+ 	/*
+@@ -1552,6 +1601,7 @@ int get_device_system_crosststamp(int (*get_time_fn)
+ 	unsigned int seq, clock_was_set_seq =3D 0;
+ 	ktime_t base_sys, base_raw, *offs;
+ 	u64 nsec_sys, nsec_raw;
++	s64 ntp_error;
+ 	u8 cs_was_changed_seq;
+ 	bool do_interp;
+ 	struct timekeeper *tk;
+@@ -1617,9 +1667,10 @@ int get_device_system_crosststamp(int (*get_time_fn)
+=20
+ 		nsec_sys =3D timekeeping_cycles_to_ns(&tk->tkr_mono, cycles);
+ 		nsec_raw =3D timekeeping_cycles_to_ns(&tk->tkr_raw, cycles);
++		ntp_error =3D snapshot_ntp_error(tk, xtstamp->clock_id, cycles);
+ 	} while (read_seqcount_retry(&tkd->seq, seq));
+=20
+-	xtstamp->sys_systime =3D ktime_add_ns(base_sys, nsec_sys);
++	xtstamp->sys_systime =3D ktime_add_ns(base_sys, nsec_sys) + ntp_error;
+ 	xtstamp->sys_monoraw =3D ktime_add_ns(base_raw, nsec_raw);
+=20
+ 	/*
+@@ -2447,6 +2498,7 @@ static void timekeeping_adjust(struct timekeeper *tk,=
+ s64 offset)
+ {
+ 	u64 ntp_tl =3D ntp_tick_length(tk->id);
+ 	s64 skew =3D ntp_get_skew_delta(tk->id);
++	u64 dividend;
+ 	u32 mult;
+=20
+ 	/*
+@@ -2467,8 +2519,19 @@ static void timekeeping_adjust(struct timekeeper *tk=
+, s64 offset)
+ 		 * scale it back up to the full per-tick rate for the mult bias.
+ 		 */
+ 		skew *=3D NTP_INTERVAL_FREQ;
+-		mult =3D div64_u64((tk->ntp_tick + skew) >> tk->ntp_error_shift,
+-				 tk->cycle_interval);
++		dividend =3D (tk->ntp_tick + skew) >> tk->ntp_error_shift;
++		mult =3D div64_u64(dividend, tk->cycle_interval);
++		/*
++		 * Stash the fractional part of the per-cycle ideal mult that
++		 * the integer @mult discards, scaled by 2^32, in clock-shifted
++		 * ns per cycle. The lockless snapshot readers use it to
++		 * extrapolate @ntp_error forward over the cycles accumulated
++		 * since the last tick (which on a NO_HZ kernel may be many
++		 * ticks' worth).
++		 */
++		tk->ntp_err_frac =3D div64_u64((dividend - (u64)mult *
++					      tk->cycle_interval) << 32,
++					     tk->cycle_interval);
+ 	}
+=20
+ 	/*
+--=20
+2.43.0
+
+
+--=-Q3Q2zOmnLo31GFPkE090
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYyMjA5MDQx
+N1owLwYJKoZIhvcNAQkEMSIEIN47exOOV8Grh514hhl4KVRHl0MYw6BIhdyW3FGcn16VMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAZl+WB4Nz+pRT
+3y9ncaduCdLcqlSWy7jXKREH4Z1ymk4ZPsDt50YESfPkhutEk1uZxtqeB2L/SUKiYoZnILZ9096A
+9FPeDl4IKy821+LwHeyg1WWvFVVBLy9m5fiL9PqkTV3dxihSHD+WGJwY2ROmRlceoF/LCE7vymvl
+9udU25bPSBLWnCR/x93iJubwWCxek7TUaoAgPJqdRKll0fQLGzwMG2oPeA9WKvPuTS/Wp0mEx0NF
+uQaB31xQoIT5z27P4sUQNJmV75yUiw2IEL5taVg5zabSiS0Qgh0NbARl/Ka0GhQKMd6lMjBRLTkR
+gg5nxc5BjlFbCmDgVTs5ywwzjw/8PaClQRh7phhKqJvM8GJm4HJ1q4x8Yj/2+OwTlxRJPXn3o0Xn
+Qbs7bsjqCLiPSXvYQNYi0KdJsfkLQPln8rFOp9/9aNp4j5+IypWFVcJtkUKnUleLjhvbuK6g5Z+q
+xfkXJLgB0qP9oQAE1EOvY56Jqgz2j8kJkCNss1t039w26FevPxD7Kqh+1xVz7bXjbdrWB5JN1lhV
+TozE8zr0+5EoFj+0LPg7OZvcHqg1EjWmB02dUGl6RBYOSaMWvW3S3aJboC88i1Av9fxPyJ+ZWjFO
+FDg0nDSWT/ao7iLI+dY/TXoiKMVp1kQj+tqF5brLRAkGyht+KEvtZnttbkmndoYAAAAAAAA=
+
+
+--=-Q3Q2zOmnLo31GFPkE090--
 
