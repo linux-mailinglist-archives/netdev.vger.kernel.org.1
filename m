@@ -1,329 +1,397 @@
-Return-Path: <netdev+bounces-301064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CGk4GDUaOWqdmwcAu9opvQ
-	(envelope-from <netdev+bounces-301064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:19:17 +0200
+	id XFCYCD8cOWoDnAcAu9opvQ
+	(envelope-from <netdev+bounces-301065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:27:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0EFD6AF01F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:19:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48F06AF0EE
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:27:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=YSNd+fXr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301064-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301064-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=NP5vIVfj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301065-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301065-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 696EB300C30E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:19:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4CE8E300E2A7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C845B3947B8;
-	Mon, 22 Jun 2026 11:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FA43A6412;
+	Mon, 22 Jun 2026 11:27:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDB037997A
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:19:11 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782127153; cv=fail; b=k+pmupOVCzxY5g4BGYBSw8lgEPCa/+d3o0Wm7lxYK58oLhtHfOt0SPL0kEY52OFySaFC7HCdNf+bb1AtIBszgAHSfLhchwbOYEAUkU8XNZ9Je95UgV7vT5Ee6+OiQKQpCj4Ux7BKFi7MJ8DQBXAytHACVBiJoTcZ6yvy49a6zkg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782127153; c=relaxed/simple;
-	bh=YPAbbSvQXocjMUpiHAJymvF221z4fS+SbwINVpvkyBc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PI78L7RtpJ8tIwQy8HBBkhT24B9xefMBqVzx/Bg2xZyQeTZ5qVNHIqkuhK1lCcY8DPqdiqi/d86hh6sJRXWhIJdMO+hJ0xWdNrNi9/mB6dp/chRr0TohWiy3LsUW/xmdajyn/et4Emnd5YAxd6n4KCkuLRKR4i2Sw1/B6edy3HE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YSNd+fXr; arc=fail smtp.client-ip=192.198.163.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782127152; x=1813663152;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=YPAbbSvQXocjMUpiHAJymvF221z4fS+SbwINVpvkyBc=;
-  b=YSNd+fXrX8b1CTJOQfjzfVPUTNIcgWvl0WjsJ3gnDSxXE/AA7LmiUwYC
-   pkzZbHuvLsFbkIf9A7zHC8lDW5p2JHfQRR9LqLveydMIocJqVX+s6Cu27
-   yMCUZ+EQ44L5C8fg04cMgkVRUZn9byvi5qGBqejnx+5rw1viDXgCogmg2
-   Hm4awYvyuHZODFAKRbWG70PXev65orbu0C4SYoxHnmtXlxdb/HF2Zrze3
-   BCIMOECGFbA0aTD7yScajR+UQ7PSoAkSQACN38JFaEKUQCoNnQyBZd4wh
-   rVLEfIMVR9+AXEVzRVhVM2TFSKjLS0Su9t43k6aJ2gG13FVoZaXqeVKDg
-   g==;
-X-CSE-ConnectionGUID: JKWRc9zoQ827FZq0kxGxaQ==
-X-CSE-MsgGUID: bONWFJ8WQw6nKOjdMCYTBw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="81956459"
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="81956459"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 04:19:09 -0700
-X-CSE-ConnectionGUID: 0uW29eumRTmDrWbI52kGXQ==
-X-CSE-MsgGUID: 76OjqJqVQbOa0uLTLVuITA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="254298697"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 04:19:05 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 22 Jun 2026 04:19:04 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 22 Jun 2026 04:19:04 -0700
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.28)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 22 Jun 2026 04:19:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U/HG3Gjim39GqivscGXNnHDweaaAmOGMT2LHrjzVgXzl96WQFe7vziRWxpvKs19+/OXd4RmfVDHSXvZEYRj/DWR+ZTps2fchUd3FREsUrDCUK1374cCyj6jX4B9JRrEozVP3x6Dy/3TDsi/K3JOSIjB6g8uIyvLnk/GDJvSXOWmi72bMELwsAWttimh1+jOROpXsZO+ULPoMbsI+hM7ND4IbVfLOTAM4YxlDylXko+ltTM0I2k6e0ttQRqVifXJR5E3ZEBxlxLW8LzuimWAgxxwGmvUiyzSFSJdQ+iwHbN88xynQNz8nWlLIdmSE01Qq3P13vKlKpUvZx7bSUaUp6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6/RyXoq1cohG7XzhiLmZCupKT36uwWtgz76/FbYqcrk=;
- b=gTUu1H1GFo6shs5JlUGYSavJT4H3rTNsnc3fizoUrmmdVaxLatzWGqRFIa/mmabuFtCtmM3rYK0Q9JtL0WmFCcKrlGKCvIQaJYaI8WQI8YY9G8HJsTYCsojFvVs3KjC6mc4aKnX2qY26rCkbai2fNGMopBrCXv0m8UwREKkC6pDCcNwQOvnws9jU0SGmrfG3oOeMafC9CB5ShoXssoyEOPk396/K9qNjjXYvehkViIIRjIbqW19ccOWheh2xGyfGhHjCpe3uWXgVp+cGXyNEZDmheDQLA7dyPdTPp4uX4hjH+0Rx7tyG8KWYpyJDB3VNqGa/gFQDh47EZns+YxKfKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by IA0PR11MB7332.namprd11.prod.outlook.com (2603:10b6:208:434::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.20; Mon, 22 Jun
- 2026 11:19:01 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0139.011; Mon, 22 Jun 2026
- 11:19:00 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>, "Nguyen, Anthony
- L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH net v6 4/4] ice: skip unnecessary VF reset when setting
- trust
-Thread-Topic: [PATCH net v6 4/4] ice: skip unnecessary VF reset when setting
- trust
-Thread-Index: AQHc/7LceK/tTBsRgUK0XusOw5V7sLZKcmSA
-Date: Mon, 22 Jun 2026 11:19:00 +0000
-Message-ID: <IA3PR11MB898604F3A55FAAA60C8217C2E5EF2@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260619061321.8554-1-jtornosm@redhat.com>
- <20260619061321.8554-5-jtornosm@redhat.com>
-In-Reply-To: <20260619061321.8554-5-jtornosm@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA0PR11MB7332:EE_
-x-ms-office365-filtering-correlation-id: 3367ee78-b3a8-464f-9917-08ded0500f07
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|38070700021|18002099003|22082099003|11063799006|56012099006|4143699003;
-x-microsoft-antispam-message-info: Zag2LxpJyrrPG+/9C6e39yGHXx3E2upwWnqaVctaD6fOi28NjjGM2PopEWMf8mzgrUdWzMkhr3oF/gmWEBkg6Pfh/rHY3b2F3PIbpFZYaIdfDnGUziTqt7ev+hIxyU/oaLlzP8yEgO/g9mFPtbRC27em1xL9ZsQxIMj1CvCAXAqXd8WavsXzFzagmFsmxIb5RlD3lA5ZOHv2C6BWDhe49EbKyoTa/JNYsB0Zkw2ihNB6B1O8jvMnt5LmjKnzOMVjj9n0YfswIEFhk6aeCvWnHwn9G2qRak8Vai/7sISId4yGEQk/m0sWGjVtz893CEcqE976B0o/4agZUshXydg0oUWreYHOkXcFxGr0KJ1YikET/Sh6OV/Quva/7iDaNn4n2c7bNAcXMWV7bkROYzHMF9VjD8d7J2Fzu0vthzvdn6pyg0w9/LKMcnlGUHXdGHI2UEaGFo58jN7NEyQ97x/XjJCnbcIPm8S/RhYfbIzRTFolf6j250W5lLm/CBslW05Ghn2WYU0AMJqUh70O4beto1Qey5HOCmDTQmbdEJy6/mqSCX0w9tMuqLitRrnvXbaHZLWoSrcyTKjhgJwT+p37Z6vFRBz4foo75owazOV8tTOtBn0OGJLfxFvPQ90JLssK3psOupIl3glAbBggCRoEDMnDn4oQzFhuRKeBmiMg/95fXDa1N4rxtgV2Wbe05sXZdKWwF1zFvwJrihnIuynMos9VOhD93dWiJKye4Ixt9o4=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(38070700021)(18002099003)(22082099003)(11063799006)(56012099006)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ixu5MHkmJ5+CKwq2F5MNYEu77caBSQIRohK/MelBx9vxyk3acRU7ao1AcLQr?=
- =?us-ascii?Q?VTttGub+BvrgcLMzRr9tjTB8zGJhySAsBqnmfw9a21FY/COF8M4Ks4FXlEUU?=
- =?us-ascii?Q?VHQuOsF4v4Mr4lujQs3UeuvXhN0fR/Y88IRb9+fuC/6swUvpkJ/Bed/P47TB?=
- =?us-ascii?Q?C6VAathEby76OuWnAcTZrD37ZPudW8Gdhd+nIrhY/JY3H8LjLm5nvgYCsrdW?=
- =?us-ascii?Q?OsM/9spRvl7orIJBrIeUdQdvsSGefL3JY3s0kg6QPadK3xQ+P4SIhnuLcdRk?=
- =?us-ascii?Q?UyunBzQJxNpJFmGn0GeCrvwQ61T/UfemdcGWxm9nt7u7bpz+K1kSS8lmTuxq?=
- =?us-ascii?Q?Sd7j2QJ33QT3wcWICH8zrr9B/jXNRVeIMFuQ7oHAyAt1++rT68Z/+m2V02V4?=
- =?us-ascii?Q?m+PAAjqQ7DegDTaqK/uOjeUQICNlgcTtkHOomLxVW6vcRj3EmLw09bZ15Njr?=
- =?us-ascii?Q?yOeaAnKFPiW8sqvr6pGKmzunjff1Ik93r2ok9gLPrZTKOYapZEmbj4GFQ7Rb?=
- =?us-ascii?Q?ly9E5dwgIhPUemqfwBc2tkjbA3siXww+cqVlWQlixQCGfDzbz2yj6hL0tN9E?=
- =?us-ascii?Q?xeV6MgGqBv/EoQRjwASkdwdkyk6PyFZVYO2iIrb6bnWtq9L1VyhkM3TzpUSx?=
- =?us-ascii?Q?nb0xXIDMT9k6Soin4kPdNTaQhjSfLm3ZSahvnoX4fD4sLJPq5qOmfc7ZOTk9?=
- =?us-ascii?Q?i/f7YIO50xA2upt49TEpe0rrOCeVK4slhzK48fOaVkQlh/5Qh5eOkuCEEXFa?=
- =?us-ascii?Q?HCL+JsDC3dLADhRQBunhufMwM/g/5cx6ejCpPfrk4pe7r5dLRHMJLrcixokP?=
- =?us-ascii?Q?tsLyrcgAv2W5edD3UUGzNBWAvd6I3166nX2//H//3hA8CGKdaIj6546LBFuw?=
- =?us-ascii?Q?vdGjhqIfP1Es42KbSJR4D6lKCRVrtxxpozbxz7b4palkRUF0ksw691NMlcjq?=
- =?us-ascii?Q?dcZ9To57hqgvaMiRXGB9pWHA+bxbeOY0S7/CnBip1Jw31dzgQmSe+RyAQJEj?=
- =?us-ascii?Q?qt/hmLo3e9lCnjXq56Jb8chK28oVC3tJVoocFc+Stw+0dhFP9NeQ5Q6FekUh?=
- =?us-ascii?Q?MrBcWTzJOMEfN4CW5mXPhMrmGoXiL4NKKHlGD/IoXYex3FhBjBJSlbSs9ghY?=
- =?us-ascii?Q?n8NglKLWNiQjjbK8nlhPVABXYtZ39UIb9kJW1x09hW2+L3LdZfr1VwwbQJv6?=
- =?us-ascii?Q?TYcuUYiZ2gAR7Z0dbjtqBMnz0Q1TvYbFem6PXN52pL6n9RrFZtFCy4y8yDkL?=
- =?us-ascii?Q?9XglyQPNE5fRGP0jl6bRT3DEwbU2ncQGLvOu/wUvwL5V3ayY6J27xz6LeYrm?=
- =?us-ascii?Q?G3B7QpCtVFsb1SdaozFwFtecpVFxyscR78z6ZKw/iKjBCnJ0M+SErj6zCDR4?=
- =?us-ascii?Q?YMUrHPvFUPbl9WfLG5Pf8l5frm1CGpgGSBl7DHB12aMF6D1iZ61CP0BGEaqs?=
- =?us-ascii?Q?LGUniZGexPrEsm5zHUJsbrUizsPbKeMuzTl65JHyT0eE3Vl8Bne2kCYn3bdD?=
- =?us-ascii?Q?jVHDVNgbBIMwdugBbQ4QVGgl6bD8b9LhSLRZM1zogOfTiqdi8Z4g5Psvb22f?=
- =?us-ascii?Q?ngifOnnvIsesehAHerAff/ag4wKgcNVFBSR/zTYXS/yuKO7HPp/qKfyiHc6u?=
- =?us-ascii?Q?YZNdDpwD/qqWWaPi7OKy3TJhHkMwTH3VC1N+3VL9N98MYwCZKW/a1DSHRH1y?=
- =?us-ascii?Q?qOFZpR2L3TXN0gY+zRDZtLKufwzdjD/n4C6Se19RorV5xmPu3ojcgCOo3fd0?=
- =?us-ascii?Q?FtrGdmLGEngidoDHlOguzbi9Rd3XSpo=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF753A4F47;
+	Mon, 22 Jun 2026 11:27:47 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782127669; cv=none; b=eVZH/Zgg4diWX7A/vL3ZM6uOVUNs8pT0j/SkTQFOGa4nttJDYAzZ1tNHNj9BbowU657N/sBrd02KpbdAMq5ICKU1evE98i+LuoBSxd/vJjNFw0Uz6vDHy+31UMYdiFcaOkPb/LZe/PAd5h7L01K8P8lvZ2ZREaTEPDNsWLbGh+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782127669; c=relaxed/simple;
+	bh=N/vuDHI9SQW1janB0j5sO1lsg3p3zPSFITHHbgn1I9o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N6BSQiUlze+NFvrkVh5/fninGhgV2NrV1roGLM0qGbypx0hb7Z0Kf/1BM9MBGcyUjr8tbjJqaA7Tg4JzDhDs5ZyVqzzLxKsB7548qWFBecXGhk6lOxjaf7mAlCtlp1XBCsQfx+aPtIXP0JU5aLOwIuhHjj9lxRfMN1yAk95Q6zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NP5vIVfj; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AED81F000E9;
+	Mon, 22 Jun 2026 11:27:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782127667;
+	bh=CxKnwWbJ6o3Gp2gCYHflIyVCw0BGlYpweEWWlR7Zxlc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=NP5vIVfjsp4feyIcuAfoiRvYPwPZKLTXzyb0N0wUNoKxJZDnW14mB+Ksso1zMBEZX
+	 fUxTpjrKClw00GwNOT/ge4xL2rriBHbh5PxOP732GJlaoArFBmxyEOXdYsklIEobB9
+	 /pFQVIcOni9/exs8OPh0iGTCF0YrB1elReGRM0Pk+0VV64ksMWO5Yff5O4AFlcbETU
+	 7oQHcuU8AyNBq9zKQ3Q/5sFiPWawUkfJJPp52WQ+UesWgVbFX7LlIhxh77+4lU8xhN
+	 0Mxv8uME2L+nRo7wVhECL6694CE+9AKg1Xt97qlcIjmOAoH39Xw4JyyfVaAkL3HiaO
+	 P5VjuChOEJC/w==
+Message-ID: <8f98a3a6-f97b-4673-964f-fb09c8879e2e@kernel.org>
+Date: Mon, 22 Jun 2026 13:27:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: e0i63YLIoMsdHaMcdgtGzrkLO29MT171fk21KKMKxbs8pXW3hhK+0IQ+SbV8VqLyRa0hbYr9VoqNHni4xTW/H/aHi+E6i3FkwsfR4H1oHGXORk/Gria6Q9OJ7nmpByLJF/WG7vk5IW+RdyPfiGy8MKzSGFPE0gND87pW602IusapSLnUS9BhoaA3xTJAxd8b+N3QARtiDuQHIihs8HinfkOTEktBAJ9Kpo/3ACHAv0Maf8jPqvP3hsBJWp699vQRNfDDfO7/3eJvVe1Ee4c3lUZjJCNJ1skK0rHtzoaXJdsE5tLtxQiWwf3Ac/OWWnS/CKyDLPDIwrNZjsP1lV8Enw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3367ee78-b3a8-464f-9917-08ded0500f07
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2026 11:19:00.0662
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iMZxF/KSpg+cQ5efd+4PwrNB2JFjdhuEFYDIZUcFOGQr2Lc20+q6rycBPBN05U/m1HusQOx0fVW+ImZhaxqDAjWQUlGs484V5qR61ZCXQK0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7332
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
+ state
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Kaitao Cheng <kaitao.cheng@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+ linux-ntfs-dev@lists.sourceforge.net,
+ Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
+ io-uring <io-uring@vger.kernel.org>, audit@vger.kernel.org,
+ bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ dri-devel@lists.freedesktop.org,
+ "linux-perf-use." <linux-perf-users@vger.kernel.org>,
+ linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
+ kexec@lists.infradead.org, live-patching@vger.kernel.org,
+ linux-modules@vger.kernel.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Linux Power Management <linux-pm@vger.kernel.org>, rcu@vger.kernel.org,
+ sched-ext@lists.linux.dev, linux-mm <linux-mm@kvack.org>,
+ virtualization@lists.linux.dev, damon@lists.linux.dev,
+ clang-built-linux <llvm@lists.linux.dev>,
+ chengkaitao <chengkaitao@kylinos.cn>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+ <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-301064-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301065-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:kaitao.cheng@linux.dev,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org
+ ,m:linux-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,linux.dev];
+	FORGED_SENDER(0.00)[david@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:jtornosm@redhat.com,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:przemyslaw.kitszel@intel.com,m:jacob.e.keller@intel.com,m:horms@kernel.org,m:jesse.brandeburg@intel.com,m:anthony.l.nguyen@intel.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCPT_COUNT_GT_50(0.00)[52];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0EFD6AF01F
+X-Rspamd-Queue-Id: B48F06AF0EE
 
+On 6/22/26 07:28, Alexei Starovoitov wrote:
+> On Sun, Jun 21, 2026 at 9:06 PM Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+>>
+>> From: chengkaitao <chengkaitao@kylinos.cn>
+>>
+>> The list_for_each*_safe() helpers are used when the loop body may remove
+>> the current entry.  Their current interface, however, forces every caller
+>> to define a temporary cursor outside the macro and pass it in, even when
+>> the caller never uses that cursor directly.  For most call sites this
+>> extra cursor is just boilerplate required by the macro implementation.
+>>
+>> This is awkward because the saved next pointer is an internal detail of
+>> the iteration.  Callers that only remove or move the current entry do not
+>> need to spell it out.
+>>
+>> The _safe() suffix has also caused confusion.  Christian Koenig pointed
+>> out that the name is easy to read as a thread-safe variant, especially
+>> for beginners, even though it only means that the iterator keeps enough
+>> state to tolerate removal of the current entry.  He suggested _mutable()
+>> as a clearer description of what the loop permits.
+>>
+>> Add *_mutable() iterator variants for list, hlist and llist.  The new
+>> helpers are variadic and support both forms.  In the common case, the
+>> caller omits the temporary cursor and the macro creates a unique internal
+>> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
+>> explicit temporary cursor, the caller can still pass it and the helper
+>> keeps the existing *_safe() behaviour.
+>>
+>> For example, a call site may use the shorter form:
+>>
+>>   list_for_each_entry_mutable(pos, head, member)
+>>
+>> or keep the explicit temporary cursor form:
+>>
+>>   list_for_each_entry_mutable(pos, tmp, head, member)
+>>
+>> The existing *_safe() helpers remain available for compatibility.  This
+>> series only converts users in mm, block, kernel, init and io_uring.  If
+>> this approach looks acceptable, the remaining users can be converted in
+>> follow-up series.
+>>
+>> Changes in v3 (Christian König, Andy Shevchenko):
+>> - Convert safe list walks to mutable iterators
+>>
+>> Changes in v2 (Muchun Song, Andy Shevchenko):
+>> - Drop the list_for_each_entry_mutable*() helpers from v1 and make the
+>>   cursor change directly in the existing list_for_each_entry*() helpers.
+>> - Open-code special list walks that rely on updating the loop cursor in
+>>   the body, preserving their existing traversal semantics.
+>>
+>> Link to v2:
+>> https://lore.kernel.org/all/20260609061347.93688-1-kaitao.cheng@linux.dev/
+>>
+>> Link to v1:
+>> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+>>
+>> Kaitao Cheng (7):
+>>   list: Add mutable iterator variants
+>>   llist: Add mutable iterator variants
+>>   mm: Use mutable list iterators
+>>   block: Use mutable list iterators
+>>   kernel: Use mutable list iterators
+>>   initramfs: Use mutable list iterator
+>>   io_uring: Use mutable list iterators
+>>
+>>  block/bfq-iosched.c                 |  17 +-
+>>  block/blk-cgroup.c                  |  12 +-
+>>  block/blk-flush.c                   |   4 +-
+>>  block/blk-iocost.c                  |  18 +-
+>>  block/blk-mq.c                      |   8 +-
+>>  block/blk-throttle.c                |   4 +-
+>>  block/kyber-iosched.c               |   4 +-
+>>  block/partitions/ldm.c              |   8 +-
+>>  block/sed-opal.c                    |   4 +-
+>>  include/linux/list.h                | 269 ++++++++++++++++++++++++----
+>>  include/linux/llist.h               |  81 +++++++--
+>>  init/initramfs.c                    |   5 +-
+>>  io_uring/cancel.c                   |   6 +-
+>>  io_uring/poll.c                     |   3 +-
+>>  io_uring/rw.c                       |   4 +-
+>>  io_uring/timeout.c                  |   8 +-
+>>  io_uring/uring_cmd.c                |   3 +-
+>>  kernel/audit_tree.c                 |   4 +-
+>>  kernel/audit_watch.c                |  16 +-
+>>  kernel/auditfilter.c                |   4 +-
+>>  kernel/auditsc.c                    |   4 +-
+>>  kernel/bpf/arena.c                  |  10 +-
+>>  kernel/bpf/arraymap.c               |   8 +-
+>>  kernel/bpf/bpf_local_storage.c      |   3 +-
+>>  kernel/bpf/bpf_lru_list.c           |  25 ++-
+>>  kernel/bpf/btf.c                    |  18 +-
+>>  kernel/bpf/cgroup.c                 |   7 +-
+>>  kernel/bpf/cpumap.c                 |   4 +-
+>>  kernel/bpf/devmap.c                 |  10 +-
+>>  kernel/bpf/helpers.c                |   8 +-
+>>  kernel/bpf/local_storage.c          |   4 +-
+>>  kernel/bpf/memalloc.c               |  16 +-
+>>  kernel/bpf/offload.c                |   8 +-
+>>  kernel/bpf/states.c                 |   4 +-
+>>  kernel/bpf/stream.c                 |   4 +-
+>>  kernel/bpf/verifier.c               |   6 +-
+>>  kernel/cgroup/cgroup-v1.c           |   4 +-
+>>  kernel/cgroup/cgroup.c              |  54 +++---
+>>  kernel/cgroup/dmem.c                |  12 +-
+>>  kernel/cgroup/rdma.c                |   8 +-
+>>  kernel/events/core.c                |  44 +++--
+>>  kernel/events/uprobes.c             |  12 +-
+>>  kernel/exit.c                       |   8 +-
+>>  kernel/fail_function.c              |   4 +-
+>>  kernel/gcov/clang.c                 |   4 +-
+>>  kernel/irq_work.c                   |   4 +-
+>>  kernel/kexec_core.c                 |   4 +-
+>>  kernel/kprobes.c                    |  16 +-
+>>  kernel/livepatch/core.c             |   4 +-
+>>  kernel/livepatch/core.h             |   4 +-
+>>  kernel/liveupdate/kho_block.c       |   4 +-
+>>  kernel/liveupdate/luo_flb.c         |   4 +-
+>>  kernel/locking/rwsem.c              |   2 +-
+>>  kernel/locking/test-ww_mutex.c      |   2 +-
+>>  kernel/module/main.c                |  11 +-
+>>  kernel/padata.c                     |   4 +-
+>>  kernel/power/snapshot.c             |   8 +-
+>>  kernel/power/wakelock.c             |   4 +-
+>>  kernel/printk/printk.c              |  11 +-
+>>  kernel/ptrace.c                     |   4 +-
+>>  kernel/rcu/rcutorture.c             |   3 +-
+>>  kernel/rcu/tasks.h                  |   9 +-
+>>  kernel/rcu/tree.c                   |   6 +-
+>>  kernel/resource.c                   |   4 +-
+>>  kernel/sched/core.c                 |   4 +-
+>>  kernel/sched/ext.c                  |  22 +--
+>>  kernel/sched/fair.c                 |  28 +--
+>>  kernel/sched/topology.c             |   4 +-
+>>  kernel/sched/wait.c                 |   4 +-
+>>  kernel/seccomp.c                    |   4 +-
+>>  kernel/signal.c                     |  11 +-
+>>  kernel/smp.c                        |   4 +-
+>>  kernel/taskstats.c                  |   8 +-
+>>  kernel/time/clockevents.c           |   6 +-
+>>  kernel/time/clocksource.c           |   4 +-
+>>  kernel/time/posix-cpu-timers.c      |   4 +-
+>>  kernel/time/posix-timers.c          |   3 +-
+>>  kernel/torture.c                    |   3 +-
+>>  kernel/trace/bpf_trace.c            |   4 +-
+>>  kernel/trace/ftrace.c               |  49 +++--
+>>  kernel/trace/ring_buffer.c          |  25 ++-
+>>  kernel/trace/trace.c                |  12 +-
+>>  kernel/trace/trace_dynevent.c       |   6 +-
+>>  kernel/trace/trace_dynevent.h       |   5 +-
+>>  kernel/trace/trace_events.c         |  35 ++--
+>>  kernel/trace/trace_events_filter.c  |   4 +-
+>>  kernel/trace/trace_events_hist.c    |   8 +-
+>>  kernel/trace/trace_events_trigger.c |  17 +-
+>>  kernel/trace/trace_events_user.c    |  16 +-
+>>  kernel/trace/trace_stat.c           |   4 +-
+>>  kernel/user-return-notifier.c       |   3 +-
+>>  kernel/workqueue.c                  |  16 +-
+>>  mm/backing-dev.c                    |   8 +-
+>>  mm/balloon.c                        |   8 +-
+>>  mm/cma.c                            |   4 +-
+>>  mm/compaction.c                     |   4 +-
+>>  mm/damon/core.c                     |   4 +-
+>>  mm/damon/sysfs-schemes.c            |   4 +-
+>>  mm/dmapool.c                        |   4 +-
+>>  mm/huge_memory.c                    |   8 +-
+>>  mm/hugetlb.c                        |  56 +++---
+>>  mm/hugetlb_vmemmap.c                |  16 +-
+>>  mm/khugepaged.c                     |  14 +-
+>>  mm/kmemleak.c                       |   7 +-
+>>  mm/ksm.c                            |  25 +--
+>>  mm/list_lru.c                       |   4 +-
+>>  mm/memcontrol-v1.c                  |   8 +-
+>>  mm/memory-failure.c                 |  12 +-
+>>  mm/memory-tiers.c                   |   4 +-
+>>  mm/migrate.c                        |  23 ++-
+>>  mm/mmu_notifier.c                   |   9 +-
+>>  mm/page_alloc.c                     |   8 +-
+>>  mm/page_reporting.c                 |   2 +-
+>>  mm/percpu.c                         |  11 +-
+>>  mm/pgtable-generic.c                |   4 +-
+>>  mm/rmap.c                           |  10 +-
+>>  mm/shmem.c                          |   9 +-
+>>  mm/slab_common.c                    |  14 +-
+>>  mm/slub.c                           |  33 ++--
+>>  mm/swapfile.c                       |   4 +-
+>>  mm/userfaultfd.c                    |  12 +-
+>>  mm/vmalloc.c                        |  24 +--
+>>  mm/vmscan.c                         |   7 +-
+>>  mm/zsmalloc.c                       |   4 +-
+>>  124 files changed, 875 insertions(+), 681 deletions(-)
+> 
+> Not sure what you were thinking, but this diff stat
+> is not landable.
 
+Agreed. If we decide we want this, I guess we should target per-subsystem
+conversions.
 
-> -----Original Message-----
-> From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> Sent: Friday, June 19, 2026 8:13 AM
-> To: netdev@vger.kernel.org
-> Cc: intel-wired-lan@lists.osuosl.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>; Keller, Jacob E
-> <jacob.e.keller@intel.com>; horms@kernel.org;
-> jesse.brandeburg@intel.com; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Jose Ignacio
-> Tornos Martinez <jtornosm@redhat.com>
-> Subject: [PATCH net v6 4/4] ice: skip unnecessary VF reset when
-> setting trust
->=20
-> Similar to the i40e fix, ice_set_vf_trust() unconditionally calls
-> ice_reset_vf() when the trust setting changes. While the delay is
-> smaller than i40e, this reset is still unnecessary in most cases.
->=20
-> When granting trust, no reset is needed - we can just set the
-> capability flag to allow privileged operations.
->=20
-> When revoking trust, we only need to reset (conservative approach) if
-> the VF has actually configured advanced features that require cleanup
-> (MAC LLDP filters, promiscuous mode). For VFs in a clean state, we can
-> safely change the trust setting without the disruptive reset.
->=20
-> When we do reset, we maintain the original ice pattern that has been
-> reliable in production: cleanup LLDP filters first, then set vf-
-> >trusted, then reset. This ensures the privilege capability bit is
-> handled correctly during reset rebuild.
->=20
-> When we don't reset, we manually handle the capability flag via helper
-> function, eliminating the delay.
->=20
-> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> ---
-> v6: AI review identified issues with v5's reset-before-cleanup
-> approach. Revert
->     to original reset procedure (cleanup before reset) which has
-> proven reliable,
->     just adding the conditional check to skip reset when VF has no
-> advanced
->     features configured.
-> v5: https://lore.kernel.org/all/20260429102426.210750-5-
-> jtornosm@redhat.com/
->=20
->  drivers/net/ethernet/intel/ice/ice_sriov.c | 33 +++++++++++++++++++--
-> -
->  1 file changed, 29 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> index 7e00e091756d..XXXXXXXXXXXXXXXX 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> @@ -1364,6 +1364,23 @@ int ice_set_vf_mac(struct net_device *netdev,
-> int vf_id, u8 *mac)
->  	return __ice_set_vf_mac(ice_netdev_to_pf(netdev), vf_id, mac);
-> }
->=20
-> +/**
-> + * ice_setup_vf_trust - Enable/disable VF trust mode without reset
-> + * @vf: VF to configure
-> + * @setting: trust setting
-> + *
-> + * Update VF flags when changing trust without performing a VF reset.
-> + * This is only called when it's safe to skip the reset (VF has no
-> +advanced
-> + * features configured that need cleanup).
-> + */
-> +static void ice_setup_vf_trust(struct ice_vf *vf, bool setting) {
-> +	if (setting)
-> +		set_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-> +	else
-> +		clear_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
-> }
-> +
->  /**
->   * ice_set_vf_trust
->   * @netdev: network interface device structure @@ -1399,11 +1416,19
-> @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool
-> trusted)
->=20
->  	mutex_lock(&vf->cfg_lock);
->=20
-> -	while (!trusted && vf->num_mac_lldp)
-> -		ice_vf_update_mac_lldp_num(vf, ice_get_vf_vsi(vf),
-> false);
-> -
-> +	/* Reset only if revoking trust and VF has advanced features
-> configured */
-> +	if (!trusted &&
-> +	    (vf->num_mac_lldp > 0 ||
-> +	     test_bit(ICE_VF_STATE_UC_PROMISC, vf->vf_states) ||
-> +	     test_bit(ICE_VF_STATE_MC_PROMISC, vf->vf_states))) {
-> +		while (vf->num_mac_lldp)
-> +			ice_vf_update_mac_lldp_num(vf,
-> ice_get_vf_vsi(vf), false);
-> +		vf->trusted =3D trusted;
-> +		ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
-> +	} else {
-> +		vf->trusted =3D trusted;
-> +		ice_setup_vf_trust(vf, trusted);
-> +	}
-> -	vf->trusted =3D trusted;
-> -	ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
->  	dev_info(ice_pf_to_dev(pf), "VF %u is now %strusted\n",
->  		 vf_id, trusted ? "" : "un");
->=20
-> --
-> 2.43.0
+If this goes through the MM tree, I would even appreciate doing this on a per-MM
+component granularity.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+(unless we have some magic "Linus converts all of them" script, which I doubt we
+will have)
+
+Is there a way forward to replace list_for_each_*_safe entirely, possibly just
+reusing the old name but simply the parameter?
+
+-- 
+Cheers,
+
+David
 
