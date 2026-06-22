@@ -1,373 +1,251 @@
-Return-Path: <netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301004-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mJm7MFH4OGomkwcAu9opvQ
-	(envelope-from <netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:54:41 +0200
+	id A7fUB0/5OGpakwcAu9opvQ
+	(envelope-from <netdev+bounces-301004-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:58:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54CFD6ADF69
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:54:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7177A6ADFF7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:58:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=BNAvXX+r;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=infradead.org header.s=casper.20170209 header.b="JeGs/v3f";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301004-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301004-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A521B30068DC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:54:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C40530492AB
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDE435E1B5;
-	Mon, 22 Jun 2026 08:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D93393DC8;
+	Mon, 22 Jun 2026 08:55:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D77940D596;
-	Mon, 22 Jun 2026 08:54:28 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782118470; cv=fail; b=cW2CCrJt1h8cQ5Gf/6pDy1ocaUDJL0S0iU35dKHaZqblbcLpQ0BTO4elNXWjIaEmRVchRRpGSxAS1b8veruNCI8e67u6dGhfCmzezL0Eg8JYgUD0ZhcUKoJS/S6YZZpu0RSs/T9nlqcow6/KPb1v3qw+Vvks2zvp9W4U6TZAS3Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782118470; c=relaxed/simple;
-	bh=n9XDInWe4Yi/gGyW3jZbJMvmeJBOeDt6gtOA8GidQdo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HRBJ6SvG37FdZuOjJnryqKnaIcBp6u+37jkrjRWD3Hi+USx89C9CEPzD5eDU9v5Y/Bq+wUqykUM9bVGiJl5Y/kPmk/EfTr5HbER+IBXwZdMxFaywE5Dxs5TTHxkubDnj/bOYem7f9ZY4X7kJLMgvEl5I/VWPL3VF2DrAi0Z6Zlw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BNAvXX+r; arc=fail smtp.client-ip=192.198.163.10
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782118468; x=1813654468;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=n9XDInWe4Yi/gGyW3jZbJMvmeJBOeDt6gtOA8GidQdo=;
-  b=BNAvXX+rNBTZxM0aPpGMsEd3L5ybKQesNt5RFRQhuCs2zwYe9vEn0E+O
-   HBW4zpvYSHFZLMNcGulaQE0Fgu7DwqAQqglckhQSr/RoPr75D9FDitb1A
-   pb9rq6IWvyduckj0Fbq57Q7EkH7zfenAy3jjl9p6Ahw8S9FswggLChaTj
-   Bzf/GFH6ltmQT8tWArdssTioqBMlr3qqtiqpVdpmojJzRZxUxGMjEapla
-   Jbas/ylbGAftpNoLQJrDtV4JIrNKWdyCbjHRZ1g9am8b1A3NPX/A+RTMK
-   K4XLU/lNCkUxkUDMdBG0o6QjIJJNTsoxnQsGX6fV0D5wJYZ5qy+je1TT5
-   g==;
-X-CSE-ConnectionGUID: LEvcVafVToWFwIgpiT/O9g==
-X-CSE-MsgGUID: X9D5jjqVTpCp1wCGAR3Mxg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="94233845"
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="94233845"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:54:27 -0700
-X-CSE-ConnectionGUID: xqEdVHA7TfyoQV9Ie2Iyug==
-X-CSE-MsgGUID: mFK9UNA1QB2uGKAI2ZACLg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
-   d="scan'208";a="244818181"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:54:28 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 22 Jun 2026 01:54:27 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 22 Jun 2026 01:54:27 -0700
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.3) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 22 Jun 2026 01:54:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CmhB43qb1HI/eVNaQj9OJ3C1NP9OBoeI5zFJuH66tHUcd2XOPfZE8yqGt7sTsvro7UeNnd2S9rNSdCMqe3k6N7tpDFPSARBih5A76rESSng3JLlhoYerCrblRx8LMsBNa8RpMu/UjG+FHcUB3cqP6jRcwaXeVHn6B7mimcnI7Gaj11xyO7USPEwSBp36gG+kUrma0IYvI5nuTH8WzPtnFt2/BAb59jvT2uKlK0PxjwxGBgO9P72hCEPkA2LaFqlmOiOlF1uysva8tEof2yzR0iBDgzsvwtGxRhjb2vJQxmhihM0GUlbm8Ncax3wqTN0cQLnvxFdTMYBKhpZ28ZPE1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7rFN02wRnhFZ+vWnurkS0any+jsNOMSvrJCt7vKadaE=;
- b=ECb+9qEHY2GtAA9/xl4OS3kUAk9DzB8JKfW6n0FJL1imgWEUGsUG9sj7B960Uyvm+Lq1dTZTaJf0Yq0iztceagi+jXLSLO/vRc66fKpCQ6/8BQVUL+ks1VpCMlv+q0NSJVqhTypDwVoMYPhXxqdOIwTx6c9QpWWD/hMlUUtki69s83f9X4GSUewhxcdZBj5QiKAnI4c7ZlNBbYuMP+Lrg4xfEBczxseXkiqWlB8HQYFee78yvSToWlbqHHrhHUt6+e8ixt5775MJhIf7j3Ca+j5XedxmLjpDG0ryb/G3TDQZwlvc5QnplFw1Au3HFI99azMZIAyNIULl0rL57IdH+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by PH0PR11MB7633.namprd11.prod.outlook.com (2603:10b6:510:26c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.21; Mon, 22 Jun
- 2026 08:54:22 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0139.011; Mon, 22 Jun 2026
- 08:54:22 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "kao, acelan" <acelan.kao@canonical.com>, "Ruinskiy, Dima"
-	<dima.ruinskiy@intel.com>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough after
- reset
-Thread-Topic: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough
- after reset
-Thread-Index: AQHc/vTUlEkOP48iDECS1E/JP5nT7bZD8VzggAAQD4CABdXAgIAAc8/Q
-Date: Mon, 22 Jun 2026 08:54:22 +0000
-Message-ID: <IA3PR11MB89866CE465F2548BC1B8C269E5EF2@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260618073324.1843310-1-acelan.kao@canonical.com>
- <IA3PR11MB8986B77F49DF672178FEE4BCE5E32@IA3PR11MB8986.namprd11.prod.outlook.com>
- <c3030882-55c8-486f-8ff3-571d001b99a1@intel.com>
- <ajiHH-RaHUjgraMh@acelan-Precision-5480>
-In-Reply-To: <ajiHH-RaHUjgraMh@acelan-Precision-5480>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH0PR11MB7633:EE_
-x-ms-office365-filtering-correlation-id: 0baab390-d394-49d3-4ef9-08ded03bdaca
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|18002099003|22082099003|3023799007|56012099006|4143699003|5023799004|11063799006|38070700021|6133799003;
-x-microsoft-antispam-message-info: l/RpGACpOUcJbaZU7arHy/hpbxmJNroXkeD2wuZF83aHWq+DX3oetue+TEb7iBOtwfvswpaMuTr2C9oiBt7eek58McKrirSBYT1iDiXvOB/Ef7oFhgFkIu/y0hc/iA56+SXsMJO0EjM24Gd7QTKfpEOmh7uwBcGx8jNH9YO6h4pUa7lwll2GnGyMDQstp3gKmWVKLE1m6KxqN1jRufuWsmLo+23o1sbqMmlFMBMVY6JR9Iml6gTPXzFqhuYnOrvcsqYqubaf+lF6voDSk8sUDL2S+o/CFcz25PpDvMF2qOf83tO/nhNJPI8WAxVhAdgqmjzh863ZvT0gM+zl0XPVsmOnDxUqcs0PBE5s5VPa/91uLzog5dv+cTZZVAe7w1AuS+LiKRqoKn76Rbm3XhP6FWcigMr09Kcrc/AQNrUisBbLxrQZBPrF+y5xfvhNOe0Q3bE0xadCc0lv3lqX/0YzjxpoWAxpUKANXnJmEMJ/1nMeP+kkiyMuNPBjr+1s8nJvp9GJlQJPRLlZuu8inOxcSB9lZjFAEjoL6wZY2hs+bplMw782E4wnChd9CSlTSfxpfr5uf4xC1jqRiQtiE5C8anUHViAYJVzo58BLhUayKHJiUIiNU7ALLXAOb+H0dDWiI3lr+5mdEzq+EjRCeX2mbP/7UgJNLyC9WCvlh+m3ZfVh2vPrmSr4hz7eWoZRFO7Tv3ovXvCtstkuQAvoRQcsoq2S7GbATBf60m5ANnNSs2E=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(18002099003)(22082099003)(3023799007)(56012099006)(4143699003)(5023799004)(11063799006)(38070700021)(6133799003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?txUtiWIRg7TNoqY433EzhkENSga1LV0vhVXS4s7vXNE5MSsk2JFAtiYO0v9A?=
- =?us-ascii?Q?CPV9fEmniJwc9Wske6QZk+nEIIAWhJoiu9tv7w2/XYOO3BEeq4+IbyptzxVU?=
- =?us-ascii?Q?FnsNfYTqhQmGAeDrlwEGzV2CJpu5zkoOXYk6/j5zgifoAu9s02/IcD36508A?=
- =?us-ascii?Q?m4AFjnTAN2NOr7w8jmnS63vUe18RSyEnqmopXpOi8tZhi7UTXO/4qyFs2tgB?=
- =?us-ascii?Q?cKnuFsuk+iCqiMVk4zRUAL2nmN6swWo55HFR2rQcImVJwjAtZ35xiShobHgM?=
- =?us-ascii?Q?sOSTEdoH7BeEfzpk8wQsw3PPkpN7CdJvL8kw53mU+1V8ER6OSzZOAv6UuoQW?=
- =?us-ascii?Q?hVQkCN/MFmrHYSpEAL3ZWBEz9Vf80gmNuSYfglufJUsxGzVApsCym+QdDqBC?=
- =?us-ascii?Q?f45sAIt8LAMXy0f6ounmDU5YO1CYlV4krEd17AUF2Ri8FxxLe0Z2bcM+0Pmb?=
- =?us-ascii?Q?39SeI8xvYqGnAy8TVexGI2tx/9BVyL35aA/sPg6hUAt8WQlOtMGr9OZj1fER?=
- =?us-ascii?Q?hpZD1hm8RUtx99i6SUcVoZVT3KRG/OgN7TxeAOm99T7vfOvJzFAWjdoBE0hf?=
- =?us-ascii?Q?TDt013G1STHP05lXSyHIAGKMpbciPpppHQG8sERLzF0ijvkD/ouPOxUfN1lX?=
- =?us-ascii?Q?CF9SZ5UugwsHzJJmiYBguYs4l+iEUkXklYmzAOPZCiEmdHbnNEMha++H3HJL?=
- =?us-ascii?Q?mXmP9yrKl1kKtu5CAJkid1fzrjrJxCnQfH5Rk1ihlZvUj2p+urSNcXzqMUlt?=
- =?us-ascii?Q?DMbzTLisH8pT2gQBHWS61K0filUxoyXJe00DlZfWr6KQ9rQYDMqm/moxFRRd?=
- =?us-ascii?Q?QH8knfrtlCdGdbA2mE+Cs2FIapTJLZQmYMaoNaKNGc3pXmq8yQ9mxAMRSMQf?=
- =?us-ascii?Q?PxCY6zwT/Lv0DtBAJH1JVfIWQs9OcyJIIiAmq3okCfF1pgGxk9M6TrEauC+T?=
- =?us-ascii?Q?9nYfp838KmxOuFxGk5NByFuMe/FPhOOgt+RGOY6C49E3UjU8deYqtaVwKPtj?=
- =?us-ascii?Q?NFWy5lI4/8yFUkzaPF7vhy1QkcAyQLkqBzkdWYEKbAUpj5khViB8JvfberYo?=
- =?us-ascii?Q?GQXa5+AziuqsK1Xuho4f24uxvXIR2eOLsi/SIFNY9fs3fZeGP4WetAv5cmnW?=
- =?us-ascii?Q?/UOo8/GvUQ+c/W6XSKJH3xC5glXZj+GYKn7rpT5TddTbnyLKEEFWnRkasweB?=
- =?us-ascii?Q?hbTgRD/o48fL82cTMg36yHmuh4OfEW1jB2llGidydvIX+AM2ueC+i4DnCLS9?=
- =?us-ascii?Q?92DbpXE1YUrT3sPuw0EShhER6RPBftka/P3nTFtjexWvQ/WzkSuFSlODOFop?=
- =?us-ascii?Q?z2ORXSTa0Vv8TnpWayEqNMg/hOOGx1EstBYw+jZTM4kJeq4N1oB4f8OOivbc?=
- =?us-ascii?Q?apPM8pqyFRQOCWXhqDPv+zxjaacquTy2Ptc46yFzbyVeFiUOU5TjIGtAzx3p?=
- =?us-ascii?Q?+Jcjw04Nkfgz0oU2XvcD4UETFYNcuNDaRDn6MC8dzqvoiaRwun2U4aHsBQkT?=
- =?us-ascii?Q?sLUL8OJAMFARyXpkztx+N15VzKZyG6/2DU5QBPcVXirs02l1Xm3nYnh7Oyk3?=
- =?us-ascii?Q?DcNZsk2+cpyHbfKOkLnooDi87xFmiaIq5YFIgNej7byrDZhfwFgk+PnfkDYN?=
- =?us-ascii?Q?panlwjd6QVCcQYEWdQoogNyr8zZtG53KqUTbChX/MyLxIevHu2v+FjwkZEOl?=
- =?us-ascii?Q?V1/pnYfu3KQOwDnD1Lps4Vnh/UcaaWaND2uiUYvAIXHXEABmgaNgUENE88Km?=
- =?us-ascii?Q?CqejZSDMlGjZVslZwtM5s+APH0C+lcY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D6B3939B6;
+	Mon, 22 Jun 2026 08:55:30 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782118533; cv=none; b=Nr6dvdZkTXnBPSvocgDrlI158dwAWM9BfnLo1lCgdK7ET86xtnxm3bGvMfJxEKnPdRk1LZsCOWDhJvJPyPBBiv2lyamvxVxv1TwkZR7jkmUwfjYlFL+zVB1C/4WDsunKhe4KIjA9/khUy/K9c1whZfjaKoTvKRr3RuXVDePRNwE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782118533; c=relaxed/simple;
+	bh=IByh+22DFa1PqtEfpQjhNMO12rS/Q6Ppk6IvQq8sTxM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DAFedWHocjrJWWP5TZtI8MP0t/bzPwJRVGd7Llbcu5+3l2ALQDQv0XdXYPXgZFd6qq0KAsHm31/Pvfn01BxtF/U0IEw7/DQ6z7+gC6OX5pjJZywUDGTdZOWQomyyG8F7Pak0P6HN5t6kucyht9NotEyDRdAl6n03gOTX5qQsdJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JeGs/v3f; arc=none smtp.client-ip=90.155.50.34
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IByh+22DFa1PqtEfpQjhNMO12rS/Q6Ppk6IvQq8sTxM=; b=JeGs/v3f9+JKvnWtTB7MI3xZaQ
+	f6s+plgAVDCxKLit3gTIzlHJP0hgCPMufYMU4PzDO02oKjTEDcI16a6FBgxEfbSl2UjDn3DVs0KIT
+	s32GImnO/Z6UO1VBMXpka+qpLTPyEZELLWPjoFGCp46aZJ5/Ay3X7PcukVhwQThA0gX+YxzoryKkj
+	TOBKDSnoK6s10laTDywZdkZyXkE590w/8yOVc+jMxlsw6XW8/+h+Q7AIX0DWp+JZdNKGyDyPgLQYy
+	5MfQWiTEjksQSRBiouEWZzjizfqb58/AfEfDsnDwM9/FjAmCjDnee6hu41S5eoCHmZunTiJYh0G1N
+	ksS8dK3Q==;
+Received: from [2001:8b0:10b:5:9b49:795b:48f5:139a] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wbaRD-00000003wFP-0AWp;
+	Mon, 22 Jun 2026 08:55:27 +0000
+Message-ID: <b296182e2e2c1ed2fe1c4879fd6f12d67a7ad22f.camel@infradead.org>
+Subject: Re: [patch V2 18/25] timekeeping: Prepare for cross timestamps on
+ arbitrary clock IDs
+From: David Woodhouse <dwmw2@infradead.org>
+To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
+ <jstultz@google.com>,  Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Frederic Weisbecker	 <frederic@kernel.org>,
+ thomas.weissschuh@linutronix.de, Arthur Kiyanovski	 <akiyano@amazon.com>,
+ Rodolfo Giometti <giometti@enneenne.com>, Vincent Donnefort
+ <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, 	kvmarm@lists.linux.dev, Oliver Upton
+ <oupton@kernel.org>, Richard Cochran	 <richardcochran@gmail.com>,
+ netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,  Miri Korenblit
+ <miriam.rachel.korenblit@intel.com>, Johannes Berg
+ <johannes.berg@intel.com>, Jacob Keller	 <jacob.e.keller@intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Peter Hilber <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin"	
+ <mst@redhat.com>, virtualization@lists.linux.dev, 
+	linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org, Vadim
+ Fedorenko	 <vadim.fedorenko@linux.dev>
+Date: Mon, 22 Jun 2026 09:55:26 +0100
+In-Reply-To: <20260529195557.846634842@kernel.org>
+References: <20260529193435.921555544@kernel.org>
+	 <20260529195557.846634842@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-NWErNWPxUZNYOFPg3M7Q"
+User-Agent: Evolution 3.60.3-0ubuntu1~ppa6 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: YxJ8b7d6W2bq/9yQmqpHRuHmCYmGuxYIzKCsW0j8iyc09PJEwlsBqutXFAOJz648lu3sgVMC0XEEhpSGnR7b/5DKGti+5zIHBFSuYXqpXvonKgU8cai0lwRAAMVj1KJ/a5/xnlgdPgZyQlqmahacGyeGJr97mHcpEaDJPbvHJNmNgDzlqdjcKAZj78nPVq6Knj3MLysGY4PtQt6ijILQS2gCce/DPhsnLko+DymapWF4nOy+tkCJI88RD2v7QRMjBIt0hE8lsNwm1KPz8U+rsyWSS4YTRHTYSeKoQY+7Q2H+KBuyIOTxjDuKfOQt0o38Zh+9+DZB1TYNN9hcMg3Rhg==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0baab390-d394-49d3-4ef9-08ded03bdaca
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2026 08:54:22.5466
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gx4VhP01lhUGt0sWkJj64pI0o1hlqqFAy+7RHVEsRIOTFTwHphsh57/KP9ACnE5dMoSc3AYZ5iIH1/9jXC8AAWi6YD6WC4dKEcGiP/L+vHk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7633
-X-OriginatorOrg: intel.com
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_SMIME(-2.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301003-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:acelan.kao@canonical.com,m:dima.ruinskiy@intel.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS(0.00)[m:tglx@kernel.org,m:linux-kernel@vger.kernel.org,m:mlichvar@redhat.com,m:jstultz@google.com,m:sboyd@kernel.org,m:anna-maria@linutronix.de,m:frederic@kernel.org,m:thomas.weissschuh@linutronix.de,m:akiyano@amazon.com,m:giometti@enneenne.com,m:vdonnefort@google.com,m:maz@kernel.org,m:oliver.upton@linux.dev,m:kvmarm@lists.linux.dev,m:oupton@kernel.org,m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:tiwai@suse.com,m:miriam.rachel.korenblit@intel.com,m:johannes.berg@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:saeedm@nvidia.com,m:peter.hilber@oss.qualcomm.com,m:mst@redhat.com,m:virtualization@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-sound@vger.kernel.org,m:vadim.fedorenko@linux.dev,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301004-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:dkim,infradead.org:mid,infradead.org:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 54CFD6ADF69
+X-Rspamd-Queue-Id: 7177A6ADFF7
 
 
+--=-NWErNWPxUZNYOFPg3M7Q
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
-> Sent: Monday, June 22, 2026 3:58 AM
-> To: Ruinskiy, Dima <dima.ruinskiy@intel.com>
-> Cc: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; Nguyen,
-> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> David S. Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; intel-wired-lan@lists.osuosl.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: Re: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC
-> passthrough after reset
+On Fri, 2026-05-29 at 22:01 +0200, Thomas Gleixner wrote:
+> From: Thomas Gleixner <tglx@kernel.org>
 >=20
-> On Thu, Jun 18, 2026 at 11:51:35AM +0300, Ruinskiy, Dima wrote:
-> > On 18/06/2026 10:55, Loktionov, Aleksandr wrote:
-> > >
-> > >
-> > > > -----Original Message-----
-> > > > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On
-> > > > Behalf Of Chia-Lin Kao (AceLan) via Intel-wired-lan
-> > > > Sent: Thursday, June 18, 2026 9:33 AM
-> > > > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> > > > Przemyslaw <przemyslaw.kitszel@intel.com>
-> > > > Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
-> > > > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> > > > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
-> > > > intel- wired-lan@lists.osuosl.org; netdev@vger.kernel.org;
-> linux-
-> > > > kernel@vger.kernel.org
-> > > > Subject: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC
-> > > > passthrough after reset
-> > > >
-> > > > Some systems support MAC passthrough for dock Ethernet
-> controllers
-> > > > by having firmware rewrite the receive address registers after
-> the
-> > > > controller reset completes.
-> > > >
-> > > > igc resets the controller before reading RAL0/RAH0, so that
-> reset
-> > > > can restore the controller native MAC address temporarily. If
-> the
-> > > > driver reads the registers immediately, it can race the firmware
-> > > > rewrite and keep the native dock MAC instead of the host
-> passthrough MAC.
-> > > >
-> > > > For LMVP devices, poll RAL0/RAH0 after reset and before reading
-> > > > the MAC address. Stop once the address registers change to
-> another
-> > > > valid Ethernet address, allowing firmware a bounded window to
-> > > > complete the passthrough update.
-> > > >
-> Hi Aleksandr and Dima,
+> PTP device system crosstime stamps support only CLOCK_REALTIME, which is
+> meaningless for AUX clocks. The PTP core hands in the clock ID already, s=
+o
+> prepare the core code to honor it.
 >=20
-> Let me answer your questions below.
+> =C2=A0- Add a new sys_systime field to struct system_device_crosststamp w=
+hich
+> =C2=A0=C2=A0 aliases the sys_realtime field. Once all users are converted
+> =C2=A0=C2=A0 sys_realtime can be removed.
 >=20
-> > > Good day, Chia-Lin
-> > >
-> > > It'd be great if you could share more details on how to reproduce
-> the issue.
-> > >
-> > > What exact hardware setup is affected (dock model, NIC, system)?
-> We've observed this issue for a long time, and encountered the issue
-> on Lenovo's P15 Gen 2 (type 20YQ, 20YR) Laptops (ThinkPad) the first
-> time at 2021 and added 600ms delay.
-> Recently, we encountered the same issue on Dell, too, and then
-> increased the delay to 1000ms.
-> And now, the issue occurs again.
+> =C2=A0- Prepare get_device_system_crosststamp() and the related code for =
+it by
+> =C2=A0=C2=A0 switching to sys_systime and providing the initial changes t=
+o utilize
+> =C2=A0=C2=A0 different time keepers.
 >=20
-> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1942999
-> https://lore.kernel.org/lkml/20210702045120.22855-2-
-> aaron.ma@canonical.com/
-> https://bugs.launchpad.net/ubuntu/+source/linux-oem-6.17/+bug/2143197
->=20
-> > > Which firmware/BIOS version?
-> It doesn't happen on a single firmware or BIOS, and not a single
-> hardware or a single brand.
->=20
-> > > How often does the race trigger?
-> It may happen when re-plug the dock cable.
-> With the mainline kernel, it's easy to reproduce the issue by re-
-> plugging the dock cable.
->=20
-> > > Do you have a way to reliably reproduce it?
-> Yes, I can find some machines to reproduce the issue reliably.
->=20
-> > >
-> > > Also, what is the observed behavior vs. expected behavior? For
-> > > example, which MAC address is seen and which one should be used?
-> Here is the debugging logs, fc:4c:ea:ae:a1:e3 is the MAC address of
-> the machine, and c4:d6:d3:83:75:d1 is the MAC of the dock.
->=20
-> It gets the correct passthrough MAC address after bootup and the first
-> re-plug at 40s, and fails to update the MAC address in time after
-> couple of re-plugs.
->=20
-> [    0.689873] igc 0000:70:00.0: MAC debug before reset_hw:
-> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
-> [    0.755187] igc 0000:70:00.0: MAC debug after reset_hw:
-> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
-> [    0.755576] igc 0000:70:00.0: MAC debug:
-> eth_platform_get_mac_address ret=3D-19, reading RAR0/NVM fallback
-> [    0.755582] igc 0000:70:00.0: MAC debug: read_mac_addr ret=3D0
-> addr=3Dfc:4c:ea:ae:a1:e3 perm_addr=3Dfc:4c:ea:ae:a1:e3
-> [    4.687730] igc 0000:70:00.0: MAC debug firmware: fwnode=3D<none>
-> props(mac=3D0 local=3D0 address=3D0) fwnode_ret=3D-19
-> fwnode_mac=3D00:00:00:00:00:00 device_ret=3D-2
-> device_mac=3D00:00:00:00:00:00 is_tbt=3D0 external=3D0 hotplug_bridge=3D0
-> [    4.687739] igc 0000:70:00.0: MAC debug before reset_hw:
-> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
-> [    4.748545] igc 0000:70:00.0: MAC debug after reset_hw:
-> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
-> [    4.748937] igc 0000:70:00.0: MAC debug:
-> eth_platform_get_mac_address ret=3D-19, reading RAR0/NVM fallback
-> [    4.748944] igc 0000:70:00.0: MAC debug: read_mac_addr ret=3D0
-> addr=3Dfc:4c:ea:ae:a1:e3 perm_addr=3Dfc:4c:ea:ae:a1:e3
-> [   40.892715] igc 0000:70:00.0: MAC debug firmware: fwnode=3D<none>
-> props(mac=3D0 local=3D0 address=3D0) fwnode_ret=3D-19
-> fwnode_mac=3D00:00:00:00:00:00 device_ret=3D-2
-> device_mac=3D00:00:00:00:00:00 is_tbt=3D0 external=3D0 hotplug_bridge=3D0
-> [   40.892724] igc 0000:70:00.0: MAC debug before reset_hw:
-> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
-> [   40.953524] igc 0000:70:00.0: MAC debug after reset_hw:
-> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
-> [   40.953933] igc 0000:70:00.0: MAC debug:
-> eth_platform_get_mac_address ret=3D-19, reading RAR0/NVM fallback
-> [   40.953941] igc 0000:70:00.0: MAC debug: read_mac_addr ret=3D0
-> addr=3Dc4:d6:d3:83:75:d1 perm_addr=3Dc4:d6:d3:83:75:d1
-> ...
-> [  307.387282] igc 0000:70:00.0: MAC poll change at 700ms:
-> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
-> prev=3Dc4:d6:d3:83:75:d1 [  328.826084] igc 0000:38:00.0: MAC poll
-> change at 1000ms: RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1
-> RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1 prev=3Dc4:d6:d3:83:75:d1 [  429.070519=
-]
-> igc 0000:38:00.0: MAC poll change at 1100ms: RAL0=3D0xaeea4cfc
-> RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1 prev=3Dc4:d6:d3:83:7=
-5:d1
-> [  466.509571] igc 0000:70:00.0: MAC poll change at 1000ms:
-> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
-> prev=3Dc4:d6:d3:83:75:d1
->=20
+> No functional change intended.
 
-Please include the info into commit message, so users can grep error and fi=
-nd the fix.
-Exact bash commands for reproduction can also help administrators to decide=
- whether they need to patch their OS.
+We ended up with ktime_get_snapshot_id() also supporting CLOCK_BOOTTIME
+and CLOCK_MONOTONIC_RAW, but not get_device_system_crosststamp().
+Should we make that consistent?
 
-Thank you
+--=-NWErNWPxUZNYOFPg3M7Q
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-...
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDYyMjA4NTUy
+NlowLwYJKoZIhvcNAQkEMSIEIO5FB4zN5/v8AgtW0GxU/DhtDU+f/beK/Y0XNobxZGtYMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIALsX9CVSnx92x
+LDdVzyhCX8Nn1MMYo4KmsnQ6Kkfco0WejffaXIZUj7ZuyzFmG91sBHgbKxzym4gPzG+PlVeKJfNi
+4jJ5fxilNk/V6XxPmopgy9QGg9WcDIBAMywdhE69B9cdBm99TGpUNb9BASzncMxYQAM4zzC0uKGd
+uWhTr57p/fnVvg2+hgL4k7hPq5YQhAUcbnkakbRoIlQALhfwkBDgrsACyGcUVN54ElgeB5wkaJfQ
+3PQcjJPWyxE0G8upI5yaMjiJ4i80/NzqqxRoRyAizPP4fZSjadmIjnn+aXIE/Fe77Y5/pVFK47Pd
+2Hhl56FfLfUm+jeMrNCp2SU2M3Fyh11bkRg2wXqfT5Estthjncma8NcAmLP8S6uSSTDaEueXkBXX
+uMpq9QIyjgSdMgzDJvYN9UknJPzWg9eObTcOhsCEJufKJw2byubQkBTPvuZJHlg81UncWujHY7oy
+s0lWTqCFj6lsxgPQU6HIAawBq1lNg5jtuYYlvNCohlriUdOfG67MLXPR6PAzjQXz5tnKDNjy4YOr
+IxGpOT+sTpdjYBRz7hCaW4lSoMnYv+7M0Q9ACuscGTbGWisil2XT23HzpTebWlxSj1vqtCRXgjas
+FemL9mP/8h+6pBQ+pAzjHVnEmQ3C2HTKwGfATJv6SN/NO1WMEFiwmvksTgclmCsAAAAAAAA=
 
+
+--=-NWErNWPxUZNYOFPg3M7Q--
 
