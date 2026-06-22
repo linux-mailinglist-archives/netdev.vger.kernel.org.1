@@ -1,243 +1,188 @@
-Return-Path: <netdev+bounces-301009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NttsDAf9OGoUlAcAu9opvQ
-	(envelope-from <netdev+bounces-301009-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:14:47 +0200
+	id +qLHK2D9OGoplAcAu9opvQ
+	(envelope-from <netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:16:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3526AE1A4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:14:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244E96AE1BD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:16:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=uniontech.com header.s=onoh2408 header.b=L16aFXZS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301009-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301009-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=uniontech.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=G1B1K+pL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301011-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97424305685C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:08:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 47235305FADF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A319C368D5E;
-	Mon, 22 Jun 2026 09:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDE9364EA6;
+	Mon, 22 Jun 2026 09:08:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978F939AD3B;
-	Mon, 22 Jun 2026 09:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA24369970;
+	Mon, 22 Jun 2026 09:08:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782119220; cv=none; b=Mvm8SkZuTUyNd2bFLr14Cporwl0yCEYM5LCQOfUUQzXsJoHrDPzLp8LmFp/rl3ii0QmHxcWr3g87fe6kYYOCdoFPqlJNwCESZd/Zwe3wjQvNEyr0Y+WluKDF/GCDnXTKFEB0G+3r/wgqKi+faBRvA+No2RuE4Ln4AZKtcfic4Rg=
+	t=1782119298; cv=none; b=kbFPLiVXbBUF738wNKtVgQbdA5t287KTjz5YPGaTqsnsScb0SqdY6Sj/HPgVI2YSgGTRkaixESEQWAuBErTsntPR48DUfPQARbG8HbGbYVDlWLf4BCb3FoxjT27RKjR8PpKyBGKH4Jolx71LT95OfAeQPI0BxG+hPNzc+qj1gCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782119220; c=relaxed/simple;
-	bh=5UnOM3smXX450FqdC6aUVos9Kh6GKDIEMHO+1QQVwtw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WFx9KEeFDXSnF1Htf+MwJwF0ciCO1dXsz0wNhga/1TXUSyUyCZbviDCSrfQzs2pZ0oEafG4DD4LdhahN/Jlw6o5+DMqthMlS9kz7lEVFuV2oqWpqr0F2TfhqgGqbrYKNPncpvxzX+oGodlMnnfevRfmiOklwC0UDIazZImlqTXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=L16aFXZS; arc=none smtp.client-ip=54.243.244.52
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1782119144;
-	bh=pwUGxXIMPqYWyVyXYf7y44GxNFxuIdo7lkLoCfU3S/Q=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=L16aFXZSeYRXYYUKuonKi6E0ECXVZFwhEKvs4dKwV5gT+cyBD6Ml8ytl4+asgCq8t
-	 RuVFhNpgXRGLyAG6aXLB4ChokUMbgLylrrnMzzh5u6tnefFmJkANJt93xG67XB/S+U
-	 b3vSMV627qMMMtjOyrt5ImlYScpBrRN+Oi17KRic=
-X-QQ-mid: zesmtpgz3t1782119126te605c9e3
-X-QQ-Originating-IP: WAZlGoezA6r/ZBjWtoe6c1qjhdxAizivWH0ENM+m7Vo=
-Received: from localhost.localdomain ( [1.202.39.170])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 22 Jun 2026 17:05:20 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16604666416164311421
-EX-QQ-RecipientCnt: 11
-From: ZhaoJinming <zhaojinming@uniontech.com>
-To: horms@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	madalin.bucur@nxp.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sean.anderson@linux.dev,
-	zhaojinming@uniontech.com
-Subject: [PATCH v2 2/2] net: fman: use devm_kzalloc() for fman and rely on devres
-Date: Mon, 22 Jun 2026 17:05:05 +0800
-Message-Id: <20260622090505.2418478-2-zhaojinming@uniontech.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20260622090505.2418478-1-zhaojinming@uniontech.com>
-References: <20260619121328.922138-3-horms@kernel.org>
- <20260622090505.2418478-1-zhaojinming@uniontech.com>
+	s=arc-20240116; t=1782119298; c=relaxed/simple;
+	bh=eCHssKVV2pJxL1MZXNEcttSU7Bm5ic3nvRkwWPlZf5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hWA6/JNroR1nolbIDLAxHYXlTC8xuoiMSRbyeEQ01kjigdl+2K/N1IRPB7K8NdVfd+tnpviPhqrohEbrdQsNdLWcV7yOZjQT62v8Y2MOBuyUv2tf8QyLEycgRltlS+aAKKouE12rKfKfkSvsVISjydCLrXYAi66gU525WCGOmLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1B1K+pL; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64B0F1F000E9;
+	Mon, 22 Jun 2026 09:08:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782119294;
+	bh=oMLg+Sr/y5FDapu46bskmirKujQ32N1+2dZN0r1E5GY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=G1B1K+pL0YgcSkF9lt16MUlpIGOSpE0OQoc0ejByA1kBy6EcYPpmvpPFyxXW3QQGd
+	 XTS9JJ7Ilhxkl/7oE1Eqwjfm44/Lttayqjg1LGCnT0BDoXkzx5S6aqO397J7jwBfO4
+	 GqtnM/kB5xJlj8Uft0y12T+3mj5j5lzy6gWaxb4noi6kk0yU4KYyLD5UBXfS1eC0dd
+	 xXDtlemnG1rfWAtd5v0Bok/1PkbZua4Qwb428rve79Xe5kWLE3GKufXsY3iXa2hNuK
+	 s/ugVOYZXOhO48oiuNPRFwm0dq9UIW2sKyeIihaeX5KpAap5diinMI3aL4VvntcfgD
+	 5v0XqsW51cxxg==
+Date: Mon, 22 Jun 2026 11:08:10 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: ricardo@pardini.net, nic_swsd@realtek.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiko Stuebner <heiko@sntech.de>, Sebastian Reichel <sebastian.reichel@collabora.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v4 1/3] dt-bindings: net: add Realtek RTL8125 PCIe
+ Ethernet
+Message-ID: <20260622-sympathetic-inscrutable-macaque-f3bffc@quoll>
+References: <20260617-rk3588-dts-rtl-eth-describe-dt-alias-v4-0-2bd38922d129@pardini.net>
+ <20260617-rk3588-dts-rtl-eth-describe-dt-alias-v4-1-2bd38922d129@pardini.net>
+ <876a38f8-75ea-4b32-bb65-216cb3adb436@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: MvyKdZyVtFx37Tb3zg3YsTs5tgV+0jhBgNWgcUh8PGdN6r4D+DcsGrw3
-	V5cYj6PXbi73sXr+c/I3IvobSkbpMuVjNgFwv1+MrJXMViK+J31c75ULhFmD86LcoNPbFh5
-	xGMUG38mi/hHpfJUPg0tddEXFl94tEB0iEuCbT5GRUvGHeSzbAisljuRM/oyh2kRhO8qnP0
-	9LJGiohQqkn9PB0PNUyUAwQxNs+7AS3mrDEN07axMVHuUMjdx/MVymiSqNeDx3PWcfHbLrV
-	8Qmk3ftPILLHOfOZXTBTfXkcVao42zLAmft0HlIb473qYEvwYLU8vEoYpBvfFFNll+1EOWP
-	bvdeYaVs43ahWJbxyPhfpYw88xCiT94ZQd66saqAj3YIHt1TQZt5+XfFWb+3sQfgga4Y9Zq
-	zGJ6f4gLXUDBsFx8V9Gw6thZ+p1DW+S50g/sMpTIzO9aTEC6Adk8iR0U2E3WrQmucAO53tt
-	4tYX9rBfwsmFds3z1W+yjqT02UW6kc5Lm8v/wWZMIAgT8Z7Xi+hb64iVV2B2j9s0XDfUYsf
-	+sS0LORbiSj6XZfh2SLlQfOM8BNqvmuhouNjI61jQxelur+Y5WJRaUq7CguOcVtb04n8lCe
-	bRkJNwyo/lFLZXqGHHfHk9uTyeaidz43QYflgVBwIXE5ZQbymzfbNRUnbOb4dLpyZ1UQl4L
-	NytQZkryhhsoubbvilVGnemqxKDRt0tjZ9Du80ZlEKwMgFUTCNBCgxrTYQc114Fp9q5wWLJ
-	QrUM/y42qMhLEq9CemjFvn1CwGeT12/X/IDvi2cqksydr+frMEmyigH1zsZYoqU3N40lKG9
-	IOZ5oX3icz4O4QWrpUTxtiamZ9yXsYledHK0nau/8prY/oR8yUsorKAmmS7StBLiAksYL8X
-	qDzAwFfD8B2sVqR5cqun1csLH0BDYVXjFNEMXdiRIqN7UiF8dBpHBTcgmQN3WG0Zl1hhtrD
-	dmmhR4+1RBD2EmO2VDgAMUfLwl6UHEDWXkdNwcgIY/r3D2WltPa3ji0lG19MQnxmYXLVkAO
-	xGS7dXAi4No/pWy+0xAFw0hprbltgzohx9YwzVY0IdPeFkw6Gi
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <876a38f8-75ea-4b32-bb65-216cb3adb436@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:madalin.bucur@nxp.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:sean.anderson@linux.dev,m:zhaojinming@uniontech.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301009-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[uniontech.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:ricardo@pardini.net,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:sebastian.reichel@collabora.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301011-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,uniontech.com:dkim,uniontech.com:email,uniontech.com:mid,uniontech.com:from_mime]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,quoll:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devicetree.org:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7F3526AE1A4
+X-Rspamd-Queue-Id: 244E96AE1BD
 
-The driver now allocates the top-level struct fman with devm_kzalloc()
-so that its lifetime is bound to the device and resources are released
-automatically by the driver core on probe failure or device removal.
+On Wed, Jun 17, 2026 at 06:43:42PM +0200, Heiner Kallweit wrote:
+> On 17.06.2026 14:58, Ricardo Pardini via B4 Relay wrote:
+> > From: Ricardo Pardini <ricardo@pardini.net>
+> > 
+> > Add a binding for fixed/soldered Realtek RTL8125 PCIe Ethernet
+> > controller.
+> > 
+> > The "pciVVVV,DDDD" compatibles are the Open Firmware PCI Bus Binding
+> > spelling, auto-derived from PCI-SIG vendor/device IDs, but they still
+> > need a binding when used in a board DT - analogous to "usbVVVV,PPPP"
 
-Remove the explicit kfree(fman) from the error paths in fman_config()
-and read_dts_node() to avoid double-free/use-after-free and to follow
-the devm_ allocation convention.
+Ricardo,
 
-After of_find_matching_node() consumes fm_node's reference via
-of_node_put(from), the post-muram error paths no longer need to clean
-up fm_node, so replace goto fman_free with direct return ERR_PTR(err).
+No, they do not need. They are already documented, they already have a
+binding, see: dtschema/schemas/pci/pci-device.yaml
 
-This change complements the existing use of devm_* resources (irq,
-ioremap, etc.) and simplifies the error handling paths.
 
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
- drivers/net/ethernet/freescale/fman/fman.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+> > compatibles documented in their own bindings (e.g. microchip,lan95xx)
+> > so board DTs attaching properties (fixed MAC, nvmem cell, ...) to
+> > these PCI function nodes can be validated.
+> > 
+> > Suggested-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+> > Signed-off-by: Ricardo Pardini <ricardo@pardini.net>
+> > ---
+> >  .../devicetree/bindings/net/realtek,rtl8125.yaml   | 43 ++++++++++++++++++++++
+> >  MAINTAINERS                                        |  1 +
+> >  2 files changed, 44 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/realtek,rtl8125.yaml b/Documentation/devicetree/bindings/net/realtek,rtl8125.yaml
+> > new file mode 100644
+> > index 0000000000000..eee13fbc1e6a6
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/realtek,rtl8125.yaml
+> > @@ -0,0 +1,43 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/realtek,rtl8125.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Realtek RTL8125 2.5 Gigabit PCIe Ethernet Controller
+> > +
+> > +maintainers:
+> > +  - Heiner Kallweit <hkallweit1@gmail.com>
+> > +
+> > +description:
+> > +  The Realtek RTL8125 is a 2.5GBASE-T Ethernet controller with a PCIe host
+> > +  interface.
+> > +
+> > +allOf:
+> > +  - $ref: ethernet-controller.yaml#
+> > +
+> > +properties:
+> > +  compatible:
+> > +    const: pci10ec,8125
+> 
+> IIRC we came to the conclusion that the compatible string isn't used in the
+> relevant code path. Then why add it here? Is there an alignment on this?
 
-diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-index 31b0081bdf91..23b938afe17a 100644
---- a/drivers/net/ethernet/freescale/fman/fman.c
-+++ b/drivers/net/ethernet/freescale/fman/fman.c
-@@ -1793,8 +1793,6 @@ static int fman_config(struct fman *fman)
- 	kfree(fman->cfg);
- err_fm_drv:
- 	kfree(fman->state);
--err_fm_state:
--	kfree(fman);
- 	return -EINVAL;
- }
- 
-@@ -2697,7 +2695,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	struct clk *clk;
- 	u32 clk_rate;
- 
--	fman = kzalloc_obj(*fman);
-+	fman = devm_kzalloc(&of_dev->dev, sizeof(*fman), GFP_KERNEL);
- 	if (!fman)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -2759,7 +2757,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		err = -EINVAL;
- 		dev_err(&of_dev->dev, "%s: could not find MURAM node\n",
- 			__func__);
--		goto fman_free;
-+		return ERR_PTR(err);
- 	}
- 
- 	err = of_address_to_resource(muram_node, 0,
-@@ -2768,7 +2766,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		of_node_put(muram_node);
- 		dev_err(&of_dev->dev, "%s: of_address_to_resource() = %d\n",
- 			__func__, err);
--		goto fman_free;
-+		return ERR_PTR(err);
- 	}
- 
- 	of_node_put(muram_node);
-@@ -2778,7 +2776,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (err < 0) {
- 		dev_err(&of_dev->dev, "%s: irq %d allocation failed (error = %d)\n",
- 			__func__, irq, err);
--		goto fman_free;
-+		return ERR_PTR(err);
- 	}
- 
- 	if (fman->dts_params.err_irq != 0) {
-@@ -2788,7 +2786,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		if (err < 0) {
- 			dev_err(&of_dev->dev, "%s: irq %d allocation failed (error = %d)\n",
- 				__func__, fman->dts_params.err_irq, err);
--			goto fman_free;
-+			return ERR_PTR(err);
- 		}
- 	}
- 
-@@ -2796,7 +2794,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (IS_ERR(base_addr)) {
- 		err = PTR_ERR(base_addr);
- 		dev_err(&of_dev->dev, "%s: devm_ioremap() failed\n", __func__);
--		goto fman_free;
-+		return ERR_PTR(err);
- 	}
- 
- 	fman->dts_params.base_addr = base_addr;
-@@ -2808,7 +2806,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (err) {
- 		dev_err(&of_dev->dev, "%s: of_platform_populate() failed\n",
- 			__func__);
--		goto fman_free;
-+		return ERR_PTR(err);
- 	}
- 
- #ifdef CONFIG_DPAA_ERRATUM_A050385
-@@ -2822,8 +2820,6 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	of_node_put(fm_node);
- clk_put:
- 	clk_put(clk);
--fman_free:
--	kfree(fman);
- 	return ERR_PTR(err);
- }
- 
--- 
-2.20.1
+Heiner, it is used - in the DTS.
+
+> If it should be added here, then an explaining comment would be helpful.
+
+Commit msg should explain that.  The compatible is used, so it
+must be documented and in fact already is, so you need to specify them
+ONLY if device nodes have some other properties, like being an ethernet
+controller.
+
+I assume that this is the case here, although that should be mentioned
+in the commit msg.
+
+Best regards,
+Krzysztof
 
 
