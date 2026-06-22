@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ogGwLTUTOWqYmQcAu9opvQ
-	(envelope-from <netdev+bounces-301050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:49:25 +0200
+	id dqkjDxgTOWqSmQcAu9opvQ
+	(envelope-from <netdev+bounces-301051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:48:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8086AEDB3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:49:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AD76AED9E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:48:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ojBEFTuC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301050-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301050-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Qy0iPQLh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301051-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301051-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 36132302EA86
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:45:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A8999302288B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2922C326D;
-	Mon, 22 Jun 2026 10:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEA925A2DD;
+	Mon, 22 Jun 2026 10:45:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A99F2D8DB5;
-	Mon, 22 Jun 2026 10:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E7B3368BF;
+	Mon, 22 Jun 2026 10:45:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125135; cv=none; b=mDLf8GD06tvpsjbtw6DFNfZ3tEoC5mcMipQPNjwmu5WXpVITOV6Uw96Q8okIYMWG9RDNUs5eXK8QQetQT94/L48AUU2v4GjyXq3g4v7hHgtkEec4tG7PnhetTo0mA7chgvsF76bMYyw6RdE0EwSxLGgutxD77trmGgcde3xx7+c=
+	t=1782125142; cv=none; b=SNoRQz2ta0r2zGBFj8jN5+JRgHU1089nAehfqvWrEidB+XzkGyEnS9dCGOOcq8lmvkmJra5gEy840ME4r6yjjMAo2knAndIO82sCvJttVZac67RehhONPOgaS1K0jQxKL3rqNI1T4SLXY4QC3cZqKbVmfD8sMsfJfQ1it/HqQWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125135; c=relaxed/simple;
-	bh=8k7S1qfboZqmvpZVsqXkg/GjIOlb4FxWgv/vzSg8CwM=;
+	s=arc-20240116; t=1782125142; c=relaxed/simple;
+	bh=YMYEcO6oWg+5g8/K28JKn6LZ68JiT37LhT5mos5KUC0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T6vZYJ0S8tWB0YSeqEtGaTdS3FJPFYFYBBJSskUQfVY4LZlCg/gnpnNgDXpKWZqFdoFJiYaNskN1IS+XYGNAASX+BN295MB4oRAgtFtsiheYHUoUrspL6Sxn8rfv5jx03I0c1JshhKpEVP5u+n5oaY3bW++753ei28vMi8cIHvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojBEFTuC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11AD61F00A3A;
-	Mon, 22 Jun 2026 10:45:28 +0000 (UTC)
+	 MIME-Version; b=Bms3C7sR4XItQiDcAA/lRHcANpLyOjxDLFJS8v+6jqqaKRc/F/ACq1ObcuhZKJBUJkhsFr9HOOCgZOYzp1h3BSLDVxRtDaAatkupvF+rNVMUjj191GVg4Q3oDlX5JYOneOLQgANUqG5Kq9ICmyswx3u6UyJOpE2kvAGAa+Gi7oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qy0iPQLh; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92AB81F00A3D;
+	Mon, 22 Jun 2026 10:45:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125133;
-	bh=+oXU5BQE83lpg+FNcsdULE1a0aNl+zX11pMLBsZsNw8=;
+	s=k20260515; t=1782125140;
+	bh=HZ9KoAvey7IIJ0YGel+JomLuMp7h8EIw7jUe5wLKSgs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ojBEFTuCs0C8luxJ9zMTqGVG2OrkYkQtD5cmR4G1ZS+PfPL/Sy1zLqpCGm5jrxbtP
-	 KVjehGuS/OID4dA3zcrgt+qtcJ3A81nyxewSZCUPB4nF3YsD37/JqMqyNj7iwKHYbY
-	 AM1Q/66iaUAf/+ZfC5vmkmb/sW/MjcwTrguMeqymMvQPdMGaGjCCZ8mo5lRg0nmhau
-	 YZQD7G7iRpvUPcUxcInoBJ+IMBpChyL2bti19q8xddG4J1CalttOCyz8Me/cMs1BhT
-	 S7DLdbIxFAXr46sc+69WIB6cjKMiIqKp4BajjrBWsQfj5wv4hT1TWJ3ZlArJqP1O66
-	 q1G75BAu0pV4w==
+	b=Qy0iPQLhVf5A8ZZMnTFKFwpkdvTD++vdhkXK/rNXr2j9EDD4T5PmhhQfLKxGC8qNA
+	 IyFYdZINbZff+uxKFtiWiWnSWgOnH5QXELTnwcWvkd/2FdIlFPU/zxFf73HsVPowWX
+	 ILqvqwQhbfL8IGC1zc4nJXVjh8HJlHJspD107ddEG3tPOKkMvM72S1CBgnDuhebqI2
+	 o8Fl5fC9a08W82An0HhXmdw1/eskVyHu0kC9t3A7oEkN2jF5oP7Wi4BZDvIduwKvmE
+	 hm96OESwaqo0aSYwOl0LK0eJFgfplqYsOyVAv8eHQGB8xVB/uKtKL5kNgr4j41T+9M
+	 OqLbo7nrmyIGQ==
 From: Geliang Tang <geliang@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>,
 	Mat Martineau <martineau@kernel.org>,
@@ -60,12 +60,14 @@ To: Matthieu Baerts <matttbe@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	Hannes Reinecke <hare@suse.de>
-Cc: Gang Yan <yangang@kylinos.cn>,
+Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev
-Subject: [RFC net-next 14/17] mptcp: update mptcp_check_readable helper
-Date: Mon, 22 Jun 2026 18:43:34 +0800
-Message-ID: <981719194baddbe01429181a35456042d84d20c6.1782123118.git.tanggeliang@kylinos.cn>
+	mptcp@lists.linux.dev,
+	Gang Yan <yangang@kylinos.cn>,
+	Zqiang <qiang.zhang@linux.dev>
+Subject: [RFC net-next 15/17] mptcp: implement ulp getsockopt for tls support
+Date: Mon, 22 Jun 2026 18:43:35 +0800
+Message-ID: <753868a3ae0050d21457d8d3e86e39081c92a6b5.1782123118.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
 References: <cover.1782123118.git.tanggeliang@kylinos.cn>
@@ -84,13 +86,13 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:hare@suse.de,m:yangang@kylinos.cn,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:hare@suse.de,m:tanggeliang@kylinos.cn,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:yangang@kylinos.cn,m:qiang.zhang@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com,queasysnail.net,suse.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -103,58 +105,85 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301050-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301051-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A8086AEDB3
+X-Rspamd-Queue-Id: 30AD76AED9E
 
-From: Gang Yan <yangang@kylinos.cn>
+From: Geliang Tang <tanggeliang@kylinos.cn>
 
-This patch makes mptcp_check_readable() aligned with TCP, and renames it to
-mptcp_stream_is_readable(). It will be used in the case of KTLS, because
-'prot' will be modified, tls_sw_sock_is_readable() is expected to be called
-from prot->sock_is_readable().
+Add mptcp_getsockopt_tcp_ulp() to handle TCP_ULP getsockopt on MPTCP
+sockets. The helper reads the user length once, checks for negative
+value, takes the socket lock, caps the length to TCP_ULP_NAME_MAX, and
+copies the ULP name (or sets the length to zero if no ULP is attached)
+to userspace. The lock ensures safe access to icsk->icsk_ulp_ops.
 
-Co-developed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Geliang Tang <geliang@kernel.org>
+Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
+Co-developed-by: Zqiang <qiang.zhang@linux.dev>
+Signed-off-by: Zqiang <qiang.zhang@linux.dev>
+Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- net/mptcp/protocol.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ net/mptcp/sockopt.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 169bd468f212..4951b1dd013b 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3410,9 +3410,11 @@ void __mptcp_unaccepted_force_close(struct sock *sk)
- 	__mptcp_destroy_sock(sk);
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index fcf6feb2a9eb..cc45491cd3b2 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -1408,6 +1408,39 @@ static int mptcp_put_int_option(struct mptcp_sock *msk, char __user *optval,
+ 	return 0;
  }
  
--static __poll_t mptcp_check_readable(struct sock *sk)
-+static bool mptcp_stream_is_readable(struct sock *sk)
++static int mptcp_getsockopt_tcp_ulp(struct sock *sk,
++				    char __user *optval,
++				    int __user *optlen)
++{
++	struct inet_connection_sock *icsk = inet_csk(sk);
++	int ret = 0, len;
++
++	if (copy_from_sockptr(&len, USER_SOCKPTR(optlen), sizeof(int)))
++		return -EFAULT;
++
++	if (len < 0)
++		return -EINVAL;
++
++	lock_sock(sk);
++	len = min_t(unsigned int, len, TCP_ULP_NAME_MAX);
++	if (!icsk->icsk_ulp_ops) {
++		len = 0;
++		if (copy_to_sockptr(USER_SOCKPTR(optlen), &len, sizeof(int)))
++			ret = -EFAULT;
++		goto out;
++	}
++	if (copy_to_sockptr(USER_SOCKPTR(optlen), &len, sizeof(int))) {
++		ret = -EFAULT;
++		goto out;
++	}
++	if (copy_to_sockptr(USER_SOCKPTR(optval), icsk->icsk_ulp_ops->name,
++			    len))
++		ret = -EFAULT;
++out:
++	release_sock(sk);
++	return ret;
++}
++
+ static int mptcp_getsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
+ 				    char __user *optval, int __user *optlen)
  {
--	return mptcp_epollin_ready(sk) ? EPOLLIN | EPOLLRDNORM : 0;
-+	if (mptcp_epollin_ready(sk))
-+		return true;
-+	return sk_is_readable(sk);
- }
+@@ -1415,6 +1448,7 @@ static int mptcp_getsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
  
- static void mptcp_check_listen_stop(struct sock *sk)
-@@ -4476,7 +4478,8 @@ __poll_t mptcp_poll(struct file *file, struct socket *sock,
- 		mask |= EPOLLIN | EPOLLRDNORM | EPOLLRDHUP;
- 
- 	if (state != TCP_SYN_SENT && state != TCP_SYN_RECV) {
--		mask |= mptcp_check_readable(sk);
-+		if (mptcp_stream_is_readable(sk))
-+			mask |= EPOLLIN | EPOLLRDNORM;
- 		if (shutdown & SEND_SHUTDOWN)
- 			mask |= EPOLLOUT | EPOLLWRNORM;
- 		else
+ 	switch (optname) {
+ 	case TCP_ULP:
++		return mptcp_getsockopt_tcp_ulp(sk, optval, optlen);
+ 	case TCP_CONGESTION:
+ 	case TCP_INFO:
+ 	case TCP_CC_INFO:
 -- 
 2.53.0
 
