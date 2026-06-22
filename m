@@ -1,178 +1,159 @@
-Return-Path: <netdev+bounces-301175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xiXON25uOWrbsgcAu9opvQ
-	(envelope-from <netdev+bounces-301175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:18:38 +0200
+	id IfPSD7lzOWortQcAu9opvQ
+	(envelope-from <netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:41:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EEDC6B16FC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D7E6B187F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:41:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=abJcrRzQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301175-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301175-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Iw5f3bwf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68B53301FA43
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:18:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82C573028B0A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4606029B781;
-	Mon, 22 Jun 2026 17:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6391D340A6F;
+	Mon, 22 Jun 2026 17:40:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A3E33F5BE
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 17:18:13 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782148695; cv=pass; b=mRUpyAUKL3F7U511WPrqfH7Qr0qZVG3Raykc9rtS2Z+5wQLtYETekQQkXcHXMn2LjIslA9rc8xHoj9lTGejdnubR8Q5jlaUmIKg2F9LD/xYpw97F8hEQVtd4vAJT7Y+3ab2jS8RxiwSdMbSrRTxTLgxYVc5JjfQ4NYkcMc2DH+I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782148695; c=relaxed/simple;
-	bh=n44ds5wVjTX1XPep05hQMUpPwEWREleHsBxakg63dvw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QyRDsuRg3U65VXSTfa2PMBTIaSNyvbztHpcFFynT6GqvHgUegkxkuq87ujPBbeRL8XhZ91Fo1W0kTnovsaXUM6RT/0h/726OYZi5QTj0dcDZ3cg4xBZVJvEmhUnyLELr4x8hS3w64eG6AlSYsKnTisSpIzXjlStwadnm/+JMm0A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=abJcrRzQ; arc=pass smtp.client-ip=209.85.128.169
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7fffb090ddfso1502617b3.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 10:18:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782148693; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IDNleuzTERacq8X9p3WE4TPtnjLQQ44N8pEeo934/RhklnsmjoGrB2HfD4ayG010Iu
-         YLqZ8zZtJro5k3hVXMlgxgLU2CIA0lXZflOn1XvoHkHlDYlEc03/TZ0rVEgbWWAVjOWc
-         GccX/c5hpoFhW/IXXvcJE4n4174iFcoEIPpgA0rGasqyQ4IG+h9nryoucc3FlMfs4039
-         BgZa4lmILCjwdzV+oadk0XJMlnaGuTF4mOiXVAYPI+NoUNgJTiw1zLXcBPoguxtVz/vz
-         q4TzcCOAZwZYN7J/Hd+0T0O3+NvEUrotO8gcD5FTMXLNDclJW+H3gjyPskhecT9fgFAZ
-         n6AQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=n44ds5wVjTX1XPep05hQMUpPwEWREleHsBxakg63dvw=;
-        fh=yvrLcZFlO9PdaH0haKQ+mXcCVpmf6VCrEhiUwrzFws0=;
-        b=PK/J5E+9Av3R1Llu2sUtVSjJ7sZryN770CZmu5s7gVha9/2zEeexlYhxTOMmLJckDK
-         biob6wq5GJYoTOWGsCQl84Dv6QRsgV6Hj46CigMq/ejuayQa8/c2k/TXlyaBaTJODlxE
-         D1XlOjeQx/gV9A4sMO17notBj1WcttOhMTxQrj/Pvces3kbitovxkQfMB1v73a7ftTKU
-         37KDkPVxLYcGRAt+JaFoqAn+/XI4sGXpFDmbquT+91wu6Jc8XO60nLKqdK46tbierpdL
-         s1OCifYu0v89JwCGq8z7MLSrGDi6dsZx2MUtAGAgOWCbn1NyqTm70uKK9YnUWNB0C4XR
-         xm0g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782148693; x=1782753493; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n44ds5wVjTX1XPep05hQMUpPwEWREleHsBxakg63dvw=;
-        b=abJcrRzQqHkEj4nhAdP5M5nUn9wLZHN43EMk+00XWJRqdREJhgTo1fDKbCOBOAcWdl
-         fVwkOyNMVwSgFN2v6xOnyBySFWpboleNfljD+NLI1T3JyQRstEn6QKiMfiFGGj1abhZB
-         qgarO1gujf7uP/xrgA+8AP90UM/nKGfo1+rAOicINhWJ/PX3LMcAebXyWlto2UkK2Z7D
-         p1aqlA70EBUViSyohrLtV+Wzk8Wiua1ZV1GzoOAJS44zypLfGMlfnqpvoRBvYuUCH33T
-         6g2yZeCd8Wcp9BhkiF3H9LVfWHktNWrhENhuWZgy4SdiTSfeJFIBxIqXYk+AzgJsJEOu
-         186A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782148693; x=1782753493;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=n44ds5wVjTX1XPep05hQMUpPwEWREleHsBxakg63dvw=;
-        b=Vnv1QveOoUve9rzo1+cXORy6zytciy1klsMvUDhpJd9Nagf+puqT9sTZ7L2PD21xBb
-         5SbfRouzuj2Bh9GIQ/to4CQ1xgjzbx2hBN5e4c4Gek0gB8WfkNxz3mlJpHgKE1os9OTn
-         ovxEJEF2YZdzBIM9C4bWZCztsJUwVyU7K27OM0/xZDZVSsnvo4IPUqDyOHuhLpOPZxaW
-         X3nOAi7f6baAjfz0H0/DzutDaGKiQlje0/yBwpq9CJ2QTtHuvo3/+MgtSP5WFpG2EBQC
-         Gpj8lx44Ai3MzGd4rZzHB0w+OKGTx9Cu89w9k30nGSUUwqwaBal3rXHY5GM4S1QVzMor
-         YfkQ==
-X-Gm-Message-State: AOJu0YzmajP5lu1vhK3iRa/FWjKXBKZ2iWyLn5WzmfA32PQB502UYf31
-	nGKczEVF817k1XHq5Hhm6wR+80jO38pqLNWA4kqO0a/pdG6Lxlg/uGI+izzXYi2Ckzzb8XUZ+Gl
-	rHnTgqtRobS4uiMse8tdrTLoFy8ZF2pv6npeBSh8=
-X-Gm-Gg: AfdE7cl3MqtV9YuK5IKAFS1XTNG9rXaHs33UeGIzLeh6amjWQInYA7TxsPcJZCiq5rF
-	eJB9rp1nM8IiOsb9xlvarZI7Tl7K23D3VdcPwxG6Z81EavLZSUnjwos80MggA6O99cD+Y6xchRs
-	UBRE2DJ4dFznPGmhThQsQ2x0ynnl7lYtfu9iNecNECORYSB1GBAzY6bjQ0yYB7rLv/dkDesAlYj
-	X/H+omEC8HHknP8m/ZgoqMdWBeFxjxEeyV6eoMqfpsV4zDpsBOP+6zcg1vWX7WyHLFeKOCx
-X-Received: by 2002:a05:690c:2784:b0:7ff:5a5:9b60 with SMTP id
- 00721157ae682-80672df5e71mr4672897b3.22.1782148692956; Mon, 22 Jun 2026
- 10:18:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC56264A97;
+	Mon, 22 Jun 2026 17:40:54 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782150055; cv=none; b=BRCSIY9VrQqIFryIciNiBTlVi4gRBrc62mph6YawEYZO/dxnDv6SrYKu1ypISCKCPdcm/5BKktcNYW02YCxxV7Dy3Pp+sS7E0H6uw8vraB9IMMxuPm6x0AAvVTfl7znSxUfCghxyAr+HQjr1kbix3qNj7PkyDEOSmIOU16yrLFk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782150055; c=relaxed/simple;
+	bh=lfAqB3BHO7Xj2vu2mh1qKKqvy7mMcgubBf6EOBGWlnk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QjMfy+wEGdNJmFcruxPSQd4aqo9136epeameDvDPvWmDPVf++5I9iR7z4ynx5vvau2hKXhwDQNe0HA2U7EkWoK/kTayqG2um3/flRnvZvHBarSQN1hLejo6k5GXTJ/qDIgLa4/DPuKQuu8CYBceNuol50ZIEiWV49j9qwEm8A4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iw5f3bwf; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 129751F000E9;
+	Mon, 22 Jun 2026 17:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782150054;
+	bh=Ay7ugMmiG3L7SvKqqUogfugM4qLAPccAyh4+6ylExWE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=Iw5f3bwfGJ7zuq1gFGrj7iYdGdEaWnopnSm2ESbinHoFPcGO9AhT+oyJVRKCQGYf0
+	 zYywqh9WX17pa8wn+EwAeiiAJSeLsiG9ZmyeXlrC75hDP8AhkMZjAjBuAm22hlQlg+
+	 lHG5eGzeRyQezv+wzRDo9anjC0b9usHk/WmjqNOVn3nLRA/eKcQg2Ugj3dUTr2/R1i
+	 ntR4xNyHM3mcCvqObPPpa6gctIz1scfsmnF/qsMF+yrQTZ8XMR20mnLIZpcTWJDF9c
+	 BLSMHXLunTC3LvP5n+UCyDiJRdLSayOIyuganN+2CZdDOuZdbEDAclIPssVe1ROYx1
+	 0jILUnML29tww==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AA43930917;
+	Mon, 22 Jun 2026 17:40:45 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260621180311.8374-1-rosesophiewright@gmail.com> <20260622081637.172a6bb8@phoenix.local>
-In-Reply-To: <20260622081637.172a6bb8@phoenix.local>
-From: Rose <rosesophiewright@gmail.com>
-Date: Mon, 22 Jun 2026 12:18:00 -0500
-X-Gm-Features: AVVi8CeIPCxuMCuz8JwlBPmo0XYulfTexJHJU7W-QO5fCE8ewc09xqTZZQPSlGg
-Message-ID: <CAH1jfVRbB8uTt90XT1AVBnSYE8eBzB02hCgV2r92SOXOdyf4fw@mail.gmail.com>
-Subject: Re: [PATCH iproute2] ip: return correct status from help command
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 01/14] netfilter: flowtable: fix offloaded ct timeout
+ never being extended
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178215004438.1337004.6008620482552986594.git-patchwork-notify@kernel.org>
+Date: Mon, 22 Jun 2026 17:40:44 +0000
+References: <20260620222738.112506-2-pablo@netfilter.org>
+In-Reply-To: <20260620222738.112506-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[rosesophiewright@gmail.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301175-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-301176-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosesophiewright@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,networkplumber.org:email]
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3EEDC6B16FC
+X-Rspamd-Queue-Id: C9D7E6B187F
 
-Hi Stephen,
+Hello:
 
-Thanks for the feedback. I'd love to finish this up. I can apply the
-same fix to the other commands in iproute2 sometime after work, around
-17:30 UTC today.
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-Thanks again,
-Rose
+On Sun, 21 Jun 2026 00:27:25 +0200 you wrote:
+> From: Adrian Bente <adibente@gmail.com>
+> 
+> OpenWrt has recently migrated many platforms to kernel 6.18. On the
+> MediaTek platform, which supports hardware network offloading, WiFi
+> connections accelerated via the WED path were observed to drop after
+> roughly 300 seconds.
+> 
+> [...]
 
-On Mon, Jun 22, 2026 at 10:16=E2=80=AFAM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> On Sun, 21 Jun 2026 18:03:11 +0000
-> Rose Wright <rosesophiewright@gmail.com> wrote:
->
-> > Currently, "ip help" or "ip -help" always returns an error code because=
- usage() is used as a fall through on "ip" and defaults to stderr with -1.
-> >
-> > This is a minor bug that breaks "ip help | grep" and other scripts that=
- rely on standard exit codes. The fix is to pass the status code as a param=
-eter into usage() and change stderr to stdout when needed.
-> >
-> > Signed-off-by: Rose Wright <rosesophiewright@gmail.com>
-> > ---
->
-> This is the closest of the three submissions, but there are way more comm=
-ands in iproute2
-> than just ip. Need to address all the commands. Looks like perfect trivia=
-l job for AI
-> coding tools. I am looking into it now.
->
+Here is the summary with links:
+  - [net,01/14] netfilter: flowtable: fix offloaded ct timeout never being extended
+    https://git.kernel.org/netdev/net/c/53b3e60edb67
+  - [net,02/14] netfilter: nf_queue: pin bridge device while NFQUEUE holds fake dst
+    https://git.kernel.org/netdev/net/c/c9c9b37f8c55
+  - [net,03/14] netfilter: xt_cluster: reject template conntracks in hash match
+    https://git.kernel.org/netdev/net/c/5feba91006ec
+  - [net,04/14] netfilter: flowtable: fix and simplify IP6IP6 tunnel handling
+    https://git.kernel.org/netdev/net/c/f4c2d8668d85
+  - [net,05/14] netfilter: ipset: Don't use test_bit() in lockless RCU readers in hash types
+    https://git.kernel.org/netdev/net/c/e4b4984e28c1
+  - [net,06/14] netfilter: ipset: Don't use test_bit() in lockless RCU readers in bitmap types
+    https://git.kernel.org/netdev/net/c/1171192ac9af
+  - [net,07/14] netfilter: ipset: fix order of kfree_rcu() and rcu_assign_pointer()
+    https://git.kernel.org/netdev/net/c/3ca9982a8882
+  - [net,08/14] netfilter: ipset: make sure gc is properly stopped
+    https://git.kernel.org/netdev/net/c/4a597a87e2e2
+  - [net,09/14] netfilter: nft_payload: reject offsets exceeding 65535 bytes
+    https://git.kernel.org/netdev/net/c/213be32f46a2
+  - [net,10/14] netfilter: nft_meta_bridge: add validate callback for get operations
+    https://git.kernel.org/netdev/net/c/bff1c8b49a9c
+  - [net,11/14] netfilter: nft_flow_offload: zero device address for non-ether case
+    https://git.kernel.org/netdev/net/c/e409c23c2d06
+  - [net,12/14] netfilter: nf_reject: skip iphdr options when looking for icmp header
+    https://git.kernel.org/netdev/net/c/af8d6ae09c0a
+  - [net,13/14] netfilter: nf_conntrack_expect: use conntrack GC to reap expectations
+    https://git.kernel.org/netdev/net/c/b8b09dc2bf35
+  - [net,14/14] netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak
+    https://git.kernel.org/netdev/net/c/27dd2997746d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
