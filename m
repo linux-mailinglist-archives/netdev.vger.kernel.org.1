@@ -1,159 +1,192 @@
-Return-Path: <netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IfPSD7lzOWortQcAu9opvQ
-	(envelope-from <netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:41:13 +0200
+	id 97raIrp0OWrAtQcAu9opvQ
+	(envelope-from <netdev+bounces-301177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:45:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D7E6B187F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:41:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2F5D6B1908
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:45:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Iw5f3bwf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301176-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=bWs9bj1f;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301177-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301177-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 82C573028B0A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:40:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C9EE3037430
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6391D340A6F;
-	Mon, 22 Jun 2026 17:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE7134388F;
+	Mon, 22 Jun 2026 17:43:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC56264A97;
-	Mon, 22 Jun 2026 17:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827DD342509
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 17:43:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782150055; cv=none; b=BRCSIY9VrQqIFryIciNiBTlVi4gRBrc62mph6YawEYZO/dxnDv6SrYKu1ypISCKCPdcm/5BKktcNYW02YCxxV7Dy3Pp+sS7E0H6uw8vraB9IMMxuPm6x0AAvVTfl7znSxUfCghxyAr+HQjr1kbix3qNj7PkyDEOSmIOU16yrLFk=
+	t=1782150214; cv=none; b=X5C7bbuR49f7EqpCnt3OguHpgQQcjEibgPcbGHqQTx2AKYcbjP6NO4e7t/+EWi6R1tf6Vz7zM6zaz4vNqbKTNjVMLxPctUtqCDysIu6OOWnmoDl1GqpjT6iT7XpoYoVm6g2oZNyM71flwR5EVlO/s1AmKIBdOR18sl5qSRM1J60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782150055; c=relaxed/simple;
-	bh=lfAqB3BHO7Xj2vu2mh1qKKqvy7mMcgubBf6EOBGWlnk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QjMfy+wEGdNJmFcruxPSQd4aqo9136epeameDvDPvWmDPVf++5I9iR7z4ynx5vvau2hKXhwDQNe0HA2U7EkWoK/kTayqG2um3/flRnvZvHBarSQN1hLejo6k5GXTJ/qDIgLa4/DPuKQuu8CYBceNuol50ZIEiWV49j9qwEm8A4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iw5f3bwf; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 129751F000E9;
-	Mon, 22 Jun 2026 17:40:54 +0000 (UTC)
+	s=arc-20240116; t=1782150214; c=relaxed/simple;
+	bh=37n0r5kMauruI+X87up//ZNJGThpP+mu8r7gnCJwuZs=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CkXQRm2xvzeayvA9Hj54FEqmUX4Br1k6FCyQDVwz+Q/L2ZyS18XuTwXKn4fE1hHK0Tn9HXU5rdC+S8v870LRIQrhIPq0ZGRV66aptaVAwzj12wvthpMn05yyO0W6i3SpPfzHW3acZ1UmohxG/jDSRoDqi3qnsNrn1+ldEbBgttc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWs9bj1f; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 611891F00ACA
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 17:43:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782150054;
-	bh=Ay7ugMmiG3L7SvKqqUogfugM4qLAPccAyh4+6ylExWE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Iw5f3bwfGJ7zuq1gFGrj7iYdGdEaWnopnSm2ESbinHoFPcGO9AhT+oyJVRKCQGYf0
-	 zYywqh9WX17pa8wn+EwAeiiAJSeLsiG9ZmyeXlrC75hDP8AhkMZjAjBuAm22hlQlg+
-	 lHG5eGzeRyQezv+wzRDo9anjC0b9usHk/WmjqNOVn3nLRA/eKcQg2Ugj3dUTr2/R1i
-	 ntR4xNyHM3mcCvqObPPpa6gctIz1scfsmnF/qsMF+yrQTZ8XMR20mnLIZpcTWJDF9c
-	 BLSMHXLunTC3LvP5n+UCyDiJRdLSayOIyuganN+2CZdDOuZdbEDAclIPssVe1ROYx1
-	 0jILUnML29tww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AA43930917;
-	Mon, 22 Jun 2026 17:40:45 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1782150212;
+	bh=ZOvkxM7SoiYga4F3HI0NRlsezjpo0hLIkN4UO4HHxjU=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=bWs9bj1fag5KYrEtQKDWajU/F6qyj+Xj0XywCLK/icvKgyu3zXE8BtiE5VCmzBOIO
+	 skOV0vdmfh5mCkma6G1yrE/H1sWckCiKx0kV384oGGNyzktYrin//aZ1A2T9J+RvZq
+	 tLhd4ueV9nefHqs6/L55gODvylLnx+BGn1DaSxnxjd+YO5r+feGhhbbldQDXQzrV7q
+	 InN3bE5Wk7q70Sq7/fRrBO5JcoyyAgKcaZfkUgqIJcm8KxCXn9dPVJbUuFpObZuXcl
+	 40yRt2QoBA60YiGyyZSznJ1lh57IMuMv+WKUqWeRQZyld2GfoWo6fs7ZFdt1rcNYd6
+	 YnYd6Pb1v9FZg==
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-39669bcaadfso39091551fa.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 10:43:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9aYW/WDqTlWTBH5wnYYCGiY1iWJmjLy9XQe36F8fVJ/8oFqZxIOoqj9QCU+riSmGMlWH6AlE4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkO7WtRk7iMxQsUByhTxjZAe3GZOqXifY4krOt7M1ttnUZI02H
+	9VHFZ+008nhfTguG4CKWC/G2X2SdoYL/m4/kEi0IFe7KN2X/gIPaPRXXxoQ6T7JozUeafJbRpqR
+	unMGwiJZHcKpDY1Klb3ZJQC8SuZCUcgnY07AfRCXogA==
+X-Received: by 2002:a05:651c:88b:b0:394:635:70b1 with SMTP id
+ 38308e7fff4ca-3998bc52fbemr41304291fa.3.1782150210743; Mon, 22 Jun 2026
+ 10:43:30 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 22 Jun 2026 13:43:29 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 22 Jun 2026 13:43:28 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260521-pdev-fwnode-ref-v1-5-88c324a1b8d2@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/14] netfilter: flowtable: fix offloaded ct timeout
- never being extended
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178215004438.1337004.6008620482552986594.git-patchwork-notify@kernel.org>
-Date: Mon, 22 Jun 2026 17:40:44 +0000
-References: <20260620222738.112506-2-pablo@netfilter.org>
-In-Reply-To: <20260620222738.112506-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com> <20260521-pdev-fwnode-ref-v1-5-88c324a1b8d2@oss.qualcomm.com>
+Date: Mon, 22 Jun 2026 13:43:28 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MfSsLt8+CAh++8qo_=F=q5XRu6G3WGB=B2TZj8dTZydfg@mail.gmail.com>
+X-Gm-Features: AVVi8CfRnQqz6Nh2M0v3z0C67LQjbAf_AXtOmIr-lp4acya5s7VimMoD1ExGxmc
+Message-ID: <CAMRc=MfSsLt8+CAh++8qo_=F=q5XRu6G3WGB=B2TZj8dTZydfg@mail.gmail.com>
+Subject: Re: [PATCH 05/23] powerpc/powermac: fix OF node refcount
+To: Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: brgl@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
+	driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-pm@vger.kernel.org, imx@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
+	linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, stable@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Mark Brown <broonie@opensource.wolfsonmicro.com>, 
+	Thierry Reding <thierry.reding@avionic-design.de>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Srinivas Kandagatla <srini@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Vinod Koul <vkoul@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, 
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Doug Berger <opendmb@gmail.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>, 
+	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
+	Matthew Brost <matthew.brost@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>, 
+	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Maximilian Luz <luzmaximilian@gmail.com>, 
+	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-301176-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org];
+	TAGGED_FROM(0.00)[bounces-301177-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:email];
+	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:maddy@linux.ibm.com,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:stable@vger.kernel.org,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:sar
+ avanak@kernel.org,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:andriy.shevchenko@linux.intel.com,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[67];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C9D7E6B187F
+X-Rspamd-Queue-Id: D2F5D6B1908
 
-Hello:
+On Thu, 21 May 2026 10:36:28 +0200, Bartosz Golaszewski
+<bartosz.golaszewski@oss.qualcomm.com> said:
+> Platform devices created with platform_device_alloc() call
+> platform_device_release() when the last reference to the device's
+> kobject is dropped. This function calls of_node_put() unconditionally.
+> This works fine for devices created with platform_device_register_full()
+> but users of the split approach (platform_device_alloc() +
+> platform_device_add()) must bump the reference of the of_node they
+> assign manually. Add the missing call to of_node_get().
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 81e5d8646ff6 ("i2c/powermac: Register i2c devices from device-tree")
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> ---
+>  arch/powerpc/platforms/powermac/low_i2c.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/powerpc/platforms/powermac/low_i2c.c b/arch/powerpc/platforms/powermac/low_i2c.c
+> index da72a30ab8657e6dc7e6f3437af612155783d8f9..973f58771d9636605ed5d3e91b45008543b584d3 100644
+> --- a/arch/powerpc/platforms/powermac/low_i2c.c
+> +++ b/arch/powerpc/platforms/powermac/low_i2c.c
+> @@ -1471,7 +1471,7 @@ static int __init pmac_i2c_create_platform_devices(void)
+>  		if (bus->platform_dev == NULL)
+>  			return -ENOMEM;
+>  		bus->platform_dev->dev.platform_data = bus;
+> -		bus->platform_dev->dev.of_node = bus->busnode;
+> +		bus->platform_dev->dev.of_node = of_node_get(bus->busnode);
+>  		platform_device_add(bus->platform_dev);
+>  	}
+>
+>
+> --
+> 2.47.3
+>
+>
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+Madhavan, can you please pick this up and send it upstream as a fix please?
+Not having to carry it with the rest of the series will make things easier
+for the next release.
 
-On Sun, 21 Jun 2026 00:27:25 +0200 you wrote:
-> From: Adrian Bente <adibente@gmail.com>
-> 
-> OpenWrt has recently migrated many platforms to kernel 6.18. On the
-> MediaTek platform, which supports hardware network offloading, WiFi
-> connections accelerated via the WED path were observed to drop after
-> roughly 300 seconds.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,01/14] netfilter: flowtable: fix offloaded ct timeout never being extended
-    https://git.kernel.org/netdev/net/c/53b3e60edb67
-  - [net,02/14] netfilter: nf_queue: pin bridge device while NFQUEUE holds fake dst
-    https://git.kernel.org/netdev/net/c/c9c9b37f8c55
-  - [net,03/14] netfilter: xt_cluster: reject template conntracks in hash match
-    https://git.kernel.org/netdev/net/c/5feba91006ec
-  - [net,04/14] netfilter: flowtable: fix and simplify IP6IP6 tunnel handling
-    https://git.kernel.org/netdev/net/c/f4c2d8668d85
-  - [net,05/14] netfilter: ipset: Don't use test_bit() in lockless RCU readers in hash types
-    https://git.kernel.org/netdev/net/c/e4b4984e28c1
-  - [net,06/14] netfilter: ipset: Don't use test_bit() in lockless RCU readers in bitmap types
-    https://git.kernel.org/netdev/net/c/1171192ac9af
-  - [net,07/14] netfilter: ipset: fix order of kfree_rcu() and rcu_assign_pointer()
-    https://git.kernel.org/netdev/net/c/3ca9982a8882
-  - [net,08/14] netfilter: ipset: make sure gc is properly stopped
-    https://git.kernel.org/netdev/net/c/4a597a87e2e2
-  - [net,09/14] netfilter: nft_payload: reject offsets exceeding 65535 bytes
-    https://git.kernel.org/netdev/net/c/213be32f46a2
-  - [net,10/14] netfilter: nft_meta_bridge: add validate callback for get operations
-    https://git.kernel.org/netdev/net/c/bff1c8b49a9c
-  - [net,11/14] netfilter: nft_flow_offload: zero device address for non-ether case
-    https://git.kernel.org/netdev/net/c/e409c23c2d06
-  - [net,12/14] netfilter: nf_reject: skip iphdr options when looking for icmp header
-    https://git.kernel.org/netdev/net/c/af8d6ae09c0a
-  - [net,13/14] netfilter: nf_conntrack_expect: use conntrack GC to reap expectations
-    https://git.kernel.org/netdev/net/c/b8b09dc2bf35
-  - [net,14/14] netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak
-    https://git.kernel.org/netdev/net/c/27dd2997746d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Bartosz
 
