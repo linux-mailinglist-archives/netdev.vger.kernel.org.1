@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +SZcGUESOWpMmQcAu9opvQ
-	(envelope-from <netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:45:21 +0200
+	id z9ciF5ASOWpcmQcAu9opvQ
+	(envelope-from <netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29D66AECF2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:45:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DA46AED19
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kE+vJ55m;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jplHGzm+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301043-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E8CF13011EBA
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 66532300A589
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F39536654F;
-	Mon, 22 Jun 2026 10:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817DE39EB5B;
+	Mon, 22 Jun 2026 10:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F73439F19F;
-	Mon, 22 Jun 2026 10:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C44D396B79;
+	Mon, 22 Jun 2026 10:44:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125086; cv=none; b=b+fKtc+/d7hP1PYob61lIazUFZ9vPZjlVukUKMTKlJ1Ky42tFO0c5ZVSnBfe4K8dhRBI9/I/fVUuIQnOLRBWleKhl3okjRgAlBXgia70w6uJRkVI6XNmC02UU46jwUAyHI3EZ366Jh8CDQ2O0fIb8eSLLQwyDJ0gzCfdG5WM+Ao=
+	t=1782125091; cv=none; b=cdl+RoSmZwkQ38eWTRHwJoj6nQDXyPqL3DN6V96yqsBt+BkyZ2/fwWVg0v34+7wBrT4x8XebdJWfrL6cZfBrEpJYm7k80blaIznPVqUUcwWVpwnp44n7pAg2i0pI1rEzQOGw31TbQ49m9NJ/PWXYpZXz9i9gS16K3gxVXMfvQSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125086; c=relaxed/simple;
-	bh=L8ALMhMzye9OWF9aqb4A63inTTgNPXkuLlL6kT5bjpg=;
+	s=arc-20240116; t=1782125091; c=relaxed/simple;
+	bh=uUAz00WkmvKE4Pw3KMgKRpIyOHXUaewfiwq3ELCxz6c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LoVJfgSlnSWZqo3DOe/P8B5Laoelxtb4ljRv1+sK+JCZ59rEHfV4uFXxAKaLVMDazqPJQ5VCBwpZTu5Dtbf3VAxH4Vhm6Ue2cIpqaUO/iRToBGZBujqJ0dvd0iDu3fdi8UahYJG3scE0xnP4ys9jRtQX7yC4lQ0RTr3YyHjd/wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kE+vJ55m; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BED21F00A3D;
-	Mon, 22 Jun 2026 10:44:39 +0000 (UTC)
+	 MIME-Version; b=uXi5RSTHz17kh4WJfRiVg5+3CyFEE4JwhHXmdVlbl3MLgRb9j5K01X5qVdeEYanpagecX7mblakale9KcUL3/tJ1jrrAM3rw4XlDmusAQhVnQrGrjfo8Q6Ye0iQSyWKNhzAWwys0V9XW6/0tohJY+EHwLm8+iECpuh8f37Yiaj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jplHGzm+; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D0851F000E9;
+	Mon, 22 Jun 2026 10:44:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125084;
-	bh=KAZXrpf5DysoitoHYWCgK/fcW29jojMKSDLi2cg6A7Q=;
+	s=k20260515; t=1782125090;
+	bh=5U39BmXz5gXJhw1YQj428YGYFBW5iG5GsyNCDasB+xI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kE+vJ55mm34hSOd/hRlUr0IDQd8CBjlqLXim20N522Fj4GIt5CgfFyUMhFCHUCz/Y
-	 VvJl9uQFHZDXnPVrUI6zzmAzslmuwa2qRNTRzgmm+T9NlcMKRpSfiKpafEOJQXJ+Ae
-	 4IxGDiDU/32DATLGx/2YFpMXqqzzHgNLgVBpslIJOXlSocPEJ7hyWcmWKq1agFnWF1
-	 sPzkfOvVksFqf8KuDOawPTOzxE8exBQi2ZMmlGQz61eyZUpq9buaJR73tWHR9dRJNA
-	 HEAGjQXH3l1/1u+Oi0eG09vwEJxVJGz9nfqhyPcQcq0ROFw1cColAyG82HCA5X5EE4
-	 NbW3rkAMnmNSA==
+	b=jplHGzm+Ngni6xtBTDItq7x30P7LqXB+nL20Thk4rnreYKLYZSytvca2QPwUnB0Lq
+	 /wdP5BaArDkf0ZlZi3Fup10+6Ig/vhTeZYTv4EzKUMFTPv0ORF6q77ueTw+ZYpRvga
+	 wLMq/kBeFuMDpJxHqUKP+gWxyMysygFx16zZ3FPJsPl6pTU+f4B9duUM7+eNV8KSd9
+	 By3XjHnxRgH2bJQSPbsn91Ey1F4j5fYYRvjVf9UyJov7YiQFPzfto0NbnkHJa/qvx8
+	 7RWIwdbHmXV82nj3OUHmpYgVykibvC74wcOeoSKE62OL8sgVYetxp3YRiwTbZcP8/y
+	 MgM0E869VLYMg==
 From: Geliang Tang <geliang@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>,
 	Mat Martineau <martineau@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	mptcp@lists.linux.dev,
 	Gang Yan <yangang@kylinos.cn>,
 	Zqiang <qiang.zhang@linux.dev>
-Subject: [RFC net-next 06/17] mptcp: implement peek_len for proto_ops
-Date: Mon, 22 Jun 2026 18:43:26 +0800
-Message-ID: <18c20e74da2323812ba3881ae0a5aa25ada3a8f3.1782123118.git.tanggeliang@kylinos.cn>
+Subject: [RFC net-next 07/17] tls: replace tcp_inq with socket peek_len
+Date: Mon, 22 Jun 2026 18:43:27 +0800
+Message-ID: <2c96084e62a7b48733443b70ca2e540bd095bf51.1782123118.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
 References: <cover.1782123118.git.tanggeliang@kylinos.cn>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -105,32 +105,30 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301042-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301043-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F29D66AECF2
+X-Rspamd-Queue-Id: 72DA46AED19
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-The TLS stack uses tcp_inq() to query the amount of data available
-in the receive queue without consuming it. For MPTCP sockets, this
-information is not directly available from a TCP subflow; it must be
-computed from the MPTCP receive queue and the current mapping.
+TLS (device, strparser, and software) calls tcp_inq() directly to
+determine how much data is still pending in the socket receive queue.
+This breaks when the underlying socket is not TCP (e.g., MPTCP).
 
-Introduce mptcp_peek_len() which returns the number of bytes that
-can be peeked from the MPTCP socket. It reuses the existing
-mptcp_inq() helper (used by ioctl SIOCINQ). The implementation
-considers the first skb in the receive queue, the current ack_seq,
-and handles the FIN case.
+Switch all occurrences of tcp_inq(sk) to sk->sk_socket->ops->
+peek_len(sk->sk_socket). This operation is implemented for both TCP
+and MPTCP (after the previous commits), making TLS transparently
+usable over MPTCP connections.
 
-Assign .peek_len in both mptcp_stream_ops and mptcp_v6_stream_ops
-so that upper layers (e.g., TLS) can obtain the correct in-queue
-byte count for an MPTCP connection.
+The change is straightforward: every place where TLS needed the
+available in-queue bytes now uses the protocol-specific peek_len
+method instead of assuming a TCP socket.
 
 Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
@@ -138,68 +136,82 @@ Co-developed-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- net/mptcp/protocol.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ net/tls/tls_device.c | 4 ++--
+ net/tls/tls_strp.c   | 6 ++++--
+ net/tls/tls_sw.c     | 4 +++-
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 7f0c560f6b7e..18c8b6c64c3f 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -4689,6 +4689,38 @@ static ssize_t mptcp_splice_read(struct socket *sock, loff_t *ppos,
- 	return ret;
- }
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index 741aef09bfd3..c44a59d9d715 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -805,7 +805,7 @@ void tls_device_rx_resync_new_rec(struct sock *sk, u32 rcd_len, u32 seq)
+ 		/* head of next rec is already in, note that the sock_inq will
+ 		 * include the currently parsed message when called from parser
+ 		 */
+-		sock_data = tcp_inq(sk);
++		sock_data = sk->sk_socket->ops->peek_len(sk->sk_socket);
+ 		if (sock_data > rcd_len) {
+ 			trace_tls_device_rx_resync_nh_delay(sk, sock_data,
+ 							    rcd_len);
+@@ -864,7 +864,7 @@ static void tls_device_core_ctrl_rx_resync(struct tls_context *tls_ctx,
+ 	rxm = strp_msg(skb);
  
-+static int mptcp_inq(struct sock *sk)
-+{
-+	const struct mptcp_sock *msk = mptcp_sk(sk);
-+	const struct sk_buff *skb;
-+
-+	if ((1 << sk->sk_state) & (TCPF_SYN_SENT | TCPF_SYN_RECV))
-+		return 0;
-+
-+	skb = skb_peek(&sk->sk_receive_queue);
-+	if (skb) {
-+		u64 answ = READ_ONCE(msk->ack_seq) - MPTCP_SKB_CB(skb)->map_seq;
-+
-+		if (answ >= INT_MAX)
-+			answ = INT_MAX;
-+
-+		/* Subtract 1, if FIN was received */
-+		if (answ &&
-+		    (sk->sk_state == TCP_CLOSE ||
-+		     (sk->sk_shutdown & RCV_SHUTDOWN)))
-+			answ--;
-+
-+		return (int)answ;
-+	}
-+
-+	return 0;
-+}
-+
-+static int mptcp_peek_len(struct socket *sock)
-+{
-+	return mptcp_inq(sock->sk);
-+}
-+
- static const struct proto_ops mptcp_stream_ops = {
- 	.family		   = PF_INET,
- 	.owner		   = THIS_MODULE,
-@@ -4712,6 +4744,7 @@ static const struct proto_ops mptcp_stream_ops = {
- 	.read_sock	   = mptcp_read_sock,
- 	.splice_read	   = mptcp_splice_read,
- 	.sendmsg_locked	   = mptcp_sendmsg_locked,
-+	.peek_len	   = mptcp_peek_len,
- };
+ 	/* head of next rec is already in, parser will sync for us */
+-	if (tcp_inq(sk) > rxm->full_len) {
++	if (sk->sk_socket->ops->peek_len(sk->sk_socket) > rxm->full_len) {
+ 		trace_tls_device_rx_resync_nh_schedule(sk);
+ 		ctx->resync_nh_do_now = 1;
+ 	} else {
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index 61b10c697ecc..82a5b64b5f48 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -484,12 +484,14 @@ bool tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh)
+ {
+ 	struct strp_msg *rxm;
+ 	struct tls_msg *tlm;
++	int inq;
  
- static struct inet_protosw mptcp_protosw = {
-@@ -4825,6 +4858,7 @@ static const struct proto_ops mptcp_v6_stream_ops = {
- 	.read_sock	   = mptcp_read_sock,
- 	.splice_read	   = mptcp_splice_read,
- 	.sendmsg_locked	   = mptcp_sendmsg_locked,
-+	.peek_len	   = mptcp_peek_len,
- };
+ 	DEBUG_NET_WARN_ON_ONCE(!strp->msg_ready);
+ 	DEBUG_NET_WARN_ON_ONCE(!strp->stm.full_len);
  
- static struct proto mptcp_v6_prot;
+ 	if (!strp->copy_mode && force_refresh) {
+-		if (unlikely(tcp_inq(strp->sk) < strp->stm.full_len)) {
++		inq = strp->sk->sk_socket->ops->peek_len(strp->sk->sk_socket);
++		if (unlikely(inq < strp->stm.full_len)) {
+ 			WRITE_ONCE(strp->msg_ready, 0);
+ 			strp->msg_announced = 0;
+ 			memset(&strp->stm, 0, sizeof(strp->stm));
+@@ -513,7 +515,7 @@ static int tls_strp_read_sock(struct tls_strparser *strp)
+ {
+ 	int sz, inq;
+ 
+-	inq = tcp_inq(strp->sk);
++	inq = strp->sk->sk_socket->ops->peek_len(strp->sk->sk_socket);
+ 	if (inq < 1)
+ 		return 0;
+ 
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 9324e4ed20a3..35fb0c3c965a 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1706,12 +1706,14 @@ tls_read_flush_backlog(struct sock *sk, struct tls_prot_info *prot,
+ 		       size_t *flushed_at)
+ {
+ 	size_t max_rec;
++	int inq;
+ 
+ 	if (len_left <= decrypted)
+ 		return false;
+ 
++	inq = sk->sk_socket->ops->peek_len(sk->sk_socket);
+ 	max_rec = prot->overhead_size - prot->tail_size + TLS_MAX_PAYLOAD_SIZE;
+-	if (done - *flushed_at < SZ_128K && tcp_inq(sk) > max_rec)
++	if (done - *flushed_at < SZ_128K && inq > max_rec)
+ 		return false;
+ 
+ 	*flushed_at = done;
 -- 
 2.53.0
 
