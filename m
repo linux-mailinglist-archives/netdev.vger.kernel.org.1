@@ -1,134 +1,227 @@
-Return-Path: <netdev+bounces-301095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301096-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id z9QOMjYrOWpTnwcAu9opvQ
-	(envelope-from <netdev+bounces-301095-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:31:50 +0200
+	id gGd3DqIrOWqCnwcAu9opvQ
+	(envelope-from <netdev+bounces-301096-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:33:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A17D6AF736
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:31:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920426AF774
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:33:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YrmOh2GV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301095-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301095-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZKbfXwqT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301096-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301096-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B18F9301B92D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:31:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6AE4330071DD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09253A7193;
-	Mon, 22 Jun 2026 12:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1223A9DAB;
+	Mon, 22 Jun 2026 12:33:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0AA3A9D9C
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 12:31:40 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782131501; cv=none; b=QLVLuyYcfeg8a40FeoWG9TRFPnd6LXWcwhgPDwKFkwrs12wQibbLjVX73s7W5kMBjnLEnokZVtYF1n7F8OoejQ6vkdw6VkIHw/1j6UNwVRi3JyxUuOdibKWGkQJsC+Y1ge3qfdQ0tLhRwYPqssMxGBYe2oIyaO2kFbqS+SZSoRM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782131501; c=relaxed/simple;
-	bh=oeqhaPLp8ej9rEGowTO0rZuMYcCiYVDbc+yFv3sa+RI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AFCG6kba9OiafFdXDl44Cb41RM1g/ypqz0FRbIXsYxk8Hf6HJh3q7UmrwSv9HV2A+QHftswzmUdMgvReV+EvmjyEb6rCDi4o0WZVGa2ewFRPiC7QhFDTP30Sx30EQ00d1lNmYVvcwZPQhxf70xUwhZP5se9HfZTir1+tx5ZttxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrmOh2GV; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F871F00A3A;
-	Mon, 22 Jun 2026 12:31:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782131500;
-	bh=YrvQZarvBaqo6562x1DTyzlBVnEuUX8qf3CFw17g3xc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YrmOh2GVwMxg8umpXDDmyE1exfsL/3W5IXzdl9M4lKtjZdzGaOAw0FwiSGILT5ysv
-	 SOMcqFdC/oIoVFOf0bF2VrLi7PvTouGdEhHEYVQ9emHRpj7fDCDYGYLuv+ugHVTX08
-	 xoV42t0/CFp6+GvWx7Ro587G7hklkQxALmebqc+gL8W80fviKakDHkUOMWTOEzzass
-	 fG5PSUmxQ4cyE/Cc40+WYN50pRn+1xyDYqn9Wk3GWM648r4Ut/6yOFsOlBZSo3ORR6
-	 08iBrjgIW+POD43DEg1f4qgpdPCQnijF2aDR5hg67jeGKm84I+REbTuawJGsM6LoIN
-	 JHJwKcwSbiO8Q==
-Date: Mon, 22 Jun 2026 13:31:36 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wayen Yan <win847@gmail.com>, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] net: airoha: fix netif_set_real_num_tx_queues
- for sparse QoS channels
-Message-ID: <20260622123136.GC827683@horms.kernel.org>
-References: <20260619-airoha-qos-fixes-v2-0-5c43485038f9@kernel.org>
- <20260619-airoha-qos-fixes-v2-2-5c43485038f9@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749C23A75A3
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 12:33:21 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782131602; cv=pass; b=GKYZsteAFayWilFUXeESQIdDkWj8aIa0fZkmL70AE8b+xNyo5K8m1J1y8Px7zguSaiyRFs5NuwoxQISGLedFQjVpgKeTtaVRj891xWaMAeJjsCzQV+zqIC/MS/7Ij0XvMlChbp8HGsLpar8gV9AFCdmPMlwUwKcbdMXA3afQhJ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782131602; c=relaxed/simple;
+	bh=8vDes+e7/1V7VR8Nz218XUkz8Pq+TNyxUOlsiUiLAs4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PjJaUEsKf8zyS5hSEKoWB9JgtyD4+15JowT5iDYg1GSRAHEJdUoR5KwFN0zNl9dV+sOsz5/HpPHakJv/Gz1uBuZVTcAi2xXgOKmJB3N1kodMhequHfvLdNYEmdr01ynLeGd+Rvtx/4qKg8uOCy0B7DjulIy778+IqCgFSfwLGAk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZKbfXwqT; arc=pass smtp.client-ip=209.85.219.67
+Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-8e066990ff9so21935036d6.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 05:33:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782131600; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lpIGJKx4hlKBWqU+Fb5H+aCeDHdedhyTF9cE/lLPyC1hykqiU5g/S8S2KJAKKl0EP4
+         WgVn/B3cm7AAWh40GOf902LCXY2xaCBXLqNtGTBesamfypfC/bQo6mw/Wr2Ydmalzr56
+         IVcLUukRWGSaClliXRPrm2Hin7mmFBcQdgPPGvkzgQSS+4vVdGoiBo6cc8tBSAmTsKVr
+         LG1lKNyEeyV+R8ncjtU7lnRRhKoXXxg6dLG6gvvX+uLvtez7RURhRaGkiwA55ZbK44PA
+         qCLwIu0r5eCaPCvYvQF+zqgyYYPSVI+Pdsge+SwnAq95ksK0dRuTk4KpSQ3gTKNzSFCF
+         yyAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YmRvukfSJvgUJLvig9hb0giMVedRKpfKlkMKmCdzG6E=;
+        fh=s19bV8nnADrhwZlb8cY60mIIGLmAFKXkU60plN/9Q/0=;
+        b=FcOm2gTSeWgmG3NRLVlTXbtFwp21KnH2j/vihy55rA8WLQ/EgQ1/JVOQOLWRAzQdou
+         Y/jeq3DHTfa8WDljnc/qndAI5t8zf9Ba5evvJNnDXEvzgBMncU8G4JT3DNLn0QtLVmcd
+         nJ5brjRSqTcdvrduwzeI0mhxX8N/BHWK50JeaUM2QXVxYOjlDYcIzLQeyap3P/vfMmKG
+         YgGwkF7dAzuYt3tgYXsIGD7aQXM21CJYRC78ckss2aSam8wbsFlpceHJfmnw/V51NBsb
+         ybSLALl0FZ/hW+9M4dfAsU27b0WEb6Pbce4rAaTRLbfVCwblSaI343T27JmeEImVK809
+         +wew==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782131600; x=1782736400; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YmRvukfSJvgUJLvig9hb0giMVedRKpfKlkMKmCdzG6E=;
+        b=ZKbfXwqTfYWeJ4Dy3ATCTWY/wwV5z039Fhx6AehOHXE3JCsY2Y+mXtU8OG/bGeXJbc
+         /5r7F1202BR/EY2sNMqOnza5QSmHubVQaLMd11gCon7Q6OlXUsm7n+YuLEWlOz0tvN5v
+         HCte8XwVFAVBg2V+Gd3kjghUNDLnRoU9RNqmB4YyADlxXQ3OhWSiRSfWbxrMOHosnH1E
+         fFnSyhk/tKTatNaYcRFbe3iiNbiL1cudV7ASV8oK++4YnktG0Y7jlwdg0H0KUvu7iPgp
+         yUV8dSo9DxqcnZJoK+lp68y7MrHleEX6H43pIjUGjrgrYEYFoQgZE7TxD3YyKh5j+NgX
+         4O3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782131600; x=1782736400;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YmRvukfSJvgUJLvig9hb0giMVedRKpfKlkMKmCdzG6E=;
+        b=IozIc8PyTDqSPuNZMpBfiRGvflSjCi8wsTkxEoPfPRhxZiIzfBFlhb1mI67LP/dUyQ
+         00BJQPPTLA6+/BfgI72687f+0iGD6h6e9WzuRi+CORb8thw8iJmtjrN1Y2Q7DAMWmQs0
+         yGUuvCrr7j4vYizsFUABpMHVM5p4KC3PfIoqpcG/dVHhRYNIgdkMZQCtFkhaPIzQni0n
+         dcm0xvFj/xbVxVSEFxg5WUN4Nx01CTBw+vSsZiIaZbBxo588XluzeMUqdQHCbgtESpvh
+         i2x/E9o2J5JXJyTxYfghJTZdYHWkvm9KoRrO2+Pi9oUYHCNp63hPvJyGc5TLNKsUDL5O
+         hoLw==
+X-Forwarded-Encrypted: i=1; AHgh+RpImV5Aa+AYS8j2/fTa2ayr8HfwpXGSvLLhD3b+8oeYhcvkeRle+8WPyrKw75/2b7Ge0fCtNW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywt3DhkDh6JU+/U5iR03ZjHmqcZ3h32w5ivJPUd5HSVhsxIG1bu
+	8R/9m9B6N4iVnb9mck0+3YM8gybdZBsSyR3fGfy9x+QUooEYSl4vhRQshrRUmr8rxbj8sAz6Wbx
+	Dxd9GAdDbK3063vSHwZh4znUMzFOBdzc=
+X-Gm-Gg: AfdE7cmi84RNOhH60aCKWzLHeDa/H4o1q4Es1fbgJL4eIRd+3NOvY7iFuUk02l7JilW
+	5y/gCk0Fh5xFzq8dqTBb1oLOGHpyTHrglJiNEhqWTcC2ZeiX052qDdkp9e/Xi0Ta0vQjXETCCDp
+	73TmIkzabNw1lAA44oaMTWtYVxqMTjso7gBxrf+HJyDHw/4QoaLD8yyo6Oa2on7h8EiirphN8uo
+	HVeUVMQBEcSU71itAZ2S/x3nqfD3R1sIPiKrTOs6OVcA/EnzJlqK3MdX/ZxnIlbikR0J77hoQ==
+X-Received: by 2002:a05:6214:2306:b0:8ca:1e84:4e79 with SMTP id
+ 6a1803df08f44-8de499920a7mr168892476d6.4.1782131600408; Mon, 22 Jun 2026
+ 05:33:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260619-airoha-qos-fixes-v2-2-5c43485038f9@kernel.org>
+References: <CAHPqNmyfm4j0Vy--8rpYMEY1wOP-TgmnRWYd=7ragj1Z29=F7g@mail.gmail.com>
+ <aih7PqPryonzP7cI@chamomile> <CAHPqNmxbS+YLQeOLOibm5rOBxA_nciMAVuEe5ERCOs3uE6+8+Q@mail.gmail.com>
+ <d26c8934-6d4c-4171-9e6f-f58a249dd9ff@linux.dev>
+In-Reply-To: <d26c8934-6d4c-4171-9e6f-f58a249dd9ff@linux.dev>
+From: Longxing Li <coregee2000@gmail.com>
+Date: Mon, 22 Jun 2026 20:33:09 +0800
+X-Gm-Features: AVVi8Cc3g-9OGtbUN98eEDlvqip_g98UCHITOr6LdAmxjZsGiv90lF7uZn7ybfU
+Message-ID: <CAHPqNmz32qs57+w4kLgJvDnKqMtwi+Ca-4OUcP1SYmC3No2dwg@mail.gmail.com>
+Subject: Re: [Kernel Bug] INFO: task hung in xt_find_table
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, syzkaller@googlegroups.com, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301096-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301095-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:pablo@netfilter.org,m:syzkaller@googlegroups.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[coregee2000@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:win847@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.infradead.org,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[coregee2000@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linux.dev:email,vger.kernel.org:from_smtp,syzkaller.appspot.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A17D6AF736
+X-Rspamd-Queue-Id: 920426AF774
 
-On Fri, Jun 19, 2026 at 01:37:14PM +0200, Lorenzo Bianconi wrote:
-> airoha_tc_htb_alloc_leaf_queue() assigns queue IDs based on the channel
-> index (opt->qid = AIROHA_NUM_TX_RING + channel), but updates
-> real_num_tx_queues with a simple increment (num_tx_queues + 1). When QoS
-> channels are allocated sparsely (e.g., channels 0 and 3 without 1 and
-> 2), the returned qid can exceed real_num_tx_queues, causing out-of-bounds
-> accesses in the networking stack.
-> For example, allocating channel 0 then channel 3 results in
-> real_num_tx_queues = 34 but qid = 35, which is out of range [0, 34).
-> Fix this by computing real_num_tx_queues based on the highest active
-> channel index rather than using a simple counter, in both the allocation
-> and deletion paths.
-> 
-> Fixes: ef1ca9271313b ("net: airoha: Add sched HTB offload support")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Hi Jiayuan,
+Thanks for explaining the situation. I will double check this problem.
 
-Thanks for the update since v1.
+Best regards,
+Longxing Li
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-FTR, there is an AI-generated review of this patch on sashiko.dev.
-I do not think that should impede the progress of this patch but
-you may want to consider it in the context of follow-up.
+Jiayuan Chen <jiayuan.chen@linux.dev> =E4=BA=8E2026=E5=B9=B46=E6=9C=8810=E6=
+=97=A5=E5=91=A8=E4=B8=89 17:26=E5=86=99=E9=81=93=EF=BC=9A
+>
+>
+> On 6/10/26 3:14 PM, Longxing Li wrote:
+> > sorry for not containing report plain text in last email. the report
+> > is as follows:
+> >
+> > INFO: task syz-executor.4:42949 blocked for more than 143 seconds.
+> >        Not tainted 7.0.6 #1
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
+e.
+> > task:syz-executor.4  state:D stack:26456 pid:42949 tgid:42937
+> > ppid:9759   task_flags:0x400140 flags:0x00080002
+> > Call Trace:
+> >   <TASK>
+> >   context_switch kernel/sched/core.c:5298 [inline]
+> >   __schedule+0x1006/0x5f00 kernel/sched/core.c:6911
+> >   __schedule_loop kernel/sched/core.c:6993 [inline]
+> >   schedule+0xe7/0x3a0 kernel/sched/core.c:7008
+> >   schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7065
+> >   __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+> >   __mutex_lock+0xd9e/0x1df0 kernel/locking/mutex.c:776
+> >   xt_find_table+0x59/0x1a0 net/netfilter/x_tables.c:1245
+> >   ip6t_unregister_table_exit+0x22/0x50 net/ipv6/netfilter/ip6_tables.c:=
+1808
+> >   ops_exit_list net/core/net_namespace.c:199 [inline]
+> >   ops_undo_list+0x2dd/0xa50 net/core/net_namespace.c:252
+> >   setup_net+0x1f3/0x3a0 net/core/net_namespace.c:462
+> >   copy_net_ns+0x351/0x7c0 net/core/net_namespace.c:579
+> >   create_new_namespaces+0x3f6/0xac0 kernel/nsproxy.c:130
+> >   copy_namespaces+0x45c/0x580 kernel/nsproxy.c:195
+> >   copy_process+0x30cc/0x76d0 kernel/fork.c:2227
+> >   kernel_clone+0xea/0x8f0 kernel/fork.c:2655
+> >   __do_sys_clone+0xce/0x120 kernel/fork.c:2796
+> >   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+> >   do_syscall_64+0x11b/0xf80 arch/x86/entry/syscall_64.c:94
+> >   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x471ecd
+> > RSP: 002b:00007f51f163e008 EFLAGS: 00000202 ORIG_RAX: 0000000000000038
+> > RAX: ffffffffffffffda RBX: 000000000059bf80 RCX: 0000000000471ecd
+> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000040080020
+> > RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: 0000000000000202 R12: 000000000059bf8c
+> > R13: 000000000000000b R14: 000000000059bf80 R15: 00007f51f161e000
+> >   </TASK>
+>
+>
+>
+> This is not a deadlock =E2=80=94 there's no lock cycle.
+>
+> The runner is simply under heavy pressure on all three axes: CPU (zswap
+> compression) + memory (direct reclaim) + IO (swap).
+>
+> The hung task is just a victim. The actual holder is another task that
+> took the mutex and then fell into direct reclaim.
+>
+> Likely stack of the holder:
+> get_entries
+>    xt_find_table_lock
+>    copy_entries_to_user
+>      alloc_counters
+>         vzalloc  -> direct reclaim
+>
+> "INFO: task hung" reports of this kind are common on the official
+> syzkaller dashboard https://syzkaller.appspot.com/upstream/
+>
+>
 
