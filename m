@@ -1,602 +1,373 @@
-Return-Path: <netdev+bounces-301002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XJObFKf3OGr2kgcAu9opvQ
-	(envelope-from <netdev+bounces-301002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:51:51 +0200
+	id mJm7MFH4OGomkwcAu9opvQ
+	(envelope-from <netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:54:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92F26ADEC9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:51:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CFD6ADF69
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:54:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=Oj464p5y;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301002-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301002-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=BNAvXX+r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301003-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77F2F30071EC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:51:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A521B30068DC
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502D63939B6;
-	Mon, 22 Jun 2026 08:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDE435E1B5;
+	Mon, 22 Jun 2026 08:54:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010022.outbound.protection.outlook.com [52.101.85.22])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6163921F6;
-	Mon, 22 Jun 2026 08:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D77940D596;
+	Mon, 22 Jun 2026 08:54:28 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782118292; cv=fail; b=hHhUYhGHGMRkQFI1Xoqox1PxYcawQS39mkuR+AtrwqcVH58zhILpwtvlyvoP6zMBLsKCtzex1s/OzOgjfbz5/JC9e0/HskSMvBmwujlNpM8gMBjogNPfHD57yVjK+6hta8PsmBdfIgfBXVgK556Q2q7JDIAadr0cY0mr4oyRwYc=
+	t=1782118470; cv=fail; b=cW2CCrJt1h8cQ5Gf/6pDy1ocaUDJL0S0iU35dKHaZqblbcLpQ0BTO4elNXWjIaEmRVchRRpGSxAS1b8veruNCI8e67u6dGhfCmzezL0Eg8JYgUD0ZhcUKoJS/S6YZZpu0RSs/T9nlqcow6/KPb1v3qw+Vvks2zvp9W4U6TZAS3Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782118292; c=relaxed/simple;
-	bh=5nsxj7zwfySyJPiUSPAYBBuCFUlLNIcFsTKvpV2+Lrc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lPSJGQbO2jZWAnjWqjHXbwRrUvnXcRYFam603MU/jGpyv3X8W6/6apZfRXwZpZfuXwuC5yM39+oNsAZSdOrsnhn4WKqINLiOoAmBlwGeU7gY2sdQCN28RfDf6T+/sL2VV7SvFAMneysIGw6a+6YqYBC3Ipxx6qeHoBu2b7ceOfM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Oj464p5y; arc=fail smtp.client-ip=52.101.85.22
+	s=arc-20240116; t=1782118470; c=relaxed/simple;
+	bh=n9XDInWe4Yi/gGyW3jZbJMvmeJBOeDt6gtOA8GidQdo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HRBJ6SvG37FdZuOjJnryqKnaIcBp6u+37jkrjRWD3Hi+USx89C9CEPzD5eDU9v5Y/Bq+wUqykUM9bVGiJl5Y/kPmk/EfTr5HbER+IBXwZdMxFaywE5Dxs5TTHxkubDnj/bOYem7f9ZY4X7kJLMgvEl5I/VWPL3VF2DrAi0Z6Zlw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BNAvXX+r; arc=fail smtp.client-ip=192.198.163.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782118468; x=1813654468;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=n9XDInWe4Yi/gGyW3jZbJMvmeJBOeDt6gtOA8GidQdo=;
+  b=BNAvXX+rNBTZxM0aPpGMsEd3L5ybKQesNt5RFRQhuCs2zwYe9vEn0E+O
+   HBW4zpvYSHFZLMNcGulaQE0Fgu7DwqAQqglckhQSr/RoPr75D9FDitb1A
+   pb9rq6IWvyduckj0Fbq57Q7EkH7zfenAy3jjl9p6Ahw8S9FswggLChaTj
+   Bzf/GFH6ltmQT8tWArdssTioqBMlr3qqtiqpVdpmojJzRZxUxGMjEapla
+   Jbas/ylbGAftpNoLQJrDtV4JIrNKWdyCbjHRZ1g9am8b1A3NPX/A+RTMK
+   K4XLU/lNCkUxkUDMdBG0o6QjIJJNTsoxnQsGX6fV0D5wJYZ5qy+je1TT5
+   g==;
+X-CSE-ConnectionGUID: LEvcVafVToWFwIgpiT/O9g==
+X-CSE-MsgGUID: X9D5jjqVTpCp1wCGAR3Mxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="94233845"
+X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
+   d="scan'208";a="94233845"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:54:27 -0700
+X-CSE-ConnectionGUID: xqEdVHA7TfyoQV9Ie2Iyug==
+X-CSE-MsgGUID: mFK9UNA1QB2uGKAI2ZACLg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
+   d="scan'208";a="244818181"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:54:28 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 22 Jun 2026 01:54:27 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 22 Jun 2026 01:54:27 -0700
+Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.3) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 22 Jun 2026 01:54:26 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nwQEh21o2VSckybAsizVeLRP7aTQEFc4SNJ0W9rMBBl7zoo8WGU8Mc/X0VHZvDlOeUm8vF41TVCHv1zvIWYDnaDUneW/1gBrbztOfzufGEaqS3BE2IjU9VOKDAFNUxLIJAzJu8bR0hODDMG7+BBipKPx4k4TNZWBVZV2X9/zYZx+hU8+d+MHc9Zl4OfHM4/YvOkqJHtBbW3KoiD3Ei4h/9i542in/JhC/S32kgZ+nMScNTtScKx1142XpMQdnioZ2EEj3wXGBQVcLbI0P78AfMPJEtx7vknE/8Vhidz5f0DTraRsaZPFx2HSmEAD8FxRiJkcowwTYcqIiC1IcmTElw==
+ b=CmhB43qb1HI/eVNaQj9OJ3C1NP9OBoeI5zFJuH66tHUcd2XOPfZE8yqGt7sTsvro7UeNnd2S9rNSdCMqe3k6N7tpDFPSARBih5A76rESSng3JLlhoYerCrblRx8LMsBNa8RpMu/UjG+FHcUB3cqP6jRcwaXeVHn6B7mimcnI7Gaj11xyO7USPEwSBp36gG+kUrma0IYvI5nuTH8WzPtnFt2/BAb59jvT2uKlK0PxjwxGBgO9P72hCEPkA2LaFqlmOiOlF1uysva8tEof2yzR0iBDgzsvwtGxRhjb2vJQxmhihM0GUlbm8Ncax3wqTN0cQLnvxFdTMYBKhpZ28ZPE1A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N1CTmu+6LGlgB/BKD81AcsdoGTuKCbZDkKyItYzOVJo=;
- b=v2BY7tj0h5oxjj5yjsfFWtN6tFLH1gBgks+WFLJ8PSOPB7aoNyAVL0vDPzKTPwTOrGmnSA7hQkXhi3bwmVz8vho6Sl8SMT3wr+E0jWH+MCC+yBqfbtDGMYbpdmEudGgvNcKe8wV+zzL5dGk+PzpFfNcTLxG71TbWPjnG+rUcJzlgQQXNn5zrlkRJzozVkLPbZcQwUq5yWwoQ9rlLYR2bxt64rKBWZg757AbAoP3JQbsp+9M+yU+avHJgkPUIpIUYzIMBfmAyfV6vCu5Jsntk6q8FjvoqJiaMMivEeQIQLtE4mjz3kF9snAu+26NgmnaEr3QD8xS9+ouPCxblF/ZSnQ==
+ bh=7rFN02wRnhFZ+vWnurkS0any+jsNOMSvrJCt7vKadaE=;
+ b=ECb+9qEHY2GtAA9/xl4OS3kUAk9DzB8JKfW6n0FJL1imgWEUGsUG9sj7B960Uyvm+Lq1dTZTaJf0Yq0iztceagi+jXLSLO/vRc66fKpCQ6/8BQVUL+ks1VpCMlv+q0NSJVqhTypDwVoMYPhXxqdOIwTx6c9QpWWD/hMlUUtki69s83f9X4GSUewhxcdZBj5QiKAnI4c7ZlNBbYuMP+Lrg4xfEBczxseXkiqWlB8HQYFee78yvSToWlbqHHrhHUt6+e8ixt5775MJhIf7j3Ca+j5XedxmLjpDG0ryb/G3TDQZwlvc5QnplFw1Au3HFI99azMZIAyNIULl0rL57IdH+g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N1CTmu+6LGlgB/BKD81AcsdoGTuKCbZDkKyItYzOVJo=;
- b=Oj464p5yFx5WkTQKYW8C8t7LwqSVyT6K0+Eerw7lOm1sv/TNiWcQQ12aVmFPOGW8RHuWPAaEUnGLM0cm98TZ162SScfM2ZUYlKAxuSj/Opwr+nDe74rJojsk35fGlijgwwCpXUr1RSNLZCtfh/zo5Xq68aZg8LGT0MwX4rNmDvQ=
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by SA0PR12MB4365.namprd12.prod.outlook.com (2603:10b6:806:96::22) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by PH0PR11MB7633.namprd11.prod.outlook.com (2603:10b6:510:26c::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Mon, 22 Jun
- 2026 08:51:25 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0113.015; Mon, 22 Jun 2026
- 08:51:25 +0000
-Message-ID: <4f55fc00-e83f-43a3-9dd3-739c75534b14@amd.com>
-Date: Mon, 22 Jun 2026 10:51:10 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
-To: Kaitao Cheng <kaitao.cheng@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Shakeel Butt <shakeel.butt@linux.dev>
-Cc: David Howells <dhowells@redhat.com>,
- Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <20260622040533.29824-2-kaitao.cheng@linux.dev>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.21; Mon, 22 Jun
+ 2026 08:54:22 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0139.011; Mon, 22 Jun 2026
+ 08:54:22 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "kao, acelan" <acelan.kao@canonical.com>, "Ruinskiy, Dima"
+	<dima.ruinskiy@intel.com>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough after
+ reset
+Thread-Topic: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough
+ after reset
+Thread-Index: AQHc/vTUlEkOP48iDECS1E/JP5nT7bZD8VzggAAQD4CABdXAgIAAc8/Q
+Date: Mon, 22 Jun 2026 08:54:22 +0000
+Message-ID: <IA3PR11MB89866CE465F2548BC1B8C269E5EF2@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260618073324.1843310-1-acelan.kao@canonical.com>
+ <IA3PR11MB8986B77F49DF672178FEE4BCE5E32@IA3PR11MB8986.namprd11.prod.outlook.com>
+ <c3030882-55c8-486f-8ff3-571d001b99a1@intel.com>
+ <ajiHH-RaHUjgraMh@acelan-Precision-5480>
+In-Reply-To: <ajiHH-RaHUjgraMh@acelan-Precision-5480>
+Accept-Language: en-US
 Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20260622040533.29824-2-kaitao.cheng@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0001.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::11)
- To PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH0PR11MB7633:EE_
+x-ms-office365-filtering-correlation-id: 0baab390-d394-49d3-4ef9-08ded03bdaca
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|18002099003|22082099003|3023799007|56012099006|4143699003|5023799004|11063799006|38070700021|6133799003;
+x-microsoft-antispam-message-info: l/RpGACpOUcJbaZU7arHy/hpbxmJNroXkeD2wuZF83aHWq+DX3oetue+TEb7iBOtwfvswpaMuTr2C9oiBt7eek58McKrirSBYT1iDiXvOB/Ef7oFhgFkIu/y0hc/iA56+SXsMJO0EjM24Gd7QTKfpEOmh7uwBcGx8jNH9YO6h4pUa7lwll2GnGyMDQstp3gKmWVKLE1m6KxqN1jRufuWsmLo+23o1sbqMmlFMBMVY6JR9Iml6gTPXzFqhuYnOrvcsqYqubaf+lF6voDSk8sUDL2S+o/CFcz25PpDvMF2qOf83tO/nhNJPI8WAxVhAdgqmjzh863ZvT0gM+zl0XPVsmOnDxUqcs0PBE5s5VPa/91uLzog5dv+cTZZVAe7w1AuS+LiKRqoKn76Rbm3XhP6FWcigMr09Kcrc/AQNrUisBbLxrQZBPrF+y5xfvhNOe0Q3bE0xadCc0lv3lqX/0YzjxpoWAxpUKANXnJmEMJ/1nMeP+kkiyMuNPBjr+1s8nJvp9GJlQJPRLlZuu8inOxcSB9lZjFAEjoL6wZY2hs+bplMw782E4wnChd9CSlTSfxpfr5uf4xC1jqRiQtiE5C8anUHViAYJVzo58BLhUayKHJiUIiNU7ALLXAOb+H0dDWiI3lr+5mdEzq+EjRCeX2mbP/7UgJNLyC9WCvlh+m3ZfVh2vPrmSr4hz7eWoZRFO7Tv3ovXvCtstkuQAvoRQcsoq2S7GbATBf60m5ANnNSs2E=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(18002099003)(22082099003)(3023799007)(56012099006)(4143699003)(5023799004)(11063799006)(38070700021)(6133799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?txUtiWIRg7TNoqY433EzhkENSga1LV0vhVXS4s7vXNE5MSsk2JFAtiYO0v9A?=
+ =?us-ascii?Q?CPV9fEmniJwc9Wske6QZk+nEIIAWhJoiu9tv7w2/XYOO3BEeq4+IbyptzxVU?=
+ =?us-ascii?Q?FnsNfYTqhQmGAeDrlwEGzV2CJpu5zkoOXYk6/j5zgifoAu9s02/IcD36508A?=
+ =?us-ascii?Q?m4AFjnTAN2NOr7w8jmnS63vUe18RSyEnqmopXpOi8tZhi7UTXO/4qyFs2tgB?=
+ =?us-ascii?Q?cKnuFsuk+iCqiMVk4zRUAL2nmN6swWo55HFR2rQcImVJwjAtZ35xiShobHgM?=
+ =?us-ascii?Q?sOSTEdoH7BeEfzpk8wQsw3PPkpN7CdJvL8kw53mU+1V8ER6OSzZOAv6UuoQW?=
+ =?us-ascii?Q?hVQkCN/MFmrHYSpEAL3ZWBEz9Vf80gmNuSYfglufJUsxGzVApsCym+QdDqBC?=
+ =?us-ascii?Q?f45sAIt8LAMXy0f6ounmDU5YO1CYlV4krEd17AUF2Ri8FxxLe0Z2bcM+0Pmb?=
+ =?us-ascii?Q?39SeI8xvYqGnAy8TVexGI2tx/9BVyL35aA/sPg6hUAt8WQlOtMGr9OZj1fER?=
+ =?us-ascii?Q?hpZD1hm8RUtx99i6SUcVoZVT3KRG/OgN7TxeAOm99T7vfOvJzFAWjdoBE0hf?=
+ =?us-ascii?Q?TDt013G1STHP05lXSyHIAGKMpbciPpppHQG8sERLzF0ijvkD/ouPOxUfN1lX?=
+ =?us-ascii?Q?CF9SZ5UugwsHzJJmiYBguYs4l+iEUkXklYmzAOPZCiEmdHbnNEMha++H3HJL?=
+ =?us-ascii?Q?mXmP9yrKl1kKtu5CAJkid1fzrjrJxCnQfH5Rk1ihlZvUj2p+urSNcXzqMUlt?=
+ =?us-ascii?Q?DMbzTLisH8pT2gQBHWS61K0filUxoyXJe00DlZfWr6KQ9rQYDMqm/moxFRRd?=
+ =?us-ascii?Q?QH8knfrtlCdGdbA2mE+Cs2FIapTJLZQmYMaoNaKNGc3pXmq8yQ9mxAMRSMQf?=
+ =?us-ascii?Q?PxCY6zwT/Lv0DtBAJH1JVfIWQs9OcyJIIiAmq3okCfF1pgGxk9M6TrEauC+T?=
+ =?us-ascii?Q?9nYfp838KmxOuFxGk5NByFuMe/FPhOOgt+RGOY6C49E3UjU8deYqtaVwKPtj?=
+ =?us-ascii?Q?NFWy5lI4/8yFUkzaPF7vhy1QkcAyQLkqBzkdWYEKbAUpj5khViB8JvfberYo?=
+ =?us-ascii?Q?GQXa5+AziuqsK1Xuho4f24uxvXIR2eOLsi/SIFNY9fs3fZeGP4WetAv5cmnW?=
+ =?us-ascii?Q?/UOo8/GvUQ+c/W6XSKJH3xC5glXZj+GYKn7rpT5TddTbnyLKEEFWnRkasweB?=
+ =?us-ascii?Q?hbTgRD/o48fL82cTMg36yHmuh4OfEW1jB2llGidydvIX+AM2ueC+i4DnCLS9?=
+ =?us-ascii?Q?92DbpXE1YUrT3sPuw0EShhER6RPBftka/P3nTFtjexWvQ/WzkSuFSlODOFop?=
+ =?us-ascii?Q?z2ORXSTa0Vv8TnpWayEqNMg/hOOGx1EstBYw+jZTM4kJeq4N1oB4f8OOivbc?=
+ =?us-ascii?Q?apPM8pqyFRQOCWXhqDPv+zxjaacquTy2Ptc46yFzbyVeFiUOU5TjIGtAzx3p?=
+ =?us-ascii?Q?+Jcjw04Nkfgz0oU2XvcD4UETFYNcuNDaRDn6MC8dzqvoiaRwun2U4aHsBQkT?=
+ =?us-ascii?Q?sLUL8OJAMFARyXpkztx+N15VzKZyG6/2DU5QBPcVXirs02l1Xm3nYnh7Oyk3?=
+ =?us-ascii?Q?DcNZsk2+cpyHbfKOkLnooDi87xFmiaIq5YFIgNej7byrDZhfwFgk+PnfkDYN?=
+ =?us-ascii?Q?panlwjd6QVCcQYEWdQoogNyr8zZtG53KqUTbChX/MyLxIevHu2v+FjwkZEOl?=
+ =?us-ascii?Q?V1/pnYfu3KQOwDnD1Lps4Vnh/UcaaWaND2uiUYvAIXHXEABmgaNgUENE88Km?=
+ =?us-ascii?Q?CqejZSDMlGjZVslZwtM5s+APH0C+lcY=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SA0PR12MB4365:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5843db8-2292-4c6f-6373-08ded03b7106
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|18002099003|22082099003|921020|4143699003|6133799003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	UrYmGbn8maWnHNc5D1qlVh+jrcQmrgStTdJf4BpRRFgI09yY0t5o3kI+QFue1RhDqmkyHpxlbNIsUyVgifZBOfhgqCKTMcjX995MBXWc20TEezTy5dAGaJra4KOqCesvs8RpPueT0jpnFEwuvTeS3ivGUM75dL6izUy8aZ5IA9mkAlRyUxcdmVBWoVuN3m3FQa1T1jMdGsfOLVZIi5pGVsHI8Vg00YPKD0qr5kXFjd/sNeinWHYCNkwR1HIcyfjeFoWuBJ0xuPLSv0ZQMLm4nUaJ6/fCgDfkZysVJyYCjdU7AXJ/tAW0o8wmQbWA4/AEwiC0MmyWuVg8HaSTBShQX4TNauMFcLGutmZSSNW077PQwIcEUnKRoW/FA0mQ7TkpSflOuOgzVUJFfXfRiduI5+807QLgLHM09PTDE2r9q9MOVMatD74eT2o1BBGRwrLLJolVQhYpkznZ9O6QMSF3KFOuL8uEA/nRzKJz9LorWYPkk5Z++5e8KmAoMQvJBwwh7V1k7jSq6csJb7X0EKS7JAjrpUsCe6Kd73jW5zEdBErveu3sVf1+ktIcyuDFF18B7xKsBEIP7CF6PAwdRDJuc8lNstT6A14JkeH+9nJwJTY7BI2jnUP7ZE282Y7U9nkglCXQ59yNkgS/WDdKg6jk3F4gDabH999DqevpnZFnlGpX921G6ifWu98iLl/S02N/shf0Me8MgGWkt8E+cGwGRA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(18002099003)(22082099003)(921020)(4143699003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?azFEQUF2QnZLcC9OTzB6SkdoWk9zdXBGTHNqdVlzTWNaVWVTRHN1ZDVQQUpQ?=
- =?utf-8?B?UFdNTUhKZWxsd2hFTitYRmw2aTYvZW5sc08vZWdYeDdaaXdLdzBpWkZuUUFL?=
- =?utf-8?B?MDZWTVE3dzExbzNMQnBlTEt3RVN0Nk1aTjJEdlQzamhvRFU2SWgwVGVoUUNt?=
- =?utf-8?B?ZjJhQVBlVGZ2WkRtVHh6SzZHbHlPNUtJZEJKNDJTT3F1YkVZeGpCNjVmenVr?=
- =?utf-8?B?WGpXSW0rLzM1TThvQjBoRVBJNDlIQUsyK1M0TmRFNkphQWJCVzMrRWxGQnoz?=
- =?utf-8?B?VmptY1F4SXZkdTBrVjhMZmp4SmdVVkJKT09vQkVIOU91bXlZeEliZmFNYVdh?=
- =?utf-8?B?eVViOE5SVHdPVmVqaGdMSGs3MjMydVBmR3A1RFloL2llSmV1SFJIVERWQ1F3?=
- =?utf-8?B?RC84R2kyRHkwVjFzblY1RUZHRjN3aFhISi91VUQ4Uy9lc1RTMkRIK2JjR0VC?=
- =?utf-8?B?SDE0eSt3R2VBRm1TN09RdzcrTzB3by80Qy9DcG9acWZnRDFJanpObWh3NHlr?=
- =?utf-8?B?aGU5WVdCMUhNeEwreU5HNE8zQW5iZmltR2Jvd2FrYmN5M1JabExEMGtTby9U?=
- =?utf-8?B?TjJZaXpObGJxWmNrTWxYWGdZdUE1bHRLMVdCbUNCelR4MjI3OWJsVVp3aFBK?=
- =?utf-8?B?NzUvUU9Ia2NTb3N5VFZveWFPZVR2bkFSeUgxb3NzS0ZCeEdHRTRiMFJIN2xI?=
- =?utf-8?B?bjJyMFQrYTZFR3N0YlpXRE9VY3J4NVF3d0FLNnlITTZIcGk2ZnhFTDlzL3RO?=
- =?utf-8?B?QTBROFpwRjUwMTZFdW5QNW1VYmh0VUxoZi9LMnNtNTV2QmtWSXlqT3hKMlZS?=
- =?utf-8?B?UzY4aW51Q0kyMWZkaGY5MjB1VzdLTGw0MFVaYnZOcHVHKzFwT09xSXdqVU1U?=
- =?utf-8?B?R0dJWW5jR0RFc1JIMkVkM3lkS0JlanFUSWVwblQyTlZVV1BjUEVrbThjUXlY?=
- =?utf-8?B?ZHN6TjlrbFJrRDc2MklweWoyeFdFdmNVemRMejRQK0NINFlycFBnMVBzSmpM?=
- =?utf-8?B?L0RiNU1PZXloakd6VVVwVXNwTzA0aHZuMUNXOUpJQmlPakkrQWpTTVR4QTVC?=
- =?utf-8?B?YUk5VGVBM2d6ejdibE9YVjE3UFRVWFBXc09XeXVBMUQvYmE1Y0NXQ01VRWxI?=
- =?utf-8?B?QkFpcTQvTnpOMGZ1a3cxeFdhOSttME1LTVplUHc5RWJBWG4yREp5SmRUc0d4?=
- =?utf-8?B?ZWh6V3MxNXBWK0pWUFZ3b2hyazdOa2xvSEUrWnRsZjVWMHVQVGJ1WEhNeGNy?=
- =?utf-8?B?L01XSFhReWk5QmNFRTNLWjRmS1o1Rm9qMzNPenpGNHdYZS9oNjlha2g3MERW?=
- =?utf-8?B?cHc4cnI4QUpvN1FoSzZCQWJMNkVTWU9MU2hBcGZEM0hvMHM0cHc2RGtkQmVS?=
- =?utf-8?B?ajIxeHhKL0ZSMWJxN2YwTGdjVkJyM0J6eDBIZGhJTDVVejJrTnMyUlFmamI2?=
- =?utf-8?B?aWJUMm5QN0c1d1V1bm1oSCt6Mi82ZkZGcUx6aW85MGpVcDVUQkpHaTZqNFVW?=
- =?utf-8?B?cVBNYVVMNzd1T25kUWVhNWczTGxhV0hRZSswYjRFdVZSRlRRMDJkcElKclJD?=
- =?utf-8?B?bWdJQ00vdVFxbXZWYUhVTURmNUhTSVhONWRUbjFUaHdTd21UcDk0Nlpna0Z0?=
- =?utf-8?B?WEs5VlNvUC8vbjBFNTltMDVqNEZaY2tpRmcybmZvL20rRWtJRUZXTmVoRHVk?=
- =?utf-8?B?dGwzYVVoUDViSkxPeFJOR28wQ3N1YXNtdHlDTGtwZk5xbnFBTTFWaGtybWxM?=
- =?utf-8?B?REJnTTBFTnRydjhodnkwd3U4Ty9tdStqMDdjbUpIMjVQU0ZNUmIvaWN1d1pj?=
- =?utf-8?B?Q0JubWNkNUtPTExteUtRUUdUalpydUJDMXZHa3hMTERhWFFCZ0I3bTk4dnFV?=
- =?utf-8?B?YklhOXZ6MEtaUnhwUUMrOGtMOW1EWjBMZUl4K01YamZlZkFoOG8yNStHMERt?=
- =?utf-8?B?NWordldKV3lBTWVmVW1TWGtvRzh6YjhpZzV3L3h5aTJRMVB3YTdkWi9QZTVS?=
- =?utf-8?B?UHZaMUt2UUhsYk9XcEJmTE9neDFJRHpiSlhHR3dhWjd0SWJLUS83bVhyMEl6?=
- =?utf-8?B?U0RweUtUNHRYNis4TFhYNU94U1A0S2JabmIyQ29qWU5tUk55M1FadC9ZRU9T?=
- =?utf-8?B?NHlxM1E4aDF2RXYzd3ltOHlBeEVFUHp1REF2cUovemZ1aFJyVHFtdFE4WkR5?=
- =?utf-8?B?UGxUZ05XQWFsVE1FNEptYXV6akl3K0JEVU5EYVN2eXAwUEFtMjJ5RUdSd1hN?=
- =?utf-8?B?eVFRTzZNOHlHayt3ZGhXbEw3ZWl5SER6SlpOc2d1WG1IcVRhRzJCZEY2cmUw?=
- =?utf-8?Q?I/sExwDfVHkzWno0CT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5843db8-2292-4c6f-6373-08ded03b7106
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-Exchange-RoutingPolicyChecked: YxJ8b7d6W2bq/9yQmqpHRuHmCYmGuxYIzKCsW0j8iyc09PJEwlsBqutXFAOJz648lu3sgVMC0XEEhpSGnR7b/5DKGti+5zIHBFSuYXqpXvonKgU8cai0lwRAAMVj1KJ/a5/xnlgdPgZyQlqmahacGyeGJr97mHcpEaDJPbvHJNmNgDzlqdjcKAZj78nPVq6Knj3MLysGY4PtQt6ijILQS2gCce/DPhsnLko+DymapWF4nOy+tkCJI88RD2v7QRMjBIt0hE8lsNwm1KPz8U+rsyWSS4YTRHTYSeKoQY+7Q2H+KBuyIOTxjDuKfOQt0o38Zh+9+DZB1TYNN9hcMg3Rhg==
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 08:51:25.3341
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0baab390-d394-49d3-4ef9-08ded03bdaca
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2026 08:54:22.5466
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MyQthcf0k8t8V1QPq+PMD5vm3w+cwazXpSklvIukCqaryCgt6VPENiHsqHAftsLd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4365
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gx4VhP01lhUGt0sWkJj64pI0o1hlqqFAy+7RHVEsRIOTFTwHphsh57/KP9ACnE5dMoSc3AYZ5iIH1/9jXC8AAWi6YD6WC4dKEcGiP/L+vHk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7633
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301002-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301003-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:acelan.kao@canonical.com,m:dima.ruinskiy@intel.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kaitao.cheng@linux.dev,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m
- :kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:mid,amd.com:from_mime,kylinos.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D92F26ADEC9
-
-On 6/22/26 06:05, Kaitao Cheng wrote:
-> From: Kaitao Cheng <chengkaitao@kylinos.cn>
-> 
-> The list_for_each*_safe() helpers are used when the loop body may
-> remove the current entry.  Their API exposes the temporary cursor at
-> every call site, even though most users only need it for the iterator
-> implementation and never reference it in the loop body.
-> 
-> Add *_mutable() variants for list and hlist iteration.  The new helpers
-> support both forms: callers may keep passing an explicit temporary cursor
-> when they need to inspect or reset it, or omit it and let the helper use
-> a unique internal cursor.
-
-That sounds like a bad idea to me. The macro should really be doing one job and that as best as it can.
-
-> This makes call sites that only mutate the list through the current entry
-> less noisy, while keeping the existing *_safe() helpers available for
-> compatibility.
-
-This can be perfectly used for code that which really needs the separate variable for the next entry.
-
-Regards,
-Christian.
+X-Rspamd-Queue-Id: 54CFD6ADF69
 
 
-> 
-> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> ---
->  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
->  1 file changed, 231 insertions(+), 38 deletions(-)
-> 
-> diff --git a/include/linux/list.h b/include/linux/list.h
-> index 09d979976b3b..1081def7cea9 100644
-> --- a/include/linux/list.h
-> +++ b/include/linux/list.h
-> @@ -7,6 +7,7 @@
->  #include <linux/stddef.h>
->  #include <linux/poison.h>
->  #include <linux/const.h>
-> +#include <linux/args.h>
->  
->  #include <asm/barrier.h>
->  
-> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
->  #define list_for_each_prev(pos, head) \
->  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
->  
-> -/**
-> - * list_for_each_safe - iterate over a list safe against removal of list entry
-> - * @pos:	the &struct list_head to use as a loop cursor.
-> - * @n:		another &struct list_head to use as temporary storage
-> - * @head:	the head for your list.
-> +/*
-> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
->   */
->  #define list_for_each_safe(pos, n, head) \
->  	for (pos = (head)->next, n = pos->next; \
->  	     !list_is_head(pos, (head)); \
->  	     pos = n, n = pos->next)
->  
-> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
-> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
-> +	     !list_is_head(pos, (head));				\
-> +	     pos = tmp, tmp = pos->next)
-> +
-> +#define __list_for_each_mutable1(pos, head)				\
-> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
-> +
-> +#define __list_for_each_mutable2(pos, next, head)			\
-> +	list_for_each_safe(pos, next, head)
-> +
->  /**
-> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
-> + * list_for_each_mutable - iterate over a list safe against entry removal
->   * @pos:	the &struct list_head to use as a loop cursor.
-> - * @n:		another &struct list_head to use as temporary storage
-> - * @head:	the head for your list.
-> + * @...:	either (head) or (next, head)
-> + *
-> + * next:	another &struct list_head to use as optional temporary storage.
-> + *		The temporary cursor is internal unless explicitly supplied by
-> + *		the caller.
-> + * head:	the head for your list.
-> + */
-> +#define list_for_each_mutable(pos, ...)					\
-> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-> +		(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_prev_safe is an old interface, use list_for_each_prev_mutable instead.
->   */
->  #define list_for_each_prev_safe(pos, n, head) \
->  	for (pos = (head)->prev, n = pos->prev; \
->  	     !list_is_head(pos, (head)); \
->  	     pos = n, n = pos->prev)
->  
-> +#define __list_for_each_prev_mutable_internal(pos, tmp, head)		\
-> +	for (typeof(pos) tmp = (pos = (head)->prev)->prev;		\
-> +	     !list_is_head(pos, (head));				\
-> +	     pos = tmp, tmp = pos->prev)
-> +
-> +#define __list_for_each_prev_mutable1(pos, head)			\
-> +	__list_for_each_prev_mutable_internal(pos, __UNIQUE_ID(prev), head)
-> +
-> +#define __list_for_each_prev_mutable2(pos, prev, head)			\
-> +	list_for_each_prev_safe(pos, prev, head)
-> +
-> +/**
-> + * list_for_each_prev_mutable - iterate over a list backwards safe against entry removal
-> + * @pos:	the &struct list_head to use as a loop cursor.
-> + * @...:	either (head) or (prev, head)
-> + *
-> + * prev:	another &struct list_head to use as optional temporary storage.
-> + *		The temporary cursor is internal unless explicitly supplied by
-> + *		the caller.
-> + * head:	the head for your list.
-> + */
-> +#define list_for_each_prev_mutable(pos, ...)				\
-> +	CONCATENATE(__list_for_each_prev_mutable, COUNT_ARGS(__VA_ARGS__)) \
-> +		(pos, __VA_ARGS__)
-> +
->  /**
->   * list_count_nodes - count nodes in the list
->   * @head:	the head for your list.
-> @@ -895,12 +940,8 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	for (; !list_entry_is_head(pos, head, member);			\
->  	     pos = list_prev_entry(pos, member))
->  
-> -/**
-> - * list_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-> - * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> +/*
-> + * list_for_each_entry_safe is an old interface, use list_for_each_entry_mutable instead.
->   */
->  #define list_for_each_entry_safe(pos, n, head, member)			\
->  	for (pos = list_first_entry(head, typeof(*pos), member),	\
-> @@ -908,15 +949,36 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	     !list_entry_is_head(pos, head, member); 			\
->  	     pos = n, n = list_next_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_internal(pos, tmp, head, member)	\
-> +	for (typeof(pos) tmp = list_next_entry(pos =			\
-> +		list_first_entry(head, typeof(*pos), member), member);	\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_next_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable2(pos, head, member)		\
-> +	__list_for_each_entry_mutable_internal(pos, __UNIQUE_ID(next), head, member)
-> +
-> +#define __list_for_each_entry_mutable3(pos, next, head, member)		\
-> +	list_for_each_entry_safe(pos, next, head, member)
-> +
->  /**
-> - * list_for_each_entry_safe_continue - continue list iteration safe against removal
-> + * list_for_each_entry_mutable - iterate over a list safe against entry removal
->   * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> + * @...:	either (head, member) or (next, head, member)
->   *
-> - * Iterate over list of given type, continuing after current point,
-> - * safe against removal of list entry.
-> + * next:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + */
-> +#define list_for_each_entry_mutable(pos, ...)				\
-> +	CONCATENATE(__list_for_each_entry_mutable, COUNT_ARGS(__VA_ARGS__)) \
-> +		(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_entry_safe_continue is an old interface,
-> + * use list_for_each_entry_mutable_continue instead.
->   */
->  #define list_for_each_entry_safe_continue(pos, n, head, member) 		\
->  	for (pos = list_next_entry(pos, member), 				\
-> @@ -924,30 +986,79 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	     !list_entry_is_head(pos, head, member);				\
->  	     pos = n, n = list_next_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_continue_internal(pos, tmp, head, member) \
-> +	for (typeof(pos) tmp = list_next_entry(pos =			\
-> +		list_next_entry(pos, member), member);			\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_next_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable_continue2(pos, head, member)	\
-> +	__list_for_each_entry_mutable_continue_internal(pos,		\
-> +		__UNIQUE_ID(next), head, member)
-> +
-> +#define __list_for_each_entry_mutable_continue3(pos, next, head, member) \
-> +	list_for_each_entry_safe_continue(pos, next, head, member)
-> +
->  /**
-> - * list_for_each_entry_safe_from - iterate over list from current point safe against removal
-> + * list_for_each_entry_mutable_continue - continue list iteration safe against removal
->   * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> + * @...:	either (head, member) or (next, head, member)
->   *
-> - * Iterate over list of given type from current point, safe against
-> - * removal of list entry.
-> + * next:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + *
-> + * Iterate over list of given type, continuing after current point,
-> + * safe against removal of list entry.
-> + */
-> +#define list_for_each_entry_mutable_continue(pos, ...)			\
-> +	CONCATENATE(__list_for_each_entry_mutable_continue,		\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_entry_safe_from is an old interface,
-> + * use list_for_each_entry_mutable_from instead.
->   */
->  #define list_for_each_entry_safe_from(pos, n, head, member) 			\
->  	for (n = list_next_entry(pos, member);					\
->  	     !list_entry_is_head(pos, head, member);				\
->  	     pos = n, n = list_next_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_from_internal(pos, tmp, head, member) \
-> +	for (typeof(pos) tmp = list_next_entry(pos, member);		\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_next_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable_from2(pos, head, member)		\
-> +	__list_for_each_entry_mutable_from_internal(pos,		\
-> +		__UNIQUE_ID(next), head, member)
-> +
-> +#define __list_for_each_entry_mutable_from3(pos, next, head, member)	\
-> +	list_for_each_entry_safe_from(pos, next, head, member)
-> +
->  /**
-> - * list_for_each_entry_safe_reverse - iterate backwards over list safe against removal
-> + * list_for_each_entry_mutable_from - iterate over list from current point safe against removal
->   * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> + * @...:	either (head, member) or (next, head, member)
->   *
-> - * Iterate backwards over list of given type, safe against removal
-> - * of list entry.
-> + * next:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + *
-> + * Iterate over list of given type from current point, safe against
-> + * removal of list entry.
-> + */
-> +#define list_for_each_entry_mutable_from(pos, ...)			\
-> +	CONCATENATE(__list_for_each_entry_mutable_from,			\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_entry_safe_reverse is an old interface,
-> + * use list_for_each_entry_mutable_reverse instead.
->   */
->  #define list_for_each_entry_safe_reverse(pos, n, head, member)		\
->  	for (pos = list_last_entry(head, typeof(*pos), member),		\
-> @@ -955,6 +1066,37 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	     !list_entry_is_head(pos, head, member); 			\
->  	     pos = n, n = list_prev_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_reverse_internal(pos, tmp, head, member) \
-> +	for (typeof(pos) tmp = list_prev_entry(pos =			\
-> +		list_last_entry(head, typeof(*pos), member), member);	\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_prev_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable_reverse2(pos, head, member)	\
-> +	__list_for_each_entry_mutable_reverse_internal(pos,		\
-> +		__UNIQUE_ID(prev), head, member)
-> +
-> +#define __list_for_each_entry_mutable_reverse3(pos, prev, head, member)	\
-> +	list_for_each_entry_safe_reverse(pos, prev, head, member)
-> +
-> +/**
-> + * list_for_each_entry_mutable_reverse - iterate backwards over list safe against removal
-> + * @pos:	the type * to use as a loop cursor.
-> + * @...:	either (head, member) or (prev, head, member)
-> + *
-> + * prev:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + *
-> + * Iterate backwards over list of given type, safe against removal
-> + * of list entry.
-> + */
-> +#define list_for_each_entry_mutable_reverse(pos, ...)			\
-> +	CONCATENATE(__list_for_each_entry_mutable_reverse,		\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
->  /**
->   * list_safe_reset_next - reset a stale list_for_each_entry_safe loop
->   * @pos:	the loop cursor used in the list_for_each_entry_safe loop
-> @@ -1189,6 +1331,31 @@ static inline void hlist_splice_init(struct hlist_head *from,
->  	for (pos = (head)->first; pos && ({ n = pos->next; 1; }); \
->  	     pos = n)
->  
-> +#define __hlist_for_each_mutable_internal(pos, tmp, head)		\
-> +	for (typeof(pos) tmp = (pos = (head)->first) ? pos->next : NULL; \
-> +	     pos;							\
-> +	     pos = tmp, tmp = pos ? pos->next : NULL)
-> +
-> +#define __hlist_for_each_mutable1(pos, head)				\
-> +	__hlist_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
-> +
-> +#define __hlist_for_each_mutable2(pos, next, head)			\
-> +	hlist_for_each_safe(pos, next, head)
-> +
-> +/**
-> + * hlist_for_each_mutable - iterate over a hlist safe against entry removal
-> + * @pos:	the &struct hlist_node to use as a loop cursor.
-> + * @...:	either (head) or (next, head)
-> + *
-> + * next:	another &struct hlist_node to use as optional temporary storage.
-> + *		The temporary cursor is internal unless explicitly supplied by
-> + *		the caller.
-> + * head:	the head for your hlist.
-> + */
-> +#define hlist_for_each_mutable(pos, ...)				\
-> +	CONCATENATE(__hlist_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-> +		(pos, __VA_ARGS__)
-> +
->  #define hlist_entry_safe(ptr, type, member) \
->  	({ typeof(ptr) ____ptr = (ptr); \
->  	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
-> @@ -1224,18 +1391,44 @@ static inline void hlist_splice_init(struct hlist_head *from,
->  	for (; pos;							\
->  	     pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member))
->  
-> -/**
-> - * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-> - * @pos:	the type * to use as a loop cursor.
-> - * @n:		a &struct hlist_node to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the hlist_node within the struct.
-> +/*
-> + * hlist_for_each_entry_safe is an old interface, use hlist_for_each_entry_mutable instead.
->   */
->  #define hlist_for_each_entry_safe(pos, n, head, member) 		\
->  	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
->  	     pos && ({ n = pos->member.next; 1; });			\
->  	     pos = hlist_entry_safe(n, typeof(*pos), member))
->  
-> +#define __hlist_for_each_entry_mutable_internal(pos, tmp, head, member)	\
-> +	for (struct hlist_node *tmp = (pos =				\
-> +		hlist_entry_safe((head)->first, typeof(*pos), member)) ? \
-> +		pos->member.next : NULL;				\
-> +	     pos;							\
-> +	     pos = hlist_entry_safe((tmp), typeof(*pos), member),	\
-> +		tmp = pos ? pos->member.next : NULL)
-> +
-> +#define __hlist_for_each_entry_mutable2(pos, head, member)		\
-> +	__hlist_for_each_entry_mutable_internal(pos,			\
-> +		__UNIQUE_ID(next), head, member)
-> +
-> +#define __hlist_for_each_entry_mutable3(pos, next, head, member)	\
-> +	hlist_for_each_entry_safe(pos, next, head, member)
-> +
-> +/**
-> + * hlist_for_each_entry_mutable - iterate over hlist safe against entry removal
-> + * @pos:	the type * to use as a loop cursor.
-> + * @...:	either (head, member) or (next, head, member)
-> + *
-> + * next:	a &struct hlist_node to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your hlist.
-> + * member:	the name of the hlist_node within the struct.
-> + */
-> +#define hlist_for_each_entry_mutable(pos, ...)				\
-> +	CONCATENATE(__hlist_for_each_entry_mutable,			\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
->  /**
->   * hlist_count_nodes - count nodes in the hlist
->   * @head:	the head for your hlist.
+
+> -----Original Message-----
+> From: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+> Sent: Monday, June 22, 2026 3:58 AM
+> To: Ruinskiy, Dima <dima.ruinskiy@intel.com>
+> Cc: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; Nguyen,
+> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; intel-wired-lan@lists.osuosl.org;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: Re: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC
+> passthrough after reset
+>=20
+> On Thu, Jun 18, 2026 at 11:51:35AM +0300, Ruinskiy, Dima wrote:
+> > On 18/06/2026 10:55, Loktionov, Aleksandr wrote:
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On
+> > > > Behalf Of Chia-Lin Kao (AceLan) via Intel-wired-lan
+> > > > Sent: Thursday, June 18, 2026 9:33 AM
+> > > > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> > > > Przemyslaw <przemyslaw.kitszel@intel.com>
+> > > > Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
+> > > > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > > > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+> > > > intel- wired-lan@lists.osuosl.org; netdev@vger.kernel.org;
+> linux-
+> > > > kernel@vger.kernel.org
+> > > > Subject: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC
+> > > > passthrough after reset
+> > > >
+> > > > Some systems support MAC passthrough for dock Ethernet
+> controllers
+> > > > by having firmware rewrite the receive address registers after
+> the
+> > > > controller reset completes.
+> > > >
+> > > > igc resets the controller before reading RAL0/RAH0, so that
+> reset
+> > > > can restore the controller native MAC address temporarily. If
+> the
+> > > > driver reads the registers immediately, it can race the firmware
+> > > > rewrite and keep the native dock MAC instead of the host
+> passthrough MAC.
+> > > >
+> > > > For LMVP devices, poll RAL0/RAH0 after reset and before reading
+> > > > the MAC address. Stop once the address registers change to
+> another
+> > > > valid Ethernet address, allowing firmware a bounded window to
+> > > > complete the passthrough update.
+> > > >
+> Hi Aleksandr and Dima,
+>=20
+> Let me answer your questions below.
+>=20
+> > > Good day, Chia-Lin
+> > >
+> > > It'd be great if you could share more details on how to reproduce
+> the issue.
+> > >
+> > > What exact hardware setup is affected (dock model, NIC, system)?
+> We've observed this issue for a long time, and encountered the issue
+> on Lenovo's P15 Gen 2 (type 20YQ, 20YR) Laptops (ThinkPad) the first
+> time at 2021 and added 600ms delay.
+> Recently, we encountered the same issue on Dell, too, and then
+> increased the delay to 1000ms.
+> And now, the issue occurs again.
+>=20
+> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1942999
+> https://lore.kernel.org/lkml/20210702045120.22855-2-
+> aaron.ma@canonical.com/
+> https://bugs.launchpad.net/ubuntu/+source/linux-oem-6.17/+bug/2143197
+>=20
+> > > Which firmware/BIOS version?
+> It doesn't happen on a single firmware or BIOS, and not a single
+> hardware or a single brand.
+>=20
+> > > How often does the race trigger?
+> It may happen when re-plug the dock cable.
+> With the mainline kernel, it's easy to reproduce the issue by re-
+> plugging the dock cable.
+>=20
+> > > Do you have a way to reliably reproduce it?
+> Yes, I can find some machines to reproduce the issue reliably.
+>=20
+> > >
+> > > Also, what is the observed behavior vs. expected behavior? For
+> > > example, which MAC address is seen and which one should be used?
+> Here is the debugging logs, fc:4c:ea:ae:a1:e3 is the MAC address of
+> the machine, and c4:d6:d3:83:75:d1 is the MAC of the dock.
+>=20
+> It gets the correct passthrough MAC address after bootup and the first
+> re-plug at 40s, and fails to update the MAC address in time after
+> couple of re-plugs.
+>=20
+> [    0.689873] igc 0000:70:00.0: MAC debug before reset_hw:
+> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
+> [    0.755187] igc 0000:70:00.0: MAC debug after reset_hw:
+> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
+> [    0.755576] igc 0000:70:00.0: MAC debug:
+> eth_platform_get_mac_address ret=3D-19, reading RAR0/NVM fallback
+> [    0.755582] igc 0000:70:00.0: MAC debug: read_mac_addr ret=3D0
+> addr=3Dfc:4c:ea:ae:a1:e3 perm_addr=3Dfc:4c:ea:ae:a1:e3
+> [    4.687730] igc 0000:70:00.0: MAC debug firmware: fwnode=3D<none>
+> props(mac=3D0 local=3D0 address=3D0) fwnode_ret=3D-19
+> fwnode_mac=3D00:00:00:00:00:00 device_ret=3D-2
+> device_mac=3D00:00:00:00:00:00 is_tbt=3D0 external=3D0 hotplug_bridge=3D0
+> [    4.687739] igc 0000:70:00.0: MAC debug before reset_hw:
+> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
+> [    4.748545] igc 0000:70:00.0: MAC debug after reset_hw:
+> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
+> [    4.748937] igc 0000:70:00.0: MAC debug:
+> eth_platform_get_mac_address ret=3D-19, reading RAR0/NVM fallback
+> [    4.748944] igc 0000:70:00.0: MAC debug: read_mac_addr ret=3D0
+> addr=3Dfc:4c:ea:ae:a1:e3 perm_addr=3Dfc:4c:ea:ae:a1:e3
+> [   40.892715] igc 0000:70:00.0: MAC debug firmware: fwnode=3D<none>
+> props(mac=3D0 local=3D0 address=3D0) fwnode_ret=3D-19
+> fwnode_mac=3D00:00:00:00:00:00 device_ret=3D-2
+> device_mac=3D00:00:00:00:00:00 is_tbt=3D0 external=3D0 hotplug_bridge=3D0
+> [   40.892724] igc 0000:70:00.0: MAC debug before reset_hw:
+> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
+> [   40.953524] igc 0000:70:00.0: MAC debug after reset_hw:
+> RAL0=3D0x83d3d6c4 RAH0=3D0x8000d175 RAR0=3Dc4:d6:d3:83:75:d1 valid=3D1
+> [   40.953933] igc 0000:70:00.0: MAC debug:
+> eth_platform_get_mac_address ret=3D-19, reading RAR0/NVM fallback
+> [   40.953941] igc 0000:70:00.0: MAC debug: read_mac_addr ret=3D0
+> addr=3Dc4:d6:d3:83:75:d1 perm_addr=3Dc4:d6:d3:83:75:d1
+> ...
+> [  307.387282] igc 0000:70:00.0: MAC poll change at 700ms:
+> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
+> prev=3Dc4:d6:d3:83:75:d1 [  328.826084] igc 0000:38:00.0: MAC poll
+> change at 1000ms: RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1
+> RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1 prev=3Dc4:d6:d3:83:75:d1 [  429.070519=
+]
+> igc 0000:38:00.0: MAC poll change at 1100ms: RAL0=3D0xaeea4cfc
+> RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1 prev=3Dc4:d6:d3:83:7=
+5:d1
+> [  466.509571] igc 0000:70:00.0: MAC poll change at 1000ms:
+> RAL0=3D0xaeea4cfc RAH0=3D0x8000e3a1 RAR0=3Dfc:4c:ea:ae:a1:e3 valid=3D1
+> prev=3Dc4:d6:d3:83:75:d1
+>=20
+
+Please include the info into commit message, so users can grep error and fi=
+nd the fix.
+Exact bash commands for reproduction can also help administrators to decide=
+ whether they need to patch their OS.
+
+Thank you
+
+...
 
 
