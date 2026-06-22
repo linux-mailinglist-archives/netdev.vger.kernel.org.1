@@ -1,353 +1,204 @@
-Return-Path: <netdev+bounces-300963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300964-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vUBGAXbTOGrHigcAu9opvQ
-	(envelope-from <netdev+bounces-300963-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:17:26 +0200
+	id C6S6FDzYOGrTiwcAu9opvQ
+	(envelope-from <netdev+bounces-300964-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:37:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6F66ACEC3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:17:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 716F16ACF86
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:37:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=t15fr1vS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300963-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300963-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=ZaKAb0MN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300964-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300964-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06D8230342AD
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 06:16:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 124BF301413B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 06:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D609335F170;
-	Mon, 22 Jun 2026 06:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6691A35E1CE;
+	Mon, 22 Jun 2026 06:37:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010063.outbound.protection.outlook.com [52.101.85.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18EE35DA6D
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 06:16:19 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782108982; cv=none; b=ZJo1SHMHeeMA2mrZSZb7Tq9NL+lsdy6zoJmtpHeHQ/O3NEYkr1nCJFN+oXd8IGg9QeABIPOGBFLW0viT1kG8Q+qtQFyULDUa2LQgHnmAV4KWgB/oSTnAQanNBPQXecnBTkJM3Kk4Pwo7kDlocRwrsc0rZjv8XjasR3feAQExjcQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782108982; c=relaxed/simple;
-	bh=hk8s1HyY3dzHKU/LGLjDjlXFo8lRWPfUJ+Vkj0iR3dk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OapMcEwQan79IAw0NNFCmyHiiiUcxyCbWK8FdLVZAlQI1h8lJ97PTsZ46+HojWAFE+fgg2/m/rRFzGN5hDC5145YASjPFv0GT9xhLvYK0CO3JVCxUdnhFMUDwmMLrv6SV7RZCu/9xs1lTQxqMI11MfCN3FZEsyZWkA15e2Cjf4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t15fr1vS; arc=none smtp.client-ip=91.218.175.180
-Message-ID: <8c8f1849-86d3-4c69-be27-30bbdffdf616@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782108966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uc01vIZYGfTIV3fdEG67Z2UKVAOKK7e6urfcQoWTPXs=;
-	b=t15fr1vSWPqYuOVx1/bxMEqBYsgHtm0lD1qKuOgL6xYl94f+kJLWMkDtNXA1O6oXS4NWrk
-	UXfi4I4xGSapixdXs6K5v7yl7QxZTsj0xBO+b54oW8Z9JaKuiK5OobLxhWf+TcWH/AL++5
-	EurPaDWOivYCOI4YE0QW4UrJN1dv49Y=
-Date: Mon, 22 Jun 2026 14:15:01 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC29340A52
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 06:37:43 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782110265; cv=fail; b=BM7TksYrRyh2fsT9xeb7ovGQbxuq5Yifl8SlH+DonkF9WIBl2oJioBsJHJTWKdWzBTnSJIrck1i0jQyVEVF+7PvDtLYnAGKtN+SrEVy9BnLxeUm33QHfUy1IfXwu7CHRFSFBiahu0H1tvGL4nayCg1+xwpR5NGJDQSZXpBZSVEc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782110265; c=relaxed/simple;
+	bh=zf1r+styy33An/l4kQM1oQRV1fCcOj8q89FvLP60q7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=n+l7iCbawNjaCJcAoTdI4aNds3RU0AFcRUpBuIK4LPd48xkMX1V5X8eh1zpWNkyJ9OnEXOhte81JIGwIqgbcHLFgS414vKzHR13+O0uiyqE8c73LZsZkN9KmyvDVDVyzTDvxdlWQCfQEw7IBMMFUuZ6zg/SBuvtXvVt+6Jcte4A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZaKAb0MN; arc=fail smtp.client-ip=52.101.85.63
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WZy61K0Wp9gKV5JjewaYboAbXvXHZ9zSOendvE/8cb8zvyLhEGRhkN4zuIRjcCi+OqEaDv00z21lI5ruHz+1YScuegU8UYfiJkLTb8T3rm79/bAJ1Wpcds5LztrLoyXIn2y6FZ3CHbiLYkG5l86BsKN+6ePz/fu1z55Hf4VNvKiujTTxmy+aT7QgxMcQNYZgD6L5vEUeO7kqsyIkL+eJjpy/Hwtb9T6j3OP+MG4smwG7aXAE6pDcJYEnOOo79sL0eM4EHHCtkDt2DtXrYYkykBWPT26MHp4F6Ke0Ugey1SRwbcNxkMSXvjjPCrQgSS3lb2OdOLD5MGMRB8OPmzg5Fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EpzCsfNBy7mbqKNeIMCvuwqe2rwOGjrgRviuAJRJMtk=;
+ b=BGLaCNWzZuTTQbTblrI2GIiDyfEhQqAKXK/kUo2Bv+g+rhTioeqyrWKZPbXb/INLTB4zHKmmQEX/vn3II58h3CYHbTLHITyl6XsoWAa6IR9SIKxbVh5BbeOwF7oFCo8NDOt4LMKahBpIUbJq1fnZrIXV3wceQtEXkWBf5XIBb5yjKPGaCNCNOd6q8OVGhvxTG3padh47CHr3HtC8jgnU7shMbx0ZjjWl0wliHEdV3eq1CiZM4yNW9wYBH1LeQaPEokQ6yxLRNQL3mBDD1CQrqyjTDqUTIjyjCGxv6GrTtWHxTOl3Is7Xn4m5PkwtVWjTK/duLrfyRfL066hIbf2cdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EpzCsfNBy7mbqKNeIMCvuwqe2rwOGjrgRviuAJRJMtk=;
+ b=ZaKAb0MNeUToiwdyYJhHcq3h1tr4vj3qFWiFyo4XQJ4BTJZanoWi4nk/wqxtJGzfNiXVusGjlRNuo7eKNXNT4F8uMqHwD0HrJdiZcRqCIi/aeR+7mRNwjAtAsrYGu682VqPW+ytliAJSBqc5iecneKOSXoHx1Pp2bu6YqTF8TxFbRffxw2KIiKoUunFQTv6qABdKsZJNNbIJeVn3B0UgTfYxk17U2A520BD1lPHD6nHTDVBkZkurnAQFOInksGCNzRPlPtOs/L5WD8cTg2opvFyIqAt8vGfvmBeJX5pt2Obpe7w9Qeg3NYLbuVYBDrTzkFbOJ8OgzHEUl6Be2/CJZg==
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SA1PR12MB7319.namprd12.prod.outlook.com (2603:10b6:806:2b5::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Mon, 22 Jun
+ 2026 06:37:40 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
+ 06:37:40 +0000
+Date: Mon, 22 Jun 2026 09:37:30 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: xmei5@asu.edu
+Cc: dsahern@kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
+	horms@kernel.org, bestswngs@gmail.com
+Subject: Re: [PATCH net] ipv6: Fix null-ptr-deref in fib6_nh_mtu_change().
+Message-ID: <20260622063730.GA72186@shredder>
+References: <20260619045334.2427073-1-xmei5@asu.edu>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260619045334.2427073-1-xmei5@asu.edu>
+X-ClientProxiedBy: TL2P290CA0021.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::15) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
- state
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Shakeel Butt <shakeel.butt@linux.dev>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>,
- Randy Dunlap <rdunlap@infradead.org>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
- linux-ntfs-dev@lists.sourceforge.net,
- Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
- io-uring <io-uring@vger.kernel.org>, audit@vger.kernel.org,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- dri-devel@lists.freedesktop.org,
- "linux-perf-use." <linux-perf-users@vger.kernel.org>,
- linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Linux Power Management <linux-pm@vger.kernel.org>, rcu@vger.kernel.org,
- sched-ext@lists.linux.dev, linux-mm <linux-mm@kvack.org>,
- virtualization@lists.linux.dev, damon@lists.linux.dev,
- clang-built-linux <llvm@lists.linux.dev>,
- chengkaitao <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <CAADnVQJmPWFT01b7DuLdtafv=8FyB84GYHNZ8zSTck+9Aw0JpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SA1PR12MB7319:EE_
+X-MS-Office365-Filtering-Correlation-Id: 237e35bb-240f-4634-edd4-08ded028c1cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|23010399003|366016|6133799003|56012099006|11063799006|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	rUSmmLP2Tv3952GpBZalWKfxCf14Whcj1Cz/jNcl3AgaeVDkZmRBrPno2iT6afHlkNv6ecRqLmYaUZnhtgBO29nBkfDWY0yFOxWclqujGDXFbTG8Kjk+JXLhRb1eL3lUJ5OiGo32QwsMJC/bbHXNFDzXz3op+IFV+JYJ7QMds+svuqts4koPCEJXllkhZESTqGo9jypMUCM7Z0ySu1MzhqCUznrxiscoT2z6uhiLqE7VLZPs9wyhddvvMvRLqmnRI7Hebga9ajWPpvk2St62D32wqhVVgITtpNX39+lzCd0+yIGzjdHuuheZ6xQLS6lLXmERrESry5Buo8+nrCQKaexFwIwWfZR9NMK6r5lZ7W8wNN1Yo6P9hbPcMArrHHQZ1ki0EP8THMkm+wS7Ken/HrAqQt+hWWOkBXsLtdfamHaoyMYHAGEdMhXPtfuzybCa1KVl3AVpcPuySLm0UUucix4K/JECo4VyTCDIOSE8oMbb20o++m+MisOAFFCmF6FtYAbI5bHWPjW8DDkVA31xN5UFVJBwRtNat2SJnecb1L7FiVHHsgvbM6ck9fVNqFpKuQqXR3LARQCPB3YIwjlUoijbrS/iEv9HceOWrfZImKVvegXAiZVP9wewilD0jmvCmMU9n01pncDSsiX5Itfk/Xh+5eMZwaqJtLPsX9TmIJc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(366016)(6133799003)(56012099006)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pO8IwLAWmPmXSNb+JQooAmuV9qjXt5TLaJN8DcZNuojcy+x56liKT77SWnSE?=
+ =?us-ascii?Q?KKb0rnotM4HTeh0bWNMak2R3p6x4mc1yAoCqHTKTCt3wo6zcKCOOOHJ/1oYS?=
+ =?us-ascii?Q?g56QtF8OrzvI18ypNmyMNRFkYNKPRcxvWSOZ3hIebJBdEO+JRbd8Ts6wLPxp?=
+ =?us-ascii?Q?ZQxAZ/l11whWD5n9d/onvzw8bNWMzNcyThGmWmnlrjB4FziGRHu+cMWZvpw9?=
+ =?us-ascii?Q?tl35yk79mVmfE+ewjS8mBSLfTdy6haFSITdv8QZR6rPPJirEu9vYDG25Bjm3?=
+ =?us-ascii?Q?kmUZUWUTnSLBAuW6qRUYfmr8T0rQco/Uotw+Wo3vdq75fPIAAMhq/ISq6WbB?=
+ =?us-ascii?Q?AfXYZREOXgnzvhOvsonAJCE9XNTmOTe81PCoy5hkDHKPrydkRngdHBM9OeIi?=
+ =?us-ascii?Q?2p8/ZSVxsRxwWPXMjnjeGl0uRSHrn7ahNaJyNeOvUQo1KD6YFA070oIu/6RE?=
+ =?us-ascii?Q?e5FifE9mB2XhUz9HOdT3ryTGqhGvA+ZAF/xCVEH+WlK6dBl2Od6FIAPMf92q?=
+ =?us-ascii?Q?r2avoMbdEzt8Nuu8YjzfZ0wauXNI71HalNGBZb8/NVRUu1zHFFFWo/8j9wum?=
+ =?us-ascii?Q?19YL8sncd1ptUjqJ/z5d01/2bWgaw0QAXEnw16GXOmQekYo0HKpox+EBy/aJ?=
+ =?us-ascii?Q?huNHuUik1qZciSeXpaIPg64OsAFq/NNBFQgfCFMBt9FMCGf+qOvh+/C3O9AZ?=
+ =?us-ascii?Q?QImud5JXK6dIUB4DIXUzRthJKAOLLQfbIn8q7qSsf/8hoBG9pL0UTLbGl37x?=
+ =?us-ascii?Q?7n5Amrdv7XO0PFdz2De5IXMMnw+Fg1W5KC6znE0HFvxgOraGhS9O+zGbvaFS?=
+ =?us-ascii?Q?ACZXEY3aT44Z+MxEokph4/MlaPClxxRg2A0cLW22SZwZRR4qoCo/5Y+KKJ6k?=
+ =?us-ascii?Q?mPOtx5e7u0lZ8JUZmxKo47u2lBNDu9uDXRvswy1ivgLt5SH4ysoKmGnFk1TY?=
+ =?us-ascii?Q?VPfsd66UjAElUae9jSqMHBWd2SOJc7MPLKX6JqikC56GQLDbErbyaKwKNOMO?=
+ =?us-ascii?Q?FmhN6turkZTpmJwpc6DhqPN1BTbBp5eIJbvx1YX4eXrbpD/3wIPxTWaKhAf3?=
+ =?us-ascii?Q?GRBu49BAdXWwkdIpJ4HfBRQ1FezmPY7wvzXjPOLsroKc5oM9qeJPHpbGea15?=
+ =?us-ascii?Q?vcUImADSntO/3KqUlPUCs8Co0W3oLoY7U3ogsgDA6DJrEcyxB21xt7J8DybI?=
+ =?us-ascii?Q?k6cWKlaWJ9QfaT71Kg1hcNg2wthNM/nEmYWvJJYOV4JY6DCZ1EUDMNRMXq91?=
+ =?us-ascii?Q?g4/GgL1M8FcbCffyCO+zAfsnqcJ/0jZwPWUyjdERZK+F/l4CItnATDhlbsCO?=
+ =?us-ascii?Q?hFdE0d5rQTonocttNsaNdObUpbOEKvGABeFhDZHI5jghMuwNFwOBR0A0nP8w?=
+ =?us-ascii?Q?cc/M3bXgbRFIZaeI+o4SSV0FSvmGRHPyb8qAidJ8N0Lw9u7WcdaKNZwX93pB?=
+ =?us-ascii?Q?H7j1yqdpKXp4ZinwMgccM7dE+8B7EY9wNVIqTnRK/wgymJUT3aSMAtJSlNLZ?=
+ =?us-ascii?Q?2t1MC87v5hMu5qS/m9+olSMaUgCyp7nHaXcfcoFd2O0+aEiqL8AimoUaZ1pS?=
+ =?us-ascii?Q?15C99FDQmLyQ+RurPnwFcNnCGfz2W3eTzT5BvCDY82tQxT+MsSeufe4rsAsY?=
+ =?us-ascii?Q?nFS2MfGTi8LrMKJsjQiYfLEvlkDCy45OENcB99SIWAnibr92//Llhv+/Sc+T?=
+ =?us-ascii?Q?AYMiv6eLwa6ZxAqQo41E3o6/ruekBXSOfXhjZ2eblxa9lTzm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 237e35bb-240f-4634-edd4-08ded028c1cf
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 06:37:40.3442
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5y3HpZjbl+Dtk5KYHl2iMRk+Ae0MHF+Ywjs4i6/A6o5r++SREGkHxcf3uyBgLrf1vRZV52fQkIwUsxK2gHfcIw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7319
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-6.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300963-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:lin
- ux-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,m:muchun.song@linux.dev,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-300964-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:kuba@kernel.org,m:horms@kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[53];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:email,shredder:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4F6F66ACEC3
+X-Rspamd-Queue-Id: 716F16ACF86
 
-
-
-在 2026/6/22 13:28, Alexei Starovoitov 写道:
-> On Sun, Jun 21, 2026 at 9:06 PM Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
->>
->> From: chengkaitao <chengkaitao@kylinos.cn>
->>
->> The list_for_each*_safe() helpers are used when the loop body may remove
->> the current entry.  Their current interface, however, forces every caller
->> to define a temporary cursor outside the macro and pass it in, even when
->> the caller never uses that cursor directly.  For most call sites this
->> extra cursor is just boilerplate required by the macro implementation.
->>
->> This is awkward because the saved next pointer is an internal detail of
->> the iteration.  Callers that only remove or move the current entry do not
->> need to spell it out.
->>
->> The _safe() suffix has also caused confusion.  Christian Koenig pointed
->> out that the name is easy to read as a thread-safe variant, especially
->> for beginners, even though it only means that the iterator keeps enough
->> state to tolerate removal of the current entry.  He suggested _mutable()
->> as a clearer description of what the loop permits.
->>
->> Add *_mutable() iterator variants for list, hlist and llist.  The new
->> helpers are variadic and support both forms.  In the common case, the
->> caller omits the temporary cursor and the macro creates a unique internal
->> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
->> explicit temporary cursor, the caller can still pass it and the helper
->> keeps the existing *_safe() behaviour.
->>
->> For example, a call site may use the shorter form:
->>
->>   list_for_each_entry_mutable(pos, head, member)
->>
->> or keep the explicit temporary cursor form:
->>
->>   list_for_each_entry_mutable(pos, tmp, head, member)
->>
->> The existing *_safe() helpers remain available for compatibility.  This
->> series only converts users in mm, block, kernel, init and io_uring.  If
->> this approach looks acceptable, the remaining users can be converted in
->> follow-up series.
->>
->> Changes in v3 (Christian König, Andy Shevchenko):
->> - Convert safe list walks to mutable iterators
->>
->> Changes in v2 (Muchun Song, Andy Shevchenko):
->> - Drop the list_for_each_entry_mutable*() helpers from v1 and make the
->>   cursor change directly in the existing list_for_each_entry*() helpers.
->> - Open-code special list walks that rely on updating the loop cursor in
->>   the body, preserving their existing traversal semantics.
->>
->> Link to v2:
->> https://lore.kernel.org/all/20260609061347.93688-1-kaitao.cheng@linux.dev/
->>
->> Link to v1:
->> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
->>
->> Kaitao Cheng (7):
->>   list: Add mutable iterator variants
->>   llist: Add mutable iterator variants
->>   mm: Use mutable list iterators
->>   block: Use mutable list iterators
->>   kernel: Use mutable list iterators
->>   initramfs: Use mutable list iterator
->>   io_uring: Use mutable list iterators
->>
->>  block/bfq-iosched.c                 |  17 +-
->>  block/blk-cgroup.c                  |  12 +-
->>  block/blk-flush.c                   |   4 +-
->>  block/blk-iocost.c                  |  18 +-
->>  block/blk-mq.c                      |   8 +-
->>  block/blk-throttle.c                |   4 +-
->>  block/kyber-iosched.c               |   4 +-
->>  block/partitions/ldm.c              |   8 +-
->>  block/sed-opal.c                    |   4 +-
->>  include/linux/list.h                | 269 ++++++++++++++++++++++++----
->>  include/linux/llist.h               |  81 +++++++--
->>  init/initramfs.c                    |   5 +-
->>  io_uring/cancel.c                   |   6 +-
->>  io_uring/poll.c                     |   3 +-
->>  io_uring/rw.c                       |   4 +-
->>  io_uring/timeout.c                  |   8 +-
->>  io_uring/uring_cmd.c                |   3 +-
->>  kernel/audit_tree.c                 |   4 +-
->>  kernel/audit_watch.c                |  16 +-
->>  kernel/auditfilter.c                |   4 +-
->>  kernel/auditsc.c                    |   4 +-
->>  kernel/bpf/arena.c                  |  10 +-
->>  kernel/bpf/arraymap.c               |   8 +-
->>  kernel/bpf/bpf_local_storage.c      |   3 +-
->>  kernel/bpf/bpf_lru_list.c           |  25 ++-
->>  kernel/bpf/btf.c                    |  18 +-
->>  kernel/bpf/cgroup.c                 |   7 +-
->>  kernel/bpf/cpumap.c                 |   4 +-
->>  kernel/bpf/devmap.c                 |  10 +-
->>  kernel/bpf/helpers.c                |   8 +-
->>  kernel/bpf/local_storage.c          |   4 +-
->>  kernel/bpf/memalloc.c               |  16 +-
->>  kernel/bpf/offload.c                |   8 +-
->>  kernel/bpf/states.c                 |   4 +-
->>  kernel/bpf/stream.c                 |   4 +-
->>  kernel/bpf/verifier.c               |   6 +-
->>  kernel/cgroup/cgroup-v1.c           |   4 +-
->>  kernel/cgroup/cgroup.c              |  54 +++---
->>  kernel/cgroup/dmem.c                |  12 +-
->>  kernel/cgroup/rdma.c                |   8 +-
->>  kernel/events/core.c                |  44 +++--
->>  kernel/events/uprobes.c             |  12 +-
->>  kernel/exit.c                       |   8 +-
->>  kernel/fail_function.c              |   4 +-
->>  kernel/gcov/clang.c                 |   4 +-
->>  kernel/irq_work.c                   |   4 +-
->>  kernel/kexec_core.c                 |   4 +-
->>  kernel/kprobes.c                    |  16 +-
->>  kernel/livepatch/core.c             |   4 +-
->>  kernel/livepatch/core.h             |   4 +-
->>  kernel/liveupdate/kho_block.c       |   4 +-
->>  kernel/liveupdate/luo_flb.c         |   4 +-
->>  kernel/locking/rwsem.c              |   2 +-
->>  kernel/locking/test-ww_mutex.c      |   2 +-
->>  kernel/module/main.c                |  11 +-
->>  kernel/padata.c                     |   4 +-
->>  kernel/power/snapshot.c             |   8 +-
->>  kernel/power/wakelock.c             |   4 +-
->>  kernel/printk/printk.c              |  11 +-
->>  kernel/ptrace.c                     |   4 +-
->>  kernel/rcu/rcutorture.c             |   3 +-
->>  kernel/rcu/tasks.h                  |   9 +-
->>  kernel/rcu/tree.c                   |   6 +-
->>  kernel/resource.c                   |   4 +-
->>  kernel/sched/core.c                 |   4 +-
->>  kernel/sched/ext.c                  |  22 +--
->>  kernel/sched/fair.c                 |  28 +--
->>  kernel/sched/topology.c             |   4 +-
->>  kernel/sched/wait.c                 |   4 +-
->>  kernel/seccomp.c                    |   4 +-
->>  kernel/signal.c                     |  11 +-
->>  kernel/smp.c                        |   4 +-
->>  kernel/taskstats.c                  |   8 +-
->>  kernel/time/clockevents.c           |   6 +-
->>  kernel/time/clocksource.c           |   4 +-
->>  kernel/time/posix-cpu-timers.c      |   4 +-
->>  kernel/time/posix-timers.c          |   3 +-
->>  kernel/torture.c                    |   3 +-
->>  kernel/trace/bpf_trace.c            |   4 +-
->>  kernel/trace/ftrace.c               |  49 +++--
->>  kernel/trace/ring_buffer.c          |  25 ++-
->>  kernel/trace/trace.c                |  12 +-
->>  kernel/trace/trace_dynevent.c       |   6 +-
->>  kernel/trace/trace_dynevent.h       |   5 +-
->>  kernel/trace/trace_events.c         |  35 ++--
->>  kernel/trace/trace_events_filter.c  |   4 +-
->>  kernel/trace/trace_events_hist.c    |   8 +-
->>  kernel/trace/trace_events_trigger.c |  17 +-
->>  kernel/trace/trace_events_user.c    |  16 +-
->>  kernel/trace/trace_stat.c           |   4 +-
->>  kernel/user-return-notifier.c       |   3 +-
->>  kernel/workqueue.c                  |  16 +-
->>  mm/backing-dev.c                    |   8 +-
->>  mm/balloon.c                        |   8 +-
->>  mm/cma.c                            |   4 +-
->>  mm/compaction.c                     |   4 +-
->>  mm/damon/core.c                     |   4 +-
->>  mm/damon/sysfs-schemes.c            |   4 +-
->>  mm/dmapool.c                        |   4 +-
->>  mm/huge_memory.c                    |   8 +-
->>  mm/hugetlb.c                        |  56 +++---
->>  mm/hugetlb_vmemmap.c                |  16 +-
->>  mm/khugepaged.c                     |  14 +-
->>  mm/kmemleak.c                       |   7 +-
->>  mm/ksm.c                            |  25 +--
->>  mm/list_lru.c                       |   4 +-
->>  mm/memcontrol-v1.c                  |   8 +-
->>  mm/memory-failure.c                 |  12 +-
->>  mm/memory-tiers.c                   |   4 +-
->>  mm/migrate.c                        |  23 ++-
->>  mm/mmu_notifier.c                   |   9 +-
->>  mm/page_alloc.c                     |   8 +-
->>  mm/page_reporting.c                 |   2 +-
->>  mm/percpu.c                         |  11 +-
->>  mm/pgtable-generic.c                |   4 +-
->>  mm/rmap.c                           |  10 +-
->>  mm/shmem.c                          |   9 +-
->>  mm/slab_common.c                    |  14 +-
->>  mm/slub.c                           |  33 ++--
->>  mm/swapfile.c                       |   4 +-
->>  mm/userfaultfd.c                    |  12 +-
->>  mm/vmalloc.c                        |  24 +--
->>  mm/vmscan.c                         |   7 +-
->>  mm/zsmalloc.c                       |   4 +-
->>  124 files changed, 875 insertions(+), 681 deletions(-)
+On Thu, Jun 18, 2026 at 09:53:34PM -0700, xmei5@asu.edu wrote:
+> From: Xiang Mei <xmei5@asu.edu>
 > 
-> Not sure what you were thinking, but this diff stat
-> is not landable.
+> fib6_nh_mtu_change() re-fetches idev via __in6_dev_get(arg->dev) and
+> dereferences idev->cnf.mtu6 without a NULL check. addrconf_ifdown()
+> clears dev->ip6_ptr with RCU_INIT_POINTER() after rt6_disable_ip() has
+> released tb6_lock, so the RA-driven MTU walk can observe a NULL idev and
+> oops. The caller rt6_mtu_change_route() guards its own __in6_dev_get(),
+> but this re-fetch is unguarded; nexthop-backed routes survive
+> addrconf_ifdown()'s flush, so the walk still reaches it after ip6_ptr is
+> nulled.
+> 
+> Return 0 when idev is NULL, matching rt6_mtu_change_route() and the
+> fib6_mtu() fix in commit 5ad509c1fdad ("ipv6: Fix null-ptr-deref in
+> fib6_mtu().").
+> 
+>   Oops: general protection fault, ... KASAN: null-ptr-deref in range
+>         [0x00000000000002a8-0x00000000000002af]
+>   RIP: 0010:fib6_nh_mtu_change+0x203/0x990
+>    rt6_mtu_change_route+0x141/0x1d0
+>    __fib6_clean_all+0xd0/0x160
+>    rt6_mtu_change+0xb4/0x100
+>    ndisc_router_discovery+0x24b5/0x2cb0
+>    icmpv6_rcv+0x12e9/0x1710
+>    ipv6_rcv+0x39b/0x410
+> 
+> Fixes: c0b220cf7d80 ("ipv6: Refactor exception functions")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-[PATCH v3 1/7] and [PATCH v3 2/7] contain the main logic and can
-be merged directly. They are also compatible with the old API.
-[PATCH v3 3/7] through [PATCH v3 7/7] are just simple interface
-replacements and do not change any functional logic. They can be
-left unmerged for now; individual modules can pick them up later
-if needed.
-
-In v2, Andy Shevchenko mentioned: "If it's done by Linus himself
-during the day when he prepares -rc1, it's fine." Even so, the
-changes in this patch series are indeed quite large and touch
-almost every subsystem. I have only converted part of them for
-now, so I wanted to send this out first and see what people think.
-
--- 
-Thanks
-Kaitao Cheng
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
