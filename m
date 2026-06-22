@@ -1,283 +1,288 @@
-Return-Path: <netdev+bounces-301079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NTKPILwiOWpinQcAu9opvQ
-	(envelope-from <netdev+bounces-301079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:55:40 +0200
+	id OgpcEhAlOWqynQcAu9opvQ
+	(envelope-from <netdev+bounces-301080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:05:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EBD6AF3D9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:55:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46BC56AF468
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:05:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=eBDr0NTq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301079-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301079-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=VpgilBJt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301080-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301080-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7CE36301F141
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:55:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6ED6B3007A61
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B071C2E040D;
-	Mon, 22 Jun 2026 11:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7B83909BF;
+	Mon, 22 Jun 2026 12:05:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7F22DC78C
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC2A2DC78C
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 12:05:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782129333; cv=none; b=gFNx/n2yovaQJfmi2xhrMxp2DE2TGHSlKHfVs/738zLwyiG90bcV/iLAFE8OeM5h2aXibP44mXodpZrFag7r8/1LweD1q1dn1hpfx7iVgSpCgHDvRsWBoeWEW+3uitQssVQOt25rTwvGG0fXIkXHsmS5cfnoRH+Sk2yTMVkzx4o=
+	t=1782129931; cv=none; b=IwtQJh1hnBjHn880bX39WSwRp0mIRXm0yAZYNhNH5yUDuyjxmSv7rVQ5G+23NRcdJmbV0m0X6icUKqqYyzKMVjxoUyeZrNpXA+kmTTH16TTov0B5WP9Vyoi21XxAOL61lxJRMpwqXUnUJfaOJu/b/rujjceXbA0/ke0CFbHZDDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782129333; c=relaxed/simple;
-	bh=PrVUMGsRNDpIJ/UshiJYTdB0TRQ987SpJrx5TNYpco0=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YbfBvKIjd1tJLt01fwe1u/rbM4jHwka+WSH1TccmALxJPx4QkPrD/+FC7J3GX6sHCrXUcBckmDr0KOCmWgCskH7HB1mpNl/ashl8A8cb2lAqNWFDykIdw/rr2iFkXq+x8CN+wiYLzuYngJueTWr7r/xU+MwKytTibE9wI839oUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBDr0NTq; arc=none smtp.client-ip=209.85.128.177
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7fe723ca5e5so44609827b3.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 04:55:32 -0700 (PDT)
+	s=arc-20240116; t=1782129931; c=relaxed/simple;
+	bh=dN1pLmbmed/NC96M/cd4Xbam1n1B1pvbnIxNHE495dY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bY1Ziqu2BQ9uqFYdLBKsI0TyBJcA+vtYCqgjdTS3hJSQWkpmlp+Ql5tmV0K6N5fYruCEF4ufM9KjA0VJwOSO0o7d4oiRWrBJzIJHvKCIuCySn2KdFvr+8KLoRC9+1A8RP3Sc/VL2Xu/fql2/+S3EP3mHE/uu8EZRTzgDuPS3i8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VpgilBJt; arc=none smtp.client-ip=209.85.128.51
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-490aaeabdb4so25267935e9.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 05:05:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782129331; x=1782734131; darn=vger.kernel.org;
-        h=content-language:thread-index:content-transfer-encoding
-         :mime-version:message-id:date:subject:in-reply-to:references:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AjtVZE+G6ZNdvtmmDJa7f0CJF6c7p8Zb+gTkGkKohN4=;
-        b=eBDr0NTqosFfv2i/cxebJkkKzworUTlnbvth85FwomRmUla8Y+OjPBNQSd6vTxZpsi
-         6O4XieBdnr8UBFwiM65miAsyJRXo7CffX+pdTFejH+kCxHivUD8aLT9RwvKUVUmVppfo
-         dGRmwlg2towjK9YzLSsxKa800cBMozvrU3EeG9uQ1sOjwkvxVT257ZU0obOGjtyC5Vox
-         sfm2VIAQV7YvAhjje9/RGJD4kvbcEHLeWN1oHssXS42psnNB38p+9uTb57j4946NkyF9
-         cfRiqHn5qVopL+0IDHCSqHyvCkymKlchvus6+YLnU8L4CAgzkWH2aMW47XGx/sPkxD46
-         im2Q==
+        d=gmail.com; s=20251104; t=1782129928; x=1782734728; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w2RuwhHXabj+ww9YZldGbi29RRzljhvrbTpiXJqZXhE=;
+        b=VpgilBJtDgaddZDKBYB8FCWGyakbkOEhIeKFl4cWdHUoRscX34cbGzLCYaMH2rWQvL
+         LkO4W49QJUFmXa9VyZ/uP+GigiaL9vmYFjcUGUCoLFEcTfJhwgDi6qwXEU1qGLXxBTX+
+         9B3FYKorl+Y9W4LhRH9R6A0sOerHTyQECCidEQpyz4g/6QwnEfjAe5A6caj8MuxKF6aU
+         AE/DqNNC1mQgH7Fcpv5njVHa2Yzq3uNitDRhZEDqBagkdcF8ovDm/iXb0wba3eVXu5NM
+         7u7jZ1a0zRL+8fsFFPhGM2hrWiohsMGAzeV/6AlsJFi39FtzLn8w+3xaLcNuGh5RVtUu
+         nCKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782129331; x=1782734131;
-        h=content-language:thread-index:content-transfer-encoding
-         :mime-version:message-id:date:subject:in-reply-to:references:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AjtVZE+G6ZNdvtmmDJa7f0CJF6c7p8Zb+gTkGkKohN4=;
-        b=fKEMeQUY2jOYd38WOgsAmRc5Qlkdvcp+Zr1lNY1kzj7f2pXdBn43Zu4as1E+lHGXCl
-         Mm7Wp5bv/s+pPTrTViRxS6X+fXPJovO7H+ukMbk7suGeuBa4OStw64/dbKeIZXtU+IBF
-         qBrL4zzq/r4WOVvEE2V4kMTPA1IfTycOo9BP/2pggGJZL3Dmo2jHSaqoeTnUE6hjeGWe
-         18jhQIVIRZuTf8v/WwCp4pyHYeokXJu+A70yOu1rjC1xyc1Bk9gL92unAO6zFWib+qV/
-         Qx1iVVcoxwS6753jXWj/AQ1b+wnIsp3eqB/2VgvPztIpI5i0/U7UR3xxfe/ouuWGYSQT
-         KlBg==
-X-Gm-Message-State: AOJu0YwJlcgpvab0FtTzGuB3gPR2gqbEF6EVXuKi8S/WxUrzTzHGK+zW
-	TeYrqVXqhmWTq53/bO09u0SE7URRIERpFRliDtBS9ODklOKI0LA+PyYeX4cC/OGP
-X-Gm-Gg: AfdE7ckD1yYeB6XlDrv2nKv2VAxMFd2zxiVjX50Q3C28yQZMEK0mtAdpQ5KBd6S5h2p
-	tMlB24QvXcP6rYi4MSuKXYVIK1xCl3hkFtnwbEBs/FMqv3SnqNaP1WdJ/J7xdfS89ufGJPilfuC
-	2n3ieyb0WtOI/zQkq5OHHLkFvoVqtnpp9Jp8Xs/umueJLxX0jmi0lzpSJ7GqrRXWVQg1IHtqVrc
-	9x2LGFnuNG3MauyP6OfzxgSnTKSJ25Vlk5YZhKucjIe3kzIQQRxDdSXUlefjVO9fU1Peq6Vglnb
-	5AqSAllHdNxa95G2BOy3jw3RdiDei5YXIWqKm0bvKarJ8elrBGz0XqjJLYdaVby21JMX2AkFE+Y
-	6akuPBbWYrbij65tD62I/LA8JQzabiihyF/JCgP5KmQLxIMLdsu8tvJ0o3e0xlHMz99zQH96ZTa
-	9wwr2hyZCXNpqduO7mbN0WUia4xQyIwIDmr1TOoO1GbP3nbWF7lQlMvOY9cWU+ZNw2lTTMVnfvy
-	imw
-X-Received: by 2002:a05:690c:6706:b0:7bb:11a4:2e70 with SMTP id 00721157ae682-80130b0b8cdmr125913627b3.14.1782129331028;
-        Mon, 22 Jun 2026 04:55:31 -0700 (PDT)
-Received: from WIN6DK41G9CSL2 (c-73-56-149-95.hsd1.fl.comcast.net. [73.56.149.95])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-802606a918bsm29833007b3.43.2026.06.22.04.55.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jun 2026 04:55:30 -0700 (PDT)
-From: "Brien Oberstein" <brienpub@gmail.com>
-To: "'Stefano Garzarella'" <sgarzare@redhat.com>
-Cc: <netdev@vger.kernel.org>,
-	<regressions@lists.linux.dev>,
-	<stable@vger.kernel.org>
-References: <467b01dd017b$733792d0$59a6b870$@gmail.com> <ajkAlpiyPWmNPWfx@sgarzare-redhat>
-In-Reply-To: <ajkAlpiyPWmNPWfx@sgarzare-redhat>
-Subject: RE: [REGRESSION 6.12.90 -> 6.12.94] vsock/virtio: large AF_VSOCK transfers reset under backpressure
-Date: Mon, 22 Jun 2026 07:55:30 -0400
-Message-ID: <618701dd023e$063de350$12b9a9f0$@gmail.com>
+        d=1e100.net; s=20251104; t=1782129928; x=1782734728;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w2RuwhHXabj+ww9YZldGbi29RRzljhvrbTpiXJqZXhE=;
+        b=j49mgy2NJUf1KbFzWGKrK9wA8lYdZhUqvuhP9TTlSFHp4tckCqZtshPlM3pwkuXQEX
+         18OBYYuRBwkCp1HLuuMYg0wEwWBBV/Sm9t7QcQ5kNCrPisfP2IADNZg/E8KiRBdqYlPC
+         cUZTar2CUcjVNRBE/PgfymzZ1NMmJlCrXulhDthXqQTtKZcQDmh+2DZDoj9WWhnEZ1eH
+         XzScXW3Q9BZWh4U2A0xe1uArcbQo8g7aaXf5K5iL5+X06vVgrK/cWQMwk6DW2/FS2KQR
+         NPnf8trGSPIW/x5Jojef6sgmPV6BPFTG9X8o9qi+2kRz4UU7cZRDjhEQvbdaJ+Eonvof
+         s5nA==
+X-Forwarded-Encrypted: i=1; AFNElJ+kXlPVO+2flQiUUzQoKLseiRkaHlhsshsI55Wgz1Ea5c7bGRvP5rd6pdehKRDaIqXZ+zHV8xQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjamMGbVLfCAiEsAJ9JE3KvmV8ZEbkUT5egQA82cU/mpk9DCBA
+	KeONn0U5+wwm+taxhQK/IeVFJ99vR6mPlLol6GR9vIwWP1YNF9X5HLT6
+X-Gm-Gg: AfdE7clAo2xVXGGar0atIrsDCrPSenAe4bKgeyvs2iwfq1hToM11n9wTT8tYGTDmmef
+	Xr+HGOHlH+C9txJIJBnKp2bMqLiqTcujGQTEKjq8kEmDUU5XYcMXdXUh6eY4p+W5eiCEPqyMamz
+	xo2+SPeZwgpII6dH05Xoc5JJ37XUgjw05Mi5Z+V3lc1ZSJJP7z1BJ1GnC9OU6XmyD6+mikXTliB
+	33VnJxVMnf5C4obLY2YTdAil6L3wSiTdslwCfLcREhXP4axss47VzNhc/8LVe6x3y6qXX1V8/2q
+	T8WawVo4sNp1t4u9QLaljyLFrSlBvCfYBiExz2zg+oiPuVIdJBNUH/XVKO0eCXVEH492bloRBIe
+	lsIOK424c8oaDRZ7GM7m0tsjLjjmhRrp0FWoZC9a7vPg7CsSSHDptunpwuPubI81fXkNdFAz7VY
+	fbq+a+TQGWpfEemhWN
+X-Received: by 2002:a05:600c:6386:b0:492:3763:aeb9 with SMTP id 5b1f17b1804b1-4923f6d2ff1mr234328755e9.21.1782129927618;
+        Mon, 22 Jun 2026 05:05:27 -0700 (PDT)
+Received: from mtardy-friendly-lvh-runner.local ([2600:1900:4010:1a8::])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4923fc47720sm491083105e9.0.2026.06.22.05.05.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 05:05:27 -0700 (PDT)
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: bpf@vger.kernel.org
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	jordan@jrife.io,
+	kuba@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com,
+	yonghong.song@linux.dev,
+	Mahe Tardy <mahe.tardy@gmail.com>
+Subject: [PATCH bpf-next v8 0/7] bpf: add icmp_send kfunc
+Date: Mon, 22 Jun 2026 12:05:08 +0000
+Message-Id: <20260622120515.137082-1-mahe.tardy@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQGzlm2Q3QdtCPSkkHXQpTkeFGbfJwIutksBtovYSHA=
-Content-Language: en-us
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301079-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[brienpub@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sgarzare@redhat.com,m:netdev@vger.kernel.org,m:regressions@lists.linux.dev,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-301080-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:jordan@jrife.io,m:kuba@kernel.org,m:martin.lau@linux.dev,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:pabeni@redhat.com,m:yonghong.song@linux.dev,m:mahe.tardy@gmail.com,m:johnfastabend@gmail.com,m:mahetardy@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,google.com,gmail.com,jrife.io,linux.dev,vger.kernel.org,redhat.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brienpub@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,lwn.net:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E0EBD6AF3D9
+X-Rspamd-Queue-Id: 46BC56AF468
 
-Hi Stefano,
+Hello,
 
-Thanks, that matches what I'm seeing: large transfers reset mid-stream
-instead of the sender being throttled (reliable above ~1.5 MB, fine =
-below
-~90 KB).
+This is v8 of adding the icmp_send kfunc, as suggested during LSF/MM/BPF
+2025[^1]. The goal is to allow cgroup_skb programs to actively reject
+east-west traffic, similarly to what is possible to do with netfilter
+reject target. Applications can receive early feedback that something
+went wrong during the TCP handshake.
 
-The bind for me: it's not just this mail bridge -- I use AF_VSOCK for a =
-few
-host/guest services, some of which open their own sockets, so the =
-per-socket
-buffer workaround can't cover them all. That leaves pinning 6.12.90 =
-(losing
-the DoS fix and further kernel updates) as the only blanket option.
+The first step to implement this is using ICMP control messages, with
+the ICMP_DEST_UNREACH type with various code ICMP_NET_UNREACH,
+ICMP_HOST_UNREACH, ICMP_PROT_UNREACH, etc. This is easier to implement
+than a TCP RST reply and will already hint the client TCP stack to abort
+the connection and not retry extensively.
 
-A few quick questions:
+Note that this is different than the sock_destroy kfunc, that along
+calls tcp_abort and thus sends a reset, destroying the underlying
+socket.
 
-1. Is a -stable backport of the merging fix likely, and roughly when?
-2. Could a smaller interim land in -stable sooner (e.g. more default
-   headroom) without reopening the DoS?
-3. Will the fix guarantee backpressure for any packet size, or just =
-widen
-   the margin?
+Caveats of this kfunc design are that a program can call this function N
+times, thus send N ICMP unreach control messages and that the program
+can return from the BPF filter with pass leading to a potential
+confusing situation where the TCP connection was established while the
+client received ICMP_DEST_UNREACH messages.
 
-Happy to test any patch -- I have a solid reproducer and can turn it =
-around
-in a day. I'll also file this as a tracked regression so it's not lost.
+v2 updates:
+- fix a build error from a missing function call rename;
+- avoid changing return line in bpf_kfunc_init;
+- return SK_DROP from the kfunc (similarly to bpf_redirect);
+- check the return value in the selftest.
 
-Thanks again,
-Brien
+v3 update:
+- fix an undefined reference build error.
 
-#regzbot introduced: v6.12.90..v6.12.94
+v4 updates:
+- prevent the kfunc to be called recursively and add a test (thanks to
+  Martin).
+- do not fetch dst route when unnecessary (thanks to Martin).
+- extend the test for IPv6 (thanks to Martin).
+- use SK_DROP in examples and use non blocking sockets for testing
+  (thanks to Martin).
+- test when the kfunc returns -EINVAL (thanks to Jordan).
+- add the kfunc to bpf_kfunc_set_skb as suggested by Alexei.
+- guard the IPv4 parts with IS_ENABLED(CONFIG_INET).
+- fix a wrong initial value for client_fd (thanks to Yonghong).
+- add documentation to the kfunc.
+- to Jordan: I couldn't include <linux/icmp.h> because of redefines from
+  <network_helpers.h>.
 
------Original Message-----
-From: Stefano Garzarella <sgarzare@redhat.com>=20
-Sent: Monday, June 22, 2026 6:08 AM
-To: Brien Oberstein <brienpub@gmail.com>
-Cc: edumazet@google.com
-Subject: Re: [REGRESSION 6.12.90 -> 6.12.94] vsock/virtio: large =
-AF_VSOCK transfers reset under backpressure
+v5 updates:
+- kfunc name is now icmp_send and takes the control message type as
+  parameter for future potential extension (daniel)
+- drop the net patches to route packet since now the kfunc is limited to
+  cgroup_skb and tc progs (daniel & martin)
+- linearize skb headers (sashiko)
+- zero SKB control block (sashiko)
+- bind to port 0 instead of fixed port (sashiko)
+- poll to wait for POLLERR event (sashiko)
+- do not use ASSERT_EQ in CMSG_NXTHDR loop (sashiko)
+- fix comment about byte order (sashiko)
+- fix endianness IP address issue (sashiko)
+- add forgotten cleanup_cgroup_environment (sashiko)
+- let packets pass in recursion test (sashiko)
+- clarify evaluation order for recursion test (sashiko)
 
-On Sun, Jun 21, 2026 at 08:42:41AM -0400, Brien Oberstein wrote:
->Hi Stefano, Eric,
+v6 updates (all from sashiko):
+- bring back the net patches to route packet since tc ingress needs it.
+- rename the ip_route_reply helpers from fetch to fill.
+- call pskb_network_may_pull on the cloned pkt.
+- check explicitly that we received one and only one ICMP err ctrl msg.
 
-Hi Brien,
+v7 updates:
+- use consume_skb on success path (stanislav)
+- replace recursion protection with CPU_ARRAY by checking the nature of
+  the sk (daniel, offline)
+- use reverse xmas tree in read_icmp_errqueue (jordan)
+- use ASSERT_OK_FD instead of ASSERT_GE whenever possible (jordan)
+- add a test for tc (jordan)
+- better filtering from host cgroup test progs (sashiko)
 
->
->I'm hitting a regression in the 6.12.y stable series: a bulk transfer=20
->over
->AF_VSOCK is torn down mid-stream once the message is large enough to
->exercise receiver-side backpressure. By stable version it lands on
->6.12.94; 6.12.90 is fine.
->
->Setup
->-----
->A host process mails a guest's postfix over an AF_VSOCK bridge:
->
->  host msmtp --(unix sock)--> socat --(AF_VSOCK: host CID 2 ->
->    guest CID 101, port 20025)--> [guest] socat --(TCP 127.0.0.1:25)-->
->    postfix
->
->postfix (TLS-terminating, then writing to its queue) drains the stream
->slower than the host writes it, so the per-socket vsock buffer fills
->during a large message.
->
->Symptom (guest, 6.12.94)
->------------------------
->The guest-side socat exits status=3D1 mid-transfer and postfix logs:
->
->  postfix/smtpd: NNN: lost connection after DATA (153330 bytes)
->    from localhost[127.0.0.1]
->  postfix/smtpd: disconnect ... data=3D0/1 commands=3D5/6
->
->On the host, msmtp reports:
->
->  msmtp: cannot write to TLS connection: The TLS connection was
->    non-properly terminated.        (sendmail exit 74 / EX_TEMPFAIL)
->
->So the AF_VSOCK connection is dropped while data is still flowing, =
-rather
->than the sender being throttled by the credit-based flow control.
->
->Reproduction
->------------
->Send messages of increasing size through the bridge:
->
->  body <=3D ~88 KB : always succeeds
->  body ~354 KB   : intermittent failure
->  body >=3D 1.5 MB : fails 12/12
->
->On 6.12.90 the identical test passes 20/20, including 1.5 MB x12,
->2.4 MB x3, 4 MB x3 and 8 MB x2. The only variable is the guest kernel.
->
->Bisection
->---------
->6.12.91, .92 and .93 carry no vsock changes. 6.12.94 pulled in three
->vsock/virtio commits:
->
->  1eca304f  vsock/virtio: fix potential unbounded skb queue
->  f3bf0f3b  vsock/virtio: fix skb overhead accounting to preserve
->            full buf_alloc
->  149205a1  vsock/virtio: fix skb overhead overflow on 32-bit builds
->
->The behaviour (drop/reset under a fast sender + slow receiver instead =
-of
->applying backpressure) makes 1eca304f the prime suspect, but I have =
-only
->A/B tested whole stable releases, not the individual commits.
+v8 updates:
+- mostly a resend as it's been sitting as "New" in the queue for almost
+  one month, fixed a few nits.
+- on new bpf_icmp_send kfunc cgroup_skb test (patch 4/7):
+  - guard a close fd with fd >= 0 (jordan)
+  - use ASSERT_OK_FD instead of ASSERT_GE (jordan)
+  - fixed comment style (sashiko)
+- on recursion test (patch 7/7):
+  - guard a close fd with fd >= 0 (jordan)
+  - fixed comments style (sashiko)
+  - filter bpf prog on pid and ICMP message types (sashiko)
 
-Yep, I'm working on a followup to improve the status.
+[^1]: https://lwn.net/Articles/1022034/
 
-Basically, the memory management in AF_VSOCK has always been broken. The =
+Link to v7: https://lore.kernel.org/bpf/20260526153708.279717-1-mahe.tardy@gmail.com/
 
-patches you mentioned are designed to prevent one peer from consuming=20
-all of the other peer=E2=80=99s memory.
-Instead of counting only the payload bytes, we now also take the packet=20
-metadata into account, using a socket buffer that is double the size set =
+Mahe Tardy (7):
+  net: move netfilter nf_reject_fill_skb_dst to core ipv4
+  net: move netfilter nf_reject6_fill_skb_dst to core ipv6
+  bpf: add bpf_icmp_send kfunc
+  selftests/bpf: add bpf_icmp_send kfunc cgroup_skb tests
+  selftests/bpf: add bpf_icmp_send kfunc cgroup_skb IPv6 tests
+  selftests/bpf: add bpf_icmp_send kfunc tc tests
+  selftests/bpf: add bpf_icmp_send recursion test
 
-(default 256 KB).
+ include/net/ip6_route.h                       |   2 +
+ include/net/route.h                           |   1 +
+ net/core/filter.c                             | 109 ++++++++
+ net/ipv4/netfilter/nf_reject_ipv4.c           |  19 +-
+ net/ipv4/route.c                              |  15 ++
+ net/ipv6/netfilter/nf_reject_ipv6.c           |  17 +-
+ net/ipv6/route.c                              |  18 ++
+ .../bpf/prog_tests/icmp_send_kfunc.c          | 248 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/icmp_send.c | 184 +++++++++++++
+ 9 files changed, 580 insertions(+), 33 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/icmp_send.c
 
-So if your system is sending small packets, then this is likely hitting=20
-this issue.
+--
+2.34.1
 
-My advice for now is to increase the socket buffer size. Thanks to=20
-VMware, AF_VSOCK have specific sockopts :-(:
-- SO_VM_SOCKETS_BUFFER_SIZE (0)
-- SO_VM_SOCKETS_BUFFER_MAX_SIZE (2)
 
-I suggest to set both to 16 MB (MAX should be set first).
-I tried this with socat and seems to work:
-   socat =
-VSOCK-LISTEN:4242,setsockopt=3D40:2:x0000000001000000,setsockopt=3D40:0:x=
-0000000001000000
+Mahe Tardy (7):
+  net: move netfilter nf_reject_fill_skb_dst to core ipv4
+  net: move netfilter nf_reject6_fill_skb_dst to core ipv6
+  bpf: add bpf_icmp_send kfunc
+  selftests/bpf: add bpf_icmp_send kfunc cgroup_skb tests
+  selftests/bpf: add bpf_icmp_send kfunc cgroup_skb IPv6 tests
+  selftests/bpf: add bpf_icmp_send kfunc tc tests
+  selftests/bpf: add bpf_icmp_send recursion test
 
-Hope this helps.
+ include/net/ip6_route.h                       |   2 +
+ include/net/route.h                           |   1 +
+ net/core/filter.c                             | 109 ++++++++
+ net/ipv4/netfilter/nf_reject_ipv4.c           |  19 +-
+ net/ipv4/route.c                              |  15 ++
+ net/ipv6/netfilter/nf_reject_ipv6.c           |  17 +-
+ net/ipv6/route.c                              |  18 ++
+ .../bpf/prog_tests/icmp_send_kfunc.c          | 250 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/icmp_send.c | 184 +++++++++++++
+ 9 files changed, 582 insertions(+), 33 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/icmp_send_kfunc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/icmp_send.c
 
-In the mean time, I'm working on a follow-up for net-next to ensure that =
-
-packets are merged when we exceed a threshold; we might be able to=20
-backport this to stable, but I'm not sure.
-
-Thanks,
-Stefano
-
+--
+2.34.1
 
 
