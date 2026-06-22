@@ -1,214 +1,193 @@
-Return-Path: <netdev+bounces-301120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1dQ6MD81OWo6ogcAu9opvQ
-	(envelope-from <netdev+bounces-301120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:14:39 +0200
+	id +lFmM+k1OWpaogcAu9opvQ
+	(envelope-from <netdev+bounces-301121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:17:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14A596AFB9A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:14:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2740A6AFBB8
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:17:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wUX9LJ0n;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=QUOnTYaI;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wUX9LJ0n;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=QUOnTYaI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301120-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301120-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=suse.de;
+	dkim=pass header.d=huawei.com header.s=dkim header.b=oYvvp46q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301121-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301121-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A63F30432E7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:09:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 772A83008A75
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05C03B14AC;
-	Mon, 22 Jun 2026 13:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2BE3B14B5;
+	Mon, 22 Jun 2026 13:11:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB1A3B1022
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 13:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7CD2DC78C;
+	Mon, 22 Jun 2026 13:11:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782133795; cv=none; b=jlUDQCwNHWGjIDPHNRAiVRqwGfV8OpTQVYX2nAZF3ItN7zraOsWGxkFoKgaBNeFCxOabtRi95GL6d0uIlJJHrmhi4n1AWGpODJeEgv0uNRgnCkNZHXlgx4Qh5cxag87JatEsnfct6UmKR0HrOBqeKwl0ziVt5G/Pzon41/4SbFQ=
+	t=1782133878; cv=none; b=VYD1MeT6/LBVwZJbqbJDDtDj9SGyAFYsiFCtTN7THYhXXP6RFjI+gIM2Szyy9ej4u7/Y0HYLNzk4KGR0Uc0uBSSDeg6kuU+dcjyGWiFfz5e+vKEAISCRyDQUVrvn4cetBtvbCx1RrNJcxNE2HZ5KLO0SnkTf2lnmm4hAMJHxb9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782133795; c=relaxed/simple;
-	bh=Wb17KUkJCUmLv3it19IfxsBne2r/P05MGGxuTsENHMw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TRJzC9tyqNokeD1PQI+oNJiAut3FoYM1c1hZs2WExGatunWKJeBnCN5V6aBuqHE/6/9pQ0EqhjPluf8gVosUNzEmVt88j9i8KhD/hwzjljIt8eEYowOk8jyz3sFIUiV2/5VFKRZCwNELmtbVkz71HDa2fF6uMTnkO1Gw5/UHfEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wUX9LJ0n; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QUOnTYaI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wUX9LJ0n; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QUOnTYaI; arc=none smtp.client-ip=195.135.223.130
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3EE9F70821;
-	Mon, 22 Jun 2026 13:09:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1782133764; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=wUX9LJ0nqJwKopdqM5fpfHmBeLFb83Uwzgkr/Vn8B1BOTYpYECaKCCGEm0xN4U4j7IjDZE
-	1HSZWnsXy0IHC4KnUayRk6t7+RMD+IXZ3SCRm4WTa8wfu4fm2xkPX0pmbvQCLs7USmHVMo
-	AdvZlmBPgYtpCbjFT4tTkhCtMi5YY9M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1782133764;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=QUOnTYaI7wuVhp8Cwl+R5rU8Gf2TzeItRK8XDEjGoOwLb+mYcTBNmGNLBdxkaMYHkAl7fD
-	mJ8V6oXgW6HwPQDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1782133764; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=wUX9LJ0nqJwKopdqM5fpfHmBeLFb83Uwzgkr/Vn8B1BOTYpYECaKCCGEm0xN4U4j7IjDZE
-	1HSZWnsXy0IHC4KnUayRk6t7+RMD+IXZ3SCRm4WTa8wfu4fm2xkPX0pmbvQCLs7USmHVMo
-	AdvZlmBPgYtpCbjFT4tTkhCtMi5YY9M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1782133764;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7nvC0guHRMCveV+VaTW4MThaii9NlaCh+DP7Lyu8yo=;
-	b=QUOnTYaI7wuVhp8Cwl+R5rU8Gf2TzeItRK8XDEjGoOwLb+mYcTBNmGNLBdxkaMYHkAl7fD
-	mJ8V6oXgW6HwPQDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 85FC1779AB;
-	Mon, 22 Jun 2026 13:09:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +J6MHQM0OWqdEQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 22 Jun 2026 13:09:23 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: nicolas.dichtel@6wind.com,
-	stephen@networkplumber.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	idosch@nvidia.com,
-	dsahern@kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net v3 6/6] ipv6: fix missing notification for ignore_routes_with_linkdown
-Date: Mon, 22 Jun 2026 15:08:57 +0200
-Message-ID: <20260622130857.5115-7-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260622130857.5115-1-fmancera@suse.de>
-References: <20260622130857.5115-1-fmancera@suse.de>
+	s=arc-20240116; t=1782133878; c=relaxed/simple;
+	bh=yO3caAyi4S8eGw5/PloG6r+/w21Exf8biz+9wTWqlAA=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=qYeSa4ZgLEAvCLNlXwBUye//X/t7XOMEz3zfawQkfF/kaxoXcGuhELfv9bf4E+TfjHXBfYfMaTI6o+89gav9MgflIzny9utpPQyeB82c89o8iUxyWOE2k4+AFls9Dq97xSpI2Jytqdm+O+YEtGnVmfSL1zimIx+l4KFAspiGGoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=oYvvp46q; arc=none smtp.client-ip=113.46.200.224
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=eVfel96FTk2W3+UWJY9+QBd0QfGBeLxK7SJQgiKSUik=;
+	b=oYvvp46qx6+RSbqcE7FcIbNHc3K66EMDOJHsKNaZvC9bAZTb4IoJvCLX6BDOZdUzNxN64GpKi
+	ttGNM09anTUBaU58pF+lU8mOUg1yhgdZFsAjibRSbiP6QyuX70EviGq73CQaAluRBgqrmsg6kDt
+	/aBoR6/8izrbGMLF6723omI=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4gkSym3dJlz1cyTd;
+	Mon, 22 Jun 2026 21:02:08 +0800 (CST)
+Received: from kwepemo500018.china.huawei.com (unknown [7.202.195.199])
+	by mail.maildlp.com (Postfix) with ESMTPS id 38ADB40563;
+	Mon, 22 Jun 2026 21:11:11 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemo500018.china.huawei.com (7.202.195.199) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Mon, 22 Jun 2026 21:11:10 +0800
+Message-ID: <17c623e2-9c7b-4e0a-a0ce-99c77dd0465e@huawei.com>
+Date: Mon, 22 Jun 2026 21:11:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -3.01
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 4/5] net: hns3: differentiate autoneg default values
+ between copper and fiber
+To: Simon Horman <horms@kernel.org>
+References: <20260617112721.75186-5-shaojijie@huawei.com>
+ <20260618153450.909964-1-horms@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20260618153450.909964-1-horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemo500018.china.huawei.com (7.202.195.199)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301120-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:nicolas.dichtel@6wind.com,m:stephen@networkplumber.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:fmancera@suse.de,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-301121-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:shaojijie@huawei.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[suse.de:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:dkim,suse.de:email,suse.de:mid,suse.de:from_mime,6wind.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url,huawei.com:dkim,huawei.com:mid,huawei.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 14A596AFB9A
+X-Rspamd-Queue-Id: 2740A6AFBB8
 
-When changing the ignore_routes_with_linkdown sysctl for a specific
-interface, the RTM_NEWNETCONF netlink notification was not being emitted
-to userspace. Fix this by emitting the notification when needed.
 
-In addition, fix bogus return value for successful "all" and specific
-interface write operation leading to a wrong reset of the position
-pointer.
+on 2026/6/18 23:34, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> net: hns3: differentiate autoneg default values between copper and fiber
+>
+> This commit addresses a link loss issue during driver initialization on
+> optical ports connected to forced-mode remote switches. It modifies
+> hclge_init_ae_dev to set autonegotiation based on media type. Copper ports
+> retain the AUTONEG_ENABLE default, while optical ports inherit the firmware
+> pre-configured autoneg setting.
+>
+>> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+>> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+>> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+>> @@ -11916,6 +11916,9 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
+>>   	if (ret)
+>>   		goto err_ptp_uninit;
+>>   
+>> +	if (hdev->hw.mac.media_type != HNAE3_MEDIA_TYPE_COPPER)
+>> +		hdev->hw.mac.req_autoneg = hdev->hw.mac.autoneg;
+>> +
+> [Severity: High]
+> Does this apply the wrong speed when autonegotiation is disabled on fiber
+> ports?
+>
+> During driver initialization, hclge_update_port_info() dynamically probes
+> the SFP module and updates mac->speed, but does not update mac->req_speed,
+> which retains its statically configured default capability.
+>
+> When hdev->hw.mac.autoneg is 0 (forced-mode), req_autoneg becomes 0, and
+> then hclge_set_autoneg_speed_dup() uses req_speed:
+>
+> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:hclge_set_autoneg_speed_dup() {
+> ...
+>      if (!hdev->hw.mac.req_autoneg) {
+>          ret = hclge_cfg_mac_speed_dup_hw(hdev, hdev->hw.mac.req_speed,
+> ...
+> }
+>
+> Could this override the dynamically probed SFP speed with the static default
+> speed?
 
-Fixes: 35103d11173b ("net: ipv6 sysctl option to ignore routes when nexthop link is down")
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
- net/ipv6/addrconf.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+[Reject] This is initializing the path. mac->speed has been parsed in hclge_configure()
+          and an initial value has been assigned to req_speed.
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 82b6f603faa0..cbe681de3818 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -955,11 +955,7 @@ static int addrconf_fixup_linkdown(const struct ctl_table *table, int *p, int ne
- 						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 						     NETCONFA_IFINDEX_DEFAULT,
- 						     net->ipv6.devconf_dflt);
--		rtnl_net_unlock(net);
--		return 0;
--	}
--
--	if (p == &net->ipv6.devconf_all->ignore_routes_with_linkdown) {
-+	} else if (p == &net->ipv6.devconf_all->ignore_routes_with_linkdown) {
- 		WRITE_ONCE(net->ipv6.devconf_dflt->ignore_routes_with_linkdown, newf);
- 		addrconf_linkdown_change(net, newf);
- 		if ((!newf) ^ (!old))
-@@ -968,11 +964,21 @@ static int addrconf_fixup_linkdown(const struct ctl_table *table, int *p, int ne
- 						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 						     NETCONFA_IFINDEX_ALL,
- 						     net->ipv6.devconf_all);
-+	} else {
-+		if (!newf ^ !old) {
-+			struct inet6_dev *idev = table->extra1;
-+
-+			inet6_netconf_notify_devconf(net,
-+						     RTM_NEWNETCONF,
-+						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
-+						     idev->dev->ifindex,
-+						     &idev->cnf);
-+		}
- 	}
- 
- 	rtnl_net_unlock(net);
- 
--	return 1;
-+	return 0;
- }
- 
- #endif
--- 
-2.54.0
+>
+> [Severity: High]
+> Does this unconditionally disable autonegotiation for V1 optical hardware?
+>
+> Looking at hclge_update_port_info(), it only queries SFP information via
+> hclge_get_sfp_info() for V2 hardware. For V1 hardware, it falls back to
+> hclge_get_sfp_speed(), which leaves mac->autoneg uninitialized (0):
+>
+> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:hclge_update_port_info() {
+> ...
+>      if (hdev->ae_dev->dev_version >= HNAE3_DEVICE_VERSION_V2) {
+>          speed = mac->speed;
+>          ret = hclge_get_sfp_info(hdev, mac);
+>      } else {
+>          speed = HCLGE_MAC_SPEED_UNKNOWN;
+>          ret = hclge_get_sfp_speed(hdev, &speed);
+>      }
+> ...
+> }
+>
+> If mac->autoneg is left as 0, wouldn't req_autoneg unconditionally be set
+> to 0 here, overriding the speed and breaking connectivity for V1 devices?
+
+[Reject] No, this process is the same as before the modification.
+        Before the modification, mac->autoneg was not actively assigned a value (it was initialized to 0 by default).
+
+Thanks,
+Jijie Shao
+
 
 
