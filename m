@@ -1,168 +1,276 @@
-Return-Path: <netdev+bounces-301053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301057-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DQpxCJ0TOWrUmQcAu9opvQ
-	(envelope-from <netdev+bounces-301053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:51:09 +0200
+	id gc/YFvYUOWoMmgcAu9opvQ
+	(envelope-from <netdev+bounces-301057-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:56:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FC1F6AEDF2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:51:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB10C6AEE6C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:56:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=iMyAkRTT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301053-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301053-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=realtek.com header.s=dkim header.b=EbHhjJh7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301057-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301057-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realtek.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 513D83023307
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:45:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C449300CFFD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D60E288C08;
-	Mon, 22 Jun 2026 10:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41200379EC1;
+	Mon, 22 Jun 2026 10:56:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6287225A2DD;
-	Mon, 22 Jun 2026 10:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8781360EE2;
+	Mon, 22 Jun 2026 10:56:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125154; cv=none; b=c9vzCcAjkClOyLYnr0MxUEKmK4SZ25ihf/KUGTlAOXEOxPjAww3Y06B4uZTNwsmElQ0KKmzMPm6jvHj/Q3uByCbVbvNvduRbmuT8fUemrhbiBDYx9dneoKyXVOND/zHXeAfPER3vF9oaNHipysUkTQTPS5xr/eM/ifbedeQnVw0=
+	t=1782125810; cv=none; b=BofiW7WRcirgdFMcIP3jzTd8c4XdL3B81O2NjgWTgcRNV/JmgB/rxw4zqh9Yq4GcuiGK857NQwwlbFtByiAhthY1LK+eTWliX9vS47wN346GpYPXZuIfa4e/OqqYl/vTo0lLHrZ8KKozxHP0gJ5jcobqfZSRCvjFEG+MrViUBbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125154; c=relaxed/simple;
-	bh=VNvrtxoaG5emAwKov6TZiEf5xy1ZkFNWlEUcXAj737A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rptcXUL5FPbajmk051Xq/AzafAND9li+hEYMo/CM2km79JNczhmvMTFLNIugjeNWKxQ+Tcj9BOo5amZ0ljegB1/nmX2YGWOhNga0AIM2pUhjkq/5fwPA+Iz2lNMsotNH/aazqHSZGIevy2hKnqgSztmWQj0tr/aN27ufvMtm+Lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMyAkRTT; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03C2D1F000E9;
-	Mon, 22 Jun 2026 10:45:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125153;
-	bh=YtkPB6i0OvwV1lSTcqmCxooTBK1I0ZwQwnbBpJV8564=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iMyAkRTT0g6B+mY3jolDy6vdeFQNrpJ1Y3QrG8k5PwlMTjcN+qHIF9iM80NOLHlmY
-	 DInkHYlF8O2bnciY0LFKHSQ1PHMuMIx6QgHo92TXN99Gck+CDMpZbZ1goEzFUmFaR/
-	 rJl1vVYfq2II8S78Jhn+wyVNq2otuPq+n6m+HxGjznf2maF0vRk8/lZLapb0nf+Civ
-	 BITyJS7pKSQWeORWGaP4YoMm2peErFpYG5RuN2KpUKUHoepY95n9uzp0X00lFc5epL
-	 d56XJ9IFGb2zh4l5JzharQrXnAU1y+KoiUX6rTNRgm1/9Lv/NrAgBvyAyZUKUYbedN
-	 beXtbuUQ0w9+w==
-From: Geliang Tang <geliang@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Hannes Reinecke <hare@suse.de>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	Gang Yan <yangang@kylinos.cn>,
-	Zqiang <qiang.zhang@linux.dev>
-Subject: [RFC net-next 17/17] selftests: mptcp: connect: use espintcp for ulp test
-Date: Mon, 22 Jun 2026 18:43:37 +0800
-Message-ID: <b3f8cf142bf314d3611df4cdf4df01ef511d33d7.1782123118.git.tanggeliang@kylinos.cn>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
-References: <cover.1782123118.git.tanggeliang@kylinos.cn>
+	s=arc-20240116; t=1782125810; c=relaxed/simple;
+	bh=G2d/F5lIuNZ88vz6q3ApypSyb+YyqYB+oCPq20Q2bZQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=r5OJB1NJ2S56cdhMcW/WdeeQuWQlSmTrh13eGcBkxEjC1mrofHxA3iYaywNfx/2tN8rY2ptCGUtvit8nwOSFAirC+p9cAELYpIamMlWun10j2klikz9I3gTVCzk9AZ0TDdU8kVWeZCA0J7Vg/oy5Nyr74IofMJudPdGHINveX7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=EbHhjJh7; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65MAkLirD2483908, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1782125182; bh=URHnGG65LYP3ZVacahzioKWmvwkb6Ar9SydTOAJZofE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=EbHhjJh7LrXezxTInXnZuoN5P/0GabfBUFbr+oxpxRiDgLe9FBM9OtVSslDGw8F/b
+	 B0bmgJqwo2pBOjuFD7pWM9LK8uemiJYY8/lj3pnLDsij4TErlTIlaSPf8R6GVp2pBO
+	 k1xBRJZPQo49ZBI97/opt6vngHleY0OM0w9VLJe1bmQ5axqkFSYqiL3gjnILT35eGP
+	 VBvTdTNDtBKzdr9acA4gBj7158YiX1hTLDBoWqqj9LQuZY3Wv6JUkpNY8LK0kwdfOb
+	 YgYg7jvrHh0xLAkLDEYtmRqSF5F8YqgmA3nGPDhLJeFr7Ye5iig4Li/d26nrGUEYGX
+	 3rDAJISBL0K0g==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65MAkLirD2483908
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 22 Jun 2026 18:46:21 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 22 Jun 2026 18:46:22 +0800
+Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
+ RTKEXHMBS06.realtek.com.tw (10.21.1.56) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 22 Jun 2026 18:46:22 +0800
+Received: from RTKEXHMBS04.realtek.com.tw ([::1]) by
+ RTKEXHMBS04.realtek.com.tw ([fe80::552f:8b32:656c:c395%6]) with mapi id
+ 15.02.2562.017; Mon, 22 Jun 2026 18:46:22 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Simon Horman <horms@kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"david.laight.linux@gmail.com" <david.laight.linux@gmail.com>,
+	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>, Ping-Ke Shih
+	<pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net v3] rtase: Workaround for TX hang caused by short UDP
+ packets entering hardware PTP parsing
+Thread-Topic: [PATCH net v3] rtase: Workaround for TX hang caused by short UDP
+ packets entering hardware PTP parsing
+Thread-Index: AQHc/Mk9ctTr65FPK0GOwiW0nIIMYrZB7hOAgAh/KbA=
+Date: Mon, 22 Jun 2026 10:46:22 +0000
+Message-ID: <0a295c5c3cc64a92964f4f32848334e1@realtek.com>
+References: <20260615131653.15730-1-justinlai0215@realtek.com>
+ <20260617085416.841731-2-horms@kernel.org>
+In-Reply-To: <20260617085416.841731-2-horms@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:hare@suse.de,m:tanggeliang@kylinos.cn,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:yangang@kylinos.cn,m:qiang.zhang@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com,queasysnail.net,suse.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301053-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301057-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:richardcochran@gmail.com,m:david.laight.linux@gmail.com,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:andrew@lunn.ch,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,vger.kernel.org,gmail.com,intel.com,realtek.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:email,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7FC1F6AEDF2
+X-Rspamd-Queue-Id: BB10C6AEE6C
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+Simon Horman <horms@kernel.org> wrote:
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ---
+> rtase: Workaround for TX hang caused by short UDP packets entering
+> hardware PTP parsing
+>=20
+> This patch adds a workaround for a hardware TX hang that occurs when
+> short UDP packets matching destination ports 319/320 enter a PTP parsing
+> path that reads beyond the packet end. The workaround pads affected
+> packets so the transport data reaches RTASE_MIN_PAD_LEN before
+> transmission.
+>=20
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > index 55105d34bc79..4c295a39c7a0 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+>=20
+> [ ... ]
+>=20
+> > +static bool rtase_get_udp_offset(struct sk_buff *skb, u32 *udp_offset)
+> > +{
+> > +     int no =3D skb_network_offset(skb);
+> > +     struct ipv6hdr *i6h, _i6h;
+> > +     struct iphdr *ih, _ih;
+> > +
+> > +     switch (vlan_get_protocol(skb)) {
+> > +     case htons(ETH_P_IP):
+> > +             ih =3D skb_header_pointer(skb, no, sizeof(_ih), &_ih);
+> > +             if (!ih)
+> > +                     return false;
+> > +
+> > +             if (ih->ihl < 5)
+> > +                     return false;
+> > +
+> > +             if (ih->protocol !=3D IPPROTO_UDP)
+> > +                     return false;
+> > +
+> > +             *udp_offset =3D no + ih->ihl * 4;
+>=20
+> [Low]
+> Should ih->ihl also be checked against the actual data present in the
+> skb? With ihl up to 15 (60 bytes), if the skb only contains the basic
+> 20-byte IP header, the computed udp_offset can exceed skb->len.
+>=20
+> Downstream in rtase_skb_pad():
+>=20
+>         trans_data_len =3D skb->len - udp_offset;
+>=20
+> trans_data_len is u32, so when udp_offset > skb->len this underflows to
+> a very large value, which trivially satisfies:
+>=20
+>         trans_data_len >=3D RTASE_MIN_PAD_LEN
+>=20
+> and rtase_skb_pad() silently skips the padding. A malformed packet from
+> an AF_PACKET sender with CAP_NET_RAW could craft a mismatched ihl and
+> bypass the workaround. Would clamping or validating udp_offset against
+> skb->len before the subtraction be appropriate?
+>=20
+Thanks for pointing this out.
+=20
+I'll add a check for udp_offset > skb->len before calculating
+trans_data_len to avoid the potential underflow.
+=20
+If the computed UDP offset is beyond the packet length, the packet is
+malformed and cannot be safely handled by this workaround, so it should
+not be transmitted.
 
-With KTLS being implemented, "tls" should no longer be used in
-sock_test_tcpulp(), it breaks mptcp_connect.sh tests. Another ULP
-name, "espintcp", is set instead in this patch.
+> > +
+> > +             return true;
+> > +     case htons(ETH_P_IPV6):
+> > +             i6h =3D skb_header_pointer(skb, no, sizeof(_i6h), &_i6h);
+> > +             if (!i6h)
+> > +                     return false;
+> > +
+> > +             if (i6h->nexthdr !=3D IPPROTO_UDP)
+> > +                     return false;
+> > +
+> > +             *udp_offset =3D no + sizeof(*i6h);
+> > +
+> > +             return true;
+> > +     default:
+> > +             return false;
+> > +     }
+> > +}
+> > +
+> > +static bool rtase_skb_pad(struct sk_buff *skb)
+> > +{
+> > +     __be16 *dest, _dest;
+> > +     u32 trans_data_len;
+> > +     u32 udp_offset;
+> > +     u16 dest_port;
+> > +     u32 pad_len;
+> > +
+> > +     if (!rtase_get_udp_offset(skb, &udp_offset))
+> > +             return true;
+> > +
+> > +     trans_data_len =3D skb->len - udp_offset;
+> > +     if (trans_data_len < offsetof(struct udphdr, len) ||
+> > +         trans_data_len >=3D RTASE_MIN_PAD_LEN)
+> > +             return true;
+>=20
+> [Low]
+> When trans_data_len is less than offsetof(struct udphdr, len) (i.e., the
+> transport region is under 4 bytes), this returns true and skips the
+> padding entirely.
+>=20
+> The commit message states the hardware "may access data beyond the end
+> of the packet" during PTP parsing. If the hardware also reads out of
+> bounds while classifying the packet, an IPv4 last fragment with 1-3
+> trailing bytes could still be misclassified as PTP based on whatever
+> garbage memory the hardware happens to read, and the workaround would
+> be bypassed.
+>=20
+> The implicit assumption here seems to be "if the driver cannot read the
+> dest port from the skb, the hardware cannot classify it either", which
+> appears to contradict the premise that the hardware reads beyond the
+> packet boundary. Should these very short transport-data cases also be
+> padded to be safe?
+>=20
 
-Co-developed-by: Gang Yan <yangang@kylinos.cn>
-Signed-off-by: Gang Yan <yangang@kylinos.cn>
-Co-developed-by: Zqiang <qiang.zhang@linux.dev>
-Signed-off-by: Zqiang <qiang.zhang@linux.dev>
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
----
- tools/testing/selftests/net/mptcp/config          | 4 ++++
- tools/testing/selftests/net/mptcp/mptcp_connect.c | 4 ++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/config b/tools/testing/selftests/net/mptcp/config
-index 59051ee2a986..f48bd5183fb3 100644
---- a/tools/testing/selftests/net/mptcp/config
-+++ b/tools/testing/selftests/net/mptcp/config
-@@ -34,3 +34,7 @@ CONFIG_NFT_SOCKET=m
- CONFIG_NFT_TPROXY=m
- CONFIG_SYN_COOKIES=y
- CONFIG_VETH=y
-+CONFIG_INET_ESP=y
-+CONFIG_INET_ESPINTCP=y
-+CONFIG_INET6_ESP=y
-+CONFIG_INET6_ESPINTCP=y
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-index cbe573c4ab3a..299a7a02d6f5 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-@@ -285,11 +285,11 @@ static void sock_test_tcpulp(int sock, int proto, unsigned int line)
- 	if (buflen > 0) {
- 		if (strcmp(buf, "mptcp") != 0)
- 			xerror("unexpected ULP '%s' for proto %d at line %u", buf, proto, line);
--		ret = do_ulp_so(sock, "tls");
-+		ret = do_ulp_so(sock, "espintcp");
- 		if (ret == 0)
- 			X("setsockopt");
- 	} else if (proto == IPPROTO_MPTCP) {
--		ret = do_ulp_so(sock, "tls");
-+		ret = do_ulp_so(sock, "espintcp");
- 		if (ret != -1)
- 			X("setsockopt");
- 	}
--- 
-2.53.0
+Thanks for the review.
 
+The out-of-bounds access occurs after the packet has already matched
+the PTP classification criteria (UDP destination port 319/320) and
+enters the hardware PTP parsing path.
+
+If the transport data is shorter than the destination port field
+itself, the packet cannot match the affected PTP classification path.
+
+Thanks,
+Justin
+
+> > +
+> > +     dest =3D skb_header_pointer(skb,
+> > +                               udp_offset + offsetof(struct udphdr,
+> dest),
+> > +                               sizeof(_dest), &_dest);
+>=20
+> [ ... ]
 
