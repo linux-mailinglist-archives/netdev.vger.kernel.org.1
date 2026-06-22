@@ -1,276 +1,134 @@
-Return-Path: <netdev+bounces-300992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300993-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VqpSLBzxOGqGkQcAu9opvQ
-	(envelope-from <netdev+bounces-300992-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:23:56 +0200
+	id v70ED4rwOGpbkQcAu9opvQ
+	(envelope-from <netdev+bounces-300993-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:21:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FCB76ADAB6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:23:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE7F6ADA26
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:21:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b=vMIheu57;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300992-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300992-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XB7uoLjJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300993-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300993-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3F6B030250B2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:17:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 31ACB3001A5D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 08:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37ACE38F227;
-	Mon, 22 Jun 2026 08:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2FC38F244;
+	Mon, 22 Jun 2026 08:21:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB95D2F361B;
-	Mon, 22 Jun 2026 08:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B7C38F23D;
+	Mon, 22 Jun 2026 08:21:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782116227; cv=none; b=aY4aJOgrenKqGtdJFJAgbyO7O4U9XrRc/yJXJzJunCG0IDnsLe2iPWLbYCXfPa5Unx2g+ODyWodV3zbQfIOTUIsFv15Bbh4uyBfTE+UKBSbymdtOMmXUrPO9tDh5Z0FrC7Oj0Nu3m/5lqKe1h7WznfXAm/fWkfqBa1lKxqnbSns=
+	t=1782116484; cv=none; b=N2pckOY7QiGI1mVPHekW40PqBT/ZVmamyaOR+jbdlh5Pho5Rtp21n3zSpTK7hIvZv0VhjhYu1eHUZCloxpN1gFNlllXxFqahVMXVc5NoHa2kpZaCJnyI//8sorPJ/aejZlysZdMQtDEoXttM15HkSk18I1Gz9FFA1e/rjHBncKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782116227; c=relaxed/simple;
-	bh=c2dZi0Bc2nOEEZ6s1+fQRG2Pw1jPvKmPSDJwmFp60Fo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m78Z9dHuJyOYlefS7qKR42wBlFkCExlMsSCKMvhdmZnhr2w4RiD0V22qNruviX2GLCCw+PP9OZM63HW9OpsPB49DE6j7NOUPNVq7bdT9Py8wKV73dhQQDOQSchv/M1dYGhF4A7BG9tYWVSgYSWV6qXfatCLoed3GQtcISL0J8cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=vMIheu57; arc=none smtp.client-ip=217.70.190.124
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5A54560177;
-	Mon, 22 Jun 2026 10:16:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1782116215;
-	bh=7gNwO8luEsfQj4kEiM/bb9V7zP/WYST8WewJgNqitcE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vMIheu57AESyOkWUHc10YjKfoXBbbtNOT1YQM3guXlQ3sdi++VCPGyMkYd86ldfoZ
-	 fQdqv/Yu7APn7asxjb7BmhZ/83XZ2CNGbzv6ToQPD1dVSXSQAw74XMMk8B6oAviCli
-	 UM7k+agU93EYJ6o9gP3j/xLr48QcF9Q4phapZBspMCewaE0OhOm+lHH5jCJKmTIIP4
-	 1++Mr222jdHlaBAimfZ7IHis1M9tbKkBW+JSyazBRjlFwREo/YKplyXUrffv9OQby5
-	 /r85PFDi37ba1azQvyGu8GK1RKa17DEp6UZF2DZP1hgOnO8D3iQABIooaRXoJdyn+J
-	 cDgnJYnh2H0Pw==
-Date: Mon, 22 Jun 2026 10:16:52 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
-	horms@kernel.org
-Subject: Re: [PATCH net,v2 00/14] Netfilter fixes for net
-Message-ID: <ajjvdPUXkVNiBh6k@chamomile>
-References: <20260620222738.112506-1-pablo@netfilter.org>
+	s=arc-20240116; t=1782116484; c=relaxed/simple;
+	bh=IdmExyROUV25/EktZki9aBpJp0ijNsEyKNDbjR9hpyk=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=u+zxj0RDGsyqBI8mW3xO2qICZrehfZ0PwGjjFmmCek32w4cjlz8g6ZX6N+dq2odSriO324jgcC5Z0wXdA1QkF1ZWJWzFlKHXjCt1IXD/OwHvQJHT1PJMgeAEYy1oMf7ktEK+evA6gRP0Gj1AIhLkNmVK1QHUriQ+FuhOLLTQhjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XB7uoLjJ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 973B21F000E9;
+	Mon, 22 Jun 2026 08:21:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782116483;
+	bh=IdmExyROUV25/EktZki9aBpJp0ijNsEyKNDbjR9hpyk=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=XB7uoLjJEkleWKn/h6/0LM1GCrUd4baGc2fOGJ0GlCmuiXQG2sAzA7cD7KpiSdHob
+	 Ct9uN68rjkmEsAO/XrglfVEcYMuwtQgxzMS0JCOQVXdMqjKppoB66OcyWIT2v5G200
+	 bTAFJJfiRSaiPASjRt6jUohUomWsyTaaBNYQQKFCZ4CWKvyk4Kyi2FdeAAJAKxroe+
+	 g8ZsoiXj6X1bRBGXTDr/jMd75J29CgMwe+laiSN+i27b60wIH+/1WUo4v0z/b4dXjr
+	 PXi/zDR937ZblGH9sODw6+DTwSbChBKbFfooQY4zI+zQ5rA/raHgI7KKyChgc3Aedz
+	 QvK8tHhyVmyOw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260620222738.112506-1-pablo@netfilter.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/2] fs: Add bpf_sock_read_xattr() kfunc to read socket
+ xattrs
+From: Christian Brauner <brauner@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Christian Brauner <brauner@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, linux-fsdevel@vger.kernel.org, 
+ netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>
+In-Reply-To: <DJDJX62AS415.2BVILN08QK149@gmail.com>
+References: <20260617-work-bpf-sock-xattr-v1-0-a1276f7c9da3@kernel.org>
+ <20260617-work-bpf-sock-xattr-v1-1-a1276f7c9da3@kernel.org>
+ <DJDJX62AS415.2BVILN08QK149@gmail.com>
+Date: Mon, 22 Jun 2026 10:21:12 +0200
+Message-Id: <20260622-biobauer-finte-beunruhigen-51cdfc70ddf9@brauner>
+X-Mailer: b4 0.16-dev-63c58
+X-Developer-Signature: v=1; a=openpgp-sha256; l=116; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=IdmExyROUV25/EktZki9aBpJp0ijNsEyKNDbjR9hpyk=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRZfKgKv+f/V9bx9BVbxmx3V4+LHUcfyBQ7sLb8SjrpK
+ fntlHVnRykLgxgXg6yYIotDu0m43HKeis1GmRowc1iZQIYwcHEKwER+WjIy/K5x79Ld/o2hWO/z
+ ubNb1E7sSkxQP12+5LrtH1NFZqEHbgz/87SnF2yI8/Zb/+34RNltr80vxU1ODZwj+31v5Jx3EWt
+ yOAA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-300992-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:brauner@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:viro@zeniv.linux.org.uk,m:jack@suse.cz,m:horms@kernel.org,m:kuniyu@google.com,m:willemb@google.com,m:linux-fsdevel@vger.kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300993-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,iogearbox.net,zeniv.linux.org.uk,suse.cz,vger.kernel.org,linux.dev,gmail.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,brauner:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3FCB76ADAB6
+X-Rspamd-Queue-Id: 2FE7F6ADA26
 
-Hi,
+> lgtm.
+> How do you want to route it? Thought vfs tree for the next merge window?
 
-Sashiko reports two issues, one in:
+Yes, thank you for looking!
 
-- netfilter: flowtable: fix offloaded ct timeout never being extended
-  which is real for net/sched/act_ct.c, this was a preexisting issue,
-  we can follow up on it.
-
-- netfilter: nf_conntrack_expect: use conntrack GC to reap expectations
-  I already planned to follow up on this and a few more subtle issues
-  (includeing one related patch I have withdrew because it is
-   incomplete).
-
-Please apply, thanks.
-
-On Sun, Jun 21, 2026 at 12:27:24AM +0200, Pablo Neira Ayuso wrote:
-> This is v2, dropping two patches that need a bit more work,
-> uncovered by sashiko. I have revisit the working of this cover
-> letter to refine it.
-> 
-> -o-
-> 
-> Hi,
->  
-> The following patchset contains Netfilter fixes for net. This batches
-> fixes for real crashes with trivial/correctness fixes. There is too
-> a rework of the conntrack expectation timeout strategy to deal with
-> a possible race when removing an expectation.
->  
-> 1) Fix the incorrect flowtable timeout extension for entries in
->    hw offload, from Adrian Bente. This is correcting a defect in
->    the functionality, no crash.
->  
-> 2) Hold reference to device under the fake dst in br_netfilter,
->    from Haoze Xie. This is fixing a possible UaF if the device
->    is removed while packet is sitting in nfqueue.
->  
-> 3) Reject template conntrack in xt_cluster, otherwise access to
->    uninitialize conntrack fields are possible leading to WARN_ON
->    due to unset layer 3 protocol. From Wyatt Feng.
->  
-> 4) Make sure the IPv6 tunnel header is in the linear skb data
->    area before pulling. While at it remove incomplete NEXTHDR_DEST
->    support. From Lorenzo Bianconi. This possibly leading to crash
->    if IPv4 header is not in the linear area.
->  
-> 5) Use test_bit_acquire in ipset hash set to avoid reordering
->    of subsequent memory access. This is addressing a LLM related
->    report, no crash has been observed. From Jozsef Kadlecsik.
->  
-> 6) Use test_bit_acquire in ipset bitmap set too, for the same
->    reason as in the previous patch, from Jozsef Kadlecsik.
->  
-> 7) Call kfree_rcu() after rcu_assign_pointer() to address a
->    possible UaF if kfree_rcu() runs inmediately, which to my
->    understanding never happens. Never observed in practise,
->    reported by LLM. Also from Jozsef Kadlecsik.
-> 
-> 8) Use disable_delayed_work_sync() instead cancel_delayed_work_sync()
->    to avoid that ipset GC handler re-queues work as reported by LLM.
->    From Jozsef Kadlecsik. This is for correctness.
->  
-> 9) Restore the check in nft_payload for exceeding payloda offset
->     over 2^16. From Florian Westphal. This fixes a silent truncation,
->     not a big deal, but better be assertive and reject it.
->  
-> 10) Validate NFT_META_BRI_IIFHWADDR can only run from bridge
->     prerouting. From Florian Westphal. Harmless but it could allow
->     to read bytes from skb->cb.
->  
-> 11) Zero out destination hardware address during the flowtable
->     path setup, also from Florian. This is a correctness fix, LLM
->     points that possible infoleak can happen but topology to achieve
->     it is not clear.
-> 
-> 12) Skip IPv4 options if present when building the IPV4 reject reply.
->     Otherwise bytes in the IPv4 options header can be sent back to
->     origin where the ICMP header is being expected. Again from
->     Florian Westphal.
->  
-> 13) Replace timer API for expectation by GC worker approach. This
->     is implicitly fixing a race between nf_ct_remove_expectations()
->     which might fail to remove the expectation due to timer_del()
->     returning false because timer has expired and callback is
->     being run concurrently. This fix is addressing a crash that has
->     been already reported with a reproducer.
-> 
-> 14) Check if br_vlan_get_pvid_rcu() fails, otherwise possible stack
->     infoleak of 4-bytes. From Florian Westphal.
-> 
-> Please, pull these changes from:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-06-21
-> 
-> Thanks.
-> 
-> ----------------------------------------------------------------
-> 
-> The following changes since commit 96e7f9122aae0ed000ee321f324b812a447906d9:
-> 
->   eth: fbnic: take netif_addr_lock_bh() around rx mode address programming (2026-06-18 18:36:26 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-06-21
-> 
-> for you to fetch changes up to 27dd2997746d54ebc079bb13161cc1bdd401d4a6:
-> 
->   netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak (2026-06-21 00:18:37 +0200)
-> 
-> ----------------------------------------------------------------
-> netfilter pull request 26-06-21
-> 
-> ----------------------------------------------------------------
-> Adrian Bente (1):
->       netfilter: flowtable: fix offloaded ct timeout never being extended
-> 
-> Florian Westphal (5):
->       netfilter: nft_payload: reject offsets exceeding 65535 bytes
->       netfilter: nft_meta_bridge: add validate callback for get operations
->       netfilter: nft_flow_offload: zero device address for non-ether case
->       netfilter: nf_reject: skip iphdr options when looking for icmp header
->       netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak
-> 
-> Haoze Xie (1):
->       netfilter: nf_queue: pin bridge device while NFQUEUE holds fake dst
-> 
-> Jozsef Kadlecsik (4):
->       netfilter: ipset: Don't use test_bit() in lockless RCU readers in hash types
->       netfilter: ipset: Don't use test_bit() in lockless RCU readers in bitmap types
->       netfilter: ipset: fix order of kfree_rcu() and rcu_assign_pointer()
->       netfilter: ipset: make sure gc is properly stopped
-> 
-> Lorenzo Bianconi (1):
->       netfilter: flowtable: fix and simplify IP6IP6 tunnel handling
-> 
-> Pablo Neira Ayuso (1):
->       netfilter: nf_conntrack_expect: use conntrack GC to reap expectations
-> 
-> Wyatt Feng (1):
->       netfilter: xt_cluster: reject template conntracks in hash match
-> 
->  include/net/netfilter/nf_conntrack_expect.h        |  16 ++-
->  include/net/netfilter/nf_queue.h                   |   1 +
->  include/net/netfilter/nft_meta.h                   |   2 +
->  include/uapi/linux/netfilter/nf_conntrack_common.h |   1 +
->  net/bridge/netfilter/nft_meta_bridge.c             |  23 +++-
->  net/ipv4/netfilter/nf_reject_ipv4.c                |   2 +-
->  net/ipv6/ip6_tunnel.c                              |   7 +
->  net/netfilter/ipset/ip_set_bitmap_gen.h            |   4 +-
->  net/netfilter/ipset/ip_set_bitmap_ip.c             |   2 +-
->  net/netfilter/ipset/ip_set_bitmap_ipmac.c          |   2 +-
->  net/netfilter/ipset/ip_set_bitmap_port.c           |   2 +-
->  net/netfilter/ipset/ip_set_core.c                  |   4 +-
->  net/netfilter/ipset/ip_set_hash_gen.h              |  12 +-
->  net/netfilter/nf_conntrack_core.c                  |  33 ++++-
->  net/netfilter/nf_conntrack_expect.c                | 145 ++++++++++-----------
->  net/netfilter/nf_conntrack_h323_main.c             |   4 +-
->  net/netfilter/nf_conntrack_helper.c                |  10 +-
->  net/netfilter/nf_conntrack_netlink.c               |  22 ++--
->  net/netfilter/nf_conntrack_sip.c                   |  13 +-
->  net/netfilter/nf_flow_table_core.c                 |  13 +-
->  net/netfilter/nf_flow_table_ip.c                   |  80 +++---------
->  net/netfilter/nf_flow_table_path.c                 |   4 +-
->  net/netfilter/nf_queue.c                           |  14 ++
->  net/netfilter/nfnetlink_queue.c                    |   3 +
->  net/netfilter/nft_ct.c                             |   3 +-
->  net/netfilter/nft_meta.c                           |   5 +-
->  net/netfilter/nft_payload.c                        |  16 ++-
->  net/netfilter/xt_cluster.c                         |   2 +-
->  .../selftests/net/netfilter/nft_flowtable.sh       |   8 +-
->  29 files changed, 254 insertions(+), 199 deletions(-)
-> 
 
