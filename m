@@ -1,185 +1,153 @@
-Return-Path: <netdev+bounces-301162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7n74JWFgOWpDrQcAu9opvQ
-	(envelope-from <netdev+bounces-301162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:18:41 +0200
+	id 7+VCBPhfOWo4rQcAu9opvQ
+	(envelope-from <netdev+bounces-301163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:16:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7476B113A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:18:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D8D6B111B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:16:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=LQz0b6Y4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301162-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301162-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KDHBLkTG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301163-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301163-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D01E9304A927
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:12:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EF60D3012578
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323273CB2F0;
-	Mon, 22 Jun 2026 16:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54B32C032C;
+	Mon, 22 Jun 2026 16:16:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCD03148D0
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 16:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EAC29DB6C
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 16:16:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782144745; cv=none; b=s5NBbREdmIbQGZD1Qyc/zAw9rm0+JF7WQJfJQrh+4mvVp3jNI2uM3j4PadfYuOBtqoT/X/vIDlFpTqir3xE4jdO/yKuErOoVdchatWAEsVjwKEw/a85ibrcZaq2i94Kdns2UMj2vUQC6p9Of5Cb0OLX3qYE8ZBmJVXKtUB40P4M=
+	t=1782145013; cv=none; b=fGuPyl4OzYv+jxZLo2n6VCLDxjM2abOUiQusrK3XyxaHDNMaD5llr8FB//LW7jfTgcESB4YULNLvTsDG8t1vS7tnFOazidAwTb4OUJGIuXEhywS+Z4lvHhpj1pqS93OcJny+dyxJfJ9ATZSenweh5I5gbJvITY9ag6fWWXDMdsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782144745; c=relaxed/simple;
-	bh=rnpGHcRT/uDU1Bh3FfjKGETbbXNtClx+wKFf7+M0tc4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DfRRqv2G8zQwgP3SRrIbINTl9UkkRYZzolaZqk3veNysn1mMkqfi+li9LnANQp+Z2VooA3k7WeHZWFrghE5fsBr8GDaOn4cRpOAvOWXVgVf5oc7wD8+JMqukQ7EDbKfuFLD9lFU7wv1oRaWYSTQzZGTOjP2eKX0f3vofRQJA0+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LQz0b6Y4; arc=none smtp.client-ip=209.85.215.202
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c88cfe287e1so2878873a12.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 09:12:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782144742; x=1782749542; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvWly0L6srT0V376JtE+3+EfepszO+XEtHPredUzn5c=;
-        b=LQz0b6Y4jauQRQHV+b0wdZiEX6TU/FSyjkpxr3Gu+Eag3iiv0S64dSxSYMNj8PIyw4
-         u2pob4GuKCtZqEiYrqANvfOU/OPOsfyKWQSTJSMudcQAqOb4UQcd70C5Cth/mC+UZFtG
-         Js5A+8dJj8j+WETfGI+ARNsAjBDKabsmB39F/8M5x0zCUwEgcb3rXorS9fUml7BanWmg
-         E8dAODMBcr7rCEkBqv3MWrUOiAccsRrWizzQueTv+gV90Zsig7Bo1L/4CHDshDgLG+Qs
-         NhnmuHoodvxZLATZyqLiBnf6dmjZcSKRtCcnAYy//M/rsyVMAoWtfalXzSggge7/PJ9d
-         jyuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782144742; x=1782749542;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvWly0L6srT0V376JtE+3+EfepszO+XEtHPredUzn5c=;
-        b=f4yJUBuI0GsR//OfvqmTR09PvktFTT494WgiwZyWPM4nYR5nYQrzNjm5JBoOFEa46H
-         qS4cjh5mh8RU4wqvSLSNRoiEYwl8tV7MeltaCqxxqkBHt3hWLrE6CuHNB67+Oo+IUiAF
-         cbbiXKMy0ZeDwd14cGQkSK1K0QwlgNIcaU7M/QoOA1rKbxt49bu7MC4oIm+8dzMigWLn
-         8849nn++qNNS9vV9jPbKR6QBAwN4kNjKTkSaLHl00CFXS7EpbR6TkPAnQqqPzMvWUQqQ
-         +ekoVka9ALsGM0OWAYONjs3qe2g40d31eksEvJmWxXR4Wo4c4mPYQy+EDA49eQO5a7U6
-         T67g==
-X-Forwarded-Encrypted: i=1; AHgh+RoyDO6gKJRhAmoeX8HvNHzZYPkY6pMEYNIc4Bp44Hp66q0ZINeno53hjHeyVb5x7uELw+WwYzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGvtx2paq1ULq+1H8ZD/tJMBOFw6x9wVr3Qcaydnm8RYNoVHKD
-	XantHtrSKslpzX0ifbEfmxftU99/iyipuLcqTulq0iowNXVGzaoSrO+EngYQyAOXN32IjC7+SvP
-	wFSRkHw==
-X-Received: from pjbgb21.prod.google.com ([2002:a17:90b:615:b0:37d:833c:fe41])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3911:b0:37c:9bad:f6b7
- with SMTP id 98e67ed59e1d1-37d160728b7mr13874467a91.11.1782144741968; Mon, 22
- Jun 2026 09:12:21 -0700 (PDT)
-Date: Mon, 22 Jun 2026 16:11:40 +0000
-In-Reply-To: <20260622-bpf-sk_msg-split-unix-v1-1-d7e0cb7bb03b@cloudflare.com>
+	s=arc-20240116; t=1782145013; c=relaxed/simple;
+	bh=yJcllB74eIjca8TFI82rE3EwRf8FjWl7B9m34uEES7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mFrwRYtFaK6OV/8bkt0+ZitO4iuPoQBG1nrHsek0LVztjiTFyx7CcQ2jQfsOvMWi2rSEwrhJfjIjBp6T93xc/TnyPFXO15eblMpBFpkCQxx+55QNOLuISapIvyljDsKf5mYs+WERAe75enSnS+JRj+H9UkGM+nvYATEOmLpcbXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KDHBLkTG; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63A4A1F000E9;
+	Mon, 22 Jun 2026 16:16:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782145012;
+	bh=C/c/ZnFn816x3dYN0EttbOgIrQ9C3fDEkTn38/FB7uY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KDHBLkTGnpBq0tBH98rMEFx3nPcKMjBPMCY/Psi7PkEq/zhVqyD4DfYCO6gYN8Ggw
+	 eK/e2HlZazzAdAoaJquWQhvvwlqU4TdnsDHcydZEiFilhVi6cjxPX7+9CsuRdc9Epc
+	 GXKJhumyMWqRTYrw9qdDIRJs6f1AW60WW3Ej4HrpRP6xw4zsP/tx7rfn0rBSjLJnSB
+	 JcZjAC/+5TWOdcItI3sFOoiWPd3VKXoe8h7xUsJR3jl/X1wa6XChtGWbZ4hqqy4QcX
+	 nk/6rXM42ia6NkZFnL+L3dPMPCyAlb4/Pe2N9QU5UWr/BIVeQN0V3jBmoyCc4bKzBU
+	 +5hb0CUOfvNfg==
+Date: Mon, 22 Jun 2026 17:16:48 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wayen Yan <win847@gmail.com>, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 2/2] net: airoha: fix netif_set_real_num_tx_queues
+ for sparse QoS channels
+Message-ID: <20260622161648.GG827683@horms.kernel.org>
+References: <20260619-airoha-qos-fixes-v2-0-5c43485038f9@kernel.org>
+ <20260619-airoha-qos-fixes-v2-2-5c43485038f9@kernel.org>
+ <20260622123136.GC827683@horms.kernel.org>
+ <ajk0kS76nahtop8g@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260622-bpf-sk_msg-split-unix-v1-1-d7e0cb7bb03b@cloudflare.com>
-X-Mailer: git-send-email 2.55.0.rc0.786.g65d90a0328-goog
-Message-ID: <20260622161221.1742161-1-kuniyu@google.com>
-Subject: Re: [PATCH bpf-next] bpf, unix: Guard sk_msg-dependent code behind CONFIG_NET_SOCK_MSG
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: jakub@cloudflare.com
-Cc: ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	jiayuan.chen@linux.dev, john.fastabend@gmail.com, kernel-team@cloudflare.com, 
-	kuba@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajk0kS76nahtop8g@lore-desk>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301163-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,linux.dev,gmail.com,cloudflare.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301162-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:jakub@cloudflare.com,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:jiayuan.chen@linux.dev,m:john.fastabend@gmail.com,m:kernel-team@cloudflare.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:win847@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.infradead.org,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cloudflare.com:email,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,horms.kernel.org:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2D7476B113A
+X-Rspamd-Queue-Id: 87D8D6B111B
 
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 22 Jun 2026 14:58:34 +0200
-> Prepare to decouple BPF_SYSCALL config option from NET_SOCK_MSG.
+On Mon, Jun 22, 2026 at 03:11:45PM +0200, Lorenzo Bianconi wrote:
+> > On Fri, Jun 19, 2026 at 01:37:14PM +0200, Lorenzo Bianconi wrote:
+> > > airoha_tc_htb_alloc_leaf_queue() assigns queue IDs based on the channel
+> > > index (opt->qid = AIROHA_NUM_TX_RING + channel), but updates
+> > > real_num_tx_queues with a simple increment (num_tx_queues + 1). When QoS
+> > > channels are allocated sparsely (e.g., channels 0 and 3 without 1 and
+> > > 2), the returned qid can exceed real_num_tx_queues, causing out-of-bounds
+> > > accesses in the networking stack.
+> > > For example, allocating channel 0 then channel 3 results in
+> > > real_num_tx_queues = 34 but qid = 35, which is out of range [0, 34).
+> > > Fix this by computing real_num_tx_queues based on the highest active
+> > > channel index rather than using a simple counter, in both the allocation
+> > > and deletion paths.
+> > > 
+> > > Fixes: ef1ca9271313b ("net: airoha: Add sched HTB offload support")
+> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > 
+> > Thanks for the update since v1.
+> > 
+> > Reviewed-by: Simon Horman <horms@kernel.org>
 > 
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-> ---
->  net/unix/unix_bpf.c | 6 ++++++
-
-AFAIU, everyhing in this file is for BPF_SYSCALL && NET_SOCK_MSG,
-or am I missing something ?
-
-I feel that it would be cleaner to add a new Kconfig that depends
-on BPF_SYSCALL and NET_SOCK_MSG, change Makefile obj-$(CONFIG_XXX),
-and guard .psock_update_sk_prot in af_unix.c
-
-
->  1 file changed, 6 insertions(+)
+> Hi Simon,
 > 
-> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
-> index f86ff19e9764..5289a04b4993 100644
-> --- a/net/unix/unix_bpf.c
-> +++ b/net/unix/unix_bpf.c
-> @@ -7,6 +7,7 @@
->  
->  #include "af_unix.h"
->  
-> +#ifdef CONFIG_NET_SOCK_MSG
->  #define unix_sk_has_data(__sk, __psock)					\
->  		({	!skb_queue_empty(&__sk->sk_receive_queue) ||	\
->  			!skb_queue_empty(&__psock->ingress_skb) ||	\
-> @@ -94,6 +95,7 @@ static int unix_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  	sk_psock_put(sk, psock);
->  	return copied;
->  }
-> +#endif /* CONFIG_NET_SOCK_MSG */
->  
->  static struct proto *unix_dgram_prot_saved __read_mostly;
->  static DEFINE_SPINLOCK(unix_dgram_prot_lock);
-> @@ -107,8 +109,10 @@ static void unix_dgram_bpf_rebuild_protos(struct proto *prot, const struct proto
->  {
->  	*prot        = *base;
->  	prot->close  = sock_map_close;
-> +#ifdef CONFIG_NET_SOCK_MSG
->  	prot->recvmsg = unix_bpf_recvmsg;
->  	prot->sock_is_readable = sk_msg_is_readable;
-> +#endif
->  }
->  
->  static void unix_stream_bpf_rebuild_protos(struct proto *prot,
-> @@ -116,8 +120,10 @@ static void unix_stream_bpf_rebuild_protos(struct proto *prot,
->  {
->  	*prot        = *base;
->  	prot->close  = sock_map_close;
-> +#ifdef CONFIG_NET_SOCK_MSG
->  	prot->recvmsg = unix_bpf_recvmsg;
->  	prot->sock_is_readable = sk_msg_is_readable;
-> +#endif
->  	prot->unhash  = sock_map_unhash;
->  }
->  
+> thx for the review.
 > 
+> > 
+> > FTR, there is an AI-generated review of this patch on sashiko.dev.
+> > I do not think that should impede the progress of this patch but
+> > you may want to consider it in the context of follow-up.
+> 
+> Even if it is not introduced by this patch, I do not think what is reported
+> by Sashiko is a real issue since airoha_eth driver implements
+> ndo_select_queue() callback and the selected queue is always in the range
+> [0, AIROHA_NUM_TX_RING[. HTB queues (in the range
+> [AIROHA_NUM_TX_RING, AIROHA_NUM_TX_RING + AIROHA_NUM_QOS_CHANNELS[) are just 
+> 'offloaded' and never used in the TC sw path. Agree?
+
+Thanks Lorenzo,
+
+I've looked over this more closely with the above in mind and I agree.
 
