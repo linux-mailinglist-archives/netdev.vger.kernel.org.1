@@ -1,192 +1,204 @@
-Return-Path: <netdev+bounces-300942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300943-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nL+rCfubOGrXeQcAu9opvQ
-	(envelope-from <netdev+bounces-300942-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 04:20:43 +0200
+	id 0dOEIdKiOGreewcAu9opvQ
+	(envelope-from <netdev+bounces-300943-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 04:49:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4CF66AC0BD
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 04:20:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D97716AC33E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 04:49:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300942-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300942-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=tap6l4BQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300943-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300943-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E8BA5300233D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 02:20:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0317A3021EAF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 02:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9839130C157;
-	Mon, 22 Jun 2026 02:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A293290BA;
+	Mon, 22 Jun 2026 02:45:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C052641C6;
-	Mon, 22 Jun 2026 02:20:33 +0000 (UTC)
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA178136358;
+	Mon, 22 Jun 2026 02:45:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782094838; cv=none; b=pJHtHHHPxJj2vxpWIUZ4blzWHs2eiAY1bhp+C4XCxl54Z6O1UhheQQ0joSgwMY2RGgrcIRK488b30E/rn2CxqB6iDL6lupqBm9w2Bx4KHGFWipPggO693Xfe9zHRXEI8hXzqRYDncIyR5HmjMGM+YgM4bo3qYQvhsmxjQhe95Wo=
+	t=1782096322; cv=none; b=f9KZuUdQqw+PZTcmNfNLnp5MfBmwvl+snsq27kx1Kkc4mUHlO1OKtcV4ji4zR835JeCoyAfjxW2wKaFPGABXC7WlsRlrHsqEvCI/n4aSxpJwaSnervSIpAkqjACF4yoctn+NE2FTCzlzyVqLw0uwmw0zGl+NXAam++eig0rwzfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782094838; c=relaxed/simple;
-	bh=zNzXLGPbgjHjVIZkEPXI0gjusig9YVEFyMRzgKCkUvc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=GJY8tEAiz4ktt0kC23pDsN1zMPyZkQpi5VhQDNsjA/243NVMcTNl5L3FWWJ4O94vBcM/ife47NasRnSq7tm+1+TWMqdPxdlzw0ToGzSZJHj8JHpGo1vik8AEvdvjVJLIraoHh7qvNQgpPzsTWBm8cZd2533UvlOteXN8Cj9BfTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.75.44.102
-Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
- ajax-webmail-app1 (Coremail) ; Mon, 22 Jun 2026 10:19:50 +0800 (GMT+08:00)
-Date: Mon, 22 Jun 2026 10:19:50 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: "Maxime Chevallier" <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
-	pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	alex@ghiti.fr, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	ningyu@eswincomputing.com, linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com,
-	weishangjuan@eswincomputing.com, horms@kernel.org, lee@kernel.org
-Subject: Re: Re: [PATCH net-next v8 3/6] net: stmmac: eic7700: make RGMII
- delay properties optional
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <30229cfe-b395-4d0f-81ef-eb780ac26599@lunn.ch>
-References: <20260610012727.848-1-lizhi2@eswincomputing.com>
- <20260610012937.911-1-lizhi2@eswincomputing.com>
- <eaa645fc-be06-4a15-8c2f-6e82129c4715@bootlin.com>
- <30229cfe-b395-4d0f-81ef-eb780ac26599@lunn.ch>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1782096322; c=relaxed/simple;
+	bh=cCnB8SHaTELhBMM2vNSo8nome0XmO9U28qrztuN+eZY=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Nxt8899l6Xz3lh1bT38/FDB+2EIAwhumPIPUz9sYL0ub4AIQ5J5UQJkO4VpcT2WDphyaW54pqcgKzsiirbyKP4kaUw1Tz9HnCrtc1TxHWpTtxqzuzr1V6whgLE1u/TvSGVcirQQL4PgxqSwL9GLeqNpv696uKSVoWlfKk80PIsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tap6l4BQ; arc=none smtp.client-ip=115.124.30.99
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1782096313; h=Message-ID:Subject:Date:From:To;
+	bh=6l8D54I1qhjeNtbRwIBHC97XmtG0Dd57mu48xVCfLtk=;
+	b=tap6l4BQF3pctbMQkK0yhd+dZQVQifrYHOJztpJ83oIAnOZnavwIWe9qoNUFG1gZxDnuYmPWtp2hTm4SGcIiDoA73+wUlj8Yi2io4xi/X7VUBeMgYo/xyEyhBCpwBwdsnH+t7r4VUk25nNm2jW3srV47t/r+d63fTkqGfBMTZEo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R311e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0X5GhaeY_1782096312;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X5GhaeY_1782096312 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 22 Jun 2026 10:45:13 +0800
+Message-ID: <1782096043.3540094-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3] virtio-net: xsk: support tx wake up
+Date: Mon, 22 Jun 2026 10:40:43 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: mst@redhat.com,
+ jasowang@redhat.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org,
+ eperezma@redhat.com
+References: <20260616115912.513183-1-dongml2@chinatelecom.cn>
+In-Reply-To: <20260616115912.513183-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <512b77d5.993b.19eed207fc9.Coremail.lizhi2@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TAJkCgDHW3DHmzhqEvksAA--.8326W
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAgEGDGo4EpcWfAACs2
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.14 / 15.00];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:maxime.chevallier@bootlin.com,m:devicetree@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:pjw@kernel.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:alex@ghiti.fr,m:linux-riscv@lists.infradead.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:ningyu@eswincomputing.com,m:linmin@eswincomputing.com,m:pinkesh.vaghela@einfochips.com,m:pritesh.patel@einfochips.com,m:weishangjuan@eswincomputing.com,m:horms@kernel.org,m:lee@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[eswincomputing.com];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:menglong8.dong@gmail.com,m:mst@redhat.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:eperezma@redhat.com,m:menglong8dong@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FORGED_SENDER(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-300942-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com,eswincomputing.com,einfochips.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
-	HAS_X_PRIO_THREE(0.00)[3];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	TAGGED_FROM(0.00)[bounces-300943-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,alibaba.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.alibaba.com:dkim,linux.alibaba.com:mid,linux.alibaba.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A4CF66AC0BD
+X-Rspamd-Queue-Id: D97716AC33E
 
-CgoKPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiQW5kcmV3IEx1bm4iIDxh
-bmRyZXdAbHVubi5jaD4KPiBTZW5kIHRpbWU6U2F0dXJkYXksIDEzLzA2LzIwMjYgMTU6NDg6NDYK
-PiBUbzogIk1heGltZSBDaGV2YWxsaWVyIiA8bWF4aW1lLmNoZXZhbGxpZXJAYm9vdGxpbi5jb20+
-Cj4gQ2M6IGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20sIGRldmljZXRyZWVAdmdlci5rZXJuZWwu
-b3JnLCBhbmRyZXcrbmV0ZGV2QGx1bm4uY2gsIGRhdmVtQGRhdmVtbG9mdC5uZXQsIGVkdW1hemV0
-QGdvb2dsZS5jb20sIGt1YmFAa2VybmVsLm9yZywgcm9iaEBrZXJuZWwub3JnLCBrcnprK2R0QGtl
-cm5lbC5vcmcsIGNvbm9yK2R0QGtlcm5lbC5vcmcsIG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcsIHBh
-YmVuaUByZWRoYXQuY29tLCBtY29xdWVsaW4uc3RtMzJAZ21haWwuY29tLCBhbGV4YW5kcmUudG9y
-Z3VlQGZvc3Muc3QuY29tLCBybWsra2VybmVsQGFybWxpbnV4Lm9yZy51aywgcGp3QGtlcm5lbC5v
-cmcsIHBhbG1lckBkYWJiZWx0LmNvbSwgYW91QGVlY3MuYmVya2VsZXkuZWR1LCBhbGV4QGdoaXRp
-LmZyLCBsaW51eC1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnLCBsaW51eC1zdG0zMkBzdC1tZC1t
-YWlsbWFuLnN0b3JtcmVwbHkuY29tLCBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5v
-cmcsIGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcsIG5pbmd5dUBlc3dpbmNvbXB1dGluZy5j
-b20sIGxpbm1pbkBlc3dpbmNvbXB1dGluZy5jb20sIHBpbmtlc2gudmFnaGVsYUBlaW5mb2NoaXBz
-LmNvbSwgcHJpdGVzaC5wYXRlbEBlaW5mb2NoaXBzLmNvbSwgd2Vpc2hhbmdqdWFuQGVzd2luY29t
-cHV0aW5nLmNvbSwgaG9ybXNAa2VybmVsLm9yZywgbGVlQGtlcm5lbC5vcmcKPiBTdWJqZWN0OiBS
-ZTogW1BBVENIIG5ldC1uZXh0IHY4IDMvNl0gbmV0OiBzdG1tYWM6IGVpYzc3MDA6IG1ha2UgUkdN
-SUkgZGVsYXkgcHJvcGVydGllcyBvcHRpb25hbAo+IAo+IE9uIFdlZCwgSnVuIDEwLCAyMDI2IGF0
-IDEwOjI2OjUwQU0gKzAyMDAsIE1heGltZSBDaGV2YWxsaWVyIHdyb3RlOgo+ID4gSGksCj4gPiAK
-PiA+IE9uIDYvMTAvMjYgMDM6MjksIGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20gd3JvdGU6Cj4g
-PiA+IEZyb206IFpoaSBMaSA8bGl6aGkyQGVzd2luY29tcHV0aW5nLmNvbT4KPiA+ID4gCj4gPiA+
-IE1ha2UgcngtaW50ZXJuYWwtZGVsYXktcHMgYW5kIHR4LWludGVybmFsLWRlbGF5LXBzIG9wdGlv
-bmFsIGluIHRoZQo+ID4gPiBFSUM3NzAwIERXTUFDIGRyaXZlci4KPiA+ID4gCj4gPiA+IFRoZSBk
-cml2ZXIgcHJldmlvdXNseSByZXF1aXJlZCBib3RoIHByb3BlcnRpZXMgdG8gYmUgcHJlc2VudCBh
-bmQgd291bGQKPiA+ID4gZmFpbCBwcm9iZSB3aGVuIHRoZXkgd2VyZSBtaXNzaW5nLiBUaGlzIHJl
-c3RyaWN0cyB2YWxpZCBoYXJkd2FyZQo+ID4gPiBjb25maWd1cmF0aW9ucyB3aGVyZSBSR01JSSB0
-aW1pbmcgaXMgaW5zdGVhZCBwcm92aWRlZCBieSB0aGUgUEhZIG9yCj4gPiA+IGJvYXJkIGRlc2ln
-bi4KPiA+ID4gCj4gPiA+IFVwZGF0ZSB0aGUgZHJpdmVyIHRvIHRyZWF0IG1pc3NpbmcgZGVsYXkg
-cHJvcGVydGllcyBhcyB6ZXJvIGRlbGF5LAo+ID4gPiBhbGxvd2luZyBzeXN0ZW1zIHdpdGhvdXQg
-ZXhwbGljaXQgTUFDLXNpZGUgZGVsYXkgdHVuaW5nIHRvIG9wZXJhdGUKPiA+ID4gY29ycmVjdGx5
-Lgo+ID4gPiAKPiA+ID4gVGhpcyBhbGlnbnMgdGhlIGRyaXZlciBiZWhhdmlvciB3aXRoIHRoZSB1
-cGRhdGVkIGRldmljZSB0cmVlIGJpbmRpbmcKPiA+ID4gYW5kIHByb3ZpZGVzIGEgc2FmZSBkZWZh
-dWx0IGNvbmZpZ3VyYXRpb24gd2hlbiBNQUMtc2lkZSBkZWxheQo+ID4gPiBwcm9ncmFtbWluZyBp
-cyBub3QgcmVxdWlyZWQuCj4gPiA+IAo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBaaGkgTGkgPGxpemhp
-MkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gPiA+IC0tLQo+ID4gPiAgZHJpdmVycy9uZXQvZXRoZXJu
-ZXQvc3RtaWNyby9zdG1tYWMvZHdtYWMtZWljNzcwMC5jIHwgNiAtLS0tLS0KPiA+ID4gIDEgZmls
-ZSBjaGFuZ2VkLCA2IGRlbGV0aW9ucygtKQo+ID4gPiAKPiA+ID4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL2R3bWFjLWVpYzc3MDAuYyBiL2RyaXZlcnMv
-bmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL2R3bWFjLWVpYzc3MDAuYwo+ID4gPiBpbmRleCA0
-YWM5NzlkODc0ZDYuLmVjOTliNTk3YWVhZiAxMDA2NDQKPiA+ID4gLS0tIGEvZHJpdmVycy9uZXQv
-ZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvZHdtYWMtZWljNzcwMC5jCj4gPiA+ICsrKyBiL2RyaXZl
-cnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL2R3bWFjLWVpYzc3MDAuYwo+ID4gPiBAQCAt
-MTY1LDkgKzE2NSw2IEBAIHN0YXRpYyBpbnQgZWljNzcwMF9kd21hY19wcm9iZShzdHJ1Y3QgcGxh
-dGZvcm1fZGV2aWNlICpwZGV2KQo+ID4gPiAgCQlkd2NfcHJpdi0+ZXRoX2Nsa19kbHlfcGFyYW0g
-Jj0gfkVJQzc3MDBfRVRIX1JYX0FESl9ERUxBWTsKPiA+ID4gIAkJZHdjX3ByaXYtPmV0aF9jbGtf
-ZGx5X3BhcmFtIHw9Cj4gPiA+ICAJCQkJIEZJRUxEX1BSRVAoRUlDNzcwMF9FVEhfUlhfQURKX0RF
-TEFZLCB2YWwpOwo+ID4gPiAtCX0gZWxzZSB7Cj4gPiA+IC0JCXJldHVybiBkZXZfZXJyX3Byb2Jl
-KCZwZGV2LT5kZXYsIC1FSU5WQUwsCj4gPiA+IC0JCQkibWlzc2luZyByZXF1aXJlZCBwcm9wZXJ0
-eSByeC1pbnRlcm5hbC1kZWxheS1wc1xuIik7Cj4gPiA+ICAJfQo+ID4gPiAgCj4gPiA+ICAJLyog
-UmVhZCB0eC1pbnRlcm5hbC1kZWxheS1wcyBhbmQgdXBkYXRlIHR4X2NsayBkZWxheSAqLwo+ID4g
-PiBAQCAtMTg3LDkgKzE4NCw2IEBAIHN0YXRpYyBpbnQgZWljNzcwMF9kd21hY19wcm9iZShzdHJ1
-Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQo+ID4gPiAgCQlkd2NfcHJpdi0+ZXRoX2Nsa19kbHlf
-cGFyYW0gJj0gfkVJQzc3MDBfRVRIX1RYX0FESl9ERUxBWTsKPiA+ID4gIAkJZHdjX3ByaXYtPmV0
-aF9jbGtfZGx5X3BhcmFtIHw9Cj4gPiA+ICAJCQkJIEZJRUxEX1BSRVAoRUlDNzcwMF9FVEhfVFhf
-QURKX0RFTEFZLCB2YWwpOwo+ID4gPiAtCX0gZWxzZSB7Cj4gPiA+IC0JCXJldHVybiBkZXZfZXJy
-X3Byb2JlKCZwZGV2LT5kZXYsIC1FSU5WQUwsCj4gPiA+IC0JCQkibWlzc2luZyByZXF1aXJlZCBw
-cm9wZXJ0eSB0eC1pbnRlcm5hbC1kZWxheS1wc1xuIik7Cj4gPiA+ICAJfQo+ID4gCj4gPiBJIHRo
-aW5rIHRoZW4geW91IG5lZWQgdG8gaGFuZGxlIFJHTUlJLCBSR01JSV9JRCwgUkdNSUlfUlhJRCBh
-bmQgUkdNSUlfVFhJRCwKPiA+IGJ5IHVzaW5nIGRlZmF1bHQgZGVsYXlzIGZvciB0aGVzZSAodXN1
-YWxseSBhcm91bmQgMm5zKSwgYXMgaGVyZSBhbGwgZGVsYXlzCj4gPiB3aWxsIGJlIHNldCB0byAw
-LCByZWdhcmRsZXNzIG9mIHRoZSBSR01JSSBtb2RlIGluIHVzZS4KPiAKPiBOby4gQnkgZGVmYXVs
-dCwgdGhlIE1BQyBhZGRzIDBucyBkZWxheSwgYW5kIHBhc3NlcyB0aGUgcGh5LW1vZGUgdG8gdGhl
-Cj4gUEhZLiBJdCB3aWxsIHRoZW4gYWRkIHRoZSAybnMgZGVsYXkuIEl0IGlzIHBvc3NpYmxlIHRv
-IHVzZSB0aGUKPiB0eC1pbnRlcm5hbC1kZWxheS1wcyBhbmQgcngtaW50ZXJuYWwtZGVsYXktcHMg
-aW4gdGhlIE1BQyB0byBhZGQgc21hbGwKPiB0dW5pbmcgZGVsYXlzLCBidXQgbm90IHRoZSBmdWxs
-IDJucy4KPiAKPiBodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51eC92Ni4xNS9zb3VyY2Uv
-RG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9ldGhlcm5ldC1jb250cm9sbGVy
-LnlhbWwjTDI4Nwo+IAoKVGhhbmtzIGZvciB0aGUgZWFybGllciBkaXNjdXNzaW9uIGFuZCBmb3Ig
-aGVscGluZyBjbGFyaWZ5IHRoZSBldGgwCmRlc2lnbi4KCkknbSBwcmVwYXJpbmcgYSB2OSBvZiB0
-aGUgc2VyaWVzLiBUaGUgbmV4dCByZXZpc2lvbiB3aWxsIGFkZHJlc3MgdGhlCmlzc3VlcyByZXBv
-cnRlZCBieSBTYXNoaWtvIHJldmlldywgbWFpbmx5IERUIGJpbmRpbmcgc2NoZW1hIGFuZCBEVFMK
-d2FybmluZ3MuCgpCZWZvcmUgSSBwb3N0IHY5LCBJJ2QgbGlrZSB0byBjaGVjayB3aGV0aGVyIHlv
-dSBoYXZlIGFueSBjb25jZXJucyBvcgpzdWdnZXN0aW9ucyByZWdhcmRpbmcgdGhlIGRyaXZlciBj
-aGFuZ2VzLgoKVGhhbmtzLApaaGkK
+On Tue, 16 Jun 2026 19:59:12 +0800, Menglong Dong <menglong8.dong@gmail.com> wrote:
+> For now, XDP_RING_NEED_WAKEUP is not supported properly by the virtio-net
+> in the tx path for example: we set xsk_set_tx_need_wakeup() in
+> virtnet_xsk_xmit(), but we didn't call xsk_clear_tx_need_wakeup()
+> anywhere, which means the user will call send() for every packet.
+>
+> We call xsk_set_tx_need_wakeup() after virtnet_xsk_xmit_batch() if sq->vq
+> is empty, as we can't be wakeup by the skb_xmit_done() in this case.
+> Otherwise, we will clear the wakeup flag.
+>
+> Race condition is considered for tx path.
+>
+> Fixes: 89f86675cb03 ("virtio_net: xsk: tx: support xmit xsk buffer")
+
+This is not a bug, so we do not need this.
+And you post this to net-next.
+
+
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> ---
+> v3:
+> - remove the confusing comment
+>
+> v2:
+> - add the Fixes tag
+> ---
+>  drivers/net/virtio_net.c | 23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index f4adcfee7a80..6e099edef6e9 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -1440,8 +1440,9 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
+>  	struct virtnet_info *vi = sq->vq->vdev->priv;
+>  	struct virtnet_sq_free_stats stats = {};
+>  	struct net_device *dev = vi->dev;
+> +	int sent, vring_size;
+> +	bool need_wakeup;
+>  	u64 kicks = 0;
+> -	int sent;
+>
+>  	/* Avoid to wakeup napi meanless, so call __free_old_xmit instead of
+>  	 * free_old_xmit().
+> @@ -1451,8 +1452,25 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
+>  	if (stats.xsk)
+>  		xsk_tx_completed(sq->xsk_pool, stats.xsk);
+>
+> +	vring_size = virtqueue_get_vring_size(sq->vq);
+> +	need_wakeup = xsk_uses_need_wakeup(pool);
+> +
+> +	if (need_wakeup && vring_size == sq->vq->num_free)
+> +		xsk_set_tx_need_wakeup(pool);
+
+You need to comment this.
+
+
+> +
+>  	sent = virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
+>
+> +	if (need_wakeup) {
+> +		if (vring_size == sq->vq->num_free)
+> +			/* we can't wake up by ourself, and it should be done
+> +			 * by the user.
+> +			 */
+> +			xsk_set_tx_need_wakeup(pool);
+> +		else
+> +			/* we can wake up from skb_xmit_done() */
+> +			xsk_clear_tx_need_wakeup(pool);
+> +	}
+> +
+>  	if (!is_xdp_raw_buffer_queue(vi, sq - vi->sq))
+>  		check_sq_full_and_disable(vi, vi->dev, sq);
+
+
+After fixed above comments, you can add:
+
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+Thanks.
+
+
+>
+> @@ -1470,9 +1488,6 @@ static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_pool *pool,
+>  	u64_stats_add(&sq->stats.xdp_tx,  sent);
+>  	u64_stats_update_end(&sq->stats.syncp);
+>
+> -	if (xsk_uses_need_wakeup(pool))
+> -		xsk_set_tx_need_wakeup(pool);
+> -
+>  	return sent;
+>  }
+>
+> --
+> 2.54.0
+>
 
