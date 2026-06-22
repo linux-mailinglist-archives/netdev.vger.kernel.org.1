@@ -1,163 +1,143 @@
-Return-Path: <netdev+bounces-301021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301022-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QKieClQIOWq5lgcAu9opvQ
-	(envelope-from <netdev+bounces-301021-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:03:00 +0200
+	id hz7lHroIOWrclgcAu9opvQ
+	(envelope-from <netdev+bounces-301022-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:04:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6DD96AE7F6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:02:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DE56AE831
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:04:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SG2XRnqq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301021-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301021-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301022-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301022-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2AB79300B1B7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:02:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B83CE300C38F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD993A16B2;
-	Mon, 22 Jun 2026 10:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26E53A4523;
+	Mon, 22 Jun 2026 10:03:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D72D39E6C6;
-	Mon, 22 Jun 2026 10:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3873639B481;
+	Mon, 22 Jun 2026 10:03:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782122576; cv=none; b=alPIIjMDzrgDsUaGFkCyH+ejavjDGIG60Um9M6kmsH+JExU570EG10jcPl+yVZi8Lj0stn3tWEwmX5lHsmasBDDBzqGn6c28QB6XD16g6cNXLn1VWyuBIHqVEypu2GfI4jtrykDGk9vyzbf4UzU47P2ZUwYSzwT9utTxT3CVb1Q=
+	t=1782122583; cv=none; b=CS3pQLXFfSO7dV0ZfkL/JqYNmo8maldudo6w7HnXLuQ6Y2bHHd/H8lbnt4enroU/brUuQwSWS7s0aB6fzir7Uj7TAEZG+MrAslnV2mzvPpZdBER9YKcGnEeqPvoLGOi0PcGXa1fTfyzfwdNBC3VQsz7qL/XqbpAXWe7fOnFUG3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782122576; c=relaxed/simple;
-	bh=dKfybWohSASsPe89t8jIARC8460aGoHyag7Mc6QBxl8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lE0K6B3BIJHg4b+IPTMl9nb70APU4ZX8B51k2kWN7CS57qHSIDnLGxZBA5cyswHJMqDjEO0SG13BdGwArOVBuA8b7bq9Xck0ulz2m4j+GiraD/mqT5+kJYTXfQ74gY6cIfz5pSVJI27+MPaWhG6Tv+Dgcjq90EJSlOo6RiEo+pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SG2XRnqq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EE481F000E9;
-	Mon, 22 Jun 2026 10:02:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782122575;
-	bh=mWZmZTPHZ8K22xz/s5/6k7OT/phab6SxzhtQKKn0a68=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=SG2XRnqqvokDNzDx2mq+5l610+XuOv5eMkLiPssVytSN4KqhJFA0TmRSTSLEzUNcp
-	 2fvbI6l+zo3R+g4sFvKdCQ2m2Vw/+nyAXjyYn4FEEoO6KMrFWPHwDMnM23X6QNEsOC
-	 HaNd992VCic3RZjRITPlOpNfbc4WiN5PvDuzC5NXJIV34RnSracu8hga3oc4JRpFgP
-	 TTBdO44HMEnHCbOV6dfaXOjQy5Z3LjQS3a3AnXTVhbIryboMKAURqwPvH92ze43qZf
-	 eEJGiPxfKSWRtWHzjKU+LpqvmGXyeMNsxdix0PS2dpr9YKTqMMpCnHvCpoiBpneG+F
-	 dsj6ezs/xx7hg==
-From: Christian Brauner <brauner@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Christian Brauner <brauner@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, linux-fsdevel@vger.kernel.org, 
- netdev@vger.kernel.org, bpf@vger.kernel.org, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>
-In-Reply-To: <20260617-work-bpf-sock-xattr-v1-0-a1276f7c9da3@kernel.org>
-References: <20260617-work-bpf-sock-xattr-v1-0-a1276f7c9da3@kernel.org>
-Subject: Re: [PATCH 0/2] Add bpf_sock_read_xattr() kfunc to read socket
- xattrs
-Message-Id: <20260622-giraffe-zahntechnik-gepfercht-f9953c9d4a75@brauner>
-Date: Mon, 22 Jun 2026 12:02:35 +0200
+	s=arc-20240116; t=1782122583; c=relaxed/simple;
+	bh=aW5tpOiVP3K52zuoTpSZyUea9npiJy6qVPe7I+Ng8bg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LjKV8LqSEejwV1C8WG5C8zaWP+OmRfTz6MGo54npTbXFGjSVnEuWqKgjOrFLG5J5OMpIK4PFxxiHS9HAMVGNTGQPvW6dxquvWBhuYo3GJRHt3qo91Q3/hwi/AaPL9CntTwgLLvBe+BWJ95sTReLtSdsXlNlGezCU7wAFTNjhJ34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Received: from localhost.localdomain (unknown [117.182.74.238])
+	by APP-03 (Coremail) with SMTP id rQCowACHf7ZBCDlqXQ2FFQ--.42823S2;
+	Mon, 22 Jun 2026 18:02:43 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH v2 net-next] sctp: use sctp_auth_shkey_release() in error path for consistency
+Date: Mon, 22 Jun 2026 18:02:35 +0800
+Message-Id: <20260622100235.34263-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.16-dev-7d9ce
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1939; i=brauner@kernel.org;
- h=from:subject:message-id; bh=dKfybWohSASsPe89t8jIARC8460aGoHyag7Mc6QBxl8=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRZcnhFzpY161QOS0/5Jzsvf5NRsUuN8tQq3cJ3EdfYq
- nZXL37aUcrCIMbFICumyOLQbhIut5ynYrNRpgbMHFYmkCEMXJwCMJG9Mgz/HYzsEvy1rGYkdBpd
- 9OObxqEobtAoYL110/6T9x+9LtJKYfgrKbv+cJJwya0jT3xDJi/Vtd2yYV7GjIN1ry0zXzrsznr
- CBQA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowACHf7ZBCDlqXQ2FFQ--.42823S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7JrW8Kry3JF1ktFyDZrW3GFg_yoWfCFbEyF
+	y3CrZaqF4UKFs8Zw4fCr4avrZagw4jq3W8CrnrKFZrZ34UXrsrXrWfWrs3X3WxWw48Zr13
+	Jr95try3Jw13ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAcGA2o43ZmpwAAAsx
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:brauner@kernel.org,m:viro@zeniv.linux.org.uk,m:jack@suse.cz,m:horms@kernel.org,m:kuniyu@google.com,m:willemb@google.com,m:linux-fsdevel@vger.kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301022-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301021-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,suse.cz,kernel.org,google.com,vger.kernel.org,linux.dev,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B6DD96AE7F6
+X-Rspamd-Queue-Id: D5DE56AE831
 
-On Wed, 17 Jun 2026 13:18:26 +0200, Christian Brauner wrote:
-> Add bpf_sock_read_xattr() kfunc to read socket xattrs
-> 
-> In c8db08110cbe ("Merge tag 'vfs-7.1-rc1.xattr' of git://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs")
-> we added support for extended attributes for sockets. This comes in two
-> flavors: sockfs and non-sockfs/filesystem sockets. Filesystem sockets
-> are actual filesystem objects so reading xattrs must use dedicated fs
-> helpers such as bpf_get_dentry_xattr() and bpf_get_file_xattr(). Those
-> are inherently sleeping operations. Sockfs sockets on the other hand
-> don't need to use sleeping operations as the underlying data structure
-> is lockless. In addition, retrieval of sockfs extended attributes often
-> happens from LSM hooks that only provide struct socket and it's
-> completely nonsensical to grab a reference to a file, then force a
-> sleeping operation to retrieve the xattr and drop the reference. We know
-> that the sockfs file cannot go away while the LSM hook runs.
-> 
-> [...]
+Use the proper refcount-aware helper sctp_auth_shkey_release() instead
+of kfree() when freeing cur_key in the error path of sctp_auth_set_key().
+While both are equivalent in the current code, using the helper maintains
+abstraction consistency and prevents potential issues if the code is
+reordered in the future.
 
-Applied to the vfs-7.3.kfunc branch of the vfs/vfs.git tree.
-Patches in the vfs-7.3.kfunc branch should appear in linux-next soon.
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ net/sctp/auth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-7.3.kfunc
-
-[1/2] fs: Add bpf_sock_read_xattr() kfunc to read socket xattrs
-      https://git.kernel.org/vfs/vfs/c/f80386e3838e
-[2/2] selftests/bpf: Add test for bpf_sock_read_xattr() kfunc
-      https://git.kernel.org/vfs/vfs/c/99a63a6aff40
+diff --git a/net/sctp/auth.c b/net/sctp/auth.c
+index be9782760f50..84708f87392f 100644
+--- a/net/sctp/auth.c
++++ b/net/sctp/auth.c
+@@ -753,7 +753,7 @@ int sctp_auth_set_key(struct sctp_endpoint *ep,
+ 	/* Create a new key data based on the info passed in */
+ 	key = sctp_auth_create_key(auth_key->sca_keylength, GFP_KERNEL);
+ 	if (!key) {
+-		kfree(cur_key);
++		sctp_auth_shkey_release(cur_key);
+ 		return -ENOMEM;
+ 	}
+ 
+-- 
+2.39.5 (Apple Git-154)
 
 
