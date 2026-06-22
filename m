@@ -1,234 +1,118 @@
-Return-Path: <netdev+bounces-301157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4Ft3FPVcOWqGrAcAu9opvQ
-	(envelope-from <netdev+bounces-301157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:04:05 +0200
+	id 01BbBSddOWqNrAcAu9opvQ
+	(envelope-from <netdev+bounces-301158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:04:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B6CC6B0F65
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:04:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A69716B0F73
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:04:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301157-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301157-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CUCYAo1L;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301158-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301158-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7DCA930459E9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:00:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1640304EBA8
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A083CAE9B;
-	Mon, 22 Jun 2026 16:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484663CAE9B;
+	Mon, 22 Jun 2026 16:01:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9465535839E;
-	Mon, 22 Jun 2026 16:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5667730FC39;
+	Mon, 22 Jun 2026 16:01:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782144056; cv=none; b=ojdGcI2dEKQgHUZ2Cq1y/1Zmm2UL3fCf1II8tLtauUdRgpAvcTughLRWOcYFZYFI508pBn1zL8EsCjNVbT+spjvfDe1YYIh8XyYKRuA5jbLn3Mf5B22NdneT32TOwtIWuTmlKuqiHDtDa8xE9oUPlu7iLDbOOM0ricy6CbEILHs=
+	t=1782144062; cv=none; b=eGlePelin1vaAWVph256QVmWwxQSdiDBn8VS0BNcjPKkcyZQRW+TfOWEyEws6KGpZiRj8+ywe2w3E9uGnKzkZNJcEkmybTPPzP6FvJwnQECMMPLJmxamm7Fr+i23V7Nwuwiy3rQB/uXYBKEshlUVgaCxaSwRDOxHwgaJUuSRdis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782144056; c=relaxed/simple;
-	bh=7UT5IRWOiV6egMs7KlbG/lfk0lDn8cic0obhliOTZ0c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hVoHJJ6BYfTmvNbZasLmqW/Zb9RwEqQ9iVb0kagNDZSPToSTBWxNKlAAvppHhT663nWKwhr1euwFdjlvMHcCTZZHYh/wGRW2UEHEiIRI5GEApQmjekyG3fUqMZ6xlLPZiDQsGrHLyxnkV+Qrv8CekFOryIiiG63EM29KNyh18vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2FF704C28871AA;
-	Mon, 22 Jun 2026 17:59:55 +0200 (CEST)
-Message-ID: <40abd0b5-7f3f-4cd4-9975-9db4498d15d3@molgen.mpg.de>
-Date: Mon, 22 Jun 2026 17:59:53 +0200
+	s=arc-20240116; t=1782144062; c=relaxed/simple;
+	bh=uWrN9N8tLkl5jeJNrH98xFTV+fIzbe5ovyczRTpj/bs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EitOkI6tWMUYKAxf9t8RlJWSYkqxH0puuoxBQTNPoczzCJaZ4hUjJW+94IUI0+0x6QfbmpYAWUZEGUk4bvzrDk6CV92IB8jlG3WwbZ2sOHCbzzXSt41GWHHF+Lcw/wJKeliMcxqa/lLCwi0aI6EKVoaSh/vswebItF2U94bXhiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CUCYAo1L; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C561F000E9;
+	Mon, 22 Jun 2026 16:01:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782144061;
+	bh=uWrN9N8tLkl5jeJNrH98xFTV+fIzbe5ovyczRTpj/bs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=CUCYAo1LFxfge7jZFLyQOPKo6REe5AjDLNc2cU3Y/grBFxpbLVX8lIRYlb64V/8PR
+	 AjWv34uaq2AUiOh5QEIu88iNfSXuAq0j4wfzjTIxjwOvzADvFGx2c+uHkWEASeVJfi
+	 pCQ/iEuk13mVt8JjjIowFNn2AYbaBWpHWUqFF3n1XsvkTRYPELJ7R2VIOI3Of6hMn+
+	 1/GE1XNjpOf9UF785xD54kxObPgjPbwHuwcPYMlLYS9vgNEhbYJ146uBZIugukKkmF
+	 hSSnSBoUd9pti4FDBySf7Ki0tQ6pzASJPAQ74UXmAPdqBGX3MHnLyd4nJnyTNEo1J2
+	 6wmgdhGkgpEXg==
+Date: Mon, 22 Jun 2026 09:00:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Geliang Tang <geliang@kernel.org>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+ <martineau@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, John Fastabend <john.fastabend@gmail.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Hannes Reinecke <hare@suse.de>,
+ Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, Gang Yan <yangang@kylinos.cn>, Zqiang
+ <qiang.zhang@linux.dev>
+Subject: Re: [RFC net-next 00/17] MPTCP KTLS support
+Message-ID: <20260622090059.5d1813dd@kernel.org>
+In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
+References: <cover.1782123118.git.tanggeliang@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net] igc: Fix RX HW timestamp reporting
- when NET_RX_BUSY_POLL is disabled
-To: Ding Meng <meng.ding@siemens.com>,
- Florian Bezdeka <florian.bezdeka@siemens.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jan.kiszka@siemens.com,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, wq.wang@siemens.com
-References: <20260622041718.6106-1-meng.ding@siemens.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260622041718.6106-1-meng.ding@siemens.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[mpg.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:meng.ding@siemens.com,m:florian.bezdeka@siemens.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jan.kiszka@siemens.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:wq.wang@siemens.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301158-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-301157-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS(0.00)[m:geliang@kernel.org,m:matttbe@kernel.org,m:martineau@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:hare@suse.de,m:tanggeliang@kylinos.cn,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:yangang@kylinos.cn,m:qiang.zhang@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com,queasysnail.net,suse.de,kylinos.cn,vger.kernel.org,lists.linux.dev,linux.dev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,molgen.mpg.de:mid,molgen.mpg.de:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6B6CC6B0F65
+X-Rspamd-Queue-Id: A69716B0F73
 
-Dear Ding,
+On Mon, 22 Jun 2026 18:43:20 +0800 Geliang Tang wrote:
+> Subject: [RFC net-next 00/17] MPTCP KTLS support
 
-
-Thank you for your patch.
-
-Am 22.06.26 um 06:13 schrieb Ding Meng via Intel-wired-lan:
-> When CONFIG_NET_RX_BUSY_POLL is deactivated, fetching RX HW timestamps
-> from the NIC no longer works as expected.
-
-Maybe paste some logs/errors, so it can be easier found by people with 
-the same issue.
-
-> This occurs because disabling CONFIG_NET_RX_BUSY_POLL disables the
-> SKB NAPI mapping in __skb_mark_napi_id(). Consequently, get_timestamp()
-> fails to perform its driver lookup, and the igc driver's struct
-> net_device_ops::ndo_get_tstamp is never invoked.
-> 
-> Instead, get_timestamp() falls back to use shhwtstamps(skb)->hwtstamp,
-> a field that the driver has not populated.
-> 
-> Fix this by populating the hwtstamp field with the correct timestamp
-> in the default timer when CONFIG_NET_RX_BUSY_POLL is disabled.
-
-Maybe detail, why the adapter needs to be passed now.
-
-Also, please describe a test case to check the change.
-
-> Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
-> Co-developed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
-> Signed-off-by: Florian Bezdeka <florian.bezdeka@siemens.com>
-> Signed-off-by: Ding Meng <meng.ding@siemens.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 38 ++++++++++++++++-------
->   1 file changed, 26 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 8ac16808023..1da8d7aa76d 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -1992,7 +1992,26 @@ static struct sk_buff *igc_build_skb(struct igc_ring *rx_ring,
->   	return skb;
->   }
->   
-> -static struct sk_buff *igc_construct_skb(struct igc_ring *rx_ring,
-> +static void igc_construct_skb_timestamps(struct igc_adapter *adapter,
-> +					 struct sk_buff *skb,
-> +					 struct igc_xdp_buff *ctx)
-> +{
-> +	if (!ctx->rx_ts)
-> +		return;
-> +#ifdef CONFIG_NET_RX_BUSY_POLL
-
-Is there a way to do this in C instead of the pre-processor. That way 
-all the code gets build tested. (Is there a config with disabled 
-NET_RX_BUSY_POLL?)
-
-> +	skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
-> +	skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
-> +#else
-> +	struct igc_inline_rx_tstamps *tstamps;
-> +
-> +	tstamps = ctx->rx_ts;
-> +	skb_hwtstamps(skb)->hwtstamp = igc_ptp_rx_pktstamp(adapter,
-> +							   tstamps->timer0);
-> +#endif
-> +}
-> +
-> +static struct sk_buff *igc_construct_skb(struct igc_adapter *adapter,
-> +					 struct igc_ring *rx_ring,
->   					 struct igc_rx_buffer *rx_buffer,
->   					 struct igc_xdp_buff *ctx)
->   {
-> @@ -2013,10 +2032,7 @@ static struct sk_buff *igc_construct_skb(struct igc_ring *rx_ring,
->   	if (unlikely(!skb))
->   		return NULL;
->   
-> -	if (ctx->rx_ts) {
-> -		skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
-> -		skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
-> -	}
-> +	igc_construct_skb_timestamps(adapter, skb, ctx);
->   
->   	/* Determine available headroom for copy */
->   	headlen = size;
-> @@ -2686,7 +2702,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
->   		else if (ring_uses_build_skb(rx_ring))
->   			skb = igc_build_skb(rx_ring, rx_buffer, &ctx.xdp);
->   		else
-> -			skb = igc_construct_skb(rx_ring, rx_buffer, &ctx);
-> +			skb = igc_construct_skb(adapter, rx_ring, rx_buffer, &ctx);
->   
->   		/* exit if we failed to retrieve a buffer */
->   		if (!xdp_res && !skb) {
-> @@ -2738,7 +2754,8 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
->   	return total_packets;
->   }
->   
-> -static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
-> +static struct sk_buff *igc_construct_skb_zc(struct igc_adapter *adapter,
-> +					    struct igc_ring *ring,
->   					    struct igc_xdp_buff *ctx)
->   {
->   	struct xdp_buff *xdp = &ctx->xdp;
-> @@ -2760,10 +2777,7 @@ static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
->   		__skb_pull(skb, metasize);
->   	}
->   
-> -	if (ctx->rx_ts) {
-> -		skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
-> -		skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
-> -	}
-> +	igc_construct_skb_timestamps(adapter, skb, ctx);
->   
->   	return skb;
->   }
-> @@ -2775,7 +2789,7 @@ static void igc_dispatch_skb_zc(struct igc_q_vector *q_vector,
->   	struct igc_ring *ring = q_vector->rx.ring;
->   	struct sk_buff *skb;
->   
-> -	skb = igc_construct_skb_zc(ring, ctx);
-> +	skb = igc_construct_skb_zc(q_vector->adapter, ring, ctx);
->   	if (!skb) {
->   		ring->rx_stats.alloc_failed++;
->   		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &ring->flags);
-
-Otherwise this looks good.
-
-
-Kind regards,
-
-Paul
+Please no. We have a ton of unfixed bugs and may have to revert some of
+the features we dropped back in. I'd prefer to avoid large new bug
+surfaces until we reach an LTS release.
 
