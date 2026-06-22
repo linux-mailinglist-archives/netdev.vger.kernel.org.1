@@ -1,256 +1,147 @@
-Return-Path: <netdev+bounces-301192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8PQ8Mr2HOWptuwcAu9opvQ
-	(envelope-from <netdev+bounces-301192-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 21:06:37 +0200
+	id T/i+CfSFOWoLuwcAu9opvQ
+	(envelope-from <netdev+bounces-301188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:59:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36CB66B1FD5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 21:06:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CF126B1F2A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:58:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=trager.us (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301192-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301192-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b="HU/3f4iX";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301188-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301188-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3B0353025A5A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 19:06:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2135C305043D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9ACD347BC4;
-	Mon, 22 Jun 2026 19:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFAE73469FC;
+	Mon, 22 Jun 2026 18:52:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7001C2324
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 19:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A1133F58B
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 18:52:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782155195; cv=none; b=p6UoP4B6swTWnzH0AU9MsxcR99M93Q2JEzckmErGs8IbewfSOhdzn4KVj/+4PLpOiEUHeQA+YaBfATfNnAK1c34TSG8m8cAdhbKiomVcuWjeV5PXONTO1wDsjoT5IYGVaOmn9c1qcJqXkhyAuRN569JfMgpatE4qay4+3Ngx1gQ=
+	t=1782154372; cv=none; b=hoxWk0BdQVkUlyKaiCULm8QhucB6asrGnOS3W7YFXGbU8z+P+1TfqKlVw8qdGeM03YvZf0kQDK1sXdj5dq5it7lukIvIJWYX/bEe7CnQuFAa7jZTaJzLJ4jKMXeYcZYN+lIjgFikG1wCwIHYUgE7sSNlCCCosb5lRpPRp7kvDwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782155195; c=relaxed/simple;
-	bh=jg+J7Z05s/OxCLHQHKhL8Q8/aSgcFvwJWjp91o97TcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sAwbhwuTyKeYEDpL9gh/VH6lMlKkNce6tw3DGvPJRmZ6zkvYqBY2q5dTGtRfIwDuLBGAetmxjZirvTcfr/3RCTYeaY36v3URG0a6HNTToA/fXxdNRDuFg8d3kUF6jq/2w8+xW121tVGca+IcYo9FmAgc4Mpm9Yt7LwCF1x6q+JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=[192.168.1.225])
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_128_GCM_SHA256:128)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1wbj76-0006Ku-Mm; Mon, 22 Jun 2026 18:11:16 +0000
-Message-ID: <d8dd2a52-ee75-4d20-a99d-73caff59da76@trager.us>
-Date: Mon, 22 Jun 2026 11:11:09 -0700
+	s=arc-20240116; t=1782154372; c=relaxed/simple;
+	bh=tDyYHse3WP0DNWl34llpjdqgP8tQd4WqI/dOWUIG5J8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GnnN25CZulhVal5s0i5uIH0Z1/k0OqsQQTcrJsEcWiF0KG8PrLkLqykHYNrIueHb+rYIxaRe+DpCX8KbjdYcCRCfL/EoVGw8T+6LaQtgWN3Bi7uNxqMgRpFX8sYr7PdEWPUUNZRWN2lM5ZpYtsNDGg3rD1YfM83pw71KxD9ZkgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HU/3f4iX; arc=none smtp.client-ip=209.85.160.201
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-517c65c019bso120996321cf.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:52:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782154370; x=1782759170; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=L5zUy7Occ9qQS2/iGdSG45HCNIMWOMZ4XyPILwkgfIM=;
+        b=HU/3f4iXqD5GkdPaKdsMxoEy4ZkdKNWO31wcRivp8+OTFWFJEs+lwwt6+m9mtHFnL1
+         ZSDcLKGk0WqjDrfMHlroHPgzDRdZjMwcevFd2Ey6TLv+aP4ZPlNkB9fPSTsS/w6GwIt7
+         t6lfEfgpngBo+i93x8SbI1gqCVWWzRXibmAL3/SKEeLRBY8RmTpV4s8B5wmA6xegJtX1
+         MmhSoz4QxT2OEfsbqtXS7f3Jg/C+BPxO/GFgsB+6WVm2jIixBRbE5dklsMZOl4UJyr9T
+         3TsCcx7meF1MQnrwoxsF3hmeggbMzaUN3+fsyW9zyU5I/uZknPLB3rNU1i4+kLwk/Tfj
+         IpsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782154370; x=1782759170;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L5zUy7Occ9qQS2/iGdSG45HCNIMWOMZ4XyPILwkgfIM=;
+        b=eJT+S4JLVJZnSQLZucFNLY0U1L2hlPj9dMNJzp8KTTu1C2cKZFSIsHWGd2hY5YTCdq
+         dRNPv5ny4YnzTBC1m839rbXVavQYqZ3xtXBkiXDnsk0ychSztoW1XnMsNT+pqhkqaph7
+         NhFti7ga0rUM/kmrdWoz6KAfKFM54w+6/GKPcnZBwexqn8xHGl19/OEUJBWB+PMeapu6
+         i70Y9psQr2jHFYBCFnsAoKUx9BuAvSltgUDpJ0gpZIC4XBD6BXTs+QxAkozpXdjagE1S
+         ivFoKHyAejXHiNCs7vUNRl3r0EfiMDBeMhQuUBBOeEyKtTDSZOQXwzR8Uq9xE8v++mHH
+         Vm6w==
+X-Forwarded-Encrypted: i=1; AFNElJ+RQuZyjd8m99Oj22UrTNdqeEvRFhbYRxm5peNEP9T/ezcTiqUm+gdy9BizPS5I/+fcXbJrpHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwblsyRCf1+bXTvPe/tgUwIrbusCoUMV8ndPtTtl5Axi7Nx8BUM
+	xAX+BaEizwfaF0QXhqW08RL4VMRpY1bdk/Rfh1ifTC4SexHi9Vpjmm78NfAvywBSZloYUcwra6+
+	ywd1EZYY3OY+/2g==
+X-Received: from qtpg3.prod.google.com ([2002:ac8:70c3:0:b0:519:f94d:a3bf])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:a0f:b0:517:7701:c085 with SMTP id d75a77b69052e-519e4a766bbmr240186711cf.21.1782154370058;
+ Mon, 22 Jun 2026 11:52:50 -0700 (PDT)
+Date: Mon, 22 Jun 2026 18:52:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Ethtool : PRBS feature
-To: "Das, Shubham" <shubham.das@intel.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Alexander H Duyck <alexander.duyck@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "mkubecek@suse.cz" <mkubecek@suse.cz>,
- "D H, Siddaraju" <siddaraju.dh@intel.com>,
- "Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
- "Lindberg, Magnus" <magnus.k.lindberg@ericsson.com>,
- "niklas.damberg@ericsson.com" <niklas.damberg@ericsson.com>
-References: <SN7PR11MB810923BBDEC398E860099150FF1B2@SN7PR11MB8109.namprd11.prod.outlook.com>
- <f4a3e4ad-91e2-4844-a29b-81f70151228e@lunn.ch>
- <SN7PR11MB81099B4885C10E16D52A2EB9FFE52@SN7PR11MB8109.namprd11.prod.outlook.com>
- <06d8c98da24e80d148ede4e933bb621c5515a7a2.camel@gmail.com>
- <SN7PR11MB8109C173933D08F994FBB084FFE22@SN7PR11MB8109.namprd11.prod.outlook.com>
- <26971635-b13a-4ed3-b2cb-ce35da9b63d3@lunn.ch>
- <SN7PR11MB81096CF160930DB8FA278B3CFFE12@SN7PR11MB8109.namprd11.prod.outlook.com>
- <be5c474b-c969-49af-8235-825580ee945c@bootlin.com>
- <SN7PR11MB8109149608172808784CDCBEFFEF2@SN7PR11MB8109.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Lee Trager <lee@trager.us>
-In-Reply-To: <SN7PR11MB8109149608172808784CDCBEFFEF2@SN7PR11MB8109.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260622185248.1717846-1-edumazet@google.com>
+Subject: [PATCH net 0/2] tcp: make TCP-AO lookups more predictable
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[trager.us : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301192-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:shubham.das@intel.com,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,m:alexander.duyck@gmail.com,m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:siddaraju.dh@intel.com,m:balaji.chintalapalle@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:alexanderduyck@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lee@trager.us,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301188-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:0x7f454c46@gmail.com,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,suse.cz,intel.com,ericsson.com];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lee@trager.us,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,google.com,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:email,intel.com:email,ericsson.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 36CB66B1FD5
+X-Rspamd-Queue-Id: 7CF126B1F2A
 
-On 6/22/26 8:38 AM, Das, Shubham wrote:
+This series fixes a TCP-AO key lookup precedence bug.
 
-> Hi Maxime,
->
->> Can you elaborate on what you have in mind for now ? what would the "ethtool --
->> phy-test" command look like in terms of its behaviour and parameters ?
-> We are trying to converge on a userspace uAPI for PRBS/BERT functionality that can work across
-> different hardware models (PHY-managed, MAC/NIC-offloaded, or firmware-based implementations),
-> without exposing those differences to userspace.
+TCP-AO stores MKTs in an unsorted list and returns the first match. This
+allows newer, less-specific keys (wildcard VRF or shorter prefixes) to
+shadow older, more-specific keys if inserted later.
 
-This was my original thought as well. Create a well defined uAPI for 
-PRBS testing/TX FIR tuning and allow the driver to implement support 
-however it sees fit. Since our target is for ethernet devices ethtool 
-was a natural spot for the uAPI.
+Fix this by implementing sorted insertion in tcp_ao_link_mkt() based on
+key specificity (VRF binding, then prefix length). This keeps the RX
+lookup path fast while ensuring correctness.
 
-I presented this at netdev last year and received strong push back 
-against associating PRBS testing/TX FIR tuning with ethtool. The 
-argument being any new uAPI added to the kernel should be generic enough 
-to handle future use cases so duplicate uAPIs don't have to be added. 
-Since PRBS testing/TX FIR tuning can be done on many phys(Ethernet, 
-PCIE, USB, etc) the uAPI does not belong in ethtool and needs to be 
-structured to support other use cases.
+The second patch adds a selftest to verify this behavior.
 
-As drivers/phy is the base phy library the thought was support should be 
-added in drivers/phy and a new phytool should be created to interact 
-with a uAPI. This would be generic enough to support all use cases, with 
-the downside being existing drivers would have to onboard to drivers/phy.
+Eric Dumazet (2):
+  tcp: fix TCP-AO key lookup precedence (shadowing)
+  selftests/net: Add TCP-AO key shadowing test
 
-I do wonder if the best path forward would be to create phytool in a way 
-that allows the driver to implement PRBS testing/TX FIR tuning as it 
-sees fit instead of being strictly tied to drivers/phy.
+ net/ipv4/tcp_ao.c                             | 27 +++++-
+ tools/testing/selftests/net/tcp_ao/Makefile   |  1 +
+ .../testing/selftests/net/tcp_ao/shadowing.c  | 93 +++++++++++++++++++
+ 3 files changed, 120 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/shadowing.c
 
->
-> Based on the functionality we currently have, we proposed below commands in first email :
->
-> PRBS Transmitter/Checker Pattern Configuration:
-> ethtool --phy-test eth1 tx-prbs prbs7
-> ethtool --phy-test eth2 rx-prbs prbs7
->
-> BERT Test:
-> ethtool --phy-test eth2 bert start
-> ethtool --phy-test eth2 bert stop
->
-> BERT Test Counter Read/ PRBS Lock Status:
-> ethtool --phy-test eth2 stats
->
-> BERT Clear stats - Symbol and Error counter:
-> ethtool --phy-test eth2 clear-stats
->
-> TX Error Injection:
-> ethtool --phy-test eth1 inject-error 1
-> ethtool --phy-test eth1 inject-error 1e-3
->
-> Disable PRBS Pattern : TX/RX
-> ethtool --phy-test eth1 tx-prbs off
-> ethtool --phy-test eth2 rx-prbs off
+-- 
+2.55.0.rc0.799.gd6f94ed593-goog
 
-The goal of running testing is to validate TX FIR values. If testing 
-fails we need a uAPI to change those values.
-
-Also the uAPI need to support testing per lane. One thing hardware 
-engineers at Meta did was test each lane with a different set of TX FIR 
-values which allowed them to quickly determine the best set of values.
-
->
-> Approach would be to add a generic ethtool netlink API for PHY/SerDes and allow drivers to implement the operations directly.
-> Conceptually:
->         ethtool ⇒ ethtool netlink ⇒ driver-specific implementation
->
-> We would appreciate your input on whether a command-based model is suitable for a uAPI, and how we should design
-> it to accommodate different implementation models, such as PHY-based, phylib-based, and MAC/firmware-offloaded PRBS.
->
-> - Shubham D
->
->> -----Original Message-----
->> From: Maxime Chevallier <maxime.chevallier@bootlin.com>
->> Sent: 20 June 2026 20:09
->> To: Das, Shubham <shubham.das@intel.com>; Andrew Lunn <andrew@lunn.ch>
->> Cc: Alexander H Duyck <alexander.duyck@gmail.com>; lee@trager.us;
->> netdev@vger.kernel.org; mkubecek@suse.cz; D H, Siddaraju
->> <siddaraju.dh@intel.com>; Chintalapalle, Balaji
->> <balaji.chintalapalle@intel.com>; Lindberg, Magnus
->> <magnus.k.lindberg@ericsson.com>; niklas.damberg@ericsson.com
->> Subject: Re: Ethtool : PRBS feature
->>
->> Hi,
->>
->> On 6/20/26 15:48, Das, Shubham wrote:
->>>> Can you change the firmware to expose the 802.3 registers for PRBS?
->>>> You can then write a library which both plylib and your driver can use.
->>> Andrew,
->>>
->>> No, exposing the PRBS registers to drivers is not possible in our design (the
->> registers are buried deep within the Accelerator/NIC/PHY/Analog IP hierarchy).
->>> Additionally, the PHY PRBS registers are not in accordance with the IEEE Clause
->> 45 definitions. For instance, the PRBS registers are paged and 32-bit wide.
->>> Given these constraints, we think ethtool --phy-test is a reasonable starting
->> point for exposing the long-established Ethernet PRBS functionality to Linux
->> userspace, as it aligns well with the driver-owned NIC architecture model. If you
->> think a more generic layered approach would be preferable, we would appreciate
->> guidance on the expected architecture. That would help us better understand the
->> implementation complexity, required effort, and delivery timelines.
->>
->> Can you elaborate on what you have in mind for now ? what would the "ethtool --
->> phy-test" command look like in terms of its behaviour and parameters ?
->>
->> This feature is interesting for multiple people, each having different hardware
->> designs and constraints. It's good to consider an iterative approach to build this,
->> however we need to have in mind that this is uAPI, so once we commit to a design
->> choice, we have to live with it.
->>
->> We do have flexibility on the kernel side of the API. We can implement PRBS in
->> generic PHY, phylib, some MAC driver that talks to a firmware, etc. and hide away
->> these implementation details to userspace, but we need to make sure the uAPI
->> we come up with allows us to support all of that.
->>
->> Let's figure this out together, if you already have some ideas in mind we can use
->> that as a starting point for the discussion :)
->>
->> Maxime
->>
->>> Thanks,
->>> Shubham D
->>>
->>>> -----Original Message-----
->>>> From: Andrew Lunn <andrew@lunn.ch>
->>>> Sent: 20 June 2026 00:07
->>>> To: Das, Shubham <shubham.das@intel.com>
->>>> Cc: Alexander H Duyck <alexander.duyck@gmail.com>; lee@trager.us;
->>>> netdev@vger.kernel.org; mkubecek@suse.cz; D H, Siddaraju
->>>> <siddaraju.dh@intel.com>; Chintalapalle, Balaji
->>>> <balaji.chintalapalle@intel.com>; Lindberg, Magnus
->>>> <magnus.k.lindberg@ericsson.com>; niklas.damberg@ericsson.com
->>>> Subject: Re: Ethtool : PRBS feature
->>>>
->>>>> The host driver does not directly access any registers but requests
->>>>> the PHY FW to manage PRBS on behalf of it.
->>>> Maybe a dumb question. Why?
->>>>
->>>> Can you change the firmware to expose the 802.3 registers for PRBS?
->>>> You can then write a library which both plylib and your driver can use.
->>>>
->>>> 	Andrew
 
