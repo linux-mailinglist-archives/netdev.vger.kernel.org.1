@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-301189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0EGAJJCEOWrMugcAu9opvQ
-	(envelope-from <netdev+bounces-301189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:53:04 +0200
+	id H+9QL42EOWrLugcAu9opvQ
+	(envelope-from <netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:53:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F2A6B1E84
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:53:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6158A6B1E7E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 20:53:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=FV2YU6VO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301189-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301189-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b="s/Fxb79f";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301190-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 556583023E02
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:52:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8BF3A3008D76
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00F83469FC;
-	Mon, 22 Jun 2026 18:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CC2346E5E;
+	Mon, 22 Jun 2026 18:52:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D08346E5E
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 18:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C8C346E5D
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 18:52:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782154374; cv=none; b=hlEGn8uCXVXWbJSLmHABBh7/2iXtqZa6+gm+hHtzoWu5v5rS/Yqz6JKPbyY/GSAx3ovxBd/6knxTYB2YOgeNrC93DBE5w8JUcLCkd6SDospgDe2OnTuKJRXr1Hyu5zzO9NIkP+PT2CCjPBukb67g/i/z1KK9g0CNZan3fM/SK1g=
+	t=1782154376; cv=none; b=YafBIzJtdI16qDoWd06CujlcMyMRcN2P0TTxDw1TQhEGlrwXKftYtRp0T/obaz1+uD1aA9mxY6X+G7cmJ0f3hZjxkZPhuLACV04qQ2Iu7SzSOif8df/3beMtvh19m+l+FhO6XVsUWdsnOx2Jk9XK0oUQK1myKDAdIm7Luoza4Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782154374; c=relaxed/simple;
-	bh=lMH4+NZXmLbuufKB6FQJqM6N1aQvroFMjK833IVzEjA=;
+	s=arc-20240116; t=1782154376; c=relaxed/simple;
+	bh=yPa7NOHrj92YRaj3+nvIHEjTFD+2RQLrQIgmZdskk+g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lq8zfENb/N8UWWCpOfF2YYcNt9m6Uwwp1aKmWzIEFoTa7quSYhppXXI7VBUy8raYQuVlzoPOr3FVGn2+zfvoD4PW8FCSMfy0Fdfw/bcXyR33ajTP2RtUP6Ga44iuVxfMxgrjdy27p9acpZ+zho4et7YKkAoOGeiN2pQgYjR9/yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FV2YU6VO; arc=none smtp.client-ip=209.85.222.201
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-915d3261c5cso997538585a.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:52:52 -0700 (PDT)
+	 To:Cc:Content-Type; b=MkkoSll35CJ3zsOli6ECYX/KFLDq3zb3q0iZpwbP4xGTaCo5q2HiRu0vhLaA9ejqSCwewbwBkV6aFZRbPvejh3DXyDZtf11U/ZH+kUr2hmqTx/C64SGaYvWoG0RJ+tRVGr+6lcRwLSV3yCTRLoGI8Schj9l95zle6OP5jWnOhEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s/Fxb79f; arc=none smtp.client-ip=209.85.160.202
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-519fd49d101so3985941cf.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 11:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782154372; x=1782759172; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782154374; x=1782759174; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVJRemTYjAkJgqkYi9ZyDyQGajKg9ZRjv8aBHX0Qx3Q=;
-        b=FV2YU6VO+Tlj8X0vRvO2hTGEsLpioRs5aSruKzs3DW+1NIg2noctswELba/KgUQUm6
-         FilivhbY4qsIdUwCoCbTWrhBwm2TE0+kmIUEJnYKvIVRxw9n+ZsaUBbYY68HCKDwL8Y8
-         QnnO5eL/ntAKGBLNGGLoYK7P5XLQeMCtw1aiLyh63zhl+JgkZnljjpNjQcE9fWeOJaG6
-         TbHivcnFY9tHH7lpZlkIT1//SAZ+i8GVMHnvwfQwOR8HwZ8CqielLpgoQMGGozI9g/o9
-         WRn/Hs78E/8OpUp6ak8E52YGZH029bQzbme+8V9IVa3IFRtXFqdVH4Y+Lpm4ZwscjFDK
-         VrGQ==
+        bh=mUYiga/rA61F6GfSKny16M3WpKqYKTvbN+XI5uTufgM=;
+        b=s/Fxb79fTnZYmC9eS8m3jtkLABOv2sgZuJIL172nzMtGAzRiFnuEbc1wFzdsUlDNoy
+         d5UEucEOHdFflB60tWMNpuFc4pJ6r2CL5YxYcBEMLzEvaJzDUtRrXjvLc+8P8teVvawd
+         cOp95RhHgkGK+1TlWgfX2tD14ECs1blvQoW/N/2vMN+uS5j0ge4cv25Uf/+M7j0G57Yj
+         Eitz7nMbafbys4GR+Dggd4LYzyUQZiYCWrlQn47tGeRrEQbFINjiNEWLQGdM30CSNmeU
+         p8YAHWj5mWGtqls+Jo/o4Xd1aE4cXcIN/tLuDuiw9+Zn3qJ00L7hY16ft3dq3WGsabys
+         IPwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782154372; x=1782759172;
+        d=1e100.net; s=20251104; t=1782154374; x=1782759174;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVJRemTYjAkJgqkYi9ZyDyQGajKg9ZRjv8aBHX0Qx3Q=;
-        b=IKRdJjzt3RhDsWfMMhkt0EjdD1tL0L5f35n/1N0fWTo+0Xbgk23IfIrob52Uv/V91q
-         1wKm79CGmftOpJ4b87sDuh/wtKOnP+dvZs4MF2gzt0+qIFonJr6lJJFsiVnkyKa/V8s0
-         VtuY5+bfLj2RWyM8uYCRzyvfOmbrwayeb1WA5fHiFdASVCh6Fg4LOz//yiIggLCzTWEb
-         W63qQXPOPMOKEsbY8coA+5VypelMGoqZrSk1ul1XsU61oSxyx7+vZP6XEw28CrAUA8gX
-         KBtP2QX1bAdzb4zBcJu823kj/rMGRLQh0L8ANKSy+5uCF9JMJsWm/JsEpbp/crU7o8MG
-         rwzQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/zA7WeqjtR7rsz3qxkb+P66MWy+HShVwCfQWbzCcFdc8+HRuCttpUKszZxDLK1xFBuVkB+u/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvAESmX1n/G1fLKx6dIbt2anNTomXY1KdNEElyAKJwN0jIwhvl
-	3TkpWGRthTeBbfCwr8ytSejI8uaGBTE4FSozEXSVSdbYriussyuI+YWCIA1gqBepN5/EHmYpllu
-	IBSuSWyn00KV8Yw==
-X-Received: from qkoc10.prod.google.com ([2002:a05:620a:164a:b0:920:645f:1348])
+        bh=mUYiga/rA61F6GfSKny16M3WpKqYKTvbN+XI5uTufgM=;
+        b=dhgPzuCRN6TdBAQwhCGdE6rUL1CQ5w6/PuBHQaM7Z1krHIC4oSlODGsFxsoUxz23Lu
+         yYTQskwazoc5S3iykDgNkqhfnB5GFHTLgNznqCD0WHsEqMJKECKQIqxGLbaChlAvZnoW
+         IxMzl2hD3J8+Ril7mNxWwwsI5UoGjUHe3t94HSaIQ0K/BIdE5dOk8wkIkkEjfQKty9Mh
+         nJ3U4tQfvDRgMNMWUkj6C3xMOZuznUWpGvCmmYWxgL8l1FCbs7ARIE0s4HapNJ8mbBHz
+         2hKh6tWgtP5PlR06ikbDgnnzJCHSTILQotUFMErcNj6zxlvOsEfm1u8QJnAdPhLM+T+K
+         7dYw==
+X-Forwarded-Encrypted: i=1; AFNElJ/Jhc0NSy8MpOLLjWLCiCzgudhEkUe3rsGP26aiOvUUFfE6cZi6MfnWuDvALgSuLTZqeqz18LA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWAGzPHHsotlchWglEXgeJKYDAt1lTza5vuCW3KYt8gOvBaG74
+	PXdJLX9A+9cY8Tn2MJhnUbGsa+dmwjicKzSx+iijKMJX8eEsd9XpBP4k3jZyHpW+NELV2UlKU8D
+	GRL6H67+2HBaMkg==
+X-Received: from qtbdq1.prod.google.com ([2002:a05:622a:5201:b0:517:d786:16e1])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4606:b0:915:db15:4e36 with SMTP id af79cd13be357-9209197507emr2503112285a.42.1782154371746;
- Mon, 22 Jun 2026 11:52:51 -0700 (PDT)
-Date: Mon, 22 Jun 2026 18:52:47 +0000
+ 2002:ac8:5e0b:0:b0:50b:3429:a10b with SMTP id d75a77b69052e-51a51aa74d9mr10172291cf.12.1782154373399;
+ Mon, 22 Jun 2026 11:52:53 -0700 (PDT)
+Date: Mon, 22 Jun 2026 18:52:48 +0000
 In-Reply-To: <20260622185248.1717846-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260622185248.1717846-1-edumazet@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260622185248.1717846-2-edumazet@google.com>
-Subject: [PATCH net 1/2] tcp: fix TCP-AO key lookup precedence (shadowing)
+Message-ID: <20260622185248.1717846-3-edumazet@google.com>
+Subject: [PATCH net 2/2] selftests/net: Add TCP-AO key shadowing test
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -93,12 +93,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301189-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301190-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:0x7f454c46@gmail.com,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -116,87 +116,142 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 08F2A6B1E84
+X-Rspamd-Queue-Id: 6158A6B1E7E
 
-TCP-AO implementation stores Master Key Tuples (MKTs) in an unsorted
-doubly-linked list (ao_info->head) and inserts new keys at the head.
-When looking up a key, __tcp_ao_do_lookup() walks this list and returns
-the first match it finds.
+Add a new selftest shadowing.c to tools/testing/selftests/net/tcp_ao
+to verify that more specific keys are correctly preferred over less
+specific ones (shadowing prevention), regardless of their insertion order.
 
-Because the list is unsorted, a newer, less-specific key can shadow an
-older, more-specific key if it happens to be inserted later. This leads
-to incorrect key selection in two scenarios:
+The test configures a server with a specific host key, and a client with
+both a specific host key and a wildcard subnet key, inserted in the
+"wrong" order (wildcard last, which would shadow the specific one under
+the bug). It then verifies that the client can still successfully
+connect to the server, which only succeeds if the client correctly
+selects the more specific key for the outbound connection.
 
-1. VRF Shadowing: A wildcard VRF key (not bound to an interface) added
-   after a VRF-specific key will shadow the VRF-specific key for traffic
-   arriving on that VRF.
-2. Prefix Shadowing: A less-specific prefix key (e.g., /24) added after
-   a more-specific prefix key (e.g., /32) will shadow the more-specific
-   key during outbound connection establishment.
-
-Unlike TCP MD5, which walks the entire list and evaluates the "best
-match" using better_md5_match(), TCP-AO expects the list order to
-determine precedence.
-
-Fix this by implementing sorted insertion in tcp_ao_link_mkt(). Keys
-are inserted in descending order of specificity:
-  - VRF-bound keys take precedence over unbound keys.
-  - Longer prefix matches (LPM) take precedence over shorter ones.
-
-This preserves the performance of the lockless RX lookup path (early
-return on first match) while ensuring correct precedence.
-
-Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Assisted-by: Gemini:gemini-3.1-pro
 ---
- net/ipv4/tcp_ao.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/tcp_ao/Makefile   |  1 +
+ .../testing/selftests/net/tcp_ao/shadowing.c  | 93 +++++++++++++++++++
+ 2 files changed, 94 insertions(+)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/shadowing.c
 
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 2f69bcecae78a677f33033a2d30e09a8ff858ad8..2d10fb1dd4cf87cc79ef5b5ead80eb3048218250 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -341,9 +341,34 @@ static struct tcp_ao_info *tcp_ao_alloc_info(gfp_t flags)
- 	return ao;
- }
- 
-+static bool tcp_ao_key_is_more_specific(const struct tcp_ao_key *a,
-+					const struct tcp_ao_key *b)
+diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+index 5b0205c70c3983815315048c0ec1275525b7a29a..0c601d7049320be2310f9ff32988ae229584222e 100644
+--- a/tools/testing/selftests/net/tcp_ao/Makefile
++++ b/tools/testing/selftests/net/tcp_ao/Makefile
+@@ -2,6 +2,7 @@
+ TEST_BOTH_AF := bench-lookups
+ TEST_BOTH_AF += connect
+ TEST_BOTH_AF += connect-deny
++TEST_BOTH_AF += shadowing
+ TEST_BOTH_AF += icmps-accept icmps-discard
+ TEST_BOTH_AF += key-management
+ TEST_BOTH_AF += restore
+diff --git a/tools/testing/selftests/net/tcp_ao/shadowing.c b/tools/testing/selftests/net/tcp_ao/shadowing.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..da14b13e032d5a0632f398b7eaa72b8045e61ffe
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/shadowing.c
+@@ -0,0 +1,93 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <inttypes.h>
++#include "aolib.h"
++
++static void *server_fn(void *arg)
 +{
-+	bool a_vrf = !!(a->keyflags & TCP_AO_KEYF_IFINDEX);
-+	bool b_vrf = !!(b->keyflags & TCP_AO_KEYF_IFINDEX);
++	int sk, lsk;
++	ssize_t bytes;
 +
-+	if (a_vrf != b_vrf)
-+		return a_vrf; /* VRF-bound is more specific */
++	lsk = test_listen_socket(this_ip_addr, test_server_port, 1);
 +
-+	return a->prefixlen > b->prefixlen; /* Longer prefix is more specific */
++	/* Server only has the specific key for the client.
++	 * It expects KeyID 100, signed with "pass_specific".
++	 */
++	if (test_add_key(lsk, "pass_specific", this_ip_dest, -1, 100, 100))
++		test_error("setsockopt(TCP_AO_ADD_KEY)");
++
++	synchronize_threads(); /* 1: Server ready and key added */
++
++	if (test_wait_fd(lsk, TEST_TIMEOUT_SEC, 0))
++		test_error("test_wait_fd()");
++
++	sk = accept(lsk, NULL, NULL);
++	if (sk < 0)
++		test_error("accept()");
++
++	synchronize_threads(); /* 2: Connection accepted */
++
++	/* Verify we can receive data from the client */
++	bytes = test_server_run(sk, 0, 0);
++	if (bytes < 0) {
++		test_fail("server: failed to receive data");
++	} else {
++		test_ok("server: connection authenticated successfully");
++	}
++
++	close(sk);
++	close(lsk);
++	return NULL;
 +}
 +
- static void tcp_ao_link_mkt(struct tcp_ao_info *ao, struct tcp_ao_key *mkt)
- {
--	hlist_add_head_rcu(&mkt->node, &ao->head);
-+	struct tcp_ao_key *pos;
-+	struct hlist_node *last = NULL;
++static void *client_fn(void *arg)
++{
++	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
++	union tcp_addr wildcard_addr = {};
 +
-+	hlist_for_each_entry(pos, &ao->head, node) {
-+		if (tcp_ao_key_is_more_specific(mkt, pos)) {
-+			hlist_add_before_rcu(&mkt->node, &pos->node);
-+			return;
-+		}
-+		last = &pos->node;
++	if (sk < 0)
++		test_error("socket()");
++
++	/* Client adds keys in the "wrong" order (wildcard last) to trigger shadowing.
++	 * 1. Specific key (Key B, ID 100)
++	 * 2. Wildcard key (Key A, ID 101)
++	 *
++	 * Without the fix, the wildcard key will be at the head of the list
++	 * and will shadow the specific key during outbound lookup, causing
++	 * the client to send a SYN with KeyID 101 (which the server doesn't have).
++	 */
++
++	/* 1. Add specific key */
++	if (test_add_key(sk, "pass_specific", this_ip_dest, -1, 100, 100))
++		test_error("setsockopt(TCP_AO_ADD_KEY) specific");
++
++	/* 2. Add wildcard key (any address, prefix 0) */
++	if (test_add_key(sk, "pass_wildcard", wildcard_addr, 0, 101, 101))
++		test_error("setsockopt(TCP_AO_ADD_KEY) wildcard");
++
++	synchronize_threads(); /* 1: Client ready and keys added => connect() */
++
++	if (test_connect_socket(sk, this_ip_dest, test_server_port) <= 0) {
++		test_fail("client: failed to connect (shadowing bug present?)");
++		close(sk);
++		return NULL;
 +	}
-+	if (last)
-+		hlist_add_behind_rcu(&mkt->node, last);
-+	else
-+		hlist_add_head_rcu(&mkt->node, &ao->head);
- }
- 
- static struct tcp_ao_key *tcp_ao_copy_key(struct sock *sk,
++
++	synchronize_threads(); /* 2: Connection established */
++
++	/* Send some data to verify the connection works */
++	if (test_client_verify(sk, 100, 20)) {
++		test_fail("client: verify failed");
++	} else {
++		test_ok("client: connection established and verified (precedence correct)");
++	}
++
++	close(sk);
++	return NULL;
++}
++
++int main(int argc, char *argv[])
++{
++	/* We expect 2 test results: 1 from server, 1 from client */
++	test_init(2, server_fn, client_fn);
++	return 0;
++}
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
