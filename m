@@ -1,161 +1,152 @@
-Return-Path: <netdev+bounces-301060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301061-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Z4/YH5QXOWrTmgcAu9opvQ
-	(envelope-from <netdev+bounces-301060-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:08:04 +0200
+	id cMJAMeEZOWp6mwcAu9opvQ
+	(envelope-from <netdev+bounces-301061-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:17:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D526AEF30
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:08:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C11DA6AEFE1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:17:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=P+fhj6gv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301060-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301060-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=163.com header.s=s110527 header.b=h4iSzb6E;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301061-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301061-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=163.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE4D530095DA
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:07:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD95F302E30D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E7137AA63;
-	Mon, 22 Jun 2026 11:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CA637A48D;
+	Mon, 22 Jun 2026 11:17:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339C3379EC1;
-	Mon, 22 Jun 2026 11:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5608028CF6F;
+	Mon, 22 Jun 2026 11:17:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782126470; cv=none; b=R2vXo4oQJRHtrdnmmT27gSh/ofPI/bcUMfHqX1Rkz7MCfJwYp7CUuwTn3+vXw83B4lJxKdAeJa6Av1FYR8JGkMy/Xxre8C7K6kDbf4qCpwUmoWF8maq4vqfcODRFoM+C+srCRHBmE7PkCranq/+TOrzBcQVzeNmT06YiSLqOyvQ=
+	t=1782127060; cv=none; b=AImK0rwgBhxevo/va63lkgGLJpww2GtHgbwfL1ZypZLsyiIZ5yB4AjsGIOK7kPoH94pdVrWsQ3HFvUXhKTcrXlk534IQItRZtT3ujd54tu7ppUhke4Gpgf4HHMdTomjoB9k353v348rpojG1cLO62yS/Ce7DMfqs9demXtWXORc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782126470; c=relaxed/simple;
-	bh=+sUs033RCzPqgG4D0WKAQvJtW9ijh/ekE1r3w+eHkus=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YyMKDVowgKx2w04a9V1/puIZyCy2rTeg4AmjZdG3syj2BDUi/NpFYNnVoLQafFdJKlZl+rr8k8IToQPAM/BOAE9g4st4mXXHJ5fj1vDCrk6ghSUZ+ADhfkgpnIA7GvsEVQBkeQm4ZMUk7qYwQsGPGy/k/5jN5YstnSHoCb35LNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+fhj6gv; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324221F000E9;
-	Mon, 22 Jun 2026 11:07:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782126468;
-	bh=wgVMVHa2k0yY+2/n/waYjplt/Z+GwM/2A/ABlT/a+Gk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=P+fhj6gv5NDqwQfr40nDoCFoUhpzVIJ9PXgrDr0Orq1OXGvPaifaOJqMs8rMqIv8j
-	 4QV0TvJWYvdBGBf/IPIs5ZlLfOpILEiCJSHUSLqYTUeP2EzWffaNTy5jwhT6tUtNym
-	 8o9fPL4/1oNiFX/7dcFihCb9TT4I+Odqq/LjLd+AbgXPQcEF4ssL5iOIB9DiQQuW+8
-	 34YGR/nHma7q+4yCl1DuYdkr8uRJiLfu0jWeqS0gmB+fQazKMwWsdJeDvxPLn3MmzS
-	 CL+/b1kKuTbKR+r38RJ+y6CjShiijqNcnhwcmz5ZCDLZvu2jZmyZqI8LN7wzXQ23Wc
-	 iLlcyx1t4IfnA==
-From: Thomas Gleixner <tglx@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
- thomas.weissschuh@linutronix.de, Arthur Kiyanovski <akiyano@amazon.com>,
- Rodolfo Giometti <giometti@enneenne.com>, Vincent Donnefort
- <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver Upton
- <oupton@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, Johannes Berg
- <johannes.berg@intel.com>, Jacob Keller <jacob.e.keller@intel.com>, Tony
- Nguyen <anthony.l.nguyen@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Peter Hilber <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, virtualization@lists.linux.dev,
- linux-wireless@vger.kernel.org, linux-sound@vger.kernel.org, Vadim
- Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [patch V2 18/25] timekeeping: Prepare for cross timestamps on
- arbitrary clock IDs
-In-Reply-To: <b296182e2e2c1ed2fe1c4879fd6f12d67a7ad22f.camel@infradead.org>
-References: <20260529193435.921555544@kernel.org>
- <20260529195557.846634842@kernel.org>
- <b296182e2e2c1ed2fe1c4879fd6f12d67a7ad22f.camel@infradead.org>
-Date: Mon, 22 Jun 2026 13:07:46 +0200
-Message-ID: <87se6eltod.ffs@fw13>
+	s=arc-20240116; t=1782127060; c=relaxed/simple;
+	bh=0JuUvxOK9qSQ8lIrhurl6d7+7wG09ok1+E2/4hVjXcI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OJJ+M4aFLIoIz9HuhkLI01/yUuBbGCyMmk62qA98S2VrINe2vTAG8/45I28LT2iRsBw8GFeGmmtedpzuUtHnLWTNrhww6OwzwVWfeKlmHKwpWHZNLckqK2+keByPpPKwAgu1qM6Di+ubaiUkSt38bZZwTxuFYCcDIrR90lJhzsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=h4iSzb6E; arc=none smtp.client-ip=117.135.210.2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=tK
+	9MfZvggUrMaoHXSIR9WNzTOOGQS5zd5mZgqd7Ab4Q=; b=h4iSzb6EFevOHSzEYD
+	HWN47GC96uPQoLsiKyRmI8TyRSIrlsfp+skAOQxhKnFUMqgF7gGgSjaYhsLdcAxp
+	faAIZEnu9R5/ZdenFoR8/BOnNSKpIjkho2eDzepRWQtLEVYcEAH/Uq48OBgRCY3g
+	xCILFU1XqZ0n0Jr96Sn35iL3w=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wB3ZWCWGTlqlPdvFA--.18479S2;
+	Mon, 22 Jun 2026 19:16:40 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: madalin.bucur@nxp.com,
+	sean.anderson@linux.dev,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	florinel.iordache@nxp.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>,
+	stable@kernel.org
+Subject: [PATCH] fsl/fman: Free init resources on KeyGen failure in fman_init()
+Date: Mon, 22 Jun 2026 19:16:38 +0800
+Message-Id: <20260622111638.997251-1-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wB3ZWCWGTlqlPdvFA--.18479S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWrtr43Wr4xJF1rXF4DJF1DJrb_yoW8JrW8pr
+	WxK3yYkr48trWfGwnrJw40yFyYyw4xtryDWrnrWwsavw1ayr1jqr48GrW8Wr1IqFZ7ZF1Y
+	qryUZr4akFn8AwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piL0ePUUUUU=
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbC7hhVw2o5GZgmwAAA3U
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:dwmw2@infradead.org,m:linux-kernel@vger.kernel.org,m:mlichvar@redhat.com,m:jstultz@google.com,m:sboyd@kernel.org,m:anna-maria@linutronix.de,m:frederic@kernel.org,m:thomas.weissschuh@linutronix.de,m:akiyano@amazon.com,m:giometti@enneenne.com,m:vdonnefort@google.com,m:maz@kernel.org,m:oliver.upton@linux.dev,m:kvmarm@lists.linux.dev,m:oupton@kernel.org,m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:tiwai@suse.com,m:miriam.rachel.korenblit@intel.com,m:johannes.berg@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:saeedm@nvidia.com,m:peter.hilber@oss.qualcomm.com,m:mst@redhat.com,m:virtualization@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-sound@vger.kernel.org,m:vadim.fedorenko@linux.dev,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:florinel.iordache@nxp.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:haoxiang_li2024@163.com,m:stable@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FORGED_SENDER(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301060-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-301061-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,vger.kernel.org,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,163.com,kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[163.com:+];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A3D526AEF30
+X-Rspamd-Queue-Id: C11DA6AEFE1
 
-On Mon, Jun 22 2026 at 09:55, David Woodhouse wrote:
-> On Fri, 2026-05-29 at 22:01 +0200, Thomas Gleixner wrote:
->> From: Thomas Gleixner <tglx@kernel.org>
->>=20
->> PTP device system crosstime stamps support only CLOCK_REALTIME, which is
->> meaningless for AUX clocks. The PTP core hands in the clock ID already, =
-so
->> prepare the core code to honor it.
->>=20
->> =C2=A0- Add a new sys_systime field to struct system_device_crosststamp =
-which
->> =C2=A0=C2=A0 aliases the sys_realtime field. Once all users are converted
->> =C2=A0=C2=A0 sys_realtime can be removed.
->>=20
->> =C2=A0- Prepare get_device_system_crosststamp() and the related code for=
- it by
->> =C2=A0=C2=A0 switching to sys_systime and providing the initial changes =
-to utilize
->> =C2=A0=C2=A0 different time keepers.
->>=20
->> No functional change intended.
->
-> We ended up with ktime_get_snapshot_id() also supporting CLOCK_BOOTTIME
-> and CLOCK_MONOTONIC_RAW, but not get_device_system_crosststamp().
-> Should we make that consistent?
+fman_muram_alloc() allocates initialization resources before
+initializing the KeyGen block. If keygen_init() fails, the
+function returns -EINVAL directly and leaves those resources
+allocated. Free the initialization resources before returning
+from the KeyGen failure path.
 
-Maybe. The BOOTTIME support is only there for that ARM64 hyper trace muck,
-but has no other relevance.
+While at it, drop the unused error check around enable(), which
+always returns 0.
 
-MONORAW is there for the PTP EXTENDED IOCTL, but with PRECISE the
-snapshot already contains the raw value and you'd have to prevent the
-historical adjustment part for RAW. So I don't see the actual value, but
-I don't have a strong opinion either.
+Fixes: 7472f4f281d0 ("fsl/fman: enable FMan Keygen")
+Cc: stable@kernel.org
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+---
+ drivers/net/ethernet/freescale/fman/fman.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thanks,
-
-        tglx
-
-
+diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
+index 013273a2de32..3a2a57207e55 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.c
++++ b/drivers/net/ethernet/freescale/fman/fman.c
+@@ -1995,12 +1995,12 @@ static int fman_init(struct fman *fman)
+ 
+ 	/* Init KeyGen */
+ 	fman->keygen = keygen_init(fman->kg_regs);
+-	if (!fman->keygen)
++	if (!fman->keygen) {
++		free_init_resources(fman);
+ 		return -EINVAL;
++	}
+ 
+-	err = enable(fman, cfg);
+-	if (err != 0)
+-		return err;
++	enable(fman, cfg);
+ 
+ 	enable_time_stamp(fman);
+ 
+-- 
+2.25.1
 
 
