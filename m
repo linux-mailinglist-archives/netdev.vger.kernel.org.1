@@ -1,226 +1,208 @@
-Return-Path: <netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ElogLmROOWphqQcAu9opvQ
-	(envelope-from <netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:01:56 +0200
+	id xnWKJhxQOWrVqQcAu9opvQ
+	(envelope-from <netdev+bounces-301144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:09:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DC496B0905
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:01:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BDB6B09B1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:09:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=kt5UdAiU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=jF558DJT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301144-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301144-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=onsemi.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0671A30078D9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:01:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E0973005679
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84943101A5;
-	Mon, 22 Jun 2026 15:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCCA832861F;
+	Mon, 22 Jun 2026 15:04:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA34C23B61B;
-	Mon, 22 Jun 2026 15:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8D63264EF
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 15:04:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782140512; cv=none; b=uQDkLmhQcV2dSRvItdBrlFfFkGsOKjFN2/j88xKDfRVUxCf5vLm/RAiMnBJG2LFX1xPe7sY7B51FcsoNOrZqL20W4HHudIIoG+2+Rm1s1L3zkto/cEaEsN7G9XxSZAUPbAXtTNELBq3GyfoOIdzspfARIUV4VKRnCMFPmsFn+Tc=
+	t=1782140650; cv=none; b=GU/5JDxERaXHMt4Z42dy/KDrBfJ5ph1SHOgrpFIuIf+83+fehkKKPqckm2OnWqzJwoMm62lx/EiFuZeLTJCIS8ftMC21u7p/wR0knQagrIVdxUWezqu1Le/WSxKRgWP2w1YI9NwUYViAqon1A+IMUFOt+C0okXHV615WqrXpsuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782140512; c=relaxed/simple;
-	bh=fi9OKxumYq8MA8wVF41Gx0pkkHxM1ZJyBBe9VTw0fwY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IYDoC6EQkCm94/2La8qNeLULyOIpMgfhFlwWY3giZ6trPUXMmQVpiX30v26MUAQhRiL/SBYsluDH/mZSFldWqBf42tc5wAVokH2kYrWJgVEqEQ03bPBeBQo1MHvVt8145Qdcsq/rP528Hdt7lwKT1+9FAmbMQXRf8DftCWWbjzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=kt5UdAiU; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=St9tHSZzfDXYzrB/rouWzdlJkubowTv6NS6nJVEwL8M=; b=kt5UdAiUnjIBcVwIWrpGXNvvLx
-	z7/KxNQU1keZTR8uquNUHY0vi+vbQpbby0SseTjpcxOFp4hxLLEilQfgpltLCMONymrOLGHItRwWY
-	nBXYzM3IYHSHy5d4Wt1Do1ePBmxvgzsD4pEQy5b7l/e6+a6MhOznp/9Wuhl/jb1O7pQSFktgjqGdO
-	n5r1S+BSIcrxAd4VQ5Bg64RrYEOtCorC21E8j0bN7vRMq174J6RT9F7i+td6aBYaiemt4N2Bk21FG
-	yMZs9tGwkXJY2+EcbKm7/N3NE+JtmTSswY9HPFjK9wooylt1RqbEWHBbWiRskXjvpo4d5w76b0Cv1
-	TrlkNJyw==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wbg9Z-000xIZ-24;
-	Mon, 22 Jun 2026 15:01:37 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 22 Jun 2026 08:01:23 -0700
-Subject: [PATCH net] netpoll: fix a use-after-free on shutdown path
+	s=arc-20240116; t=1782140650; c=relaxed/simple;
+	bh=+djZrNrJOngpdaP+EVeozDWXRgZlJg6AxlfudT9a4Jo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=MIfYFWVAKqWOD8eQjKqszmRWe0rShP0qeVe3VgeAOR8+Tg8xP7/+xLX8L2brqaAQXzrTBZiiNshYBzHqe5ES5dIOePf8D/Lt/2QAGLhYwXQ5u03ToAnsCD114MTnZrmOVckH5TfLlH3eVnLE+rG/b+b4zTVVRz/Edwu76W+QSvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=jF558DJT; arc=none smtp.client-ip=170.10.153.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1782140647;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+djZrNrJOngpdaP+EVeozDWXRgZlJg6AxlfudT9a4Jo=;
+	b=jF558DJT9Ksx67xM/ZBhTg8aQSUiCZSj9Q3mTWrMBdS1Dohv6AeimCgXAJNANAWGNveekE
+	KvQCmslGupfuQe9LJMBO9Uxls7Iio9pDSKS+hk6Z9Zk9bI15pQ6REn9bfFCFhcaWLPCF+N
+	Ct4Qu+YNpCosrs2yTLWrK/n8tVr5EV470HwSPJr2bmVZHSJnGeooLJw6BF0CqKf87hdjVJ
+	59pSqV7ZkjNCVPz32vbbZRs/FvI4WF34IiTUOl2MKnQts5KoLbcN1zQ6xhEr6lvmjuXT9L
+	M1tZE+Gu7L5odcam+BB9XyvLIBtVmNePiTmNBTQ7Pm93w9dxF194YfV0b+ijEw==
+Received: from SA9PR02CU001.outbound.protection.outlook.com
+ (mail-southcentralusazon11013031.outbound.protection.outlook.com
+ [40.93.196.31]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ usb-mta-28-DFCMm7Q6PziUVOaB5jdRIA-1; Mon, 22 Jun 2026 08:03:51 -0700
+X-MC-Unique: DFCMm7Q6PziUVOaB5jdRIA-1
+X-Mimecast-MFC-AGG-ID: DFCMm7Q6PziUVOaB5jdRIA_1782140627
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
+ by PH0PR02MB8858.namprd02.prod.outlook.com (2603:10b6:510:10e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Mon, 22 Jun
+ 2026 15:03:43 +0000
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
+ 15:03:43 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: Eric Dumazet <edumazet@google.com>
+CC: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Piergiorgio Beruto <Pier.Beruto@onsemi.com>, "David
+ S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>
+Subject: RE: [PATCH 1/2] Protect skb pointer used by two different kernel
+ instances
+Thread-Topic: [PATCH 1/2] Protect skb pointer used by two different kernel
+ instances
+Thread-Index: AQHdAgBOEWaJAuWPO0+l+Rd6t26PgLZKQQ4AgABrbbA=
+Date: Mon, 22 Jun 2026 15:03:43 +0000
+Message-ID: <CYYPR02MB98281E5F6C87DF65C29B6E6B83EF2@CYYPR02MB9828.namprd02.prod.outlook.com>
+References: <20260621-fix-race-condition-and-crash-v1-0-87e290d9357f@onsemi.com>
+ <20260621-fix-race-condition-and-crash-v1-1-87e290d9357f@onsemi.com>
+ <CANn89iLLrOZ4Ep=dBgs0sC0tWsrZHy8DnCPLw_Em+7v2UtE9tA@mail.gmail.com>
+In-Reply-To: <CANn89iLLrOZ4Ep=dBgs0sC0tWsrZHy8DnCPLw_Em+7v2UtE9tA@mail.gmail.com>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|PH0PR02MB8858:EE_
+x-ms-office365-filtering-correlation-id: d920ee82-431e-4bdc-efb7-08ded06f7393
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|56012099006|6133799003|4143699003|11063799006|38070700021|18002099003|22082099003
+x-microsoft-antispam-message-info: KybCXBqOvqjkL4f+liYESXPpjyarpohgP79UDCL8stBea6hszra8EBp2rh5CXY2pyAIL1mRXB4tDUkJ2UHeQvHMYbAolFh+Rn9hth80tww42/dLto5QTd5AJPzlDk8PjJTd4QDEloIGYhwMM5nh4MrjRL1V1LvLQlNrEiAaB15YkzyqkW0kSzkSEN52YmfYNz1HcoTn0WWvz6n+Q4WbMam/acpUyubwHTXW5X9rw7ur2J06VF6vIGOzlKAqqBot3FN2ytiCkmFmQ2RDPxR8KhdrdX0rYwqHDE3mlACrj6ZYUWt3d2Nlf6+zmZVsVb6m5WeeGpuH3vvkS3lpoPDyxOJJgF+Jq8O0v336GcIrdtL7ySVRnmc8lt/c3k1Rvr8cCjw0jBdiwR/7Ci7LEue2lN/1EEB0PSNsn+MjEDx52YWcptb/+LG2OY2s09Bfh9anzQS2FqOt/Vj0p3UvjhyNqnyiUnIYimYaRySiNAo1zKqeUSu5hYSfr1uhefZdoyZOJ5sl4MXJ4lHe4r+W87CWpOXvvOebpbqT6rZUQspbTdU1LgWqi6Tt1dq8icXxgUlvoSeZlCAs0cEuwKPUg94MmnUAIyhVr6G6npI7FevzX8JZIPbUoTEcT0JNb0BdhnVWGNcdIPlvyCnDdcP0A/49CwVlesLl/B+u8gaNYxHXwHiA3E/xvGsF8Wnyrpv4v/0T+Op+urHsnjsYajHSYLaaYa9TU4u6m97zRV1TWNQVUj6A=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(56012099006)(6133799003)(4143699003)(11063799006)(38070700021)(18002099003)(22082099003);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VXl5SEh2WENQb3ZRVUlLOGxVTllpcVVzdGFiZ1hZY0tUaXBJQk55OWZWOXBj?=
+ =?utf-8?B?L0J0ZGNYZForMGlxMGpxTSswb2VWWi9XLzhzZWxXaEFZVmROTnp1b0Z5MDJk?=
+ =?utf-8?B?bDNnUm9SMng5cmFjNzV3V010RmIwRDlFaGZ4R2pUQ1NXSTdzMDR5d1gyKzM3?=
+ =?utf-8?B?RnYwTEZieVpKWGJodG5jenZCZm11b21aOGQ2WnNPUWQxWFRCUmRONHA5RTJO?=
+ =?utf-8?B?MWY2WDRpZS82eVVraklRWXlRL3ZPUW82bDFHcnJ3TzNyRHoyRHZhaU9VbndC?=
+ =?utf-8?B?eEllT0lMQTF6bFJhTzRYR01OZk0yNm0wb3RIT3c4cHJ2L09Tc0ZWSXFaMnBt?=
+ =?utf-8?B?OVNTRmZlWnRYQ3ZhZkFySmh2WmVzOTRlUWg3QWZXZjRTbXNTUEQvRWN2Y0dF?=
+ =?utf-8?B?dkJtQ0FOWENsbURNcnJzUTF0MkF5RnJqeEppWWFtcEc2b0tvZkYzYnY4Q1pF?=
+ =?utf-8?B?YUlqMDlMQkM2VTBIR0hyQnlxQnhiWTZqU0pacVFKN1YrWFdkSzJYektoTE5G?=
+ =?utf-8?B?UmpyVXdPNEZ2ckVDWDk3VlN6TUxnZEVFS3U5NFlnWjdnQVoxM1Uwdkd3Q3Vh?=
+ =?utf-8?B?RDYyWlFzQjZvaVg3clpZcU1GREJ4WXR1R2xSQkE4cHVMYmhJaEJKdjVWY1hq?=
+ =?utf-8?B?NCtyc21kajAyaGFuSEhmNFhZbnNzREtFZ2NUUU01UzJXMkR3aEdGSTN3YVlG?=
+ =?utf-8?B?S0FIN2VyZFRyMmRZTXZzMWlYempwNlRjaDFoelI4SEV4TmNGSzVNamo4ZXNa?=
+ =?utf-8?B?c0pLU3lBOEJjaUt3Q3JaVjdyOWQxc2dPYXYzV2x5ZTZSWUZMYmF3a1FaeXkr?=
+ =?utf-8?B?eENmQTNieEkxQTFsS1JhVGRGRWFXdjFxN0tEWVJaeWdCS1N5OCs4NjZWeXdX?=
+ =?utf-8?B?djJkZ2ZXb2lMTTN2UHdnZ05Ja1NRcVBXMlBTdzNJNktQOUlwWjJ3Z3FWT3Bn?=
+ =?utf-8?B?Y2hZSnRTNnp1YVIyazdHY09EdmQ0UWdzRDNIbGJ4T3hSaktXTndkUjhUT0tp?=
+ =?utf-8?B?K0xZUWdXd3d4OTl0a2U4dzhJejhYTGJlOFhnYTh6bnlKQXRWQXhZZ3MvaVhh?=
+ =?utf-8?B?VmQ2NnVKTnEvbk5NLzROVzJHcUg0TXJMaVVYSFBpRUR2Tzk4YlAweVF6L2lh?=
+ =?utf-8?B?c0QwcjlWRkZMMkd6aU1YVTZ1YWJlMEFaR0RQZFJQbDJCNm5aOGM5Rk5zanVi?=
+ =?utf-8?B?UnlLdHFZY3NNaHJlbWJvdTdBUFA3VysrdVgvU1ZMaml4YjJSeXE5WStBKzNu?=
+ =?utf-8?B?MklZZVdZS0tYYmhUQlJTd2IzenM2ZG96K3RHZ0RxUHhNK3BXWTVhMmx6Tkto?=
+ =?utf-8?B?aWk2a2wvUEJ3RXhhRWNDbTI1ak5uRXBjcFMzd1U4WmZDUDdmdE4rRHM5dlVp?=
+ =?utf-8?B?OUJGS3VoQm5HVUJqZG13SlVJc3BUakdELzhUakNnZ0tPYlBPNXlQbk11TjEy?=
+ =?utf-8?B?L0tNV0V0VTRyNER0TEJLM2thd3psZ0ZaRkZCakk1cDhuVUJyZ2dZU0dYUzk3?=
+ =?utf-8?B?cUdVMStHaDZYcng0YVRkK1R3dXZLWFhTVFpZVFhzTDhUb0FUS2xWYU5wTzVy?=
+ =?utf-8?B?RnAwQTR6MXVWZEh3Z2h0MFFmcCtEL1VPYW8zeWpZTEU5N1VCM1g0aDV6YlZI?=
+ =?utf-8?B?OU9MOXBRUWhRWUdIRkI0c2I4MTVuV3NYbTFLK3FrWUV1SWRHY1dkR2wwckVL?=
+ =?utf-8?B?SVRzc2h5SzR3OFhBZHpEenFSdXAya3NrS1p2S3NtZjVwMi9VNHVDYU1RQXNw?=
+ =?utf-8?B?QVMrdnMvUzV2cTFLQnV1WERHemNEaVoyeW14cUxOcmJMMHRkSFZqU1cyWVZS?=
+ =?utf-8?B?NXcySmVQb0d5bHo5Z0NMY25qUDdhTkNEUXhHbkVPeXdRTENRL1VSbEhqQi9t?=
+ =?utf-8?B?WmppMmN0N0Fid1lWQXFzWkFhMWhCOGhFYm8yQk5QRFRrS3ladDJUb2FDZzAv?=
+ =?utf-8?B?ZFJLVENNZ3NsSmtpcEhCazVSSkhFdEFpR0NtRXdMRXVZVGwxR3NGUUx1NUJT?=
+ =?utf-8?B?bFVES0dKZGpvS2FrRXJ4c0o0YmE2TGoxRUx0VnFEblhYWktYM1RlVWFMRFQ3?=
+ =?utf-8?B?WWJVdHl5V1VPTGEySEZ6eDUzNXQvTllabFp1dUJraWp2QWY5bExIVEN1a1ZQ?=
+ =?utf-8?B?ZGdHYW8xZk9WeDQ3NkRpZFlya3U4aFRsdXJISmRUMTQzRHBxd09NMTFmVCt0?=
+ =?utf-8?B?ZWQya1A4UlE1MUdJRUZLRzFaUTU1L0hHak5JS0dCRnA3eCtTSndzMSt4aFlS?=
+ =?utf-8?B?dUY1TlF2TjdlOGJnWnNvQ3YzUG03cFM4VEhaMlU4UWszOVJYeFNtSGtnS2xq?=
+ =?utf-8?B?MG9KRnlLWGlCTzNhNWVwQStuUTE1NFkyOTZjcnBPbU9VNmxhUzUxUm42TFZq?=
+ =?utf-8?Q?58wgEcZMYKEM2Lzg=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260622-netpoll_rcu_fix-v1-1-15c3285e92e6@debian.org>
-X-B4-Tracking: v=1; b=H4sIAEJOOWoC/x3MQQqDMBAF0KsMf20gzkIhV5EiNv7UAYmS2CKId
- xf6DvAuVBZjRZALhT+rtmUEaRtBXKb8obMZQaBeO9+pusxj39Z1LPE7JjvdzNS/I1v1/YRGsBc
- mO//jgMwDr/t+ADPsJ2RmAAAA
-X-Change-ID: 20260622-netpoll_rcu_fix-def7bce1207a
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Amerigo Wang <amwang@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- vlad.wing@gmail.com, asantostc@gmail.com, kernel-team@meta.com, 
- stable@vger.kernel.org, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3308; i=leitao@debian.org;
- h=from:subject:message-id; bh=fi9OKxumYq8MA8wVF41Gx0pkkHxM1ZJyBBe9VTw0fwY=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqOU5M1vUuFcVLU5pEzknj66KcmxTFGJceBHXHy
- nsbpaqI1ZaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCajlOTAAKCRA1o5Of/Hh3
- bY9iD/9ERNCq4R8zH2Hnm5Xf/vyAOl6FfVGKCS2slx/brhTK5UgDle6pnuLzfnoir/0tLgEMEqf
- lhu/Ddwir7rSuo+mbHBLZKWwQ4tzgdkOw5ji2K7knJUFeyosNI/4gZQmOjHgTTZMTpw3jaXMoxW
- bm8EDpkfPUnyurX6DZ1xToYeM+emH2qrXILjVpZvaTATLW+uHBRecB1MFKbViutRxM59XpNc87q
- SKPivPxsohNuquGN8p88PDYRw1jPkkGjeLokshWIJ04SfyceIqqZFRP8KjQ1GOHfK9P5YLWS6Ok
- DI02amb5C2YWHbz+NOC/Y7nUhJvnWOQVxxZ5QAEtXurvONnA+uvqNz996YamLcqxUnHSvgdbbr/
- 0cSwkxuEBVnutQDiyFgjwGYZtjyFzjZtxQGqSZSsQnMX4yMshJghAAuLs7O9GLnSJr3h2bsG8yR
- 4y+SHmr5adhmztXPvAkQ/AS4IEnr6ZkGOw0ud9A7mJDk8r6oEaXIxs9AdLYyq9otPfMOkYnuJ0h
- thEEVw71wBVb548ZLmRSLTVFKyNVgECpUjFOoZI4sAkFVvdj06JAqpGAhLbnte4KfVLNz5Fl4TJ
- A7oBOAmqDOWmtiQD5GgRNkkI6E6NUp4mO+exJsWj6NiEezcjKGBiSrcKWWUy1Pv73dU1zQVEGyZ
- MSDLVx2IRaYNBOw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+X-Exchange-RoutingPolicyChecked: aOv6GTbeQK9aWndAiKYUHuGZjPVLOShIg4Hgkzkd06jkFNezkbQs2DUlH6JSopEY4A+BE0wGfkvhyUjdgFZHA8JgLwF2N/sdyRNKCpMxfiTluckG/R1fqEO4Hx6oFkOuUMmNl8wN7Xhy38ZW7zGE7BDFp0T4JRdLH7jiRQ8sp66Sveu7aOh9HbfPgg238fLr9duh+8DZYkDov+3m9t5IbH3nvAMJac1CQ9E+rhxpBQgieTFmOrdL9jFrOogsyWByy3JqS9Il9EAfMV1SQleocIh3SgPqndjtwe5fENMNgC1GnvMp4tLRcIZc6NjoYZXcnZYgBnjs/635kU4eBhJXRg==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d920ee82-431e-4bdc-efb7-08ded06f7393
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2026 15:03:43.1766
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Wsj0f9m8i6zweMK1dy8SPIfI/W0Kl4uDOQukb+81+T6Cst5PFbco9C5gVbxWAZgDwua7dLDsoguxrDABbGMJ3gll/4oKogE+iLdAQxoIjNE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB8858
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Prj5PZm4G2rAFxYlVLZiNBDkatik_Jem_fYAfyHpf4M_1782140627
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-301144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301143-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:amwang@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vlad.wing@gmail.com,m:asantostc@gmail.com,m:kernel-team@meta.com,m:stable@vger.kernel.org,m:leitao@debian.org,m:vladwing@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,meta.com,debian.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:Pier.Beruto@onsemi.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[CYYPR02MB9828.namprd02.prod.outlook.com:mid,onsemi.com:dkim,onsemi.com:email,onsemi.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DC496B0905
+X-Rspamd-Queue-Id: 09BDB6B09B1
 
-There is a use-after-free error on netpoll, which is clearly detected by
-KASAN.
-
-      BUG: KASAN: slab-use-after-free in _raw_spin_lock_irqsave+0x3b/0x80
-      Read of size 1 at addr ... by task kworker/9:1
-      Workqueue: events queue_process
-      Call Trace:
-       skb_dequeue+0x1e/0xb0
-       queue_process+0x2c/0x600
-       process_scheduled_works+0x4b6/0x850
-       worker_thread+0x414/0x5a0
-      Allocated by task 242:
-       __netpoll_setup+0x201/0x4a0
-       netpoll_setup+0x249/0x550
-       enabled_store+0x32f/0x380
-      Freed by task 0:
-       kfree+0x1b7/0x540
-       rcu_core+0x3f8/0x7a0
-
-The problem happens when there is a pending TX worker running in
-parallel with the cleanup path.
-
-This is what happens on netpoll shutdown path:
-
-1) __netpoll_cleanup() is called
-2) set dev->npinfo to NULL
-3) call_rcu() with rcu_cleanup_netpoll_info()
-  3.1) rcu_cleanup_netpoll_info() tries to cancel all workers with
-       cancel_delayed_work(), but doesn't wait for the worker to finish
-4) and kfree(npinfo);
-
-Because 3.1) doesn't really cancel the work, as the comment says "we
-can't call cancel_delayed_work_sync here, as we are in softirq", the TX
-worker can run after 4).
-
-Tl;DR: queue_process() is not an RCU reader, it reaches npinfo through
-the work item via container_of().
-
-In reality, we can improve this cleanup path by a lot, but, given that
-this is targeting net, just do the sane path:
-
-1) set dev->npinfo to NULL
-2) synchronize net / RCU
-3) cancel_delayed_work_sync() any new worker (that potentially showed up
-   after the grace period -- and should exit soon given they will see
-   dev->npinfo = NULL)
-4) then rcu_cleanup_netpoll_info() -> kfree() npinfo
-
-In the future, we can do the cleanup inline here, and don't need
-npinfo->rcu rcu_head, but that is net-next material.
-
-Cc: stable@vger.kernel.org
-Fixes: 38e6bc185d95 ("netpoll: make __netpoll_cleanup non-block")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/core/netpoll.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 229dde818ab33..5765015b40720 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -634,9 +634,6 @@ static void rcu_cleanup_netpoll_info(struct rcu_head *rcu_head)
- 
- 	skb_queue_purge(&npinfo->txq);
- 
--	/* we can't call cancel_delayed_work_sync here, as we are in softirq */
--	cancel_delayed_work(&npinfo->tx_work);
--
- 	/* clean after last, unfinished work */
- 	__skb_queue_purge(&npinfo->txq);
- 	/* now cancel it again */
-@@ -664,6 +661,14 @@ static void __netpoll_cleanup(struct netpoll *np)
- 			ops->ndo_netpoll_cleanup(np->dev);
- 
- 		RCU_INIT_POINTER(np->dev->npinfo, NULL);
-+		/*
-+		 * synchronize_net() does not protect the worker
-+		 * (queue_process() is not an RCU reader). It fences the
-+		 * senders -- the real RCU readers -- so they cannot re-arm
-+		 * tx_work after the np->dev->npinfo was set to NULL.
-+		 */
-+		synchronize_net();
-+		cancel_delayed_work_sync(&npinfo->tx_work);
- 		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
- 	}
- 
-
----
-base-commit: d07d80b6a129a44538cda1549b7acf95154fb197
-change-id: 20260622-netpoll_rcu_fix-def7bce1207a
-
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBEdW1hemV0IDxl
+ZHVtYXpldEBnb29nbGUuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDEvMl0gUHJvdGVjdCBz
+a2IgcG9pbnRlciB1c2VkIGJ5IHR3byBkaWZmZXJlbnQga2VybmVsIGluc3RhbmNlcw0KPiANCj4g
+DQo+ID4NCj4gPiBGaXhlczogYjU0MmQxM2ZhYjBmICgibmV0OiBldGhlcm5ldDogb2FfdGM2OiBJ
+bnRlcnJ1cHQgaXMgYWN0aXZlIGxvdywgbGV2ZWwgdHJpZ2dlcmVkLiIpDQo+ID4gU2lnbmVkLW9m
+Zi1ieTogU2VsdmFtYW5pIFJhamFnb3BhbCA8U2VsdmFtYW5pLlJhamFnb3BhbEBvbnNlbWkuY29t
+Pg0KPiA+IC0tLQ0KPiANCj4gT0sgYnV0IHBsZWFzZSB1c2UgIm5ldDogZXRoZXJuZXQ6IG9hX3Rj
+NjoiIHByZWZpeCBpbiB0aGUgcGF0Y2ggdGl0bGUuDQoNCg0KWWVzLiBBbm90aGVyIG1pc3MuIFNv
+cnJ5IGFib3V0IHRoYXQuDQo=
 
 
