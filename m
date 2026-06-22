@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-301214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k7UfMxS3OWpbwgcAu9opvQ
-	(envelope-from <netdev+bounces-301214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 00:28:36 +0200
+	id lFv1ADm3OWpjwgcAu9opvQ
+	(envelope-from <netdev+bounces-301215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 00:29:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3232C6B29E1
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 00:28:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF396B2A01
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 00:29:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=ofcV7gf7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301214-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301214-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=Jlei4Ipy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301215-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301215-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11130303FAAA
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 22:28:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8422D304D72F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 22:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C80237B002;
-	Mon, 22 Jun 2026 22:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D88837C923;
+	Mon, 22 Jun 2026 22:28:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D12C37882E
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 22:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DFC37BE8D
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 22:28:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782167299; cv=none; b=S7j7XgB4V/a2MfUpYB9G7XiLcxu2d1YbBEW+5kl9xmuDVpRNRKshOLIWnbZ58/z5PATJn25MIVdAQOgo4uBpQk148Rs5NwCXU6lYH+PSeUoKsR97oUL4K6oNMWwJE2LvxN0PpGI440PJXPPXYmlYaF+/VVvCg+wrXKh1DqfvXgg=
+	t=1782167300; cv=none; b=mNli0FHSFo114RZ6B1D4Vilo1oDWQL1TcgtGyXG2Yk4BixlZJwFTcPTosRrCs0JZbJSO8tEiIgq24QZeq59pdljVIHHg1qruURjKKZ2/1TUKRDcwztp3uEjHf8nnMyrrRaRftuD+c+qd7muVOpWjQ3lPhlg73ilH0E0mBGxEYUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782167299; c=relaxed/simple;
-	bh=SihlRBBTVD9/sumreJgofJm7EYPORk4CoiN8TCjcnAY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mZTHxe2LkWWGATPcqxZ7DajK3CEs21NDVlUP4CMOh7UztFMDam38wFgZUKYTt5VhxVLHbI0KsldZxtx/Wd9HB6/RO6BU2gGu8vQ/noVN46kHSJ09d/PIXBFfxFjRT+4raaOVjWoLB3GwKYFHHJd9zGxuHOfbKsvl26oup2rU9u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ofcV7gf7; arc=none smtp.client-ip=209.85.210.202
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-84540c1fff4so6993266b3a.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 15:28:17 -0700 (PDT)
+	s=arc-20240116; t=1782167300; c=relaxed/simple;
+	bh=gry1uQqAa0tANDVkHjkuPNbr5jKjvV245FrhWBFwAuQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KMfu7SxM2zbOUwrAGJdzWQhXJ5bIBmrfKXMM/l4fNrAm0r6UVtlm+VOZGYopHQyg5O/NaMxAGcnWhxJsQAKZtJSynxf5/6DZ6JA6WQJThNKGxta8HaIVIHNfwOXC2aEe6OJvR/c/pUOkVUxdkKEA5OzABdln39Cri+saWZ4vby0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jlei4Ipy; arc=none smtp.client-ip=209.85.210.201
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-845438fbd9cso3622921b3a.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 15:28:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782167297; x=1782772097; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fVIN0Q4+496+/EZ2BPsuqq3VkPJBQAckK67gmjBeUzE=;
-        b=ofcV7gf71kW1NyH7+rbpeYkcSQal/D4xrCi5c+kv5gT6wDLu8Pgj8AFXj4cavAUZ/G
-         ZpzX+PheBICFBZpNSg3yiUWj58pZW+e9MX4gvBOYrY47oZbhHnkDxGSY9v31xoknKGmt
-         m+H4OlyORp7vvJXM50gpnWc+TRxsHTqqob88uFPeJpCD1mHs/t6HvQXmX/yIZJOvBu9I
-         /q/5EDu1IawSRqoHG0v8ovGOpF+vIQGircMo4e0e6k/OaMwuh5IXucuUGG2G1BB0OcNy
-         LEcYRQO6iaYsoIxzNdRnFyU3+Q63sjxs4T8KHrcONJEzBnRbw1MS7/AkIxeApgnF7GQW
-         LQ5g==
+        d=google.com; s=20251104; t=1782167298; x=1782772098; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AEqk/nI9MwbHFJChA3EKe7XfZWAt05hBZjjNOpuqeXY=;
+        b=Jlei4IpyQ3goNhDa9zVqdgLsY1t+VD5eYju0ZpbPO8QuSAPeurqxXDRSY7iV+6IIhQ
+         sdmAeeMfAc1tsz1nq43TlRUXhcYiRH7HOKiiQG3oI5upK9DsmVGsalIxWhymw/qwZFKy
+         Q1rBTeOmuhHuuA5dkg2nSH2vA1NzAfCT4x7hESSPUQhpFhQlHJIOlDBqne0RTfCKyVff
+         h/DRTFgs3YSeU/59ub8RylBNeotHT7vdVBnIcqwsvvFVALjcESoiCFarcp3igRgwzPcR
+         vZv3Kt6rimbn3ZOM4xJ1sPdETWRCJ3ifqEeN4bts96xQ621GHB2k1OexF/gbpHJHtxGZ
+         GoJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782167297; x=1782772097;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fVIN0Q4+496+/EZ2BPsuqq3VkPJBQAckK67gmjBeUzE=;
-        b=XD7S8T6OWkxomBiY+JnRE4rTJOAHsAb56skYJi1iwiZ2oOaRlfEg7BjuMXy550np87
-         ba50fzqYSk+/hZzzTpGf4gylHAGa1OCzbVpIVitlyp5I6Tw28jFqAGV7i5BqYqVBq0Z/
-         rcZEa+Xl7M0dFjG5ZnPISGnBzzo9tj/CYeY8z4tKIo019NTITQVl7zBEBgyw+Z1FEt78
-         s8CUaS4r9fWQf4EJsEUAkjntLNsy58sP0bT0LLw++j00BYcHE7q1a7a6zesyMcCA4r5u
-         NkV1HTGac0NVyDsB/Q7+37o3jSv5EPu4Ktpdh+94C78eXUrsVAyE9Ss9GTNA4BlOA01C
-         McfA==
-X-Gm-Message-State: AOJu0Yx8scjQSFEyTJ5yrSRf9T18xs7hDFRnNP9CTFBg2ioIIJ1breyO
-	UfFm1xWX1DT1NYdIMF5wwu1qQpEKqVtna0y6a3dpImckUnYkG2zs0NXA5Ln43wZkKSEkt/V7NYL
-	kGqpJXcshA5NxI3DP4wiuHMaTS+0x7onCZBhOMSB7sjAJpFjumDL/pXDQig+Ew8+JSSXWfJEQiE
-	ocHG2MUeGRsiCOhCCbu6F53gJPANjUWwk=
-X-Received: from pfmb6.prod.google.com ([2002:a05:6a00:1146:b0:842:8ec2:ef16])
- (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4004:b0:845:4c76:e46a
- with SMTP id d2e1a72fcca58-845952108a1mr266932b3a.3.1782167296263; Mon, 22
- Jun 2026 15:28:16 -0700 (PDT)
-Date: Mon, 22 Jun 2026 22:27:55 +0000
+        d=1e100.net; s=20251104; t=1782167298; x=1782772098;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AEqk/nI9MwbHFJChA3EKe7XfZWAt05hBZjjNOpuqeXY=;
+        b=GgQ+z5IEawV6C+KmoCLV3UsHJ2dqvBZjY1JFK78PIys0UuG9vdJpENExbKk5UAND4K
+         CYPUhDg9VYm4Cstje4a27Gmzz2JQ0MIjeqdBUUSQEcCE2zg9fXgQ9QoAsSCWe6f5z9eJ
+         2i4eE338T3QbpK9f5kNjWItijTCoLWFDpE6zXuFp7025kjVVSb383rWxYyaGe7A2kRTy
+         dd3bwGd4IyhBwWJBY3Lt+Qutrr7oWc/kdATz6qXxyDdlh94lGCQ5GbuwRC9nrlgJSege
+         hCgb9Rh0cOa2la5/Jzge0CWIVdPqDpbEJj/xv+2ZnmLz/mE1nIjLFaXL8d/rCaG75sUd
+         Sllg==
+X-Gm-Message-State: AOJu0YwpQSsphxOCkB5XpPtuMYYAFhR+5RFHTQkxgcbtqKOzY0U1E5Ol
+	szZURHcTmvmXdefVXD74199IsPwFsW1NBUqZ2xwBTClD0/KRtCzMlZOxiLCWI0BMMuiOp0dXRSx
+	fk61hqpzPf677oE2+pvPsqbpzsQg52ZkRJJW8cY/hzgXv3kDlYGNYfKY09tb6KKLpwT2uYnFq1M
+	OlQy/iZ/VNvShUNC2KLOX4uoQiOj7gjoA=
+X-Received: from pfn22.prod.google.com ([2002:a05:6a00:a216:b0:842:3963:226a])
+ (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:806:b0:845:41e4:3faa
+ with SMTP id d2e1a72fcca58-845508bb8a9mr17027325b3a.31.1782167297664; Mon, 22
+ Jun 2026 15:28:17 -0700 (PDT)
+Date: Mon, 22 Jun 2026 22:27:56 +0000
+In-Reply-To: <20260622222757.2130402-1-tavip@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260622222757.2130402-1-tavip@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260622222757.2130402-1-tavip@google.com>
-Subject: [PATCH net v3 0/2] vsock/virtio: fix msg_iter desync on transmission failure
+Message-ID: <20260622222757.2130402-2-tavip@google.com>
+Subject: [PATCH net v3 1/2] iov_iter: export iov_iter_restore
 From: Octavian Purdila <tavip@google.com>
 To: netdev@vger.kernel.org
 Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, 
@@ -108,7 +111,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301214-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301215-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -121,39 +124,31 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3232C6B29E1
+X-Rspamd-Queue-Id: 8FF396B2A01
 
-This series fixes a msg_iter desync issue in the virtio vsock transport
-that can lead to warnings and eventual -ENOMEM under specific failure
-scenarios (e.g. partial GUP failure during MSG_ZEROCOPY transmission).
+Export iov_iter_restore so that it can be used by modules.
 
-To fix this, we need to restore the msg_iter state on transmission failure.
-However, since virtio vsock transport can be built as a module, we first
-need to export iov_iter_restore.
+This is needed by the virtio vsock transport (which can be built as a
+module) to restore the msg_iter state when transmission fails.
 
-Patch 1 exports iov_iter_restore.
-Patch 2 implements the msg_iter restoration in virtio vsock.
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Octavian Purdila <tavip@google.com>
+---
+ lib/iov_iter.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes in v3:
-- Use EXPORT_SYMBOL_GPL (Jens)
-
-Changes in v2:
-- Use iov_iter_savestate()/iov_iter_restore() (Stefano)
-- Use a single restore point (Stefano)
-- Reverse xmas tree (Stefano)
-- Added comments in the code (Stefano)
-
-v2: https://lore.kernel.org/all/20260613000953.467473-1-tavip@google.com/
-v1: https://lore.kernel.org/all/20260609004809.1285028-1-tavip@google.com/
-
-Octavian Purdila (2):
-  iov_iter: export iov_iter_restore
-  vsock/virtio: restore msg_iter on transmission failure
-
- lib/iov_iter.c                          |  1 +
- net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
-
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 273919b161617..f5df63961fb24 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1491,6 +1491,7 @@ void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
+ 		i->__iov -= state->nr_segs - i->nr_segs;
+ 	i->nr_segs = state->nr_segs;
+ }
++EXPORT_SYMBOL_GPL(iov_iter_restore);
+ 
+ /*
+  * Extract a list of contiguous pages from an ITER_FOLIOQ iterator.  This does
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
