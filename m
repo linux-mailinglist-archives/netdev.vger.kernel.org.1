@@ -1,335 +1,181 @@
-Return-Path: <netdev+bounces-301019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301020-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Wwf7D5L/OGqwlAcAu9opvQ
-	(envelope-from <netdev+bounces-301019-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:25:38 +0200
+	id SZc1ERcDOWqplQcAu9opvQ
+	(envelope-from <netdev+bounces-301020-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:40:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3667C6AE2F7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:25:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A29C26AE54F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 11:40:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=TkT2XMH5;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=KMQKP3Kq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301019-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301019-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ESGrJIF2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301020-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301020-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5A6EF3012C47
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:24:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2A467303CF24
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 09:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50F439B97F;
-	Mon, 22 Jun 2026 09:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1AE339DBC0;
+	Mon, 22 Jun 2026 09:35:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9CC3655DD
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 09:24:17 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782120259; cv=pass; b=CCYaTyFAIb5+nitfM5N/RXtbizCMY3drc3t4ZWTa8veD38EQllALWENuTFpFKMvdGJ1FZcLvOJXBZWgJaMyzN67Dpi7tPcLHnV9sjPcWnDUK6PRrEXijEtdJZtZ6wSRSw+aEq1GSZG1pgBjpRgBEwSQkIoGScBh1rlF6HyDGniY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782120259; c=relaxed/simple;
-	bh=+vjfu+BhfoRhdod3ax7XIibD0urP8iK+x+y0nVqbMLw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oz7fYKtgHVpFy+RKniGpwwDxtaT3+VRM4RdHN0VGOYedZl3ixydYTgyrkDeZuaK410eEf3nfw4MilLdt31MRcxtlcK7zYY6PdjlD9AZn9l3cWucI9SBzJzukLGzMr/vcGLK9uFVFS/CanADmkTCEv87LARCkafKyW/rWcMWLz90=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=TkT2XMH5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=KMQKP3Kq; arc=pass smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65M59Wx13880726
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 09:24:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	GArM74qnbNn74pkKdk5flnpvpw6XEnRlwvdWaHNFJaM=; b=TkT2XMH5fGdfmxh+
-	L5zZ6+w8+34sEglP8ScnznU3OodYXcZe97s5VsCq8CqwORHI55iV9plqZ2TmfBt4
-	lSbhgGRqoJKcUgiSv3oTiMO3SVB2wSwV9nn9ue2eZJErE4T8REmFO4gEF2DoHleq
-	jzyLg+LEAW8UJ6/voeyBTOaa6Oc6FqFeVWS07It4V3wLn+EC5znAdHZuMdSRlvPH
-	RkJv/1c+n8V6SpfWLCpX/tyB3vPVYkJzkb9Vj0wB7GO0PrnL+qrZpTGg/syDidy8
-	/+vxb6/QQ6kVbMjWgTEyMk3dq16f+UYpbnIc+vE2nfaYF5TqGKCHAYi8AL+D6JTH
-	01xR0A==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ewgjee180-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 09:24:17 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-92158791d14so240475785a.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 02:24:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782120256; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z/0QdNQYGtyCnPx78s6/wRW4VSZNPU4Ae/rPEbrQoz2zGtxb3++yO+wYhEg/ocg1Cj
-         mbNhlcetNmc7e+lOvdE6M0N5cbjw05gEy9a8DrvnibuihouRN1rRHCNAqRM9As/f/tt+
-         6xTg9NzF8y4Cf6bUL1jzYYMxOgnm9V5r7W1AwwgVx9xYLWLxm7EskXqmB4hV81f9lEAh
-         fB2PXObCAVSgt+g42AwRxe/UpHCfbP8yYhlXVHc6PeeDG7LMZLB8HUavNjg9fqV9JSjC
-         LJ/dNTvwIsI7nuCeJY+dy2Vq1fqOhmINcHvlvW4BwqEkITS3gmphqIh98O25X+at0Muc
-         6fVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GArM74qnbNn74pkKdk5flnpvpw6XEnRlwvdWaHNFJaM=;
-        fh=+wJrYPe1IDdjkxpMgnleDemCy7z2YS8+WSBLB6kQHqw=;
-        b=Y7HvG4vWP2b9Kq32lzUdGj1ssNFLgh5tD6IpJDwQzuqYxioLy9DpcEQFnlYL1fouhX
-         3JAkmrfjkH2aiXpwXTqJkswk4LxzOE85sHv5R0Y8owAQS06jIAJ7umU+4T9fqK8nVV59
-         vdUjprd1kLBRv8osOWw1h5vYO0EE2H1nEyrGW245ATFFz+6axFB+Y04iV6lX6Y/Vrb+u
-         gQI0iCZdw1dmxW9gYsZYkWoC/v4lnLCeLpdHlIW+QX/INMQ4lUS1Ih/zPb0XQqqilA0C
-         vhD8+YhK6eK1pdyZs+D5jWQSBLqeMuB7PxaX1MW42M7hPDmqgsBJ+zzJ23gpYB/h3uag
-         /0zA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782120256; x=1782725056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GArM74qnbNn74pkKdk5flnpvpw6XEnRlwvdWaHNFJaM=;
-        b=KMQKP3Kqe0MQrfyCHhoROjxXCD1ok8YmmBRw+ZcW6/9liwAIzuVmXFqphdYM5XmhkX
-         ngM+fWvu8if32JonHJg0wBnjqiP2nSNCWs1w4X3V37B/ZS59DKiRf1/vHjakqbRVVMym
-         1fGvvmON47m3hW6GGwaiNqo5aArYDFcY49lPDGyczxu2Sc53MHYn9ieMAkWylAfYfXjk
-         L/vRoStlOLyrqj6kXdhGIkoNLdWeXVhPCkV1R4hzujejgoden3TQ2cqK8kknc8Nc+KfA
-         MGafETl2GB7M264pzuhb5vyDiDLeYaNcfkdMsAakMITtz1PRGEgzYgqNKRIv7Cf6DLxE
-         DMiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782120256; x=1782725056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GArM74qnbNn74pkKdk5flnpvpw6XEnRlwvdWaHNFJaM=;
-        b=RzADmB++iGkMptlt0clapD0vUCCAy2gZbg8G9pAgacOfKJjKWT34sKbugkSAeTKK2x
-         pwks+bKthEBHjI8HSeKG0uSS1tIi4C9Vker/mBb7254slwvnqIaY5M64gW0qy+9Vb7zi
-         YCuJwWogHN4VCVB6RrZ2pSYOgdpE7qEdwnndEVvA2jiV8ZZBFCbzDm6LdnCd96kzSj3l
-         I8k/RH0z4X7wCagVqX/H4pFNGFxn+lsYsGOcJaWcm5pMf3QmrRgEZv9V82+Y/71gx6UG
-         bbQW/unbMidFoZ8WLQLlGLyl5cLsAJ/fXfo7z9uPhiiFjf8u57U0/MQAtR97kUWIXKG2
-         jlkw==
-X-Forwarded-Encrypted: i=1; AFNElJ+1kiJuLx7HHd2QjXqeZVxPfEM5WA6LrFNJTrUGALdqapQTYIB+7I9rrL+nrf6iBYS2WhEmmQM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeNUVC1Y2PnYATfMRzCIolJvYeZc76QwQxNfTbJvgpNIlJJNlV
-	XAfEGIw0D48et8PMO9XWj95q//jeGVDMxqcuyXjkGJwJcW9gzpOpNVWY86KCph4t4yvNm1Ijm7c
-	Jdh4vWACM9IAu3WXBWYTYL3FFdl04VSXUXku0Ja9qXhdHhUM2RvSRPeT8Oeg1Xx51LMKiy4+7x0
-	PJDQWahUVdWR8FVx/JUDVZprZll1IoGi7kOA==
-X-Gm-Gg: AfdE7cmg1+2tJGhOIvtHh/TZkql4a2M7MUyVyF6o+O8yc1+Yvpn4suJ3gDfnCPZQusV
-	mXbHSB+FuczRxtUjynwFXxT4lOYuPJZwXuXMEL/sLzBawwTN+MaoMjO0nV5qxfDvWVljBVA6htP
-	EMypNKZ8GxwjViHygaP6CPRiNX5pcKAfIp1CfD6VTUX61hXjXgQ9JN6OQBP0Hcl/cBLnxw44TdA
-	NcCrkOzwk9fq+idttz/gsBihwxMB9j7OEmsoXdyTl9NCEYJdudqRS/kLAT0HjstTxI50X2vgT5S
-	dvDxLjvNaw==
-X-Received: by 2002:a05:620a:2947:b0:915:a101:48d with SMTP id af79cd13be357-9208ddc3d63mr2267952685a.56.1782120255933;
-        Mon, 22 Jun 2026 02:24:15 -0700 (PDT)
-X-Received: by 2002:a05:620a:2947:b0:915:a101:48d with SMTP id
- af79cd13be357-9208ddc3d63mr2267949985a.56.1782120255356; Mon, 22 Jun 2026
- 02:24:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917E339C006
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 09:35:26 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782120927; cv=none; b=LTBlhQM/8hy8upTa2ovehvlhtf3qf8Kqhy8viaBZR7NTFU/XWnfhfBucg09HdwjvrtG0G2GxnxI7EX+f4jsJ658QFBKi7KLGOxSjalvryBeLH7mPSCifZvcssx2il62Av5yvhXW02Lxx42fm4vJ/WRePrCG9vdtUF3OQnF/iMj8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782120927; c=relaxed/simple;
+	bh=9ai7vpeQmT1bsxBHrCNnpzRgD0Lk3aIkJN01AVXOfns=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OZs4aHggCXd6+K/TSPYSJHGiDBebOTz72X8o9zrGHSrc7lEqU6FeNZSiUNon5qdsHacr/CaI779mfwLyBVVqt0UwYy+ORH6rwJ+TEEX7XbI3QRLdEya745UzRquK5w2wGuEXoXdlb1ljvZq3W49yDLA9HYf8Y2p8c6KX7RxUy0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESGrJIF2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B10B31F00A3A;
+	Mon, 22 Jun 2026 09:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782120926;
+	bh=OBdMhJJ0Y7gIABwR1q/8w26Nesukt0v7qHvKC0K0k5c=;
+	h=From:Date:Subject:To:Cc;
+	b=ESGrJIF2eQfsXySEQ1mH/Yr5U6gKvtDjbJbUD1pfHwSPS1P/07NVe66c+WqLyfvZv
+	 Y11VRoAQKqjPfbCifvtqeV4qxwVWfP3iIueZciWP3CylDRwoL7Xat7B8didP6AKBUL
+	 mIPk18XkrYB9YbuhblaEft+uGJTFgJ3qJ8+KZn3b5MDwoCD/bsC9NaCLBH0iYVdC3l
+	 mXkY5ifmOZK6nWqlBH6t2vUJTQRSBCqFeM9GogYthIMZUDE9nkxjpbMwvvLjfZy2ET
+	 ivBnwCqITnAr+sBqig407umXp/J8YsYYQRi5nLjx3hq7/WRxhpVdYDBOpvTUTe05e3
+	 7tYOA4g3dNNmg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 22 Jun 2026 11:35:07 +0200
+Subject: [PATCH net v2] net: airoha: Add retry mechanism to
+ airoha_qdma_set_trtcm_param()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <178196118045.462404.11069139160448641355@maoyixie.com>
-In-Reply-To: <178196118045.462404.11069139160448641355@maoyixie.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 22 Jun 2026 11:24:04 +0200
-X-Gm-Features: AVVi8CfyS_ylE1iVRIoh3zvGMYG3LeW2cuA8hUNIwvvj0zyp3zHOrXVrmx5bJso
-Message-ID: <CAFEp6-04no0SNQ+Q4L0R78cmCgrVHManT_TzaYWsTAkxJ2LFww@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: wwan: iosm: bound device offsets in the MUX
- downlink decoder
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-ORIG-GUID: p0t68HyGhklUrjYRhAwashEtl-n2N7nb
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIyMDA5MiBTYWx0ZWRfX2nzX+V0Xex6s
- lyugTpvnewP21XN6/usICFpKGo+wtp5fLdEGZrZSqqbd85oDTcY90ilE76TrL1pjM1w9U1tGe6H
- 4sjqABvfa5coSn+Md3dVw44XrrrRxug=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIyMDA5MiBTYWx0ZWRfX9+5Cm9ccd+bb
- nQRujTDbRVRPN+nIRDc2PGNS+nk+xZ+ray0BNaZeaSR/RzonYWVEBuLkO37If4bPSow5TBSIwct
- 21veAjaqmDqW9+2WSmURdUD+0NgCjRGZEMnodbFxmPzON0C9s4KuauEM4/V8dSPs9AlbbR0Fu9a
- gnoLmBGJnFZdMKZJBsMKKPTjYLqTTxKi6MhbVeTuTDqtcX3D/wrz+uPckzwP2HJxvZRjfZw8Wdz
- twzEn4ChlwbJvfCS/3bCEjV33TAITkQOMI1/gBuVGmpcW+QQSGx6zBPMWjmTjuk7FW90bnrtyoD
- PRAsdpF+bU9X8UgwcznfmoiLjyDujIrLI09dnBO04q45FiqRD1kbhvzht5YlXXOP6xAMBS72YVb
- Mmaxo2pBZaSwmFhfs02tNFX+YuzTbC81mMhHYpqO70E+Cg5nLr36AMydw+sFy5BivhWH5lHeV4p
- DfD6yTrH3+NCn0POaFg==
-X-Proofpoint-GUID: p0t68HyGhklUrjYRhAwashEtl-n2N7nb
-X-Authority-Analysis: v=2.4 cv=TO51jVla c=1 sm=1 tr=0 ts=6a38ff41 cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=eoimf2acIAo5FJnRuUoq:22 a=VwQbUJbxAAAA:8 a=SnhycFdtAAAA:8 a=pGLkceISAAAA:8
- a=EUspDBNiAAAA:8 a=ckisEX8qNS7d6mgPHJgA:9 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22 a=IdunurJ9zWQ3aaQyNLvr:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-22_01,2026-06-18_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 malwarescore=0 clxscore=1015 phishscore=0
- spamscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606220092
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260622-airoha_qdma_set_trtcm_param-retry-fix-v2-1-95a83ac99dbd@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NWwqDMBBFtyLz3ZQY6qtf7qNIiGaioTWxkyAVc
+ e8N0gX085wL9+wQkCwGuGc7EK42WO8SiEsGw6TciMzqxCC4KHnJC6Ys+UnJt56VDBhlpDjMclG
+ kZkYYaWPGfphqtGiKsm96YSB9LYRJn50HOIzQJTnZED1tZ3vNz+mXqf/MrDnLmeFVxW+G63oo2
+ ieSw9fV0wjdcRxfNIRUzuAAAAA=
+X-Change-ID: 20260605-airoha_qdma_set_trtcm_param-retry-fix-a9d2956b9b2f
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Leto Liu <leto.liu@airoha.com>, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Brown Huang <brown.huang@airoha.com>
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301019-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301020-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:leto.liu@airoha.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:brown.huang@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3667C6AE2F7
+X-Rspamd-Queue-Id: A29C26AE54F
 
-On Sat, Jun 20, 2026 at 3:13=E2=80=AFPM Maoyi Xie <maoyixie.tju@gmail.com> =
-wrote:
->
-> mux_dl_adb_decode() walks a chain of aggregated datagram tables using
-> offsets and lengths taken from the modem. first_table_index,
-> next_table_index, table_length, datagram_index and datagram_length are
-> all device supplied le values. Only first_table_index was checked, and
-> only for being non zero. The decoder then formed adth =3D block +
-> adth_index and read the table header and the datagram entries with no
-> bound against the received skb. A modem that reports an index or a
-> length past the downlink buffer makes the decoder read out of bounds.
->
-> The buffer is IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE and skb->len is at most
-> that, so skb->len is the real limit, but none of these in band offsets
-> were checked against it.
->
-> Validate every device offset and length against skb->len before use.
-> The block header must fit. Each table header, on entry and after every
-> next_table_index, must lie inside the skb. The datagram table must fit.
-> Each datagram index and length must stay inside the skb. The header
-> padding must not exceed the datagram length so the receive length does
-> not wrap.
->
-> This was reproduced under KASAN as a slab out of bounds read on a normal
-> downlink receive once the iosm net device is up.
->
-> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support"=
-)
-> Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+From: Brown Huang <brown.huang@airoha.com>
 
-Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+CPU accesses QDMA via the bus. When multiple modules are using the bus
+simultaneously, CPU access to QDMA may encounter bus timeouts and fails,
+resulting in QDMA configuration failures and potentially causing packet
+transmission issues. In order to mitigate the issue, introduce a retry
+mechanism to airoha_qdma_set_trtcm_param routine in order to ensure the
+configuration is correctly applied to the hardware.
 
+Fixes: ef1ca9271313b ("net: airoha: Add sched HTB offload support")
+Signed-off-by: Brown Huang <brown.huang@airoha.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Wait for write configuration to be completed before running
+  airoha_qdma_get_trtcm_param() in airoha_qdma_set_trtcm_param().
+- Link to v1: https://lore.kernel.org/r/20260608-airoha_qdma_set_trtcm_param-retry-fix-v1-1-f07704f0d8c5@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-> ---
-> Changes in v2:
-> - mux_dl_process_dg now uses intermediate native endian locals dg_index
->   and dg_len so the bound checks read cleaner and avoid the repeated
->   le32_to_cpu conversions, per Loic Poulain's review. No functional
->   change.
->
-> Link to v1: https://lore.kernel.org/all/178185979029.4044562.999361597594=
-9055530@maoyixie.com/
->
->  drivers/net/wwan/iosm/iosm_ipc_mux_codec.c | 33 ++++++++++++++++------
->  1 file changed, 24 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c b/drivers/net/wwa=
-n/iosm/iosm_ipc_mux_codec.c
-> index bff46f7ca59f..ff9a4bc52f29 100644
-> --- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-> @@ -553,19 +553,21 @@ static int mux_dl_process_dg(struct iosm_mux *ipc_m=
-ux, struct mux_adbh *adbh,
->         u32 packet_offset, i, rc, dg_len;
->
->         for (i =3D 0; i < nr_of_dg; i++, dg++) {
-> -               if (le32_to_cpu(dg->datagram_index)
-> -                               < sizeof(struct mux_adbh))
-> +               u32 dg_index =3D le32_to_cpu(dg->datagram_index);
-> +
-> +               dg_len =3D le16_to_cpu(dg->datagram_length);
-> +
-> +               if (dg_index < sizeof(struct mux_adbh))
->                         goto dg_error;
->
-> -               /* Is the packet inside of the ADB */
-> -               if (le32_to_cpu(dg->datagram_index) >=3D
-> -                                       le32_to_cpu(adbh->block_length)) =
-{
-> +               /* Is the packet inside of the ADB and the received skb ?=
- */
-> +               if (dg_index >=3D le32_to_cpu(adbh->block_length) ||
-> +                   dg_index >=3D skb->len ||
-> +                   dg_len > skb->len - dg_index ||
-> +                   dl_head_pad_len >=3D dg_len) {
->                         goto dg_error;
->                 } else {
-> -                       packet_offset =3D
-> -                               le32_to_cpu(dg->datagram_index) +
-> -                               dl_head_pad_len;
-> -                       dg_len =3D le16_to_cpu(dg->datagram_length);
-> +                       packet_offset =3D dg_index + dl_head_pad_len;
->                         /* Pass the packet to the netif layer. */
->                         rc =3D ipc_mux_net_receive(ipc_mux, if_id, ipc_mu=
-x->wwan,
->                                                  packet_offset,
-> @@ -595,6 +597,10 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_m=
-ux,
->         block =3D skb->data;
->         adbh =3D (struct mux_adbh *)block;
->
-> +       /* The block header itself must fit in the received skb. */
-> +       if (skb->len < sizeof(struct mux_adbh))
-> +               goto adb_decode_err;
-> +
->         /* Process the aggregated datagram tables. */
->         adth_index =3D le32_to_cpu(adbh->first_table_index);
->
-> @@ -606,6 +612,11 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_m=
-ux,
->
->         /* Loop through mixed session tables. */
->         while (adth_index) {
-> +               /* The table header must lie within the received skb. */
-> +               if (adth_index < sizeof(struct mux_adbh) ||
-> +                   adth_index > skb->len - sizeof(struct mux_adth))
-> +                       goto adb_decode_err;
-> +
->                 /* Get the reference to the table header. */
->                 adth =3D (struct mux_adth *)(block + adth_index);
->
-> @@ -629,6 +640,10 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_m=
-ux,
->                 if (le16_to_cpu(adth->table_length) < sizeof(struct mux_a=
-dth))
->                         goto adb_decode_err;
->
-> +               /* The whole datagram table must fit in the received skb.=
- */
-> +               if (le16_to_cpu(adth->table_length) > skb->len - adth_ind=
-ex)
-> +                       goto adb_decode_err;
-> +
->                 /* Calculate the number of datagrams. */
->                 nr_of_dg =3D (le16_to_cpu(adth->table_length) -
->                                         sizeof(struct mux_adth)) /
-> --
-> 2.34.1
->
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 3370c3df7c10..bb5c0599a4ee 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -2673,14 +2673,30 @@ static int airoha_qdma_set_trtcm_param(struct airoha_qdma *qdma, int channel,
+ 		     FIELD_PREP(TRTCM_METER_GROUP_MASK, group) |
+ 		     FIELD_PREP(TRTCM_PARAM_INDEX_MASK, idx) |
+ 		     FIELD_PREP(TRTCM_PARAM_RATE_TYPE_MASK, mode);
++	int i;
+ 
+-	airoha_qdma_wr(qdma, REG_TRTCM_DATA_LOW(addr), val);
+-	airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
++	for (i = 0; i < 100; i++) {
++		u32 data;
+ 
+-	return read_poll_timeout(airoha_qdma_rr, val,
+-				 val & TRTCM_PARAM_RW_DONE_MASK,
+-				 USEC_PER_MSEC, 10 * USEC_PER_MSEC, true,
+-				 qdma, REG_TRTCM_CFG_PARAM(addr));
++		airoha_qdma_wr(qdma, REG_TRTCM_DATA_LOW(addr), val);
++		wmb();
++		airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
++
++		if (read_poll_timeout(airoha_qdma_rr, data,
++				      data & TRTCM_PARAM_RW_DONE_MASK,
++				      USEC_PER_MSEC, 10 * USEC_PER_MSEC,
++				      true, qdma, REG_TRTCM_CFG_PARAM(addr)))
++			return -ETIMEDOUT;
++
++		if (airoha_qdma_get_trtcm_param(qdma, channel, addr, param,
++						mode, &data, NULL))
++			continue;
++
++		if (data == val)
++			return 0;
++	}
++
++	return -EBUSY;
+ }
+ 
+ static int airoha_qdma_set_trtcm_config(struct airoha_qdma *qdma, int channel,
+
+---
+base-commit: d07d80b6a129a44538cda1549b7acf95154fb197
+change-id: 20260605-airoha_qdma_set_trtcm_param-retry-fix-a9d2956b9b2f
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
