@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uZTNK3kSOWpWmQcAu9opvQ
-	(envelope-from <netdev+bounces-301041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:17 +0200
+	id +SZcGUESOWpMmQcAu9opvQ
+	(envelope-from <netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:45:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1823A6AED05
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:46:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29D66AECF2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:45:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=neDaCJBr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301041-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301041-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kE+vJ55m;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301042-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D689303B1A2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E8CF13011EBA
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE1036403B;
-	Mon, 22 Jun 2026 10:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F39536654F;
+	Mon, 22 Jun 2026 10:44:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0F63911AB;
-	Mon, 22 Jun 2026 10:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F73439F19F;
+	Mon, 22 Jun 2026 10:44:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782125080; cv=none; b=Ie8YZPh1OmfUM2T4FrKUHSI9eOTkq4kfh5/Dog1hbHYxgu/npSn0lb7row9AObrIbiYELG3r8CfG67pW7jwYenNjTmpg4mjZqL163N2hUhhHS5iHobeNC3ibW8x7+70fEqCY3zW9ldwD7K0TjgoKpUNtYYDVhSX9GstauI8Dd5A=
+	t=1782125086; cv=none; b=b+fKtc+/d7hP1PYob61lIazUFZ9vPZjlVukUKMTKlJ1Ky42tFO0c5ZVSnBfe4K8dhRBI9/I/fVUuIQnOLRBWleKhl3okjRgAlBXgia70w6uJRkVI6XNmC02UU46jwUAyHI3EZ366Jh8CDQ2O0fIb8eSLLQwyDJ0gzCfdG5WM+Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782125080; c=relaxed/simple;
-	bh=dCweXSwZahBhbS+UWwbV+PSu1HCL6L4nmJGA+iKmKKs=;
+	s=arc-20240116; t=1782125086; c=relaxed/simple;
+	bh=L8ALMhMzye9OWF9aqb4A63inTTgNPXkuLlL6kT5bjpg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LnbUqgvC8mx6djrn3tFrOacCN/tJ8BEuEVcua1FJcDHHDecuOmfcX33C4ByFPEhuQceA20SDig17m+7NF+ytSK5XbMcD99KxQWGAIYDc+1xHFAvmBYaVKAIaxK8wRfh0rAUYRyF+CXf73BlGb9C6dfwaohX/HkH9e2BHVCYi85I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neDaCJBr; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D050D1F000E9;
-	Mon, 22 Jun 2026 10:44:32 +0000 (UTC)
+	 MIME-Version; b=LoVJfgSlnSWZqo3DOe/P8B5Laoelxtb4ljRv1+sK+JCZ59rEHfV4uFXxAKaLVMDazqPJQ5VCBwpZTu5Dtbf3VAxH4Vhm6Ue2cIpqaUO/iRToBGZBujqJ0dvd0iDu3fdi8UahYJG3scE0xnP4ys9jRtQX7yC4lQ0RTr3YyHjd/wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kE+vJ55m; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BED21F00A3D;
+	Mon, 22 Jun 2026 10:44:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782125078;
-	bh=fehQSkc7VdP41HQ+w8t04mqwikH5bRxdEWNY0w+oBr8=;
+	s=k20260515; t=1782125084;
+	bh=KAZXrpf5DysoitoHYWCgK/fcW29jojMKSDLi2cg6A7Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=neDaCJBr2HHQrsGjbCLOPT5GFadcZDyckUoQgaiI4nBxSd7Xq3DZUaExfVRON/vYH
-	 ZrtdqXZiAXTVYWsab1BDh82Lo5jFo+X+t4hBW/SMzlI/jCN/KoCJ2dxXCTVm1jasmY
-	 u2jMJul0kOLUI4gLJxqgK6yCC9pIpc9/3LxsXYtK8Auz7pfQAaFWPuX67ihjMAZB/a
-	 JIqDCla1NnWa7OxKjBBjm+ugfS6AV+qntfc47tRsugsjP258NvI9Y9A9GPf3hjUwFT
-	 EcLdn4JtQjg8VG9nU8yUEkvFE1eRXHcMfaWBHLsc3LfZ3jPzO1mdhBsocACy6kLj4Q
-	 OHVq9y51wsvew==
+	b=kE+vJ55mm34hSOd/hRlUr0IDQd8CBjlqLXim20N522Fj4GIt5CgfFyUMhFCHUCz/Y
+	 VvJl9uQFHZDXnPVrUI6zzmAzslmuwa2qRNTRzgmm+T9NlcMKRpSfiKpafEOJQXJ+Ae
+	 4IxGDiDU/32DATLGx/2YFpMXqqzzHgNLgVBpslIJOXlSocPEJ7hyWcmWKq1agFnWF1
+	 sPzkfOvVksFqf8KuDOawPTOzxE8exBQi2ZMmlGQz61eyZUpq9buaJR73tWHR9dRJNA
+	 HEAGjQXH3l1/1u+Oi0eG09vwEJxVJGz9nfqhyPcQcq0ROFw1cColAyG82HCA5X5EE4
+	 NbW3rkAMnmNSA==
 From: Geliang Tang <geliang@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>,
 	Mat Martineau <martineau@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Geliang Tang <tanggeliang@kylinos.cn>,
 	mptcp@lists.linux.dev,
 	Gang Yan <yangang@kylinos.cn>,
 	Zqiang <qiang.zhang@linux.dev>
-Subject: [RFC net-next 05/17] tls: use sendmsg_locked from the underlying socket
-Date: Mon, 22 Jun 2026 18:43:25 +0800
-Message-ID: <ffa80c5eff3c80aafa68079d695b5858cb1a110c.1782123118.git.tanggeliang@kylinos.cn>
+Subject: [RFC net-next 06/17] mptcp: implement peek_len for proto_ops
+Date: Mon, 22 Jun 2026 18:43:26 +0800
+Message-ID: <18c20e74da2323812ba3881ae0a5aa25ada3a8f3.1782123118.git.tanggeliang@kylinos.cn>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1782123118.git.tanggeliang@kylinos.cn>
 References: <cover.1782123118.git.tanggeliang@kylinos.cn>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -105,30 +105,32 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[geliang@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301041-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301042-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1823A6AED05
+X-Rspamd-Queue-Id: F29D66AECF2
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-TLS offload (device and sw) may call tcp_sendmsg_locked() directly
-when pushing TLS records. This assumes the underlying socket is always
-a TCP socket. With MPTCP, the socket can be an MPTCP socket, which
-does not directly expose a sendmsg_locked method via its proto_ops.
+The TLS stack uses tcp_inq() to query the amount of data available
+in the receive queue without consuming it. For MPTCP sockets, this
+information is not directly available from a TCP subflow; it must be
+computed from the MPTCP receive queue and the current mapping.
 
-Replace the hard-coded tcp_sendmsg_locked() call with
-sk->sk_socket->ops->sendmsg_locked(). This enables TLS to work
-transparently over any socket that implements .sendmsg_locked,
-including MPTCP after the previous commit.
+Introduce mptcp_peek_len() which returns the number of bytes that
+can be peeked from the MPTCP socket. It reuses the existing
+mptcp_inq() helper (used by ioctl SIOCINQ). The implementation
+considers the first skb in the receive queue, the current ack_seq,
+and handles the FIN case.
 
-The change is safe because both TCP and MPTCP now provide a conformant
-.sendmsg_locked implementation.
+Assign .peek_len in both mptcp_stream_ops and mptcp_v6_stream_ops
+so that upper layers (e.g., TLS) can obtain the correct in-queue
+byte count for an MPTCP connection.
 
 Co-developed-by: Gang Yan <yangang@kylinos.cn>
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
@@ -136,22 +138,68 @@ Co-developed-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Zqiang <qiang.zhang@linux.dev>
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 ---
- net/tls/tls_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/mptcp/protocol.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 94133d62f73e..b6adfa67491b 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -205,7 +205,7 @@ int tls_push_sg(struct sock *sk,
- 		bvec_set_page(&bvec, p, size, offset);
- 		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 7f0c560f6b7e..18c8b6c64c3f 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -4689,6 +4689,38 @@ static ssize_t mptcp_splice_read(struct socket *sock, loff_t *ppos,
+ 	return ret;
+ }
  
--		ret = tcp_sendmsg_locked(sk, &msg, size);
-+		ret = sk->sk_socket->ops->sendmsg_locked(sk, &msg, size);
++static int mptcp_inq(struct sock *sk)
++{
++	const struct mptcp_sock *msk = mptcp_sk(sk);
++	const struct sk_buff *skb;
++
++	if ((1 << sk->sk_state) & (TCPF_SYN_SENT | TCPF_SYN_RECV))
++		return 0;
++
++	skb = skb_peek(&sk->sk_receive_queue);
++	if (skb) {
++		u64 answ = READ_ONCE(msk->ack_seq) - MPTCP_SKB_CB(skb)->map_seq;
++
++		if (answ >= INT_MAX)
++			answ = INT_MAX;
++
++		/* Subtract 1, if FIN was received */
++		if (answ &&
++		    (sk->sk_state == TCP_CLOSE ||
++		     (sk->sk_shutdown & RCV_SHUTDOWN)))
++			answ--;
++
++		return (int)answ;
++	}
++
++	return 0;
++}
++
++static int mptcp_peek_len(struct socket *sock)
++{
++	return mptcp_inq(sock->sk);
++}
++
+ static const struct proto_ops mptcp_stream_ops = {
+ 	.family		   = PF_INET,
+ 	.owner		   = THIS_MODULE,
+@@ -4712,6 +4744,7 @@ static const struct proto_ops mptcp_stream_ops = {
+ 	.read_sock	   = mptcp_read_sock,
+ 	.splice_read	   = mptcp_splice_read,
+ 	.sendmsg_locked	   = mptcp_sendmsg_locked,
++	.peek_len	   = mptcp_peek_len,
+ };
  
- 		if (ret != size) {
- 			if (ret > 0) {
+ static struct inet_protosw mptcp_protosw = {
+@@ -4825,6 +4858,7 @@ static const struct proto_ops mptcp_v6_stream_ops = {
+ 	.read_sock	   = mptcp_read_sock,
+ 	.splice_read	   = mptcp_splice_read,
+ 	.sendmsg_locked	   = mptcp_sendmsg_locked,
++	.peek_len	   = mptcp_peek_len,
+ };
+ 
+ static struct proto mptcp_v6_prot;
 -- 
 2.53.0
 
