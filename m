@@ -1,178 +1,226 @@
-Return-Path: <netdev+bounces-301142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RnK5BURNOWoUqQcAu9opvQ
-	(envelope-from <netdev+bounces-301142-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:57:08 +0200
+	id ElogLmROOWphqQcAu9opvQ
+	(envelope-from <netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:01:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821136B0888
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:57:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC496B0905
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 17:01:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=Y5RACkEG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301142-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301142-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=kt5UdAiU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301143-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=debian.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E39D53012B07
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 14:57:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0671A30078D9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:01:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E233101A5;
-	Mon, 22 Jun 2026 14:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84943101A5;
+	Mon, 22 Jun 2026 15:01:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DE530DEAC
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 14:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA34C23B61B;
+	Mon, 22 Jun 2026 15:01:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782140225; cv=none; b=hEJ7TdWeiEEt0OGpTfqZEXrI+ENbWGONknJK4wPciFDUJVK2Mt38QaNe1bgEJnwHyNBaPgT+Fl2uEbZ1sZfmmscl5mUx173d/lwtCPKlGvwSkhz+FWtTwshKo2W6IbqCXUV0gAIhEleNnrciYIIhPDwx9TXzIU6LuH4nW7mfYrs=
+	t=1782140512; cv=none; b=uQDkLmhQcV2dSRvItdBrlFfFkGsOKjFN2/j88xKDfRVUxCf5vLm/RAiMnBJG2LFX1xPe7sY7B51FcsoNOrZqL20W4HHudIIoG+2+Rm1s1L3zkto/cEaEsN7G9XxSZAUPbAXtTNELBq3GyfoOIdzspfARIUV4VKRnCMFPmsFn+Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782140225; c=relaxed/simple;
-	bh=0hLLKMzQu8RNFIKEy1vh7Z2WBSIBgnuV1KVfQH7vWDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JzSVnRozj8n8x/92eTyzsTHNETffMazMbqL7+XkowEY/LXtxAuT1tbqZfn+fLMZDraLbC46OMw8QKPW5IYLba0OXja555NLLRHo8TX/7B4NzdxQpmbGgekZlYBj70xvZAJiXusYqUaIa4DI+9ybd6tEsl+BQdTcvGiopcR8IbLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=Y5RACkEG; arc=none smtp.client-ip=74.125.82.54
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-137eb0d76beso3862616c88.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 07:57:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1782140223; x=1782745023; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0hLLKMzQu8RNFIKEy1vh7Z2WBSIBgnuV1KVfQH7vWDA=;
-        b=Y5RACkEGZNO3pkGwCyicMg6kpD/Drgy743ABPojB3MuN2JcL7TyoSLhn49kLw9XbRq
-         WkwKS6ZwzImet5AFkptz3jGbAbOts7GU5VwZ4aYcdrq3nUQbOavf9OJRft3pQGnXoome
-         CCKy8fvGodrBOkZ4fgFN4w4x4NzyxXp6LSOgpQWPTq/vtCnKFWHlrozQ0Zh/MOZJQtIt
-         9BqefDdNsJ6OJ81jAO4O7rb9AIUXX4kNusSd+K+riyy0FJ+5LpRHvcGwi6eDCYkxcPCu
-         H8as8F22+iO1xZz7seMHhcrpCZbCicEmsnTmZhg0poHd3kqUqXthzNFVqUK+LYdPyP59
-         gnaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782140223; x=1782745023;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0hLLKMzQu8RNFIKEy1vh7Z2WBSIBgnuV1KVfQH7vWDA=;
-        b=JKKCPu58nC4VsAyDsHGxZ+BOV681I0utdI4Cn32TMPoYPe8oaroWj26QZB9vMFKheT
-         DvYznUeCdHwD9UfBAJKO2IUL0Ol3p7Qb3k8Vdrm4bwNzDUykgZR4Jrr560BFbENoid9K
-         iOSLaZGFU4nVG9B5/W/GcYKYhmkhHwfvp5r3pMuWiLRPgnGkhZr54scDv8B8HFzHvc/Y
-         4RbRcyD/YfyiZCBd7h6liu1E0g40X6WE4WXJ/VS5Jc07DUnpQWv+uTtpncEPEC3NC7Aq
-         d24qxGqaAELR8bY5+jdpyaTUChiB00Qs9bSYIcX27VftnMW8XJjNEbIUAHogNoTP7M3r
-         wRoQ==
-X-Gm-Message-State: AOJu0YwLM+M+h67zyVYmr5hB2ADymSZ5rhAhuMMY20194BWijhrwxVFy
-	6f7s1O51hbRpsK5ENjlWgz83hRc0lxPcEj4jw2hPZBAiO0nQsiThfiQjIUhiRzfE/PQ=
-X-Gm-Gg: AfdE7ckH55Da46j+G6lns+Ygqe8BHwOhXCOy2+Cbdi6h9hkgmfmvYq411TP0sHddxMm
-	xKOOAvJljhSzJJYlT8kKo1ynzl/+mtaOp431WLQUYgxeFj5IYcWF8qa/GoQHKfDeSWLDPRjMxvf
-	NMKqW0CY/DnpufAONR3J0yTehmzFmMaxwvbb0QDqAmZ8Fq8ioviNOo9ykRzmA/cu8ILwjJ03mr5
-	y+QAqji7nNC5SFtA2CVKCWfVi8enqoBSQOLNBxsHXmxcwOpHrT2oeUeayYiPxKAgE8+/2Maw/wJ
-	ZYFc97elUHEtHruJEuXkZAH/VpcgR9SikaAe2hvbbJDc1PbbbgCHEPlAWEEAJ9o+TCpkaaf0HNG
-	ym9jYZm/XV+PAY04MBKFRWY9gKC2K3gMjjhAeZAQ/GmilR8IAcEyU0RNA1Qn21cHRKeUZ9wDP3R
-	Rd5fz5xG7rCbFFGRfCZPbDKfMxyYWQUSKNbikJdwJn6NgN2/Nc998REQ==
-X-Received: by 2002:a05:7022:e989:b0:138:4021:b20a with SMTP id a92af1059eb24-139a3020d24mr8036699c88.3.1782140223186;
-        Mon, 22 Jun 2026 07:57:03 -0700 (PDT)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139add5bd68sm8854983c88.11.2026.06.22.07.57.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2026 07:57:02 -0700 (PDT)
-Date: Mon, 22 Jun 2026 07:57:00 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Dmitri Seletski <drjoms@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] "ip help" wrong output, exit code.
-Message-ID: <20260622075700.27806286@phoenix.local>
-In-Reply-To: <069b13e1-f689-410b-bd40-b5e5831b67e7@gmail.com>
-References: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
-	<20260621082105.1196ef72@phoenix.local>
-	<069b13e1-f689-410b-bd40-b5e5831b67e7@gmail.com>
+	s=arc-20240116; t=1782140512; c=relaxed/simple;
+	bh=fi9OKxumYq8MA8wVF41Gx0pkkHxM1ZJyBBe9VTw0fwY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IYDoC6EQkCm94/2La8qNeLULyOIpMgfhFlwWY3giZ6trPUXMmQVpiX30v26MUAQhRiL/SBYsluDH/mZSFldWqBf42tc5wAVokH2kYrWJgVEqEQ03bPBeBQo1MHvVt8145Qdcsq/rP528Hdt7lwKT1+9FAmbMQXRf8DftCWWbjzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=kt5UdAiU; arc=none smtp.client-ip=82.195.75.108
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
+	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
+	bh=St9tHSZzfDXYzrB/rouWzdlJkubowTv6NS6nJVEwL8M=; b=kt5UdAiUnjIBcVwIWrpGXNvvLx
+	z7/KxNQU1keZTR8uquNUHY0vi+vbQpbby0SseTjpcxOFp4hxLLEilQfgpltLCMONymrOLGHItRwWY
+	nBXYzM3IYHSHy5d4Wt1Do1ePBmxvgzsD4pEQy5b7l/e6+a6MhOznp/9Wuhl/jb1O7pQSFktgjqGdO
+	n5r1S+BSIcrxAd4VQ5Bg64RrYEOtCorC21E8j0bN7vRMq174J6RT9F7i+td6aBYaiemt4N2Bk21FG
+	yMZs9tGwkXJY2+EcbKm7/N3NE+JtmTSswY9HPFjK9wooylt1RqbEWHBbWiRskXjvpo4d5w76b0Cv1
+	TrlkNJyw==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wbg9Z-000xIZ-24;
+	Mon, 22 Jun 2026 15:01:37 +0000
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 22 Jun 2026 08:01:23 -0700
+Subject: [PATCH net] netpoll: fix a use-after-free on shutdown path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260622-netpoll_rcu_fix-v1-1-15c3285e92e6@debian.org>
+X-B4-Tracking: v=1; b=H4sIAEJOOWoC/x3MQQqDMBAF0KsMf20gzkIhV5EiNv7UAYmS2CKId
+ xf6DvAuVBZjRZALhT+rtmUEaRtBXKb8obMZQaBeO9+pusxj39Z1LPE7JjvdzNS/I1v1/YRGsBc
+ mO//jgMwDr/t+ADPsJ2RmAAAA
+X-Change-ID: 20260622-netpoll_rcu_fix-def7bce1207a
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Amerigo Wang <amwang@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ vlad.wing@gmail.com, asantostc@gmail.com, kernel-team@meta.com, 
+ stable@vger.kernel.org, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3308; i=leitao@debian.org;
+ h=from:subject:message-id; bh=fi9OKxumYq8MA8wVF41Gx0pkkHxM1ZJyBBe9VTw0fwY=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqOU5M1vUuFcVLU5pEzknj66KcmxTFGJceBHXHy
+ nsbpaqI1ZaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCajlOTAAKCRA1o5Of/Hh3
+ bY9iD/9ERNCq4R8zH2Hnm5Xf/vyAOl6FfVGKCS2slx/brhTK5UgDle6pnuLzfnoir/0tLgEMEqf
+ lhu/Ddwir7rSuo+mbHBLZKWwQ4tzgdkOw5ji2K7knJUFeyosNI/4gZQmOjHgTTZMTpw3jaXMoxW
+ bm8EDpkfPUnyurX6DZ1xToYeM+emH2qrXILjVpZvaTATLW+uHBRecB1MFKbViutRxM59XpNc87q
+ SKPivPxsohNuquGN8p88PDYRw1jPkkGjeLokshWIJ04SfyceIqqZFRP8KjQ1GOHfK9P5YLWS6Ok
+ DI02amb5C2YWHbz+NOC/Y7nUhJvnWOQVxxZ5QAEtXurvONnA+uvqNz996YamLcqxUnHSvgdbbr/
+ 0cSwkxuEBVnutQDiyFgjwGYZtjyFzjZtxQGqSZSsQnMX4yMshJghAAuLs7O9GLnSJr3h2bsG8yR
+ 4y+SHmr5adhmztXPvAkQ/AS4IEnr6ZkGOw0ud9A7mJDk8r6oEaXIxs9AdLYyq9otPfMOkYnuJ0h
+ thEEVw71wBVb548ZLmRSLTVFKyNVgECpUjFOoZI4sAkFVvdj06JAqpGAhLbnte4KfVLNz5Fl4TJ
+ A7oBOAmqDOWmtiQD5GgRNkkI6E6NUp4mO+exJsWj6NiEezcjKGBiSrcKWWUy1Pv73dU1zQVEGyZ
+ MSDLVx2IRaYNBOw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:drjoms@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	TAGGED_FROM(0.00)[bounces-301143-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301142-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:amwang@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vlad.wing@gmail.com,m:asantostc@gmail.com,m:kernel-team@meta.com,m:stable@vger.kernel.org,m:leitao@debian.org,m:vladwing@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,meta.com,debian.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 821136B0888
+X-Rspamd-Queue-Id: 3DC496B0905
 
-On Sun, 21 Jun 2026 22:48:59 +0100
-Dmitri Seletski <drjoms@gmail.com> wrote:
+There is a use-after-free error on netpoll, which is clearly detected by
+KASAN.
 
-> From 0805e07105cd15c5b94271a4706e50e3c65dbde5 Mon Sep 17 00:00:00 2001
-> From: Dmitri Seletski <drjoms@gmail.com>
-> Date: Sun, 21 Jun 2026 22:12:43 +0100
-> Subject: [PATCH iproute2-next] =C2=A0"ip help" wrong output, exit code.
->=20
-> Changed output of "ip help" from standard error to standard output. And=20
-> Exit is now 0 instead of -1. "ip help|grep bridge" - now gives bridge=20
-> syntax instead of flooding user with everything from "ip help".
-> ---
-> ip/ip.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/ip/ip.c b/ip/ip.c
-> index e4b71bde..4627b61c 100644
-> --- a/ip/ip.c
-> +++ b/ip/ip.c
-> @@ -56,7 +56,7 @@ static void usage(void) __attribute__((noreturn));
->=20
-> static void usage(void)
-> {
-> -fprintf(stderr,
-> +fprintf(stdout,
-> "Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }\n"
-> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip [ -force ] -batch filename\n"
-> "where =C2=A0OBJECT :=3D { address | addrlabel | fou | help | ila | ioam =
-| l2tp=20
-> | link |\n"
-> @@ -72,7 +72,7 @@ static void usage(void)
-> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-o[neline] | -t[imestamp] | -t=
-s[hort] | -b[atch]=20
-> [filename] |\n"
-> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-rc[vbuf] [size] | -n[etns] na=
-me | -N[umeric] |=20
-> -a[ll] |\n"
-> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-c[olor]}\n");
-> -exit(-1);
-> +exit(0);
-> }
+      BUG: KASAN: slab-use-after-free in _raw_spin_lock_irqsave+0x3b/0x80
+      Read of size 1 at addr ... by task kworker/9:1
+      Workqueue: events queue_process
+      Call Trace:
+       skb_dequeue+0x1e/0xb0
+       queue_process+0x2c/0x600
+       process_scheduled_works+0x4b6/0x850
+       worker_thread+0x414/0x5a0
+      Allocated by task 242:
+       __netpoll_setup+0x201/0x4a0
+       netpoll_setup+0x249/0x550
+       enabled_store+0x32f/0x380
+      Freed by task 0:
+       kfree+0x1b7/0x540
+       rcu_core+0x3f8/0x7a0
 
-Your mailer damages white space.
+The problem happens when there is a pending TX worker running in
+parallel with the cleanup path.
+
+This is what happens on netpoll shutdown path:
+
+1) __netpoll_cleanup() is called
+2) set dev->npinfo to NULL
+3) call_rcu() with rcu_cleanup_netpoll_info()
+  3.1) rcu_cleanup_netpoll_info() tries to cancel all workers with
+       cancel_delayed_work(), but doesn't wait for the worker to finish
+4) and kfree(npinfo);
+
+Because 3.1) doesn't really cancel the work, as the comment says "we
+can't call cancel_delayed_work_sync here, as we are in softirq", the TX
+worker can run after 4).
+
+Tl;DR: queue_process() is not an RCU reader, it reaches npinfo through
+the work item via container_of().
+
+In reality, we can improve this cleanup path by a lot, but, given that
+this is targeting net, just do the sane path:
+
+1) set dev->npinfo to NULL
+2) synchronize net / RCU
+3) cancel_delayed_work_sync() any new worker (that potentially showed up
+   after the grace period -- and should exit soon given they will see
+   dev->npinfo = NULL)
+4) then rcu_cleanup_netpoll_info() -> kfree() npinfo
+
+In the future, we can do the cleanup inline here, and don't need
+npinfo->rcu rcu_head, but that is net-next material.
+
+Cc: stable@vger.kernel.org
+Fixes: 38e6bc185d95 ("netpoll: make __netpoll_cleanup non-block")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/netpoll.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 229dde818ab33..5765015b40720 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -634,9 +634,6 @@ static void rcu_cleanup_netpoll_info(struct rcu_head *rcu_head)
+ 
+ 	skb_queue_purge(&npinfo->txq);
+ 
+-	/* we can't call cancel_delayed_work_sync here, as we are in softirq */
+-	cancel_delayed_work(&npinfo->tx_work);
+-
+ 	/* clean after last, unfinished work */
+ 	__skb_queue_purge(&npinfo->txq);
+ 	/* now cancel it again */
+@@ -664,6 +661,14 @@ static void __netpoll_cleanup(struct netpoll *np)
+ 			ops->ndo_netpoll_cleanup(np->dev);
+ 
+ 		RCU_INIT_POINTER(np->dev->npinfo, NULL);
++		/*
++		 * synchronize_net() does not protect the worker
++		 * (queue_process() is not an RCU reader). It fences the
++		 * senders -- the real RCU readers -- so they cannot re-arm
++		 * tx_work after the np->dev->npinfo was set to NULL.
++		 */
++		synchronize_net();
++		cancel_delayed_work_sync(&npinfo->tx_work);
+ 		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
+ 	}
+ 
+
+---
+base-commit: d07d80b6a129a44538cda1549b7acf95154fb197
+change-id: 20260622-netpoll_rcu_fix-def7bce1207a
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
