@@ -1,148 +1,195 @@
-Return-Path: <netdev+bounces-301167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301168-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ipSYG1RlOWpOrgcAu9opvQ
-	(envelope-from <netdev+bounces-301167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:39:48 +0200
+	id hP61KI1mOWrorgcAu9opvQ
+	(envelope-from <netdev+bounces-301168-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:45:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB636B12F6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:39:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004ED6B13B3
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 18:45:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=A7u0TWl4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301167-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301167-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bKqsuRg2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301168-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301168-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 70919300BC65
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:39:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2DDD3003607
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 16:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEAD238D52;
-	Mon, 22 Jun 2026 16:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130352BCF4C;
+	Mon, 22 Jun 2026 16:44:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CFE33122A
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 16:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF06175A85
+	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 16:44:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782146382; cv=none; b=Vx/Kas5KFzbAWw6FsPo7+6LNqX7xe4q/hZ/x1w1ByuwfT0eww2lfhkTGd5gs+LoTpqivgF7XZmhFubrSIMIb4n/ElfgQcrOSB5ysgQhh8StELJuq8DYMq0PDkeBAI0P5D+0vVXZ/6XBbqMByyiI61Vgr8y0BM7cW0Jf0msiX7PA=
+	t=1782146699; cv=none; b=Y5Cb1XNChmSS1Sl46uiFO13lxjNU3uyWlVf8levFcuOGgrYLJn9vkE0SjOt3tm6j7IWQwK+uKzLwdtFeCqR8PA+Mh2p6rul5pacc0AzF2TXc31z1F3I5FW/1jGAtnbZs4+DzKOSEXBRErEo36t5a2eFf3wFueg4BT10HJBiiHTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782146382; c=relaxed/simple;
-	bh=XIHiu0O5xbQNgDMVw+8qHBFtUFZeCNyYb1TeYSKO1ww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gbH+Mpe8324HprdJYIA4Shg2xeaAW8C4bYfJCxHasUwPWjpcg+shQwsKkZs71bwXcOs2PsfDLG8zB3/aAA0F026LdPnnwG+UR1JVYbRKTjaMbOs/h1xjdqjblme1/N7nw0i2XEDMXmyf6yXOU2kSPKUD8chMO0h4EuA9tG+eCPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7u0TWl4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B5871F000E9;
-	Mon, 22 Jun 2026 16:39:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782146381;
-	bh=QUZD+emMQ2xlB4a05ZZK2Z1/2LYgrrwvQo0kKAM+qPg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=A7u0TWl4NdgWXkAMlDQhZA9OVkFj9CDXRLeJ0IQJ1e6symrrmYwzLrCZ9FCEQ1/0e
-	 pTA9PwpEaO53WqkDwx1TwQCkOhWhjypPk7KItRuXW4LG/nQpwuXE3zY1WjjdtkNmte
-	 vk2U6VFIx+0aF9JPW1LZNTfzxGNPaSSa2MLJM1jEr/5SaWO7bdszv48UNu4h1WKBTg
-	 lm/JubDjaM+vFcSBV5BWvoVkKxTUDNEQOWgERHxVasD8jFOzzSqLytg8y39E3d0IQU
-	 zxeEh7xUCvsNa92YKvqBSUCtnuS3OWhsBWxRuQ++Cvt8sZLR9XZtAQJZWXGMbtwpeM
-	 ZVftYS3FjcX2Q==
-Date: Mon, 22 Jun 2026 17:39:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wayen Yan <win847@gmail.com>, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v3] net: airoha: fix BQL underflow in shared QDMA TX
- ring
-Message-ID: <20260622163937.GH827683@horms.kernel.org>
-References: <20260620-airoha-bql-fixes-v3-1-76b95374e63e@kernel.org>
+	s=arc-20240116; t=1782146699; c=relaxed/simple;
+	bh=52okT5bt09/zEjfuJg57RgAQ9s722P7n5z2k6Vageuw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ivz+hvevy+0FAvh8xfG2whAid7Jpex076uMEXhD69HIBY+qtQ7238Yp+88gbY03iYo/f1MFZz8UKO+8erxOPjXF4FSUvfb8h9pa4DiVMYW16xBuLxFosZAEVer0jp6YwqLhmbe+6DHn3VC/DonGhQTjTFgTHpQsRUwTKZzAmxlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bKqsuRg2; arc=none smtp.client-ip=209.85.128.49
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4924593f45dso29832975e9.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 09:44:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782146696; x=1782751496; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vbhX7NYq6NAwLggkmVvi+rfcNAqAVuZT3BPCddDjjeY=;
+        b=bKqsuRg2aNUGuM8WGf53lFWekwt2WtZWy5+OFJFByYWnpSdRC+h5tSrhhbSBFgivbY
+         8KalttBbiKxIriBw4F1m+kh88+fyOAnk96nJWjCyONASOo47oN/euj01lGgYYz2IrD5r
+         TTapykk6cRLm4k9AWfQ0kPvnRRFZ2CWuAw1R38sounNfaleEgIiIliNVC+3jGleeqKpM
+         RwbePOey2vpaHMnrANvSQvF20ZIHgo/zNP4qJ6IyCPqJ7OyeMu1fw27KwWGrCSVFvvv5
+         ArdgTOKLn7Wai0cdcMEC5iQEr7a/NEfsZjGztexSamqohaOiRHiplql7HVGNifcOTc/m
+         p2YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782146696; x=1782751496;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vbhX7NYq6NAwLggkmVvi+rfcNAqAVuZT3BPCddDjjeY=;
+        b=HfUgEX1yTEzIrhjf3LdhVhVt/RDRwmppHpy+ZnYjHqEy0lIt93lf8RbaICvVXot01Y
+         XluUDKVvv4l+I25OexQ7s+BpjInhnifDQo3L+hU7yCpF6DglHKhMs6T0Zr84UF21zjD6
+         QQL6UChePEISA1rixi0Fl3rwl0hqN4x2dqyghE0r8Pi8KDxDzDQUSmqU7+LU0HDwIKiK
+         RvAWGq25DfpTnvNfXRRSaVxOekFHBZJRKktxCUtiN/F98g0utD9X5rBXt8GrQ62N2bnS
+         7IdnDpPvbO+xHZHp2XrnisMR0Moi5H3TZnTAM8gDyRzw8nI4/MOamF3aNLHtNNTopA1Z
+         +mKw==
+X-Forwarded-Encrypted: i=1; AFNElJ/XKNXQFnEwQaZBaV65IpjtdaB9HM7bxqvOPQKtjDowGqWxjafGMtwOPMkN3faNGeV0Qb9HH80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL6nx83KoYL8dyGwjxIJLieQ/L66UvEygzmviLLtUZ2rngA048
+	b1JGG/uQi7lzb0zA7Bhv6fpTHTqgaPctw3JHfIj4B1k30+MjVql+sr91FT+4XBoE
+X-Gm-Gg: AfdE7cnTrP3VNU2B/faqu19KrKsrFkdrJL9X1P5ecvPA1g39eKd6tTHj5V7gFz46dyD
+	vKHssWiBHEoUd/pmq9EEdjqKauRej62Ij9vzuFmYcTRTNpsPT5/1RPdlN8tSSKQIIabfUVb14NW
+	Zhsv+aWVDnB6KylpueZgZGP8bMuozoxZx7wABPe788S46L9CrsMiVHLFQOSt/L5KUmN2iK7KgIa
+	dlf/7weTQbHSKY1qiI3Mi8v7YWe0hJyXQaZ4D1pFvpBe+wzw95Y6smXKbjex4N9eRYmx0fruS4v
+	j+YBwhoLEzCoLqwsv/2OlL9p2WDtO9siuYv2/lDtsPB+/Bo3TKNJ2dtr45XpWFtrPvWDVgcQy0N
+	C4nTp6lQ4qRXCQpSfk/CR/Ib0gKFoMxSIjz9/HmFdS5rddvV3Vaej41Lz5O0453s1wKRZ4PPREZ
+	HLU4TqQVYmhJO4pFBjO1/rbcSWHfBQ1DW9Ueflfo6OOPHCC/yAww==
+X-Received: by 2002:a05:600c:1c09:b0:492:4d56:d5fe with SMTP id 5b1f17b1804b1-4924d56d644mr181368975e9.14.1782146695650;
+        Mon, 22 Jun 2026 09:44:55 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46666c57a0esm25841842f8f.27.2026.06.22.09.44.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 09:44:55 -0700 (PDT)
+Date: Mon, 22 Jun 2026 17:44:54 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Dmitri Seletski <drjoms@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next] "ip help" wrong output, exit code.
+Message-ID: <20260622174454.576b3580@pumpkin>
+In-Reply-To: <20260622075700.27806286@phoenix.local>
+References: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
+	<20260621082105.1196ef72@phoenix.local>
+	<069b13e1-f689-410b-bd40-b5e5831b67e7@gmail.com>
+	<20260622075700.27806286@phoenix.local>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260620-airoha-bql-fixes-v3-1-76b95374e63e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301167-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301168-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:win847@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.infradead.org,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:drjoms@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,networkplumber.org:email,pumpkin:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BB636B12F6
+X-Rspamd-Queue-Id: 004ED6B13B3
 
-On Sat, Jun 20, 2026 at 05:04:51PM +0200, Lorenzo Bianconi wrote:
-> When multiple netdevs share a QDMA TX ring and one device is stopped,
-> netdev_tx_reset_subqueue() zeroes that device's BQL counters while its
-> pending skbs remain in the shared HW TX ring. When NAPI later completes
-> those skbs via netdev_tx_completed_queue(), the already-zeroed
-> dql->num_queued counter underflows.
-> 
-> Fix the issue:
-> - Remove netdev_tx_reset_subqueue() from airoha_dev_stop() so pending
->   skbs are completed naturally by NAPI with proper BQL accounting.
-> - Rework airoha_qdma_tx_cleanup() to disable TX DMA, flush BQL
->   counters, DMA-unmap and free all pending skbs while skb->dev
->   references are still valid. Use a per-queue flushing flag checked
->   under q->lock in airoha_dev_xmit() to prevent races between teardown
->   and transmit. Call airoha_qdma_stop_napi() before
->   airoha_qdma_tx_cleanup() at the call sites.
-> - Move DMA engine start into probe. Split DMA teardown so TX DMA is
->   disabled in airoha_qdma_tx_cleanup() and RX DMA in
->   airoha_qdma_cleanup().
-> - Remove qdma->users counter since DMA lifetime is now tied to
->   probe/cleanup rather than per-netdev open/stop.
-> 
-> Fixes: a9c2ca61fec7 ("net: airoha: Support multiple net_devices for a single FE GDM port")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
-> Changes in v3:
-> - Remove airoha_qdma users counter.
-> - Drop DEV_STATE_FLUSH bit and add per-queue flushing bool to avoid any
->   race between airoha_qdma_tx_flush() and airoha_dev_xmit().
-> - Refactor airoha_qdma_cleanup_tx_queue().
-> - Rename airoha_qdma_cleanup_tx_queue() in airoha_qdma_tx_cleanup().
-> - Link to v2: https://lore.kernel.org/r/20260619-airoha-bql-fixes-v2-1-4351d6a24484@kernel.org
-> 
+On Mon, 22 Jun 2026 07:57:00 -0700
+Stephen Hemminger <stephen@networkplumber.org> wrote:
 
-Thanks for the updates.
+> On Sun, 21 Jun 2026 22:48:59 +0100
+> Dmitri Seletski <drjoms@gmail.com> wrote:
+>=20
+> > From 0805e07105cd15c5b94271a4706e50e3c65dbde5 Mon Sep 17 00:00:00 2001
+> > From: Dmitri Seletski <drjoms@gmail.com>
+> > Date: Sun, 21 Jun 2026 22:12:43 +0100
+> > Subject: [PATCH iproute2-next] =C2=A0"ip help" wrong output, exit code.
+> >=20
+> > Changed output of "ip help" from standard error to standard output. And=
+=20
+> > Exit is now 0 instead of -1. "ip help|grep bridge" - now gives bridge=20
+> > syntax instead of flooding user with everything from "ip help".
+> > ---
+> > ip/ip.c | 4 ++--
+> > 1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/ip/ip.c b/ip/ip.c
+> > index e4b71bde..4627b61c 100644
+> > --- a/ip/ip.c
+> > +++ b/ip/ip.c
+> > @@ -56,7 +56,7 @@ static void usage(void) __attribute__((noreturn));
+> >=20
+> > static void usage(void)
+> > {
+> > -fprintf(stderr,
+> > +fprintf(stdout,
+> > "Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }\n"
+> > " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip [ -force ] -batch filename\n"
+> > "where =C2=A0OBJECT :=3D { address | addrlabel | fou | help | ila | ioa=
+m | l2tp=20
+> > | link |\n"
+> > @@ -72,7 +72,7 @@ static void usage(void)
+> > " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-o[neline] | -t[imestamp] | -t=
+s[hort] | -b[atch]=20
+> > [filename] |\n"
+> > " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-rc[vbuf] [size] | -n[etns] na=
+me | -N[umeric] |=20
+> > -a[ll] |\n"
+> > " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-c[olor]}\n");
+> > -exit(-1);
+> > +exit(0);
+> > } =20
+>=20
+> Your mailer damages white space.
+>=20
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+The output also needs to depend on whether these is a 'usage' error or
+if 'help' is requested.
+Code code is correct for the former - except it should do exit(1).
+
+	David
+
 
 
