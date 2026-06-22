@@ -1,234 +1,146 @@
-Return-Path: <netdev+bounces-301034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Z+yXKBsROWoNmQcAu9opvQ
-	(envelope-from <netdev+bounces-301034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:40:27 +0200
+	id 9B/aB04ROWobmQcAu9opvQ
+	(envelope-from <netdev+bounces-301035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:41:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61726AEC5A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:40:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20476AEC81
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 12:41:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JY89DMa6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301034-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301034-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QZ294WN1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301035-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301035-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73CC6302925A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:39:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BA004300CCA9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 10:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C26372073;
-	Mon, 22 Jun 2026 10:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD96D372ED7;
+	Mon, 22 Jun 2026 10:41:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B5E371D14
-	for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 10:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55D9372B57;
+	Mon, 22 Jun 2026 10:41:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782124791; cv=none; b=iHWgJkGqfyZWa+Y+UWpC3Vt6d+bqW9e3wQtYi510ZOKqUhmCybREJ0MafrFeaweJCY/fV2JfugKD5j9ael7J0uAe6UkRLuvSpE3mz33iE5qMmrDMoBuMNhs6PpEymLPa6kQjRN+ZZfkFyJ2kLy2L/iGhA3upvtXZAVs4wRv6/7U=
+	t=1782124870; cv=none; b=Qg8oxpADU1/IGlcOWlRb2RX4WhRNcF53tLWH7Un/grOFIWyn/5cuk+0XTi4DWrXQRHOT/sZNaawBg1WogkASLK8qmBHs07L4z5Vqp/9oeGHakccISnYp4P81wBqvambekGdeJ/nQoni9nlAlvufuCh7J5g3kPrR2QQGYFz2avrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782124791; c=relaxed/simple;
-	bh=l7GE8ppv7syndesvKvd8fs/IZ33+/HRctLy+inIPAT8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tgXCfuCjejJjXxdWqB3pjWU/AG+s/NwL+/hME4RTLMWVRfmd+9SfJ7WcK4BC5sjRCY5bm4B0L8CR+18nCfRvKDM/LIRKL0JVrQdyTylsWrzzVIgzyos7SAcLB2wqNIeHB6aLzZbp7+48ZxpnjZv967PbUkMkzqJ9CSrFqgXsdYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JY89DMa6; arc=none smtp.client-ip=209.85.218.49
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c07680fdd12so473517166b.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 03:39:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782124789; x=1782729589; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SK/Fc7QLqT//mHxJWtHX0hIYStHzfhddF03i10bvQiw=;
-        b=JY89DMa6VRJYVtaRoQPLvOUSrOWr+nIdErGXVPff36KZW4ZSdOxBjmb/U/eGDzWa4T
-         54kghMeuQmfJ1ZwLyFcRGCkGLu0ocU+EdDbzRcsU8CQ/cnZ0QoOGNgiOKFdsIvQwsS3s
-         3GAQeWYufnmLJpC4lg7alUhvM4WQS8jlUcjxaTIi5CYly8GsIfxQ8posFqvJ+tukKEgF
-         328HRQ9tk6sk73pnOC8vUEOjDbfO8SWThppG3jboVR3bBVv7RypqrTC7HYXXrMUsuIdU
-         i2wlD13bUatwwSP4rGf4V3mvQEuEexO5tvC6NaT3ruMKgnyV596eVezT281QDCvi/uR9
-         vvjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782124789; x=1782729589;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SK/Fc7QLqT//mHxJWtHX0hIYStHzfhddF03i10bvQiw=;
-        b=D87+4pv2gsIeAV28Hf5B48BuAJub6ZgUbtoAmNXulysaWdNMcmZi7jj6WcOGB9xtJp
-         QSQzX6vJIsCQHB3V8qpi2A1vVK3QRZxhKYIUNpB4SYHfzaKOQNKHIaTrwajaM18WfjKO
-         Yux8g8fnmAwoZFUbpEx5WMeToerFGWDPeQtKpqy9MZp120JV5+oqWqruqynZxRXpBvys
-         yBw/fCQ2gqrleW6Mzyh30Gy2XtBE9Vxpgbww8KqPE70XppbZJa0bNiFBmongaZCJo+9h
-         aq928IBgbnDomXRvIu/FbRN1K/9SY88TNGDGKAktmlRasYOT2MrMuxHNZC1IGRytCSRg
-         VZ2Q==
-X-Gm-Message-State: AOJu0YzKEmnN1b1oxkUaWSOF+22jjIa9PT+DhxP2ytPXN/o541+C3pfo
-	nyuRfdActgpbQ1Sd8AcXIb8AogfQDmtbZM0+WBh1MIDjdAFzNCirEMVk
-X-Gm-Gg: AfdE7ckX/HvwEz2rICwWhpIdyaTMTUrOrzlRoF6RrUNePFnHT59u55+9OD9wScCdJud
-	TdiF6AF680FIP6tZf+ZaZQLExCSdbeD/CetYEmL/JvS1GCkKJW36pJ5KU44zRONL+EsIXQSnCek
-	brn+b4s9ca+lSdxxNYu+ZlU+X7H9PXmEDqGynNdXSrOLA7u2Nig9CzB9XTTBadkhjBCflTLUX7t
-	7cSvfD7HlBKSxkDkLF5gr/3+giS6LoqVMyBZ9BGYVFoYo5YSz0srgmP7X44+6VoXE1lG6Z2zoY6
-	PovFXKmwO9bQVtj7DjI5c6ptz4HEqPqK4naF6a5shXX8iMLneWwKl52ROlKkpUsQMRKRgdw/OqU
-	mxDdY9I0z0btlRTZNg5npYp53KG1EJJf/U86HMPJrd0xCuH0bXPSX6Q6N2nulx2zhNp9LYtv+uf
-	TDJ1nsrSA4UdcVqo/sytbY268+WrY6DrHV1ZdXuoxpYyKPxkRJCAzwsRk=
-X-Received: by 2002:a17:907:3f99:b0:bec:2ad0:cba5 with SMTP id a640c23a62f3a-c0b744a6dd6mr649220966b.29.1782124788696;
-        Mon, 22 Jun 2026 03:39:48 -0700 (PDT)
-Received: from ?IPV6:2001:bb6:1b96:9200:cf2e:dbb6:5a08:1ea4? ([2001:bb6:1b96:9200:cf2e:dbb6:5a08:1ea4])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c61617677sm344922066b.60.2026.06.22.03.39.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jun 2026 03:39:48 -0700 (PDT)
-Message-ID: <e07eeab3-9cb2-4cdd-9831-0851c278ac43@gmail.com>
-Date: Mon, 22 Jun 2026 11:39:46 +0100
+	s=arc-20240116; t=1782124870; c=relaxed/simple;
+	bh=H8kkjnVH2sr/aXhdi1kSRMYfYqNlcC9x5Bp4D4zn0YE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nkTJurmgy6bmrEcYX3OaGyIBntlN4Q4RG9O+Hp5297HQxSAH06R/0rpK+bY1Sf8NewMzCnYnXOviJa5601t7HKbpKTgavWIBF2jmuac1FQRGIU9kzgUMfwS/jBhZB7Gv0Qe3nQP6Zx1Dc7viNQCwaw1NLKxPCJyQ0JGB/yGxoto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZ294WN1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD331F000E9;
+	Mon, 22 Jun 2026 10:41:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782124869;
+	bh=DaIWgeqJoY7AB6Acb+TUrH2c1hf7Qtz2kCUERJI3vHE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QZ294WN1Sf0VVopfavVbVKjPvWMoZVA025jTnK/VJU3ZWXyo/GKqu/jmKkvxS+YFd
+	 B4AeyWkEMSKniVe4Qu72FEl64FmHg80kogic/IE7+olw+1n+zBJuKDg9Q+GjWcrU6W
+	 OkxI00IbazBLF/IXkFY/8zttcolhCNJ2E2II2Z3Q0Kn8zHRP6gF020JJGdGpxy3RZr
+	 b7/HCVPnVwQYk3V2dBVxdzxLxqdZP7nGXG+IFN2WeNE0QHkACmnHOZHdgCwAWrjavx
+	 HWnEIUvB4S/LK+GJFt1yVgn8tPU09WGhnldp/N3fhxTTviXWNiyg0Uo73x6LoFTyxk
+	 WT6lpLNpsZAFw==
+Date: Mon, 22 Jun 2026 11:41:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, dipayanroy@linux.microsoft.com,
+	ssengar@linux.microsoft.com, jacob.e.keller@intel.com,
+	gargaditya@linux.microsoft.com, kees@kernel.org,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net] net: mana: Fall back to standard MTU when PF reports
+ adapter_mtu of 0
+Message-ID: <20260622104103.GA827683@horms.kernel.org>
+References: <20260619055348.467224-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: "ip help" output is an error
-To: David Laight <david.laight.linux@gmail.com>,
- Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-References: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
- <20260621082105.1196ef72@phoenix.local> <20260622084925.6f3dfc4f@pumpkin>
-Content-Language: en-US
-From: Dmitri Seletski <drjoms@gmail.com>
-In-Reply-To: <20260622084925.6f3dfc4f@pumpkin>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260619055348.467224-1-ernis@linux.microsoft.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301034-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,networkplumber.org];
+	TAGGED_FROM(0.00)[bounces-301035-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:stephen@networkplumber.org,m:netdev@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[drjoms@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[drjoms@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:ernis@linux.microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dipayanroy@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:jacob.e.keller@intel.com,m:gargaditya@linux.microsoft.com,m:kees@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E61726AEC5A
+X-Rspamd-Queue-Id: A20476AEC81
 
-Hello David,(sorry for duplicate, I keep on forgetting to turn off HTML)
+On Thu, Jun 18, 2026 at 10:53:38PM -0700, Erni Sri Satya Vennela wrote:
+> Commit d7709812e13d ("net: mana: hardening: Validate adapter_mtu from
+> MANA_QUERY_DEV_CONFIG") rejected any adapter_mtu value smaller than
+> ETH_MIN_MTU + ETH_HLEN, including 0, returning -EPROTO and failing
+> mana_probe().
+> 
+> Some older PF firmware versions still in the field report
+> adapter_mtu as 0 in the MANA_QUERY_DEV_CONFIG response. With the
+> hardening check in place, the MANA VF driver now fails to load on
+> those hosts, breaking networking entirely for guests.
+> 
+> MANA hardware always supports the standard Ethernet MTU. Treat a
+> reported adapter_mtu of 0 as "the PF did not advertise a value" and
+> fall back to ETH_FRAME_LEN, the same value used for the pre-V2
+> message version path. Only jumbo frames remain unavailable until
+> the PF reports a valid MTU.
+> 
+> Other small-but-nonzero bogus values are still rejected, preserving
+> the original protection against the unsigned-subtraction wrap that
+> would otherwise let ndev->max_mtu underflow to a huge value.
+> 
+> Fixes: d7709812e13d ("net: mana: hardening: Validate adapter_mtu from MANA_QUERY_DEV_CONFIG")
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
 
-Yes, user could do the redirection, but it's less convenient and 
-counterintuitive. IMHO, it's just wrong.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Once user has done "ip help" - IMHO, exit code should be 0. Because user 
-did run a command and it correctly executed with a reasonable 
-results(provided help text).
+FTR, I agree with your assessment that the issue flagged in the
+AI-generated review of this patch on sashiko.dev can be
+treated as a follow-up [1].
 
-And if exit code is 0 - then it reasonably stands that output data is 
-standard output and not an error.
+And I don't think the low priority issue flagged in the AI-generated
+review on https://netdev-ai.bots.linux.dev/sashiko/ should impede progress
+of this patch.
 
+[1] https://lore.kernel.org/bpf/ajj+5mhswcqhI2z7@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net/
 
-"it do exit(0) is likely cause new scripts to fail on old systems." - do 
-I understand correctly, concern is that existing scripts that depend on 
-current behavior will fail?
-
-First of all, I am guessing that there are not many scripts that depend 
-on "ip help".
-
-Second of all, if there are such scripts and we follow this logic - do 
-we ever patch anything? Since any script out there can depend on broken 
-behavior that will be patched?
-
-Third of all, people who wrote such scripts, should have reported bug 
-here in the first place. But it's neither here nor there.
-
-
-Do I fail to see a bigger picture here? Cause I feel silly talking in 
-this mailing list.(I submitted a change for this issue about half a day ago)
-
-Kind Regards
-
-Dmitri Seletski
-
-
-On 6/22/26 08:49, David Laight wrote:
-> On Sun, 21 Jun 2026 08:21:05 -0700
-> Stephen Hemminger <stephen@networkplumber.org> wrote:
->
->> On Sat, 20 Jun 2026 10:36:31 +0100
->> Dmitri Seletski <drjoms@gmail.com> wrote:
->>
->>> Hello iproute2 maintainers,
->>>
->>> I am reporting an inconsistency regarding the exit status of the ip help
->>> command.
->>>
->>> Current Behavior:
->>> When running ip help, the command prints the help documentation to
->>> stdout, but exits with a non-zero status (error). This causes issues in
->>> shell scripts that rely on exit codes for control flow.
->>>
->>> Steps to reproduce:
->>> bash
->>>
->>> # This returns "FAIL" because the exit code is non-zero
->>> if ip help > /dev/null; then
->>>       echo "SUCCESS"
->>> else
->>>       echo "FAIL"
->>> fi
->>>
->>> Expected Behavior:
->>> Since the command successfully performs the requested task (displaying
->>> help information) and does not encounter a system error, it should
->>> return an exit code of 0.
->>>
->>> Context:
->>> This behavior breaks standard Bash logic for automation. For example:
->>> ip help && echo "This will not execute"
->>>
->>> "ip help |grep br" - this will bring no result.
->>>
->>> Current version tested: iproute2-6.19.0
->>>
->>> Thank you for your time and for maintaining this tool.
->>>
->>> Regards,
->>> Dmitri Seletski
->>>
->>>    
->> Yes iproute2 doesn't do a great job of handling error codes
->> with usage vs help. Its a bug and no one has bothered to fix it.
->>
-> The version I've got does write(2, "Usage...", 972); exit(-1);
-> Changing it to do write(1, ...) is likely to break scripts, and making
-> it do exit(0) is likely cause new scripts to fail on old systems.
->
-> The 'grep' works fine if you redirect stderr to stdout.
->
-> The exit(-1) is a bug; the parameter is only 8 bits and the high bit
-> is expected to be used to indicate abnormal termination (eg by a signal).
-> That should probably be changed to exit(1), there doesn't seem to be
-> a standard way to differentiate between command line errors and
-> operational ones.
->
-> 	David
->
 
