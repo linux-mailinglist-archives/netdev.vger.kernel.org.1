@@ -1,330 +1,189 @@
-Return-Path: <netdev+bounces-301131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301130-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qamAOzw9OWpDpAcAu9opvQ
-	(envelope-from <netdev+bounces-301131-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:48:45 +0200
+	id wxahH107OWrHowcAu9opvQ
+	(envelope-from <netdev+bounces-301130-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:40:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516B86B000A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:48:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9886AFEF9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 15:40:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mandelbit.com header.s=MBO0001 header.b=SGKC6Bh9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301131-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301131-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YFXni578;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301130-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301130-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 883FD3048AE7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:45:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 71066303A11A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jun 2026 13:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D843A9D88;
-	Mon, 22 Jun 2026 13:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43913B0ADB;
+	Mon, 22 Jun 2026 13:35:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-107.mailbox.org (mout-b-107.mailbox.org [195.10.208.47])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286583B52E2;
-	Mon, 22 Jun 2026 13:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B7C3AC0EC;
+	Mon, 22 Jun 2026 13:35:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782135906; cv=none; b=U0H5jiB/brXocM6bOfMz7LNNSO52qTKEHtXP/xwUyafAqMolWRK6rtqCkUoHGiR7JN31pkQaElQIclQOWe1uaB7oIs3kTSGexd9w2wZx0p0EIbWc/xGPvL2fvaheHlvMIAQ47EJEyxXFXsd1kzVpUCCLmEO/dMTAbAhJjjrnHKo=
+	t=1782135350; cv=none; b=qkv70XTQQ89ZfFRjLdVC9w+U//TRZh0zdVXqEYN+Ilzt4bfJ2S4JdxZI3l/W3VouqFGkqy2KlKDGC6tb4q6iLJS1Egk343CHeqjRvLGxq68ufep5rW2Czihluq/l5PujxCILh4tguKkWn6WU+GX37Wco1CwGGji9Pim/rHB0Bp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782135906; c=relaxed/simple;
-	bh=3EERqSROkKJeZIS55WvTwPWn1OGBTmhXO/o5MGT/Ivo=;
+	s=arc-20240116; t=1782135350; c=relaxed/simple;
+	bh=79GrnNmccOWEnTcWsWeS1nETBKc4S2/rQl047Me7XZg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DxfN7iBlsItITGzUpiJG0rgftLudReGROvEW/W6fDTuZQAwYhbSA4Y72MDdiEo/FADvvXIP1FX9nGFFUJSwHri5uoy1+QIOrekd+d4aoJeR7LgUVuHzoi/gcLRzYH/6tbuAg1BKuDp98TiGYG/+R2XVNJY+5NBcPBOr+7o7UcdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=SGKC6Bh9; arc=none smtp.client-ip=195.10.208.47
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-107.mailbox.org (Postfix) with ESMTPS id 4gkThr3kYSzDs9K;
-	Mon, 22 Jun 2026 15:35:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1782135308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YsiunaZljnUO2GDKo2sNr9GAmCWULG3HSc99XfVjq+I=;
-	b=SGKC6Bh9nMSCupPhVG2CzVRlFmTFVjd0/6uO6bywYJUVD1qgKU07QSsWtRD4o+kXycvWZ7
-	Gsk8CySlegCeuOjUECRfrYe+abZwdBiBLlUkzAei/Y1QjPYt85KkI4KGegzH7OF6eFh/YT
-	6NCQw3rn6rdBZ1h35M2owwF6d3RvePDXfqUCJg/SbU/eeukXt0tB4V9PwDHB1p3LOXDhHm
-	nmfTSYPGDwkQ6I7hIGcLEiD/hjkoqRWxlq5ANwLh34lQLxFTeKhnYMsbpXUmGuMtoSX/zT
-	iZbcp085O9YK1rJolhBECIZP2meqWSblZGsnG/uCVhRE66tkZA6/iFpNDHJEPQ==
-From: Ralf Lici <ralf@mandelbit.com>
-To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: netdev@vger.kernel.org,
-	=?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	 MIME-Version; b=E2Lb066AYxZhShtDrLcfkrlc+pFqkN0i6Wz5ecrVrN3arJs5rUnNrBTl1CO+XDCjUp+ph2bKHFeA8IwJqLlM2YetpLkXbhSWZ5K0V7xReyc9GTCOOSXoyVWg+DoYZqKTjvxv7mrkRONbwLDq8yG2b19NcYSrNDOiXErag0f2yzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YFXni578; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760521F000E9;
+	Mon, 22 Jun 2026 13:35:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782135348;
+	bh=1Fh81ithYkoGIp0Hgtq9CaMm1HVH3MBQhaSNQwHHFbk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=YFXni578peR0ZKlOn9yOiZ7p47SFlU3xPWWtYEPmY7U7icOQjPwA++Pppbelh2x0z
+	 bjzjl7ZP7AMOmqTv23aAokB2DRAt7F5YmeTHxE51lB6hW5u3WzkXunzK59CLKPxKyo
+	 TdMl9CYIHXOLewuNsSzNjpAkK8gKM7wcFy36VD/qwP+hSBrFGLs/3yoAolhJlaJPYj
+	 Yqjq2vPk1EAM1Oiq7zDRS1RGS5W+DJtKM00m+c+vi67Gu34hGHSYZRNaXZh2B6mie5
+	 hH4xNescEM02xU9LRMHJSCHei+KfqAz+HO/We/5W3MiZia9zjpfvOXWHG3kIqNs7ux
+	 zWS/zYAoJgddA==
+From: Simon Horman <horms@kernel.org>
+To: hrushirajg23@gmail.com
+Cc: Simon Horman <horms@kernel.org>,
+	kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	Beniamino Galvani <bgalvani@redhat.com>
-Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and dispatch core
-Date: Mon, 22 Jun 2026 15:34:47 +0200
-Message-ID: <20260622133452.432257-1-ralf@mandelbit.com>
-In-Reply-To: <87tsr4gcag.fsf@toke.dk>
-References: <87tsr4gcag.fsf@toke.dk>
+	syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com
+Subject: Re: [PATCH] netdevsim: fix use-after-free in __nsim_dev_port_del
+Date: Mon, 22 Jun 2026 14:35:13 +0100
+Message-ID: <20260622133513.1025185-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260620064937.16301-1-hrushirajg23@gmail.com>
+References: <20260620064937.16301-1-hrushirajg23@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:toke@kernel.org,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:bgalvani@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mandelbit.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301130-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:hrushirajg23@gmail.com,m:horms@kernel.org,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301131-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mandelbit.com:+];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mandelbit.com:dkim,mandelbit.com:mid,mandelbit.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,6c25f4750230faf70be9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,syzkaller.appspot.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 516B86B000A
+X-Rspamd-Queue-Id: CF9886AFEF9
 
-On Mon, 15 Jun 2026 15:31:51 +0200, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
-> >> >> I think a better model is to treat the device as basically a loopback
-> >> >> device that translates packets before looping them back (so when they
-> >> >> come back they appear to be coming from that device).
-> >> >>
-> >> >> Any reason why that wouldn't work?
-> >> >>
-> >> >
-> >> > That's indeed the intended model for the ipxlat netdevice: route packets
-> >> > to it, translate them, then loop them back into the stack as packets
-> >> > received from that same device. That seemed like the simplest model and
-> >> > the one that exposes the translation point most clearly.
-> >>
-> >> Right. I think this could be made a bit more explicit in the
-> >> documentation as well, since it's a bit of an unusual model.
-> >>
-> >> And, well, taking a step back: is it really the right model? Regular NAT
-> >> lives in netfilter, why can't this be a netfilter module as well? Seems
-> >> to me you could have something like:
-> >>
-> >> table ip xlat4 {
-> >> 	chain postrouting {
-> >> 		type nat hook postrouting priority srcnat; policy accept;
-> >> 		ip daddr 0.0.0.0/0 oifname "eth0" xlat to 64:ff9b::/96
-> >> 	}
-> >> }
-> >> table ip6 xlat6 {
-> >> 	chain prerouting {
-> >> 		type nat hook prerouting priority dstnat; policy accept;
-> >> 		ip6 saddr 64::ff0b::/96 iifname "eth0" xlat from 64::ff9b::/96
-> >> 	}
-> >> }
-> >>
-> >> and that would provide the functionality without having to implement a
-> >> new interface type and the associated multiple traversals through the
-> >> stack? Did you consider this as an alternative to the new device type?
-> >>
-> >
-> > We did consider netfilter, and your example is syntactically attractive,
-> > but I am no longer convinced it is the cleanest model for SIIT.
-> >
-> > An nft expression cannot simply rewrite ETH_P_IP <-> ETH_P_IPV6 and
-> > return ACCEPT as if this were normal NAT because the current hook
-> > invocation, dst, and conntrack-related state were established for the
-> > packet as it entered that hook. A cross-family translator would need to
-> > consume the skb, clear or rebuild route and ct metadata as appropriate,
-> > do an other-family route lookup, and resume at a well-defined point in
-> > that family. That seems possible, but it would be a new stateless
-> > cross-family action, not just a new mode of the existing nft nat
-> > expression (which is built around nf_nat_setup_info and assumes the
-> > packet's L3 family does not change AFAICT).
->
-> Right, I did not expect it would be possible to actually share code with
-> the existing NAT functionality, but conceptually they're similar. I.e.,
-> if I was an admin trying to figure out if my system supported SIIT
-> translation, my chain of thought would be something along the line of:
-> "SIIT is a variant of NAT, and I know NAT is a long-standing feature of
-> netfilter, so I wonder if SIIT exists there as well".
->
-> Adding the netfilter folks to Cc to try to get their attention and an
-> opinion on this :)
->
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+Subject: netdevsim: fix use-after-free in __nsim_dev_port_del
 
-That's the right move, it would be great to have their opinion on these
-architectural questions.
+The patch removes the per-port debugfs directory in nsim_destroy()
+before free_netdev() so that debugfs files referencing fields inside
+the netdevsim struct cannot be reached after the slab is released.
 
-For the netfilter folks just added: the context is a stateless
-IPv6<>IPv4 SIIT translator (RFC 7915). The open design question is
-whether the stateless cross-family translation should live as an nft
-action, or as a route/LWT action (ILA / seg6_local lineage).
+Link: https://syzkaller.appspot.com/bug?extid=6c25f4750230faf70be9
 
-> > My second concern is that the SIIT boundary would be a property of
-> > rule and hook placement. That gives flexibility, but it also means the
-> > translation point has to be constrained and documented very carefully
-> > to avoid ambiguous TTL/Hop Limit, PMTU/ICMP, and hook-order behavior.
-> > For this use case I would rather have the route that matches the
-> > translation prefix also be the object that says: leave this family
-> > here and continue in the other one.
->
-> Yeah, with flexibility comes the ability to shoot yourself in the foot.
-> But that's not really different from much of the other functionality we
-> have in the kernel today, is it? For netfilter in particular it's
-> certainly possible to configure a broken NAT configuration that leads to
-> packet drops (or just invalid packets being sent out on a network
-> device).
->
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index 27e5f109f933..08136e7990cb 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -1214,6 +1214,13 @@ void nsim_destroy(struct netdevsim *ns)
+>  		ns->page = NULL;
+>  	}
+>  
+> +	/*
+> +	 * Remove per-port debugfs files before free_netdev() releases the
+> +	 * netdevsim struct to prevent use-after-free in concurrent readers.
+> +	 */
+> +	debugfs_remove_recursive(ns->nsim_dev_port->ddir);
+> +	ns->nsim_dev_port->ddir = NULL;
+> +
+>  	free_netdev(dev);
+>  }
 
-True, misconfiguration is always possible and that alone is not an
-argument against the netfilter model. But what do we actually gain in
-capability from that flexibility? I agree on the UX argument (an admin
-would look in nft first), but in terms of what the feature can do, I
-can't yet see what the nft model unlocks. More on this just below.
+[High]
+Does the same use-after-free window remain on the nsim_create() error
+path?
 
-> > After looking at the available kernel mechanisms again, I think the
-> > better model is probably LWT: routes carry an ipxlat encap referencing a
-> > named translator domain configured over netlink. That should represent
-> > the stateless, prefix-based and symmetric nature of ipxlat.
->
-> I think this description actually hits the nail on the head: What are we
-> implementing here? Is it a product feature, or a building block for one?
-> The properties you mention wrt consistency, symmetry etc are properties
-> of the high-level feature (which is also generally the level things are
-> specified in RFCs). Whereas other packet mangling features in the kernel
-> are more in the "building block" category, where it's possible to
-> configure things to implement a particular feature set / compliance with
-> a particular RFC, but it's also possible to do things that are outside
-> of that.
->
-> I think this relates to the "mechanism, not policy" approach that we
-> take to most things in the kernel: implement the building blocks to do
-> something in the most general way we can, and then leave it up to
-> userspace to configure things in a way that results in a consistent
-> high-level system behaviour.
->
+nsim_create() unconditionally calls nsim_ethtool_init(ns) before the
+init step that can fail:
 
-That's a good point, and I agree that we should not bake a high-level
-product policy into the kernel if what we need is a reusable mechanism
-(the LWT idea was my attempt at exactly that). What I am still trying to
-understand is whether there is a useful generic trigger for stateless
-cross-family translation beyond the route/prefix/policy-routing cases.
+    SET_NETDEV_DEVLINK_PORT(dev, &nsim_dev_port->devlink_port);
+    nsim_ethtool_init(ns);
+    if (nsim_dev_port_is_pf(nsim_dev_port))
+        err = nsim_init_netdevsim(ns);
+    else
+        err = nsim_init_netdevsim_vf(ns);
+    if (err)
+        goto err_free_netdev;
+    ...
+err_free_netdev:
+    free_netdev(dev);
+    return ERR_PTR(err);
 
-Routes and policy routing already cover the selectors I can make
-coherent for a stateless, per-packet translator: destination/source
-prefix, iif/oif/VRF, mark, TOS/DSCP, and so on. nft can of course match
-much more than that, but the additional selectors that would materially
-change the translation decision seem to be selectors such as L4 fields,
-payload state, or conntrack state. Those are exactly the selectors I am
-struggling to make correct for a stateless translator:
+nsim_ethtool_init() populates files under nsim_dev_port->ddir whose
+data pointers reference fields inside ns, for example:
 
-- non-first fragments carry no L4 header at all, yet the translator must
-  rewrite every fragment (an nft ... tcp dport trigger cannot fire on
-  them);
+    ethtool = debugfs_create_dir("ethtool", ns->nsim_dev_port->ddir);
+    debugfs_create_u32("get_err", 0600, ethtool, &ns->ethtool.get_err);
+    debugfs_create_u32("set_err", 0600, ethtool, &ns->ethtool.set_err);
+    ...
+    dir = debugfs_create_dir("ring", ethtool);
+    debugfs_create_u32("rx_max_pending", 0600, dir,
+                      &ns->ethtool.ring.rx_max_pending);
 
-- ICMP errors must be translated too, but the flow identity lives in the
-  quoted inner header (reversed), not in anything an L4/ct match on the
-  error packet can see and there is no conntrack to associate them,
-  since this is stateless.
+If nsim_init_netdevsim() (or nsim_init_netdevsim_vf()) fails, the
+err_free_netdev label runs free_netdev(dev) directly and returns
+ERR_PTR(err). The caller then calls nsim_dev_port_debugfs_exit() to
+tear down ddir, but in the meantime the netdevsim slab has already
+been freed while these debugfs files are still live with data pointers
+into it.
 
-So an L4-conditional trigger does not look like a good primitive for
-correct stateless SIIT unless the action also defragments/refragments or
-uses conntrack-like state. Those may be valid mechanisms, but they move
-the design away from the stateless per-packet SIIT boundary this RFC is
-trying to model.
+Should the same debugfs_remove_recursive(nsim_dev_port->ddir) be done
+on the err_free_netdev path before free_netdev(dev), or should the
+debugfs file creation be moved past the point of no return so the
+fuzzer-reachable failure paths (alloc pressure on mock_phc_create,
+register_netdevice, nsim_psp_init, etc.) cannot leave dangling
+debugfs entries?
 
-So my first question is: is there a useful nft configuration this should
-enable that is not naturally expressible as route selection, while still
-remaining stateless SIIT rather than a NAT64-like stateful feature?
-Maybe there is a real use case there, but I cannot construct one yet.
-
-> That being said:
->
-> > Very roughly, userspace could look like:
-> >
-> >     ip xlat add siit0 prefix6 64:ff9b::/96
-> >     ip route add ... encap ipxlat id siit0
-> >     ip -6 route add ... encap ipxlat id siit0
-> >
-> > There are some useful precedents for this: ILA is stateless address
-> > translation as LWT, seg6_local already has cross-family LWT actions, and
-> > ioam6 has a similar split between separately configured objects and
-> > route attachments.
-> >
-> > The invariant I would like v2 to follow is that the original-family
-> > route lookup selects translation as its terminal route action. The
-> > translated skb then gets a fresh lookup in the other family. From that
-> > point on, TTL/Hop Limit where applicable, PMTU, ICMP errors, and
-> > netfilter visibility belong to the translated family.
-> >
-> > So I think your question addresses the core design issue in this RFC. My
-> > current preference is to rework the next version around an LWT/domain
-> > model instead of the virtual netdevice model, unless prototyping shows a
-> > fundamental problem with that approach.
-> >
-> > Does that model make sense to you?
->
-> I did consider this as well before suggesting netfilter as the right
-> place to hook things, and I do think the route object model has some
-> appeal. I agree it's a better model than the magical loopback interface,
-> certainly.
->
-> I think in the end this comes down to whether flexibility in how to use
-> this translation mechanism is a bug or a feature, as outlined above. I'm
-> leaning towards "feature", but could probably be persuaded otherwise :)
->
-
-I agree this is the tradeoff to settle now. The reason I suggested LWT
-is that making the family-A route lookup the handoff point gives the
-TTL/PMTU/ICMP-and-reroute semantics a natural place to live.
-
-So my other question, where the netfilter maintainers' input would be
-very useful, is what semantics would be acceptable for changing address
-family inside a netfilter hook. Concretely:
-
-- What verdict should such an expression return? My assumption is it
-  has to consume the skb and reinject into the other family (NF_STOLEN
-  + reinject), since ACCEPT would resume traversal in a family whose
-  dst/chain no longer apply.
-
-- What becomes of the original-family conntrack entry, which is now
-  orphaned (and is pure overhead in the stateless case)?
-
-- Where do TTL/Hop-Limit, PMTU/ICMP generation, and netfilter
-  visibility end up belonging after the family changes?
-
-All that said, the netfilter model has its own strengths, and once we
-settle the architectural questions it could turn into a very clean
-design. Curious to hear your thoughts on the points above.
-
--- 
-Ralf Lici
-Mandelbit Srl
+The Fixes: tag e05b2d141fef appears to cover this path as well.
 
