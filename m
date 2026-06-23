@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-301444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vmwPFL3IOmp0GwgAu9opvQ
-	(envelope-from <netdev+bounces-301444-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:56:13 +0200
+	id SMxpLO3IOmqMGwgAu9opvQ
+	(envelope-from <netdev+bounces-301446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:57:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E993E6B949E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:56:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF916B94B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:57:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=agEVr39L;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301444-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301444-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dM3x+Aa4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301446-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301446-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC19C31238A9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:50:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8883B313BC9B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9173911AD;
-	Tue, 23 Jun 2026 17:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600933905E3;
+	Tue, 23 Jun 2026 17:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBF13905E4
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 17:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AF8390991
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 17:50:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782237025; cv=none; b=ce1n5GZ0t93D4Xpu0kAzB0DtpW2ZTYuYTRXj7+AvKJVq3MT9vVvJa3nIUPVlX8sP5IMq8aKwOcVL77H+b9b9Bp8R7vZWVzN0g1T1ki6z4U1lcBDlIeYMjj82oIkNy6IbLMmKbbiSAPuUN3sNieA7KUkjG2Tl1FP0fg7OKsP7NQU=
+	t=1782237029; cv=none; b=HMC0ZrbgKAUIXTSMjoghzlXNFca9kBy2ctqkU9lYa+hVU0KcTynyWQWyv0ssU/vdlhPypAFcYahnhO2m2YrbZcpE4lsay83BPRmUrR74zFnCdFQdcgqcX+W4EO/dQbtbbxRnpye1uF/b+4m+ZUxVwRqrPAzwfHIvUpMx/OgIEQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782237025; c=relaxed/simple;
-	bh=tQS7G3igjqTE5AGoBawXrCKdVpGS19OgIH+yLemhCrk=;
+	s=arc-20240116; t=1782237029; c=relaxed/simple;
+	bh=Eq7a+53Jhwj3Y60E0eqcfWa8ZvQaQOz5wHt2RKMJ6iY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xm1HXzLLJ+sT0GD9gNijD/4Dv+BmiRleAewwqZN2YN9AW70lfm5DFL0iZ5WV06ZYrLpq2w3FM1d2scel8qUh+ifRWrXrGlU3HtNMKVVsUvD8vCMxNmzk6q/VOyz3alInucqL2LpPWZ+XWTeOQHfYUqkSWwASi7BTMNvg5aP1vOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=agEVr39L; arc=none smtp.client-ip=209.85.161.46
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6a0e3a9c3a1so75179eaf.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 10:50:23 -0700 (PDT)
+	 MIME-Version; b=CDTY/Uwzo+l2JZ4SFn9GMKOzTL1KpfvOIoNgIXEvSEJSe4aXl/oEDnLjldIl5zGW8Uk2EhMd/6SasC/1VllOIOuIULK3hzMMp3bYib7qKyLftH7/qAU8da0EN/8cW6XKKdiWIh0V/YTT5caiUnJcPLmqvYdU9bVO8rek8YBkmA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dM3x+Aa4; arc=none smtp.client-ip=209.85.161.48
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-6a1009f6adeso100738eaf.3
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 10:50:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782237023; x=1782841823; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782237025; x=1782841825; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LjCQl/P7Gd0beihZZQp6q4xIlerD4L/jMZ3FMoPeCaQ=;
-        b=agEVr39LalOY5RpnkLWG2XDt/mi+ZugN2yCeIzHHdLRuSyGNB84L1NJeTSc2jhmenp
-         LgPAQ/Gw10DnwrPF/g7ch2p+Y7ULwT6hL97HibVOC/RFvcN73OP0iRvrJ0uH4XdwRN8Y
-         Ifr+ysaj69Yr5yWHD2m5dTD7UAWtSoQ24iGyLem0Qfwb0c1Lyi7v5DXcyDw2bK2URv+I
-         uvQsoo+jEN8thDo7sGyxofLrwn943BuxNUlpO3jsnoxrMIAQ5NpqXgqNRKwErMSxIMqF
-         6cMX/GrDD5ohAxgCD38wh1gGQ/XQBgn7GlRGw7NS8RJRGjwL5iTd6GLAmv5foknFaiMo
-         4UBw==
+        bh=PiMtg+CA8K/addrg/w0MPHpF32bH/BwsVNnAnFesBpw=;
+        b=dM3x+Aa48oKHJX8bmjTxSrUNOIPMZtFktNL54hzd2AxBNO1F5gJHRlRXZcG3H7nudX
+         iDkrdogR8EQ4WnBOeKPKyqf6b6890fvHQtY46OHgg8PhqEw3lD1epTwjcoua+Mv9Mcnr
+         wrDYmACakrwuaU+aiMGkzw7fiE8mxbBe4gu7oobX7Nt5a8T+zCfCx+DcSycLYwFDKVNT
+         hROxeC0EXDpDqWmdv21TLUbfLntjmp3OGPJ2hYBC0UrFqinNlhMRxGIPD86pDkXep1QM
+         G7SygsOjwXGPQOffTQLjVsWC++pWLGRnOgIHxJ0OdKI2X6hlE8dyzHHXAG2o0wp3swNY
+         VviA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782237023; x=1782841823;
+        d=1e100.net; s=20251104; t=1782237025; x=1782841825;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LjCQl/P7Gd0beihZZQp6q4xIlerD4L/jMZ3FMoPeCaQ=;
-        b=s1iku9yWac/KCN72AIUl9G1DDe6tlWBAXLjG5v1lzBAe6eGw7UfZVWRqIY6zjXemLG
-         BustZ5Lk1xnoOEmSegIwlQq0k1CJ8FeH8B1u85MnLogkHW5i11+SjgKIUycCIbSYusVf
-         qnXoRGpexrv63pFSFELL5R4n7UwdMPR1JxJbX8DqW3luoCFiKtY18aglHqwTIWO/oSyW
-         VM2Y+Jv2A2VWTVs/CWR4RkYgN7aON7yP3PzjTYysFwF2VniMzkLCaw5AQRyMgjvxyVAU
-         GXU/GD6Q1dMTQlPCsgshZuY/40IrihyOvdQiffk705fLD8u3ZNeWAV1HUII83qM7zILo
-         1BIg==
-X-Gm-Message-State: AOJu0Yxxich1TbFZxSfvfJDOTcoZmX9Kr1lFd374VolxAI1PWJck9LIg
-	mJXFy38ODB+HDz7L1PfgHL31QGIDB+11PMXJvZMuz8GgHgigKB8yxkEP
-X-Gm-Gg: AfdE7clAlW9dsTsgHSEkYp572gizlqg1ya5xOxO6OUe9vmXI2kshaFi+ksaVvWHT7cJ
-	S633GdWFUzZB6JLA/6NGWpa7r2eY9yO4wSCCRnS3F93n4IUnxf/mRiHpGKMmMa+Xl4/3c7Wv1Fb
-	zyhxvqNtWPIPrr1h2k2nYkDg6LlpWqaTqqhyDG6oXfIgQPa20Phlw3lk625I/udN8ax5tITzwvZ
-	uAQeMYJK+fKZoECED3NrQQwaJRfaSw9y7wSsMWSRfbmhOlH9E3h+TOVWZntlmT+vJI2m5kLOj/e
-	XQi+tvWDZsjgHwi0H5pn+Ew5CyX7Fo1NvxDyurgxk1TM/LoG2jZPsiebfXSqUp/DNimbaOijbVU
-	DVLtcurUwZfGejnk0m7WZZ7pdmgtHxDQpxKWU6JczxBzWgwN2uo8nY1oyUaDlvj3qYEorDUuzZI
-	3aDda6dYK7eRJ2hQ==
-X-Received: by 2002:a05:6820:1892:b0:6a0:e0fb:8eeb with SMTP id 006d021491bc7-6a1163e2fdamr2378106eaf.25.1782237022980;
-        Tue, 23 Jun 2026 10:50:22 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:4a::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-44778b6159fsm5202677fac.11.2026.06.23.10.50.22
+        bh=PiMtg+CA8K/addrg/w0MPHpF32bH/BwsVNnAnFesBpw=;
+        b=LmFKFnV/rgP1wI47HfDEBeBwBzaL03b8OfKplzWtJv+fxPGipTIWIOIs0rhh+zka+1
+         NXiMLsKs5JzOumTcRW/t/yn01FuRnLFn08F0wEDKdK8sMW3pd4DBtu58D5ki05jSlfxh
+         M5jaLEgPu+0pRVIgpDLl3w3czcaJNcEuTZGJAnxo0vBi3Y8jTFg0/DdJ04MazlPIsqTk
+         8IJ1/OVCodM+EbaZmTQjuhqXaqu3ZiH9c73bs4Z9vrYQobDq901jgEE9y6yfWID5hpYm
+         Xts1Ep8hL36PvzEy7rOBosX0kpMmqvW6mJWAXlZDgCjmJabT/mkMIT+TNHvKaPQD/T49
+         hLZg==
+X-Gm-Message-State: AOJu0Ywd3YtZjg5yWiQxl28HoF99M6Iv55DJk6NedkOqEBjtqUXxl4ES
+	I4ytmle9Uo7ug+4vnKolGTd4hfR4anBeiwXlzCeKC9mHqilVu5JjSNcg2vscWg==
+X-Gm-Gg: AfdE7clRIsEmS7npf6KRy23cF+mHbKRbu7+mgOh00DvdmSR41nmqT4pg0VYBmJYxUdd
+	pnirDIyeo1042FTpQr51JRAnoAgTBoPGsqMiWvJkBwhDY9T8ybGY260UhxCrxiTeHWoWvagBKu+
+	5o25QxAlJGFtBA2ek/TfuYSu/Bwyq9vx1IghEVsv2VCJsMTiUdC/qtnJpkFRhXOmgyHGszfU6AZ
+	q+ogE9aiNMmeDTIFW82tcGuFd77ZOjeFx7lH6rw8ZdSjA91bHFifl1aGBDhByX3pfJyKr+ezJH+
+	Nxo1DnlVcWh2YnG56DbJtN3ovjRc2537OojwBfd2Ra7BKaJq9anIUDoqchmAPVyTJdoM0Wl3biy
+	IO6e02sacVSPLQa8sdjmIsQD8hpzG13h+dT8MZWBNBBXCJ/IenX3EkWf5nyslujidPMfKjllCoQ
+	0=
+X-Received: by 2002:a05:6820:1b08:b0:6a1:1292:ec3d with SMTP id 006d021491bc7-6a11292ef69mr3507288eaf.33.1782237024506;
+        Tue, 23 Jun 2026 10:50:24 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6a0e9f29e37sm7206477eaf.3.2026.06.23.10.50.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 10:50:22 -0700 (PDT)
+        Tue, 23 Jun 2026 10:50:24 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 To: bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org,
@@ -90,9 +90,9 @@ Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	ameryhung@gmail.com,
 	kernel-team@meta.com
-Subject: [PATCH bpf-next v2 10/15] bpf: Allow all struct_ops to use bpf_dynptr_from_skb()
-Date: Tue, 23 Jun 2026 10:49:58 -0700
-Message-ID: <20260623175006.3136053-11-ameryhung@gmail.com>
+Subject: [PATCH bpf-next v2 11/15] bpf: tcp: Support selected sock_ops callbacks as struct_ops
+Date: Tue, 23 Jun 2026 10:49:59 -0700
+Message-ID: <20260623175006.3136053-12-ameryhung@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260623175006.3136053-1-ameryhung@gmail.com>
 References: <20260623175006.3136053-1-ameryhung@gmail.com>
@@ -111,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
-	TAGGED_FROM(0.00)[bounces-301444-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301446-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -135,72 +135,506 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E993E6B949E
+X-Rspamd-Queue-Id: 2CF916B94B9
 
-bpf_dynptr_from_skb() was only made available to bpf_qdisc, so far the
-only struct_ops type that needs to read an skb. The upcoming bpf_tcp_ops
-header-option hooks (parse_hdr/write_hdr_opt) also want to access the TCP
-options of an skb through a dynptr.
+In LSFMMBPF 2025, I have talked about moving the BPF_PROG_TYPE_SOCK_OPS
+to a struct_ops interface [1].
 
-All struct_ops programs share BPF_PROG_TYPE_STRUCT_OPS, so register
-bpf_kfunc_set_skb (which holds bpf_dynptr_from_skb) for that program type
-once, instead of per struct_ops. This makes bpf_dynptr_from_skb()
-available to bpf_tcp_ops and any future struct_ops.
+The BPF_SOCK_OPS_*_CB enum interface has grown over time as new TCP
+callback points were added. A BPF_PROG_TYPE_SOCK_OPS program now
+commonly needs a large switch on sock_ops->op, and the shared
+bpf_sock_ops_kern context has become harder to extend because different
+callbacks have different locking, argument, skb, and helper
+requirements. The existing 'union { u32 args[4]; u32 replylong[4]; }' is
+also not reliable in passing args to bpf prog when there are multiple
+progs attached to a cgroup.
 
-With the kfunc now provided to all of struct_ops, the bpf_qdisc-specific
-registration becomes redundant and is dropped: bpf_qdisc_kfunc_filter()
-only constrains kfuncs listed in qdisc_kfunc_ids, so removing
-bpf_dynptr_from_skb from that set (and from qdisc_common_kfunc_set) lets
-it fall through the filter unchanged, and bpf_qdisc keeps access via the
-generic struct_ops registration.
+The above has already been solved in struct_ops. Add a TCP-specific
+struct_ops type, bpf_tcp_ops, and support attaching it to cgroups.
+This allows each callback have its own func signature and allows
+the verifier to select kfuncs/helpers based on the specific
+struct_ops member being implemented.
 
-Widening the registration is safe: a struct_ops that does not receive an
-skb in its context has nothing to pass to the helper.
+This patch wires up the following existing sock_ops callbacks:
+- BPF_SOCK_OPS_TIMEOUT_INIT
+- BPF_SOCK_OPS_RWND_INIT
+- BPF_SOCK_OPS_RTT_CB
+- BPF_SOCK_OPS_STATE_CB
+- BPF_SOCK_OPS_RETRANS_CB
+- BPF_SOCK_OPS_TCP_CONNECT_CB
+- BPF_SOCK_OPS_TCP_LISTEN_CB
+- BPF_SOCK_OPS_RTO_CB
+- BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB
+- BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB
 
+BASE_RTT is ignored as it is not particularly useful. NEEDS_ECN should
+be done in bpf-tcp-cc instead. The tstamp ones should be a separate
+struct_ops (e.g. "bpf_sock_ops") that can work in both TCP and UDP.
+
+timeout_init and rwnd_init could have a request_sock pointer. This patch
+tries a different API and direclty passes the request_sock pointer as
+an arg.
+
+Two other approaches were considered before settling on having
+bpf_get_retval() read the dispatcher's run_ctx via saved_run_ctx. The
+first was to inherit the retval in the trampoline itself: add a helper
+in the four __bpf_prog_enter*() paths that, for struct_ops programs,
+copies the chained value from the caller's run_ctx (now saved_run_ctx)
+into the program's own run_ctx. It works but puts a per-enter
+program-type check on the generic trampoline fast path, taxing all
+fentry/fexit/lsm callers for a cgroup-struct_ops-only feature. The
+second was to do that same inherit only for the int-returning members
+via a gen_prologue that emits a hidden kfunc at the start of
+timeout_init/rwnd_init; this keeps the cost off the generic path and
+scoped to bpf_tcp_ops, but needs a kfunc + BTF_ID + prologue-emission
+machinery. The chosen approach avoids both: it touches neither the
+trampoline nor the program, since saved_run_ctx already points at the
+dispatcher's run_ctx that carries the value.
+
+[1], page 13: https://drive.google.com/file/d/1wjKZth6T0llLJ_ONPAL_6Q_jbxbAjByp/view?usp=sharing
+
+Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 Signed-off-by: Amery Hung <ameryhung@gmail.com>
 ---
- net/core/filter.c     | 1 +
- net/sched/bpf_qdisc.c | 2 --
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ include/linux/bpf.h    |   1 +
+ include/net/tcp.h      | 113 +++++++++++++++++++++++++-
+ net/ipv4/Makefile      |   1 +
+ net/ipv4/af_inet.c     |   1 +
+ net/ipv4/bpf_tcp_ops.c | 177 +++++++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp.c         |   1 +
+ net/ipv4/tcp_input.c   |   4 +
+ net/ipv4/tcp_output.c  |   2 +
+ net/ipv4/tcp_timer.c   |   1 +
+ 9 files changed, 299 insertions(+), 2 deletions(-)
+ create mode 100644 net/ipv4/bpf_tcp_ops.c
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 1dd5e37ae130..f85578772930 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -12633,6 +12633,7 @@ static int __init bpf_kfunc_init(void)
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_SEG6LOCAL, &bpf_kfunc_set_skb);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_NETFILTER, &bpf_kfunc_set_skb);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_TRACING, &bpf_kfunc_set_skb);
-+	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_kfunc_set_skb);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_skb_meta);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_skb_meta);
- 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
-diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-index 098ca02aed89..5691c13781a8 100644
---- a/net/sched/bpf_qdisc.c
-+++ b/net/sched/bpf_qdisc.c
-@@ -280,7 +280,6 @@ BTF_KFUNCS_START(qdisc_kfunc_ids)
- BTF_ID_FLAGS(func, bpf_skb_get_hash)
- BTF_ID_FLAGS(func, bpf_kfree_skb, KF_RELEASE)
- BTF_ID_FLAGS(func, bpf_qdisc_skb_drop, KF_RELEASE)
--BTF_ID_FLAGS(func, bpf_dynptr_from_skb)
- BTF_ID_FLAGS(func, bpf_qdisc_watchdog_schedule)
- BTF_ID_FLAGS(func, bpf_qdisc_init_prologue)
- BTF_ID_FLAGS(func, bpf_qdisc_reset_destroy_epilogue)
-@@ -290,7 +289,6 @@ BTF_KFUNCS_END(qdisc_kfunc_ids)
- BTF_SET_START(qdisc_common_kfunc_set)
- BTF_ID(func, bpf_skb_get_hash)
- BTF_ID(func, bpf_kfree_skb)
--BTF_ID(func, bpf_dynptr_from_skb)
- BTF_SET_END(qdisc_common_kfunc_set)
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index df95ae690da5..91024d2da4ea 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -2597,6 +2597,7 @@ struct bpf_trace_run_ctx {
+ struct bpf_tramp_run_ctx {
+ 	struct bpf_run_ctx run_ctx;
+ 	u64 bpf_cookie;
++	int retval;
+ 	struct bpf_run_ctx *saved_run_ctx;
+ };
  
- BTF_SET_START(qdisc_enqueue_kfunc_set)
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 6d376ea4d1c0..2102f9f2afd6 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2953,12 +2953,120 @@ static inline void tcp_clear_sock_ops_cb_flags(struct sock *sk)
+ 
+ #endif
+ 
++#if defined(CONFIG_BPF_JIT) && defined(CONFIG_CGROUP_BPF)
++
++struct bpf_tcp_ops {
++	/* Should return the initial SYN (active open) or SYN-ACK (passive open)
++	 * retransmission timeout. Return the timeout in jiffies, or <= 0 for
++	 * the kernel default.
++	 *
++	 * @req: request_sock on the passive (synack) path; NULL otherwise.
++	 */
++	int (*timeout_init)(struct sock *sk, struct request_sock *req);
++
++	/* Should return the initial advertised receive window, in packets,
++	 * or < 0 for the kernel default. @req as in timeout_init().
++	 */
++	int (*rwnd_init)(struct sock *sk, struct request_sock *req);
++
++	/* Called when an active connection becomes established.
++	 * @skb is the SYNACK that completed the 3WHS, or NULL for a
++	 * TCP_REPAIR socket (tcp_finish_connect() with no skb).
++	 */
++	void (*active_established)(struct sock *sk, struct sk_buff *skb__nullable);
++
++	/* Called when a passive connection becomes established.
++	 * @skb is the ACK that completed the 3WHS.
++	 */
++	void (*passive_established)(struct sock *sk, struct sk_buff *skb);
++
++	/* Called when the retransmission timer fires. */
++	void (*rto)(struct sock *sk);
++
++	/* Called on every RTT sample.
++	 * @mrtt: the measured RTT, in microseconds.
++	 * @srtt: the updated smoothed RTT.
++	 */
++	void (*rtt)(struct sock *sk, long mrtt, u32 srtt);
++
++	/* Called when the connection changes TCP state.
++	 * @state: the new state (one of the TCP_* states).
++	 */
++	void (*set_state)(struct sock *sk, int state);
++
++	/* Called when an skb is retransmitted.
++	 * @skb: the retransmitted skb.
++	 * @err: tcp_transmit_skb() return value (0 on success).
++	 */
++	void (*retrans)(struct sock *sk, struct sk_buff *skb, int err);
++
++	/* Called right before an active connection is initialized. */
++	void (*connect)(struct sock *sk);
++
++	/* Called on listen(2), right after the socket enters TCP_LISTEN. */
++	void (*listen)(struct sock *sk);
++};
++
++#define bpf_tcp_ops_call(op, sk, ...)					\
++do {									\
++	if (cgroup_bpf_enabled(CGROUP_TCP_SOCK_OPS)) {			\
++		const struct bpf_prog_array_item *item;			\
++		const struct bpf_tcp_ops *tcp_ops;			\
++		struct cgroup *cgrp;					\
++									\
++		cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);		\
++		rcu_read_lock_dont_migrate();				\
++		bpf_cgroup_struct_ops_foreach(tcp_ops, item, cgrp,	\
++					      CGROUP_TCP_SOCK_OPS) {	\
++			if (tcp_ops->op)				\
++				tcp_ops->op(sk, ##__VA_ARGS__);		\
++		}							\
++		rcu_read_unlock_migrate();				\
++	}								\
++} while (0)
++
++#define bpf_tcp_ops_call_int(op, init_retval, sk, ...)			\
++({									\
++	int __retval = (init_retval);					\
++	if (cgroup_bpf_enabled(CGROUP_TCP_SOCK_OPS)) {			\
++		const struct bpf_prog_array_item *item;			\
++		const struct bpf_tcp_ops *tcp_ops;			\
++		struct bpf_tramp_run_ctx run_ctx;			\
++		struct bpf_run_ctx *old_run_ctx;			\
++		struct sock *__sk = sk_to_full_sk(sk);                  \
++		struct request_sock *req = NULL;			\
++		struct cgroup *cgrp;					\
++									\
++		if (__sk) {						\
++			run_ctx.retval = (init_retval);			\
++			cgrp = sock_cgroup_ptr(&__sk->sk_cgrp_data);	\
++			if (!sk_fullsock(sk))				\
++				req = (struct request_sock *)sk;	\
++			rcu_read_lock_dont_migrate();			\
++			old_run_ctx = bpf_set_run_ctx(&run_ctx.run_ctx);\
++			bpf_cgroup_struct_ops_foreach(tcp_ops, item, cgrp, \
++						      CGROUP_TCP_SOCK_OPS) { \
++				if (tcp_ops->op)			\
++					run_ctx.retval = tcp_ops->op(__sk, req, ##__VA_ARGS__); \
++			}						\
++			bpf_reset_run_ctx(old_run_ctx);			\
++			rcu_read_unlock_migrate();			\
++			__retval = run_ctx.retval;			\
++		}							\
++	}								\
++	__retval;							\
++})
++#else
++#define bpf_tcp_ops_call(op, sk, ...)		do { } while (0)
++#define bpf_tcp_ops_call_int(op, init_retval, sk, ...)	(init_retval)
++#endif
++
+ static inline u32 tcp_timeout_init(struct sock *sk)
+ {
+ 	int timeout;
+ 
+ 	timeout = tcp_call_bpf(sk, BPF_SOCK_OPS_TIMEOUT_INIT, 0, NULL);
+-
++	timeout = bpf_tcp_ops_call_int(timeout_init, timeout, sk);
+ 	if (timeout <= 0)
+ 		timeout = TCP_TIMEOUT_INIT;
+ 	return min_t(int, timeout, TCP_RTO_MAX);
+@@ -2969,7 +3077,7 @@ static inline u32 tcp_rwnd_init_bpf(struct sock *sk)
+ 	int rwnd;
+ 
+ 	rwnd = tcp_call_bpf(sk, BPF_SOCK_OPS_RWND_INIT, 0, NULL);
+-
++	rwnd = bpf_tcp_ops_call_int(rwnd_init, rwnd, sk);
+ 	if (rwnd < 0)
+ 		rwnd = 0;
+ 	return rwnd;
+@@ -2984,6 +3092,7 @@ static inline void tcp_bpf_rtt(struct sock *sk, long mrtt, u32 srtt)
+ {
+ 	if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_RTT_CB_FLAG))
+ 		tcp_call_bpf_2arg(sk, BPF_SOCK_OPS_RTT_CB, mrtt, srtt);
++	bpf_tcp_ops_call(rtt, sk, mrtt, srtt);
+ }
+ 
+ #if IS_ENABLED(CONFIG_SMC)
+diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
+index 06e21c26b76f..afbac63d1cb4 100644
+--- a/net/ipv4/Makefile
++++ b/net/ipv4/Makefile
+@@ -70,6 +70,7 @@ obj-$(CONFIG_TCP_AO) += tcp_ao.o
+ 
+ ifeq ($(CONFIG_BPF_JIT),y)
+ obj-$(CONFIG_BPF_SYSCALL) += bpf_tcp_ca.o
++obj-$(CONFIG_CGROUP_BPF) += bpf_tcp_ops.o
+ endif
+ 
+ ifdef CONFIG_GCOV_PROFILE_NETFILTER
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 32d006c1a8ee..ac8431da67f4 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -227,6 +227,7 @@ int __inet_listen_sk(struct sock *sk, int backlog)
+ 			return err;
+ 
+ 		tcp_call_bpf(sk, BPF_SOCK_OPS_TCP_LISTEN_CB, 0, NULL);
++		bpf_tcp_ops_call(listen, sk);
+ 	}
+ 	return 0;
+ }
+diff --git a/net/ipv4/bpf_tcp_ops.c b/net/ipv4/bpf_tcp_ops.c
+new file mode 100644
+index 000000000000..cf53c95a0dbc
+--- /dev/null
++++ b/net/ipv4/bpf_tcp_ops.c
+@@ -0,0 +1,177 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2026 Meta Platforms, Inc. and affiliates. */
++
++#include <linux/bpf.h>
++#include <linux/btf_ids.h>
++#include <linux/bpf_verifier.h>
++#include <net/bpf_sk_storage.h>
++#include <net/tcp.h>
++
++static int timeout_init_stub(struct sock *sk, struct request_sock *req__nullable)
++{
++	struct bpf_tramp_run_ctx *ctx =
++		container_of(current->bpf_ctx, struct bpf_tramp_run_ctx, run_ctx);
++
++	return ctx->retval;
++}
++
++static int rwnd_init_stub(struct sock *sk, struct request_sock *req__nullable)
++{
++	struct bpf_tramp_run_ctx *ctx =
++		container_of(current->bpf_ctx, struct bpf_tramp_run_ctx, run_ctx);
++
++	return ctx->retval;
++}
++
++static void active_established_stub(struct sock *sk, struct sk_buff *skb__nullable)
++{
++}
++
++static void passive_established_stub(struct sock *sk, struct sk_buff *skb)
++{
++}
++
++static void rto_stub(struct sock *sk)
++{
++}
++
++static void rtt_stub(struct sock *sk, long mrtt, u32 srtt)
++{
++}
++
++static void set_state_stub(struct sock *sk, int state)
++{
++}
++
++static void retrans_stub(struct sock *sk, struct sk_buff *skb, int err)
++{
++}
++
++static void connect_stub(struct sock *sk)
++{
++}
++
++static void listen_stub(struct sock *sk)
++{
++}
++
++static struct bpf_tcp_ops __bpf_tcp_ops = {
++	.timeout_init = timeout_init_stub,
++	.rwnd_init = rwnd_init_stub,
++	.active_established = active_established_stub,
++	.passive_established = passive_established_stub,
++	.rto = rto_stub,
++	.rtt = rtt_stub,
++	.set_state = set_state_stub,
++	.retrans = retrans_stub,
++	.connect = connect_stub,
++	.listen = listen_stub,
++};
++
++BPF_CALL_0(bpf_tcp_ops_get_retval)
++{
++	struct bpf_tramp_run_ctx *ctx =
++		container_of(current->bpf_ctx, struct bpf_tramp_run_ctx, run_ctx);
++
++	/* bpf_get_retval() is only exposed to timeout_init/rwnd_init, which
++	 * always run via bpf_tcp_ops_call_int(). Its run_ctx carries the int
++	 * return value chained across the bpf_tcp_ops attached to the cgroup
++	 * and is this program's saved_run_ctx.
++	 */
++	if (WARN_ON_ONCE(!ctx->saved_run_ctx))
++		return 0;
++
++	return container_of(ctx->saved_run_ctx, struct bpf_tramp_run_ctx,
++			    run_ctx)->retval;
++}
++
++const struct bpf_func_proto bpf_tcp_ops_get_retval_proto = {
++	.func		= bpf_tcp_ops_get_retval,
++	.gpl_only	= false,
++	.ret_type	= RET_INTEGER,
++};
++
++static const struct bpf_func_proto *
++get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
++{
++	u32 moff = prog->aux->attach_st_ops_member_off;
++
++	switch (func_id) {
++	case BPF_FUNC_sk_storage_get:
++		return &bpf_sk_storage_get_proto;
++	case BPF_FUNC_sk_storage_delete:
++		return &bpf_sk_storage_delete_proto;
++	case BPF_FUNC_setsockopt:
++		/* The listener is not locked. */
++		if (moff == offsetof(struct bpf_tcp_ops, rwnd_init) ||
++		    moff == offsetof(struct bpf_tcp_ops, timeout_init))
++			return NULL;
++		return &bpf_sk_setsockopt_proto;
++	case BPF_FUNC_getsockopt:
++		if (moff == offsetof(struct bpf_tcp_ops, rwnd_init) ||
++		    moff == offsetof(struct bpf_tcp_ops, timeout_init))
++			return NULL;
++		return &bpf_sk_getsockopt_proto;
++	case BPF_FUNC_get_retval:
++		if (moff == offsetof(struct bpf_tcp_ops, timeout_init) ||
++		    moff == offsetof(struct bpf_tcp_ops, rwnd_init))
++			return &bpf_tcp_ops_get_retval_proto;
++		return NULL;
++	default:
++		return bpf_base_func_proto(func_id, prog);
++	}
++}
++
++static bool is_valid_access(int off, int size, enum bpf_access_type type,
++			    const struct bpf_prog *prog, struct bpf_insn_access_aux *info)
++{
++	if (!bpf_tracing_btf_ctx_access(off, size, type, prog, info))
++		return false;
++
++	if (base_type(info->reg_type) == PTR_TO_BTF_ID &&
++	    !bpf_type_has_unsafe_modifiers(info->reg_type) &&
++	    info->btf_id == btf_sock_ids[BTF_SOCK_TYPE_SOCK])
++		/* promote it to tcp_sock */
++		info->btf_id = btf_sock_ids[BTF_SOCK_TYPE_TCP];
++
++	return true;
++}
++
++static int bpf_tcp_ops_init_member(const struct btf_type *t,
++				   const struct btf_member *member,
++				   void *kdata, const void *udata)
++{
++	return 0;
++}
++
++static int bpf_tcp_ops_init(struct btf *btf)
++{
++	return 0;
++}
++
++static int bpf_tcp_ops_validate(void *kdata)
++{
++	return 0;
++}
++
++static const struct bpf_verifier_ops bpf_tcp_ops_verifier = {
++	.get_func_proto		= get_func_proto,
++	.is_valid_access	= is_valid_access,
++};
++
++static struct bpf_struct_ops bpf_tcp_ops = {
++	.verifier_ops = &bpf_tcp_ops_verifier,
++	.init_member = bpf_tcp_ops_init_member,
++	.init = bpf_tcp_ops_init,
++	.validate = bpf_tcp_ops_validate,
++	.name = "bpf_tcp_ops",
++	.cgroup_atype = CGROUP_TCP_SOCK_OPS,
++	.cfi_stubs = &__bpf_tcp_ops,
++	.owner = THIS_MODULE,
++};
++
++static int __init __bpf_tcp_ops_init(void)
++{
++	return register_bpf_struct_ops(&bpf_tcp_ops, bpf_tcp_ops);
++}
++late_initcall(__bpf_tcp_ops_init);
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 455441f1b694..94ed1ac2abc1 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2996,6 +2996,7 @@ void tcp_set_state(struct sock *sk, int state)
+ 
+ 	if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_STATE_CB_FLAG))
+ 		tcp_call_bpf_2arg(sk, BPF_SOCK_OPS_STATE_CB, oldstate, state);
++	bpf_tcp_ops_call(set_state, sk, state);
+ 
+ 	switch (state) {
+ 	case TCP_ESTABLISHED:
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 61045a8886e4..12fb690d21c4 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -6694,6 +6694,10 @@ void tcp_init_transfer(struct sock *sk, int bpf_op, struct sk_buff *skb)
+ 	tp->snd_cwnd_stamp = tcp_jiffies32;
+ 
+ 	bpf_skops_established(sk, bpf_op, skb);
++	if (bpf_op == BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB)
++		bpf_tcp_ops_call(active_established, sk, skb);
++	else
++		bpf_tcp_ops_call(passive_established, sk, skb);
+ 	/* Initialize congestion control unless BPF initialized it already: */
+ 	if (!icsk->icsk_ca_initialized)
+ 		tcp_init_congestion_control(sk);
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 26dd751ec72a..93f4a95399ea 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3678,6 +3678,7 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
+ 	if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_RETRANS_CB_FLAG))
+ 		tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RETRANS_CB,
+ 				  TCP_SKB_CB(skb)->seq, segs, err);
++	bpf_tcp_ops_call(retrans, sk, skb, err);
+ 
+ 	if (unlikely(err) && err != -EBUSY)
+ 		NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, segs);
+@@ -4298,6 +4299,7 @@ int tcp_connect(struct sock *sk)
+ 	int err;
+ 
+ 	tcp_call_bpf(sk, BPF_SOCK_OPS_TCP_CONNECT_CB, 0, NULL);
++	bpf_tcp_ops_call(connect, sk);
+ 
+ #if defined(CONFIG_TCP_MD5SIG) && defined(CONFIG_TCP_AO)
+ 	/* Has to be checked late, after setting daddr/saddr/ops.
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index bf171b5e1eb3..4337627ee0ea 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -290,6 +290,7 @@ static int tcp_write_timeout(struct sock *sk)
+ 		tcp_call_bpf_3arg(sk, BPF_SOCK_OPS_RTO_CB,
+ 				  icsk->icsk_retransmits,
+ 				  icsk->icsk_rto, (int)expired);
++	bpf_tcp_ops_call(rto, sk);
+ 
+ 	if (expired) {
+ 		/* Has it gone just too far? */
 -- 
 2.53.0-Meta
 
