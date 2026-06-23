@@ -1,171 +1,158 @@
-Return-Path: <netdev+bounces-301264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bKSJEOAeOmpB1wcAu9opvQ
-	(envelope-from <netdev+bounces-301264-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:51:28 +0200
+	id cysxGbofOmpt1wcAu9opvQ
+	(envelope-from <netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:55:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FB86B448A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:51:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0C86B449F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:55:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=BeuPjRpr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301264-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301264-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=CEXbprue;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06E96303C634
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 05:51:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 287163013A51
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 05:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB4D3A9615;
-	Tue, 23 Jun 2026 05:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7200C331EB8;
+	Tue, 23 Jun 2026 05:55:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE31306746
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 05:51:11 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782193873; cv=pass; b=KjZHC2X0+YNhxivpCxzzSeDhyFZdxJeN9m2LBWc0c/eBOlFbj7juEZQANUNEbWYGcf6E931yyv6ZZ9QfTDb4ZddGONjVBBI2V/WBxY1beSKEuQ+52KsFzi0y6O5zrko/OMkZ63sJTkegEEkxaRmqwrN75Iv1LPjAF9Z1KRm+lJU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782193873; c=relaxed/simple;
-	bh=IUNvuZf91lad4iP980g9ClhMYUALj9mv5VIwYN6g8+c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K7GtuJf8LfSQDWXiXF7lqhBNIGJN3zOWF9RROw5kJvWdM3wPDffn+AlkExPTCkTRZ/+5ZNwDl+jRAwzkK2LuEATQsG/ggyT3vN1I00YI5zAJFChDj81WAb1XkGTWl81rXO9vP0Rgg0Qj7H05LiOPy806lT4K6RbnMndKaNSvI3s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BeuPjRpr; arc=pass smtp.client-ip=209.85.160.171
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-516d0db9372so42390741cf.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 22:51:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782193871; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IbWJPpL1mxl7bT4+Rgw3o7JhWo5S0liz4aJTuJqbaWsiM7DQFw4iPSFgsm1kHkDHOw
-         NV1LTffurmLDGB+YVIBjEiWTL9sGig6aP2FXxGY8HLz3So5JkjOUsP5Z3GNwMT87Bjdf
-         xK4dHLM1Mw4xeKSPtjt0PZh+0BiGGKo7FRznyfGbavvvWW9TyUhca7xpCM6FeNKDv6O5
-         eLdMobpYX+zcgiSSqstmyHqnAzi2DGKqEj69smmO1kDZ31rlOkWqkTVurxtBzrftYafZ
-         MDNBavgnhdO8XproLM3RP0WeiA/JnIqVSXT2OPrD7FQwMzqEKUohWtOPm7ARAuLeooGW
-         U4Vw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Gz0cOtr+Us+wZSO4QqOuJ9usqoqszN3hmAILauOaBc4=;
-        fh=Tq23LtVWppyF3cX4kCWTV2FpFwNzCor3dG6+7DJAcE4=;
-        b=NGrMDupyQAyRfe85GCHPPEfKqaW/w4YI8ZepJr7ZrV9SzUkjC/17KBswiBh5yRdh7u
-         gZ4IXlOaoDAsOtUi/pJRIyJ35UiQEOVmeaA7wlkZ+GcECbAK6QInW4Pkilu+dMOGiWyZ
-         AwqEbHhM1LwMskda2PKdddgiGlcFFR7GuuZGIjGe1S5L5nAYhfPF7NW5Te2rZwl5w/fZ
-         RCElP3Dsw/0wveXJmNC7eG8aE3yaOOqEFzRj6RpAN0JPOE4lKiiPXay1LJkK1CK21OwG
-         HKO7JdA/IX+eCFpsWYhY4UtqwnvFU73jRxsUf/kf2pVzdVuyYe7juUrl1kXzL2CJeYdA
-         iahA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6E8306746;
+	Tue, 23 Jun 2026 05:55:00 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782194103; cv=none; b=bpnTTGmCbpjGYs6iaEC0m0+e6cf+Eg3K9vP9c9ily4iIsCoRUPo8AuZUwV/C/YhAFseObtgr9+hLrPtrM6lscURSenMPV2PUbbYFA2gzPKFND9qaRF2RtyXGrl+VUwt3nuQn3KNAgt7kMNOgvDNy4Ap6491E8iRB4oB6DrJaFaQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782194103; c=relaxed/simple;
+	bh=xn+wvnXzpc9jXLOuctsgT9WJqipzbFncNOD9qXKry7g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Kv4qucF1zU6+LNL45rB6l7HTa5T+d7JYk+3GCto5tvLephQEFHjyo6NzzCBiv9IfMDSUyS7vKNHxjK1W6nj2W42eqZWGjOhmuZgX/NZ+HRjbNxU6FLyzdTjDjF9DWi9OaOSk8/LN8KvRJmHUp3AO1SnZR5NV8MJm/9laBIF1V7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=CEXbprue; arc=none smtp.client-ip=203.29.241.158
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782193871; x=1782798671; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gz0cOtr+Us+wZSO4QqOuJ9usqoqszN3hmAILauOaBc4=;
-        b=BeuPjRprV3+we41fiMhlx6SLA4cYK3Bz1sGvEIkNmRwvMSfS4HdBt4VjLizfbpTIkI
-         s4E2uq+KULS3lmUjs137HMGZ2WTRMPa6cqxM+tPh36KmuzY/I6r/6wbraVE2+XzG7U3O
-         64x0dvsVoL61e5HrHWC1sYSMkDUE5ee8QV47xK349PGt5n9qYx0AfZySS8V1td1Gm5IU
-         RcIG8+eIU+p6WomrHLCdG/JPMuff4ERr8sVR4u/QNqR/mwPMsuB5RhpYiCg2eL/8mvVF
-         uuIQ56ZmLKAZ/7bYVYURm0vKHl+KuGNNFpqiUWspwWyzK49V3zEJkEV1LvhL7gFyQj+K
-         0OGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782193871; x=1782798671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Gz0cOtr+Us+wZSO4QqOuJ9usqoqszN3hmAILauOaBc4=;
-        b=lzjhrf33jQEk/f2Ki248batKvZGovrxBHVT6KWg8ieyz5h84vYKIjP+cCcfkbzHmgS
-         1Z03gHYnyLAFeP/nmHtSTnlfrnPy12W7+6JGx7p9frDyZ7PCXIyLfdgBaYfQEg8uRIoQ
-         VNWJZMOr7rb0xqi9p3I2wdZDlxmnJPiDaT7Vw1ffvWhsmKtWag6KoGhzD6uxi5kiCpAN
-         kCPVtO9QThvCLumeER1IKVvMvFL7sNOz8DrusWIYjZtzSmI8ruJ2bIxdcF8YV0UlNi11
-         Rb4AtWTP6BhbkDIoiuntFb1Uj72wxcxeQZC4/MHhekf2qP20cDn6QCVmRwblXLeQ7Ghh
-         myow==
-X-Gm-Message-State: AOJu0YyhJcPZXJ5298ruDoIb1DNOnXAiBOB84TeNLfW0RlSpK6sZsQbu
-	nHUwkv1eHr1VUGOVwpRAQ7xnnKH932FeubZeQjU1B4W4GyNnRwclp7RABI9Ua/LlkmSKQroZZH1
-	1VZYkcVe1kmYSF5gd1NnpXCWMLvkTgO/QD22WucsA
-X-Gm-Gg: AfdE7cnleMpODKZDM6c09szhy9IxldRqIbWbcX8lCu8XAGvKC/xFeS3lQRH47LGFi67
-	7NjX9TIhksgZaATN1upokImiZ7faWnWaOE6gSwngzgYmf/yRtEqciY8qFGXUEV3IJE/fRadav0B
-	s0ACry7MRtImDJEBa2+NiwFzkEgUtm7Q+x/d9DOwCkdnscUBFbU+cglFy5GHc0MDCJCdSF/4/jn
-	R3PYzoBYGhiOBNOXKa+v2/dqSs9VQizGl7QI0hqrPhECHmIBuKApD9S30g2hPQKWn9opHsWDCrs
-	QpnZSabS7QvS1IvcU70tXdJXghgUZl9YeFpAAyC2XhxCm2wMCIeZsIEWfiQrJSc3mTDVR46CRmZ
-	dcs5Y7Gs2
-X-Received: by 2002:a05:622a:190e:b0:517:8d24:6500 with SMTP id
- d75a77b69052e-519e4bf7edemr272892601cf.32.1782193870406; Mon, 22 Jun 2026
- 22:51:10 -0700 (PDT)
+	d=codeconstruct.com.au; s=2022a; t=1782194093;
+	bh=xn+wvnXzpc9jXLOuctsgT9WJqipzbFncNOD9qXKry7g=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=CEXbpruebyN+ULBwabnfGMz/IPLDYGMrn054ck0qigRfFZLKsimynnZEPLMgRuUMR
+	 7hkB2IN5TXKNUmNB23Ist4JUEij/F31pAzd+G1YrGhtg4XaAL3ncS3PF+uw+AkTyis
+	 SonIfDUjb/EdCSS/tK61+BsIo6gmZdx738kwOLVGP2bfG7sgppH3mTg3jy7l8xvXMY
+	 V4LvKdH46WZ3wALZfKGzp6oWeLn9CMiebQPdYqaeJUQ5V7zWpahSvtEW/ishBMGDjZ
+	 AYjxa5bPrs5RM0IuGkTuDINXD3A/LBEsx3rnM4kpRdv8DS0/Ph2KkKNe4ppaxEgDIZ
+	 6XisPsdwOAq8w==
+Received: from [192.168.72.161] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 26C8A60007;
+	Tue, 23 Jun 2026 13:54:51 +0800 (AWST)
+Message-ID: <9d11a866347c2c8cd69fdcb338bae743d6e68bfc.camel@codeconstruct.com.au>
+Subject: Re: [net-next v44] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Paolo Abeni
+	 <pabeni@redhat.com>, admiyo@os.amperecomputing.com
+Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, sudeep.holla@arm.com,
+ Jonathan.Cameron@huawei.com,  lihuisong@huawei.com
+Date: Tue, 23 Jun 2026 13:54:50 +0800
+In-Reply-To: <edacdad5-7936-4fbf-ba66-973768ebdf73@amperemail.onmicrosoft.com>
+References: <20260522193610.234166-1-admiyo@os.amperecomputing.com>
+	 <20260528084611.133703-1-pabeni@redhat.com>
+	 <63aebaed-2456-457d-be70-5211d2f746df@amperemail.onmicrosoft.com>
+	 <8c2a9e591ba22a95962c2c5f7dff5971fc5123df.camel@codeconstruct.com.au>
+	 <4fabc99f-52c1-422e-9513-69e2190bc91a@amperemail.onmicrosoft.com>
+	 <068cd5ffb49aac3bfd2184df7289093cbcd524ee.camel@codeconstruct.com.au>
+	 <edacdad5-7936-4fbf-ba66-973768ebdf73@amperemail.onmicrosoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260623015208.1191687-1-eilaimemedsnaimel@gmail.com>
-In-Reply-To: <20260623015208.1191687-1-eilaimemedsnaimel@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Jun 2026 22:50:59 -0700
-X-Gm-Features: AVVi8CewAkA60aCmgRFsz_H0_OXUnZNiugJpfNsSgv_GDvrrSksrfmJPKuwaigY
-Message-ID: <CANn89iKQmOSJWN0h4uRs1-SLKc8NqfZ=UbbcYjYTsF9D4tV=FQ@mail.gmail.com>
-Subject: Re: [PATCH] net/tcp-ao: fix use-after-free of key in del_async path
-To: HanQuan <eilaimemedsnaimel@gmail.com>
-Cc: netdev@vger.kernel.org, ncardwell@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:eilaimemedsnaimel@gmail.com,m:netdev@vger.kernel.org,m:ncardwell@google.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301264-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301265-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:admiyo@amperemail.onmicrosoft.com,m:pabeni@redhat.com,m:admiyo@os.amperecomputing.com,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sudeep.holla@arm.com,m:Jonathan.Cameron@huawei.com,m:lihuisong@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 88FB86B448A
+X-Rspamd-Queue-Id: 1E0C86B449F
 
-On Mon, Jun 22, 2026 at 6:52=E2=80=AFPM HanQuan <eilaimemedsnaimel@gmail.co=
-m> wrote:
->
-> In tcp_ao_delete_key(), the del_async path skips the current_key
-> and rnext_key validity checks present in the synchronous path,
-> assuming these pointers are always NULL on LISTEN sockets.  However,
-> if a key was added with set_current=3D1/set_rnext=3D1 while the socket
-> was in CLOSE state, current_key and rnext_key will be non-NULL
-> after listen() transitions the socket to LISTEN.
->
-> When such a key is deleted with del_async=3D1, hlist_del_rcu() and
-> call_rcu() free the key without clearing the dangling pointers.
-> After the RCU grace period, getsockopt(TCP_AO_INFO) dereferences
-> current_key->sndid and rnext_key->rcvid from freed slab memory.
->
-> Clear current_key and rnext_key in the del_async path when they
-> reference the key being deleted.
->
-> Fixes: d6732b95b6fb ("net/tcp: Allow asynchronous delete for TCP-AO keys =
-(MKTs)")
-> Signed-off-by: HanQuan <eilaimemedsnaimel@gmail.com>
+Hi Adam,
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+> > > The code itself will not, as written, work on a 32 Bit system, as the=
+re
+> > > are 64 bit specific code.
+> > Yeah, that was more my question - what is 64-bit specific about the
+> > code?
+>=20
+> I'd really have to dig, as this decision was mixed in with the earlier=
+=20
+> endinaness conversions.=C2=A0=C2=A0I suspect, that it was origianally tri=
+ggered by=20
+> the ACPICA insisting on Machine architecture for these values, where=20
+> they are supposed to be explicitly 32, 64 bit etc.
+
+Looking at the history, it appears like this was a in response to the
+AI review comments about the stats update with interrupts enabled. The
+report was that it may result in tearing of the stats values on 32-bit
+machines, but if you have the stats updates right (which I think
+you do now?) then this is not an issue.
+
+> It might be perfectly safe, but I have no way to test. Treat it as a=20
+> general trend toward not supporting newer technology on older architectur=
+es.
+
+This is more about not imposing a configuration restriction with no
+purpose. There is no need for you to test/support those configurations
+though.
+
+> Could I safely acquire a spinlock in the rx_ callback during interupt
+> context?
+
+Yes, absolutely. That's a main use-case for spinlocks, to allow
+serialisation from within an atomic context.
+
+> I thought that had a significant impact on the system.
+
+You don't want to be doing large amounts of work within the critical
+section (and with interrupts disabled), but your scenario should be
+fine.
+
+Cheers,
+
+
+Jeremy
 
