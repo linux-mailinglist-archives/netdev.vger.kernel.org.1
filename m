@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-301373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TLhxFLOLOmo2/gcAu9opvQ
-	(envelope-from <netdev+bounces-301373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:35:47 +0200
+	id w4nWBsyLOmpC/gcAu9opvQ
+	(envelope-from <netdev+bounces-301374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:36:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6E46B77ED
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:35:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78D006B77F3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:36:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=ahYpNpRN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301373-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301373-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=Hgy38gv+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301374-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301374-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3145030B96EF
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:33:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 81DED30BFFFC
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39D137C916;
-	Tue, 23 Jun 2026 13:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9613637BE95;
+	Tue, 23 Jun 2026 13:33:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742DF37BE74;
-	Tue, 23 Jun 2026 13:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF04737A4AF;
+	Tue, 23 Jun 2026 13:33:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782221612; cv=none; b=Hrx61avtjwUSJPCtDY0yjLsoD9Sa5gQh7IeGmAmaj000ntwEvtS2VlrZrZy+C7mYMGP7bxN8NVKmTlT3JB+IHfh53UYbHJJ3S7NIgwgeAj7KAGq6ooH7Miv2W+U1O4CNZ2bPfPCKwWytmbzRxkemqQ9Ynjpp+WF6d6xS1nQbmJI=
+	t=1782221614; cv=none; b=pzdpvckB8tyWa71BW8/cI5wiYy+Jb8mKny/u4kRT1PLbWWqEvqRVCPWx9Jyc/8v0HhxbyDk+i2Tf4rSNEMTlAbyQVsgYZCSZz2hEVqtEJgiA5YdeEIkSJvgPC9QgB2D9zTIWDFGHSyfZ/FmWRXal9i5XEkZKEkn/4ghAjYUqxEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782221612; c=relaxed/simple;
-	bh=NGl2cPE3G06zK1isKDNsgc88FNuQebzB+qzAK6MBUMQ=;
+	s=arc-20240116; t=1782221614; c=relaxed/simple;
+	bh=is7zopIAMhOW8oDZVX6eFpOs59mHojYC2SVJaus1deQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UeA5AZS49jdd+s63MnKlW6Am4sSrtruGwibcneK2YNM4IwRCAXVXRXIYvvA0iDcPzk/0owBOEkhErtl2S6WSebFmVbcs1u1hyTs3yGbSDT5QB06L1q40fPybBcZBu0zFixuSymsOmxfcmEb15jXaPZ/x/GccfRdRCcJF/WxAXo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ahYpNpRN; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=o2DZnKe9G3rIm81Md+m5I5e/bGhk6NsIVVZ8+cY7RgHPCvQ6QWxc4cPvG9/GCGaAYdahWgKixrZkzzI9LGuBRCfmvtUCFmrpVuL2RWu28zithuFvrsJQPAz1FXY4SaAQ2IbvB4mpDIEgYzH/949VIXWWvqnBD5iFbCR77CtDbPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hgy38gv+; arc=none smtp.client-ip=198.175.65.16
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782221610; x=1813757610;
+  t=1782221613; x=1813757613;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NGl2cPE3G06zK1isKDNsgc88FNuQebzB+qzAK6MBUMQ=;
-  b=ahYpNpRNda9KOTgF8OqpyY8L9tTrIFf6PflUPJRJ6g/9R2232U1PvGEo
-   dwEPCBwLpj6+KzdsDUhTePWY9tLG5l3ePlnTXGH6jlvObIR/p6K42jtfx
-   ZCmM9B145bcpDpev2SH4L9T6gVkfJBTKA5cl1Y1SuBlLgIzoiFh87CviO
-   jYb27FGHmPHs5yvJ4Zku66XVLW4SFasxlubiLoJvzQiE2PFggVoRLwn39
-   otuQObX7fUv9cN63KnSsR0EXiWUAaqeBD5ijwePdYRLO2aQZLBfTv3XNs
-   hFxb8M4DHc/SWRdYm0SMHvvZlFRoDJ0hKcFWB/aH469tv0IWlA/Gu0/fT
-   w==;
-X-CSE-ConnectionGUID: 7kTosZJ5SfWT3BrU/0ujzw==
-X-CSE-MsgGUID: txZEvzIYShKPJZSFZ8BiQQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11826"; a="83153556"
+  bh=is7zopIAMhOW8oDZVX6eFpOs59mHojYC2SVJaus1deQ=;
+  b=Hgy38gv+YKEUceOtukQySTmZP0eOXy4nfFd0ygyYq5uPmF8W5olUNI+x
+   5Nzcct3+7pgqfWrED2NaC2JqhCxi2dekKYx9QEchSQCv+UygcS1Zv8mB6
+   M2f0MLp7qJ4lPAYylzHMsqnVVZWE21q0Rm7Dd7eiIzn5/loWfRyRRXXhI
+   BgLs0LN5ae4BWyNMPK9fkbcxrJiQf40R4Zye2iGeXSd6QGWlrE1fGr9qm
+   YIB+yETc8rRiR2dkZNxW05UfqX3e5B/w5yVQLNVywbFC32GAnOaBlCzj8
+   xOl/Zu7OSv3JDnn6tQKYdPnOPto5qmS07sFuKRjuYGKaOGhdOoJd8uc/6
+   Q==;
+X-CSE-ConnectionGUID: z5Nrnh3DTyy75LMDqecHpA==
+X-CSE-MsgGUID: H4YD4uHHSH2Mml3KE8EtOw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11826"; a="83153565"
 X-IronPort-AV: E=Sophos;i="6.24,220,1774335600"; 
-   d="scan'208";a="83153556"
+   d="scan'208";a="83153565"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 06:33:30 -0700
-X-CSE-ConnectionGUID: zNk4bXImSC2mctWi4D6ljQ==
-X-CSE-MsgGUID: ITCwqASGRQuXMRqXBnnQFQ==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 06:33:32 -0700
+X-CSE-ConnectionGUID: e5PO2b20TeCWwyAXsm4Hkw==
+X-CSE-MsgGUID: K+jWfzFeSUubIBz8iwMDhg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,220,1774335600"; 
-   d="scan'208";a="251447518"
+   d="scan'208";a="251447524"
 Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Jun 2026 06:33:27 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 23 Jun 2026 06:33:30 -0700
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: bpf@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	bjorn@kernel.org,
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH net 5/7] xsk: reclaim invalid multi-buffer Tx descs in ZC path
-Date: Tue, 23 Jun 2026 15:32:38 +0200
-Message-Id: <20260623133240.1048434-6-maciej.fijalkowski@intel.com>
+Subject: [PATCH net 6/7] selftests/xsk: fix too-many-frags multi-buffer Tx test
+Date: Tue, 23 Jun 2026 15:32:39 +0200
+Message-Id: <20260623133240.1048434-7-maciej.fijalkowski@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
 References: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,10 +102,10 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301373-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301374-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kerneljasonxing@gmail.com,m:bjorn@kernel.org,m:maciej.fijalkowski@intel.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -120,400 +120,74 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AE6E46B77ED
+X-Rspamd-Queue-Id: 78D006B77F3
 
-Currently, the zero-copy Tx batching path stops when it encounters an
-invalid descriptor. For multi-buffer packets this can leave descriptors
-consumed from the Tx ring without returning their buffers to userspace
-through the completion ring.
+The too-many-frags test describes a packet that is valid from the Tx
+ring ownership point of view, but invalid for transmission because it
+exceeds the supported number of fragments.
 
-Handle invalid multi-buffer packets as a packet-sized unit. Keep
-descriptors that are valid for transmission separate from descriptors
-that are consumed only because they belong to an invalid multi-buffer
-packet. The former are returned to the driver as Tx work, while the
-latter are written to the CQ address area so they can be reclaimed by
-userspace.
+Keep the generated Tx descriptors valid so that __send_pkts() accounts
+them as outstanding descriptors that must be reclaimed through the CQ.
+Then mark the corresponding Rx packet invalid so the test still does
+not expect the oversized packet to appear on the receive side.
 
-The batched path can retain drain state when the producer has not yet
-supplied the end of an invalid packet. Do not allow a second Tx socket to
-join the pool while such state exists. Gate the batched data path while a
-same-pool bind waits for pre-existing readers, then either add the new
-socket or fail the bind with -EAGAIN. This guarantees that drain state is
-handled only by the singular batched path and avoids teaching the shared
-UMEM fallback path about multi-buffer packet draining.
+Add a valid synchronization packet after the oversized packet so the
+test can verify that the Tx path drains the bad packet and resumes at
+the next packet boundary.
 
-The reclaim-only descriptors must not be submitted to the completion
-ring immediately when they follow real Tx descriptors in the same batch.
-Drivers may complete only part of the Tx work returned by
-xsk_tx_peek_release_desc_batch(), and publishing the reclaim descriptors
-too early would also publish earlier real Tx descriptors that the driver
-has not completed yet.
-
-Track the number of driver-visible Tx descriptors that precede pending
-reclaim descriptors. xsk_tx_completed() first advances through the real
-Tx completions and submits the reclaim descriptors only after all earlier
-Tx descriptors in the CQ address order have been completed. If a batch
-contains only reclaim descriptors, complete them immediately because
-there is no driver-visible Tx work in front of them.
-
-This preserves CQ ordering while ensuring that every descriptor consumed
-as part of an invalid multi-buffer packet is eventually returned to
-userspace.
-
-Fixes: cf24f5a5feea ("xsk: add support for AF_XDP multi-buffer on Tx path")
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 ---
- include/net/xsk_buff_pool.h |  6 ++++
- net/xdp/xsk.c               | 62 +++++++++++++++++++++++++++++++---
- net/xdp/xsk_buff_pool.c     | 66 +++++++++++++++++++++++++++++++++++++
- net/xdp/xsk_queue.h         | 66 +++++++++++++++++++++++++++----------
- 4 files changed, 177 insertions(+), 23 deletions(-)
+ .../selftests/bpf/prog_tests/test_xsk.c       | 20 +++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index ccb3b350001f..4e5abacfcbb7 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -78,9 +78,12 @@ struct xsk_buff_pool {
- 	u32 chunk_size;
- 	u32 chunk_shift;
- 	u32 frame_len;
-+	u32 reclaim_descs;
-+	u32 tx_zc_pending_descs;
- 	u32 xdp_zc_max_segs;
- 	u8 tx_metadata_len; /* inherited from umem */
- 	u8 cached_need_wakeup;
-+	bool tx_share_pending;
- 	bool uses_need_wakeup;
- 	bool unaligned;
- 	bool tx_sw_csum;
-@@ -113,6 +116,9 @@ void xp_get_pool(struct xsk_buff_pool *pool);
- bool xp_put_pool(struct xsk_buff_pool *pool);
- void xp_clear_dev(struct xsk_buff_pool *pool);
- void xp_add_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs);
-+int xp_prepare_xsk_tx_share(struct xsk_buff_pool *pool, struct xdp_sock *xs,
-+			    bool *pending);
-+void xp_finish_xsk_tx_share(struct xsk_buff_pool *pool);
- void xp_del_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs);
- 
- /* AF_XDP, and XDP core. */
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 43791647cf18..2dda854c6590 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -499,6 +499,18 @@ void __xsk_map_flush(struct list_head *flush_list)
- 
- void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries)
- {
-+	if (unlikely(pool->reclaim_descs)) {
-+		if (nb_entries < pool->tx_zc_pending_descs) {
-+			pool->tx_zc_pending_descs -= nb_entries;
-+			xskq_prod_submit_n(pool->cq, nb_entries);
-+			return;
-+		}
-+
-+		pool->tx_zc_pending_descs = 0;
-+		nb_entries += pool->reclaim_descs;
-+		pool->reclaim_descs = 0;
-+	}
-+
- 	xskq_prod_submit_n(pool->cq, nb_entries);
- }
- EXPORT_SYMBOL(xsk_tx_completed);
-@@ -576,9 +588,20 @@ static u32 xsk_tx_peek_release_fallback(struct xsk_buff_pool *pool, u32 max_entr
- 
- u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
- {
-+	struct xsk_tx_batch batch = {};
- 	struct xdp_sock *xs;
-+	u32 cq_cached_prod;
- 
- 	rcu_read_lock();
-+
-+	/* Pairs with the release stores in xp_prepare_xsk_tx_share() and
-+	 * xp_finish_xsk_tx_share(). If bind is converting a singular Tx pool
-+	 * to shared, do not enter the singular batched path.
-+	 */
-+	if (smp_load_acquire(&pool->tx_share_pending))
-+		goto out;
-+	if (unlikely(pool->reclaim_descs))
-+		goto out;
- 	if (!list_is_singular(&pool->xsk_tx_list)) {
- 		/* Fallback to the non-batched version */
- 		rcu_read_unlock();
-@@ -586,10 +609,8 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
+diff --git a/tools/testing/selftests/bpf/prog_tests/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
+index 72875071d4f1..de1e63c3fdf6 100644
+--- a/tools/testing/selftests/bpf/prog_tests/test_xsk.c
++++ b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
+@@ -2258,7 +2258,7 @@ int testapp_too_many_frags(struct test_spec *test)
+ 		max_frags += 1;
  	}
  
- 	xs = list_first_or_null_rcu(&pool->xsk_tx_list, struct xdp_sock, tx_list);
--	if (!xs) {
--		nb_pkts = 0;
-+	if (!xs)
- 		goto out;
--	}
+-	pkts = calloc(2 * max_frags + 2, sizeof(struct pkt));
++	pkts = calloc(2 * max_frags + 3, sizeof(struct pkt));
+ 	if (!pkts)
+ 		return TEST_FAILURE;
  
- 	nb_pkts = xskq_cons_nb_entries(xs->tx, nb_pkts);
+@@ -2279,21 +2279,29 @@ int testapp_too_many_frags(struct test_spec *test)
+ 	/* An invalid packet with the max amount of frags but signals packet
+ 	 * continues on the last frag
+ 	 */
+-	for (i = max_frags + 1; i < 2 * max_frags + 1; i++) {
++	for (i = max_frags + 1; i < 2 * max_frags + 2; i++) {
+ 		pkts[i].len = MIN_PKT_SIZE;
+ 		pkts[i].options = XDP_PKT_CONTD;
+-		pkts[i].valid = false;
++		pkts[i].valid = true;
+ 	}
++	pkts[2 * max_frags + 1].options = 0;
  
-@@ -603,19 +624,38 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
- 	if (!nb_pkts)
- 		goto out;
+ 	/* Valid packet for synch */
+-	pkts[2 * max_frags + 1].len = MIN_PKT_SIZE;
+-	pkts[2 * max_frags + 1].valid = true;
++	pkts[2 * max_frags + 2].len = MIN_PKT_SIZE;
++	pkts[2 * max_frags + 2].valid = true;
  
--	nb_pkts = xskq_cons_read_desc_batch(xs->tx, pool, nb_pkts);
-+	batch = xskq_cons_read_desc_batch(xs, pool, nb_pkts);
-+	nb_pkts = xsk_tx_batch_cq_descs(&batch);
- 	if (!nb_pkts) {
- 		xs->tx->queue_empty_descs++;
- 		goto out;
+-	if (pkt_stream_generate_custom(test, pkts, 2 * max_frags + 2)) {
++	if (pkt_stream_generate_custom(test, pkts, 2 * max_frags + 3)) {
+ 		free(pkts);
+ 		return TEST_FAILURE;
  	}
  
- 	__xskq_cons_release(xs->tx);
-+	cq_cached_prod = pool->cq->cached_prod;
-+
- 	xskq_prod_write_addr_batch(pool->cq, pool->tx_descs, nb_pkts);
-+
-+	if (unlikely(batch.reclaim_descs)) {
-+		u32 cq_pending_descs;
-+
-+		/* CQ is positional. Descriptors already written but not
-+		 * submitted must complete before any reclaim-only descriptors
-+		 * appended below.
-+		 */
-+		cq_pending_descs = cq_cached_prod - xskq_get_prod(pool->cq);
-+
-+		pool->tx_zc_pending_descs = batch.tx_descs + cq_pending_descs;
-+		pool->reclaim_descs = batch.reclaim_descs;
-+		if (unlikely(!pool->tx_zc_pending_descs))
-+			xsk_tx_completed(pool, 0);
-+	}
-+
- 	xs->sk.sk_write_space(&xs->sk);
- 
- out:
- 	rcu_read_unlock();
--	return nb_pkts;
-+	return batch.tx_descs;
- }
- EXPORT_SYMBOL(xsk_tx_peek_release_desc_batch);
- 
-@@ -1442,6 +1482,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
- 	struct sockaddr_xdp *sxdp = (struct sockaddr_xdp *)addr;
- 	struct sock *sk = sock->sk;
- 	struct xdp_sock *xs = xdp_sk(sk);
-+	bool tx_share_pending = false;
- 	struct net_device *dev;
- 	int bound_dev_if;
- 	u32 flags, qid;
-@@ -1549,6 +1590,13 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
- 				goto out_unlock;
- 			}
- 
-+			err = xp_prepare_xsk_tx_share(umem_xs->pool, xs,
-+						      &tx_share_pending);
-+			if (err) {
-+				sockfd_put(sock);
-+				goto out_unlock;
-+			}
-+
- 			xp_get_pool(umem_xs->pool);
- 			xs->pool = umem_xs->pool;
- 
-@@ -1559,6 +1607,8 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
- 			if (xs->tx && !xs->pool->tx_descs) {
- 				err = xp_alloc_tx_descs(xs->pool, xs);
- 				if (err) {
-+					if (tx_share_pending)
-+						xp_finish_xsk_tx_share(xs->pool);
- 					xp_put_pool(xs->pool);
- 					xs->pool = NULL;
- 					sockfd_put(sock);
-@@ -1598,6 +1648,8 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
- 	xs->sg = !!(xs->umem->flags & XDP_UMEM_SG_FLAG);
- 	xs->queue_id = qid;
- 	xp_add_xsk(xs->pool, xs);
-+	if (tx_share_pending)
-+		xp_finish_xsk_tx_share(xs->pool);
- 
- 	if (qid < dev->real_num_rx_queues) {
- 		struct netdev_rx_queue *rxq;
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 1f28a9641571..6fa732a843a9 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -22,6 +22,72 @@ void xp_add_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs)
- 	spin_unlock(&pool->xsk_tx_list_lock);
- }
- 
-+int xp_prepare_xsk_tx_share(struct xsk_buff_pool *pool, struct xdp_sock *xs,
-+			    bool *pending)
-+{
-+	struct xdp_sock *tmp;
-+	int err = 0;
-+
-+	*pending = false;
-+	if (!xs->tx)
-+		return 0;
-+
-+	spin_lock(&pool->xsk_tx_list_lock);
-+	if (!list_is_singular(&pool->xsk_tx_list)) {
-+		spin_unlock(&pool->xsk_tx_list_lock);
-+		return 0;
-+	}
-+
-+	if (pool->tx_share_pending) {
-+		spin_unlock(&pool->xsk_tx_list_lock);
-+		return -EAGAIN;
-+	}
-+
-+	/* Pairs with the acquire load in xsk_tx_peek_release_desc_batch().
-+	 * Stop new singular batched Tx readers before synchronize_net()
-+	 * waits for readers that may already have observed a singular list.
++	/* The generated Tx stream must keep the too-big packet valid so that
++	 * __send_pkts() accounts its descriptors in outstanding_tx. The Rx
++	 * stream, however, must not expect this packet on the wire.
 +	 */
-+	smp_store_release(&pool->tx_share_pending, true);
-+	*pending = true;
-+	spin_unlock(&pool->xsk_tx_list_lock);
++	test->ifobj_rx->xsk->pkt_stream->pkts[2].valid = false;
++	test->ifobj_rx->xsk->pkt_stream->nb_valid_entries--;
 +
-+	/* A batch that observed a singular Tx socket list before the gate was
-+	 * armed may set drain_cont. Wait for all such readers before checking
-+	 * whether the pool can safely become shared.
-+	 */
-+	synchronize_net();
-+
-+	spin_lock(&pool->xsk_tx_list_lock);
-+	list_for_each_entry(tmp, &pool->xsk_tx_list, tx_list) {
-+		if (READ_ONCE(tmp->drain_cont)) {
-+			err = -EAGAIN;
-+			break;
-+		}
-+	}
-+
-+	if (err) {
-+		/* Pairs with the acquire load in xsk_tx_peek_release_desc_batch().
-+		 * No socket was added; clear the gate so Tx can resume.
-+		 */
-+		smp_store_release(&pool->tx_share_pending, false);
-+		*pending = false;
-+	}
-+	spin_unlock(&pool->xsk_tx_list_lock);
-+
-+	return err;
-+}
-+
-+void xp_finish_xsk_tx_share(struct xsk_buff_pool *pool)
-+{
-+	spin_lock(&pool->xsk_tx_list_lock);
-+	/* Pairs with the acquire load in xsk_tx_peek_release_desc_batch().
-+	 * Publish the preceding xp_add_xsk() list update before allowing Tx
-+	 * to observe that the share transition has finished.
-+	 */
-+	smp_store_release(&pool->tx_share_pending, false);
-+	spin_unlock(&pool->xsk_tx_list_lock);
-+}
-+
- void xp_del_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs)
- {
- 	if (!xs->tx)
-diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-index 3e3fbb73d23e..99fa62e0d337 100644
---- a/net/xdp/xsk_queue.h
-+++ b/net/xdp/xsk_queue.h
-@@ -58,6 +58,16 @@ struct parsed_desc {
- 	u32 valid;
- };
- 
-+struct xsk_tx_batch {
-+	u32 tx_descs;
-+	u32 reclaim_descs;
-+};
-+
-+static inline u32 xsk_tx_batch_cq_descs(const struct xsk_tx_batch *batch)
-+{
-+	return batch->tx_descs + batch->reclaim_descs;
-+}
-+
- /* The structure of the shared state of the rings are a simple
-  * circular buffer, as outlined in
-  * Documentation/core-api/circular-buffers.rst. For the Rx and
-@@ -263,17 +273,19 @@ static inline void parse_desc(struct xsk_queue *q, struct xsk_buff_pool *pool,
- 	parsed->mb = xp_mb_desc(desc);
- }
- 
--static inline
--u32 xskq_cons_read_desc_batch(struct xsk_queue *q, struct xsk_buff_pool *pool,
--			      u32 max)
-+static inline struct xsk_tx_batch
-+xskq_cons_read_desc_batch(struct xdp_sock *xs, struct xsk_buff_pool *pool,
-+			  u32 max)
- {
--	u32 cached_cons = q->cached_cons, nb_entries = 0;
- 	struct xdp_desc *descs = pool->tx_descs;
--	u32 total_descs = 0, nr_frags = 0;
-+	bool drain = READ_ONCE(xs->drain_cont);
-+	u32 cached_cons, nb_entries = 0;
-+	struct xsk_tx_batch batch = {};
-+	struct xsk_queue *q = xs->tx;
-+	u32 nr_frags = 0;
-+
-+	cached_cons = q->cached_cons;
- 
--	/* track first entry, if stumble upon *any* invalid descriptor, rewind
--	 * current packet that consists of frags and stop the processing
--	 */
- 	while (cached_cons != q->cached_prod && nb_entries < max) {
- 		struct xdp_rxtx_ring *ring = (struct xdp_rxtx_ring *)q->ring;
- 		u32 idx = cached_cons & q->ring_mask;
-@@ -282,26 +294,44 @@ u32 xskq_cons_read_desc_batch(struct xsk_queue *q, struct xsk_buff_pool *pool,
- 		descs[nb_entries] = ring->desc[idx];
- 		cached_cons++;
- 		parse_desc(q, pool, &descs[nb_entries], &parsed);
--		if (unlikely(!parsed.valid))
--			break;
-+		if (unlikely(!parsed.valid)) {
-+			if (!drain && !nr_frags && !parsed.mb)
-+				break;
-+
-+			drain = true;
-+		}
-+
-+		nr_frags++;
-+		nb_entries++;
- 
- 		if (likely(!parsed.mb)) {
--			total_descs += (nr_frags + 1);
--			nr_frags = 0;
--		} else {
--			nr_frags++;
--			if (nr_frags == pool->xdp_zc_max_segs) {
-+			if (unlikely(drain)) {
-+				batch.reclaim_descs = nr_frags;
-+				WRITE_ONCE(xs->drain_cont, false);
- 				nr_frags = 0;
- 				break;
- 			}
-+
-+			batch.tx_descs += nr_frags;
-+			nr_frags = 0;
-+			continue;
- 		}
--		nb_entries++;
-+
-+		if (nr_frags == pool->xdp_zc_max_segs)
-+			drain = true;
- 	}
- 
--	cached_cons -= nr_frags;
-+	if (nr_frags) {
-+		if (drain) {
-+			batch.reclaim_descs = nr_frags;
-+			WRITE_ONCE(xs->drain_cont, true);
-+		} else {
-+			cached_cons -= nr_frags;
-+		}
-+	}
- 	/* Release valid plus any invalid entries */
- 	xskq_cons_release_n(q, cached_cons - q->cached_cons);
--	return total_descs;
-+	return batch;
- }
- 
- /* Functions for consumers */
+ 	ret = testapp_validate_traffic(test);
+ 	free(pkts);
+ 	return ret;
 -- 
 2.43.0
 
