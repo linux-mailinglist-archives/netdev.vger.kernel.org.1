@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-301428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6gwhD6rEOmpUGQgAu9opvQ
-	(envelope-from <netdev+bounces-301428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:38:50 +0200
+	id oFKIOpDEOmpKGQgAu9opvQ
+	(envelope-from <netdev+bounces-301429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:38:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7E7E6B9234
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:38:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E17576B9226
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:38:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b="jH/sg/32";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301428-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301428-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=hXFrhRGn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301429-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301429-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DD5A8311E7A9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:34:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ACABD3027ABB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C9B38C421;
-	Tue, 23 Jun 2026 17:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9985B38C42B;
+	Tue, 23 Jun 2026 17:34:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B65730BF69;
-	Tue, 23 Jun 2026 17:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584E738C2B8;
+	Tue, 23 Jun 2026 17:34:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782236068; cv=none; b=WvAdCfT/Y+DqL73zvPyJF2uW3uEFYAJeOIlSTvSLFVAag8ZfmEYNiEA9unZApGc95bAxmWSaZmixbrVP9gw7PimxDAvfvZdUKDf8EF0/elNwJ1GgW6XSN7ati+7Foe7AplHnGysyx6AhWO9d5WdTXZePNBUSqICVYfNoemu3zJY=
+	t=1782236083; cv=none; b=B/8WiAspwGlN8D7jo5yHxa337iUBK1gx3fh8tAQjC+SU7J2zJx3BiIERfwwvbkLgzPPzvyq5QHPIjdtjfq/TWdW+2SaEKIo/KxFtJtZuIBbeb8KE1OHFluV6w4+C08CFebhUphHVnNuTBtCizPPl0Z+y7EoVyJ7r3uHl5yfi3Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782236068; c=relaxed/simple;
-	bh=ru4xmAG5090zMTorvzBMO3CkMmXYAyYQWFiIdf/Og8c=;
+	s=arc-20240116; t=1782236083; c=relaxed/simple;
+	bh=z/sNUYaIrPTPe86EjpLm5BGVrpojz7obnEIgESIDYQQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DEl58yX2sd6i7SztHdNlA79WI3bjUzwvWwtrVzrqHDIMoLHKLbjNsUGeGuaGHYvjxSEvzFLWkxIM0b66GKGJoS2JbZLDUBgEJqMDFLxaMmm5D4++S199v7UNpafNNtK+63ONqtEmGaIxnXvJriu4/m2Oost2mdSIcamfDJ6ERd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jH/sg/32; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=o6Ic+swF2KefUI/EwrX3/gbwcMWuRu3lb4rmzGdcxtlu99PjmYHfAMkj1mbT+plJO1B1LIkfbHmWkTBn5uPcMN/OLNgl8YqW6UhF73KcwbFwMH97i+VYhZjvgoSpWp06rBD02Az5VJbQoLsnSoOAzAGyGctqb8OyL0QPFji6x1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hXFrhRGn; arc=none smtp.client-ip=198.175.65.10
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782236067; x=1813772067;
+  t=1782236082; x=1813772082;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=ru4xmAG5090zMTorvzBMO3CkMmXYAyYQWFiIdf/Og8c=;
-  b=jH/sg/32qssJVc2slRAADa9uJoTxurohvvh6xGvk3rxpoEFe5z4aCfM2
-   WDqZlOSluqUfrUUYyqsYRIZVmIseMdwGrpVaKY8+m316h3G9P5gUKvzkG
-   2084DjHDEkbLEl98lW7BGWXZNQtpjC70UkPkJtBoqXTDVK4Agvxla02rM
-   ZZXwNJYBcw5gpQpnutLtFIQhNiHLMxJ90Sewim7nl4nPwYJGIl4LbrnRY
-   6Zuki8LXtMYx4E9wfLpjT20QEWp+FX2IdFmAHTKJpCtv7Q3R/9rYhzFSA
-   ANFSgQM1bQfbQ5O2MpFMf+9DGKW3YsdQn82NSOxIp/1c/pj95Lp7f+RYJ
-   g==;
-X-CSE-ConnectionGUID: ohOXgrVxQJ6QeFVgsbFmjQ==
-X-CSE-MsgGUID: o6V9ijYFQXeiWtL1+szp+A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11826"; a="100414944"
+  bh=z/sNUYaIrPTPe86EjpLm5BGVrpojz7obnEIgESIDYQQ=;
+  b=hXFrhRGnl2UniOGQWDEsqhAuNiMntTi2dEmg7qJdMnyT2dTnXudVhuof
+   9ApnSR+9Ic4SVP+VXgRjzG92TgxudSzHxNdlO+5soa6214EZkLfkFYKxa
+   EU00U6zsqpyilTirN2dGyBhcwkMmkbUjZ6azxJ/FccM9FwoI3R50pGDrn
+   OGwtZnYkUudHPBte73FugnGrPMsoAR1D6d6oASZpe7aSmrZoa7H8cavBI
+   Z8cK8yzlGlX9k7enIxJrj/JzjXDI5QFyuBYOEiAHzftaEOa8dIl2CixjO
+   EmxmZJPyzubmC12noAvmMailIf6mFP8Y/9GpiYuJZYlzh5WYuqK5fMvHy
+   w==;
+X-CSE-ConnectionGUID: yXtpioI1TDyv33wTqISp0Q==
+X-CSE-MsgGUID: yb4yGPZmSsSuOb950KFPrQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11826"; a="100414986"
 X-IronPort-AV: E=Sophos;i="6.24,221,1774335600"; 
-   d="scan'208";a="100414944"
+   d="scan'208";a="100414986"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:34:26 -0700
-X-CSE-ConnectionGUID: 6wSkGP6/Sau1gn3LkRf6RQ==
-X-CSE-MsgGUID: bDL9NoYfQhOpSnvbLMl24w==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:34:41 -0700
+X-CSE-ConnectionGUID: 65kKS9OBRXKCxe0IHEOtwA==
+X-CSE-MsgGUID: dZylsM7yQC25fVOamVuTGw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,221,1774335600"; 
-   d="scan'208";a="249687588"
+   d="scan'208";a="249687621"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:34:27 -0700
-Date: Tue, 23 Jun 2026 10:34:25 -0700
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:34:42 -0700
+Date: Tue, 23 Jun 2026 10:34:41 -0700
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -96,9 +96,8 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v12 07/12] static_call: Define
- EXPORT_STATIC_CALL_FOR_MODULES()
-Message-ID: <20260622-vmscape-bhb-v12-7-76cbda0ae3e5@linux.intel.com>
+Subject: [PATCH v12 08/12] KVM: Define EXPORT_STATIC_CALL_FOR_KVM()
+Message-ID: <20260622-vmscape-bhb-v12-8-76cbda0ae3e5@linux.intel.com>
 X-Mailer: b4 0.16-dev
 References: <20260622-vmscape-bhb-v12-0-76cbda0ae3e5@linux.intel.com>
 Precedence: bulk
@@ -117,12 +116,12 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301428-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301429-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,akamai.com,goodmis.org,linuxfoundation.org];
 	RCPT_COUNT_TWELVE(0.00)[42];
@@ -142,66 +141,91 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,linux.intel.com:from_mime,intel.com:dkim,intel.com:email,infradead.org:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,linux.intel.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A7E7E6B9234
+X-Rspamd-Queue-Id: E17576B9226
 
-There is EXPORT_STATIC_CALL_TRAMP() that hides the static key from all
-modules. But there is no equivalent of EXPORT_SYMBOL_FOR_MODULES() to
-restrict symbol visibility to only certain modules.
+EXPORT_SYMBOL_FOR_KVM() exists to export symbols to KVM modules. Static
+calls need the same treatment when the core kernel defines a static_call
+that KVM needs access to (e.g. from a VM-exit path).
 
-Add EXPORT_STATIC_CALL_FOR_MODULES(name, mods) that wraps both the key and
-the trampoline with EXPORT_SYMBOL_FOR_MODULES(), allowing only a limited
-set of modules to see and update the static key.
+Define EXPORT_STATIC_CALL_FOR_KVM() as the static_call analogue of
+EXPORT_SYMBOL_FOR_KVM(). The same three-way logic applies:
 
-The immediate user is KVM, in the following commit.
+  - KVM_SUB_MODULES defined: export to "kvm," plus all sub-modules
+  - KVM=m, no sub-modules: export to "kvm" only
+  - KVM built-in: no export needed (noop)
 
-checkpatch reported below warnings with this change that I believe don't
-apply in this case:
+  As with EXPORT_SYMBOL_FOR_KVM(), allow architectures to override both
+  macros (e.g. to suppress the export when kvm.ko itself will not be
+  built despite CONFIG_KVM=m). Add the x86 no-op overrides in
+  arch/x86/include/asm/kvm_types.h for that case. To keep the pair in
+  sync, EXPORT_STATIC_CALL_FOR_KVM() is defined inside the
+  EXPORT_SYMBOL_FOR_KVM #ifndef block; an arch that defines
+  EXPORT_SYMBOL_FOR_KVM must also define EXPORT_STATIC_CALL_FOR_KVM or the
+  build will fail with a compile-time error.
 
-  include/linux/static_call.h:219: WARNING: Non-declarative macros with multiple statements should be enclosed in a do - while loop
-  include/linux/static_call.h:220: WARNING: EXPORT_SYMBOL(foo); should immediately follow its function/variable
+As with EXPORT_SYMBOL_FOR_KVM(), allow architectures to override
+EXPORT_STATIC_CALL_FOR_KVM definition (e.g. to suppress the export when
+kvm.ko itself will not be built despite CONFIG_KVM=m). Add the x86 no-op
+override in arch/x86/include/asm/kvm_types.h for that case.
 
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Architectures must also define EXPORT_STATIC_CALL_FOR_KVM when they define
+EXPORT_SYMBOL_FOR_KVM.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Acked-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- include/linux/static_call.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/x86/include/asm/kvm_types.h |  1 +
+ include/linux/kvm_types.h        | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/static_call.h b/include/linux/static_call.h
-index 78a77a4ae0ea..b610afd1ed55 100644
---- a/include/linux/static_call.h
-+++ b/include/linux/static_call.h
-@@ -216,6 +216,9 @@ extern long __static_call_return0(void);
- #define EXPORT_STATIC_CALL_GPL(name)					\
- 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
- 	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
-+#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
-+	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
-+	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
+diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
+index d7c704ed1be9..bceeaed2940e 100644
+--- a/arch/x86/include/asm/kvm_types.h
++++ b/arch/x86/include/asm/kvm_types.h
+@@ -15,6 +15,7 @@
+  * at least one vendor module is enabled.
+  */
+ #define EXPORT_SYMBOL_FOR_KVM(symbol)
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
+ #endif
  
- /* Leave the key unexported, so modules can't change static call targets: */
- #define EXPORT_STATIC_CALL_TRAMP(name)					\
-@@ -276,6 +279,9 @@ extern long __static_call_return0(void);
- #define EXPORT_STATIC_CALL_GPL(name)					\
- 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
- 	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
-+#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
-+	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
-+	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
+ #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index a568d8e6f4e8..be602d3f287e 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -13,6 +13,8 @@
+ 	EXPORT_SYMBOL_FOR_MODULES(symbol, __stringify(KVM_SUB_MODULES))
+ #define EXPORT_SYMBOL_FOR_KVM(symbol) \
+ 	EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol) \
++	EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
+ #else
+ #define EXPORT_SYMBOL_FOR_KVM_INTERNAL(symbol)
+ /*
+@@ -23,11 +25,17 @@
+ #ifndef EXPORT_SYMBOL_FOR_KVM
+ #if IS_MODULE(CONFIG_KVM)
+ #define EXPORT_SYMBOL_FOR_KVM(symbol) EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm")
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol) EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm")
+ #else
+ #define EXPORT_SYMBOL_FOR_KVM(symbol)
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
+ #endif /* IS_MODULE(CONFIG_KVM) */
+-#endif /* EXPORT_SYMBOL_FOR_KVM */
++#else
++#ifndef EXPORT_STATIC_CALL_FOR_KVM
++#error Must #define EXPORT_STATIC_CALL_FOR_KVM if #defining EXPORT_SYMBOL_FOR_KVM
+ #endif
++#endif /* EXPORT_SYMBOL_FOR_KVM */
++#endif /* KVM_SUB_MODULES */
  
- /* Leave the key unexported, so modules can't change static call targets: */
- #define EXPORT_STATIC_CALL_TRAMP(name)					\
-@@ -346,6 +352,8 @@ static inline int static_call_text_reserved(void *start, void *end)
- 
- #define EXPORT_STATIC_CALL(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
- #define EXPORT_STATIC_CALL_GPL(name)	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
-+#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
-+	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods)
- 
- #endif /* CONFIG_HAVE_STATIC_CALL */
+ #ifndef __ASSEMBLER__
  
 
 -- 
