@@ -1,283 +1,261 @@
-Return-Path: <netdev+bounces-301457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ycbuBAjQOmptHggAu9opvQ
-	(envelope-from <netdev+bounces-301457-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 20:27:20 +0200
+	id LYHcI/LBOmoTGAgAu9opvQ
+	(envelope-from <netdev+bounces-301416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:27:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923F66B96BD
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 20:27:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B0E6B90A4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:27:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VistuIYF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301457-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301457-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="UMHkL/cB";
+	dkim=pass header.d=redhat.com header.s=google header.b=OrQ4pUnH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301416-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301416-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E0EC43033E6E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:27:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CAF09307384E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8673932E1;
-	Tue, 23 Jun 2026 18:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CED838B7CD;
+	Tue, 23 Jun 2026 17:26:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5170838D3EA;
-	Tue, 23 Jun 2026 18:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3E338B149
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 17:26:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782239237; cv=none; b=OiEf3BGMCGWFsMBoG1fpDYipLWKBDLTSTfLx1JZ4h1LPi1k50jchdhj3lIHgI5rQzQj/imWjLFQuRF4tYXhDE1TCnLWplPbxM/IhZayX4kKm0C8iSjJwjxJKNHjM9/L2oR7SYl60BaV9GeCG0ivO8rxx8KUMdeeN01T1DkHm2r4=
+	t=1782235608; cv=none; b=SKlc9NZivj1mn9v6o8Ld2Ia2TYxfDMBIVvwhp7kPPSTOWIIpNbQWLuuKwMr9Ct/Qotxrfbei+N4bywT+yBWSmxyAsPrEfyVYtdz4ADBFZqfiwWeGh1ZxIVGakAG9revMpQqiyGTiz29g8GQyperQWA2UeEt6uMSBKEqlCpELB5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782239237; c=relaxed/simple;
-	bh=c266SklNeNU3U1hZxkhZXefmDfRswMXlkKWxX6IQPFU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X4hms5qrDHRy0rdLKTty4ORlum4aGQTIogKPvARNLjIahO8fCxXWfqbylkPpj+mFAIIc23hwkDn/PqEYVdLB8ehCkvcjz/es54F7aouC1YRZXZ4t1qwUFMXvjI0jXzgbs9gcvFp7Bxw54IwXWJFPwi5FtZIAnOjrtH5qoM2ErOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VistuIYF; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C28DF1F000E9;
-	Tue, 23 Jun 2026 18:27:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782239235;
-	bh=M1H6GgCBkd12Q2vTtVWlECeEISgxezKOQCjK4ILhU5Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VistuIYFPmsC9YAjO6zS3akWtB7tmYrnuf958eTRfOHmEFfov6RoofYe0xZdZesIU
-	 gAPBOENhcg6P+A0jRh8KTQqFuVrptXuntVmewM1Zi1fJ2NHMIGPfeQ8nAjeKL79GrJ
-	 pM5UAVCvkUW/3Hp9YiIakqaaEPQRt3R50XKsjR5CZS8hQNT2wYztUtS0KcyryhCzW6
-	 fMl1TumweDCyj4N7hRf13pQIIqroVuGlXcMYYWy/g5IsvF6Aw3MGm02s1h2m+ErNtF
-	 oiRo0PVFQq6eAJZEUX43QsFWk/aU1TPMQeV/zz2rY8/qUvCr4/mXe9+9zATWz7wqjg
-	 imjgaNWU0x7+Q==
-From: Simon Horman <horms@kernel.org>
-To: sam@bynar.io
-Cc: Simon Horman <horms@kernel.org>,
-	david@ixit.cz,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	oe-linux-nfc@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] nfc: nci: fix out-of-bounds write in nci_target_auto_activated()
-Date: Tue, 23 Jun 2026 18:21:10 +0100
-Message-ID: <20260623172109.1105965-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260622145243.3167276-1-sam@bynar.io>
-References: <20260622145243.3167276-1-sam@bynar.io>
+	s=arc-20240116; t=1782235608; c=relaxed/simple;
+	bh=rip9uRV7z1MrHq44c9P9AtUk8yQpQ+kZiXRL/p9vnmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CutssQvcknTLOfm1rZSNUQX1RzXaThqvCGoMXRqSlj9JacinXe2wjAN7SbKN6TYqVVC7odwGLf0j1V83MvbkoF8gDGDTZ19zf6SOotDjUT90PVbONdSXZdjI0gIp3w/NUK55wKHggWDZ7axvey72CCszGxlEhGLIDT0EDB2VuGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UMHkL/cB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OrQ4pUnH; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782235606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lVPkNP6BJkSGxsw8Xm+oSCJFyrrNmnKR4VG6pNKWuqE=;
+	b=UMHkL/cBt9u4LU5O9Ozvgx4IZp1j7yLBffa2cpF18SDH9hmeWTZi6O5GC7Rq73z+C2a+MT
+	yHQY2ZI3EtM6J/qvuFBc5xjxnZ7hDafE4MqeLBvHb/Bvp0p/wmMDhUFtuS1q4TquQRxc+c
+	s7WbtS1iVZiM5zn0GHVfciHrMEirlq8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-1Wr_Xe2fOx-RYOuPvj7gHQ-1; Tue, 23 Jun 2026 13:26:44 -0400
+X-MC-Unique: 1Wr_Xe2fOx-RYOuPvj7gHQ-1
+X-Mimecast-MFC-AGG-ID: 1Wr_Xe2fOx-RYOuPvj7gHQ_1782235604
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-46250b59ed5so98317f8f.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 10:26:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1782235603; x=1782840403; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lVPkNP6BJkSGxsw8Xm+oSCJFyrrNmnKR4VG6pNKWuqE=;
+        b=OrQ4pUnHp2YYjc1FdTz+DLqvRxFJ01jcGUSNWcjh+CW5S7E3SyrOMCTOGZtqmrA324
+         7jdbZ9Olg136ZlaewucoVRRQBy6AJZB4eu8YByQG8hpRinGLR1I1e1CeNMg4kcYndIrR
+         Q+Or4zQPzvjIclxOVRvsACpPRQVBVBtICcx1IHbBVa3YoeNh/DhdBIzN2CecnKaS6tqn
+         C2QJdXeR94c0sxH7cY1E5W++ZxCz3w+SzYu+e+0B5wGnFOKm6M8nGRAY9PSfWMhzNXX/
+         ACumuXFtdAwcIWexOPj9E176dNnFZvuklReamEy3CHAd71UItcoRb8/kxoG7hkKemJLY
+         nxvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782235604; x=1782840404;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lVPkNP6BJkSGxsw8Xm+oSCJFyrrNmnKR4VG6pNKWuqE=;
+        b=BbviW0Es+CgX4vrmzxM0dlRG5s3pzyNDA3njR6h/1qhgK8n2kt6nxzEt+fyLZVkY5C
+         eULvdn0ohwZVbeKV8yZ5rnAUH2Cah7hynNR4KNBcIwfmBP1lKDSSdSK0VTvhdDkZ8n4H
+         SWMBQaj42KVRXalgf/yGxtF6E30E9L6zqfrSCr7RQ603nsXF5wN6b3vNeq+PptHrBbPV
+         uLtd1B2vTvqWBptReDJudyogyVmjQh1X7dKXmg6MFmHBfpj4Pko38EU9KHhCBeVWD2MU
+         tPgRmFSK1aEJ7YNUejSPbGG/qe55WfVPRSVT3v5hgtC7qEn76ElKI0RxNyRwBDIP39i+
+         fFbw==
+X-Forwarded-Encrypted: i=1; AFNElJ9bmlk+X4Wduy1+CpjoNzD/p5yVj8Wvq1FhAIF54t51xQ0SRPoeJJxvyGoYHTqVJHFieLcF7QQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7s9UiqWu+PI8ihIWAV8s1jELTB3Oh5jwwiyuej2Rf4E7KX1HH
+	n0J6eM88OW3ykrA5lhTDIvbErfYw/3zjhraFsEO9fd/0mgeFOrXNSR4iIA2phQCUspKj6I7W+16
+	2vQ46Ox/iXnMMXJWWE9U2uJ4Tm3U5lt9U2oTMwwmOko3lr7fe3Nn8sHLwJQ==
+X-Gm-Gg: AfdE7clNXzB3GqBp78j5PXUuLkMFHS9tl9h+DiGatDHr5B6cWJvB3Dg4dQ/BlqIcnlz
+	CTzgABdIq5NE7O0ANhmxxV9W8tv8w4DhYVkWg80zAB/HMG1xxhJv+L/WBXQ94+uUtW0htwEpwNC
+	6OAdt1NYtCMLiXntKcR8iYNiKchJV8GijW093TeXQJKFSrpWEFQV9XoFeYOZz3rCGU+qCUUPjVW
+	lr7ueQSnNI/RbW70j3r2brp0ftwCW+nR/P+Q5T5p/2MCOzv2NCBZKOyXoiqfQeIoT2WBu8dd3II
+	CCxpyjtK8o24aymwaLn8yWm2TUFzNEYwMQUhQe1Z51L5XGF2aLdhafkt8k/KUNOh00KiZzxq4jT
+	iB1bxyeAgGKiR/13ODoclI1ikmJGeS03G
+X-Received: by 2002:a05:600c:d4:b0:488:ac01:72de with SMTP id 5b1f17b1804b1-49240e20de0mr257222885e9.5.1782235603253;
+        Tue, 23 Jun 2026 10:26:43 -0700 (PDT)
+X-Received: by 2002:a05:600c:d4:b0:488:ac01:72de with SMTP id 5b1f17b1804b1-49240e20de0mr257222385e9.5.1782235602685;
+        Tue, 23 Jun 2026 10:26:42 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4923fd15535sm425803415e9.3.2026.06.23.10.26.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 10:26:41 -0700 (PDT)
+Date: Tue, 23 Jun 2026 13:26:38 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@rulkc.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobbyeshleman@meta.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Simon Horman <horms@kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, oxffffaa@gmail.com,
+	rulkc@linuxtesting.org
+Subject: Re: [PATCH net-next v3] vsock/virtio: rewrite MSG_ZEROCOPY flag
+ handling
+Message-ID: <20260623132014-mutt-send-email-mst@kernel.org>
+References: <20260623153819.697635-1-avkrasnov@rulkc.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260623153819.697635-1-avkrasnov@rulkc.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301457-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sam@bynar.io,m:horms@kernel.org,m:david@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301416-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,meta.com,linux.alibaba.com,vger.kernel.org,lists.linux-foundation.org,gmail.com,linuxtesting.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:avkrasnov@rulkc.org,m:stefanha@redhat.com,m:sgarzare@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jasowang@redhat.com,m:bobbyeshleman@meta.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:horms@kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux-foundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oxffffaa@gmail.com,m:rulkc@linuxtesting.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,rulkc.org:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 923F66B96BD
+X-Rspamd-Queue-Id: F0B0E6B90A4
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-nfc: nci: fix out-of-bounds write in nci_target_auto_activated()
+On Tue, Jun 23, 2026 at 06:38:19PM +0300, Arseniy Krasnov wrote:
+> Logically it was based on TCP implementation, so to make further support
+> easier, rewrite it in the TCP way (like in 'tcp_sendmsg_locked()'). This
+> patch only rewrites flag handling (e.g. it doesn't change logic).
+> 
+> Signed-off-by: Arseniy Krasnov <avkrasnov@rulkc.org>
 
-This commit adds a bounds check to nci_target_auto_activated() to prevent
-an out-of-bounds array write. If ndev->n_targets equals
-NCI_MAX_DISCOVERED_TARGETS, it prints a debug message and returns early.
 
-> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-> index c96512bb86531..566ca839fa488 100644
-> --- a/net/nfc/nci/ntf.c
-> +++ b/net/nfc/nci/ntf.c
-> @@ -603,6 +603,12 @@ static void nci_target_auto_activated(struct nci_dev *ndev,
->  	struct nfc_target *target;
->  	int rc;
+It seems to change logic though:
+
+> ---
+>  Changelog v1->v2:
+>  * Rebase on last 'net-next'. Don't need 'skb_zcopy_set()' now - it was
+>    already added.
+>  Changelog v2->v3:
+>  * Update commit message.
+>  * Remove one empty line.
+> 
+>  net/vmw_vsock/virtio_transport_common.c | 47 ++++++++++++-------------
+>  1 file changed, 22 insertions(+), 25 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 09475007165b..41c2a0b82a8e 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -328,38 +328,35 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+>  		return pkt_len;
 >  
-> +	/* This is a new target, check if we've enough room */
-> +	if (ndev->n_targets == NCI_MAX_DISCOVERED_TARGETS) {
-> +		pr_debug("not enough room, ignoring new target...\n");
-> +		return;
+> -	if (info->msg) {
+> -		/* If zerocopy is not enabled by 'setsockopt()', we behave as
+> -		 * there is no MSG_ZEROCOPY flag set.
+> +	if (info->msg && (info->msg->msg_flags & MSG_ZEROCOPY)) {
+> +		/* If 'info->msg' is not NULL, this is only VIRTIO_VSOCK_OP_RW.
+> +		 * 'MSG_ZEROCOPY' flag handling here is based on the same flag
+> +		 * handling from 'tcp_sendmsg_locked()'.
+>  		 */
+> -		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
+> -			info->msg->msg_flags &= ~MSG_ZEROCOPY;
 
-[Severity: High]
-Does this early return cause the state machine to stall?
+So previously without SOCK_ZEROCOPY, MSG_ZEROCOPY was always ignored...
 
-Looking at nci_rf_intf_activated_ntf_packet(), the state is transitioned
-to NCI_POLL_ACTIVE right before this function is called:
 
-net/nfc/nci/ntf.c:nci_rf_intf_activated_ntf_packet() {
-    ...
-    atomic_set(&ndev->state, NCI_POLL_ACTIVE);
-    if (err == NCI_STATUS_OK)
-        nci_target_auto_activated(ndev, &ntf);
-    ...
-}
+> +		if (info->msg->msg_ubuf) {
+> +			uarg = info->msg->msg_ubuf;
+> +			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
 
-Because of the early return here, nfc_targets_found() is skipped. Does this
-leave the state wedged in NCI_POLL_ACTIVE, permanently blocking future 
-attempts to stop polling since nci_stop_poll() requires the state to be 
-NCI_DISCOVERY?
+now it's not in this case?
 
-> +	}
+
+Maybe the right call, but saying "does not change logic" seems wrong.
+
+
+> +		} else if (sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY)) {
+> +			uarg = msg_zerocopy_realloc(sk_vsock(vsk), pkt_len,
+> +						    NULL, false);
+> +			if (!uarg) {
+> +				virtio_transport_put_credit(vvs, pkt_len);
+> +				return -ENOMEM;
+> +			}
+>  
+> -		if (info->msg->msg_flags & MSG_ZEROCOPY)
+>  			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
+> +			if (!can_zcopy)
+> +				uarg_to_msgzc(uarg)->zerocopy = 0;
+>  
+> +			have_uref = true;
+> +		}
 > +
->  	target = &ndev->targets[ndev->n_targets];
+> +		/* 'can_zcopy' means that this transmission will be
+> +		 * in zerocopy way (e.g. using 'frags' array).
+> +		 */
+>  		if (can_zcopy)
+>  			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
+>  					    (MAX_SKB_FRAGS * PAGE_SIZE));
+> -
+> -		if (info->msg->msg_flags & MSG_ZEROCOPY &&
+> -		    info->op == VIRTIO_VSOCK_OP_RW) {
+> -			uarg = info->msg->msg_ubuf;
+> -
+> -			if (!uarg) {
+> -				uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+> -							    pkt_len, NULL, false);
+> -				if (!uarg) {
+> -					virtio_transport_put_credit(vvs, pkt_len);
+> -					return -ENOMEM;
+> -				}
+> -
+> -				if (!can_zcopy)
+> -					uarg_to_msgzc(uarg)->zerocopy = 0;
+> -
+> -				have_uref = true;
+> -			}
+> -		}
+>  	}
+>  
+>  	rest_len = pkt_len;
+> -- 
+> 2.25.1
 
-[ ... ]
-
-[Severity: Critical]
-This isn't a bug introduced by this patch, but can the ntf union copy
-uninitialized stack memory into persistent device structures?
-
-In net/nfc/nci/ntf.c:nci_rf_discover_ntf_packet(), the local ntf struct
-is declared on the stack:
-
-    struct nci_rf_discover_ntf ntf;
-
-If the incoming packet has ntf.rf_tech_specific_params_len == 0, the
-extraction routines are bypassed, leaving the rf_tech_specific_params union
-uninitialized. The struct is then passed to nci_add_new_target():
-
-    if (add_target == true)
-        nci_add_new_target(ndev, &ntf);
-
-This eventually calls nci_add_new_protocol(), which blindly reads from this
-union:
-
-    nfca_poll = (struct rf_tech_specific_params_nfca_poll *)params;
-    target->sens_res = nfca_poll->sens_res;
-    target->sel_res = nfca_poll->sel_res;
-    target->nfcid1_len = nfca_poll->nfcid1_len;
-
-Could this uninitialized stack garbage be copied into ndev->targets, and
-later broadcasted to userspace via Netlink in nfc_targets_found()?
-
-[Severity: Critical]
-This isn't a bug introduced by this patch, but does the general bytes length
-calculation underflow?
-
-In net/nfc/nci/ntf.c:nci_store_general_bytes_nfc_dep():
-
-    ndev->remote_gb_len = min_t(__u8, 
-        (ntf->activation_params.listen_nfc_dep.atr_req_len - 
-         NFC_ATR_REQ_GT_OFFSET), NFC_ATR_REQ_GB_MAXSIZE);
-         
-    memcpy(ndev->remote_gb, 
-        (ntf->activation_params.listen_nfc_dep.atr_req + 
-         NFC_ATR_REQ_GT_OFFSET), ndev->remote_gb_len);
-
-The length is computed by subtracting NFC_ATR_REQ_GT_OFFSET (14) from
-atr_req_len. If atr_req_len is less than 14, this subtraction will
-underflow.
-
-Because of the min_t cast, this large underflowed value is bounded to
-NFC_ATR_REQ_GB_MAXSIZE (48). The memcpy() then copies 48 bytes starting
-from atr_req + 14 into ndev->remote_gb.
-
-Since the source buffer is part of the ntf union allocated on the stack
-in nci_rf_intf_activated_ntf_packet(), could this leak up to 48 bytes of
-uninitialized kernel stack memory to userspace?
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does the lack of skb->len
-validation in NCI response handlers allow out-of-bounds reads?
-
-In nci_core_init_rsp_packet_v1() in net/nfc/nci/rsp.c, fields are read
-and arrays are copied from the payload:
-
-    ndev->num_supported_rf_interfaces = 
-        rsp_1->num_supported_rf_interfaces;
-        
-    memcpy(ndev->supported_rf_interfaces, rsp_1->supported_rf_interfaces, 
-           ndev->num_supported_rf_interfaces);
-
-Similarly in nci_core_init_rsp_packet_v2():
-
-    while (rf_interface_idx < ndev->num_supported_rf_interfaces) {
-        ndev->supported_rf_interfaces[rf_interface_idx++] = 
-            *supported_rf_interface++;
-    }
-
-Since the NCI control header is stripped via skb_pull(), leaving the
-payload length in skb->len, what happens if an NFCC sends a short response
-packet (e.g. plen = 1)? Could this cause the handlers to read adjacent
-kernel slab memory?
-
-[Severity: High]
-This isn't a bug introduced by this patch, but is there a missing boundary
-validation when extracting activation parameters?
-
-In net/nfc/nci/ntf.c:nci_extract_activation_params_iso_dep():
-
-    nfca_poll->rats_res_len = min_t(__u8, *data++, NFC_ATS_MAXSIZE);
-    if (nfca_poll->rats_res_len > 0) {
-        memcpy(nfca_poll->rats_res, data, nfca_poll->rats_res_len);
-    }
-
-And in nci_extract_activation_params_nfc_dep():
-
-    poll->atr_res_len = min_t(__u8, *data++, NFC_ATR_RES_MAXSIZE - 2);
-    if (poll->atr_res_len > 0)
-        memcpy(poll->atr_res, data, poll->atr_res_len);
-
-These inner lengths are bounded by a maximum size like NFC_ATS_MAXSIZE, but
-they are not validated against the remaining bytes in the SKB (skb->len).
-
-If a malformed packet provides a large inner length but a short payload,
-could this memcpy() read out of bounds into the device structure,
-potentially leaking adjacent slab memory to userspace later?
-
-[Severity: High]
-This isn't a bug introduced by this patch, but is there a potential
-priority inversion or timeout deadlock involving the device lock?
-
-Functions like nfc_stop_poll() in net/nfc/core.c acquire the device lock:
-
-    device_lock(&dev->dev);
-    ...
-    if (dev->ops->stop_poll)
-        dev->ops->stop_poll(dev);
-
-This eventually calls nci_request(), which synchronously waits for a
-completion signaled by the nci_rx_work thread. However, if an NTF packet
-is received first, nci_rx_work processes it and invokes
-nfc_targets_found(), which also attempts to acquire the device lock:
-
-    device_lock(&dev->dev);
-
-Since the calling thread already holds the device lock, nci_rx_work blocks
-indefinitely. Because the RX worker is blocked, it cannot process the
-pending RSP, causing nci_request() to time out and fail. Could this
-deadlock the RX thread?
 
