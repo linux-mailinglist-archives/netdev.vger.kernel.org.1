@@ -1,172 +1,183 @@
-Return-Path: <netdev+bounces-301308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DF4QJuxNOmq/5gcAu9opvQ
-	(envelope-from <netdev+bounces-301308-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:12:12 +0200
+	id O6ZpOaVOOmr35gcAu9opvQ
+	(envelope-from <netdev+bounces-301309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:15:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AF5C6B5A54
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:12:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E686B5ADE
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:15:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=NS0aC2s7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301308-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301308-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="b eFqV/F";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=VTsXWTFi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301309-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301309-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E6EA3050E59
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 09:10:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A29D530428FF
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 09:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C083630C37A;
-	Tue, 23 Jun 2026 09:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB4C32A3E5;
+	Tue, 23 Jun 2026 09:10:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1452DCF6C;
-	Tue, 23 Jun 2026 09:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425072D4B68;
+	Tue, 23 Jun 2026 09:10:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782205822; cv=none; b=hYvqnla0eSRlB/ywbGt94ZZ42dVeqDrWrdflUJrbgspMh3JIhGTw4XCslUkzeJRPeqqiW+qIxurAb+/PYvx4HcrPkZSCkI6ZyOQDrqhzGXmhEsgISJnTrBnxjxuvs+bXubJsiH33bK8yUt6QbmSCicE8BnBR5aWCWjMG3tllhYw=
+	t=1782205859; cv=none; b=VgIr4OlKwKtKdAoEnJkVgPZmJnVJmRnA3wbduTcZQg0blRUSFSuqfrxxR9FfwV7ngJYJLmZTZfyrW4SFVgb2RgblcM1vUnJfSz7R6efvkcUnPANFZjUOtDgDDDfZH8HstMwZFDlv/VSSxCvE3YjVK357i1LsF+HN3bPxHwLyjoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782205822; c=relaxed/simple;
-	bh=8T7a6XFiQW5FjXNXf6ApxxXet+uPYOEeejpkCBZrULw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Trvx7g0ud/Yg/Rrh0u5pDnHD9KbFhLlmAi/x/oE73dYfoISfEIGcX2HGnXe3CvyC9+peBdlNiOs4p1rCdRZplNj7cUQuAo8ucWmBEjjfQ56o6aSdPLBuYE7PLsIeuM3aidnjLPdP/s6O32aiOOfydQNOfkAdXNT9c0dWDS3s9RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NS0aC2s7; arc=none smtp.client-ip=198.175.65.12
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782205822; x=1813741822;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8T7a6XFiQW5FjXNXf6ApxxXet+uPYOEeejpkCBZrULw=;
-  b=NS0aC2s7Ix8bjfH3I4LuKgduuz1uFtXcbZoSkWgzpRRb0pYN3ocydETq
-   DdUleqywTRfdlXs/AfCvggdwH/3XiSkL659oHI0fk6Idy8RdUpuw6odMq
-   0A2WTnPffwiSo/zm0YAIdOzzV3I0Sxp5gHF/3iLdHVBATlwc/wzXiQf+3
-   UWhasM8dJCYlAv3ChxzhgQ3QehyNzH/MhBqMeQPP1lGcmAGqqRhLuf+RP
-   sWdYoT+jpLQffTjIYXlS92viAqjgox0RQF5TsO/TyoCQlQF9k/18YbS/3
-   xb+08mIJn7Q/QapCINePpz7lprWyMCppGFtwiDTD1NftjZRcyLKhyE2Nc
-   g==;
-X-CSE-ConnectionGUID: ol27wEWjTCOlw/d7HtTjOg==
-X-CSE-MsgGUID: n4QE3Gx+QBWaGNazRTfL0Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11825"; a="94438659"
-X-IronPort-AV: E=Sophos;i="6.24,220,1774335600"; 
-   d="scan'208";a="94438659"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 02:10:21 -0700
-X-CSE-ConnectionGUID: dupOZkCyS2a+pS+w5rAh9A==
-X-CSE-MsgGUID: iUStIykWTUeTmRtyp4ctsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,220,1774335600"; 
-   d="scan'208";a="249505933"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa007.jf.intel.com with ESMTP; 23 Jun 2026 02:10:19 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	stfomichev@gmail.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	tushar.vyavahare@intel.com,
-	kerneljasonxing@gmail.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH net-next] selftests/xsk: preserve UMEM view in bidi test
-Date: Tue, 23 Jun 2026 11:10:08 +0200
-Message-Id: <20260623091008.1046547-1-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1782205859; c=relaxed/simple;
+	bh=H0ejhMob9U1Tp7NLyQih5D7xrwz4zP/ui9ghCzP4aqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JeX5mXjPAXSY7L4TstosWWwRurolLaliHwGeZGoYYLbgvo0ZEz6EQtmMPJC15IVGTqpJfeCECcqJMMx9NLR/TQHMGlbsjCetRFv1ukgdxofb3v7SdnPVBPSEzG0Nf6okfoYVUatvnln5T5ku/8x6V4y3qk5yYKLdNUiHUo1ZTy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=beFqV/F7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VTsXWTFi; arc=none smtp.client-ip=202.12.124.152
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 165347A015F;
+	Tue, 23 Jun 2026 05:10:55 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Tue, 23 Jun 2026 05:10:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1782205854; x=
+	1782292254; bh=8hZD5mizY6mE9lDCe600zLjaG96JwIduRGgsYhIAe9I=; b=b
+	eFqV/F7UtNB0TBq0IIZZGfPqfFTBd0IYWOHhLqFmk8Xiqss3EYR90wSwDi/v0GYR
+	m/37H3TjWdnOyJcAxnxnG96iiRQVkMg8i8jkuIufAzObUIUuzVRM1SF/LQuQKc0j
+	F9JH3wOplE1rNStXLwqwBKJuF4kxnwcgjjxn7J7QIvu/5T/Rca0NciCs4Prz1MfW
+	5fdA1BA+V0SIVS9kBrAMQTSaKHnWQ8RvM4ZnJuBXSyZ/Em6eABk3xQxfwhcjYWGu
+	UttFFyabF62zRmHXylJCzqho67HRZYtM1tB10/MpGnShn+oBavQzXILUEjRDqkE5
+	SgVnyNxS8dQvwKBIJNcOQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1782205854; x=1782292254; bh=8hZD5mizY6mE9lDCe600zLjaG96JwIduRGg
+	sYhIAe9I=; b=VTsXWTFiZo/w2/i5o4DbnDqkLyw2vCn9mAfNRU/UkZGJzrEO+xc
+	uy10sWJenOnFD8fP5uBYaweuxOi5Vf54CuxWsAO+8TolYZCJEIkbJE2gZwtzXK88
+	yHqKk/TFaKFJJTuYD3/eyYJ/OXXiWgED2j1ADcYIGgfeUOXc45rqPIiId3IfnOoX
+	8R2EC5cJXKFC44N5SPLRisj7rE3o+WqKH/5dYUqghycwDVk8pw3aFG/CmfABrAuz
+	r3GrFAjH7D/6NJ//ApyWbVdBvwYxbyMJjxyf10n7MGHRwoAaAtpwTvV+28KyAPHF
+	36BbpJ1i5tbrSDtXpSDCbBcexI9uKjO7FPg==
+X-ME-Sender: <xms:nk06amji6U1cneISU_LV-tNczGrwqX-ojUn0jJeoj6JfrJN_sj99SA>
+    <xme:nk06an9UF3JbkItc77S3QWLKnijqXnCmxF50NYCEeugIsg6V3EmYBf8Jq4NdsFMNS
+    NObQjIcUXZKtty8luZIs9DRraRauQHzusGR0jtLvxk6cPa-Ak0bKeg>
+X-ME-Received: <xmr:nk06auYZmm8xuMPtP-kyMUqJ5A3b4K8urb4KwJgluY63LWRZD3UA7JZMw9uk50HTFPP2AVLPr69Nl--W_OS0ZfA>
+X-ME-Proxy-Cause: dmFkZTEZ26e5DWSZZNJ6NO2CAGw1Wd8AuwmZtVtuY9zTCrJXg2jF63KkKQWmSfegBPLJpH
+    /0KzGFi5gcfsMWGJefzPH6JR8um+ccoGk2BdPu+9TADe/Z62pgCUNAWsk4s7Gw482gKDd4
+    bQtzq1zdT79L0U2SJ9zzIeOPdnhNpVOUR622rzOiPb2ZaVu9y+0V/8T99l705kcGvMbJOG
+    YeXzfqG03OCM0ylXMnMIGQBJBIoKH40Z0eZZzJPkRaGH6ehtES+bqyy3/TndlCYUQKXo2Z
+    Fn7zf/mTmKENN/1l6gRxCOKf5/bkWMAAu4KpaDkDDsQNbN+NZlVYrwTawrztbL2Z0/KuD2
+    m5gttXcaW79O+igZDGeviVmBTlH+7syG/XPCDiMi/nZWEhyIUE92ozYxDykmXJDQyA1Mri
+    4ZpELle3+F43/q5Omj4/q7XINXaDiJN3+VnCMLdHGELWHrqkb6HOLz1gZ8R5xl8ivaV5r7
+    PIlDcGk3Uk7NeZ9msvaAPxIAkLH1O8vJoOZyT1bnJT3VvVhNIJDppkLffzkTQZQI91wtK+
+    Eb8fyyfJnEcHfreRIb0/NCJcSKwSmdTNdK16xxf+Y95EnIqJijmQFXZzdTlqCnIrhg4p4x
+    ZCUnGuZN2fboAqajHBVfh19M4dDqrH0PvH6bcL7y2WXZPoFbKIMVTk1H+BBA
+X-ME-Proxy: <xmx:nk06att0a_nSnJIFPDJnNru_rFkDVTSynUbbsw5EfcDY1gCZ1G_XiQ>
+    <xmx:nk06aqkllxvDWusrpPERAvftnr_f866TmR9-jXI5zobTRLBnNlZ3iw>
+    <xmx:nk06atydQRoCSltBS3ZWA_eysLFP1L5VHuIBu9vgxRC8WHbuLUFQlQ>
+    <xmx:nk06aux6dTPSo8zJ95JPcuMGG4OspXr-zeP-MHjFNg8u8UO1u5gwRw>
+    <xmx:nk06auTwgSbHnaPHkJCblc1hTLvDwHS24lb45GkPJQkL-grtKNttCkY8>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 23 Jun 2026 05:10:54 -0400 (EDT)
+Date: Tue, 23 Jun 2026 11:10:51 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Daniel Zahka <daniel.zahka@gmail.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Raed Salem <raeds@nvidia.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [net] eth: mlx5: fix macsec dependency
+Message-ID: <ajpNm2ULHJ1QgSAy@krikkit>
+References: <20260622124229.2444502-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260622124229.2444502-1-arnd@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-301309-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS(0.00)[m:arnd@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:arnd@arndb.de,m:daniel.zahka@gmail.com,m:rrameshbabu@nvidia.com,m:raeds@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:danielzahka@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301308-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tushar.vyavahare@intel.com,m:kerneljasonxing@gmail.com,m:maciej.fijalkowski@intel.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,arndb.de,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:from_mime,messagingengine.com:dkim,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,arndb.de:email,krikkit:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0AF5C6B5A54
+X-Rspamd-Queue-Id: E9E686B5ADE
 
-The UMEM state refactor made __send_pkts() use xsk->umem for Tx
-address generation. At the same time, the shared-UMEM Tx setup copies the
-Rx UMEM state into a Tx-local state object and resets base_addr and
-next_buffer before configuring the Tx socket.
+2026-06-22, 14:41:07 +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Configurations with mlx5 built-in but macsec=m fail to link:
+> 
+> x86_64-linux-ld: drivers/infiniband/hw/mlx5/macsec.o: in function `mlx5r_add_gid_macsec_operations':
+> macsec.c:(.text+0x77d): undefined reference to `macsec_netdev_is_offloaded'
+> x86_64-linux-ld: drivers/infiniband/hw/mlx5/macsec.o: in function `mlx5r_del_gid_macsec_operations':
+> macsec.c:(.text+0xe81): undefined reference to `macsec_netdev_is_offloaded'
+> 
+> Fix the dependency so this configuration cannot happen.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Passing that Tx-local object to xsk_configure() makes xsk->umem point to
-the zero-based Tx allocator state. This breaks the BIDIRECTIONAL test once
-the roles are switched: the same socket is then used for Rx validation, but
-received descriptors from the other logical UMEM half are checked against
-base_addr == 0. With the new UMEM bounds check, a valid address such as
-base_addr + XDP_PACKET_HEADROOM is rejected as being outside the UMEM
-window.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Keep xsk->umem as the shared/Rx UMEM view used for socket configuration
-and Rx validation. Use the ifobject-local UMEM copy only for Tx descriptor
-address generation, preserving the BIDIRECTIONAL test's intent of using
-the proper logical UMEM half after the direction switch.
+>  drivers/net/ethernet/mellanox/mlx5/core/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Fixes: b17631032769 ("selftests/xsk: Move UMEM state from ifobject to xsk_socket_info")
-Signed-off-by: Maciej Fijalkowski maciej.fijalkowski@intel.com
----
- tools/testing/selftests/bpf/prog_tests/test_xsk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+...
+> @@ -144,7 +144,7 @@ config MLX5_CORE_IPOIB
+>  config MLX5_MACSEC
+>  	bool "Connect-X support for MACSec offload"
+>  	depends on MLX5_CORE_EN
+> -	depends on MACSEC
+> +	depends on MACSEC=y || MACSEC=MLX5_CORE
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-index d8a1c0d40e5a..50a8dbacb63d 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-@@ -1169,8 +1169,8 @@ static int receive_pkts(struct test_spec *test)
- static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, bool timeout)
- {
- 	u32 i, idx = 0, valid_pkts = 0, valid_frags = 0, buffer_len;
-+	struct xsk_umem_info *umem = ifobject->xsk_arr[0].umem_real;
- 	struct pkt_stream *pkt_stream = xsk->pkt_stream;
--	struct xsk_umem_info *umem = xsk->umem;
- 	bool use_poll = ifobject->use_poll;
- 	struct pollfd fds = { };
- 	int ret;
-@@ -1524,7 +1524,7 @@ static int thread_common_ops_tx(struct test_spec *test, struct ifobject *ifobjec
- 	umem_tx->base_addr = 0;
- 	umem_tx->next_buffer = 0;
- 
--	ret = xsk_configure(test, ifobject, umem_tx, true);
-+	ret = xsk_configure(test, ifobject, umem_rx, true);
- 	if (ret)
- 		return ret;
- 	ifobject->xsk = &ifobject->xsk_arr[0];
+I'd never seen this 'configA=configB' syntax, cool.
+
 -- 
-2.43.0
-
+Sabrina
 
