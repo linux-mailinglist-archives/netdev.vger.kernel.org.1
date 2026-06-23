@@ -1,694 +1,255 @@
-Return-Path: <netdev+bounces-301240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JUUEMvzkOWoTywcAu9opvQ
-	(envelope-from <netdev+bounces-301240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:44:28 +0200
+	id 0ZS6DCznOWqUywcAu9opvQ
+	(envelope-from <netdev+bounces-301241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:53:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91FAB6B353D
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:44:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805316B36B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:53:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=lvq8GiGz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301240-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301240-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=N4sqpEjH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301241-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301241-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6C9D7302E60A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 01:44:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F6F1300614A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 01:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65CC385D88;
-	Tue, 23 Jun 2026 01:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3212C355F22;
+	Tue, 23 Jun 2026 01:48:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BB43859E9;
-	Tue, 23 Jun 2026 01:44:21 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782179061; cv=none; b=Qyyv2R+y4wlTvesA+TmcPedsIrI+0Vb0YWX9kfU9MSXresdBDV1W3yxd1aZSSNTcBiuErnEGTo13nGuPY9xs71f1zTl2yzmdlgIFIkEPbzTfYmqVP43gMQSTiiGrf22i1Hul84ePuo6PbL3CGnycqrO8YxlgAXf09WcnNbwN1kU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782179061; c=relaxed/simple;
-	bh=DCS1za55/rSsh5bVMlsWkkrErILlwbOCuD+tx0Uth0Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DU4iKxZ/U7RVyiA2WENpt5DIETst0rENYbI/LGjFwXQVudFxf/0uLiqrNJMDNkrk6X2z7ESPkZTjy2L4CVZgKoofOVGY5Q/ib75ykBgaFS360cg5rJb/BtAhIAdN//DKwDMgOsAxDet+0cGq4PWZcoTWAeY11hP6X2LuFn+Ytgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvq8GiGz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 295A2C2BCF5;
-	Tue, 23 Jun 2026 01:44:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782179061;
-	bh=DCS1za55/rSsh5bVMlsWkkrErILlwbOCuD+tx0Uth0Y=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=lvq8GiGzZIFbKTZVhko78Cpje5g94kLeO4//dcm61AQo1LKfChrWQ4E22D8nOvb4V
-	 2LFb4r4iAp7BDHTpaaBs1HXBE9oLW8L+JkZTklMZJDSnQ6mM7R+XQHMgLV4xYpIFrv
-	 OxxyxwOGeerCfY7KbultwcDvfqxZIT3UXDzXL2/tan415mVpAcOo/plbPA7AxjZm7x
-	 OSs7NF3oJorx4QkoHIbrDL1zgxTFqOuy+IZKRqu3amtDMn3eweIO19zBaR29CvYi/l
-	 AaFTqn33lC7nq7ZWkfCNcb87S1Vcqu7ENsngSWf/AYi6/XDgtXdjsfOyAyThl5/F2x
-	 +0wvg/jgDaRrQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDEACDB46F;
-	Tue, 23 Jun 2026 01:44:21 +0000 (UTC)
-From: Esteban Urrutia via B4 Relay <devnull+esteuwu.proton.me@kernel.org>
-Date: Mon, 22 Jun 2026 21:44:19 -0400
-Subject: [PATCH 3/3] net: ipa: Add IPA v5.1 data
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C260112B94
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 01:48:02 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782179284; cv=pass; b=UiL69d2SWz4eof0/FP5hPbDQLZc3iDdEqOoqIABsnBcjIIQgqlwK5zMAyrNDp2Bc+Yc7GZTW8QXg6Sf314dW89kS3PwS7Dh4bEPHd/WAs3iXEhZUb7XrQcrop5Il7z/Ihnqh9P4KJkr4PqkA+M9H3KSfWCUafGVY6nWoSKGCU7o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782179284; c=relaxed/simple;
+	bh=5L5622+PlQcyS7Jn4DJE2Jg9X7ZQRPSC6RFfcfDoN6g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FuClnX8VKtrtQHQA1VyyOiJOyvUHkQtfgDJPrus/u+f7fffCZf1zUrvmzoPnPVMJ0297+xg9dU008HHbWe4GRqoGSjSnhzTklEBeNPt4Hw/kGTxlj7AW3G4QzjuZp7QFSd0smK4PWKfe/LJnuqPdFrFn5zrGj2RSPUkNrDpYM+0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N4sqpEjH; arc=pass smtp.client-ip=209.85.210.178
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8423610ec93so4697852b3a.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 18:48:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782179282; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NRhg9KrRnkC5MoSMQ/g05jiwT0slTmuKb1tFVUkQm5seic95fJ1x9E06sbWxe5ff2o
+         ZxEx9PcBdTGEdD8AZF8iM3lQexkjxP5UWy2emZNSQWhmxP8a/yp1B8BGySAJqoWSLJaV
+         MgN5PPQhyKv7sMBd+QH0b1DTK3HNtBm1XfROwh9mIe6g69ymxwy1kimIYwTYQabsP9pp
+         TfV3XLUZ6mQAyCQylxjw0s6oBsNUJttV29EZaVjsGU/v0pQ6QSnVU6RKjdwcEbd5ERNt
+         oN8OPhvFkicWFtySiuX2YOdRRhL0GLBwkPxAh7LlDPiHU0DTYT5HvrfC6lNxH/u6Yd7g
+         75Bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cDnxyYH4sYtX0BdSDsVd5/mdRZ3nkxchuZKFq9+uuKI=;
+        fh=P7B9iKCM3bWOcdBUC6P4Lnmu6gH4nTZSTPJwCZq3BVE=;
+        b=hhA//ugK1rAtcR4c5EvyyMfDv9lTpmKmk7cWZ2Fo7Ezler9BIs5/CVj4jxsGwWYMLC
+         1xeqlFD/GwyXEGa4dkDsPwXQoBMEf9qfwdPIJoLD9PAJMR60WJClmL20YwNXGQceAyPs
+         eJ0cIrTOZqr3neQtHORNHWotLFZarfFM4yJo5tVAEKxVf/gIoPgPHpOcySUhUrsrPUxI
+         QZC0oWx2aGFv4WnSpzveqGnP2fZkk9ZhQOePepfx5jRi98Tw+yLO6mx64n4q/cuvMoRc
+         TLeuzHYFYo5eq+5ZWCIafGW6C4p9PaF3dxIIXhRyXuW5Jyz9M4HO+ZXRBCIqsVZh+dkq
+         MFEg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782179282; x=1782784082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cDnxyYH4sYtX0BdSDsVd5/mdRZ3nkxchuZKFq9+uuKI=;
+        b=N4sqpEjH9Opr63R3rXWqxuq1GYM33miwV2PHOE6aYvJpkvSjg+45idvVLVuUQlDL4z
+         1OBtbHTvrPtc2ADIwAlVDY2nCZG57/9qve95hUzlbNlvIN/d9d9YwLrIrMKUiICM6PPt
+         HVim88fPvSbsI6lqTpu6aF+lp12/UhyfM3+unQ0QByb0wp2Crg1qmi14oe1vJEq+0d7w
+         vA+XyQIvSgg1H2Qdm1KoA3i++2hplyGBIoMsGj4cYZ5kH7S6eSXz2Ggh/h+85P3Xwh3s
+         zUpTC9qcBMp7ui0777+ypJjFBrnnJk4fpqefnl/V4mmjNKygihaB3AD4L257dTunzYN1
+         q+Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782179282; x=1782784082;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cDnxyYH4sYtX0BdSDsVd5/mdRZ3nkxchuZKFq9+uuKI=;
+        b=cNpHj21jGmhUFvfvAovjPl5nwRnXr1mc4ur1CfrU6/pcnpCeYTdeJnPfiiVw49sMkD
+         bVNrG0wrURBKH/C89HmYauLfcchbW+k/APtSMBSGpemtPqXmM7Yoiwm999R9YwqT+o4R
+         frC01NYUMH2PFzwiWbe1rPhphY5vAXJE2oeIUaTcUWXbNyE5t2K+5eljMFLcYQIGvsTI
+         oLB/HMbul3UbLInd2QASYtgo5RACTaKa5sCaZn/xXkN93Cvra+U01ixpbWL1W33vNR+I
+         9m7udYkGv3vfZGHtkVWmh9NABYFzknJlMgbUGoUhK09Yxbck9HJnzN08MjzWYiv06xLm
+         uvDw==
+X-Forwarded-Encrypted: i=1; AFNElJ8tPQqZicaisUV5EheWecJ8lJoDepPrNv/Q2f7csbog2hV8ReeVJ+C2p4v7GG9tBTSFbsR9xz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUV/7TRT0bLlM6BoZNBvelnmg9LFMQJ7zHYnxKSQtJ8/2iNldj
+	Oe09Lz/tn5qrV3bv12YvoauhHaI9c0v2gOQIt5Gtc2QPqtt6JJG+PwIJ2SG3p6nRHYqMMgP/47p
+	odIKcvjWPvgAFQOkdFpCgHxodTjqa4oA=
+X-Gm-Gg: AfdE7cl8i4dKFgBEjnEdAupVTnvdgwMTlEbR4vIewKhPyNQ2SDalZ93dH3vt8idkWnG
+	+MY0u/9Z8/I7hJ+booX4qNkDdkQElVIxYAJcwRBiHhBtvP0c2SpCBvw1+J/7iDbZoVWGHk8eRR2
+	wTCS744G8GRhfhRmWMLrebLLAeakNSmYmi1wOAnZH6kt5btZPafU1xoyUPAuOitbU5jRKG+V5iM
+	gDs5JVZ87lmPjhkNIuuGiDWzk4rzY5QSMYTzMU8j3W/e1TMMQb2Us3Af/pqQloMNDbTVo9PvWfN
+	eBRtguObZcgUPhIPWNXb6phtVXwbLrN7iRajfjdRuTotGp/n8mZA9xYlk9666jTGfBlPhSPG
+X-Received: by 2002:a05:6a00:882:b0:842:3801:47b with SMTP id
+ d2e1a72fcca58-845507e137dmr18541248b3a.18.1782179281926; Mon, 22 Jun 2026
+ 18:48:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260622-sm8450-ipa-v1-3-532f0299f96e@proton.me>
-References: <20260622-sm8450-ipa-v1-0-532f0299f96e@proton.me>
-In-Reply-To: <20260622-sm8450-ipa-v1-0-532f0299f96e@proton.me>
-To: Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alex Elder <elder@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Esteban Urrutia <esteuwu@proton.me>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782179059; l=14925;
- i=esteuwu@proton.me; s=20260622; h=from:subject:message-id;
- bh=v6K46HlhdIU4i2Dn8Ai622b7nj00uVugNirCPctoJHI=;
- b=2/O8lsVT4VXuTaZBQvcfRZjMvLG4DGx4PWEFk4fFKFDulVH1gP1sI00PGZnLiao7pPH1vDJ9s
- iPZDQV/oGiTC3IuZjI7c0O1sccOmOzEuFN5l6o4oFH8tXrmuSj0oPkm
-X-Developer-Key: i=esteuwu@proton.me; a=ed25519;
- pk=wToFt4mOAWkzbqb15Ye1hrhevI13vK9BcMUFiQ/me1M=
-X-Endpoint-Received: by B4 Relay for esteuwu@proton.me/20260622 with
- auth_id=835
-X-Original-From: Esteban Urrutia <esteuwu@proton.me>
-Reply-To: esteuwu@proton.me
+References: <20260622171048.1626022-1-edumazet@google.com>
+In-Reply-To: <20260622171048.1626022-1-edumazet@google.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 22 Jun 2026 21:47:49 -0400
+X-Gm-Features: AVVi8CcuCKbrtiCdlFfVPYSlkn7tDYThM7Cg9k_CVWwmhNiMZpAJZBsCz75JM7s
+Message-ID: <CADvbK_e_7184a_jm5ASjKafXrJqaOKFUKJF6V1wp7AnFxK596g@mail.gmail.com>
+Subject: Re: [PATCH net] tipc: fix UAF in cleanup_bearer() due to premature dst_cache_destroy()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com, 
+	Jon Maloy <jon.maloy@ericsson.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301240-lists,netdev=lfdr.de,esteuwu.proton.me];
-	FORGED_RECIPIENTS(0.00)[m:andersson@kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:elder@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:esteuwu@proton.me,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301241-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com,m:jon.maloy@ericsson.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,ericsson.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[esteuwu@proton.me];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev,e14bc5d4942756023b77];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 91FAB6B353D
+X-Rspamd-Queue-Id: 805316B36B9
 
-From: Esteban Urrutia <esteuwu@proton.me>
+On Mon, Jun 22, 2026 at 1:10=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> TIPC UDP media bearer teardown calls dst_cache_destroy() on its
+> replicast caches before calling synchronize_net() to wait for
+> concurrent RCU readers (transmitters) to finish:
+>
+> static void cleanup_bearer(struct work_struct *work)
+> {
+> ...
+>         list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
+>                 dst_cache_destroy(&rcast->dst_cache);
+>                 list_del_rcu(&rcast->list);
+>                 kfree_rcu(rcast, rcu);
+>         }
+> ...
+>         dst_cache_destroy(&ub->rcast.dst_cache);
+>         udp_tunnel_sock_release(ub->sk);
+>         synchronize_net();
+> ...
+> }
+>
+> This is highly buggy because dst_cache_destroy() immediately frees the
+> per-CPU cache memory (free_percpu()) and releases the cached dst
+> entries without any synchronization.
+>
+> If a concurrent transmitter (e.g., tipc_udp_xmit()) is running on another
+> CPU under RCU protection, it can call dst_cache_get() concurrently,
+> leading to:
+> 1. Use-After-Free on the per-CPU cache pointer itself (crash).
+> 2. "rcuref - imbalanced put()" warning if it attempts to release a
+>    dst that was concurrently released by dst_cache_destroy().
+>
+> Furthermore, calling kfree(ub) immediately after synchronize_net() withou=
+t
+> closing the socket first (or waiting after closing it) leaves a window
+> where a concurrent receiver (tipc_udp_recv()) could start after
+> synchronize_net(), access ub, and suffer a UAF when kfree(ub) runs.
+>
+> To fix this, we must defer dst_cache_destroy() and kfree(ub) until after
+> we have ensured that no more readers can see the bearer/socket and all
+> existing readers have finished:
+>
+> 1. Move the rcast entries from the public list to a private list
+>    and delete them using list_del_rcu() (stops new transmit readers).
+> 2. Release the bearer socket using udp_tunnel_sock_release() (stops
+>    new receive readers).
+> 3. Call synchronize_net() to wait for all outstanding RCU readers
+>    (both transmit and receive) to finish.
+> 4. Now that it is safe, call dst_cache_destroy() on all isolated
+>    rcast entries and the main bearer cache, and free the memory.
+>
+> Fixes: e9c1a793210f ("tipc: add dst_cache support for udp media")
+> Reported-by: syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6a396a66.52ae72c2.136ac7.0003.GAE@=
+google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Xin Long <lucien.xin@gmail.com>
+> Cc: Jon Maloy <jon.maloy@ericsson.com>
+> ---
+>  net/tipc/udp_media.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
+> index 988b8a7f953ad6da860e6190f1f244650f121dce..befaf7137caf642462b7203a2=
+429a60386e64db8 100644
+> --- a/net/tipc/udp_media.c
+> +++ b/net/tipc/udp_media.c
+> @@ -808,21 +808,26 @@ static void cleanup_bearer(struct work_struct *work=
+)
+>  {
+>         struct udp_bearer *ub =3D container_of(work, struct udp_bearer, w=
+ork);
+>         struct udp_replicast *rcast, *tmp;
+> +       LIST_HEAD(private_list);
+>         struct tipc_net *tn;
+>
+>         list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
+> -               dst_cache_destroy(&rcast->dst_cache);
+>                 list_del_rcu(&rcast->list);
+> -               kfree_rcu(rcast, rcu);
+> +               list_add(&rcast->list, &private_list);
+>         }
 
-Add the required ipa_data-v5.1.c file for IPA v5.1 along with changes
-that declare IPA v5.1 support.
-This version of IPA is used in both SM8450 and SM8475 SoCs.
+Could this corrupt the list for concurrent RCU readers?
+When list_del_rcu() is called, it intentionally leaves the next pointer
+intact so concurrent readers can continue their traversal. However, the
+immediate call to list_add() overwrites both the next and prev pointers
+to link the entry into private_list.
+If a concurrent reader is currently positioned at rcast, won't it follow
+the newly clobbered next pointer and jump from the original RCU list
+directly into private_list?
+Because private_list is allocated on the local stack, the reader might
+interpret stack memory as a struct udp_replicast. Furthermore, the reader
+would miss its loop termination condition because it expects to reach the
+original list head, potentially resulting in an infinite loop or a crash.
+[ ... ]
 
-Signed-off-by: Esteban Urrutia <esteuwu@proton.me>
----
- drivers/net/ipa/Makefile             |   2 +-
- drivers/net/ipa/data/ipa_data-v5.1.c | 477 +++++++++++++++++++++++++++++++++++
- drivers/net/ipa/gsi_reg.c            |   1 +
- drivers/net/ipa/ipa_data.h           |   1 +
- drivers/net/ipa/ipa_main.c           |   4 +
- drivers/net/ipa/ipa_reg.c            |   1 +
- 6 files changed, 485 insertions(+), 1 deletion(-)
+This looks legit.
 
-diff --git a/drivers/net/ipa/Makefile b/drivers/net/ipa/Makefile
-index e148ec3c1a10..d4995c2e8ca0 100644
---- a/drivers/net/ipa/Makefile
-+++ b/drivers/net/ipa/Makefile
-@@ -7,7 +7,7 @@ IPA_REG_VERSIONS	:=	3.1 3.5.1 4.2 4.5 4.7 4.9 4.11 5.0 5.5
- # Some IPA versions can reuse another set of GSI register definitions.
- GSI_REG_VERSIONS	:=	3.1 3.5.1 4.0 4.5 4.9 4.11 5.0
- 
--IPA_DATA_VERSIONS	:=	3.1 3.5.1 4.2 4.5 4.7 4.9 4.11 5.0 5.2 5.5
-+IPA_DATA_VERSIONS	:=	3.1 3.5.1 4.2 4.5 4.7 4.9 4.11 5.0 5.1 5.2 5.5
- 
- obj-$(CONFIG_QCOM_IPA)	+=	ipa.o
- 
-diff --git a/drivers/net/ipa/data/ipa_data-v5.1.c b/drivers/net/ipa/data/ipa_data-v5.1.c
-new file mode 100644
-index 000000000000..85b21efa1224
---- /dev/null
-+++ b/drivers/net/ipa/data/ipa_data-v5.1.c
-@@ -0,0 +1,477 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/* Copyright (C) 2023-2024 Linaro Ltd. */
-+/* Copyright (C) 2026 Esteban Urrutia <esteuwu@proton.me> */
-+
-+#include <linux/array_size.h>
-+#include <linux/log2.h>
-+
-+#include "../ipa_data.h"
-+#include "../ipa_endpoint.h"
-+#include "../ipa_mem.h"
-+#include "../ipa_version.h"
-+
-+/** enum ipa_resource_type - IPA resource types for an SoC having IPA v5.1 */
-+enum ipa_resource_type {
-+	/* Source resource types; first must have value 0 */
-+	IPA_RESOURCE_TYPE_SRC_PKT_CONTEXTS		= 0,
-+	IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_LISTS,
-+	IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_BUFF,
-+	IPA_RESOURCE_TYPE_SRC_HPS_DMARS,
-+	IPA_RESOURCE_TYPE_SRC_ACK_ENTRIES,
-+
-+	/* Destination resource types; first must have value 0 */
-+	IPA_RESOURCE_TYPE_DST_DATA_SECTORS		= 0,
-+	IPA_RESOURCE_TYPE_DST_DPS_DMARS,
-+	IPA_RESOURCE_TYPE_DST_ULSO_SEGMENTS,
-+};
-+
-+/* Resource groups used for an SoC having IPA v5.1 */
-+enum ipa_rsrc_group_id {
-+	/* Source resource group identifiers */
-+	IPA_RSRC_GROUP_SRC_UL				= 0,
-+	IPA_RSRC_GROUP_SRC_DL,
-+	IPA_RSRC_GROUP_SRC_UNUSED_2,
-+	IPA_RSRC_GROUP_SRC_UNUSED_3,
-+	IPA_RSRC_GROUP_SRC_URLLC,
-+	IPA_RSRC_GROUP_SRC_U_RX_QC,
-+	IPA_RSRC_GROUP_SRC_COUNT,	/* Last in set; not a source group */
-+
-+	/* Destination resource group identifiers */
-+	IPA_RSRC_GROUP_DST_UL				= 0,
-+	IPA_RSRC_GROUP_DST_DL,
-+	IPA_RSRC_GROUP_DST_UNUSED_2,
-+	IPA_RSRC_GROUP_DST_UNUSED_3,
-+	IPA_RSRC_GROUP_DST_UNUSED_4,
-+	IPA_RSRC_GROUP_DST_UC,
-+	IPA_RSRC_GROUP_DST_DRB_IP,
-+	IPA_RSRC_GROUP_DST_COUNT,	/* Last; not a destination group */
-+};
-+
-+/* QSB configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_qsb_data ipa_qsb_data[] = {
-+	[IPA_QSB_MASTER_DDR] = {
-+		.max_writes		= 0,
-+		.max_reads		= 0,	/* no limit (hardware max) */
-+		.max_reads_beats	= 0,
-+	},
-+	[IPA_QSB_MASTER_PCIE] = {
-+		.max_writes		= 0,
-+		.max_reads		= 0,	/* no limit (hardware max) */
-+		.max_reads_beats	= 0,
-+	},
-+};
-+
-+/* Endpoint configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
-+	[IPA_ENDPOINT_AP_COMMAND_TX] = {
-+		.ee_id		= GSI_EE_AP,
-+		.channel_id	= 12,
-+		.endpoint_id	= 14,
-+		.toward_ipa	= true,
-+		.channel = {
-+			.tre_count	= 256,
-+			.event_count	= 256,
-+			.tlv_count	= 20,
-+		},
-+		.endpoint = {
-+			.config = {
-+				.resource_group	= IPA_RSRC_GROUP_SRC_UL,
-+				.dma_mode	= true,
-+				.dma_endpoint	= IPA_ENDPOINT_AP_LAN_RX,
-+				.tx = {
-+					.seq_type = IPA_SEQ_DMA,
-+				},
-+			},
-+		},
-+	},
-+	[IPA_ENDPOINT_AP_LAN_RX] = {
-+		.ee_id		= GSI_EE_AP,
-+		.channel_id	= 13,
-+		.endpoint_id	= 16,
-+		.toward_ipa	= false,
-+		.channel = {
-+			.tre_count	= 256,
-+			.event_count	= 256,
-+			.tlv_count	= 9,
-+		},
-+		.endpoint = {
-+			.config = {
-+				.resource_group	= IPA_RSRC_GROUP_DST_UL,
-+				.aggregation	= true,
-+				.status_enable	= true,
-+				.rx = {
-+					.buffer_size	= 8192,
-+					.pad_align	= ilog2(sizeof(u32)),
-+					.aggr_time_limit = 500,
-+				},
-+			},
-+		},
-+	},
-+	[IPA_ENDPOINT_AP_MODEM_TX] = {
-+		.ee_id		= GSI_EE_AP,
-+		.channel_id	= 11,
-+		.endpoint_id	= 2,
-+		.toward_ipa	= true,
-+		.channel = {
-+			.tre_count	= 512,
-+			.event_count	= 512,
-+			.tlv_count	= 25,
-+		},
-+		.endpoint = {
-+			.filter_support	= true,
-+			.config = {
-+				.resource_group	= IPA_RSRC_GROUP_SRC_UL,
-+				.checksum       = true,
-+				.qmap		= true,
-+				.status_enable	= true,
-+				.tx = {
-+					.seq_type = IPA_SEQ_2_PASS_SKIP_LAST_UC,
-+					.status_endpoint =
-+						IPA_ENDPOINT_MODEM_AP_RX,
-+				},
-+			},
-+		},
-+	},
-+	[IPA_ENDPOINT_AP_MODEM_RX] = {
-+		.ee_id		= GSI_EE_AP,
-+		.channel_id	= 1,
-+		.endpoint_id	= 23,
-+		.toward_ipa	= false,
-+		.channel = {
-+			.tre_count	= 256,
-+			.event_count	= 256,
-+			.tlv_count	= 9,
-+		},
-+		.endpoint = {
-+			.config = {
-+				.resource_group	= IPA_RSRC_GROUP_DST_UL,
-+				.checksum       = true,
-+				.qmap		= true,
-+				.aggregation	= true,
-+				.rx = {
-+					.buffer_size	= 8192,
-+					.aggr_time_limit = 500,
-+					.aggr_close_eof	= true,
-+				},
-+			},
-+		},
-+	},
-+	[IPA_ENDPOINT_MODEM_AP_TX] = {
-+		.ee_id		= GSI_EE_MODEM,
-+		.channel_id	= 0,
-+		.endpoint_id	= 12,
-+		.toward_ipa	= true,
-+		.endpoint = {
-+			.filter_support	= true,
-+		},
-+	},
-+	[IPA_ENDPOINT_MODEM_AP_RX] = {
-+		.ee_id		= GSI_EE_MODEM,
-+		.channel_id	= 7,
-+		.endpoint_id	= 21,
-+		.toward_ipa	= false,
-+	},
-+	[IPA_ENDPOINT_MODEM_DL_NLO_TX] = {
-+		.ee_id		= GSI_EE_MODEM,
-+		.channel_id	= 2,
-+		.endpoint_id	= 15,
-+		.toward_ipa	= true,
-+		.endpoint = {
-+			.filter_support	= true,
-+		},
-+	},
-+};
-+
-+/* Source resource configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_resource ipa_resource_src[] = {
-+	[IPA_RESOURCE_TYPE_SRC_PKT_CONTEXTS] = {
-+		.limits[IPA_RSRC_GROUP_SRC_UL] = {
-+			.min = 7,	.max = 12,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
-+			.min = 1,	.max = 63,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_U_RX_QC] = {
-+			.min = 0,	.max = 63,
-+		},
-+	},
-+	[IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_LISTS] = {
-+		.limits[IPA_RSRC_GROUP_SRC_UL] = {
-+			.min = 21,	.max = 21,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
-+			.min = 10,	.max = 10,
-+		},
-+	},
-+	[IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_BUFF] = {
-+		.limits[IPA_RSRC_GROUP_SRC_UL] = {
-+			.min = 33,	.max = 33,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
-+			.min = 20,	.max = 20,
-+		},
-+	},
-+	[IPA_RESOURCE_TYPE_SRC_HPS_DMARS] = {
-+		.limits[IPA_RSRC_GROUP_SRC_UL] = {
-+			.min = 0,	.max = 63,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
-+			.min = 1,	.max = 63,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_U_RX_QC] = {
-+			.min = 0,	.max = 63,
-+		},
-+	},
-+	[IPA_RESOURCE_TYPE_SRC_ACK_ENTRIES] = {
-+		.limits[IPA_RSRC_GROUP_SRC_UL] = {
-+			.min = 38,	.max = 38,
-+		},
-+		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
-+			.min = 16,	.max = 16,
-+		},
-+	},
-+};
-+
-+/* Destination resource configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_resource ipa_resource_dst[] = {
-+	[IPA_RESOURCE_TYPE_DST_DATA_SECTORS] = {
-+		.limits[IPA_RSRC_GROUP_DST_UL] = {
-+			.min = 6,	.max = 6,
-+		},
-+		.limits[IPA_RSRC_GROUP_DST_DL] = {
-+			.min = 5,	.max = 5,
-+		},
-+		.limits[IPA_RSRC_GROUP_DST_DRB_IP] = {
-+			.min = 39,	.max = 39,
-+		},
-+	},
-+	[IPA_RESOURCE_TYPE_DST_DPS_DMARS] = {
-+		.limits[IPA_RSRC_GROUP_DST_UL] = {
-+			.min = 0,	.max = 3,
-+		},
-+		.limits[IPA_RSRC_GROUP_DST_DL] = {
-+			.min = 0,	.max = 3,
-+		},
-+	},
-+	[IPA_RESOURCE_TYPE_DST_ULSO_SEGMENTS] = {
-+		.limits[IPA_RSRC_GROUP_DST_UL] = {
-+			.min = 0,	.max = 63,
-+		},
-+		.limits[IPA_RSRC_GROUP_DST_DL] = {
-+			.min = 0,	.max = 63,
-+		},
-+	},
-+};
-+
-+/* Resource configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_resource_data ipa_resource_data = {
-+	.rsrc_group_dst_count	= IPA_RSRC_GROUP_DST_COUNT,
-+	.rsrc_group_src_count	= IPA_RSRC_GROUP_SRC_COUNT,
-+	.resource_src_count	= ARRAY_SIZE(ipa_resource_src),
-+	.resource_src		= ipa_resource_src,
-+	.resource_dst_count	= ARRAY_SIZE(ipa_resource_dst),
-+	.resource_dst		= ipa_resource_dst,
-+};
-+
-+/* IPA-resident memory region data for an SoC having IPA v5.1 */
-+static const struct ipa_mem ipa_mem_local_data[] = {
-+	{
-+		.id		= IPA_MEM_UC_EVENT_RING,
-+		.offset		= 0x0000,
-+		.size		= 0x1000,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_UC_SHARED,
-+		.offset		= 0x1000,
-+		.size		= 0x0080,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_UC_INFO,
-+		.offset		= 0x1080,
-+		.size		= 0x0200,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_V4_FILTER_HASHED,
-+		.offset		= 0x1288,
-+		.size		= 0x0078,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V4_FILTER,
-+		.offset		= 0x1308,
-+		.size		= 0x0078,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V6_FILTER_HASHED,
-+		.offset		= 0x1388,
-+		.size		= 0x0078,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V6_FILTER,
-+		.offset		= 0x1408,
-+		.size		= 0x0078,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V4_ROUTE_HASHED,
-+		.offset		= 0x1488,
-+		.size		= 0x0098,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V4_ROUTE,
-+		.offset		= 0x1528,
-+		.size		= 0x0098,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V6_ROUTE_HASHED,
-+		.offset		= 0x15c8,
-+		.size		= 0x0098,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_V6_ROUTE,
-+		.offset		= 0x1668,
-+		.size		= 0x0098,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_MODEM_HEADER,
-+		.offset		= 0x1708,
-+		.size		= 0x0240,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_AP_HEADER,
-+		.offset		= 0x1948,
-+		.size		= 0x01e0,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_MODEM_PROC_CTX,
-+		.offset		= 0x1b40,
-+		.size		= 0x0b20,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_AP_PROC_CTX,
-+		.offset		= 0x2660,
-+		.size		= 0x0200,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_STATS_QUOTA_MODEM,
-+		.offset		= 0x2868,
-+		.size		= 0x0060,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_STATS_QUOTA_AP,
-+		.offset		= 0x28c8,
-+		.size		= 0x0048,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_STATS_TETHERING,
-+		.offset		= 0x2910,
-+		.size		= 0x03c0,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_AP_V4_FILTER,
-+		.offset		= 0x29b8,
-+		.size		= 0x0188,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_AP_V6_FILTER,
-+		.offset		= 0x2b40,
-+		.size		= 0x0228,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_STATS_FILTER_ROUTE,
-+		.offset		= 0x2cd0,
-+		.size		= 0x0ba0,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_STATS_DROP,
-+		.offset		= 0x3870,
-+		.size		= 0x0020,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_MODEM,
-+		.offset		= 0x3898,
-+		.size		= 0x0d48,
-+		.canary_count	= 2,
-+	},
-+	{
-+		.id		= IPA_MEM_NAT_TABLE,
-+		.offset		= 0x45e0,
-+		.size		= 0x0900,
-+		.canary_count	= 0,
-+	},
-+	{
-+		.id		= IPA_MEM_PDN_CONFIG,
-+		.offset		= 0x4ee8,
-+		.size		= 0x0100,
-+		.canary_count	= 2,
-+	},
-+};
-+
-+/* Memory configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_mem_data ipa_mem_data = {
-+	.local_count	= ARRAY_SIZE(ipa_mem_local_data),
-+	.local		= ipa_mem_local_data,
-+	.imem_addr	= 0x146a8000,
-+	.imem_size	= 0x00002000,
-+	/*
-+	 * While this value is 0xb000 on SM8450 and 0x9000 on SM8475,
-+	 * it has been left set to 0x9000 for compatibility with SM8475
-+	 */
-+	.smem_size	= 0x00009000,
-+};
-+
-+/* Interconnect rates are in 1000 byte/second units */
-+static const struct ipa_interconnect_data ipa_interconnect_data[] = {
-+	{
-+		.name			= "memory",
-+		.peak_bandwidth		= 1900000,	/* 1.9 GBps */
-+		.average_bandwidth	= 590000,	/* 590 MBps */
-+	},
-+	/* Average rate is unused for the next interconnect */
-+	{
-+		.name			= "config",
-+		.peak_bandwidth		= 76800,	/* 76.8 MBps */
-+		.average_bandwidth	= 0,		/* unused */
-+	},
-+};
-+
-+/* Clock and interconnect configuration data for an SoC having IPA v5.1 */
-+static const struct ipa_power_data ipa_power_data = {
-+	.core_clock_rate	= 120 * 1000 * 1000,	/* Hz */
-+	.interconnect_count	= ARRAY_SIZE(ipa_interconnect_data),
-+	.interconnect_data	= ipa_interconnect_data,
-+};
-+
-+/* Configuration data for an SoC having IPA v5.1. */
-+const struct ipa_data ipa_data_v5_1 = {
-+	.version		= IPA_VERSION_5_1,
-+	.qsb_count		= ARRAY_SIZE(ipa_qsb_data),
-+	.qsb_data		= ipa_qsb_data,
-+	.modem_route_count	= 11,
-+	.endpoint_count		= ARRAY_SIZE(ipa_gsi_endpoint_data),
-+	.endpoint_data		= ipa_gsi_endpoint_data,
-+	.resource_data		= &ipa_resource_data,
-+	.mem_data		= &ipa_mem_data,
-+	.power_data		= &ipa_power_data,
-+};
-diff --git a/drivers/net/ipa/gsi_reg.c b/drivers/net/ipa/gsi_reg.c
-index e13cf835a013..a57072ba4bef 100644
---- a/drivers/net/ipa/gsi_reg.c
-+++ b/drivers/net/ipa/gsi_reg.c
-@@ -110,6 +110,7 @@ static const struct regs *gsi_regs(struct gsi *gsi)
- 		return &gsi_regs_v4_11;
- 
- 	case IPA_VERSION_5_0:
-+	case IPA_VERSION_5_1:
- 	case IPA_VERSION_5_2:
- 	case IPA_VERSION_5_5:
- 		return &gsi_regs_v5_0;
-diff --git a/drivers/net/ipa/ipa_data.h b/drivers/net/ipa/ipa_data.h
-index 3eb9dc2ce339..fe6f7d5bfe88 100644
---- a/drivers/net/ipa/ipa_data.h
-+++ b/drivers/net/ipa/ipa_data.h
-@@ -253,6 +253,7 @@ extern const struct ipa_data ipa_data_v4_7;
- extern const struct ipa_data ipa_data_v4_9;
- extern const struct ipa_data ipa_data_v4_11;
- extern const struct ipa_data ipa_data_v5_0;
-+extern const struct ipa_data ipa_data_v5_1;
- extern const struct ipa_data ipa_data_v5_2;
- extern const struct ipa_data ipa_data_v5_5;
- 
-diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 788dd99af2a4..6c449032ae45 100644
---- a/drivers/net/ipa/ipa_main.c
-+++ b/drivers/net/ipa/ipa_main.c
-@@ -669,6 +669,10 @@ static const struct of_device_id ipa_match[] = {
- 		.compatible	= "qcom,sdx65-ipa",
- 		.data		= &ipa_data_v5_0,
- 	},
-+	{
-+		.compatible	= "qcom,sm8450-ipa",
-+		.data		= &ipa_data_v5_1,
-+	},
- 	{
- 		.compatible	= "qcom,milos-ipa",
- 		.data		= &ipa_data_v5_2,
-diff --git a/drivers/net/ipa/ipa_reg.c b/drivers/net/ipa/ipa_reg.c
-index 30bd69f4c147..5f22ca6295b1 100644
---- a/drivers/net/ipa/ipa_reg.c
-+++ b/drivers/net/ipa/ipa_reg.c
-@@ -125,6 +125,7 @@ static const struct regs *ipa_regs(enum ipa_version version)
- 	case IPA_VERSION_4_11:
- 		return &ipa_regs_v4_11;
- 	case IPA_VERSION_5_0:
-+	case IPA_VERSION_5_1:
- 	case IPA_VERSION_5_2:
- 		return &ipa_regs_v5_0;
- 	case IPA_VERSION_5_5:
-
--- 
-2.54.0
-
-
+Thanks.
 
