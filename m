@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-301302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301303-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /oM4LgJLOmrS5QcAu9opvQ
-	(envelope-from <netdev+bounces-301302-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:59:46 +0200
+	id 9YKfLXBLOmr15QcAu9opvQ
+	(envelope-from <netdev+bounces-301303-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:01:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141646B57FC
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:59:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449386B5849
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:01:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lrewN8lb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301302-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301302-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=J5LYJiiU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301303-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301303-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 042F830CF9AB
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:54:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D13AE30737B7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667A13CF692;
-	Tue, 23 Jun 2026 08:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4481B3CF207;
+	Tue, 23 Jun 2026 08:55:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9A53CF68B;
-	Tue, 23 Jun 2026 08:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DCC3CEBB9;
+	Tue, 23 Jun 2026 08:55:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782204877; cv=none; b=JG+mGiGPBXzcvU42OkmQuQY2SuO8yQdatvOHrZy8G9dYvMFpTcVCuJBjK/35bBddAUV5ziMBq2rjjbunvwZwMRmKhP95t19xTqLEmfjvokyLt/Tfarpw3Wzfb1zlaGmV3zWlPtFPYtmJDYq1aXBchZ6iegNCibVyQpxpWcazcNg=
+	t=1782204947; cv=none; b=t7PuQlebZ6YqG3IA4gCQmZvUSyYt/q3bUbL5eRWNFmfha/j/QcvXbSozvYI49pzb03yZpKjmQ+83d0vfMHNAKY+pH3GOuSphKPsu72HEiLvpO34mRib0YEiGm8i1uuyspHgNOhBzZjyZXBcoHxPEFuIfpDOJBpftdfQp3V1Z2rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782204877; c=relaxed/simple;
-	bh=kFAKRrQ3zICZT6MUaJ0rB0BJxQeNLxOKSVJw/6BG9rk=;
+	s=arc-20240116; t=1782204947; c=relaxed/simple;
+	bh=jGwyzwpV+0fbRB304ZsBQubFjjTShLOmX41SJ6Iuny8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qav12Rvs5yCyBqgqH4/vSZsPBw7nd8X9b14jD/bB9f7p5Vx1+D+OWduKaSODJc89keJ9V/XZozaVmL6kURtAH3y3jWfVEknqLVft0eqUCFX1B4uooQtenTiAo8lfHMP7sP3nlikeX16lV8gUf9cMjgn5Ad4ohZHKVIZg4MQLm/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrewN8lb; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D10291F000E9;
-	Tue, 23 Jun 2026 08:54:34 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=u9LZ97MOF3XydbnLLz8W62Yq2q7tFgVVFtE9MoU4T791tZzq8ub/uJN31WUQ/9TCu87Lqt5Z4e9+HFtjBbr4ooifTi14lEZRHNnJAhjl5e+cyxdiYC0OxMA4mRWTp6WEq+lXaKQnka4005cZhfszudLqcy7YKMNHeo4afiZLoJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J5LYJiiU; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA4161F000E9;
+	Tue, 23 Jun 2026 08:55:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782204876;
-	bh=kFAKRrQ3zICZT6MUaJ0rB0BJxQeNLxOKSVJw/6BG9rk=;
+	s=k20260515; t=1782204945;
+	bh=4X3bBQc3lvKwGqiHYbAt5IGECs2yaCHfuNxmosYV04c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lrewN8lbokIftMCJeK+ZvnRGFJ20U/MqNF3LxCaR8QinbnwfFrClIhd6ZGMpTI9WE
-	 Xwv+iRXM643l9cTcwErqrmkfNyP3tROFMUnaDVZ9FuSXNMDlAAZrRGKIO9FU85jJ/A
-	 y4t44zO6I4OZivJ225Gb1iwrL0VAK51zcrhh4QY6DhNgPZhYkS6IgscIfywLT404Np
-	 GgewrXkgBfm+U1TMNVfvOoUvWDpo9Wjf3+iZ/RBqdMn2wHwaedGEYlaAv5ljlgTgx8
-	 zqRPaBECvF7GeWGvU9rZsuo8Q+2FdqOqVsSAOU3Nn+XsLKJ/+YZboleqCfRMAiKW17
-	 qemKn4+53Flog==
-Date: Tue, 23 Jun 2026 10:54:31 +0200
+	b=J5LYJiiUjJkIs72bmaLxztLrP4euT6PWAllXHlNCC4TWiM6KcZgJfg1VxwVGnCs5q
+	 v6OBFJ43UP7bCijAbNb8/mbzWxCIZoeQ4JDlVCuYFLwVUFr+OrgkjaBLUR7+1DYGcp
+	 zN0b4Yp1Kn6MiNmNd7Dvw4QSTgCvOCVwa7uwwOeirCemVse+WRCh+RmdiZ2sBrb2Jm
+	 j5PlIxXo/PWCVivrmTCrqegxBBXv2UNyMVC+VvIgEaVjuN1QJ3GD4ovTAEjrdC3iUd
+	 biSMdYIfxYnHeL2QNJ1ntLnn35iEUUIUIXMjYYrPGa3jlYXwkWLoGMcUu9Fs8R/595
+	 TuQ5JZKoIMmEw==
+Date: Tue, 23 Jun 2026 10:55:42 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Esteban Urrutia <esteuwu@proton.me>
 Cc: Bjorn Andersson <andersson@kernel.org>, 
@@ -56,11 +56,10 @@ Cc: Bjorn Andersson <andersson@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org, 
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/3] dt-bindings: net: qcom,ipa: Add SM8450 compatible
- string
-Message-ID: <20260623-rustling-sincere-walrus-1359a2@quoll>
+Subject: Re: [PATCH 1/3] arm64: dts: qcom: sm8450: Add IPA support
+Message-ID: <20260623-eccentric-accurate-heron-fece6f@quoll>
 References: <20260622-sm8450-ipa-v1-0-532f0299f96e@proton.me>
- <20260622-sm8450-ipa-v1-2-532f0299f96e@proton.me>
+ <20260622-sm8450-ipa-v1-1-532f0299f96e@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260622-sm8450-ipa-v1-2-532f0299f96e@proton.me>
+In-Reply-To: <20260622-sm8450-ipa-v1-1-532f0299f96e@proton.me>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -77,7 +76,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -91,7 +90,7 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301302-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301303-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -103,26 +102,43 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,quoll:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[quoll:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,proton.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 141646B57FC
+X-Rspamd-Queue-Id: 449386B5849
 
-On Mon, Jun 22, 2026 at 09:44:18PM -0400, Esteban Urrutia wrote:
-> Declare compatible string in ipa binding for SM8450,
-> which uses IPA v5.1.
+On Mon, Jun 22, 2026 at 09:44:17PM -0400, Esteban Urrutia wrote:
+> Add support for IPA in DT while expanding the IMEM region just enough to
+> accommodate the modem tables used by IPA.
+> As reference, SM8450 uses IPA v5.1.
+> 
+> Signed-off-by: Esteban Urrutia <esteuwu@proton.me>
+> ---
+>  arch/arm64/boot/dts/qcom/sm8450.dtsi | 55 ++++++++++++++++++++++++++++++++----
+>  1 file changed, 50 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qcom/sm8450.dtsi
+> index 56cb6e959e4e..c904720008fa 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
+> @@ -2639,6 +2639,47 @@ adreno_smmu: iommu@3da0000 {
+>  			dma-coherent;
+>  		};
+>  
+> +		ipa: ipa@3f40000 {
+> +			compatible = "qcom,sm8450-ipa";
+> +
+> +			iommus = <&apps_smmu 0x5c0 0x0>,
+> +				 <&apps_smmu 0x5c2 0x0>;
+> +			reg = <0 0x3f40000 0 0x10000>,
 
-Please wrap commit message according to Linux coding style / submission
-process (neither too early nor over the limit):
-https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
+'reg' is always the second property, followed by reg-names.
 
-Please organize the patch documenting the compatible (DT bindings)
-before the patch using that compatible.
-See also: https://elixir.bootlin.com/linux/v6.14-rc6/source/Documentation/devicetree/bindings/submitting-patches.rst#L46
-
-With this fixed:
-
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> +			      <0 0x3f50000 0 0x5000>,
+> +			      <0 0x3e04000 0 0xfc000>;
+> +			reg-names = "ipa-reg",
+> +				    "ipa-shared",
+> +				    "gsi";
 
 Best regards,
 Krzysztof
