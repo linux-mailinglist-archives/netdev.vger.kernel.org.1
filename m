@@ -1,224 +1,230 @@
-Return-Path: <netdev+bounces-301382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id e/1RFEGQOmq5AAgAu9opvQ
-	(envelope-from <netdev+bounces-301382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:55:13 +0200
+	id EapfAbCQOmryAAgAu9opvQ
+	(envelope-from <netdev+bounces-301383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:57:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EABD6B7A69
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:55:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B0B6B7AA2
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:57:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=garyguo.net header.s=selector1 header.b=Qb3GuF8p;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301382-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301382-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=garyguo.net;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=bynar.io header.s=google header.b=HQVR9AA4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301383-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301383-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bynar.io;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 593B6300F7AA
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:53:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B285930941EE
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4179637E316;
-	Tue, 23 Jun 2026 13:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBDB37EFF0;
+	Tue, 23 Jun 2026 13:55:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020139.outbound.protection.outlook.com [52.101.196.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE0C37DEB2;
-	Tue, 23 Jun 2026 13:53:55 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782222837; cv=fail; b=tZLdyNxK3sx3mvqOn65ynW70LUT1W6V0lGpxxWAFUOARwbBwUBTIC1LrrohwJ6Mlq6m/pLp8jlBReHRxSSgDagRzjC/ehgUiEkeDzc6vDsHd5bIN96V4KmkZpIgjsnyt1Q+6Ee8WIPWcX47NO6yjf/x7XX27nu/RNdVLhTgj0uo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782222837; c=relaxed/simple;
-	bh=nXBm6cQjZnNVAj0zPW+VjraD+FeenNV/XcxIBPbFkHw=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=Gga+K7yWmlMoFOgxE2uWkep6eLCsZfxr5caJ4FdFPVH5lRMbhkj4wZi7k+ygB83rHmIXPthsotLO9XISIz7BzvY87+DEYjGaQlAcarp+0uwVK8da31Z8JxcnhpUq7GWotLFobtZDrz/GU+L3I9D8t6DHja7a0p5n4hDMZB33TCM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=Qb3GuF8p; arc=fail smtp.client-ip=52.101.196.139
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=naoRKJ0fCEYFdDlWRKYiqs4X29YFP2lt2YHAAT1Iupi7FIfx9eVTlcN37y3ZNczqBxcMUBMTbpV6mJ8JnxQdyJFOhw1WBqwvi9RZwEkrpxxjreoR5kQOi8D2MA1+46/PyP7onUUUqcxDVhbJ7/QABa9w/DWBIodHgwTfTIveuD1Tho1k3A1zKOZg1xJcCyughl8AhcKwNf6h7Ttj1SRmfXwQVTkhvzYNVSlRpKoUPohPLi5gWfBPvFynXTc568MzKdEnJM/4jq8tmLORO2HzichC6LZbo9Ddz54K2UONglUfFTtdaMkrCJGLhhwVXf+DaeM4Rw//NI5gOl76zv83Yw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ntZ+H/jZbw6Qr7gjbdNaPlIGZcih3eFBassSF0OFppA=;
- b=Mh1sq7xZy2BGHhDlS/NNearErx7CbxP9uxFFQpVaBksUo63ziN4rYPE11kpZXe9aGbMEdK08GlFKBKoegzm8TxTLxD2wmgzavlR/uiCcApvtE+gOv/Fkj38c3PnFpqFrVEcRaVAHoT7SAcmq53jzwUR2bVUNYsbslN3r/F4d/aPF/OqKFv3R/qF8xqt7D5d3u66R6c4HgUA6vum3wv3vZS0bVYSh2d8trZ/hvjY0tZ2Wb8BP6+Ww+PFyosm+FSMLgP+fgWPFWX6y002et3RVPFNCOc6IM+eVH41P6EVvEW1yjnNWhOumr5oAMeCsE/VRhvg5llcqoDKLKS8OBqyN+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ntZ+H/jZbw6Qr7gjbdNaPlIGZcih3eFBassSF0OFppA=;
- b=Qb3GuF8pdzzKPb+EffVXBy/UGHTpj69hfN4gI4KubBV5Lqcf/KaUMeGH3dIYyVmiJdTk419zupf8hZpGteXyjwT/A+MFsRV0Knpi/XpauFKNqA+nK4dHD+bEjNYydPt002BaJeSHrOODv4yrWDzR7sMOjfgNhgWFtq5UG1gS1Co=
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LO9P265MB7950.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:3a1::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.20; Tue, 23 Jun
- 2026 13:53:50 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0139.020; Tue, 23 Jun 2026
- 13:53:50 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 23 Jun 2026 14:53:49 +0100
-Message-Id: <DJGH9KZY0KTF.YC8IJ8SLC4YM@garyguo.net>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
- <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
- <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v4 9/9] rust: macros: remove `THIS_MODULE` static from
- `module!`
-From: "Gary Guo" <gary@garyguo.net>
-To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
- "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
- Krummrich" <dakr@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
- Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
- Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Arnd
- Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
- "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
- Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>, "Dave Ertman"
- <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
- Romanovsky" <leon@kernel.org>, "Igor Korotin" <igor.korotin@linux.dev>,
- "FUJITA Tomonori" <fujita.tomonori@gmail.com>, "Bjorn Helgaas"
- <bhelgaas@google.com>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>, =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?=
- <arve@android.com>, "Todd Kjos" <tkjos@android.com>, "Christian Brauner"
- <brauner@kernel.org>, "Carlos Llamas" <cmllamas@google.com>
-X-Mailer: aerc 0.21.0
-References: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
- <20260623-fix-fops-owner-v4-9-0daf5f077d5c@linux.dev>
-In-Reply-To: <20260623-fix-fops-owner-v4-9-0daf5f077d5c@linux.dev>
-X-ClientProxiedBy: LO4P123CA0386.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18f::13) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A585637DEB2
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 13:55:08 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782222910; cv=none; b=HbH7RxJ/V6yGnT7Wwr0n/p/kOsJEsX2E/1GvvVoTeaUOSWLtJHIklFZQE85lTjfbAm5YsZMwy0nQ729rAPi/FssqGfne3tZdB6IeByOY6GWuAPGKQaiAWzjiWXDvL8H+ZYsVcgh9ELFMQB9AAbv/yo8QeAEWkyLl5XweQM/vnGk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782222910; c=relaxed/simple;
+	bh=qM2dMH49/Ul0x9msAr/GEBJZsleQiGJNrZBlH/mQLuo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JXIEXu9FJGlQIZ2ZJuDGNs84IGKujt0bvwgf648u7A3VBRurQE5MWEPqfyzHVC1zkI1shF5OKacg9hTHIfzswRmw3Vvg15VWO+tZIImWo0i9HHb2gIW4z7s/6k75Rj8VJggApfSS1+e2HL9KhNwvWWu/11CU/rTuiZTb4h3LS3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=HQVR9AA4; arc=none smtp.client-ip=209.85.218.44
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c07ea058c1aso46156166b.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 06:55:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bynar.io; s=google; t=1782222907; x=1782827707; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PQBuHD6hzcpoFNovRalWspwnCRbO3HNmQu7ubyUULa4=;
+        b=HQVR9AA4peIrv+fknJeq9M1QZUNte72kPXnlUxzx0ODpUf3cGjfWXEgZ7d4uZO2RF8
+         LkQESZOvcUpm9mO0xyqdqK91t2KHmaJHgMjydDSXeGv/7XCxKkt1whyiJ/5269mesWh7
+         eo/iAvH9ksGdGrFIqrk7VIOtjymBGx0tOk7wCqpZMJpjx+OHA5Mc7Mh7DWwa/U9DOTd7
+         W9NZ/yhxDRxS2hnW1rlm+wSYgkcWPPc6AhNHozxFV9j/BFrvsT4u6Ud2T7Zw0uoeF3aO
+         NFljifVVSMr4D2P36QArYFt5Sao22SHIkFDZNOUg/gwaSTmoQiz2rNfIxe71lMumRNwS
+         huzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782222907; x=1782827707;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PQBuHD6hzcpoFNovRalWspwnCRbO3HNmQu7ubyUULa4=;
+        b=APTPyk9AUhhPtVo1QbeHJOi+P9VYtRTN4dN77rOxVh5fv0IOyWcWjsb+1inOU1Y5wk
+         DDeToYC/pnYDAzwxvILPx8dIHyggh4nZb0N5KUBIvYOORfLSkgYCcAUfUMjBh4tKIy1f
+         D+5il0ifw4w9u1mLHYM7nfZSa7Z1SwtFLoj2y+S3P8vAuxox/B3PDBpFTAkTownqn2RL
+         OiAGrnRPI4X7GRvrbvuty8uVZzo0WamD2QDf+v0gNb/tD1u66rDPAbgN79+GYuo+FEaf
+         gdn7bzLmqxs9hNmDSoDbf9RZhaZDwVOQYZr1kTz4v1lQx/fbykz7BvnlqPLfyh3gUqDl
+         nmPw==
+X-Forwarded-Encrypted: i=1; AFNElJ8s0LaYJyEsAYfbQUJiH1xHU2w2ngHhMA7oxHD3u1Y/ei4dBcVAkNACTDO1NM6FAbIMtWqXxHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPMcbYEMtjqzaBDO9Ft+OYsf4+jKz05kcf3pjoNFTSQEYjVLQZ
+	Ss2wu+PQP0kL5iIe/Rf9QvGVx2kqaH2Pt0HXjXSSo8KhSwWn1R4UedHQq1mEZWgkrRtb
+X-Gm-Gg: AfdE7ckSpevG84QGJuDR3UKxu0ff3l1GFMWup/Mrevv5X4eJaKuJnU23fSG0rJEBIEB
+	zmjt1DASC9d31gylpmwt5r1vqCfMihR4h9TD+hC3BxT5k3HYB7ErbHXK0D8hOZstpbnvc9ZEVmr
+	Yv4dYNNTQ9n3a0wjLbaDllvv5LWcfl0/IjgkSFmhGPqH84omLkYfpkGgvrXdTRe4xXqTTfxfy2j
+	lhsSIbXKNOPfX8T8JIPCnW9kyIQ5yEqFo/YkPXQch7BjlKn4pjY+i8dvyhyEMQQm0Fd9T8/5X/N
+	uygmD/cHEXDTTnUhtS47PYGpRNY45LqR0F3f9XjHBLEErBNQcjXxfpyTINwY67Jt8F3I5wyOaBk
+	CReiEqqb9kCX4y3eld/s1lQGmW6wn7s7pk6btLkziWf5HSctrFj2TrtopJmeEUfUQ5qJGBo007g
+	7V
+X-Received: by 2002:a17:907:d86:b0:c08:dc83:b4f0 with SMTP id a640c23a62f3a-c108cdfb558mr150142766b.9.1782222906643;
+        Tue, 23 Jun 2026 06:55:06 -0700 (PDT)
+Received: from localhost ([2a06:61c2:d427:0:b321:1c7a:b072:326e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c60ac8284sm538307866b.34.2026.06.23.06.55.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 06:55:06 -0700 (PDT)
+From: Samuel Page <sam@bynar.io>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Samuel Page <sam@bynar.io>
+Subject: [PATCH net] tipc: fix out-of-bounds read in broadcast Gap ACK blocks
+Date: Tue, 23 Jun 2026 15:54:43 +0200
+Message-ID: <20260623135443.3662041-1-sam@bynar.io>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO9P265MB7950:EE_
-X-MS-Office365-Filtering-Correlation-Id: 970ba5c3-7513-4dc6-fa7f-08ded12edac3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|23010399003|10070799003|1800799024|921020|18002099003|22082099003|4143699003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	WtGUz4nXCe+cI4fITPELpdJOdOyTYdVAbSYKRUfo3m/V9oXq53/KEQgMRQnDafXIBUM1y7LJuZIIy783nnPD9G7KbnxiFvtdwGtobD4redLoB+EbYYArbTtN5nSd1n154OVwquexSfB5OQq0YKw6OOGJiF6vA5Lkz43LpheylO9QQG3t6lOgfHnXJTOSNgZnEZFmnxzOukvD0zC4oGyEOjYxxRpIue1XLHSMzKz/h59T00HwQgwLUAT/aLtGuUgFBS90VTSarYn65S8ghVbAFcqmPkKhlDfevJNepHNZDSTnYMOeXbI2eIqzWrjQ1UIMiIpkvlK/m7WHExqRiSiL/h4PueNg1QQQpZ60MYlzM+lOEzYPGtGtEz/fXsY84iU/7tDs/HSylNtsoiiLWm9XxY8Bpab6T+lBW/ApbKJcHHoTNRZgZkrC9znQICp/UBfKACp3YUHv36SaCFTaTKEJkaN/hutBVy0AFzTcPQJRrn9bq4eXSJy1kQhb0kGeYuBbSYiybIxn68w2MyHOmVqkAMhqS+0QwlnKAllYpfQm0ZcCA6nzqxaN3WjSbiFA+2d3v5xE/vZZD83ubWmm8z972p426x6DYjVg8T44/undw+aGYOiyLBdJyJEg4/Bb7bXxDtKjlorymNpZ3ulcBFddqyIM1+US+r7NhIO84byHZ3gcLKXLGdNZ/zChSeeM7tvNAODJantIIlteZCndKgH4pg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(23010399003)(10070799003)(1800799024)(921020)(18002099003)(22082099003)(4143699003)(56012099006);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WGtBMDZxWlRFeGJHVlYySmFIWUhzRzF6Y29YbjN0YkpXemNjWDNvYnVVZHVW?=
- =?utf-8?B?NFJFMWlWbWtnaXRZeTByM1JjZGkzbGt6VDJBSGdnc0JjaXBpblRqMEMrclUx?=
- =?utf-8?B?djFNMCswMUFpVjBSaFhqTkp5S3hCb1crcjBnT3JtcDBzUys1bWNZTkxnSzJM?=
- =?utf-8?B?c0NUY0hscFlDck5ZUW90azhOaHV1VEord3dJL21VSnRqckU5OVByM2paVUlx?=
- =?utf-8?B?OG1pU0c3TDJCZnE0RzFtMDNSR2RYT1J1eWNhTytWNGNQZ0JKclpVQytOb3l0?=
- =?utf-8?B?dExWWjk2RHIvTm96ZVcxTllsZmVuQjNWamxnaDNkalh0MkdiQWZyKy91M0lW?=
- =?utf-8?B?MTh1cStTNDdYQklZbnA4algwaC9JUkpVdzFTY04wKzZ2YkNKQ25xNWJIckUx?=
- =?utf-8?B?V210WUk2Z0UvMVJIR0RXanpHTmpDeDh5VFV0SnBvMUcrcFJ4eTVkU25yV1RI?=
- =?utf-8?B?RGlSdEVZNVJDQm1pMTI0UHVnTlhKT3VLQVRCbTFHWHVxRFUwM21DcDRYdlhm?=
- =?utf-8?B?RFU2c0Y0TDFvcVlETi9YYy9waGQ3S01QSm8yZGJNOXl6QlVaZy9jL0dLZWlQ?=
- =?utf-8?B?UWtsRjg4ZStrNHRlQy9ERGsrcFJhMUp5aUg4LzhDYmtPampFVERUL1hqMVJ5?=
- =?utf-8?B?aGNXMXU0dEZYY2V0Q0JTTmY3M1RzNFRuR3JxMUtabklCSDF3ZTBpM24wSjZu?=
- =?utf-8?B?Q1I1WVNZU0FqUGtrMlNWS1ByOWtzVXdTS214Z3M4eHpDd3RreWZpdGh3R2tZ?=
- =?utf-8?B?c1ZvaFJ6cUc3YVVPWVdqOElocTlDT1FQTEJ6OHdqQ29SOTVVK010QVA5VGx6?=
- =?utf-8?B?ZzRzK1cyMGMrRHBjVllldjF3THBTd1ZVNjRwTzJQdno0Y2lPcnRpTVRLRkxL?=
- =?utf-8?B?OHJFSzRBVFdWdlMzekxZMTloSVRROWY4WEpMcnpidExxeXh1eGZXRWtSdjB5?=
- =?utf-8?B?ZHF5Rzh3MVV4RlkxSkkzWFZRR25WU1NlTDViVFBZektTclZZM09wdnpSbVI3?=
- =?utf-8?B?TGVYc2I1RmJUWjd0Q3I3eG1pNGU0Sm9BYXVrVkI1V0d4VCsrY2hrSDlGSzR6?=
- =?utf-8?B?OHVRRFJrZzJuOTgxcjFwNzhUclhhbXJHdHUvNVZOUFNYc2lVN2tuUU1tMW5v?=
- =?utf-8?B?NG1ScjUySmJKMjJqd3lPa1ZNWG56SGVZN3NrRG5YOThXMVdFcGRJOXZrUXRr?=
- =?utf-8?B?WS9yZTk5VU1SaC9RbGRseng3ZWtzd2RqMi9tR1RXNUc2T045b1FBNGM3bTRV?=
- =?utf-8?B?bUZ0NDczeXZXZlNYV1RtTUxzWW13cjZWbE80T2g3SDU5aW9DVTl0VXc1SkRE?=
- =?utf-8?B?LzFyMEFYWDBHWjJTSVRZcStaUWdDaWZMRGgwUTJiTkdFRGRtRmcvaE9VNjVZ?=
- =?utf-8?B?YWdRMmlJRzU3NzRnQkxDVjhHbGVwdTBiWC9CU2Q1M2pVVjQ1UXpydno0cGtQ?=
- =?utf-8?B?eW9nclJ2Q3pwMnRuL2FhQy96Zy8wVXVpdEhWUzdCTTNlSHljVkRRbzF6Tzhw?=
- =?utf-8?B?akFNUWFodFNCZDlnZnNjM2dXMXc4N3crSy8rU1hTZU90STRwZFRDTUFONTF5?=
- =?utf-8?B?VGlHN2JNSkhldmVaZE9JODF2MTZRNjhLdXZjeTZoTm5TM04rVHFidVJqV1dw?=
- =?utf-8?B?K2duY05QeGNjcndZckpVb0xGRVg4YmxmNFdUWWFZcWgzM1hFWjEzeEh0dzdW?=
- =?utf-8?B?czlPN3NaRTBIM3dKSWNjeVRSbjhBaTg2UkxCb281NmliZE94ZjQ0dG05cDNL?=
- =?utf-8?B?MDlwR0FRV084STJxTlA4Q1lCQmJqVUIxWWhYa1cycW9aMU94ZUxOSEovdWRx?=
- =?utf-8?B?c3ROMHdnc3U3TzBSOHNVYzdiOFc2RjQ0SmY4S1p4ZHJGbmc5dlo4UDIzaUJJ?=
- =?utf-8?B?YlNWRm1FZ21VSDNKR1MrYVBsODlWVXM2aDR6SThVYTNaVGZBaUY0TWJFNmdm?=
- =?utf-8?B?aFh1MXRlL1dxNlg3WDFFd2lLOGt3dUxIcENtcGZLRDhKUWF1UXArVFFPbTEy?=
- =?utf-8?B?VGhtZERVVlZrOEJneWhNelJQaitXUHk1OHVKWUhMNU5rUGxCOWQrMUZ0TGdT?=
- =?utf-8?B?MHVwVHduMmpTZmxDeFh1blBYQkRqU1c1aDF5aU5BdmNSWHlYY3EvNmV3cFRL?=
- =?utf-8?B?Z3dHbkRSN3d6MjJJWEUwTDlFbUtWYUZUQWpaam5Ldy95NlRqUmhLYXdkelBN?=
- =?utf-8?B?UWZrM29TV1BYN0xmSFByVHU5L2wyM09vV0I4TVQwYUlNclpSM0s1d0crTk05?=
- =?utf-8?B?cksyVjZuK2pQVXBnQ2ZDYVhPN1pEN0JxYThHUWJ0S2ZmVVJzcGZqMnIrQ0Vx?=
- =?utf-8?B?MW1CVXJKUmZ1OHBFeFdkNGt1MzFXd2VhZEtydVV6WUg2Zit6bFVGQT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 970ba5c3-7513-4dc6-fa7f-08ded12edac3
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2026 13:53:50.2983
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9+aOxQ2/JEBMa0DPK2jyVDpvsA4qe1FtIAqjiyP0qOJB2lf0KqE1v+6labme7i+yFc0c9PK+yX1rL1XOqd/Jow==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO9P265MB7950
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
-	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301382-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@googlegroups.com,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:alvin.sun@linux.dev,m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:dakr@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:ira.weiny@intel.com,m:leon@kernel.org,m:igor.
- korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[linux.dev,kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,davidgow.net,debian.org,kernel.dk,intel.com,android.com];
-	FORGED_SENDER(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[garyguo.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301383-lists,netdev=lfdr.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:sam@bynar.io,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[bynar.io:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[garyguo.net:dkim,garyguo.net:email,garyguo.net:mid,garyguo.net:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:email,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,bynar.io:dkim,bynar.io:email,bynar.io:mid,bynar.io:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2EABD6B7A69
+X-Rspamd-Queue-Id: 39B0B6B7AA2
 
-On Tue Jun 23, 2026 at 7:29 AM BST, Alvin Sun wrote:
-> All users have been migrated to `ModuleMetadata::THIS_MODULE` const or
-> `this_module::<LocalModule>()` helper. The `static THIS_MODULE`
-> generated by the `module!` macro is no longer referenced anywhere,
-> so remove it to avoid having two sources of the same `ThisModule`
-> pointer.
->=20
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+A broadcast PROTOCOL/STATE_MSG can carry a Gap ACK blocks record in its
+data area. tipc_get_gap_ack_blks() only verifies that the record's len
+field is self-consistent with its ugack_cnt/bgack_cnt counts
+(sz == struct_size(p, gacks, ugack_cnt + bgack_cnt)); it does not check
+that the record actually fits in the message data area, msg_data_sz().
 
-Reviewed-by: Gary Guo <gary@garyguo.net>
+The unicast caller tipc_link_proto_rcv() bounds it ("if (glen > dlen)
+break;"), but the broadcast caller tipc_bcast_sync_rcv() discards the
+returned size, so tipc_link_advance_transmq() copies the record off the
+receive skb with an attacker-controlled count:
 
-> ---
->  rust/macros/module.rs | 16 ----------------
->  1 file changed, 16 deletions(-)
+	this_ga = kmemdup(ga, struct_size(ga, gacks, ga->bgack_cnt),
+			  GFP_ATOMIC);
+
+A TIPC neighbour that negotiated TIPC_GAP_ACK_BLOCK triggers it with one
+ordinary broadcast STATE_MSG (msg_bc_ack_invalid() clear), sized so its
+data area is short, carrying a Gap ACK record with len = 0x400,
+bgack_cnt = 0xff and ugack_cnt = 0. len then equals
+struct_size(p, gacks, 255), so the consistency check passes and ga is
+non-NULL; kmemdup() reads struct_size(ga, gacks, 255) = 1024 bytes out
+of the much smaller skb:
+
+  BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x48/0x60
+  Read of size 1024 at addr ffff0000c7030d38 by task poc864/69
+  Call trace:
+   kmemdup_noprof+0x48/0x60
+   tipc_link_advance_transmq+0x86c/0xb80
+   tipc_link_bc_ack_rcv+0x19c/0x1e0
+   tipc_bcast_sync_rcv+0x1c4/0x2c4
+   tipc_rcv+0x85c/0x1340
+   tipc_l2_rcv_msg+0xac/0x104
+  The buggy address belongs to the object at ffff0000c7030d00
+   which belongs to the cache skbuff_small_head of size 704
+  The buggy address is located 56 bytes inside of
+   allocated 704-byte region [ffff0000c7030d00, ffff0000c7030fc0)
+
+The copied-out bytes are subsequently consumed as gap/ack values, but
+the read is already out of bounds at the kmemdup() regardless of how
+they are used.
+
+Apply the same bound the unicast path uses to the broadcast caller: drop
+the Gap ACK blocks when the reported size exceeds the message data size.
+A NULL ga is already the defined "no Gap ACK blocks" case, so well-formed
+state messages are unaffected.
+
+Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
+Cc: stable@vger.kernel.org
+Assisted-by: Bynario AI
+Signed-off-by: Samuel Page <sam@bynar.io>
+---
+Before posting I found an earlier thread for what looks like the same (or a
+very closely related) issue:
+
+  https://lore.kernel.org/netdev/1316452e465e9a96fce44ec15130a14f3872149f.1775809727.git.caoruide123@gmail.com/
+  [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
+
+That one added the validation inside tipc_get_gap_ack_blks() and the thread
+stalled on whether the extra checks were redundant. This patch instead adds,
+on the broadcast caller, only the same bound the unicast path already applies,
+and includes the KASAN reproducer that was asked for there. 
+
+ net/tipc/bcast.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/net/tipc/bcast.c b/net/tipc/bcast.c
+index 76a1585d3f6b..61c83bd95755 100644
+--- a/net/tipc/bcast.c
++++ b/net/tipc/bcast.c
+@@ -502,6 +502,7 @@ int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
+ 	struct sk_buff_head *inputq = &tipc_bc_base(net)->inputq;
+ 	struct tipc_gap_ack_blks *ga;
+ 	struct sk_buff_head xmitq;
++	u16 glen;
+ 	int rc = 0;
+ 
+ 	__skb_queue_head_init(&xmitq);
+@@ -510,7 +511,10 @@ int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
+ 	if (msg_type(hdr) != STATE_MSG) {
+ 		tipc_link_bc_init_rcv(l, hdr);
+ 	} else if (!msg_bc_ack_invalid(hdr)) {
+-		tipc_get_gap_ack_blks(&ga, l, hdr, false);
++		/* Validate Gap ACK blocks, drop if invalid */
++		glen = tipc_get_gap_ack_blks(&ga, l, hdr, false);
++		if (glen > msg_data_sz(hdr))
++			ga = NULL;
+ 		if (!sysctl_tipc_bc_retruni)
+ 			retrq = &xmitq;
+ 		rc = tipc_link_bc_ack_rcv(l, msg_bcast_ack(hdr),
+
+base-commit: a986fde914d88af47eb78fd29c5d1af7952c3500
+-- 
+2.54.0
 
 
