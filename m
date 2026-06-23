@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-301422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301423-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oyMCOU/DOmqvGAgAu9opvQ
-	(envelope-from <netdev+bounces-301422-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:33:03 +0200
+	id RdJ9GI7DOmrOGAgAu9opvQ
+	(envelope-from <netdev+bounces-301423-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:34:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796316B914B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:33:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D3166B917A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:34:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=YB6SiHm5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301422-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301422-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=CFa+Bkjh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301423-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301423-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 185CB3046412
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:32:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4DCBE302B762
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352CF38B7DD;
-	Tue, 23 Jun 2026 17:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB1938BF81;
+	Tue, 23 Jun 2026 17:33:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7358338B7DC;
-	Tue, 23 Jun 2026 17:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA6F38B7DC;
+	Tue, 23 Jun 2026 17:33:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782235975; cv=none; b=fVROdJNbI9ZyUQ48wsbzsx9ab9QnipCPVLke0igXkeuV3zSsYLOc9j/ebSqLAIVmUyg5VAhEzMnPFs+VvS7S6fcPLIDlF1mv1ze2gX6jpWmgmRJdNuOgecHhqU4rofszjNs/dhacVHXvaZWOzt9VpbY3DrMBD8mR04O9kSXFOCY=
+	t=1782235989; cv=none; b=Mh2uAJYAmfWegHHd8hd0Z/OFc2DX6oCs7zIuGc3G17FCnBiZ5IcvsPIpP2dbuBd9xqK9teIMu/6lTjTSH3fTjVuB+n7g/vkhOV1Ps28gXxfATfiX5laZKxfZlj5gkbb5WjhX5PXN0Xk+rwDQ8qanV99lUiEvTKfum0zHsbvHL8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782235975; c=relaxed/simple;
-	bh=6DVBrnCq5bmt+ll0ZWJey6dNV/vHdCzXNW0bHcIz61o=;
+	s=arc-20240116; t=1782235989; c=relaxed/simple;
+	bh=FqPeAu2aXn50pK5Y76zeGXtcTS8WHY1hC22NrxzcURI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E3Z3avbCMnUhr6VB0fe/gmFclv4MD8hSWwjFpw2cH8/1DYEzOOwaSFgDefP9QLQqkgwrCgMPVB7rGSXMTha6sdKERwZuUrx56WSUh+lphUHTwyTBqxFDGzfLKO9Z9QAElls1Lov2+FFA4qZC+V/q0t1volBXY06s4ooCQi/RuIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YB6SiHm5; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=pryIcZ6imkscJ9TMNEo/MpuYjf/Cs/K7MuYOiisMmCjXEY1aca0BIiLOJIKvTkDJZntUbkAB8ah1rlmZCGQ22yzGULb3YBUL+STxObB7wkq/OPI4+eAu7DHMw5M8BiXdto3yQeW05w5NF/eh8G/921tqL7Ke5SPTpxC8+KbVjmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CFa+Bkjh; arc=none smtp.client-ip=198.175.65.10
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782235973; x=1813771973;
+  t=1782235988; x=1813771988;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=6DVBrnCq5bmt+ll0ZWJey6dNV/vHdCzXNW0bHcIz61o=;
-  b=YB6SiHm5scIuXyIrOG7oDLgBz9jNWn/0hRPhYxkAQUSp3Qitu9Hye+4V
-   ikLrp81OyC62DCVb7WeTwuNv905YwOfL6D0IhS4NyMViPfSjPV90V0xy0
-   h9Ms5kBzzC/JglMOVH7V8VTNaAD9gfEWs/aLy0SjmY0ZfH5FznLUaug6Y
-   SAwwIb0GxR3mXosU2crumT5W3wpk6IcmaRntrgt79kv1xIgYa8RLIyrcz
-   u0KhJpPkexfrlvZvofLswpMolvYvHdbl57yDdSSQ6/Hbsy+MGlyZwauJJ
-   AGphHH75idzVTl46aY48NU5jaBaJiCnkXhzyQbqB9Q1HWt5eHgdTYCRrr
-   w==;
-X-CSE-ConnectionGUID: cH6IhuWKT4+x/kM+gS0WEw==
-X-CSE-MsgGUID: +csoSylsSry3jXwYWJQUHw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11826"; a="100414772"
+  bh=FqPeAu2aXn50pK5Y76zeGXtcTS8WHY1hC22NrxzcURI=;
+  b=CFa+Bkjhss9yKkfEkjAXoLkwNcnRZxaEAcbUK7wjMOYUyi46aOoSusY7
+   bnFpX4u76eNt8sejlQ/yOpmiMTjCXmalwjwfFytFojrpuWGraaFJb/CEN
+   G0tAooX8BuXgKdk1qO8Mu4vb+UNaKGBZOW6Hg9MIcYRKdKaD8nCh3TdSO
+   iJcp5OApu4Ifol8Rvvjjzp9YczpVMc6ayqBItau/D05P8+zPQXnKtZeiA
+   TVs9ttQF+0amDMLQH/lk5Y8x14gxFyoMVaKgsbsidMgIm2X2XlWj6a4IG
+   GBaxH6HM/aWJ/pOxEL1qJsYlNFJpxHEtnp4cAJoD1yey01lqj/eqO1YSk
+   Q==;
+X-CSE-ConnectionGUID: edfUalfZSF6oCjhF7QaRDw==
+X-CSE-MsgGUID: q4qcMT07RMCVOdDMLzAq3w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11826"; a="100414824"
 X-IronPort-AV: E=Sophos;i="6.24,221,1774335600"; 
-   d="scan'208";a="100414772"
+   d="scan'208";a="100414824"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:32:52 -0700
-X-CSE-ConnectionGUID: 9oXY0NbYT6iPJFD0nsnnAA==
-X-CSE-MsgGUID: U20VLWv6Szal0E2YC7K6rA==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:33:08 -0700
+X-CSE-ConnectionGUID: Nj7kMV99Q/iFc2psnBJV0A==
+X-CSE-MsgGUID: 3zwjpVILRhyHzkyNiWFHkg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,221,1774335600"; 
-   d="scan'208";a="248700399"
+   d="scan'208";a="248700437"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:32:53 -0700
-Date: Tue, 23 Jun 2026 10:32:52 -0700
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 10:33:08 -0700
+Date: Tue, 23 Jun 2026 10:33:07 -0700
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -96,9 +96,9 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v12 01/12] x86/bhi: x86/vmscape: Move LFENCE out of
- clear_bhb_loop()
-Message-ID: <20260622-vmscape-bhb-v12-1-76cbda0ae3e5@linux.intel.com>
+Subject: [PATCH v12 02/12] x86/bhi: Make clear_bhb_loop() effective on newer
+ CPUs
+Message-ID: <20260622-vmscape-bhb-v12-2-76cbda0ae3e5@linux.intel.com>
 X-Mailer: b4 0.16-dev
 References: <20260622-vmscape-bhb-v12-0-76cbda0ae3e5@linux.intel.com>
 Precedence: bulk
@@ -117,12 +117,12 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301422-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301423-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,akamai.com,goodmis.org,linuxfoundation.org];
 	RCPT_COUNT_TWELVE(0.00)[42];
@@ -142,113 +142,109 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nutanix.com:email,suse.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,alien8.de:email,vger.kernel.org:from_smtp,linux.intel.com:mid,linux.intel.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,linux.intel.com:from_mime,vger.kernel.org:from_smtp,alien8.de:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 796316B914B
+X-Rspamd-Queue-Id: 5D3166B917A
 
-Currently, the BHB clearing sequence is followed by an LFENCE to prevent
-transient execution of subsequent indirect branches prematurely. However,
-the LFENCE barrier could be unnecessary in certain cases. For example, when
-the kernel is using the BHI_DIS_S mitigation, and BHB clearing is only
-needed for userspace. In such cases, the LFENCE is redundant because ring
-transitions would provide the necessary serialization.
+As a mitigation for BHI, clear_bhb_loop() executes branches that overwrite
+the Branch History Buffer (BHB). On Alder Lake and newer parts this
+sequence is not sufficient because it doesn't clear enough entries. This
+was not an issue because these CPUs use the BHI_DIS_S hardware mitigation
+in the kernel.
 
-Below is a quick recap of BHI mitigation options:
+Now with VMSCAPE (BHI variant) it is also required to isolate branch
+history between guests and userspace. Since BHI_DIS_S only protects the
+kernel, the newer CPUs also use IBPB.
 
-On Alder Lake and newer
+A cheaper alternative to the current IBPB mitigation is clear_bhb_loop().
+But it currently does not clear enough BHB entries to be effective on newer
+CPUs with larger BHB. At boot, dynamically set the loop count of
+clear_bhb_loop() such that it is effective on newer CPUs too.
 
-    BHI_DIS_S: Hardware control to mitigate BHI in ring0. This has low
-    performance overhead.
-
-    Long loop: Alternatively, a longer version of the BHB clearing sequence
-    can be used to mitigate BHI. It can also be used to mitigate the BHI
-    variant of VMSCAPE. This is not yet implemented in Linux.
-
-On older CPUs
-
-    Short loop: Clears BHB at kernel entry and VMexit. The "Long loop" is
-    effective on older CPUs as well, but should be avoided because of
-    unnecessary overhead.
-
-On Alder Lake and newer CPUs, eIBRS isolates the indirect targets between
-guest and host. But when affected by the BHI variant of VMSCAPE, a guest's
-branch history may still influence indirect branches in userspace. This
-also means the big hammer IBPB could be replaced with a cheaper option that
-clears the BHB at exit-to-userspace after a VMexit.
-
-In preparation for adding the support for the BHB sequence (without LFENCE)
-on newer CPUs, move the LFENCE to the caller side after clear_bhb_loop() is
-executed. Allow callers to decide whether they need the LFENCE or not. This
-adds a few extra bytes to the call sites, but it obviates the need for
-multiple variants of clear_bhb_loop().
+Introduce global loop counts, initializing them with appropriate value
+based on the hardware feature X86_FEATURE_BHI_CTRL.
 
 Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-Tested-by: Jon Kohler <jon@nutanix.com>
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- arch/x86/entry/entry_64.S            | 5 ++++-
- arch/x86/include/asm/nospec-branch.h | 4 ++--
- arch/x86/net/bpf_jit_comp.c          | 2 ++
- 3 files changed, 8 insertions(+), 3 deletions(-)
+ arch/x86/entry/entry_64.S            |  8 +++++---
+ arch/x86/include/asm/nospec-branch.h |  2 ++
+ arch/x86/kernel/cpu/bugs.c           | 13 +++++++++++++
+ 3 files changed, 20 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index 42447b1e1dff..3a180a36ca0e 100644
+index 3a180a36ca0e..bbd4b1c7ec04 100644
 --- a/arch/x86/entry/entry_64.S
 +++ b/arch/x86/entry/entry_64.S
-@@ -1528,6 +1528,9 @@ SYM_CODE_END(rewind_stack_and_make_dead)
-  * refactored in the future if needed. The .skips are for safety, to ensure
-  * that all RETs are in the second half of a cacheline to mitigate Indirect
-  * Target Selection, rather than taking the slowpath via its_return_thunk.
-+ *
-+ * Note, callers should use a speculation barrier like LFENCE immediately after
-+ * a call to this function to ensure BHB is cleared before indirect branches.
-  */
- SYM_FUNC_START(clear_bhb_loop)
+@@ -1536,7 +1536,9 @@ SYM_FUNC_START(clear_bhb_loop)
  	ANNOTATE_NOENDBR
-@@ -1562,7 +1565,7 @@ SYM_FUNC_START(clear_bhb_loop)
- 	sub	$1, %ecx
- 	jnz	1b
- .Lret2:	RET
--5:	lfence
-+5:
- 	pop	%rbp
- 	RET
- SYM_FUNC_END(clear_bhb_loop)
+ 	push	%rbp
+ 	mov	%rsp, %rbp
+-	movl	$5, %ecx
++
++	movzbl    bhb_seq_outer_loop(%rip), %ecx
++
+ 	ANNOTATE_INTRA_FUNCTION_CALL
+ 	call	1f
+ 	jmp	5f
+@@ -1556,8 +1558,8 @@ SYM_FUNC_START(clear_bhb_loop)
+ 	 * This should be ideally be: .skip 32 - (.Lret2 - 2f), 0xcc
+ 	 * but some Clang versions (e.g. 18) don't like this.
+ 	 */
+-	.skip 32 - 18, 0xcc
+-2:	movl	$5, %eax
++	.skip 32 - 20, 0xcc
++2:	movzbl  bhb_seq_inner_loop(%rip), %eax
+ 3:	jmp	4f
+ 	nop
+ 4:	sub	$1, %eax
 diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index 4f4b5e8a1574..70b377fcbc1c 100644
+index 70b377fcbc1c..87b83ae7c97f 100644
 --- a/arch/x86/include/asm/nospec-branch.h
 +++ b/arch/x86/include/asm/nospec-branch.h
-@@ -331,11 +331,11 @@
+@@ -548,6 +548,8 @@ DECLARE_PER_CPU(u64, x86_spec_ctrl_current);
+ extern void update_spec_ctrl_cond(u64 val);
+ extern u64 spec_ctrl_current(void);
  
- #ifdef CONFIG_X86_64
- .macro CLEAR_BRANCH_HISTORY
--	ALTERNATIVE "", "call clear_bhb_loop", X86_FEATURE_CLEAR_BHB_LOOP
-+	ALTERNATIVE "", "call clear_bhb_loop; lfence", X86_FEATURE_CLEAR_BHB_LOOP
- .endm
++extern u8 bhb_seq_inner_loop, bhb_seq_outer_loop;
++
+ /*
+  * With retpoline, we must use IBRS to restrict branch prediction
+  * before calling into firmware.
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 83f51cab0b1e..2cb4a96247d8 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -2047,6 +2047,10 @@ enum bhi_mitigations {
+ static enum bhi_mitigations bhi_mitigation __ro_after_init =
+ 	IS_ENABLED(CONFIG_MITIGATION_SPECTRE_BHI) ? BHI_MITIGATION_AUTO : BHI_MITIGATION_OFF;
  
- .macro CLEAR_BRANCH_HISTORY_VMEXIT
--	ALTERNATIVE "", "call clear_bhb_loop", X86_FEATURE_CLEAR_BHB_VMEXIT
-+	ALTERNATIVE "", "call clear_bhb_loop; lfence", X86_FEATURE_CLEAR_BHB_VMEXIT
- .endm
- #else
- #define CLEAR_BRANCH_HISTORY
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index ea9e707e8abf..f58ff2891d7d 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -1624,6 +1624,8 @@ static int emit_spectre_bhb_barrier(u8 **pprog, u8 *ip,
- 
- 		if (emit_call(&prog, func, ip))
- 			return -EINVAL;
-+		/* Don't speculate past this until BHB is cleared */
-+		EMIT_LFENCE();
- 		EMIT1(0x59); /* pop rcx */
- 		EMIT1(0x58); /* pop rax */
++/* Default to short BHB sequence values */
++u8 bhb_seq_outer_loop __ro_after_init = 5;
++u8 bhb_seq_inner_loop __ro_after_init = 5;
++
+ static int __init spectre_bhi_parse_cmdline(char *str)
+ {
+ 	if (!str)
+@@ -3242,6 +3246,15 @@ void __init cpu_select_mitigations(void)
+ 		x86_spec_ctrl_base &= ~SPEC_CTRL_MITIGATIONS_MASK;
  	}
+ 
++	/*
++	 * Switch to long BHB clear sequence on newer CPUs (with BHI_CTRL
++	 * support), see Intel's BHI guidance.
++	 */
++	if (cpu_feature_enabled(X86_FEATURE_BHI_CTRL)) {
++		bhb_seq_outer_loop = 12;
++		bhb_seq_inner_loop = 7;
++	}
++
+ 	x86_arch_cap_msr = x86_read_arch_cap_msr();
+ 
+ 	cpu_print_attack_vectors();
 
 -- 
 2.34.1
