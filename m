@@ -1,120 +1,57 @@
-Return-Path: <netdev+bounces-301282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301267-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vTTEDBUrOmrd3AcAu9opvQ
-	(envelope-from <netdev+bounces-301282-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:43:33 +0200
+	id ABwIL6skOmoL2gcAu9opvQ
+	(envelope-from <netdev+bounces-301267-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:16:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02C16B49E0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:43:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6666B4670
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:16:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=PBUsv3iF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301282-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301282-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301267-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301267-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E251B300E275
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:43:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 689D53014375
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0E53AB262;
-	Tue, 23 Jun 2026 06:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691A73B27C6;
+	Tue, 23 Jun 2026 06:16:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f97.google.com (mail-ot1-f97.google.com [209.85.210.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4F4331EAF
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 06:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5467D3ACA79;
+	Tue, 23 Jun 2026 06:16:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782197011; cv=none; b=d7kd5wQWbwc7p8HH+3jAfNtzetqsJTjLik4D+kkY3BudoVUIosUYWrBzF5J2Ufq9FY8/0gO9X88osiRmzBRsgV6xr189xapRvTOBp2aTSe4XcLysEBj1+t0bR3vmUdibeXPfY4MUPhy/19qyKlhsdVaykVdI0+dGKLNc71SE88I=
+	t=1782195366; cv=none; b=KrY550VP3e6r04KLlV8nlZMWkIlnqAkyc7Ptgb00gnrAundVimGWhG0PLlKY4K+js2zRRNrqdVSXvIMDNWAhSNB9qBkR1Vfh/JUYFnhEQGQ9KAFdVWQ4P+oQzeFap8RhbKF8mTK8zrt5ozFwBLtg5ndWy6P0tXhRgsWXiLynynY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782197011; c=relaxed/simple;
-	bh=hwdcxQZyp1DiMpjzaka9N2DHGUC+C3QJjPD7Z9vvutk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O6Sh7eqH+9AWAMbELy1OWIIXDGHKKKastkty4ZMpFiJkJ200Z25/ATupjGtjCIayrWcxhu84UwoB890agsFCJ65xc4qeRrP7TxmvZ7Yx09cirfyimk6QWNR9Ict6ICq+ENkxvRy7JaAFTi27PacYQ/2UBSCDhzuYmb4rYRNsszo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PBUsv3iF; arc=none smtp.client-ip=209.85.210.97
-Received: by mail-ot1-f97.google.com with SMTP id 46e09a7af769-7e6e41cf7aeso2531383a34.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 23:43:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782197008; x=1782801808;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fy4aFh7UcrzBTSJogToF7QAZLN083cdJaTVBVx/OKCs=;
-        b=MSH6R/FBHUuE+x6fAgsH84oKmGFAqqoDN7iQHZ954iqdjkQauZbaC77TWtJLstM+CY
-         tXMp5pWwuCU+bH0X7j5OWK4ohir5lRnrsG1bF9BOAhJqkId+pA3Xh4wYDvOnv43bexsr
-         xoA5OjdPmV3qGPdD1C3K/mpRDY9523XbVPHf80vhOGAjt609PsoisPM9D0CApOjk3n32
-         G5fAcOqRHAlafFRWVr381E5z+lb73UeZA0NLGvfO5XHfHGvl25vjr2+ZD5Qp/f9F1aqm
-         fN9aFXlkTxfeEt1N6u+ioMUa0Uc1mMmSh12IfFVkC6BawQoSqLE50R6L73oVLL5hhU+u
-         P4rg==
-X-Forwarded-Encrypted: i=1; AFNElJ+Q5a4kZCdFy06nmLQQqSoIMKNHYkI+KqEvDCGBAcpPDSPDUCSpaC0XQdikExuPDnmmHW55tAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLa0kxLQStrXy5bPseKlBISwVJelLw+Ura8bAyY2cSMsh0DLEt
-	7jzy7ZsaLqtokIw+G/emzObYqr17QfjJWdQ0KEFT2AFkAnRoRsHhlEO8fHipbgbplWG6t0GT/bk
-	mx7BJx5t9djZuPadlYUGbfJWczWLwpbe0xC++jjTLc88zuwWRrCitJt5fO2c3mjK8JFmKEcNq2I
-	jkskrQESidy43nBqrJKiS0DJMde0Pm7uvgqXexLlZKQyoKwvkGkno5K1u0B/Tkcnsv1CSb1EHjX
-	ECe8nitKVSmNM0=
-X-Gm-Gg: AfdE7cmFxEQ8VVhlQp5Ftx0kT1LNd6pnR5i74uRq8tHZQnLGgv+bl/B+FM2hCNXYlaL
-	Eq3vX5mvEV/0sWyNQCLzilW5Xj61Q7+oQbn+zVvRA28oHQtEEvGEZWhBNmun0DPi5Y1HE+wLVQq
-	16Aunt0u+jXz8avrIEtNHxdoiwm07FTqQrrpEFKUSfDeRuAM4NPxigh7sMUcTL8XcDLq8YiivCo
-	bhOCPTE9G5n5ZfL9Ae6+Nr7O7CuI3oZ9RxnZQZICg78My1qLYZT00+1dWWG3IQWcOyqXBgwf1M2
-	X5V7RZTfWuEsq0E+Vah79ehDWyNF96uLfbUktmr0bhZDpQpaXQu26wj5UCpCrLieuhEGfsu8SnB
-	vk1kfnmvY1oQZ5065LBoH9Vy38sFlj7jk/V/I547KXy49sfNKsPUSWWwjjrmxL50FB0W4fzaGJH
-	CSRnYYyzrVsr3G7WnpTnyGzAijAu0lg4Z64tETO+dBnVgyIeAglA==
-X-Received: by 2002:a05:6830:2306:b0:7dc:d7e8:cb37 with SMTP id 46e09a7af769-7e9794fad9cmr1092393a34.21.1782197008313;
-        Mon, 22 Jun 2026 23:43:28 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-29.dlp.protect.broadcom.com. [144.49.247.29])
-        by smtp-relay.gmail.com with ESMTPS id 46e09a7af769-7e94420575dsm708069a34.4.2026.06.22.23.43.27
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jun 2026 23:43:28 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-1384427c3efso6769399c88.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 23:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1782197007; x=1782801807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fy4aFh7UcrzBTSJogToF7QAZLN083cdJaTVBVx/OKCs=;
-        b=PBUsv3iFQzf3S16YaoJvUl7nxLpID7JZ9ISmn2WvvFZh+EBUUVUpEIzpcmA1zD5Msu
-         yJOGoFNuNknIZKcfa3L+VJd7gPym/NDiWS7Z4MOxQN9evuTOw+7ozPFU1mRFMnwGAE+n
-         u2fnAvTrdUufJVeCfIChacn4jkY2L+dHBFmYY=
-X-Forwarded-Encrypted: i=1; AFNElJ+4bWN+kYFwm05Gy60xyCT72R/PV8BquryrrRYbqRA0+iU6eiaPlsi63T03X0xefXgmxE9qYB0=@vger.kernel.org
-X-Received: by 2002:a05:7022:69d:b0:138:267:af4a with SMTP id a92af1059eb24-139c5cdad1bmr1260130c88.8.1782197006859;
-        Mon, 22 Jun 2026 23:43:26 -0700 (PDT)
-X-Received: by 2002:a05:7022:69d:b0:138:267:af4a with SMTP id a92af1059eb24-139c5cdad1bmr1260089c88.8.1782197006208;
-        Mon, 22 Jun 2026 23:43:26 -0700 (PDT)
-Received: from shivania.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139adcb7aabsm13598321c88.5.2026.06.22.23.43.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2026 23:43:25 -0700 (PDT)
-From: Shivani Agarwal <shivani.agarwal@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: pablo@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
+	s=arc-20240116; t=1782195366; c=relaxed/simple;
+	bh=dltAV1c0sfR46UqvP8RllgnPbtkyfse/asDFH0vbGjk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nioQtPt9PTTj7qV1O1C6E8WvnprH0F0KW1cdUEHRaaNAs/xI/TQlGYEnwWO3gWXMEUn2NZq3VgFPT6JjPS3eshIs7kcNwqjuSYHBJxLNLawzSxGRMSzCJPnhGq1qsYl1IpsNMpjTF+UbC8ord6dFcGS2pv7JjZQlRKPUVWo1HDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Received: from localhost.localdomain (unknown [111.196.245.140])
+	by APP-05 (Coremail) with SMTP id zQCowADHINSVJDpqLTTKFA--.5253S2;
+	Tue, 23 Jun 2026 14:15:49 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	yin.ding@broadcom.com,
-	tapas.kundu@broadcom.com,
-	Yiming Qian <yimingqian591@gmail.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Shivani Agarwal <shivani.agarwal@broadcom.com>
-Subject: [PATCH v2 v6.6-v6.1] netfilter: nf_tables: always walk all pending catchall elements
-Date: Mon, 22 Jun 2026 23:14:04 -0700
-Message-Id: <20260623061404.1288986-1-shivani.agarwal@broadcom.com>
-X-Mailer: git-send-email 2.25.1
+	linux-kernel@vger.kernel.org
+Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Subject: [PATCH net] net: bcmgenet: report MDIO busy timeout
+Date: Tue, 23 Jun 2026 14:15:24 +0800
+Message-ID: <20260623061524.51411-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -122,97 +59,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-CM-TRANSID:zQCowADHINSVJDpqLTTKFA--.5253S2
+X-Coremail-Antispam: 1UD129KBjvdXoWruw1Duw1xCF15KFW3CFyUZFb_yoWkKrX_Ww
+	4vqF9rGw48KFyqkw42yr45A34I9FWqvr1kua4I9ryaga9xZw17Zws5Ary5AryDWFWxZF98
+	Jw1aya4fA34I9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8Jw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbUPEDUUUUU==
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301282-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,broadcom.com,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ajay.kaher@broadcom.com,m:alexey.makhalov@broadcom.com,m:vamsi-krishna.brahmajosyula@broadcom.com,m:yin.ding@broadcom.com,m:tapas.kundu@broadcom.com,m:yimingqian591@gmail.com,m:sashal@kernel.org,m:shivani.agarwal@broadcom.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301267-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_SENDER(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:pengpeng@iscas.ac.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[shivani.agarwal@broadcom.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shivani.agarwal@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,broadcom.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E02C16B49E0
+X-Rspamd-Queue-Id: 4B6666B4670
 
-From: Florian Westphal <fw@strlen.de>
+bcmgenet_mii_wait() waits for the UNIMAC MDIO command busy bit to clear,
+but ignores wait_event_timeout() and always returns success.
 
-[ Upstream commit 7cb9a23d7ae40a702577d3d8bacb7026f04ac2a9 ]
+Return -ETIMEDOUT when the busy bit remains set for the whole wait
+period so MDIO callers see the failed transaction instead of continuing
+as if the bus were idle.
 
-During transaction processing we might have more than one catchall element:
-1 live catchall element and 1 pending element that is coming as part of the
-new batch.
-
-If the map holding the catchall elements is also going away, its
-required to toggle all catchall elements and not just the first viable
-candidate.
-
-Otherwise, we get:
- WARNING: ./include/net/netfilter/nf_tables.h:1281 at nft_data_release+0xb7/0xe0 [nf_tables], CPU#2: nft/1404
- RIP: 0010:nft_data_release+0xb7/0xe0 [nf_tables]
- [..]
- __nft_set_elem_destroy+0x106/0x380 [nf_tables]
- nf_tables_abort_release+0x348/0x8d0 [nf_tables]
- nf_tables_abort+0xcf2/0x3ac0 [nf_tables]
- nfnetlink_rcv_batch+0x9c9/0x20e0 [..]
-
-Fixes: 628bd3e49cba ("netfilter: nf_tables: drop map element references from preparation phase")
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[ Shivani: Modified to apply on v6.6.y-v6.1.y ]
-Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- net/netfilter/nf_tables_api.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/net/ethernet/broadcom/genet/bcmmii.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 201e2cc04539..3de8895bb991 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -627,7 +627,6 @@ static void nft_map_catchall_deactivate(const struct nft_ctx *ctx,
- 		elem.priv = catchall->elem;
- 		nft_set_elem_change_active(ctx->net, set, ext);
- 		nft_setelem_data_deactivate(ctx->net, set, &elem);
--		break;
- 	}
- }
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+index a4e0d5a68268..92b5997d00b2 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+@@ -439,10 +439,12 @@ static int bcmgenet_mii_wait(void *wait_func_data)
+ {
+ 	struct bcmgenet_priv *priv = wait_func_data;
  
-@@ -5243,7 +5242,6 @@ static void nft_map_catchall_activate(const struct nft_ctx *ctx,
- 		nft_clear(ctx->net, ext);
- 		elem.priv = catchall->elem;
- 		nft_setelem_data_activate(ctx->net, set, &elem);
--		break;
- 	}
+-	wait_event_timeout(priv->wq,
+-			   !(bcmgenet_umac_readl(priv, UMAC_MDIO_CMD)
+-			   & MDIO_START_BUSY),
+-			   HZ / 100);
++	if (!wait_event_timeout(priv->wq,
++				!(bcmgenet_umac_readl(priv, UMAC_MDIO_CMD)
++				& MDIO_START_BUSY),
++				HZ / 100))
++		return -ETIMEDOUT;
++
+ 	return 0;
  }
  
 -- 
-2.25.1
+2.50.1 (Apple Git-155)
 
 
