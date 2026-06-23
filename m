@@ -1,84 +1,51 @@
-Return-Path: <netdev+bounces-301514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XTKoF8oJO2pePAgAu9opvQ
-	(envelope-from <netdev+bounces-301514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 00:33:46 +0200
+	id 9vfFJigKO2qBPAgAu9opvQ
+	(envelope-from <netdev+bounces-301515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 00:35:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43C16BA6E4
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 00:33:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD6A6BA6FB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 00:35:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bynar.io header.s=google header.b=Uadk5vg0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301514-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301514-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bynar.io;
+	dkim=pass header.d=arm.com header.s=foss header.b=G5flbO5J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301515-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301515-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=arm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8FEC3013D58
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:33:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3277A300DDF9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7280A3749F0;
-	Tue, 23 Jun 2026 22:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D271388E59;
+	Tue, 23 Jun 2026 22:35:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F069E1DE4FB
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 22:33:27 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB43371D11;
+	Tue, 23 Jun 2026 22:35:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782254010; cv=none; b=QZ2+7JZK96RpWvcU1LW7D34+06607cqAKWd8XiUku2+I3/Ji+fgPOGYDVj+czJ0HJREv0GvZznn3F4IRx0zXVFsCW1UF+IJR4j9brVowKEZg3P5UhJuUyIDgR1lHFjiMr7oryK0vNehgbSl/NJYMq9uVE5G6UDGRWTvfK2o3iBc=
+	t=1782254116; cv=none; b=lHwd2H3OzYHcwexhBOOpcu/mdx9660Wfxm2okjoKUZDbXzNHuEhYKGchJA6DTFtVhKErL4CQfg6X7Iu3y5HM7ePNol3j+9EJuqcq1fHSsxJG6sGPs9nIEFE3cJ0vhV13Omyuy7cTT2VAh6cDVHtG7tE323j4qy8yNRzf9aYgP/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782254010; c=relaxed/simple;
-	bh=28fitR7AD3p5MIhLTudcCTvDU4SWVERttyDPYSu3Y2k=;
+	s=arc-20240116; t=1782254116; c=relaxed/simple;
+	bh=SRPt/Z1N9zfS5tVZtHc1Ym/DJpa09C6NIWLnEJarli8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kEk7s8oU6hKinSYbE09VYMz2ChdUPUD7sY3si46bXerUiWEve+Abm02PvwbdAIA8QqvxGLOm+O5QcqjgIBjA+wafmLFgK8UqFZBQwoLICWoFSVlnAcC1jlobCe8Gvu8A5W7x1Voppa/loEJTKjZ7VyVvEHV4PHyivUMIonqI8XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=Uadk5vg0; arc=none smtp.client-ip=209.85.208.48
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-697b8540279so567097a12.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 15:33:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bynar.io; s=google; t=1782254006; x=1782858806; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iQe2zkk4/rX7iIUXwjPWxzQOps0a3V9iYGHKEVDhy8o=;
-        b=Uadk5vg0yJWg2f0ravOpdU6TFLnE+Zs1Qj//ttPrWAU5ID4ir4XOez7+9m/cVncHnD
-         hMLvA6JzzmZRNemRVK95Xg9Lp2eslpmGJdgSsJiKd4NKMOfT3iitXR/xPXgPyy90j77s
-         bg1QPPidpUWBBNBAtfSMcgJXPVDDVqZMt2fTJIwR8mNiesAmvKTHihsOfe8ygezqUZ9r
-         0U+2XtdhFo84EfEIecd/lEkzWy7I9ao1y8TAmMk7uAijQLnXu/LX3xZf61hL3a88R5fY
-         Yuy1ItkWGm84kIEo+IteHVdOy1eCxfcz2Y9I0doz3uBaADi6JNaF8KpcyG7A8stHiPSn
-         1f6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782254006; x=1782858806;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iQe2zkk4/rX7iIUXwjPWxzQOps0a3V9iYGHKEVDhy8o=;
-        b=dz+iPZrkVH5GuTIq5kit6AY8TKCRGbtsU0TYwOFv+l451oBw1OG023Hdj2CChKmBTI
-         JXZdwEdPjS00vBB+i8uzzX0/sFnR6Iq4rgorx8m8VBaeH6CSq4KUZPNmvMU+lO52muR7
-         CWAue2be0+yKyBGedWG2pzWmC9ihmVra3Dh4SN4tgTGL9MQ5GNlR/LFeZMA/txlQvcTF
-         GeEf/u598Rv1zy/blsbOPL1qmH4JC0vTFHTHiTLLcdaYJb6hdT1j/zf23ZDsLBCikeyU
-         uqKHm3AbrtRNwnimk2dTkebs2fOcH/PCVSo7PQgh50Im8hKVNvwL8yTGxsvFnVYRoebC
-         T8nw==
-X-Forwarded-Encrypted: i=1; AFNElJ/Q25QiYm/BQzCcT5auDDHpbvFchg8xF7CfwV1I1KtqJKJknZv+QFz3i8kOyqNVb0r+3L7+abU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0xvyDlGHqnTvXINl2SD4vsK0wRKw2uiMrKfj2fzqGFLDLNWpq
-	LD6izLIyefZ4Fb6NXuzqLJ0H3iFgULNDmUJdTCbfstzDE6YwYQ+tG++YEMsQGMW8Wuh9
-X-Gm-Gg: AfdE7cn+GwTZaJTerCtuEpFYa3GauDKbYsyOKS0/GnfqGomBkj5bRqzNpn5Wez5h/Dq
-	oOMR8HrS3SfMHWoxXth2jf/SS4n7t5jHCzejKo4ZmMnZkaNHNNDVCTYznjsUaMX5ZXCMw7U9ZtB
-	MmnOj0MdgwTwd81Wp/ZmfEgJ5VAGQ2oemJ31fs5PRCg7XjqFagIE3xWqU55UWFQ+kZ3UPNkuNfh
-	XhC2WNdDKzA0wKDbt+pYjyC5gOZtG92L4YxT4hALfJeCfB3vSEJGuJfZHAwZ3+GjgtDhlTg2F2H
-	q8HOJVEf4DJfRoIrweXulezvhQfGRjNJsnER4dyL60e/Hp7RLRx0FNIbIJ8vvxO2rYRStqK1MaK
-	Rsjtg6aZZ+9Pk0n2Lyw3lmoNApuEnZpNCImW22hnDTcdb5UlTObqDhN9fLpsmJUCk0pqfK19pCe
-	2abVlcpH6FOuaa11g8fKxKzUGSWKaDI/T5/JbuoQMqnODWV//77EZZmD5M
-X-Received: by 2002:a05:6402:190b:b0:697:98dc:1196 with SMTP id 4fb4d7f45d1cf-697db815650mr2261536a12.0.1782254006268;
-        Tue, 23 Jun 2026 15:33:26 -0700 (PDT)
-Received: from ?IPV6:2a06:61c2:d427:0:b321:1c7a:b072:326e? ([2a06:61c2:d427:0:b321:1c7a:b072:326e])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f4bd44d0sm125957a12.29.2026.06.23.15.33.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2026 15:33:23 -0700 (PDT)
-Message-ID: <443e2ee1-e9c1-45ca-be57-0c67966ec7d9@bynar.io>
-Date: Wed, 24 Jun 2026 00:33:21 +0200
+	 In-Reply-To:Content-Type; b=p/qxonJ7W5O8R0pMS+u3td0044Ai2mM1pWRi5PVYvX1bCLfzcoBvevMOggYdOjV2DAtdCbHL/qocuOIKVeMPzVOdqJkQwswlxmkgp+ZuZZ4yHkHttNEVHSsv+nqdOf3Nj4cUdd5i0vOCDci5pGgzRoaSzAXQWUiPs+PwI86Vtmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=G5flbO5J; arc=none smtp.client-ip=217.140.110.172
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B3EC1713;
+	Tue, 23 Jun 2026 15:35:07 -0700 (PDT)
+Received: from [10.43.8.246] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B3D423F632;
+	Tue, 23 Jun 2026 15:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1782254112; bh=SRPt/Z1N9zfS5tVZtHc1Ym/DJpa09C6NIWLnEJarli8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=G5flbO5JtjY2PHGG2ojKGXX8SqI+2MRfa+r6LYez6kIYWrMO5mYm3Z02byPITyVx5
+	 yIv7eGXrRte6UNWeKzB1Oryv66h5vXQEk1IcivwwfWgcjoIuMI/XRYk4euGrcbvraI
+	 pTYpub3JKKI8VTcq9p5Y59S2sQJTxCa6efj4jEfE=
+Message-ID: <138b5b54-7e2a-45fd-9c3f-eb4b4e04d954@arm.com>
+Date: Tue, 23 Jun 2026 23:35:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,262 +53,278 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] nfc: nci: fix out-of-bounds write in
- nci_target_auto_activated()
-To: Simon Horman <horms@kernel.org>
-Cc: david@ixit.cz, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260622145243.3167276-1-sam@bynar.io>
- <20260623172109.1105965-2-horms@kernel.org>
-Content-Language: en-GB
-From: Sam P <sam@bynar.io>
-In-Reply-To: <20260623172109.1105965-2-horms@kernel.org>
+Subject: Re: [PATCH RFC 5/8] clk: sunxi-ng: a733: Add bus clocks support
+To: Junhui Liu <junhui.liu@pigmoral.tech>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Chen-Yu Tsai <wens@kernel.org>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Paul Walmsley <pjw@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org
+References: <20260310-a733-clk-v1-0-36b4e9b24457@pigmoral.tech>
+ <20260310-a733-clk-v1-5-36b4e9b24457@pigmoral.tech>
+Content-Language: en-US
+From: Andre Przywara <andre.przywara@arm.com>
+In-Reply-To: <20260310-a733-clk-v1-5-36b4e9b24457@pigmoral.tech>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
+	R_DKIM_ALLOW(-0.20)[arm.com:s=foss];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bynar.io:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301514-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301515-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[pigmoral.tech,baylibre.com,kernel.org,gmail.com,sholland.org,pengutronix.de,dabbelt.com,eecs.berkeley.edu,ghiti.fr];
+	FORGED_RECIPIENTS(0.00)[m:junhui.liu@pigmoral.tech,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:wens@kernel.org,m:jernej.skrabec@gmail.com,m:samuel@sholland.org,m:p.zabel@pengutronix.de,m:pjw@kernel.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:alex@ghiti.fr,m:richardcochran@gmail.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-sunxi@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-riscv@lists.infradead.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:jernejskrabec@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andre.przywara@arm.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[sam@bynar.io,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:david@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andre.przywara@arm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arm.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bynar.io:dkim,bynar.io:mid,bynar.io:from_mime,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pigmoral.tech:email,vger.kernel.org:from_smtp,arm.com:dkim,arm.com:mid,arm.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D43C16BA6E4
+X-Rspamd-Queue-Id: 1CD6A6BA6FB
 
-On 23/06/2026 19:21, Simon Horman wrote:
->> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
->> index c96512bb86531..566ca839fa488 100644
->> --- a/net/nfc/nci/ntf.c
->> +++ b/net/nfc/nci/ntf.c
->> @@ -603,6 +603,12 @@ static void nci_target_auto_activated(struct nci_dev *ndev,
->>       struct nfc_target *target;
->>       int rc;
->>
->> +    /* This is a new target, check if we've enough room */
->> +    if (ndev->n_targets == NCI_MAX_DISCOVERED_TARGETS) {
->> +        pr_debug("not enough room, ignoring new target...\n");
->> +        return;
->
-> [Severity: High]
-> Does this early return cause the state machine to stall?
->
-> Looking at nci_rf_intf_activated_ntf_packet(), the state is transitioned
-> to NCI_POLL_ACTIVE right before this function is called:
->
-> net/nfc/nci/ntf.c:nci_rf_intf_activated_ntf_packet() {
->      ...
->      atomic_set(&ndev->state, NCI_POLL_ACTIVE);
->      if (err == NCI_STATUS_OK)
->          nci_target_auto_activated(ndev, &ntf);
->      ...
-> }
->
-> Because of the early return here, nfc_targets_found() is skipped. Does this
-> leave the state wedged in NCI_POLL_ACTIVE, permanently blocking future
-> attempts to stop polling since nci_stop_poll() requires the state to be
-> NCI_DISCOVERY?
->
->> +    }
->> +
->>       target = &ndev->targets[ndev->n_targets];
->
-> [ ... ]
+Hi,
 
-Thanks for sharing the review.
+On 3/10/26 08:33, Junhui Liu wrote:
+> Add the essential bus clocks in the Allwinner A733 CCU, including AHB,
+> APB0, APB1, APB_UART, NSI, and MBUS. These buses are necessary for many
+> other functional modules. Additionally clocks such as trace, gic and
+> cpu_peri are also added as they fall within the register address range
+> of the bus clocks, even though they are not strictly bus clocks.
+> 
+> The MBUS clock is marked as critical to ensure the memory bus remains
+> operational at all times. For the NSI and MBUS clocks, the hardware
+> requires an update bit (bit 27) to be set so that the configuration
+> takes effect and the updated parameters can be correctly read back.
+> 
+> Signed-off-by: Junhui Liu <junhui.liu@pigmoral.tech>
+> ---
+>   drivers/clk/sunxi-ng/ccu-sun60i-a733.c | 131 +++++++++++++++++++++++++++++++++
+>   1 file changed, 131 insertions(+)
+> 
+> diff --git a/drivers/clk/sunxi-ng/ccu-sun60i-a733.c b/drivers/clk/sunxi-ng/ccu-sun60i-a733.c
+> index cf819504c51f..68457813dbbb 100644
+> --- a/drivers/clk/sunxi-ng/ccu-sun60i-a733.c
+> +++ b/drivers/clk/sunxi-ng/ccu-sun60i-a733.c
+> @@ -19,6 +19,7 @@
+>   #include "ccu_common.h"
+>   
+>   #include "ccu_div.h"
+> +#include "ccu_mp.h"
+>   #include "ccu_mult.h"
+>   #include "ccu_nkmp.h"
+>   #include "ccu_nm.h"
+> @@ -65,6 +66,16 @@ static const struct clk_hw *pll_ref_hws[] = {
+>   	&pll_ref_clk.common.hw
+>   };
+>   
+> +/*
+> + * There is a non-software-configurable mux selecting between the DCXO and the
+> + * PLL_REF in hardware, whose output is fed to the sys-24M clock. Although both
+> + * sys-24M and pll-ref are fixed at 24 MHz, define a 1:1 fixed factor clock to
+> + * provide logical separation:
+> + * - pll-ref is dedicated to feeding other PLLs
+> + * - sys-24M serves as reference clock for downstream functional modules
+> + */
+> +static CLK_FIXED_FACTOR_HWS(sys_24M_clk, "sys-24M", pll_ref_hws, 1, 1, 0);
+> +
+>   #define SUN60I_A733_PLL_DDR_REG		0x020
+>   static struct ccu_nkmp pll_ddr_clk = {
+>   	.enable		= BIT(27),
+> @@ -371,6 +382,107 @@ static SUNXI_CCU_M_HWS(pll_de_4x_clk, "pll-de-4x", pll_de_hws,
+>   static SUNXI_CCU_M_HWS(pll_de_3x_clk, "pll-de-3x", pll_de_hws,
+>   		       SUN60I_A733_PLL_DE_REG, 16, 3, 0);
+>   
+> +/**************************************************************************
+> + *                           bus clocks                                   *
+> + **************************************************************************/
+> +
+> +static const struct clk_parent_data ahb_apb_parents[] = {
+> +	{ .hw = &sys_24M_clk.hw },
+> +	{ .fw_name = "losc" },
+> +	{ .fw_name = "iosc" },
+> +	{ .hw = &pll_periph0_600M_clk.hw },
+> +};
+> +
+> +static SUNXI_CCU_M_DATA_WITH_MUX(ahb_clk, "ahb", ahb_apb_parents, 0x500,
+> +				 0, 5,		/* M */
+> +				 24, 2,		/* mux */
+> +				 0);
+> +
+> +static SUNXI_CCU_M_DATA_WITH_MUX(apb0_clk, "apb0", ahb_apb_parents, 0x510,
+> +				 0, 5,		/* M */
+> +				 24, 2,		/* mux */
+> +				 0);
+> +
+> +static SUNXI_CCU_M_DATA_WITH_MUX(apb1_clk, "apb1", ahb_apb_parents, 0x518,
+> +				 0, 5,		/* M */
+> +				 24, 2,		/* mux */
+> +				 0);
+> +
+> +static const struct clk_parent_data apb_uart_parents[] = {
+> +	{ .hw = &sys_24M_clk.hw },
+> +	{ .fw_name = "losc" },
+> +	{ .fw_name = "iosc" },
+> +	{ .hw = &pll_periph0_600M_clk.hw },
+> +	{ .hw = &pll_periph0_480M_clk.common.hw },
+> +};
+> +static SUNXI_CCU_M_DATA_WITH_MUX(apb_uart_clk, "apb-uart", apb_uart_parents, 0x538,
+> +				 0, 5,		/* M */
+> +				 24, 3,		/* mux */
+> +				 0);
+> +
+> +static const struct clk_parent_data trace_parents[] = {
+> +	{ .hw = &sys_24M_clk.hw },
+> +	{ .fw_name = "losc" },
+> +	{ .fw_name = "iosc" },
+> +	{ .hw = &pll_periph0_300M_clk.hw },
+> +	{ .hw = &pll_periph0_400M_clk.hw },
+> +};
+> +static SUNXI_CCU_M_DATA_WITH_MUX_GATE(trace_clk, "trace", trace_parents, 0x540,
+> +				 0, 5,		/* M */
+> +				 24, 3,		/* mux */
+> +				 BIT(31),	/* gate */
+> +				 0);
+> +
+> +static const struct clk_parent_data gic_cpu_peri_parents[] = {
+> +	{ .hw = &sys_24M_clk.hw },
+> +	{ .fw_name = "losc" },
+> +	{ .hw = &pll_periph0_600M_clk.hw },
+> +	{ .hw = &pll_periph0_480M_clk.common.hw },
+> +	{ .hw = &pll_periph0_400M_clk.hw },
+> +};
+> +static SUNXI_CCU_M_DATA_WITH_MUX_GATE(gic_clk, "gic", gic_cpu_peri_parents, 0x560,
 
-I don't believe the early return can stall the state machine, as
-nci_target_auto_activated() does not touch ndev->state.
+Do we really want to model the GIC clock? The A523 has one as well, as 
+we don't describe it there. And while the GICv3 binding describes a 
+clock property, the Linux driver completely ignores that.
+So if I see this correctly, this clock would become unused, and would be 
+turned off, killing the GIC? So we would at least need a CLK_IS_CRITICAL 
+flag?
 
-nci_rf_intf_activated_ntf_packet() sets ndev->state = NCI_POLL_ACTIVE
-before it calls nci_target_auto_activated(), so the transition has
-already happened by the time the new check runs. Neither
-nci_target_auto_activated() nor nfc_targets_found() modifies ndev->state;
-nfc_targets_found() only clears the nfc_dev dev->polling flag under
-device_lock, which is independent of the NCI state machine that
-nci_stop_poll() tests. So ndev->state is NCI_POLL_ACTIVE after an
-auto-activation whether the target is appended or the guard returns
-early; the state behaviour is the same with or without this patch.
+But it's a good reminder to lift this clock to something PLL based, in 
+U-Boot's SPL, because I guess the 24MHz are rather slow.
 
-The check is the same n_targets == NCI_MAX_DISCOVERED_TARGETS guard the
-sibling nci_add_new_target() (the RF_DISCOVER_NTF path) has used since
-the Fixes: commit; it only drops the out-of-spec 11th+ target, which a
-conformant controller shouldn't produce. The device still returns to
-NCI_DISCOVERY/NCI_IDLE through the normal RF_DEACTIVATE path.
+> +				      0, 5,	/* M */
+> +				      24, 3,	/* mux */
+> +				      BIT(31),	/* gate */
+> +				      0);
+> +
+> +static SUNXI_CCU_M_DATA_WITH_MUX_GATE(cpu_peri_clk, "cpu-peri", gic_cpu_peri_parents, 0x568,
 
-> [Severity: Critical]
-> This isn't a bug introduced by this patch, but can the ntf union copy
-> uninitialized stack memory into persistent device structures?
->
-> In net/nfc/nci/ntf.c:nci_rf_discover_ntf_packet(), the local ntf struct
-> is declared on the stack:
->
->      struct nci_rf_discover_ntf ntf;
->
-> If the incoming packet has ntf.rf_tech_specific_params_len == 0, the
-> extraction routines are bypassed, leaving the rf_tech_specific_params union
-> uninitialized. The struct is then passed to nci_add_new_target():
->
->      if (add_target == true)
->          nci_add_new_target(ndev, &ntf);
->
-> This eventually calls nci_add_new_protocol(), which blindly reads from this
-> union:
->
->      nfca_poll = (struct rf_tech_specific_params_nfca_poll *)params;
->      target->sens_res = nfca_poll->sens_res;
->      target->sel_res = nfca_poll->sel_res;
->      target->nfcid1_len = nfca_poll->nfcid1_len;
->
-> Could this uninitialized stack garbage be copied into ndev->targets, and
-> later broadcasted to userspace via Netlink in nfc_targets_found()?
+What is this clock about? I don't see it referenced by any peripheral in 
+the manual.
 
-I managed to repro this issue locally via KMSAN, I can queue up a patch
-for this that I can submit separately, ntf just needs to be zero-initd.
+> +				      0, 5,	/* M */
+> +				      24, 3,	/* mux */
+> +				      BIT(31),	/* gate */
+> +				      0);
+> +
+> +static const struct clk_parent_data nsi_parents[] = {
+> +	{ .hw = &sys_24M_clk.hw },
+> +	{ .hw = &pll_ddr_clk.common.hw },
+> +	{ .hw = &pll_periph0_800M_clk.common.hw },
+> +	{ .hw = &pll_periph0_600M_clk.hw },
+> +	{ .hw = &pll_periph0_480M_clk.common.hw },
+> +	{ .hw = &pll_de_3x_clk.common.hw },
+> +};
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE_FEAT(nsi_clk, "nsi", nsi_parents, 0x580,
 
-> [Severity: Critical]
-> This isn't a bug introduced by this patch, but does the general bytes length
-> calculation underflow?
->
-> In net/nfc/nci/ntf.c:nci_store_general_bytes_nfc_dep():
->
->      ndev->remote_gb_len = min_t(__u8,
->          (ntf->activation_params.listen_nfc_dep.atr_req_len -
->           NFC_ATR_REQ_GT_OFFSET), NFC_ATR_REQ_GB_MAXSIZE);
->
->      memcpy(ndev->remote_gb,
->          (ntf->activation_params.listen_nfc_dep.atr_req +
->           NFC_ATR_REQ_GT_OFFSET), ndev->remote_gb_len);
->
-> The length is computed by subtracting NFC_ATR_REQ_GT_OFFSET (14) from
-> atr_req_len. If atr_req_len is less than 14, this subtraction will
-> underflow.
->
-> Because of the min_t cast, this large underflowed value is bounded to
-> NFC_ATR_REQ_GB_MAXSIZE (48). The memcpy() then copies 48 bytes starting
-> from atr_req + 14 into ndev->remote_gb.
->
-> Since the source buffer is part of the ntf union allocated on the stack
-> in nci_rf_intf_activated_ntf_packet(), could this leak up to 48 bytes of
-> uninitialized kernel stack memory to userspace?
+Similar question like for the GIC: do we need this in the kernel, and do 
+we need to prevent this from being turned off?
 
-This one is already being fixed on the list:
+> +					    0, 5,	/* M */
+> +					    0, 0,	/* no P */
+> +					    24, 3,	/* mux */
+> +					    BIT(31),	/* gate */
+> +					    0, CCU_FEATURE_UPDATE_BIT);
+> +
+> +static const struct clk_parent_data mbus_parents[] = {
+> +	{ .hw = &sys_24M_clk.hw },
+> +	{ .hw = &pll_periph1_600M_clk.hw },
+> +	{ .hw = &pll_ddr_clk.common.hw },
+> +	{ .hw = &pll_periph1_480M_clk.common.hw },
+> +	{ .hw = &pll_periph1_400M_clk.hw },
+> +	{ .hw = &pll_npu_clk.common.hw },
+> +};
+> +static SUNXI_CCU_MP_DATA_WITH_MUX_GATE_FEAT(mbus_clk, "mbus", mbus_parents, 0x588,
+> +					    0, 5,	/* M */
+> +					    0, 0,	/* no P */
+> +					    24, 3,	/* mux */
+> +					    BIT(31),	/* gate */
+> +					    CLK_IS_CRITICAL,
+> +					    CCU_FEATURE_UPDATE_BIT);
+> +
+>   /*
+>    * Contains all clocks that are controlled by a hardware register. They
+>    * have a (sunxi) .common member, which needs to be initialised by the common
+> @@ -407,11 +519,21 @@ static struct ccu_common *sun60i_a733_ccu_clks[] = {
+>   	&pll_de_clk.common,
+>   	&pll_de_4x_clk.common,
+>   	&pll_de_3x_clk.common,
+> +	&ahb_clk.common,
+> +	&apb0_clk.common,
+> +	&apb1_clk.common,
+> +	&apb_uart_clk.common,
+> +	&trace_clk.common,
+> +	&gic_clk.common,
+> +	&cpu_peri_clk.common,
+> +	&nsi_clk.common,
+> +	&mbus_clk.common,
+>   };
+>   
+>   static struct clk_hw_onecell_data sun60i_a733_hw_clks = {
+>   	.hws	= {
+>   		[CLK_PLL_REF]		= &pll_ref_clk.common.hw,
+> +		[CLK_SYS_24M]		= &sys_24M_clk.hw,
+>   		[CLK_PLL_DDR]		= &pll_ddr_clk.common.hw,
+>   		[CLK_PLL_PERIPH0_4X]	= &pll_periph0_4x_clk.common.hw,
+>   		[CLK_PLL_PERIPH0_2X]	= &pll_periph0_2x_clk.common.hw,
+> @@ -453,6 +575,15 @@ static struct clk_hw_onecell_data sun60i_a733_hw_clks = {
+>   		[CLK_PLL_DE]		= &pll_de_clk.common.hw,
+>   		[CLK_PLL_DE_4X]		= &pll_de_4x_clk.common.hw,
+>   		[CLK_PLL_DE_3X]		= &pll_de_3x_clk.common.hw,
+> +		[CLK_AHB]		= &ahb_clk.common.hw,
+> +		[CLK_APB0]		= &apb0_clk.common.hw,
+> +		[CLK_APB1]		= &apb1_clk.common.hw,
+> +		[CLK_APB_UART]		= &apb_uart_clk.common.hw,
+> +		[CLK_TRACE]		= &trace_clk.common.hw,
+> +		[CLK_GIC]		= &gic_clk.common.hw,
+> +		[CLK_CPU_PERI]		= &cpu_peri_clk.common.hw,
+> +		[CLK_NSI]		= &nsi_clk.common.hw,
+> +		[CLK_MBUS]		= &mbus_clk.common.hw,
+>   	},
+>   	.num	= CLK_FANOUT3 + 1,
+>   };
+> 
 
-[PATCH net v4 1/5] nfc: nci: fix u8 underflow in
-nci_store_general_bytes_nfc_dep  (Lekë Hapçiu)
-https://lore.kernel.org/all/20260424180151.3808557-2-snowwlake@icloud.com/
-
-> [Severity: High]
-> This isn't a bug introduced by this patch, but does the lack of skb->len
-> validation in NCI response handlers allow out-of-bounds reads?
->
-> In nci_core_init_rsp_packet_v1() in net/nfc/nci/rsp.c, fields are read
-> and arrays are copied from the payload:
->
->      ndev->num_supported_rf_interfaces =
->          rsp_1->num_supported_rf_interfaces;
->
->      memcpy(ndev->supported_rf_interfaces, rsp_1->supported_rf_interfaces,
->             ndev->num_supported_rf_interfaces);
->
-> Similarly in nci_core_init_rsp_packet_v2():
->
->      while (rf_interface_idx < ndev->num_supported_rf_interfaces) {
->          ndev->supported_rf_interfaces[rf_interface_idx++] =
->              *supported_rf_interface++;
->      }
->
-> Since the NCI control header is stripped via skb_pull(), leaving the
-> payload length in skb->len, what happens if an NFCC sends a short response
-> packet (e.g. plen = 1)? Could this cause the handlers to read adjacent
-> kernel slab memory?
-
-I've since submitted a fix for this issue:
-
-[PATCH net] nfc: nci: fix uninit-value in
-nci_core_init_rsp_packet()
-https://lore.kernel.org/netdev/20260623222402.175798-1-sam@bynar.io/
-
-> [Severity: High]
-> This isn't a bug introduced by this patch, but is there a missing boundary
-> validation when extracting activation parameters?
->
-> In net/nfc/nci/ntf.c:nci_extract_activation_params_iso_dep():
->
->      nfca_poll->rats_res_len = min_t(__u8, *data++, NFC_ATS_MAXSIZE);
->      if (nfca_poll->rats_res_len > 0) {
->          memcpy(nfca_poll->rats_res, data, nfca_poll->rats_res_len);
->      }
->
-> And in nci_extract_activation_params_nfc_dep():
->
->      poll->atr_res_len = min_t(__u8, *data++, NFC_ATR_RES_MAXSIZE - 2);
->      if (poll->atr_res_len > 0)
->          memcpy(poll->atr_res, data, poll->atr_res_len);
->
-> These inner lengths are bounded by a maximum size like NFC_ATS_MAXSIZE, but
-> they are not validated against the remaining bytes in the SKB (skb->len).
->
-> If a malformed packet provides a large inner length but a short payload,
-> could this memcpy() read out of bounds into the device structure,
-> potentially leaking adjacent slab memory to userspace later?
-
-This one is already being fixed on the list too:
-
-[PATCH v3] nfc: nci: add data_len bound checks to activation
-parameter extractors  (Bryam Vargas)
-https://lore.kernel.org/all/20260612-b4-disp-6d52d8b0-v3-1-e26221f8826d@proton.me/
-
-> [Severity: High]
-> This isn't a bug introduced by this patch, but is there a potential
-> priority inversion or timeout deadlock involving the device lock?
->
-> Functions like nfc_stop_poll() in net/nfc/core.c acquire the device lock:
->
->      device_lock(&dev->dev);
->      ...
->      if (dev->ops->stop_poll)
->          dev->ops->stop_poll(dev);
->
-> This eventually calls nci_request(), which synchronously waits for a
-> completion signaled by the nci_rx_work thread. However, if an NTF packet
-> is received first, nci_rx_work processes it and invokes
-> nfc_targets_found(), which also attempts to acquire the device lock:
->
->      device_lock(&dev->dev);
->
-> Since the calling thread already holds the device lock, nci_rx_work blocks
-> indefinitely. Because the RX worker is blocked, it cannot process the
-> pending RSP, causing nci_request() to time out and fail. Could this
-> deadlock the RX thread?
-
-No patch for this one, although I'm not sure how accurate it is.
-
-Thanks,
-Sam
 
