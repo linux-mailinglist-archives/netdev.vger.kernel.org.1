@@ -1,125 +1,71 @@
-Return-Path: <netdev+bounces-301470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mkLIGk3iOmobKAgAu9opvQ
-	(envelope-from <netdev+bounces-301470-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 21:45:17 +0200
+	id 1VPGBbnlOmojKggAu9opvQ
+	(envelope-from <netdev+bounces-301471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 21:59:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2111A6B9C25
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 21:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A40E6B9D1A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 21:59:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=H2wWzv3B;
-	dkim=pass header.d=redhat.com header.s=google header.b=UjIEQNPU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301470-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301470-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=L0QSkjhI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301471-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301471-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1C366307CD59
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:45:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 808643084BF3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 959873939DA;
-	Tue, 23 Jun 2026 19:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E3E39281F;
+	Tue, 23 Jun 2026 19:59:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386E9392C4B
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 19:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5DE2E0902;
+	Tue, 23 Jun 2026 19:59:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782243913; cv=none; b=H3WOHT6354lbF7/OWMuJtwR6kRFiNHlVv6rtcJD2vyfIr4ao4YbFkdI61DGBGVk8jl1R2qVXAq/cS7Q0zXGBGSM2NFYESHMcPuNC+X0xxEExYA4iwrbKQbhBxGzLpY1yPmUN3Lj9XfW3RumKRpPuQlIU77Nd9mpElFP8oMXGECQ=
+	t=1782244789; cv=none; b=aOnwazB7TmtaDdMY1aTm/2Iv9ceE3RCYUcWJd/ySOkW+04PJUxvIS37MTj10XZSvfmMZihlig/qpmNQVlFQM65Kc/AvF1WDJczZd/tZFfW1ESV5dos/lzFm+zlo0d1H2960f5wM/YOj74Y1Cgyx+Jk4ZFeGhD9gx9AzEZcrIEvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782243913; c=relaxed/simple;
-	bh=w0LYy/lkhOkRJ1mcPpKcBJQ8WkRX9RNPOn4dmhRbI5Q=;
+	s=arc-20240116; t=1782244789; c=relaxed/simple;
+	bh=Y1rQK8DdECZwtHe0BRuyZVGyB/9hqdCoRQ8Cj/HR9/Q=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QfwLrnnZhMvSH2K9wNt5CAz5058Gy2hzecw9sdh58Z62a/UoGEe0baQXH3hCuNzdJXXZdhLbb/QyCzkarWOKql9vv0lreU3rPwOlUPBsFDihWPgDy20RAh0aD2ftR1VHq7pdHhAg54CdTORW2tXMIWcNSQYKzLgkKm6EvkdM/yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H2wWzv3B; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UjIEQNPU; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782243911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qROIoP7Ox4zuQ1KlaWsTu9O+Pw1tden3SzMg+Ihd/Yg=;
-	b=H2wWzv3BZv/A/oZrzte7WS60CbbQ0STE4rNJq92LG2JjrFwkcOP5mx9aHfyfDtCySw3KWB
-	tg8MMNe+EUUphNNkqwDHT5SI+kwrqJKeo9S2uuyLSZG9B4ug0yfpeSimNgQmZoG0x6RwCd
-	Bz1V9H//fsgu/f9T3Ny+d4MduFLvZTE=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-QDByUduXMhGRZiryG1bTIQ-1; Tue, 23 Jun 2026 15:45:10 -0400
-X-MC-Unique: QDByUduXMhGRZiryG1bTIQ-1
-X-Mimecast-MFC-AGG-ID: QDByUduXMhGRZiryG1bTIQ_1782243909
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-bf4ba05fd18so17797866b.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 12:45:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782243909; x=1782848709; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qROIoP7Ox4zuQ1KlaWsTu9O+Pw1tden3SzMg+Ihd/Yg=;
-        b=UjIEQNPUMkiH4TwPruAPCW4v81RyCjUhxAdBRCU+jiFaYQF1MeZZ3WmGmIj6y31dr0
-         APSrj9pIqpIbIw3X4K8OTRWQkhWkRYA8aiE3EKhyHGI94q+NW/FHXJ9R3hBlzk8/MY0/
-         Ixyhtob4WtIM1AWkGnuB/prI2d0K2nyys1scIlrmjbTZvFHib5UzPigw/BJjIv4ECqpA
-         +hlmX853OkyiNu9LIQvkn42vOmYCWgvkQ3Oyo/rfoRjhVAfq+NnP3NJL438AmCToBKRd
-         s04v0/sfyvGj6kghTpRdKXd3UCiMhh7qg8wttzZ5cL+wt99cX+PiusDPVfYKOzrP1CUX
-         /3Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782243909; x=1782848709;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qROIoP7Ox4zuQ1KlaWsTu9O+Pw1tden3SzMg+Ihd/Yg=;
-        b=Q9PLilq3GcUdx7AVj9L65HvLDGY972onWjyvlTmOgz5aSL3gUUvTjwG5H0m0WYA9uZ
-         W9kaSMBRldH7sVfOcCNgWTLu6R5kokdK2vlM1x3JsVYOOzaIPfm+jlX5SHU/rzN+44Kg
-         R6BhRNlTdE0p1M87m3vhVEk486Qi6RbM1GOu3reLrdultSvZK7LesyMfQPF0F3UgtrQU
-         xeOVVrfDiXLfaXL4G9fDk198gpYuVbS6oV6X2Zepu2wAFYmPhpkTdk88SKX26NXV/fUb
-         f9uF6zGC48DEOi6q6ydcp8Kf8R26Us7yr7j1fQbcPOaSO236XN4QeCkobW24sNqR4QEQ
-         G4dg==
-X-Forwarded-Encrypted: i=1; AFNElJ/F7y4Qj8lUdZdyeR9CIYGEp/QwElKhkVy/X4kAXkinp6omBqKjCtBp945UpcHzDeAzAhyWsNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6uNNeFwBqpC7w77xm8qe/gjJFyDtu8POrNkIvNYnLVkyZxNJw
-	5bzL16FZjXDg36JbbHVG20mcelvGGRN7ZRFB7f+9QeDOSuKgX8SFos+EMiIOWgzzF3uVCXY6+Bi
-	AFtQEZJ5tAgXRIZwnvtS6XXDnvPI8TShTBnS6TwJNHvIEa1GPBIHW6mc8mA==
-X-Gm-Gg: AfdE7cnXVI5H7a+ud14d+AsFqwYGvqP4iVIAgWoVDIp4M3n4f/fFm+zRMdxbvMAt9Q7
-	Zb+WP4Jc+Fo518WCQ/F7ov4JJjurvLZjngN4UboFn1tXA/O1gc1OSYuILJYHf4qNpABsKXMlrxp
-	ngIaDwUMhoAyz0FcqVVZQhHmM0DRvH4bE5S9GliDldodjU/orljsM8YwxO7MB5AsWJLHGPhYks1
-	exe4M1gxNfPo/hNyhN0Wj8/VBh3PpUmoC88VOY9oYE5ghjTUlPZj5WE+ThgiwE9xa8p3+VxFyWK
-	vK4aAQbW7qzgrPLqU/zb+SkICTe7FtKEQe6JwgY7VNGpDyiJ/mb+zIYWMr3Ap7n2aBN8Z5wx3U3
-	cjvQMSLx2/SoQl1bssQKn6l94fkHPegGiSJBHWw==
-X-Received: by 2002:a17:906:99c2:b0:bec:2d7f:fe03 with SMTP id a640c23a62f3a-c107e0dffb5mr233288466b.17.1782243908592;
-        Tue, 23 Jun 2026 12:45:08 -0700 (PDT)
-X-Received: by 2002:a17:906:99c2:b0:bec:2d7f:fe03 with SMTP id a640c23a62f3a-c107e0dffb5mr233285566b.17.1782243908159;
-        Tue, 23 Jun 2026 12:45:08 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c610e4c76sm563520866b.46.2026.06.23.12.45.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 12:45:07 -0700 (PDT)
+	 MIME-Version:Content-Type; b=C32HvZgS5y8+GU0j75uNF6n1qD5hU4z3mi9j6I2Y6NMWmJkrH5suhLdxgEci6hWedcE4shEy8g7lH4qjTwTepDSDdf69M3V/rsbW3GoeVB6/RwcLpDPxhesa8BgXxKPxx3ig3ramExb7IVzAl8+lOst8T4GV3s5zgN3dqAOubAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0QSkjhI; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E8201F000E9;
+	Tue, 23 Jun 2026 19:59:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782244787;
+	bh=IsxH7MOIh2p46ZJMqngpVvQlSSdPJ/UIZlWgK4gluwQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=L0QSkjhIow5sungdraTWJz12bf+DD8calIL5RDrx9Zbo24kSuG9D6cUVz7Nd8zeg1
+	 lhWX04ZtSmnmMkK3TjUowyACpKUTkiPDcWzUrZYpa16YZ+CEln4EDhRU/2/UTtzirC
+	 TboTbrk1HppaZvKIcNb4ImmlvWVL/mZvpsLWpPjW7t6LfMomTb2tNfcWfo7TDLaEbd
+	 6ShqkRzkNDaGK1eIcToawCq3beqJDMp0Kw8Vm4qQUsMO67EXaG/TDBwCL/C/cOLtb1
+	 ZxoUdIuYrNb3DMEXR07HdOI2mbWYaIVV0+3zP8oIjEFgge+gci7JGBGNHFh4nNoWUf
+	 8uFACuVvaLaIw==
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 25089808D82; Tue, 23 Jun 2026 21:45:06 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Avinash Duduskar <avinash.duduskar@gmail.com>, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org
-Cc: eddyz87@gmail.com, memxor@gmail.com, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
- emil@etsalapatis.com, john.fastabend@gmail.com, sdf@fomichev.me,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org,
- yatsenko@meta.com, leon.hwang@linux.dev, kpsingh@kernel.org,
- a.s.protopopov@gmail.com, ameryhung@gmail.com, rongtao@cestc.cn,
- eyal.birger@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- dsahern@kernel.org
-Subject: Re: [PATCH bpf-next v4 1/3] bpf: Add BPF_FIB_LOOKUP_VLAN flag to
- bpf_fib_lookup() helper
-In-Reply-To: <20260623182849.2623521-1-avinash.duduskar@gmail.com>
-References: <20260623025147.1001664-1-avinash.duduskar@gmail.com>
- <20260623025147.1001664-2-avinash.duduskar@gmail.com>
- <877bnpeaeq.fsf@toke.dk>
- <20260623182849.2623521-1-avinash.duduskar@gmail.com>
+	id 66F0D808D89; Tue, 23 Jun 2026 21:59:44 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Ralf Lici <ralf@mandelbit.com>
+Cc: netdev@vger.kernel.org, Daniel =?utf-8?Q?Gr=C3=B6ber?=
+ <dxld@darkboxed.org>, Antonio
+ Quartulli <antonio@mandelbit.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter
+ <phil@nwl.cc>, Beniamino Galvani <bgalvani@redhat.com>
+Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and
+ dispatch core
+In-Reply-To: <20260623163606.33510-1-ralf@mandelbit.com>
+References: <87ik7aej6f.fsf@toke.dk>
+ <20260623163606.33510-1-ralf@mandelbit.com>
 X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 23 Jun 2026 21:45:06 +0200
-Message-ID: <87y0g5ca7x.fsf@toke.dk>
+Date: Tue, 23 Jun 2026 21:59:44 +0200
+Message-ID: <87v7b9c9jj.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -129,99 +75,275 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.10 / 15.00];
+X-Spamd-Result: default: False [-3.07 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.56)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_MIXED_CHARSET(0.59)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-301471-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301470-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[toke@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:ralf@mandelbit.com,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:bgalvani@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:yatsenko@meta.com,m:leon.hwang@linux.dev,m:kpsingh@kernel.org,m:a.s.protopopov@gmail.com,m:ameryhung@gmail.com,m:rongtao@cestc.cn,m:eyal.birger@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:dsahern@kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,m:asprotopopov@gmail.com,m:eyalbirger@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[toke@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,toke.dk:mid,vger.kernel.org:from_smtp];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[toke@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,toke.dk:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2111A6B9C25
+X-Rspamd-Queue-Id: 7A40E6B9D1A
 
-Avinash Duduskar <avinash.duduskar@gmail.com> writes:
+Ralf Lici <ralf@mandelbit.com> writes:
 
-> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
->
->> I think it's better to just move the assignment of params->ifindex
->> entirely into bpf_fib_set_fwd_params(), instead of this restore dance.
->> That way this can be simplified to:
+> On Mon, 22 Jun 2026 16:36:24 +0200, Toke H=C3=B8iland-J=C3=B8rgensen <tok=
+e@kernel.org> wrote:
+>> >> > My second concern is that the SIIT boundary would be a property of
+>> >> > rule and hook placement. That gives flexibility, but it also means =
+the
+>> >> > translation point has to be constrained and documented very careful=
+ly
+>> >> > to avoid ambiguous TTL/Hop Limit, PMTU/ICMP, and hook-order behavio=
+r.
+>> >> > For this use case I would rather have the route that matches the
+>> >> > translation prefix also be the object that says: leave this family
+>> >> > here and continue in the other one.
+>> >>
+>> >> Yeah, with flexibility comes the ability to shoot yourself in the foo=
+t.
+>> >> But that's not really different from much of the other functionality =
+we
+>> >> have in the kernel today, is it? For netfilter in particular it's
+>> >> certainly possible to configure a broken NAT configuration that leads=
+ to
+>> >> packet drops (or just invalid packets being sent out on a network
+>> >> device).
+>> >>
+>> >
+>> > True, misconfiguration is always possible and that alone is not an
+>> > argument against the netfilter model. But what do we actually gain in
+>> > capability from that flexibility? I agree on the UX argument (an admin
+>> > would look in nft first), but in terms of what the feature can do, I
+>> > can't yet see what the nft model unlocks. More on this just below.
+>> >
+>> >> > After looking at the available kernel mechanisms again, I think the
+>> >> > better model is probably LWT: routes carry an ipxlat encap referenc=
+ing a
+>> >> > named translator domain configured over netlink. That should repres=
+ent
+>> >> > the stateless, prefix-based and symmetric nature of ipxlat.
+>> >>
+>> >> I think this description actually hits the nail on the head: What are=
+ we
+>> >> implementing here? Is it a product feature, or a building block for o=
+ne?
+>> >> The properties you mention wrt consistency, symmetry etc are properti=
+es
+>> >> of the high-level feature (which is also generally the level things a=
+re
+>> >> specified in RFCs). Whereas other packet mangling features in the ker=
+nel
+>> >> are more in the "building block" category, where it's possible to
+>> >> configure things to implement a particular feature set / compliance w=
+ith
+>> >> a particular RFC, but it's also possible to do things that are outside
+>> >> of that.
+>> >>
+>> >> I think this relates to the "mechanism, not policy" approach that we
+>> >> take to most things in the kernel: implement the building blocks to do
+>> >> something in the most general way we can, and then leave it up to
+>> >> userspace to configure things in a way that results in a consistent
+>> >> high-level system behaviour.
+>> >>
+>> >
+>> > That's a good point, and I agree that we should not bake a high-level
+>> > product policy into the kernel if what we need is a reusable mechanism
+>> > (the LWT idea was my attempt at exactly that). What I am still trying =
+to
+>> > understand is whether there is a useful generic trigger for stateless
+>> > cross-family translation beyond the route/prefix/policy-routing cases.
+>> >
+>> > Routes and policy routing already cover the selectors I can make
+>> > coherent for a stateless, per-packet translator: destination/source
+>> > prefix, iif/oif/VRF, mark, TOS/DSCP, and so on. nft can of course match
+>> > much more than that, but the additional selectors that would materially
+>> > change the translation decision seem to be selectors such as L4 fields,
+>> > payload state, or conntrack state. Those are exactly the selectors I am
+>> > struggling to make correct for a stateless translator:
+>> >
+>> > - non-first fragments carry no L4 header at all, yet the translator mu=
+st
+>> >   rewrite every fragment (an nft ... tcp dport trigger cannot fire on
+>> >   them);
+>> >
+>> > - ICMP errors must be translated too, but the flow identity lives in t=
+he
+>> >   quoted inner header (reversed), not in anything an L4/ct match on the
+>> >   error packet can see and there is no conntrack to associate them,
+>> >   since this is stateless.
 >>
->> 	err =3D bpf_fib_set_fwd_params(dev, params, flags, mtu);
->> 	if (!err && fwd_dev)
->> 		*fwd_dev =3D dev;
->> 	return err;
+>> True in principle, but if (say) you deploy this on a network that is
+>> configured so it will never fragment packets, this won't be an issue in
+>> practice.
+>>
+>> I.e., you're quite right that arbitrary matching criteria cannot be
+>> guaranteed to result in coherent translation. But I think that goes into
+>> the "use it wrong, get wrong results" bin. E.g., if you match on
+>> something that results in only a subset of the packets of a flow being
+>> translated, well, only that subset of the packets will make it to the
+>> destination. The SIIT translator itself should not try to fix this, but
+>> neither should it prevent it; that's what I mean by "building block" -
+>> it's up to the builder using the blocks to make sure the building
+>> doesn't collapse, that's out of scope for the block manufacturer to
+>> worry about :)
+>>
 >
-> The caller-side restore is ungainly, agreed, but the assignment can't move
-> all the way into the helper. The early params->ifindex =3D dev->ifindex
-> sits above the neighbour lookup on purpose: that is d1c362e1dd68a
-> ("bpf: Always return target ifindex in bpf_fib_lookup"), which took it
-> out of bpf_fib_set_fwd_params() and put it there so a program still
-> gets the target ifindex on the BPF_FIB_LKUP_RET_NO_NEIGH path and can
-> bpf_redirect_neigh() on it. bpf_fib_set_fwd_params() is called only at
-> the set_fwd_params label, below the NO_NEIGH return (and below the IPv6
-> NO_SRC_ADDR return), so an assignment living in the helper never runs
-> on those paths and params->ifindex falls back to the input. That would
-> change the reported ifindex for plain bpf_fib_lookup() callers hitting
-> NO_NEIGH, not only the VLAN ones.
+> I agree with that framing. The translation core should not try to prove
+> that the surrounding policy describes a coherent SIIT deployment.
 
-Right. Well, seems I forgot about that patch, even though I seem to have
-written it :)
+Cool!
 
-> I can still get the caller down to your form by keeping the early write
-> and moving just the VLAN_FAILURE rewind into the helper, with one extra
-> parameter, the input ifindex saved before the egress write:
+>> > So an L4-conditional trigger does not look like a good primitive for
+>> > correct stateless SIIT unless the action also defragments/refragments =
+or
+>> > uses conntrack-like state. Those may be valid mechanisms, but they move
+>> > the design away from the stateless per-packet SIIT boundary this RFC is
+>> > trying to model.
+>> >
+>> > So my first question is: is there a useful nft configuration this shou=
+ld
+>> > enable that is not naturally expressible as route selection, while sti=
+ll
+>> > remaining stateless SIIT rather than a NAT64-like stateful feature?
+>> > Maybe there is a real use case there, but I cannot construct one yet.
+>>
+>> So the poster child for "match on arbitrary criteria" is of course BPF.
+>> You can write BPF programs that match on arbitrary parts of the packet
+>> header, custom encapsulation headers,or even on out of band things like
+>> system state, phase of the moon, or what have you. And we should
+>> certainly allow a BPF program to make the decision on whether to perform
+>> the SIIT translation.
+>>
+>> Which... maybe is an argument to keep it as a device like you do in this
+>> RFC series? Redirecting to a device is trivially supported from TC-BPF,
+>> which also makes it possible to use the translation mechanism without
+>> going through the routing subsystem at all, saving a bit of overhead.
+>> Whereas making it a route action ties it very closely to the routing
+>> subsystem.
+>>
+>> WDYT?
+>>
 >
-> 	err =3D bpf_fib_set_fwd_params(dev, params, flags, mtu, in_ifindex);
-> 	if (!err && fwd_dev)
-> 		*fwd_dev =3D dev;
-> 	return err;
+> I see the netdevice appeal for this, especially as a BPF redirect
+> target. But as we discussed earlier, the device model has some real
+> problems: the device selected by the first route is not the real
+> post-translation egress, so the model ends up doing translation and
+> reinjection rather than normal transmission. Concretely:
 >
-> and the helper owning the rewind in the unreducible branch:
+> - it needs synthetic routing state purely to get things like MTU for
+>   fragmentation, because the real post-translation nexthop is not known
+>   at translation time;
 >
-> 	} else {
-> 		params->ifindex =3D in_ifindex;
-> 		return BPF_FIB_LKUP_RET_VLAN_FAILURE;
-> 	}
+> - TTL/Hop Limit handling gets harder to reason about because the packet
+>   has effectively gone through two routing decisions;
+>
+> - rx/tx stats can't be made meaningful for a direction-agnostic device
+>   whose ndo_start_xmit is really "translate and receive";
+>
+> - and the setup is not very obvious: create an interface, route packets
+>   to it, then have them come back translated.
+>
+> None of these is fatal on its own, but together they make me think the
+> abstraction does not quite fit.
 
-OK, if we do need to restore it, I think it's better to do it there.
+Right, OK, you're right.
 
-Also, wrt the fwd_dev parameter: Do we really have a use case from using
-this from TC? In TC you can just redirect to the VLAN device; this is
-meant for XDP which can't do that. So how about we just reject the flag
-on the TC side, and get rid of the fwd_dev parameter entirely?
+> On the BPF point specifically: I agree a BPF program should be able to
+> decide whether to translate. What I am less sure about is whether
+> redirecting to a netdevice is the best way to expose that. A TC action
+> (yet another model, I know :)) gives you the same thing in-pipeline and
+> more directly:
+>
+>     tc filter add dev wwan0 egress \
+>         bpf obj match.o action ipxlat4to6 domain clat0
+>
+> Let BPF make the policy decision, with the native action doing the
+> translation work that the current BPF CLAT implementations have trouble
+> with: fragmentation, checksum corner cases, and ICMP error inner
+> headers (as explained by Beniamino).
+>
+> So TC clsact looks like the natural in-kernel replacement for today's
+> TC-BPF CLAT programs: no extra netdev, you attach to the existing
+> uplink, direction is explicit, and on egress you sit on the real route
+> dst, so the synthetic-dst and double-routing problems above just don't
+> arise. The cost is more moving parts than a single bpf_redirect since
+> userspace has to manage clsact, filters, priorities and action
+> lifecycle/cleanup.
 
-If we do that we're back to just a plain 'return bpf_fib_set_fwd_params()' =
-:)
+Hmm, so no one really uses the bpf filter mechanism, since you can just
+do everything from an action anyway (and with TCX attachment, you can
+even avoid the overhead of the TC filter/action infrastructure
+entirely). However, point taken wrt how to integrate this with BPF. I
+guess the most flexible thing would be to expose the functionality
+directly (as a kfunc callable from a BPF program). Which also fits with
+your point below:
+
+> For a gateway translator, though, I still think a device-bound model is
+> less natural. There the translation point is more like a forwarding
+> decision across routes and nexthops, so a route/LWT attachment, or
+> possibly a netfilter attachment seems easier to reason about. Also, as
+> you already pointed out while discussing LWT, an admin setting up NAT64
+> is more likely to reach for an nft rule than for a clsact filter on a
+> specific device.
+>
+> Taking a step back, ipxlat is really a generic translation engine plus a
+> thin harness around it. So rather than pick one attachment, it might be
+> worth structuring the engine so different harnesses can drive it.
+> There's interesting precedent for this shape:
+>
+> - ILA, again, is the closest sibling: stateless IPv6 address translation
+>   with a shared core in ila_common.c, driven both by an LWT frontend in
+>   ila_lwt.c and by an inline netfilter hook with a netlink-configured
+>   mapping table in ila_xlat.c.
+>
+> - act_ct is the precedent for the TC side specifically: a TC action that
+>   reuses the netfilter conntrack engine rather than reimplementing it.
+>
+> And act_nat is the cautionary counter-example: a standalone TC
+> reimplementation of stateless NAT that shares no code with nf_nat, and
+> carries a "would be nice to share code" comment :)
+>
+> So I am wondering whether the right direction is to factor the
+> translation engine cleanly, land it with one harness first, and keep the
+> other attachment points as follow-up work once the core semantics are
+> settled.
+>
+> Does that direction seem reasonable to you?
+
+Yes, reusable functionality that can be called from multiple places
+sounds like a good fit; let's try to structure it that way!
+
+As for which hook to start with, well, let's see if we hear back from
+the netfilter devs, but either netfilter or the routing subsystem (LWT
+style) would be OK for me I think.
 
 -Toke
-
 
