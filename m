@@ -1,262 +1,134 @@
-Return-Path: <netdev+bounces-301481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301482-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BtQcBD7uOmq6LwgAu9opvQ
-	(envelope-from <netdev+bounces-301481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:36:14 +0200
+	id q3j5B4buOmreLwgAu9opvQ
+	(envelope-from <netdev+bounces-301482-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:37:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E146BA0D1
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:36:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21AA86BA0E0
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:37:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=UBpCpzx8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301481-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301481-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QY3skTBh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301482-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301482-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28B793006801
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 20:36:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A30273006785
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 20:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F4F3A6B9C;
-	Tue, 23 Jun 2026 20:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1077E3A6EEB;
+	Tue, 23 Jun 2026 20:36:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F733A6417
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 20:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127AE3A6B9C;
+	Tue, 23 Jun 2026 20:36:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782246967; cv=none; b=V0JMQ9dt2x9zFIydXPbqcmVPv69yQFraLHODGCErkZFf0DQ8kKXDSx8IrVHlPVZdSLTr3vBKxYjVQQv6t4ZmKojYydRrKS+JVuGrE59HNqIYWITBysjzHG35GyWdJb2bQaOTKIEgyWmAq7MKD47AFBqyt+o7d8BR2WRI0SbB604=
+	t=1782246996; cv=none; b=o/isvaYZMJdhSwSKOOuTAS6NpTyoD8Yxmp1H8ChJZ56/wnTS04Hs5HLy/hIoKwjwxK3B6EnMEm6FaKweEOxf8xeenpVHQBnOwy5OUgxAKzXeB6OV2sZnuuhu4r4YKf7m0REHmkiHKbnOcHXANxXFlGOjl3Ls5qE7bLhwyquOJmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782246967; c=relaxed/simple;
-	bh=/GRGD1MLD4X5/6xzuqcyhlzMs7a2/Xib0LBHx4kotfU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=S2jswhI9JlbvTaYNFUjlo5qVm61ttrLh9ZYBi/e+9V7nACecmN80JZCQXNjveMuYl3xMDYo1s85qby078VHVS+XEnbDev9wolv/+yttWPZmne8zYWFqmTnuyo0726+XgHvLTSuvw8SbckKkawQSgclyPKZTGztV5iPcJNwpPovs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=UBpCpzx8; arc=none smtp.client-ip=209.85.208.54
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6974a6e54dbso427793a12.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 13:36:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1782246964; x=1782851764; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zpP2TgAWS6LY05FhT2gkiNjZjpsX/XmOaS8W6L/6Guw=;
-        b=UBpCpzx82ReHPrbiYxd+lsYYyboAMrBhFygsPg3LAmBQRpmS6OO4CWf5qIrzHyxaBo
-         2c8Z1MviLoEkDxi5t/hyuz1ZgFozfMO4gFLSqngf6Kykg6AGHAzr4EV3IXVnLoAJyYM+
-         zFEv0nCnHFvsR9MMdLtZUdEDxaX0yOsQeNA3PodV7qx46PnC47HicKsLgaKsQ1moN1bJ
-         mqoxjrPDPQ3g0nZVGYIav5WWjThsFMQWFthEfJCa4B5virf5i7NMA+Q9l5qkmtjp6H77
-         vilRyiCpFwp/4JDYmfI0UZpj5bnNQ2rSzZJAu2K4oaaGRAbmDOcAxgqWRtt3XwliYI5S
-         mu5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782246964; x=1782851764;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zpP2TgAWS6LY05FhT2gkiNjZjpsX/XmOaS8W6L/6Guw=;
-        b=Ho7mvM1p2+nrluyQktOBUtXaHJHlp1E4vyYP7qUpz+WMVdL+heaXDcj4pij9QhBiGj
-         5m9fNmvYfne8m3QG3cSQGJjzs5BkqxdTscMPskosWV3zqeDH6uYC3aoTGjJVGkS7nKQW
-         BV3vtX0XT8pDBX6BgtOH8Me4F9m0IxU6aIFIdPGa2s2/azOWf/ztsSOIam4aZXdaVl13
-         rB4W0SFdOuw/TXOY8yOoy+dzYPE3h7KEf+EEg1CILv1Nk2fD023xG1w7dbcyfedLc77f
-         J5dWC7M7KcUwfNE9F7uAEa0WCCEUghpkZNTRlk1Oolbgw4kjCfcqDJUX8sFlxv9t8VmV
-         RCyw==
-X-Forwarded-Encrypted: i=1; AFNElJ+dCd77C4JVOj7RNdCz8fZMz4bS/iTuacvo5qGoQLbmXXOqQL30FROVBLkA5vAC1IdWFxRzsPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkFpxKvoiFEwsTwz7Mw4COERBQ2Jn+6hAgXUVO8aB/0eYwbRol
-	tsk6C4GktojmRwbI5DpTr+C85g6euvsd01nVtp1e585QEmacCiMVfMyyHerpgBqx0eE=
-X-Gm-Gg: AfdE7cnDtyslaaxK7cC0BQQWY86db015xSyXZOJEa5eLEWANpgE+YaUSS9M3Q3sxnlr
-	ULjL4CtrJ7jf7gAoADPUyiea0xlj/PdPk51MeIe/oCyQS+y8AP1c73nvaUFiEvoJAR9uAccPO36
-	xyM2+T8qBVfRyexnUFptsLe7T0jc8c8jX9Et5PHq5m12Q3xeeXcn3/FtneTGOMjyAxWNsZ9OjPe
-	Q0pkoTX/pMd9b/2WboYpKZ++w/IRGV3cZ/BzkwmbH3rvBBV8/jao588FZoSCEWRnjUantbQ6og4
-	dSIPX+7lUMLweRT2GMM/Z5Art/iKue5wqaJjw/FM6aeThXgyhabHwhXFtMXu0fM+RkYH6qYxwDR
-	Bxg3IHOPnX2Le4XleMou8Yn5rbGtF7mHSbRHUinYx20SpX1aa+F+ynDqHYcn2Mm4qT9bK4VoGdM
-	EwKQsQG0XD281E8o/upKTYVH5IjA==
-X-Received: by 2002:a05:6402:538c:b0:697:8341:9e40 with SMTP id 4fb4d7f45d1cf-697f376fe8cmr98020a12.5.1782246964455;
-        Tue, 23 Jun 2026 13:36:04 -0700 (PDT)
-Received: from cloudflare.com ([104.28.21.182])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f4bc8016sm16312a12.25.2026.06.23.13.36.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 13:36:04 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,  Kuniyuki Iwashima
- <kuniyu@google.com>,  bpf <bpf@vger.kernel.org>,  Alexei Starovoitov
- <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Jakub Kicinski
- <kuba@kernel.org>,  Jiayuan Chen <jiayuan.chen@linux.dev>,  John Fastabend
- <john.fastabend@gmail.com>,  Network Development <netdev@vger.kernel.org>,
-  kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH bpf-next v2] bpf, unix: Guard sk_msg-dependent code
- behind CONFIG_NET_SOCK_MSG
-In-Reply-To: <CAMB2axMVhJJpP5HZtDFyQLLbKoRxhW08rj1zGRtWtgDkfYaVNA@mail.gmail.com>
-	(Amery Hung's message of "Tue, 23 Jun 2026 13:22:38 -0700")
-References: <20260623-bpf-sk_msg-split-unix-v2-1-ca7a626a94a5@cloudflare.com>
-	<CAAVpQUBsQFFxJFDnJzxmsER3bOjm=zqJ5P5MSeW_T9v-4639cw@mail.gmail.com>
-	<87v7b9ysep.fsf@cloudflare.com>
-	<CAAVpQUBARp1qCEomgzWXVe35WatdaswujVLku+RESm_LW0dE7Q@mail.gmail.com>
-	<CAADnVQL2pfQ0BoN-vWcuCpbOBBKq_rM7Bp7P4XdLMFER5LGSDg@mail.gmail.com>
-	<87mrwlyqg4.fsf@cloudflare.com>
-	<CAMB2axMVhJJpP5HZtDFyQLLbKoRxhW08rj1zGRtWtgDkfYaVNA@mail.gmail.com>
-User-Agent: mu4e 1.14.1; emacs 30.2
-Date: Tue, 23 Jun 2026 22:36:02 +0200
-Message-ID: <878q85yoy5.fsf@cloudflare.com>
+	s=arc-20240116; t=1782246996; c=relaxed/simple;
+	bh=2Gyr82snPt9y2zAFsuCqcD8MRiMv0Xzu72h1HyGDZls=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j0kdZ4SV34eYOFNRx1XHo/boz4OV1fYMrLDiiu9xDBEsxjmmbS+C+TEO6Cbj0MW1FQBtSY2ywaFgWSwsO9GhJER2QUnng3ot0MbDf3gqg3EX4FNysLkXXZTVjgLIpRXaNDLGw7DDaMx6Re+MsZBH5VCO7yf+rLk7tBsCaOz2BK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QY3skTBh; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68A071F000E9;
+	Tue, 23 Jun 2026 20:36:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782246994;
+	bh=xpg/nHxXH9DlFY0d8gQErFvMzvxfYuzDRVc9FFshC90=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=QY3skTBhCHtOu23oGQCl4jM38Td9r6cSBj/iGhYxKEiUhLZ1uaboezkJdGfBHkN83
+	 3JmGdOHcO8mV0V5Dg+Mo3O6V7z/MRyhzSdTrgkgbo7E7YS2lyosssgjOw4HJcxSjIJ
+	 9+Ixcc6Nip6a1jcbiKXII5FMHvKaeSFCxJXL2c5WQQnfJLTOBsIjHiUqeHUtKpeDns
+	 kBKD+NmVvBMMAM3KXSyefHhJ23ttzPmO6WnncAjp9RylR9VJURbcYpuLCkZcBNAjuD
+	 QOpiZsaBIlVGcDip3STrDaUiZbk66/GlV/CeUCKGlrRQqwr+p2Uvj5kg0fUgP0WSDt
+	 lNfGociHc36Kg==
+Date: Tue, 23 Jun 2026 13:36:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Tushar Vyavahare
+ <tushar.vyavahare@intel.com>, <netdev@vger.kernel.org>,
+ <magnus.karlsson@intel.com>, <stfomichev@gmail.com>,
+ <kernelxing@tencent.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <tirthendu.sarkar@intel.com>,
+ <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 0/3] selftests/xsk: stabilize timeout test
+ behavior
+Message-ID: <20260623133633.34c6fad7@kernel.org>
+In-Reply-To: <ajqfDYznpCU18C2P@boxer>
+References: <20260616154955.1492560-1-tushar.vyavahare@intel.com>
+	<CAL+tcoDr0gtCPeGi1yOUtg+ZD2YxEbjAy41LBgG63b8-=CStcw@mail.gmail.com>
+	<ajJsMj0QMOF5I8qq@boxer>
+	<20260622160706.0b4a27bf@kernel.org>
+	<ajpLuDNCu2PHS78l@boxer>
+	<ajqfDYznpCU18C2P@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,cloudflare.com];
-	TAGGED_FROM(0.00)[bounces-301481-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ameryhung@gmail.com,m:alexei.starovoitov@gmail.com,m:kuniyu@google.com,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:jiayuan.chen@linux.dev,m:john.fastabend@gmail.com,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:alexeistarovoitov@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301482-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:kerneljasonxing@gmail.com,m:tushar.vyavahare@intel.com,m:netdev@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kernelxing@tencent.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:tirthendu.sarkar@intel.com,m:bpf@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,intel.com,vger.kernel.org,tencent.com,davemloft.net,redhat.com,kernel.org,iogearbox.net];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,vger.kernel.org:from_smtp,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 04E146BA0D1
+X-Rspamd-Queue-Id: 21AA86BA0E0
 
-On Tue, Jun 23, 2026 at 01:22 PM -07, Amery Hung wrote:
-> On Tue, Jun 23, 2026 at 1:04=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
-com> wrote:
->>
->> On Tue, Jun 23, 2026 at 12:33 PM -07, Alexei Starovoitov wrote:
->> > On Tue, Jun 23, 2026 at 12:31=E2=80=AFPM Kuniyuki Iwashima <kuniyu@goo=
-gle.com> wrote:
->> >>
->> >> On Tue, Jun 23, 2026 at 12:21=E2=80=AFPM Jakub Sitnicki <jakub@cloudf=
-lare.com> wrote:
->> >> >
->> >> > On Tue, Jun 23, 2026 at 09:08 AM -07, Kuniyuki Iwashima wrote:
->> >> > > On Tue, Jun 23, 2026 at 4:20=E2=80=AFAM Jakub Sitnicki <jakub@clo=
-udflare.com> wrote:
->> >> > >>
->> >> > >> Prepare to decouple BPF_SYSCALL config option from NET_SOCK_MSG.=
- When
->> >> > >> completed all code paths related to sockmap-based redirects shou=
-ld be
->> >> > >> guarded by BPF_SYSCALL && NET_SOCK_MSG to allow users to opt out=
- by
->> >> > >> disabling NET_SOCK_MSG. The implementation of sockmap as a conta=
-iner for
->> >> > >> socket references would remain under BPF_SYSCALL.
->> >> > >>
->> >> > >> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
->> >> > >> ---
->> >> > >> Changes in v2:
->> >> > >> - Handle prot->recvmsg being NULL (Sashiko)
->> >> > >> - Elaborate on the end goal in description
->> >> > >> - Link to v1: https://patch.msgid.link/20260622-bpf-sk_msg-split=
--unix-v1-1-d7e0cb7bb03b@cloudflare.com
->> >> > >> ---
->> >> > >>  net/unix/af_unix.c  | 4 ++--
->> >> > >>  net/unix/unix_bpf.c | 6 ++++++
->> >> > >>  2 files changed, 8 insertions(+), 2 deletions(-)
->> >> > >>
->> >> > >> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
->> >> > >> index f7a9d55eee8a..84c11c60c75f 100644
->> >> > >> --- a/net/unix/af_unix.c
->> >> > >> +++ b/net/unix/af_unix.c
->> >> > >> @@ -2675,7 +2675,7 @@ static int unix_dgram_recvmsg(struct socke=
-t *sock, struct msghdr *msg, size_t si
->> >> > >>  #ifdef CONFIG_BPF_SYSCALL
->> >> > >>         const struct proto *prot =3D READ_ONCE(sk->sk_prot);
->> >> > >>
->> >> > >> -       if (prot !=3D &unix_dgram_proto)
->> >> > >> +       if (prot->recvmsg)
->> >> > >
->> >> > > There is no reason to have this dead branch when
->> >> > > CONFIG_BPF_SYSCALL && !NET_SOCK_MSG.
->> >> > >
->> >> > > Let's compile out all sockmap code when both configs
->> >> > > are not enabled.
->> >> > >
->> >> > > Since AF_UNIX differs from TCP/UDP, it can take the
->> >> > > simpler approach.
->> >> >
->> >> > Okay, will put the whole file behind hidden config option like so:
->> >> >
->> >> > --- a/net/unix/Kconfig
->> >> > +++ b/net/unix/Kconfig
->> >> > @@ -30,3 +30,8 @@ config UNIX_DIAG
->> >> >         help
->> >> >           Support for UNIX socket monitoring interface used by the =
-ss tool.
->> >> >           If unsure, say Y.
->> >> > +
->> >> > +config UNIX_BPF
->> >>
->> >> Maybe UNIX_BPF_SOCKMAP or something.
->> >> bpf_iter is supported without this config.
->> >
->> > I don't like where it's going.
->> > I strongly dislike new config knobs.
->> > I'd rather remove existing knobs.
->> > What is the motivation?
->>
->> The goal is to compile out sockmap bits that use sk_msg.
->> NET_SOCK_MSG is natural, exisiting candidate.
->> New knob wasn't my idea.
->
-> I'm also missing the big picture here.
->
-> sockmap already holds socket references today. You can store and look
-> up sockets without attaching any verdict/parser program, and no
-> redirect happens. So if the goal is to use sockmap purely as a socket
-> container without the sk_msg fast-path overhead, what does a
-> compile-time NET_SOCK_MSG knob add over the runtime checks?
+On Tue, 23 Jun 2026 16:58:21 +0200 Maciej Fijalkowski wrote:
+> On Tue, Jun 23, 2026 at 11:02:48AM +0200, Maciej Fijalkowski wrote:
+> > last refactor from Tushar broke BIDIRECTIONAL test case when HW is test
+> > target, but not on veth, so let me test these changes locally and then get
+> > back to you.
+> > 
+> > BPF CI runs xskxceiver on veth so this has not been caught. Seems my/our
+> > focus should be to enable xskxceiver HW tests on any kind of
+> > environment/infrastructure.
+> > 
+> > Gonna get back to you by the EOD.
+> > Maciej  
+> 
+> Ah I replied on other thread I guess, so let me repeat:
+> 
+> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-Sure, let me clarify. It's about the maintenance overhead.
+Great, thanks!
 
-sockmap-based redirects are a rather niche feature with few users, for
-which we've been getting quite a few bug reports since AI came along.
-
-We're not using it internally at Cloudflare, so I don't really have a
-good reason to justify time spent on these bug reports.
-
-Hence the move to put sockmap-based redirect behind a config option,
-which you can enable at your own risk. Or which we can deprecate, but
-that's not really my call.
-
-> I am also not sure if NET_SOCK_MSG is right. It is broader than
-> "sockmap redirect". It is selected by TLS and {INET,INET6}_ESPINTCP.
-> Because those select it, it can't be toggled independently.
-
-Once the sockmap redirect bits are behind _some_ config option, it will
-be easy to replace it with a more granular one that depends on
-NET_SOCK_MSG. But we're not there yet. One step at a time.
-
-> Could you share the concrete use case you have in mind, and whether
-> this came out of an earlier discussion or thread upstream?
-
-This is a follow up from discussions at BPF summit with Alexei & John.
 
