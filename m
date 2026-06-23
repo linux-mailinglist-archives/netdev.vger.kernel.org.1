@@ -1,158 +1,205 @@
-Return-Path: <netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301266-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cysxGbofOmpt1wcAu9opvQ
-	(envelope-from <netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:55:06 +0200
+	id P84dNXkhOmoT2AcAu9opvQ
+	(envelope-from <netdev+bounces-301266-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:02:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E0C86B449F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:55:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D74E6B455C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:02:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=codeconstruct.com.au header.s=2022a header.b=CEXbprue;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301265-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=codeconstruct.com.au;
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=Y9vekp61;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301266-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301266-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 287163013A51
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 05:55:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ED4703015C91
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7200C331EB8;
-	Tue, 23 Jun 2026 05:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC2E264A97;
+	Tue, 23 Jun 2026 06:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6E8306746;
-	Tue, 23 Jun 2026 05:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D4C331EB8;
+	Tue, 23 Jun 2026 06:02:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782194103; cv=none; b=bpnTTGmCbpjGYs6iaEC0m0+e6cf+Eg3K9vP9c9ily4iIsCoRUPo8AuZUwV/C/YhAFseObtgr9+hLrPtrM6lscURSenMPV2PUbbYFA2gzPKFND9qaRF2RtyXGrl+VUwt3nuQn3KNAgt7kMNOgvDNy4Ap6491E8iRB4oB6DrJaFaQ=
+	t=1782194551; cv=none; b=GPnnoC+Gp4ucLnPAmh7NgQf0fx6ygvjrruuwPa4QEWLcZn4ceGzWTVO6pc+ubZEoQB7EgxVJ2CrOE1UQrag8JdWVgKFkUltLbPaYvtSMxPMXS1PTy5Ngc4lACYCuefnUhyJ8/MOJGDwlhKPhe7Nbu4hIhl5N7aQcDIpzSa0Zjqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782194103; c=relaxed/simple;
-	bh=xn+wvnXzpc9jXLOuctsgT9WJqipzbFncNOD9qXKry7g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Kv4qucF1zU6+LNL45rB6l7HTa5T+d7JYk+3GCto5tvLephQEFHjyo6NzzCBiv9IfMDSUyS7vKNHxjK1W6nj2W42eqZWGjOhmuZgX/NZ+HRjbNxU6FLyzdTjDjF9DWi9OaOSk8/LN8KvRJmHUp3AO1SnZR5NV8MJm/9laBIF1V7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=CEXbprue; arc=none smtp.client-ip=203.29.241.158
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1782194093;
-	bh=xn+wvnXzpc9jXLOuctsgT9WJqipzbFncNOD9qXKry7g=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=CEXbpruebyN+ULBwabnfGMz/IPLDYGMrn054ck0qigRfFZLKsimynnZEPLMgRuUMR
-	 7hkB2IN5TXKNUmNB23Ist4JUEij/F31pAzd+G1YrGhtg4XaAL3ncS3PF+uw+AkTyis
-	 SonIfDUjb/EdCSS/tK61+BsIo6gmZdx738kwOLVGP2bfG7sgppH3mTg3jy7l8xvXMY
-	 V4LvKdH46WZ3wALZfKGzp6oWeLn9CMiebQPdYqaeJUQ5V7zWpahSvtEW/ishBMGDjZ
-	 AYjxa5bPrs5RM0IuGkTuDINXD3A/LBEsx3rnM4kpRdv8DS0/Ph2KkKNe4ppaxEgDIZ
-	 6XisPsdwOAq8w==
-Received: from [192.168.72.161] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 26C8A60007;
-	Tue, 23 Jun 2026 13:54:51 +0800 (AWST)
-Message-ID: <9d11a866347c2c8cd69fdcb338bae743d6e68bfc.camel@codeconstruct.com.au>
-Subject: Re: [net-next v44] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Paolo Abeni
-	 <pabeni@redhat.com>, admiyo@os.amperecomputing.com
-Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net, 
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, sudeep.holla@arm.com,
- Jonathan.Cameron@huawei.com,  lihuisong@huawei.com
-Date: Tue, 23 Jun 2026 13:54:50 +0800
-In-Reply-To: <edacdad5-7936-4fbf-ba66-973768ebdf73@amperemail.onmicrosoft.com>
-References: <20260522193610.234166-1-admiyo@os.amperecomputing.com>
-	 <20260528084611.133703-1-pabeni@redhat.com>
-	 <63aebaed-2456-457d-be70-5211d2f746df@amperemail.onmicrosoft.com>
-	 <8c2a9e591ba22a95962c2c5f7dff5971fc5123df.camel@codeconstruct.com.au>
-	 <4fabc99f-52c1-422e-9513-69e2190bc91a@amperemail.onmicrosoft.com>
-	 <068cd5ffb49aac3bfd2184df7289093cbcd524ee.camel@codeconstruct.com.au>
-	 <edacdad5-7936-4fbf-ba66-973768ebdf73@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2+deb12u1 
+	s=arc-20240116; t=1782194551; c=relaxed/simple;
+	bh=Ohl8H5CIdVJ0LZVBp5/kkC99ycMWv9vhyOY2FRSkPyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M5NJdIBsjhoREWewXt3UKF+B+4o2Y7VYdAzmw6q9SyF1TLn5Rrwyl6YcTHS16L7ffFUDs6x9SnKeYLMgCA7d5Yp23A9h3YLF2kgo82/oi1bhimGRwOp+8n923FWLfOnDKwIBtEN5jmWQyviHDZxFq6Tk7qLSn9Eydzs8JmU1bIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Y9vekp61; arc=none smtp.client-ip=115.124.30.97
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1782194539; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=5D6qSgcvkXY5fZhgXS+3C6PguwJ4UnErXlSfTf6hK/0=;
+	b=Y9vekp61xn2XhxSvykk9bYtq5TyJ6bTyOa86OlMAzzOKGVp7HLoKyayz+2iRlV0yUWUgJ0rpjkJJiltf4J4gpnu6HSfSAtR+g96UMf83HyOIfEEbjwR2ogbGhYzTS5E+NVe9Cx/IVg0vVDkKqVHGhMd9/lRUH+wK+EgmWBuHjjc=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0X5SwrVe_1782194538;
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X5SwrVe_1782194538 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 23 Jun 2026 14:02:18 +0800
+Date: Tue, 23 Jun 2026 14:02:18 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Sechang Lim <rhkrqnwk98@gmail.com>
+Cc: "D . Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>,
+	Ursula Braun <ubraun@linux.ibm.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Guvenc Gulce <guvenc@linux.ibm.com>, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net v2] net/smc: fix out-of-bounds read when sk_user_data
+ holds a sk_psock
+Message-ID: <20260623060218.GA29925@j66a10360.sqa.eu95>
+References: <20260619150342.3626224-1-rhkrqnwk98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260619150342.3626224-1-rhkrqnwk98@gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-12.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301265-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:admiyo@amperemail.onmicrosoft.com,m:pabeni@redhat.com,m:admiyo@os.amperecomputing.com,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sudeep.holla@arm.com,m:Jonathan.Cameron@huawei.com,m:lihuisong@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:ubraun@linux.ibm.com,m:kgraul@linux.ibm.com,m:guvenc@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301266-lists,netdev=lfdr.de];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.alibaba.com:dkim,linux.alibaba.com:from_mime,j66a10360.sqa.eu95:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1E0C86B449F
+X-Rspamd-Queue-Id: 2D74E6B455C
 
-Hi Adam,
+On Fri, Jun 19, 2026 at 03:03:41PM +0000, Sechang Lim wrote:
+> SMC stores its smc_sock in the clcsock's sk_user_data tagged
+> SK_USER_DATA_NOCOPY and reads it back with smc_clcsock_user_data(), which
+> only strips that flag. sockmap stores a sk_psock in the same field tagged
+> SK_USER_DATA_NOCOPY | SK_USER_DATA_PSOCK. Nothing keeps both off one
+> socket, and SMC then casts the sk_psock to an smc_sock.
+> 
+> A passive-open child hits this. It inherits the listener's
+> smc_clcsock_data_ready(), but sk_clone_lock() clears its NOCOPY
+> sk_user_data, and a BPF sock_ops program then adds the child to a sockmap,
+> installing a sk_psock in that field. The inherited callback reads it as an
+> smc_sock and dereferences a clcsk_* pointer past the end of the sk_psock:
+> 
+>   BUG: KASAN: slab-out-of-bounds in smc_clcsock_data_ready+0x84/0x200 net/smc/af_smc.c:2637
+>   Read of size 8 at addr ffff8880013b8674 by task syz.6.12484/67930
+>    <IRQ>
+>    smc_clcsock_data_ready+0x84/0x200 net/smc/af_smc.c:2637
+>    tcp_urg+0x24d/0x360 net/ipv4/tcp_input.c:6264
+>    tcp_rcv_state_process+0x280d/0x4940 net/ipv4/tcp_input.c:7336
+>    tcp_child_process+0x371/0xa50 net/ipv4/tcp_minisocks.c:1002
+>    tcp_v4_rcv+0x1eaa/0x2a00 net/ipv4/tcp_ipv4.c:2186
+>    [...]
+>    </IRQ>
+> 
+>   Allocated by task 67930:
+>    sk_psock_init+0x142/0x740 net/core/skmsg.c:766
+>    sock_hash_update_common+0xd3/0x990 net/core/sock_map.c:1010
+>    bpf_sock_hash_update+0x114/0x170 net/core/sock_map.c:1229
+>    __cgroup_bpf_run_filter_sock_ops+0x74/0xa0 kernel/bpf/cgroup.c:1727
+>    tcp_init_transfer+0x1085/0x1100 net/ipv4/tcp_input.c:6693
+>    [...]
+> 
+> sk_psock() already guards the other side, returning NULL unless
+> SK_USER_DATA_PSOCK is set. Make smc_clcsock_user_data() and its RCU
+> variant return the smc_sock only when sk_user_data carries SMC's tag
+> alone. A sk_psock then reads back as NULL, which the data_ready and
+> fallback callbacks already handle.
+> 
+> Fixes: a60a2b1e0af1 ("net/smc: reduce active tcp_listen workers")
+> Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+> ---
+>  net/smc/smc.h | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/smc/smc.h b/net/smc/smc.h
+> index 52145df83f6e..88dfb459b7cc 100644
+> --- a/net/smc/smc.h
+> +++ b/net/smc/smc.h
+> @@ -342,13 +342,25 @@ static inline void smc_init_saved_callbacks(struct smc_sock *smc)
+>  
+>  static inline struct smc_sock *smc_clcsock_user_data(const struct sock *clcsk)
+>  {
+> -	return (struct smc_sock *)
+> -	       ((uintptr_t)clcsk->sk_user_data & ~SK_USER_DATA_NOCOPY);
+> +	uintptr_t data = (uintptr_t)clcsk->sk_user_data;
+> +
+> +	/*
+> +	 * Return the smc_sock only if the slot carries SMC's tag alone.
+> +	 * sockmap stores a sk_psock here tagged SK_USER_DATA_PSOCK; it is
+> +	 * not an smc_sock and must not be dereferenced as one.
+> +	 */
+> +	if ((data & ~SK_USER_DATA_PTRMASK) != SK_USER_DATA_NOCOPY)
+> +		return NULL;
+> +	return (struct smc_sock *)(data & SK_USER_DATA_PTRMASK);
+>  }
+>  
+>  static inline struct smc_sock *smc_clcsock_user_data_rcu(const struct sock *clcsk)
+>  {
+> -	return (struct smc_sock *)rcu_dereference_sk_user_data(clcsk);
+> +	uintptr_t data = (uintptr_t)rcu_dereference(__sk_user_data(clcsk));
+> +
+> +	if ((data & ~SK_USER_DATA_PTRMASK) != SK_USER_DATA_NOCOPY)
+> +		return NULL;
+> +	return (struct smc_sock *)(data & SK_USER_DATA_PTRMASK);
+>  }
+>  
+>  /* save target_cb in saved_cb, and replace target_cb with new_cb */
 
-> > > The code itself will not, as written, work on a 32 Bit system, as the=
-re
-> > > are 64 bit specific code.
-> > Yeah, that was more my question - what is 64-bit specific about the
-> > code?
->=20
-> I'd really have to dig, as this decision was mixed in with the earlier=
-=20
-> endinaness conversions.=C2=A0=C2=A0I suspect, that it was origianally tri=
-ggered by=20
-> the ACPICA insisting on Machine architecture for these values, where=20
-> they are supposed to be explicitly 32, 64 bit etc.
+No. The core issue is how to resolve the ownership conflict between
+sockmap and SMC over sk_user_data, which can by no means be solved by
+adding runtime checks on the read path.
 
-Looking at the history, it appears like this was a in response to the
-AI review comments about the stats update with interrupts enabled. The
-report was that it may result in tearing of the stats values on 32-bit
-machines, but if you have the stats updates right (which I think
-you do now?) then this is not an issue.
+Following sk_psock_init(), the simplest approach would be to always
+explicitly set sk_user_data or ulp_ops during the active/passive
+creation of smc->clcsock, thereby avoiding the conflict at its root.
 
-> It might be perfectly safe, but I have no way to test. Treat it as a=20
-> general trend toward not supporting newer technology on older architectur=
-es.
+Additionally, compatibility with sockmap in the fallback path needs to
+be considered, though that can be addressed later.
 
-This is more about not imposing a configuration restriction with no
-purpose. There is no need for you to test/support those configurations
-though.
-
-> Could I safely acquire a spinlock in the rx_ callback during interupt
-> context?
-
-Yes, absolutely. That's a main use-case for spinlocks, to allow
-serialisation from within an atomic context.
-
-> I thought that had a significant impact on the system.
-
-You don't want to be doing large amounts of work within the critical
-section (and with interrupts disabled), but your scenario should be
-fine.
-
-Cheers,
-
-
-Jeremy
+> -- 
+> 2.43.0
 
