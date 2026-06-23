@@ -1,226 +1,163 @@
-Return-Path: <netdev+bounces-301348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HNU0GP9rOmrB8gcAu9opvQ
-	(envelope-from <netdev+bounces-301348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:20:31 +0200
+	id e/+3GkJsOmrS8gcAu9opvQ
+	(envelope-from <netdev+bounces-301349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:21:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4C9F6B6A73
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:20:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5996B6A89
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:21:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=T3K4jyEw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301348-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301348-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=XuwEV5DW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301349-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301349-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3B6A4303CEC9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:20:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CBF2B303F984
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E50D3C769F;
-	Tue, 23 Jun 2026 11:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3DD3D34BB;
+	Tue, 23 Jun 2026 11:21:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82568298CAF
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 11:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D903337C0FE
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 11:21:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782213626; cv=none; b=S7SlkQhOcaGKfhoZo8CAjnTwYeBK8EpDu1ifbomZtVr5QCl3e7e2kFG6chpoKVxXZpfLxvAtcBhJlI8Bp4OBLM4W3ymFFgJyLzMIQe/r5nfDDAV1Pt7fZg73aNmo+rqGB30Q3xjf35LN8sCpP5qoM3rk5fWDSt9zNPxWWfwwi3A=
+	t=1782213694; cv=none; b=V9tbGVtxpRVMD+5B0I94E4F2OBhUEcFVAPwYjxoaV5xYKh5z0fTexVsHoMSEfpvw4/d+vzdlCpEh+1UtMK70AxAPw0oFewjGeiX72LUchLtninahVjj6gadh7FeIJoebImiz4YABnCDvqI6TlPzK1JMMG82KJi/oENtU0QzYzxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782213626; c=relaxed/simple;
-	bh=WpUspO+Gz3+m31nHLT5NVtXRWZab4kvM0luKnWbl/Es=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eelUxWMEKwBUZO/9AvVkvq8UN83O0sQJx25PLlV3PBcLuwVtRwIQdLRj4i4owi7W6gz+gSSH2V/QSEHjrExHk4XB3NXna3MJPsAjMOjY+1M1W7s3J0tERV5zO9jf4dhHIGRNuSx2cFO9Y/GzjPRbGaaQBdtgaTjNqT4Ud5C/DQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=T3K4jyEw; arc=none smtp.client-ip=209.85.218.44
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c0efc7ef797so313693666b.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 04:20:24 -0700 (PDT)
+	s=arc-20240116; t=1782213694; c=relaxed/simple;
+	bh=a4AMbgsU9vnD3f+9idFEn0dPE+OfDvFh/UXAkrsR24M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G27/4FVhEiiGkqKpPctdP/JY9sO+iISwzGU98JZw1EcyTm9i3Iq/HrxUn5XnjRiauOTTBtMvDs9wHngatMkSukpeUhagx0iKxdv+Q+NMpmAmVd1zob+QDntzjlZPfxVwFiEtUATXET/64zuK0MM5AJgIFn6JC5MWs3xMehskpB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XuwEV5DW; arc=none smtp.client-ip=209.85.210.54
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7e6e21c47e6so3142939a34.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 04:21:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1782213623; x=1782818423; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=elaSjIGfSwH+Wak0Gp5qRHdd7cauBRR9ppc4J3/+sDI=;
-        b=T3K4jyEwW4oa51y28Sbb6tBMcMT7v6VIIdTSepFcgpuaiyWy1swERl6KFQFCHzhyZM
-         B76KODWyQLS30ZKWAGDegAI2Pnu+Q2ANPPYtxK/J42+wTLsR0MNlgBRSj7e/TJ4Qi8iL
-         3H/3o1TKygR7CXYo3RrD9FFx1hSyrTeRhbcC3+COTqUPJDyLeb4wrllr/ICoZGXuPJ3L
-         FKboSsW345HfgFBN8sWcA9mWYREVSxEg/XN7iONa9XkAsEAWDbkAld3fjABVBeBWYC1y
-         xnqXroTlV4bW/q6VMrhHV8S82xiEiwKOe9gkPNHGUtYrtqogjAhjd4hQzHW0CgiZTZ4w
-         OpyA==
+        d=gmail.com; s=20251104; t=1782213692; x=1782818492; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iUJToStsuX+ZnU0L6C4YrQgVNiGOS5/f7s1ZTO1n2Qw=;
+        b=XuwEV5DWrHplKPVDfZJ977Yn9NEo/ebHj9zhck42x3xNEg0QKIH0C/0YjjDPN2qSOE
+         /y+dsUph0R8zIS5Zvv2iX5tiC9aLQ27B56mQFfNnhVplYx2DqayQre2zWzn8dkkdOap9
+         5peHot6nEYWRQoNqdXx8ABRf/kU9yIPKFVITm/LwB3nh246PaGIPT9QnJENvliezBmtM
+         HuVOPtycqlQxCe9jHIBGa3M9ZlLAE9E5myV1xtGHZTWlANRU1zP9gtpDWqVC5wUDajgk
+         ECJ8+ay6UEoyOboW+ly9q5X9kvyBqb/b+MB+ik4UNWzBveXVb55PoQUVA6LLXs1YWMQZ
+         R4Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782213623; x=1782818423;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1782213692; x=1782818492;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=elaSjIGfSwH+Wak0Gp5qRHdd7cauBRR9ppc4J3/+sDI=;
-        b=pP+Zb/G5OP0tlWOD3eEPuCFX+8xW3LVsqntKtczwGYP9k3R5oSS/EIzsDk/QyK1mJK
-         bLqGKaBZiAingFwMfUTjwz8Cbkc4LcfX5RGcEpeoV0VFQnnaCsybPN/VmPC0Pyvu3iMa
-         HXmixuFITSrJHd5rndZhdBRWcSCnZutlF4R8w3M0Dd8udIyJX9texqhkLIkiRJwLrX7N
-         IoVRfZ1JF2QfeCQG56M0FUlud7oOYPsBNt8mEVOP4TBi/TR7H0I1g+pvBtDrP3QHCEiv
-         l2fTTHZSzWjTWruWeXu8Zgr0JhY+n9ooYXBV6nWgxxW4Pt2Br9isdWhJGb84LTzwNSA2
-         V4Zw==
-X-Forwarded-Encrypted: i=1; AFNElJ+SL6m/UUqVrlvtfuDTw/ENEWwP6pMlhcSQFLxGGrqoygPy+qnKdjWWlKnM7isjaIq60cMym5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpTQXNEYujPBoFO8UHR35JVXgTTqGhvt2rGJN0S6jmY6Xs0UHy
-	K0CUb7XTqSxu7TD7YsKGpk/u9R/1HFiEnqd1imTgiXJNjCQ2r2BO5nAmxJj3IJx9jEINBcsXQLJ
-	EGpDW
-X-Gm-Gg: AfdE7cmXKrYNEvuhNX/rKSeaE57CHUD9zhAyaomOOFp0ch2u1p//6jfaaMtK42hs4X6
-	Ua/b84EeuIcBrx9YZuuDRywxDZKaJ8bpNFzT/7PFbrBDcHhVPmjTeEzxvFJw0sI5qoEwmh4I8Jd
-	m1Qnjg1E8KGnIwksVe6fAkCjVnHYUk2AdNu+t2pqJzeI+VYPUFJU4s+QjAl9MSI7dUJ/QEtxepX
-	wLfYfTEOqD8uQwyYhrhl0AxE4kaMoojNWRdlF7G0SQoY+ZVkXz19/EjlCran9L2dBpyRsvOlugl
-	4Aiky72WsSA5DbMMTB7fBpurWPrrH8ioS22oWv8Z73Bya04z6rGxA1S5V472DxLOZ+LTOPtbYy+
-	f9X9IDip4kahRxmQ5eqYfO6mxi3U8kjVHmgxdIpWH6oZ4zKEo0k1MSYWCX1HqJ2faJXMS/ncbA9
-	ydRAIAr+sVi04tKLSM
-X-Received: by 2002:a17:907:c085:b0:c0d:9172:c8bc with SMTP id a640c23a62f3a-c10902d21afmr125473866b.42.1782213622896;
-        Tue, 23 Jun 2026 04:20:22 -0700 (PDT)
-Received: from cloudflare.com ([81.15.226.210])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c60ac9e77sm490232666b.37.2026.06.23.04.20.22
+        bh=iUJToStsuX+ZnU0L6C4YrQgVNiGOS5/f7s1ZTO1n2Qw=;
+        b=Olimif3n7aqaLWhxS5Xzh6OJ/eVB63g1/59+21mljndm3zncrshd0iZyAX88J1yBzy
+         cPr9Jk9t9gcfexXFSuAqkurH1QL8dWY6dDNrAYkDdw1sEewsX6fYXXK0WOHH9q2SMbho
+         L5N+6MguDuQ1FzOa51OXG+cWLzzyHogoD9X+/7mWcp0cWo5geZZQJ0vVSlSa/K63t8nz
+         AK4bCr4a8wPNTvhCnJXHnZFNwELQNxzW2rbdVjb0pN31Cu1RCiLsMZTWH659VDorD+Qh
+         OWShPPOVXuuyWA2XUxtLlPQaCJo25qbaR7cgPqY37hkEwoBl8bgzTlRSHczRH6w77MQz
+         d24Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+JXTuUnvCsGaW61O6K3BaA17dyPy+ivV9QveNue+ticC586d101g9Sho9tm29CEkj59ifvQ5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkwMgdWqrNrK9xuU/GuTzKCV65gvmVJRv20shV8BJzhXlDeHKv
+	9Y57Qu3/uFCg48pecWv3wk93WKUIMpZCNrCQHt+8dyfltUGkogNfBqs4
+X-Gm-Gg: AfdE7cki4dfmeSCCLeNmAZjl1y2WYAlOCkkQgec0QyDjAH72p2Co5pOqMo4lM8v/6w3
+	cCHm7HIy5nNbMBAgeDObGXeeUyh/mpTwnGf6Cn1nK4b3EXdnEWmVFV+6x9o2uPmfCp1OXN/pb5a
+	5d3m8QQr0mB5L6g3JxFRsEm2P6jWJNXsTt1Fm8Jhbv/HB7tac/XUbtkagvDT7vPRHweK1rlzZFX
+	DnJNauJ9tGJgk5EczQU33sR53EF5M+l5/hMDd2E0wpCj+3L/D2fSaEtaWOq3vXjaBnfoLp8slCD
+	OhVlJpy6nr5McvY+E965TJNKvK1baJixLWky8wZUCMVQVSiSAORo/JV+HuDorkcU6e+FTae6llF
+	Y7dQGlW1EHyaT2z+njVDW2CJXJxCzRX8p2r97vptkKOluensOvgcu+uUf4smAxOcVxGShBU+Q7M
+	iFiJOAEB8wBCmoA/eS3vuNseAZACC+
+X-Received: by 2002:a05:6830:81ec:b0:7e7:45f:ce3c with SMTP id 46e09a7af769-7e9798d60d5mr1467767a34.14.1782213691855;
+        Tue, 23 Jun 2026 04:21:31 -0700 (PDT)
+Received: from GINKO1.localdomain ([216.167.189.32])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e94406d488sm8630916a34.8.2026.06.23.04.21.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 04:20:22 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Tue, 23 Jun 2026 13:20:18 +0200
-Subject: [PATCH bpf-next v2] bpf, unix: Guard sk_msg-dependent code behind
- CONFIG_NET_SOCK_MSG
+        Tue, 23 Jun 2026 04:21:31 -0700 (PDT)
+From: Michael Pratte <slatoncomputers@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org
+Subject: s2io: driver still in use - please reconsider removal
+Date: Tue, 23 Jun 2026 06:21:33 -0500
+Message-ID: <20260623112133.752195-1-slatoncomputers@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260623-bpf-sk_msg-split-unix-v2-1-ca7a626a94a5@cloudflare.com>
-X-B4-Tracking: v=1; b=H4sIAPFrOmoC/4WOQQ6CMBREr0L+2pq2EjCuvIchhrYfqEJL+gvBE
- O5uwQO4nMy8mVmBMFgkuGUrBJwtWe+SkKcMdFe7Fpk1SYPksuCFlEyNDaP3c6CW0djbyCZnF2Z
- KkRuOPL9qBYkdAzZ2OXofsCMOlwjVz6FJvVDHvXbPdpaiD5/jwiwO4s/aLJhIk8i1KpXiF3XXv
- Z9M09cBz9oPUG3b9gVOTc8G2wAAAA==
-X-Change-ID: 20260622-bpf-sk_msg-split-unix-d714d0e048cb
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jiayuan Chen <jiayuan.chen@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
- kernel-team@cloudflare.com
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,google.com,vger.kernel.org,cloudflare.com];
-	TAGGED_FROM(0.00)[bounces-301348-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:jiayuan.chen@linux.dev,m:john.fastabend@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,lunn.ch,kernel.org,davemloft.net,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301349-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:enelsonmoore@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[slatoncomputers@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slatoncomputers@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:from_mime,msgid.link:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E4C9F6B6A73
+X-Rspamd-Queue-Id: CF5996B6A89
 
-Prepare to decouple BPF_SYSCALL config option from NET_SOCK_MSG. When
-completed all code paths related to sockmap-based redirects should be
-guarded by BPF_SYSCALL && NET_SOCK_MSG to allow users to opt out by
-disabling NET_SOCK_MSG. The implementation of sockmap as a container for
-socket references would remain under BPF_SYSCALL.
+Hi,
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
-Changes in v2:
-- Handle prot->recvmsg being NULL (Sashiko)
-- Elaborate on the end goal in description
-- Link to v1: https://patch.msgid.link/20260622-bpf-sk_msg-split-unix-v1-1-d7e0cb7bb03b@cloudflare.com
----
- net/unix/af_unix.c  | 4 ++--
- net/unix/unix_bpf.c | 6 ++++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+Commit aba0138eb7d7 ("net: ethernet: neterion: s2io: remove unused
+driver") removed s2io in v7.0 as "highly unlikely to still be used."
+It is still in use here: an Exar Xframe-II (PCI 17d5:5832) in a
+Supermicro X5DA8.
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index f7a9d55eee8a..84c11c60c75f 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2675,7 +2675,7 @@ static int unix_dgram_recvmsg(struct socket *sock, struct msghdr *msg, size_t si
- #ifdef CONFIG_BPF_SYSCALL
- 	const struct proto *prot = READ_ONCE(sk->sk_prot);
- 
--	if (prot != &unix_dgram_proto)
-+	if (prot->recvmsg)
- 		return prot->recvmsg(sk, msg, size, flags);
- #endif
- 	return __unix_dgram_recvmsg(sk, msg, size, flags);
-@@ -3152,7 +3152,7 @@ static int unix_stream_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct sock *sk = sock->sk;
- 	const struct proto *prot = READ_ONCE(sk->sk_prot);
- 
--	if (prot != &unix_stream_proto)
-+	if (prot->recvmsg)
- 		return prot->recvmsg(sk, msg, size, flags);
- #endif
- 	return unix_stream_read_generic(&state, true);
-diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
-index f86ff19e9764..5289a04b4993 100644
---- a/net/unix/unix_bpf.c
-+++ b/net/unix/unix_bpf.c
-@@ -7,6 +7,7 @@
- 
- #include "af_unix.h"
- 
-+#ifdef CONFIG_NET_SOCK_MSG
- #define unix_sk_has_data(__sk, __psock)					\
- 		({	!skb_queue_empty(&__sk->sk_receive_queue) ||	\
- 			!skb_queue_empty(&__psock->ingress_skb) ||	\
-@@ -94,6 +95,7 @@ static int unix_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 	sk_psock_put(sk, psock);
- 	return copied;
- }
-+#endif /* CONFIG_NET_SOCK_MSG */
- 
- static struct proto *unix_dgram_prot_saved __read_mostly;
- static DEFINE_SPINLOCK(unix_dgram_prot_lock);
-@@ -107,8 +109,10 @@ static void unix_dgram_bpf_rebuild_protos(struct proto *prot, const struct proto
- {
- 	*prot        = *base;
- 	prot->close  = sock_map_close;
-+#ifdef CONFIG_NET_SOCK_MSG
- 	prot->recvmsg = unix_bpf_recvmsg;
- 	prot->sock_is_readable = sk_msg_is_readable;
-+#endif
- }
- 
- static void unix_stream_bpf_rebuild_protos(struct proto *prot,
-@@ -116,8 +120,10 @@ static void unix_stream_bpf_rebuild_protos(struct proto *prot,
- {
- 	*prot        = *base;
- 	prot->close  = sock_map_close;
-+#ifdef CONFIG_NET_SOCK_MSG
- 	prot->recvmsg = unix_bpf_recvmsg;
- 	prot->sock_is_readable = sk_msg_is_readable;
-+#endif
- 	prot->unhash  = sock_map_unhash;
- }
- 
+Bringing it up, I found that no TCP can be transmitted on these
+adapters since v4.2. I bisected it to 51466a7545b7 ("tcp: fill
+shinfo->gso_type at last moment"): since that commit tcp_transmit_skb()
+sets skb_shinfo(skb)->gso_type unconditionally, non-GSO TCP frames now
+reach s2io_xmit() with gso_type=SKB_GSO_TCPV4 but gso_size=0. The driver
+arms the hardware LSO engine off gso_type alone and programs MSS=0,
+which the Xframe-II rejects (LSO6_ABORT), dropping every TCP frame
+before the MAC. UDP and ICMP are unaffected.
 
+The fix is one line - only arm LSO for skbs that are really GSO:
 
+-	if (offload_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)) {
++	if ((offload_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)) && skb_is_gso(skb)) {
 
+I have submitted that patch to stable@ for the 6.6.y and 6.12.y trees
+that still carry the driver. Given it is evidently still in use, would
+you consider reverting the removal?
+
+Thanks,
+Michael Pratte
 
