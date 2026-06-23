@@ -1,209 +1,300 @@
-Return-Path: <netdev+bounces-301392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id sdlCIPWbOmpNBggAu9opvQ
-	(envelope-from <netdev+bounces-301392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:45:09 +0200
+	id WhNiLhOcOmpbBggAu9opvQ
+	(envelope-from <netdev+bounces-301393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:45:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196366B7FF0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:45:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15CC56B8000
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:45:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LCW8H1+H;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301392-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301392-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=HwWOh4GP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301393-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301393-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 86499303F965
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:45:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA9CC30422E9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33D53CC32B;
-	Tue, 23 Jun 2026 14:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C0E3C0A12;
+	Tue, 23 Jun 2026 14:45:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448E23C199A
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 14:45:05 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782225907; cv=none; b=gDbw6Yk5H5sll1GAJnXKptI3G792M8jKdOWf1nuODaq1tfl5vE8vt6MChPVZO7pquxxZB3mD1iwg3KOne6oNRgjfugcD+j7R8T2Ci/XFe7kcH/CstOvHMxB4EI9a95YAtEaA97LkEmWfwuZ0poQ3liboKnJQXjJ2qQCsWXTPxAg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782225907; c=relaxed/simple;
-	bh=sZNi6xg9sflBEGhOc7EN8IGrWBPWKS1LHIHSe3Ram6M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IfRvKQceM24OzCcDPB21WfHFuB+fPIObS48ZS4BV7GGD8bD3lL6Uzez3deM06gt2/PQGzFAzP/JtDqO4W82UZplAuDzNowfs83uAX/gvyrpucZ0Wtdvi1r7lg7PliReZNH/04UGFrTE5nY/l3c6JW5i9LUnP1GAxLvRAtVDj4Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCW8H1+H; arc=none smtp.client-ip=209.85.215.180
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c858014845aso620809a12.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:45:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404CC37C926
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 14:45:34 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782225935; cv=pass; b=i05NPNbJkeW+A0OhE68Q0UPo54SZ3e/F70hglP3iGR/jnOjqV+nQIXzYPQLKJnWX4Gj0uQ3opwO5Nuyb7nRX5ohadEkqjeEBt9qjMMrpitjCY/jR5fKzlVTn0usRZF5ooa0oWg9XP3Hjq8g50v8tridzdHTLrPifyraVNB+ckG0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782225935; c=relaxed/simple;
+	bh=TWDxtNBN1wtcPoOt7UHbi2xXpEZpXLvOIqhPtM9hZhE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sT6rLvJw6SIcGi0HDHiMmzTfJesopq0cp65j2ChhONRfJFY82unwMRYvXCuxE4DAB7cqbSTDBeRIsV03GtiJyGRzNKjeGIDwgEBr8JJQooX2Idur9n/H+wqn6ftCRNpMTHzjVdx4+aw0Nh/h9d/N/TMLwvYYRemPRGKnqztJLyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HwWOh4GP; arc=pass smtp.client-ip=209.85.210.176
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-842848fd613so4682637b3a.3
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:45:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782225933; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AOZ6K6uwQzakXntZdXur4C839p+ELEZkjpDKJLwGBp0FsaU/hAFkEdje9CkDCCKHrU
+         gH6F4VgPtFx2NziT9myJiTJI0wcMa5x0McU3tiGHqoH3oKzm/KbpoBjSXEl3LMy56i1z
+         CqNboyGkJjQigcrTRfYPOPM++ieRLUGZd/5l86Xdyb6MI2jBs6zbL55kBGFzDv2R2pI+
+         m41rgZZeyoco5ILGp+YJ97jY7QZ6KkEFKlEuCISgzOTag6uqIFo3huUzgmTqPuoOlCvW
+         yuPZzaO+oWFymFIvgM3uHsXyY/euSNlWI0xRm0fnLb3AjKQruGp0gBAyhmrlvBT4wO7q
+         UkzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7YrJwCPEG0aBXTN15tNlhGW5UegrbPvJCOtLBHc3hwM=;
+        fh=bPWtr0gPe0NqD52gA6wscJA50bRcDkbd6O3I13RwQtQ=;
+        b=DM44i4U6L+XcsDqNIpCUnl5vElmtu/iUmFeVRBXc/31g6VEhipKMUom22rHUdX8fZQ
+         dKkyO5dUXcfTZ+ZiNpDV2QrOyMhEaycqd89tW7e+PQOsFHOjzzvKUtQ956HSiDoCUxOL
+         XE5s9UiE8S78eQAuOjPctnJvnTf1OZ9LXXqknyrjoxV1ytwATxcONlNnETfRauuP1kkx
+         munU5Kc+sbrdYuWdycfBnsAlAxDJBkPcup6w/CPIw8/33FUSTxf14Oepj7mbeC4u4SCl
+         gTT0j3tq3cmtWGsSeH/V9EUhlTC2SfwCCBsO1GyoqQTg7/I9H61jh/AfIGySQZk7NCnd
+         oAqg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782225904; x=1782830704; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2cAvGjsb7kwxKnrggDL0ESG1XH4uHWWvpVFC+MpwI9o=;
-        b=LCW8H1+HnWXkd8L8LdOLweY1uEVX+0ymxJJ8yQnr94l0NhEKz86L5K/d9L3+VzjY9L
-         t/Ayf9cUwfboJXLY+y/Ez6wmoEoR3ty3JXMYK1EW4R1F/ZsLyT/3PnXcm5DA37Mt6kmn
-         Wx1C1mwnMwd9N8WlqWckjABIFHy7+rURt8vKWQF2XvKU+5Pd1ZfhDf1W+281gLncamdg
-         dezVz32wbvHxCwA2qtluzKXvYVHSRxIPWCRFstM0n3DQCSt4NKCmvB3Y6rYWGxJv9kDf
-         qYWKwfNeE2LQbdz0b0JMKgJdiS0kKI6E+vctTxQT5MFCEuYMat633DXM6FBdURwradB6
-         S34g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782225904; x=1782830704;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782225933; x=1782830733; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2cAvGjsb7kwxKnrggDL0ESG1XH4uHWWvpVFC+MpwI9o=;
-        b=LQ+sj76cHXYx2hZfREP/89/18RrrrkJvhiziDkZnCUGeckyYJwKPf7d+LuoApLg1Jp
-         seZzm8u4xIT+0oISQ3UwOb7G6Zv6kSYIIlCDXx28AZXz71wo+nfcuN9x1pN29HEiBkT9
-         AcPR0XsfbAbPUJfr4dOKE3ixPE8kNub7C2QdKqsOveDHDcoxtjhVGpe+5GadiKo87JV9
-         Brg3JdZqEdBefPMUfDqcLPGkcBfLxLCZ9b8vYn95iGILoxxwWZ9fr0cA7yEFqI+eRFq8
-         m2YmtnX/RaNGGXO54lTCjivVnKVsiaOTtSniPK9dK1o/aiEKGjD2vV04r2OUw+2hMs0q
-         nWbg==
-X-Forwarded-Encrypted: i=1; AFNElJ9sWSQiM71t95hI68izAFPf131U3yQK7DgO6ADTY/h7MgXqWxMog8Vsh4qpT//OGwH1tRa2gyA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMAPIcaryQ9jF/Zpu6v4fyvMzKvHclsSIe1AK2qM02RCVN1o9N
-	Id15hzyMw38G6CMJyWwHmU20KLCypbBr1CI3BHr+oMWzKjcXrT4vyLqA
-X-Gm-Gg: AfdE7cmGt+pb2CqytjNYQ/6LNhnM1mVckRi9LkFfqUboHpl6EwqArivWwLLNI1/ml58
-	GIRMLw9teEdNasn9karg5MNNQPImNujMAx9mRTjwv2f+8nKnE+1BhUUu0cAOkN15rTDlkmCYWC9
-	xrj8Cz/OFh9Tg8IEFapR4Yf3W/1Bc8vpBbCorYhQ+1KR1xhzGZ5nUiV82holuVYN3iyltxQ7VV4
-	qMqnpzuUkkVkFYs+9jSuDiqhv7MgsMC75ptlublzA+gwi6NSllOrVJ//ZBQwcww6FjUtNcclWJH
-	aWqr4Iy6iZFQCF3CuRbkNwKyBMe/QJhBZRhY2MSMWHs7s78cG/3GLr+ORbi1B1Evxq7sPUG7yKS
-	/2MAPnbZYh0stPEun+Zjj6MDa8h489w0ppQ41hryQHObn7G0ir0o4mRy9I2MnaW8ZpCj5kPdk5U
-	iSf4eSqu6zj0ZqItYO8Ujn
-X-Received: by 2002:a05:6300:8811:b0:3a0:c246:bb98 with SMTP id adf61e73a8af0-3bd10b3de08mr4191736637.29.1782225904306;
-        Tue, 23 Jun 2026 07:45:04 -0700 (PDT)
-Received: from i386.168.1.127 ([150.107.232.166])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8bc5a1dc13sm10229638a12.26.2026.06.23.07.44.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 07:45:03 -0700 (PDT)
-From: Hrushiraj Gandhi <hrushirajg23@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com,
-	Hrushiraj Gandhi <hrushirajg23@gmail.com>
-Subject: [PATCH v2] netdevsim: fix use-after-free in nsim_create and __nsim_dev_port_del
-Date: Tue, 23 Jun 2026 20:14:47 +0530
-Message-ID: <20260623144447.255326-1-hrushirajg23@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        bh=7YrJwCPEG0aBXTN15tNlhGW5UegrbPvJCOtLBHc3hwM=;
+        b=HwWOh4GPUuPuXt17QC4afV4QX542hoX3qhnxast2IbB5d11fPuxgXn16q5csSkqky2
+         2TTxRvlqGaFpGAAzzmQt4gvHBR/vTTt2dBh+2bnPdLMkxDX0qe6Cansv/ARUZ4d8aJ4k
+         wt0rh089K9cDO0wxb6eiWOILb739TV7xT2ts8Ty5XkaN9nmP28v0zou4JAqTFHGnkdOc
+         c6ul7cq2sX6r/H8pXjMClf7GjuhyaUFBM6pmWCo3/Gm2ZJ8h72oCuILFElqn0iOUfZm5
+         d1j500QZunEEPejKQU7pnflCB8PWJjoCn1O6Senix7dVAQOnXhXz1rPIO6RJmMSwqltA
+         2bJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782225933; x=1782830733;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7YrJwCPEG0aBXTN15tNlhGW5UegrbPvJCOtLBHc3hwM=;
+        b=VTKzbS2j4oQO1mOpX406kdkFEw/sQ2xU+j13DtsdeQlBI6Uij1A2rc0u+j1mQwhC7d
+         KX49Sh8XOTxXDemfMIUcWtDouuQL6tT1Bk/lFTaKM2j2DNrJ4OcQh7Vc5pwWBxBLnOJu
+         HaG5s02EnUwY/YGo5RuaY1ano/IMH9eJKfdGxrzha6ro6ZxSlfdMoohdzRl8hPf5tYKW
+         MeCWlGmkqY1G/DbTRqrK/cQTn1aVd/78OH3XrMwk/wSFmePq+MK329YSX2U923EYSd+A
+         69vim/eONb8GpobMyYRD+6CZ9TJA7V9m3gUatgvdOKl8T5JfjSMWjmAFCFT+Prs0BzGj
+         WE/g==
+X-Gm-Message-State: AOJu0YwIEiL+r0v98jE7amftMuAOryFz+iAOujgCi+REceIqfbkrHnxb
+	kkFQ3J7iBRGSjPUZObCeUY1sLKn43jMlosEyfiIE7AnzW/70RFJjPoRo0tHRraM7X2pGQKE4SFm
+	ExnjOfA6xPUYt3Z1PPYxUZdq7p8mx/zY=
+X-Gm-Gg: AfdE7cnMjhR+VQ5sWtWvqrxL7eMg1ay6ltYIfoLk0t2+13tqv4IDr5Z5qP41/wzxQy1
+	SExpAHPbOUhQpAmJrATMtSrG7cdCU0WBhSymTWgiYONI35mSHwlLhVQNkF2NcpY/7TCDs3KZNCO
+	BgBrpcHDjUgJVEOfgAUbFoTMPqcqqRk1bNHSu6rbxd91YX6hSgelb4p4pfALsGXDDtVgUYPBrs+
+	fFcC06GJ++j7fgAni6xDtZqbhcrmC6mH4Qei7pu96OGMQfQUAvCA69z3t2xpHHQvf5CwzKAIzaR
+	F6hEz/W7rfYxnSLXGjxBLulxU/7XYmden/whYWq58qyY3005FXMIz38a7Ut6WBFve+1cTQc=
+X-Received: by 2002:a05:6a00:8d94:b0:843:46ee:9de6 with SMTP id
+ d2e1a72fcca58-8456245767emr16301017b3a.9.1782225933257; Tue, 23 Jun 2026
+ 07:45:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <c34fee6105f9051a52f8e774fe4c35f0e6ba0afc.1781968162.git.lucien.xin@gmail.com>
+ <20260622165200.1050676-1-horms@kernel.org>
+In-Reply-To: <20260622165200.1050676-1-horms@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 23 Jun 2026 10:45:21 -0400
+X-Gm-Features: AVVi8Cf67VBgrz-P6QNs7hqWOu3Y4VT7LWbbJFXjYz-7qpCdYTKbWCeCfYxH9G8
+Message-ID: <CADvbK_cN=Sv9SmgdfZ=BFZedY10EmLurRnmv+en2ZQ5QbKvrdw@mail.gmail.com>
+Subject: Re: [PATCH net v2 2/2] sctp: add INIT verification after cookie unpacking
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, 
+	marcelo.leitner@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301392-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[hrushirajg23@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,resnulli.us,vger.kernel.org,syzkaller.appspotmail.com,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com,m:hrushirajg23@gmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hrushirajg23@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301393-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,6c25f4750230faf70be9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,vger.kernel.org:from_smtp,syzkaller.appspot.com:url]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:url,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 196366B7FF0
+X-Rspamd-Queue-Id: 15CC56B8000
 
-debugfs files created under a port's ddir (ethtool/get_err,
-ethtool/set_err, ring params, bpf_offloaded_id, udp_ports/inject_error,
-etc.) store raw pointers directly into the netdevsim struct, which lives
-in the net_device private data kmalloc slab.
+On Mon, Jun 22, 2026 at 12:52=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+> ---
+> sctp: add INIT verification after cookie unpacking
+>
+> This commit adds sctp_verify_init() checks in the COOKIE-ECHO processing
+> paths sctp_sf_do_5_1D_ce() and sctp_sf_do_5_2_4_dupcook() when
+> cookie_auth_enable is disabled, and updates sctp_verify_init() to bound
+> the parameter walk against peer_init length rather than chunk->chunk_end.
+> On verification failure the new association is freed and an ABORT is
+> generated via sctp_abort_on_init_err().
+>
+> > diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+> > index 8c636f045e45..6967e889d1bd 100644
+> > --- a/net/sctp/sm_statefuns.c
+> > +++ b/net/sctp/sm_statefuns.c
+> > @@ -650,11 +650,12 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct n=
+et *net,
+> >                                        struct sctp_cmd_seq *commands)
+> >  {
+> >       struct sctp_ulpevent *ev, *ai_ev =3D NULL, *auth_ev =3D NULL;
+> > +     struct sctp_chunk *err_chk_p =3D NULL;
+> >       struct sctp_association *new_asoc;
+> >       struct sctp_init_chunk *peer_init;
+> >       struct sctp_chunk *chunk =3D arg;
+> > -     struct sctp_chunk *err_chk_p;
+> >       struct sctp_chunk *repl;
+> > +     enum sctp_cid cid;
+> >       struct sock *sk;
+> >       int error =3D 0;
+> >
+> > @@ -728,6 +729,18 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct ne=
+t *net,
+> >               }
+> >       }
+> >
+> > +     peer_init =3D (struct sctp_init_chunk *)(chunk->subh.cookie_hdr +=
+ 1);
+> > +     cid =3D peer_init->chunk_hdr.type;
+> > +     if (!sctp_sk(sk)->cookie_auth_enable &&
+> > +         !sctp_verify_init(net, ep, asoc, cid, peer_init, chunk,
+> > +                           &err_chk_p)) {
+> > +             sctp_association_free(new_asoc);
+> > +             return sctp_abort_on_init_err(net, ep, asoc, cid, arg, co=
+mmands,
+> > +                                           err_chk_p);
+> > +     }
+>
+> [Critical]
+> When cookie_auth_enable is disabled the cookie HMAC is not validated by
+> sctp_unpack_cookie(), so every byte of the embedded INIT (including
+> peer_init->chunk_hdr.type) is attacker-controlled.  Is it safe to feed
+> that byte directly into both sctp_verify_init() and
+> sctp_abort_on_init_err() as cid?
+>
+> Inside the COOKIE-ECHO body the embedded chunk is by RFC always an INIT.
+> Could the cid argument be hard-coded to SCTP_CID_INIT (or
+> peer_init->chunk_hdr.type be validated against SCTP_CID_INIT before use)
+> instead of trusting the wire byte?
+>
+> Two attacker-reachable consequences look possible if cid is forged to
+> SCTP_CID_INIT_ACK (3) and the STATE_COOKIE parameter is omitted:
+>
+> sctp_verify_init() then returns 0 via this branch with *errp populated:
+>
+>         if ((SCTP_CID_INIT_ACK =3D=3D cid) && !has_cookie)
+>                 return sctp_process_missing_param(asoc, SCTP_PARAM_STATE_=
+COOKIE,
+>                                                   chunk, errp);
+>
+> control transfers to sctp_abort_on_init_err(net, ep, asoc, cid, ...) with
+> cid =3D=3D SCTP_CID_INIT_ACK and a non-NULL err_chunk.  After sending the
+> ABORT packet, that helper falls through to its out: label because
+> cid =3D=3D SCTP_CID_INIT_ACK:
+>
+>         if (cid !=3D SCTP_CID_INIT_ACK) {
+>                 if (!packet)
+>                         return SCTP_DISPOSITION_NOMEM;
+>                 return SCTP_DISPOSITION_CONSUME;
+>         }
+>
+> out:
+>         ...
+>         return sctp_stop_t1_and_abort(net, commands, error, ECONNREFUSED,
+>                                       asoc, chunk->transport);
+>
+> In the sctp_sf_do_5_1D_ce() context, asoc is typically NULL (the function
+> itself opens with if (asoc && !sctp_vtag_verify(chunk, asoc))).  Can the
+> SCTP_CMD_NEW_STATE / SCTP_CMD_TIMER_STOP / SCTP_CMD_INIT_FAILED commands
+> queued by sctp_stop_t1_and_abort() against a NULL asoc be dispatched
+> without the sideeffect interpreter dereferencing asoc?
+>
+> > @@ -2205,6 +2219,19 @@ enum sctp_disposition sctp_sf_do_5_2_4_dupcook(
+> >       switch (action) {
+> >       case 'A': /* Association restart. */
+> >       case 'B': /* Collision case B. */
+> > +             peer_init =3D (struct sctp_init_chunk *)
+> > +                             (chunk->subh.cookie_hdr + 1);
+> > +             cid =3D peer_init->chunk_hdr.type;
+> > +             if (!sctp_sk(ep->base.sk)->cookie_auth_enable &&
+> > +                 !sctp_verify_init(net, ep, asoc, cid, peer_init, chun=
+k,
+> > +                                   &err_chk_p)) {
+> > +                     sctp_association_free(new_asoc);
+> > +                     return sctp_abort_on_init_err(net, ep, asoc, cid,=
+ arg,
+> > +                                                   commands, err_chk_p=
+);
+> > +             }
+> > +             if (err_chk_p)
+> > +                     sctp_chunk_free(err_chk_p);
+> > +             fallthrough;
+>
+> [Critical]
+> The same attacker-controlled cid is propagated here as well.  In
+> sctp_sf_do_5_2_4_dupcook() asoc is the existing established association.
+> With a forged cid of SCTP_CID_INIT_ACK and missing STATE_COOKIE, can a
+> single unauthenticated COOKIE-ECHO drive sctp_abort_on_init_err() into
+> its out: path and have sctp_stop_t1_and_abort() tear down the established
+> asoc and report ECONNREFUSED to the application?
+>
+> Would constraining the verification to the well-defined INIT case (for
+> example, hard-coding SCTP_CID_INIT or rejecting any cid !=3D
+> SCTP_CID_INIT before calling sctp_verify_init()/sctp_abort_on_init_err())
+> avoid both of these paths?
 
-If these files outlive the netdevsim struct, a concurrent reader can
-trigger a slab-use-after-free by passing debugfs_file_get() (which only
-checks dentry lifetime) and then dereferencing the freed data pointer
-in debugfs_u32_get().
+I will place a check in sctp_unpack_cookie() for such malformed packets:
 
-In __nsim_dev_port_del(), nsim_destroy() is called before
-nsim_dev_port_debugfs_exit(). However, nsim_destroy() calls free_netdev()
-at its end, while nsim_dev_port_debugfs_exit() removes the port's
-debugfs directory. This means the slab is freed before the debugfs
-files are removed.
+diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
+index d5ee81934d93..8adac9e0cd66 100644
+--- a/net/sctp/sm_make_chunk.c
++++ b/net/sctp/sm_make_chunk.c
+@@ -1761,6 +1761,8 @@ struct sctp_association *sctp_unpack_cookie(
+        bear_cookie =3D &cookie->c;
 
-The same window exists on nsim_create()'s error path:
-nsim_ethtool_init() creates debugfs files under ddir with pointers into
-ns before nsim_init_netdevsim()/nsim_init_netdevsim_vf() which can fail,
-and the err_free_netdev label calls free_netdev() while those debugfs
-entries are still live.
+        ch =3D (struct sctp_chunkhdr *)(bear_cookie + 1);
++       if (ch->type !=3D SCTP_CID_INIT)
++               goto malformed;
+        chlen =3D ntohs(ch->length);
+        if (chlen < sizeof(struct sctp_init_chunk))
+                goto malformed;
 
-Fix both paths by calling debugfs_remove_recursive() on the port's
-ddir before every free_netdev() call. The subsequent
-nsim_dev_port_debugfs_exit() calls become harmless no-ops since ddir is
-set to NULL.
-
-Reported-by: syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6c25f4750230faf70be9
-Fixes: e05b2d141fef ("netdevsim: move netdev creation/destruction to dev probe")
-Signed-off-by: Hrushiraj Gandhi <hrushirajg23@gmail.com>
----
-v2:
-- Also fix the same use-after-free window on the error path of nsim_create() as suggested by Simon Horman.
-- Shorten the code comment in nsim_destroy() to be more concise.
-
- drivers/net/netdevsim/netdev.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 27e5f109f933..f2824e75cddd 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -1165,6 +1165,8 @@ struct netdevsim *nsim_create(struct nsim_dev *nsim_dev,
- 	return ns;
- 
- err_free_netdev:
-+	debugfs_remove_recursive(nsim_dev_port->ddir);
-+	nsim_dev_port->ddir = NULL;
- 	free_netdev(dev);
- 	return ERR_PTR(err);
- }
-@@ -1214,6 +1216,13 @@ void nsim_destroy(struct netdevsim *ns)
- 		ns->page = NULL;
- 	}
- 
-+	/*
-+	 * Remove per-port debugfs files before free_netdev() releases the
-+	 * netdevsim struct to prevent use-after-free in concurrent readers.
-+	 */
-+	debugfs_remove_recursive(ns->nsim_dev_port->ddir);
-+	ns->nsim_dev_port->ddir = NULL;
-+
- 	free_netdev(dev);
- }
- 
--- 
-2.47.3
-
+Thanks.
 
