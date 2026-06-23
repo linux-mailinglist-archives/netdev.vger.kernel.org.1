@@ -1,150 +1,182 @@
-Return-Path: <netdev+bounces-301412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301413-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UWc4B126OmrAFAgAu9opvQ
-	(envelope-from <netdev+bounces-301412-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:54:53 +0200
+	id fN2dDU66Omq6FAgAu9opvQ
+	(envelope-from <netdev+bounces-301413-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:54:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 610EB6B8E66
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:54:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD9C6B8E54
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:54:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eb50iDUH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301412-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301412-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=XYQ+4qmb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301413-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301413-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFD9731088B4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:51:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 46D55302F778
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F45831B838;
-	Tue, 23 Jun 2026 16:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80363242B8;
+	Tue, 23 Jun 2026 16:54:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D1531AABF;
-	Tue, 23 Jun 2026 16:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE5D3242AC
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 16:53:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782233469; cv=none; b=LDrkfvEXEDEpA17r3PBoCGNReI3+tMjfba22iwWcj5krOrjZrNkFf393VNgBHiVLoL9QwJ60vbqQUoNzqYqWacs2LOrehoyiUEihJ0EE6BPh9tBnRu67ieqlhu/Duj+U7NJ5j5erP/bE7glB3z1Y7cSZH+HC/clTBmU1KaFSgmo=
+	t=1782233640; cv=none; b=c4CxLeUlNFHFmXWnKjZnq2PY0cmGcVQByThRYmYaWj3vrYFGku20SVbCWujbK1oyrMeTlPasISD0V1ax6CXU9UzQiacSegRBvFGC5nCKG3Kz+OgpqiZldNWsX8+Wh6oMl0P5T8wLSTaggNsHjLysC4S0xuqwwmij5aiPlbks6Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782233469; c=relaxed/simple;
-	bh=jEIfOz8L3Xvj/I99+aKSmhRVI9moHWAB23vzqWdnkhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kUpqXJ1uXCKFppCwk7jHyyoMb3v+omyF/n8RurnIjU9idb2BWNDbkGIFhaG9eTnySpWt26oAEsl10CsJ7ckgC3d65n2LaEK6fajgQH7KgGZO7Hz44HDskeiadE7HlBv9M3DRSZMvyGBDXC6e565jhtQD4aTDnnGf9Tf3z2NsFLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eb50iDUH; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C7BC1F000E9;
-	Tue, 23 Jun 2026 16:51:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782233468;
-	bh=br1dDqQSE3Y/rlJoCar3aldqoF93foDqyKQcutQqY9s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=eb50iDUHq00+xrXaIrlUViHsFtPLU4oDzdWikR5Bkk78aU56/2xe07iQ91ISc//Zl
-	 kHUAsfjK1Y3U2rb523vLCRbrdbCqBBWUmRgKGNG9oeupcVoz3FDSbF3wYHGF/R1EWB
-	 6pIUmeYYYyq9hfLyFg1AdhSPhZ01XPbzwZakM+i+u07Q9vnjKGY0XCaa2pj6sZekwk
-	 eAGVHPQ7OERb7En2c4Zm9SM6ogQnJf5x3v7Um48ZiSS2msWbq+AJ3Ls+0Ag6Hk1Tcq
-	 U058ws8hmOS4bxcwd1AnPcJtcEvdc237m8bjr1S8vk7TEO5Pglj0D1Du8AX7Z7D9RL
-	 KmSxq8pCB7o4g==
-Date: Tue, 23 Jun 2026 09:49:32 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-doc@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-bluetooth@vger.kernel.org, ell@lists.linux.dev
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Message-ID: <20260623164932.GA1793@sol>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
- <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
+	s=arc-20240116; t=1782233640; c=relaxed/simple;
+	bh=ldiRrZdBa6mW4oKMFxkyvPpg4R5eWCQxoVjoGq2HEGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L4zdHZscWaf/LFM0fHuNGw7L1NG0G5DFQvXt8475cs9SbQ2wGMgxqI7IFkiKwQ4V7J17sGH13N/uiQLKieh1gtuL8yIAV4Pf9erxJeS4oulXDVDm3fkzfAvTFcq06ZA+F/jeg4PtXPBHRZqiArrIRbWxQHvez2bBvzU36mA55eQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XYQ+4qmb; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id A8C3F4E40773;
+	Tue, 23 Jun 2026 16:53:56 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6AF8A601C2;
+	Tue, 23 Jun 2026 16:53:56 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BEDE3106C8382;
+	Tue, 23 Jun 2026 18:53:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782233635; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=z14O1Oxv2MwpgYnEYsps2OBdWGQ1E7SU6CsxbrKj0vc=;
+	b=XYQ+4qmbXXeldrcn9HdaF60+1YlbI4oqajGsTyoZ3GOmFLAk8mbo9eEIGW387IITgwp/hh
+	sqIzohPg5uC0vvhiKcYRo8zkzFRQsYknDD2eT7TO+scjLzEFnPc8LPi/gNX20DcCygj/2L
+	DkZW5Jz6kME6LbEAxUP9N2MtjWGNdnSLCfDgqr9VZAl1LxqjihK2+PgWtmsctPyufJta+Z
+	QaT31nsU1MLJNsHy7rVPnN4FCwhnegT/9XFBInRwmknfuZicE6kKrdYCYFuDLg9kfMDUkX
+	j3K43D2pE51iCCQbjxEOjIFe9DKSg7BNrxq57syQNtK0zTAmUq9APdcO9jHM9Q==
+Message-ID: <12bb1713-d620-4db4-b240-fbc911be5ea3@bootlin.com>
+Date: Tue, 23 Jun 2026 18:53:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] net: stmmac: dwmac-spacemit: Fix wrong phy
+ interface definition
+To: Inochi Amaoto <inochiama@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Yixun Lan
+ <dlan@kernel.org>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+References: <20260623074637.503864-1-inochiama@gmail.com>
+ <20260623074637.503864-2-inochiama@gmail.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260623074637.503864-2-inochiama@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:hadess@hadess.net,m:linux-crypto@vger.kernel.org,m:herbert@gondor.apana.org.au,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:linux-doc@vger.kernel.org,m:linux-api@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:torvalds@linux-foundation.org,m:linux-bluetooth@vger.kernel.org,m:ell@lists.linux.dev,m:luizdentz@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301412-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-301413-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foss.st.com,armlinux.org.uk];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:inochiama@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:dlan@kernel.org,m:rmk+kernel@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-riscv@lists.infradead.org,m:spacemit@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:dlan@gentoo.org,m:looong.bin@gmail.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,m:looongbin@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,gentoo.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gondor.apana.org.au,holtmann.org,gmail.com,linux-foundation.org,lists.linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sol:mid]
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 610EB6B8E66
+X-Rspamd-Queue-Id: 2AD9C6B8E54
 
-On Tue, Jun 23, 2026 at 02:44:28PM +0200, Bastien Nocera wrote:
-> Hey,
-> 
-> Replying to this older patch.
-> 
-> On Wed, 2026-04-29 at 18:15 -0700, Eric Biggers wrote:
-> <snip>
-> > This isn't intended to change anything overnight.  After all, most Linux
-> > distros won't be able to disable the kconfig options quite yet, mainly
-> > because of iwd.  But this should create a bit more impetus for these
-> > userspace programs to be fixed, and the documentation update should also
-> > help prevent more users from appearing.
-> 
-> There are 2 other users that I know of: bluez, and the ell library
-> (used by iwd and bluez).
->
-> From what I could tell, bluetoothd uses AF_ALG for cryptography:
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/crypto.c
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/mesh-gatt/crypto.c
-> 
-> It uses "ecb(aes)" and "cmac(aes)" as algorithms.
-> 
-> Finally, it also uses them both again:
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/mesh/crypto.c
-> through ell:
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c
-> 
-> Because that's a question that also came up, bluetoothd also uses the
-> CAP_NET_ADMIN capability.
-> 
-> I'll let Luiz and Marcel take it over from here.
-> 
+Hello,
 
-We're aware of that and are taking it into account in the allowlist:
-https://lore.kernel.org/linux-crypto/20260622234803.6982-1-ebiggers@kernel.org/
-If you have any feedback on the allowlist, please respond to that patch.
+On 6/23/26 09:46, Inochi Amaoto wrote:
+> The current MII interface register definition from the vendor is wrong,
+> use the right number for the macro. Also, correct the interface mask
+> in spacemit_set_phy_intf_sel() so it can update the register with the
+> right number
+> 
+> Fixes: 30f0ba420ed3 ("net: stmmac: Add glue layer for Spacemit K3 SoC")
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c
+> index 223754cc5c79..3bfb6d49be6c 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-spacemit.c
+> @@ -18,8 +18,10 @@
+>  #include "stmmac_platform.h"
+>  
+>  /* ctrl register bits */
+> -#define CTRL_PHY_INTF_RGMII		BIT(3)
+> -#define CTRL_PHY_INTF_MII		BIT(4)
+> +#define CTRL_PHY_INTF_MODE		GENMASK(4, 3)
+> +#define CTRL_PHY_INTF_RMII		FIELD_PREP(CTRL_PHY_INTF_MODE, 0)
+> +#define CTRL_PHY_INTF_RGMII		FIELD_PREP(CTRL_PHY_INTF_MODE, 1)
+> +#define CTRL_PHY_INTF_MII		FIELD_PREP(CTRL_PHY_INTF_MODE, 3)
+>  #define CTRL_WAKE_IRQ_EN		BIT(9)
+>  #define CTRL_PHY_IRQ_EN			BIT(12)
+>  
+> @@ -118,7 +120,7 @@ static void spacemit_get_interfaces(struct stmmac_priv *priv, void *bsp_priv,
+>  
+>  static int spacemit_set_phy_intf_sel(void *bsp_priv, u8 phy_intf_sel)
+>  {
+> -	unsigned int mask = CTRL_PHY_INTF_MII | CTRL_PHY_INTF_RGMII;
+> +	unsigned int mask = CTRL_PHY_INTF_MODE;
+>  	struct spacmit_dwmac *dwmac = bsp_priv;
+>  	unsigned int val = 0;
+>  
+> @@ -128,6 +130,7 @@ static int spacemit_set_phy_intf_sel(void *bsp_priv, u8 phy_intf_sel)
+>  		break;
+>  
+>  	case PHY_INTF_SEL_RMII:
+> +		val = CTRL_PHY_INTF_RMII;
 
-- Eric
+This isn't strictly-speaking necessary as this is 0 and val is already 0, maybe
+compilers can figure it out and this leaves us with more self-documenting code ?
+
+So I'm ok with that personally,
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
+
+>  		break;
+>  
+>  	case PHY_INTF_SEL_RGMII:
+
 
