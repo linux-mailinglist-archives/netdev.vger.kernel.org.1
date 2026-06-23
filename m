@@ -1,126 +1,163 @@
-Return-Path: <netdev+bounces-301354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CgDRDP9uOmrK8wcAu9opvQ
-	(envelope-from <netdev+bounces-301354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:33:19 +0200
+	id IfJ6OLRxOmqj9AcAu9opvQ
+	(envelope-from <netdev+bounces-301355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:44:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3236B6BE5
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:33:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1568F6B6D39
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:44:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=ozHrpuCk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301354-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301354-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=163.com header.s=s110527 header.b=W68ccqO2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301355-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301355-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=163.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEB3B305D873
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:33:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F6D8302EEB0
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B2E37104A;
-	Tue, 23 Jun 2026 11:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFCF3D47A3;
+	Tue, 23 Jun 2026 11:44:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF0E2772D;
-	Tue, 23 Jun 2026 11:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE0A3D4131;
+	Tue, 23 Jun 2026 11:44:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782214394; cv=none; b=jcgFIXhizK3GLt/PPQjI+64b3Q0hv3YQt9HskzqxfAdQypTwlTwdIRVDLkxxycKcPWeVOZ87OEHe80ADW+sCpdXoPPFAB4hMa3Nf0qdax+6WTCMR6QpJIpu/l3ZbU5Mqx6609d6KtdVLvqNE4+IKb6LXXTOFLzHiKQJuyKNriEE=
+	t=1782215053; cv=none; b=GJXocgIxqmMpnAov4v7fy7ZTDw036K9iaudk+Dk6urTLfdvo5OgCqEPpORZ2x3sOXA5URoA1+GLspw9Y2ECkgMocp89vNCuodrrM4JryOL82FHT+CXCKM3Y8YvzimCskUwdwk7sieKZXRWqBzkhR22ucgO9l4x9mP9pZZsFMoH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782214394; c=relaxed/simple;
-	bh=+BCocolzNbPqVls/vOUaBRdhKMlP7Yt6GUBic0kLLgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i9ObwR6NttbZ0TzO8awbY4KFP7M+Fyv327NzT4optn8HnibGj5tPZyukiJQmfaQSI25+zUKqaHmVDtHKatw0MxTyCftPPQ727fbQHk/YusAjkncR5FJdNLtiY3kenxiCQJuOOaxrjgLXDIB0JevT2FBOzcf01SZGm/fjBHZnfFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ozHrpuCk; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XdA/MiW6laQIoTxSswqnH73r0TTTKiMzVB16q8vAsp4=; b=ozHrpuCk16GLXUg2AHUYBiZOoy
-	O2QaDSL4QCJwvwRop5dzcyG5PoGDUjI5toV3TLK6urV6ILbglITQTVncITWEEq+V71tcBTSYez+bo
-	KL9AfPMuNmEB5QPQ/MZULnvo5bP3E8/ik/341LOSG2xpjB1I3e8n8KWu2s6buZTjUxUE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wbzNJ-008whw-9V; Tue, 23 Jun 2026 13:33:05 +0200
-Date: Tue, 23 Jun 2026 13:33:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Cc: Jie Luo <jie.luo@oss.qualcomm.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Brian Masney <bmasney@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ethernet: qualcomm: ppe: Demote from supported
- and fix maintainer addresses
-Message-ID: <0c1be662-3c6a-41be-bc19-081d0299ceae@lunn.ch>
-References: <20260623073307.36483-2-krzysztof.kozlowski@oss.qualcomm.com>
- <0247dfba-1c14-4fea-aab3-5489a36f35f6@lunn.ch>
- <8b0560ae-af5c-4d54-be02-d186be1d799c@oss.qualcomm.com>
- <f8441903-c768-46a1-8f95-b1b25d420a2c@oss.qualcomm.com>
+	s=arc-20240116; t=1782215053; c=relaxed/simple;
+	bh=KPAmj7aDGiKAZkKcPtUk6oRSaJpQQF75AYEbE9S2gDg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e9CqJiFgMoIAFtAtMZFvk8+dmcgvOBsBaM5HyFK7RotCceZYLy9YI84XgS55Vdjn37xH5gSxPxkrzxwjRHUk8pEjZkALkxHF+TG7FdTcntNW397VaPxFHbDX101eltKdGe+cAK0TrGPwrxzgrvv9G93UIFS4bcdH6loHjLxBwWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=W68ccqO2; arc=none smtp.client-ip=220.197.31.4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=gv
+	ybHwrlSJJexIpk2JiGbmml9pbb9SZAyfP6bmqjPAA=; b=W68ccqO2n/q/NT6dSU
+	VM+Z9vc5DFbT/xz5agy6RTsaGwxyiarjpZ0Y8TBtbv30aajqzRbQL+ON3560lRJ9
+	Ul4nf1WK7PZy+RJyzSv+e2AH27tN2jOjaqkoGjph6xzzvbDs8dHL3ZnlTmEClqLt
+	3vo/7HPb4BZfdysgInMiWAEGg=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDn7_JVcTpqE0LjFA--.8026S2;
+	Tue, 23 Jun 2026 19:43:18 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: sgoutham@marvell.com,
+	lcherian@marvell.com,
+	gakula@marvell.com,
+	hkelam@marvell.com,
+	sbhatta@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] octeontx2-af: Free BPID bitmap on setup failure
+Date: Tue, 23 Jun 2026 19:43:16 +0800
+Message-Id: <20260623114316.2182271-1-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8441903-c768-46a1-8f95-b1b25d420a2c@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDn7_JVcTpqE0LjFA--.8026S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tFyxXF1fZFWrKw17trykAFb_yoW8WrWfpF
+	4jy34rAa40qFyfuw17tw40vay5Ca9FgrWUKFyxZ3WrZ3Wftr4kuFZYkF1Fvr4FkF97Cr1j
+	yF1Fy3W3CFyDArUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pitCztUUUUU=
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbCxRaaCWo6cVY6mwAA3W
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301354-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:krzysztof.kozlowski@oss.qualcomm.com,m:jie.luo@oss.qualcomm.com,m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:quic_leiwei@quicinc.com,m:quic_suruchia@quicinc.com,m:quic_pavir@quicinc.com,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:haoxiang_li2024@163.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-301355-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,163.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[163.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B3236B6BE5
+X-Rspamd-Queue-Id: 1568F6B6D39
 
-> If address did not work for half a year, I really doubt that you commit
-> to above.
+nix_setup_bpids() allocates bp->bpids with rvu_alloc_bitmap(), which uses
+a plain kcalloc(). If any of the following devm_kcalloc() allocations for
+the BPID mapping arrays fails, the function returns without freeing the
+bitmap. Free the BPID bitmap before returning from those error paths.
 
-I tend to agree. Maybe we should set it to Orphaned, and then decide
-in 6 months time if it can be set back to Maintained?
+Fixes: d6212d2e41a0 ("octeontx2-af: Create BPIDs free pool")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-   Andrew
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index d8989395e875..0297c7ab0614 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -528,19 +528,24 @@ static int nix_setup_bpids(struct rvu *rvu, struct nix_hw *hw, int blkaddr)
+ 	bp->fn_map = devm_kcalloc(rvu->dev, bp->bpids.max,
+ 				  sizeof(u16), GFP_KERNEL);
+ 	if (!bp->fn_map)
+-		return -ENOMEM;
++		goto free_bpids;
+ 
+ 	bp->intf_map = devm_kcalloc(rvu->dev, bp->bpids.max,
+ 				    sizeof(u8), GFP_KERNEL);
+ 	if (!bp->intf_map)
+-		return -ENOMEM;
++		goto free_bpids;
+ 
+ 	bp->ref_cnt = devm_kcalloc(rvu->dev, bp->bpids.max,
+ 				   sizeof(u8), GFP_KERNEL);
+ 	if (!bp->ref_cnt)
+-		return -ENOMEM;
++		goto free_bpids;
+ 
+ 	return 0;
++
++free_bpids:
++	rvu_free_bitmap(&bp->bpids);
++	bp->bpids.bmap = NULL;
++	return -ENOMEM;
+ }
+ 
+ void rvu_nix_flr_free_bpids(struct rvu *rvu, u16 pcifunc)
+-- 
+2.25.1
+
 
