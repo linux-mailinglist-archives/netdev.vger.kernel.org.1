@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-301273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TFqUC+0oOmo+3AcAu9opvQ
-	(envelope-from <netdev+bounces-301273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:34:21 +0200
+	id Sqf2CJ4oOmoY3AcAu9opvQ
+	(envelope-from <netdev+bounces-301275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:33:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B1D6B4901
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:34:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1961F6B48B7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:33:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=korg header.b=XizuaQsk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301273-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301273-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=korg header.b=neuM+55q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301275-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301275-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D06AE30B8DA2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:30:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CA3D03028BC4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F593C583A;
-	Tue, 23 Jun 2026 06:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E13A3CC7EA;
+	Tue, 23 Jun 2026 06:30:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB23D3C278B;
-	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A063C1994;
+	Tue, 23 Jun 2026 06:30:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782196210; cv=none; b=g8mwzwSAm70FUC+08fezvwmE0//e8cuuWV7AzTYiJy/XoNx8c/1Kshngc93JIPKNb6uhu2mvmWQH1bBBUd85x5YhbBYa1HZ1bpbUFn5YPyOi68xwTSnfxHYOK0F2u5z0QUSrRCreNOOcUL9jnk5ssfG96R4N9K4v3aloD8F62gk=
+	t=1782196210; cv=none; b=nnJAmOu+xT2zfl7N2iigXhVdu1Jc9C6oYoz7ixgDgWPWkt2nGDxygib69/o5i8zKQY60Zcw1LOYmJT2cjJKXbRIMwY5XAGBF5nwuRf8W4txA26Ibbu1oTjjGlqSbSSSl+kykOZxhaUGlNWV851qpN0BbalQkgStVegHYjTwkNS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782196210; c=relaxed/simple;
-	bh=5oizrScRGK0L0DRw4ik4voFRWclURwUVLyMJt4i1g8w=;
+	bh=Ti7w8XNP4fw929XO4M5y+gDX8+sXECmyMVne5zeDayM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HSc4g6nHd+uXhVj2CKZO7gVtLFlmR9vVbVN9yh4enwwbbkdGRYJGI8oJVuKrb46Fhtna3NPXpPNQs6WwW211n45fa+JnsV3Ctv/wp5Ge3udYWN/lS5jBd4ZW1pQ1rxa1Bjd1zhgOfZyWp1eD8kOWRc0pulNowsh4NijU+wPH5+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XizuaQsk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9B7E9C4AF09;
+	 In-Reply-To:To:Cc; b=imwb8/z73Few8iELeUCvLLRTYM+by8u4K09sxItoFN53EnOy/ZRSiEtyGuLIVYrLIMFba8IThLs7JG507n6T/tGtQjbg1fDIjXyA0d6cUwNcRnnLcKGd06ANn39WgFA+C6p2HTtLySXoQ4Ej7FWGYaa6Tdq6pXTqsM/Xzr5govE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=neuM+55q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B4217C32782;
 	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782196209; bh=5oizrScRGK0L0DRw4ik4voFRWclURwUVLyMJt4i1g8w=;
+	t=1782196209; bh=Ti7w8XNP4fw929XO4M5y+gDX8+sXECmyMVne5zeDayM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=XizuaQskQjMlhT6h7rqnvL+I6g5zybHPJvTUhN/rs8B3/At1QE/j4BOx0zN7vDfgM
-	 hIioPkt+bpU0UpUvyYG5WZoG76/iNdwWWHdR3J+hkr2lJmhwSpEkFixbzDHIAi4SEm
-	 GqdyWYAQMUcXOkOkn4rOL5b62YDY+SOXUzArJK+8=
+	b=neuM+55qeemXxbQFeqDYtjkdRJZPD3T3q8gbmPgxbpSz9fINjheP0AWaRys2qg53e
+	 +k9MDFmJ58EIUWFTP0U1xrXth56gLuWqw40aSHEu/j6IXSfYmO9B6WW5EGb3YOd225
+	 ba3Yu9EJAyG897Tklu2mLE4lMlFs8F6aRwj9uZ24=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C00FCDB47D;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF32CDB47C;
 	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Tue, 23 Jun 2026 14:29:47 +0800
-Subject: [PATCH v4 4/9] rust: macros: auto-insert OwnerModule in #[vtable]
+Date: Tue, 23 Jun 2026 14:29:48 +0800
+Subject: [PATCH v4 5/9] rust: drm: set fops.owner from driver module
+ pointer
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260623-fix-fops-owner-v4-4-0daf5f077d5c@linux.dev>
+Message-Id: <20260623-fix-fops-owner-v4-5-0daf5f077d5c@linux.dev>
 References: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
 In-Reply-To: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -89,11 +90,11 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782196206; l=4459;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782196206; l=1849;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=5oizrScRGK0L0DRw4ik4voFRWclURwUVLyMJt4i1g8w=;
- b=6pbiNm/E/nRLVpJf3qpqytVOX9tRo099hxG6zyj2W/EEZmyG+0h+1/MVIGS0cBNCXPORmDJfs
- 8POKhZeeJNcBpwP8a/SoZZpThL8krTxKG7DlcCARPByuuO/bN6P+epo
+ bh=Ti7w8XNP4fw929XO4M5y+gDX8+sXECmyMVne5zeDayM=;
+ b=UAbDEFquJEWH4q8B3WEPnEtU9cy0hucE0oiD/YYklQj/JkOHsvTucnDTvI9FY1BUrnZba72oJ
+ r3F3yEFaMX0BvdhtiQyrHGgl5+BeOXKHVoAj/lQcdHAIshJxgzqJfEe
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
@@ -104,12 +105,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301273-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301275-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[48];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -129,119 +130,55 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[garyguo.net:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,garyguo.net:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,fops.open:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A5B1D6B4901
+X-Rspamd-Queue-Id: 1961F6B48B7
 
-Auto-add `type OwnerModule: ::kernel::ModuleMetadata;` as a required
-associated type on the trait side if not already defined, and
-auto-insert `type OwnerModule = crate::LocalModule;` on the impl side
-if not explicitly provided, eliminating the need to manually declare
-and implement `OwnerModule` in every vtable trait and impl.
+Change `create_fops()` to accept an owner module pointer instead of
+hardcoding `null_mut()`, ensuring the kernel correctly tracks the
+module owning the DRM device's file operations.
 
 Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-Suggested-by: Gary Guo <gary@garyguo.net>
-Link: https://lore.kernel.org/all/DIMMWHUOLPSH.13JFRHDKDQJGO@garyguo.net
+Reviewed-by: Gary Guo <gary@garyguo.net>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- rust/macros/lib.rs    |  6 ++++++
- rust/macros/vtable.rs | 41 ++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 42 insertions(+), 5 deletions(-)
+ rust/kernel/drm/device.rs  | 3 ++-
+ rust/kernel/drm/gem/mod.rs | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-index 2cfd59e0f9e7c..bc7ded353c5ca 100644
---- a/rust/macros/lib.rs
-+++ b/rust/macros/lib.rs
-@@ -176,6 +176,12 @@ pub fn module(input: TokenStream) -> TokenStream {
- ///
- /// This macro should not be used when all functions are required.
- ///
-+/// Additionally, this macro automatically handles the `OwnerModule`
-+/// associated type: on the trait side, `type OwnerModule: ModuleMetadata;`
-+/// is added as a required associated type if not already defined; on the
-+/// impl side, `type OwnerModule = LocalModule;` is automatically inserted
-+/// if not explicitly defined.
-+///
- /// # Examples
- ///
- /// ```
-diff --git a/rust/macros/vtable.rs b/rust/macros/vtable.rs
-index c6510b0c4ea1d..be9a5ed8abe5e 100644
---- a/rust/macros/vtable.rs
-+++ b/rust/macros/vtable.rs
-@@ -30,6 +30,22 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
-          const USE_VTABLE_ATTR: ();
-     });
+diff --git a/rust/kernel/drm/device.rs b/rust/kernel/drm/device.rs
+index 403fc35353c74..d92cacb665366 100644
+--- a/rust/kernel/drm/device.rs
++++ b/rust/kernel/drm/device.rs
+@@ -111,7 +111,8 @@ impl<T: drm::Driver> Device<T> {
+         fops: &Self::GEM_FOPS,
+     };
  
-+    // Add `type OwnerModule: ModuleMetadata` as a required associated type if
-+    // the trait does not already define it.
-+    if !item
-+        .items
-+        .iter()
-+        .any(|i| matches!(i, TraitItem::Type(t) if t.ident == "OwnerModule"))
-+    {
-+        gen_items.push(parse_quote! {
-+            /// The module implementing this vtable trait.
-+            ///
-+            /// Automatically set to `crate::LocalModule` by the `#[vtable]`
-+            /// impl macro.
-+            type OwnerModule: ::kernel::ModuleMetadata;
-+        });
-+    }
-+
-     for item in &item.items {
-         if let TraitItem::Fn(fn_item) = item {
-             let name = &fn_item.sig.ident;
-@@ -57,12 +73,18 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
+-    const GEM_FOPS: bindings::file_operations = drm::gem::create_fops();
++    const GEM_FOPS: bindings::file_operations =
++        drm::gem::create_fops(crate::module::this_module::<T::OwnerModule>().as_ptr());
  
- fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
-     let mut gen_items = Vec::new();
--    let mut defined_consts = HashSet::new();
-+    let mut defined_items = HashSet::new();
+     /// Create a new `drm::Device` for a `drm::Driver`.
+     pub fn new(dev: &device::Device, data: impl PinInit<T::Data, Error>) -> Result<ARef<Self>> {
+diff --git a/rust/kernel/drm/gem/mod.rs b/rust/kernel/drm/gem/mod.rs
+index 01b5bd47a3332..9a203efc59116 100644
+--- a/rust/kernel/drm/gem/mod.rs
++++ b/rust/kernel/drm/gem/mod.rs
+@@ -357,10 +357,10 @@ impl<T: DriverObject> AllocImpl for Object<T> {
+     };
+ }
  
--    // Iterate over all user-defined constants to gather any possible explicit overrides.
-+    // Iterate over all user-defined items to gather any possible explicit overrides.
-     for item in &item.items {
--        if let ImplItem::Const(const_item) = item {
--            defined_consts.insert(const_item.ident.clone());
-+        match item {
-+            ImplItem::Const(const_item) => {
-+                defined_items.insert(const_item.ident.clone());
-+            }
-+            ImplItem::Type(type_item) => {
-+                defined_items.insert(type_item.ident.clone());
-+            }
-+            _ => {}
-         }
-     }
+-pub(super) const fn create_fops() -> bindings::file_operations {
++pub(super) const fn create_fops(owner: *mut bindings::module) -> bindings::file_operations {
+     let mut fops: bindings::file_operations = pin_init::zeroed();
  
-@@ -70,6 +92,15 @@ fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
-         const USE_VTABLE_ATTR: () = ();
-     });
- 
-+    // Auto-insert `type OwnerModule = crate::LocalModule` if not explicitly defined.
-+    // `crate::LocalModule` resolves to the real module type (via `module!`) or a
-+    // dummy fallback in non-module contexts (e.g., doctests).
-+    if !defined_items.contains(&parse_quote!(OwnerModule)) {
-+        gen_items.push(parse_quote! {
-+            type OwnerModule = crate::LocalModule;
-+        });
-+    }
-+
-     for item in &item.items {
-         if let ImplItem::Fn(fn_item) = item {
-             let name = &fn_item.sig.ident;
-@@ -78,7 +109,7 @@ fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
-                 name.span(),
-             );
-             // Skip if it's declared already -- this allows user override.
--            if defined_consts.contains(&gen_const_name) {
-+            if defined_items.contains(&gen_const_name) {
-                 continue;
-             }
-             let cfg_attrs = crate::helpers::gather_cfg_attrs(&fn_item.attrs);
+-    fops.owner = core::ptr::null_mut();
++    fops.owner = owner;
+     fops.open = Some(bindings::drm_open);
+     fops.release = Some(bindings::drm_release);
+     fops.unlocked_ioctl = Some(bindings::drm_ioctl);
 
 -- 
 2.43.0
