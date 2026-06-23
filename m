@@ -1,111 +1,113 @@
-Return-Path: <netdev+bounces-301254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id alJwMzwFOmq30AcAu9opvQ
-	(envelope-from <netdev+bounces-301254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:02:04 +0200
+	id 6UUWJWcGOmoC0QcAu9opvQ
+	(envelope-from <netdev+bounces-301255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:07:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BB16B3EBD
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:02:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED90C6B3F3C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:07:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=H1JmbI+H;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301254-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301254-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=XMuFczW6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301255-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301255-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1FB430151DE
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 04:02:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1983302A6A6
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 04:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E991F3911B6;
-	Tue, 23 Jun 2026 04:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2514039901C;
+	Tue, 23 Jun 2026 04:05:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
+Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D802397689
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 04:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9667394498
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 04:05:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782187321; cv=none; b=BFRGaA0uCGL8+kHexC1RJUue4V0pX2aus04mCn0dBx028gFmRs5MTUkhT1eeGnQhDrNvElzbi5tQcffllGZAzNgl9lrKrJKnG1GLY7MqthCRENhddPATF8VquM2TtEs+INka2lD8sHinMnX8J+Ebp+TC/kFtPih8f6o3LmvQWME=
+	t=1782187522; cv=none; b=jKK1lc5l+wm/jlFUhkzBTqLTeu3RE7LeerhruWUnDjsL/mIp2H4Yj7JZkSgiuzSVFCjdhAH76ATr45yEnBON2gVvcxmMBJurKKgkhpDiUg448ha0j1VCbiHuXOBGNzGBamvjWd0zXQjjOmcVIGu02kpFqsaUiNCZwbunfZfQJ2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782187321; c=relaxed/simple;
-	bh=2L2aU/Hrvv3YnYPwvBRUJm9oTAGn0axG7zGrH4IYIy8=;
+	s=arc-20240116; t=1782187522; c=relaxed/simple;
+	bh=lrXb16OMKe/PevFq3ZOczPjmZien0i/1QKNeJoqNUY8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OO8JFl2rgBYxeK7jIUJlmbAvvPoIGrM//0afxSh2+oCcZbQzy38FgiA6DgeOihu880HVKl2uRC3IT9Ex29EuQ3j5eiHX/zeQjo4awPeI2R1960TO9usK+zlcCyiYiCjqzI8YujsreHxEH/9xmZczMf+M7oHkOxnpDqTYO9rrt3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=H1JmbI+H; arc=none smtp.client-ip=209.85.160.227
-Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-519eced8cbeso52681731cf.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 21:01:55 -0700 (PDT)
+	 To:Cc:Content-Type; b=aLCi12+AnpkDsA3DNLrPLo0atisbTf6X67/8RkYPAoGdbmKo/8Slf2DnVgWQlIeWgEE1xbVGapeqMO/0wuFoeZmi+lYMvijsuMOCi2Z0PitmwQp4i9kcgmhkhBLhmH3k/T64mr+6Kg8+HjsIQQnFOMG8wsqoTiXuWSyh3R8JmK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XMuFczW6; arc=none smtp.client-ip=209.85.214.226
+Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2c40397e746so31701465ad.3
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 21:05:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782187314; x=1782792114;
+        d=1e100.net; s=20251104; t=1782187520; x=1782792320;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UGLmmp4QlZFzP/NZP0UvdaJeCOD+ByF4bA8wGuvi4CM=;
-        b=sDxczo/T7dS3moqpXk9p69D+Sos/DOuKBM+FvvPJJwj9tdaaaa2UEuxGwXrfjS8/tN
-         AjSaluuKSUCY13acGyw0hCcjT+LMb03mLdsWN15YkNiSxCVrgrNRI2dFFDPXJSEy4dw0
-         ydUniv7X0iqdBojtEHLv/UpX6Xl3U4JxU6nDaalrPJl+9HrS+hYka8aIbbynubkqqx24
-         rXHuvFJG93JqmyIP4hXhSvkMLuIilZNq0DVPXi34QzzJH2Pk9CGOzRaT0JUmhThUPfoR
-         SV3UZG9ACp8J8YWz39ADe9EjE2trU/9r+/j8djuY0LbL9kCZwdpKryoKpBDaZOWL/fDf
-         GdZA==
-X-Forwarded-Encrypted: i=1; AFNElJ86HotaNat1ZLrhY7UixDfppUO2ThGOk21Tv7MmTyFgsmT1dxI4Fr4jvpysl1rLVLz+xpvCSAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1pNIZTyZziarrlMGRdX/E1saBDBB+Dbj+Qm7l1zbRMacEpDV1
-	wgVo6jzFbbiU0rwog9WDOhiBr3b7TwlBQLufIVtwYDr5HEBh6YhvMc18NOti77vJxCbeO3Vj2yQ
-	V7h5tWTCRBofhlPZf9Wl8stYiA9RPrBWl22RH+9Joo0NrP6o6JbF2OJdMsyB1x/p8VeYmxykFuo
-	adCYn98d3+sGU6mSeaTKOFpX8dAH3MPiO2fLl8ooME1GVcIOAu/6szmbAsVY3UJFLJxUMXnzOrH
-	YJhp+GkblM=
-X-Gm-Gg: AfdE7ckhZDrtdd8EFROU9RYmUK7ptVjan34RfzqLLrbPtZ6TDYwMkYKp2r/l0NCvfYd
-	r+WNewzzXinn6AX9HX4TrYKUIrN8G8wMplrpe3+PaeOSAQyWBzr3DGRvZ00Qzxos1iNN+ktogES
-	djlxJ2FQcjfqIAzAOhSBBS3oupY4XOSRB9rY4r9CwQNPYA26opcwwv9Gl8qxGILOmQie3jG6YNs
-	ON8GLlZm/lM2cKKdYmE6Jbw/45CSNiLFddsZ8uYVIG09enjpsOXVL4Y6wAX3hBEPhv2/yyfE5RN
-	8fl1jEnMNrHedhNmdrdhJ6N3SpEVBHUL68sZb17mJaK/gPYeoJhuiLLwAfKDquMzHnULNFl3deS
-	Ljb/DjGhP+Tlof8+mzaoxKfdfF3nYNgHIXEUry40+3ErPbkC5DX+YDdpxCQVQ/hwgf7csFDfvyC
-	v60Mazv7IbOTDBqHDIpU0rfC+GhLTcXMkdGDQtpqd31O7ttcFi
-X-Received: by 2002:ac8:5c8f:0:b0:517:8792:12ba with SMTP id d75a77b69052e-51a558ebc01mr15634021cf.22.1782187314286;
-        Mon, 22 Jun 2026 21:01:54 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-51a513bd2dfsm717881cf.2.2026.06.22.21.01.53
+        bh=BRJ3Mv8IB1E9DGVKFZqYuQwdBM8WEpkvBM7VqsEQunQ=;
+        b=ZQ+x/vLffQt36BVhwgB9Go6sx2eXEezNDK39qIc+6//p8LN138AUs4nwpuCCmYW55V
+         zS3cg6ytfn7HN6Wo2XCB87o1i5yecgOolllShDtX+AqMbooeoyz2WYH+Xqu2e4HZfuIi
+         GyelKclrpBirhc5shVI1kKtGxECyLVksGOntYjzUrH2eTDRY6jHvjeAL2e7XfbvlVw8U
+         sZPG86SQidhoaTdchsx61x9WwM7bTzoMsiMuXVDxflxYfWzKxr0prwMSvI67dAz6PgJx
+         KA9vW0SO9OeAaBSNcfll7PF3kC6CnI7+bk8mZM4sEt6uJjvqcMalVMCzRwZ1XbgL/oDh
+         g9kA==
+X-Forwarded-Encrypted: i=1; AHgh+RqUdX04Wxle8fzc/nLFbUE5pkrHSCAymTwmzD3jnqKh3KSAoDTjNKBmvEMXmwZqDynDw4X+Hqs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyB7TVszfq//qxvY4RjKEEbtZBrlCF8DxMwWT32L3DQ+MDv5D0o
+	30r3eUfTxDxPS71zOsy1wJw6UIs4gHckvXT4DL/bLz66ePredBYJimvClyor9yIMabvu0ZtjAbg
+	QGXE2P9wn9L4yZi24Z4W1yL40ftub/1neXIz75WheKOprdGKBRPRSigGMde2DZliLe+1qDM5ok1
+	LISNRmfv7VA7G7NAaGwnSc4pfmH9d2GZBoiSEJqP6+MGMLF4cafgsasBdHErF3SAy282/sEEAZ/
+	N+oKl7g9Uo=
+X-Gm-Gg: AfdE7ckGbeu9+hnJRy0lcjnh2oGN8qjwJT8xFTZ77D9PMKYD+H02am4zv3kDTuW0skx
+	5dqMJ+s4TzFXiVZgCzfH8ad+Pbh73s1uVBB+sCWgRK7a8iGlF7iI6DWI88bC9uBrZm21toQmTOa
+	h97eczAWsX+O+y3Kvxsk7Rr8j3EXyenKoJxYzF41FBThX3jLPOD0xNuK3QOY75RYsMOnaitPfoP
+	B5kbeFIYQSVHThGZ3SnlLroc6AQhLTq5IzYm1EGq2Gml1+qlrOK2tubW5aDwiwXzhsbk2h+nAJK
+	qz68zdvAp8fJEHzlo348mO67DACKwYWs/YRx00AciDs1rnLOkAXkKqeg8uDjdqjeO1T2Rhk2vbf
+	JhJXues67kULqQtnqJuYuY0Z6vvJMrKAliSdQMfSu/hAeHBYWcePWKPrkOUHASR1uCKw7hT692P
+	tLl8lLod8JkKkuTjPXIqRlSlLA1A9B2YwQkM8qZWwLtQ1wPg==
+X-Received: by 2002:a17:902:cf08:b0:2c1:ef9:450e with SMTP id d9443c01a7336-2c742b3e132mr129891775ad.27.1782187519832;
+        Mon, 22 Jun 2026 21:05:19 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-23.dlp.protect.broadcom.com. [144.49.247.23])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2c74600799dsm7768885ad.53.2026.06.22.21.05.19
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jun 2026 21:01:54 -0700 (PDT)
+        Mon, 22 Jun 2026 21:05:19 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-8421f5d76aaso3563889b3a.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 21:01:53 -0700 (PDT)
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8453e61d6f0so4091306b3a.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 21:05:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1782187313; x=1782792113; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1782187518; x=1782792318; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UGLmmp4QlZFzP/NZP0UvdaJeCOD+ByF4bA8wGuvi4CM=;
-        b=H1JmbI+HMRICVQg7+WpR5RcJHX58usgfmquxPaQCzkkBF5qqgwenAcE4TNwUdT4pIU
-         zUWyAaRApvqCjbTIeUpzzL7mWbbb8O2O/rhRJ0HlB+IYTd/ucMYY6q8rjBJ9VxgakIoF
-         k8bbwW9WVHoAA7/fzisVzt2Jx5vFQucgqubGo=
-X-Forwarded-Encrypted: i=1; AFNElJ+R75s38mQvCo/TfOoyaFv30SGFtkhPJ5pkUrWcczT2tFBMIdbtRw7rCXU9de12pPcatbtaQiU=@vger.kernel.org
-X-Received: by 2002:a05:6a00:3a1c:b0:841:dc7d:306a with SMTP id d2e1a72fcca58-845970ed5e0mr836841b3a.25.1782187312846;
-        Mon, 22 Jun 2026 21:01:52 -0700 (PDT)
-X-Received: by 2002:a05:6a00:3a1c:b0:841:dc7d:306a with SMTP id
- d2e1a72fcca58-845970ed5e0mr836815b3a.25.1782187312379; Mon, 22 Jun 2026
- 21:01:52 -0700 (PDT)
+        bh=BRJ3Mv8IB1E9DGVKFZqYuQwdBM8WEpkvBM7VqsEQunQ=;
+        b=XMuFczW6KO4W3Ju4yomnRpiUt8/Ip4FM9OD8zMtn3o+HT09UU0kyY08Skk3at+1e4W
+         YgKm0lb0d7i02BrzfcXiZcsJkSE4x39STAxAI4pIsx7BoXUnehkpcgJAIERzA1SasViT
+         qa4HNaeFklPugVWouPKON3pgN3ZvTtcVAj51o=
+X-Forwarded-Encrypted: i=1; AFNElJ+sD81MbQISoSTgLyTyRgx9GyWUB/czqQUFo/QXjdEX1Iveda0nEVLgjo17+AJ48SiBarI0KYw=@vger.kernel.org
+X-Received: by 2002:a05:6a00:10d2:b0:835:405a:7e72 with SMTP id d2e1a72fcca58-84562478e8emr13197828b3a.11.1782187518154;
+        Mon, 22 Jun 2026 21:05:18 -0700 (PDT)
+X-Received: by 2002:a05:6a00:10d2:b0:835:405a:7e72 with SMTP id
+ d2e1a72fcca58-84562478e8emr13197800b3a.11.1782187517678; Mon, 22 Jun 2026
+ 21:05:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260622154753.827506-1-kuba@kernel.org>
-In-Reply-To: <20260622154753.827506-1-kuba@kernel.org>
+References: <20260622-netpoll_rcu_fix-v1-1-15c3285e92e6@debian.org>
+In-Reply-To: <20260622-netpoll_rcu_fix-v1-1-15c3285e92e6@debian.org>
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Tue, 23 Jun 2026 09:31:41 +0530
-X-Gm-Features: AVVi8Cdrb74jau6AYg5357nm1ImUfrXRYPNph856Y9z-hThVfFKcRimrmxUgbvU
-Message-ID: <CALs4sv2SDRjkUeoSovqazDQwyKSyKYjGSXWR4uYUrLPvwxn+5Q@mail.gmail.com>
-Subject: Re: [PATCH net] eth: fbnic: fix ordering of heartbeat vs ownership
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>
+Date: Tue, 23 Jun 2026 09:35:05 +0530
+X-Gm-Features: AVVi8Ccmh_ztCIeVp1GzlCl_L5WuCrm3B6soK9sMqzxZ0b65aO2wXvoBkhfEEN8
+Message-ID: <CALs4sv1pZzgqiL9c0rqXM8Ck_-_oCBaEUKsrRgC+Kx3zrprO7g@mail.gmail.com>
+Subject: Re: [PATCH net] netpoll: fix a use-after-free on shutdown path
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Amerigo Wang <amwang@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	vlad.wing@gmail.com, asantostc@gmail.com, kernel-team@meta.com, 
+	stable@vger.kernel.org
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000bcaf7c0654e3d114"
+	boundary="000000000000f70dd20654e3dd08"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-9.76 / 15.00];
 	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
@@ -113,83 +115,107 @@ X-Spamd-Result: default: False [-9.76 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301254-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:alexanderduyck@fb.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TAGGED_FROM(0.00)[bounces-301255-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:amwang@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vlad.wing@gmail.com,m:asantostc@gmail.com,m:kernel-team@meta.com,m:stable@vger.kernel.org,m:vladwing@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	HAS_ATTACHMENT(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,meta.com];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,fb.com:email,broadcom.com:dkim,broadcom.com:email,broadcom.com:from_mime]
+	HAS_ATTACHMENT(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,broadcom.com:dkim,broadcom.com:email,broadcom.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 23BB16B3EBD
+X-Rspamd-Queue-Id: ED90C6B3F3C
 
---000000000000bcaf7c0654e3d114
+--000000000000f70dd20654e3dd08
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 22, 2026 at 9:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+On Mon, Jun 22, 2026 at 8:31=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
 ote:
 >
-> When requesting ownership of the NIC (MAC/PHY control), we set up
-> the heartbeat to look stale:
+> There is a use-after-free error on netpoll, which is clearly detected by
+> KASAN.
 >
->   /* Initialize heartbeat, set last response to 1 second in the past
->    * so that we will trigger a timeout if the firmware doesn't respond
->    */
->   fbd->last_heartbeat_response =3D req_time - HZ;
->   fbd->last_heartbeat_request =3D req_time;
+>       BUG: KASAN: slab-use-after-free in _raw_spin_lock_irqsave+0x3b/0x80
+>       Read of size 1 at addr ... by task kworker/9:1
+>       Workqueue: events queue_process
+>       Call Trace:
+>        skb_dequeue+0x1e/0xb0
+>        queue_process+0x2c/0x600
+>        process_scheduled_works+0x4b6/0x850
+>        worker_thread+0x414/0x5a0
+>       Allocated by task 242:
+>        __netpoll_setup+0x201/0x4a0
+>        netpoll_setup+0x249/0x550
+>        enabled_store+0x32f/0x380
+>       Freed by task 0:
+>        kfree+0x1b7/0x540
+>        rcu_core+0x3f8/0x7a0
 >
-> The response handler then sets:
+> The problem happens when there is a pending TX worker running in
+> parallel with the cleanup path.
 >
->   fbd->last_heartbeat_response =3D jiffies;
+> This is what happens on netpoll shutdown path:
 >
-> for which we wait via:
+> 1) __netpoll_cleanup() is called
+> 2) set dev->npinfo to NULL
+> 3) call_rcu() with rcu_cleanup_netpoll_info()
+>   3.1) rcu_cleanup_netpoll_info() tries to cancel all workers with
+>        cancel_delayed_work(), but doesn't wait for the worker to finish
+> 4) and kfree(npinfo);
 >
->   fbnic_fw_init_heartbeat() -> fbnic_fw_heartbeat_current()
+> Because 3.1) doesn't really cancel the work, as the comment says "we
+> can't call cancel_delayed_work_sync here, as we are in softirq", the TX
+> worker can run after 4).
 >
-> The scheme is a bit odd, but it should work in principle.
+> Tl;DR: queue_process() is not an RCU reader, it reaches npinfo through
+> the work item via container_of().
 >
-> Fix the ordering of operations. We have to set up the stale heartbeat
-> before we send the message. Otherwise if the response is very fast
-> we will override it. This triggers on QEMU if we run on the core
-> that handles the IRQ, and results in ndo_open failing with ETIMEDOUT.
+> In reality, we can improve this cleanup path by a lot, but, given that
+> this is targeting net, just do the sane path:
 >
-> The change in ordering doesn't impact releasing the ownership.
-> Both ndo_stop and heartbeat check are under rtnl_lock.
+> 1) set dev->npinfo to NULL
+> 2) synchronize net / RCU
+> 3) cancel_delayed_work_sync() any new worker (that potentially showed up
+>    after the grace period -- and should exit soon given they will see
+>    dev->npinfo =3D NULL)
+> 4) then rcu_cleanup_netpoll_info() -> kfree() npinfo
 >
-> Fixes: 20d2e88cc746 ("eth: fbnic: Add initial messaging to notify FW of o=
-ur presence")
-> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> In the future, we can do the cleanup inline here, and don't need
+> npinfo->rcu rcu_head, but that is net-next material.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 38e6bc185d95 ("netpoll: make __netpoll_cleanup non-block")
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
->  drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  net/core/netpoll.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 >
 
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
---000000000000bcaf7c0654e3d114
+--000000000000f70dd20654e3dd08
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -282,14 +308,14 @@ eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
 Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
 a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
 ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDKA5AL
-/mJ4Ka+2H5JGJVkGssvIYGiqQgMUBsdIODnZADAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA2MjMwNDAxNTNaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCBeRHN4
+whHxr9A9QVhIFGAwb72kYWX3Q1Dm8Fn0JDjAEjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA2MjMwNDA1MThaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
 MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCBuaAqxC0DXd6XFdedj+EQhYG2mBycT1C+3K2TX/Y3
-2PqEHuAEKa5V0VlPD6nh7a493FUN40viRuIkJeDU7lq23UtL/R2NzAx0JX214dxKughjOKA5wgwe
-Udd5ahHEIokpaNB6kRenFSwKIQHPz6w7a51q6OheEb7MJnTelf4/3vU7jmJ4lOroeYYcXiLQ3YKr
-hATs/9Rup5C+bUagpOoFYX/i8TwIUr6uztEWv9h7rmoh9H1DyRXFw58vLLhnHQ9/rbG2B87XhMba
-d0Is+Q+oPIQ5JP67/qOjfvIGVyMWclkDWaPxUzMu7kpZKBHltMg9miuthU/H56SA4F40sh+w
---000000000000bcaf7c0654e3d114--
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCaiNTq3n2tY/WAOJ/pfNyklHD05xYROfu389Natq3d
+fFSTUwigueMbG0GP7xEPMY5ST++E28wP1lKV50hs9o6CHQ1uBYtQZvVg3gbFH3kSPOMUtNBs2x1i
+n6KdHaina4JT+eGKYwn/TDbLLfbv6Qvqu1AeumdQWwWrZxwXndQdBEnXNIAh+pHvvaxOQXsU88bX
+iJTp9bvMMEp560yObUkFAP+sOhwwiUXQEFoioSnwJUexYJW8JjyBVz+F49M7ZZwKiU4EW0k0yzHl
+Y1T9N+Fj7KnJ59tur4AHf39E+V+nqQXji6sFkXOuwOsNG+xyExGIDZxhYLZT2TL7xc6NBJQD
+--000000000000f70dd20654e3dd08--
 
