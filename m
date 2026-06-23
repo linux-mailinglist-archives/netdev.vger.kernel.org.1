@@ -1,164 +1,313 @@
-Return-Path: <netdev+bounces-301410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +5uALam1OmpUEggAu9opvQ
-	(envelope-from <netdev+bounces-301410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:34:49 +0200
+	id 8wi5B6K3OmpLEwgAu9opvQ
+	(envelope-from <netdev+bounces-301411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:43:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6A96B8C22
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:34:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 626126B8CC6
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 18:43:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=PwsCCeSx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301410-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301410-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=mandelbit.com header.s=MBO0001 header.b=KhIa09nH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301411-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301411-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8FE1B301426D
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:34:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24E0E303FBBB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 16:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0BD30C14E;
-	Tue, 23 Jun 2026 16:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B78318EC5;
+	Tue, 23 Jun 2026 16:41:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F17829992A;
-	Tue, 23 Jun 2026 16:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D65318EDC;
+	Tue, 23 Jun 2026 16:41:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782232482; cv=none; b=cjknsJVOO4b431nEkAE3iF1oRJfYQN1t1XjNc4+6NHa3BCJSiPPLnxsRb0W5MT1Y4kd/QGBynDGBIXMse7IgGFHnL7kzGAoS631ifBqJGxtRTwiJthc+NBsDIpAgHrxz5uNlhi5uHSLkpfEQzBT09/3Tc/ZPQo1BmVC9y6ebe9M=
+	t=1782232917; cv=none; b=goh7PeHc+nx+ygVMiQGKaksU9ZkiOKbvF+oZU5ybzUMib4qfkG9ksgCjsDRbhUHFbIYFKcx8REN/Bz+tvkFjY8i1mwAOHpx+FYKpBqSlQc+kQO1JLpnx2PFHkzHKZ/RlvAP/tFzS9QLpls7Kp+VJ1GasvHetd2eErbvSh3U0ZMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782232482; c=relaxed/simple;
-	bh=Q7C2WLq+w3wseZRK2d2WjJK33bsL447mI7ejl55BvK8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hgxbdKZtBBhY11zEI/nsKCzmIMwOwRIYsP91YyrCpF85T0MZVLIwZ/NCM6xcOlrOfLy0EhFz8/TL1ayiOinICJ/M1qsMQOeqGXUwkSYCEvQ3DbamOCKaSJXwJouYrBRjqDCtDcr1Eg5Hx1AcF+gGd7hOe4ZPW1JlfIAFEWD3WZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PwsCCeSx; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A0DA51A08AE;
-	Tue, 23 Jun 2026 16:34:38 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5F793601C2;
-	Tue, 23 Jun 2026 16:34:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 85E0A106C8382;
-	Tue, 23 Jun 2026 18:34:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782232477; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=2wrqOjRzMhTb93M3exBJA5foYnr34jfu7Zmsb7q95s4=;
-	b=PwsCCeSxTkhSaGoTDg4xMxOoL2zk6ED1MVfvwyPJwRYk5o/tBKr9xwp0bp3tVAV+1jWQFx
-	aXOFvygrE8H0EM9WRUdBcMhbSGm5hdjaRUlOF4YjdOBWMz7ruzOkAzqJZq+GSinJ0PHaZS
-	OIvOUOReO5w6MMQYLlYlmJiiF6wmd+BoxMc33zS7hYx/XqLHFTnwqI+GspefyRnGHr+p/N
-	hi36FB6nBMSnCDhwtkRiwqd5l44Pf0use01uJ9BgFF5cek9TkqE/RIy9ywPS072cIjLgoM
-	7JDhtOCvX+1BDNMuow4M5LA+oaq6a1O23DTc0O20HQMNJmTcvTSGYPgmgT4Omg==
-Message-ID: <6738bbb7-63ed-4c65-a0df-f5f9514fcde0@bootlin.com>
-Date: Tue, 23 Jun 2026 18:34:32 +0200
+	s=arc-20240116; t=1782232917; c=relaxed/simple;
+	bh=/Ozw/pJ649THbLLCrz2kMTyMshGfgnwrsXhgqUAQES8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DZdPY7IX8R7ocrV8r82Thhb0f4LOu1sRprp417sV7o/hURI9WuG8bNtMlMxqRapkC/2I+uzc0x0rHkjF4nuC4b9tbUQc02i7+74WFDBhbrfxriH3F8YkpRnVtxs1c4GymyKWFLoE27yEmQR7aA3Vz9k4D4FleQOPHFwZcx+WiCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=KhIa09nH; arc=none smtp.client-ip=195.10.208.52
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4gl9gT3rKxz9yDb;
+	Tue, 23 Jun 2026 18:36:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
+	s=MBO0001; t=1782232581;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dmxk5IGzfmvM4jtNa0odBeix8Um4lg5ptIdqKleDFpE=;
+	b=KhIa09nHYDpXmGqj4MEPHbCTdLzb/CCryPctvSdZO7+BEU0mg06dsS6tVRnPDoRJYrMJ4m
+	DpRNhgS/VV8bqWMmJzbrD4ZM89AAtuJgzeHql9pu1oc1g8QwGDU51zS1VIa6kM0j9eWoyi
+	ODz6kgooNoW/GwGXEp3EhLddUonZh9lmdu0qpwtthFgG/cjB7ULLPOf0g+0hGsYFw1Ivjl
+	mt5JW0KBOHoDD/MriQIVv5xUaQCEZ2O5FiDbAzunQZr2SswoO70tYrHMx9GjK9jwrEIETn
+	aIIU3XLK0NRtb/Um0bxpcokJH1beTD4tjF6iGwwiSuAZug61d/br11UWdosR4A==
+From: Ralf Lici <ralf@mandelbit.com>
+To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+Cc: netdev@vger.kernel.org,
+	=?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
+	Antonio Quartulli <antonio@mandelbit.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	Beniamino Galvani <bgalvani@redhat.com>
+Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and dispatch core
+Date: Tue, 23 Jun 2026 18:36:03 +0200
+Message-ID: <20260623163606.33510-1-ralf@mandelbit.com>
+In-Reply-To: <87ik7aej6f.fsf@toke.dk>
+References: <87ik7aej6f.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/2] net: phy: sfp/mdio-i2c: defer RollBall
- probe + fix mii_bus leak
-To: Petr Wozniak <petr.wozniak@gmail.com>, linux@armlinux.org.uk,
- andrew@lunn.ch, hkallweit1@gmail.com
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-phy@lists.infradead.org, bjorn@mork.no, olek2@wp.pl, kabel@kernel.org
-References: <20260623080538.7646-1-petr.wozniak@gmail.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260623080538.7646-1-petr.wozniak@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301410-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:toke@kernel.org,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:bgalvani@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,lunn.ch];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:petr.wozniak@gmail.com,m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-phy@lists.infradead.org,m:bjorn@mork.no,m:olek2@wp.pl,m:kabel@kernel.org,m:petrwozniak@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[mandelbit.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,lists.infradead.org,mork.no,wp.pl];
+	TAGGED_FROM(0.00)[bounces-301411-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[mandelbit.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8A6A96B8C22
+X-Rspamd-Queue-Id: 626126B8CC6
 
-Hi Petr,
+On Mon, 22 Jun 2026 16:36:24 +0200, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
+> >> > My second concern is that the SIIT boundary would be a property of
+> >> > rule and hook placement. That gives flexibility, but it also means the
+> >> > translation point has to be constrained and documented very carefully
+> >> > to avoid ambiguous TTL/Hop Limit, PMTU/ICMP, and hook-order behavior.
+> >> > For this use case I would rather have the route that matches the
+> >> > translation prefix also be the object that says: leave this family
+> >> > here and continue in the other one.
+> >>
+> >> Yeah, with flexibility comes the ability to shoot yourself in the foot.
+> >> But that's not really different from much of the other functionality we
+> >> have in the kernel today, is it? For netfilter in particular it's
+> >> certainly possible to configure a broken NAT configuration that leads to
+> >> packet drops (or just invalid packets being sent out on a network
+> >> device).
+> >>
+> >
+> > True, misconfiguration is always possible and that alone is not an
+> > argument against the netfilter model. But what do we actually gain in
+> > capability from that flexibility? I agree on the UX argument (an admin
+> > would look in nft first), but in terms of what the feature can do, I
+> > can't yet see what the nft model unlocks. More on this just below.
+> >
+> >> > After looking at the available kernel mechanisms again, I think the
+> >> > better model is probably LWT: routes carry an ipxlat encap referencing a
+> >> > named translator domain configured over netlink. That should represent
+> >> > the stateless, prefix-based and symmetric nature of ipxlat.
+> >>
+> >> I think this description actually hits the nail on the head: What are we
+> >> implementing here? Is it a product feature, or a building block for one?
+> >> The properties you mention wrt consistency, symmetry etc are properties
+> >> of the high-level feature (which is also generally the level things are
+> >> specified in RFCs). Whereas other packet mangling features in the kernel
+> >> are more in the "building block" category, where it's possible to
+> >> configure things to implement a particular feature set / compliance with
+> >> a particular RFC, but it's also possible to do things that are outside
+> >> of that.
+> >>
+> >> I think this relates to the "mechanism, not policy" approach that we
+> >> take to most things in the kernel: implement the building blocks to do
+> >> something in the most general way we can, and then leave it up to
+> >> userspace to configure things in a way that results in a consistent
+> >> high-level system behaviour.
+> >>
+> >
+> > That's a good point, and I agree that we should not bake a high-level
+> > product policy into the kernel if what we need is a reusable mechanism
+> > (the LWT idea was my attempt at exactly that). What I am still trying to
+> > understand is whether there is a useful generic trigger for stateless
+> > cross-family translation beyond the route/prefix/policy-routing cases.
+> >
+> > Routes and policy routing already cover the selectors I can make
+> > coherent for a stateless, per-packet translator: destination/source
+> > prefix, iif/oif/VRF, mark, TOS/DSCP, and so on. nft can of course match
+> > much more than that, but the additional selectors that would materially
+> > change the translation decision seem to be selectors such as L4 fields,
+> > payload state, or conntrack state. Those are exactly the selectors I am
+> > struggling to make correct for a stateless translator:
+> >
+> > - non-first fragments carry no L4 header at all, yet the translator must
+> >   rewrite every fragment (an nft ... tcp dport trigger cannot fire on
+> >   them);
+> >
+> > - ICMP errors must be translated too, but the flow identity lives in the
+> >   quoted inner header (reversed), not in anything an L4/ct match on the
+> >   error packet can see and there is no conntrack to associate them,
+> >   since this is stateless.
+>
+> True in principle, but if (say) you deploy this on a network that is
+> configured so it will never fragment packets, this won't be an issue in
+> practice.
+>
+> I.e., you're quite right that arbitrary matching criteria cannot be
+> guaranteed to result in coherent translation. But I think that goes into
+> the "use it wrong, get wrong results" bin. E.g., if you match on
+> something that results in only a subset of the packets of a flow being
+> translated, well, only that subset of the packets will make it to the
+> destination. The SIIT translator itself should not try to fix this, but
+> neither should it prevent it; that's what I mean by "building block" -
+> it's up to the builder using the blocks to make sure the building
+> doesn't collapse, that's out of scope for the block manufacturer to
+> worry about :)
+>
 
-On 6/23/26 10:05, Petr Wozniak wrote:
-> This series resends the RollBall bridge probe deferral (a fix for the
-> regression in commit 8fe125892f40) and adds a related mii_bus leak fix.
+I agree with that framing. The translation core should not try to prove
+that the surrounding policy describes a coherent SIIT deployment.
 
-These are bugfixes, you need to target the 'net' tree as explained here :
+> > So an L4-conditional trigger does not look like a good primitive for
+> > correct stateless SIIT unless the action also defragments/refragments or
+> > uses conntrack-like state. Those may be valid mechanisms, but they move
+> > the design away from the stateless per-packet SIIT boundary this RFC is
+> > trying to model.
+> >
+> > So my first question is: is there a useful nft configuration this should
+> > enable that is not naturally expressible as route selection, while still
+> > remaining stateless SIIT rather than a NAT64-like stateful feature?
+> > Maybe there is a real use case there, but I cannot construct one yet.
+>
+> So the poster child for "match on arbitrary criteria" is of course BPF.
+> You can write BPF programs that match on arbitrary parts of the packet
+> header, custom encapsulation headers,or even on out of band things like
+> system state, phase of the moon, or what have you. And we should
+> certainly allow a BPF program to make the decision on whether to perform
+> the SIIT translation.
+>
+> Which... maybe is an argument to keep it as a device like you do in this
+> RFC series? Redirecting to a device is trivially supported from TC-BPF,
+> which also makes it possible to use the translation mechanism without
+> going through the routing subsystem at all, saving a bit of overhead.
+> Whereas making it a route action ties it very closely to the routing
+> subsystem.
+>
+> WDYT?
+>
 
-https://docs.kernel.org/process/maintainer-netdev.html
+I see the netdevice appeal for this, especially as a BPF redirect
+target. But as we discussed earlier, the device model has some real
+problems: the device selected by the first route is not the real
+post-translation egress, so the model ends up doing translation and
+reinjection rather than normal transmission. Concretely:
 
-Thanks :)
+- it needs synthetic routing state purely to get things like MTU for
+  fragmentation, because the real post-translation nexthop is not known
+  at translation time;
 
-Maxime
-> 
-> Patch 1 fixes a pre-existing mii_bus leak in sfp_i2c_mdiobus_destroy()
-> that has been present since the helper was introduced in 2022. Patch 2's
-> new -ENODEV path destroys the MDIO bus via sfp_i2c_mdiobus_destroy(), so
-> patch 1 is a prerequisite to avoid leaking the bus on that path.
-> 
-> The v2 deferral patch was corrupted in transit and failed to apply; it is
-> regenerated here against current net-next with no functional change.
-> 
-> v3:
->  - Resend: v2 defer patch was corrupted in transit and failed to apply
->    (netdev/apply); regenerated against current net-next.
->  - Fixed block comment style flagged by checkpatch. No functional change.
->  - Added patch 1/2 (sfp: free mii_bus in sfp_i2c_mdiobus_destroy).
-> v2 (defer):
->  - Generalized scope: regression affects boot-inserted and hotplugged
->    modules where bridge init exceeds 200 ms; Aleksander Bajkowski
->    confirmed FLYPRO SFP-10GT-CS-30M / AQR113C broken when hotplugged.
->  - Corrected state machine description (probe runs in SFP_S_INIT after
->    SFP_S_WAIT) - Jan Hoffmann.
->  - No code changes from v1.
-> v1: initial submission.
-> 
-> Petr Wozniak (2):
->   net: phy: sfp: free mii_bus in sfp_i2c_mdiobus_destroy
->   net: phy: mdio-i2c: defer RollBall bridge probe to PHY discovery
-> 
->  drivers/net/mdio/mdio-i2c.c   | 15 +++++++++------
->  drivers/net/phy/sfp.c         | 23 ++++++++++++++---------
->  include/linux/mdio/mdio-i2c.h |  1 +
->  3 files changed, 24 insertions(+), 15 deletions(-)
-> 
-> 
-> base-commit: b85966adbf5de0668a815c6e3527f87e0c387fb4
+- TTL/Hop Limit handling gets harder to reason about because the packet
+  has effectively gone through two routing decisions;
 
+- rx/tx stats can't be made meaningful for a direction-agnostic device
+  whose ndo_start_xmit is really "translate and receive";
+
+- and the setup is not very obvious: create an interface, route packets
+  to it, then have them come back translated.
+
+None of these is fatal on its own, but together they make me think the
+abstraction does not quite fit.
+
+On the BPF point specifically: I agree a BPF program should be able to
+decide whether to translate. What I am less sure about is whether
+redirecting to a netdevice is the best way to expose that. A TC action
+(yet another model, I know :)) gives you the same thing in-pipeline and
+more directly:
+
+    tc filter add dev wwan0 egress \
+        bpf obj match.o action ipxlat4to6 domain clat0
+
+Let BPF make the policy decision, with the native action doing the
+translation work that the current BPF CLAT implementations have trouble
+with: fragmentation, checksum corner cases, and ICMP error inner
+headers (as explained by Beniamino).
+
+So TC clsact looks like the natural in-kernel replacement for today's
+TC-BPF CLAT programs: no extra netdev, you attach to the existing
+uplink, direction is explicit, and on egress you sit on the real route
+dst, so the synthetic-dst and double-routing problems above just don't
+arise. The cost is more moving parts than a single bpf_redirect since
+userspace has to manage clsact, filters, priorities and action
+lifecycle/cleanup.
+
+For a gateway translator, though, I still think a device-bound model is
+less natural. There the translation point is more like a forwarding
+decision across routes and nexthops, so a route/LWT attachment, or
+possibly a netfilter attachment seems easier to reason about. Also, as
+you already pointed out while discussing LWT, an admin setting up NAT64
+is more likely to reach for an nft rule than for a clsact filter on a
+specific device.
+
+Taking a step back, ipxlat is really a generic translation engine plus a
+thin harness around it. So rather than pick one attachment, it might be
+worth structuring the engine so different harnesses can drive it.
+There's interesting precedent for this shape:
+
+- ILA, again, is the closest sibling: stateless IPv6 address translation
+  with a shared core in ila_common.c, driven both by an LWT frontend in
+  ila_lwt.c and by an inline netfilter hook with a netlink-configured
+  mapping table in ila_xlat.c.
+
+- act_ct is the precedent for the TC side specifically: a TC action that
+  reuses the netfilter conntrack engine rather than reimplementing it.
+
+And act_nat is the cautionary counter-example: a standalone TC
+reimplementation of stateless NAT that shares no code with nf_nat, and
+carries a "would be nice to share code" comment :)
+
+So I am wondering whether the right direction is to factor the
+translation engine cleanly, land it with one harness first, and keep the
+other attachment points as follow-up work once the core semantics are
+settled.
+
+Does that direction seem reasonable to you?
+
+-- 
+Ralf Lici
+Mandelbit Srl
 
