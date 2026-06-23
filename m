@@ -1,68 +1,71 @@
-Return-Path: <netdev+bounces-301365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301366-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QzORLf6AOmrk+QcAu9opvQ
-	(envelope-from <netdev+bounces-301365-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:50:06 +0200
+	id 85LgGouDOmr++gcAu9opvQ
+	(envelope-from <netdev+bounces-301366-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:00:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6D06B732E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:50:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E05086B7475
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 15:00:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=codethink.co.uk header.s=imap5-20230908 header.b=bKfYRKzj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301365-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301365-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=codethink.co.uk;
+	dkim=pass header.d=163.com header.s=s110527 header.b=GCShpWYp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301366-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301366-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=163.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A38D23015C9B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:50:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8973310B979
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4995B1A3160;
-	Tue, 23 Jun 2026 12:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A5ED23D7E6;
+	Tue, 23 Jun 2026 12:57:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27A370836;
-	Tue, 23 Jun 2026 12:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7C523C4FA;
+	Tue, 23 Jun 2026 12:57:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782219001; cv=none; b=eHzfRCexl8OclPwMmaOtd9Xzk9bKTWgdSjDYBTyhUmPeAp5FTqtN9AnD+qwFTY3eclf0e4hNSxPDcnBi047khEicRt2ddOGb17Qmx4nOxMvCnbrCWIHgakM4KYzKyq+C7sSFIAQiPE4Dbs/2YdomEEh5HHR0+wdRCmPFwSibiZU=
+	t=1782219461; cv=none; b=jx136wRFJnLEeNHTyn/Y6pwn/Tmk9v9CZw1XPqU57CW1JZlpTjWRKzLE5Tcckl69IgUxv4nwnu0yJPi3KitBpF+gIF7nAjZhMB6sWxQCfXn3oLz0mtJ1oZYOx/Xn3n3OSv3iNmgFgX/28TIrtv2sv/QB3JpQTHO1gYF+AUT74yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782219001; c=relaxed/simple;
-	bh=4eJvxUFSnF+t+nCfUF/DRuBZ5U1aFM/SVBOL62oDVMY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MKKw5b0drJZOlGHEHs0HF23MBakkkygOKuxjPN06yYrK8btJ5SfRk1b88mLr+3X+oBMwwbuVwQOGcDIRTsk+Gxpn0nLeG+qQ9Lm3FDs4xw4ML5L9g0RgDy2XtGDNz7FDOW4EzUZUrXtNKTNo3xB8g3z6lsaqnfkdmhdwpampLds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.com; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=bKfYRKzj; arc=none smtp.client-ip=78.40.148.171
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:In-Reply-To:
-	References; bh=eph+6inJ7SuUxT31iR5t9WooZcKPpfJY4dEugCNlNcM=; b=bKfYRKzjh35D+n
-	Iza5xoRQXM6ZQ2sOv05HM9hM23ki8qxPcSSU6xR84OLtX1OmFjCOreNBcoSiGEKHmReYfIzVvLb2m
-	mHaWgnVPnbtGIiUtJOrWYYOw86p+Mgw1+zm/NbUvwa0c16sW06VDyU6tW/Vlc2wJUx05meBoBRp2X
-	ds0TEkfTP8glezxtGHFBVCpPbqXoD7QXJ/Q8UzYKbQq7yi108/Z/5PwbfelQd5Sw+n0db3F3mMvwp
-	fuBpuaA4G4QI6p4tayA0OqPU9u3gKWquBQF3CVCW2GZCbgbPqIfimidcbwNgo26o2p/bOd2sxgpbM
-	9aYWAc6Huc82USyVoxZg==;
-Received: from [167.98.27.226] (helo=rainbowdash)
-	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-	id 1wc0ZR-007GQj-8B; Tue, 23 Jun 2026 13:49:41 +0100
-Received: from ben by rainbowdash with local (Exim 4.99.4)
-	(envelope-from <ben@rainbowdash>)
-	id 1wc0ZQ-00000003Jpz-3v3p;
-	Tue, 23 Jun 2026 13:49:40 +0100
-From: Ben Dooks <ben.dooks@codethink.co.uk>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Ben Dooks <ben.dooks@codethink.co.uk>
-Subject: [PATCH] af_unix: move proto info out of CONFIG_BPF_SYSCALL
-Date: Tue, 23 Jun 2026 13:49:40 +0100
-Message-Id: <20260623124940.791230-1-ben.dooks@codethink.co.uk>
-X-Mailer: git-send-email 2.37.2.352.g3c44437643
+	s=arc-20240116; t=1782219461; c=relaxed/simple;
+	bh=N3v6qUckgyI9nxqvBsLkZa5/FRKCD0HFiekcYK0P3wA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ImDHbmDJxmrCqC8rOj5lQX2nhD/zTLtl8G08UQsyYFCeUj9RJ6vnjyGum4e39qmACVvtiAwxWNfnlRV5MJmLNsnS+JYLFw5WAWIC8H4tGwPi23Z2rjpw9H8gDj8hL1F/3hq7QY/56yiZErW0JEnd+ZNwDQPeUmz6N+4crZZiqwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=GCShpWYp; arc=none smtp.client-ip=220.197.31.3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=xE
+	18IhiGf4Rx2yGJ6G05XzQ3IDNdWM+p9SDW4T1+DTs=; b=GCShpWYpYqw/rrsTrr
+	Hf3t8hb50+nToyPUjaIOFMhWhX6BXALsb+frbZyJIhJ7V2QMaHUXK7juSgdjFrCV
+	wLzBR9Gdnt3oNJuzimUektiu2zMRz8RyufvQkVpRQVc0RCIEoXxov8wE/C2hv8/d
+	pyz0YrghS15uEYdi9iL9n1C0g=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD3f3NsgjpqxcRHFQ--.61307S2;
+	Tue, 23 Jun 2026 20:56:14 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kory.maincent@bootlin.com,
+	zilin@seu.edu.cn,
+	petrm@nvidia.com,
+	u.kleine-koenig@baylibre.com,
+	marco.crivellari@suse.com,
+	vadim.fedorenko@linux.dev,
+	Aleksey.Makarov@caviumnetworks.com,
+	satananda.burla@caviumnetworks.com,
+	felix.manlunas@caviumnetworks.com,
+	derek.chickles@caviumnetworks.com,
+	rvatsavayi@caviumnetworks.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: liquidio: Check soft command allocation in lio_main setup_nic_devices()
+Date: Tue, 23 Jun 2026 20:56:11 +0800
+Message-Id: <20260623125611.2228149-1-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,76 +73,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Sender: srv_ts003@codethink.com
+X-CM-TRANSID:_____wD3f3NsgjpqxcRHFQ--.61307S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WrWrAw45Aw1fCw1xXF4kCrg_yoW8JFW3pF
+	WkAFy2kF9rJ3WxGanFyw48CF98tan2kayYkFyxJ3s5Xr90y3Wv9ryjkFyF9rWDurWkCF13
+	tF9Ikws8X3Z5Ar7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zER6wZUUUUU=
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbC7Q7kU2o6gm60mwAA3H
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[codethink.co.uk,reject];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[codethink.co.uk:s=imap5-20230908];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301365-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ben.dooks@codethink.co.uk,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[ben.dooks@codethink.co.uk,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301366-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[163.com];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kory.maincent@bootlin.com,m:zilin@seu.edu.cn,m:petrm@nvidia.com,m:u.kleine-koenig@baylibre.com,m:marco.crivellari@suse.com,m:vadim.fedorenko@linux.dev,m:Aleksey.Makarov@caviumnetworks.com,m:satananda.burla@caviumnetworks.com,m:felix.manlunas@caviumnetworks.com,m:derek.chickles@caviumnetworks.com,m:rvatsavayi@caviumnetworks.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:haoxiang_li2024@163.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[ben.dooks@codethink.co.uk,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[codethink.co.uk:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[163.com:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,codethink.co.uk:dkim,codethink.co.uk:email,codethink.co.uk:mid,codethink.co.uk:from_mime]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,163.com];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[stable.vger.kernel.org:query timed out];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA6D06B732E
+X-Rspamd-Queue-Id: E05086B7475
 
-These two structs are defined even if CONFIG_BPF_SYSCALL but
-the header does not export them, so declare them anyway and
-move the check for CONFIG_BPF_SYSCALL lower into the file.
+octeon_alloc_soft_command() returns NULL when the soft command buffer
+pool is empty. setup_nic_devices() dereferences the returned pointer
+immediately when preparing the interface configuration command, which
+can lead to a NULL pointer dereference if the pool is exhausted.
 
-This removes the two sparse warnings:
-net/unix/af_unix.c:1060:14: warning: symbol 'unix_dgram_proto' was not declared. Should it be static?
-net/unix/af_unix.c:1071:14: warning: symbol 'unix_stream_proto' was not declared. Should it be static?
+Return -ENOMEM when the allocation fails and let the existing NIC init
+failure path handle the error.
 
-This change is less complicated than trying to make those two
-structs static based on the CONFIG_BPF_SYSCALL configuration.
-
-Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+Fixes: f21fb3ed364b ("Add support of Cavium Liquidio ethernet adapters")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 ---
- net/unix/af_unix.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/cavium/liquidio/lio_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
-index 8119dbeef3a3..2a6a26b3a2db 100644
---- a/net/unix/af_unix.h
-+++ b/net/unix/af_unix.h
-@@ -55,10 +55,10 @@ static inline void unix_sysctl_unregister(struct net *net)
- int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size, int flags);
- int __unix_stream_recvmsg(struct sock *sk, struct msghdr *msg, size_t size, int flags);
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index 0db08ac3d098..5077129656e8 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -3363,6 +3363,9 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
+ 		sc = (struct octeon_soft_command *)
+ 			octeon_alloc_soft_command(octeon_dev, data_size,
+ 						  resp_size, 0);
++		if (!sc)
++			return -ENOMEM;
++
+ 		resp = (struct liquidio_if_cfg_resp *)sc->virtrptr;
+ 		vdata = (struct lio_version *)sc->virtdptr;
  
--#ifdef CONFIG_BPF_SYSCALL
- extern struct proto unix_dgram_proto;
- extern struct proto unix_stream_proto;
- 
-+#ifdef CONFIG_BPF_SYSCALL
- int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore);
- int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore);
- void __init unix_bpf_build_proto(void);
 -- 
-2.37.2.352.g3c44437643
+2.25.1
 
 
