@@ -1,123 +1,83 @@
-Return-Path: <netdev+bounces-301358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VZrvMpJ1Omoe9gcAu9opvQ
-	(envelope-from <netdev+bounces-301358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:01:22 +0200
+	id 9hcqAQl6OmqI9wcAu9opvQ
+	(envelope-from <netdev+bounces-301359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:20:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796016B6F2E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:01:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0697B6B7067
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 14:20:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=h7AEYe7U;
-	dkim=pass header.d=redhat.com header.s=google header.b=hXNkHfPw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301358-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301358-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=GeTwnJr6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301359-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301359-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 432873014857
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:00:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 139A030C595F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA2F3D5666;
-	Tue, 23 Jun 2026 12:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571623D45CF;
+	Tue, 23 Jun 2026 12:17:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E968308F2A
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 12:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6C626F2BF;
+	Tue, 23 Jun 2026 12:17:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782216053; cv=none; b=AkBfGhF26WB/9/3FZfMEfuu02xZfgVW/32aiGUHCbUXvEF8TljPHUmGVRqJPioF0BWjbX8qSqlzy1y4B3S53Cdc56BsgGiGJQqm9qSsTkvBQbls4a9SGT+XgfBfxRKdvkgBwjHalUdYs4aZbgKCXRDz+HI0P0aLybuiIHnZDFgI=
+	t=1782217072; cv=none; b=fShk68R6+rlb6xRDbZTrbgAL8BKta7c7HcbU9SPSTP703PsQ8EqkAeVKlzdxNKqXKoWJ7HycfNfRCsVZxMzEYPx6ZEP1YNHLJuS9RaQ2Sb1HO+7X727gWhIYc0UYtiRhQ8IaATdLveRkjnqo+wRh2n7LBsOsb2fl21eRZOL/zJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782216053; c=relaxed/simple;
-	bh=fD1ssBHumg0Z/KRB6UvyA2t+hWd2u9qcEbBZhmVSYkE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PCuJOju0/7ujd2jpextOsTG1JCvi5pRBV74VHkFId3NJq0e216UQWuZ94RVYEzPzEDvZ60vibFl1ups6/E236FLIp9THr0QiSeutdhJZBoJKD8rC8OXih23QAXXr6C5KUP9Hy59V4DS9yfPcmWQDUWcncKJCp9n/n/n+RhD3wpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h7AEYe7U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hXNkHfPw; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782216051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fD1ssBHumg0Z/KRB6UvyA2t+hWd2u9qcEbBZhmVSYkE=;
-	b=h7AEYe7Udgvqqa80+rOwiPsORBtVDPSaLIeMgy7mSskTzQWGy5xFnB4kUQspDWeJHuh+er
-	VcJfr7xWHwU2RJuobmQOz1BjU+qIJMS718qymXaPamTFeLBniXpzQP0mne9rMpH5oGdTB5
-	J/j4yOk377cznwUp6kPQ5qdwiwlwT7I=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-rLCVWKyAOPq8m1NhXFBZ7A-1; Tue, 23 Jun 2026 08:00:49 -0400
-X-MC-Unique: rLCVWKyAOPq8m1NhXFBZ7A-1
-X-Mimecast-MFC-AGG-ID: rLCVWKyAOPq8m1NhXFBZ7A_1782216048
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4925bf70f5bso4861585e9.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 05:00:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782216048; x=1782820848; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fD1ssBHumg0Z/KRB6UvyA2t+hWd2u9qcEbBZhmVSYkE=;
-        b=hXNkHfPwhev9JdbxkV+JsG0fBqn29LCm85K+2kUKCzPyiHNmyzalmI+PKnN+k4Qbw8
-         1wXIguD623gYcPhe+UScZ7jvJD8wMC4kvrMVvJYvhM+LFnn2uNvgml7EmSK7IrmhfRVF
-         iR5XRaxn/nhCmwZg6CfduMgAk/nYI0PD6hcTdro4F3qvrZC1RrEoF58jz6Dkqb4cwxLR
-         4tc7ELQZmXYVp81ZaRaDGgZQ4bfAlQG9If9YGZH6dz2NXxLl6c2r+FhTTkadOl4bU5gG
-         eFdJNvPFBePuOEuNKpVwSRb2hIbdnIxHDzVrl7ullygc9A3DDsqy9wcCcTtsdRppnUNz
-         cBnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782216048; x=1782820848;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fD1ssBHumg0Z/KRB6UvyA2t+hWd2u9qcEbBZhmVSYkE=;
-        b=QMnriqiIaSKkxMKJvdAra0BoDfdhwzBUqRFctm7GbV938I8PEGBoDKsLqj3DMOZy9N
-         0YjGwikckS33OQGD20SGmNjOf24d80O5Cv1xM43201wZwC9XnECnfvQz6H/pTfk819oe
-         jam+ZAnl/i6pg5CTHFI2ok98YCcJSCITK9ELR8N5WQV220MrURvqNilSmHYTN2PI6I12
-         XSAl28EossdhPcptvjTOjPJb7G62oKXnCmpgtAXyHDr0ee1a9v25eqWc3iBAvVCBDxPz
-         CbAibWyOxNICdTw5fd3Ycsu2WlOk6Mk4PVVPU6Ltpj5dhjKaa/xsKq1sxzS3YOp0h3AA
-         2clA==
-X-Forwarded-Encrypted: i=1; AFNElJ9FE0B4vigvcSuCzutgz6nKaKIoJNVotEoRpJArQRwiboJqRtPZI6m/h03T2zscTxMiMpIeyXc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOc5HM8E/J7bpaPNnwKdbOwhppQBBI7EfMP7RtPo8WXvasYTae
-	/dYYjV98SqSzUfvV4THv2nzoic4dgidOd24q6cVzEEm4zD456Jjs3TLfB7+nxbkHpXXWzU+PRHS
-	M40wxQKe7yIwoeQng48rrv55cWUo2ld57+rzvT7R6f9IUneNJcNd57n9DDA==
-X-Gm-Gg: AfdE7cls0cp1uHDvkNFwKfpDJqkEJ+QO39itFbtj0hUuSGyG2Z/kkPeoHaZJejDHGkQ
-	ZhXYDYkbImATe8ylM5gPaWkk2RbDK25oE1r5VqNweTaUPM6x4qVs4w+Yty1CkfAwcH114x5pCqx
-	XJzY5Gie4cv3qP2TYq8UARbqOn11Y6lhWIICe7w/UlhBO7nxImqzUdd+VYW7+BkFohiM1lArKXe
-	VcbIZ7TxjpUP3IPyLUTv7217Ei9iVSuyvRnsknR02Z5ltYWmThnUg+LBwBPHwLQcdLWz08iWZvr
-	jKywV+QeTTAYckdLQBRIJpMt2G6DaGzf/DQPBMQv6H4ie5H16cuId7duAgCqqwh8b4aJWnO3LX8
-	2NTcuqakvcSvH30WmRIIjZdlPA+p83WDzG/k=
-X-Received: by 2002:a7b:cb56:0:b0:490:b65f:8b1 with SMTP id 5b1f17b1804b1-49240e22ed1mr202516345e9.5.1782216047217;
-        Tue, 23 Jun 2026 05:00:47 -0700 (PDT)
-X-Received: by 2002:a7b:cb56:0:b0:490:b65f:8b1 with SMTP id 5b1f17b1804b1-49240e22ed1mr202515915e9.5.1782216046755;
-        Tue, 23 Jun 2026 05:00:46 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4924944fb71sm273200945e9.14.2026.06.23.05.00.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 05:00:45 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 5BC60808C88; Tue, 23 Jun 2026 14:00:44 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Avinash Duduskar <avinash.duduskar@gmail.com>, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org
-Cc: eddyz87@gmail.com, memxor@gmail.com, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
- emil@etsalapatis.com, john.fastabend@gmail.com, sdf@fomichev.me,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org,
- yatsenko@meta.com, leon.hwang@linux.dev, kpsingh@kernel.org,
- a.s.protopopov@gmail.com, ameryhung@gmail.com, rongtao@cestc.cn,
- eyal.birger@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- dsahern@kernel.org
-Subject: Re: [PATCH bpf-next v4 2/3] bpf: Add BPF_FIB_LOOKUP_VLAN_INPUT flag
- to bpf_fib_lookup() helper
-In-Reply-To: <20260623025147.1001664-3-avinash.duduskar@gmail.com>
-References: <20260623025147.1001664-1-avinash.duduskar@gmail.com>
- <20260623025147.1001664-3-avinash.duduskar@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 23 Jun 2026 14:00:44 +0200
-Message-ID: <874iiteaab.fsf@toke.dk>
+	s=arc-20240116; t=1782217072; c=relaxed/simple;
+	bh=L1fmSH/ngeQavYEYr07Dz490+UJrqa9tBu7ExUZOitg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lgUFMjdGpOUX0YovKY1eKjXmsqpR85YRgZgWf2x0gllVDXndLNOvrqwT3WxkB73A7sxBx5xpt7zTh9nHr8Hzo/zo1h95ht0qXSzFAz+mmKipWvHzitU7JsB7PB9FuWkBTgo7/BmI9ZUMq/rqPVZFfYgpdq2tTtGmpsBLW6gxsD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GeTwnJr6; arc=none smtp.client-ip=192.198.163.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782217071; x=1813753071;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=L1fmSH/ngeQavYEYr07Dz490+UJrqa9tBu7ExUZOitg=;
+  b=GeTwnJr62DC98UCWnjq+4pk4o6Cg8Nw4BCfTtPMLIqa9TlW+X6wxPO1b
+   ek+TD6TWYDRHvuYz0MGOkZi8NdcmAwL0oPrVWBaDB6lNu8uNAfRYAzSuk
+   U81yXrk9wGgCzeUyiDwmnw+0U7AZG3ox4DUsvc+glteAv7hF8Zs7eCptq
+   LRNS4bxHaGG9MNKUBqxY7ZTZWVsmaPyMZ2Jdu2VcmypnWi7udAaBDjrM8
+   3pphkCONuytPoD1aesSgTL7RZp5vhiSS8vviBAjP53iJQggFTsVTd08kC
+   95Uejor0thjqslpztacrlDNjNDybDP2yAxNGF/IyElidtiJtQORv6mnNE
+   w==;
+X-CSE-ConnectionGUID: 4WSLVIARQOaMt/D2JOhxIg==
+X-CSE-MsgGUID: MYXCnIgGQTCHUY35DctRbQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11825"; a="82999146"
+X-IronPort-AV: E=Sophos;i="6.24,220,1774335600"; 
+   d="scan'208";a="82999146"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2026 05:17:50 -0700
+X-CSE-ConnectionGUID: Izw3kUsBS7yuTBUSDff/mw==
+X-CSE-MsgGUID: q4sWQ8K3QhOczEFYXY7V/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,220,1774335600"; 
+   d="scan'208";a="254486432"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by orviesa005.jf.intel.com with ESMTP; 23 Jun 2026 05:17:47 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1001)
+	id 9CB5F95; Tue, 23 Jun 2026 14:17:46 +0200 (CEST)
+Date: Tue, 23 Jun 2026 14:17:46 +0200
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+Cc: Mika Westerberg <westeri@kernel.org>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v1 0/3] thunderbold: A few cleanups
+Message-ID: <20260623121746.GD3066@black.igk.intel.com>
+References: <cover.1781776904.git.u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -125,103 +85,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1781776904.git.u.kleine-koenig@baylibre.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.10 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.56)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:yatsenko@meta.com,m:leon.hwang@linux.dev,m:kpsingh@kernel.org,m:a.s.protopopov@gmail.com,m:ameryhung@gmail.com,m:rongtao@cestc.cn,m:eyal.birger@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:dsahern@kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,m:asprotopopov@gmail.com,m:eyalbirger@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301358-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,toke.dk:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	RSPAMD_URIBL_FAIL(0.00)[toke.dk:query timed out];
-	FORGED_SENDER(0.00)[toke@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net];
+	TAGGED_FROM(0.00)[bounces-301359-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:u.kleine-koenig@baylibre.com,m:westeri@kernel.org,m:YehezkelShB@gmail.com,m:andreas.noever@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:andreasnoever@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
+	FORGED_SENDER(0.00)[mika.westerberg@linux.intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mika.westerberg@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[black.igk.intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,linux.intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 796016B6F2E
+X-Rspamd-Queue-Id: 0697B6B7067
 
-Avinash Duduskar <avinash.duduskar@gmail.com> writes:
+Hi,
 
-> BPF_FIB_LOOKUP_VLAN resolves a VLAN egress. The reverse is also
-> useful: an XDP program receiving a VLAN-tagged frame on a physical
-> device wants the lookup to behave as if the packet had arrived on the
-> corresponding VLAN subinterface, so iif-based policy routing and VRF
-> table selection use the right ingress.
->
-> Add BPF_FIB_LOOKUP_VLAN_INPUT. When set, params->h_vlan_proto and
-> params->h_vlan_TCI are read as an input VLAN tag and the matching VLAN
-> device of params->ifindex is resolved with __vlan_find_dev_deep_rcu().
-> The device must be up and in the same network namespace as
-> params->ifindex (a VLAN device can be moved to another netns while
-> registered on its parent; receive would deliver into that other
-> namespace, which a lookup here cannot represent). If params->ifindex
-> is itself a VLAN device, its inner (QinQ) subinterface is matched.
-> For a bond or team, a tag on a port matches no device and returns
-> NOT_FWDED; pass the master's ifindex.
-> The lookup then runs with the resolved device as the ingress;
-> params->ifindex itself is not modified on the input side. When the
-> resolved device is enslaved to a VRF, both the full lookup (via the
-> l3mdev rule) and BPF_FIB_LOOKUP_DIRECT (via l3mdev_fib_table_rcu())
-> select the VRF's table from the resolved ingress. That follows from
-> feeding the resolved device to the flow as the ingress
-> (fl4.flowi4_iif =3D dev->ifindex), which is what makes l3mdev resolve
-> the VRF master from the subinterface rather than from
-> params->ifindex.
->
-> The two failure classes get different treatment on purpose. A
-> h_vlan_proto other than 802.1Q/802.1ad is API misuse and returns
-> -EINVAL, since it would otherwise reach the WARN in vlan_proto_idx()
-> with a program-controlled value. An unmatched VID, a device that is
-> down, or one in another namespace is a data outcome and returns
-> BPF_FIB_LKUP_RET_NOT_FWDED, matching the DIRECT path when
-> fib_get_table() finds no table and mirroring real ingress, where the
-> receive path drops such frames. A VID of 0 (a priority tag) is looked
-> up literally and normally fails the same way; receive instead
-> processes such frames untagged, so callers should not set the flag for
-> priority tags. Proceeding on the physical device for any of these
-> would be fail-open for the policy-routing cases above.
->
-> The h_vlan fields share a union with tbid, so the flag cannot be
-> combined with BPF_FIB_LOOKUP_TBID. It describes ingress, so it also
-> cannot be combined with BPF_FIB_LOOKUP_OUTPUT. Both combinations
-> return -EINVAL; restricting now keeps a later relaxation backward
-> compatible. Combining with BPF_FIB_LOOKUP_VLAN is allowed: the tag is
-> consumed on the ingress side and the egress tag is written on
-> success.
->
-> Under !CONFIG_VLAN_8021Q the __vlan_find_dev_deep_rcu() stub returns
-> NULL, so every lookup with the flag returns NOT_FWDED, which is
-> correct since no VLAN device can exist.
->
-> Suggested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
+On Thu, Jun 18, 2026 at 12:14:49PM +0200, Uwe Kleine-König (The Capable Hub) wrote:
+> Hello,
+> 
+> I'm currently working on a project that includes looking at all device
+> ID structures from <linux/mod_devicetable.h>. While doing that for
+> tb_service_id, I spotted these patch opportunities.
+> 
+> These are all non-critical and also my quest doesn't depend on this, so
+> there is no urge to apply these patches. My suggestion is to apply them
+> via the thunderbold tree during the next merge window with an ack from
+> the network guys.
+> 
+> The first patch touches drivers/net and drivers/thunderbold. It could
+> theretically be split, but then this results in at least 3 commits which
+> seems excessive to handle three drivers, so I kept it as a single patch.
+> 
+> The third patch is a style change and so is subjective. Drop it, if you
+> don't like it. Here splitting would be easy, but given that patch #1
+> already touches the same files, letting these go in together without
+> splitting seems to be sensible.
+> 
+> Best regards
+> Uwe
+> 
+> Uwe Kleine-König (The Capable Hub) (3):
+>   thunderbold: Stop passing matched device ID to .probe()
+>   thunderbold: Assert that a service driver has a probe callback
+>   thunderbold: Drop comma after device id array terminator
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+Fixed the typo "thunderbold" -> "thunderbolt" and applied all to
+thunderbolt.git/next. I also took the networking patch, let me know if
+that's not okay (I'm the maintainer of that driver too and it looked fine).
 
+Thanks!
 
