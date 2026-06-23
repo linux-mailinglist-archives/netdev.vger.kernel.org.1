@@ -1,173 +1,196 @@
-Return-Path: <netdev+bounces-301338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301339-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id q9eiBipgOmrp7QcAu9opvQ
-	(envelope-from <netdev+bounces-301338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:30:02 +0200
+	id odkINdxgOmoe7gcAu9opvQ
+	(envelope-from <netdev+bounces-301339-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:33:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCF66B6490
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:30:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 295E06B64D4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 12:33:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hldRoK8v;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301338-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301338-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="mRQA1o 9";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301339-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301339-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0C165301A12C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:30:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C49F13067099
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A733B3B42D3;
-	Tue, 23 Jun 2026 10:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4138C3624D7;
+	Tue, 23 Jun 2026 10:32:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7AC35200A;
-	Tue, 23 Jun 2026 10:29:56 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5D42E7389;
+	Tue, 23 Jun 2026 10:32:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782210597; cv=none; b=CN2AD3C5PT9XHTDeXd7oi7WViQEXGFWPFCrlH9YdNC84HwZL7jc2I66PE/tFPIlqlx43ecqO6lvpkQvI2FAG3kMxc6ji2fm0vly+2fwUKDqDX9y5nXheNsoK72huo1dkSvg6tKW48kbC1IA+FXvbU5cSdVqE3lS6WSOQLwxbxp4=
+	t=1782210778; cv=none; b=ICkDWjddGzYkwglBkNwWhHqO0J/BRrsq9f9l+OsYkpT5Q4yIBpPVXzzudo1QZoH39UgPHrX7xSPcx9KheJhTijD79ryQ6DLX6HESsI+rI43U0tdnFKleIgNzG6GCeufKv5NPOvho+hyvh2FQSzFYYOv0Y12rIfgxsl36euDuRzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782210597; c=relaxed/simple;
-	bh=sAG2e6gDVhDw/IMNqh2cES6ptv4l5e7DQ7s0H/IcCeE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eEE18QeDX003mx3c18MZw4ouZibFnngiyVCbpQdEydoG+dfQExvWtSNDOwikVp+4B59qo7kbMPtw8USM7PELqOVh8dEmhDq4svqNGE7idvUkQ5oxhJesZ6/934wOXIuFeKM5OjK2IjQ7ZlgZAbB4wdY1YQ1iPtVUUJFp12eE4RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hldRoK8v; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 985471F000E9;
-	Tue, 23 Jun 2026 10:29:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782210596;
-	bh=7T1CU5SSShDw0aJ9KVYUgQhuWKn/RhlR48iRi5suHSQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=hldRoK8vcpn7kEthG8alQzSf9gF2SaT6ZvQLwwP/WpSnZHbTrSJaeQzykQjKQv4OW
-	 bUk3ic3Ua2enzhh8wA9tt1SSv86e7xsKb9LBy6yLxffWTqULMaTzer1ETP6W4vGL1C
-	 hsO7N28i9oeDbDpZ5AC4HiBfVFcJUMJiFAIQyRINGAXSwAJ5NofUv/Ne2jMoVuCYS2
-	 130Rvc7zknfhC3MlmVDMZMlV/goMSXobtzsFcBvLmGpSpakIwJ+6fyWQeUW/hNBbVl
-	 laEx8Rix5+b0CxuyEqDSh+XwszZqPej60MvjCQnWvdsH6hPMxTX8UNWukO+lYefsnt
-	 5UcKC2eGY0H+g==
-From: Simon Horman <horms@kernel.org>
-To: poros@redhat.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jacob.e.keller@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-net] ice: clear the default forwarding VSI rule when releasing a VSI
-Date: Tue, 23 Jun 2026 11:29:34 +0100
-Message-ID: <20260623102934.1072800-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260622081030.2312129-1-poros@redhat.com>
-References: <20260622081030.2312129-1-poros@redhat.com>
+	s=arc-20240116; t=1782210778; c=relaxed/simple;
+	bh=92VbNPJTkjdEBtbdvlNU+3BxeLMswukvLPMH/Wxhr7U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pczcaKWcZhoTYDlUpVaf6UA5XVhFszPCXzFRGqccWS8lqv8JJoTA6DMwPDxpcQqCUdudQSudbUeRHiAcilXIFVWKGh0pDeTfOfovXFMZdhmv/Nf4KhLaJ78Sj6bBndyg2yiULXizUseFq/Y5185GgbmVZAddyWrmrBYmxHiMbYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=mRQA1o9q; arc=none smtp.client-ip=13.76.78.106
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:Date:Subject:
+	MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
+	To:Cc; bh=d9d0le26UbuID8At9QM8NwqEIEAx0X81rJCUP5FPzYA=; b=mRQA1o
+	9q6mCQKCeBfc0yvmSRZexyXsKsJmjL95JhhsWeTXZFJK0JtBCxKS0YSMGICCUIvo
+	bZptNVex97qmAM2gyWJ7IebLMqrNAHDOH8Fopq7o8MpLZollxUibWUcaPtjDWJ91
+	SzP07yOk2Fg5nNGIZKMZDYxzy56Y32GaIfarw=
+Received: from [127.0.0.1] (unknown [101.6.30.195])
+	by web4 (Coremail) with SMTP id ywQGZQBHWJ3AYDpqOMt3Ag--.50276S2;
+	Tue, 23 Jun 2026 18:32:32 +0800 (CST)
+From: Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
+Date: Tue, 23 Jun 2026 18:32:31 +0800
+Subject: [PATCH net v2] seg6: validate SRH length before reading fixed
+ fields
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260623-f01-17-seg6-srh-len-v2-1-2edc40e9e3e1@mails.tsinghua.edu.cn>
+X-B4-Tracking: v=1; b=H4sIAL5gOmoC/22NwQ6CMBBEf4Xs2ZK2CKgn/8NwoGULa7CYLhAN4
+ d8tcPU4LzPzFmAMhAy3ZIGAMzENPgZ9SsB2tW9RUBMzaKkLWaircFIJVQrGthAcOtGjF/Uld1l
+ +1iVKA3H5Dujos78+wOMI1QF5Mk+04/a31TricQjf3T2rvXxotPyrmSMSWWGN0VertFP3V009p
+ yOTb7upTrGZUuuhWtf1B7r5cnPZAAAA
+X-Change-ID: 20260619-f01-17-seg6-srh-len-a85f35427e0b
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>, 
+ Mathieu Xhonneux <m.xhonneux@gmail.com>, 
+ Daniel Borkmann <daniel@iogearbox.net>, David Lebrun <dlebrun@google.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782210753; l=2240;
+ i=gnq25@mails.tsinghua.edu.cn; s=20260605; h=from:subject:message-id;
+ bh=92VbNPJTkjdEBtbdvlNU+3BxeLMswukvLPMH/Wxhr7U=;
+ b=dh6mR3KdjJPZ52OQuPdFNWGIGvtdFm2uuulipqIRfslz1/Ucql/ca3QUpbNC/tWn43yteNtSk
+ aVDl2zlmwTyDBj1wI1U7S+mg7CnTEgtUCY58eMz3iEJGkkvhwxspfbZ
+X-Developer-Key: i=gnq25@mails.tsinghua.edu.cn; a=ed25519;
+ pk=nqQ48fAxVTDp3z/IUmqv6BB+agXPpd8tQjDOBxwlgZo=
+X-CM-TRANSID:ywQGZQBHWJ3AYDpqOMt3Ag--.50276S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFy7Zryfuw4kXw1DAF4rGrg_yoW8tw1Dp3
+	WrGr4aqFWkGF97Zrn7K3Wjya4Du398GF1rXr95Aas5Crn0q3WxWr409w4YgFWYy398GF4a
+	y3y0qrWaq34DZaDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
+	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
+	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Av
+	z4vE14v_Gw1l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU0kWrtUUUUU==
+X-CM-SenderInfo: xjqtjko6pdxz3vow2x5qjk3toohg3hdfq/1tbiAQQHA2o6M-xrbwAAsa
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301338-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrea.mayer@uniroma2.it,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gnq25@mails.tsinghua.edu.cn,m:m.xhonneux@gmail.com,m:daniel@iogearbox.net,m:dlebrun@google.com,m:mxhonneux@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:poros@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[gnq25@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-301339-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gnq25@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mails.tsinghua.edu.cn,gmail.com,iogearbox.net,google.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,davemloft.net:email,vger.kernel.org:from_smtp,uniroma2.it:email,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9CCF66B6490
+X-Rspamd-Queue-Id: 295E06B64D4
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+seg6_validate_srh() reads fixed SRH fields such as srh->type and
+srh->hdrlen before checking that the supplied length covers the fixed
+struct ipv6_sr_hdr fields.
+
+The BPF SEG6 encap path reaches this with a BPF program-supplied pointer
+and length: bpf_lwt_push_encap() and the SEG6 local BPF END_B6 and
+END_B6_ENCAP actions call bpf_push_seg6_encap(), which forwards the
+length to seg6_validate_srh() with no minimum-size guard.  A 2-byte SEG6
+encap header can therefore make the validator read srh->type at offset 2
+beyond the caller-supplied buffer.
+
+Reject lengths shorter than the fixed SRH at the top of
+seg6_validate_srh(), before any field is read.  This fixes the BPF helper
+path and keeps the common validator robust.
+
+Fixes: fe94cc290f53 ("bpf: Add IPv6 Segment Routing helpers")
+Signed-off-by: Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
 ---
-ice: clear the default forwarding VSI rule when releasing a VSI
+Changes in v2:
+- Narrowed the commit message to the BPF encap callers that can supply a
+  too-short SRH length.
+- Dropped the unnecessary cast in the minimum SRH length check.
+- Link to v1: https://patch.msgid.link/20260620-f01-17-seg6-srh-len-v1-1-36cbb29c12f1@mails.tsinghua.edu.cn
 
-This patch restores the cleanup of the default forwarding VSI rule
-in ice_vsi_release(), clearing it when the VSI owns it. This prevents
-a rule leak if a trusted VF enters promiscuous mode and is then destroyed.
+To: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>
+To: Mathieu Xhonneux <m.xhonneux@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+To: David Lebrun <dlebrun@google.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: bpf@vger.kernel.org
+---
+ net/ipv6/seg6.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-> @@ -2871,6 +2871,9 @@ int ice_vsi_release(struct ice_vsi *vsi)
->  		return -ENODEV;
->  	pf = vsi->back;
->  
-> +	if (ice_is_vsi_dflt_vsi(vsi))
-> +		ice_clear_dflt_vsi(vsi);
-> +
+diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
+index 1c3ad25700c4c..62a7eb7792026 100644
+--- a/net/ipv6/seg6.c
++++ b/net/ipv6/seg6.c
+@@ -29,6 +29,9 @@ bool seg6_validate_srh(struct ipv6_sr_hdr *srh, int len, bool reduced)
+ 	int max_last_entry;
+ 	int trailing;
+ 
++	if (len < sizeof(*srh))
++		return false;
++
+ 	if (srh->type != IPV6_SRCRT_TYPE_4)
+ 		return false;
+ 
 
-[Severity: High]
-Is there a time-of-check to time-of-use race here?
+---
+base-commit: 96e7f9122aae0ed000ee321f324b812a447906d9
+change-id: 20260619-f01-17-seg6-srh-len-a85f35427e0b
 
-ice_is_vsi_dflt_vsi() acquires and releases the filt_rule_lock to check if
-the current VSI is the default. If true, ice_clear_dflt_vsi() is called,
-which acquires the lock again during rule removal.
+Best regards,
+--  
+Nuoqi Gui <gnq25@mails.tsinghua.edu.cn>
 
-If the lock is dropped between these two calls, could another thread
-establish a new default VSI rule before ice_clear_dflt_vsi() runs?
-
-When ice_clear_dflt_vsi() executes, it appears the rule search only matches
-by l_data and flag:
-
-ice_switch.c:ice_find_rule_entry() {
-	if (!memcmp(&f_info->l_data, &list_itr->fltr_info.l_data,
-		    sizeof(f_info->l_data)) &&
-	    f_info->flag == list_itr->fltr_info.flag) {
-        ...
-}
-
-For the default VSI rule, l_data is empty, so it might match any newly
-established default rule.
-
-And since ice_remove_rule_internal() does not appear to validate the
-vsi_handle for non-list rules:
-
-ice_switch.c:ice_remove_rule_internal() {
-	if (list_elem->fltr_info.fltr_act != ICE_FWD_TO_VSI_LIST) {
-		remove_rule = true;
-        ...
-}
-
-Could this blindly remove the default forwarding configuration for a
-completely unrelated VSI?
-
->  	if (test_bit(ICE_FLAG_RSS_ENA, pf->flags))
->  		ice_rss_clean(vsi);
 
