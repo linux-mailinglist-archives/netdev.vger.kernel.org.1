@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-301232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id deGAOLvhOWouygcAu9opvQ
-	(envelope-from <netdev+bounces-301232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:30:35 +0200
+	id uR20EcLhOWowygcAu9opvQ
+	(envelope-from <netdev+bounces-301233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:30:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D20ED6B32EC
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:30:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A636B32F1
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 03:30:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=IIYvL7+P;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301232-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301232-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=N55a0gJh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301233-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301233-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C8A7E3015D42
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 01:30:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C14CE30172C9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 01:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7553537CE;
-	Tue, 23 Jun 2026 01:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABA736998C;
+	Tue, 23 Jun 2026 01:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02B640D59E
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 01:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E069369234;
+	Tue, 23 Jun 2026 01:30:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782178221; cv=none; b=VB6x3q1HJ/ahpOyXYMwSry9JaDYJjincMahNbznTzmvx8jGXK185EesDAnyICQxtnJbx4XAneDeOdEErUUCcm3hIRL4LrxjzokFQoDpmo3iSDqyndmZPBBVYK+R8InUBk7Akd6TPfJ1ooUGjef7e/ox0FjHCAiFbb+UbgGLmx10=
+	t=1782178223; cv=none; b=Xz/vN9L5L8wklYdjO2VWnd7y6BP9q+vLMcXJub/Pcl3h/yZSafI+B7nXXapuZIBk8lHJWnKLUMu8cz9S2uV8cuAL529135nH3d6xW8QwTKyHZWdDfX/dyKjt0+BQPoWihqD6BTkNNM9dSWPyhlw9lK50HNq4x+/L9EXqLW1mJS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782178221; c=relaxed/simple;
-	bh=Cbc1IptnmyYPWbPHJpfHk+EdGrUyRbCcPiTcIXYcq9s=;
+	s=arc-20240116; t=1782178223; c=relaxed/simple;
+	bh=YF9ftz5RCBKjYnIjEwLjeaRvCaZnre6RWM+aLZ14O4E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P6Y/UMc5KJ4A7jGvyk6O6ZKx3gKqCASChQI9DFy1ViQqcbMgwtDnNhSNCGYn6oR47s6QjhaIIh8pn8NpJv4PBHqBu3EPwPU32fYtnknxw28DeFitSxVOS8mQcFaTv6+fB3WwjywVaPqA4nMGBs6te/yw0SnmCFPlOaF6GRIzqWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIYvL7+P; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67E781F000E9;
-	Tue, 23 Jun 2026 01:30:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ocaqm5vPA+5+IRykDkI/WX8vkDrjjYs3AR3vFQrtJmZ7ovM2GKzkVGeY6CQ8GulAQhQcDbgfTpcZENKVpZ+tNUZSD7dq7dGMVXBzyZ28Cl+dAFh10C1V21VKD5BwDSjxRYRi2rPREyC/zrfdtEQJl3wCFoQUfHKTkRMpEf11jqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N55a0gJh; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1BE81F000E9;
+	Tue, 23 Jun 2026 01:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782178220;
-	bh=bY9CbvwNiGdx3n/spdaZ2EO/smQd5Nd7llRFcIMgLk0=;
+	s=k20260515; t=1782178221;
+	bh=eR7JjrV3zhpo3lRNLX6zAdd9ulOAgIgurKLwWRFmcG0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=IIYvL7+PGgbdrCY7JxjDYjnikEHmYnxE3336cBqLwPCHvPUd3DDQmCUDJEwpikE6I
-	 u5zmvp0FqH+JlYWj0AS55H8MiLy/51Z1YiSdHLh3GIGCUcaUGQFpetg68MZDdZvgfL
-	 7ohrwgt+TbxgWotfBdCKerCc5ew7WD8IVgP/xybc8RIpspgGHUitmD8kBBPg8pgRQl
-	 qaWg0ZBACHSqqRRUhTKeDtlOjfGw4AbQ5RKRvkVplVwyyjB+ha+qdDIbyJr7SgEhXE
-	 wmCt8pvymEb725p+YiKvBXbTA7nCDVzRCiTbzIcWLkDKUShM7tkDFLFiuTfPeDTfVX
-	 cHe0ndGX+t9PQ==
+	b=N55a0gJhOuRzunH+uiN4s4MTVymbigHQMAUGvay4i9/zBleVOb3s5DKen0k6SsTTA
+	 TfZZAKoj4UbuRV8aAgMMSYiSzZDLRnk0Ee5QO3Oy8aOLEwvK+Hjdz/qrctUn+HM3Ze
+	 z4yhFbzB1+nhJxFnoEcWRe1pi6RTkSqqnlWKKjsddzBxBD5cbCBTbMdC8hNmX0okA/
+	 KFsv8uW1FFpITP5v7h+JRmkXuvDWh9oUjSG2ugsbdx7jy4S38OQ8EBAm/KVo2RdyMG
+	 BtFlpNcLIrMgbfFusx1NggIMymmDE7vgz9Jjg66EYCXUpz4xLVrNUJ4Yiq1OQ6LBap
+	 JblNFafQ5IAKA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0FCF393098F;
-	Tue, 23 Jun 2026 01:30:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56C8C393098F;
+	Tue, 23 Jun 2026 01:30:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,17 +57,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] eth: bnxt: improve the timing of stats
+Subject: Re: [PATCH net] net/wan/hdlc_ppp: sync per-proto timers before
+ freeing
+ hdlc state
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178217821051.1493333.5714369108079292852.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Jun 2026 01:30:10 +0000
-References: <20260619191538.104165-1-kuba@kernel.org>
-In-Reply-To: <20260619191538.104165-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com
+ <178217821199.1493333.4954244089937861432.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Jun 2026 01:30:11 +0000
+References: <20260617020518.116319-1-fanwu01@zju.edu.cn>
+In-Reply-To: <20260617020518.116319-1-fanwu01@zju.edu.cn>
+To: Fan Wu <fanwu01@zju.edu.cn>
+Cc: netdev@vger.kernel.org, khc@pm.waw.pl, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -75,15 +77,15 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	URIBL_MULTI_FAIL(0.00)[vger.kernel.org:server fail,sin.lore.kernel.org:server fail];
-	TAGGED_FROM(0.00)[bounces-301232-lists,netdev=lfdr.de,netdevbpf];
+	URIBL_MULTI_FAIL(0.00)[sin.lore.kernel.org:server fail,vger.kernel.org:server fail];
+	TAGGED_FROM(0.00)[bounces-301233-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:fanwu01@zju.edu.cn,m:netdev@vger.kernel.org,m:khc@pm.waw.pl,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
@@ -92,7 +94,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -102,32 +104,37 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D20ED6B32EC
+X-Rspamd-Queue-Id: 21A636B32F1
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 19 Jun 2026 12:15:38 -0700 you wrote:
-> Kernel selftests wait 1.25x of the promised stats refresh time
-> (as read from ethtool -c). bnxt reports 1sec by default, but
-> the stats update process has two steps. First device DMAs the
-> new values, then the service task performs update in full-width
-> SW counters. So the worst case delay is actually 2x.
+On Wed, 17 Jun 2026 02:05:18 +0000 you wrote:
+> Each PPP control protocol (LCP/IPCP/IPV6CP) embedded in struct ppp
+> registers a timer via timer_setup(). That struct ppp is the
+> hdlc->state allocation, which detach_hdlc_protocol() frees with kfree()
+> in both teardown paths: unregister_hdlc_device() and the re-attach inside
+> attach_hdlc_protocol().
 > 
-> Note that the behavior is different for ring stats and port stats.
-> Port stats are fetched synchronously by the service worker, so
-> there's no risk of doubling up the delay there.
+> The ppp proto never registered a .detach callback, so
+> detach_hdlc_protocol() performs no timer synchronization before the
+> kfree(). The only cancel, timer_delete(&proto->timer) in ppp_cp_event(),
+> is partial (it does not wait for a running callback) and only runs on the
+> ->CLOSED transition; ppp_stop()/ppp_close() do not sync either. A
+> ppp_timer callback already executing (blocked on ppp->lock) survives the
+> kfree and then dereferences proto->state / ppp->lock in freed memory,
+> leading to a use-after-free.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] eth: bnxt: improve the timing of stats
-    https://git.kernel.org/netdev/net/c/40529e58629b
+  - [net] net/wan/hdlc_ppp: sync per-proto timers before freeing hdlc state
+    https://git.kernel.org/netdev/net/c/c78a4e41ab5e
 
 You are awesome, thank you!
 -- 
