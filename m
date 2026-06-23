@@ -1,198 +1,176 @@
-Return-Path: <netdev+bounces-301279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301280-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yPDnCLMpOmpv3AcAu9opvQ
-	(envelope-from <netdev+bounces-301279-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:37:39 +0200
+	id Ow9PGtAqOmrI3AcAu9opvQ
+	(envelope-from <netdev+bounces-301280-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:42:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976AC6B495D
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:37:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF61E6B49CF
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:42:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="sT4Ch/Pi";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301279-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301279-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=RN0JphHi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301280-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301280-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2562A305A462
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:35:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E192303CC0C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC769331EB5;
-	Tue, 23 Jun 2026 06:35:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5833A4F2F;
+	Tue, 23 Jun 2026 06:42:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FCA1547C0
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 06:35:37 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782196538; cv=pass; b=YcUR209rcfNdCeK6InXenNx85kJUEhIu/1jC15sdbQsGfBcahm9C4PzIj8c4g5S50CR+a8Z1uZjdTgGh3Ct4Hlufx/v1aSFOdh9kLc2aQDnGJ6jC7tbP444KgCuoTh+xdPcLbL2kxPogRflEIUnuNW+eKOggP3iOUaWrBZJ6jho=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782196538; c=relaxed/simple;
-	bh=U0ircmHktCJ8xCYoMbhZqHyHDmgQ0AnW9fZmB+Vt7TM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XbT7yx9CmuD2QxSXQ500nzxP0VEfapVUufnMPp04MK+F/9N7XWwS3htnomjf6oEp4YdJnae7uSCAj5QNJSegAOwzH4KW/hGxrnY+EmMzrVzQmtTVBmjmMU+W3VuzqnOVJoUCzh+QteVF2rzNORzW3VcNiCzMhuEpMwD7uFMfoDA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sT4Ch/Pi; arc=pass smtp.client-ip=209.85.160.177
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5176ca6bab1so7870521cf.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 23:35:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782196536; cv=none;
-        d=google.com; s=arc-20260327;
-        b=hH74Z9EYHguDZv7pPFRciGYs9qadbFzFcH9huJfM6FnnND2ujlmrvKHOHTPeguQEK9
-         i3ntXmP44V56SiUD9Q9+rXihA7U66Iwp8tS0zs9QTVVNDZhDQCPLVRjz0xq6eZHAqatD
-         rOc9gP5ZlFvgulQIJfQKKKX/kUiFHNzUhJQqMrKy1jvJlUndxkEDB5Tz87niBVYNqC7E
-         M7nNfmfRHCQnbLbjZD47GpRgFHKDKB/5q2esisXWzT60KZTdsE2UV11hWCVjXQ89KPDd
-         tLmrnitf1RLHdXbb60G688RyutOaTv8SWHiyhrhwlTZBHBQP5YjkOmKa4pvXQev+B1ba
-         Upxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=XNp8OOr9Dg85fWjggrG8LtNFt4/KIkDIH3WeFv9MgkE=;
-        fh=NLQX11mEjMLhyGjPTkWeAzSfQHVYbNoubEgGRrLiQnU=;
-        b=jis72afKSHha6FZWK32NkvH8dT4AkinxTB4HQlvdRwSfVOAI0leQ+Uf+tEnFHa8In4
-         THkcCCxkGvW3N9yEflwQzkzufGSRfQzXaAXKpLf0TJfyVAm4z0p4ie4vV3iJLMQ4ig+q
-         sIK2FWH1JG4WQgeQ6K3EcfGGZPBFIuEDJFS5/X36x4Sk7fEBxrM4ggBE8CrKl03rkgjo
-         lfJNl2VInePrU0KOflYnaZGC0XaT7YWSh5HDM9LcIl9J2Uhlg6xrOmDzhuTq3eAH6eHK
-         pOsFXmPwZUUV26/G055Lfldc51Kr+bVDEJ5e/2L5bnh+Me3nkhZSA+/DFAEJIpLsvJSB
-         XiPw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231DC23EA84
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 06:42:14 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782196935; cv=none; b=HG5wUSMl9EWJbsWFdqhO94psUlx7t34/GqRtk4QI6aGU7v3HL0MEj2tXr8G0GDdlxhzC4FduVKibKshvcALK99Xko8BX1xOTlBGaHh7txfdtqurFKOmbjWIPYc0OSnPdk+YxI83Nb+2VvvsCUFR+5Cr5fGn2oc79+B2aN3bdILQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782196935; c=relaxed/simple;
+	bh=vcz1qNnnGqmF7wP8cgvAUAQIctb1YOSTQsyCD3dfS40=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i2bxaoMXhsH1UuHXK6cVIkyYPKsMUd2BYcr2IIiABQGgWSuckM879Do2rta/bVJgpejDLO8/B9Bykdnso0xeUr+HBqC9LDrXAE1D+7o97Y1IkPxOZCefTjKdJiLuT+/eUt2D4T/id5R8KIniyfNmVeLHqVpudNLDqqT2yyjU8y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RN0JphHi; arc=none smtp.client-ip=209.85.214.170
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2c7c684353dso4610185ad.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 23:42:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782196536; x=1782801336; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XNp8OOr9Dg85fWjggrG8LtNFt4/KIkDIH3WeFv9MgkE=;
-        b=sT4Ch/Pi6emaXTwh5t6EAHLphL21e6uerAuHjYmVe8+OFK/Pe+eINs8z8d7N9vGe6w
-         SLW6RKovRlMbd6HjSs9a0K5n+5xY9d2s9VWqd+e4pJqC6OndDO/leiRywbM4sC1MCgey
-         W6APcgWIjtvwfjWTKw8An8n48hnxKU1D5LGRid9/NSsNH6Ut3Tk4wa/gsn6CO8qFNGiL
-         CPtHdMnXdoWR0uHFQ3dx7TNh55T/M/SAQHUA93uwcx6Vsl1VuOvVwAXppfdJif0r7rcU
-         MPOHDTms0cPdKcZn9kIbo9NbWcKvmUYLUZgOa1+eCwf7NXLNmjqza30OrvEssfvcPROd
-         sn2w==
+        d=gmail.com; s=20251104; t=1782196933; x=1782801733; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=REeiWEzXJsG7DqV0Bw6mP/ft4dBk/VGKau57IND9SCI=;
+        b=RN0JphHihF5pbn4RG/KFHVeH3158Gxh/bNXsd4U+6w68amk2kEYbp0kvxtN41y6PTZ
+         WCBTeNtdTOY1zxMCvBTai/4+6Tk22Jrwa98FUt65+yqGocg7KXZMdI1JzmxbbjLUHxgT
+         qypcFb71VQ9ZxLUIiHFVhOpdeLnt8HrfvMkK6CoLgwnVSCEeioYeU26KV5HNMEdW9byV
+         yrPYZA3e4to0iaZ3IcEqzuklPf9xtmOsqETjplGK5oubNSwD86IaU6M1Ody2m1ZqxuV/
+         Ux44ldUY79WV/1p3uD5G69V2Byrd7ZhugaJaNO9/pRASpodAVrBookscqoDOvfwVEPtt
+         im6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782196536; x=1782801336;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XNp8OOr9Dg85fWjggrG8LtNFt4/KIkDIH3WeFv9MgkE=;
-        b=X7rVZNiK7kf1RvaWMKzTU5a/es4DDMUr+MlxGgfySZupJYYkw9O9R6WDs0ziwdqlF+
-         cHvC7dxHi3LEPsAI5Z1CHgIqn/0X0sjAVsiccxHXOhorDU+h8FhZhI1lbEyIJNgzgK4k
-         xwL9qeuU4i+WXOLNIoiHnZR8zmpEZti+AMdb+ZmVyvUNmyxZoJ1109/dGrlXw/8+D8Xw
-         5g8LApizUhy/LkSJgbalzqXamL0eKJMP6n0qoIj0+/tf9dA1vhpE1D5kJaDjFMhLVB+2
-         L6Oc3NzYcK+1ASBNHVrenFh6gkjTFFolzOxsPO3gHU0wyahuBqwh3xJwP0NqEEuEZviO
-         JNoQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+Nw7HKOp7z9g6pLykUpvej2NZRTJWgGsGPlon5S9Z78YFTWydgwQGaJe9GgNTn2MW7SlS56z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIbMaLpRo1HzKn4veNB8yp8id40RbUNQ/9wkOWkD4MKt2S84c5
-	9H9hnq1+5Y+Gl07xcXJGuOnuiYiza/cDfwDwSZneVjja7v47HwkgqozTDfbOOrxaYrKcFj0+xFO
-	mYsWFhv7DRxak5qvNc4hgMiB771RhO2yA/XdQAQZe
-X-Gm-Gg: AfdE7cksRlwSFWPZJzLeXDg1zpeso3mU4WvrmwT5v6J2/DphBG339Voq6s2SrdYDxZK
-	Zv3Q6fMpNU8zLTH0gCsaeqjEjObelsTVKVVAof0HLmRGveptqoi1p7bbE8zjr+zGTtds9cpZ9iq
-	qSXqQKy0KakpFA020tOJgZoS12hhgxbMkCzhh+PWNmRvru/U8+y9y4Q4rLc9Fz6KPaExfN8hjR0
-	DyTIcLuRiYUQXZ1UR6th6C/UPXsYdykMWuSSMYucZE4m7pacIcueyk6kj6SEpM3IgirY49Ok1ej
-	9nbETDR8XKnj3RK2ehypUI/mn8bEM6fCCBgwlkEXLYWrsC2iW5BJbBsLQM3D+VPoktYKLwDqSEN
-	2pIaI1cZ/z0AhipmFTNE=
-X-Received: by 2002:ac8:5a48:0:b0:516:ddfa:b6b9 with SMTP id
- d75a77b69052e-51a51b2e6acmr34930681cf.23.1782196535612; Mon, 22 Jun 2026
- 23:35:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782196933; x=1782801733;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=REeiWEzXJsG7DqV0Bw6mP/ft4dBk/VGKau57IND9SCI=;
+        b=o4U1vgHCkW1pDc6NNXOfcUv+yUaR5tw2BdZgZ8zzdTlpdtOL2CBEvWd4HKCfHymPhM
+         +/Rj85gHqKPB4ulWr1VCP0JogNev+B6/qvlDnTkLCpuEOHxA3g5zfoTDaCUv1pmsH0P7
+         3Gr698WQxqEhgqEJ9v5EtaFZCd9Kbw0T8imQ1zBtX+Spzo8lkpaeoo3k+wAHnB/qwMyV
+         aCkPbxha8WUqz89D2a3oMZ0f3xQaixsCEo2E7JUSLx3e/wADTVZRMfPutBRPCVOFlwm1
+         qYAWjFW5p/indCscJ4UNMrV6F8qjeSZscsJb70KMzUySJPx1DYGFiaH2f2am5vQbrFfL
+         R2yg==
+X-Forwarded-Encrypted: i=1; AHgh+RqS8TeVtWahSUkdwa0qGIeR1wr59AU7kd5mt8T7LsEBYIpULFEWZfYTFfjJcv400KxJiMBxegg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzV3t/la/q4Ys2F+bChPyBUb9jRMUuSg0crBi0asEUv50kpFewm
+	q3eI10FKFbKjI2GAyp3OI5eFVhFd6kikkMvX5+G+4bAXg7V9nGXGR4P6
+X-Gm-Gg: AfdE7cmccl4yPqQMcBH5fYtQZpQRnnve6WS8drvf+Gs5KAW0GX4GoKTmHGhPAeICsLL
+	ZNIxGChRfNePsfQaz9DCk+Xf89x7VxTFvnzGTyJvYIwG1e8rgU7+9DrnOPgCajvVPjfl4y4MrdI
+	yv027Gt5QeV1NIH2J8vOSEYNrx7j0qnVyFy/vK/6ZaRgvf/KF2yRxQsbvg12RbaWhff6a4TMuup
+	sgR0xP9b4v6g4PEqCEmqOhqvQ+4IvRaiIu+YczfbNrIjKk2e7BKQX8JpxqwdbUBdpGgMxZBdaQB
+	/AKRSMZz9+RaoH2yMKmCdFKRrE/BPPlqrTa6tmyx7+lj7iDVsYbS/UJC8llxk45MCzKQEuQCRys
+	ZpBYOf4bdjfCwXwQQzFBJvESpjyjFTlpElFjAlnvkY+H62Vy/6d2Vs/oD985WvyhBIJRC98bYwL
+	Hc+2qxLtxDF3LzH7MwibFiuD3fFSeW7X7qg8nc7hHuHk3oH3phd9U=
+X-Received: by 2002:a17:902:e803:b0:2c2:f675:32c5 with SMTP id d9443c01a7336-2c7c9a314c8mr11669575ad.29.1782196933437;
+        Mon, 22 Jun 2026 23:42:13 -0700 (PDT)
+Received: from localhost.localdomain ([115.110.225.242])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7436af22bsm93689415ad.10.2026.06.22.23.42.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 23:42:13 -0700 (PDT)
+From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+To: Wells Lu <wellslutw@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: [PATCH net v3 0/2] net: ethernet: sunplus: spl2sw: fix of_node refcount leaks
+Date: Tue, 23 Jun 2026 12:11:41 +0530
+Message-Id: <cover.1782195965.git.shitalkumar.gandhi@cambiumnetworks.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260622171048.1626022-1-edumazet@google.com> <CADvbK_e_7184a_jm5ASjKafXrJqaOKFUKJF6V1wp7AnFxK596g@mail.gmail.com>
- <CANn89iKFj9vSS6B-=KAMnLyqFqY5edZ-eChfcq+SuGckU6T9yg@mail.gmail.com>
-In-Reply-To: <CANn89iKFj9vSS6B-=KAMnLyqFqY5edZ-eChfcq+SuGckU6T9yg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Jun 2026 23:35:22 -0700
-X-Gm-Features: AVVi8CdaYF7Y6jL9GrW6H3t7INWD9i274710TrnB97EVpN869s4FVrVBu1heiOg
-Message-ID: <CANn89i+dkbrSAwvaWXW7yWMfcwUebuTBLG5T7AGZaZcpVYGyfQ@mail.gmail.com>
-Subject: Re: [PATCH net] tipc: fix UAF in cleanup_bearer() due to premature dst_cache_destroy()
-To: Xin Long <lucien.xin@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com, 
-	Jon Maloy <jon.maloy@ericsson.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301279-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,google.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com,m:jon.maloy@ericsson.com,m:lucienxin@gmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,ericsson.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:kuba@kernel.org,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,s:lists@lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301280-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev,e14bc5d4942756023b77];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,cambiumnetworks.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 976AC6B495D
+X-Rspamd-Queue-Id: BF61E6B49CF
 
-On Mon, Jun 22, 2026 at 10:37=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Mon, Jun 22, 2026 at 6:48=E2=80=AFPM Xin Long <lucien.xin@gmail.com> w=
-rote:
-> >
->
-> > Could this corrupt the list for concurrent RCU readers?
-> > When list_del_rcu() is called, it intentionally leaves the next pointer
-> > intact so concurrent readers can continue their traversal. However, the
-> > immediate call to list_add() overwrites both the next and prev pointers
-> > to link the entry into private_list.
-> > If a concurrent reader is currently positioned at rcast, won't it follo=
-w
-> > the newly clobbered next pointer and jump from the original RCU list
-> > directly into private_list?
-> > Because private_list is allocated on the local stack, the reader might
-> > interpret stack memory as a struct udp_replicast. Furthermore, the read=
-er
-> > would miss its loop termination condition because it expects to reach t=
-he
-> > original list head, potentially resulting in an infinite loop or a cras=
-h.
-> > [ ... ]
->
-> I think you are right.
->
-> Considering there is already one rcu_head in udp_replicast I will use it =
-in V2.
+This series fixes of_node refcount leaks in the Sunplus SP7021 ethernet
+driver, found by inspection. Compile-tested only; no SP7021 hardware
+available here.
 
-While looking at many syzbot reports with RTNL pressure. I found this
-gem in  tipc_exit_net()
+Patch 1/2 fixes the phy_node leak in the remove path.
+Patch 2/2 fixes multiple leaks in the probe path and depends on the
+cleanup contract from patch 1/2.
 
-while (atomic_read(&tn->wq_count))
-      cond_resched();
+Changes since v2:
+  - Patch 2/2: replaced __free(device_node) scoped cleanup with
+    explicit of_node_put() calls on each exit path (Jakub Kicinski).
+  - Patch 1/2: no functional change.
 
-On some kernel builds cond_resched() can be a NOP, so we might loop
-here for a while :/
+Changes since v1:
+  - Combined the two related fixes into a single series with cover
+    letter, per netdev convention.
+  - Added "Compile-tested only" note to both commit messages
+    (Andrew Lunn).
+  - Dropped Cc: stable@vger.kernel.org -- the leaks only manifest on
+    driver unbind/rebind, which is not a path normally exercised on
+    this SoC (Andrew Lunn).
+  - Fix author email to match Signed-off-by (DCO).
 
-Added in
+v2: https://lore.kernel.org/netdev/cover.1781552725.git.shitalkumar.gandhi@cambiumnetworks.com/
+v1: https://lore.kernel.org/netdev/20260607193029.589736-1-shitalkumar.gandhi@cambiumnetworks.com/
+    https://lore.kernel.org/netdev/20260607193711.601544-1-shitalkumar.gandhi@cambiumnetworks.com/
 
-commit 04c26faa51d1e2fe71cf13c45791f5174c37f986    tipc: wait and exit
-until all work queues are done
+Shitalkumar Gandhi (2):
+  net: ethernet: sunplus: spl2sw: fix phy_node refcount leak in remove
+  net: ethernet: sunplus: spl2sw: fix multiple of_node refcount leaks in
+    probe
+
+ drivers/net/ethernet/sunplus/spl2sw_driver.c | 23 +++++++++++++++++---
+ drivers/net/ethernet/sunplus/spl2sw_phy.c    |  6 +++--
+ 2 files changed, 24 insertions(+), 5 deletions(-)
+
+-- 
+2.25.1
+
 
