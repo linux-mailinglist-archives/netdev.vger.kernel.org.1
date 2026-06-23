@@ -1,151 +1,299 @@
-Return-Path: <netdev+bounces-301477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8MREJmftOmoxLwgAu9opvQ
-	(envelope-from <netdev+bounces-301477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:32:39 +0200
+	id yyR0EpLtOmpKLwgAu9opvQ
+	(envelope-from <netdev+bounces-301478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:33:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078386BA075
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:32:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A28F6BA080
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 22:33:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301477-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301477-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="N/gAeghP";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301478-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301478-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C28F730994FC
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 20:32:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0CB963008693
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 20:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFE33A6B85;
-	Tue, 23 Jun 2026 20:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DF33A48D9;
+	Tue, 23 Jun 2026 20:32:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E66D3A4539
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 20:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90B63A544D
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 20:32:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782246750; cv=none; b=QT6mMJj/bYnPSpkHGFV56G5SViRdYQpw+sMh26HwGycLDGyf4raw4CSU5GHfRPvZkK3gubwCFYrcYjUzVeHZAfFJQ9icqTixhAXBYc3TYJ4S2BXQfZ2babIfVU7+Wb9dUSxckgNIiGXr+PsLEb8DotTFTiirxZJ4xua+mpkYNRk=
+	t=1782246779; cv=none; b=AYZ07tQWhT3TjdB9SS1zCgIID6P/3owyIIj6sGE1PVNUIcqzLMYyMyI3aojOskr1NnvNuaVrHtZ31AnJTAn5rQPujk5eEOWK/w9vvWcJ4IaGvjC7I3vaPXL1A4IV+NssL4hSlFXidYjVsXVMaVmpl6UWziwPI0tAKOLA2Gv4n6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782246750; c=relaxed/simple;
-	bh=4uGzuH+YLKHx3Pe7eT8jQOF49p+UFV7PGd1poNJur2o=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eVKeyg0OyP+QUWvhFt1ZRqgAggQfEB6E2ibK7um/PN88Pvhr2nMcnWMPYcZWgTRDBE8uCzCuOBnvftBhZya35etpn/U9K8nx17tqL9YuBJhlGMV24AX8SNVByXZ7J3og7IhQ0TjGaqMjIs4HR6L49RyxZ+baEWJkM91dozmGEOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-48651d7d505so411857b6e.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 13:32:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782246749; x=1782851549;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QE3Fkd6EZeeRlA1amqgDlpy/1Dkbg+0qWNiUAEYQ6N4=;
-        b=SMW5FZHrrNlhEktBPJfgxxhX+vZVC0K4z2EwaYJQ6j0iuKf9eSWFT742quibKKSjnU
-         zN3e++OrmZ0Lfuf+OaILgYywo+JerTL9Mh0HYRb4BRNyPZRL3fFh6oCAFny2uYkWhu/Z
-         GBAtdsdNs3NN4HTXs52Ls8iD4uvIgMRjo9VEycIqX4Gpl65ReemeIxwEZOaidkzmCyou
-         eHRInz/G/j5HJkdOhBY11/iYfRD51vVmZdbBolC0exLNJc52qERaTaNRCTMdGIZ+QFx3
-         j2DhXB4kjBJwlVpR42W4yTQck05uY7xmaBMDS75I1mZV2DZHs1SMDoc3jeL6CB4RfC6s
-         yP9Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9JljsKOvWXi+sBYFV6JFE2Sn/rUd+8LaD/tjiKGBxj/X32jkeiVwfkDYbYYnaCyv6/2TIm4Qs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7IT4i8KIlho+HyZ/uDcOy3Uk1tJ//1eCjE835oH4L2dnBmWJB
-	pFPJLPR6cLLJryJx/nE5rEz6Xgn/jyvtuuh43EXkyl1ZHJ/QLzVRh7ySEJ0s3H8YViknCoWZx+x
-	O0Uwm13vyGxVqcRA+NQxvZZH46p2Csr2RjuK0yQvki642AVwOUSIXZIXpk0A=
+	s=arc-20240116; t=1782246779; c=relaxed/simple;
+	bh=5NFJnPlLc/vQFOiPNY0oyrs56OMvEhyinspiCApmcqI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eg5vPfD3cy67V0nDIWlSGc9AtX4k6JdaD+yv4X4d+xY0zUS7OFzz8wllwdDM4KQaPDGF2ZOJ+ivyHeUQolI52ugn7MFG98PzM1jmsygY1cywZ6cqgEflQb3CXMIpCgdSAxvHRuvfiqCo9iI97yk29MZuUv8BLEvOgZBK8ifPvYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/gAeghP; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26EC01F000E9;
+	Tue, 23 Jun 2026 20:32:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782246777;
+	bh=ouMHGOvMc2V/MonYeZTIKoTCZTr7oOqL3Hc354KdZOA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=N/gAeghPXWBeOOzXW3MobOa/tkuES83zcd5MWcmhYfJrT45375eKspP20DNt/fq+8
+	 9r79BBM2GV4GzdQofzhjudn6HhXfuQvX5WjygacOE1QINuHJT2cYaF9pZJRIsonKDz
+	 TUpJU7hgm173+LuAaAtv6KYXU3z7P+CKf9XcQVsMtBN+PQpMNv3IBeBJ29gw3lJNyg
+	 2+flqG/6SkILKa5URY89XXiVg3A+8Fq7StR+5quae5c6Col4I1Dbu7DwDtgRaIck5W
+	 TT1aZ7Rz9tno+F1irbgeS+e5TXTiaTyP49sj5KFBL0E9qmjnVMhZbZSCPTLhXhqElp
+	 sPPjTrLCOrpGA==
+Date: Tue, 23 Jun 2026 22:32:55 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, leto.liu@airoha.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	brown.huang@airoha.com
+Subject: Re: [PATCH net v2] net: airoha: Add retry mechanism to
+ airoha_qdma_set_trtcm_param()
+Message-ID: <ajrtd5WA2GFzQyV9@lore-desk>
+References: <20260622-airoha_qdma_set_trtcm_param-retry-fix-v2-1-95a83ac99dbd@kernel.org>
+ <20260623105341.1076863-3-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1a13:b0:490:660f:5979 with SMTP id
- 5614622812f47-49079493371mr245188b6e.32.1782246748717; Tue, 23 Jun 2026
- 13:32:28 -0700 (PDT)
-Date: Tue, 23 Jun 2026 13:32:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a3aed5c.b0c80a11.da7f.0005.GAE@google.com>
-Subject: [syzbot] Monthly net report (Jun 2026)
-From: syzbot <syzbot+list22a3a73a6e2d7e751aad@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="UkOWUaq6LIU/PkBM"
+Content-Disposition: inline
+In-Reply-To: <20260623105341.1076863-3-horms@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301477-lists,netdev=lfdr.de,list22a3a73a6e2d7e751aad];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-301478-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:leto.liu@airoha.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:brown.huang@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 078386BA075
+X-Rspamd-Queue-Id: 3A28F6BA080
 
-Hello net maintainers/developers,
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+--UkOWUaq6LIU/PkBM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-During the period, 5 new issues were detected and 15 were fixed.
-In total, 59 issues are still open and 1748 have already been fixed.
-There are also 30 low-priority issues.
+On Jun 23, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+>=20
+> Simon says: I'd appreciate it if you could look over the first two issues
+>             flagged below in the context of this patch. While the third
+> 	    and final issue looks like it is in possible separate follow-up
+> 	    territory.
+>=20
+> ---
+> net: airoha: Add retry mechanism to airoha_qdma_set_trtcm_param()
+>    =20
+> This patch introduces a retry loop to airoha_qdma_set_trtcm_param() to mi=
+tigate
+> bus timeouts when configuring QDMA parameters. It attempts to verify that=
+ the
+> configuration is correctly applied to the hardware.
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 3370c3df7c107..bb5c0599a4eed 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -2673,14 +2673,30 @@ static int airoha_qdma_set_trtcm_param(struct a=
+iroha_qdma *qdma, int channel,
+> >  		     FIELD_PREP(TRTCM_METER_GROUP_MASK, group) |
+> >  		     FIELD_PREP(TRTCM_PARAM_INDEX_MASK, idx) |
+> >  		     FIELD_PREP(TRTCM_PARAM_RATE_TYPE_MASK, mode);
+> > +	int i;
+> > =20
+> > -	airoha_qdma_wr(qdma, REG_TRTCM_DATA_LOW(addr), val);
+> > -	airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
+> > +	for (i =3D 0; i < 100; i++) {
+> > +		u32 data;
+> > =20
+> > -	return read_poll_timeout(airoha_qdma_rr, val,
+> > -				 val & TRTCM_PARAM_RW_DONE_MASK,
+> > -				 USEC_PER_MSEC, 10 * USEC_PER_MSEC, true,
+> > -				 qdma, REG_TRTCM_CFG_PARAM(addr));
+> > +		airoha_qdma_wr(qdma, REG_TRTCM_DATA_LOW(addr), val);
+> > +		wmb();
+> > +		airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
+> > +
+> > +		if (read_poll_timeout(airoha_qdma_rr, data,
+> > +				      data & TRTCM_PARAM_RW_DONE_MASK,
+> > +				      USEC_PER_MSEC, 10 * USEC_PER_MSEC,
+> > +				      true, qdma, REG_TRTCM_CFG_PARAM(addr)))
+> > +			return -ETIMEDOUT;
+>=20
+> [Severity: High]
+> If a bus timeout causes the write phase's read_poll_timeout() in
+> airoha_qdma_set_trtcm_param() to fail, this immediately returns -ETIMEDOU=
+T,
+> aborting the 100-iteration retry loop.
+>=20
+> Doesn't this defeat the mitigation?
 
-Some of the still happening issues:
+I agree we just run 'continue' here instead of returing -ETIMEDOUT
 
-Ref  Crashes Repro Title
-<1>  8753    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<2>  2480    Yes   unregister_netdevice: waiting for DEV to become free (9)
-                   https://syzkaller.appspot.com/bug?extid=e2af46126e0644cbebdd
-<3>  686     Yes   INFO: task hung in tun_chr_close (5)
-                   https://syzkaller.appspot.com/bug?extid=b0ae8f1abf7d891e0426
-<4>  456     Yes   WARNING in inet_sock_destruct (6)
-                   https://syzkaller.appspot.com/bug?extid=5b3b7e51dda1be027b7a
-<5>  447     No    possible deadlock in __ipv6_dev_mc_inc
-                   https://syzkaller.appspot.com/bug?extid=afbcf622635e98bf40d2
-<6>  443     Yes   INFO: task hung in nsim_destroy (4)
-                   https://syzkaller.appspot.com/bug?extid=8141dcbd23a8f857798a
-<7>  150     No    possible deadlock in __ethtool_get_link_ksettings
-                   https://syzkaller.appspot.com/bug?extid=9bb8bd77f3966641f298
-<8>  83      Yes   KASAN: use-after-free Read in qdisc_pkt_len_segs_init
-                   https://syzkaller.appspot.com/bug?extid=83181a31faf9455499c5
-<9>  67      Yes   INFO: rcu detected stall in rescuer_thread (2)
-                   https://syzkaller.appspot.com/bug?extid=d5f7a5097c24c7c2dbbb
-<10> 3       Yes   memory leak in __vsock_create (2)
-                   https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+>=20
+> > +
+> > +		if (airoha_qdma_get_trtcm_param(qdma, channel, addr, param,
+> > +						mode, &data, NULL))
+> > +			continue;
+>=20
+> [Severity: High]
+> If airoha_qdma_get_trtcm_param() times out during the verification phase,=
+ it
+> indicates the hardware hasn't finished the read command (DONE bit is stil=
+l 0).
+>=20
+> The continue statement then immediately starts the next iteration, writin=
+g new
+> commands to DATA_LOW and CFG_PARAM.
+>=20
+> Can writing to command registers while the hardware state machine is acti=
+vely
+> busy violate hardware protocols and lead to unrecoverable lockups?
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+@Brown and @Leto: can you please comment on this case?
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+>=20
+> > +
+> > +		if (data =3D=3D val)
+> > +			return 0;
+>=20
+> [Severity: High]
+> This isn't a bug introduced by this patch, but if the bus drops the comma=
+nd
+> write to REG_TRTCM_CFG_PARAM, the hardware never executes the command and=
+ the
+> TRTCM_PARAM_RW_DONE_MASK bit remains set from the previous operation.
+>=20
+> Consequently, read_poll_timeout() returns an immediate false success.
+>=20
+> If both the set and get command writes are dropped by the bus, the get
+> operation will read back the newly written DATA_LOW register value.
+>=20
+> Will the data =3D=3D val check evaluate to true and falsely report succes=
+s without
+> the hardware ever processing the configuration?
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+This seems quite a 'pathological' scenario, is it really an issue?
 
-You may send multiple commands in a single email message.
+Regards,
+Lorenzo
+
+>=20
+> > +	}
+> > +
+> > +	return -EBUSY;
+> >  }
+> > =20
+>=20
+> [ ... ]
+>=20
+> >  static int airoha_qdma_set_trtcm_config(struct airoha_qdma *qdma, int =
+channel,
+> >  					u32 addr, enum trtcm_mode_type mode,
+> >  					bool enable, u32 enable_mask)
+> >  {
+> >  	u32 val;
+> > =20
+> >  	if (airoha_qdma_get_trtcm_param(qdma, channel, addr, TRTCM_MISC_MODE,
+> >  					mode, &val, NULL))
+> >  		return -EINVAL;
+>=20
+> [Severity: High]
+> Standalone calls to airoha_qdma_get_trtcm_param(), like this one in
+> airoha_qdma_set_trtcm_config(), lack a retry loop entirely.
+>=20
+> Does this leave read-modify-write cycles fully vulnerable to the same bus
+> timeouts the patch attempts to mitigate?
+>=20
+> [Severity: High]
+> This isn't a bug introduced by this patch, but the patch mitigates bus
+> timeouts in airoha_qdma_set_trtcm_param() while entirely missing
+> airoha_qdma_set_rl_param().
+>=20
+> The latter performs the exact same write-and-poll sequence on identical Q=
+DMA
+> configuration registers:
+>=20
+> drivers/net/ethernet/airoha/airoha_eth.c:airoha_qdma_set_rl_param() {
+>     ...
+>     return read_poll_timeout(..., val & RATE_LIMIT_PARAM_RW_DONE_MASK, ..=
+=2E);
+> }
+>=20
+> If bus timeouts affect QDMA access broadly as stated in the commit messag=
+e, are
+> the rate-limiting configuration paths randomly vulnerable to the same fai=
+lures?
+>=20
+> [Severity: High]
+> This isn't a bug introduced by this patch, but in airoha_tc_remove_htb_qu=
+eue(),
+> hardware teardown incorrectly uses queue + 1 instead of queue:
+>=20
+> drivers/net/ethernet/airoha/airoha_eth.c:airoha_tc_remove_htb_queue() {
+>     ...
+>     airoha_qdma_set_tx_rate_limit(netdev, queue + 1, 0, 0);
+>     ...
+> }
+>=20
+> Does this leave the removed queue's hardware limits permanently active
+> (resource leak) and inadvertently disable the rate limits for queue + 1,
+> corrupting the QoS state of another active channel?
+
+--UkOWUaq6LIU/PkBM
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajrtdwAKCRA6cBh0uS2t
+rOA7AQCVwcnGTvgsBMt3sEm3xy+Xm0d3pO8aN3W5C9mTe6BnwAD/YJ+REZqwrvs3
+BpaC9wSWuXEuVLVX0mq5PSr7zq6ucQQ=
+=Z/ww
+-----END PGP SIGNATURE-----
+
+--UkOWUaq6LIU/PkBM--
 
