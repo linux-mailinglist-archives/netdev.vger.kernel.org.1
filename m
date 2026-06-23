@@ -1,230 +1,226 @@
-Return-Path: <netdev+bounces-301262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GH3AIMUbOmpY1gcAu9opvQ
-	(envelope-from <netdev+bounces-301262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:38:13 +0200
+	id /rLHES4eOmr11gcAu9opvQ
+	(envelope-from <netdev+bounces-301263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:48:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A37F6B4360
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:38:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A59F6B43FF
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:48:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=i9QSSQqV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301262-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301262-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=aM9jQqZl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301263-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301263-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=onsemi.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 76B333014772
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 05:38:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B73B303D332
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 05:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84C23A9628;
-	Tue, 23 Jun 2026 05:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DAA3A9616;
+	Tue, 23 Jun 2026 05:48:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.151.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824793A7F7E
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 05:38:06 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782193087; cv=pass; b=I8E2ZMWFmGblVlbXbS77sopz6iDSSvyIDV5DpdMC+gXkkRzAuVw8xM9s3E2UxsStzKZvVNg74sXEImcM1d3xA2bsnsfdVkYWmsitcVCyRnBfE2zRtGl5UEMLkQctAd7/+yp9lXv2eT4P83tC1HoGTXmgLRMiP62GoUxzYwgVs84=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782193087; c=relaxed/simple;
-	bh=VWljG9XLveu5P792LTWTSwGwrOfJ/Y/pbZEGuBu9e1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YNTwMsDGV27Pyw2T/Kgv5c71E6nqSAbR2CHNU2jQULWA8jMAWWqa/Om5T9f/ZawlcwmUmpF2DlwOyU7mHRj/kC1bdbv+Iof6HdeL4g3zbv+3GatFadLNVl/uh+G2cA2teZcZwIyvDQhKWq2ScFvNO2DyshTCKyD9+dZrqoZtVc4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i9QSSQqV; arc=pass smtp.client-ip=209.85.222.173
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-9157b949fc7so524445885a.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jun 2026 22:38:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782193085; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BukBT1iT0tiWmkGyPSYKETWO0ohnoFgw/RKOvVn96A0D+mea6R3wAOqu1bc9Q+SRwF
-         XPeOAc7nez1/AcIlkAvV5cj4cPbGQmjHv1olh4I2fajQhBnXNww3Ifzfut8QTJ2Q+q22
-         QRGEX7HnurZx5xsGcOTHVzRnybUx+IXTKx5/r9khpbrxTrlZ4LoanuTw4S/oUR1GVJDC
-         /NFYuK++G+1oiCPtBcsGO8JDlMld80ztOF0wU9tRu5cxwjKeZsRnr4UD2qFb4m3tv6Wf
-         R/LmLJhH7UwxCaZUF48PTWRcp9g9mUaBFfit7zvRcV2vTtIki2S7vJ3QfQObomoYno7A
-         HlIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ysOiikk67d0nfdQNdMyo9Uu9CDaFRmos1+EHeJBZSf0=;
-        fh=wRX3sGTkS/4nc6mbrqbKWJCUlfC4+e/MgXtGlPYtngI=;
-        b=OCleEEJRX++bF9TsVzNhPWxG4HpaHLnDOEkhj7yV/gbFxTWWK2Vsr70E/DesMpJl7S
-         5e2qkRNG2PEhCH7Oi5GFtdh2UZZTxB2zp/86vIX/tev7BGdnjcKf4TYOtjA7V7lP+228
-         +6glI9audHOd+PeHe3urybzcGlaLSlm3j9nK7niO912jCE0z9VilyTuZ5AF9cxhlHUZr
-         XtGv2Fs2h9iR8R6AV8La71M8TkLV2/H+FAWgu2rB9UdYvJOMJMUvOFw3GVyrTp/f51YZ
-         4bbScryUZ7fG+9QirCtQK3JdEKk3HBsqaWVoHs9m3oVzEUBEUbeAMG2f1gVmC1RQo7bV
-         doXw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782193085; x=1782797885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ysOiikk67d0nfdQNdMyo9Uu9CDaFRmos1+EHeJBZSf0=;
-        b=i9QSSQqVNNLOVNKA9wFoADizJ3062goj7F8pkl7sANyBmNMV+6egTUpQVDliC/Y587
-         sXwdoRuhyheO2IY35JE00kmlJwHJWX7cgQRr0VcqVK8uiSO9EHG93GMqn6vHaUDHAjlt
-         vzt+uhJSb6ffJ3iBCVFYTADcDOXVjWzJV6u0dsT7JoDD8k2IhxFLX7+RXd39EwT3D1aL
-         6UiO0IjyikBCdtb6su04xP6Pnha5Fs9SFZ5BLB8Vy0fsS8r00m4D3Heye6+djvdafJwF
-         83UpHUyKm7ffbqxX0hry+evBtBX/VspkZtwHfnslHRaTfP10ZLRg8LxjfxFrgqi8I33g
-         B+6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782193085; x=1782797885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ysOiikk67d0nfdQNdMyo9Uu9CDaFRmos1+EHeJBZSf0=;
-        b=qqHJoqXYEunXtasuwVnEzCO2KyHSA3HSXKu8sZZxX0FQAfbJhA0rXnRcqoADBmzJPw
-         fVDi9uzYoHqf+ldwzmE37Um9aIAXEtDKqOxiJVcaZKpPKCyF8MuEGkQ8gtsOaeKs2ep6
-         vGRgbyEEThnhURfQQ6N/hvuqoMN1k3pqi+3pTPGUVL9i88AP+AXim61n7z48sGkGEG9/
-         qb6fRd3CMqNhnVatu4S9kl5RjIIWyM+a6Rag1PMKXFyq8fepGTEhnGRwZDFfocnG2gnb
-         2Us3TtLiqihUwXzokw3zg0JGVQ54Zb+JVAmzlaxf8ojWHAkqA7WUYXwIq5vX1OBuHAMf
-         BG4Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9gLn3KdNWzP/fZOMtCQ940XkpdbwH7SXoHpUwgQwcbdAh/jEezSlfZmRJQzZEKJsgU6nkuOXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6QuHzk5kB+Yruv77LX3UDO3OrFeIesi3k1J/BBgKnsnC5TLPo
-	Dkh+gQWeMV1dpAh2CW7aG0w5DujF1hDS5zYDKswc2GRhm2FP9uNQ1/vcxkvQ3Z4USX5Fj7FfEPG
-	Un5AxrIER9ODd0iiH4QtDigqHJNGFKYUWYMxWjdq7
-X-Gm-Gg: AfdE7clww7lntqcBB9luyFZ6iHRIDAcQVldGXehmlcr46oZhlw17D9N7AFa9ZqPKKx1
-	Kv77HieG0cDuw0Vi8uNZfIgrQ+qDCtUiRZlTU9cKfrF5W3pwD8/oRpswlPVnV2pEAyHD12KlUPh
-	Oc7Wp6xrBoidEg5DgjfrIslz6LYoqH5iNa8H854n3nYTDxOwoo+hR+Yp9GT8hB/bCEjY90paltk
-	09oxVb+OFKviZKp+bftiHyg+fXPiYnNBgrMEcU68jX0jTi1ARidXTQDEfwS0zkX3e2mSlwHXOcl
-	uJPvbdgPdf5cIyb76UE5AS2/rKWs3/FX4rMa7ZwAaPTFTqzrM02JfeWwZktv3vOPLdc6m8+3h4K
-	n2zKI2hVQasUtW+zpteM=
-X-Received: by 2002:a05:620a:28d0:b0:915:e12d:19ed with SMTP id
- af79cd13be357-921d3da8fe9mr2050998385a.52.1782193084707; Mon, 22 Jun 2026
- 22:38:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5350B369D65
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 05:48:24 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782193705; cv=none; b=DN3iW/bvT494abIiqY4gLvqh5TFc6uvYk98tZbWhCFwSijLI2s2YDnbYSxjrwglhxI0uje/pIhkAC+dXvVbmgiyaTo9t01bYP5CUjVddTU/SlrUJtYSzGbHsYaLAcqAExpURHEkqpBBrLkriM/YXyLP/KlJv9q5FQBxEQpPdV2Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782193705; c=relaxed/simple;
+	bh=Ahqpoz09mO7HrQKC+1MK+E4Ir9NkPYkwg3eGODfCaO0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=VabM1casXIaGIIySxpeoxIh2B4MiXTNZhB7ZzVXh8qiLJ1t/eKRZqre44rGvW2WMeVDWKRfviEL9QVRlbenMegpRO3bTQ5fuZqrW/GpSsVNjLsXnnYLA/kOTdAn+V3C2ddO6/Q305hM3OBRKCBWa/KEz4kqnRTbowVHbOxaEJEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=aM9jQqZl; arc=none smtp.client-ip=170.10.151.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1782193698;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ahqpoz09mO7HrQKC+1MK+E4Ir9NkPYkwg3eGODfCaO0=;
+	b=aM9jQqZl4bipkpbaSo8WczHYHtZZQJGAE9hht81gFfYMz+0xb7aCE3302YWnDhPep9d1pL
+	XrtUkf9WqkUHVD3UcJiQRIEjworqDBmP2kNF6QRFZhmjcDmNwALlDQlIVT3ISU7HHk+MOT
+	QwKswr0iqf7vRDCZxjBZOBhyU2wBk2sZ6PS0Hvg76NFcj7kEvOgcPZHpbNyOLDKWVP9BpW
+	+LYR7C3MzmO85OYRWYKXHyQsoVQAObIfz1skd4zCXg2UpsIN6JViG2mdygVLE21vZAyUUN
+	jhRgjqjuYpYWLaULKPAZwDqrWxlfyLevKOXuNk0goKVVDwwY+lril6oMY3yjiQ==
+Received: from PH8PR06CU001.outbound.protection.outlook.com
+ (mail-westus3azon11012011.outbound.protection.outlook.com [40.107.209.11])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id usb-mta-55-lgPmqTCLO-SqxrIGGBGOdA-1; Mon,
+ 22 Jun 2026 22:48:15 -0700
+X-MC-Unique: lgPmqTCLO-SqxrIGGBGOdA-1
+X-Mimecast-MFC-AGG-ID: lgPmqTCLO-SqxrIGGBGOdA_1782193693
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
+ by CH0PR02MB8120.namprd02.prod.outlook.com (2603:10b6:610:10d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.21; Tue, 23 Jun
+ 2026 05:48:12 +0000
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0139.018; Tue, 23 Jun 2026
+ 05:48:04 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: "Parthiban.Veerasooran@microchip.com"
+	<Parthiban.Veerasooran@microchip.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
+	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, Piergiorgio Beruto
+	<Pier.Beruto@onsemi.com>
+CC: "andrew@lunn.ch" <andrew@lunn.ch>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Conor.Dooley@microchip.com"
+	<Conor.Dooley@microchip.com>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>
+Subject: RE: [PATCH net v5 1/4] net: ethernet: oa_tc6: Interrupt is active
+ low, level triggered.
+Thread-Topic: [PATCH net v5 1/4] net: ethernet: oa_tc6: Interrupt is active
+ low, level triggered.
+Thread-Index: AQHc+e0nFxx0u09WdkC+bo9XNPrS8rZAt0OAgAMGobCABlg+EIABlccAgAAFtTA=
+Date: Tue, 23 Jun 2026 05:48:04 +0000
+Message-ID: <CYYPR02MB9828E1167750AEA090EC60CD83EE2@CYYPR02MB9828.namprd02.prod.outlook.com>
+References: <20260611-level-trigger-v5-0-4533a9e85ce2@onsemi.com>
+ <20260611-level-trigger-v5-1-4533a9e85ce2@onsemi.com>
+ <7c89df6b-32ac-46c8-8400-945879037f2e@microchip.com>
+ <CYYPR02MB9828CD98EEEB9B218A940E4483E32@CYYPR02MB9828.namprd02.prod.outlook.com>
+ <CYYPR02MB9828A1434E6339A6CFCCA74283EF2@CYYPR02MB9828.namprd02.prod.outlook.com>
+ <64f4f30e-a987-4289-b36a-1acc977a6764@microchip.com>
+In-Reply-To: <64f4f30e-a987-4289-b36a-1acc977a6764@microchip.com>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|CH0PR02MB8120:EE_
+x-ms-office365-filtering-correlation-id: 26108cd1-4005-43d0-8c47-08ded0eafec1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|23010399003|56012099006|6133799003|11063799006|18002099003|22082099003|4143699003|921020|38070700021
+x-microsoft-antispam-message-info: 5PqsQnD0s2X/dGJ0J5l4mjfpGQkNGSF5ByUaFY7r9qqmBW5eKKxuyqB59M6+D2RPakGLqd7QOrrNrMkPN04rfqkRb2k1jdK864sapU8qItrPi2s9ceUJdlEhW7pxZG7Ld0imNGSE4qT4CD2vBO9zAWB/6xl9iTsnPXrs9yMVQM29Ta23JknidJOqZ4Ijqv62S7rFnCd14Um/pG1fbeLz7FUjpJaT+wiLnxzJZ0X8nedpGVIOIhzCBFzeDG0d7Llf7+bXIrru23HCjcmdLG5tiQu1FZcqnl1QRRQfq6edwzfRv115FLxPGuiQClVyRIJ/YjW0Oj0oRHFrzHcBeK+ABFrRJFiNHSy1fBw/m9VJ4J2CFCkdqI9h+xqqQ8ELMlUeEbWULTKNKSx30ZM+7WsIhV19ZvPvgY52xb1jPdR+aDB1s/bVwdm05SHqzMT8JlYUKrt1iYXNvhxhy/uDRCfqpduP5NSBPj70O1Na6oBSTaQOhZ/HhGACKFrG13uYyL1WUVFpug8Iw9pK1v4w1MOACoRQpaTfN8LCXDs1Q6Yo7LNQ4ImNwbGGZ/VLSL9or0uXpFcjMKR4py/0hi2wiWLghhieUK/Xcog11rf5ztfa9a/ozT+sZFy5JV9JRXm8QuupDWmsE7SbsOupLomwBAN619jenGmTHJq/vnbfiaTLTSXntaxx0xzMais7u4/Ad5jyP7w+bxEQS8oH+ezKai6sYr269XXzgn/rDlzytaGKqftfujAjA6eKYs+NDCluySga
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(23010399003)(56012099006)(6133799003)(11063799006)(18002099003)(22082099003)(4143699003)(921020)(38070700021);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QTBFMnlTRFJ0SDY3WkJpNDBPbk5WenNHdlE3YkkvWjhQQnA0WTBnMHdlT2h4?=
+ =?utf-8?B?dFppZmlXVllwejZRMDV2YTdvSW9LVGFGeVNxWE5xdkpXVUpvWW1VTzZTWnp2?=
+ =?utf-8?B?ME1xcndLcGVoK2tXRy9hS2h1elBudGt5TFRKL2R0a3k5YXdjWEZpWDN0d2dj?=
+ =?utf-8?B?Sjk4WFdHME1LNWZTNTFXeUFCa240YkFaNUh1SVdmaVFTaSswOHVaaFh0Ni92?=
+ =?utf-8?B?WmZXWWNKTDV2TUpybTNRQXYxYndrZDZjbHEwUkhrdEhGS25CRXMrYjFkV2lm?=
+ =?utf-8?B?c3J5dTFmcUg1K2dDdXhOa2M2S05jZ2FHdm9ML1BQcUN1V0FuWGFZa0Y4RExM?=
+ =?utf-8?B?dG1IMFVqNG5zMVYwM1FGbFg1WjBlUVdtOERETTNSQ0FkTitseXMwckppYndm?=
+ =?utf-8?B?Y2xlK21BOGFKZ2NKbWdpYm50NmhENUdaODZmYi9lRDBhQjd5ZnRnaFRIVFlJ?=
+ =?utf-8?B?Ykt5QS9TOXRHMWJHQjB0T0FFcDk0ajZ4aURiL1ZCam1hTkxKVm1pdEp4TkxK?=
+ =?utf-8?B?blN2OGQwOG1qdDk0ZFFsZU9lRHBZTVR0dVQzQi9nWVZKcFc4UlhXK0xER044?=
+ =?utf-8?B?ZjNFVkNFSWlSa3VKNVdvVEFrQ0QzVy9ZMjArNldrOWR0NENDOHQycEJCNGVu?=
+ =?utf-8?B?RGcyV1hldEJqUXMzVzBaYXRUUHQ0Ym1GQ3VMVUI2R1JMQThUQnNIMWphY1lD?=
+ =?utf-8?B?anVYTFF4c0J5dWx1RnlSYmZaNStHdFU4UXJGbXVmMko3TXAzS2FWODhzUTNn?=
+ =?utf-8?B?YzNKQVVBbzhTdk50eFNwYXRQWHFWRHpiYTlyRW42SitTMzFIT3JOVTFEazlz?=
+ =?utf-8?B?OVZqUUdudGZzNXhBU2dWSUxmZ2ZLMXFmZDZtc2gwS3Y5NjlPZHhSMjFTS3k3?=
+ =?utf-8?B?eFBSTmU4TGhXZlIzdHJZSlJvQlJhTVk2V0J4WWZTTWI5U3JMVS9TbXpjdWhp?=
+ =?utf-8?B?cy9DSEpzdHlLSytMSEkwQmRpOGVyRUZHTk4yL2taSTBCMjRzUjRFcTI5eXdm?=
+ =?utf-8?B?VzBhTGFJM3pWVjZ4MnB6czJ3c0tHZmFWM1QrTS9OMk9SOERyak5JQlZkaEUx?=
+ =?utf-8?B?Zk9mRnVTYmhwWExxOWNWWnFLbmpCeXZodTQ5TVozM1ExTjd3RjFuYkVTK1pt?=
+ =?utf-8?B?bGNVVkUvS0FZK25xY3hxb3BHNFdxNVRqSHB3cE02Rk4yckNJbjVYbDBXRW1C?=
+ =?utf-8?B?dktvVWpGVkF5VGNCVVI3aldrblNLS3VmMjUrSlJTd1hUbld4UHdDYjhYeCtC?=
+ =?utf-8?B?T3NUcGczOXBtMHI1VkI0NWpBVXNPZ2VMRkhqbnZIQWI0V3gwQWdkY25yODV3?=
+ =?utf-8?B?ZGUySTN4SS9GL0ZVT05iT2ZvS2JXaVJUMVlVWmc5aW0wWVpPR08welJzQ0sz?=
+ =?utf-8?B?ZVVPdTdHc3g1VzVxUVcybXlkbTcwTDNJb3g3bDdTa2tYYnphUm8zKzB5WDRS?=
+ =?utf-8?B?SCtiOUdSdi9nVS9Wc2svc1QrcEJMWnhJL3FhZVNDQUM3Y0F5OUpicUJCWUY2?=
+ =?utf-8?B?dkVDdHBUWk0rU1prZXFsOXpZUkRyaHFwaFdJS3NaOE8zTWs4OThqK21aMGh1?=
+ =?utf-8?B?YS8ycU9PSWpwOGI4cEhBQTRZY2YxN0l5OGlxVkU2VWxiMmRKRjZKcEFtNS9P?=
+ =?utf-8?B?YWZNOHFzUnZaREpSMVMyT1hveS9EUk00UDBlVWFqTlpPQis4NThSTkpNa3pN?=
+ =?utf-8?B?bVNUSkg5MkpHTUNVQWFMdWsvUm80WnRkVXBFK3BNK29hbC9jV2Q1WG1uV0J2?=
+ =?utf-8?B?TkNkcXlxdFgwU2VEb3d4QTBCWm1NTzN1Y3VtT0xKbExQc1pzS0Zqb3NDUXlH?=
+ =?utf-8?B?cVFFYVQ4UjVuOG9ZaERaOVlqWDc5dnc4TTNpL1ZkNVdRd00zcDN0UnIySjdS?=
+ =?utf-8?B?VUp4S0pyamp6VkVXeU9UYytQMnJKdVpxSDAyZTdVS3VZNitOQlM4b3E3TGlL?=
+ =?utf-8?B?L1lmV1NCVWlGSTRrWDEyT3lBc2hkZlcyMjJrSG9SWWRpZXY2RzlNK01vTG45?=
+ =?utf-8?B?L2lBejQvcDFaeXpiK3gybHlTc1VuaVVocGJaMWhjZHBQSnFjMWx1UitaSmkr?=
+ =?utf-8?B?YWt0bzdVNGxqV080UUEvcnp3bEhPcHd2ZHA1amo4TVRLRXNpcjNTM0VmSlA2?=
+ =?utf-8?B?NUNJZnNaS2pCeWZ2ODBjeGJ5SW45aHNqUTd2QzVDUFR5Z2FuMVlyeUFoTkxq?=
+ =?utf-8?B?RWZhaGdyeGM5TWswMmlQSHRVRnJHaWhDZDMwY29QcWt3Y1JianFCUzU1K0pF?=
+ =?utf-8?B?dlhTdTExYVlUWUdjYkttTVZ6SThQZXFydE96cTZRN1RPTmY2c05rRU80Ymhn?=
+ =?utf-8?B?SE5GWlRjdWVIMTRDTVJnYWgwRHNvVFdNcFNvUUdrc2tKVjEyak90QmRLMDRU?=
+ =?utf-8?Q?idVGu6oHJmVMeqgc=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260622171048.1626022-1-edumazet@google.com> <CADvbK_e_7184a_jm5ASjKafXrJqaOKFUKJF6V1wp7AnFxK596g@mail.gmail.com>
-In-Reply-To: <CADvbK_e_7184a_jm5ASjKafXrJqaOKFUKJF6V1wp7AnFxK596g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Jun 2026 22:37:51 -0700
-X-Gm-Features: AVVi8CeidMQXxuMWfPuny_GiAkuPeb9HWG8ghffbqrtFuGv34sIlzvjhxyoZ4Ik
-Message-ID: <CANn89iKFj9vSS6B-=KAMnLyqFqY5edZ-eChfcq+SuGckU6T9yg@mail.gmail.com>
-Subject: Re: [PATCH net] tipc: fix UAF in cleanup_bearer() due to premature dst_cache_destroy()
-To: Xin Long <lucien.xin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com, 
-	Jon Maloy <jon.maloy@ericsson.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Exchange-RoutingPolicyChecked: LdB1HyHTjkRg+XKwkLHJwzhAPfow5x62V9WBuD/BT4ZH4+X/G65YYBkPXWlNjN0JOZT0wgP2J4pvdcyLs/QQbyzMwYJk69+D86NU8/QKq9o5rZYxfR0pae3OWtOHzCKfBQ+b5z3/34WpSxxbOa/gmsvBel8uHgWQzKMaFN8Bd6+4TD6LujTPwAL8fwn6ID48iIaxWCotD29+12jo+6tbgSBOW4ZzoKmG+BrYizh9Izp2kPneFq4p0uzYZuDwARwRmrTTodAZ0HoE0atFfbxsdjSfi/QSWwqM1vx1/As+RQypyVbI1v0pDTdnZkX+1QT0u8sFn4IRudHlgR/CIcIwHQ==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26108cd1-4005-43d0-8c47-08ded0eafec1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2026 05:48:04.7746
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ExjckTN6tcZfXcSS5CPN8MIjRl2fR5mlNTCdl1gJ0DpMuV9yUr5Icjs4/hucOlvEuJaJpHdihg4BSEnK9E0AbeL0j3Xrbb7/V2TGDBwUlrA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR02MB8120
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: -U2kFAXdNVD7wQDjOh5j-H22AGKP-CmLT3snjiWFERI_1782193693
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301262-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-301263-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+e14bc5d4942756023b77@syzkaller.appspotmail.com,m:jon.maloy@ericsson.com,m:lucienxin@gmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:Parthiban.Veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Pier.Beruto@onsemi.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:Conor.Dooley@microchip.com,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,ericsson.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev,e14bc5d4942756023b77];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A37F6B4360
+X-Rspamd-Queue-Id: 9A59F6B43FF
 
-On Mon, Jun 22, 2026 at 6:48=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
-te:
->
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBhcnRoaWJhbi5WZWVyYXNv
+b3JhbkBtaWNyb2NoaXAuY29tIDxQYXJ0aGliYW4uVmVlcmFzb29yYW5AbWljcm9jaGlwLmNvbT4N
+Cj4gU3ViamVjdDogUmU6IFtQQVRDSCBuZXQgdjUgMS80XSBuZXQ6IGV0aGVybmV0OiBvYV90YzY6
+IEludGVycnVwdCBpcyBhY3RpdmUgbG93LCBsZXZlbA0KPiB0cmlnZ2VyZWQuDQo+IA0KPiANCj4g
+SSB3aWxsIGZpbmQgc29tZSB0aW1lIHRoaXMgd2VlayB0byB0ZXN0IGFuZCBzaGFyZSBteSBmZWVk
+YmFjay4gSW4gdGhlDQo+IG1lYW50aW1lLCB3b3VsZCBpdCBiZSBwb3NzaWJsZSBmb3IgeW91IHRv
+IHRlc3QgdXNpbmcgdHdvIGluc3RhbmNlcyAoVGVzdA0KPiBDYXNlIDIpPyBJIGRpZCBub3QgZW5j
+b3VudGVyIG1hbnkgaXNzdWVzIHdoZW4gdGVzdGluZyB3aXRoIGEgc2luZ2xlDQo+IGluc3RhbmNl
+Lg0KPiANCj4gSSBiZWxpZXZlIHRoYXQgdGVzdGluZyB3aXRoIHR3byBpbnN0YW5jZXMgaW5jcmVh
+c2VzIHRoZSBsaWtlbGlob29kIG9mDQo+IHJlcHJvZHVjaW5nIHRoZSBpc3N1ZSBpbiB5b3VyIHNl
+dHVwIGFzIHdlbGwuDQoNClBhcnRoaWJhbiwNCg0KVGhhbmtzLg0KDQpPdXIgRVZCIGRlc2lnbiBh
+bGxvd3Mgb25seSBvbmUgYm9hcmQgdG8gYmUgY29ubmVjdGVkIHRvIG9uZSBSYXNwYmVycnkgUGku
+IA0KU28sIEkgZG9uJ3QgdGhpbmsgSSBjYW4gaGF2ZSBhIHNldHVwIGxpa2UgeW91cnMuIFdlIGRp
+ZCB0ZXN0IHdpdGggdGhyZWUgUmFzcGJlcnJ5IFBpIGJvYXJkcyB3aXRoIA0KbXVsdGktZHJvcCBj
+b25uZWN0aW9uLiBDb3VsZG4ndCBzZWUgeW91ciAiTlVMTCBwb2ludGVyIiBjcmFzaC4gV2lsbCBr
+ZWVwIHRyeWluZyB0aG91Z2guDQoNCkJ1dCBJIGNvdWxkIHNlZSBhc3NlcnQgaW4gc2tiX3B1dCBp
+bW1lZGlhdGVseSBxdWlja2x5Lg0KDQo+IA0KPiBCZXN0IHJlZ2FyZHMsDQo+IFBhcnRoaWJhbiBW
+DQo+ID4NCj4gPj4NCg0K
 
-> Could this corrupt the list for concurrent RCU readers?
-> When list_del_rcu() is called, it intentionally leaves the next pointer
-> intact so concurrent readers can continue their traversal. However, the
-> immediate call to list_add() overwrites both the next and prev pointers
-> to link the entry into private_list.
-> If a concurrent reader is currently positioned at rcast, won't it follow
-> the newly clobbered next pointer and jump from the original RCU list
-> directly into private_list?
-> Because private_list is allocated on the local stack, the reader might
-> interpret stack memory as a struct udp_replicast. Furthermore, the reader
-> would miss its loop termination condition because it expects to reach the
-> original list head, potentially resulting in an infinite loop or a crash.
-> [ ... ]
-
-I think you are right.
-
-Considering there is already one rcu_head in udp_replicast I will use it in=
- V2.
-
-I will squash/test the following:
-
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index befaf7137caf642462b7203a2429a60386e64db8..1b1977bd09a3f24028a30c1b98d=
-5edc4b1882ba2
-100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -803,17 +803,24 @@ static int tipc_udp_enable(struct net *net,
-struct tipc_bearer *b,
-        return err;
- }
-
-+static void rcast_free_rcu(struct rcu_head *rcu)
-+{
-+       struct udp_replicast *rcast =3D container_of(rcu, struct
-udp_replicast, rcu);
-+
-+       dst_cache_destroy(&rcast->dst_cache);
-+       kfree(rcast);
-+}
-+
- /* cleanup_bearer - break the socket/bearer association */
- static void cleanup_bearer(struct work_struct *work)
- {
-        struct udp_bearer *ub =3D container_of(work, struct udp_bearer, wor=
-k);
-        struct udp_replicast *rcast, *tmp;
--       LIST_HEAD(private_list);
-        struct tipc_net *tn;
-
-        list_for_each_entry_safe(rcast, tmp, &ub->rcast.list, list) {
-                list_del_rcu(&rcast->list);
--               list_add(&rcast->list, &private_list);
-+               call_rcu_hurry(&rcast->rcu, rcast_free_rcu);
-        }
-
-        tn =3D tipc_net(sock_net(ub->sk));
-@@ -822,11 +829,6 @@ static void cleanup_bearer(struct work_struct *work)
-
-        synchronize_net();
-
--       list_for_each_entry_safe(rcast, tmp, &private_list, list) {
--               dst_cache_destroy(&rcast->dst_cache);
--               kfree(rcast);
--       }
--
-        dst_cache_destroy(&ub->rcast.dst_cache);
-        atomic_dec(&tn->wq_count);
-        kfree(ub);
-
-
-Thanks.
 
