@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-301277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lmjBK2opOmpb3AcAu9opvQ
-	(envelope-from <netdev+bounces-301277-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:36:26 +0200
+	id /5Z8EKYoOmob3AcAu9opvQ
+	(envelope-from <netdev+bounces-301276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:33:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AEB6B4931
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:36:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EB16B48C3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:33:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=korg header.b=j3ntXHCJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301277-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301277-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=korg header.b=kvyt4ILX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301276-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301276-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C76F30DC23F
+	by sin.lore.kernel.org (Postfix) with ESMTP id A8B863029D56
 	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 06:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7963CCA19;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACDB3CCFA8;
 	Tue, 23 Jun 2026 06:30:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A783C4552;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B3B3C4554;
 	Tue, 23 Jun 2026 06:30:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782196210; cv=none; b=RBHWOyeHz7Nl9yO4bfJ6WAZLIKdaM8T+abmwCdPz6+m4DFfDU8NOocLiS723SZqcOh9M3LeUDphJIeagJvn/0Pv8aCk52gPaWOaE4FH1rVOmfFH1nsIL9t4K1/hgCj7p89zw6tP9reXfn5nqe228fUiF7pYGb1W4PupSKppf7Ls=
+	t=1782196210; cv=none; b=EYRL+SEGcFFy56+mEN+ouHAuAyX4HeeURkB5wZCJ6AnfUjPhVzX8hSH3UE8mBOwZQNo4Bmtfacl0ZfHCdzCZ5c2tndhrsa61Tv2kV7EI4MlIXgj+EhVbZCinTxRpq90UqolkSD6TCh6qO9hsy2+E9jgBcabYZeQXvZL67kT9SVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782196210; c=relaxed/simple;
-	bh=Xnr2iON5maPaNfp+lWg2xOIOEVsh4Sji5U4OX1e8gvs=;
+	bh=UpI9p9cSp2Ii3d4RVVYEVHNvSOxoRDUiBS4Pr+8Z+2c=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uDQYHYz1oiLmQcsZG+8l5kP29CltX7f7OlnPMVkltbiH/w6KkaKgx//CFlSVLSg7sIvlpUoike9hHdW/ntmybrG/kkLn7+OcgHIGWmLstVPqEpTowCQ379x+JXrToQkDDoMDJLhJLCrqZTwnuzUzee9iYBcYAk1ZQzwI9IWcvjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j3ntXHCJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D1AA2C4AF0B;
+	 In-Reply-To:To:Cc; b=JPJ4AojKUefnDNM1j4iMZf1IU3wHPw94Yf3MsBI/P65GBCuCYSa7CgygNsGQye4p9ETBioUaTbzoEMDEz/lO+uUQnpP58vf+g5KrzRkHLdWQ7X5/SlWqGDYpQKwCYvzxQdfAVujKk5VKUYpP+hnoKP7XMBNp2FWntVBd5SuB0OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kvyt4ILX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E0E4DC2BCF6;
 	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782196210; bh=Xnr2iON5maPaNfp+lWg2xOIOEVsh4Sji5U4OX1e8gvs=;
+	t=1782196210; bh=UpI9p9cSp2Ii3d4RVVYEVHNvSOxoRDUiBS4Pr+8Z+2c=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=j3ntXHCJ3aeP2STcpzQWWUeX08WZhojHT279NZ2C0lIUqzjS0Mjs3chwJRQkgayCB
-	 FmkCMWahdVM3XhzMDFxw7W6c11dSpxCQJ1uekFaPHkbrw6VKfQUICxK1ZcLVehMhV7
-	 CFS6F9OUZHQsTkLxIbRFa3lfcIVh0eBWjhWrSR+Q=
+	b=kvyt4ILXq1pLkObq2EcAb6CXYsHyceEnPQP3DsKB4AX44/ug8Q746+XHQDf/3GCUR
+	 p39XGy/TmVst2v+Hve8swncMamJ9Gf5IASX8VfAiyRVjj3pp1u5ITk0eNRHHtvvqLy
+	 nlRT1KSwCknKLX0fgK3ipkndYIDgXRcKoM1wTMeA=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F94CDB471;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4091CD4F26;
 	Tue, 23 Jun 2026 06:30:09 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Tue, 23 Jun 2026 14:29:50 +0800
-Subject: [PATCH v4 7/9] rust: configfs: use `LocalModule` for `THIS_MODULE`
+Date: Tue, 23 Jun 2026 14:29:51 +0800
+Subject: [PATCH v4 8/9] rust: binder: use `LocalModule` for `THIS_MODULE`
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260623-fix-fops-owner-v4-7-0daf5f077d5c@linux.dev>
+Message-Id: <20260623-fix-fops-owner-v4-8-0daf5f077d5c@linux.dev>
 References: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
 In-Reply-To: <20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -89,11 +89,11 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782196206; l=2566;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782196206; l=1258;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=Xnr2iON5maPaNfp+lWg2xOIOEVsh4Sji5U4OX1e8gvs=;
- b=GIOgjU5IYMNDwbnidQNmq6XGYuIb90egfwA2enzxe+p3iHHO4pCNxlfmfxoHVlhIlX0IqCM0U
- /g/hiI1b5wRCjo6+AOe1fSDyvJ2BHNbYgboyrEby6GMSk+FEBpuCubK
+ bh=UpI9p9cSp2Ii3d4RVVYEVHNvSOxoRDUiBS4Pr+8Z+2c=;
+ b=HkL1+er7vHj//9B4WFmJtd5WPXvI4isc0vrQcbic+R9vXop0PiA3q8nnGehnRDAmT8ej+ahIb
+ Qil2mKF4R2WBd5PnuQpWAmC4QJe5oGxkyMnIKmprCo+Ptk4seBNoGJm
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
@@ -104,12 +104,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301277-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301276-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[48];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -129,73 +129,42 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 20AEB6B4931
+X-Rspamd-Queue-Id: 39EB16B48C3
 
-Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
-macro with `this_module::<LocalModule>()`, and update
-rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
-with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
+Replace the `THIS_MODULE` static reference in the binder fops with
+`this_module::<LocalModule>()`, consistent with the move of
+`THIS_MODULE` into the `ModuleMetadata` trait.
 
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- drivers/block/rnull/configfs.rs | 6 ++----
- rust/kernel/configfs.rs         | 8 +++++---
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/android/binder/rust_binder_main.rs | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index c10a55fc58948..b2547ad1e5ddd 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -1,9 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
+diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
+index dc1941cd2407b..d6ceebbd5f94e 100644
+--- a/drivers/android/binder/rust_binder_main.rs
++++ b/drivers/android/binder/rust_binder_main.rs
+@@ -17,6 +17,7 @@
+     bindings::{self, seq_file},
+     fs::File,
+     list::{ListArc, ListArcSafe, ListLinksSelfPtr, TryNewListArc},
++    module::this_module,
+     prelude::*,
+     seq_file::SeqFile,
+     seq_print,
+@@ -318,7 +319,7 @@ unsafe impl<T> Sync for AssertSync<T> {}
+     let zeroed_ops = unsafe { core::mem::MaybeUninit::zeroed().assume_init() };
  
--use super::{
--    NullBlkDevice,
--    THIS_MODULE, //
--};
-+use super::NullBlkDevice;
-+use crate::LocalModule;
- use kernel::{
-     block::mq::gen_disk::{
-         GenDisk,
-diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
-index 2339c6467325d..b542422115461 100644
---- a/rust/kernel/configfs.rs
-+++ b/rust/kernel/configfs.rs
-@@ -875,7 +875,7 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
- ///                 configfs::Subsystem<Configuration>,
- ///                 Configuration
- ///                 >::new_with_child_ctor::<N,Child>(
--///             &THIS_MODULE,
-+///             ::kernel::module::this_module::<LocalModule>(),
- ///             &CONFIGURATION_ATTRS
- ///         );
- ///
-@@ -1021,7 +1021,8 @@ macro_rules! configfs_attrs {
- 
-                     static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
-                         $crate::configfs::ItemType::<$container, $data>::new::<N>(
--                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                            $crate::module::this_module::<LocalModule>(),
-+                            &[<$ data:upper _ATTRS >]
-                         );
-                 )?
- 
-@@ -1030,7 +1031,8 @@ macro_rules! configfs_attrs {
-                         $crate::configfs::ItemType<$container, $data>  =
-                             $crate::configfs::ItemType::<$container, $data>::
-                             new_with_child_ctor::<N, $child>(
--                                &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                                $crate::module::this_module::<LocalModule>(),
-+                                &[<$ data:upper _ATTRS >]
-                             );
-                 )?
- 
+     let ops = kernel::bindings::file_operations {
+-        owner: THIS_MODULE.as_ptr(),
++        owner: this_module::<LocalModule>().as_ptr(),
+         poll: Some(rust_binder_poll),
+         unlocked_ioctl: Some(rust_binder_ioctl),
+         compat_ioctl: bindings::compat_ptr_ioctl,
 
 -- 
 2.43.0
