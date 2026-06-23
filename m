@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-301296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AjguMPc+Omrq4gcAu9opvQ
-	(envelope-from <netdev+bounces-301296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:08:23 +0200
+	id 3LYbIBY/Omrz4gcAu9opvQ
+	(envelope-from <netdev+bounces-301297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:08:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEA56B5267
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:08:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87A76B527C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 10:08:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=iakbT8hb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301296-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301296-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=C11yMzU1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301297-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301297-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2C90308C783
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:05:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 848DA309683E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 08:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA2A3C873B;
-	Tue, 23 Jun 2026 08:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE8D38C2A0;
+	Tue, 23 Jun 2026 08:05:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB5738C2A0
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 08:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F10331AF07
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 08:05:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782201944; cv=none; b=pPcdraxa9bGOrQzRxL9bP7R+xG1KXj/PXrKyrnulsoxVtONuTW1LS6Me+cSU6SsuCfNPsbf1yVm+ONEjVh17/0AOUwIkkWxYLVQS/O+A0P/gkeivJVw9R1eSOEDXpe85YXGspxCDL4Ijw13TJrW+V++wT9afxtGqA+zWh0CnVaM=
+	t=1782201945; cv=none; b=SbZfeN/7d+rLkrKkrIgzo+QVQj9QEv7U2/NbNgXWovJB0Q2N/zBI5TMFkIYdKplNlwXx6r4OkaAf53RMBF/aSh78fGNufX/utMlSasrgjSKqE6UjEVy2Da/8ETVZ9LxnU+3jmCu1U9mAqbyhF3O5ZNwMw862qOJgOI7b0xIMN3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782201944; c=relaxed/simple;
-	bh=YJmm+HKpkkiTdwMwesviCNckrbU/Cp5fMed5bjBfz9g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aFGGtbm7vEQPYo+0GF2miqlNOu/OWufKkzQbXlSBpVaPIOor7UWN49j5Mx5mPoQod3DwHZTGueOod4pUtIkl0VbgDlby7SBpBvtE+5Kl2btUxSRXpbUP1ZOijCCXMpkB4qNB9OyfUvdPDDRh+fp72fVK8pDKKp87M8jkMKIunIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iakbT8hb; arc=none smtp.client-ip=209.85.221.41
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-45ef41adbc1so4108629f8f.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 01:05:42 -0700 (PDT)
+	s=arc-20240116; t=1782201945; c=relaxed/simple;
+	bh=l7Grnr3PmFISuxul3Ve894yunIdFyWsPBWHXEUkjAck=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FKm7ud2Bw/fQm57XUghRJj5J0P3mEwJk/tgSJhBedr0oL7gCyl1W1rR8EofCifPutcDtbjzj4a98oEKe8H00esQqzuZEE4wYsGMXu/a9s463qTAfqSZkYrbp3P1wuuQ3AX93BVapGmfNNxO8B4V21SnLrqW6Bm2RPGRJ1zzUYTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C11yMzU1; arc=none smtp.client-ip=209.85.218.50
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c07fcdd75d3so647210566b.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 01:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782201941; x=1782806741; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ELOEUuutMxNNAMcf6UDVW4Cm1ruDQcVU3Uet78R6qow=;
-        b=iakbT8hbvg4Q1DQ6NfFJBQaBRTO8rPsysEdYke+fvn/GboCOpElmJyPJssBY5AdpFB
-         VoqYBPvUHO6V7SKEdMm90a+b2IF9h7xsSF9yZoQ2d/shuecRQug9F3J7OLTmZAr91CmL
-         8YpRc1VB0rfQSVrVZTbASKuKakW3NphsY7LgRYiMfdd502sNkyaBpGzjvdze8TC4Q1Rm
-         AH6CZSlDf7ZRdRySf125rBB/S5acauP7dEeA5AVGlRFwIm7Axer9zIzTB2FXnfosFpp3
-         O3qefu6L6lxmh12Q/NO+aHruoxXLrxgHolrBuUUd+4XtRMt4PVodXEDkcJUAxE/rZfvs
-         mOVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782201941; x=1782806741;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782201943; x=1782806743; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ELOEUuutMxNNAMcf6UDVW4Cm1ruDQcVU3Uet78R6qow=;
-        b=BfDfipfVq+Gxv/ZPttW2iuxFBUs5pDkSFUzICggVQJH+5FRHkxzJgyF45HF+gdHYHy
-         7KsoTm3gckAb5LgHKwOCzqk+3zoVA5zZcBsLLsnc+sGP5bFg8T2DRDQBZBrkqg2SYcbZ
-         iuKb0wzqLq90LMBpXGnjqW0Vv1spZMGFwC4Du86RRJ3DeKryc91QygnjOZ7SsgmhEEj5
-         dwNuYk9fayFDRzWAg1V4VkCB6WhM5JENZj6JaOZZlF+YgWyNC73uHHHnY2+rMaLnRaKr
-         W6v5f7s3IuEVjFe7dwnteeJFiuJNyShkna9NBYPcbU+DGQsFcc2/mP+sEqb4U+u5oeDn
-         Jx+A==
-X-Forwarded-Encrypted: i=1; AHgh+RrEh22vyWKKMFSpftTWC02cdzp/2NqfWSQvPCl3mgZh2PquiChOWbvr9nJKqSm+WyOmclHGcrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXml9+hD5YRBIFVlNjwe4GsbYUfpXp0H04GcxT82SddTdkbq3l
-	3oSR35PSiSU8qZYJHT6VuGik47ZhuTiVRjtGIWbvrzpF/jjereAAM3NP
-X-Gm-Gg: AfdE7clcjbTtw0wcrH00OlZQR69m8Epl2eQsNcQ/0T7qrK+mY/QvLvY5JOcXAnTY43k
-	dTlDCRr95YRONTjHxxH6F6HNvuWpbVuidwtwKAYY4v7qpY4ecREnv5WmIK3Wlm0BmDix6Ocil8X
-	hTVL6rOLwZxZYyeuXYUqHasCSpc17HIIudzxLY67WvuFFVW6YvsfSbOZ+A/a7PdV+NQ0wveUNau
-	iVgHW+oYxHLlsD2y64twqltps7twk3t/WADSoTSJ9Eg6frpjwILd23CRy/ZHRpH2JX85UdealLH
-	Tq1VgBUOdkceaNAUWgfIDXm2lIGMOFtOVrcQ2BnAH1MmzzhdY+aBobButbldbuBXbj9Q3TjbuM0
-	KAHdbvDJDUadj0AAurgAGPs3nTX/Wo7vUz50dEuX/smDt0B3nJUZvti9oko93GvbvE7IVJbjMZs
-	aMGt6Y9IuNz7PHwm5SVusjgulC0UxZe+lBedOZGJyoUApt7c6H0JbJ4KqB6e19X1nSLMK+sy53E
-	3oPNulFX+mTaOU8Cg==
-X-Received: by 2002:a5d:6f1b:0:b0:461:a161:8101 with SMTP id ffacd0b85a97d-46adb5875camr2438044f8f.11.1782201941275;
-        Tue, 23 Jun 2026 01:05:41 -0700 (PDT)
+        bh=gSJzQ7BvL7UAfauGXcds5wC0m0PWvmurBL/+ctg9lkA=;
+        b=C11yMzU15eEJtUGFBdeD7ST8IAX8DL6Hs/oIzPujvZCPZN+yigz/MxrZgIA4TcFhev
+         VdcN86q4AFLVCjJR4Q/Ceng33jjz5zZr8J12JVzeC5M2mwgvlT5fjasnf2mh2QfdWDo8
+         ajBRSKZv+CiQP6+nM//s7jpSohQGb6VryuO670lW+wFIvDIThMVJEKlGcI7D7ljl/EU0
+         SxjPYGAr2A+byv3YJQLCu0ML6G7K+AwrwAH9R4JeZAieg46tdDk2CtAECgAWOKkxgMwi
+         R9P+rnPBQ4TNMYPZKc98ZVNj8Al7x/VJB9qLlUt+Ya3hAooQSOhR888XoppSCx/tNAAm
+         +2cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782201943; x=1782806743;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gSJzQ7BvL7UAfauGXcds5wC0m0PWvmurBL/+ctg9lkA=;
+        b=Pj3+vaBIWb9BSgEc/nQzddwtvaeWDfDj0+7vieFEMzYAyMblvZRIKHXhkG+4Lqs9/X
+         RfNHNEDIlSuQtGhIHfjfCfQFIkJasYrgfESvy0MwKCEVnBEjDdge/n1WYkTRtq/xWfLf
+         0zoH8w9QFbGxfS8c64fnqn1gdshoJmlUFMbbmLpfUIhz8cSAZkDTiRDy4PPGlVbry+sb
+         njgiVHlAv15l0nc954uuLaAn6WS+dxfXP74JdLwJFG62Ckl1skHXgdc9LkBFR9ry9j91
+         MBBhl/Ii3coa9KPRbmyVbDk9YLRaW0ZMBM8hdVgGK7E5lwMTRQKaSDE8s3jzaJDsJCrB
+         D/6A==
+X-Forwarded-Encrypted: i=1; AFNElJ/1M+8XtU2O0UqAc6Dv+ncY/z4sL1YU0fLT4aGqDBKz/ZDW8VrY6OPZkmIdT0lUXBXy2lwzNvM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK2mNuskAuXN9Tdb90X7YrrZvLEjZUCbwyQhstryrI3qL9J8e7
+	8UhmDnUSX/kwDvPcEe4v3m1DYP8q5KejmsCq+hjMk6ZTSQldV3mnhndf
+X-Gm-Gg: AfdE7cnYrHAAL/UQmJOIGB5D3AsBaV1uWv7A/dsKY7EEOWY/PEIwxQrZzdNJAfboGWR
+	uET/xLlju/KnAFA1Mfl6KDHrzbsg+Mr/8xkAY4UqGcaVQLqId5iI7pEKF3+6avo7YX9PrckZQq3
+	9dOs9E2lgRad1y9MhtKzN88Ynr2UKHFsChKf1rOGDFOGTxmS7/p2xfQFQthQACrbKq2B7Np0ba/
+	+siDPD2RY9LLTS58ruqVqM8jKBcIX+QTCo8bjdJQnmJxOi3bawHDtaz4vbRpQ5E+1Dg1dt9Q/C6
+	q6HSxOrHHpEl+7ys8+pnA8jjRRuXUQ38zssGATXK4VwpgvIjBHcSmcSsJfrTQYOzgrCVcCXfE8H
+	kVtOY7CQLS505X30X+XwEZ6m4t3GvTOsnjzW5zKHPTjjzneVXG6jbEKYs4Yia6HUF4ItpwOQHbX
+	3pIctn6pxdfhT/U55BFeBu/t++Hp6KKSmzBr3pro7qkr2U0JMfWH30dA0eDJMopNIp5SltadlMi
+	imJWDs=
+X-Received: by 2002:a17:906:c14d:b0:c0d:1553:3da5 with SMTP id a640c23a62f3a-c108f0fcd14mr71897766b.35.1782201942670;
+        Tue, 23 Jun 2026 01:05:42 -0700 (PDT)
 Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46667221de7sm32486503f8f.33.2026.06.23.01.05.39
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46667221de7sm32486503f8f.33.2026.06.23.01.05.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 01:05:40 -0700 (PDT)
+        Tue, 23 Jun 2026 01:05:42 -0700 (PDT)
 From: Petr Wozniak <petr.wozniak@gmail.com>
 To: linux@armlinux.org.uk,
 	andrew@lunn.ch,
@@ -91,10 +93,12 @@ Cc: kuba@kernel.org,
 	olek2@wp.pl,
 	kabel@kernel.org,
 	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: [PATCH net-next v3 0/2] net: phy: sfp/mdio-i2c: defer RollBall probe + fix mii_bus leak
-Date: Tue, 23 Jun 2026 10:05:36 +0200
-Message-ID: <20260623080538.7646-1-petr.wozniak@gmail.com>
+Subject: [PATCH net-next v3 1/2] net: phy: sfp: free mii_bus in sfp_i2c_mdiobus_destroy
+Date: Tue, 23 Jun 2026 10:05:37 +0200
+Message-ID: <20260623080538.7646-2-petr.wozniak@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260623080538.7646-1-petr.wozniak@gmail.com>
+References: <20260623080538.7646-1-petr.wozniak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,14 +113,14 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-301296-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301297-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-phy@lists.infradead.org,m:maxime.chevallier@bootlin.com,m:bjorn@mork.no,m:olek2@wp.pl,m:kabel@kernel.org,m:petr.wozniak@gmail.com,m:petrwozniak@gmail.com,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -134,50 +138,47 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2DEA56B5267
+X-Rspamd-Queue-Id: E87A76B527C
 
-This series resends the RollBall bridge probe deferral (a fix for the
-regression in commit 8fe125892f40) and adds a related mii_bus leak fix.
+sfp_i2c_mdiobus_create() allocates the I2C MDIO bus with mdio_i2c_alloc(),
+a plain (non-devm) allocation, and registers it. sfp_i2c_mdiobus_destroy()
+only unregisters the bus and clears sfp->i2c_mii without calling
+mdiobus_free(). As the only reference to the bus is then cleared, the
+struct mii_bus is leaked.
 
-Patch 1 fixes a pre-existing mii_bus leak in sfp_i2c_mdiobus_destroy()
-that has been present since the helper was introduced in 2022. Patch 2's
-new -ENODEV path destroys the MDIO bus via sfp_i2c_mdiobus_destroy(), so
-patch 1 is a prerequisite to avoid leaking the bus on that path.
+This is hit whenever a copper/RollBall SFP module that instantiated an MDIO
+bus is removed: sfp_sm_main() takes the global teardown path and calls
+sfp_i2c_mdiobus_destroy(). sfp_cleanup(), on driver unbind, frees
+sfp->i2c_mii directly, which is why the leak only triggered on module
+hot-removal and not on unbind.
 
-The v2 deferral patch was corrupted in transit and failed to apply; it is
-regenerated here against current net-next with no functional change.
+Free the bus in sfp_i2c_mdiobus_destroy() to match the allocation done in
+sfp_i2c_mdiobus_create().
 
-v3:
- - Resend: v2 defer patch was corrupted in transit and failed to apply
-   (netdev/apply); regenerated against current net-next.
- - Fixed block comment style flagged by checkpatch. No functional change.
- - Added patch 1/2 (sfp: free mii_bus in sfp_i2c_mdiobus_destroy).
-v2 (defer):
- - Generalized scope: regression affects boot-inserted and hotplugged
-   modules where bridge init exceeds 200 ms; Aleksander Bajkowski
-   confirmed FLYPRO SFP-10GT-CS-30M / AQR113C broken when hotplugged.
- - Corrected state machine description (probe runs in SFP_S_INIT after
-   SFP_S_WAIT) - Jan Hoffmann.
- - No code changes from v1.
-v1: initial submission.
+Fixes: e85b1347ace6 ("net: sfp: create/destroy I2C mdiobus before PHY probe/after PHY release")
+Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
+---
+ drivers/net/phy/sfp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Petr Wozniak (2):
-  net: phy: sfp: free mii_bus in sfp_i2c_mdiobus_destroy
-  net: phy: mdio-i2c: defer RollBall bridge probe to PHY discovery
-
- drivers/net/mdio/mdio-i2c.c   | 15 +++++++++------
- drivers/net/phy/sfp.c         | 23 ++++++++++++++---------
- include/linux/mdio/mdio-i2c.h |  1 +
- 3 files changed, 24 insertions(+), 15 deletions(-)
-
-
-base-commit: b85966adbf5de0668a815c6e3527f87e0c387fb4
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 03bfd8640db9..c4d274ab651e 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -963,6 +963,7 @@ static int sfp_i2c_mdiobus_create(struct sfp *sfp)
+ static void sfp_i2c_mdiobus_destroy(struct sfp *sfp)
+ {
+ 	mdiobus_unregister(sfp->i2c_mii);
++	mdiobus_free(sfp->i2c_mii);
+ 	sfp->i2c_mii = NULL;
+ }
+ 
 -- 
 2.51.0
 
