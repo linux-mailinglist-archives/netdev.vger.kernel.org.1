@@ -1,272 +1,131 @@
-Return-Path: <netdev+bounces-301351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YqAFAqxsOmr48gcAu9opvQ
-	(envelope-from <netdev+bounces-301351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:23:24 +0200
+	id j6F4KxZtOmol8wcAu9opvQ
+	(envelope-from <netdev+bounces-301352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:25:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CA9A6B6AA4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:23:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C7FA6B6AFD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 13:25:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=bsfX8BvI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301351-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301351-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=SurS4QPs;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301352-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301352-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC90D3094024
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:22:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A952E303CEEB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 11:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3E93D45DD;
-	Tue, 23 Jun 2026 11:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558973D4101;
+	Tue, 23 Jun 2026 11:25:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC843D4125
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 11:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134853D3CE3;
+	Tue, 23 Jun 2026 11:25:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782213752; cv=none; b=SjjqiEBsbQanLSJjO17gt+1fppWlzrrHJzQ/hIVvf0l0b5A8bon+mF4AZ9d9hsOljumb5rPdrHVsTkKgGrUoWSrPipU7TgjmpinNxyrZTPhJxkQiVSkKr/jWmH2ghQRXKGBsMnmOnlncgA5GEU6qq+dMSA2Frg4hzJeECr8S2+U=
+	t=1782213906; cv=none; b=VyKWeniMFAzHg3spORpfnabpdOl9w4/y0nAxXQ7ezfyrBKmekaVB/7d99pEgxcMlNjqerRhbqNCmJNe/RU1/9K13BLZUWGr+RbePhvgSVp6Vm2iUDOy9ArUuJwL7EFgFtB3ejkOelpNVHStcQJ6Q19z0iCNo8csL0u39Vl1Hvqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782213752; c=relaxed/simple;
-	bh=S2wixHTY5PpR7xzLsbG2IqKF1SaBjFwr2zTAieLWxXw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GAGAQ4csOFmh+JGSPVVslkMRGTQfDCrQhwuJkCr6JojNV0kbWu2tjfspzrD0tMscGc1neKb+xjjhkhVqy57DEd8/Y8eSiGRqgASc64hE7sFRG2mUT5h0DPGEKDtJCXSjMVfrpcYQEC3YCwKIaX+IIGslOXlA2rS8rRRXCvpPcGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bsfX8BvI; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4908b92904fso78446745e9.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 04:22:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782213750; x=1782818550; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Ll5fGvrULmASpVjjrUyqyYpgppQmeYjrRkuEZdoatc=;
-        b=bsfX8BvIuCEJWba8m1oEiK+IB3M/pO6Hb9OkWi3LFatWpOwH6zdPW1gfbPSAGYekuk
-         d2V8hs6mhViIsZY/k5wlGzxMjbZOHDfbaC9GbSSTCusqGoIjlBoEmU7RNwMPq78CrrHf
-         RDoowpBFRIufmJ00nvJm2NjjK6SR7M3uOymZB3Fo4uWVTH+cSC3s6WKRIeOru4z7wJAi
-         mK6AEZ9I0AY7DzVDhCPgc2VX374u0JtFT8G0+WKPc4KLGH3cnvVcqh1Tv7lhqpnLKTA+
-         O/2RZ8HuVXcvNUwlEYH5ECjeLpyINra7PtGrBhY6S0D86JuVuZidCIHmpfiMQlLZYDeC
-         h85Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782213750; x=1782818550;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Ll5fGvrULmASpVjjrUyqyYpgppQmeYjrRkuEZdoatc=;
-        b=ZEMxZf2FHXLtzkAzxgIlJe/4+kOKUKqn3iGewkQp3Yb+fki90Ee5eesZQHvXka3uwD
-         QnUgX+m3tQ/dfYqDFEFAHWL9Boz3f8MQt1iTpM3GquxfumKpSAQDNBw9jXiAQwJPLh/q
-         EE0c2VC2ADbEBsemavIpBgepqpNskAqETh/cEqh3LmOxwXgL6/9tNM6uFh4CDed2d1Ya
-         Oy/RzQYuc+d4ahEr1QXsTHybVGD0xnisICUWkPHwKrdt91bXLyS/QeFujqES928J9HdQ
-         +kNCOvdUO9kvWJPG7sL1iKB0KBytDUFSWEt123NavWHX/46LrWS64StYZWSFdN5eIFw1
-         9PFw==
-X-Forwarded-Encrypted: i=1; AFNElJ9JK64ABovBNLsITVWkZMZfSq9zIhNFTUaz+ebNO3AtpChoqVT9MEJjDgsR9Q0PPV5OUFG5QqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXUJnw6BzZYqAWLazCBwWFTK5TlzL9y6SSZdioji7Fxr31aXN1
-	rgcwUqrMY0Uw4sQQU7D5EUPwb5f7+JzcF5i5GEdiWpU6cqUQHACC8X+o
-X-Gm-Gg: AfdE7cmmaybszfJ+A2lUmYAdFWtZSRvQEF4xmF3deElwolH6eDlk8tacRuZOqAXD4xb
-	t/I6VuyE3RLLPfFlrOEA/W2vZvhWTp8njqvgzztge/CLVQzLgWsYrr91HXYwhcF0Ys/GM2nWU/O
-	liar3scuenBjt7WdEZCO7J8F6ZIFMfsgJPDP4GbCff3LxNPoerrbX8ROVJrsU/odei5va2arEaM
-	uwnsseNlKKCx9EeVlsZvwi9rERAbA8SsvdDPu9HWI4NZZrb9I0uR4dtvDqF3+UUIEomQqFb/EbW
-	DroJquTGOT1typuFn7QhQqcoIsKmitWIMHmsGX+XG2aRgMY0iD0JD5IL1BIu23hdKvLFQ37qyLT
-	lkjN3GkurLU2vm65FQd5L7qJCOkwGB/loppFA0lvr1UWyecWM184ngtQNpgRqoBVg88mzfTjfoU
-	0ZAZaB7vzU8FwW0q34KGOpCCeShlRWwBxfY9NqTMkZ6D+vA3b7xkCaHAS6sgDhMaOOUxiUHAe07
-	nX0qMuw7xM=
-X-Received: by 2002:a05:600c:4455:b0:492:40f2:4d78 with SMTP id 5b1f17b1804b1-4925b34a2e6mr33035365e9.2.1782213749442;
-        Tue, 23 Jun 2026 04:22:29 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4924923cbe7sm272220715e9.8.2026.06.23.04.22.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 04:22:29 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	m-malladi@ti.com,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1782213906; c=relaxed/simple;
+	bh=0KCCvXPfVd2bmw0jPy+5myZTaMJmyhSuOOs8jT7M4EQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=olXkb/bBJxcDZ1Cr8vq4X2UiAPPhlJXV8STJ0yQDREYZNj8mwDzqTB9/tiMow10uOlpFUX+nQ4m8QdoSRh81TtbI64o9PHfIsLit+ULCgMRqKwhWAGwVoJhUCi7dg328A1Yh7Q3wocFhNYaK0KtjLh2kHJOiEsSD5188QPT1/dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SurS4QPs; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pl+BzDIKoo4boeq72u3k+4d6jfCuyZ9nFHxEzrKKC4Q=; b=SurS4QPsVJ821ItLjf8S85xBld
+	JQYan5wzaJiy6Rk8F8na6uX/nRIjB9JlMhhJ3R/aqIroktz6X4fQL9W0p3v1pZt5ZEurB8kC79vWf
+	6xnBKHdQ+GdjbgaqTdym6ePtV8TyMtYjQiDvLHud66r/aroYkE7cYnZaGKn7SIUjRYMc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wbzFS-008wdt-E0; Tue, 23 Jun 2026 13:24:58 +0200
+Date: Tue, 23 Jun 2026 13:24:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+Cc: Wells Lu <wellslutw@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH net v2] net: ti: icssg-prueth: fix XDP_TX from the AF_XDP zero-copy RX path
-Date: Tue, 23 Jun 2026 12:22:25 +0100
-Message-ID: <20260623112225.303930-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: Re: [PATCH net v3 1/2] net: ethernet: sunplus: spl2sw: fix phy_node
+ refcount leak in remove
+Message-ID: <7f24bb41-dd32-453e-a478-487937ecf698@lunn.ch>
+References: <cover.1782195965.git.shitalkumar.gandhi@cambiumnetworks.com>
+ <f3bdd4c91f3e2269b4e256075f9dc70808b1b8e9.1782195965.git.shitalkumar.gandhi@cambiumnetworks.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3bdd4c91f3e2269b4e256075f9dc70808b1b8e9.1782195965.git.shitalkumar.gandhi@cambiumnetworks.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301351-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,ti.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,lists.infradead.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:danishanwar@ti.com,m:rogerq@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:m-malladi@ti.com,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:ast@kernel.org,m:daniel@iogearbox.net,m:bpf@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:devnexen@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301352-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:shital.gandhi45@gmail.com,m:wellslutw@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,m:shitalgandhi45@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,cambiumnetworks.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,lunn.ch:from_mime,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3CA9A6B6AA4
+X-Rspamd-Queue-Id: 3C7FA6B6AFD
 
-On XDP_TX from the zero-copy RX path, emac_run_xdp() converts the xsk
-buffer via xdp_convert_zc_to_xdp_frame(), which clones the data into a
-fresh MEM_TYPE_PAGE_ORDER0 page that is not DMA mapped. Transmitting it
-as PRUETH_TX_BUFF_TYPE_XDP_TX derives the DMA address with
-page_pool_get_dma_addr(), reading an uninitialized page->dma_addr, so
-the device DMAs from a bogus address (corrupt TX, or an IOMMU fault).
+On Tue, Jun 23, 2026 at 12:11:42PM +0530, Shitalkumar Gandhi wrote:
+> mac->phy_node is acquired via of_parse_phandle() in spl2sw_probe() and
+> stored in the mac private data, transferring ownership of the
+> device_node reference to mac. On driver removal, spl2sw_phy_remove()
+> disconnects the PHY but never drops that reference, so each
+> probe-then-remove cycle leaks one of_node refcount per port permanently.
 
-Pick the TX buffer type from the frame's memory type: keep
-PRUETH_TX_BUFF_TYPE_XDP_TX for page_pool frames and use
-PRUETH_TX_BUFF_TYPE_XDP_NDO for the cloned zero-copy frame, which is then
-DMA mapped through the NDO path and unmapped on completion.
 
-While at it, fix the page_pool XDP_TX completion path. A
-PRUETH_TX_BUFF_TYPE_XDP_TX frame carries a page_pool-owned DMA mapping
-(established against rx_chn->dma_dev), yet prueth_xmit_free()
-unconditionally calls dma_unmap_single() on it with tx_chn->dma_dev,
-tearing down a mapping the driver does not own; xdp_return_frame()
-already recycles the page back to the pool. Tag such frames with a
-dedicated PRUETH_SWDATA_XDPF_TX type so the completion path skips the
-unmap, the same way PRUETH_SWDATA_XSK buffers are handled.
 
-Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
-Fixes: 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
-v2:
- - fold in the page_pool XDP_TX completion-path unmap fix raised by
-   Meghana Malladi: tag page_pool TX frames with PRUETH_SWDATA_XDPF_TX
-   so prueth_xmit_free() skips dma_unmap_single() on a pool-owned
-   mapping; xdp_return_frame() already recycles the page.
- - add Fixes: 62aa3246f462 for that path.
- - no change to the original zero-copy fix.
-v1: https://lore.kernel.org/netdev/20260620213756.87499-1-devnexen@gmail.com
- drivers/net/ethernet/ti/icssg/icssg_common.c | 20 +++++++++++++++++---
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  1 +
- 2 files changed, 18 insertions(+), 3 deletions(-)
+> 
+> Drop the reference after phy_disconnect(). While at it, remove the
+> redundant inner "if (ndev)" check; comm->ndev[i] was just verified
+> non-NULL on the line above.
+> 
+> Compile-tested only; no SP7021 hardware available.
+> 
+> Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+> Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index 82ddef9c17d5..96c8bf5ef671 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -185,7 +185,7 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
- 	first_desc = desc;
- 	next_desc = first_desc;
- 	swdata = cppi5_hdesc_get_swdata(first_desc);
--	if (swdata->type == PRUETH_SWDATA_XSK)
-+	if (swdata->type == PRUETH_SWDATA_XSK || swdata->type == PRUETH_SWDATA_XDPF_TX)
- 		goto free_pool;
- 
- 	cppi5_hdesc_get_obuf(first_desc, &buf_dma, &buf_dma_len);
-@@ -259,6 +259,7 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
- 			napi_consume_skb(skb, budget);
- 			break;
- 		case PRUETH_SWDATA_XDPF:
-+		case PRUETH_SWDATA_XDPF_TX:
- 			xdpf = swdata->data.xdpf;
- 			dev_sw_netstats_tx_add(ndev, 1, xdpf->len);
- 			total_bytes += xdpf->len;
-@@ -769,7 +770,8 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
- 	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
- 	cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
- 	swdata = cppi5_hdesc_get_swdata(first_desc);
--	swdata->type = PRUETH_SWDATA_XDPF;
-+	swdata->type = buff_type == PRUETH_TX_BUFF_TYPE_XDP_TX ?
-+		PRUETH_SWDATA_XDPF_TX : PRUETH_SWDATA_XDPF;
- 	swdata->data.xdpf = xdpf;
- 
- 	/* Report BQL before sending the packet */
-@@ -804,6 +806,7 @@ EXPORT_SYMBOL_GPL(emac_xmit_xdp_frame);
-  */
- static u32 emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp, u32 *len)
- {
-+	enum prueth_tx_buff_type tx_buff_type;
- 	struct net_device *ndev = emac->ndev;
- 	struct netdev_queue *netif_txq;
- 	int cpu = smp_processor_id();
-@@ -826,11 +829,21 @@ static u32 emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp, u32 *len
- 			goto drop;
- 		}
- 
-+		/* In AF_XDP zero-copy mode xdp_convert_buff_to_frame()
-+		 * clones the xsk buffer into a fresh MEM_TYPE_PAGE_ORDER0
-+		 * page that is not DMA mapped. Such a frame must be mapped
-+		 * via the NDO path; only a page pool-backed frame already
-+		 * carries a usable page_pool DMA address.
-+		 */
-+		tx_buff_type = xdpf->mem_type == MEM_TYPE_PAGE_POOL ?
-+				PRUETH_TX_BUFF_TYPE_XDP_TX :
-+				PRUETH_TX_BUFF_TYPE_XDP_NDO;
-+
- 		q_idx = cpu % emac->tx_ch_num;
- 		netif_txq = netdev_get_tx_queue(ndev, q_idx);
- 		__netif_tx_lock(netif_txq, cpu);
- 		result = emac_xmit_xdp_frame(emac, xdpf, q_idx,
--					     PRUETH_TX_BUFF_TYPE_XDP_TX);
-+					     tx_buff_type);
- 		__netif_tx_unlock(netif_txq);
- 		if (result == ICSSG_XDP_CONSUMED) {
- 			ndev->stats.tx_dropped++;
-@@ -1395,6 +1408,7 @@ void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
- 		dev_kfree_skb_any(skb);
- 		break;
- 	case PRUETH_SWDATA_XDPF:
-+	case PRUETH_SWDATA_XDPF_TX:
- 		xdpf = swdata->data.xdpf;
- 		xdp_return_frame(xdpf);
- 		break;
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index df93d15c5b78..00bb760d68a9 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -153,6 +153,7 @@ enum prueth_swdata_type {
- 	PRUETH_SWDATA_CMD,
- 	PRUETH_SWDATA_XDPF,
- 	PRUETH_SWDATA_XSK,
-+	PRUETH_SWDATA_XDPF_TX,
- };
- 
- enum prueth_tx_buff_type {
--- 
-2.53.0
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
+    Andrew
 
