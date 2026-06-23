@@ -1,275 +1,300 @@
-Return-Path: <netdev+bounces-301287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301288-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oPmFAVEyOmpR3wcAu9opvQ
-	(envelope-from <netdev+bounces-301287-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 09:14:25 +0200
+	id BI37MB03OmqY4AcAu9opvQ
+	(envelope-from <netdev+bounces-301288-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 09:34:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59B2D6B4BF6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 09:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 195EB6B4E3A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 09:34:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=canonical.com header.s=20251003 header.b=gotsvS28;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301287-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301287-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=canonical.com;
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=PYyw3NBy;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=WbVhwiii;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301288-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301288-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF4F83011874
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:13:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4DDE30078EA
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 07:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B093C3BF1;
-	Tue, 23 Jun 2026 07:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90593C8C68;
+	Tue, 23 Jun 2026 07:34:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F9F3C4B88
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3014E3C819D
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:34:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782198837; cv=none; b=kSfKBn6hlRl6D6yFKp+lFnWcA50l9UVpccCSc7IxVywiYu5LFXgnICI4CWmY4H+Vd0RENWU3Z7WXenxk5PxwFzqUrjIMMCArRDxPVfT3jK5+zfZWejPFvW5uArXjMqLdOLSc1/o8EpfqKiXd1IVUNUQILUZgiGumGk/ZHyHsxRs=
+	t=1782200090; cv=none; b=r9Pb/bF7LfUJ9vnxGEmiB1YtoqXuPGYeyDzvbVSGWW2T10r6Pf6T8lYrdmYGCwXFe54LSJeZRHnyygCOa2GpMg0o91egcpNPho8MZ9odLMLP7meCD8HX5PcvC/C70E8Gi55SFYpU8HTOc6lXXrrSGwuUI9kuOmYhAKGw/I1YnQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782198837; c=relaxed/simple;
-	bh=R4q5eqY41dd6Ubjl5PjNYO/uC+yf2Zj+2A5yPBbzegg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ew7begnSoph4uiN3qjeiNYMtmOUJjtu7ZeSa0+QOhoNiF7fOPGafeOlAS4J2vqlNXzNgtnXw6JXBK2Ve4yhNRU3pFaRa0doQCWQj87Cyxgi1tBU9YI5a6+4j1VlBGCdMS7D/gIAnaDnPTvZg0pazfFJlmObCBI75VhVZRBCIWAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=gotsvS28; arc=none smtp.client-ip=185.125.188.122
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 773AE3F2C5
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:13:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1782198827;
-	bh=TFcPZJr7OnPmIdUVN+MTZFKKeAf+5ltdnQrc4dogtko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=gotsvS28JS1EbzvoJ2HkhO9ge4CpTLEA9nXCtqR1v1YeH5PnZBjGaUJ5UbIcINfeZ
-	 Oji6fL38PD94D9+kG3smsoRXCjonLOcNj5fi44M2zKZ8tbesaByjIwlES1ouDFQ9va
-	 YdQKh/ssgE0e3s+qoNXI704ufslFUrLBxDigyUgFvcAbWqu9CBnCqIarewPIGLXvkV
-	 nP2c7HDcsgsQGk15Fj33C7dQsIVidBLuDRCrGaOD8dJethPrjwzyGRbEaWSwaSxZNM
-	 vupbuugtLymROdf289/ijp5hG5Fki02p7D+W2JwiCnP8wOLQAHJHAd6uch4NeFZfH0
-	 ehA11YIRhbEjImPHnpuJBtfLfZxPbd0PGJh1N2UAVCzY4HHrXBi3p18etjrgQzNVwS
-	 BxBASvhyqVeXupEBwgPogdEx9xIfGvkjeB/n622cA7Q1su9YIP9Ob2mn1oEQ6oWSgi
-	 SbO/PjwleCeM8W9DCxkxSFOHYyp6EV79hkyMr4l/5U1lQdT0LEQL9bjL/AVoENaHns
-	 MqK4eL3+TO7fvHa/eg31jZ6J9Z4OEwfrlCFENcVIvLzfk9AsRXJajrB5uddV2riXau
-	 pLavMA/ohqOCykeFXCiWIhZWXR8akcYT7NSsk27wKdJ0G0nG+QwnuZ5Gx1vAqYYTAj
-	 xZW0/qwo9z8ZxGUnWYik40os=
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-36b9d265308so3516107a91.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 00:13:47 -0700 (PDT)
+	s=arc-20240116; t=1782200090; c=relaxed/simple;
+	bh=zMZ130vCFWl7DqmQl6TnnSI/sV8pYfA5UZbrwJxA4ic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V4ilz4Upa1CrZVqTtA5+/C9dJC2y766Cq4CyfGUrCIPN7F5eGrICbyhy7XG57dZbmgFX9EMueaWo91sNCFT+rD3cJDPwAlg4a7P2fC3UgF9L3Ad+WFJ/AsTFO+8Q3zG3+c1U3BwHOzuVopgZvUh/nMsn3MSKHKcp2Ahtft5171c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=PYyw3NBy; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WbVhwiii; arc=none smtp.client-ip=205.220.168.131
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65N6cVrF472103
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:34:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=JbRww8nPhhpxtS+7cOKXGbLWj7BLD9Ao7/a
+	LGJ/o9YU=; b=PYyw3NByQWyZwd0YO6UP2kkGoVrWpbd9yBLS3FhefteT0KFU/2Z
+	gyq627wIc+pquwPTq9y/RG+7r0KGZbptOebUFdcscupODAcQjQ2Sp0qZnIBXwL9h
+	HHTx3KYYzaBtunEmxdF3C9PGTdcCybT3jI9sQOz2jiiiE/vSn3wr2pCcPVAbQTCO
+	nDzUX/CVuyMl9V4xJk7nX8sFk8vS3JMOlCcUNOmlGB9u3pbu/C8vdZMIsyI+/rSC
+	/TcVjZ8nHAyzJKMYLoaxwZGyRADEojspq54qaxTwG+712eyCsiv17DQUq+Lz+GFv
+	ipcySYJtofGxvj+PhmUnNP+3TkEZlnbVyOw==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ey5sn3hrb-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 07:34:42 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-92045e86763so163223485a.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 00:34:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1782200081; x=1782804881; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JbRww8nPhhpxtS+7cOKXGbLWj7BLD9Ao7/aLGJ/o9YU=;
+        b=WbVhwiiiwKp+nuiLJH/L0C6novY3C4ty3yeRTdzyXFQzUpgJmg00TF6pJ1b9qlt1HD
+         V6IuxKaXS3klFvxWQrh0jK8q8uTSeaNTCKI6ppv9sndMD+u7Vmexbk2+Bq/yZABSOaBW
+         X/swv5attGHUzWfwlelyuY6Q/vtt7lbw7GRHY1etuWQafAUiWoXEtGtXvVXBX0qM7jvV
+         JPpNq8qcyO93EbPrdwwCYF65x70rfLLvX0VCPJa2io1EOKG41VAtz69QkH0cGriBpuz+
+         xB2QQ4KPM5QFo17Q+BLcJOetjmhQ6gB0jBbbIzjNoNGnGzIPy30Or9jsEGFKCnme3sMg
+         YYQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782198826; x=1782803626;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1782200081; x=1782804881;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TFcPZJr7OnPmIdUVN+MTZFKKeAf+5ltdnQrc4dogtko=;
-        b=Qh5vFIQAYPgbXuOd45uuiDO3Lay6JH7QHfwtw3qQ3SjUHbncg1MuFuet/zPR6Ne8Zr
-         ryg6JPjzv+WDIxLCu0bNUu0Jcbk+cWdjNjC27ts1AyL2oJMSnoxdBtaaOwDOQ8XGrcx/
-         9r+vHclTyDwRcGv/cZR3E+ao/ukald9aojkKKvVD8QmFonFLl13DlaUv1JyMb/q9SFDB
-         n7e79ZYAaESYY+xtvlIchksowE4BRPD0Wh2uwcAheXt3UMYxGre+Ud0d7WFnEVNsU1BD
-         n9o7akMmCXgqM7bLFCVUIgNvGJ+Hk+NC+RH9zIMhxd6a7XoQ43Fjt74Jvb0o4yDSpQWl
-         BWVw==
-X-Forwarded-Encrypted: i=1; AHgh+RrKgdNB27DUTI/+Scngc3RUS4oskMtyGxUJosb3zyEyuiAFCwofajm7e6T17uexBjL7q9Uun+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYW748p+gkgJiZ9LnugG2HLKz07GoxH2tzKepjFBZUHAjxkJq3
-	2bqRRTej2PjaYMoMp3iU5ZgZ0frSCgkNoGdq9aJA5LXwf3leBwnBmfcs2LUhYinNEwGIZbxiFO/
-	WDUpwSK3UX9UTifDbtMGg4jM55Jsj2/q0iRFKn9KxI8TS2iJMmy4dvFm6hMlwPq0jDmaRZmAkXw
-	==
-X-Gm-Gg: AfdE7cnoGUsRgvKMAHl691pH07y8R1q7Y9zSPaIJ8UtAIVSEq0lSADfJ5FouPFUZ2Cn
-	/2BphWKZEBjHNDhGtMS6sTYi2cTGiIgCI+82SL4IfymS2DzmCg36/gqAbbFFHCkp66zzZqyRtvN
-	VyAwsm9l057MdbEAdXKleugAP/LeaPk8nUX2XkkVV999LON2Ov4bP8ZLyeCVS+3qHG7lnXX5zip
-	qdJWhmeY4ATc58y0evD73ZQ630AvgqRLQ5+0WCKwtMkDPn7kG4I4tC1AT7CdDUI3NmqQHtv750o
-	wxk+zrf4RmUIoZXMNXPRxXXDvbwFcnZQtgivPWLtvEcmCO6dTsGYE/g4AR9K0VcJRrqIvyq0GFG
-	11NfNTN2JwgxlVL1cYWhaRavw9g==
-X-Received: by 2002:a17:90b:3fc3:b0:36d:79c6:1562 with SMTP id 98e67ed59e1d1-37dd17a276emr1681373a91.25.1782198825946;
-        Tue, 23 Jun 2026 00:13:45 -0700 (PDT)
-X-Received: by 2002:a17:90b:3fc3:b0:36d:79c6:1562 with SMTP id 98e67ed59e1d1-37dd17a276emr1681352a91.25.1782198825554;
-        Tue, 23 Jun 2026 00:13:45 -0700 (PDT)
-Received: from [192.168.192.71] ([50.47.147.90])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-37d15e0b1d4sm13105240a91.17.2026.06.23.00.13.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2026 00:13:44 -0700 (PDT)
-Message-ID: <ff6eb32d-a2d3-480c-8291-e2e6dede2423@canonical.com>
-Date: Tue, 23 Jun 2026 00:13:43 -0700
+        bh=JbRww8nPhhpxtS+7cOKXGbLWj7BLD9Ao7/aLGJ/o9YU=;
+        b=iCT0bcAwtyp5iIgG0JdmYDRva15ZELd+x0b6mQdLiBPhZhBnt78seujcizrdeGchHw
+         3c5qUJPRk+kIJvtev4qMcUAPgAUg7r3RFwvHFrhWjFI085du/OCBxEN5+xMBhEAi3kVA
+         IXmYDNRIRT+QZ6j4UURL7Qs7aUnzNThDDyHiELCC+t3JYlaf9wzhHOhnahnjRh3khY1E
+         o7EF2U/zMCqFKX8iHOovbyLBOH6n+KMKu9R3pBe4pGCd6441VxJBKpQstZnIC+XZ9WZy
+         OVBl0vLv+NkbUiMbZ2GGgqbT1yQSeZ1/e+HmlojySJq6B7O9LX/V5WH8vvX32hdGExfm
+         Dkmg==
+X-Forwarded-Encrypted: i=1; AFNElJ+kC+1jAjdn1vKkbwmk0J39Alg9pOjjGEcCgvHjLjsKzgKUk+zXH7o7A+u71W1P3OQd1h7/bT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3eaf3UxIF/Mtp3RJOL96iXsM5nMyn239k9vclSKhSbOxw/69p
+	fvRvh66Q/fwTHTBkjD1HFkqKpZg5lxCIgPpxvWP2n7yEQVU45tVgULhnCvjbzJxgckNGHLXFnEE
+	8YKv3oNX7lEjXKTbgY+y3ykmoAueEaoF3dwZ0jVz+8kh09iAjxgb71WIMhHc=
+X-Gm-Gg: AfdE7clCM4O5QSZxf4cwCEc/QElgXk5OE+aJhXID5ny56BySsKZ1R0NMv72CehdNx4e
+	XTOtVvG1wcJvS+EP6em1fm/QUnwN5r+6ohrqGbS+LwtQi4tZdHud+QgEMY8CdkowdSvXCVEZDpZ
+	tmH0pz7o75MVK5Mw3xDuL5y7tQ+0MPoFl22w41W4wSV0bzc3cvAdQpcrU6Sp4UUcKRGmjivM3jS
+	LUoBl3W5Fj+FcsFif+gVpBYCheqUp/92qC3OliXr07hnZxScc8ETJSNS83YjhJp5r5TWUjjo3i+
+	xwUz2non1BBcJ27gkU+MDlo7O9RhdilCXLFUigF6FlGosFQQEouhsRspw4CtAGh5kkEnHJOWLDM
+	kSyZ4Qki7staxbj9SPk/tBWydf04=
+X-Received: by 2002:a05:620a:4613:b0:915:aa65:6e95 with SMTP id af79cd13be357-926039b55aamr440150185a.44.1782200080994;
+        Tue, 23 Jun 2026 00:34:40 -0700 (PDT)
+X-Received: by 2002:a05:620a:4613:b0:915:aa65:6e95 with SMTP id af79cd13be357-926039b55aamr440148085a.44.1782200080513;
+        Tue, 23 Jun 2026 00:34:40 -0700 (PDT)
+Received: from quoll ([178.197.218.240])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-466643f4e3esm31621828f8f.8.2026.06.23.00.34.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 00:34:39 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Brian Masney <bmasney@redhat.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Luo Jie <jie.luo@oss.qualcomm.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Lei Wei <quic_leiwei@quicinc.com>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+        devicetree@vger.kernel.org, netdev@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Subject: [PATCH net] net: ethernet: qualcomm: ppe: Demote from supported and fix maintainer addresses
+Date: Tue, 23 Jun 2026 09:33:08 +0200
+Message-ID: <20260623073307.36483-2-krzysztof.kozlowski@oss.qualcomm.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: AppArmor: TCP Fast Open bypasses connect mediation (last
- unaddressed LSM)
-To: Bryam Vargas <hexlabsecurity@proton.me>,
- linux-security-module@vger.kernel.org, apparmor@lists.ubuntu.com
-Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E . Hallyn" <serge@hallyn.com>, Mickael Salaun <mic@digikod.net>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Matthieu Buffet <matthieu@buffet.re>,
- Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260619011138.264578-1-hexlabsecurity@proton.me>
-Content-Language: en-US
-From: John Johansen <john.johansen@canonical.com>
-Autocrypt: addr=john.johansen@canonical.com; keydata=
- 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 lT9Q
-Organization: Canonical
-In-Reply-To: <20260619011138.264578-1-hexlabsecurity@proton.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4322; i=krzysztof.kozlowski@oss.qualcomm.com;
+ h=from:subject; bh=zMZ130vCFWl7DqmQl6TnnSI/sV8pYfA5UZbrwJxA4ic=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBqOjazy+CGgsFoC5bradNDUIXivrQCA/T2/GdGW
+ MRx1arzdJeJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCajo2swAKCRDBN2bmhouD
+ 14WtD/44vRc4VEabogwLpOCsUUaqaJM+sLsM2L0gYyC2whu75RUVBzqqW+HM1X3QE9RstfwvD4j
+ UY3DGbOAgfO5U/SVSZIhTUZkmZeIM2V4UD7zbCmBT5lg9WC/FrvUMjE/K7EFY7ax06aapyjPTmU
+ bGSCtHrsvOQ2jJ2/j8bWPU+rV+BeQdy1DXXRX/Yq4+OPJdEEmRzVpNdFF/c8Nj9EoubVSfAie/3
+ qEBIT8cUqvfQQdE03eC7gd2P4EhYnKXCcYffZ1jCgIEaYAemPxlKn2tYaOE2debWs81WxHI10/A
+ 6mfC8ezxoCmwuZl0saQLihlRxJqNZKu6OXtnON0mlYcSwzCWtX++PN9YtRwWBf6Z1UwrlD1DGaj
+ M0gxeeGvT6akpvq+RnQhLraKQiifbpEse4hWdYRV9ePxFbbECp3/k/EXC4Yq07X+6ufNkOgupDQ
+ 3ebgZDvDXvCUvMnb8F93VUWnsuScr6hCTuMbvOyCqOXqO0iZjvWpajEurc3JhCdQBiLJ7uOGaby
+ GajzsKwWfQpor683BocSqycNSj0Y6lN+IeEcF8M7qloE0vUWrLtgCJVzz+cEhkdOu7a6ePiIeXg
+ KxpH90opId7Qmtbug+6wjw8uJYOl8Gz5FANvs/XLVRcCvOvwT3Mkot1arUmngQQMpnVz7v1ExFc Irx0cICn6yzOhlg==
+X-Developer-Key: i=krzysztof.kozlowski@oss.qualcomm.com; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: 1iBODoWrXKD7ZUAtHQ7I2fKEC0nvjgOX
+X-Proofpoint-ORIG-GUID: 1iBODoWrXKD7ZUAtHQ7I2fKEC0nvjgOX
+X-Authority-Analysis: v=2.4 cv=PuKjqQM3 c=1 sm=1 tr=0 ts=6a3a3712 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=qMZSjPy+XpteAuilWfML4g==:17
+ a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=gEfo2CItAAAA:8
+ a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8 a=P-IC7800AAAA:8 a=6yzhs6WGAAAA:8
+ a=dlmhaOwlAAAA:8 a=40pjNWuwAAAA:8 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8
+ a=7CQSdrXTAAAA:8 a=hD80L64hAAAA:8 a=LpQP-O61AAAA:8 a=pGLkceISAAAA:8
+ a=9xbOYk6fAAAA:8 a=gPJu0pBYAAAA:8 a=r_1tXGB3AAAA:8 a=yRDnTAKIR_WafuKkSVIA:9
+ a=PEH46H7Ffwr30OY-TuGO:22 a=sptkURWiP4Gy88Gu7hUp:22 a=TjNXssC_j7lpFel5tvFf:22
+ a=d3PnA9EDa4IxuAV0gXij:22 a=j5F3_G_i7ziBYwdlbqZG:22 a=y4cfut4LVr_MrANMpYTh:22
+ a=coQwfJANHVg1YNGTr4By:22 a=a-qgeE7W1pNrGK8U0ZQC:22 a=pioyyrs4ZptJ924tMmac:22
+ a=qQLkZBVM-NGEvsx9vKov:22 a=AlIIF0cMT2hfDT4axODj:22 a=t8nPyN_e6usw4ciXM-Pk:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIzMDA1OSBTYWx0ZWRfX+WALX9DPlhN8
+ rwYsQgmTdWqEJQOUC5PG+lbhyK6FNimHj7if65o8TIbJNXuJvMI7iPRouzNQE4etyEtXMyF/mDR
+ jV6AKOz8JR5ZTYxB2hZlysCxt/q5SZY=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIzMDA1OSBTYWx0ZWRfX+TeBsB6MSr0y
+ QkOlNHKJGRdLUPKCdD7Vqu1x6qeLWkq4hRUAMU7BbWZmHoDDMlZxcZ9ln6KEC1SjBWVUDtb/5HY
+ xP+DEOgJzdy5srzYbM5xNf+D/c8ANum1UkJwuqOQwChqvKFpSqZXeLUCcV+MKrHVvsjikjMsF71
+ Ltz+QUvYvK24GKjnTXBZlP/KgoGBc2yDwT+CjU+LlckPAGWX90clrUWm58epy0XjV5zwN1mLUMG
+ hNc4XRJF7uiWab1b+eqarCT80axpHII5rSE/wQwLTZR/4zzcF6YRaMQGextKq4PGha5mrjCg19o
+ FO8uxCqK4vLRbrE8y47/JY58/pFnkW0kaUnkrJqCObyJroitpkioBvx4ory7lFvaKihPHb4te8g
+ rSaKydLyrhCTEVnQM4Za3EqqimkAnbj8fdllq1buMN6y73JaboAX1EmAex4KDmcegknby0EvBb3
+ DU53Dj0FfhKQ2Y1hLaQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-23_02,2026-06-22_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 phishscore=0 impostorscore=0
+ adultscore=0 clxscore=1015 bulkscore=0 spamscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606230059
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[paul-moore.com,namei.org,hallyn.com,digikod.net,gmail.com,buffet.re,huawei-partners.com,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301287-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[john.johansen@canonical.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:linux-security-module@vger.kernel.org,m:apparmor@lists.ubuntu.com,m:paul@paul-moore.com,m:jmorris@namei.org,m:serge@hallyn.com,m:mic@digikod.net,m:stephen.smalley.work@gmail.com,m:matthieu@buffet.re,m:ivanov.mikhail1@huawei-partners.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stephensmalleywork@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER(0.00)[krzysztof.kozlowski@oss.qualcomm.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-301288-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[canonical.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:jie.luo@oss.qualcomm.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:quic_leiwei@quicinc.com,m:quic_suruchia@quicinc.com,m:quic_pavir@quicinc.com,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:netdev@vger.kernel.org,m:krzysztof.kozlowski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[john.johansen@canonical.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[krzysztof.kozlowski@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,canonical.com:dkim,canonical.com:mid,canonical.com:from_mime,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 59B2D6B4BF6
+X-Rspamd-Queue-Id: 195EB6B4E3A
 
-On 6/18/26 18:11, Bryam Vargas wrote:
-> Hello John, and LSM folks,
-> 
-> I have been working on the Landlock TCP Fast Open connect bypass [1]. Stephen
-> Smalley's SELinux fix for the same issue [3] -- "Similar to Landlock, SELinux was
-> not updated when TCP Fast Open support was introduced ..." -- made me go back and
-> check the rest of the connect-mediating LSMs, since I had only been looking at
-> Landlock. With Landlock [2], SELinux [3], and now TOMOYO [4] all getting fixes,
-> AppArmor is the last one with the same gap and no fix yet.
-> 
-> Root cause (shared with the others)
-> -----------------------------------
-> security_socket_connect() has a single call site, net/socket.c (the connect(2)
-> syscall). TCP Fast Open performs an implicit connect inside sendmsg:
-> 
->    tcp_sendmsg -> tcp_sendmsg_fastopen -> __inet_stream_connect(..., is_sendmsg=1)
->                -> sk->sk_prot->connect()                 net/ipv4/{tcp.c,af_inet.c}
-> 
-> This never calls security_socket_connect(); the only LSM hook on the path is
-> security_socket_sendmsg(). mptcp_sendmsg_fastopen reaches the same code and is a
-> second producer.
-> 
-> AppArmor
-> --------
-> apparmor_socket_connect() requests AA_MAY_CONNECT; apparmor_socket_sendmsg() (via
-> aa_sock_msg_perm) requests AA_MAY_SEND. These are distinct bits, and apparmor_parser
-> compiles them independently: "network send inet stream," yields accept mask 0x02
-> while "network connect inet stream," yields 0x40. So an egress-restriction profile
-> that grants send but not connect is bypassed by MSG_FASTOPEN.
-> 
-> Reproduced on 6.12.88 with apparmor active. Under a profile granting the inet/inet6
-> stream lifecycle except connect:
-> 
->    aa-exec -p egress_restricted -- ./probe
->    [TCP ] connect(2)=EACCES(blocked)  sendto(MSG_FASTOPEN)=OK(reached)  => connection established
->    [TCP6] connect(2)=EACCES(blocked)  sendto(MSG_FASTOPEN)=OK(reached)  => connection established
-> 
-> (The coarse "network inet stream," idiom grants connect anyway, so this only bites the
-> fine-grained "allow send, deny connect" policy that the asymmetry is meant to serve.)
-> 
-> Fix
-> ---
-> Same shape as the TOMOYO [4] and SELinux [3] fixes: in apparmor_socket_sendmsg (or
-> aa_sock_msg_perm), when MSG_FASTOPEN is set and msg_name carries a destination on a
-> not-yet-connected stream socket, additionally require aa_sk_perm(OP_CONNECT,
-> AA_MAY_CONNECT, sk). I am happy to send that patch and the reproducer.
-> 
-If you have a patch, I'd love to take it and give you the credit other wise I can
-throw it together.
+Emails to the maintainer of Qualcomm PPE Ethernet driver (Luo Jie
+<quic_luoj@quicinc.com>) bounce permanently (full mailbox), because the
+"quicinc.com" addresses were deprecated for public work.  All Qualcomm
+contributors are aware of that and were asked to fix their addresses.
 
-> (A single core check in __inet_stream_connect(), gated on is_sendmsg, would have
-> covered all five LSMs and both the TCP and MPTCP producers in one place -- the kernel
-> already mediates the analogous implicit-connect-on-send for AF_UNIX via
-> security_unix_may_send and for SCTP via security_sctp_bind_connect. But since the
-> other four LSMs are taking per-hook fixes, AppArmor matching them is the consistent
-> move; mentioning the core option only in case it is preferred.)
-> 
-I think per LSM makes sense, at least atm, as it is probably easier. We can look
-at refactoring after the fact.
+Driver is not supported - in terms of how netdev understands supported
+commitment - if maintainer does not care to receive the patches for its
+code, so demote it to "maintained" to reflect true status.
 
-> [1] Landlock: LANDLOCK_ACCESS_NET_CONNECT_TCP bypass via TCP Fast Open (report)
->      https://lore.kernel.org/r/20260616201615.275032-1-hexlabsecurity@proton.me
-> [2] landlock: fix TCP Fast Open connection bypass (Matthieu Buffet)
->      https://lore.kernel.org/r/20260617180526.15627-2-matthieu@buffet.re
-> [3] selinux: check connect-related permissions on TCP Fast Open (Stephen Smalley)
->      https://lore.kernel.org/r/20260618175513.112443-2-stephen.smalley.work@gmail.com
-> [4] tomoyo: Enforce connect policy in TCP Fast Open (Matthieu Buffet)
->      https://lore.kernel.org/r/20260619002207.61104-1-matthieu@buffet.re
-> 
-> Thanks,
-> Bryam Vargas
-> 
-Thanks for the detailed report Bryan
+Fix all occurences of Luo Jie email address to preferred and working
+domain.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+---
+ .mailmap                                                      | 3 ++-
+ .../devicetree/bindings/clock/qcom,ipq9574-cmn-pll.yaml       | 2 +-
+ Documentation/devicetree/bindings/clock/qcom,qca8k-nsscc.yaml | 2 +-
+ Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml   | 2 +-
+ MAINTAINERS                                                   | 4 ++--
+ 5 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/.mailmap b/.mailmap
+index 1f23ea6e8ce1..23eb9a4b04f4 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -530,7 +530,8 @@ Luca Ceresoli <luca.ceresoli@bootlin.com> <luca@lucaceresoli.net>
+ Luca Weiss <luca@lucaweiss.eu> <luca@z3ntu.xyz>
+ Lucas De Marchi <demarchi@kernel.org> <lucas.demarchi@intel.com>
+ Lukasz Luba <lukasz.luba@arm.com> <l.luba@partner.samsung.com>
+-Luo Jie <quic_luoj@quicinc.com> <luoj@codeaurora.org>
++Luo Jie <jie.luo@oss.qualcomm.com> <luoj@codeaurora.org>
++Luo Jie <jie.luo@oss.qualcomm.com> <quic_luoj@quicinc.com>
+ Lance Yang <lance.yang@linux.dev> <ioworker0@gmail.com>
+ Lance Yang <lance.yang@linux.dev> <mingzhe.yang@ly.com>
+ Maciej W. Rozycki <macro@mips.com> <macro@imgtec.com>
+diff --git a/Documentation/devicetree/bindings/clock/qcom,ipq9574-cmn-pll.yaml b/Documentation/devicetree/bindings/clock/qcom,ipq9574-cmn-pll.yaml
+index b9c3650e5c4c..a4f9af8fa187 100644
+--- a/Documentation/devicetree/bindings/clock/qcom,ipq9574-cmn-pll.yaml
++++ b/Documentation/devicetree/bindings/clock/qcom,ipq9574-cmn-pll.yaml
+@@ -8,7 +8,7 @@ title: Qualcomm CMN PLL Clock Controller on IPQ SoC
+ 
+ maintainers:
+   - Bjorn Andersson <andersson@kernel.org>
+-  - Luo Jie <quic_luoj@quicinc.com>
++  - Luo Jie <jie.luo@oss.qualcomm.com>
+ 
+ description:
+   The CMN (or common) PLL clock controller expects a reference
+diff --git a/Documentation/devicetree/bindings/clock/qcom,qca8k-nsscc.yaml b/Documentation/devicetree/bindings/clock/qcom,qca8k-nsscc.yaml
+index 3da10c364a85..8d7a58609372 100644
+--- a/Documentation/devicetree/bindings/clock/qcom,qca8k-nsscc.yaml
++++ b/Documentation/devicetree/bindings/clock/qcom,qca8k-nsscc.yaml
+@@ -8,7 +8,7 @@ title: Qualcomm NSS Clock & Reset Controller on QCA8386/QCA8084
+ 
+ maintainers:
+   - Bjorn Andersson <andersson@kernel.org>
+-  - Luo Jie <quic_luoj@quicinc.com>
++  - Luo Jie <jie.luo@oss.qualcomm.com>
+ 
+ description: |
+   Qualcomm NSS clock control module provides the clocks and resets
+diff --git a/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml b/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
+index 753f370b7605..6d0b21a10732 100644
+--- a/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
++++ b/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
+@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ title: Qualcomm IPQ packet process engine (PPE)
+ 
+ maintainers:
+-  - Luo Jie <quic_luoj@quicinc.com>
++  - Luo Jie <jie.luo@oss.qualcomm.com>
+   - Lei Wei <quic_leiwei@quicinc.com>
+   - Suruchi Agarwal <quic_suruchia@quicinc.com>
+   - Pavithra R <quic_pavir@quicinc.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 895a87b571c3..e173828acfe1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22324,9 +22324,9 @@ F:	Documentation/devicetree/bindings/power/supply/qcom,pmi8998-charger.yaml
+ F:	drivers/power/supply/qcom_smbx.c
+ 
+ QUALCOMM PPE DRIVER
+-M:	Luo Jie <quic_luoj@quicinc.com>
++M:	Luo Jie <jie.luo@oss.qualcomm.com>
+ L:	netdev@vger.kernel.org
+-S:	Supported
++S:	Maintained
+ F:	Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
+ F:	Documentation/networking/device_drivers/ethernet/qualcomm/ppe/ppe.rst
+ F:	drivers/net/ethernet/qualcomm/ppe/
+-- 
+2.53.0
 
 
