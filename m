@@ -1,200 +1,260 @@
-Return-Path: <netdev+bounces-301434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OQREIkHGOmo8GggAu9opvQ
-	(envelope-from <netdev+bounces-301434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:45:37 +0200
+	id hv8aBXDHOmrZGggAu9opvQ
+	(envelope-from <netdev+bounces-301435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:50:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEF96B9325
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:45:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA2B6B9405
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 19:50:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=johnericson.me header.s=fm3 header.b=cxpjNDPi;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="M o9immC";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301434-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301434-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=johnericson.me;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dPnPftCa;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301435-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301435-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9A12A30031F8
-	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:40:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBCD0305E1B6
+	for <lists+netdev@lfdr.de>; Tue, 23 Jun 2026 17:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7431832938D;
-	Tue, 23 Jun 2026 17:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72FE38F633;
+	Tue, 23 Jun 2026 17:50:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231AB26E165
-	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 17:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4376A38D3F9
+	for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 17:50:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782236433; cv=none; b=VKVAPkG6UlPQVXP8SUdylKtg0l3kCnXApl5odQdshF6AQgRcufOGQ7TSNQA+kl1gGhMFjIJdp6RNQzsU9oNpmCVyR6GG3t7wiDwIxU0ncCggov/rquCGBompFqRfWnfN28Jooz1nXplr8gezvzh9XMJrj1RTxpgnytffbcljkSk=
+	t=1782237011; cv=none; b=M3AyjgCJmOnQKOoArCcLC/nrBTDgvlUyZA8hPdVHLc/Aw3SxN8bgrtPN6V0XBMzFYaBTLmcCFq2chORvnbEwN8oFJcaKVn72mCZ2dSdxXxdm20xiHgfPFy86QHNQssSyY1jHKrvH5MuQN8Fd7S9nSgu2+heZMXlqzd1g2CFSGYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782236433; c=relaxed/simple;
-	bh=oSQvxznWe4ypj+axOzEFmAdkcR3C5J0ABK5XxKx/tNU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=FdtF8buLwWfVZnkNmoHQDmXHW0gJvwi78VgDCaWQHaGNbdnVniVuPpDYQvPhJiCT/w3jn4msT5ERXNUCPoeIBWV4QLdw/u8a9nEkjjd+bpfsTk+iUatNJ8RlzsvXuvAwqM2tQ81uBiDUyL4YuyMhTK6U+ZfpWSWVhP4g5idW2Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=johnericson.me; spf=pass smtp.mailfrom=johnericson.me; dkim=pass (2048-bit key) header.d=johnericson.me header.i=@johnericson.me header.b=cxpjNDPi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Mo9immC7; arc=none smtp.client-ip=103.168.172.144
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 3462FEC01CC;
-	Tue, 23 Jun 2026 13:40:30 -0400 (EDT)
-Received: from phl-imap-16 ([10.202.2.88])
-  by phl-compute-05.internal (MEProxy); Tue, 23 Jun 2026 13:40:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=johnericson.me;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1782236430; x=1782322830; bh=oSQvxznWe4ypj+axOzEFmAdkcR3C5J0A
-	BK5XxKx/tNU=; b=cxpjNDPiGR7y4D7z5GyUhooyK1XE7X9FihQiH0eBNvrMfNCo
-	NY2ZdL2i5SChmg7lJLTuLo5b+OIA/K3DMg6hdVpV+jJnOhE21AmsFtWsmk9QmsX/
-	KLqKQEfNaBpR71oFDo6qa0HUKzWPadyEdX26nAdxyGADuTlbor3/OlkP2CtAJaNq
-	InCk2UktRQoxfmYsu1ZUOQYttX+ZbgWOshizRfVqrICFwFL0k3i6JvcFxqJVGreB
-	F1O7HzR2PtXgRSHPiokXLdU3evfYqWbr3QK33auTyUPz7dZsSt7NA+GvWAhtuTM0
-	8Y92v5UHjILGMXYhoRAgU/XaiV2Qr1nSni9aQA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1782236430; x=
-	1782322830; bh=oSQvxznWe4ypj+axOzEFmAdkcR3C5J0ABK5XxKx/tNU=; b=M
-	o9immC7ibPngc1MeENfdh4ErRqLCJzwVmPCCGn2ITuR3nv0MIqLFVUQa0wUO4FPk
-	JP2SfS9fZVyvCr3/5e5Z3bNZ3gVPRfiAMrei2R6Ezz6NKMAH1MfANHd26kKXMSAk
-	pgLpvMPEubIPkgIO+1Dco32+lIPg6XhHnESazX5+I5qGgerA4jr3FPFKl3gGXX+y
-	nUAYPCD89CbD2H4Z6wkRUuCIST3aTyuL9+eJW4lkr2rHp9yv1oq8CFP7u93INyot
-	8y2yuCsmM/r3pE6gwfENzbkV/Jyq0Y3+tKQNReCtIHCkcerFANK/7aLYtoTBQTL5
-	VYIvEIFT8daSDSyhYaadg==
-X-ME-Sender: <xms:DcU6anv2d3iYvEO9bLTz3udNb_z8FGU2AxgzQouuG-24qlKDzxdkfw>
-    <xme:DcU6ajRIedGrEyoJcCDLSxDlkZsciqVYUJgoxSRFyixJiU_fUNusp_RzHtyT-H3c1
-    UdUi6eQjbF3B-nPU-J1mAMxKr9HWUh_yO1itCzDjL5ikj6UWBz-7w>
-X-ME-Proxy-Cause: dmFkZTEEcIQSwnJHrOxkKJjI4DpllrqcRH2YsHytmG/5AmuJDjKOOd6aj6xvQZqmHITs7G
-    HEcV2hCv21vOYxWDWmhIYaiSaoO1aDU+GjF2lXT/nkhfuxYhY0FgFHplsXEXizLphbj6/A
-    2VVrkLQC+2aJ6+3Ge4a1xTAwBkNwa5KfVbEJVDG+PcDqRjHJpe/kTCMJG+Tk5eHXq7Cnc7
-    oiw4udpvcxzxuTfLzxGI8Ru9ZLumJuS8MW/MSN7sCcnQzCNvSaP9lySsrYeE3N/o6TM7Xb
-    mobTIOny1gQAeS4UiYhrw7OsBSnRTZkeMCHJ8jscGpBGHQXIfN53WWmOBUe/zpe4PEYwTz
-    yoxLpJmry+ew2myGTE5gRv+J+gCUQb6QbPSCjYA/4N2dEZDUdKwAa0r+5HpUmC3UNFsQKm
-    UsvB2BrwOa4fRbnRNkATTMCFSdIePdHHEW/B3+2uLjmWbI+yT+6/e2otuFaXYBvuFBco+b
-    w9WOjuLccCQi0W2iNUWLq05iPDFpnjRQTocm6IcrlYcqfWIkAiUx8ekpyv5QWZGKGeDwyT
-    bBFyc1a5BN0kuZ0llykdSisStNqDy7q9fF4R9dZBDKmMDlWWjTipWF7998F6/7v6vBA7VS
-    lWHV7mMBm1cmiwcP4AfbhgQUlfcs0pCJ+zJV4kXLqkymImFrUl6ObINT4eWQ
-X-ME-Proxy: <xmx:DcU6arpWwBr_cadx3dOrXjekDj4g7UcbxSURC7ZToJkEcmw5RhhN9Q>
-    <xmx:DcU6ataMElrAedx_RNXgb2kut5Pszt7LYzB0R4qbslJ580qhLEb00A>
-    <xmx:DcU6arS2F9iyHfFhL2FCIbgRe18_e8aFmfweSz3AQjj-p1y3wEQN_g>
-    <xmx:DcU6as4DwODo6pg0HSoYFJLalN6neAbBg0lvvIMBIFrH-RAAWx6MDg>
-    <xmx:DsU6aszRMxzRRO_7R1gly7o6xKE56qwVs7Hb-whwjkbCCxRw9wM-yWEh>
-Feedback-ID: ieb4144f1:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id D42922CC0083; Tue, 23 Jun 2026 13:40:29 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1782237011; c=relaxed/simple;
+	bh=J4Mmg50ei5MqCilxr8JVSS/g8YXU0rdSBLfRIFuLPHo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QBpao2+2UVpAdX1+p0vfGK7+UVSgQTvRGd9POVynv6aSWL8VB6SBK32w/rmWvHG9Gnp1UJRzmuq+2k7ztn9fsl3TuoRNB7i4gIiki06/0XXzr7zcUmiouT0IrkWOcoCWn9uI5PItpKzsKQzz7ueK3K6uJIS0/4I4CXT+5z81q0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPnPftCa; arc=none smtp.client-ip=209.85.161.47
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-6a11ee16bafso138302eaf.0
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 10:50:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782237008; x=1782841808; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5T1ktDtWc3MIt0N1DGCs0NMaU/i1dfQECQKpgA5t4J0=;
+        b=dPnPftCaVwoCNrSuOpSm50wf6msfZN1PLHmqDbVUfcCgNSUkg9iXBRb8WX052kOw+v
+         yVhefuAKLQ9mJB9i3oba0ANuIViVKIsPgzZMKNl8cy1b86jagfORDbWhDqD8jx5PqTs2
+         4ct3AmpFxgXEBe04dXB7uEQU/wTwTsrLp2+v+rD7lfjiyyU1aXbreRP3G0fMH0NjcPQc
+         AzUse3DDXSdm2V5iPMlzPHGquPomRJZtDKjrOLhgO/HKD5q0BPSHwnGKtQLGUiXbKniQ
+         sqdZ6qL/1vnkqeXdZf/rbLfNoKjfKGOiG+Ojy0Z0VARYSepYlpxXNqCrriAK+MXh1bCN
+         xqZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782237008; x=1782841808;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5T1ktDtWc3MIt0N1DGCs0NMaU/i1dfQECQKpgA5t4J0=;
+        b=DRN0hgDCRovNTQUsTrONQ278sQ781R40HOORL7+MxTscm1ahrdklNHQFALR2BsmcKn
+         ae9ksoBSwO7+oqDL7AfMUqem/GcbeM62QhTt8K2iXI3/rPyq2sBPLHvxr4NM+aqc7bXf
+         523D8ra/gJfCYjCD9K8hDXmhXwPzD7FmHERSpV3cnS2K8qmLnqDbn+S1g4y0KTcLv530
+         +SC3+MDKjKLJFXo6jAQyj0rGX/hbw8IZrzNz6e7LykjgxmPEdUukMWFWKKZW1nsD74/m
+         EURmtQgkctb+wEi/rwPsJTMcPk4Pjsn43nnBL+yJHfheHLAYGOOroJrKswJAmDPDdBu1
+         xmBg==
+X-Gm-Message-State: AOJu0Yy0HWPAW3i/YEcEDjS9oIfyqLvBGrs6JUXrFFaDiBn3uCoU87ol
+	m/3eR5BDJJ/am+LQPxoFyY0w5pVfpen5WYYJSAi+WH2kclqHQC5dIjZ/
+X-Gm-Gg: AfdE7ckRmCnBBKNZe40lrHZeKTgGawX7UfYNXSTuwfXa+tt0QI0UhvvX5WIGZSJYNzj
+	n4S8AjoYdJYTbUtpwD+6jzsOtX0/JlB5HKfWRKVGHtMLvPIAvJOnKb9qOV6lKuApnSYS4cbGYLs
+	xcQWJzcUqmIXkXvs7WVLgcq9Sv23ZfTiCNyKBIUxzDgk4vuoO+9uA8215Acr5nXY8fv6FdNWAeZ
+	MeHhUJb2telL4vfIPq7wfk+RHVOLN124yg+1+KDcDpusD0a4+V7azDwbmRLOXunSrHcVcDGvejE
+	RO9jSsqYaQ/2ZdexEswMwfuTlvviXJY7puMVyPfcei4qqIVOWeH9Odw+JYc74+sglqoDoVeckSG
+	RJsDutpsIyOJO+M09HevC9MQDyx6YJ8Ry4/7v6RxrH46yYdgktxl4t0MESypkqGdsIP6kcG92ql
+	lV8jA=
+X-Received: by 2002:a05:6820:190f:b0:6a0:c3ed:be45 with SMTP id 006d021491bc7-6a0d8d5d523mr14664965eaf.54.1782237007813;
+        Tue, 23 Jun 2026 10:50:07 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:41::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6a0ea102694sm7193449eaf.13.2026.06.23.10.50.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 10:50:07 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	shakeel.butt@linux.dev,
+	roman.gushchin@linux.dev,
+	kuniyu@google.com,
+	kerneljasonxing@gmail.com,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v2 00/15] bpf: A common way to attach struct_ops to a cgroup
+Date: Tue, 23 Jun 2026 10:49:48 -0700
+Message-ID: <20260623175006.3136053-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Aqzxz9K-cSE-
-Date: Tue, 23 Jun 2026 13:40:09 -0400
-From: "John Ericson" <mail@johnericson.me>
-To: "Cong Wang" <cwang@multikernel.io>
-Cc: "network dev" <netdev@vger.kernel.org>, "Li Chen" <me@linux.beauty>
-Message-Id: <66eb8227-85b6-4684-a4fa-e3e17ac2fa45@app.fastmail.com>
-In-Reply-To: <aixU_RccxS_BKhgX@pop-os.localdomain>
-References: <b1af80fc-a57c-408d-bdfe-fa6bae26eaca@app.fastmail.com>
- <aicbyQIC2qEveNd-@pop-os.localdomain>
- <455281ec-3ee1-4f27-989b-c239f0690d8b@app.fastmail.com>
- <aixU_RccxS_BKhgX@pop-os.localdomain>
-Subject: Re: [RFC] connectat()/bindat() or an alternative design
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.15 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[johnericson.me,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[johnericson.me:s=fm3,messagingengine.com:s=fm1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301434-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[mail@johnericson.me,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:cwang@multikernel.io,m:netdev@vger.kernel.org,m:me@linux.beauty,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,linux.dev,google.com,meta.com];
+	TAGGED_FROM(0.00)[bounces-301435-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:alexei.starovoitov@gmail.com,m:andrii@kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@kernel.org,m:shakeel.butt@linux.dev,m:roman.gushchin@linux.dev,m:kuniyu@google.com,m:kerneljasonxing@gmail.com,m:ameryhung@gmail.com,m:kernel-team@meta.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@johnericson.me,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[johnericson.me:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,messagingengine.com:dkim,app.fastmail.com:mid,johnericson.me:dkim,johnericson.me:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6CEF96B9325
+X-Rspamd-Queue-Id: 9CA2B6B9405
 
-Hi Cong,
+Hi,
 
-Sorry I have taken so long to respond. Rest assured, I still wish to put
-in the work discussing this and (if there is agreement) implementing it.
+I am continuing Martin's work to support attaching struct_ops to cgroup.
 
-On Fri, Jun 12, 2026, at 2:50 PM, Cong Wang wrote:
-> "Nix needs it" is a much better justification than "BSD already has it".
-> :) So please add this to your patch description/cover letter.
+At LSF/MM/BPF 2025, Martin presented [1] the need for a new interface
+to extend tcp_sock operations instead of adding more BPF_SOCK_OPS_*CB
+enum values. The need for predictable ordering when attaching struct_ops
+to a cgroup was also briefly discussed.
 
-Well, to be clear, the motivation goes beyond Nix's immediate needs. I
-think the Nix ecosystem would be interested in my object capability /
-"zero trust" experiments that this (and other things) would enable, but
-this is farther afield.
+At LSF/MM/BPF 2026, additional use cases were raised, in particular
+OOM and memcg use cases that also need to attach struct_ops to a
+cgroup.
 
-> Just curious: any reason not to use TCP loopback here?
+BPF already has a common bpf_link-based API for attaching different
+BPF program types to a cgroup. It provides common attach, detach,
+update, ordering, and query semantics across those program types.
 
-Sending file descriptors over sockets is very important to me, so TCP is
-ruled out.
+This series extends the same model to struct_ops. Conceptually,
+struct_ops is a group of BPF programs, so using similar
+attachment/detachment/update/query APIs and ordering semantics for
+cgroup attachment keeps the interface consistent with existing cgroup
+BPF links.
 
-> Any reason not to use abstract socket?
+This series uses a new struct bpf_tcp_ops as the first user. The
+struct_ops mirrors the TCP-related sockops hooks except
+BPF_SOCK_OPS_NEEDS_ECN and BPF_SOCK_OPS_BASE_RTT, which are
+intentionally left out.
 
-I wrote a bit about that but perhaps it got buried:
+The selftests cover attach, query, update, ordering, before/after
+placement, retval chaining, the header option hooks, and inheritance
+across a multi-level cgroup hierarchy.
 
-> > But I really don't like this because we have just replaced one
-> > ambient authority contraption (the root filesystem) with another
-> > (the abstract socket name space in the network namespace). The
-> > problems with ambient authority remain all the same (and indeed, our
-> > experience with Nix has been that network namespace unsharing when
-> > you do want to do some outside world network access is much more
-> > work than filesystem namespace unsharing).
+The map_free_pre_rcu addition in patch 2 is not very ideal; it will
+need some thought too.
 
-To make that more concrete, connecting to an abstract socket by name has
-similar TOCTOU issues. For example, it is possible that the original
-server disconnected and something else "stole" the name in the meantime.
-With file descriptors there is no name reuse issue --- the `O_PATH` open
-file must point to the original socket.
+[1] page 13: https://drive.google.com/file/d/1wjKZth6T0llLJ_ONPAL_6Q_jbxbAjByp/view?usp=sharing
 
-I don't want the socket to have to live in the file system *or* the
-abstract socket namespace. I want it to be truly anonymous, and only
-referred to by file descriptors.
 
-(Also note, the mechanisms described in my last email go further than
-the original patch's, but also subsume them. If it would be helpful to
-illustrate exactly what I mean, I would be happy to share a new patch
-implementing them instead.)
+Changelog
 
-> Indeed, it would be very hard to change since it is coded in UDS API since
-> probably day 1.
+RFC v1 -> v2
+  - Fix UAF of cfi_stubs
+  - Fix retval: use bpf_tramp_run_ctx instead of bpf_cg_run_ctx and
+    expose bpf_get_retval() to bpf_tcp_ops
+  - Add selftests
+    - struct_ops cgroup attachment
+      - Test bpf_get_retval()
+      - Test before/after order
+      - Test cgroup hierarchy and inheritance
+    - Test TCP header option hooks and helpers
+  - Move bpf_tcp_ops out of legacy BPF_SOCK_OPS_TEST_FLAG guard
+  - Complete bpf_tcp_ops (make it comparable to legacy sockops tcp)
 
-Just to be clear, I don't consider things so hard to change, because the
-bad UDS UAPI stuff is rather "cosmetic". "Anonymous listening sockets"
-(let's call them) can be retrofitted fairly easily, just as abstract
-sockets were retrofitted fairly easily.
+---
 
-Thanks,
+Amery Hung (4):
+  bpf: Allow all struct_ops to use bpf_dynptr_from_skb()
+  bpf: tcp: Support selected sock_ops callbacks as struct_ops
+  bpf: tcp: Support parse/len/write header option hooks in bpf_tcp_ops
+  selftests/bpf: Add test for bpf_tcp_ops header option hooks
 
-John
+Martin KaFai Lau (11):
+  bpf: Remove __rcu tagging in st_link->map
+  bpf: Make struct_ops tasks_rcu grace period optional
+  bpf: Add bpf_struct_ops accessor helpers
+  bpf: Remove unnecessary prog_list_prog() check
+  bpf: Replace prog_list_prog() check with direct pl->prog and pl->link
+    check
+  bpf: Add prog_list_init_item(), prog_list_replace_item(), and
+    prog_list_id()
+  bpf: Move LSM trampoline unlink into bpf_cgroup_link_auto_detach()
+  bpf: Add a few bpf_cgroup_array_* helper functions
+  bpf: Add infrastructure to support attaching struct_ops to cgroups
+  libbpf: Support attaching struct_ops to a cgroup
+  selftests/bpf: Test attaching struct_ops to a cgroup
+
+ include/linux/bpf-cgroup-defs.h               |   1 +
+ include/linux/bpf-cgroup.h                    |  28 +
+ include/linux/bpf.h                           |  56 +-
+ include/linux/filter.h                        |   5 +
+ include/net/tcp.h                             | 153 ++++-
+ include/uapi/linux/bpf.h                      |  39 +-
+ kernel/bpf/bpf_struct_ops.c                   | 152 +++--
+ kernel/bpf/btf.c                              |  23 +-
+ kernel/bpf/cgroup.c                           | 472 ++++++++++++++-
+ kernel/bpf/core.c                             |   5 +
+ kernel/bpf/syscall.c                          |   4 +
+ net/core/filter.c                             |  33 +-
+ net/ipv4/Makefile                             |   1 +
+ net/ipv4/af_inet.c                            |   1 +
+ net/ipv4/bpf_tcp_ca.c                         |  16 +
+ net/ipv4/bpf_tcp_ops.c                        | 310 ++++++++++
+ net/ipv4/tcp.c                                |   1 +
+ net/ipv4/tcp_input.c                          |  17 +
+ net/ipv4/tcp_output.c                         |  48 ++
+ net/ipv4/tcp_timer.c                          |   1 +
+ net/sched/bpf_qdisc.c                         |   2 -
+ tools/include/uapi/linux/bpf.h                |  39 +-
+ tools/lib/bpf/bpf.c                           |   2 +
+ tools/lib/bpf/bpf.h                           |   3 +-
+ tools/lib/bpf/libbpf.c                        |  59 ++
+ tools/lib/bpf/libbpf.h                        |   3 +
+ tools/lib/bpf/libbpf.map                      |   5 +
+ tools/lib/bpf/libbpf_version.h                |   2 +-
+ .../selftests/bpf/prog_tests/bpf_tcp_ops.c    | 554 ++++++++++++++++++
+ .../bpf/prog_tests/bpf_tcp_ops_hdr.c          |  97 +++
+ .../testing/selftests/bpf/progs/bpf_tcp_ops.c | 141 +++++
+ .../selftests/bpf/progs/bpf_tcp_ops_hdr.c     |  83 +++
+ 32 files changed, 2234 insertions(+), 122 deletions(-)
+ create mode 100644 net/ipv4/bpf_tcp_ops.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_tcp_ops.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_tcp_ops_hdr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_tcp_ops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_tcp_ops_hdr.c
+
+-- 
+2.53.0-Meta
+
 
