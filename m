@@ -1,211 +1,288 @@
-Return-Path: <netdev+bounces-301802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CSpUIUFfPGqcnQgAu9opvQ
-	(envelope-from <netdev+bounces-301802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:50:41 +0200
+	id eNd8GvFfPGrPnQgAu9opvQ
+	(envelope-from <netdev+bounces-301803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:53:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE9E16C1D21
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:50:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF27B6C1D4A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:53:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microsoft.com header.s=selector2 header.b=ahVe+yan;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301802-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301802-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=microsoft.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=LUze095b;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301803-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301803-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2BBB63025C57
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:50:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F13623024A53
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952833B4EBF;
-	Wed, 24 Jun 2026 22:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A9A3B52F4;
+	Wed, 24 Jun 2026 22:53:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11022105.outbound.protection.outlook.com [52.101.48.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E143274FD1;
-	Wed, 24 Jun 2026 22:50:34 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782341435; cv=fail; b=riZSPg4/SFeEM3cOBWAVworNjLya09BYqCZnQ8BTGmFJUefWwkfnr3Q3dOH36pLgKH/3u/Iu9QTMaiw1oaFBwK2yTHKWMq2c75BVLBx6d4x/fnwCE9/4UdH1yx/AKl9W9V7YRwgGDlTloIKL5tMxbn+IWXWVy9x+CpVIpX0AEvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782341435; c=relaxed/simple;
-	bh=aJrmBp1g13oO6oBQB6r/GMwXxDq2mofOtZ1mIht/O2A=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fuo/sZvGpP/PeEFKnTjPCuGsMm9zf3tuPlbSeY/5SkFaUN6i7y0PtQ72lkwoPviGWtjy1U7w06Xmu4RumvinkWHcZGic/KzoUTsokEfbLpVFiR+kBgKLujTT/MtGrKP0KbMZfonzimagymjo3vTe8M1lspZOktSD0WMwLUbTuDs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=ahVe+yan; arc=fail smtp.client-ip=52.101.48.105
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PBPYdZHiL8Z9TgL56OD3wbSmDzzvIFEOGl3Jr+dOuT294i1WL71dgNFTYfUtdLBpqrmvjNFWH2zXj+bC0ShPNxZq9KYLbYWNhwHHqGNdMUAZSf4YElR/GEyH+39WnYb9+35DLul1q2SfCStElreso/BU/xvKZmQ0gzBF6vRe4ingmIPXbA6K45vEwexEXFMwpQslmtzoksDoEU3KecXyMUXNrICiG3adzV/ku8De9VKXM1nikf8FYZMzqmVMSokvVTIQ0TC2UNSMRDbrvJ8FMeaE/cqcLMlg/dvIIHu8Lo+Unttgd8HqNHXsgRxaljRpDpUX0hrxgKC9n0tBfT7X1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aJrmBp1g13oO6oBQB6r/GMwXxDq2mofOtZ1mIht/O2A=;
- b=BLh58+Sh7aIwWB0kdm+4Q00apuo8bkZ92nXtTTTSB4r+SnNeiMnZl8WKNYihShUNYAng0n/DnuJdNk7Uz2KROH+YNJ1KVifN1YQXjxOIMcEQ5PZA9jtNFiB5/mnyGI+GLIjzjp+pkQ7kwRwX33aZw3nPT2aZ7PaKUrX2YvOXloraxyP6WCUzrj4dS+T1z5VlxP1cNEosT23Ekk8Lvx2vW0MJuM6lvljaPMPFW5CVhDp3vru/Ksc18FRFsvkWV1A1KVfYm3mq7n6bWXCtv6D3Od9yrOumAZoGTo9R1JQ5x/x7Ax68WnL5IpFRuroJ+yxbt+A11aSnZJCIR8zxW63xFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aJrmBp1g13oO6oBQB6r/GMwXxDq2mofOtZ1mIht/O2A=;
- b=ahVe+yanUws7oyj7swI6glq0NxoHBfwH+Yj5Al8G9io1Fvb8eWodzDlzZcxeamnhwbnsuvrU9GwTCoS5CfCvkMQHa1kAma3JzaY6JAujkhCGAXSxQmYZMer5o3Bhh6k2nD4d0yut3T3havnCQCIAxB2K5Snvw0mPdiP7RWmTOuc=
-Received: from SA1PR21MB6921.namprd21.prod.outlook.com (2603:10b6:806:4a7::11)
- by SA1PR21MB6201.namprd21.prod.outlook.com (2603:10b6:806:4a3::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.3; Wed, 24 Jun
- 2026 22:50:31 +0000
-Received: from SA1PR21MB6921.namprd21.prod.outlook.com
- ([fe80::648e:8c2b:b5e4:aefc]) by SA1PR21MB6921.namprd21.prod.outlook.com
- ([fe80::648e:8c2b:b5e4:aefc%5]) with mapi id 15.21.0181.003; Wed, 24 Jun 2026
- 22:50:30 +0000
-From: Dexuan Cui <DECUI@microsoft.com>
-To: Simon Horman <horms@kernel.org>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Long Li <longli@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>, "ernis@linux.microsoft.com"
-	<ernis@linux.microsoft.com>, "dipayanroy@linux.microsoft.com"
-	<dipayanroy@linux.microsoft.com>, "kees@kernel.org" <kees@kernel.org>,
-	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [PATCH net] net: mana: Sync page pool RX frags for
- CPU
-Thread-Topic: [EXTERNAL] Re: [PATCH net] net: mana: Sync page pool RX frags
- for CPU
-Thread-Index: AQHc/8rEsKaflwivok+NQI77f+CD7rZOVvxw
-Date: Wed, 24 Jun 2026 22:50:30 +0000
-Message-ID:
- <SA1PR21MB6921C97DBB667A6A8C8D89F9BFED2@SA1PR21MB6921.namprd21.prod.outlook.com>
-References: <20260618035029.249361-1-decui@microsoft.com>
- <20260619090514.GT827683@horms.kernel.org>
-In-Reply-To: <20260619090514.GT827683@horms.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d96642d4-0ce9-46f7-acee-c25d07b808c0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-06-24T22:46:24Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR21MB6921:EE_|SA1PR21MB6201:EE_
-x-ms-office365-filtering-correlation-id: 2e56f192-0854-4ebf-d067-08ded242fe3d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|23010399003|366016|1800799024|18002099003|22082099003|56012099006|4143699003|11063799006|38070700021;
-x-microsoft-antispam-message-info:
- QPGtw73jLnmIJxz2OqrA/pwJeESLsjhzBh/x+a+HlZDegKJAoPUoBjKypUySxznkk5Ai5+TMpgeJQdWjhvMnS9fCa2oggg1FX6yuVIKw1DNSLf0bzlqs5B+eDUz5Nt8mWsUxJ2735vRqh4uXZ+vODNLdc5zx46PSmIWtQIAibtrUcdSPJXsizo40+LrtQc+r00+HnkHdny0yueH7AqVhzi+xcl1ToDgQwVMAuOT7etNXv7kzxWW04G2RmZz4FsXvcAVOhnQVOzghPiHwRv+2SOr1UeWJhcZX+A6JBCg0Q3jsnhc+Qu4y4SYrPnHucx2DxeQSepQXBwDkkHLdTGPZ/LSNSe9qEOkAZq10OdiZ/LkazaaLx7SajlRr6mR6nvphMJ2Fazq4QXPcqpnj7w/fbUdGLzT0BJ8Q4UFKBebxJxbiNNIeTk5S6nzZLUN4FGG1J5eYU0FIqTVaxEMCf14iOq3pnsMSFVmGO+evZaHfvtBgcltzo5XUOtVi1CGwdqcg7gx/AzC0kKtiUkvVZlV1zFgQOzOCewa805Adjb0lAfay1PgO+VMd6xq1ozUpCn9KPqHLXxZQ5LD0797VhXbMOSP3FM8XA2cOKofIh4lmmZIdX4JQVGVI6qlOJsBwnWds/i+nxvzRvJN6PhO6FdzhmNAOFvuf4h8mWWle8mWY8GQZPqFTGeOUly08ba3ePVlm8JWvYqGoDKhDOdriLsKBGpwRkwEGntH6Vnpjr1cVqU4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB6921.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(23010399003)(366016)(1800799024)(18002099003)(22082099003)(56012099006)(4143699003)(11063799006)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ABp7SwJRawF41WdTxcXzL2XbJKi/QJINQTvH5AJCBl/dGN5vEyaXEBb7FA9H?=
- =?us-ascii?Q?BzpceZ8964gjZWKyCCnNa/YJZXhmzs8zYZjMfTMoH+tqiy+HvnLydgbwrAQP?=
- =?us-ascii?Q?YnVZ4z0xA2ZaVUK2HAUCDNn23B9D/uM6IT+qX9Wi3iF+3QzRk4M0GXkLBDEz?=
- =?us-ascii?Q?37wOpdr8DaWnhCQbIKxenA1QzG1LL5uQYSs/r3C0oPm+9UFhF0vDI5kZtv7Z?=
- =?us-ascii?Q?VbL6QhpofviiOEylB7J42rf2jvG/GdB6CDFlkJTfpSe1U3EMAZGv08NMYjMi?=
- =?us-ascii?Q?rshb5Folyx9gn4/tzWxP930RH0rJ3xlqrkio6K+JMc4fDCte+Lh4LNLP+N1m?=
- =?us-ascii?Q?MSift4oqVI2/P5uxdQPa0/pvmnIT9MaxPqnIrbAx5YjtYKuiVT4ZlbAi96K2?=
- =?us-ascii?Q?w+/EvGZx3+31wl5aabOkatofwRFb15KIBtFG/z0gNpOxNh66bj6rMaBEK2xw?=
- =?us-ascii?Q?VAxxQCleFkh3ptaaCU17vpFbnL0jPLWroV3hOnohbaSzHbvSRG63wuwd+Trn?=
- =?us-ascii?Q?ZsF6kJaRuXGLboCbC68yir4IhCpX151iLzmq8MUaBJqirjhGjtFrbrndA7dt?=
- =?us-ascii?Q?4EB63T5IfAtsc13pLqWBo2VWNOwcBBGMBKRBSRpW8bWafmuoZfZjVmekif0E?=
- =?us-ascii?Q?WImIvD3kXaVnKBlk6O704qVtnRIePaqznp7cxUj86U5zYcWZ5SdXfSveEBAS?=
- =?us-ascii?Q?G3+DYOWeE52UzUryyVjCWLejNT6GUFo7BpVwNH6nEfneToB/UoqAvrM4akXE?=
- =?us-ascii?Q?BOA0xKobB3DLcl2PvxzMBcFXsCzbUPJhzYCt8keAuuaA6wziuzuKXLESuGjm?=
- =?us-ascii?Q?ugYBlU8V6uQLKZU7AlcxT3THwl920bHFxM2O6mZq43doCJjhjen1A+DBTe9/?=
- =?us-ascii?Q?HqpJRBPIIIjMPK+0GfOhSJJg8xDexK692VSudrdEaw9YVYDGml8fHnyLVZMn?=
- =?us-ascii?Q?AlzennBxpviGQ2B+OINrKULxkgLOn+GYKmCoS3fNBhUqMG+3Dqlnbt7gnG27?=
- =?us-ascii?Q?YJT+rJDznJ7ugoRk3P79zMzdlSkBfk6bnfGblKABJIEdSu+jV5esKLZrIkws?=
- =?us-ascii?Q?M720wVnHA9ClmJq27sei/3IUjvS+yArusugsjCdWyOOWocNoLForEX3qEVM8?=
- =?us-ascii?Q?/Nm4ScWiafzVAAepfNA1Ig900xi05tpFuQ4QS7EYC5UDCr7bXLd+wdofuiwb?=
- =?us-ascii?Q?MDPdihtJG3HcVD9lYYKvvFFTzmgfIRqCxAAXcaJzS0h0OhQjdXvPi5STjvcJ?=
- =?us-ascii?Q?yUdL91IuaWkaq0UBzgcKQMQvTKdYr2N5JqM3HfUNMk1tINVpgmtpRZrD4a39?=
- =?us-ascii?Q?M7sS9n44ooRd/9rwAvuP2v3Nov01B6iQ831iKZvYDsC6KrZdej4GXXaLDPun?=
- =?us-ascii?Q?6J5k1dTn6zoO8ys5W/jza6IL9qA6/30lkYBnB3vZmAbvLkxjgA6Ja5m0qBaN?=
- =?us-ascii?Q?j+wpGyyDhp/YRu+dsLaE5SUR5IZKue2Qxqe07RJkdwzeWKIOfqSUnxvfB2zn?=
- =?us-ascii?Q?x5I9I8C0uKNkBEFt89r7UyOsU74HRCKrAdJ/0VfsWFlk3nUPHCGRkww5TuwY?=
- =?us-ascii?Q?LPoQvehdN2s0J5HArLy43fUgAq70fAlNtPhGfccS6MffusC0QAEK4V3QHadm?=
- =?us-ascii?Q?aN1LEgkG1/rZ/b8VQxsknb36LU5e6nuwU8idsWgABl3QvZqzL0UB7j+snteT?=
- =?us-ascii?Q?lAugHRr0VERhB+Add+Lj/jqy9IjKlZxM98zFMv8PVC9xJCnx?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4373264FD
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:53:14 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782341596; cv=none; b=eKfjfZDbTWAeFAroKtMtCtBwZz6tSmGx6KB2GTi0G597HZYLtCojPPQqEQSmGI6jrPuml8WcLmV6WEMX4FHdmntVmRHcVnmkB+EG3/jVu1lDhEsRHNxQXjh2Z3poyY/Blam6TsIWtwhaLGlZ/pFoO9kqJzGYj+d+55jXOZPu/m4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782341596; c=relaxed/simple;
+	bh=imRuHVBhKfABF7GDG7+dYgzzSoSRS/FeqP+1jjPolUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NW5iZv/mGBj5TEkYsbz3eXDY/nFQqApCMPBooQIcPYxCyGjjuXhkyvh/hUsjrNIuKj1+DFSvrv03Qg+yF2kGrcMSR4RbdPQde3RSLqWRy/b71JCqyQJ4oB2vP+QU6NGP9CoU+D3Hbb2gz/wgiVgybRceTIFtkRzMmzAFF8RcFfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LUze095b; arc=none smtp.client-ip=209.85.219.54
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8dcd895a4c0so17165496d6.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782341594; x=1782946394; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ia6bejGY2180aBdl76NYMpgDPjwVDmZWAHJ4Wp5NX0I=;
+        b=LUze095bvJCYaHv1Edi32G/Qp08NVta8Kb/Ss/VLCCq5fGV05s4m4myvognvpeN4Ns
+         t5A41U3Hy6Z+QONFQWNw8k9yWMg+UtnYtJg66LMrlCIeXlLJ69rnVIWiyQ2Cb8Vks2NL
+         JX6KSSGSbAKwrLqVPruttmILsxXHui16/TSqU7X5aSjCS1Tno11fQGbZZOkt5YE+HBr3
+         dlJzt8rk9gTAe+ZQ3gK9V5WjRp+XikqP+tXf0zU6xfhVFmvsdiLsWWfeL/ClwIDBM25e
+         wLToMhnRyAxUSA8sGwyFNd5QIf6Mx1eAB8WyH2kRb934pRjM2eIjna42ZsojqPE9oUlG
+         RWXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782341594; x=1782946394;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ia6bejGY2180aBdl76NYMpgDPjwVDmZWAHJ4Wp5NX0I=;
+        b=p7Ad8qD6KnKYBvfyUVJwjTj96hyGdHFc0T16zySj6duWbQ3Yl3JG4xdZGKRaip0+0N
+         SLBXF1kcKRRoCNMkigTZtGO4SmmeYlo39zrGWku2kqkkecaHAnzi7mep5bC+h5/jBPvy
+         phnk7b0eCvbsatiEpe7hcvhf2qRl8ePgm7iXYyQkAQ9r1iLMBPbRdihA7fgBkq9gxppO
+         5qG5XRoKbPopvXZWKhweMU+4LHM2eqPXGxIbHImN0Fy4JqjyWkOwKRFn1guFRhsVZfff
+         HDDOulxlFvbZZLgalpo8nvcqyBRYcydy8hyFLdeFKGWY/c1aZbd2PinLHhAvEr/SyDQT
+         J2gQ==
+X-Gm-Message-State: AOJu0YzxyBo3ucbXRG2UlMlagHkO79PijKiR15Bt7G7wVKO3Y1x46+rY
+	0urGQTLm1GNHK9IHJU0kfRRKYhkcQlNtjfLWwFFCVVH92eO8odp1zIie1HiDCg==
+X-Gm-Gg: AfdE7cm5QPZQ5Mh//dx9pt2Gtvrqj2LvN4fOq0wF8OHO6XqFLe/oCEgEZs39MfPJVLK
+	lMnbYjTGIC260XvF8vq99nsPJakzyrriV4YYsmalvFP6wogZVVp1m+mcG2U/zoQFNdYquMCT0Pp
+	FeC+ug0P9swyJw4RcStuQLhvbi3+vBGs/chZaj1nzuPMq7QE6aKNMh4dFq9/KbVgfq+SA+c7iy2
+	eSa3Lo6RZQwBiSDh6M9VAqhFU2haZJi31BBqx97Xx+kJ8xKj2mARpxGgu8LXMisPVH5M1h2O6eb
+	lEA58YyPDndvc76QMyix6C4sc0HP1AD0NTpD59iGJGntSVfcX9nfhcRq6BzPfUpcjbb/SesgNsi
+	yRJ/RZ3x+UB6gS5bEx3oCovPmYKe88cFhF94uHUPTxHgxckFcZRAxKFNLI0O5MooK3gK/3kkyYu
+	CMJnKJroUDYcp3uIHXcT9m41p/hA+tppYNuYFB8AamNPhSPvYNXC8TnNhd8sFlg8DfQaTewrtoi
+	Nn6IBS/1K2AmlomU0GffCZsEob+Gavd7+WqNjitmyVSDtqNm6QAHwo=
+X-Received: by 2002:a05:6214:4381:b0:8ce:aace:eaf7 with SMTP id 6a1803df08f44-8e6d6f62ad7mr2950566d6.39.1782341593853;
+        Wed, 24 Jun 2026 15:53:13 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8df81cdf302sm171758536d6.30.2026.06.24.15.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 15:53:13 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net v3] sctp: add INIT verification after cookie unpacking
+Date: Wed, 24 Jun 2026 18:53:12 -0400
+Message-ID: <ebcbbac574815b0850f371b4bdb02f2e602b94d3.1782341592.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB6921.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e56f192-0854-4ebf-d067-08ded242fe3d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jun 2026 22:50:30.8142
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xXzJP6jmr88oY36tX63e/SCcIT/3KM7lDDDmpPtZXnOWPsjda/vuGZO1lgEG4IPXvLNhdkabVRG1FnUUPz106A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6201
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301802-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER(0.00)[DECUI@microsoft.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:jacob.e.keller@intel.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[DECUI@microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-301803-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[SA1PR21MB6921.namprd21.prod.outlook.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EE9E16C1D21
+X-Rspamd-Queue-Id: BF27B6C1D4A
 
-> From: Simon Horman <horms@kernel.org>
-> Sent: Friday, June 19, 2026 2:05 AM
-> > ...
-> > Also validate the packet length reported in the RX CQE before using it =
-as
-> > a DMA sync length or passing it to skb processing. The CQE is supplied
-> > by the device and should not be blindly trusted by Confidential VMs.
->=20
-> I think this last part warrants being split out into a separate patch.
+In SCTP handshake, the INIT chunk is initially processed by the server
+and embedded into the cookie carried in INIT-ACK. The client then
+returns this cookie via COOKIE-ECHO, where the server unpacks it and
+reconstructs the original INIT chunk.
 
-Sorry for the late reply. I split v1 into 2 patches of v2, which I just pos=
-ted:
-https://lwn.net/ml/linux-kernel/20260624222605.1794719-1-decui@microsoft.co=
-m/
-=20
-Thanks,
-Dexuan
+When cookie authentication is enabled, the cookie contents are protected
+against tampering, so reusing the unpacked INIT without re-verification
+is safe.
+
+However, when cookie authentication is disabled, the reconstructed INIT
+can no longer be trusted. In this case, the INIT must be explicitly
+validated after unpacking to avoid processing potentially tampered data.
+
+Add sctp_verify_init() checks after cookie unpacking in COOKIE-ECHO
+processing paths (sctp_sf_do_5_1D_ce() and sctp_sf_do_5_2_4_dupcook())
+when cookie_auth_enable is disabled. On failure, the new association is
+freed and the packet is discarded.
+
+Also tighten cookie validation in sctp_unpack_cookie() by verifying the
+embedded chunk type is SCTP_CID_INIT before treating it as an INIT
+chunk.
+
+Finally, update sctp_verify_init() to validate parameter bounds using
+the actual embedded INIT length instead of chunk->chunk_end, since the
+INIT stored in COOKIE-ECHO may not span the entire chunk buffer.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+v2:
+  - Because of sctp_abort_on_init_err() param change in patch 1/2,
+    pass cid and not chunk.
+  - Use SCTP_PAD4() around ntohs(peer_init->chunk_hdr.length) when
+    checking param.v in sctp_verify_init() to make Sashiko happy.
+v3:
+  - Validate the embedded INIT chunk type in sctp_unpack_cookie(), as
+    noted by Sashiko.
+  - Discard the packet if embedded INIT chunk validation fails,
+    consistent with malformed cookie handling.
+---
+ net/sctp/sm_make_chunk.c |  5 ++++-
+ net/sctp/sm_statefuns.c  | 36 +++++++++++++++++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
+index 41958b8e59fd..8adac9e0cd66 100644
+--- a/net/sctp/sm_make_chunk.c
++++ b/net/sctp/sm_make_chunk.c
+@@ -1761,6 +1761,8 @@ struct sctp_association *sctp_unpack_cookie(
+ 	bear_cookie = &cookie->c;
+ 
+ 	ch = (struct sctp_chunkhdr *)(bear_cookie + 1);
++	if (ch->type != SCTP_CID_INIT)
++		goto malformed;
+ 	chlen = ntohs(ch->length);
+ 	if (chlen < sizeof(struct sctp_init_chunk))
+ 		goto malformed;
+@@ -2298,7 +2300,8 @@ int sctp_verify_init(struct net *net, const struct sctp_endpoint *ep,
+ 	 * VIOLATION error.  We build the ERROR chunk here and let the normal
+ 	 * error handling code build and send the packet.
+ 	 */
+-	if (param.v != (void *)chunk->chunk_end)
++	if (param.v != (void *)peer_init +
++		       SCTP_PAD4(ntohs(peer_init->chunk_hdr.length)))
+ 		return sctp_process_inv_paramlength(asoc, param.p, chunk, errp);
+ 
+ 	/* The only missing mandatory param possible today is
+diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+index 8e920cef0858..d23d935e128e 100644
+--- a/net/sctp/sm_statefuns.c
++++ b/net/sctp/sm_statefuns.c
+@@ -707,11 +707,12 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
+ 					 struct sctp_cmd_seq *commands)
+ {
+ 	struct sctp_ulpevent *ev, *ai_ev = NULL, *auth_ev = NULL;
++	struct sctp_chunk *err_chk_p = NULL;
+ 	struct sctp_association *new_asoc;
+ 	struct sctp_init_chunk *peer_init;
+ 	struct sctp_chunk *chunk = arg;
+-	struct sctp_chunk *err_chk_p;
+ 	struct sctp_chunk *repl;
++	enum sctp_cid cid;
+ 	struct sock *sk;
+ 	int error = 0;
+ 
+@@ -785,6 +786,19 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
+ 		}
+ 	}
+ 
++	peer_init = (struct sctp_init_chunk *)(chunk->subh.cookie_hdr + 1);
++	cid = peer_init->chunk_hdr.type;
++	if (!sctp_sk(sk)->cookie_auth_enable &&
++	    !sctp_verify_init(net, ep, asoc, cid, peer_init, chunk,
++			      &err_chk_p)) {
++		sctp_association_free(new_asoc);
++		if (err_chk_p)
++			sctp_chunk_free(err_chk_p);
++		return sctp_sf_pdiscard(net, ep, asoc, type, arg, commands);
++	}
++	if (err_chk_p)
++		sctp_chunk_free(err_chk_p);
++
+ 	if (security_sctp_assoc_request(new_asoc, chunk->head_skb ?: chunk->skb)) {
+ 		sctp_association_free(new_asoc);
+ 		return sctp_sf_pdiscard(net, ep, asoc, type, arg, commands);
+@@ -798,7 +812,6 @@ enum sctp_disposition sctp_sf_do_5_1D_ce(struct net *net,
+ 	/* This is a brand-new association, so these are not yet side
+ 	 * effects--it is safe to run them here.
+ 	 */
+-	peer_init = (struct sctp_init_chunk *)(chunk->subh.cookie_hdr + 1);
+ 	if (!sctp_process_init(new_asoc, chunk,
+ 			       &chunk->subh.cookie_hdr->c.peer_addr,
+ 			       peer_init, GFP_ATOMIC))
+@@ -2215,10 +2228,12 @@ enum sctp_disposition sctp_sf_do_5_2_4_dupcook(
+ 					void *arg,
+ 					struct sctp_cmd_seq *commands)
+ {
++	struct sctp_chunk *err_chk_p = NULL;
+ 	struct sctp_association *new_asoc;
++	struct sctp_init_chunk *peer_init;
+ 	struct sctp_chunk *chunk = arg;
+ 	enum sctp_disposition retval;
+-	struct sctp_chunk *err_chk_p;
++	enum sctp_cid cid;
+ 	int error = 0;
+ 	char action;
+ 
+@@ -2287,6 +2302,21 @@ enum sctp_disposition sctp_sf_do_5_2_4_dupcook(
+ 	switch (action) {
+ 	case 'A': /* Association restart. */
+ 	case 'B': /* Collision case B. */
++		peer_init = (struct sctp_init_chunk *)
++				(chunk->subh.cookie_hdr + 1);
++		cid = peer_init->chunk_hdr.type;
++		if (!sctp_sk(ep->base.sk)->cookie_auth_enable &&
++		    !sctp_verify_init(net, ep, asoc, cid, peer_init, chunk,
++				      &err_chk_p)) {
++			sctp_association_free(new_asoc);
++			if (err_chk_p)
++				sctp_chunk_free(err_chk_p);
++			return sctp_sf_pdiscard(net, ep, asoc, type, arg,
++						commands);
++		}
++		if (err_chk_p)
++			sctp_chunk_free(err_chk_p);
++		fallthrough;
+ 	case 'D': /* Collision case D. */
+ 		/* Update socket peer label if first association. */
+ 		if (security_sctp_assoc_request((struct sctp_association *)asoc,
+-- 
+2.47.1
+
 
