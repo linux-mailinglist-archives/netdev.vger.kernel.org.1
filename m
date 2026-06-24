@@ -1,164 +1,211 @@
-Return-Path: <netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MwtDCf0CPGo8iggAu9opvQ
-	(envelope-from <netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:17:01 +0200
+	id RVNQCjsFPGrOiggAu9opvQ
+	(envelope-from <netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:26:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C886BFF06
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:17:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC496BFF5D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:26:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ixit.cz header.s=dkim header.b=MnpUL2zc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=ixit.cz;
+	dkim=pass header.d=mandelbit.com header.s=MBO0001 header.b=SG4LA9ij;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 680843017FBF
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:16:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 81BE4301CC49
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97D01E1C11;
-	Wed, 24 Jun 2026 16:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999C22BDC2A;
+	Wed, 24 Jun 2026 16:26:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ixit.cz (ixit.cz [185.100.197.86])
+Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D511A6800;
-	Wed, 24 Jun 2026 16:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADDF1C84A6;
+	Wed, 24 Jun 2026 16:26:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782317818; cv=none; b=kbVnffsulQmaFukq3U8F6mHCxflXbXieb3QFHpyrKjc8qpM103lrEsI/pS+8qdckhxaIUqHIo6RpEt5jBDGdWGHtfhVZ3JCEKQf00Frc+RLsvRXUyLYRC9cjxJaahXew+EO8W4fGQCCYZPalw4Pliy+JQrZdotvzBBzRirCJfw8=
+	t=1782318390; cv=none; b=tznEoFEofqH1TmESMB//ytq+ccdKePb8UZDL5swvM25yVjQh8xp3IIuQqcu9v3G0XRv94JbLBkX0y1xCYxE2HF3XPUDH8aRp0sPsylPLNCu5Le07zeMhyFqo5/wEs67m+kO8MeGnQ9Dv9voVZ3osjj6kDGCF+kS8Oh1pr6mXdvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782317818; c=relaxed/simple;
-	bh=IOhWgwBBMWg6Ldbg26XTYhcGvygbIBOcQjU8gr0xbjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jtx7n3vKnRh4tEb5eoTY8GgHtQwCvgCsWO26c89xQiVgleD1qaBtv+bU5wvHH7hFFsUki9jTcTji4/maP394E+vilcSNCP8aW0uLUfSMfHIJSZa9jF65vZFYEWjJMZ97s/nwI8NFKBXccGU3/ghaQUbQ1bWbLGh38/AHUfqQ8aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=MnpUL2zc; arc=none smtp.client-ip=185.100.197.86
-Received: from [10.0.0.200] (unknown [10.88.125.21])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519)
+	s=arc-20240116; t=1782318390; c=relaxed/simple;
+	bh=dqheWV0MoBE8GFdeH5pTuxFjJ46lZ7tAJI2rPyDPQ1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u+gio+VUMH1xy36S0JX2A7Tw6IegcNUCXYt2LeAnrwh6+hnc9ODYsL3S/eMEbZ8jThOc3XH0TORVFZfXRm+H9WHwv+o7EqfeofTpOT1DXGer32nKdyhFR4iHOl4CWXIeGcjHbmPCuoJZTc7KzV3DEUujgrW9JYTrgOloQOuy5Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=SG4LA9ij; arc=none smtp.client-ip=195.10.208.40
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
 	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 6C8175340427;
-	Wed, 24 Jun 2026 18:16:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1782317814;
+	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4glnFB0stVzMm3v;
+	Wed, 24 Jun 2026 18:19:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
+	s=MBO0001; t=1782317950;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YKIkxch6KLPeashywy0J/xWIuotTcRwzMsXsdGIZyMw=;
-	b=MnpUL2zcl2CdP0319oQMHMagw4BLto6CBFgevV6EaXXgzvQlZlF/w/d9r9RhA6F8EZi/3s
-	DyGiGNwBoBaNVs8wmODmhXG4GZzkL2UxPgxkj1YMUAMaizla1iSzMsna1vwed8RZ2bpWli
-	jSs+Qwyzen24Cv5+OOeoUNy5N6OSTvM=
-Message-ID: <87079ae8-bee8-4ae5-a016-de9b81962c04@ixit.cz>
-Date: Wed, 24 Jun 2026 18:16:54 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/WLT1yFW6o+7ddGyEm3OpCyzzUL7JiZATagfJStkU4=;
+	b=SG4LA9ij845HuzjRwxoIBCYwje70OKH3X50VitM6aC0Gte3nWwQCsTltezpxxP1Zk5IVsM
+	uBosnlUJ324e/7+SLIYEUf5A0RinQM6rpi5eYnYW4fGQDPloMDqW9RhsJ4r0QTYMPndGaH
+	czZI+NMVWhO2yrKavOyLnrnYohkA6lbgvsym/TnldIIA1NZWfFiSwGVKydUDQaHu6HXSA8
+	WmdTwcuKibIb5J5cmtwhd/D3ebL0i602An8LgJ+KqEgcfkKUNFy0It/SeVz0bfSaxulhYK
+	FEAehBqlEQAenOhMqioTV+qAoD95xm9u7Z1OAnhFjY7DsxdyLgjx+HhsDmDSGA==
+From: Ralf Lici <ralf@mandelbit.com>
+To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+Cc: netdev@vger.kernel.org,
+	=?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
+	Antonio Quartulli <antonio@mandelbit.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	Beniamino Galvani <bgalvani@redhat.com>
+Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and dispatch core
+Date: Wed, 24 Jun 2026 18:18:52 +0200
+Message-ID: <20260624161854.686569-1-ralf@mandelbit.com>
+In-Reply-To: <87v7b9c9jj.fsf@toke.dk>
+References: <87v7b9c9jj.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] nfc: llcp: fix OOB read and u8 offset wrap in TLV
- parsers
-To: Muhammad Bilal <meatuni001@gmail.com>, oe-linux-nfc@lists.linux.dev
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, krzk@kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
-References: <20260622131802.239035-1-meatuni001@gmail.com>
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Autocrypt: addr=david@ixit.cz; keydata=
- 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
-In-Reply-To: <20260622131802.239035-1-meatuni001@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301712-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:toke@kernel.org,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:bgalvani@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301713-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:meatuni001@gmail.com,m:oe-linux-nfc@lists.linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:krzk@kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lists.linux.dev];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ixit.cz:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DMARC_NA(0.00)[mandelbit.com];
+	FORGED_SENDER(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mandelbit.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 83C886BFF06
+X-Rspamd-Queue-Id: 7CC496BFF5D
 
+On Tue, 23 Jun 2026 21:59:44 +0200, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
+> Ralf Lici <ralf@mandelbit.com> writes:
+> > On the BPF point specifically: I agree a BPF program should be able to
+> > decide whether to translate. What I am less sure about is whether
+> > redirecting to a netdevice is the best way to expose that. A TC action
+> > (yet another model, I know :)) gives you the same thing in-pipeline and
+> > more directly:
+> >
+> >     tc filter add dev wwan0 egress \
+> >         bpf obj match.o action ipxlat4to6 domain clat0
+> >
+> > Let BPF make the policy decision, with the native action doing the
+> > translation work that the current BPF CLAT implementations have trouble
+> > with: fragmentation, checksum corner cases, and ICMP error inner
+> > headers (as explained by Beniamino).
+> >
+> > So TC clsact looks like the natural in-kernel replacement for today's
+> > TC-BPF CLAT programs: no extra netdev, you attach to the existing
+> > uplink, direction is explicit, and on egress you sit on the real route
+> > dst, so the synthetic-dst and double-routing problems above just don't
+> > arise. The cost is more moving parts than a single bpf_redirect since
+> > userspace has to manage clsact, filters, priorities and action
+> > lifecycle/cleanup.
+>
+> Hmm, so no one really uses the bpf filter mechanism, since you can just
+> do everything from an action anyway (and with TCX attachment, you can
+> even avoid the overhead of the TC filter/action infrastructure
+> entirely). However, point taken wrt how to integrate this with BPF. I
+> guess the most flexible thing would be to expose the functionality
+> directly (as a kfunc callable from a BPF program). Which also fits with
+> your point below:
+>
 
-On Mon, 22 Jun 2026 18:18:02 +0500, Muhammad Bilal wrote:
- > nfc: llcp: fix OOB read and u8 offset wrap in TLV parsers
+Ah, I see, the cls_bpf example was dated, and I like the kfunc angle
+better than a new TC action.
 
-Applied, thanks!
+I would probably keep that as the minimal per-packet interface: BPF can
+decide whether a packet should be translated, and the kfunc can do the
+actual translation work for packets whose translated form still fits the
+output MTU. The full 4->6 fragmentation case still looks like
+output-path/harness territory to me, since it is a 1->N fan-out
+operation.
 
-[1/1] nfc: llcp: fix OOB read and u8 offset wrap in TLV parsers
-       commit: cb682b66aba4bc3f4dd4d7ae5612f49ad75b2087
+> > For a gateway translator, though, I still think a device-bound model is
+> > less natural. There the translation point is more like a forwarding
+> > decision across routes and nexthops, so a route/LWT attachment, or
+> > possibly a netfilter attachment seems easier to reason about. Also, as
+> > you already pointed out while discussing LWT, an admin setting up NAT64
+> > is more likely to reach for an nft rule than for a clsact filter on a
+> > specific device.
+> >
+> > Taking a step back, ipxlat is really a generic translation engine plus a
+> > thin harness around it. So rather than pick one attachment, it might be
+> > worth structuring the engine so different harnesses can drive it.
+> > There's interesting precedent for this shape:
+> >
+> > - ILA, again, is the closest sibling: stateless IPv6 address translation
+> >   with a shared core in ila_common.c, driven both by an LWT frontend in
+> >   ila_lwt.c and by an inline netfilter hook with a netlink-configured
+> >   mapping table in ila_xlat.c.
+> >
+> > - act_ct is the precedent for the TC side specifically: a TC action that
+> >   reuses the netfilter conntrack engine rather than reimplementing it.
+> >
+> > And act_nat is the cautionary counter-example: a standalone TC
+> > reimplementation of stateless NAT that shares no code with nf_nat, and
+> > carries a "would be nice to share code" comment :)
+> >
+> > So I am wondering whether the right direction is to factor the
+> > translation engine cleanly, land it with one harness first, and keep the
+> > other attachment points as follow-up work once the core semantics are
+> > settled.
+> >
+> > Does that direction seem reasonable to you?
+>
+> Yes, reusable functionality that can be called from multiple places
+> sounds like a good fit; let's try to structure it that way!
+>
 
-Best regards,
+Great, that's the direction I'll take then.
+
+> As for which hook to start with, well, let's see if we hear back from
+> the netfilter devs, but either netfilter or the routing subsystem (LWT
+> style) would be OK for me I think.
+>
+
+Works for me. The engine factoring is common to all of them, so I'll
+start there. Once it's in shape I can sketch a harness against it to
+sanity-check the interface.
+
 -- 
-David Heidelberg <david@ixit.cz>
+Ralf Lici
+Mandelbit Srl
 
