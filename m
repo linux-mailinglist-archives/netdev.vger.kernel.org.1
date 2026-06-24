@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-301722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pOR0JoYJPGoQjAgAu9opvQ
-	(envelope-from <netdev+bounces-301722-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:44:54 +0200
+	id RQnZKS0IPGqyiwgAu9opvQ
+	(envelope-from <netdev+bounces-301723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:39:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B606C00EE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:44:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0536C005D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:39:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="D1Z/2vwZ";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301722-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301722-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=PJk8W6XZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301723-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301723-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49A9C31482BA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:38:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 92E263029618
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 036173264CB;
-	Wed, 24 Jun 2026 16:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC583264F1;
+	Wed, 24 Jun 2026 16:38:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFACC3254B8
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 16:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D766E32779D
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 16:38:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782319123; cv=none; b=EbtS1IpQDMan12eghQOh6hCEeZMahW3Kp6XfOzzWNa+93BII50bvi6DDCwDK0rQ552kCMLogrhyxUMpp0IOQ3oJwmR0y8EDGzam5biLHy49RPE3bzQb8Opa6sLYkIHsIhFLLFZhb2EaMZDfTE8C0/Fo00OXgL3oeWqRJGmoaPK4=
+	t=1782319126; cv=none; b=Cj3cxkffwjfkBlqPWeoU6h8BLlI0K2IvpKBwp8G0uK/bCfMMhe9Emy2uXGX4zoc1LdEjQW3WQ1hYj6SS9QXgIyDedrGSBP/JlP4QGO4fo61Zt55hxr7HIWLb1nZ1VTGUYH0C/PSUbYEOzRlUCFWMvnIBsTxyxWDlWJjvxvdZSwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782319123; c=relaxed/simple;
-	bh=71YhhEWVOfBZicLxtxgRiYXUvkOYKW01IOQrScal9c0=;
+	s=arc-20240116; t=1782319126; c=relaxed/simple;
+	bh=8nwdQtBPYv4uOmSu6Wkd/1b8WQrwpc4CCxSg9N/B0PE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J9BuqCfSEFEh/7no4sAKsHwW+Wcid0ORCjEmT2ac9I2JHZjJvrX/efNiuyg/ekuX1j4n3a0SaLA2FfOgUIGGzQGynzdFupXYH8z2eXLJfpFkzedlakExno5xd6eceBI+BdK7piocx4RTCTp4HwBmwAFNEHglqvYVZZv2SaVmcSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D1Z/2vwZ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=hKnkd2kjeyygK4hyBwfLdP0gyCWdlABFcTiu5sSLzCxfQjyoxiLrTZXCIXhNKCT/Vc813xBBy+ztcBpXIT8haenczFyKtIn0yjb2nZwvy7/fiISnVRyVQFSNk+eoruDE2xFvovg4ZQu7zhn4OnJok7gEkhkLHODGJ+nFEcuQsDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PJk8W6XZ; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782319120;
+	s=mimecast20190719; t=1782319123;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AION8xlEfyArmZW7ZAp97FKVNaslFpVnOEzx/+Mk9bs=;
-	b=D1Z/2vwZDNbHUSXHDt4oj3Jidn4jZM44/ivqbg3VkX3AY/He/ltQ8KUSfZWvPRDRFgPEqk
-	ZE4cfMfpzEYL5P5iqN5gvmxvu+WoXo6F//haxgbYXxktT4REiTF3TEyzKNivOBJtCBtVJW
-	Fn8W73Jt2xFE3sRHBVx+VaiF9UbT2YM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=85uWVUY9V2s5UjhcsvLOsswYy01tW6tr9ulaUKagkw0=;
+	b=PJk8W6XZH9Lhw+UpjgG5SYbmQ74v9tLuMD8U2cTODnrUzznRd7MBOcOea1TtZB/eD218pO
+	SWPCBjNMA1rcbOZY5Ihz3zOIcRxlmd+/HZmn6jJuleTGdjYrpRz0RgdxCldtJ1jf2l6f/b
+	D4l5xOxJJMVVF8flw+x6efHHguBIkRo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-692-4tWb9zxzODygAol-uB0Yfw-1; Wed,
- 24 Jun 2026 12:38:37 -0400
-X-MC-Unique: 4tWb9zxzODygAol-uB0Yfw-1
-X-Mimecast-MFC-AGG-ID: 4tWb9zxzODygAol-uB0Yfw_1782319115
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-262-wdc5jPGhPi2bVFWzAogCzA-1; Wed,
+ 24 Jun 2026 12:38:40 -0400
+X-MC-Unique: wdc5jPGhPi2bVFWzAogCzA-1
+X-Mimecast-MFC-AGG-ID: wdc5jPGhPi2bVFWzAogCzA_1782319119
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 06484195604A;
-	Wed, 24 Jun 2026 16:38:34 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F24241801373;
+	Wed, 24 Jun 2026 16:38:38 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.49.152])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A44B41800361;
-	Wed, 24 Jun 2026 16:38:27 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A45211956041;
+	Wed, 24 Jun 2026 16:38:35 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -71,17 +71,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Wyatt Feng <bronzed_45_vested@icloud.com>,
-	Yuan Tan <yuantan098@gmail.com>,
-	Yifan Wu <yifanwucs@gmail.com>,
-	Juefei Pu <tomapufckgml@gmail.com>,
-	Zhengchuan Liang <zcliangcn@gmail.com>,
-	Xin Liu <bird@lzu.edu.cn>,
-	Ren Wei <n05ec@lzu.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3 01/11] rxrpc: Fix ACKALL packet handling
-Date: Wed, 24 Jun 2026 17:38:08 +0100
-Message-ID: <20260624163819.3017002-2-dhowells@redhat.com>
+	stable@kernel.org
+Subject: [PATCH net v3 02/11] rxrpc: Fix leak of connection from OOB challenge
+Date: Wed, 24 Jun 2026 17:38:09 +0100
+Message-ID: <20260624163819.3017002-3-dhowells@redhat.com>
 In-Reply-To: <20260624163819.3017002-1-dhowells@redhat.com>
 References: <20260624163819.3017002-1-dhowells@redhat.com>
 Precedence: bulk
@@ -91,260 +84,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[redhat.com,auristor.com,kernel.org,davemloft.net,google.com,lists.infradead.org,vger.kernel.org,icloud.com,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-301722-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:stable@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:bronzed_45_vested@icloud.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:n05ec@lzu.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301723-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,auristor.com:email,vger.kernel.org:from_smtp,icloud.com:email,lzu.edu.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E6B606C00EE
+X-Rspamd-Queue-Id: 8F0536C005D
 
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
+Fix leak of connection object from OOB challenge queue when response is
+provided by userspace.
 
-rxrpc_input_ackall() accepts ACKALL packets without checking whether the
-call is in a state that can legitimately have outstanding transmit buffers.
-A forged ACKALL can therefore reach a new service call in
-RXRPC_CALL_SERVER_RECV_REQUEST before any reply packets have been queued.
-
-In that state call->tx_top is zero and call->tx_queue is NULL, so
-rxrpc_rotate_tx_window() dereferences a NULL txqueue and triggers a
-null-pointer dereference.
-
-Fix the handling of ACKALL packets by the following means:
-
- (1) Add two new call states: RXRPC_CALL_CLIENT_PRE_SEND which indicates
-     that the client call is connected, but nothing has been transmitted as
-     yet; and RXRPC_CALL_CLIENT_AWAIT_ACK, which indicates that everything
-     has been transmitted at least once, but we're now waiting for the
-     stuff remaining in the Tx buffer to be ACK'd (retransmissions may
-     still happen).
-
-     The RXRPC_CALL_CLIENT_PRE_SEND state is set when the call is assigned
-     a channel and transitions to RXRPC_CALL_CLIENT_SEND_REQUEST when the
-     first packet is transmitted.
-
-     RXRPC_CALL_CLIENT_AWAIT_REPLY is then narrowed in scope to indicate
-     that all Tx packets have been ACK'd and we're now waiting for the
-     reply to be received.
-
- (2) As per Wyatt Feng's original patch[1], the ACKALL handler then checks
-     that the call state is one in which there might be stuff in the Tx
-     buffer to ACK, but now this includes AWAIT_ACK rather than
-     AWAIT_REPLY.  ACKALL packets are ignored if received in the wrong
-     state.
-
-     Note that unlike Wyatt Feng's patch, it's no longer necessary to check
-     to see if the Tx buffer exists as this the state set now covers this.
-
- (3) Make the ACKALL handler use call->tx_transmitted rather than
-     call->tx_top as the former is explicitly the highest packet seq number
-     transmitted, whereas the latter has a looser definition.
-
-Thanks to Jeffrey Altman for a description of the history of the ACKALL
-packet[1].
-
-Fixes: b341a0263b1b ("rxrpc: Implement progressive transmission queue struct")
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Co-developed-by: David Howells <dhowells@redhat.com>
+Fixes: 5800b1cf3fd8 ("rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE")
+Link: https://sashiko.dev/#/patchset/20260609140911.838677-1-dhowells%40redhat.com
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Ren Wei <n05ec@lzu.edu.cn>
 cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
 cc: linux-afs@lists.infradead.org
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/r/20260616155749.2125907-2-dhowells@redhat.com/ [1]
-Link: https://lore.kernel.org/r/c0fd4fec-1576-4070-b31e-a37d5506f5ed@auristor.com/ [2]
+cc: stable@kernel.org
 ---
- net/rxrpc/ar-internal.h |  2 ++
- net/rxrpc/call_event.c  |  5 ++++-
- net/rxrpc/call_object.c |  2 ++
- net/rxrpc/conn_client.c |  2 +-
- net/rxrpc/input.c       | 23 +++++++++++++++++++----
- net/rxrpc/sendmsg.c     |  3 ++-
- 6 files changed, 30 insertions(+), 7 deletions(-)
+ net/rxrpc/oob.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 98f2165159d7..b6ccd8a8199b 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -650,7 +650,9 @@ enum rxrpc_call_event {
- enum rxrpc_call_state {
- 	RXRPC_CALL_UNINITIALISED,
- 	RXRPC_CALL_CLIENT_AWAIT_CONN,	/* - client waiting for connection to become available */
-+	RXRPC_CALL_CLIENT_PRE_SEND,	/* - client is connected, but hasn't sent anything yet */
- 	RXRPC_CALL_CLIENT_SEND_REQUEST,	/* - client sending request phase */
-+	RXRPC_CALL_CLIENT_AWAIT_ACK,	/* - client awaiting ACKs of request */
- 	RXRPC_CALL_CLIENT_AWAIT_REPLY,	/* - client awaiting reply */
- 	RXRPC_CALL_CLIENT_RECV_REPLY,	/* - client receiving reply phase */
- 	RXRPC_CALL_SERVER_PREALLOC,	/* - service preallocation */
-diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-index fec59d9338b9..21be9c86d7a7 100644
---- a/net/rxrpc/call_event.c
-+++ b/net/rxrpc/call_event.c
-@@ -178,7 +178,7 @@ static void rxrpc_close_tx_phase(struct rxrpc_call *call)
- 
- 	switch (__rxrpc_call_state(call)) {
- 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
--		rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_AWAIT_REPLY);
-+		rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_AWAIT_ACK);
+diff --git a/net/rxrpc/oob.c b/net/rxrpc/oob.c
+index 05ca9c1faa57..3318c8bd82ad 100644
+--- a/net/rxrpc/oob.c
++++ b/net/rxrpc/oob.c
+@@ -210,6 +210,11 @@ static int rxrpc_respond_to_oob(struct rxrpc_sock *rx,
  		break;
- 	case RXRPC_CALL_SERVER_SEND_REPLY:
- 		rxrpc_set_call_state(call, RXRPC_CALL_SERVER_AWAIT_ACK);
-@@ -244,6 +244,8 @@ static void rxrpc_transmit_fresh_data(struct rxrpc_call *call, unsigned int limi
- 				break;
- 		} while (req.n < limit && before(seq, send_top));
+ 	}
  
-+		if (__rxrpc_call_state(call) == RXRPC_CALL_CLIENT_PRE_SEND)
-+			rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_SEND_REQUEST);
- 		if (txb->flags & RXRPC_LAST_PACKET) {
- 			rxrpc_close_tx_phase(call);
- 			tq = NULL;
-@@ -267,6 +269,7 @@ void rxrpc_transmit_some_data(struct rxrpc_call *call, unsigned int limit,
- 		fallthrough;
- 
- 	case RXRPC_CALL_SERVER_SEND_REPLY:
-+	case RXRPC_CALL_CLIENT_PRE_SEND:
- 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
- 		if (!rxrpc_tx_window_space(call))
- 			return;
-diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
-index fcb9d38bb521..817ed9acb91e 100644
---- a/net/rxrpc/call_object.c
-+++ b/net/rxrpc/call_object.c
-@@ -18,7 +18,9 @@
- const char *const rxrpc_call_states[NR__RXRPC_CALL_STATES] = {
- 	[RXRPC_CALL_UNINITIALISED]		= "Uninit  ",
- 	[RXRPC_CALL_CLIENT_AWAIT_CONN]		= "ClWtConn",
-+	[RXRPC_CALL_CLIENT_PRE_SEND]		= "ClPreSnd",
- 	[RXRPC_CALL_CLIENT_SEND_REQUEST]	= "ClSndReq",
-+	[RXRPC_CALL_CLIENT_AWAIT_ACK]		= "ClAwtAck",
- 	[RXRPC_CALL_CLIENT_AWAIT_REPLY]		= "ClAwtRpl",
- 	[RXRPC_CALL_CLIENT_RECV_REPLY]		= "ClRcvRpl",
- 	[RXRPC_CALL_SERVER_PREALLOC]		= "SvPrealc",
-diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
-index 9b757798dedd..48519f0de185 100644
---- a/net/rxrpc/conn_client.c
-+++ b/net/rxrpc/conn_client.c
-@@ -449,7 +449,7 @@ static void rxrpc_activate_one_channel(struct rxrpc_connection *conn,
- 	trace_rxrpc_connect_call(call);
- 	call->tx_last_sent = ktime_get_real();
- 	rxrpc_start_call_timer(call);
--	rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_SEND_REQUEST);
-+	rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_PRE_SEND);
- 	wake_up(&call->waitq);
- }
- 
-diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
-index ce761466b02d..2eedab1b0919 100644
---- a/net/rxrpc/input.c
-+++ b/net/rxrpc/input.c
-@@ -181,7 +181,8 @@ void rxrpc_congestion_degrade(struct rxrpc_call *call)
- 	if (call->cong_ca_state != RXRPC_CA_SLOW_START &&
- 	    call->cong_ca_state != RXRPC_CA_CONGEST_AVOIDANCE)
- 		return;
--	if (__rxrpc_call_state(call) == RXRPC_CALL_CLIENT_AWAIT_REPLY)
-+	if (__rxrpc_call_state(call) == RXRPC_CALL_CLIENT_AWAIT_ACK ||
-+	    __rxrpc_call_state(call) == RXRPC_CALL_CLIENT_AWAIT_REPLY)
- 		return;
- 
- 	rtt = ns_to_ktime(call->srtt_us * (NSEC_PER_USEC / 8));
-@@ -356,6 +357,7 @@ static void rxrpc_end_tx_phase(struct rxrpc_call *call, bool reply_begun,
- 
- 	switch (__rxrpc_call_state(call)) {
- 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-+	case RXRPC_CALL_CLIENT_AWAIT_ACK:
- 	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
- 		if (reply_begun) {
- 			rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_RECV_REPLY);
-@@ -694,6 +696,7 @@ static void rxrpc_input_data(struct rxrpc_call *call, struct sk_buff *skb)
- 
- 	switch (__rxrpc_call_state(call)) {
- 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-+	case RXRPC_CALL_CLIENT_AWAIT_ACK:
- 	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
- 		/* Received data implicitly ACKs all of the request
- 		 * packets we sent when we're acting as a client.
-@@ -1154,10 +1157,12 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	if (hard_ack + 1 == 0)
- 		return rxrpc_proto_abort(call, 0, rxrpc_eproto_ackr_zero);
- 
--	/* Ignore ACKs unless we are or have just been transmitting. */
-+	/* Ignore ACKs unless we are transmitting or are waiting for
-+	 * acknowledgement of the packets we've just been transmitting.
-+	 */
- 	switch (__rxrpc_call_state(call)) {
- 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
--	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
-+	case RXRPC_CALL_CLIENT_AWAIT_ACK:
- 	case RXRPC_CALL_SERVER_SEND_REPLY:
- 	case RXRPC_CALL_SERVER_AWAIT_ACK:
- 		break;
-@@ -1215,7 +1220,17 @@ static void rxrpc_input_ackall(struct rxrpc_call *call, struct sk_buff *skb)
- {
- 	struct rxrpc_ack_summary summary = { 0 };
- 
--	if (rxrpc_rotate_tx_window(call, call->tx_top, &summary))
-+	switch (__rxrpc_call_state(call)) {
-+	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-+	case RXRPC_CALL_CLIENT_AWAIT_ACK:
-+	case RXRPC_CALL_SERVER_SEND_REPLY:
-+	case RXRPC_CALL_SERVER_AWAIT_ACK:
++	switch (skb->mark) {
++	case RXRPC_OOB_CHALLENGE:
++		rxrpc_put_connection(sp->chall.conn, rxrpc_conn_put_oob);
 +		break;
-+	default:
-+		return;
 +	}
-+
-+	if (rxrpc_rotate_tx_window(call, call->tx_transmitted, &summary))
- 		rxrpc_end_tx_phase(call, false, rxrpc_eproto_unexpected_ackall);
+ 	rxrpc_free_skb(skb, rxrpc_skb_put_oob);
+ 	return ret;
  }
- 
-diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
-index c35de4fd75e3..ed2c9a51005a 100644
---- a/net/rxrpc/sendmsg.c
-+++ b/net/rxrpc/sendmsg.c
-@@ -366,7 +366,8 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
- 	if (state >= RXRPC_CALL_COMPLETE)
- 		goto maybe_error;
- 	ret = -EPROTO;
--	if (state != RXRPC_CALL_CLIENT_SEND_REQUEST &&
-+	if (state != RXRPC_CALL_CLIENT_PRE_SEND &&
-+	    state != RXRPC_CALL_CLIENT_SEND_REQUEST &&
- 	    state != RXRPC_CALL_SERVER_ACK_REQUEST &&
- 	    state != RXRPC_CALL_SERVER_SEND_REPLY) {
- 		/* Request phase complete for this client call */
 
 
