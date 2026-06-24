@@ -1,304 +1,211 @@
-Return-Path: <netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4zOkN/VVPGptmwgAu9opvQ
-	(envelope-from <netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:11:01 +0200
+	id s0nJD7ZYPGoDnAgAu9opvQ
+	(envelope-from <netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:22:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A8C56C1B15
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:11:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C59ED6C1BB3
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:22:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kTF6YpxH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=JKj7yS1M;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E383A300B1CE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:11:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1BAE9301C2D9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DAF28D8D0;
-	Wed, 24 Jun 2026 22:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481FB2F5474;
+	Wed, 24 Jun 2026 22:22:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABDA28C869
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:10:57 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782339058; cv=none; b=daJ1vVBhkGHnwCCRehjRrlKVGJPexbceji159Q9xC4cilTyVGTmgXDheGWGPFhpDqsKOPKFdWPZ1zHIWPssFyK6zQ1ll+78UqNygb0AHELHrmovHBUfPOLXPDIG0l7kDhnuX+KIkAkqH9JRyOOhHMy+ccmfwwAFJodkjKWbBq5k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782339058; c=relaxed/simple;
-	bh=+qcaSEjsBGY0hfxGQAac9FZCSg+r6O3gmoiaDeZc9b8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=qV0LCELkDXraDCufggby5WX+2sd851jRLUcXpejFr3LaWLJvF5qdRATNSvmXj6X1tG9Dw/AGTI/G3TiYCQd8+0DHyG4t+YEyya062/vmbTvCdwV9i7obc3Us0zW6PnneNL0plogJbpMfNE0lWL4Ln5l5B9S/lm+rDl4rL6qOkqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kTF6YpxH; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC5361F00A3D
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782339057;
-	bh=2zDeOvPena4qlSxGBMWoQ/GeMf6iu2rEhQfYk/kmj8Q=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=kTF6YpxHbCRBNyLhjZIBEHLDUxNmaF9rCQtZWDwx28bzGNmtzeVA0NChYBguxf169
-	 vgbXcI1yReX+DovftnbDhToikdzLBVhsom8X04oz2kTcaZC4so2JwQOUa93vUTvWMX
-	 5le6N8ViIDB6caUyCMIJtbhw6hSe5izfuFOKszTqAW4mP/9h+mBI8iVh+u8Ce97fdJ
-	 FrcSLlTSAp6Eh3yfBZr+yYVsSNkxiGwis9qeqCAHY8tfo3u4FebGqSeKR9KNE65m2U
-	 ZlBfsCB2+vazOzmuvnLM53KKf3TMuB0rQvu4UnPRORzuXBHzWhqXPPhGs6Fysv40XR
-	 riuCGUpJsIxrg==
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 5131DF40088;
-	Wed, 24 Jun 2026 18:10:56 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Wed, 24 Jun 2026 18:10:56 -0400
-X-ME-Sender: <xms:8FU8aiME317O9D-ZFxSWrSyQzIias2JSQOcoGtydlMAvCu6vZ9tisg>
-    <xme:8FU8aihynh8JXZBgkQo-8a4MHIx0XI2AxtNLJkGdZqEvsKOTflxvvpzFdApOpmiDy
-    Li9wwXRqnEyQgZMWgd24nrKoSMJqCqpexmmteufkgomxTJl3cz2n9Lm>
-X-ME-Received: <xmr:8FU8aoghcQQKtP-3Z3J9gPq0gWu6wqPfLsWlYRY_bVlJ0Ppqg-qTwTo_c1UgIWMMU60GpTe4FvC6DI7ynErQafLp89NO7Sqdj7A>
-X-ME-Proxy-Cause: dmFkZTF3zlzLBzyKjCAA6Cea2zlqBSqAMAQCqXaPu05Ub4Ydgfd8fyShASWLMBR4wT+YMG
-    UcPBGsHqJxZJy8fX3hIF5Jzl0g8EowykA7Jy613efCgfGn1XxpcjT6osgdQkpc57steuEk
-    9T4HXnYjXfCX1JRV8f7uW4pjeX7REeW5+eUwZdMprmX3OIdWMnNLG42vXdPO0Dr4fPRa34
-    4PMRLgpm3YAACIU+F7mzvGzCYOIfDn8YdGIIUa+3GxABJcyjdMMGuPQ2qCJsg0g1Iwxq/E
-    Tk/6H3iC+oO1TsNt1Lz0UGhCXp1t7GxV5AGSTqCJTxHNZBKlbPuwdlS3RHUT4BpFSt4wLJ
-    8rawabeRnaKendPHMoFLJ55MVQdQ47RrzL7syVw2djYIyH65LihPi1nxXQOTIR4TYm/5CF
-    7B3lKuzL6tgTpPrs/Kw/Ro25YaZIN59BpSlT1dyFBHCjT2dg98TLABqMGpsyUT9AM5fE4g
-    uHOJBIkaP8fg+C5RmVBktVI4bXmPXWLh0yvMl75wEFcO2RqftwSxoaZtMSxSAbE0/4/PFh
-    4xWKUd6gCPxk9tA0ADA27F0Eoyefqm1i6hncwE+tHqzYnRzfTMCtcbyLk6FOUJ+3CkLGbs
-    CsvJz8jF6M2X5VMVD1Ji/TBGOdELUx6qxvWNOpkKXYz9ydApNu0RAabLb7Yw
-X-ME-Proxy: <xmx:8FU8apJIqowhus-XKQ6rF5FpLH23yGvVlV-_oF3wdhuhnFcIqdJRAQ>
-    <xmx:8FU8avkf5S1z8fy8bFwUAC8a8DE6CuyVCKJAxKA-szyysQ-OU6S83g>
-    <xmx:8FU8apPRPh-9iqI63DESH3c8YocBVSAaT_Mbt-E0OoF-K7B9zV8HKw>
-    <xmx:8FU8ah5vfegxnX7PARtXxRKrEGtStvPLaJLVUAaL-_GpuD9nWgSN7A>
-    <xmx:8FU8albjUoi-G9B67uEzJXlvqnmE1RS668bbjvxo4aAEkQaNpw0mi4sx>
-Feedback-ID: i67ae4b3e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 24 Jun 2026 18:10:55 -0400 (EDT)
-Date: Wed, 24 Jun 2026 15:10:54 -0700
-From: "Dan Williams (nvidia)" <djbw@kernel.org>
-To: alejandro.lucero-palau@amd.com, 
- linux-cxl@vger.kernel.org, 
- netdev@vger.kernel.org, 
- dan.j.williams@kernel.org, 
- edward.cree@amd.com, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>, 
- Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <6a3c55eea91d0_f12301008f@djbw-dev.notmuch>
-In-Reply-To: <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
-References: <20260622124010.2192888-1-alejandro.lucero-palau@amd.com>
- <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
-Subject: Re: [PATCH v29 4/5] sfc: obtain and map cxl range using
- devm_cxl_probe_mem
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5943286415
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:22:40 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782339762; cv=pass; b=Jm5TLDPyU8udkBgjSpRPUVPiqWe6HmlPTgk4EXPsR9th972j0OprEysj0CBucPp/lz8oFrSyNSzWT0wuQJ0O8L9a0SRzT82oSHYTNyJHLgz0G5d8guKMPSabw3GcIeA5xIO1l8rzRsMj5o/5ivUdfU5V2wjgbKstVDz9Ylfh0qY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782339762; c=relaxed/simple;
+	bh=5VlpqCGU1q1I49q7nKHuT13zBfrNqDmjX6Vl4W3t8rw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zn5yhhkhqRKKVAYnE1XP6yaBRC8YdsHGKtQRddFgIJXmOSYuJCD54BRoW0GyvITWSO0cLB9etn1yRxcfS2QKY9mU9+5Z3BnWYv9v7+n8xUYhCpJhU+yfzFAgRQBMww4hL+dqeFm/wyhSPGswc9BtOK27gshtbEJMRaPXYR5WY1c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKj7yS1M; arc=pass smtp.client-ip=209.85.221.52
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-46cdcec58c2so151548f8f.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:22:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782339759; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C4wQ97yH/AXX7ZB4djUXKCYcZ20g4dAXp3AP7tgIFwmfVVw27IEcu1+2CRjWznHKzt
+         P24VXlShHk7Bq+T9dpE+STRn9g1/eXyoekcgimpEk0v6fblK2w3bU9ubd30BRKOppKGI
+         1eu6F1Sawxc/3u3R6pxxIROx7s+fkh90tkJ5w1A6kUV83cQ6UrQvBID6LxODbgS9XDjn
+         xmmZsIioexaHehdwaPOXSNckNj5qsGCBl0Tyfz7HwTGBojKITtcZydWtE16lLc4CEHJB
+         rOyxFo1AC/A79fx85YEEP/mefuOkBUkVCb2PE6sz5g72Rfvp88oRa+swNUJlVt8K5hLo
+         AXAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vuJl+Bg+2bV1wge+DbmfgL7AjZRt4WMMPEu+xxJXlSU=;
+        fh=YUTz5FIFFh7C2Yp+6B0aLY9woBEZ1pV6jregA8FE3hE=;
+        b=I0FXH8CLBzPqn5BT+hJPHKur/brF54n5JpOWocWOzqnYFVIV9aFcjSR89C9rSSI0pj
+         sXmqwHAzX+HyrgJu/NM0jNvOzTROQF+teBGQirtyqfwIN9S/HzP9/CspPkMM8hivffV8
+         3eAiIVpfy/yhRDaAVNLIV3e/tn04ZJtxlqn8N9OVvaeq+Hpesy3mlICgEBUglq2YFO1A
+         +GudeKoFgtVqF3VcWK+YW0IyPOCrouNLSQAbhuWCrqcaryVZSWTO1k98ukd7udRLj6xH
+         uJCD74ZLc7lsa1Bwj8AwjgHbAgPsYI81yb4k8xkIWKLZTXOXqqNoxCbmVez9AL6iNfXj
+         nOAQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782339759; x=1782944559; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vuJl+Bg+2bV1wge+DbmfgL7AjZRt4WMMPEu+xxJXlSU=;
+        b=JKj7yS1MWq5SnXx4qXLG+j5MbvwxK8Nd9H7q8lBnEtM6hfxtgCO/z+nfhJ3dZaSBW7
+         RI1GBu+bDmK1cTq5dHW1iwC/o1Oeo2u8NEm2LhN2bqPkexyR5w8e047u1KPLd9ppXPrQ
+         KxI2V1LeTjltpxAvGVqr09jNT4T2dleHS3qIQsq0dlmkjeBaqcCElE2QBDC9gheHeYNE
+         XQz9kGR7YY3TG1W4F6J54rsMj+8JW+o3NFHKLYAo6vDB27nnqJR7b1oyQyisXzxeC8XK
+         /CBR8ziql5+OI7he+6P3AMtbhK6fx8RWzJH+wlXNT6Bk2rJimPGOw+2BrasX3dyvDA45
+         OYug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782339759; x=1782944559;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vuJl+Bg+2bV1wge+DbmfgL7AjZRt4WMMPEu+xxJXlSU=;
+        b=prd0rl3Jxtjv2/1K3ag36Pgh0aW+mlkPGNLVhFh8x2S26y5JqZQKsT+JDhPrndD7j4
+         5uqoqdw3C1Eep4fu66B4ODrJVKHfpDoIiSSEzcU1X57+/bQnzNF44VWmGTS2ciHb+9es
+         m2eQ0CVtOzdQ95RA6jBVw/W3pJ4emW1Vj+dAWZsfHv2rNvhZ9Bw+4xVCYFwVdNmOWqhw
+         kPDCS7J+8uLZiZMoaogt8m+BXAIr0uzOPmHi6FZix7kvSdiEmYwi/SKK+vZ40Rbn0yMk
+         4JNgaRINImVM56HsKJRD2f6Hl3VSiOAMS0LtAfBl/EfNGAEGWgyduo86/FbgqB5oEHJ0
+         5umw==
+X-Forwarded-Encrypted: i=1; AHgh+RrUrtHIawG//QfjiZrvSMTaqLu+Aiawvk2xme6/3EM/R/NQQLDw/GIlkEFu43e0ddTGq61DT4Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDJo4+rLTd2gXvtKLxYBNBEsbfqSoj86Z6PGbhJ1ItijLX0yTT
+	gK+DwK4wIAqwC3FyMKLCv0N7ewrwjr1IYtURTlsU2uhTdHInq8GRfzztlveFHRNB2DvgKGqR2Pk
+	Bna/mnUnJyD2ht0azfbEI/ag1NxigpJI=
+X-Gm-Gg: AfdE7ckTyoQtQMzy9hsoObRDmH7kxYFL9AQrD78FyxvUW8DHRHz47RJfVhMQtIfi0dm
+	wmxd0ARklS7V7ROVlYqrOm4e+9YGMxKB3Aivi1zprcvsa9TUyruRRlCbpXOZiCNLlJJtaJkIkCQ
+	JfBLjQkdZYEu8cpRLkl8uMU3pAmlgqI+jnMmMMilKi3zNWmhJFFWDm0L2TLa3MHQfcD098iQ/nu
+	kWL7JMW6ZciHn/0qCbhXcYxjduonrtwEhxKGQPieK3QCpH53QVzG7ClaxOzE4a9GgyaBJc2JSTi
+	PXxYTdcy1As70lmfDjSFvWEPn337nAl8oD67UQQxjuwEjLbOBnMqVg==
+X-Received: by 2002:a05:6000:2488:b0:464:c5be:37fe with SMTP id
+ ffacd0b85a97d-46d04d45829mr2957273f8f.15.1782339759159; Wed, 24 Jun 2026
+ 15:22:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20260624200514.1332788-1-zinclim@meta.com> <0673af7d-51a6-484c-be38-3f46849ebb30@lunn.ch>
+ <f2ecb668-ec56-4c84-ac97-474a2d761005@lunn.ch>
+In-Reply-To: <f2ecb668-ec56-4c84-ac97-474a2d761005@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 24 Jun 2026 15:22:01 -0700
+X-Gm-Features: AVVi8Cc-lGFigjd_GNJEAb-CaiVR2AemzJb_22M2NOs-5hBez_OQRdMgtyJ7NRk
+Message-ID: <CAKgT0UeU=8b6a3w6GA-0fB2bU12HsREZphchojoYW0h6wr8Qag@mail.gmail.com>
+Subject: Re: [PATCH net] eth: fbnic: fix race between concurrent hwmon sensor reads
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Zinc Lim <limzhineng2@gmail.com>, Alexander Duyck <alexanderduyck@fb.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, kernel-team@meta.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zinclim@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MV_CASE(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:limzhineng2@gmail.com,m:alexanderduyck@fb.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:kernel-team@meta.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zinclim@meta.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301795-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-301794-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[djbw@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[amd.com,gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:dan.j.williams@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:alucerop@amd.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,amd.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,djbw-dev.notmuch:mid];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[djbw@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,fb.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,meta.com,vger.kernel.org];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,lunn.ch:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7A8C56C1B15
+X-Rspamd-Queue-Id: C59ED6C1BB3
 
-alejandro.lucero-palau@ wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Use core API for safely obtain the CXL range linked to an HDM committed
-> by the BIOS. Map such a range for being used as the ctpio buffer.
-> 
-> A potential user space action through sysfs unbinding or core cxl
-> modules remove will trigger sfc driver device detachment, with that case
-> not racing with this mapping as this is done during driver probe and
-> therefore protected with device lock against those user space actions.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-> ---
->  drivers/net/ethernet/sfc/efx.c     |  2 ++
->  drivers/net/ethernet/sfc/efx_cxl.c | 23 +++++++++++++++++++++++
->  drivers/net/ethernet/sfc/efx_cxl.h |  3 +++
->  3 files changed, 28 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-> index 61cbb6cfc360..3806cd3dd7f4 100644
-> --- a/drivers/net/ethernet/sfc/efx.c
-> +++ b/drivers/net/ethernet/sfc/efx.c
-> @@ -984,6 +984,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
->  	efx_fini_io(efx);
->  
->  	probe_data = container_of(efx, struct efx_probe_data, efx);
-> +	efx_cxl_exit(probe_data);
->  
->  	pci_dbg(efx->pci_dev, "shutdown successful\n");
->  
-> @@ -1242,6 +1243,7 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
->  	return 0;
->  
->   fail3:
-> +	efx_cxl_exit(probe_data);
->  	efx_fini_io(efx);
->   fail2:
->  	efx_fini_struct(efx);
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 18b535b3ea40..3e7c950f83e9 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -18,6 +18,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  {
->  	struct efx_nic *efx = &probe_data->efx;
->  	struct pci_dev *pci_dev = efx->pci_dev;
-> +	struct range cxl_pio_range;
->  	struct efx_cxl *cxl;
->  	u16 dvsec;
->  	int rc;
-> @@ -73,9 +74,31 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		return -ENODEV;
->  	}
->  
-> +	cxl->cxlmd = devm_cxl_probe_mem(&cxl->cxlds, &cxl_pio_range);
-> +	if (IS_ERR(cxl->cxlmd)) {
-> +		pci_err(pci_dev, "CXL accel memdev creation failed\n");
-> +		return PTR_ERR(cxl->cxlmd);
-> +	}
-> +
-> +	cxl->ctpio_cxl = ioremap_wc(cxl_pio_range.start,
-> +				    range_len(&cxl_pio_range));
-> +	if (!cxl->ctpio_cxl) {
-> +		pci_err(pci_dev, "CXL ioremap region (%pra) failed\n",
-> +			&cxl_pio_range);
-> +		return -ENOMEM;
-> +	}
-> +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
->  }
->  
-> +void efx_cxl_exit(struct efx_probe_data *probe_data)
-> +{
+On Wed, Jun 24, 2026 at 2:56=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, Jun 24, 2026 at 11:51:29PM +0200, Andrew Lunn wrote:
+> > On Wed, Jun 24, 2026 at 01:05:14PM -0700, Zinc Lim wrote:
+> > > From: Zinc Lim <limzhineng2@gmail.com>
+> > >
+> > > Reading an hwmon sensor
+> >
+> > Since this is a hwmon related patch, it is a good idea to Cc: the
+> > hwmon Maintainer.
+> >
+> > I don't know hwmon too well, i've never had to look at locking, but...
+> >
+> > static int hwmon_thermal_get_temp(struct thermal_zone_device *tz, int *=
+temp)
+> > {
+> >       struct hwmon_thermal_data *tdata =3D thermal_zone_device_priv(tz)=
+;
+> >       struct hwmon_device *hwdev =3D to_hwmon_device(tdata->dev);
+> >       int ret;
+> >       long t;
+> >
+> >       guard(mutex)(&hwdev->lock);
+> >
+> >       ret =3D hwdev->chip->ops->read(tdata->dev, hwmon_temp, hwmon_temp=
+_input,
+> >                                    tdata->index, &t);
+> >
+> > Could you explain why this lock in the hwmon core is not sufficient?
+> > It could be i'm reading it wrong, but it looks like the lock is shared
+> > by all hwmon instanced registered by a
+> > hwmon_device_register_with_info() call.
+>
+> Documentation/hwmon/hwmon-kernel-api.rst
+>
+> When using ``[devm_]hwmon_device_register_with_info()`` to register the
+> hardware monitoring device, accesses using the associated access function=
+s
+> are serialised by the hardware monitoring core. If a driver needs locking
+> for other functions such as interrupt handlers or for attributes which ar=
+e
+> fully implemented in the driver, hwmon_lock() and hwmon_unlock() can be u=
+sed
+> to ensure that calls to those functions are serialized.
 
-If you are going to have an explicit efx_cxl_exit() then I would also
-add an explicit unregistration of the memdev. This would also fix the
-Sashiko report about pci_disable_device() running while the cxl_memdev
-is still registered. Unfortunately, mixing devm and explicit unwind is
-always fraught.
+I did some digging and it looks like 3ad2a7b9b15d ("hwmon: Serialize
+accesses in hwmon core") landed into 6.18. This was a patch put
+together based on issues reported in an earlier kernel version and
+explains how this got missed. So what we have is a redundant fix. We
+can drop this for upstream and probably look at pulling the upstream
+fix into our kernels that were having the issues.
 
-Let me know if this passes your testing, and I can send it out as a
-standalone patch. You could also use it to unwind if the ioremap()
-fails.
+Thanks for the review feedback.
 
--- 8< --
-From 47940f7d6de6dd1039d0e445eb944ca96ad5eb3a Mon Sep 17 00:00:00 2001
-From: Dan Williams <djbw@kernel.org>
-Date: Wed, 24 Jun 2026 11:47:24 -0700
-Subject: [PATCH] cxl: Add devm_cxl_remove_mem()
-
-Undo devm_cxl_probe_mem() without causing the host driver to unload.
-
-The expectation of devm_cxl_probe_mem() is that upon attach the caller
-depends on the CXL topology not being torn down. If it is then it is
-escalated to a 'remove' event on the caller. However, if the caller wants
-to cancel their interest in CXL operation, they should be able to do so
-without that side effect.
-
-This is useful for setup scenarios where CXL successfully attaches, but
-some other event precludes CXL operation.
-
-Cc: Alejandro Lucero <alucerop@amd.com>
-Signed-off-by: Dan Williams <djbw@kernel.org>
----
- include/cxl/cxl.h         |  1 +
- drivers/cxl/core/memdev.c | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
-
-diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-index 016c74fb747c..cff2922b0d4a 100644
---- a/include/cxl/cxl.h
-+++ b/include/cxl/cxl.h
-@@ -226,4 +226,5 @@ struct cxl_dev_state *_devm_cxl_dev_state_create(struct device *dev,
- 
- struct cxl_memdev *devm_cxl_probe_mem(struct cxl_dev_state *cxlds,
- 				      struct range *range);
-+void devm_cxl_remove_mem(struct cxl_memdev *cxlmd);
- #endif /* __CXL_CXL_H__ */
-diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-index 33a3d2e7b13a..aa35876f0067 100644
---- a/drivers/cxl/core/memdev.c
-+++ b/drivers/cxl/core/memdev.c
-@@ -1185,6 +1185,31 @@ struct cxl_memdev *__devm_cxl_add_memdev(struct cxl_dev_state *cxlds,
- }
- EXPORT_SYMBOL_FOR_MODULES(__devm_cxl_add_memdev, "cxl_mem");
- 
-+static struct cxl_attach_region *cancel_probe_mem_teardown(struct cxl_memdev *cxlmd)
-+{
-+	struct cxl_attach_region *attach;
-+
-+	guard(device)(&cxlmd->dev);
-+	attach = container_of(cxlmd->attach, typeof(*attach), attach);
-+	cxlmd->attach = NULL;
-+	return attach;
-+}
-+
-+void devm_cxl_remove_mem(struct cxl_memdev *cxlmd)
-+{
-+	struct cxl_attach_region *attach;
-+	struct cxl_dev_state *cxlds;
-+
-+	if (IS_ERR(cxlmd))
-+		return;
-+
-+	attach = cancel_probe_mem_teardown(cxlmd);
-+	cxlds = cxlmd->cxlds;
-+	devm_release_action(cxlds->dev, cxl_memdev_unregister, cxlmd);
-+	devm_kfree(cxlds->dev, attach);
-+}
-+EXPORT_SYMBOL_NS_GPL(devm_cxl_remove_mem, "CXL");
-+
- static void sanitize_teardown_notifier(void *data)
- {
- 	struct cxl_memdev_state *mds = data;
--- 
-2.54.0
+- Alex
 
