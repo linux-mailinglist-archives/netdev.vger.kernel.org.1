@@ -1,249 +1,231 @@
-Return-Path: <netdev+bounces-301769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OvipEI43PGqSlQgAu9opvQ
-	(envelope-from <netdev+bounces-301769-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:01:18 +0200
+	id aOO9OYo4PGrClQgAu9opvQ
+	(envelope-from <netdev+bounces-301770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:05:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E248E6C1248
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:01:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F4296C12A0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:05:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZwdMobqj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301769-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301769-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=raIVNGY5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301770-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301770-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2E45A301DD22
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:01:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EF2AE301F88E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99118388E55;
-	Wed, 24 Jun 2026 20:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E963DE420;
+	Wed, 24 Jun 2026 20:05:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311E535F60A
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 20:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C214E1A3165
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 20:05:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782331273; cv=none; b=mk5tvoCBsuA4iMvRxESMQZQDA8tbIXOGvzpyq5+n5kRRJqZS/6B3MnRgif72AVZbn8a3NQN+Mcx/c8e9IOvo20tJHWpxQ7MMhbC8D6wbmwX8aiJxMVo8Y/xVn1NH1pcOfbt20i02I+h6jqvMkrlBbdx+DvOFfYOeASsE3k5ry2M=
+	t=1782331529; cv=none; b=LAj8tDC4S7fNuRXWAqZiZTrUNTW0SillHChLMfs2jX0yPQdCMaznhoXuzfD1plFcoACSZrk1nYEEjYdZA1mAMOskdA2D6Czmtqw2QqNBSxOhrU/WxSp8ruahb04xb2T/O92g8yiYlrv9WB/yWxHP9xTc7tcV4zdsgx7p4xENAis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782331273; c=relaxed/simple;
-	bh=EKxSlgEBSBkAM5+htBMrWemn3+ErZ8FA7IixhRa/dSI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gCpxx2V44rERmvTqlf2Sy3T9XFFfYszu0CPqyvgHTzcdTkEjc5tP06nur9VMyhUBahwKD5xALHdhJ/8ExoCgfphIhpy5+gN3qf+Ouc016U4VCxT9H3MoKXVDWk9NCNXfQFhMqENKL123v+n1gweiNrfgA2hn1WIeG2hbVEe7h9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZwdMobqj; arc=none smtp.client-ip=74.125.224.54
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-664346e66daso1103972d50.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 13:01:12 -0700 (PDT)
+	s=arc-20240116; t=1782331529; c=relaxed/simple;
+	bh=uGQCT8E7NdnJjk84oOCWd+hFDtOe2uO15imvJTeo8aM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eQPSneS2OlZYb+s8F2hyWyPM6RWYU+s1NWdZTjdxoyaHlNygudYgtLMEGLrbuAtx5KST/y69hHVjLIAFdj1OyXeamAqFg7yV14EhU8BNNTHbGp3naLC+6O53ASHKODLggIqmI05D/63OXUyyYUlg9Br4erxVCn1w5Kvbchnqx4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=raIVNGY5; arc=none smtp.client-ip=74.125.82.173
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-30bf8b2bd20so3043181eec.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 13:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782331271; x=1782936071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X2A8EKBL3N7BN+s6tAkTzPMXNdRY8rqNJI+vtC/7pCo=;
-        b=ZwdMobqjUPsGo8LE+n+nM5S8ddB2K481rM2YXvRTlZ505ci9yGifHg+gt5MYNxfMPB
-         S+L0gDss0iYi9r1lYUDac8g86JTt+88aGXWL1x2Jpx4WoRWJjOS787sM0YBHvbbJltPx
-         yW6t/b1RNv256eGRL47SKNFYsSi3Fno6nU2/FElT8xzozEIOU6w9iOBvw+uMBL/c+Tms
-         cGLK26Nya42GtqrkIrO0MEjwvmWcRQUxmLaThPXj9sOKFbT5fZ3rBhRu9v177IUk9OXb
-         dRAgQH+mD8GX5N3W0phJvSPehqQExV4MLN43I1JFZvSBXWLA2IgqSmhgtCyt2bicuxXy
-         UDYw==
+        d=gmail.com; s=20251104; t=1782331527; x=1782936327; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ApMdDB/EOPXueJ52vfhYu8DXz0RQ47fUhjfwMUESgEk=;
+        b=raIVNGY5+kI0tjK5cxkK1eH/6ojBtN5Efv/FIVVAaVy36Nisvpy8OrF8cIntkUQb6Z
+         7P6j6OFGBJd0cKxrFYz0GIL7XQIAtPbmtfltBEgPnereRSfgIMFL9dT+d0PJ750hPKps
+         9UpannPRWgutzqed2ioUuCFArADQ6yzJStkR/bZ+yTLq1N6JVwvQLI8S4BTpBvAGCzha
+         +veO7e/I9aPw2NHlIAjAKTVmNZh1hTND/iGANcYXRwzJtSs9xZbdYa8FncgwojGOhVg8
+         sKwt0h62SNBvp4IT4QLLJc3V6Q22E/+AiLM8My7f1OzpBIcKH1IbBROrRrwrdPvvBFa8
+         bWFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782331271; x=1782936071;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X2A8EKBL3N7BN+s6tAkTzPMXNdRY8rqNJI+vtC/7pCo=;
-        b=jfxU6pdlty2B/NqbYKDGe1NU4/k6BurhX18a+rWkQJ9Ks4jMFgfdmi1fEs1obpB46L
-         VuznJ4iI51VlIPhl9GTpg5JN1Qj0P3UpgBra2FhppmDoyUxbtwsyG/T9xHTla1CSsJkl
-         6wqRVXHU0KMzhZqJLs1BcOK/KWphb6e1jsqTttVt7TBjbU7yh1cHyF8dVXQ8P/SmzsrA
-         zh//QbrI2+nI+cpRotHPUCcMzX/jrRiNR8q9RiLlGkJOFtLmLMOyD42/cycpPAmCd/ke
-         KxjFnu7VmuqbVI8cAplaEhamj216InArh7Tp7YDiL1QPijVZC9QlHq3WhtE/X1wIpLZF
-         xMww==
-X-Forwarded-Encrypted: i=1; AHgh+RrbxlKw9pmyI8W3e4AjGlASuKg8dcC9yZFOIV5vL/1xpy+xo5v9u1X56Y++BkS/lCHjX7niy4w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrQrAnbM2wWMjg7EDpkNoP+FNLHrEdoJ7ZGqmT5wzzLpA90rKP
-	kjh9Mn+epKQBL8MZDNfyNZ19rosb8NnSgkedbpgrQWLJezETc8bXFmnq
-X-Gm-Gg: AfdE7cn5ch6lR+KNW1coesxw+CHeyyRxN/27zvteHxeFzC7svEQfyVs5I4tjYJixKI7
-	NSedQSJtT9V/0jZOLJM8FPS9VWtFdmHTeLYqyMQbFf8HtZHSmmflvs3IRHBJxyJ5iB12rQGQ27m
-	kLd0/m6ic5l86X+NtinNM6+8l6jy0JrxybYsJSpYdV+Nw38u+TRS6IuHLd93bT/dqfjleSyZPT/
-	i/fYDtXl2l+0nG6re5XdMTPej4NR2CLH/C0mTAnRB5urpN4R2NDgBjo9eTF8glrePc+t848bMaa
-	5bfiIr/bVKsvGg+7rUo8QqMYVUwg/PtGii0os9pHxwokNiivc9cUjflXgLTIWSe741RwcAemEcd
-	iOc5jXjntbElJ/BbNMUhpCny+AyCtpO6Kz8tSVcTmzOpCd13yu6gw6e/wRRLLrTkHusUX4W5JT7
-	7CXEgb10hZexmbZEYW8KbqKHHz0bGM6noyBpZWudBQMLTcodu0LA5DAovNEdAx9IZlh/BM
-X-Received: by 2002:a05:690e:1909:b0:660:56ee:ebf1 with SMTP id 956f58d0204a3-6636e489415mr4425430d50.22.1782331270986;
-        Wed, 24 Jun 2026 13:01:10 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6647f99b601sm351024d50.20.2026.06.24.13.01.10
+        d=1e100.net; s=20251104; t=1782331527; x=1782936327;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ApMdDB/EOPXueJ52vfhYu8DXz0RQ47fUhjfwMUESgEk=;
+        b=BlD9dIjKuEai4Cl0qLO4VwlqaGgmL7C4xhIXuLGjGz3tFtERCHJ9cchRJDFQGgcTBe
+         hJqQSE+4MC1BSKmirLdN+KISoA8HhZ9wW0r3KS2MSBzdnbh6UNzM82S9PHR9UcvNNmxw
+         SuqjrMkbRhex5Vq3uOh+aKzO5N0Lp5sKTZSUxyw04P7boFNvd3f5xiA5fTCo+RJz8dkH
+         V/Zpf33woAUS+eG6HBDDyhukIxZWzyHWDjEI1wQx3GtPYEA/U8J0heLXGRXCDJeI/WDP
+         FPStGu4o/Y62arzSgc0LDdGm880HP6vvVQLiL46lxbD9wafHd1o44+R12RZbzguwfLWE
+         fuug==
+X-Forwarded-Encrypted: i=1; AHgh+RogE1MrwPRbrJKL9YvJ+1Fjm+BQtIMgoYRNvh1rT0ymK881VPYu7qLyjw6GXCc2+/MxGKb7EE4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbH3eIjoovjMSkxxG2KBrwpEfQoSU8ifCQ530Sj4+w9e+7FUxS
+	ooIvB4XqAF9DwwDc46ZLnpVuBwtp8zRHGVLUeUUAfnR0uF5sxo4fkile
+X-Gm-Gg: AfdE7clg3l9FA4UKPqNoHASD8ddvXo2xP2FkXb4LdHhEuSOSO43agYgRpky7WvRe0h9
+	1NkQcyLm70MFk0ROdtBr2CLMCCo9eij20cO+HNNFRM5KhP/SbXrrWE3Ktq2rXlITrdD4yFjhRgv
+	d54VM3w61VPvGUFlUtKT2PK2IJlV3cHipczuDxHWvFh9xg9McR2aUgUjN+TX3xt5PM/K6Z5Lzdc
+	dizLF2MUGrlauVaL0H2nJHPPkMee9n9FlDH9uB/inWj+du2WheSxQC20k5MAIUhwvVwvnRzhERG
+	sJa++l0+bEN3O5gknHzmM0qddUVzemGG3xxUXeZ/MzuPFjQVuizCbojaMYyJ3wecjv4/OovRJjt
+	bHge/ZQd8M4K2Gpamz0FDQDVbnB42XtHMvhPGCHV6Z96p1MfrUrkn3jR/F8c2L/xpo1NXaUljEq
+	Y8HLcfga7q8Po+O5nciz/M6Z+w8Nwsfw==
+X-Received: by 2002:a05:7300:cb83:b0:307:d4e7:b16f with SMTP id 5a478bee46e88-30c1dc2196amr14663620eec.23.1782331526828;
+        Wed, 24 Jun 2026 13:05:26 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:500::3:7577])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c7c4ca208sm1347501eec.3.2026.06.24.13.05.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 13:01:10 -0700 (PDT)
-Date: Wed, 24 Jun 2026 16:01:09 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, 
- Michal Luczaj <mhal@rbox.co>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, 
- Jiayuan Chen <jiayuan.chen@linux.dev>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Cong Wang <cong.wang@bytedance.com>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Emil Tsalapatis <emil@etsalapatis.com>, 
- Shuah Khan <shuah@kernel.org>, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- kuniyu@google.com
-Message-ID: <willemdebruijn.kernel.24d11e11d5dc0@gmail.com>
-In-Reply-To: <87wlvoxdq1.fsf@cloudflare.com>
-References: <20260623-sockmap-lookup-udp-leak-v1-0-05804f9308e4@rbox.co>
- <20260623-sockmap-lookup-udp-leak-v1-1-05804f9308e4@rbox.co>
- <87wlvoxdq1.fsf@cloudflare.com>
-Subject: Re: [PATCH bpf 1/2] bpf, sockmap: Don't leak UDP socks on
- lookup-bind-release
+        Wed, 24 Jun 2026 13:05:26 -0700 (PDT)
+From: Zinc Lim <limzhineng2@gmail.com>
+X-Google-Original-From: Zinc Lim <zinclim@meta.com>
+To: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: alexander.duyck@gmail.com,
+	kernel-team@meta.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zinclim@meta.com,
+	Zinc Lim <limzhineng2@gmail.com>
+Subject: [PATCH net] eth: fbnic: fix race between concurrent hwmon sensor reads
+Date: Wed, 24 Jun 2026 13:05:14 -0700
+Message-ID: <20260624200514.1332788-1-zinclim@meta.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301769-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jakub@cloudflare.com,m:mhal@rbox.co,m:willemdebruijn.kernel@gmail.com,m:john.fastabend@gmail.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ast@kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:kuniyu@google.com,m:willemdebruijnkernel@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,davemloft.net,google.com,kernel.org,redhat.com,bytedance.com,iogearbox.net,etsalapatis.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[cloudflare.com,rbox.co,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301770-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[limzhineng2@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:alexanderduyck@fb.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:alexander.duyck@gmail.com,m:kernel-team@meta.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zinclim@meta.com,m:limzhineng2@gmail.com,m:andrew@lunn.ch,m:alexanderduyck@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,meta.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[limzhineng2@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,rbox.co:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,meta.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E248E6C1248
+X-Rspamd-Queue-Id: 7F4296C12A0
 
-Jakub Sitnicki wrote:
-> On Tue, Jun 23, 2026 at 08:03 PM +02, Michal Luczaj wrote:
-> > UDP sockets get SOCK_RCU_FREE set when (auto-)bound. This means
-> > sk_is_refcounted(unbound) = true, while sk_is_refcounted(bound) = false.
-> >
-> > Because sockmap accepts unbound UDP sockets, a BPF program can increment a
-> > socket's refcount via lookup. If the socket is subsequently bound, the
-> > transition from unbound to bound causes bpf_sk_release() to skip the
-> > decrement of the refcount, causing a memory leak.
-> >
-> > unreferenced object 0xffff88810bc2eb40 (size 1984):
-> >   comm "test_progs", pid 2451, jiffies 4295320596
-> >   hex dump (first 32 bytes):
-> >     7f 00 00 01 7f 00 00 01 d2 04 1b b7 04 d2 00 00  ................
-> >     02 00 01 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
-> >   backtrace (crc bdee079d):
-> >     kmem_cache_alloc_noprof+0x557/0x660
-> >     sk_prot_alloc+0x69/0x240
-> >     sk_alloc+0x30/0x460
-> >     inet_create+0x2ce/0xf80
-> >     __sock_create+0x25b/0x5c0
-> >     __sys_socket+0x119/0x1d0
-> >     __x64_sys_socket+0x72/0xd0
-> >     do_syscall_64+0xa1/0x5f0
-> >     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> >
-> > Maintain balanced refcounts across sk lookup/release: (re-)set
-> > SOCK_RCU_FREE on proto update to treat the socket (whether bound or
-> > unbound) as not requiring a refcount increment on (a RCU protected) lookup.
-> >
-> > Fixes: 0c48eefae712 ("sock_map: Lift socket state restriction for datagram sockets")
-> > Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> > ---
-> > Note: this issue is related to commit 67312adc96b5 ("bpf: reject unhashed
-> > sockets in bpf_sk_assign").
-> > ---
-> >  net/ipv4/udp_bpf.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
-> > index ad57c4c9eaab..970327b59582 100644
-> > --- a/net/ipv4/udp_bpf.c
-> > +++ b/net/ipv4/udp_bpf.c
-> > @@ -173,6 +173,9 @@ int udp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
-> >  	if (sk->sk_family == AF_INET6)
-> >  		udp_bpf_check_v6_needs_rebuild(psock->sk_proto);
-> >  
-> > +	/* Treat all sockets as non-refcounted, regardless of binding state. */
-> > +	sock_set_flag(sk, SOCK_RCU_FREE);
-> > +
-> >  	sock_replace_proto(sk, &udp_bpf_prots[family]);
-> >  	return 0;
-> >  }
-> 
-> There is a side effect that an unhashed (unbound) UDP socket can now be
-> selected in sk_lookup with bpf_sk_assign.
+From: Zinc Lim <limzhineng2@gmail.com>
 
-The commit does mention a related fix, beneath the ---, commit
-67312adc96b5 ("bpf: reject unhashed sockets in bpf_sk_assign").
-That fixes a similar issue by exactly disallowing this:
+Reading an hwmon sensor issues a TSENE firmware mailbox transaction that
+uses a shared completion slot. Concurrent reads (e.g. parallel
+"cat .../temp1_input" or a monitoring agent polling all attributes) race
+over that slot, and the second transmit fails because a completion is
+already pending:
 
-    Fix the problem by rejecting unhashed sockets in bpf_sk_assign().
-    This matches the behaviour of __inet_lookup_skb which is ultimately
-    the goal of bpf_sk_assign().
+  fbnic 0000:41:00.0: Failed to transmit TSENE read msg, err -17
 
-So ..
+Serialize the hwmon read path with a per-device mutex so only one TSENE
+transaction is in flight at a time.
 
-> Though perhaps that's for the
-> better because TC bpf_sk_assign doesn't reject non-refcounted UDP
-> sockets either, so we would have both socket dispatch sites behave the
-> same way.
+Fixes: 880630734102 ("eth: fbnic: Add hardware monitoring support via HWMON interface")
+Signed-off-by: Zinc Lim <limzhineng2@gmail.com>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  2 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-.. there are two conflicting types of consistency here? Consistent with
-__inet_lookup_skb or the TC bpf hook. Of those the first is the more
-canonical.
-
-> Also, with this patch, if we insert & remove an unhashed UDP socket
-> into/from a sockmap, we end up with an unhashed non-refcounted UDP
-> socket. Not entirely sure if that is actually a problem or not.
-> 
-> Willem, what is your take on having unhashed non-refcoted UDP sockets?
-
-I don't immediately see a problem, but I'm not an expert on SOCK_RCU_FREE.
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index d0715695c43e..e31d6f88b746 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -6,6 +6,7 @@
+ 
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/mutex.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/types.h>
+ #include <linux/workqueue.h>
+@@ -27,6 +28,7 @@ struct fbnic_dev {
+ 	struct net_device *netdev;
+ 	struct dentry *dbg_fbd;
+ 	struct device *hwmon;
++	struct mutex hwmon_mutex; /* Serializes hwmon sensor reads */
+ 	struct devlink_health_reporter *fw_reporter;
+ 	struct devlink_health_reporter *otp_reporter;
+ 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c b/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
+index def8598aceec..ac1b4a422677 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
+@@ -33,10 +33,17 @@ static int fbnic_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
+ {
+ 	struct fbnic_dev *fbd = dev_get_drvdata(dev);
+ 	const struct fbnic_mac *mac = fbd->mac;
+-	int id;
++	int id, err;
+ 
+ 	id = fbnic_hwmon_sensor_id(type);
+-	return id < 0 ? id : mac->get_sensor(fbd, id, val);
++	if (id < 0)
++		return id;
++
++	mutex_lock(&fbd->hwmon_mutex);
++	err = mac->get_sensor(fbd, id, val);
++	mutex_unlock(&fbd->hwmon_mutex);
++
++	return err;
+ }
+ 
+ static const struct hwmon_ops fbnic_hwmon_ops = {
+@@ -60,6 +67,8 @@ void fbnic_hwmon_register(struct fbnic_dev *fbd)
+ 	if (!IS_REACHABLE(CONFIG_HWMON))
+ 		return;
+ 
++	mutex_init(&fbd->hwmon_mutex);
++
+ 	fbd->hwmon = hwmon_device_register_with_info(fbd->dev, "fbnic",
+ 						     fbd, &fbnic_chip_info,
+ 						     NULL);
+@@ -68,6 +77,7 @@ void fbnic_hwmon_register(struct fbnic_dev *fbd)
+ 			   "Failed to register hwmon device %pe\n",
+ 			   fbd->hwmon);
+ 		fbd->hwmon = NULL;
++		mutex_destroy(&fbd->hwmon_mutex);
+ 	}
+ }
+ 
+@@ -78,4 +88,5 @@ void fbnic_hwmon_unregister(struct fbnic_dev *fbd)
+ 
+ 	hwmon_device_unregister(fbd->hwmon);
+ 	fbd->hwmon = NULL;
++	mutex_destroy(&fbd->hwmon_mutex);
+ }
+-- 
+2.53.0-Meta
 
 
