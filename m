@@ -1,250 +1,164 @@
-Return-Path: <netdev+bounces-301711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JJ/EOcACPGo0iggAu9opvQ
-	(envelope-from <netdev+bounces-301711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:16:00 +0200
+	id MwtDCf0CPGo8iggAu9opvQ
+	(envelope-from <netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:17:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B72B6BFEF3
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:16:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C886BFF06
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:17:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=zbFrCbjA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301711-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301711-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=ixit.cz header.s=dkim header.b=MnpUL2zc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301712-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=ixit.cz;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE776300D14F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:15:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 680843017FBF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711C01B78F3;
-	Wed, 24 Jun 2026 16:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97D01E1C11;
+	Wed, 24 Jun 2026 16:16:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0555A78F3A;
-	Wed, 24 Jun 2026 16:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D511A6800;
+	Wed, 24 Jun 2026 16:16:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782317758; cv=none; b=ULzCzh65FczIBGXRFHvP+8PvweeApremKmvMX4UARHinUSMQBApjDRiAy3+WXeq70mjFJYS77DgF/uy4PW4HXofbNG/QtVXsrGf1c7JEOiu1AItFFHnhvrf8VZX+Pminu/Cv7/hkYjtjuO399Upvl1Yc/qGWlPkWshEkzHCmPEY=
+	t=1782317818; cv=none; b=kbVnffsulQmaFukq3U8F6mHCxflXbXieb3QFHpyrKjc8qpM103lrEsI/pS+8qdckhxaIUqHIo6RpEt5jBDGdWGHtfhVZ3JCEKQf00Frc+RLsvRXUyLYRC9cjxJaahXew+EO8W4fGQCCYZPalw4Pliy+JQrZdotvzBBzRirCJfw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782317758; c=relaxed/simple;
-	bh=evE72iBnepmuEVf7F1JayoufXy9qjWrv9pQTEJJex68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDzLmuXXWlHqs0qrqU2aqDOdK/QhHGl4nWbsLm0vhVegqhRcvTWEXk2KKTBKyvoA0eZq+tJBq6UsROo/2JdLRYAsLYxeRwuI13gcfl2w//j6LbFT827oIAn8I5G4wqVoMxPIpR1pJflpDCee1yhH0R+1TxQupYRnvXgG2XtGAXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zbFrCbjA; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=C/KIgQ42qvKpfhlsSKyF2HuauF1ECg4OdEJw3N/MxDE=; b=zbFrCbjAVWSr9s/Viyahf2Olbs
-	oTCo4yIjsXdPR24Ttlmx4kTxQXI8ylSJ9k1iCBYbolL65pl78MI2bF9pydBeML/noASJ4tMOyHWpC
-	6aBGrmDevD7vE41CyvPDSgLfC5gUPFIl+HZwR/zpqp+4/fLNW977+zmJbh7JowiPQJlI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wcQGH-00978o-CO; Wed, 24 Jun 2026 18:15:37 +0200
-Date: Wed, 24 Jun 2026 18:15:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: jackbb_wu@compal.com
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wen-Zhi Huang <wen-zhi.huang@mediatek.com>,
-	Shi-Wei Yeh <shi-wei.yeh@mediatek.com>,
-	Minano Tseng <Minano.tseng@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 3/7] net: wwan: t9xx: Add control DMA interface
-Message-ID: <dc007021-9013-47b2-b06a-fe4a50d26722@lunn.ch>
-References: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
- <20260624-t9xx_driver_v1-v3-3-73ff03f60c48@compal.com>
+	s=arc-20240116; t=1782317818; c=relaxed/simple;
+	bh=IOhWgwBBMWg6Ldbg26XTYhcGvygbIBOcQjU8gr0xbjc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jtx7n3vKnRh4tEb5eoTY8GgHtQwCvgCsWO26c89xQiVgleD1qaBtv+bU5wvHH7hFFsUki9jTcTji4/maP394E+vilcSNCP8aW0uLUfSMfHIJSZa9jF65vZFYEWjJMZ97s/nwI8NFKBXccGU3/ghaQUbQ1bWbLGh38/AHUfqQ8aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=MnpUL2zc; arc=none smtp.client-ip=185.100.197.86
+Received: from [10.0.0.200] (unknown [10.88.125.21])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id 6C8175340427;
+	Wed, 24 Jun 2026 18:16:54 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1782317814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=YKIkxch6KLPeashywy0J/xWIuotTcRwzMsXsdGIZyMw=;
+	b=MnpUL2zcl2CdP0319oQMHMagw4BLto6CBFgevV6EaXXgzvQlZlF/w/d9r9RhA6F8EZi/3s
+	DyGiGNwBoBaNVs8wmODmhXG4GZzkL2UxPgxkj1YMUAMaizla1iSzMsna1vwed8RZ2bpWli
+	jSs+Qwyzen24Cv5+OOeoUNy5N6OSTvM=
+Message-ID: <87079ae8-bee8-4ae5-a016-de9b81962c04@ixit.cz>
+Date: Wed, 24 Jun 2026 18:16:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624-t9xx_driver_v1-v3-3-73ff03f60c48@compal.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] nfc: llcp: fix OOB read and u8 offset wrap in TLV
+ parsers
+To: Muhammad Bilal <meatuni001@gmail.com>, oe-linux-nfc@lists.linux.dev
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, krzk@kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
+References: <20260622131802.239035-1-meatuni001@gmail.com>
+Content-Language: en-US
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <20260622131802.239035-1-meatuni001@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301711-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301712-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jackbb_wu@compal.com,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_RECIPIENTS(0.00)[m:meatuni001@gmail.com,m:oe-linux-nfc@lists.linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:krzk@kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lists.linux.dev];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4B72B6BFEF3
+X-Rspamd-Queue-Id: 83C886BFF06
 
-> diff --git a/drivers/net/wwan/t9xx/pcie/mtk_cldma.c b/drivers/net/wwan/t9xx/pcie/mtk_cldma.c
 
-> +static inline void mtk_cldma_clr_bd_dsc(struct cldma_drv_info *drv_info,
-> +					struct bd_dsc *bd_dsc_pool, int nr_bds)
+On Mon, 22 Jun 2026 18:18:02 +0500, Muhammad Bilal wrote:
+ > nfc: llcp: fix OOB read and u8 offset wrap in TLV parsers
 
-No inline functions in C files. Please let the compiler decide.
+Applied, thanks!
 
-> +static int mtk_cldma_reload_rx_skb(struct mtk_md_dev *mdev, struct rxq *rxq,
-> +				   struct rx_req *req)
-> +{
-> +	struct sk_buff *tail = NULL;
-> +	struct bd_dsc *bd_dsc;
-> +	int nr_bds;
-> +	int i, ret;
-> +
-> +	nr_bds = rxq->nr_bds;
-> +
-> +	for (i = 0; i < nr_bds; i++) {
-> +		bd_dsc = req->bd_dsc_pool + i;
-> +		bd_dsc->skb = __dev_alloc_skb(req->frag_size, GFP_KERNEL);
-> +		if (!bd_dsc->skb) {
-> +			dev_warn((mdev)->dev, "Failed to alloc SKB\n");
+[1/1] nfc: llcp: fix OOB read and u8 offset wrap in TLV parsers
+       commit: cb682b66aba4bc3f4dd4d7ae5612f49ad75b2087
 
-You might want to rate limit this, and the other similar messages in
-the data path, otherwise it could be a DOS.
-
-> +u32 mtk_cldma_stop_queue(struct cldma_drv_info *drv_info, enum mtk_tx_rx dir, u32 qno)
-> +{
-> +	u32 val = (qno == ALLQ) ? qno : BIT(qno);
-> +	struct cldma_hw_regs *hw_regs;
-> +	unsigned int active;
-> +	int cnt = 0;
-> +	int base;
-> +	u32 addr;
-> +
-> +	hw_regs = drv_info->hw_regs;
-> +	base = drv_info->base_addr;
-> +
-> +	if (dir == DIR_TX)
-> +		addr = base + hw_regs->reg_cldma_ul_stop_cmd;
-> +	else
-> +		addr = base + hw_regs->reg_cldma_so_stop_cmd;
-> +
-> +	mtk_pci_write32(drv_info->mdev, addr, val);
-> +
-> +	do {
-> +		active = drv_info->drv_ops->cldma_queue_status(drv_info, dir, qno);
-> +		if (active == LINK_ERROR_VAL || !active)
-> +			break;
-> +		usleep_range(WAIT_QUEUE_STOP, 2 * WAIT_QUEUE_STOP);
-> +	} while (++cnt < 10);
-
-Please use one of the helpers from iopoll.h. Any loops waiting for an
-event to happen should use those macros, since the open code
-implementation is often wrong.
-
-> +static int mtk_ctrl_trb_srv_init(struct mtk_ctrl_trans *trans)
-> +{
-> +	struct srv_que *srv_que;
-> +	struct trb_srv *srv;
-> +	int i, j;
-> +	int ret;
-> +
-> +	for (i = 0; i < trans->trb_srv_num; i++) {
-> +		srv = devm_kzalloc(trans->mdev->dev, sizeof(*srv), GFP_KERNEL);
-> +		if (!srv) {
-> +			ret = -ENOMEM;
-> +			goto err_free_srv;
-> +		}
-> +
-> +		srv->trans = trans;
-> +		srv->srv_id = i;
-> +		trans->trb_srv[i] = srv;
-> +
-> +		init_waitqueue_head(&srv->trb_waitq);
-> +		for (j = 0; j < NR_CLDMA; j++)
-> +			INIT_LIST_HEAD(&srv->srv_q_list[j]);
-> +	}
-> +
-> +	for (i = 0; i < NR_CLDMA; i++)
-> +		for (j = 0; j < HW_QUE_NUM; j++) {
-> +			if (trans->srv_cfg[i][j] < 0 ||
-> +			    trans->srv_cfg[i][j] >= trans->trb_srv_num)
-> +				trans->srv_cfg[i][j] = 0;
-> +			srv_que = devm_kzalloc(trans->mdev->dev, sizeof(*srv_que), GFP_KERNEL);
-> +			if (!srv_que) {
-> +				ret = -ENOMEM;
-> +				goto err_free_srv_que;
-> +			}
-> +			srv_que->hif_id = i;
-> +			srv_que->qno = j;
-> +			list_add_tail(&srv_que->list,
-> +				      &trans->trb_srv[trans->srv_cfg[i][j]]->srv_q_list[i]);
-> +		}
-> +
-> +	for (i = 0; i < trans->trb_srv_num; i++) {
-> +		trans->trb_srv[i]->trb_thread = kthread_run(mtk_ctrl_trb_thread, trans->trb_srv[i],
-> +							    "mtk_trb_srv%d_%s", i,
-> +							    trans->mdev->dev_str);
-> +		if (IS_ERR(trans->trb_srv[i]->trb_thread)) {
-> +			ret = PTR_ERR(trans->trb_srv[i]->trb_thread);
-> +			trans->trb_srv[i]->trb_thread = NULL;
-> +			goto err_stop_kthread;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +err_stop_kthread:
-> +	while (--i >= 0)
-> +		kthread_stop(trans->trb_srv[i]->trb_thread);
-> +err_free_srv_que:
-> +	for (i = 0; i < trans->trb_srv_num; i++) {
-> +		for (j = 0; j < NR_CLDMA; j++) {
-> +			struct srv_que *next_srv_que;
-> +
-> +			list_for_each_entry_safe(srv_que, next_srv_que,
-> +						 &trans->trb_srv[i]->srv_q_list[j], list) {
-> +				list_del(&srv_que->list);
-> +				devm_kfree(trans->mdev->dev, srv_que);
-
-It is unusual to see devm_kfree(). Why is it needed?
-
-> +static unsigned int ctrl_port_chl_mtu;
-
-Is this a global variable? Why is it not part of priv?
-
-> +module_param(ctrl_port_chl_mtu, uint, 0644);
-> +MODULE_PARM_DESC(ctrl_port_chl_mtu, "This is used to config the ctrl port mtu!\n");
-
-Ah. No modules parameters please. If this is an MTU, why not use the
-normal networking interfaces to set the MTU?
-
-	Andrew
+Best regards,
+-- 
+David Heidelberg <david@ixit.cz>
 
