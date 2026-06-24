@@ -1,168 +1,319 @@
-Return-Path: <netdev+bounces-301673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301674-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RziTBpnmO2pTfAgAu9opvQ
-	(envelope-from <netdev+bounces-301673-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:15:53 +0200
+	id ngYMAGnoO2rAfAgAu9opvQ
+	(envelope-from <netdev+bounces-301674-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:23:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA45A6BF039
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:15:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8422C6BF11C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:23:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b="iztr/RQI";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301673-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301673-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=huawei.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=CK1QgHuI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301674-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301674-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 42CB130B4483
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:14:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1010D3011EAB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EA33BF692;
-	Wed, 24 Jun 2026 14:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B783A3C3438;
+	Wed, 24 Jun 2026 14:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4DF3BD646;
-	Wed, 24 Jun 2026 14:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB5A3C198A
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 14:23:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782310427; cv=none; b=Gu0XryKjRG8+CMT2DAQvyugepRtbZACq5jEW3sW+L3hnP5ZU2Uu8xNLAJj9p7l88eVhk/rAu0IGJWTo4nGxsYLs9X9EETh7JD2E1/gbavkwJKB9aL8NnMn+dKl/yeEK643EgVkFetX+DXdkp6SsCBORMl6vYMilSSRp4TsKp+Eo=
+	t=1782311011; cv=none; b=Yl5t/IVcTqQQLy7ODK6wb6Y3Zy8OJLIBaamiDBanDHhLVwiic1qRCfQKGSlSxUrqSNOUAY4uiEUjqN1g/BmKb/Ec/ZSsRYBEe2v2AGWip00lVDjnw/WfNqlE/Xifls/j1cMOi9e2kZ4fWX+ZuQgQ+pSrhEtXRySELIo9bmhufPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782310427; c=relaxed/simple;
-	bh=ecq8X27WUlcD6CGRnsnN8jdbbG08c6CgSG1Tge++SGE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=if1YjV7HTsDwzwkhLpZJHO+K/BjI7QsG0szCHvD031b7zHGvPDIs1MIbUV5oL+PumJAFRj+Qbc4OCDoAGkeNEXbz0JKgQV7ORWqb+vcF6SblLUwvRbOKCDXbuVZKBTZGSC2Er/NLELEZOl4dgkDoZ1JwBCso1k2g2gX3NLWs7iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=iztr/RQI; arc=none smtp.client-ip=113.46.200.216
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=ZwA/s/5XnySdVCJVedrFV2NNFQgsq8LvqPgYCIvpi5I=;
-	b=iztr/RQIQLS+0x9TfRIdmmhmQHL0mSXhFKKOup3o42hRJG/6tfvqSwwMJc93T5QMYKiMA/rPr
-	8nEiDMbys+CB2SkVqW2aVgpXoQefmzcJrmkoXaUQ5gXb0NNbyfKDFkFTTjeCsy3vFeiI6RBlC12
-	C/gOynVbBx6F+tOjAq3PTRo=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4glkGM5B4yz1T4G8;
-	Wed, 24 Jun 2026 22:04:59 +0800 (CST)
-Received: from kwepemo500018.china.huawei.com (unknown [7.202.195.199])
-	by mail.maildlp.com (Postfix) with ESMTPS id CE9E140561;
-	Wed, 24 Jun 2026 22:13:40 +0800 (CST)
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemo500018.china.huawei.com (7.202.195.199) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 24 Jun 2026 22:13:40 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
-	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V2 net 4/4] net: hns3: differentiate autoneg default values between copper and fiber
-Date: Wed, 24 Jun 2026 22:13:19 +0800
-Message-ID: <20260624141319.271439-5-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260624141319.271439-1-shaojijie@huawei.com>
-References: <20260624141319.271439-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1782311011; c=relaxed/simple;
+	bh=ANcnDbJl1GrE6afhpUmaNktn53Zw0TE+IUnQR7Lyflk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UZe0F+CEM0Y+FcHXOnXA1y8Bbjw1BQRnTBQ77X5SUt5miWe/2UFu2z+MZboMk9NsMLfCO8JYbth9xgUrgBIB0+X1MdKy5UxIITLZ8XQBU61SIV+Opda4BLb4fxPsL1CrVGS24uiXZGJmabfAgXc4KMNnRswyqq5TgSsSO9nX0iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CK1QgHuI; arc=none smtp.client-ip=209.85.221.47
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-46cdcec58c2so213773f8f.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782311007; x=1782915807; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Per6MI6n5CBZ4jce2Yah0coKW3mXxHCaIKwWKmwmsgQ=;
+        b=CK1QgHuIU3L+Hoq9eyhLAP/tW60WuHCUI7tfWelD/UEnl2Wy0NhsVkfh8AA22XEOA2
+         hDg0I3Qw0c8thCpYKIRQF2GB97/jDtHq3N7sH/zC33OPWPVMkUtDc/wZajKMWaLEVhh+
+         9ZNJdTbT7ze+PrqZ/wGdLFb1rAwCCMVFvHdTBfoD6HTQegbltGhdwjkQ+PvECoQiudJB
+         SKRNGqOXEB2kF2ZVf2qCX1biZAaWtJawZh0E366EpIQ4SAIrWsXVO2ZBPpaWDzupv+RC
+         TaMQybC2UB1JHLVfYACnBxKWlff5n5TZv8mwnhHgObgWNzrtct1UvpEaaP+EMi+/wDnr
+         NuMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782311007; x=1782915807;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Per6MI6n5CBZ4jce2Yah0coKW3mXxHCaIKwWKmwmsgQ=;
+        b=nGVTQxuM/DdFh2RbzHXIIPciyqRx/Ru522+uziFrMoqtoIsRq0gI3t+wewnv5HMUfa
+         M3w5Qpms3dSyRRASLcFb8M75CoOq/eY5UPMvNAA/NUTGo3FWCv0/ZnF9Vyu9hDfj55iO
+         bCZPh/A+XxmyL9qB/wGsbGPNxjlFb49dySQo4PutcBOyZKY2C9xqCgS3/tw/IksvAcLG
+         XSpoS4pecgAtHIOxmZoF72ifknyx/JssuwEBI+17a8G/B3eyinLo8NzkFNAK1RLGHZoF
+         4+twUVaMBRxKDnEbBBCF+48Ibe9N2Nfsxw39z7jCouEqyLhfuuaL9/7cLtTnXRZrJPiu
+         ZsVA==
+X-Forwarded-Encrypted: i=1; AHgh+RoF24+9JoHvsXgODNAoivMdi2EATV1pefgSQuPzAYr/mkvO3M11YttzHB9dMYPi1wlFFztFkyA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPumjPtTZjFSbkaAUP3BswmAcKCoBdmSQFRWgwjFDdTzC6IZm+
+	kckN16SugO6GEYeChRsfrJaVHvjTbpjl2djuz7ly7b/6ETcd9FMm0tBD
+X-Gm-Gg: AfdE7cnC2fFSNkEcMctyI+MZ85j+3iZ3ER5DsYvIzNmeRDbIZpvX7V1trGk6W1UKVLs
+	HVqEyvIyVjId3usLCa4HtVTG652+K2j8uBUUSKgZUlzccL6YwWPPLtGz5hshQW/NkNNNfy35uKh
+	2MySMTukcJV9YE9XDpJ3eHWhwsJZDWbPvfoDq356NnJdc+e3+ng6uEvMpqqkTPMYRiggwWDCuSM
+	Ncnko7pZYDUXF4UeQpr8vX4S77R2dX1saqzmebwTnQSjSV24G7NV6zOscSnHcahjwfBnxvaaNRW
+	1YoeR3CJ6w/fTpN4Mb2qRCc6mQ36+lGmpIxdlCh7orKPmcRf2pJfos4T4+iQFIsilQMqvQeMDVt
+	keCgKmK15VwdUs9WnKQGStSSRFtb8Mcvv3jfq0jDxe6O0dSrzYaHtT9Cu4MOpiz9xZPxNM2sbX8
+	baCrePeKb3J7iFPjIpgkTOF6CC+6UU8tpD9smsU8gYDmF85tU6zw==
+X-Received: by 2002:a05:6000:471a:b0:460:2e53:a6f6 with SMTP id ffacd0b85a97d-46d04583b35mr1261972f8f.12.1782311006854;
+        Wed, 24 Jun 2026 07:23:26 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c221d9405sm8183744f8f.22.2026.06.24.07.23.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 07:23:26 -0700 (PDT)
+Date: Wed, 24 Jun 2026 15:23:24 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Kaitao Cheng <kaitao.cheng@linux.dev>, Andrew Morton
+ <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, Jens
+ Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
+ <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Juri Lelli
+ <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, Paul
+ Moore <paul@paul-moore.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, David Howells
+ <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
+ <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>, Philipp
+ Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ kexec@lists.infradead.org, live-patching@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
+ linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
+ llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
+Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
+Message-ID: <20260624152324.3def88ce@pumpkin>
+In-Reply-To: <cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+	<20260622040533.29824-2-kaitao.cheng@linux.dev>
+	<20260622094242.64531b9a@pumpkin>
+	<351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
+	<cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemo500018.china.huawei.com (7.202.195.199)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301673-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301674-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:christian.koenig@amd.com,m:kaitao.cheng@linux.dev,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:linux-tra
+ ce-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[52];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime,h-partners.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,linux.dev:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA45A6BF039
+X-Rspamd-Queue-Id: 8422C6BF11C
 
-From: Shuaisong Yang <yangshuaisong@h-partners.com>
+On Wed, 24 Jun 2026 15:23:47 +0200
+Christian K=C3=B6nig <christian.koenig@amd.com> wrote:
 
-Fix a link loss issue during driver initialization on optical ports
-connected to forced-mode (non-autoneg) remote switches.
+> On 6/24/26 15:14, Kaitao Cheng wrote:
+> >=20
+> >=20
+> > =E5=9C=A8 2026/6/22 16:42, David Laight =E5=86=99=E9=81=93: =20
+> >> On Mon, 22 Jun 2026 12:05:31 +0800
+> >> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+> >> =20
+> >>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+> >>>
+> >>> The list_for_each*_safe() helpers are used when the loop body may
+> >>> remove the current entry.  Their API exposes the temporary cursor at
+> >>> every call site, even though most users only need it for the iterator
+> >>> implementation and never reference it in the loop body.
+> >>>
+> >>> Add *_mutable() variants for list and hlist iteration.  The new helpe=
+rs
+> >>> support both forms: callers may keep passing an explicit temporary cu=
+rsor
+> >>> when they need to inspect or reset it, or omit it and let the helper =
+use
+> >>> a unique internal cursor. =20
+> >>
+> >> I'm not really sure 'mutable' means anything either.
+> >> It is possible to make it valid for the loop body (or even other threa=
+ds)
+> >> to delete arbitrary list items - but that needs significant extra over=
+heads.
+> >>
+> >> It might be worth doing something that doesn't need the extra variable,
+> >> but there is little point doing all the churn just to rename things.
+> >> =20
+> >>>
+> >>> This makes call sites that only mutate the list through the current e=
+ntry
+> >>> less noisy, while keeping the existing *_safe() helpers available for
+> >>> compatibility.
+> >>>
+> >>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+> >>> ---
+> >>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++----=
+--
+> >>>  1 file changed, 231 insertions(+), 38 deletions(-)
+> >>>
+> >>> diff --git a/include/linux/list.h b/include/linux/list.h
+> >>> index 09d979976b3b..1081def7cea9 100644
+> >>> --- a/include/linux/list.h
+> >>> +++ b/include/linux/list.h
+> >>> @@ -7,6 +7,7 @@
+> >>>  #include <linux/stddef.h>
+> >>>  #include <linux/poison.h>
+> >>>  #include <linux/const.h>
+> >>> +#include <linux/args.h>
+> >>> =20
+> >>>  #include <asm/barrier.h>
+> >>> =20
+> >>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct=
+ list_head *list,
+> >>>  #define list_for_each_prev(pos, head) \
+> >>>  	for (pos =3D (head)->prev; !list_is_head(pos, (head)); pos =3D pos-=
+>prev)
+> >>> =20
+> >>> -/**
+> >>> - * list_for_each_safe - iterate over a list safe against removal of =
+list entry
+> >>> - * @pos:	the &struct list_head to use as a loop cursor.
+> >>> - * @n:		another &struct list_head to use as temporary storage
+> >>> - * @head:	the head for your list.
+> >>> +/*
+> >>> + * list_for_each_safe is an old interface, use list_for_each_mutable=
+ instead.
+> >>>   */
+> >>>  #define list_for_each_safe(pos, n, head) \
+> >>>  	for (pos =3D (head)->next, n =3D pos->next; \
+> >>>  	     !list_is_head(pos, (head)); \
+> >>>  	     pos =3D n, n =3D pos->next)
+> >>> =20
+> >>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
+> >>> +	for (typeof(pos) tmp =3D (pos =3D (head)->next)->next;		\ =20
+> >>
+> >> Use auto
+> >> =20
+> >>> +	     !list_is_head(pos, (head));				\
+> >>> +	     pos =3D tmp, tmp =3D pos->next)
+> >>> +
+> >>> +#define __list_for_each_mutable1(pos, head)				\
+> >>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
+> >>> +
+> >>> +#define __list_for_each_mutable2(pos, next, head)			\
+> >>> +	list_for_each_safe(pos, next, head)
+> >>> +
+> >>>  /**
+> >>> - * list_for_each_prev_safe - iterate over a list backwards safe agai=
+nst removal of list entry
+> >>> + * list_for_each_mutable - iterate over a list safe against entry re=
+moval
+> >>>   * @pos:	the &struct list_head to use as a loop cursor.
+> >>> - * @n:		another &struct list_head to use as temporary storage
+> >>> - * @head:	the head for your list.
+> >>> + * @...:	either (head) or (next, head)
+> >>> + *
+> >>> + * next:	another &struct list_head to use as optional temporary stor=
+age.
+> >>> + *		The temporary cursor is internal unless explicitly supplied by
+> >>> + *		the caller.
+> >>> + * head:	the head for your list.
+> >>> + */
+> >>> +#define list_for_each_mutable(pos, ...)					\
+> >>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
+> >>> +		(pos, __VA_ARGS__) =20
+> >>
+> >> The variable argument count logic really just slows down compilation.
+> >> Maybe there aren't enough copies of this code to make that significant.
+> >> But just because you can do it doesn't mean it is a gooD idea.
+> >> I'm also not sure it really adds anything to the readability.
+> >>
+> >> And, it you are going to make the middle argument optional there is
+> >> no need to change the macro name. =20
+> >=20
+> > Christian K=C3=B6nig and Jani Nikula also disagree with the variadic-ar=
+gument
+> > implementation approach. If we abandon that method, it means we will
+> > inevitably need to add some new macros. If mutable is not a good name,
+> > suggestions for better alternatives would be welcome; coming up with a
+> > suitable name is indeed rather tricky. =20
+>=20
+> I don't think you need to add a new macro for the specific use case that =
+people want to modify the next element of the iteration.
+>=20
+> If I remember your numbers correctly that is a really corner case and kee=
+ping using the existing *_safe() macros for that sounds perfectly fine to m=
+e.
 
-Previously, during driver probe or initialization, hclge_configure()
-blindly hardcoded hdev->hw.mac.req_autoneg to AUTONEG_ENABLE for all
-media types. While this is necessary for copper (BASE-T) ports to
-establish a link, many high-speed optical (fiber) ports in data
-centers are connected to switches running in forced mode (fixed speed,
-autoneg disabled). Forcing autoneg on these optical ports during
-initialization causes a permanent link failure since the remote end
-refuses to respond to autoneg pulses.
+IIRC currently you have a choice of either:
+	define               Item that can't be deleted
+	list_for_each()	     The current item.
+	list_for_each_safe() The next item.
+There is also likely to be code that updates the variables to allow
+for other scenarios.
 
-Fix this by implementing media-type differentiated initialization in
-hclge_init_ae_dev(). Copper ports continue to default to
-AUTONEG_ENABLE, while optical ports strictly inherit the preset
-autoneg status pre-configured by the firmware (hdev->hw.mac.autoneg),
-preserving native compatibility with forced-mode network environments.
+Note that if increase a reference count and release a lock then list_for_ea=
+ch()
+is likely safer than list_for_each_safe() :-)
 
-Fixes: 05eb60e9648c ("net: hns3: using user configure after hardware reset")
-Signed-off-by: Shuaisong Yang <yangshuaisong@h-partners.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
-Changes in V2:
-- Fix a link-loss regression on fiber ports in forced mode where the
-  helper would configure hardware with the static default_speed instead
-  of the firmware-probed SFP speed, by synchronizing req_speed from
-  mac.speed when req_autoneg is overridden to AUTONEG_DISABLE.
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+list.h has 9 variants of the 'safe' loop.
+The bloat of another 9 is getting excessive.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index d176100d3e4c..fc8587c80813 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -9498,6 +9498,13 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
- 	if (ret)
- 		goto err_ptp_uninit;
- 
-+	if (hdev->hw.mac.media_type != HNAE3_MEDIA_TYPE_COPPER) {
-+		hdev->hw.mac.req_autoneg = hdev->hw.mac.autoneg;
-+		if (hdev->hw.mac.autoneg == AUTONEG_DISABLE &&
-+		    hdev->hw.mac.speed != SPEED_UNKNOWN)
-+			hdev->hw.mac.req_speed = hdev->hw.mac.speed;
-+	}
-+
- 	ret = hclge_set_autoneg_speed_dup(hdev);
- 	if (ret) {
- 		dev_err(&pdev->dev,
--- 
-2.33.0
+It has to be said that this is one of my least favourite type of list...
+
+	David
+
+>=20
+> Regards,
+> Christian.
 
 
