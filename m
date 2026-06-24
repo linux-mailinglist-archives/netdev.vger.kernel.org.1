@@ -1,314 +1,218 @@
-Return-Path: <netdev+bounces-301662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301663-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zqbACynfO2oceggAu9opvQ
-	(envelope-from <netdev+bounces-301662-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:44:09 +0200
+	id wRQMBjngO2pneggAu9opvQ
+	(envelope-from <netdev+bounces-301663-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:48:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80DC76BEC3E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:44:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 631036BECFF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:48:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ygf5Rpgo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301662-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301662-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=bEDtwo9z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301663-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301663-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 473DC304224E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:42:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4017430F2AB8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E425B3B42E4;
-	Wed, 24 Jun 2026 13:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7213B8130;
+	Wed, 24 Jun 2026 13:45:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012058.outbound.protection.outlook.com [52.101.48.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D692D0610
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 13:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C722DC350;
+	Wed, 24 Jun 2026 13:45:01 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782308563; cv=pass; b=sIsoPy4cKkIWuC1fGpw+7IHeGs83CEhsV5jkE7bSzpQIIDuoEGbBGSO76ynTjUE9zL58cvJjilZy3d/K7DeJ/OkOJE6MvvtH28ax/pJ529Y4Vyn/6hTiW3bp7drHY5Z6NMK5n03po1cc7MYJZU7VdR3cIFl95yiDDhOlW/4PjNc=
+	t=1782308702; cv=fail; b=Msu09aOeNpWWT1B8/1OLxCzoAQ7Tgam8B2syVtA4jf/k20VqWkn2XRVh//YIdKzg/Ooj3j8JN8Eo/vgGN8Ci71J3DsQyrtsIyd168jyaZY19YPEP87vcAJXPaT61/7ZVg/iWsCu7TE8NtzLt1BmOO/KueKnxcduaRbJWIxXAg0Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782308563; c=relaxed/simple;
-	bh=LRa5uC5sIo9ynceTk6iTbiYtdqTMv3fNyLerQsA4938=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WOnWfXOIG/q1BcQ9SQO6mU3TU5ASE3NXYRHPy64CZVb/6kKpDTW0I5pAhbIo51NsVmdgs7kjl4DCEkXKvrQL8PEr1YVs/mg/doq6pkpqy7Kys4dV0on6d6yVhChEGrYr+tAkHtGCZG3GmgXN1FPLWiU3OXt0zE86QxQ1OClcV+w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ygf5Rpgo; arc=pass smtp.client-ip=209.85.217.46
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-7269038ad05so783147137.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 06:42:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782308561; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gLPQl2f7yYaEX5vvJ/EL6AVFPmp5570e0FE3C7wb3mOW8AhaVP6zoNdlJNMYpoYx/i
-         FFMNyYrGAy2pZeB5wmUI3SipWK0h25MfsgaiSNQzPTnmCNF7sYBp28/iap5vOBpaSWau
-         eZWWxDLkFYaoICrgqzTvnKRlWpRtLrdV48Z1mrbZd0mjWngMDwOoeWOnimYFaqS581BU
-         Gzot2/2Ztwf1Dnio6yrNrZ2s1qc/TBXbkELTff073VjePS8jFwxAE32w03klsHlYX5eW
-         WxYa6Fre7TlCJhEZ+mTUPt6Rb28Uf1iLiSSE9Aj/Hb55InyUk1RbyCYvRbRxr5lSeli7
-         VvZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=76HR+eklWXgxHfzHdvnF6rFuKIHz69/Ic5PuGGNLF0I=;
-        fh=jvpvPN+ombvKZ1uV/HgKozGtEzZu+sFam2RsqBn+C+c=;
-        b=EbKlF0V2XJfXAW2G2MjetR+7JGW+j5brYSgUk26J5k6YZh3r3l6UMBJtt61+FQg+jb
-         739+WMcHRD8NfZ8Aa/IfNsDsFOhxq693U8va6NwOUIm2WKz5tDQHPJYY4tqHCyp5SPMv
-         6IYwdQ51/R6KSnR9Nhoe0LTVbAR63pbVFyaZlASDNpNCpSJ07rnOGxswwmab6cHKkuXu
-         Ss9rS0z6zCtgpBo1vxsREOV+GiEacwtNUOALLufwEOZrOw8xqVNmB7UuuvIiYdV/0tqL
-         4H/JXEZJTirqCfK8z0kVQeY/HRorQK/ssTE3PclQ2eXNz2W2DKYJ5+hUnPOK+dXxdT17
-         OGHw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782308561; x=1782913361; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=76HR+eklWXgxHfzHdvnF6rFuKIHz69/Ic5PuGGNLF0I=;
-        b=Ygf5Rpgo5WvWn1y3CTWUR++ei0/g2bSsHwGZ85l5RSMdsdAaqUT382u7jQvnUEwXML
-         keqUr7lk7kPlDW215iRyCJYNyPwsJDPJxyp0C0RqhIMciW27hHHixxXzSwSk/iX0CgoL
-         8p8KTDM9yNmaUGRfqok27xz3fnQZttdY2vTjbmlzZDvPse616GuW947jbElA15R39Ac0
-         cjOaJ89J69uV7D8XnjHJamJRxYFiBwY5jaXbPDlHgVsTna+CTmhoGi9yxcrW+bNeWv1J
-         txMNCPAxYJeAMOwoz8Q9jeGvUAtLQioN1Wjgcom7IpZv97bnkxWyGo/i0LWQLRM/Odwr
-         9IRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782308561; x=1782913361;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=76HR+eklWXgxHfzHdvnF6rFuKIHz69/Ic5PuGGNLF0I=;
-        b=X5ud1R0qQ6ZOmBfe4AXyLagmQBtTD43q/6eM5KuwdKVGpF52DebRG/9GKeLAh89Og4
-         HI9vRHrJkMeLLWG54Ix2UgqBQwFwqjgPg+ym74kD5c4sAgwY4x0AvpX5PML1/Vza5E7C
-         NM+HrA6NzJtMD/G2FGr+8NoGfyBt4WZ7cJeOMAyWaiIme3XCL/qDd107LGNtlIjX/jrO
-         y1hNQZUqH9Kt0kdiNF2XYQ6g6+XN1LyLvhfw8L2rXc36xtTkMvwN86yFt2zzFqzEncOD
-         vR7K1AsZnc+yBkqkXuCd6enq1iRmvtG5W7CgpHyZygESU+2L1131ozPHWU+ZI6mW9xiV
-         3hVQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqFl4tXYrMHUoT3j0me4a/3UM2fUC37MqHou/zxwGNIA1U6lSyout/KM5ZM50Ic0UBtW1+LjUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZU8cTqxGIzw7sz/9qPwCErVKruMvlA+UQmNitQIOzxCGrDLyP
-	bdSOfsVz3Y5rmk0gCz49atEyuBsN7E0RzPe5V7u4XBxstuu+njhTMs7HHK7erxqWAA8wdYCPp7Y
-	ZbzvC0+lO4tMCuvVvOQUEzV6eT6lph6k=
-X-Gm-Gg: AfdE7cmR+dMduB3u9upAgTrbheZvbSZm+xTfy6iQ6ZvQna3v/1TjzotoNgDAzfrSJWy
-	Vrc+r0TmRoZN513RbIdyelDbQdWZYgtxH4L6RM48R6rBL3KDcbsfkeNhM8wmtjjQGsh1oJvpTc1
-	2kwefV092SIV+QTHVZrI8codxuG6LS5AXdvoz0x4+54z3ZUV8aZZIf6ho1CI5LvGlHFhPmOf307
-	uMPe4GeSf6vCS6TlQ6Scp2I35RIntIelafbNjisRrXYn7C2vKoek9XlIAEvuEQg7C0lf6fr8g==
-X-Received: by 2002:a05:6102:374a:b0:728:89af:8ecf with SMTP id
- ada2fe7eead31-731133ccfb4mr1528605137.7.1782308561343; Wed, 24 Jun 2026
- 06:42:41 -0700 (PDT)
+	s=arc-20240116; t=1782308702; c=relaxed/simple;
+	bh=LgWSj0p/zzENec3beqLPjz5NlhmApjDXBhBbqoPLR3s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=afA30ZJB+nXDfkErHI0P+ECKFc4g1UcRoVCBqTxRmCRvMb6T+ynBqGG84qdxVuAjk+3gn3KmJxUjL2XLmEskeEIIa0VqSi+1oyrWKZFol4A+1N5rbuDd/OrSavkMeVWZxdq9hWjVKSW2rpyefmLNVWTCihELUoOlfHXlvE1j2hM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bEDtwo9z; arc=fail smtp.client-ip=52.101.48.58
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ikZvFUFtQkyNUsccI5yOjuFK/JNIxwXpeZyfqgqaFDsCntpzL4pbbreJkXmMyKtCAm10drTGlj5rRNTqG9zF/BAZEKObvYXawm3YOIYxKR5qy2ZAkHImGWcYaRmRpPeTkIJyxA1Jo1f3wBiuH9G5WaFPaqOynMO4V8TBYwSMcZw3Kx6rh4+zOJTMblWIUR0c0Dndi9wDELSxgxNqDMU6lKqezV+2TikC7dEgBFsIPRdqw6dhD9Rg1VIsuPZsG9kxR05KNArRQzN8AivuPdcDWIeVz7SIb1rsQn8+wxYULtDfiqJRahdzblXCpmNpAmxje9Sq59OynHgpi1TZac4Ufg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hD9qE+jv6NT5diyP31Vqbex0XMnCLhH7EoclC6175WA=;
+ b=oLDkH24LvjhJXlsR/BLYWWbiVwS55aL9ZcdcQNwVYgRzV4gPZ9o60QS/3+1X7JSZU6LpYBGv3vIHaUltKR8u0v8U5HKvOsPb573ZHu0bc7NybuccAGj3NJ+E7XpAgVB6X11cvyY2ncE/JhCkHlqkLhjQddw7pZQt6B57aMHMXx1aSNv9Llu5ZbI7c7dtu77Pc/eIh++PbWGMYc1uLejAAd5NVlycS3xohCIJ+ioSi0wVklzDqR7RTReO/eSqCkSWa3LTKlXpnD9J9PRPQgOozlDgrnujfUDRcYe79ooBU93VNKDjq9AKTh83E0F2oaNVbXNCq07TyTKl33rGo9+kqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hD9qE+jv6NT5diyP31Vqbex0XMnCLhH7EoclC6175WA=;
+ b=bEDtwo9z5ds+HSxXN26EPsGKFAJeyp1t42CBTjUykm3fSiG/TxAPAXDe+0mUVY2Q92U9EecmzUhAM2k3haG3KOnvmwR8sE9sGQvFnz2Dy7QYcHofGMpqbZMFa73StfoMVJF4WKlweoyDRvzheu0XTy4pUyElMc97tqFa4uYFjhbG/g3N/TrH/zdDo6//u0O3A9q0iWrGwc9p/+Mgt+IBtv6cno2XPtZNE74Op9qlHftJjlV8dmtzsNcrjCPNkUzJG5KycJYhqb85bV4qSpJaLI2UtJZupv7zghrSpANaNCPja1bfCUDg/DFLm8qhbv+zer2nDHTc2+Mlt1MvggD/Dw==
+Received: from BN9PR03CA0045.namprd03.prod.outlook.com (2603:10b6:408:fb::20)
+ by DS5PPFA33D606F8.namprd12.prod.outlook.com (2603:10b6:f:fc00::65b) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.20; Wed, 24 Jun
+ 2026 13:44:56 +0000
+Received: from MN1PEPF0000ECD6.namprd02.prod.outlook.com
+ (2603:10b6:408:fb:cafe::29) by BN9PR03CA0045.outlook.office365.com
+ (2603:10b6:408:fb::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.159.14 via Frontend Transport; Wed,
+ 24 Jun 2026 13:44:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000ECD6.mail.protection.outlook.com (10.167.242.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.159.10 via Frontend Transport; Wed, 24 Jun 2026 13:44:56 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 24 Jun
+ 2026 06:44:30 -0700
+Received: from 82875d6-lcedt.nvidia.com (10.126.230.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Wed, 24 Jun 2026 06:44:30 -0700
+From: Nirmoy Das <nirmoyd@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
+	John Fastabend <john.fastabend@gmail.com>
+CC: Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Nirmoy Das <nirmoyd@nvidia.com>
+Subject: [PATCH net-next v2] selftests: tls: size splice_short pipe by page size
+Date: Wed, 24 Jun 2026 06:44:16 -0700
+Message-ID: <20260624134416.3235403-1-nirmoyd@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624090135.95763-1-samsun1006219@gmail.com> <CANn89iKD=4_A+7K2erw5AZPnzvBrQqTKXJyfKN5ZfNpAYZ+y3A@mail.gmail.com>
-In-Reply-To: <CANn89iKD=4_A+7K2erw5AZPnzvBrQqTKXJyfKN5ZfNpAYZ+y3A@mail.gmail.com>
-From: Sam Sun <samsun1006219@gmail.com>
-Date: Wed, 24 Jun 2026 21:42:29 +0800
-X-Gm-Features: AVVi8CdKIbid9l84CuIX2M2sbKaTZu1s3rgvykGU04lBKY0GztB0qoQu0wfAI9A
-Message-ID: <CAEkJfYN4Uep_WEzZyaDGkW5p4rW+oVRqq2DgBt2xiYp9ARt0GA@mail.gmail.com>
-Subject: Re: [BUG] KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD6:EE_|DS5PPFA33D606F8:EE_
+X-MS-Office365-Filtering-Correlation-Id: 259b76ad-f5c4-42f6-edd6-08ded1f6c70e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|36860700016|82310400026|376014|18002099003|6133799003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	OOygJeGHQXvqVhHl9Q36RLacIhXA8N9YBrtBjj2KlIm/htRKz0uZ6tbL9cbxF82NZRQCTUef8bzGGrD9QPmuJRaNOFkBPi2lfpbI6l7u/cJT3QTE4VF8l8pa3tEtcNle/AWjmJDkyVHyjMiC+yfJ2m3xFGcCA2DfV1xGkVCoRhCVtPPUp3rl0lHWIztXkj2Rqh8InmI7phG7PusfAXi4jbpBAF1afVKVbIBicNrM9JzK3YseEpd5+0LwRzw3Zr1shPVkXQCozBHRLSHuf1r5nMIntLsM1qAbvnSreNpQCTxGlK1wRrY6Iteb2h64BsabzoaGw4M1hQEMH+orzdnXK/QYBfFbzQhUyoZH39biGT6mG4g7tXbOJKW6z3CNdgYVQNxO5YWN6n6eP+ZMwkE14TupApwoTgHmjZKkeWOYZ/+iXTmiVO5boehXIXnp62s6Y6syC+HHqjMLenDyofBaw3135bbhLMNshI/6uFK1g7Yc/Uld23LFRvzlKDi8QRHYDXxBcJ1kvqt72qrQqVJM79wMLAea83i92p5innNSzl6dncLolinSCQckTKGl1soohEvMyS0dpx7B0f4rnzZ+exLug1HWE+TEMXbG0Hz78/qVPI0sDfrpTJS/0czVSDiXcMPKoIwkRmDkt12VyeNi7qhaB1JNDoN5mqRY+TFddK14hUslo7qO3kzwjspcy8Drp5x3xIltyxArvEXAryIg8A==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(36860700016)(82310400026)(376014)(18002099003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	c21a9Uanxj9TXlXqwoI3J4UM+vUHsLAqT5xmZwvbWV3+6Uwnzb14OC2W77ZsjGKV6hrEkQA0eFs8G5vdvh+k3wOnyHXO7lfKkucpb9NPLEZBOfSVL1sT1z1Ac4G6F0RGCK5axjiA5Hq7LQqEtuhWfwKIeO7XqKVdMrWhraZeyLcahovQ8dbQWlN2QPYgGIYghYRYZfcrR7ZSUM9n3GD3TaQkFt6o9PBfJw5gUWkD7+TjyUGhmhU/50uJyu6THx1Kqmko/SI8iFrOVFHx8vM14my0lO9qCb9hX83Ntc4CZt7aJ4oXvGfznzrIxTwtyIgKO5i3ve98CeNKTnzr2GTBqXcPqa2WiMEqO3wXdlIgL0Kj2zNBTFF67sDT654KcX9u2H2x5tk98D7R5d86FGOAlieRIWBg6Nk32HYi9X3NaAxnnQhWXwXkHJOLewnWDzRU
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2026 13:44:56.3109
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 259b76ad-f5c4-42f6-edd6-08ded1f6c70e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD6.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPFA33D606F8
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301662-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzkaller@googlegroups.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[samsun1006219@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[samsun1006219@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[nirmoyd@nvidia.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:sd@queasysnail.net,m:john.fastabend@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nirmoyd@nvidia.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,queasysnail.net,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301663-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nirmoyd@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 80DC76BEC3E
+X-Rspamd-Queue-Id: 631036BECFF
 
-On Wed, Jun 24, 2026 at 6:01=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Jun 24, 2026 at 2:01=E2=80=AFAM Yue Sun <samsun1006219@gmail.com>=
- wrote:
-> >
-> > Hello,
-> >
-> > I hit a reproducible use-after-free in the UDP tunnel NIC offload work =
-item.
-> > The original local crash was reported by KFENCE as:
-> >
-> >   KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
-> >
-> > On current mainline, the C reproducer below triggers the same lifetime =
-bug,
-> > reported by KASAN before KFENCE samples the object:
-> >
-> >   BUG: KASAN: slab-use-after-free in __mutex_lock
-> >   Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_work
-> >
-> > Tested kernel:
-> >
-> >   840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of git://git.linux-nfs.org/p=
-rojects/anna/linux-nfs")
-> >   Linux 7.1.0-11240-g840ef6c78e6a #31 SMP PREEMPT_DYNAMIC
-> >
->
->
-> Thanks or the report.
->
-> Can you test the following patch?
->
-> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-> index 9944ed923ddfd10f9adf6ad788c0740daeaf2adb..c5f8d2f9d325de8f4d2247dda=
-a52e33378851857
-> 100644
-> --- a/net/ipv4/udp_tunnel_nic.c
-> +++ b/net/ipv4/udp_tunnel_nic.c
-> @@ -304,8 +304,8 @@ udp_tunnel_nic_device_sync(struct net_device *dev,
-> struct udp_tunnel_nic *utn)
->         if (!utn->need_sync)
->                 return;
->
-> -       queue_work(udp_tunnel_nic_workqueue, &utn->work);
->         utn->work_pending =3D 1;
-> +       queue_work(udp_tunnel_nic_workqueue, &utn->work);
->  }
->
->  static bool
-> @@ -866,6 +866,11 @@ udp_tunnel_nic_unregister(struct net_device *dev,
-> struct udp_tunnel_nic *utn)
->
->         udp_tunnel_nic_lock(dev);
->
-> +       if (utn->work_pending) {
-> +               udp_tunnel_nic_unlock(dev);
-> +               return;
-> +       }
-> +
->         /* For a shared table remove this dev from the list of sharing de=
-vices
->          * and if there are other devices just detach.
->          */
-> @@ -901,12 +906,6 @@ udp_tunnel_nic_unregister(struct net_device *dev,
-> struct udp_tunnel_nic *utn)
->         udp_tunnel_nic_flush(dev, utn);
->         udp_tunnel_nic_unlock(dev);
->
-> -       /* Wait for the work to be done using the state, netdev core will
-> -        * retry unregister until we give up our reference on this device=
-.
-> -        */
-> -       if (utn->work_pending)
-> -               return;
-> -
->         udp_tunnel_nic_free(utn);
->  release_dev:
->         dev->udp_tunnel_nic =3D NULL;
+splice_short grows its pipe with (MAX_FRAGS + 1) * 0x1000 so it can
+queue one short vmsplice() buffer for each fragment before draining the
+pipe. That assumes 4K pipe buffers.
 
-I tested the patch, but unfortunately the C reproducer still triggers the
-same use-after-free for me.
+On 64K-page kernels the request is rounded to 262144 bytes, which
+provides only four pipe buffers. The fifth one-byte vmsplice() blocks in
+pipe_wait_writable and the test times out before it reaches the TLS path.
 
-Tested on top of:
+Request enough bytes for the same number of pipe buffers using the
+runtime page size, and assert that the kernel granted at least that much.
+If an unprivileged run cannot raise the pipe above the system
+pipe-max-size limit, skip the test because it cannot exercise the
+intended path.
 
-  840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of
-git://git.linux-nfs.org/projects/anna/linux-nfs")
+Fixes: 3667e9b442b9 ("selftests: tls: add test for short splice due to full skmsg")
+Assisted-by: Codex:gpt-5
+Signed-off-by: Nirmoy Das <nirmoyd@nvidia.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v2: Remove redundant ASSERT_GE(ret, 0) (Simon Horman).
 
-I booted the kernel with KASAN/KFENCE enabled and:
+ tools/testing/selftests/net/tls.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-  panic_on_warn=3D1 panic_on_oops=3D1 kfence.sample_interval=3D1
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index 30a236b8e9f73..d805a7dfbdd51 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -997,6 +997,8 @@ TEST_F(tls, splice_short)
+ 	char sendbuf[0x100];
+ 	char sendchar = 'S';
+ 	int pipefds[2];
++	int pipe_sz;
++	int ret;
+ 	int i;
+ 
+ 	sendchar_iov.iov_base = &sendchar;
+@@ -1005,7 +1007,11 @@ TEST_F(tls, splice_short)
+ 	memset(sendbuf, 's', sizeof(sendbuf));
+ 
+ 	ASSERT_GE(pipe2(pipefds, O_NONBLOCK), 0);
+-	ASSERT_GE(fcntl(pipefds[0], F_SETPIPE_SZ, (MAX_FRAGS + 1) * 0x1000), 0);
++	pipe_sz = (MAX_FRAGS + 1) * getpagesize();
++	ret = fcntl(pipefds[0], F_SETPIPE_SZ, pipe_sz);
++	if (ret < 0 && errno == EPERM)
++		SKIP(return, "insufficient pipe capacity");
++	ASSERT_GE(ret, pipe_sz);
+ 
+ 	for (i = 0; i < MAX_FRAGS; i++)
+ 		ASSERT_GE(vmsplice(pipefds[1], &sendchar_iov, 1, 0), 0);
 
-Then I ran the same C reproducer:
+base-commit: 47186409c092cd7dd70350999186c700233e854d
+-- 
+2.43.0
 
-  timeout -k 10 360 /root/repro
-
-The VM panicked after about 236 seconds:
-
-[ 236.471119][ T58] BUG: KASAN: slab-use-after-free in
-__mutex_lock+0x16d0/0x1d80
-[ 236.473404][ T58] Read of size 8 at addr ff11000076a63ea8 by task
-kworker/u16:3/58
-[ 236.476455][ T58] Hardware name: QEMU Standard PC (i440FX + PIIX,
-1996), BIOS 1.15.0-1 04/01/2014
-[ 236.476478][ T58] Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_wo=
-rk
-[ 236.476787][ T58] __mutex_lock+0x16d0/0x1d80
-[ 236.477020][ T58] udp_tunnel_nic_device_sync_work+0x32/0x9c0
-[ 236.477068][ T58] process_one_work+0x9de/0x1bf0
-
-The allocation/free stacks are still the same shape:
-```
-Allocated by task 11563:
-__kmalloc_noprof
-udp_tunnel_nic_netdevice_event+0x12d8/0x1e80
-register_netdevice
-nsim_create
-nsim_dev_reload_up
-devlink_reload
-
-Freed by task 11609:
-kfree
-udp_tunnel_nic_netdevice_event+0xc26/0x1e80
-unregister_netdevice_many_notify
-nsim_destroy
-nsim_dev_reload_down
-devlink_reload
-
-Last potentially related work creation:
-queue_work_on
-__udp_tunnel_nic_del_port+0x2af/0x320
-udp_tunnel_notify_del_rx_port
-__geneve_sock_release.part.0
-geneve_stop
-
-Second to last potentially related work creation:
-queue_work_on
-__udp_tunnel_nic_add_port+0x6ec/0xd70
-udp_tunnel_notify_add_rx_port
-geneve_open
-```
-
-My read of the patch is that it closes the small window where queue_work()
-can publish the work before utn->work_pending is set, and it also prevents
-udp_tunnel_nic_unregister() from flushing/freeing the object when
-work_pending is already set.
-
-However, the test above suggests that work_pending still does not fully
-protect the lifetime of struct udp_tunnel_nic. The crashing work was still
-queued through udp_tunnel_nic_device_sync() at line 308, so the patched pat=
-h
-was exercised. One suspicious point is that udp_tunnel_nic_device_sync_work=
-()
-clears utn->work_pending at the beginning of the worker, while the same wor=
-k
-item can still interact with replay/add/del-port state. The reproducer can
-still end up with udp_tunnel_nic_unregister() freeing utn while a
-udp_tunnel_nic_device_sync_work item later runs and dereferences the freed
-utn->lock.
-
-So this patch does not seem to be sufficient for this reproducer.
-
-Thanks,
-Yue
 
