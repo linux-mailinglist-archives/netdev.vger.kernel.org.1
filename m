@@ -1,333 +1,211 @@
-Return-Path: <netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301614-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MO9XONbiO2omewgAu9opvQ
-	(envelope-from <netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:59:50 +0200
+	id 1Fm4BxO5O2p+bwgAu9opvQ
+	(envelope-from <netdev+bounces-301614-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:01:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62AD36BEE53
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:59:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ADB66BD88D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:01:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=ECZhB04C;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=f3yWLuUB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301614-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301614-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6DC363025F4F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:59:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 222FA304EA0A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5843B95F2;
-	Wed, 24 Jun 2026 13:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271BD314A8E;
+	Wed, 24 Jun 2026 11:01:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0494E3B7B7B
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 13:59:46 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782309588; cv=pass; b=Ae/v/i4L95eeqDgtNGGO3r82ksOUTICm+aJ4ixb3ykd1GJbsWsMrPUM9B4pHKDaPls6Terq4YGHSJei2VW9O0UEq6C7GFZQfQ8xi8xortN9iD4z7JreTIO8UXBkG/nYvoEJYglL9vFxBuvdI/tgknk/KVN3q5ZPDBJyFXw1+T38=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782309588; c=relaxed/simple;
-	bh=V2EUYSdGtW7m3Aw4m6n9WbdlxjOlAz7SU+/a3C1AnzY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ajR+p4YHEoIeMJaWfdZ/0Np6YQRf+tzR/xcbcCXVJccAHaTqWnw91ThPU7IhLPResUXkdIuTaCaAIe/ORydmuxGg2+wVtk/KdWX4v9Hyc1QnLGfuSMATJgNIfgSwgO1eE3brgoLqGXQstYhBnupxcO6TamEmj7znjUHlX4AdaA4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ECZhB04C; arc=pass smtp.client-ip=209.85.160.176
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-517dc520840so9723421cf.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 06:59:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782309586; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FetTSlgSirxcqgXHC5rpcxPiAdGOX6W8zboe7986y0uXuyQSuzr+BS5rukPc9+6np2
-         dQt6dBr27iWYWsQ0NnJtWgUiBuTcw+RJP4/bBQC3GPVykOuTdZ8AQO6gR2Y2rbbJcXLL
-         qUpj20440mLqy9ZJ97U/TQnlcAbELbW0eBha8BLbk6Cmlyhb4qccMPGVb9bxSpzmkIdy
-         IBfBxzKI3X+2IEdoc3JwBs87z/aaP7KDX7X4YAsFP+2s90pzEU1YVyygBWuTfGnRXoNH
-         i2t6+D4BCAIklKU9cs6/8gnWKjb/YRo+YLG4c7AldRVmLyOWDjHpL1ixpPDfzl0qRxGa
-         j9qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=IPjZx587TohMDbgAlzqgaOnK/IpS5K+mfsCogDhtDgk=;
-        fh=22emKQCdCwvaVfmfg07j/HUi64lqp5cAracPlTX+PSo=;
-        b=Gb/M8ZxjhoGrTcZn92a8VPzSQU3DVaJjZ8anR+3FqUPXnsgmYt+Umv3igtYXEENsF9
-         dYdz5aNuMpj5tXCbw17Bt1UAPZ3+hJMx1VXcLRHH+a6P/lrf9cEWT4n+spMs2elKq3Cp
-         3WUb2rHu+JI03lgWrjqcXI6cVvQSYEvIgk47yE1HK2LYXRDUMCBRI4b19VxmXgIjqNNH
-         eVea3za2Wpswxsw0/74onfZM1fwGVVXudyKjbEumTJh/F4ryR3kC24g5/WfjGJBaY2hc
-         fksCdhd2NaxP6EXqItQkopDqX+RaIzFaAWJuldVNfsQWrjfyGEHU2M4tiPnmKYqM/a3Z
-         uUrw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAD92BEFEB
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 11:01:04 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782298867; cv=none; b=cDDVsgfedWtcwDtT7kJH622mV3VWQc2DDlO4mKbZ6AH2w7rVzRMcJinVJuzXnzPgN6KNTlCp9ELqHraxzn4s9OTSPDAcMoaq6AFM2YmKxY96u6iZzo29RKpukWK+aI/JFEsflY/qI645Ipo5pFfiZQjthOwdPqITC1RNCEiHrVY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782298867; c=relaxed/simple;
+	bh=Bg/C650zMhhzCeh8uDt6OlrHOje50P0/4D6oNiD3c+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AGhDriC2Q/gXmn3T3wytNY/oXZodAUfIfwkb2PuA+SGride0QsPXfLaS6u5voovUzP3QXdsiemOgEOviAhQRczyYsyhBuGQN3vEORydK+iMxJXx7GcJVFypksCzgb1rzCCOIxnKjNCyKNy1/8O71wKpMK0koZmJffRkbDmUakXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3yWLuUB; arc=none smtp.client-ip=209.85.167.44
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5ad68b30252so1005159e87.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 04:01:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782309586; x=1782914386; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IPjZx587TohMDbgAlzqgaOnK/IpS5K+mfsCogDhtDgk=;
-        b=ECZhB04C1Le/GUG/id3Csa0Jo3cg/BGPfpPl06qgx90TslehBrAuvT5vO0jVHwFYCi
-         X5vWzI7FK3WD+p/06sozo9turnnCrS5KiuNBmNIAuiDIX3cD2S7WF9lR0mDQPxCRpFDW
-         9SYzTAL43v+oI7qhnsPSNiocEXdC5fU9ZkGU8Uj4qL4M1qXoM8z03XTnl6M3rLvo5lVz
-         HLNMN0OdwFq9T5sfa6E6M6qFUVnLICK5sJHRD7Wce+9F4aPg9JmeMZ2/cYpuVZNP7mgD
-         3U6Bn/OfRZY2//DKGO644bicFSC7dLJqkZOMvBmqUjLBjpfsat1k7gtznCRdpyFzpw1z
-         7/jg==
+        d=gmail.com; s=20251104; t=1782298863; x=1782903663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3pxuVeaMBnszMeRz8ajoDN+MAccCemdt9YS/JX9ZEN0=;
+        b=f3yWLuUBgY0PTcUmu9w6/rRbK+mvr4YY3qFzeHPqT9gOoUZiX0m7TE6mZUyMqJ78eL
+         QbsETAYUcMLs8bdD1WQrGo223rNZm5FI0Cvg/YnZusZ8hNCrOwR3QFuc0y5GSk7qImdQ
+         CBkOzGYHSvIZQi0ZTLdulBLrDSRnbzO1foYoja6SwT5KE75fXGzjTXUyqw+th1U7E06W
+         Moj2BZhAugG6VNL1emjdLkydzCuAcT3AznnxfydKt2T6ngLcLtbg5e6VMEpwfluZe6Gt
+         8tYvDKEYSaaRnC4zKqdIQVS/buk0Z9Kt8NkP6y84ib/LEsrhYBeTRM0Szxllo7Ecubgm
+         1xPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782309586; x=1782914386;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IPjZx587TohMDbgAlzqgaOnK/IpS5K+mfsCogDhtDgk=;
-        b=UN0JTOxKq6XdcwBT1DVG7ctnIEU9MaoxKKRv12kGLg2/23/qBHZsLPnnX6bGR5Qp1H
-         iezdV76c1EUzy4p8Pai5faoMjqY8n94v3CJ9Y8aaMgGU4Y9VtRqVhWer7d2JqXPp6g8j
-         oDsc2rzNn13bhl4s94K9PPLxS3gJBRwQzPv5BAVYrGy4RDYRIAUNZTzwzWpy8GWik6n5
-         np+wgvTapsdOE7LAqkgibFHwD9mynhAxlztFdEBznTWzO2ma8TOnXtrQi8yC5PRIQioe
-         E898x0FRd6cU0t8WS/M0p5VNN5gy7wVOXjZEgXMwRE0XTvNGV8mFLUug7gvhNlKRyeQ6
-         8Mhw==
-X-Forwarded-Encrypted: i=1; AFNElJ8nlPHxY/KjeEyZx+SuaVM/d2Ddte97FpIgim+5kkRUKZo/BaOb8XbTIxafUDR++5j07PR0V6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8rog/rd2aYg/gWHiihJBIahJt2v7n6zHq3dgb8eAS8e8pVBAf
-	L6/KdJaRk9mfhJvQEb2y4ljTboixZSZCM+Ez7mBvBiiozTFABIzKvqAzK0W77ShrqOM+oLvtn8X
-	S3RjvNF4poOw/awFyVYhw6IAK4oxu7S/goigeHz1w
-X-Gm-Gg: AfdE7ckhz0dTVlXFABPvBo9yTowoid+e77BKv6Yv37zH273B+PaVqc5hDeaWmpRqhQF
-	U9/ixsKhU4RGkTWhME7QJ5/XTFxjSZgOLKY6Pkm8uUuqI5HmgvMj8Bsrapp0Lgu9gNzZaxwtlDD
-	OvGixjKgp9Z27b1fa2cnwVG1ChXU2Z5EnLwprgoB8xaT2ZoeedVyC2jRd2xwOxBdmr47DIo0u7x
-	YnwtHUZNF0C8Rl8ux5ubd+ul8votfrFrfkTO/gTy1E5qi3PLGaXWtSGYtYXj8GJEEKZu2E/QAUw
-	pielF2mKkLLy5Vt4fIx8uWl7pHGGS7ecYvMeM3f1rg60iXmMiE1RhOEv5ETPHDU8X+3KxOHF5dj
-	HIzJwzrF+Gw==
-X-Received: by 2002:a05:622a:1101:b0:517:29f6:cee5 with SMTP id
- d75a77b69052e-51a61c70f0dmr50950161cf.49.1782309584831; Wed, 24 Jun 2026
- 06:59:44 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782298863; x=1782903663;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3pxuVeaMBnszMeRz8ajoDN+MAccCemdt9YS/JX9ZEN0=;
+        b=ScJ+yhYBWYPejVWHAATKzbP1t/HjhlkpTczoUVXEm26MfO5Sz0SDVEiu9/pwKAzfpu
+         sct7T4bhGDTT4fdZXeNYvaNLdZExB5F+8eUAV8JYBsbfqGti/jyBghg4aJRgyAvaF7xu
+         sD38aUR3VNMROUM5YGiymNTspJSOBrbo1dnHStafsChYLuKxxM7+e5AYSwH3AbXX8pis
+         NdrlDG4fJtwEN7VB7jnvESRjT0axpDx9iKpD1Ub8ZWm7nZinyrhj4wPNZb4OiXxVDLAS
+         GDU8QqhrNHov0A4kDLOC9GKPtn/BqBusel7ocvgMXgsUlP9H7TBk64PH2gUmVUJMUtOv
+         ylXg==
+X-Forwarded-Encrypted: i=1; AHgh+RrG5ZC7UOYZj0eyuLVCWiPTxw3gm57kqIK61QQUR0dclOAM2qaSf30+OzMXm7cU1G+iy7Ao/sg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIn34YvA5WkCijfEA2BDBx/1Law69kEobudaVFRzGDEI9bz+YU
+	peQfsmZJz9HgRjQRlf6p8pyEYy2k26mMkchO5/kdlCtz15g3zMUFEgbB
+X-Gm-Gg: AfdE7cnMyj4U9briZ8XJg3EuopbDj4dN8WJ/OLZMZUrlVGr5UC6bm3dG27LgOcnHshK
+	PqJXPTiKYB1QLU69wFrcCXL277TzUkeCAblQ6bNKPXihKLwtcCV/ZjJYrbmujIaYUvgh0ji+g8n
+	XpkAf9C9sH25dm/kLoJmrsXM4K0K0USkKSTcKnDmn5UesgpyL9cLML381I0SxM6994JndAfRG4D
+	OseYD3nj7asHRZeRvBfqjVIf5w/uxmYIyqq5mMyFgf8X22sRg4gOH/riTYgujqkZr7q5Q+lA/RL
+	TyToaxVAZqHV+m/o1gnPvvZadwaVm2DCEFPEDZ7iNbinp69XwYKEJ2FzMz+VlWYc302pG/ywUnK
+	rP8Fw6AvZZ5OX7/+v69Gkf7qBbFy5JO+Nxk/20+QMNvJHxhnei3i0k5qLxMxEqtZXGufxK5xWiD
+	4DhVj+3cQiFu8Sz6IFpTZqLWqfgjGPa+A7VvDGC+Y=
+X-Received: by 2002:a05:6512:2c0c:b0:5aa:6d0f:d74e with SMTP id 2adb3069b0e04-5ae9d56fe99mr792437e87.3.1782298862200;
+        Wed, 24 Jun 2026 04:01:02 -0700 (PDT)
+Received: from grower.astra-academy.ru ([185.32.135.49])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad695509dfsm1630422e87.18.2026.06.24.04.00.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 04:01:00 -0700 (PDT)
+From: Alexander Martyniuk <alexevgmart@gmail.com>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Alexander Martyniuk <alexevgmart@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Patrick McHardy <kaber@trash.net>,
+	netfilter-devel@vger.kernel,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH 5.10] netfilter: nf_log: validate MAC header was set before dumping it
+Date: Wed, 24 Jun 2026 14:01:15 +0000
+Message-ID: <20260624140117.19799-1-alexevgmart@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624090135.95763-1-samsun1006219@gmail.com>
- <CANn89iKD=4_A+7K2erw5AZPnzvBrQqTKXJyfKN5ZfNpAYZ+y3A@mail.gmail.com> <CAEkJfYN4Uep_WEzZyaDGkW5p4rW+oVRqq2DgBt2xiYp9ARt0GA@mail.gmail.com>
-In-Reply-To: <CAEkJfYN4Uep_WEzZyaDGkW5p4rW+oVRqq2DgBt2xiYp9ARt0GA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jun 2026 06:59:33 -0700
-X-Gm-Features: AVVi8CfNruVRxa-vPHeF0EFoTPk0YineqVA770lzyibgRqaNz2z7UDVceVDj4EY
-Message-ID: <CANn89iJ5wKuvKy=Ed-JkeyzKYaEoA_8S=mEMBicMjEPxLCY0Vw@mail.gmail.com>
-Subject: Re: [BUG] KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
-To: Sam Sun <samsun1006219@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	DATE_IN_FUTURE(4.00)[2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-301614-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,netfilter.org,strlen.de,davemloft.net,ms2.inr.ac.ru,linux-ipv6.org,kernel.org,trash.net,vger.kernel,vger.kernel.org,asu.edu];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:samsun1006219@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzkaller@googlegroups.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301666-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:alexevgmart@gmail.com,m:pablo@netfilter.org,m:kadlec@netfilter.org,m:fw@strlen.de,m:davem@davemloft.net,m:kuznet@ms2.inr.ac.ru,m:yoshfuji@linux-ipv6.org,m:kuba@kernel.org,m:kaber@trash.net,m:netfilter-devel@vger.kernel,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,asu.edu:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 62AD36BEE53
+X-Rspamd-Queue-Id: 7ADB66BD88D
 
-On Wed, Jun 24, 2026 at 6:42=E2=80=AFAM Sam Sun <samsun1006219@gmail.com> w=
-rote:
->
-> On Wed, Jun 24, 2026 at 6:01=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Wed, Jun 24, 2026 at 2:01=E2=80=AFAM Yue Sun <samsun1006219@gmail.co=
-m> wrote:
-> > >
-> > > Hello,
-> > >
-> > > I hit a reproducible use-after-free in the UDP tunnel NIC offload wor=
-k item.
-> > > The original local crash was reported by KFENCE as:
-> > >
-> > >   KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
-> > >
-> > > On current mainline, the C reproducer below triggers the same lifetim=
-e bug,
-> > > reported by KASAN before KFENCE samples the object:
-> > >
-> > >   BUG: KASAN: slab-use-after-free in __mutex_lock
-> > >   Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_work
-> > >
-> > > Tested kernel:
-> > >
-> > >   840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of git://git.linux-nfs.org=
-/projects/anna/linux-nfs")
-> > >   Linux 7.1.0-11240-g840ef6c78e6a #31 SMP PREEMPT_DYNAMIC
-> > >
-> >
-> >
-> > Thanks or the report.
-> >
-> > Can you test the following patch?
-> >
-> > diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-> > index 9944ed923ddfd10f9adf6ad788c0740daeaf2adb..c5f8d2f9d325de8f4d2247d=
-daa52e33378851857
-> > 100644
-> > --- a/net/ipv4/udp_tunnel_nic.c
-> > +++ b/net/ipv4/udp_tunnel_nic.c
-> > @@ -304,8 +304,8 @@ udp_tunnel_nic_device_sync(struct net_device *dev,
-> > struct udp_tunnel_nic *utn)
-> >         if (!utn->need_sync)
-> >                 return;
-> >
-> > -       queue_work(udp_tunnel_nic_workqueue, &utn->work);
-> >         utn->work_pending =3D 1;
-> > +       queue_work(udp_tunnel_nic_workqueue, &utn->work);
-> >  }
-> >
-> >  static bool
-> > @@ -866,6 +866,11 @@ udp_tunnel_nic_unregister(struct net_device *dev,
-> > struct udp_tunnel_nic *utn)
-> >
-> >         udp_tunnel_nic_lock(dev);
-> >
-> > +       if (utn->work_pending) {
-> > +               udp_tunnel_nic_unlock(dev);
-> > +               return;
-> > +       }
-> > +
-> >         /* For a shared table remove this dev from the list of sharing =
-devices
-> >          * and if there are other devices just detach.
-> >          */
-> > @@ -901,12 +906,6 @@ udp_tunnel_nic_unregister(struct net_device *dev,
-> > struct udp_tunnel_nic *utn)
-> >         udp_tunnel_nic_flush(dev, utn);
-> >         udp_tunnel_nic_unlock(dev);
-> >
-> > -       /* Wait for the work to be done using the state, netdev core wi=
-ll
-> > -        * retry unregister until we give up our reference on this devi=
-ce.
-> > -        */
-> > -       if (utn->work_pending)
-> > -               return;
-> > -
-> >         udp_tunnel_nic_free(utn);
-> >  release_dev:
-> >         dev->udp_tunnel_nic =3D NULL;
->
-> I tested the patch, but unfortunately the C reproducer still triggers the
-> same use-after-free for me.
->
-> Tested on top of:
->
->   840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of
-> git://git.linux-nfs.org/projects/anna/linux-nfs")
->
-> I booted the kernel with KASAN/KFENCE enabled and:
->
->   panic_on_warn=3D1 panic_on_oops=3D1 kfence.sample_interval=3D1
->
-> Then I ran the same C reproducer:
->
->   timeout -k 10 360 /root/repro
->
-> The VM panicked after about 236 seconds:
->
-> [ 236.471119][ T58] BUG: KASAN: slab-use-after-free in
-> __mutex_lock+0x16d0/0x1d80
-> [ 236.473404][ T58] Read of size 8 at addr ff11000076a63ea8 by task
-> kworker/u16:3/58
-> [ 236.476455][ T58] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> 1996), BIOS 1.15.0-1 04/01/2014
-> [ 236.476478][ T58] Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_=
-work
-> [ 236.476787][ T58] __mutex_lock+0x16d0/0x1d80
-> [ 236.477020][ T58] udp_tunnel_nic_device_sync_work+0x32/0x9c0
-> [ 236.477068][ T58] process_one_work+0x9de/0x1bf0
->
-> The allocation/free stacks are still the same shape:
-> ```
-> Allocated by task 11563:
-> __kmalloc_noprof
-> udp_tunnel_nic_netdevice_event+0x12d8/0x1e80
-> register_netdevice
-> nsim_create
-> nsim_dev_reload_up
-> devlink_reload
->
-> Freed by task 11609:
-> kfree
-> udp_tunnel_nic_netdevice_event+0xc26/0x1e80
-> unregister_netdevice_many_notify
-> nsim_destroy
-> nsim_dev_reload_down
-> devlink_reload
->
-> Last potentially related work creation:
-> queue_work_on
-> __udp_tunnel_nic_del_port+0x2af/0x320
-> udp_tunnel_notify_del_rx_port
-> __geneve_sock_release.part.0
-> geneve_stop
->
-> Second to last potentially related work creation:
-> queue_work_on
-> __udp_tunnel_nic_add_port+0x6ec/0xd70
-> udp_tunnel_notify_add_rx_port
-> geneve_open
-> ```
->
-> My read of the patch is that it closes the small window where queue_work(=
-)
-> can publish the work before utn->work_pending is set, and it also prevent=
-s
-> udp_tunnel_nic_unregister() from flushing/freeing the object when
-> work_pending is already set.
->
-> However, the test above suggests that work_pending still does not fully
-> protect the lifetime of struct udp_tunnel_nic. The crashing work was stil=
-l
-> queued through udp_tunnel_nic_device_sync() at line 308, so the patched p=
-ath
-> was exercised. One suspicious point is that udp_tunnel_nic_device_sync_wo=
-rk()
-> clears utn->work_pending at the beginning of the worker, while the same w=
-ork
-> item can still interact with replay/add/del-port state. The reproducer ca=
-n
-> still end up with udp_tunnel_nic_unregister() freeing utn while a
-> udp_tunnel_nic_device_sync_work item later runs and dereferences the free=
-d
-> utn->lock.
->
-> So this patch does not seem to be sufficient for this reproducer.
->
+From: Xiang Mei <xmei5@asu.edu>
 
-Oh well.
+commit a84b6fedbc97078788be78dbdd7517d143ad1a77 upstream
 
-u8 need_sync:1;
-u8 need_replay:1;
-u8 work_pending:1;
+The fallback path of dump_mac_header() guards the MAC header access
+only with "skb->mac_header != skb->network_header", without checking
+skb_mac_header_was_set(). When the MAC header is unset, mac_header is
+0xffff, so the test passes and skb_mac_header(skb) returns
+skb->head + 0xffff, ~64 KiB past the buffer; the loop then reads
+dev->hard_header_len bytes out of bounds into the kernel log.
 
-These bitfields are not safe, obviously :/
+This is reachable via the netdev logger: nf_log_unknown_packet() calls
+dump_mac_header() unconditionally, and an skb sent through AF_PACKET
+with PACKET_QDISC_BYPASS reaches the egress hook with mac_header still
+unset (__dev_queue_xmit(), which would reset it, is bypassed).
 
-Time to convert them to atomic bit operations.
+Add the skb_mac_header_was_set() check the ARPHRD_ETHER path already
+uses, and replace the open-coded MAC header length test with
+skb_mac_header_len(). Only skbs with an unset MAC header are affected;
+valid ones are dumped as before.
+
+ BUG: KASAN: slab-out-of-bounds in dump_mac_header (net/netfilter/nf_log_syslog.c:831)
+ Read of size 1 at addr ffff88800ea49d3f by task exploit/148
+ Call Trace:
+  kasan_report (mm/kasan/report.c:595)
+  dump_mac_header (net/netfilter/nf_log_syslog.c:831)
+  nf_log_netdev_packet (net/netfilter/nf_log_syslog.c:938 net/netfilter/nf_log_syslog.c:963)
+  nf_log_packet (net/netfilter/nf_log.c:260)
+  nft_log_eval (net/netfilter/nft_log.c:60)
+  nft_do_chain (net/netfilter/nf_tables_core.c:285)
+  nft_do_chain_netdev (net/netfilter/nft_chain_filter.c:307)
+  nf_hook_slow (net/netfilter/core.c:619)
+  nf_hook_direct_egress (net/packet/af_packet.c:257)
+  packet_xmit (net/packet/af_packet.c:280)
+  packet_sendmsg (net/packet/af_packet.c:3114)
+  __sys_sendto (net/socket.c:2265)
+
+Fixes: 7eb9282cd0ef ("netfilter: ipt_LOG/ip6t_LOG: add option to print decoded MAC header")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Alexander Martyniuk <alexevgmart@gmail.com>
+---
+Backport fix for CVE-2026-52942
+ net/ipv4/netfilter/nf_log_ipv4.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/netfilter/nf_log_ipv4.c b/net/ipv4/netfilter/nf_log_ipv4.c
+index d07583fac8f8..d6164e8e2c73 100644
+--- a/net/ipv4/netfilter/nf_log_ipv4.c
++++ b/net/ipv4/netfilter/nf_log_ipv4.c
+@@ -296,8 +296,8 @@ static void dump_ipv4_mac_header(struct nf_log_buf *m,
+ 
+ fallback:
+ 	nf_log_buf_add(m, "MAC=");
+-	if (dev->hard_header_len &&
+-	    skb->mac_header != skb->network_header) {
++	if (dev->hard_header_len && skb_mac_header_was_set(skb) &&
++	    skb_mac_header_len(skb) != 0) {
+ 		const unsigned char *p = skb_mac_header(skb);
+ 		unsigned int i;
+ 
+-- 
+2.43.0
+
 
