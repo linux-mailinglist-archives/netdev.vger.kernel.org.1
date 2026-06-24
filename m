@@ -1,246 +1,140 @@
-Return-Path: <netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 86mOBKbYO2p0eAgAu9opvQ
-	(envelope-from <netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:16:22 +0200
+	id r9GILE3aO2rReAgAu9opvQ
+	(envelope-from <netdev+bounces-301658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:23:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7153B6BE7FE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:16:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441386BE8C6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:23:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=Kz4Q9rbh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="FZ5/QveK";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301658-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301658-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74BDD3042435
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:15:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF3E73022680
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2193B6C13;
-	Wed, 24 Jun 2026 13:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CEE3B0AFB;
+	Wed, 24 Jun 2026 13:22:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5413B38B7;
-	Wed, 24 Jun 2026 13:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8712CC8CE;
+	Wed, 24 Jun 2026 13:22:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782306929; cv=none; b=C7/weAiD6L7Iw7UT833d377o3qcseDo+/aWMFS0r/ov1Fm80ld4muvUXHmZ7eU2yf7cPu+5TdTq6FlMmMKYvUzCaioSx95SYBqZdvCVwMlHyVsQAx4hKrcdcrFqNhgQhtJrRDaPNkAm+esFLQ11HhvrD119Sy+Y1bJkX8chvhN4=
+	t=1782307366; cv=none; b=qxjecyJqkwSa+24U83noAQdFF+mTXU+fV7A+jT4kvy1UMjijCJIv68BaBk6c35IDIyi4E4O82OcCp95Zh8/buSynmjKjHwtOq10f1SMfrYVNeWXAiz07pf7mPDJfk4CYK4sG7eQUE/8fip1Imn8Z9ur/O/WeJTArJKpDEjWxjaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782306929; c=relaxed/simple;
-	bh=moyOQIzaR6smZ9rBrd3W/NuwPZRv54jsj9HwphWn/HQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T/uo/ps2al7Ugu5+w0NxyTIpJzCg1BCjqulWCFO+Mlg7abujH6JcVGgj5HfNT9zZo6lnEPyxOLKe1zY78MUUmfIiX6DKAWh/9MbcB619mDDbo14C4terRWXNT8/w2L2cEtesAEJU/11RT8oP9R9CNwALtLumCkH6UjbbmCTHw0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kz4Q9rbh; arc=none smtp.client-ip=91.218.175.183
-Message-ID: <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782306914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jm5h4EGMu1/G65UxgDlhva2Uqze8a2QIkXsB3xVvPew=;
-	b=Kz4Q9rbh7etgj8euhlBLWO3TzYATCTCfu6njur0dxfGVJdMqB9UP/InGWtI0bOGTstOlHl
-	POIMRyO3mRJBT5/BeQDQV44BuugXQiS1AZGuvJ0EWei9+7fme1gtEeTZSwt1IwIDM7n5ZK
-	H6199we71vGASxf1nAZQvllBRzYOKVU=
-Date: Wed, 24 Jun 2026 21:14:50 +0800
+	s=arc-20240116; t=1782307366; c=relaxed/simple;
+	bh=44R+BZSIsweicSJqp9wx8D1cQbcqJ1zfO7984BPZ/PY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=MnVv9T0ra3Liwjzcyu0LmfCaMTTTwZLZrs0Bu5spH69Rrv9eDiI0uelQI58KpxPHrMYzAsOkmh9Ft1ph3ZKv133N97MS9qdkvGjKeODD684/vwhR7bYEL4xUcN5JuhK8jsqqF0XFhqpdXrbTK6KxgQzVapS7QX6eempXV3cRSB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZ5/QveK; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA5231F000E9;
+	Wed, 24 Jun 2026 13:22:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782307365;
+	bh=44R+BZSIsweicSJqp9wx8D1cQbcqJ1zfO7984BPZ/PY=;
+	h=Date:Subject:Cc:To:From:References:In-Reply-To;
+	b=FZ5/QveKGQFn3WVkLPk9UJeaNGMAG7EW6+VV3KqOkFGQhY5xET2NDNeCNN+RCjOHK
+	 YOH7zXLoxOcrKjFO6p0Z1yHvRkrFb97Eiw6jQFzRC5ru4qRQ/S++JXruKjhw8HUMgC
+	 zjFiGWXpAon/29jA/jgWPPD+PYUNFeArP1MekuMd9vfGwUkaTPgR/IGSu0gsZ63lyx
+	 pRnR+kXvj0Czta/VPfCCM5Y23MON104DArBz84VBrva2OVW4nSNyQZZlE/pXajmcV1
+	 jsxTJHociyo9F9fgFC8QgEz4bKoohVC9TVoXFZZ5r2TVl5W1heaOU9QyRMVzDSqqhE
+	 PnNek7mjhoRPw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Shakeel Butt <shakeel.butt@linux.dev>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>,
- Randy Dunlap <rdunlap@infradead.org>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <20260622040533.29824-2-kaitao.cheng@linux.dev>
- <20260622094242.64531b9a@pumpkin>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <20260622094242.64531b9a@pumpkin>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Date: Wed, 24 Jun 2026 15:22:35 +0200
+Message-Id: <DJHB87KG4HZD.3A8GGTU13MZSF@kernel.org>
+Subject: Re: [PATCH v5 0/9] Fix missing fops.owner in Rust DRM/misc
+ abstractions
+Cc: "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>,
+ "Gary Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Luis Chamberlain" <mcgrof@kernel.org>,
+ "Petr Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>,
+ "Sami Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin"
+ <atomlin@atomlin.com>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, "David Airlie"
+ <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Arnd Bergmann" <arnd@arndb.de>, "Brendan
+ Higgins" <brendan.higgins@linux.dev>, "David Gow" <david@davidgow.net>,
+ "Rae Moar" <raemoar63@gmail.com>, "Breno Leitao" <leitao@debian.org>, "Jens
+ Axboe" <axboe@kernel.dk>, "Dave Ertman" <david.m.ertman@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Igor Korotin" <igor.korotin@linux.dev>,
+ "FUJITA Tomonori" <fujita.tomonori@gmail.com>, "Bjorn Helgaas"
+ <bhelgaas@google.com>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>, =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?=
+ <arve@android.com>, "Todd Kjos" <tkjos@android.com>, "Christian Brauner"
+ <brauner@kernel.org>, "Carlos Llamas" <cmllamas@google.com>,
+ <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
+ <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
+ <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>
+To: "Alvin Sun" <alvin.sun@linux.dev>
+From: "Danilo Krummrich" <dakr@kernel.org>
+References: <20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev>
+In-Reply-To: <20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301657-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301658-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:lin
- ux-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[46];
+	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:leon@kernel.org,m:igor.korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@googlegroups.com,m
+ :linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:alvin.sun@linux.dev,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,linux.dev,davidgow.net,debian.org,kernel.dk,intel.com,android.com,vger.kernel.org,lists.linux.dev,lists.freedesktop.org,googlegroups.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[52];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,kylinos.cn:email]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7153B6BE7FE
+X-Rspamd-Queue-Id: 441386BE8C6
 
+On Wed Jun 24, 2026 at 2:57 PM CEST, Alvin Sun wrote:
+> The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, thre=
+ads it
+> through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates co=
+nfigfs
+> and rnull to use `this_module::<LocalModule>()`.
 
-
-在 2026/6/22 16:42, David Laight 写道:
-> On Mon, 22 Jun 2026 12:05:31 +0800
-> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
-> 
->> From: Kaitao Cheng <chengkaitao@kylinos.cn>
->>
->> The list_for_each*_safe() helpers are used when the loop body may
->> remove the current entry.  Their API exposes the temporary cursor at
->> every call site, even though most users only need it for the iterator
->> implementation and never reference it in the loop body.
->>
->> Add *_mutable() variants for list and hlist iteration.  The new helpers
->> support both forms: callers may keep passing an explicit temporary cursor
->> when they need to inspect or reset it, or omit it and let the helper use
->> a unique internal cursor.
-> 
-> I'm not really sure 'mutable' means anything either.
-> It is possible to make it valid for the loop body (or even other threads)
-> to delete arbitrary list items - but that needs significant extra overheads.
-> 
-> It might be worth doing something that doesn't need the extra variable,
-> but there is little point doing all the churn just to rename things.
-> 
->>
->> This makes call sites that only mutate the list through the current entry
->> less noisy, while keeping the existing *_safe() helpers available for
->> compatibility.
->>
->> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
->> ---
->>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
->>  1 file changed, 231 insertions(+), 38 deletions(-)
->>
->> diff --git a/include/linux/list.h b/include/linux/list.h
->> index 09d979976b3b..1081def7cea9 100644
->> --- a/include/linux/list.h
->> +++ b/include/linux/list.h
->> @@ -7,6 +7,7 @@
->>  #include <linux/stddef.h>
->>  #include <linux/poison.h>
->>  #include <linux/const.h>
->> +#include <linux/args.h>
->>  
->>  #include <asm/barrier.h>
->>  
->> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
->>  #define list_for_each_prev(pos, head) \
->>  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
->>  
->> -/**
->> - * list_for_each_safe - iterate over a list safe against removal of list entry
->> - * @pos:	the &struct list_head to use as a loop cursor.
->> - * @n:		another &struct list_head to use as temporary storage
->> - * @head:	the head for your list.
->> +/*
->> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
->>   */
->>  #define list_for_each_safe(pos, n, head) \
->>  	for (pos = (head)->next, n = pos->next; \
->>  	     !list_is_head(pos, (head)); \
->>  	     pos = n, n = pos->next)
->>  
->> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
->> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
-> 
-> Use auto
-> 
->> +	     !list_is_head(pos, (head));				\
->> +	     pos = tmp, tmp = pos->next)
->> +
->> +#define __list_for_each_mutable1(pos, head)				\
->> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
->> +
->> +#define __list_for_each_mutable2(pos, next, head)			\
->> +	list_for_each_safe(pos, next, head)
->> +
->>  /**
->> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
->> + * list_for_each_mutable - iterate over a list safe against entry removal
->>   * @pos:	the &struct list_head to use as a loop cursor.
->> - * @n:		another &struct list_head to use as temporary storage
->> - * @head:	the head for your list.
->> + * @...:	either (head) or (next, head)
->> + *
->> + * next:	another &struct list_head to use as optional temporary storage.
->> + *		The temporary cursor is internal unless explicitly supplied by
->> + *		the caller.
->> + * head:	the head for your list.
->> + */
->> +#define list_for_each_mutable(pos, ...)					\
->> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
->> +		(pos, __VA_ARGS__)
-> 
-> The variable argument count logic really just slows down compilation.
-> Maybe there aren't enough copies of this code to make that significant.
-> But just because you can do it doesn't mean it is a gooD idea.
-> I'm also not sure it really adds anything to the readability.
-> 
-> And, it you are going to make the middle argument optional there is
-> no need to change the macro name.
-
-Christian König and Jani Nikula also disagree with the variadic-argument
-implementation approach. If we abandon that method, it means we will
-inevitably need to add some new macros. If mutable is not a good name,
-suggestions for better alternatives would be welcome; coming up with a
-suitable name is indeed rather tricky.
-
--- 
-Thanks
-Kaitao Cheng
-
+Acked-by: Danilo Krummrich <dakr@kernel.org>
 
