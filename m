@@ -1,196 +1,125 @@
-Return-Path: <netdev+bounces-301748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6tK8OPEcPGo8kAgAu9opvQ
-	(envelope-from <netdev+bounces-301748-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:07:45 +0200
+	id GsA5Fh4fPGqxkAgAu9opvQ
+	(envelope-from <netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:17:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 022C26C0A07
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:07:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF6F06C0B11
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:17:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ragnatech.se header.s=fm3 header.b=ojDgyyR2;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="M GVcnIm";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301748-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301748-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ragnatech.se;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oG6UZAJW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7C073034660
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:07:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D34A6301E996
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884003DD516;
-	Wed, 24 Jun 2026 18:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF98E248893;
+	Wed, 24 Jun 2026 18:16:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE902F7F09;
-	Wed, 24 Jun 2026 18:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53CE145B3F;
+	Wed, 24 Jun 2026 18:16:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782324462; cv=none; b=Pc6Ee9Q/Gjo9l9LdJEl2doswAL2gLq+vA6Eh//LMo4X8PIbHAZlqazGlRTMWRKIICMfjkLUhr1fHY2JcqRgTApkZvX5s9+dSGO/YhomadRFKUbw3lN3ht2pBm5dTjNUkvfW2o3CfaiImL64jbdSOS3wTqeidSAIp3yne5KOlYA8=
+	t=1782325017; cv=none; b=W40eoiJ1ISyWHuwxXkRiTl6n6SriZClIRau1rIZ+Pg5HETes8riY4pOBCbY+gMo+uTQJ2pv9Du/NIP8mTTE1pqOoNvpeybL95h32oKPGGM+VGlLIIUTZTd3yoXEgukK/OGmOp0Xj7jPdJgTOGnERyQKCEEAKQ0n5fFJsgI7z0QY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782324462; c=relaxed/simple;
-	bh=vIeB7hTO5R/q0aGnn0P1wUkQqXgjBEKmTnkptIBTn4k=;
+	s=arc-20240116; t=1782325017; c=relaxed/simple;
+	bh=7NnaKsEYxlQ7+w0A9v23Et8HeWTkSa7HrG3iVsCesv0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F7oUKYlukfj9TXv+zvs+ubnm8AE0XsNassN4aOhx6IlPLY8o2DwZ04RcoTd8a/noyYfnBhjbyHwnvjf1yrnBfMsr8u8uVSMYnkz6HqsgU9TU+ZJfzDfiOJgJtss6NuShKME4jYc1z1LTHpSF0a5chMjBVt/lXcv3U6ns9r5lEI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=ojDgyyR2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MGVcnImH; arc=none smtp.client-ip=103.168.172.151
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 8D35CEC036B;
-	Wed, 24 Jun 2026 14:07:39 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Wed, 24 Jun 2026 14:07:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1782324459;
-	 x=1782410859; bh=CBO7oDIF3KnSR35ayUSjsvhUhbG+HEgdxE0c1Pcve5M=; b=
-	ojDgyyR2piSWwyY0BBWcUHxyjknFlE3Kpt8VQlguGF66HW7MqXjU4q1Zxr8I5NMI
-	9oC6B4gPkclwXe3pRxI30fd0KIz1clenNBI3zLdTpEC8DLtidAWmWVNXJOfrRMD0
-	OADZCGpVhpl859hVQKgRTNd0E1XzPvE3rXBWWyJhQAnzGKUX9hmv1D9Sa23uz6yg
-	MT06Hk4zemB4hvFEJS+Jgs5WCiZh9nxzGmcnSP8hDE/RuMIu3lQGN5IobaTdyAwj
-	zrHeDWBgatclAZ13DBdN+QeO6QtPjhEFbjlN2vk2mfL7Y8mBHMTNyymSLE4FlPsg
-	l/OajZHk8rbsgE2u+DTL8A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1782324459; x=
-	1782410859; bh=CBO7oDIF3KnSR35ayUSjsvhUhbG+HEgdxE0c1Pcve5M=; b=M
-	GVcnImH5Ud4D54TCcaTcUS5zjyf39hm2O+1/JhvafZflyN7yhU6SsHEMkcL0bQ5J
-	9tLyV65f7xn+KKt2lXESUNX9SWMqNDDsFn5Pdyf3ONHrxw7UiYszMxIeRYAbWlD2
-	VP0uKHpPAqU110Vqg5VE+iwCeOiZmTeLdtFIGXhhsyOuHxR8enGzLM6uBRQx4jvj
-	hPhC4OMvlQN21n+92XYA6P0K6uAboTXL4Ts6KjWe3fN8ViwGgFgmbTK1YCQMUHO5
-	2MWb7qeAZug02QW45V+PwN0dmvRNq9Alf+CsS9jLNHxqvAgz+V8Ut4stUwsDkiIl
-	rRHwQdciZHMp2POnsc4vw==
-X-ME-Sender: <xms:6xw8ajFZBMygWtrg-ng1sLp0HhclCeb4XfAi4Qicc-2x4FX9_lXDZw>
-    <xme:6xw8agxz0rAB0YWfD-lEYSfrsbz-NNGz_1z8qBMr9LbQk8pMUWWuc39fL82dJGlNI
-    pUEG8r7keWwZ5dK4b8zJpVGA43V-9KE6avyYl2JBWS71RS3efZC2Bs>
-X-ME-Received: <xmr:6xw8ak406zSTfrj5VnAJ1MYQ2nkbNJd0p3dFPMVKZ3J49NOYB60ZJ1phamFOkOj1Yy2r1hFPU5hSDmhB6mrGnGVLtImQVNc>
-X-ME-Proxy-Cause: dmFkZTEpiQERQE3oBq7W0Xaj6SLWgPNdfBzbhu5hBuzlRNrQlkNxGpmHkE1xEmeA+g4SjJ
-    BkJd5R8x21Bb038jK6ybX27YfQJorZaN5a8EsCH1J3yxIhqTRVYYQxxGGt5lVK+x3mtfza
-    P5K3IMou3hL2332QWy2d1R7Y1CTBR/L7mukqke7KwWH3j0TxZG0KSI8tEhhiHfPzliRmwa
-    6Vb5fZhTypDmHFzDyE9G0/DXZSxP+o9lIk2w+30C4F54KpqaZwvTZpAO8YYN/RJpFbWHvH
-    /c2SQOM6ZFKa1HEyUdA/RRBzvIUJoM8oac96K9zzf2qVbP7cdgfLPqrUj6iE1IeES5ADcC
-    CGIriOv/FU86n5/Jmusd0Bh+v5gF9auojoR31QeLgsrz5kByM5riE8thbA2qqX0IDsIIYj
-    uaNvqY5JlrwGXOKXB6vF0SkPJLf/ZEyWv+ATtJPAHqO64+L4Z9oI6tNF8ebQHc0cfGf/0M
-    yXfeGtYkOhiefhLc/ZFbcnDTdswxZO6NJdhIFSMiXC0i1lorTuCUrfBxVQdeT3n+A5vgEb
-    5cdSanhL1DuG8DxqFKmRJZRV08VFIQhDXK9dqlygwKw5YFafOmV6fV63ov6S2wV+8D1agx
-    bUwhEaks5/CQbH64P9Ve7l25XRgfReevibxq6ShZwOcVTAxeFLB6KAP78eGQ
-X-ME-Proxy: <xmx:6xw8atconQuw6tmIf5UphSWSwJZIKry9iroatgOFGZYticpwL-QwWg>
-    <xmx:6xw8ajGYeld6oNub300c--FvDHcEyWEf39rkfbgGZ-4KhR9VtZ5gNg>
-    <xmx:6xw8al4yzuIFjgwoMMuJ7nYnt68HVBQYinSV2PjmwC_5rwPijW3hzA>
-    <xmx:6xw8auttBdp3hIjE2zqHDX_5ucao1aDnukHPyyB6e4VXJsP3UPWnmQ>
-    <xmx:6xw8agg2aVWzW4HDPGx2XBn81Hlhm5Ne4qLLOyZJqRoOGxlRYsasKL37>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 24 Jun 2026 14:07:38 -0400 (EDT)
-Date: Wed, 24 Jun 2026 20:07:36 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] dt-bindings: net: renesas,ether: Drop example
- "ethernet-phy-ieee802.3-c22" fallback
-Message-ID: <20260624180736.GA1325538@ragnatech.se>
-References: <20260624150250.131966-2-robh@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WMna50D6HGEA61+ClLIjV+QPSH3v2cEBoDqvQ6Igk12o8eKMThmSYCD96vZ9pP3iajho0ijQ/429FUa0QJeLAZDJwbkKczA6IyPU4MIpUCHFIbDTbAu4rmfiJzAWG62F8v0MBhcxx6XqBQ349YllrlNcJcmBEMJzgGfWwiRR6VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oG6UZAJW; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA13A1F000E9;
+	Wed, 24 Jun 2026 18:16:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782325016;
+	bh=xls8epCz9Eh9Dj6gwTjfqKKY5gFaZNqvZ8MA83RxZGc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=oG6UZAJWNoZeyPneAL76f/xmotrBI5IsW5FU6h6ulrPghXDNhRXsXitBUwzTe0P2Q
+	 hyal4TKlYaEIW8M7YmqXXsoCHbtr4wafAf5rMygxrcggr9wKOkGfez+DdYiq9gWjKM
+	 DZkDb5J8VbWOZEvcGT4MHTKhBrdZwvWQN1nUm/FVS+PwE+9UBXlItk0GiNOwycPNM4
+	 OO17HXbEge9bWuH6/5XBUzMv97MTtYjNBJh0Utq2KUSa4EYvDTJ08DwpU5wH0W9L97
+	 feOopsCXYoJBnzbgCF81WVIsV2ssSIoouHqbbO3JBV5qvJ+qtWaldx0y80LN4Qi1ob
+	 Kiknqm1HQcliQ==
+Date: Wed, 24 Jun 2026 19:16:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+	kees@kernel.org, bjarni.jonasson@microchip.com,
+	lars.povlsen@microchip.com, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: sparx5: unregister blocking notifier on init failure
+Message-ID: <20260624181651.GC1131256@horms.kernel.org>
+References: <20260623115714.2192074-1-haoxiang_li2024@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260624150250.131966-2-robh@kernel.org>
+In-Reply-To: <20260623115714.2192074-1-haoxiang_li2024@163.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
-	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm3,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,glider.be,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301748-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-301749-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:sergei.shtylyov@gmail.com,m:netdev@vger.kernel.org,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:sergeishtylyov@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:haoxiang_li2024@163.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:UNGLinuxDriver@microchip.com,m:kees@kernel.org,m:bjarni.jonasson@microchip.com,m:lars.povlsen@microchip.com,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[163.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ragnatech.se:dkim,ragnatech.se:email,ragnatech.se:mid,ragnatech.se:from_mime,devicetree.org:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,horms.kernel.org:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 022C26C0A07
+X-Rspamd-Queue-Id: CF6F06C0B11
 
-Hi Rob,
-
-Thanks for your patch.
-
-On 2026-06-24 10:02:50 -0500, Rob Herring (Arm) wrote:
-> Fix the Micrel PHY in the example which shouldn't have the
-> fallback "ethernet-phy-ieee802.3-c22" compatible:
+On Tue, Jun 23, 2026 at 07:57:14PM +0800, Haoxiang Li wrote:
+> sparx5_register_notifier_blocks() registers the switchdev blocking
+> notifier before allocating the ordered workqueue. If the workqueue
+> allocation fails, the error path unregisters the switchdev and netdevice
+> notifiers, but leaves the blocking notifier registered.
 > 
-> Documentation/devicetree/bindings/net/renesas,ether.example.dtb: ethernet-phy@1 \
->   (ethernet-phy-id0022.1537): compatible: ['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
->         from schema $id: http://devicetree.org/schemas/net/micrel.yaml
+> Add a separate error label for the workqueue allocation failure path and
+> unregister the switchdev blocking notifier there.
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> Fixes: d6fce5141929 ("net: sparx5: add switching support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 
-Acked-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> ---
->  Documentation/devicetree/bindings/net/renesas,ether.yaml | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/renesas,ether.yaml b/Documentation/devicetree/bindings/net/renesas,ether.yaml
-> index f0a52f47f95a..dd7187f12a67 100644
-> --- a/Documentation/devicetree/bindings/net/renesas,ether.yaml
-> +++ b/Documentation/devicetree/bindings/net/renesas,ether.yaml
-> @@ -121,8 +121,7 @@ examples:
->          #size-cells = <0>;
->  
->          phy1: ethernet-phy@1 {
-> -            compatible = "ethernet-phy-id0022.1537",
-> -                         "ethernet-phy-ieee802.3-c22";
-> +            compatible = "ethernet-phy-id0022.1537";
->              reg = <1>;
->              interrupt-parent = <&irqc0>;
->              interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
-> -- 
-> 2.53.0
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
 
