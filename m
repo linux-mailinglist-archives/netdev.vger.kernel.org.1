@@ -1,127 +1,162 @@
-Return-Path: <netdev+bounces-301692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2m5SBTz2O2qFgggAu9opvQ
-	(envelope-from <netdev+bounces-301692-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:22:36 +0200
+	id 2s4CLzW0O2pebggAu9opvQ
+	(envelope-from <netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:40:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CB26BF989
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:22:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 583B76BD6FD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:40:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=TplEoqGE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301692-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301692-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=DS3UbwvU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=cloudflare.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 76FEE312A9D6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:14:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 307BF3028C9E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8693DB31B;
-	Wed, 24 Jun 2026 15:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F82129D265;
+	Wed, 24 Jun 2026 10:40:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m19731103.qiye.163.com (mail-m19731103.qiye.163.com [220.197.31.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05CD3DB31A
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18243248F72
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 10:40:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782314011; cv=none; b=PDQepHx2z52mui3DWuUdpyhTUxfNlJfZsbh5ENqO3tb3UG/7PcaXIVYnjRiMHcR+JCaoI8AZVx+Ur3+1gT/lLvkTwItXyfgX5mhq/p/xvL51WP+c9cDZwCYMk7PcB1ubpM9TwWTfdJeO4qn4V5qbxDpP3DCh4yc2ggOiIbwAFaE=
+	t=1782297612; cv=none; b=BXoF20T9Yasxq7ctDK0lHf1SPKZ1L7ZxLCxrE70TWqrf3ug9bh1DiF4WIQWGyDTrlioUSSWdq7coyYC+TQLBB/qHEDlN2kufQ7oxTGRG10gMCU1kfeNBx9Y2YD56DY3jTvAtpHiOcgmaWl8oB9V37WSXqxSAj40cx1fZKK7A29A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782314011; c=relaxed/simple;
-	bh=H9514nGSNhwuiyLq8W8xnFS2/Eoa3n5BOZ7QZEhq378=;
-	h=Content-Type:Message-ID:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:From:Date; b=jrO9vw08dIlMy4Pb1oIoiXqYduhXP8RLtWRrLDgWXUhwiP2S8elYlEW0tQLjw5I5oFbNFFgEXecZ+o26CWpmGLbKcoT5Wr+9iTbRCA6A6TfraPY4UsoBCWxqyaEyq9Rlp8szon58pnoUEiV9t8vQtay0Mw+wj5fCqo1jvyTlgo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=TplEoqGE; arc=none smtp.client-ip=220.197.31.103
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Message-ID: <AIgAEgCHKvkppDB9sUCsTarf.3.1782297429281.Hmail.220255722@seu.edu.cn>
-To: XIAO WU  <xiaowu.417@qq.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
-	Sidraya Jayagond <sidraya@linux.ibm.com>, 
-	Wenjia Zhang <wenjia@linux.ibm.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	Mahanta Jambigi <mjambigi@linux.ibm.com>, 
-	Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
-	Simon Horman <horms@kernel.org>, 
-	Karsten Graul <kgraul@linux.ibm.com>, 
-	linux-rdma <linux-rdma@vger.kernel.org>, 
-	linux-s390 <linux-s390@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	"jianhao.xu" <jianhao.xu@seu.edu.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQgdjJdIG5ldC9zbWM6IGF2b2lkIHJlY3Vyc2l2ZSBza19jYWxsYmFja19sb2NrIGluIGxpc3RlbiBkYXRhX3JlYWR5?=
-X-Priority: 3
-X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_WIN_1.64.1
-In-Reply-To: <tencent_BD4B709F8D16281265EDBC0DC9EFC8758808@qq.com>
-References: <20260617152855.1039151-1-runyu.xiao@seu.edu.cn> <20260619054815.176764-1-runyu.xiao@seu.edu.cn> <tencent_BD4B709F8D16281265EDBC0DC9EFC8758808@qq.com>
+	s=arc-20240116; t=1782297612; c=relaxed/simple;
+	bh=SzwY0ArSkepQcN7OqNhWKPW3eLo9VWe8c4Ja3adS3cU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hgzolYfjob2Wm24zAzAxOukszckft4DsjdnUkea6nHjGDwTayulqiBrLwCyc/VZW8QVbfdub4ObL0ZDyWG41d/asrWbkPjCuoNOQgYet73qeskxvO2sZfLzdXJ9rPmDC3sBpWdIVXjV6vCkD4hH4ZXqzEpytHdNwW1Wr9trc1OQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DS3UbwvU; arc=none smtp.client-ip=209.85.218.47
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-bed19623d6eso111888166b.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 03:40:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1782297609; x=1782902409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SzwY0ArSkepQcN7OqNhWKPW3eLo9VWe8c4Ja3adS3cU=;
+        b=DS3UbwvUuClnt0f0ojHK2TcomlHSFCkVepvSFhJLCQx+7xeFSVcCyv6KHqasAdI5Sz
+         9sDxDWWZGHvn9gAGBOcvaGcUiwpWxybjIo5wySO3hWzUUIWgG7m8VOr4vVOKcNEyRi+R
+         8RiZ0lX3FmsVZk1ZdZ4AuO0bVWitpK34vvxg5clhJQqn5/7+h4D6pzduBjx6J9SAYsQ7
+         o+9nstQVX4ZIqlzce78UYJSpOQ/CnQ+Ogu38kvXQQWMtPPcr8aCRx7uWlJbMx/3jez8b
+         Tk8Z8EHPM98kVcfb5WC+jSAAXh0SzToeKePiLeX2mMgMMyHSD7o/BI/T3ULMI6hUyn6z
+         pP2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782297609; x=1782902409;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SzwY0ArSkepQcN7OqNhWKPW3eLo9VWe8c4Ja3adS3cU=;
+        b=iJGqjA/yFBnS8CejMS3Kb70WeS4zT9V06It/naQ2lyiwZ2E/Sp1d2l4AJit6ZP1/75
+         Im8Ab5MyU4MrCXJU7vRILZ/uC4fHbd0Mj/8BqhRp+UxozXg/y2htJF6q/njJgXPIW4wT
+         CqdZf6EuBl0tiuC1IwJ0jir25uDELG4EVmxCwOKqeTaKOAo2PTJwUIGKizN4nbAnEPen
+         5tdJzdZQzIU1Dcy6f6iHhS4JO4e9mJchP5hPK+Hdt2E0W3gCF/rl0UuTzhMs+Y68GFVk
+         +AZPtKh0xHkJp8/fBn8qaiSMi+XuU68kOSWOunAmigT9WpdNhCbWxdFb3QGXDkuX75Mo
+         v8Cw==
+X-Forwarded-Encrypted: i=1; AFNElJ9VbuTuiDnSQCobR6pvyW33yxXJaFzuZJESL9eA8v9eQktxns5HQvBW2FGbQj4Pw4+SZm2zTXw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw60GbCBSBLQG+6rq9dgoKE2vhtTb5ua6tdYT9V1RrdX3xmS6d/
+	ag2hdKJHqFkumC+ww/JksNMG5lAB/wYMqUBnSAGh2SM2o6/lQ6FfCaIumi314iFPns8=
+X-Gm-Gg: AfdE7cn0rkj53hEDG9nV3FVXB4NJ6+2BBZybEtvjkroVGxbns+/MUI39CVzVA4TO5+Q
+	L/0EvX2eJsXsE3mKN6koOrP+YGQATCDqvpOJnVbfJkhun5X/Q5iTPzDdhQV/SDOiSAdEzVjsgxb
+	EohQfUcEEjJ3gylM9I9QelLI2xemyDAu3HmcuMqyapkOiGCsq1roLF5cQzgWFZsiLEKQY8qlCe0
+	AT1Nmm4t20gI7I4TEwOeE2flejGC44aEj6ehv4pSnhpnElr4oSsD8O+2q47sX4ZgX1lSK+GgUna
+	foqZ6xBFZ66fISmGjZi1n9JVaLEfkT0YOr8noJuz1E/sWs4+M74P1X9N9DcNA6fj8vesqYRHP7L
+	1eCYADDFGzJM5zeLbMD6gIZmwmU+8qFzgtuSvQoJZx6nCnRx34ygep7xfZEoDXUoIEJaCfcQuye
+	F+G9Lzbry16oT8jEc=
+X-Received: by 2002:a17:906:c10b:b0:c05:b9db:68cc with SMTP id a640c23a62f3a-c107a353073mr371151966b.0.1782297609382;
+        Wed, 24 Jun 2026 03:40:09 -0700 (PDT)
+Received: from cloudflare.com ([104.28.21.182])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c5e498807sm621703466b.1.2026.06.24.03.40.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 03:40:08 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Amery Hung <ameryhung@gmail.com>,  Kuniyuki Iwashima
+ <kuniyu@google.com>,  bpf <bpf@vger.kernel.org>,  Alexei Starovoitov
+ <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Jakub Kicinski
+ <kuba@kernel.org>,  Jiayuan Chen <jiayuan.chen@linux.dev>,  John Fastabend
+ <john.fastabend@gmail.com>,  Network Development <netdev@vger.kernel.org>,
+  kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH bpf-next v2] bpf, unix: Guard sk_msg-dependent code
+ behind CONFIG_NET_SOCK_MSG
+In-Reply-To: <CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
+	(Alexei Starovoitov's message of "Tue, 23 Jun 2026 14:26:06 -0700")
+References: <20260623-bpf-sk_msg-split-unix-v2-1-ca7a626a94a5@cloudflare.com>
+	<CAAVpQUBsQFFxJFDnJzxmsER3bOjm=zqJ5P5MSeW_T9v-4639cw@mail.gmail.com>
+	<87v7b9ysep.fsf@cloudflare.com>
+	<CAAVpQUBARp1qCEomgzWXVe35WatdaswujVLku+RESm_LW0dE7Q@mail.gmail.com>
+	<CAADnVQL2pfQ0BoN-vWcuCpbOBBKq_rM7Bp7P4XdLMFER5LGSDg@mail.gmail.com>
+	<87mrwlyqg4.fsf@cloudflare.com>
+	<CAMB2axMVhJJpP5HZtDFyQLLbKoRxhW08rj1zGRtWtgDkfYaVNA@mail.gmail.com>
+	<878q85yoy5.fsf@cloudflare.com>
+	<CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
+User-Agent: mu4e 1.14.1; emacs 30.2
+Date: Wed, 24 Jun 2026 12:40:08 +0200
+Message-ID: <8733ycz0fr.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from 220255722@seu.edu.cn( [223.112.146.162] ) by ajax-webmail ( [127.0.0.1] ) ; Wed, 24 Jun 2026 18:37:09 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Date: Wed, 24 Jun 2026 18:37:09 +0800 (GMT+08:00)
-X-HM-Tid: 0a9ef8c1fe0e02f2kunmf02bd3cd3a74
-X-HM-MType: 1
-X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMTUS6Y2fHkyPT6dc03QDwVaZPGiA09TnwhbhTj
-	hLfuFZO94YXwX6xgvkjGVFFRKj5DZd03xfWxKJ5+5n10A36+gYygBUjfIFA2NppH9Q3clqMzZtZS
-	/wBzHlz2GYWAOTQREDhQH2k3gw2BUVE1M9Rj0=
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaTkoaVk8aTk9PSxlOTUtNTFYVFA
-	kWGhdVEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVU
-	pLSEpOT0xVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=TplEoqGEnaAu3cY527AA6eQQ+g/Y9YRGy16bvFcwh4XF2JUUVS9ZXO841jY/F7e5cJLjiZBeUoN4pV7fTMLUkXAFlfniqM2VtzvK2UeyQe1X+aRtklPw40tqQnkdpZG+Q7Lx4Hs+lJMBzN66lTAa7m7U2pnAw3nQhia2HHu5P1A=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=H9514nGSNhwuiyLq8W8xnFS2/Eoa3n5BOZ7QZEhq378=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUBJ_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[qq.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:xiaowu.417@qq.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,cloudflare.com];
+	TAGGED_FROM(0.00)[bounces-301612-lists,netdev=lfdr.de];
 	TO_DN_ALL(0.00)[];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	HAS_X_PRIO_THREE(0.00)[3];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-301692-lists,netdev=lfdr.de];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:ameryhung@gmail.com,m:kuniyu@google.com,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:jiayuan.chen@linux.dev,m:john.fastabend@gmail.com,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:alexeistarovoitov@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:dkim,seu.edu.cn:mid,seu.edu.cn:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 69CB26BF989
+X-Rspamd-Queue-Id: 583B76BD6FD
 
-SGkgWGlhbywKCiZndDsgdGhlIGVycm9yIHBhdGggaW4gc21jX2xpc3RlbigpIGRvZXMgbm90IHJl
-c3RvcmUgaWNza19hZl9vcHMgd2hlbgomZ3Q7IGtlcm5lbF9saXN0ZW4oKSBmYWlscwoKVGhhbmtz
-LCB0aGlzIGxvb2tzIGxpa2UgYSByZWFsIGVycm9yLXBhdGggYnVnLiBJIHdpbGwgcHJlcGFyZSBp
-dCBhcyBhCnNlcGFyYXRlIGZpeCBmb3Igc21jX2xpc3RlbigpIHJhdGhlciB0aGFuIGZvbGRpbmcg
-aXQgaW50byB0aGlzCnNrX2NhbGxiYWNrX2xvY2sgcGF0Y2guCgpSdW55dQoK
+On Tue, Jun 23, 2026 at 02:26 PM -07, Alexei Starovoitov wrote:
+> On Tue, Jun 23, 2026 at 1:36=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
+com> wrote:
+>>
+>> This is a follow up from discussions at BPF summit with Alexei & John.
+>
+> Not quite. The discussion was to disable pieces of sockmap
+> that are causing trouble.
+> Not to move them under config knobs, but disable them.
+
+I really don't see how we can remove a feature that has users.
+I guess we will just have to weather out the bug wave.
 
