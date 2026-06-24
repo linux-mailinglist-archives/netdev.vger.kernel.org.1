@@ -1,126 +1,246 @@
-Return-Path: <netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4HUVMPPXO2pLeAgAu9opvQ
-	(envelope-from <netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:13:23 +0200
+	id 86mOBKbYO2p0eAgAu9opvQ
+	(envelope-from <netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:16:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1358C6BE7A8
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:13:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7153B6BE7FE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:16:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=Kz4Q9rbh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301657-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 350C83038A5A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:10:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74BDD3042435
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAEB3B19B1;
-	Wed, 24 Jun 2026 13:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2193B6C13;
+	Wed, 24 Jun 2026 13:15:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16513285C8B;
-	Wed, 24 Jun 2026 13:10:37 +0000 (UTC)
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5413B38B7;
+	Wed, 24 Jun 2026 13:15:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782306640; cv=none; b=DqVqByAHzCeYE5ZZC387zUZZ0pOpNN+17SOa27Do4PNWTRiYD/VaA1neEWViOj0vzASl8GuFRhYo2fqQ5DNXIgj2xlcLemjOZ90TS9Za3FgGUou1muueHJ/JKyvSMFB2RiK+oWyNJXpjfKEq42GYE/wZ3HmbOltuobLon1uMvjg=
+	t=1782306929; cv=none; b=C7/weAiD6L7Iw7UT833d377o3qcseDo+/aWMFS0r/ov1Fm80ld4muvUXHmZ7eU2yf7cPu+5TdTq6FlMmMKYvUzCaioSx95SYBqZdvCVwMlHyVsQAx4hKrcdcrFqNhgQhtJrRDaPNkAm+esFLQ11HhvrD119Sy+Y1bJkX8chvhN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782306640; c=relaxed/simple;
-	bh=Dtqkm98qhW+borrxFVxoJCwjgCy+xhriedBY9aDty/M=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=qiBIhNJmJfr4MgiEMtYK9kem50zoEvJelfyZ+u2Tx5EepYfMzD49Yu85AGfjL8hjDMSv9BFbpW4gHeSCKxyDdR9i+ng9LZmqSVlS3sAoqibn6EPUXd0LcMnBYVPOBYrGkFaSWa1y9mGINlctcQRD31zxHyBoi3rHisdVbUjNh2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 9937492009D; Wed, 24 Jun 2026 15:10:36 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 95E2892009C;
-	Wed, 24 Jun 2026 14:10:36 +0100 (BST)
-Date: Wed, 24 Jun 2026 14:10:36 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] ethernet: 3c509: Improve style of pnp_device_id
- array terminator
-In-Reply-To: <a0cd057e6a24b9d355b5e4bdfcdb812cdd1e4652.1781082923.git.u.kleine-koenig@baylibre.com>
-Message-ID: <alpine.DEB.2.21.2606241407580.58268@angie.orcam.me.uk>
-References: <a0cd057e6a24b9d355b5e4bdfcdb812cdd1e4652.1781082923.git.u.kleine-koenig@baylibre.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1782306929; c=relaxed/simple;
+	bh=moyOQIzaR6smZ9rBrd3W/NuwPZRv54jsj9HwphWn/HQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T/uo/ps2al7Ugu5+w0NxyTIpJzCg1BCjqulWCFO+Mlg7abujH6JcVGgj5HfNT9zZo6lnEPyxOLKe1zY78MUUmfIiX6DKAWh/9MbcB619mDDbo14C4terRWXNT8/w2L2cEtesAEJU/11RT8oP9R9CNwALtLumCkH6UjbbmCTHw0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kz4Q9rbh; arc=none smtp.client-ip=91.218.175.183
+Message-ID: <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782306914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jm5h4EGMu1/G65UxgDlhva2Uqze8a2QIkXsB3xVvPew=;
+	b=Kz4Q9rbh7etgj8euhlBLWO3TzYATCTCfu6njur0dxfGVJdMqB9UP/InGWtI0bOGTstOlHl
+	POIMRyO3mRJBT5/BeQDQV44BuugXQiS1AZGuvJ0EWei9+7fme1gtEeTZSwt1IwIDM7n5ZK
+	H6199we71vGASxf1nAZQvllBRzYOKVU=
+Date: Wed, 24 Jun 2026 21:14:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ kexec@lists.infradead.org, live-patching@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
+ linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
+ llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+ <20260622040533.29824-2-kaitao.cheng@linux.dev>
+ <20260622094242.64531b9a@pumpkin>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kaitao Cheng <kaitao.cheng@linux.dev>
+In-Reply-To: <20260622094242.64531b9a@pumpkin>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTE_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301656-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:u.kleine-koenig@baylibre.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DMARC_NA(0.00)[orcam.me.uk];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301657-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:lin
+ ux-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_GT_50(0.00)[52];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,orcam.me.uk:from_mime,orcam.me.uk:email,angie.orcam.me.uk:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1358C6BE7A8
+X-Rspamd-Queue-Id: 7153B6BE7FE
 
-On Wed, 10 Jun 2026, Uwe Kleine-König (The Capable Hub) wrote:
 
-> To match how device-id array terminators look like for other device
-> types drop `.id = ""` from it and let the compiler care for zeroing the
-> entry.
+
+在 2026/6/22 16:42, David Laight 写道:
+> On Mon, 22 Jun 2026 12:05:31 +0800
+> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
 > 
-> There are no changes in the compiled drivers, only the source looks
-> nicer.
+>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+>>
+>> The list_for_each*_safe() helpers are used when the loop body may
+>> remove the current entry.  Their API exposes the temporary cursor at
+>> every call site, even though most users only need it for the iterator
+>> implementation and never reference it in the loop body.
+>>
+>> Add *_mutable() variants for list and hlist iteration.  The new helpers
+>> support both forms: callers may keep passing an explicit temporary cursor
+>> when they need to inspect or reset it, or omit it and let the helper use
+>> a unique internal cursor.
 > 
-> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
-> ---
-> Hello,
+> I'm not really sure 'mutable' means anything either.
+> It is possible to make it valid for the loop body (or even other threads)
+> to delete arbitrary list items - but that needs significant extra overheads.
 > 
-> I'm currently working on changing various *_device_id definitions.
-> This patch is irrelevant for this quest and a pure style update for
-> consistency reasons without further dependencies on it. I just stumbled
-> over this while working on that quest.
+> It might be worth doing something that doesn't need the extra variable,
+> but there is little point doing all the churn just to rename things.
 > 
-> So if you don't like this patch, I won't insist.
+>>
+>> This makes call sites that only mutate the list through the current entry
+>> less noisy, while keeping the existing *_safe() helpers available for
+>> compatibility.
+>>
+>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+>> ---
+>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
+>>  1 file changed, 231 insertions(+), 38 deletions(-)
+>>
+>> diff --git a/include/linux/list.h b/include/linux/list.h
+>> index 09d979976b3b..1081def7cea9 100644
+>> --- a/include/linux/list.h
+>> +++ b/include/linux/list.h
+>> @@ -7,6 +7,7 @@
+>>  #include <linux/stddef.h>
+>>  #include <linux/poison.h>
+>>  #include <linux/const.h>
+>> +#include <linux/args.h>
+>>  
+>>  #include <asm/barrier.h>
+>>  
+>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
+>>  #define list_for_each_prev(pos, head) \
+>>  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
+>>  
+>> -/**
+>> - * list_for_each_safe - iterate over a list safe against removal of list entry
+>> - * @pos:	the &struct list_head to use as a loop cursor.
+>> - * @n:		another &struct list_head to use as temporary storage
+>> - * @head:	the head for your list.
+>> +/*
+>> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
+>>   */
+>>  #define list_for_each_safe(pos, n, head) \
+>>  	for (pos = (head)->next, n = pos->next; \
+>>  	     !list_is_head(pos, (head)); \
+>>  	     pos = n, n = pos->next)
+>>  
+>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
+>> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
+> 
+> Use auto
+> 
+>> +	     !list_is_head(pos, (head));				\
+>> +	     pos = tmp, tmp = pos->next)
+>> +
+>> +#define __list_for_each_mutable1(pos, head)				\
+>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
+>> +
+>> +#define __list_for_each_mutable2(pos, next, head)			\
+>> +	list_for_each_safe(pos, next, head)
+>> +
+>>  /**
+>> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
+>> + * list_for_each_mutable - iterate over a list safe against entry removal
+>>   * @pos:	the &struct list_head to use as a loop cursor.
+>> - * @n:		another &struct list_head to use as temporary storage
+>> - * @head:	the head for your list.
+>> + * @...:	either (head) or (next, head)
+>> + *
+>> + * next:	another &struct list_head to use as optional temporary storage.
+>> + *		The temporary cursor is internal unless explicitly supplied by
+>> + *		the caller.
+>> + * head:	the head for your list.
+>> + */
+>> +#define list_for_each_mutable(pos, ...)					\
+>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
+>> +		(pos, __VA_ARGS__)
+> 
+> The variable argument count logic really just slows down compilation.
+> Maybe there aren't enough copies of this code to make that significant.
+> But just because you can do it doesn't mean it is a gooD idea.
+> I'm also not sure it really adds anything to the readability.
+> 
+> And, it you are going to make the middle argument optional there is
+> no need to change the macro name.
 
- Absolutely fine with me, though I can see it's been taken already in my 
-absence.  So for the record only:
+Christian König and Jani Nikula also disagree with the variadic-argument
+implementation approach. If we abandon that method, it means we will
+inevitably need to add some new macros. If mutable is not a good name,
+suggestions for better alternatives would be welcome; coming up with a
+suitable name is indeed rather tricky.
 
-Acked-by: Maciej W. Rozycki <macro@orcam.me.uk>
+-- 
+Thanks
+Kaitao Cheng
 
- Thanks,
-
-  Maciej
 
