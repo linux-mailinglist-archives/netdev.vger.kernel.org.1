@@ -1,320 +1,184 @@
-Return-Path: <netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cedQAazDO2oFcggAu9opvQ
-	(envelope-from <netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:52 +0200
+	id y5WDJx3EO2oycggAu9opvQ
+	(envelope-from <netdev+bounces-301621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:48:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 545216BDCAD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35C216BDD1B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:48:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=TLNIv8rC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=RzcORzDA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301621-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301621-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6121C301A3A5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:45:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97EDC3020BD2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0533923815B;
-	Wed, 24 Jun 2026 11:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4AE2DECBF;
+	Wed, 24 Jun 2026 11:48:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DFF276028
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 11:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04ADB2DF153;
+	Wed, 24 Jun 2026 11:48:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782301513; cv=none; b=rrcEI4Hf1CPqqbIoNd+YIu9XAO60JE2/yDdMoYyAHiABFNw+OGeXICpXk6aRqwj1QrVVFqTdpqZpqfzSE8YMN/iv2c6C9UUX43jpz3QGhZ8tAaAThk9bpH/7e/L6LRpOcFmlEbSbvO3XMHZT9cj6MZwQM8B2ZrzGToRUdJdCy0I=
+	t=1782301722; cv=none; b=jkjjM93U/xlIkjkkPMOwZNOgcGCe/+WSHxch+xJqrZtc5XETL5os+euLX20c/a1NeTD+CoXvg8ab1GIc2A2dpvvzVQaDsrqbh1jxqiywPBZ92EbjRnSjzLF+vr20MgI7vyhWkxrnkK14VcinuzQowzH3ost8ZPvgroB3v8mx+eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782301513; c=relaxed/simple;
-	bh=H0MRJG2B1K/Bvnq9zsM3jp2THI6jTdOIvZbAQF4IfXc=;
+	s=arc-20240116; t=1782301722; c=relaxed/simple;
+	bh=Tb+d2AAtLwTqkgvKXoUk3ISGmsbGCps99DXhFcY4tik=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kdi/NJN6JS+SOa6rkCNtmQubYERZsu+zNnE2aH4GLr5ZICRVEn+bPhRgWw5Hmm40DvVbDn1mWuxs1U2hDLU45COD1DCkX6kefzGhtlHDHeFFVJzjTCIVPVThsJFinZEIWRxrWKL6hNHdgtgeIPr3LWCgDQZMRt+c9vgG+mUUSR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TLNIv8rC; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4923fb1f095so9440975e9.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 04:45:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782301511; x=1782906311; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eDHdE2/Ft54Y11URM0gtdL1NQZS1frqRaxNwltOdGA0=;
-        b=TLNIv8rCVLkYh+LyX0Ix7lUnkuVLsy1hJMyWWMgnbfdaig4Zc4iTEdlvN9fMDYc74y
-         rC93pcEeh+ZwKCYTqrUR9tq8WDoNAHb47TJhHbeVi3nb8FHfJIvIjBGA4UGcAttZnhIL
-         so9A0HPk16ttKoLS+t/i9BHdscAVBqT6/lB6kJhDXtnb4q+h9ISL+ma5yJOKbNSfA/VZ
-         9dSZrieI8GcoZkEM89x7xIZWAdW0iiOgnAIxKcosB+tciKSGFZU1ufZA4q33LxbUlbio
-         0nPj5eK6fFkfoRYDMP3WxJw9a1BlfRWtXwYuIvEpSuw0DxjNCFtYBnW5+o50bi8gocTz
-         q33g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782301511; x=1782906311;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eDHdE2/Ft54Y11URM0gtdL1NQZS1frqRaxNwltOdGA0=;
-        b=htsI3LuQVtdnwwULxdYy9KXpfx5IiZFJCdeFkdlKV4+nfJqO9l87s/8u5Jz5EjAEhQ
-         scuYv1M1Mq6cXUptlbFY8ZRtv0XyVs+jOfszZYTb2+dR1Nc8RNr6PApn+DBMeMxgiA7f
-         l/7yAF+ctguGSNNsbOgvpMEKP3VCaouoBeirl89iC9vpLmTaBPr5UT7l7/DDy9NDqW6u
-         8zlX/e3FTaG4A2grL4BQKnLMLkcSYrmmCMAVXs9Qbfp8pyduwZEbjl+bW9++A1uH1dq1
-         FvCzQT6S0D0b5cXoGmU5iHpzfRBXBMouDv0EmL/MlBRPn6ze9QRWhR2f7e7owmQ76fvY
-         pkGQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/6Lbqrdzv9l70VvpwOHxi1IDVBgd0i4rh+8WqpSX5PRZzJqQ1uBs5fS2lt5cwdI540WCv1XGs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgyFODISAtgme/PgeurWgkA96MghV/MYF039sO8wdI7MDItLuC
-	Rxf4P7ZIH8D6PBsbL4vR8BXiv/A8RbYe2HPPuoV5oVkxES5xyHxSCKpM
-X-Gm-Gg: AfdE7cnt+Y73Fmf3kg9PNNlnWunSmG7vADZazx7ah+YimZ0JmBI69ntOoTT3dqPdTut
-	Ri8lpm2oIYg4C/hcTB0KDv2uWAdQJtvqSnyqD0GdMCdG6sKOgHA4xqi3mKMnqip1A3L/Q71pxHt
-	0/7Fczs8/N+4wxFfrflKBCU+VjKOvT5BdYQeFxOxuCkKL555lhCU9BSFfpV3wutaiQNerdKy6RR
-	OLUDz7Lqt1dpWsIKqiY+3KrFZjvwrT4+uKy8kh9tHOQDcwohZsVYUvIA1mfGQMd8GSfuX7IOLla
-	OttXHT2YraU2BhNwbPRxNyhEXhUzCbaWSKOxivnZF5C2UmPcm5bIL6Fcr5wHQqhBeQp1Ua/547B
-	IuuhV9CB7cKg5YY/SpzyotpJ+BmoQsUxvFG4atn8OBZhZa4pAvvidJ3I6hBIXJYsvdvaPEUSInD
-	vGHvTJxPRRcQIV4twAIKXWOyTbWy/Ftiko1frQgfTirGLu
-X-Received: by 2002:a05:600c:1d0a:b0:492:409d:b7c3 with SMTP id 5b1f17b1804b1-4925b359fc2mr103143745e9.13.1782301510374;
-        Wed, 24 Jun 2026 04:45:10 -0700 (PDT)
-Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c225b2988sm5854285f8f.25.2026.06.24.04.45.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 04:45:09 -0700 (PDT)
-Date: Wed, 24 Jun 2026 13:45:08 +0200
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: Emil Tsalapatis <emil@etsalapatis.com>
-Cc: bpf@vger.kernel.org, andrii@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, edumazet@google.com, john.fastabend@gmail.com,
-	jordan@jrife.io, kuba@kernel.org, martin.lau@linux.dev,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com, yonghong.song@linux.dev
-Subject: Re: [PATCH bpf-next v8 3/7] bpf: add bpf_icmp_send kfunc
-Message-ID: <ajvDRCw8cPqXAqQq@gmail.com>
-References: <20260622120515.137082-1-mahe.tardy@gmail.com>
- <20260622120515.137082-4-mahe.tardy@gmail.com>
- <DJGWWQQD3B0P.2O1D9MO17YRK4@etsalapatis.com>
- <ajuqZMzqACLOijoC@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TX/ggXJ2YWTTZAmrMETIujDdxxiQFRy2im8kAca3YatIEJxF11QBJ2y0RRabgJLAuRxmgJwqmo8rLxhniS93erjaohNaBuyCEOwcfpR3StmB+TaWEW84I4IIGrc4FM3kEeTzT7+e0e4k0xTyarLSRbv1W8eNw11qIP2nBindlr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=RzcORzDA; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 188ED6057B;
+	Wed, 24 Jun 2026 13:48:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1782301711;
+	bh=5EJ4tt0BF14PyUb1G8s5DQNcfkPtXwzrKk/jyjeL05k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RzcORzDAnE8unbh+no/SvQkRTf9ugPpAbvfTtE7jF8cRTX54p5fmV9rv0v6w6FGBY
+	 oDb9OIleW+MoQhxD/TK0E47Y03d94dk9/0ghrgZoaJcCNKjMPxpDz7sxlDxzXEEHJv
+	 jKQr3BGXhW+H+QtYicDIRIgC+UXyui61xv1w20N8UaiibZdPX4IXbikRjarUoFXI+R
+	 iqqMqjaZBZg/t4SSR6+FrF3DDaGJycqJ+JzJC1M+KUMPlnL9XoxjMjlWvf6p++e9ia
+	 kc2NhyEs4I3PQzO307hxePimRRuHIIOpSYry8zG9cbl8Ui+Xe5CkweXPZWIIDxeEV6
+	 aW7kTdto/ipNg==
+Date: Wed, 24 Jun 2026 13:48:28 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Alexander Martyniuk <alexevgmart@gmail.com>
+Cc: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Jakub Kicinski <kuba@kernel.org>, Patrick McHardy <kaber@trash.net>,
+	netfilter-devel@vger.kernel, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Weiming Shi <bestswngs@gmail.com>, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH 5.10] netfilter: nf_log: validate MAC header was set
+ before dumping it
+Message-ID: <ajvEDFOlP7Bqb-3j@chamomile>
+References: <20260624140117.19799-1-alexevgmart@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ajuqZMzqACLOijoC@gmail.com>
+In-Reply-To: <20260624140117.19799-1-alexevgmart@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301620-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:emil@etsalapatis.com,m:bpf@vger.kernel.org,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:jordan@jrife.io,m:kuba@kernel.org,m:martin.lau@linux.dev,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:pabeni@redhat.com,m:yonghong.song@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,google.com,gmail.com,jrife.io,linux.dev,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_RECIPIENTS(0.00)[m:alexevgmart@gmail.com,m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:kadlec@netfilter.org,m:fw@strlen.de,m:davem@davemloft.net,m:kuznet@ms2.inr.ac.ru,m:yoshfuji@linux-ipv6.org,m:kuba@kernel.org,m:kaber@trash.net,m:netfilter-devel@vger.kernel,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linuxfoundation.org,netfilter.org,strlen.de,davemloft.net,ms2.inr.ac.ru,linux-ipv6.org,kernel.org,trash.net,vger.kernel,gmail.com,asu.edu];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301621-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,chamomile:mid,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 545216BDCAD
+X-Rspamd-Queue-Id: 35C216BDD1B
 
-On Wed, Jun 24, 2026 at 11:59:00AM +0200, Mahe Tardy wrote:
-> On Tue, Jun 23, 2026 at 10:09:20PM -0400, Emil Tsalapatis wrote:
-> > On Mon Jun 22, 2026 at 8:05 AM EDT, Mahe Tardy wrote:
+Hi,
+
+Thanks but why only 5.10?
+
+On Wed, Jun 24, 2026 at 02:01:15PM +0000, Alexander Martyniuk wrote:
+> From: Xiang Mei <xmei5@asu.edu>
 > 
-> [...]
+> commit a84b6fedbc97078788be78dbdd7517d143ad1a77 upstream
 > 
-> > > +#if IS_ENABLED(CONFIG_IPV6)
-> > > +	case htons(ETH_P_IPV6):
-> > > +		if (type != ICMPV6_DEST_UNREACH)
-> > > +			return -EOPNOTSUPP;
-> > > +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
-> > > +			return -EINVAL;
-> > > +
-> > > +		nskb = skb_clone(skb, GFP_ATOMIC);
-> > > +		if (!nskb)
-> > > +			return -ENOMEM;
-> > > +
-> > > +		if (!pskb_network_may_pull(nskb, sizeof(struct ipv6hdr))) {
-> > 
-> > Minor nit, but this may also fail with SKB_DROP_REASON_NOMEM. Now this is only
-> > possible if the IP header is not in the linear space which may well be
-> > impossible (?), but do we want to differentiate with
-> > pskb_network_may_pull_reason()?
+> The fallback path of dump_mac_header() guards the MAC header access
+> only with "skb->mac_header != skb->network_header", without checking
+> skb_mac_header_was_set(). When the MAC header is unset, mac_header is
+> 0xffff, so the test passes and skb_mac_header(skb) returns
+> skb->head + 0xffff, ~64 KiB past the buffer; the loop then reads
+> dev->hard_header_len bytes out of bounds into the kernel log.
 > 
-> Indeed, I think for the IP header is should be fine, but I replaced it
-> with the reason variant. Thanks!
+> This is reachable via the netdev logger: nf_log_unknown_packet() calls
+> dump_mac_header() unconditionally, and an skb sent through AF_PACKET
+> with PACKET_QDISC_BYPASS reaches the egress hook with mac_header still
+> unset (__dev_queue_xmit(), which would reset it, is bypassed).
+> 
+> Add the skb_mac_header_was_set() check the ARPHRD_ETHER path already
+> uses, and replace the open-coded MAC header length test with
+> skb_mac_header_len(). Only skbs with an unset MAC header are affected;
+> valid ones are dumped as before.
+> 
+>  BUG: KASAN: slab-out-of-bounds in dump_mac_header (net/netfilter/nf_log_syslog.c:831)
+>  Read of size 1 at addr ffff88800ea49d3f by task exploit/148
+>  Call Trace:
+>   kasan_report (mm/kasan/report.c:595)
+>   dump_mac_header (net/netfilter/nf_log_syslog.c:831)
+>   nf_log_netdev_packet (net/netfilter/nf_log_syslog.c:938 net/netfilter/nf_log_syslog.c:963)
+>   nf_log_packet (net/netfilter/nf_log.c:260)
+>   nft_log_eval (net/netfilter/nft_log.c:60)
+>   nft_do_chain (net/netfilter/nf_tables_core.c:285)
+>   nft_do_chain_netdev (net/netfilter/nft_chain_filter.c:307)
+>   nf_hook_slow (net/netfilter/core.c:619)
+>   nf_hook_direct_egress (net/packet/af_packet.c:257)
+>   packet_xmit (net/packet/af_packet.c:280)
+>   packet_sendmsg (net/packet/af_packet.c:3114)
+>   __sys_sendto (net/socket.c:2265)
+> 
+> Fixes: 7eb9282cd0ef ("netfilter: ipt_LOG/ip6t_LOG: add option to print decoded MAC header")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> Signed-off-by: Alexander Martyniuk <alexevgmart@gmail.com>
+> ---
+> Backport fix for CVE-2026-52942
+>  net/ipv4/netfilter/nf_log_ipv4.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/netfilter/nf_log_ipv4.c b/net/ipv4/netfilter/nf_log_ipv4.c
+> index d07583fac8f8..d6164e8e2c73 100644
+> --- a/net/ipv4/netfilter/nf_log_ipv4.c
+> +++ b/net/ipv4/netfilter/nf_log_ipv4.c
+> @@ -296,8 +296,8 @@ static void dump_ipv4_mac_header(struct nf_log_buf *m,
 >  
-> > > +			kfree_skb(nskb);
-> > > +			return -EBADMSG;
-> > > +		}
-> > > +
+>  fallback:
+>  	nf_log_buf_add(m, "MAC=");
+> -	if (dev->hard_header_len &&
+> -	    skb->mac_header != skb->network_header) {
+> +	if (dev->hard_header_len && skb_mac_header_was_set(skb) &&
+> +	    skb_mac_header_len(skb) != 0) {
+>  		const unsigned char *p = skb_mac_header(skb);
+>  		unsigned int i;
+>  
+> -- 
+> 2.43.0
 > 
-> [...]
-> 
-> > >  static int __init bpf_kfunc_init(void)
-> > >  {
-> > >  	int ret;
-> > > @@ -12639,6 +12745,9 @@ static int __init bpf_kfunc_init(void)
-> > >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
-> > >  					       &bpf_kfunc_set_sock_addr);
-> > >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
-> > > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
-> > > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
-> > > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
-> > 
-> > Based on Sashiko's feedback, since we mostly care about cgroup_skb
-> > should we just make it exclusive to them and drop CLS_ACT?
-> 
-> This would indeed simplify this patchset, I could drop most of the
-> complication induced by tc ingress routing. But I think having both
-> cgroup_skb and tc support would be nice as a first implem. I'll try
-> again in a new version as I added a test for ingress tc and could
-> actually fix the routing based on sashiko's feedback (this also drop the
-> first two patches that were partially wrong).
-
-tl;dr: I'll remove the tc support as it feels difficult (impossible
-without major plumbing changes?) to get right.
-
-Here are the details:
-
-Initially I ended up removing the first two patch set as they were
-technically wrong (see explanations after), I added this small helper:
-
-	#if IS_ENABLED(CONFIG_INET) || IS_ENABLED(CONFIG_IPV6)
-	static bool skb_dst_validate_and_hold(struct sk_buff *skb)
-	{
-	       bool ret;
-
-	       rcu_read_lock();
-	       ret = skb_valid_dst(skb) && skb_dst_force(skb);
-	       rcu_read_unlock();
-
-	       return ret;
-	}
-	#endif
-
-And then the body of the kfunc would do something like this (instead of
-calling the removed helpers):
-
-	reason = pskb_network_may_pull_reason(nskb, sizeof(struct iphdr));
-	if (reason) {
-		kfree_skb_reason(nskb, reason);
-		return -EBADMSG;
-	}
-
-	memset(IPCB(nskb), 0, sizeof(struct inet_skb_parm));
-	IPCB(nskb)->iif = nskb->skb_iif;
-
-	if (!skb_dst_validate_and_hold(nskb)) {
-		if (!nskb->dev) {
-			kfree_skb(nskb);
-			return -ENODEV;
-		}
-
-		iph = ip_hdr(nskb);
-		reason = ip_route_input(nskb, iph->daddr, iph->saddr,
-					ip4h_dscp(iph), nskb->dev);
-		if (reason) {
-			kfree_skb_reason(nskb, reason);
-			return -EHOSTUNREACH;
-		}
-	}
-
-	icmp_send(nskb, type, code, 0);
-
-Then I added a tc ingress test to showcase the issue with the previous
-helpers and trigger the routing in the kfunc, with this steup:
-
-	  client ns:                    test ns:
-	  icmp_peer                     ns_icmp_send_unreach_route_ingress
-	+------------+                +-------------------------+
-	| icmp_cli   |                | icmp_srv                |
-	| 198.18.0.1 |--------------->| primary:   198.18.0.254 |
-	+------------+ TCP SYN        | local dst: 198.18.0.2   |
-		       dst=198.18.0.2 +-------------------------+
-					  | tc ingress BPF
-					  | calls bpf_icmp_send()
-					  | -> icmp src=198.18.0.2
-					  v
-
-With the previous helpers, the icmp would route by reverting the daddr
-immediately, and then asking for the route. Thus we would "forget" about
-the actual source address, and in this case we would end up with the
-icmp control message src IP being the primary address and not the one we
-wanted: 198.18.9.2. Turns out route input was sufficient to give the
-needed _correct_ information to icmp_send that would invert the address
-for us and route the packet again.
-
-Then I submitted that for more review by sashiko and it found this new
-thing (which is orthogonal to the previous issue):
-
-	> @@ -12639,6 +12788,9 @@ static int __init bpf_kfunc_init(void)
-	>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
-	>  					       &bpf_kfunc_set_sock_addr);
-	>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
-	> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
-	> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
-	> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
-
-	Can exposing net/core/filter.c:bpf_icmp_send() to sched_cls and sched_act
-	deadlock a non-lockless qdisc?
-
-	A cls_bpf program can run from a qdisc enqueue classifier while the qdisc
-	root lock is held.  If it calls bpf_icmp_send(), the kfunc synchronously
-	goes through icmp_send()/icmpv6_send() and then normal transmit.  If the
-	reply routes back through the same qdisc, the inner transmit can try to take
-	the same root lock again.
-
-	One possible path is:
-
-	__dev_xmit_skb()
-	  q->enqueue()
-	  prio_enqueue()
-	  tcf_classify()
-	  cls_bpf_classify()
-	  bpf_icmp_send()
-	  icmp_send()/icmpv6_send()
-	  dev_queue_xmit()
-	  __dev_xmit_skb()
-
-	Is this kfunc safe in enqueue classifier/action contexts, or should this
-	registration be limited to contexts that cannot run under the qdisc root
-	lock?
-
-I managed to indeed reproduce this deadlock. So I think there's no way
-to implement this safely, we would either need:
-- make the kfunc only available to tcx only (and then prevent program
-  verified as TCX from being reused as legacy qdisc classifiers...)
-- do some crazy runtime guard, exposing the lock.
-
-So I will give up on tc support for now as it's more difficult than
-expected.
-
-> 
-> > >  	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, &bpf_kfunc_set_sock_ops);
-> > >  }
-> > >  late_initcall(bpf_kfunc_init);
-> > > --
-> > > 2.34.1
-> > 
 
