@@ -1,196 +1,187 @@
-Return-Path: <netdev+bounces-301632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0jLDJjLKO2q8dAgAu9opvQ
-	(envelope-from <netdev+bounces-301632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:14:42 +0200
+	id 8XGZBAzMO2oUdQgAu9opvQ
+	(envelope-from <netdev+bounces-301634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:22:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081746BE06E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:14:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCEC6BE0E5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:22:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301632-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301632-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ll3pdBFM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301634-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301634-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 31B493005E8A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:14:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A9B7E300C9A8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCC32BEC43;
-	Wed, 24 Jun 2026 12:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67EDD3A8743;
+	Wed, 24 Jun 2026 12:22:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DECF2D94B5
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 12:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124A439DBC9
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 12:22:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782303274; cv=none; b=ufME0jZ1iwVmvX6m9LwIh0QeS1cH83WP8c/kIiDiSGi3JJLL4ejKYnywz2lKR7Hg9sY0FwUWzJMteaDsa5La5HLa4ZygJHNOEOAdhV4AwaYrWYaftVaKRjgc1ge3C7e9IEVZ8+HAgc5bWMhd1rVh0jq258QAPWKeRHukJuYdppc=
+	t=1782303753; cv=none; b=nb0fLhcOdcwcMjqvNKSUJl00XZ6gAP4Vff/E+gE0yDVD8WAScwt0RHRX0jv7k7srtbZ6fMDHeq9luUfpCttZ8mwP1M9xfI2d/rURDrWXvrCvzdgdywT2RbyiKidx7QIzy1E4uSaeUsEgQP564chokAkoaMldPKmCI7rLpAOHL6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782303274; c=relaxed/simple;
-	bh=1VcIPUC/nBpYX8U3kB1v5nOwaGgdyAKzTTbUyoLIidY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=sMIqmC85qU0uPCcA4WVcSHvAE1fsSqrIvRaKPhiWC/pOEVSTIfXjZRE43BZszzL2fNdf0bYr8LBVrPvlI0LUXtnarNzB/fa2dg/ijDRic/hZePcObak+M+EvGsJ1yugFeSGQAmvNSY8EQooZ8OXrx0aTs7fxdaRw2NXwcI3O7HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-486cc29e03bso1296706b6e.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 05:14:33 -0700 (PDT)
+	s=arc-20240116; t=1782303753; c=relaxed/simple;
+	bh=FnG9zHq+2xxL21OVE0ldGOEIqmMpwP6fHAL5vebTYj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E37rstu6co50CFQroL/1UW2Kz56rb2UOBYh9g1mWklXRgpHS5pn9MYamqa/MUMUc/BogJiCTOGqSkMc9L9g5cU1H4c+JDueMxWlQvVRZVYB5GuRkA/Xu93UTB6uD3DM3h/qr6FEdzhU993iVtSAAhnYoLLv8OOMR4EtYF/U1uM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ll3pdBFM; arc=none smtp.client-ip=74.125.224.45
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-6647a6c1f0cso106109d50.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 05:22:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782303750; x=1782908550; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c3hCWf81IkIHy8M4N5mPkeK3GOsJg4h+ZHQGj103FE4=;
+        b=Ll3pdBFMWhKGBRZbzPTY8hdN5DvvY3EGY9o6W3Hp7MvZce70I5py899BshXy0LTTuj
+         ma0kKCpEFlrJ4VQCpXtlG7grbC2wNcc+725u31pA7XuMu73m6j+rtJb+lPxF2T0DVU9O
+         NkrMn3Po7ifwemlg7ehQ+/mWStRNPeQdKoTqtOnp09XCwH7p+DLoB/0KD+cUxkXbSBAZ
+         3mvdc05VRBXT8DikGnWJew4d1l8kXeEB4Ta+ZIfv3ARrgVMGVJY1Bw46gAARk9tE9yr8
+         OpNeD1mcXmndjdkBXjKqyvBzNwL2ZDdN1DFPzr52Ag4Hefw9jGLE9YaYDu+auXY1Eikz
+         l7gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782303272; x=1782908072;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0/BKGHSgt7kkPjfopsHIa52lwo20kFyOlX7eKJo26Y=;
-        b=L66ZOjoiCgnYGnwWAEBDOcxMDHGt8i4EmgsiT/Xu0hh8VjwIibrnREAS5rSVge18fB
-         q4MGL97kHDweh3lUHIP5O1dRuKxDFwA8VHW5DqX6cFfMNy7YrpWSZH6oKTBe3my5f90b
-         11cTJ/TsbYxpAat4zW18Q8MwdN1d8jLPnBx1D7aD/vwWIRpy8lmr5TjnsGdVrLlL/CeX
-         hjOWXf0CDrXRTz8MPRdHxepcm67G5UIraibF9MXKKCpZsrLZJW2bys9tGRqErlvEBr31
-         f0YBUHmwwpjrI1kcbUc8TDu97xTsUJywAasiSrLhwuWTHJduqqrwIFcSHiUuIjFgdlVJ
-         8BOw==
-X-Forwarded-Encrypted: i=1; AFNElJ/n7PkBSWj+iBlXGSfhBoBJXuEAHhdhduZDL5DEYKoiw4poOoZcCLBD12Zgu2yFFGuil2T8sjU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzopDQzpCdqWEF7PgARgoP0TdjspnSUaUsa78D3V+5rnydTXsTD
-	NMe+kGqrtdMcQTUnKHc/50vCFPtkv95fbyrNJ+nZMqXTg5R3xIdznehZcUyusvl+4R2x0iQRFCs
-	TkvYGwxnJJjcvmkRVByKwFPe0y3E2CzkddnLooQ4TM1ZRrJjQe8Yuu8KBUwg=
+        d=1e100.net; s=20251104; t=1782303750; x=1782908550;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c3hCWf81IkIHy8M4N5mPkeK3GOsJg4h+ZHQGj103FE4=;
+        b=qIv33L3WRxNdt8zpX7vIYOMj18JfTE9XTotHAm6oNTJKcdM6T3sWl1MrIkKVaQivpO
+         sl7JdMQINJfA1YKbqPT2OqH1Y/H6Uv72bDUJVL3KQ/x5Usok/UQZnMMu8BnbxK3ZiV3Y
+         ul2bJj8z4jH2siiEM7mTm8oq7atqXgmXipr4h7r+x2iRXT2a+KhWLFTVIrM6IUssXKgj
+         WP4lSHbKzmB4O0CI/s1c0x2nxXkuzmXYnaO7pYbTC5A9ko08Bu2/b1H3/cOc4xU/LP4U
+         yUKtoQGzne0Ko0iYgpoFvCMwGGFD02atHu7WflV0VCwUerFHuI1cmgqFBbHu3XfCY+1u
+         rFxg==
+X-Forwarded-Encrypted: i=1; AHgh+RogN2Hb+hNzO8j74WcrYAhKf3byXNny3XeWsD2l2e8iSRXAmoVPSuDjr+8kSY6mhwr061O8MfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGlx+9xwbcXGbq1X3QpHm2vptVu8AXe9Gjvmj3AvtSZRpe8F4q
+	laEgkwwH8WykJVAderjYvwOPpiotyM/YJH1j6/gUbdXcUgHeFrRNU0fa
+X-Gm-Gg: AfdE7cmH4dVWaLJ5jYY+FXcG0ZyBI5r4UT7PPKwr5Yn3J9e4RdqGtYet2bgxzP8h6d5
+	agB/pV/IVGb73bebCr8oaWle6/xfJdbN8A7ZpjP7Qq2rHX9IZkwh6lOXiD+QyLTSrr8/s1x7LqS
+	BJ2mZiPsvdZFjnmKMh9gKiqrImew5UY4unG5CZfHvRCVUxRaXmIsESOWKsVe/tSmuIwdmoEVxxR
+	59zDUktxaFkN4KL6+kusixhnlBh2dX2849dwzECpnH8Rtuxt7u8wvyPxUYDYfVrcSfJYfmV6agQ
+	K3p5PBVJSSA/W6yqvvZKUAENhPjVDi7Bukp3POX+gYCmAsw2h5FCobEQL/D8eEgnyyBDlqytNm8
+	73NGZqrXPD282AOboIjzzhc+Q4BoE0Jfp7rschF6F0SQog/05uU2REoOyDyTEFp7E93IpPEzBpJ
+	7OQ3hFRR8uhSyDXNXKy7WaXMjrzxORpmKx/A5O
+X-Received: by 2002:a05:690e:120d:b0:661:1307:3d62 with SMTP id 956f58d0204a3-6636e61116cmr2426807d50.52.1782303749893;
+        Wed, 24 Jun 2026 05:22:29 -0700 (PDT)
+Received: from Dev-Null-MSI ([2a0d:3344:52ac:a808:98a4:4381:be45:536f])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66314d444c7sm6614118d50.13.2026.06.24.05.22.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 05:22:29 -0700 (PDT)
+From: Yousef Alhouseen <alhouseenyousef@gmail.com>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yousef Alhouseen <alhouseenyousef@gmail.com>
+Subject: [PATCH net] sctp: fix SCTP_RESET_STREAMS stream list length limit
+Date: Wed, 24 Jun 2026 14:22:13 +0200
+Message-ID: <20260624122213.4052-1-alhouseenyousef@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:6718:b0:485:5982:4cfc with SMTP id
- 5614622812f47-49079492366mr2337970b6e.33.1782303272549; Wed, 24 Jun 2026
- 05:14:32 -0700 (PDT)
-Date: Wed, 24 Jun 2026 05:14:32 -0700
-In-Reply-To: <20260624073209.3703492-1-edumazet@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a3bca28.92e8a34c.2b91f1.0008.GAE@google.com>
-Subject: [syzbot ci] Re: net: clear transport header during tunnel decapsulation
-From: syzbot ci <syzbot+ci7e1fc283906ef7ab@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	eric.dumazet@gmail.com, horms@kernel.org, idosch@nvidia.com, kuba@kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzbot@syzkaller.appspotmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:eric.dumazet@gmail.com,m:horms@kernel.org,m:idosch@nvidia.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzbot@syzkaller.appspotmail.com,m:syzbot@lists.linux.dev,m:syzkaller-bugs@googlegroups.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,gmail.com,nvidia.com,vger.kernel.org,redhat.com,syzkaller.appspotmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301632-lists,netdev=lfdr.de,ci7e1fc283906ef7ab];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301634-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:alhouseenyousef@gmail.com,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,googlegroups.com:email,googlesource.com:url,appspotmail.com:email,syzbot.org:url,syzkaller.appspotmail.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 081746BE06E
+X-Rspamd-Queue-Id: 2CCEC6BE0E5
 
-syzbot ci has tested the following series
+SCTP_RESET_STREAMS carries a flexible array of u16 stream IDs, but the
+optlen clamps treat USHRT_MAX as a byte count and then multiply
+sizeof(__u16) by the fixed header size.
 
-[v1] net: clear transport header during tunnel decapsulation
-https://lore.kernel.org/all/20260624073209.3703492-1-edumazet@google.com
-* [PATCH net] net: clear transport header during tunnel decapsulation
+That caps the copied and validated option buffer at about 64 KiB, which
+rejects valid requests containing more than about half of the u16 stream
+ID range.
 
-and found the following issue:
-WARNING in geneve_udp_encap_recv
+Use struct_size_t() for the maximum struct sctp_reset_streams layout
+instead, so the bound matches the flexible array described by
+srs_number_streams.
 
-Full report is available here:
-https://ci.syzbot.org/series/1f6dc47e-354f-4904-bc18-c2b7ea4d79b2
-
-***
-
-WARNING in geneve_udp_encap_recv
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      d87363b0edfc7504ff2b144fe4cdd8154f90f42e
-arch:      amd64
-compiler:  Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
-config:    https://ci.syzbot.org/builds/7bb83c16-d55d-4d99-8c2b-6050e0022ef6/config
-
-------------[ cut here ]------------
-!skb_transport_header_was_set(skb)
-WARNING: ./include/linux/skbuff.h:3094 at geneve_udp_encap_recv+0x26ed/0x4130, CPU#1: kworker/1:3/5072
-Modules linked in:
-CPU: 1 UID: 0 PID: 5072 Comm: kworker/1:3 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: mld mld_ifc_work
-RIP: 0010:geneve_udp_encap_recv+0x26ed/0x4130
-Code: c8 00 00 00 0f b6 04 01 84 c0 0f 85 f2 18 00 00 48 8b 7c 24 78 66 44 89 6f 0a e8 7e 9b 7a 03 e9 8c 00 00 00 e8 f4 fc 33 fb 90 <0f> 0b 90 e9 2e e3 ff ff 49 83 c6 06 4c 89 f0 48 c1 e8 03 48 b9 00
-RSP: 0018:ffffc90000a08620 EFLAGS: 00010246
-RAX: ffffffff8691f92c RBX: ffff8881bcc8b5d0 RCX: ffff88816a7abb80
-RDX: 0000000000000100 RSI: 000000000000ffff RDI: 000000000000ffff
-RBP: ffffc90000a08790 R08: ffffffff903114f7 R09: 1ffffffff206229e
-R10: dffffc0000000000 R11: fffffbfff206229f R12: ffff888109f6a108
-R13: 1ffff110213ed5df R14: 0000000000000010 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8882a927b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6956ea5440 CR3: 000000016f55c000 CR4: 00000000000006f0
-Call Trace:
- <IRQ>
- udp_queue_rcv_one_skb+0xfc5/0x10e0
- udp_unicast_rcv_skb+0x21a/0x3a0
- udp_rcv+0xecb/0x1db0
- ip_protocol_deliver_rcu+0x27e/0x440
- ip_local_deliver_finish+0x3bb/0x6f0
- NF_HOOK+0x336/0x3c0
- NF_HOOK+0x336/0x3c0
- process_backlog+0xa34/0x1860
- __napi_poll+0xaa/0x330
- net_rx_action+0x61d/0xf50
- handle_softirqs+0x225/0x840
- do_softirq+0x76/0xd0
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xf8/0x130
- __dev_queue_xmit+0x1ed7/0x37f0
- ip6_output+0x337/0x540
- NF_HOOK+0x177/0x4f0
- mld_sendpack+0x890/0xe10
- mld_ifc_work+0x839/0xe70
- process_scheduled_works+0xa8e/0x14e0
- worker_thread+0xa47/0xfb0
- kthread+0x388/0x470
- ret_from_fork+0x514/0xb70
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
+Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+ net/sctp/socket.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 66e12fb0c..b8f13044a 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -4111,8 +4111,9 @@ static int sctp_setsockopt_reset_streams(struct sock *sk,
+ 	if (optlen < sizeof(*params))
+ 		return -EINVAL;
+ 	/* srs_number_streams is u16, so optlen can't be bigger than this. */
+-	optlen = min_t(unsigned int, optlen, USHRT_MAX +
+-					     sizeof(__u16) * sizeof(*params));
++	optlen = min_t(unsigned int, optlen,
++		       struct_size_t(struct sctp_reset_streams, srs_stream_list,
++				     USHRT_MAX));
+ 
+ 	if (params->srs_number_streams * sizeof(__u16) >
+ 	    optlen - sizeof(*params))
+@@ -4598,8 +4599,8 @@ static int sctp_setsockopt(struct sock *sk, int level, int optname,
+ 	if (optlen > 0) {
+ 		/* Trim it to the biggest size sctp sockopt may need if necessary */
+ 		optlen = min_t(unsigned int, optlen,
+-			       PAGE_ALIGN(USHRT_MAX +
+-					  sizeof(__u16) * sizeof(struct sctp_reset_streams)));
++			       PAGE_ALIGN(struct_size_t(struct sctp_reset_streams,
++							srs_stream_list, USHRT_MAX)));
+ 		kopt = memdup_sockptr(optval, optlen);
+ 		if (IS_ERR(kopt))
+ 			return PTR_ERR(kopt);
+-- 
+2.54.0
 
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
 
