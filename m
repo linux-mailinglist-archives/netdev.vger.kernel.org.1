@@ -1,125 +1,167 @@
-Return-Path: <netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301750-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GsA5Fh4fPGqxkAgAu9opvQ
-	(envelope-from <netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:17:02 +0200
+	id VyA4JfYfPGrlkAgAu9opvQ
+	(envelope-from <netdev+bounces-301750-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:20:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6F06C0B11
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:17:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA746C0B4A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 20:20:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oG6UZAJW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301749-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CtEuCKO1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301750-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301750-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D34A6301E996
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:17:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1AFD33002500
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF98E248893;
-	Wed, 24 Jun 2026 18:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5593242D4;
+	Wed, 24 Jun 2026 18:20:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53CE145B3F;
-	Wed, 24 Jun 2026 18:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2784175A9A
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 18:20:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782325017; cv=none; b=W40eoiJ1ISyWHuwxXkRiTl6n6SriZClIRau1rIZ+Pg5HETes8riY4pOBCbY+gMo+uTQJ2pv9Du/NIP8mTTE1pqOoNvpeybL95h32oKPGGM+VGlLIIUTZTd3yoXEgukK/OGmOp0Xj7jPdJgTOGnERyQKCEEAKQ0n5fFJsgI7z0QY=
+	t=1782325225; cv=none; b=XgySJSVkFCvCy1AsQ/ygWqi/AqSKJ48YQE7eKB2q2CTIS3U96bR7PUT/zSavv+HoRAY6auV6wX9pC4rNW9ViUovhwS2RVKg+DgV5QgUt2x3npTQYkGTiO5YKtuzhif6lLCmjJCRLfRWGGLnV7LphFpx2h4du6133cra7itsJl6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782325017; c=relaxed/simple;
-	bh=7NnaKsEYxlQ7+w0A9v23Et8HeWTkSa7HrG3iVsCesv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WMna50D6HGEA61+ClLIjV+QPSH3v2cEBoDqvQ6Igk12o8eKMThmSYCD96vZ9pP3iajho0ijQ/429FUa0QJeLAZDJwbkKczA6IyPU4MIpUCHFIbDTbAu4rmfiJzAWG62F8v0MBhcxx6XqBQ349YllrlNcJcmBEMJzgGfWwiRR6VY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oG6UZAJW; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA13A1F000E9;
-	Wed, 24 Jun 2026 18:16:53 +0000 (UTC)
+	s=arc-20240116; t=1782325225; c=relaxed/simple;
+	bh=E4qfukHzSfC4cQ+cN8PXEJ4HHX6YwxMYViD4qrrUYT8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AMzeK+gosSWl4NCMfvAcUWqIU5WE293VetIUTszIHX11D7X2zrDVO8nwSgJ4tharZrcFa7cm7iBpQwKCxIgnllWUfpK9IC7K5JFPdgJPc3bPCDmmiqgpYv1KdwLSghLDCXID9fwyIKxfNRUXBGx+BhrHIsp9tUnm5Acs/sprkf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtEuCKO1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F276B1F000E9;
+	Wed, 24 Jun 2026 18:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782325016;
-	bh=xls8epCz9Eh9Dj6gwTjfqKKY5gFaZNqvZ8MA83RxZGc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oG6UZAJWNoZeyPneAL76f/xmotrBI5IsW5FU6h6ulrPghXDNhRXsXitBUwzTe0P2Q
-	 hyal4TKlYaEIW8M7YmqXXsoCHbtr4wafAf5rMygxrcggr9wKOkGfez+DdYiq9gWjKM
-	 DZkDb5J8VbWOZEvcGT4MHTKhBrdZwvWQN1nUm/FVS+PwE+9UBXlItk0GiNOwycPNM4
-	 OO17HXbEge9bWuH6/5XBUzMv97MTtYjNBJh0Utq2KUSa4EYvDTJ08DwpU5wH0W9L97
-	 feOopsCXYoJBnzbgCF81WVIsV2ssSIoouHqbbO3JBV5qvJ+qtWaldx0y80LN4Qi1ob
-	 Kiknqm1HQcliQ==
-Date: Wed, 24 Jun 2026 19:16:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
-	kees@kernel.org, bjarni.jonasson@microchip.com,
-	lars.povlsen@microchip.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: sparx5: unregister blocking notifier on init failure
-Message-ID: <20260624181651.GC1131256@horms.kernel.org>
-References: <20260623115714.2192074-1-haoxiang_li2024@163.com>
+	s=k20260515; t=1782325224;
+	bh=3iuwuH12g8hq85AIV/aRBUBlA7FrLlqdK86rUlQ7QF4=;
+	h=From:To:Cc:Subject:Date;
+	b=CtEuCKO1jNVYnSKOyxZU42rayPM24g8HeBeJnVUD7nxPipINKcdkDEwPiqXFlN5Cu
+	 awvWIqxh9cOW72PEQhLwWoAywWeIFVPU3LYmd5Q4YV/tmuBlUJvlXlc1IFzVRE5hSo
+	 KKDgiyfdUn898JJu0gfgiSChtKHErQhIbgP89Xp/Pv5jHcjiCOttjHY6ngxf+nXYQm
+	 MLanR+Gl9vUkkC3S2EDozaXBIBZ5qMQE2IrH4yBHshP8UTO9poUG2oYAzihl9ELltY
+	 NYTwIIeFqSmKa4MSfticqcun4bzWpz23O1CE6h5ezAPNVwKS6Zq8wTcCY4Qljb5qkf
+	 I98L7izEBxzMQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	jv@jvosburgh.net,
+	sdf@fomichev.me,
+	dongchenchen2@huawei.com,
+	idosch@nvidia.com,
+	n05ec@lzu.edu.cn,
+	yuantan098@gmail.com,
+	kuniyu@google.com,
+	nb@tipi-net.de,
+	aleksandr.loktionov@intel.com,
+	dtatulea@nvidia.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net 0/4] net: avoid nested UP notifier events
+Date: Wed, 24 Jun 2026 11:20:14 -0700
+Message-ID: <20260624182018.2445732-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260623115714.2192074-1-haoxiang_li2024@163.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-301749-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301750-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:haoxiang_li2024@163.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:UNGLinuxDriver@microchip.com,m:kees@kernel.org,m:bjarni.jonasson@microchip.com,m:lars.povlsen@microchip.com,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jv@jvosburgh.net,m:sdf@fomichev.me,m:dongchenchen2@huawei.com,m:idosch@nvidia.com,m:n05ec@lzu.edu.cn,m:yuantan098@gmail.com,m:kuniyu@google.com,m:nb@tipi-net.de,m:aleksandr.loktionov@intel.com,m:dtatulea@nvidia.com,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[163.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,jvosburgh.net,fomichev.me,huawei.com,nvidia.com,lzu.edu.cn,gmail.com,tipi-net.de,intel.com];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,horms.kernel.org:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CF6F06C0B11
+X-Rspamd-Queue-Id: AFA746C0B4A
 
-On Tue, Jun 23, 2026 at 07:57:14PM +0800, Haoxiang Li wrote:
-> sparx5_register_notifier_blocks() registers the switchdev blocking
-> notifier before allocating the ordered workqueue. If the workqueue
-> allocation fails, the error path unregisters the switchdev and netdevice
-> notifiers, but leaves the blocking notifier registered.
-> 
-> Add a separate error label for the workqueue allocation failure path and
-> unregister the switchdev blocking notifier there.
-> 
-> Fixes: d6fce5141929 ("net: sparx5: add switching support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+syzbot reported that recent ethtool rework leads to deadlock
+on stacked devices. VLANs create nested notifications, confusing
+execution context. Bringing up dummy causes vlan to bring itself
+up as well. Which in turn causes bond to ask for link state -
+a call chain traveling in the opposite direction.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+  bond    (3) bond_update_speed_duplex(vlan)
+    |           ^                v
+  vlan    (2) UP(vlan)    (4) vlan_ethtool_get_link_ksettings()
+    |           ^                v
+  dummy   (1) UP(dummy)   (5) __ethtool_get_link_ksettings()
+
+We locked the instance lock of dummy at (1) and will will
+try to lock it again at (5) - which of course deadlocks.
+
+For non-nested notifications this is avoided because NETDEV_UP
+is always run ops-locked (so that bond asks for link using the
+netif_ API which assumes instance lock already held). The nesting,
+however, makes this problematic, we cannot carry the state of
+the whole chain back in the opposite direction.
+
+AFAICT vlan is the only driver which causes such issues.
+So let's try a localized fix of deferring vlan auto-open
+to a workqueue.
+
+Jakub Kicinski (4):
+  net: turn the rx_mode work into a generic netdev_work facility
+  net: add the driver-facing netdev_work scheduling API
+  vlan: defer real device state propagation to netdev_work
+  selftests: bonding: add a test for VLAN propagation over a bonded real
+    device
+
+ Documentation/networking/netdevices.rst       |   2 +
+ net/core/Makefile                             |   2 +-
+ .../selftests/drivers/net/bonding/Makefile    |   1 +
+ include/linux/netdevice.h                     |  21 +-
+ net/8021q/vlan.h                              |  11 ++
+ net/core/dev.h                                |  11 +-
+ net/8021q/vlan.c                              |  76 +-------
+ net/8021q/vlan_dev.c                          |  60 ++++++
+ net/core/dev.c                                |   2 +
+ net/core/dev_addr_lists.c                     |  77 +-------
+ net/core/netdev_work.c                        | 162 ++++++++++++++++
+ .../drivers/net/bonding/bond_vlan_real_dev.sh | 180 ++++++++++++++++++
+ 12 files changed, 457 insertions(+), 148 deletions(-)
+ create mode 100644 net/core/netdev_work.c
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_vlan_real_dev.sh
+
+-- 
+2.54.0
 
 
