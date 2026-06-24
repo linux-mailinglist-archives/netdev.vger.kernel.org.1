@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-301685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301686-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hi7WIfDzO2pNgQgAu9opvQ
-	(envelope-from <netdev+bounces-301685-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:12:48 +0200
+	id 5IoAEOTyO2q/gAgAu9opvQ
+	(envelope-from <netdev+bounces-301686-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:08:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024CC6BF84D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:12:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC8D36BF7C9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:08:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=korg header.b=oDH8bUo4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301685-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301685-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=korg header.b=MkxskqGk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301686-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301686-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50EFF325CD11
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:01:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EF8CD30ECDDE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817153DDDB8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836573DDDC1;
 	Wed, 24 Jun 2026 15:00:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC2B3DB33D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF42E3DB647;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782313245; cv=none; b=N3o5Ryzq2EUFClL0Vs6qFmJHPzHDz4xnhk5kO+0OyQgkQarrd8r4cgyhKfe+AAnOpl5ObRIWQyiUG8Nh2Mp6Mlh1rVwBxFr4zPGdzrlSNYn99dUhhSF5uh9etfwOIgOCd9+KNPRHY6+g52yXjJ0jTO9Y07QCnfGO8FkB1HZP14w=
+	t=1782313246; cv=none; b=JaoI0b7LFrMeQYBECM6jAJpAz/ucSVHNLwGzlE2xp/JRjAXDVXosjhGAqVpl4noLiqoJwtrITRHKi7c/XzkM9PZWdk9rYXMfXgG+CnKlE3QRf/JBi4cDWEYayfDYAD996kOTuAnyC6IMpAChXMu5tEn/L1CWcTCoaftBZdOygfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782313245; c=relaxed/simple;
-	bh=DgPxSWJm3yP+ocMCPSZPYulAvRJygW/tBHfG7di1GFE=;
+	s=arc-20240116; t=1782313246; c=relaxed/simple;
+	bh=5rcnLftEgCOp4lCy02ddo3ou6gJMaO0JvPUiLpW7d+w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GEur9hOq6HMnFV+4bu9XrvUCmuns/XmqRJe0LqGflU6kDWCEXfgqqJsQtalyC8ORtjyTsXZkv51fe970vKD0yYu5gXTvKaW+aHGHrnItwcsGwpMJp286jZXqHiQdjwfpVBbE0Vt1LthyqRCpcr260Hl/ktkCMnw9p51AJRWG1+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oDH8bUo4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 93A60C2BCF4;
+	 In-Reply-To:To:Cc; b=ud6ahBXsAllrobtZQPpjtvfEPMZlyqCI9a+jfoMGHIuWszQJAAaQqDxxY3iGS9h+yVPj/FpqOOxKPhJe7Cm7V/iS0N7YvNDd4YGQmoQZvJm9zEHXkZ4uYtnqbLyREw70RlfYLXLcflkyg+3/YDQtKNA2ERW+ExvMw3kIiMagfcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MkxskqGk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB237C2BCFB;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782313245; bh=DgPxSWJm3yP+ocMCPSZPYulAvRJygW/tBHfG7di1GFE=;
+	t=1782313245; bh=5rcnLftEgCOp4lCy02ddo3ou6gJMaO0JvPUiLpW7d+w=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oDH8bUo41/PjS+Gx3aKDm0dTm+WJEYiD3CovAZCOL51c+1w3uOTvuSwCVQG3hIkx9
-	 xIqisQOUmTUbIcJVCt3wgofpSthqAWbbLBujwiaqTT/hvq2mhNWojgfJNrV69kpM5h
-	 c760Dyob5fOr849kl4hfX58suT8FvfQkY6eXnVnk=
+	b=MkxskqGkDR7ziybrs4WVyyJtxyF/p5yta4Zi7sxJd0jTKW7oin2Je82H9unuIQ3v5
+	 DgjXQYKDjDA1/yxRRKcn5Sw+IXmYm4xztxdeit/7AfoJnN5UR+zEn+kYYc/KPSiu7m
+	 H7X0OpP3Qm072tlaDlsiudW6ZB5itrl7mM4P05JA=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88063CDE003;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13FBCDE002;
 	Wed, 24 Jun 2026 15:00:45 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Wed, 24 Jun 2026 23:00:08 +0800
-Subject: [PATCH v6 09/10] rust: macros: remove `THIS_MODULE` static from
- `module!`
+Date: Wed, 24 Jun 2026 23:00:09 +0800
+Subject: [PATCH v6 10/10] rust: module: update MAINTAINERS to cover
+ module.rs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260624-fix-fops-owner-v6-9-5295e333cb3e@linux.dev>
+Message-Id: <20260624-fix-fops-owner-v6-10-5295e333cb3e@linux.dev>
 References: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
 In-Reply-To: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -90,11 +90,11 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782313241; l=1808;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782313241; l=868;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=DgPxSWJm3yP+ocMCPSZPYulAvRJygW/tBHfG7di1GFE=;
- b=T8XDn77jqammHg8XuGEQ5zYrlxJkJ96REgrZO8/elB8ERN0tU+DY/u1pkKdZvOrIwBlsNdwGS
- DO05YTkWapiDkrK7T8fPPtbgzL9HIEIdlHgUVOq2b5favgMu3KS960s
+ bh=5rcnLftEgCOp4lCy02ddo3ou6gJMaO0JvPUiLpW7d+w=;
+ b=cmstUrkbLuPuqCovz0itKEpXgZDBXA1/IayJUxZLZYmVoYtq98FdyfxRGEpcVd24CXF9kuRxb
+ Q72y5Oy3kZcBCRmCDuJYlM3aqxGtITNQLqxXObuuHhfQbSegDS9NZq6
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
@@ -105,21 +105,20 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301685-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301686-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[47];
 	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,linux.dev,davidgow.net,debian.org,kernel.dk,intel.com,android.com];
 	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:dakr@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:leon@kernel.org,m:igor.korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@
  googlegroups.com,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:alvin.sun@linux.dev,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,linux.dev,davidgow.net,debian.org,kernel.dk,intel.com,android.com];
 	FORGED_SENDER(0.00)[alvin.sun@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -131,54 +130,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,garyguo.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 024CC6BF84D
+X-Rspamd-Queue-Id: EC8D36BF7C9
 
-All users have been migrated to `ModuleMetadata::THIS_MODULE` const or
-`this_module::<LocalModule>()` helper. The `static THIS_MODULE`
-generated by the `module!` macro is no longer referenced anywhere,
-so remove it to avoid having two sources of the same `ThisModule`
-pointer.
+Module types now live in `rust/kernel/module.rs` alongside
+`rust/kernel/module_param.rs`. Update the MODULE SUPPORT file pattern
+from `rust/kernel/module_param.rs` to `rust/kernel/module*.rs` so both
+files are covered.
 
 Assisted-by: opencode:glm-5.2
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-Reviewed-by: Gary Guo <gary@garyguo.net>
-Acked-by: Danilo Krummrich <dakr@kernel.org>
+Link: https://lore.kernel.org/rust-for-linux/8ea21b29-9baf-4926-a16f-7d21c5a1a1b8@suse.com
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- rust/macros/module.rs | 16 ----------------
- 1 file changed, 16 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-index aa9a618d5d19e..23b6a1b456b80 100644
---- a/rust/macros/module.rs
-+++ b/rust/macros/module.rs
-@@ -497,22 +497,6 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
-         /// Used by the printing macros, e.g. [`info!`].
-         const __LOG_PREFIX: &[u8] = #name_cstr.to_bytes_with_nul();
- 
--        // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
--        // freed until the module is unloaded.
--        #[cfg(MODULE)]
--        static THIS_MODULE: ::kernel::ThisModule = unsafe {
--            extern "C" {
--                static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
--            };
--
--            ::kernel::ThisModule::from_ptr(__this_module.get())
--        };
--
--        #[cfg(not(MODULE))]
--        static THIS_MODULE: ::kernel::ThisModule = unsafe {
--            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
--        };
--
-         /// The `LocalModule` type is the type of the module created by `module!`,
-         /// `module_pci_driver!`, `module_platform_driver!`, etc.
-         type LocalModule = #type_;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e035a3be797c4..74733de3e41ee 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17984,7 +17984,7 @@ F:	include/linux/module*.h
+ F:	kernel/module/
+ F:	lib/test_kmod.c
+ F:	lib/tests/module/
+-F:	rust/kernel/module_param.rs
++F:	rust/kernel/module*.rs
+ F:	rust/macros/module.rs
+ F:	scripts/module*
+ F:	tools/testing/selftests/kmod/
 
 -- 
 2.43.0
