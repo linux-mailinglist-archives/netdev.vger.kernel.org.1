@@ -1,232 +1,248 @@
-Return-Path: <netdev+bounces-301780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301781-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oL4pNRlRPGpJmggAu9opvQ
-	(envelope-from <netdev+bounces-301780-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 23:50:17 +0200
+	id ZkIMJhBRPGpEmggAu9opvQ
+	(envelope-from <netdev+bounces-301781-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 23:50:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE446C19A7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 23:50:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A36FE6C1990
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 23:50:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=jnCd1Qa5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301780-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301780-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=hmL4E3Yr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301781-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301781-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 383F93020841
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 21:47:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1E561300C0EB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 21:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D82C265CDD;
-	Wed, 24 Jun 2026 21:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8D526CE11;
+	Wed, 24 Jun 2026 21:50:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D461A5B8C
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 21:47:55 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782337677; cv=pass; b=QAR9vnY1AL1dz3hUtxC/TTjggHXp7IpRUMncy1/dgDuFcEJfMA36WCqifTmujcNqa0MKsPywyv5Hefq0/1QMGWc78YMIIBjPfnD3fnEiHl6F8mou9M1NAve5x5gOme/61kN74/4MjKak/HeDr40gCPj3sIXiDOHXi/S6qpNrPtE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782337677; c=relaxed/simple;
-	bh=hkFwlfmlGq5uiQhhguJIpFE+BzPicxluPWYKlmAeNw8=;
-	h=In-Reply-To:References:MIME-Version:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VOb3aVcD2jcWLEn1FSnrzKRy6qpXyf5O4J+9BmS8KJeboH+Z2pvyhcok8Tjr7GFXA/0zBMSSNHEy7QjLQTfA89YhUoKzsZThPdoMUM8qw5b062UrHrcu0Dh17vxSGf6AmDveZFV2OY5kA6z/ducJO0ieOHjXoDvCPylDiWOqmBY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jnCd1Qa5; arc=pass smtp.client-ip=209.85.128.176
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-8051ad12d23so15314847b3.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 14:47:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782337675; cv=none;
-        d=google.com; s=arc-20240605;
-        b=akbXFWn42apySvmnNlq1V9fsgyS+RQDtjAoC5kW1ld5VhKwDirNP2/LrbGn7dTZPab
-         GgS0HsiPVqE/DEWhGDQqE/b6rcRpnlVOj7JvW1gJHZjEgVJ56gEa6BH8ceQTy1WGxiLK
-         fW5aMbInvUSsnelODoHk5Ei0VP+1zbit2FRGaimYixZ1xwSoTARbZfrmPFm+fZC+bg/1
-         HmL4t6AkiRDW+HoAySn/EGh9Pwuzou2yzmL1Zms5cJWt4QNL3UkxA9qylZ3mCNbvLbYU
-         iN5rAWlY634urNQDauJs8uVrdS+BPv9PmThZYwo8/8WO3XC6LxzWICGToKjv0GvxOcl7
-         2JhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:references
-         :in-reply-to:dkim-signature;
-        bh=hkFwlfmlGq5uiQhhguJIpFE+BzPicxluPWYKlmAeNw8=;
-        fh=KaO/Alw2ALBWdgInflQuATKuNajw4I6oVa/4RFVt0ik=;
-        b=gqAwEgPnRD/AcyCGNKGBMMfw9CXOiyJwFAwHmFyzXE6SaSrIVte295+IdhObZnywj7
-         riTgCySqpuI46c5LyyIxqMPtJBR9RueK/O5kayiRJyt7oTcQBw9otg2MY4w1nzZduMG/
-         AB6RKX9ed7Jh+/Xgf4lq7mMYiQa4BVuWEdSzqsGBhIWUJUpQzZd6fdhVYhD4asbqteJp
-         RSBKcwnJN56glau4XI+gTDgKQZx33Qc5AuoXO3djLhnTHU5jzB6iGykOmoYu5pfHc1xY
-         hzl8jkOhHiFADVXcthCAa711tfgI/mMBlGpGm0Iys+gqbDoWe1DVb5NAhmaFA+aDt3tH
-         igWg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782337675; x=1782942475; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:references
-         :in-reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=hkFwlfmlGq5uiQhhguJIpFE+BzPicxluPWYKlmAeNw8=;
-        b=jnCd1Qa5U9pX1f6wh3ZWwbCacyNztSy7GGxq7n1htGWYI1K4CYLXRRU+jMJsYW9tZO
-         BPRmkkgDieGH4dwLT/VLA0qS0v2utQ1pAp6RPn7cNQgSpOLFzIzVkB7mxicq3X7sr09n
-         15hMBxQHuq4oKe5ZvjYi4NVM7Q2e1DKLc6zDOcdEfqsOSAXqLv1PT0eaVNpBJPKeENgf
-         NLUkNGxObglxjF1aES0vCjDuX8FRFqlXQahrDtxcW2GpXmTH27xj5ecJx4LWv5h12sEJ
-         FBtxc+tE1VjpeIRm26KE1fwUzaPFhKG/RAgrCVwLACDIco7mz0FV3RAKpr3ioFH9nMf6
-         MXfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782337675; x=1782942475;
-        h=cc:to:subject:message-id:date:from:mime-version:references
-         :in-reply-to:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hkFwlfmlGq5uiQhhguJIpFE+BzPicxluPWYKlmAeNw8=;
-        b=ENszkT/mhd1BhRsml1w9HPFwm0ZK/pNXsibtFV9jP0LkxcwTLnjyGgrvD+G7JLsNBz
-         3OE/rc7ktv3wWQrDeUeW25k7PF2kr5+IOyxrN7DXgFp8g+fyEwHxHfE3GNKO0p9BJA6A
-         1Qvt2FvWBRVK5xw8vPQ7XklW9oIu8P1QuU5O39auZbF+KrfG2Ec/uLT3LerYbt87TY+z
-         zym7X9jv3cgDIG9MwUH8y5oeUaAB2HfRxTcjaMxz/bACG0Tf3pQhxkTupOjed3oBWC1Y
-         cIASD4kcIKDd35ngdB33BbNZiDtR9BWsjkBLOGCGEUny2nBd2c25hafDjHJdpi3lsA8N
-         mirg==
-X-Forwarded-Encrypted: i=1; AHgh+Ro8+t61bccUqyTqZdmW9lp7aNDeEplOIrYu+BsJEBqnZAR07ywuAROkFuvprBwLxtww35TDwME=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxACSDJnQ2uu3eNrCqtbm074iVA0atB8rPRkPGMlf6iHiOScVoA
-	LdFBwqpxZavoqVu9w1hTffStG7tjNQlqQ4BxEiXSRkIo8tvZ5FJPRmCfrthCkkqGfWfF3lruN7x
-	aOpSYVaqJOZRZspMvsZ9izq2mUcfdLYE=
-X-Gm-Gg: AfdE7cmW2mXIl63VE228nIfnF5+zrKie7i38p98LE1YcxWP78bXvc6ZlgmqZo348hpV
-	yTXJum4tvo4vi0Ubl+svF3J/BxYVpbXjRGohV+8cLP05fN5yWgoehMbj+WHRPkg7sza8qOZ+9u/
-	YAW3AVSKPSz8yzgumnG5+qO7WsNeksRJDvFKCS2ZWIA+G1RU4tEy2mt1AdCP7lj0ftit6PP0bJ5
-	0YKIT2q4NpP6mKAv3lXdA0bv/Iux+pomE59iNeRI2M8jBav47W8AY94G6jIyBsaVPe7QmVZ
-X-Received: by 2002:a05:690c:628a:b0:7cf:d242:d966 with SMTP id
- 00721157ae682-80a63f4560bmr669177b3.15.1782337674985; Wed, 24 Jun 2026
- 14:47:54 -0700 (PDT)
-Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Wed, 24 Jun 2026 14:47:53 -0700
-Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Wed, 24 Jun 2026 14:47:53 -0700
-In-Reply-To: <20260624153850-mutt-send-email-mst@kernel.org>
-References: <20260624190653.2893-1-alhouseenyousef@gmail.com> <20260624153850-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D290713B7AE;
+	Wed, 24 Jun 2026 21:50:03 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782337805; cv=none; b=Jj2eC1m5hjyXr13eOXT9J15P7bTc7v2n0QT0hwDtrYQ89ROuKz1sKNzmMZWvmnrbm8gWNR1Sw9e2fi+8aGMOGf6ap5z3XqddnU82gBvwwul6KL1ukuNNukSmyylHMl4FrEDvieyoOW7s8AXS8AnWkONAaE9RdKm5psOdLg9t6ME=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782337805; c=relaxed/simple;
+	bh=iG783dtOhFEuzZOm/uX3mLYVGqFljne8fQtBXrV9r0M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PoxHAT3OoB+GP8ALa+qPRPzoN0IYUg71+yhpIr7DIMzLz9KeXP6k8QfIj0XDeswl98X8oMswlQ7od7mfJlcU7QK6p9ghH8ZzqFDj1GJav7Nmyt/mtaCCYbYx2xKsURIfu/sIg386Q4cOK7NN6wqwNcgav4t8BoDUQcwASPvPKes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hmL4E3Yr; arc=none smtp.client-ip=198.175.65.20
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782337804; x=1813873804;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iG783dtOhFEuzZOm/uX3mLYVGqFljne8fQtBXrV9r0M=;
+  b=hmL4E3YriX7mrnIR/fpkCZVj7qBIxK13OyuXBFCbJWHqFdYrTKac3K0K
+   du8C/9deFHtoaO+jBo+h6CkymU0tX7mdlm7BuWlMnrVhM5yHnCtT7PbuP
+   9FDJkz7W4ltCY3LRLDqb0usDMk/JYoxyFPjVUBf6IoUWusqDKhq6ORBcW
+   EUEK0dUmu+muYdJJRfdTXU/Bk4GUg2p4TFJysDnmqwGUHu+XkHLa0v/lo
+   QfHzhAUkKC/bUE1neCc/rhb+FCQ6/jDa6h86XDEHa9dfDEZkN4ihf0LlO
+   DW4GRvpWoXJnVHEhLVNV3K+e28IvfD/LfBVJnMx5hXirLEqBMA4i3bgrV
+   g==;
+X-CSE-ConnectionGUID: SuqTNehCTm6+ma9PhwCBkg==
+X-CSE-MsgGUID: BFL+aJInQVO2XnAbAsVABA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11827"; a="82881635"
+X-IronPort-AV: E=Sophos;i="6.24,223,1774335600"; 
+   d="scan'208";a="82881635"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2026 14:50:04 -0700
+X-CSE-ConnectionGUID: 9k7nQU13RXCIold5uacmXw==
+X-CSE-MsgGUID: ThShJhaySDOjX6gHyPEOPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,223,1774335600"; 
+   d="scan'208";a="274230416"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2026 14:50:02 -0700
+Date: Wed, 24 Jun 2026 14:49:55 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Baron <jbaron@akamai.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v12 07/12] static_call: Define
+ EXPORT_STATIC_CALL_FOR_MODULES()
+Message-ID: <20260624214955.6kkivefeuapcocib@desk>
+References: <20260622-vmscape-bhb-v12-0-76cbda0ae3e5@linux.intel.com>
+ <20260622-vmscape-bhb-v12-7-76cbda0ae3e5@linux.intel.com>
+ <ajvUp_kPJBRZ7k_p@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yousef Alhouseen <alhouseenyousef@gmail.com>
-Date: Wed, 24 Jun 2026 14:47:53 -0700
-X-Gm-Features: AVVi8CeynxX2_AcSDWHorX_h258yRsucuQ_SkLNN6wE5TmhSJnB8IHSA5IRr3Og
-Message-ID: <CAMuQ4bWKsMA_88Qt-0azvUckrKkcY87i0PZFmJ9Lozo-OsXtrw@mail.gmail.com>
-Subject: Re: [PATCH] vhost/vdpa: reject overflowing PA map page counts
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajvUp_kPJBRZ7k_p@google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301780-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:eperezma@redhat.com,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-301781-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:seanjc@google.com,m:x86@kernel.org,m:jon@nutanix.com,m:nik.borisov@suse.com,m:hpa@zytor.com,m:jpoimboe@kernel.org,m:david.kaplan@amd.com,m:bp@alien8.de,m:dave.hansen@linux.intel.com,m:peterz@infradead.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:kpsingh@kernel.org,m:jolsa@kernel.org,m:davem@davemloft.net,m:david.laight.linux@gmail.com,m:luto@kernel.org,m:tglx@kernel.org,m:mingo@redhat.com,m:dsahern@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:haoluo@google.com,m:pbonzini@redhat.com,m:corbet@lwn.net,m:jbaron@akamai.com,m:aliceryhl@google.com,m:rostedt@goodmis.org,m:ardb@kernel.org,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:asit.k.mallick@intel.com,m:tao1.zhang@intel.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:davidlaightlinux@gmail.com,m:johnfastabend@gmail.com,s:
+ lists@lfdr.de];
+	FORGED_SENDER(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[42];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,akamai.com,goodmis.org,linuxfoundation.org,vger.kernel.org,intel.com];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,infradead.org:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,desk:mid,linux.intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8EE446C19A7
+X-Rspamd-Queue-Id: A36FE6C1990
 
-On Wed, Jun 24, 2026 at 01:53:38PM -0400, Michael S. Tsirkin wrote:
-> You should add "on 32 bit systems" - I do not see how it can
-> overflow on 64 bit.
-
-Right, the overflow I was trying to cover is the unsigned long
-page-count calculation on 32-bit systems, where size can be wider than
-unsigned long and the page offset is added before PFN_UP(). I should
-have made that scope explicit in the changelog.
-
-> I don't see how this can happen at all - pinned_vm is in units of pages.
-
-Agreed, that part is not needed for this fix. I'll drop the memlock
-check change and send a v2 with the changelog clarified to say this is
-for 32-bit systems.
-
-Thanks,
-Yousef
-
-
-On Wed, 24 Jun 2026 15:53:38 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Wed, Jun 24, 2026 at 09:06:53PM +0200, Yousef Alhouseen wrote:
-> > vhost_vdpa_pa_map() adds the IOVA page offset to the user-controlled map
-> > size before computing the number of pages to pin. If that addition wraps,
-> > the code can pin and map fewer pages than the requested IOTLB range.
-> >
-> > Reject sizes that overflow the page-count calculation.
->
-> You should add "on 32 bit systems" - I do not see how it can
-> overflow on 64 bit.
->
-> > Also make the
-> > memlock check subtraction-based so a large page count cannot wrap the
-> > pinned page total.
->
-> I don't see how this can happen at all - pinned_vm is in units of pages.
->
-> > Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
+On Wed, Jun 24, 2026 at 05:59:19AM -0700, Sean Christopherson wrote:
+> On Tue, Jun 23, 2026, Pawan Gupta wrote:
+> > There is EXPORT_STATIC_CALL_TRAMP() that hides the static key from all
+> > modules. But there is no equivalent of EXPORT_SYMBOL_FOR_MODULES() to
+> > restrict symbol visibility to only certain modules.
+> > 
+> > Add EXPORT_STATIC_CALL_FOR_MODULES(name, mods) that wraps both the key and
+> > the trampoline with EXPORT_SYMBOL_FOR_MODULES(), allowing only a limited
+> > set of modules to see and update the static key.
+> > 
+> > The immediate user is KVM, in the following commit.
+> > 
+> > checkpatch reported below warnings with this change that I believe don't
+> > apply in this case:
+> > 
+> >   include/linux/static_call.h:219: WARNING: Non-declarative macros with multiple statements should be enclosed in a do - while loop
+> >   include/linux/static_call.h:220: WARNING: EXPORT_SYMBOL(foo); should immediately follow its function/variable
+> > 
+> > Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 > > ---
-> > drivers/vhost/vdpa.c | 12 ++++++++++--
-> > 1 file changed, 10 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > index ac55275fa..090cb8693 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -1102,6 +1102,8 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
-> > unsigned int gup_flags = FOLL_LONGTERM;
-> > unsigned long npages, cur_base, map_pfn, last_pfn = 0;
-> > unsigned long lock_limit, sz2pin, nchunks, i;
-> > + unsigned long page_offset;
-> > + u64 pinned_vm;
-> > u64 start = iova;
-> > long pinned;
-> > int ret = 0;
-> > @@ -1114,7 +1116,12 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
-> > if (perm & VHOST_ACCESS_WO)
-> > gup_flags |= FOLL_WRITE;
-> >
-> > - npages = PFN_UP(size + (iova & ~PAGE_MASK));
-> > + page_offset = iova & ~PAGE_MASK;
-> > + if (size > ULONG_MAX - page_offset) {
-> > + ret = -EINVAL;
-> > + goto free;
-> > + }
-> > + npages = PFN_UP(size + page_offset);
-> > if (!npages) {
-> > ret = -EINVAL;
-> > goto free;
-> > @@ -1123,7 +1130,8 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
-> > mmap_read_lock(dev->mm);
-> >
-> > lock_limit = PFN_DOWN(rlimit(RLIMIT_MEMLOCK));
-> > - if (npages + atomic64_read(&dev->mm->pinned_vm) > lock_limit) {
-> > + pinned_vm = atomic64_read(&dev->mm->pinned_vm);
-> > + if (npages > lock_limit || pinned_vm > lock_limit - npages) {
-> > ret = -ENOMEM;
-> > goto unlock;
-> > }
-> > --
-> > 2.54.0
+> >  include/linux/static_call.h | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/include/linux/static_call.h b/include/linux/static_call.h
+> > index 78a77a4ae0ea..b610afd1ed55 100644
+> > --- a/include/linux/static_call.h
+> > +++ b/include/linux/static_call.h
+> > @@ -216,6 +216,9 @@ extern long __static_call_return0(void);
+> >  #define EXPORT_STATIC_CALL_GPL(name)					\
+> >  	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
+> >  	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
+> > +#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
+> > +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
+> > +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
+> >  
+> >  /* Leave the key unexported, so modules can't change static call targets: */
+> >  #define EXPORT_STATIC_CALL_TRAMP(name)					\
+> > @@ -276,6 +279,9 @@ extern long __static_call_return0(void);
+> >  #define EXPORT_STATIC_CALL_GPL(name)					\
+> >  	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
+> >  	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
+> > +#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
+> > +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
+> > +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
+> >  
+> >  /* Leave the key unexported, so modules can't change static call targets: */
+> >  #define EXPORT_STATIC_CALL_TRAMP(name)					\
+> > @@ -346,6 +352,8 @@ static inline int static_call_text_reserved(void *start, void *end)
+> >  
+> >  #define EXPORT_STATIC_CALL(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
+> >  #define EXPORT_STATIC_CALL_GPL(name)	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
+> > +#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
+> > +	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods)
+> >  
+> >  #endif /* CONFIG_HAVE_STATIC_CALL */
+> 
+> Drat, I forgot about this.  Exporting static call trampolines for KVM came up in
+> another conversation[*].  I had already put together patches to effectively default
+> to exporting only the trampoline, and also to deduplicate this code so that the
+> CONFIG_HAVE_STATIC_CALL_INLINE=y / CONFIG_HAVE_STATIC_CALL=y / CONFIG_HAVE_STATIC_CALL=n
+> implementations don't need to copy+paste the same lines of code.
+> 
+> The attached patches touch a lot more code, and will conflict mightily with KVM
+> changes I want to land in 7.3 (more use of a static_call in KVM).  But if we get
+> them applied (to tip tree) shortly after 7.2-rc1 and provide a topic branch/tag,
+> then there shouldn't be too much juggling needed?
+> 
+> If we want to go with the more aggressive cleanup, I'll formally post the patches.
+> 
+> [*] https://lore.kernel.org/all/ahhoDGUz39KSGZ6o@google.com
+
+Thanks for the context.
+
+Earlier making the key ro-after-init came up as an option in a thread with
+Peter. Does it look like a good option to you?
+
+diff --git a/include/linux/static_call.h b/include/linux/static_call.h
+index b610afd1ed55..ea56da8fb446 100644
+--- a/include/linux/static_call.h
++++ b/include/linux/static_call.h
+@@ -200,6 +200,14 @@ extern long __static_call_return0(void);
+ 	};								\
+ 	ARCH_DEFINE_STATIC_CALL_NULL_TRAMP(name)
+ 
++#define DEFINE_STATIC_CALL_NULL_RO_AFTER_INIT(name, _func)		\
++	DECLARE_STATIC_CALL(name, _func);				\
++	struct static_call_key STATIC_CALL_KEY(name) __ro_after_init = {\
++		.func = _func,						\
++		.type = 1,						\
++	};								\
++	ARCH_DEFINE_STATIC_CALL_NULL_TRAMP(name)
++
+ #define DEFINE_STATIC_CALL_RET0(name, _func)				\
+ 	DECLARE_STATIC_CALL(name, _func);				\
+ 	struct static_call_key STATIC_CALL_KEY(name) = {		\
 
