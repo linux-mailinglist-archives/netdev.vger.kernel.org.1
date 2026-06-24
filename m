@@ -1,220 +1,133 @@
-Return-Path: <netdev+bounces-301563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301564-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id beddHNSJO2q+ZQgAu9opvQ
-	(envelope-from <netdev+bounces-301563-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:40:04 +0200
+	id dF6uFrCLO2odZggAu9opvQ
+	(envelope-from <netdev+bounces-301564-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:48:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC3716BC3FD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:40:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D071B6BC4A1
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:47:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=rulkc.org header.s=dkim header.b=Jgf9Y5iH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301563-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301563-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=rulkc.org;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=F45hTVDM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301564-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301564-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 87784306175C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:39:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BA60D30219AE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F73A2EEE9E;
-	Wed, 24 Jun 2026 07:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8107738D6AD;
+	Wed, 24 Jun 2026 07:47:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.rulkc.org (mail.rulkc.org [155.212.184.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD67242D6C;
-	Wed, 24 Jun 2026 07:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C08346AF1;
+	Wed, 24 Jun 2026 07:47:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782286780; cv=none; b=qO+Vry5GmPGcWlA5Tbl/tpRQ7gq2W5TwGNHfe81LnpqFjhDprBDhfachJnMOend2vbeE9qd1llMHmQwQwCBw7j+q8vZN6Md0ZDIyUIL0WrDyQ5TSfODTlVYG1Ov0fMTwv8VIMQQ4ZQoID5+NCwgKKi9zZ7n5Sh3SwTO3/x/0OJ8=
+	t=1782287277; cv=none; b=sWolS5LqwxhLaIw8yrt+vczSW/+DdTMr3+sW2rpXw1KIA9oeKVHTRxF6aRpRF/3ZkaNS+aeLtbqdcjccxuHdoPVJVEe8wnguTtrTIMxnrqXblcELI2fi62OTfCDEy7TNpkKNYqX7oVV5kcqLpbJf+9YemJuOgAJBuEoHnu5dwLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782286780; c=relaxed/simple;
-	bh=vnscFOV6WuRvFeIi3LRKjrBNK2qubRJ1xPKRYO5I5Hc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ccb1zKkaSdlolSD3usze82NaNIBA/v6ZJ5NWM5ydawvzQ/I4LrWNDuraZI+chHRFuReuE/IXN8/FOOhNpyJPxFlUo0ZRYPREVGhckR8YJaXvgI33eDAIvOqxQ0vDEx+DT0VHJ5ZrZl8WNiSbFP/YwhRy5pVtV0DdKGSkzz2zyq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rulkc.org; spf=pass smtp.mailfrom=rulkc.org; dkim=pass (2048-bit key) header.d=rulkc.org header.i=@rulkc.org header.b=Jgf9Y5iH; arc=none smtp.client-ip=155.212.184.193
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B951E1006E6;
-	Wed, 24 Jun 2026 10:39:24 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rulkc.org; s=dkim;
-	t=1782286773; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=u9d9ugozWzOhiPaIzDooLKLSYvxhBtS1e6crWQlC2t0=;
-	b=Jgf9Y5iHKWrYx21aCp0Kimhb2Uomi1xS4rC4Xq3LcOoc0OLdsnCkiTM83AGI7IFT0SqdPv
-	+teQBCjYWruehFEeciKnkPKEfydO3qB1B0ppeR3HGFEfifvGdq18W4SQSSzuJco8thoOut
-	D6MY2D/IPHPd4itZhEDuwEmqzrpe/5/dpKS2tbVhTwnnKHk44gGQbO4aenlnaToNIeXXTM
-	+pxW5+R5tQzyA5OFrWMS+dHQiYtVF8FXrkU6gdEgEkyMTcynx1xW2D9Twlgf6U737GiAyJ
-	yRaqYMnss1iqjBzYw3HsNgyO0nnpR62z6HJWvmYeq/JyIq5p5D5y6H6/eWNUFg==
-Message-ID: <d2bf1f1f-600d-48f6-8824-b08b4e10cc2a@rulkc.org>
-Date: Wed, 24 Jun 2026 10:39:17 +0300
+	s=arc-20240116; t=1782287277; c=relaxed/simple;
+	bh=uRMY2S2mQvHK3hp/TGSGJTP2ES8ybud+FJ8Lowms9aU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nGD4ZN/C+up9F/P8Zne2Mi4l3erEAdl0iWaq9TpcRkDwrvE8CVjmL/ubij4+9nt2H+SZG2rr9e0Wh6jSyomv+mPBzOXzQUW/d1OvrUnvo+XIi5UQ6/U4DElmSKXx+B+3IfLlYH7NBE/KiT0+1jLcQEbdW0N+LJoZa+OGi4eCt6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F45hTVDM; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3062F1F000E9;
+	Wed, 24 Jun 2026 07:47:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782287276;
+	bh=/uh5/nhoBNLmlwPugAXtFc8IZhUvOtUnsv8Lp+aiLiU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=F45hTVDMzmJlJCa97ySNZC25NCDj+Rgj9cal8azbsWoo8QL/IU7sGTGQ+JF4ClkOI
+	 5Euss85a/xMvqiJ/kkVyPwn+cjcVM9m+g6aCOTPluDPkZIkTshCk/aRCFN5p2ScoNR
+	 MiD9gw33HanW8TLGaiWiP3J0bWhfigOZ5L+ExUgvVWNqnmlRY02iZcxbeqQ/P8xSEP
+	 WxbyLK9WCU29DN7Mh6GMo5lR/hypYwidvP85ASHpcqdp0MM4oasBbPNnkt2w210NQd
+	 QmFc+Y37f0k4sPTSnEbbUo1S3aSRh7S5a5TduR1bXqqV8UNzzl2LGD//IsAx9UFPmR
+	 xYwt5iLOKgInw==
+Date: Wed, 24 Jun 2026 09:47:52 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+	Jie Luo <jie.luo@oss.qualcomm.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Brian Masney <bmasney@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Lei Wei <quic_leiwei@quicinc.com>, 
+	Suruchi Agarwal <quic_suruchia@quicinc.com>, Pavithra R <quic_pavir@quicinc.com>, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ethernet: qualcomm: ppe: Demote from supported
+ and fix maintainer addresses
+Message-ID: <20260624-eccentric-cordial-seal-c97cea@quoll>
+References: <20260623073307.36483-2-krzysztof.kozlowski@oss.qualcomm.com>
+ <0247dfba-1c14-4fea-aab3-5489a36f35f6@lunn.ch>
+ <8b0560ae-af5c-4d54-be02-d186be1d799c@oss.qualcomm.com>
+ <f8441903-c768-46a1-8f95-b1b25d420a2c@oss.qualcomm.com>
+ <0c1be662-3c6a-41be-bc19-081d0299ceae@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] vsock/virtio: rewrite MSG_ZEROCOPY flag
- handling
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Bobby Eshleman <bobbyeshleman@meta.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Simon Horman <horms@kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, oxffffaa@gmail.com, rulkc@linuxtesting.org
-References: <20260623153819.697635-1-avkrasnov@rulkc.org>
- <20260623132014-mutt-send-email-mst@kernel.org>
-Content-Language: ru
-From: Arseniy Krasnov <avkrasnov@rulkc.org>
-In-Reply-To: <20260623132014-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0c1be662-3c6a-41be-bc19-081d0299ceae@lunn.ch>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rulkc.org,reject];
-	R_DKIM_ALLOW(-0.20)[rulkc.org:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:stefanha@redhat.com,m:sgarzare@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jasowang@redhat.com,m:bobbyeshleman@meta.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:horms@kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux-foundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oxffffaa@gmail.com,m:rulkc@linuxtesting.org,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301563-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[avkrasnov@rulkc.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:krzysztof.kozlowski@oss.qualcomm.com,m:jie.luo@oss.qualcomm.com,m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:quic_leiwei@quicinc.com,m:quic_suruchia@quicinc.com,m:quic_pavir@quicinc.com,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,meta.com,linux.alibaba.com,vger.kernel.org,lists.linux-foundation.org,gmail.com,linuxtesting.org];
+	TAGGED_FROM(0.00)[bounces-301564-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avkrasnov@rulkc.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[rulkc.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,rulkc.org:dkim,rulkc.org:email,rulkc.org:mid,rulkc.org:from_mime]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,quoll:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CC3716BC3FD
+X-Rspamd-Queue-Id: D071B6BC4A1
 
+On Tue, Jun 23, 2026 at 01:33:05PM +0200, Andrew Lunn wrote:
+> > If address did not work for half a year, I really doubt that you commit
+> > to above.
+> 
+> I tend to agree. Maybe we should set it to Orphaned, and then decide
+> in 6 months time if it can be set back to Maintained?
 
-6/23/26 20:26, Michael S. Tsirkin wrote:
-> On Tue, Jun 23, 2026 at 06:38:19PM +0300, Arseniy Krasnov wrote:
->> Logically it was based on TCP implementation, so to make further support
->> easier, rewrite it in the TCP way (like in 'tcp_sendmsg_locked()'). This
->> patch only rewrites flag handling (e.g. it doesn't change logic).
->>
->> Signed-off-by: Arseniy Krasnov <avkrasnov@rulkc.org>
->
-> It seems to change logic though:
->
->> ---
->>  Changelog v1->v2:
->>  * Rebase on last 'net-next'. Don't need 'skb_zcopy_set()' now - it was
->>    already added.
->>  Changelog v2->v3:
->>  * Update commit message.
->>  * Remove one empty line.
->>
->>  net/vmw_vsock/virtio_transport_common.c | 47 ++++++++++++-------------
->>  1 file changed, 22 insertions(+), 25 deletions(-)
->>
->> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index 09475007165b..41c2a0b82a8e 100644
->> --- a/net/vmw_vsock/virtio_transport_common.c
->> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -328,38 +328,35 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>  	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
->>  		return pkt_len;
->>  
->> -	if (info->msg) {
->> -		/* If zerocopy is not enabled by 'setsockopt()', we behave as
->> -		 * there is no MSG_ZEROCOPY flag set.
->> +	if (info->msg && (info->msg->msg_flags & MSG_ZEROCOPY)) {
->> +		/* If 'info->msg' is not NULL, this is only VIRTIO_VSOCK_OP_RW.
->> +		 * 'MSG_ZEROCOPY' flag handling here is based on the same flag
->> +		 * handling from 'tcp_sendmsg_locked()'.
->>  		 */
->> -		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
->> -			info->msg->msg_flags &= ~MSG_ZEROCOPY;
-> So previously without SOCK_ZEROCOPY, MSG_ZEROCOPY was always ignored...
->
->
->> +		if (info->msg->msg_ubuf) {
->> +			uarg = info->msg->msg_ubuf;
->> +			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
-> now it's not in this case?
+That would be a bit stronger than I intended and actual responses from
+Jie did happen, thus the driver actually might be maintained. I also
+think that Qualcomm is committed to maintain it, I only doubt about
+supported.
 
-Yes, this case is currently for io_uring only, because io_uring doesn't set SOCK_ZEROCOPY to perform zerocopy transmission.
+Best regards,
+Krzysztof
 
->
->
-> Maybe the right call, but saying "does not change logic" seems wrong.
-
-Agree, I need to update commit message again :)
-
-Thanks
-
->
->
->> +		} else if (sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY)) {
->> +			uarg = msg_zerocopy_realloc(sk_vsock(vsk), pkt_len,
->> +						    NULL, false);
->> +			if (!uarg) {
->> +				virtio_transport_put_credit(vvs, pkt_len);
->> +				return -ENOMEM;
->> +			}
->>  
->> -		if (info->msg->msg_flags & MSG_ZEROCOPY)
->>  			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
->> +			if (!can_zcopy)
->> +				uarg_to_msgzc(uarg)->zerocopy = 0;
->>  
->> +			have_uref = true;
->> +		}
->> +
->> +		/* 'can_zcopy' means that this transmission will be
->> +		 * in zerocopy way (e.g. using 'frags' array).
->> +		 */
->>  		if (can_zcopy)
->>  			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
->>  					    (MAX_SKB_FRAGS * PAGE_SIZE));
->> -
->> -		if (info->msg->msg_flags & MSG_ZEROCOPY &&
->> -		    info->op == VIRTIO_VSOCK_OP_RW) {
->> -			uarg = info->msg->msg_ubuf;
->> -
->> -			if (!uarg) {
->> -				uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->> -							    pkt_len, NULL, false);
->> -				if (!uarg) {
->> -					virtio_transport_put_credit(vvs, pkt_len);
->> -					return -ENOMEM;
->> -				}
->> -
->> -				if (!can_zcopy)
->> -					uarg_to_msgzc(uarg)->zerocopy = 0;
->> -
->> -				have_uref = true;
->> -			}
->> -		}
->>  	}
->>  
->>  	rest_len = pkt_len;
->> -- 
->> 2.25.1
 
