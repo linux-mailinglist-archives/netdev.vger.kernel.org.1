@@ -1,253 +1,151 @@
-Return-Path: <netdev+bounces-301522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AmOeL8IzO2poSggAu9opvQ
-	(envelope-from <netdev+bounces-301522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 03:32:50 +0200
+	id ncpuBKM0O2quSggAu9opvQ
+	(envelope-from <netdev+bounces-301523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 03:36:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 186266BACBA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 03:32:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A018A6BACE2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 03:36:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=iOQ1dmnr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301522-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301522-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=XeGxuCQ8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301523-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301523-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C31CE30590AB
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 01:32:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1CD6930267A7
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 01:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F80C220687;
-	Wed, 24 Jun 2026 01:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EC2256C8B;
+	Wed, 24 Jun 2026 01:36:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627401F30A9
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 01:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A3022A80D
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 01:36:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782264768; cv=none; b=vAs9FSVBWZPaqRha5ZCWubmVz5POZYgFbiHyJb4krBnlBzrQFm3nn9Z3bY0+Ngv4zWeMYRpC1opBxPVDzkhZeqKvHyS8yCh24e1b9hzY1duCe7DsfZ45wSPqV9ZKN0Y+lcZhLwAHlOTz4Vw5DQAefN0ysYguGG6v+Kx/G2ogF3U=
+	t=1782264992; cv=none; b=C57md/UknvF3ORkuJ/HGiy3ZLhp9oLO/3n+2EzrRROfTAquqpqHRn2sGzPhr7h4bH7CsvuVSGF5c1I1MXJnu4kYU7WdGrGvrmfKHtiZ72PMvoeFgCt/aEM+5z9fEFDd92FIrmJ2xxlVSUSf1KLmzufCiWq6+3KiB4HDsMSwk9dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782264768; c=relaxed/simple;
-	bh=RJsGpGQRVwr+JtNwlB8ZsFkHFjOC72SBkJgXJW5OVMQ=;
+	s=arc-20240116; t=1782264992; c=relaxed/simple;
+	bh=KnvIe/6h4mSuOk3n1VB0XXJmDIZJDvKAcuC47OaLoDo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pqw2NHkbP7bfPXrZU9HNp6HUOBUDOmOm4/FPQsT4gett07ySSGH5iOTMmiFGDcZsS04gV0DkmPchrsI3QAjQGb44sDuH6JMGPoVEDO4xgHsaIF37L5MJAa5wFMXgWhDr7TIsJvglMlgAMOsT/Q5C14Ppkze2jqW/opzysYLJ3iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iOQ1dmnr; arc=none smtp.client-ip=91.218.175.170
-Message-ID: <a50cef70-d8fe-4f42-a89b-2c63c33a72ef@linux.dev>
+	 In-Reply-To:Content-Type; b=CpWmtLFyJpW+OOtbYXGyinMwfqKyZxxxSkDdz7Gsem/nkDrXfR3QABHiW7LwWVxKJesdW9148saIWBWUSVgsxbAG3BhjN6NQ7UYoBU9fV/aJCs0mZqtKFl3luqsiVr0/0zBpRuQR/+tgY4icnRQWUJS2mWoE7D2oImekUkRU6Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XeGxuCQ8; arc=none smtp.client-ip=91.218.175.188
+Message-ID: <73c05543-f6d6-4df2-9a32-8ee30343a670@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782264754;
+	t=1782264989;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZzBFoRi1EjW63O+lDY8B7JDNKdt4cYcrugVV0eKFoqw=;
-	b=iOQ1dmnrNcKk5R+/Bwqb99gm9pehbaVHV0XivtkX0NsExbboFt6U8FnQQNlT0iuuCqE9kS
-	ZDfE1IbSw7TFIQkMBJHHqCYKUpW3K+gyPWMMEUHDWA3/Q92HgofX6WF0MjCu8bAPGal2pg
-	ROKpprz62nAV+pj97AGs2NUHTRnRmC4=
-Date: Wed, 24 Jun 2026 09:32:25 +0800
+	bh=mQ383rsH80JLkIrPgbME6Yh35rwqkpod5OXpoJUyEWs=;
+	b=XeGxuCQ8QJuQO5wU9io6bNXNxpJIh+XYA0LfZ2zQoFem4dH3rK+i7ezLIZaZm6ijeTnEvv
+	9F9BTcls54kU2XYgVx9q4Keq1ZGDFgmBLwKAjORALF1hQ8nlJBPaT40ErxnFcolGTkyaIk
+	o5z4hWmN7txErnZ8BcpkpLEpZRPcHVU=
+Date: Wed, 24 Jun 2026 09:36:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2] bpf, unix: Guard sk_msg-dependent code behind
- CONFIG_NET_SOCK_MSG
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Amery Hung <ameryhung@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Network Development <netdev@vger.kernel.org>,
- kernel-team <kernel-team@cloudflare.com>
-References: <20260623-bpf-sk_msg-split-unix-v2-1-ca7a626a94a5@cloudflare.com>
- <CAAVpQUBsQFFxJFDnJzxmsER3bOjm=zqJ5P5MSeW_T9v-4639cw@mail.gmail.com>
- <87v7b9ysep.fsf@cloudflare.com>
- <CAAVpQUBARp1qCEomgzWXVe35WatdaswujVLku+RESm_LW0dE7Q@mail.gmail.com>
- <CAADnVQL2pfQ0BoN-vWcuCpbOBBKq_rM7Bp7P4XdLMFER5LGSDg@mail.gmail.com>
- <87mrwlyqg4.fsf@cloudflare.com>
- <CAMB2axMVhJJpP5HZtDFyQLLbKoRxhW08rj1zGRtWtgDkfYaVNA@mail.gmail.com>
- <878q85yoy5.fsf@cloudflare.com>
- <CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
+Subject: Re: [PATCH bpf 1/2] bpf, sockmap: Don't leak UDP socks on
+ lookup-bind-release
+To: Michal Luczaj <mhal@rbox.co>, John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Jiayuan Chen
+ <jiayuan.chen@linux.dev>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Cong Wang <cong.wang@bytedance.com>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
+ Emil Tsalapatis <emil@etsalapatis.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260623-sockmap-lookup-udp-leak-v1-0-05804f9308e4@rbox.co>
+ <20260623-sockmap-lookup-udp-leak-v1-1-05804f9308e4@rbox.co>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
+In-Reply-To: <20260623-sockmap-lookup-udp-leak-v1-1-05804f9308e4@rbox.co>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:mhal@rbox.co,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ast@kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301523-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301522-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:jakub@cloudflare.com,m:ameryhung@gmail.com,m:kuniyu@google.com,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:john.fastabend@gmail.com,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:alexeistarovoitov@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,kernel.org,iogearbox.net,cloudflare.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
+	FREEMAIL_TO(0.00)[rbox.co,gmail.com,cloudflare.com,linux.dev,davemloft.net,google.com,kernel.org,redhat.com,bytedance.com,iogearbox.net,etsalapatis.com];
 	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:mid,linux.dev:from_mime,cloudflare.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,rbox.co:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 186266BACBA
+X-Rspamd-Queue-Id: A018A6BACE2
 
 
-On 6/24/26 5:26 AM, Alexei Starovoitov wrote:
-> On Tue, Jun 23, 2026 at 1:36 PM Jakub Sitnicki <jakub@cloudflare.com> wrote:
->> On Tue, Jun 23, 2026 at 01:22 PM -07, Amery Hung wrote:
->>> On Tue, Jun 23, 2026 at 1:04 PM Jakub Sitnicki <jakub@cloudflare.com> wrote:
->>>> On Tue, Jun 23, 2026 at 12:33 PM -07, Alexei Starovoitov wrote:
->>>>> On Tue, Jun 23, 2026 at 12:31 PM Kuniyuki Iwashima <kuniyu@google.com> wrote:
->>>>>> On Tue, Jun 23, 2026 at 12:21 PM Jakub Sitnicki <jakub@cloudflare.com> wrote:
->>>>>>> On Tue, Jun 23, 2026 at 09:08 AM -07, Kuniyuki Iwashima wrote:
->>>>>>>> On Tue, Jun 23, 2026 at 4:20 AM Jakub Sitnicki <jakub@cloudflare.com> wrote:
->>>>>>>>> Prepare to decouple BPF_SYSCALL config option from NET_SOCK_MSG. When
->>>>>>>>> completed all code paths related to sockmap-based redirects should be
->>>>>>>>> guarded by BPF_SYSCALL && NET_SOCK_MSG to allow users to opt out by
->>>>>>>>> disabling NET_SOCK_MSG. The implementation of sockmap as a container for
->>>>>>>>> socket references would remain under BPF_SYSCALL.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
->>>>>>>>> ---
->>>>>>>>> Changes in v2:
->>>>>>>>> - Handle prot->recvmsg being NULL (Sashiko)
->>>>>>>>> - Elaborate on the end goal in description
->>>>>>>>> - Link to v1: https://patch.msgid.link/20260622-bpf-sk_msg-split-unix-v1-1-d7e0cb7bb03b@cloudflare.com
->>>>>>>>> ---
->>>>>>>>>   net/unix/af_unix.c  | 4 ++--
->>>>>>>>>   net/unix/unix_bpf.c | 6 ++++++
->>>>>>>>>   2 files changed, 8 insertions(+), 2 deletions(-)
->>>>>>>>>
->>>>>>>>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
->>>>>>>>> index f7a9d55eee8a..84c11c60c75f 100644
->>>>>>>>> --- a/net/unix/af_unix.c
->>>>>>>>> +++ b/net/unix/af_unix.c
->>>>>>>>> @@ -2675,7 +2675,7 @@ static int unix_dgram_recvmsg(struct socket *sock, struct msghdr *msg, size_t si
->>>>>>>>>   #ifdef CONFIG_BPF_SYSCALL
->>>>>>>>>          const struct proto *prot = READ_ONCE(sk->sk_prot);
->>>>>>>>>
->>>>>>>>> -       if (prot != &unix_dgram_proto)
->>>>>>>>> +       if (prot->recvmsg)
->>>>>>>> There is no reason to have this dead branch when
->>>>>>>> CONFIG_BPF_SYSCALL && !NET_SOCK_MSG.
->>>>>>>>
->>>>>>>> Let's compile out all sockmap code when both configs
->>>>>>>> are not enabled.
->>>>>>>>
->>>>>>>> Since AF_UNIX differs from TCP/UDP, it can take the
->>>>>>>> simpler approach.
->>>>>>> Okay, will put the whole file behind hidden config option like so:
->>>>>>>
->>>>>>> --- a/net/unix/Kconfig
->>>>>>> +++ b/net/unix/Kconfig
->>>>>>> @@ -30,3 +30,8 @@ config UNIX_DIAG
->>>>>>>          help
->>>>>>>            Support for UNIX socket monitoring interface used by the ss tool.
->>>>>>>            If unsure, say Y.
->>>>>>> +
->>>>>>> +config UNIX_BPF
->>>>>> Maybe UNIX_BPF_SOCKMAP or something.
->>>>>> bpf_iter is supported without this config.
->>>>> I don't like where it's going.
->>>>> I strongly dislike new config knobs.
->>>>> I'd rather remove existing knobs.
->>>>> What is the motivation?
->>>> The goal is to compile out sockmap bits that use sk_msg.
->>>> NET_SOCK_MSG is natural, exisiting candidate.
->>>> New knob wasn't my idea.
->>> I'm also missing the big picture here.
->>>
->>> sockmap already holds socket references today. You can store and look
->>> up sockets without attaching any verdict/parser program, and no
->>> redirect happens. So if the goal is to use sockmap purely as a socket
->>> container without the sk_msg fast-path overhead, what does a
->>> compile-time NET_SOCK_MSG knob add over the runtime checks?
->> Sure, let me clarify. It's about the maintenance overhead.
->>
->> sockmap-based redirects are a rather niche feature with few users, for
->> which we've been getting quite a few bug reports since AI came along.
->>
->> We're not using it internally at Cloudflare, so I don't really have a
->> good reason to justify time spent on these bug reports.
->>
->> Hence the move to put sockmap-based redirect behind a config option,
->> which you can enable at your own risk. Or which we can deprecate, but
->> that's not really my call.
-
-
-Hi Alexei and Jakub,
-
-skmsg is actually still pretty useful for gateways.
-I started with bpf by integrating skmsg into nginx as a module and envoy 
-has something similar.
-The usual setup is cgroup/sk for L4 bypass (reject SYN), and skmsg for 
-L7, redirecting
-between local apps by looking at the payload. So there are real users.
-
-
-> This is wishful thinking that a config knob will stop
-> the bug reports.
-> Just disable it for real instead.
-
-
-About the AI bug reports - yeah, I've seen them too. I think it just 
-comes from the complexity
-of networking plus how programmable bpf is. Reviewing AI-written patches 
-is often painful,
-the commit message is frequently wrong, once it took me a whole day just 
-to reproduce and
-confirm the issue. But I do believe these reports will converge eventually.
-
-
->>> I am also not sure if NET_SOCK_MSG is right. It is broader than
->>> "sockmap redirect". It is selected by TLS and {INET,INET6}_ESPINTCP.
->>> Because those select it, it can't be toggled independently.
->> Once the sockmap redirect bits are behind _some_ config option, it will
->> be easy to replace it with a more granular one that depends on
->> NET_SOCK_MSG. But we're not there yet. One step at a time.
-> No. That's not workable.
+On 6/24/26 2:03 AM, Michal Luczaj wrote:
+> UDP sockets get SOCK_RCU_FREE set when (auto-)bound. This means
+> sk_is_refcounted(unbound) = true, while sk_is_refcounted(bound) = false.
 >
->>> Could you share the concrete use case you have in mind, and whether
->>> this came out of an earlier discussion or thread upstream?
->> This is a follow up from discussions at BPF summit with Alexei & John.
-> Not quite. The discussion was to disable pieces of sockmap
-> that are causing trouble.
-> Not to move them under config knobs, but disable them.
+> Because sockmap accepts unbound UDP sockets, a BPF program can increment a
+> socket's refcount via lookup. If the socket is subsequently bound, the
+> transition from unbound to bound causes bpf_sk_release() to skip the
+> decrement of the refcount, causing a memory leak.
+>
+> unreferenced object 0xffff88810bc2eb40 (size 1984):
+>    comm "test_progs", pid 2451, jiffies 4295320596
+>    hex dump (first 32 bytes):
+>      7f 00 00 01 7f 00 00 01 d2 04 1b b7 04 d2 00 00  ................
+>      02 00 01 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
+>    backtrace (crc bdee079d):
+>      kmem_cache_alloc_noprof+0x557/0x660
+>      sk_prot_alloc+0x69/0x240
+>      sk_alloc+0x30/0x460
+>      inet_create+0x2ce/0xf80
+>      __sock_create+0x25b/0x5c0
+>      __sys_socket+0x119/0x1d0
+>      __x64_sys_socket+0x72/0xd0
+>      do_syscall_64+0xa1/0x5f0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> Maintain balanced refcounts across sk lookup/release: (re-)set
+> SOCK_RCU_FREE on proto update to treat the socket (whether bound or
+> unbound) as not requiring a refcount increment on (a RCU protected) lookup.
+>
+> Fixes: 0c48eefae712 ("sock_map: Lift socket state restriction for datagram sockets")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 
-Agree, just like we remove skmsg from KTLS which is rarely used.
-
-
-I think the motivation of this patch - making the boundary between skmsg 
-and sockmap clear - is worthwhile.
-
-Hope not have skmsg disabled by default.
-I don't work on that upper-layer software anymore, but I really don't 
-want my ex-colleagues to
-upgrade their kernel some day, find the feature I wrote broken, and come 
-curse me :) (selfish)
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
 
