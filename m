@@ -1,212 +1,304 @@
-Return-Path: <netdev+bounces-301793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oyXCGO1VPGpsmwgAu9opvQ
-	(envelope-from <netdev+bounces-301793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:10:53 +0200
+	id 4zOkN/VVPGptmwgAu9opvQ
+	(envelope-from <netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:11:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF5206C1B12
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:10:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8C56C1B15
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:11:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=eJj+dsGe;
-	dkim=pass header.d=redhat.com header.s=google header.b=CDQYGdeo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301793-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301793-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kTF6YpxH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301794-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47BEF3046E82
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:10:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E383A300B1CE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F8F2F7EE3;
-	Wed, 24 Jun 2026 22:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DAF28D8D0;
+	Wed, 24 Jun 2026 22:10:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2105B288C30
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABDA28C869
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:10:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782339033; cv=none; b=G0T8Ln9SLsRqmOOXfZ6EJ1Qlhcphs/enaAI49lxDRecFSmMJkbSb20KqD8Wt5bJhdrQvyK05SQ7Sab6JwoCsGr10tcwI+X2uQVNTCJL203jqhoLOy/nFLAD+JELwgAiZy5uPjaM9+Nhw2IWM2n6pY5KcrqLmHwaOkeyMzgQX3uU=
+	t=1782339058; cv=none; b=daJ1vVBhkGHnwCCRehjRrlKVGJPexbceji159Q9xC4cilTyVGTmgXDheGWGPFhpDqsKOPKFdWPZ1zHIWPssFyK6zQ1ll+78UqNygb0AHELHrmovHBUfPOLXPDIG0l7kDhnuX+KIkAkqH9JRyOOhHMy+ccmfwwAFJodkjKWbBq5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782339033; c=relaxed/simple;
-	bh=SctI5nL9w6nD1CkeTPygc0eg5Cq42shMYT/8E3NzTw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AeQ7CCkGV6vd59e7JyDQLW2XyBEtgy8bjU4ZE7NjsvnV7w/lljZefArnQbOceIBU9TrguyOtz7/aFO6KJYw3DCy69P1NQXucQLtkc0o6SeOrVUagPny7VMjtk12P+CwFd/etO3l/8pEUuyNwz5sqB6UfjWWbg/G5NlcMNztx8rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eJj+dsGe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CDQYGdeo; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782339030;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rLK07udfOGaPeFwrW6OYgWQxt14q957X4zDxurj3Eis=;
-	b=eJj+dsGeZ4n/4+C8HMMbzG6z5mqxZbhACGe21nACm3qqMC92BikdcD2zoL6ujoy1h6pfRq
-	xGQIrBiMxA1n+CqUEFB5l4y1b9vKCJwPpIpZ0r0hAN5NqCsrFQYC7Oa79TSYnbLIiUrlCi
-	8Uz5OIRj6qv4CNuxjgNdMYnvwFwdBVE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-iKAOY7PFMgSWgbI67HIoUw-1; Wed, 24 Jun 2026 18:10:28 -0400
-X-MC-Unique: iKAOY7PFMgSWgbI67HIoUw-1
-X-Mimecast-MFC-AGG-ID: iKAOY7PFMgSWgbI67HIoUw_1782339027
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-45f3d008865so259989f8f.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:10:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782339027; x=1782943827; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rLK07udfOGaPeFwrW6OYgWQxt14q957X4zDxurj3Eis=;
-        b=CDQYGdeolXbwC8tN8EF+YbxP5RCPddjmgJFYuMmNthUwOAMGTiXcX55MwPW7IheIcX
-         w9MYGRENHhAE3IQUIiBaDKrOTStu1EjhTNxaoiNbmEaH1uzSh/KNXz2n5YKk7UTYfZME
-         VbLb0YOXs1w1+Jqt8U4ZCQnClYc9cxyrrAFj4cIN7hu5iHL9Ffytl1R1kshonSGlR0Qb
-         C7lKnswrmf/dwcQZz3LCYhJD+bLXTQzGlr1RQ0mOGVn8HUJk4KzRnTE7PaFnZlq0YYSg
-         LHS7pCuKmrgUKHcdp7+pvhorMDlxz+e+znSNSI3rT3HsR4UI+Q8m219UnakFnOpnlId2
-         prCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782339027; x=1782943827;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rLK07udfOGaPeFwrW6OYgWQxt14q957X4zDxurj3Eis=;
-        b=hQrVA46tzjYXoWf9pknCItNoa2A15cicIXx3q7G/IRk6650MMxOJIv1vzPRJAC+p1r
-         ePteBJrfeaoXjDQHbhiG+c46ZpkHIpeeI7CyNDzrwvRc81hV7B00C4tOL9DPktyoNBkO
-         47OVXMCcajhr98QiqE8BChiKORo1Gz0zT9Wy+7ZzhO2curwE8iE4AL08XZgd4ha/cj55
-         +0+RCj8qyTPxN1Wqte514+j4J+2uJfyZZNIohPZVIqsIscWcI7JoAnTWAvVhqHI6Ov98
-         JHQEtUmeGKbjHJEkzHSJk7wcRXrK/98/rh4xZrpADmnC+0EOG+dvYR/2HBtduAMSkmlQ
-         22Ug==
-X-Forwarded-Encrypted: i=1; AHgh+Ro3bbYcCuJekACAEvIqRKRjFzlgV/6M/uzj2rwnstA2Pe5k2KyJzjfYYmpSqzBCeDo4g5UEk/0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPiOfoGLM7mX15jcF3zuh0W0Y8sYbv0rZ32rhAKOVRKRd5o5O8
-	+ojP+0uAx3ZpMAPQav1j7eQDZY5BLapBnJY85nGS0Kw3rLPfMv8EdHmmDR5LlbAiJ6r4sORSc60
-	4+t8R0EnR41DutK2zYCs2k7R28lLo0NgGYDAtm/y8oxvo6Q3slBd4Q2oxGw==
-X-Gm-Gg: AfdE7cmamRb6pxcE/L40m8MdXuvMfDUw2hM3Kpg2iBCUbw9hgSIYREwneAnxfA1tqoc
-	L3xd6Aq4YUd0BlggmP8TvN5m/wnt+7GeHjX0Ex6mOdu4+ikRtUhO75LvrOEg4O09shaCL5purx2
-	vLf+terOqKJe+oLS99D0poyyTZDIC1cf0+OGmISEmebHXAZW9qdWs6ml1EQpyMncanFUmjTcvFD
-	ne8WGoJ5XOAaACpd7Td6nFx2joxwgLA+cKjZPYpgLNr0cLirW/e+GPnk8FQzAr8896BFvR+wdMT
-	NRw3e1F9td9gFb+d0eZ1892K1GWiZROCZVepDh39le39Tz1arH3/JS4litvcg8q7WWw0YUwSKKa
-	k/gZdmfxA2D+TZy1Kl/1s24NouPerw/yN
-X-Received: by 2002:a05:6000:2887:b0:463:1d06:ab33 with SMTP id ffacd0b85a97d-46a80f5c6edmr17065685f8f.27.1782339027399;
-        Wed, 24 Jun 2026 15:10:27 -0700 (PDT)
-X-Received: by 2002:a05:6000:2887:b0:463:1d06:ab33 with SMTP id ffacd0b85a97d-46a80f5c6edmr17065639f8f.27.1782339026847;
-        Wed, 24 Jun 2026 15:10:26 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c22c680fasm10122841f8f.34.2026.06.24.15.10.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 15:10:26 -0700 (PDT)
-Date: Wed, 24 Jun 2026 18:10:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yousef Alhouseen <alhouseenyousef@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] vhost/vdpa: reject overflowing PA map page counts on
- 32-bit
-Message-ID: <20260624181012-mutt-send-email-mst@kernel.org>
-References: <CAMuQ4bX-iDvcUOPPY+NLz95tkRJYwWqvzAr=U48uNaub_HZLGw@mail.gmail.com>
+	s=arc-20240116; t=1782339058; c=relaxed/simple;
+	bh=+qcaSEjsBGY0hfxGQAac9FZCSg+r6O3gmoiaDeZc9b8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=qV0LCELkDXraDCufggby5WX+2sd851jRLUcXpejFr3LaWLJvF5qdRATNSvmXj6X1tG9Dw/AGTI/G3TiYCQd8+0DHyG4t+YEyya062/vmbTvCdwV9i7obc3Us0zW6PnneNL0plogJbpMfNE0lWL4Ln5l5B9S/lm+rDl4rL6qOkqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kTF6YpxH; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC5361F00A3D
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:10:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782339057;
+	bh=2zDeOvPena4qlSxGBMWoQ/GeMf6iu2rEhQfYk/kmj8Q=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=kTF6YpxHbCRBNyLhjZIBEHLDUxNmaF9rCQtZWDwx28bzGNmtzeVA0NChYBguxf169
+	 vgbXcI1yReX+DovftnbDhToikdzLBVhsom8X04oz2kTcaZC4so2JwQOUa93vUTvWMX
+	 5le6N8ViIDB6caUyCMIJtbhw6hSe5izfuFOKszTqAW4mP/9h+mBI8iVh+u8Ce97fdJ
+	 FrcSLlTSAp6Eh3yfBZr+yYVsSNkxiGwis9qeqCAHY8tfo3u4FebGqSeKR9KNE65m2U
+	 ZlBfsCB2+vazOzmuvnLM53KKf3TMuB0rQvu4UnPRORzuXBHzWhqXPPhGs6Fysv40XR
+	 riuCGUpJsIxrg==
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5131DF40088;
+	Wed, 24 Jun 2026 18:10:56 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Wed, 24 Jun 2026 18:10:56 -0400
+X-ME-Sender: <xms:8FU8aiME317O9D-ZFxSWrSyQzIias2JSQOcoGtydlMAvCu6vZ9tisg>
+    <xme:8FU8aihynh8JXZBgkQo-8a4MHIx0XI2AxtNLJkGdZqEvsKOTflxvvpzFdApOpmiDy
+    Li9wwXRqnEyQgZMWgd24nrKoSMJqCqpexmmteufkgomxTJl3cz2n9Lm>
+X-ME-Received: <xmr:8FU8aoghcQQKtP-3Z3J9gPq0gWu6wqPfLsWlYRY_bVlJ0Ppqg-qTwTo_c1UgIWMMU60GpTe4FvC6DI7ynErQafLp89NO7Sqdj7A>
+X-ME-Proxy-Cause: dmFkZTF3zlzLBzyKjCAA6Cea2zlqBSqAMAQCqXaPu05Ub4Ydgfd8fyShASWLMBR4wT+YMG
+    UcPBGsHqJxZJy8fX3hIF5Jzl0g8EowykA7Jy613efCgfGn1XxpcjT6osgdQkpc57steuEk
+    9T4HXnYjXfCX1JRV8f7uW4pjeX7REeW5+eUwZdMprmX3OIdWMnNLG42vXdPO0Dr4fPRa34
+    4PMRLgpm3YAACIU+F7mzvGzCYOIfDn8YdGIIUa+3GxABJcyjdMMGuPQ2qCJsg0g1Iwxq/E
+    Tk/6H3iC+oO1TsNt1Lz0UGhCXp1t7GxV5AGSTqCJTxHNZBKlbPuwdlS3RHUT4BpFSt4wLJ
+    8rawabeRnaKendPHMoFLJ55MVQdQ47RrzL7syVw2djYIyH65LihPi1nxXQOTIR4TYm/5CF
+    7B3lKuzL6tgTpPrs/Kw/Ro25YaZIN59BpSlT1dyFBHCjT2dg98TLABqMGpsyUT9AM5fE4g
+    uHOJBIkaP8fg+C5RmVBktVI4bXmPXWLh0yvMl75wEFcO2RqftwSxoaZtMSxSAbE0/4/PFh
+    4xWKUd6gCPxk9tA0ADA27F0Eoyefqm1i6hncwE+tHqzYnRzfTMCtcbyLk6FOUJ+3CkLGbs
+    CsvJz8jF6M2X5VMVD1Ji/TBGOdELUx6qxvWNOpkKXYz9ydApNu0RAabLb7Yw
+X-ME-Proxy: <xmx:8FU8apJIqowhus-XKQ6rF5FpLH23yGvVlV-_oF3wdhuhnFcIqdJRAQ>
+    <xmx:8FU8avkf5S1z8fy8bFwUAC8a8DE6CuyVCKJAxKA-szyysQ-OU6S83g>
+    <xmx:8FU8apPRPh-9iqI63DESH3c8YocBVSAaT_Mbt-E0OoF-K7B9zV8HKw>
+    <xmx:8FU8ah5vfegxnX7PARtXxRKrEGtStvPLaJLVUAaL-_GpuD9nWgSN7A>
+    <xmx:8FU8albjUoi-G9B67uEzJXlvqnmE1RS668bbjvxo4aAEkQaNpw0mi4sx>
+Feedback-ID: i67ae4b3e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 24 Jun 2026 18:10:55 -0400 (EDT)
+Date: Wed, 24 Jun 2026 15:10:54 -0700
+From: "Dan Williams (nvidia)" <djbw@kernel.org>
+To: alejandro.lucero-palau@amd.com, 
+ linux-cxl@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ dan.j.williams@kernel.org, 
+ edward.cree@amd.com, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ edumazet@google.com, 
+ dave.jiang@intel.com
+Cc: Alejandro Lucero <alucerop@amd.com>, 
+ Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <6a3c55eea91d0_f12301008f@djbw-dev.notmuch>
+In-Reply-To: <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
+References: <20260622124010.2192888-1-alejandro.lucero-palau@amd.com>
+ <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
+Subject: Re: [PATCH v29 4/5] sfc: obtain and map cxl range using
+ devm_cxl_probe_mem
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuQ4bX-iDvcUOPPY+NLz95tkRJYwWqvzAr=U48uNaub_HZLGw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301793-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alhouseenyousef@gmail.com,m:jasowang@redhat.com,m:eperezma@redhat.com,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-301794-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[djbw@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[amd.com,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:dan.j.williams@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:alucerop@amd.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,amd.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,djbw-dev.notmuch:mid];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[djbw@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BF5206C1B12
+X-Rspamd-Queue-Id: 7A8C56C1B15
 
-On Wed, Jun 24, 2026 at 03:02:02PM -0700, Yousef Alhouseen wrote:
-> vhost_vdpa_pa_map() adds the IOVA page offset to the user-controlled map
-> size before computing the number of pages to pin. On 32-bit systems,
-> where unsigned long is narrower than u64, that addition can overflow and
-> the code can pin and map fewer pages than the requested IOTLB range.
+alejandro.lucero-palau@ wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Reject sizes that overflow the unsigned long page-count calculation.
+> Use core API for safely obtain the CXL range linked to an HDM committed
+> by the BIOS. Map such a range for being used as the ctpio buffer.
 > 
-> Fixes: 22af48cf91aa ("vdpa: factor out vhost_vdpa_pa_map() and
-> vhost_vdpa_pa_unmap()")
-
-still 2 lines?
-
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
+> A potential user space action through sysfs unbinding or core cxl
+> modules remove will trigger sfc driver device detachment, with that case
+> not racing with this mapping as this is done during driver probe and
+> therefore protected with device lock against those user space actions.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
 > ---
-> Changes in v4:
-> - Keep the Fixes tag on one line.
-> - Add Michael's Acked-by tag.
+>  drivers/net/ethernet/sfc/efx.c     |  2 ++
+>  drivers/net/ethernet/sfc/efx_cxl.c | 23 +++++++++++++++++++++++
+>  drivers/net/ethernet/sfc/efx_cxl.h |  3 +++
+>  3 files changed, 28 insertions(+)
 > 
-> Changes in v3:
-> - Add the Fixes tag.
-> 
-> Changes in v2:
-> - Clarify that the overflow is on 32-bit systems.
-> - Drop the unrelated memlock check change.
-> 
->  drivers/vhost/vdpa.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index ac55275fa..38b28ed3d 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -1102,6 +1102,7 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->  	unsigned int gup_flags = FOLL_LONGTERM;
->  	unsigned long npages, cur_base, map_pfn, last_pfn = 0;
->  	unsigned long lock_limit, sz2pin, nchunks, i;
-> +	unsigned long page_offset;
->  	u64 start = iova;
->  	long pinned;
->  	int ret = 0;
-> @@ -1114,7 +1115,13 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->  	if (perm & VHOST_ACCESS_WO)
->  		gup_flags |= FOLL_WRITE;
-> 
-> -	npages = PFN_UP(size + (iova & ~PAGE_MASK));
-> +	page_offset = iova & ~PAGE_MASK;
-> +	if (size > ULONG_MAX - page_offset) {
-> +		ret = -EINVAL;
-> +		goto free;
+> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+> index 61cbb6cfc360..3806cd3dd7f4 100644
+> --- a/drivers/net/ethernet/sfc/efx.c
+> +++ b/drivers/net/ethernet/sfc/efx.c
+> @@ -984,6 +984,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
+>  	efx_fini_io(efx);
+>  
+>  	probe_data = container_of(efx, struct efx_probe_data, efx);
+> +	efx_cxl_exit(probe_data);
+>  
+>  	pci_dbg(efx->pci_dev, "shutdown successful\n");
+>  
+> @@ -1242,6 +1243,7 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
+>  	return 0;
+>  
+>   fail3:
+> +	efx_cxl_exit(probe_data);
+>  	efx_fini_io(efx);
+>   fail2:
+>  	efx_fini_struct(efx);
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 18b535b3ea40..3e7c950f83e9 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -18,6 +18,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  {
+>  	struct efx_nic *efx = &probe_data->efx;
+>  	struct pci_dev *pci_dev = efx->pci_dev;
+> +	struct range cxl_pio_range;
+>  	struct efx_cxl *cxl;
+>  	u16 dvsec;
+>  	int rc;
+> @@ -73,9 +74,31 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		return -ENODEV;
+>  	}
+>  
+> +	cxl->cxlmd = devm_cxl_probe_mem(&cxl->cxlds, &cxl_pio_range);
+> +	if (IS_ERR(cxl->cxlmd)) {
+> +		pci_err(pci_dev, "CXL accel memdev creation failed\n");
+> +		return PTR_ERR(cxl->cxlmd);
 > +	}
 > +
-> +	npages = PFN_UP(size + page_offset);
->  	if (!npages) {
->  		ret = -EINVAL;
->  		goto free;
-> -- 
-> 2.54.0
+> +	cxl->ctpio_cxl = ioremap_wc(cxl_pio_range.start,
+> +				    range_len(&cxl_pio_range));
+> +	if (!cxl->ctpio_cxl) {
+> +		pci_err(pci_dev, "CXL ioremap region (%pra) failed\n",
+> +			&cxl_pio_range);
+> +		return -ENOMEM;
+> +	}
+> +
+>  	probe_data->cxl = cxl;
+>  
+>  	return 0;
+>  }
+>  
+> +void efx_cxl_exit(struct efx_probe_data *probe_data)
+> +{
 
+If you are going to have an explicit efx_cxl_exit() then I would also
+add an explicit unregistration of the memdev. This would also fix the
+Sashiko report about pci_disable_device() running while the cxl_memdev
+is still registered. Unfortunately, mixing devm and explicit unwind is
+always fraught.
+
+Let me know if this passes your testing, and I can send it out as a
+standalone patch. You could also use it to unwind if the ioremap()
+fails.
+
+-- 8< --
+From 47940f7d6de6dd1039d0e445eb944ca96ad5eb3a Mon Sep 17 00:00:00 2001
+From: Dan Williams <djbw@kernel.org>
+Date: Wed, 24 Jun 2026 11:47:24 -0700
+Subject: [PATCH] cxl: Add devm_cxl_remove_mem()
+
+Undo devm_cxl_probe_mem() without causing the host driver to unload.
+
+The expectation of devm_cxl_probe_mem() is that upon attach the caller
+depends on the CXL topology not being torn down. If it is then it is
+escalated to a 'remove' event on the caller. However, if the caller wants
+to cancel their interest in CXL operation, they should be able to do so
+without that side effect.
+
+This is useful for setup scenarios where CXL successfully attaches, but
+some other event precludes CXL operation.
+
+Cc: Alejandro Lucero <alucerop@amd.com>
+Signed-off-by: Dan Williams <djbw@kernel.org>
+---
+ include/cxl/cxl.h         |  1 +
+ drivers/cxl/core/memdev.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+index 016c74fb747c..cff2922b0d4a 100644
+--- a/include/cxl/cxl.h
++++ b/include/cxl/cxl.h
+@@ -226,4 +226,5 @@ struct cxl_dev_state *_devm_cxl_dev_state_create(struct device *dev,
+ 
+ struct cxl_memdev *devm_cxl_probe_mem(struct cxl_dev_state *cxlds,
+ 				      struct range *range);
++void devm_cxl_remove_mem(struct cxl_memdev *cxlmd);
+ #endif /* __CXL_CXL_H__ */
+diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+index 33a3d2e7b13a..aa35876f0067 100644
+--- a/drivers/cxl/core/memdev.c
++++ b/drivers/cxl/core/memdev.c
+@@ -1185,6 +1185,31 @@ struct cxl_memdev *__devm_cxl_add_memdev(struct cxl_dev_state *cxlds,
+ }
+ EXPORT_SYMBOL_FOR_MODULES(__devm_cxl_add_memdev, "cxl_mem");
+ 
++static struct cxl_attach_region *cancel_probe_mem_teardown(struct cxl_memdev *cxlmd)
++{
++	struct cxl_attach_region *attach;
++
++	guard(device)(&cxlmd->dev);
++	attach = container_of(cxlmd->attach, typeof(*attach), attach);
++	cxlmd->attach = NULL;
++	return attach;
++}
++
++void devm_cxl_remove_mem(struct cxl_memdev *cxlmd)
++{
++	struct cxl_attach_region *attach;
++	struct cxl_dev_state *cxlds;
++
++	if (IS_ERR(cxlmd))
++		return;
++
++	attach = cancel_probe_mem_teardown(cxlmd);
++	cxlds = cxlmd->cxlds;
++	devm_release_action(cxlds->dev, cxl_memdev_unregister, cxlmd);
++	devm_kfree(cxlds->dev, attach);
++}
++EXPORT_SYMBOL_NS_GPL(devm_cxl_remove_mem, "CXL");
++
+ static void sanitize_teardown_notifier(void *data)
+ {
+ 	struct cxl_memdev_state *mds = data;
+-- 
+2.54.0
 
