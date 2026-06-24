@@ -1,59 +1,70 @@
-Return-Path: <netdev+bounces-301690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bbD2Myb1O2rkgQgAu9opvQ
-	(envelope-from <netdev+bounces-301690-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:17:58 +0200
+	id l808KNHzO2o/gQgAu9opvQ
+	(envelope-from <netdev+bounces-301688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:12:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 524166BF8E7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:17:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1E686BF841
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:12:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=c1Ap+tTH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301690-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301690-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KDk659yU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301688-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301688-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4FF98312C4AD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:07:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1406B319647C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F593BFAE7;
-	Wed, 24 Jun 2026 15:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108BA3DA5CF;
+	Wed, 24 Jun 2026 15:03:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA173B7B7B;
-	Wed, 24 Jun 2026 15:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F354316F27F;
+	Wed, 24 Jun 2026 15:03:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782313636; cv=none; b=RvhNOmcXX1s0Y191ZZqV+vt3GlzVbu164zoX5PVggmhcT9OsYGcfdzv19V9MJBH6yAxqvKNX8iXYfzl7MFyu7wKnfBsF6DxP4oztXaBtaSDN3yFItDCpBT4QWUk8gJRPw0rfCc/wYKCja4gR3raUjZGm8gi5PkhPC364f1I3bn8=
+	t=1782313402; cv=none; b=YVidABfMlI6QOKYb9pvYKUKcRojemFaadZmJ3IslVnDRONW1zF6Btp+m7z/pLPWpYsEPDzLxVJMezptfy+9s2/l6ApV4pSsJTB1sdLbDogNKI7jhXFajFp210vJCQOc4bSlWTZKauQLfUHtCu4+MFt6OsqfHnL2qQhvufIzkdPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782313636; c=relaxed/simple;
-	bh=ODnf/Rg982u585CA9MVRZf8zTcdfWnRXjFq8vAd94vc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=keGbyLoBY03iSf3tKh1NK62k3SdmghM1uSamao5BHqtcMJF8wxUVlw7w+mUKXNMYKxvOwnWCLdLcasXrgrneydHTOngeTFxDD0Q0NgrZJTjTPm+pfYsypmzOODGdUf5O2qUcBhVX4R1qhPnL32V6QDnLoFP8HesxSeg7Sta2JA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=c1Ap+tTH; arc=none smtp.client-ip=45.254.49.198
-Received: from PC-202605011814.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 439d318bf;
-	Wed, 24 Jun 2026 23:01:56 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org,
-	runyu.xiao@seu.edu.cn,
-	jianhao.xu@seu.edu.cn
-Subject: [PATCH net-next] openvswitch: conntrack: annotate ct limit hlist traversal
-Date: Wed, 24 Jun 2026 23:01:49 +0800
-Message-Id: <20260624150149.3510541-1-runyu.xiao@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1782313402; c=relaxed/simple;
+	bh=EgeMv3LeUurApowpd/AA+HwFECgYzVaHejtU6nS2KPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ajlXmaohAIu6MbcEkE3caWsKAnMGQQ6mAWEPK7EP70rZH25JCV9Ya0txV4zyVF1LKkJeRXIZV3pdEqHw+hTgOXH3it4rh9iiHRysbWixI0iMuIDr8m1g7PB927Lwy6p4Yfq8nb/+40SitjEzJdxbuRtcIzn7E+cj/+tr8CZCZJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KDk659yU; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF491F000E9;
+	Wed, 24 Jun 2026 15:03:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782313400;
+	bh=8unGs6rbGg9eZccPCqQKdo02LVUJ1cmOkH4JAvhO2s4=;
+	h=From:To:Cc:Subject:Date;
+	b=KDk659yUXsZ1T1YM9gK0zBqyv1q0UuxepuHjtUsBiEmdZlwZzeyqG1Cyzn5oC5FRu
+	 PyeuILawOEY7SALc/WG/s1JocO07eh8ZxeftRXwyrX5QYD3uC356b/9FbS9DEW1RLS
+	 ovzzKMHbfWaaPeGapbvF3tDI4lJZAZXFAlFElRJV/JxkAmboUqY98my6yioZiq7xg5
+	 WGzdIHLc9ENlLUg6gjxebQ2aafUmlZ7twpBpqpz/059ZLgKa8O8NC+ZxELn85+c8eS
+	 40mr9x3hxprza+i5CrLPT1970IEsmicTS4kHCPcmXUk9Wrj0WqwPUWNtnlMrJjzzQY
+	 JBmVfE5sCE7IA==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] dt-bindings: net: renesas,ether: Drop example "ethernet-phy-ieee802.3-c22" fallback
+Date: Wed, 24 Jun 2026 10:02:50 -0500
+Message-ID: <20260624150250.131966-2-robh@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,91 +72,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9efa26efcc03a1kunmf4a0eb873b849
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDTUpCVkJCGkNMSxpMGENJSFYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSE
-	pPSExVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=c1Ap+tTHfDsdYdMhYOR9tWKp2pqzRBoj9zBWhOAKbUYJDaRetHeyB2lt7HKIHXgPT42OZ7L2wc1MaGQf01zEgADYm9Gf3H0uWxf1vuGaNDioM3m0nbRNNdxHUOKQCeT/p+rW2pD6MkFnoPlxDD5aWW5B9uiCVXAb6TSJs4Vs4O8=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=v0emlpGfulGP8V887Y1pHMTBiLupsSDCWgA/s1jrzbQ=;
-	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301690-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:linux-kernel@vger.kernel.org,m:runyu.xiao@seu.edu.cn,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[ragnatech.se,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,glider.be,gmail.com];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund@ragnatech.se,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:sergei.shtylyov@gmail.com,m:netdev@vger.kernel.org,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:sergeishtylyov@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301688-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime]
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,devicetree.org:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 524166BF8E7
+X-Rspamd-Queue-Id: E1E686BF841
 
-ct_limit_set() is documented as being called with ovs_mutex held. It
-walks the ct limit hlist with hlist_for_each_entry_rcu(), but the
-iterator does not currently pass the OVS lockdep condition used
-elsewhere for RCU-protected OVS objects.
+Fix the Micrel PHY in the example which shouldn't have the
+fallback "ethernet-phy-ieee802.3-c22" compatible:
 
-Pass lockdep_ovsl_is_held() to the iterator. This matches the function's
-existing caller contract and lets CONFIG_PROVE_RCU_LIST distinguish the
-ovs_mutex-protected update path from the RCU read-side ct_limit_get()
-path.
+Documentation/devicetree/bindings/net/renesas,ether.example.dtb: ethernet-phy@1 \
+  (ethernet-phy-id0022.1537): compatible: ['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
+        from schema $id: http://devicetree.org/schemas/net/micrel.yaml
 
-This was found by our static analysis tool and then manually reviewed
-against the current tree. In the reviewed CONFIG_PROVE_RCU_LIST triage
-run, the writer-side ct limit update produced the expected "RCU-list
-traversed in non-reader section!!" warning while ovs_mutex was held,
-with the stack matching ct_limit_set() and ovs_ct_limit_set_zone_limit().
-The change is limited to documenting the existing protection contract.
-
-This is a lockdep annotation cleanup. It does not change the conntrack
-limit list update or release behavior.
-
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 ---
- net/openvswitch/conntrack.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/net/renesas,ether.yaml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-index c6fd9c424e8f..95697d4e16e6 100644
---- a/net/openvswitch/conntrack.c
-+++ b/net/openvswitch/conntrack.c
-@@ -883,7 +883,8 @@ static void ct_limit_set(const struct ovs_ct_limit_info *info,
- 	struct hlist_head *head;
+diff --git a/Documentation/devicetree/bindings/net/renesas,ether.yaml b/Documentation/devicetree/bindings/net/renesas,ether.yaml
+index f0a52f47f95a..dd7187f12a67 100644
+--- a/Documentation/devicetree/bindings/net/renesas,ether.yaml
++++ b/Documentation/devicetree/bindings/net/renesas,ether.yaml
+@@ -121,8 +121,7 @@ examples:
+         #size-cells = <0>;
  
- 	head = ct_limit_hash_bucket(info, new_ct_limit->zone);
--	hlist_for_each_entry_rcu(ct_limit, head, hlist_node) {
-+	hlist_for_each_entry_rcu(ct_limit, head, hlist_node,
-+				 lockdep_ovsl_is_held()) {
- 		if (ct_limit->zone == new_ct_limit->zone) {
- 			hlist_replace_rcu(&ct_limit->hlist_node,
- 					  &new_ct_limit->hlist_node);
+         phy1: ethernet-phy@1 {
+-            compatible = "ethernet-phy-id0022.1537",
+-                         "ethernet-phy-ieee802.3-c22";
++            compatible = "ethernet-phy-id0022.1537";
+             reg = <1>;
+             interrupt-parent = <&irqc0>;
+             interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
 -- 
-2.34.1
+2.53.0
 
 
