@@ -1,168 +1,176 @@
-Return-Path: <netdev+bounces-301609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hiEnI1isO2qlbAgAu9opvQ
-	(envelope-from <netdev+bounces-301609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:07:20 +0200
+	id MLHZMLCsO2qvbAgAu9opvQ
+	(envelope-from <netdev+bounces-301610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:08:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF39C6BD365
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:07:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6107F6BD37C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:08:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=oNp7CUeM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301609-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301609-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linutronix.de header.s=2020 header.b=Ie+Gx05T;
+	dkim=pass header.d=linutronix.de header.s=2020e header.b=ObC5D9bb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301610-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2ED6730F8B0A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:04:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C8BC2300B1B9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4D23B14D2;
-	Wed, 24 Jun 2026 10:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8274D3B840E;
+	Wed, 24 Jun 2026 10:08:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9949E3BAD89;
-	Wed, 24 Jun 2026 10:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9013B71C6;
+	Wed, 24 Jun 2026 10:08:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782295458; cv=none; b=WHvLkARd9PgK42Th8QKyYP9VbS+ybJS0/3E6T3xT1qnVGmhyuC7S1MypTBj4o+I8fJKXQefz2Lhb8j61g+11Ey+oqoVlKAi1A5mnkd8fhp+gwomO1lQ+MFd0NjXk8tJkk18JjcaR0W9itlT36lg3l5NKWvpIcecYS+HgEXDXrIk=
+	t=1782295726; cv=none; b=RMsRIH0oUbty6/bTyrP3BblKQWjhVn96yd6ejaqHppnb1JgUlPUQBiUmumqltzQ01zmDczhpFDtd6B9vQZalwWf1qPO+4g2iDYsGeYLPmkeWW+MlDosI2FGRylxvUnnngFcFPjNQ361VGCaBmA//venLUnY9N7/DCvO+ZMrnbu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782295458; c=relaxed/simple;
-	bh=QOGjg1/RGN8flpFs/dZ2Z3VqQGhz2cw/vr/wk+e5KKU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PWXS2C7k+arkdTwUj9Kw97DdmsEZ2E22CR4rULgkYld6WrabY0ZG+WjNGIhPdTyl/6g9ZX9yVTsjZaWthGDCHAL2v5AY+WPHO3kMQYlfYyV++S/kHaQhmD0SABGzV/cNIdYHZRpjSuxZYdAy5/iY4EOnB1JNjqWKsZTGFlBKKxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oNp7CUeM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 77D94C2BCFD;
-	Wed, 24 Jun 2026 10:04:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782295458;
-	bh=QOGjg1/RGN8flpFs/dZ2Z3VqQGhz2cw/vr/wk+e5KKU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=oNp7CUeMACf21wTPc2GGtAngja6hSBZOjS1i/DTzCHvMwzFrZlJ5KQKmmYzRk8hAg
-	 VCCHh6zCkVshYVfBA2fB8dwcorW4GJ/5zmcGTk2uRSh+5rGjzCHboPvQ7zi9zxWESQ
-	 Mf/wW9mEvoODQz9vJA9t9+lQJX+TlyLjuHcGnWSgjFqKFuklLN5EpBcXKEp/4UZKrs
-	 4LuPNJlodj7GeN6qvkVTEh3gYFfnIYngM34+3qcbZLTSRERi+pkoJtnMBwcZI6aqzj
-	 YcI/TlZKu1ZimQzL0AoWuTk7yu3VdpGwpN/VWQ8s7DMZTLvjKPYeERJlWBCXSEmhQs
-	 oS5yWlyrw23KA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF40CDB47C;
-	Wed, 24 Jun 2026 10:04:18 +0000 (UTC)
-From: Jack Wu via B4 Relay <devnull+jackbb_wu.compal.com@kernel.org>
-Date: Wed, 24 Jun 2026 18:04:13 +0800
-Subject: [PATCH v3 7/7] net: wwan: t9xx: Add maintainers entry
+	s=arc-20240116; t=1782295726; c=relaxed/simple;
+	bh=Zgq0HceP4qnVEiXOOc7bhS8RStlam2Jmor0wsOciRiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZwf3vGEcCxMNjkrUhPm5A0pDw+vtyPn0sGVVtBq77MOoGOUa6+2ZYa6u6YYy/jsm3ZRXtTX9evWaKBvULd8/1OmOnDCiqwaj8N3RivLBoypbgFYXPoiL1jkaG8XNm6tyRPxSG3QLJKyx9DxCxX26uCIbSZYSm33wfEk8MXNEBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ie+Gx05T; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ObC5D9bb; arc=none smtp.client-ip=193.142.43.55
+Date: Wed, 24 Jun 2026 12:08:39 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1782295722;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xn0h6VOL/cdoKYPxSepbduPQBw6kBDF1WxhF/z0UW7Y=;
+	b=Ie+Gx05T8M23x7bJzrMK2MWptU0vHip0oyTQvuPFUgWsDKpCmZksVEcVfnxxA6d/PQLScl
+	rI45s4KZMsDfMRY8ysL3w9fRA/NtG7VK+g6I1xz3/gMLJttFFL2WFnXXUV8/YJTe8thBQY
+	Qf5y4rRLeauo/kJaUBrjHulczdTlHum1Pjyu9d1ikel9LA9G9pqns+8gi5gfkDw/0fPW+p
+	HAOBcDvlaw0j/brtNJ/63ueQ4HHzgcBIY7sztfCfVmK/HMSmgbrSONvH5mf4267F9Vl+Jv
+	ZtKzYWIAQK8vuJRTynGfqP/W/wIX2uqXhNg13ZzoUKWh2zio38ymGp9tbDVb0w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1782295722;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xn0h6VOL/cdoKYPxSepbduPQBw6kBDF1WxhF/z0UW7Y=;
+	b=ObC5D9bbUWMoq2zqZJkHwNc6RZ8DTjjcUpKSr3VjK2xHvs0BzkFlm3YAJYg/fJF7Ba6atC
+	0iZH/dKSumbrHwDw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sched-ext@lists.linux.dev, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Andrea Righi <arighi@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arnd Bergmann <arnd@arndb.de>, Ben Segall <bsegall@google.com>,
+	Breno Leitao <leitao@debian.org>,
+	Changwoo Min <changwoo@igalia.com>,
+	David Vernet <void@manifault.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Eric Dumazet <edumazet@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	Paolo Abeni <pabeni@redhat.com>, Petr Mladek <pmladek@suse.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Simon Horman <horms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Vlad Poenaru <vlad.wing@gmail.com>
+Subject: Re: [PATCH 1/2] bug: Provide WARN_ON.*DEFERRED() macros for console
+ deferred output
+Message-ID: <20260624100839.XS5R23mk@linutronix.de>
+References: <20260623142650.265721-1-bigeasy@linutronix.de>
+ <20260623142650.265721-2-bigeasy@linutronix.de>
+ <20260624093117.GY48970@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260624-t9xx_driver_v1-v3-7-73ff03f60c48@compal.com>
-References: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
-In-Reply-To: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jack Wu <jackbb_wu@compal.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>, 
- Shi-Wei Yeh <shi-wei.yeh@mediatek.com>, 
- Minano Tseng <Minano.tseng@mediatek.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- linux-doc@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782295455; l=817;
- i=jackbb_wu@compal.com; s=20260526; h=from:subject:message-id;
- bh=r28B5Pv3emoSo+1n1DcJ9EobPmHHNOtOYu07ftmyDY8=;
- b=/tZOgGPZzEx4tKYfFAbEzjLrB7Sue+BbAfRGyvCb9yAneg7nS84kOWl60dYGQXpstbW6gaa3A
- SfVgkEoLgVSAVFs5+SxiGuS12SOyiKto0mSbetvxBkajeaAnUZGP/Dx
-X-Developer-Key: i=jackbb_wu@compal.com; a=ed25519;
- pk=VH1prTWixNl8OEUPPSfII3p46MzJpQN8J3+ecE1tZXg=
-X-Endpoint-Received: by B4 Relay for jackbb_wu@compal.com/20260526 with
- auth_id=793
-X-Original-From: Jack Wu <jackbb_wu@compal.com>
-Reply-To: jackbb_wu@compal.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260624093117.GY48970@noisy.programming.kicks-ass.net>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301609-lists,netdev=lfdr.de,jackbb_wu.compal.com];
-	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jackbb_wu@compal.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,compal.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301610-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[jackbb_wu@compal.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_RECIPIENTS(0.00)[m:peterz@infradead.org,m:linux-arch@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sched-ext@lists.linux.dev,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:arighi@nvidia.com,m:akpm@linux-foundation.org,m:arnd@arndb.de,m:bsegall@google.com,m:leitao@debian.org,m:changwoo@igalia.com,m:void@manifault.com,m:dietmar.eggemann@arm.com,m:edumazet@google.com,m:mingo@redhat.com,m:kuba@kernel.org,m:john.ogness@linutronix.de,m:juri.lelli@redhat.com,m:kprateek.nayak@amd.com,m:pabeni@redhat.com,m:pmladek@suse.com,m:senozhatsky@chromium.org,m:horms@kernel.org,m:rostedt@goodmis.org,m:tj@kernel.org,m:vincent.guittot@linaro.org,m:vlad.wing@gmail.com,m:vladwing@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,davemloft.net,nvidia.com,linux-foundation.org,arndb.de,google.com,debian.org,igalia.com,manifault.com,arm.com,redhat.com,kernel.org,linutronix.de,amd.com,suse.com,chromium.org,goodmis.org,linaro.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mediatek.com:email,vger.kernel.org:from_smtp,compal.com:replyto,compal.com:email,compal.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linutronix.de:dkim,linutronix.de:mid,linutronix.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DF39C6BD365
+X-Rspamd-Queue-Id: 6107F6BD37C
 
-From: Jack Wu <jackbb_wu@compal.com>
+On 2026-06-24 11:31:17 [+0200], Peter Zijlstra wrote:
+> On Tue, Jun 23, 2026 at 04:26:49PM +0200, Sebastian Andrzej Siewior wrote:
+> 
+> > +#ifndef WARN_ON_DEFERRED
+> > +#define WARN_ON_DEFERRED(condition) ({					\
+> > +	int __ret_warn_on = !!(condition);				\
+> > +	if (unlikely(__ret_warn_on)) {					\
+> > +		guard(preempt)();					\
+> > +		printk_deferred_enter()					\
+> > +		__WARN();						\
+> > +		printk_deferred_exit()					\
+> > +	}								\
+> > +	unlikely(__ret_warn_on);					\
+> > +})
+> > +#endif
+> 
+> This will generate atrocious shite at the WARN sites.
 
-Add MAINTAINERS entry for the MediaTek T9XX 5G WWAN modem device
-driver.
+You mean the missing semicolon and huge size increase?
+On x86 with these guard+deffered in the upper variant, before:
+    text    data     bss     dec   filename
+   93910   37424     832  132166   kernel/sched/core.o
+   61802    4945     152   66899   kernel/sched/fair.o
+  215108   24453    3768  243329   kernel/sched/build_policy.o
+   86128   30092   12704  128924   kernel/sched/build_utility.o
+  456948   96914   17456  571318   total
+After:
+   96140   37408     832  134380   kernel/sched/core.o
+   64490    4937     152   69579   kernel/sched/fair.o
+  222980   24157    3768  250905   kernel/sched/build_policy.o
+   86544   30100   12704  129348   kernel/sched/build_utility.o
+  470154   96602   17456  584212   total + 1.3%
 
-Signed-off-by: Jack Wu <jackbb_wu@compal.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+total went up by 1.3% or 12.59KiB.
+This effects:  alpha, arc, arm, csky, hexagon, m68k, microblaze, mips,
+nios2, openrisc, sparc, um, xtensa
+and could motivate them to implement __WARN_FLAGS which would lower size
+in general and this stunt would have no effect.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 461a3eed6129..8155d26bff03 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16494,6 +16494,15 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/wwan/t7xx/
- 
-+MEDIATEK T9XX 5G WWAN MODEM DRIVER
-+M:	Jack Wu <jackbb_wu@compal.com>
-+R:	Wen-Zhi Huang <wen-zhi.huang@mediatek.com>
-+R:	Shi-Wei Yeh <shi-wei.yeh@mediatek.com>
-+R:	Minano Tseng <Minano.tseng@mediatek.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	drivers/net/wwan/t9xx/
-+
- MEDIATEK USB3 DRD IP DRIVER
- M:	Chunfeng Yun <chunfeng.yun@mediatek.com>
- L:	linux-usb@vger.kernel.org
+Just looked at arm and it has support for invalid opcodes somehow but
+not for this.
 
--- 
-2.34.1
-
-
+Sebastian
 
