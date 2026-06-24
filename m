@@ -1,202 +1,192 @@
-Return-Path: <netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SgOZKXaCO2oIZAgAu9opvQ
-	(envelope-from <netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:08:38 +0200
+	id YcqoIW2DO2pEZAgAu9opvQ
+	(envelope-from <netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:12:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2359D6BC06A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:08:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C086BC0E2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:12:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=Z+BG+dT+;
-	dkim=pass header.d=redhat.com header.s=google header.b=qMI6S1uw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=NEk6jZgM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C20103028671
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:08:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ECF37302F4D7
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A26338B15B;
-	Wed, 24 Jun 2026 07:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F9738D401;
+	Wed, 24 Jun 2026 07:12:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F0538AC90
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6524638B7D6
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:12:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782284915; cv=none; b=LpuOSbVI/JnjtYi0VpUnRRBRuWoRapEnZs6YozAVmN1YJvgMxFEemxf46e01zfwOlB9FokZiQcGo6YGvDqz02BzwlDPbt89FuYy/bxFScrBqX55FFQBNOPtd7/N3Dmqps8g4Elox68VbgFgwfhHKluLpp7JY5JCWZjNPAy4aQNw=
+	t=1782285156; cv=none; b=eiyPBitwdGQ2r4Qyr9QDcRzJwxzetDgMnrRITeeeq0AjyGS1nkSeXJ0Elv63i7SwUjlHeg02mIcXl+P6Qx6qm40f4aA5gX2MkjE4OPpz2rT6WW7BlCZOGuPBmePl4QEns9gd21PR3YEhlpCXYF9A2evQQwMDuxcWFqYUimOR/lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782284915; c=relaxed/simple;
-	bh=xxRwD872hAY7e9+wcKaMu2M9Gp5015MokzS33Hl3FeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z/GYXWgDROn5d78s3uQ7eY+NjFOMNraBUpbPW7gqKey9MP1TaupRpmCnon48uFVAgBESHO2wpy0A0ZmuImTdQIifexzgzwYev5DAXRQR/ByQdjsTlwE9O8fViwMhniVVXmyiUgelfM//JyWEa/CeV0EQekPafbKOI9kqO69L7ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z+BG+dT+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qMI6S1uw; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782284911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SOVdOpEBfLtfj8+28uRc5uJ//FeD3/0uqHv5rRdyHRo=;
-	b=Z+BG+dT+OKUcYXx4pNxEAJbz/7uOfClvFsr5wcjQi1rlPxMSUNGOHrMeNN0YLfx5L/MjOT
-	YxxLVxYJNhQZyokjtDKnvmKwwQ51CH+W35kdtGUPLW3WtGPhEvNyHpkIEhMT0l0qPVUX5b
-	dZJhO898lKGr7KRKT7qP3WSdd8Yc5nU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-1wkSF6YzMFawLTEpDvcgkw-1; Wed, 24 Jun 2026 03:08:30 -0400
-X-MC-Unique: 1wkSF6YzMFawLTEpDvcgkw-1
-X-Mimecast-MFC-AGG-ID: 1wkSF6YzMFawLTEpDvcgkw_1782284909
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-490cc1ae292so4158405e9.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 00:08:29 -0700 (PDT)
+	s=arc-20240116; t=1782285156; c=relaxed/simple;
+	bh=T+oTEsZifQSSjkTTm8dieBj546vS01rprc6FRMPpgRY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NTxZFCjrnA21B3nZUVhz9O9ewUkswllHpKn5fPpY2l/j/ntlqKj2muXKkQ0ZujJGbd3dBnBEFPlpBgJBChNNSLiPNPsmSVgVKJv6v1fPYqRsTHcE8oKE831ikKfIcCghPLHijezIoYL3xG5wzRs6uhdm4tDTWzS48xVsDAyOCH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEk6jZgM; arc=none smtp.client-ip=209.85.221.41
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4633193af19so509439f8f.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 00:12:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782284909; x=1782889709; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SOVdOpEBfLtfj8+28uRc5uJ//FeD3/0uqHv5rRdyHRo=;
-        b=qMI6S1uwInnIe96Dcnq+iyl05p+gIdwvCqJYUK+lCtmfHTo7lrqdNSQhx5MWuQjega
-         ZY0lRACp5DPHvUOMSK7yTBeb62FaCGeRA7pHKfnvkSfXWVZtiNNOiBsC14yY8dVZIhcB
-         T61J5mPPNVSb9UDD12GyBH/6qpRvh3I3LM/y2KVpQq4IRg3qjYTQv40vqSZCMVuT0dgb
-         AnoNnS4faYBtK4DxGWXM6k5ZeFO0tqXbCQPiRzuugQm/XtSRO2Q6gImO6DNkNxMsN/D6
-         YHt0AY78GMs6WiJkiOzXjFIK0cVaMK9CajjQ0Ws1xi3fV/41wWgW4vfyEksQKgElblYM
-         WQdw==
+        d=gmail.com; s=20251104; t=1782285153; x=1782889953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VhG9FcF945Re4Q58PUpr7BwlsxWpmlT6fgah9/vT28s=;
+        b=NEk6jZgMulgJqN17XPHyzxZWrjC3SRgX+YSWsZTjYh/fBnelCNZujLrpG/e+mFyoF7
+         f1Gq3XqQrb60v77rGI8/iNo2sqx2/b7UaQAXvH3QITshpe3OUojUSyJlLvUAe2/GpKjU
+         SE3hQWJrn17c9XTEnFuUX50Exw4ddu2TEcs+Jh3H2E1/KEmNBi8R2E1viN8X/RS/F8hf
+         ArU9eVXTMzswldd/Um38NKIYizUTz23JNVE2PVtj38Gk/Zuo1ygshyyt6BVLAHby6pN0
+         x3Dfz9pBCe5euKHjThKElffKbbO9TKgxcg8aVoI/xbwPxYjVbF266rAnHHl+iApuV2NX
+         Ru3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782284909; x=1782889709;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SOVdOpEBfLtfj8+28uRc5uJ//FeD3/0uqHv5rRdyHRo=;
-        b=NoUFS+Ra3T5UbhmyAGWxx0lSTyMvcp6RAqx3DRhf6/b1o15fayKZZ0RZFR/feDlsf2
-         XXUNAlRrT5ZlUBvG7BBqwTkmsea/ZwdW8jaAMMrtrTGD+w/kPOMHfNKKePFwKxYnjXTA
-         ZOzyvCK8hQDYeKro0NX/pE/d0OhlXWykuyGdPOLYiUP9W7mZs+pymBI8MyUIdr/ZX1o8
-         gRyJO8FDHUOcPTfSRLFTZL4bLsI1dBXOYKxYbprxR+jVCWyNXYN42aMWMQCWk41Gf7p9
-         vgSqN8EcPF+MCwctaV5CUFJbtKUQaOh7mlTWdXaE6Usv7jpIPUeNamjvUvpm6IdYTmDV
-         mY/A==
-X-Forwarded-Encrypted: i=1; AFNElJ80BnptBoEYPrF3D4HGYGAXNx7oExRxm5mW0XZbuxxjcMMqdTITW7fXqLKhBkZuCAXVR8qB88Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsyFEaA1w9cnJOsEsKCme2e5TtKT1SpwR+55cBU+2+dmw6+iu/
-	heuEDFKz4/Eg/WASTBhyOnMA0gkZeyd8Jod0y0eSwTiQOZVuV5p+8UG5TBosIAfyqbbbsIpcEIr
-	OsNMZg2bGotP1VNOJUJXDh9TsPEJAuBeWel1OGTrjIyKiUA2KqVIP5UlUKA==
-X-Gm-Gg: AfdE7cn9TvlydqJyXvsCzTKDQ3qYTXCYnx6blTQB6MNKeDB76rzRjWMIH0ppmFuzQQL
-	CNFyDCAVpGnuPIGx/ejjRPcYK/sNjI28PFfF3mCe4QHP2CRIsLjrb8llZ2N+cqJCtCaFJrulQR1
-	cM1wK2ouLjxHuTRqUTI34Cl7PAOCnpqOJraSUmWTWVVXGG5bxFGRMQNoQovme9pHeeBOXYPuTQs
-	i4ZgLlj/ADrrc5ZkGU3sjbKcBrq3D7sRLTRkoQZrNyLPRAFfXIcY2cbct7bYIz6xSEAo7hmsEHG
-	Iqak9NSLpI9OFTUoqXo7okaps/jB4Hq7GYnYpmaoQDgyRL8ij0TWesY2JEoF6KuyqxlwioahpSi
-	hML1UvSjQg5868VYZdIDo9fvZC+vI4bnb
-X-Received: by 2002:a05:600c:3b2a:b0:490:af63:2cb1 with SMTP id 5b1f17b1804b1-4925a0a9b8bmr88810475e9.7.1782284908814;
-        Wed, 24 Jun 2026 00:08:28 -0700 (PDT)
-X-Received: by 2002:a05:600c:3b2a:b0:490:af63:2cb1 with SMTP id 5b1f17b1804b1-4925a0a9b8bmr88809375e9.7.1782284907436;
-        Wed, 24 Jun 2026 00:08:27 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49260e14d0asm23280535e9.0.2026.06.24.00.08.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 00:08:26 -0700 (PDT)
-Date: Wed, 24 Jun 2026 03:08:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Longjun Tang <lange_tang@163.com>
-Cc: xuanzhuo@linux.alibaba.com, jasowang@redhat.com, edumazet@google.com,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	tanglongjun@kylinos.cn
-Subject: Re: [PATCH v3] virtio_net: disable cb when NAPI is busy-polled
-Message-ID: <20260624030656-mutt-send-email-mst@kernel.org>
-References: <20260624070206.85467-1-lange_tang@163.com>
+        d=1e100.net; s=20251104; t=1782285153; x=1782889953;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VhG9FcF945Re4Q58PUpr7BwlsxWpmlT6fgah9/vT28s=;
+        b=Qg3QOnVVS82mJJqnLfkZ1xwP5ZEksMypsPgwK8fKoxYyja4ZTmbomH+P6g8vt+8aWu
+         XYprn0+XikF+6hBBmDdZtxAtg/NM0CO771qZAQQBeYUufpRrWXhs3saqmoMF28xYAia+
+         gFzh/RWHrqiohkTGVpx6CV8OD3+rtn5hKvkWFnkH+SG7vwCGbIorYbC+X2XeA0G9b4PA
+         gKUC1RxBkqOfzMCLXQAeIKI1WRi3hGI36xa7h2omZDB3naXtnEuhIbWpinKGIvL4YUs0
+         APKm7itEfX/cnWOMUq5+hAjD0ykfejZC44D0FjZ3TusDDz/DrxeIU2469rnwsyIDWCh8
+         AWcw==
+X-Forwarded-Encrypted: i=1; AHgh+Rr7IN/nwpMSch6B1Q4KUeEvDNznaJleQsCJ62AeddXEYXu0VZ9D3GNgHIly4LOKNwiFhH969M0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4ZV4BEs9Csqwxkcw8EdGwogyP44U3RvsQ2t4cpzWWk8oZVr7e
+	53KZSC04Cu2C68+p9Uw08fMlJ5hhz1biwB05Pmv1TIYVh3Porcm0bUrx
+X-Gm-Gg: AfdE7ckseCr38ApjH37Fy1zZn9lLf+P0h+9MATWUeCqZJRoBlgbWbzBcxflBT7UN7Ve
+	nUWEGbtqZ/imuFRmL6cO7x4uIovdG94JLgU75mkxX0bUBpVwkPBRNl8XFkV+Qo226rMKHhbHraU
+	/TmYBsQ00U3np4sGc1UNSl4q/F5GP9OXoHHMnIklpZAJJpIZawiFmYLAsMUo8Ny2Ej3nTFybDao
+	m6ocdhWY0NrP6Ccd7a/srUgeGTvmuQytGaShn6Ki5V+e9F9XpFC7DoenWKgO+TwSmnarmRBdwu0
+	PX28qPpkesHF982txSFroHA2lJqHectnhvPlk5cH4cCcU/G1+hZn++KICe27wKTC3T5nxZzuG9A
+	4V12UNMABLoFIpVKkAvcVd8hSC0ZbDIvn4PXR4Syyyr88DLnDAaqZYChSsoxh+IL33eO1tH0JIO
+	k7Ll4fL4K7
+X-Received: by 2002:a05:6000:4683:b0:46a:1f35:113f with SMTP id ffacd0b85a97d-46a1f35172dmr8359155f8f.21.1782285152523;
+        Wed, 24 Jun 2026 00:12:32 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46c1ee0189esm4296531f8f.9.2026.06.24.00.12.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jun 2026 00:12:32 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: avagin@gmail.com
+Cc: akpm@linux-foundation.org,
+	alexander@mihalicyn.com,
+	axboe@kernel.dk,
+	bernd@bsbernd.com,
+	brauner@kernel.org,
+	criu@lists.linux.dev,
+	david@kernel.org,
+	dhowells@redhat.com,
+	fuse-devel@lists.linux.dev,
+	hch@infradead.org,
+	jack@suse.cz,
+	joannelkoong@gmail.com,
+	linux-api@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	miklos@szeredi.hu,
+	netdev@vger.kernel.org,
+	patches@lists.linux.dev,
+	pfalcato@suse.de,
+	rostedt@goodmis.org,
+	safinaskar@gmail.com,
+	torvalds@linux-foundation.org,
+	val@packett.cool,
+	viro@zeniv.linux.org.uk,
+	willy@infradead.org
+Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
+Date: Wed, 24 Jun 2026 10:12:26 +0300
+Message-ID: <20260624071226.2272209-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <CANaxB-zK5q=Xw6UZTmeFtXsDZjUsPkFk=p485m-wtNTBnf4hgg@mail.gmail.com>
+References: <CANaxB-zK5q=Xw6UZTmeFtXsDZjUsPkFk=p485m-wtNTBnf4hgg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624070206.85467-1-lange_tang@163.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301553-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_FROM(0.00)[bounces-301554-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux-foundation.org,mihalicyn.com,kernel.dk,bsbernd.com,kernel.org,lists.linux.dev,redhat.com,infradead.org,suse.cz,gmail.com,vger.kernel.org,kvack.org,szeredi.hu,suse.de,goodmis.org,packett.cool,zeniv.linux.org.uk];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lange_tang@163.com,m:xuanzhuo@linux.alibaba.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:avagin@gmail.com,m:akpm@linux-foundation.org,m:alexander@mihalicyn.com,m:axboe@kernel.dk,m:bernd@bsbernd.com,m:brauner@kernel.org,m:criu@lists.linux.dev,m:david@kernel.org,m:dhowells@redhat.com,m:fuse-devel@lists.linux.dev,m:hch@infradead.org,m:jack@suse.cz,m:joannelkoong@gmail.com,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:rostedt@goodmis.org,m:safinaskar@gmail.com,m:torvalds@linux-foundation.org,m:val@packett.cool,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2359D6BC06A
+X-Rspamd-Queue-Id: 24C086BC0E2
 
-On Wed, Jun 24, 2026 at 03:02:06PM +0800, Longjun Tang wrote:
-> From: Longjun Tang <tanglongjun@kylinos.cn>
+Andrei Vagin <avagin@gmail.com>:
+> The CRIU fifo test fails with this change. The problem is that vmsplice
+> with SPLICE_F_NONBLOCK to a fifo file descriptor fails with -EOPNOTSUPP.
 > 
-> When busy-poll is active, napi_schedule_prep() returns false in
-> virtqueue_napi_schedule(), so virtqueue_disable_cb() is skipped.
-> The device may keep firing irqs until reaches virtqueue_napi_complete().
-> Under load (received == budget), it will lead to a large number
-> of spurious interrupts.
+> It seems we need a fix like this one:
 > 
-> Fix it by disabling the callback at the virtnet_poll() entry. This keeps
-> the callback off while we poll and re-enable
-
-and it is re-enabled
-
-> by virtqueue_napi_complete()
-> when going idle.
+> diff --git a/fs/pipe.c b/fs/pipe.c
+> index 429b0714ec57..6fc49e933727 100644
+> --- a/fs/pipe.c
+> +++ b/fs/pipe.c
+> @@ -1253,6 +1253,7 @@ static int fifo_open(struct inode *inode, struct
+> file *filp)
 > 
-> Fixes: ceef438d613f ("virtio_net: remove custom busy_poll")
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Longjun Tang <tanglongjun@kylinos.cn>
+>         /* We can only do regular read/write on fifos */
+>         stream_open(inode, filp);
+> +       filp->f_mode |= FMODE_NOWAIT;
 > 
-> ---
-> V1 -> V2: Remain agnostic to busy polling
-> V2 -> V3: Add fixes tag
-> ---
->  drivers/net/virtio_net.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index f4adcfee7a80..0a11f2b32500 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3008,6 +3008,11 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->  	unsigned int xdp_xmit = 0;
->  	bool napi_complete;
->  
-> +	/* Keep callbacks suppressed for the duration of this poll,
-> +	 * busy-poll need.
+>         switch (filp->f_mode & (FMODE_READ | FMODE_WRITE)) {
+>         case FMODE_READ:
 
-I don't know what "busy-poll need" means. Just drop this part?
-In fact, the whole comment can go, we know virtqueue_disable_cb
-disables callbacks.
+Does CRIU actually rely on ability to do SPLICE_F_NONBLOCK vmsplice into
+named fifos? Or this is merely a test?
 
-> +	 */
-> +	virtqueue_disable_cb(rq->vq);
-> +
->  	virtnet_poll_cleantx(rq, budget);
->  
->  	received = virtnet_receive(rq, budget, &xdp_xmit);
-> -- 
-> 2.43.0
+If this is just a test, I think we need not to preserve this behavior.
 
+I did debian code search with regex "vmsplice.*SPLICE_F_NONBLOCK" and I
+found very few packages. And it seems all them use pipes, not named fifos.
+
+(On speed: I still think that my vmsplice patches are good thing,
+despite performance regressions in CRIU.)
+
+-- 
+Askar Safin
 
