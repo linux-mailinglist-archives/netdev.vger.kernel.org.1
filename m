@@ -1,217 +1,202 @@
-Return-Path: <netdev+bounces-301552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id F2uHA4CCO2oLZAgAu9opvQ
-	(envelope-from <netdev+bounces-301552-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:08:48 +0200
+	id SgOZKXaCO2oIZAgAu9opvQ
+	(envelope-from <netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:08:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 674656BC06F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:08:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2359D6BC06A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:08:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=OdvSEkBL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301552-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301552-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=Z+BG+dT+;
+	dkim=pass header.d=redhat.com header.s=google header.b=qMI6S1uw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301553-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2D743028803
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:07:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C20103028671
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7C238B14D;
-	Wed, 24 Jun 2026 07:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A26338B15B;
+	Wed, 24 Jun 2026 07:08:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5F438AC90
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:07:44 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782284866; cv=pass; b=gvKi5IdcvMkHjJQbN89W12Vtgdp/ExCw8/N3ki5YIQsi8o+t3i5Q1kYDWnIlFz5dlBfu/c6/D/YF4qE6Pz6Z6pgXYDJ8JhoVdIC6A5d+An/w/c+I+YcRBWYuOaxQwYW+MJhpSINrye4A4C4RPBMgPlMv39ag/6ef5K6Qy0YsRBc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782284866; c=relaxed/simple;
-	bh=YNs2tdpdfcTpVw0ardkfzLkJzT3qdlvRYfMpTzcbAlU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KvorC2l6jasPRH+iG9OoGdHAPLwfvRNAjBFdSR0QGtQjx6IiKT9hhJ2LlBIEQQ4/C86uGZrw73HeCt55gqX8cACdB/BceCLIBkdzTrnfjjjc96f5+JgvaVdGhz+iFYzGMkyy/nqHS7UAEkmswnBODZyqkyUrI+q29gxZeZrSwcU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OdvSEkBL; arc=pass smtp.client-ip=209.85.208.45
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-697763eeafcso980308a12.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 00:07:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782284863; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Ism1Ger7nxy74o3xSkbyj9b8goMO5OuP526MqgzEkvo4CeR8QsPaumrxF809qjwVVc
-         n3zZBGJ0Cc2Ngq+cUTypRL3b9FKDr+SxqsoPEBulXoQ6eSb1n4X3Sl6F9IszNt9kLL+E
-         RowXuirYf8tOMd6M4kMCTiVSXOMNANw6E+9bE8omRw+w8J3xy6guXhSUzt+9sBvKdMVI
-         TO56yBVAboo9PXUojsx4/y1M37k/XYVTAy1FrfDLLzEcPAyuOMtRDE9yRlcQSMw5otiX
-         nUT/Y7qKHa7rJalXnMnXm7UBczfezSuZwOEsNKRRypMIZ3gMcqz+VCnaBkvNk2nEmAB8
-         p3WQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wvocXq4V+rWU46KpbTHzpxhaL58gr5k8MWByKgZXYHI=;
-        fh=6qDia7M3Y9efthqYLtH20j3MHsZgxmpXw9tiNaG+kMU=;
-        b=MBwlT+/7NKXMea5geLsj6OzDPsR9oP+p+UZWgqp9OMMtB5VAy3bFB10sjXPiKknAcL
-         Txfd//P9Eyz+SkuA+4k+sEkxVQIR8p3uXkYzcRvkpI4g2JhkgXa9z2kdHSlGK6HA9LNW
-         6uKCmqQtDcJLkDZ97SCERxG9M3J8df2bZ5RKkJhe8z6MX9cf6RotN2Zy7RJq9aapCb/A
-         CjkQCtdoZOdFA/rUhrCVR+aC0CJXWCZA5jU5Jd0TgEMu26OxJfw06k89V7QElY+eZ/kN
-         qKgpGY7Fbh+DjJ7OoayQ8fI15fSbb2N1UFTznk3i59yg9ZpukCduSqLDJnH7pny6HXXI
-         mRtQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F0538AC90
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:08:32 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782284915; cv=none; b=LpuOSbVI/JnjtYi0VpUnRRBRuWoRapEnZs6YozAVmN1YJvgMxFEemxf46e01zfwOlB9FokZiQcGo6YGvDqz02BzwlDPbt89FuYy/bxFScrBqX55FFQBNOPtd7/N3Dmqps8g4Elox68VbgFgwfhHKluLpp7JY5JCWZjNPAy4aQNw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782284915; c=relaxed/simple;
+	bh=xxRwD872hAY7e9+wcKaMu2M9Gp5015MokzS33Hl3FeQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z/GYXWgDROn5d78s3uQ7eY+NjFOMNraBUpbPW7gqKey9MP1TaupRpmCnon48uFVAgBESHO2wpy0A0ZmuImTdQIifexzgzwYev5DAXRQR/ByQdjsTlwE9O8fViwMhniVVXmyiUgelfM//JyWEa/CeV0EQekPafbKOI9kqO69L7ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z+BG+dT+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qMI6S1uw; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782284911;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SOVdOpEBfLtfj8+28uRc5uJ//FeD3/0uqHv5rRdyHRo=;
+	b=Z+BG+dT+OKUcYXx4pNxEAJbz/7uOfClvFsr5wcjQi1rlPxMSUNGOHrMeNN0YLfx5L/MjOT
+	YxxLVxYJNhQZyokjtDKnvmKwwQ51CH+W35kdtGUPLW3WtGPhEvNyHpkIEhMT0l0qPVUX5b
+	dZJhO898lKGr7KRKT7qP3WSdd8Yc5nU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-1wkSF6YzMFawLTEpDvcgkw-1; Wed, 24 Jun 2026 03:08:30 -0400
+X-MC-Unique: 1wkSF6YzMFawLTEpDvcgkw-1
+X-Mimecast-MFC-AGG-ID: 1wkSF6YzMFawLTEpDvcgkw_1782284909
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-490cc1ae292so4158405e9.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 00:08:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782284863; x=1782889663; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wvocXq4V+rWU46KpbTHzpxhaL58gr5k8MWByKgZXYHI=;
-        b=OdvSEkBLb0D9WF5dCTQfJUsuPsW5BTCgjQj48KyBnUcf+B5qs1YYbmRBxeLSaZZNNz
-         +uzTaJjXOuLWHBdQfHVyN7tsfv+MpsUaQicOZRHvjBIwIQ2FzT4F+lo4lBvPUXsLSw8X
-         aA1jP9xYkAAcPFK+s5B6FvQWO9vducJjx2eofWdFT0LfYzT+1/lwd/h++ZXg+EPNq/OH
-         B2AUJquVfAgqpcQf1+lRrA9Yn0wuI3EHE3XAu/Io3dh2A4VG+PJg/22UcLw/RvK+VGsR
-         JZUiFR28fRTZk+6/4mJ+2OKhRfmAjRGDAmstnbV99M0tIH4rE7naWd3MSG2FNyNu1jwR
-         RWig==
+        d=redhat.com; s=google; t=1782284909; x=1782889709; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SOVdOpEBfLtfj8+28uRc5uJ//FeD3/0uqHv5rRdyHRo=;
+        b=qMI6S1uwInnIe96Dcnq+iyl05p+gIdwvCqJYUK+lCtmfHTo7lrqdNSQhx5MWuQjega
+         ZY0lRACp5DPHvUOMSK7yTBeb62FaCGeRA7pHKfnvkSfXWVZtiNNOiBsC14yY8dVZIhcB
+         T61J5mPPNVSb9UDD12GyBH/6qpRvh3I3LM/y2KVpQq4IRg3qjYTQv40vqSZCMVuT0dgb
+         AnoNnS4faYBtK4DxGWXM6k5ZeFO0tqXbCQPiRzuugQm/XtSRO2Q6gImO6DNkNxMsN/D6
+         YHt0AY78GMs6WiJkiOzXjFIK0cVaMK9CajjQ0Ws1xi3fV/41wWgW4vfyEksQKgElblYM
+         WQdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782284863; x=1782889663;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wvocXq4V+rWU46KpbTHzpxhaL58gr5k8MWByKgZXYHI=;
-        b=LqHb+YajhNpAN+7WVb+gLOCRrsQ46yVsk03YtgEqI/FzlbcL8CXH10+zjCz7S4fSwJ
-         Cv3DvDS6xlcGKR9Lb3q6CWgkBWZg4rxAzG4w3UgpWYtoK8YCoaWyyNvhqPQ/qcagEN7q
-         vE0kPLYrW1bG43BUBk0EMFYJzk6aRL6STt4TdwgXAGVq7gDcZlRs5BRP2l9xVfqF8t+4
-         TqC5NvhChQqdq6qADRj/BwEU+10VrJSplXoglGXA8lZccJA+rj10qIWHr0pi8A06EvnK
-         CuZSl610P904bu8STv8zDGppqve2zvH5+U+F+MvXxZEAdOakEx3oi86O5njC5dQTXy/o
-         +Q3A==
-X-Forwarded-Encrypted: i=1; AFNElJ+CLq5IGoXfMiwiGlIJGT9OdiLGM7e7FEekbyaMHH4zFtlTtMfK0pudNw7lQcarKA48sTB32Sw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhPmGJb2c5taWTj7lBhQQmr1ZMxKtuuC4a3u628qrYOc2Mlyjw
-	2HZr+ATjlZDi0VvmSItaPCHNbDkK8WLCRlQkGQoy6wuJ2woIm2Ur7Ll6NoQi9qlGbO84UR5Q8Ag
-	A/cHHrjM+ZzwcSB8ZHxpbBvnPioRNzg==
-X-Gm-Gg: AfdE7ckLUncGyDFcFgdxmY7rDjjaGlZeufBJBoHW0nsoMaK480IFBd87NlcAAFuimEF
-	2Dabin73bSexCVfc1egayFJOKNWOw6PZ+WcwgJ1U3WzLiJnR7W2tUPuVRQOQoZIf9a6oq6F0PYo
-	DKvqZOabIfoXMecn+MH8Ky8+YOAERWBOmAcjrK+PvEU6dDrSX3Uj8yikueZd/JdCMT3MFHL423Q
-	TiRq4XF1Hj7j/ZWz3evVCXoQhG6wDhcg0VzkJgoJLLZgxfxfLf5jrwKaCV2anHXdXxF+So+m9dk
-	Vk5St+nBASExXwtBUmgAqywT
-X-Received: by 2002:a17:906:7956:b0:bf1:1d19:cf98 with SMTP id
- a640c23a62f3a-c119d65d6d7mr85002966b.15.1782284863083; Wed, 24 Jun 2026
- 00:07:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782284909; x=1782889709;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SOVdOpEBfLtfj8+28uRc5uJ//FeD3/0uqHv5rRdyHRo=;
+        b=NoUFS+Ra3T5UbhmyAGWxx0lSTyMvcp6RAqx3DRhf6/b1o15fayKZZ0RZFR/feDlsf2
+         XXUNAlRrT5ZlUBvG7BBqwTkmsea/ZwdW8jaAMMrtrTGD+w/kPOMHfNKKePFwKxYnjXTA
+         ZOzyvCK8hQDYeKro0NX/pE/d0OhlXWykuyGdPOLYiUP9W7mZs+pymBI8MyUIdr/ZX1o8
+         gRyJO8FDHUOcPTfSRLFTZL4bLsI1dBXOYKxYbprxR+jVCWyNXYN42aMWMQCWk41Gf7p9
+         vgSqN8EcPF+MCwctaV5CUFJbtKUQaOh7mlTWdXaE6Usv7jpIPUeNamjvUvpm6IdYTmDV
+         mY/A==
+X-Forwarded-Encrypted: i=1; AFNElJ80BnptBoEYPrF3D4HGYGAXNx7oExRxm5mW0XZbuxxjcMMqdTITW7fXqLKhBkZuCAXVR8qB88Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsyFEaA1w9cnJOsEsKCme2e5TtKT1SpwR+55cBU+2+dmw6+iu/
+	heuEDFKz4/Eg/WASTBhyOnMA0gkZeyd8Jod0y0eSwTiQOZVuV5p+8UG5TBosIAfyqbbbsIpcEIr
+	OsNMZg2bGotP1VNOJUJXDh9TsPEJAuBeWel1OGTrjIyKiUA2KqVIP5UlUKA==
+X-Gm-Gg: AfdE7cn9TvlydqJyXvsCzTKDQ3qYTXCYnx6blTQB6MNKeDB76rzRjWMIH0ppmFuzQQL
+	CNFyDCAVpGnuPIGx/ejjRPcYK/sNjI28PFfF3mCe4QHP2CRIsLjrb8llZ2N+cqJCtCaFJrulQR1
+	cM1wK2ouLjxHuTRqUTI34Cl7PAOCnpqOJraSUmWTWVVXGG5bxFGRMQNoQovme9pHeeBOXYPuTQs
+	i4ZgLlj/ADrrc5ZkGU3sjbKcBrq3D7sRLTRkoQZrNyLPRAFfXIcY2cbct7bYIz6xSEAo7hmsEHG
+	Iqak9NSLpI9OFTUoqXo7okaps/jB4Hq7GYnYpmaoQDgyRL8ij0TWesY2JEoF6KuyqxlwioahpSi
+	hML1UvSjQg5868VYZdIDo9fvZC+vI4bnb
+X-Received: by 2002:a05:600c:3b2a:b0:490:af63:2cb1 with SMTP id 5b1f17b1804b1-4925a0a9b8bmr88810475e9.7.1782284908814;
+        Wed, 24 Jun 2026 00:08:28 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b2a:b0:490:af63:2cb1 with SMTP id 5b1f17b1804b1-4925a0a9b8bmr88809375e9.7.1782284907436;
+        Wed, 24 Jun 2026 00:08:27 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49260e14d0asm23280535e9.0.2026.06.24.00.08.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 00:08:26 -0700 (PDT)
+Date: Wed, 24 Jun 2026 03:08:24 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Longjun Tang <lange_tang@163.com>
+Cc: xuanzhuo@linux.alibaba.com, jasowang@redhat.com, edumazet@google.com,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	tanglongjun@kylinos.cn
+Subject: Re: [PATCH v3] virtio_net: disable cb when NAPI is busy-polled
+Message-ID: <20260624030656-mutt-send-email-mst@kernel.org>
+References: <20260624070206.85467-1-lange_tang@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260623075405.47120-1-mhun512@gmail.com> <16ca6db2-6cf1-4f49-a77a-62bde8341b50@lunn.ch>
-In-Reply-To: <16ca6db2-6cf1-4f49-a77a-62bde8341b50@lunn.ch>
-From: Myeonghun Pak <mhun512@gmail.com>
-Date: Wed, 24 Jun 2026 16:07:30 +0900
-X-Gm-Features: AVVi8Cdhcf7-FBya7jmdaLBK0VO56InuhLAg8wkhJWz8_-_7NWQl4zcAh5PfaRM
-Message-ID: <CAGEsz8GP0A9VRxpuPgNO3QrByOsSedxC0zHZO5_iovHpj2TBzA@mail.gmail.com>
-Subject: Re: [PATCH] atm: fore200e: disable PCI device on DMA mask failure
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Chas Williams <3chas3@gmail.com>, netdev@vger.kernel.org, 
-	linux-atm-general@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
-	Ijae Kim <ae878000@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260624070206.85467-1-lange_tang@163.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301552-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:3chas3@gmail.com,m:netdev@vger.kernel.org,m:linux-atm-general@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:ae878000@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-301553-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lange_tang@163.com,m:xuanzhuo@linux.alibaba.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[163.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lists.sourceforge.net];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhun512@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 674656BC06F
+X-Rspamd-Queue-Id: 2359D6BC06A
 
-Hi Andrew,
+On Wed, Jun 24, 2026 at 03:02:06PM +0800, Longjun Tang wrote:
+> From: Longjun Tang <tanglongjun@kylinos.cn>
+> 
+> When busy-poll is active, napi_schedule_prep() returns false in
+> virtqueue_napi_schedule(), so virtqueue_disable_cb() is skipped.
+> The device may keep firing irqs until reaches virtqueue_napi_complete().
+> Under load (received == budget), it will lead to a large number
+> of spurious interrupts.
+> 
+> Fix it by disabling the callback at the virtnet_poll() entry. This keeps
+> the callback off while we poll and re-enable
 
-Sorry for the noise.
+and it is re-enabled
 
-This was against my local torvalds/linux v7.0 tree (028ef9c96e96), not the
-current netdev/net-next tree. I missed 6deb53595092 ("net: remove unused AT=
-M
-protocols and legacy ATM device drivers"), which removes fore200e, so this
-patch is obsolete.
-
-Please drop/ignore it. I will subscribe to netdev and check the current
-networking trees before sending future networking patches.
-
-Thanks,
-Myeonghun
-
-
-2026=EB=85=84 6=EC=9B=94 23=EC=9D=BC (=ED=99=94) =EC=98=A4=ED=9B=84 5:56, A=
-ndrew Lunn <andrew@lunn.ch>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> On Tue, Jun 23, 2026 at 04:53:56PM +0900, Myeonghun Pak wrote:
-> > fore200e_pca_detect() enables the PCI device before setting the DMA
-> > mask. If dma_set_mask_and_coherent() fails, the current error path
-> > returns without disabling the device.
-> >
-> > Reuse the existing out_disable unwind label for this failure path so
-> > pci_disable_device() is called after a successful pci_enable_device().
->
-> What tree is this against?
->
-> ommit 6deb53595092b1426885f6503d93eedc1e3ece77
-> Author: Jakub Kicinski <kuba@kernel.org>
-> Date:   Mon Apr 20 13:42:28 2026 -0700
->
->     net: remove unused ATM protocols and legacy ATM device drivers
->
->     Remove the ATM protocol modules and PCI/SBUS ATM device drivers
->     that are no longer in active use.
->
->     The ATM core protocol stack, PPPoATM, BR2684, and USB DSL modem
->     drivers (drivers/usb/atm/) are retained in-tree to maintain PPP
->     over ATM (PPPoA) and PPPoE-over-BR2684 support for DSL connections.
->     The Solos ADSL2+ PCI driver is also retained.
->
->     Removed ATM protocol modules:
->      - net/atm/clip.c - Classical IP over ATM (RFC 2225)
->      - net/atm/lec.c - LAN Emulation Client (LANE)
->      - net/atm/mpc.c, mpoa_caches.c, mpoa_proc.c - Multi-Protocol Over AT=
-M
->
->     Removed PCI/SBUS ATM device drivers (drivers/atm/):
->      - adummy, atmtcp - software/testing ATM devices
->      - eni - Efficient Networks ENI155P (OC-3, ~1995)
->      - fore200e - FORE Systems 200E PCI/SBUS (OC-3, ~1999)
->
->
-> Please subscribe to the netdev Mailing list, so you know what is going
-> on.
->
->
->     Andrew
->
+> by virtqueue_napi_complete()
+> when going idle.
+> 
+> Fixes: ceef438d613f ("virtio_net: remove custom busy_poll")
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Longjun Tang <tanglongjun@kylinos.cn>
+> 
 > ---
-> pw-bot: reject
->
+> V1 -> V2: Remain agnostic to busy polling
+> V2 -> V3: Add fixes tag
+> ---
+>  drivers/net/virtio_net.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index f4adcfee7a80..0a11f2b32500 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3008,6 +3008,11 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+>  	unsigned int xdp_xmit = 0;
+>  	bool napi_complete;
+>  
+> +	/* Keep callbacks suppressed for the duration of this poll,
+> +	 * busy-poll need.
+
+I don't know what "busy-poll need" means. Just drop this part?
+In fact, the whole comment can go, we know virtqueue_disable_cb
+disables callbacks.
+
+> +	 */
+> +	virtqueue_disable_cb(rq->vq);
+> +
+>  	virtnet_poll_cleantx(rq, budget);
+>  
+>  	received = virtnet_receive(rq, budget, &xdp_xmit);
+> -- 
+> 2.43.0
+
 
