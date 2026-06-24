@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-301717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vwOeJXAIPGrFiwgAu9opvQ
-	(envelope-from <netdev+bounces-301717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:40:16 +0200
+	id sXtXB9IIPGreiwgAu9opvQ
+	(envelope-from <netdev+bounces-301719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:41:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DBAC6C0075
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:40:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EAD6C009B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:41:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="CZIR/ww8";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301717-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301717-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ozhULR+v;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301719-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301719-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45DA43071CB8
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:37:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD88E30DEE32
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2533254BB;
-	Wed, 24 Jun 2026 16:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69AE31D366;
+	Wed, 24 Jun 2026 16:37:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3129E31A556;
-	Wed, 24 Jun 2026 16:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D196131716E;
+	Wed, 24 Jun 2026 16:37:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782319047; cv=none; b=ZubyhZstVFm0SSjU6SnAGGsEVc+jP7AypKB24HF26vbhwGqsFrp9fzgscCRQPYR4VYAzcpTUGXsRM7puLvmtxqxJJGOGs/WgWQCdH+2GNmNBK0v0dosytTOCHzy0wCvossbHFNd7sZsDqmLisPGRMLpTLe2/lIfGxFhOCG2c8SA=
+	t=1782319061; cv=none; b=rlnT/IspMzwrt0tXlWs7rFAlIsmEwSJm1IZncse21wYP3Z7ABoOZCdmdACiZop7DeaM5JQ0VUsODeFmJnG7YAxs/wxMJUcOxmJEOahuR5j2/tnetuXbS6h1JngmUYqYEvABUUMFvxRSbbSqypOv3e8UfdUPgwsUCTq4tUrZPxL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782319047; c=relaxed/simple;
-	bh=SsErrDI/mgcCYhyXKs4NAB/r5R1yy/JAlJmDhHKMVUo=;
+	s=arc-20240116; t=1782319061; c=relaxed/simple;
+	bh=SyfHu/I2XIYsJdezOUmVizfnPBrz+gMGazU/SwA/7p0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ElVhoneiJannAIXjtfGgu0VKbb8jZav+vw7J3m9aJ94ASI2qgTsr0RnUkhbNTxrri1JBsRYIRwIVmayQok9RGJL0lKHyANUp2KDXBYqQAcAbGTUIDM0tR6ZFJbH+GrfjHhXjpR+ADXEfyhgKxmLcTopj29G/3PgK8TGqLCr07aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZIR/ww8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51E3A1F00A3D;
-	Wed, 24 Jun 2026 16:37:22 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZV6g9FBwGmrIjlD9XAyjfrQiPASoEBeOZik8CibFeKVxvoceS6UTbf+3p3faHf4VXjcGfWjjHhgyI/2mwTyRXj9cJbBLDNTDMexs+OEo3Oh8cDH2vtsRoEoL2RwWR5xyaSvIFQ7ZR5pbhhxaZN72bTX/TC5GHdWD0bSoMdMsGw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ozhULR+v; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 519681F00A3A;
+	Wed, 24 Jun 2026 16:37:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782319045;
-	bh=SsErrDI/mgcCYhyXKs4NAB/r5R1yy/JAlJmDhHKMVUo=;
+	s=k20260515; t=1782319060;
+	bh=SyfHu/I2XIYsJdezOUmVizfnPBrz+gMGazU/SwA/7p0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=CZIR/ww8kd5Wkj3xWfPpdHxIMhi3TEMx0JzM9Uc+2pgczg3xBnti4IQQcWebTZXGe
-	 YhRX3U4AEfu0f8Di5E4tzW6MLB11dqtcJj/TU24vxorEm4fySGMd94TEFp6FTwSjzW
-	 qlur4txbLATnb0fEJFEMEVMHa5+66a4RLCDtMnoGLamATZuI5uOWbL2PbpKlvx6mLC
-	 jAxgsvz7+gA3s7M9s0Zd7jyMtXn/QQKsNZjnvRaDxE/27Dp6JtM7ubnT5/mEWGeHbR
-	 nkOffsaHxOxXmbKLsWk+eOlsJRxnrr4de5yIgVNrtKg8XaNE3Fm5yiyoX6FTVAfyy7
-	 AA7x0gMQMKYlg==
-Date: Wed, 24 Jun 2026 17:37:20 +0100
+	b=ozhULR+v+tD/EkyTxdaXnoHIxjSg2eEDAx2Fb3JzrUPKQSUCuaLW9ryVA1/TT4YRL
+	 t3oAm1wuAaYkPl083ZmrCaNNycX6mrrEJsfKI6XkgQ+MLCXcVKTKDNZRHxvmh/Y5CG
+	 UDTdmjmN6k26engKIkk5nWYK4uqYLBrYODRhRliIgknc7F7mFPHfyKHtnC9Q+v1nHK
+	 e61/0PUA6BL4edyh7IsFB5pjbj6jEeZQnCLSkwAn2fZUTkSW2wcISKoK0iPlFtboB0
+	 A71iuN6NTG7RnI62xhptpGQ5zGbxYrmGmsr7AB5emgy0pRqYHunZIRxgNY3B1D25ma
+	 YybFPgObmMnpA==
+Date: Wed, 24 Jun 2026 17:37:35 +0100
 From: Conor Dooley <conor@kernel.org>
 To: Yanan He <grumpycat921013@gmail.com>
 Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -63,10 +63,10 @@ Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-rockchip@lists.infradead.org, netdev@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 3/7] dt-bindings: net: rockchip-dwmac: Allow 9 clocks
-Message-ID: <20260624-pushover-umpire-2744c5b17d9f@spud>
+Subject: Re: [PATCH 2/7] dt-bindings: arm: rockchip: Add Alientek DLRV1126
+Message-ID: <20260624-catering-hacksaw-5f5bbe02dec5@spud>
 References: <20260624-rv1126-alientek-dlrv1126-v1-0-5aef608a3f64@gmail.com>
- <20260624-rv1126-alientek-dlrv1126-v1-3-5aef608a3f64@gmail.com>
+ <20260624-rv1126-alientek-dlrv1126-v1-2-5aef608a3f64@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,9 +74,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Iu3PME21ajoZ7jPL"
+	protocol="application/pgp-signature"; boundary="7R3iGmzIl153QvNt"
 Content-Disposition: inline
-In-Reply-To: <20260624-rv1126-alientek-dlrv1126-v1-3-5aef608a3f64@gmail.com>
+In-Reply-To: <20260624-rv1126-alientek-dlrv1126-v1-2-5aef608a3f64@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-5.26 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [-5.26 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-301717-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301719-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_RECIPIENTS(0.00)[m:grumpycat921013@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:david.wu@rock-chips.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -115,29 +115,26 @@ X-Spamd-Result: default: False [-5.26 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2DBAC6C0075
+X-Rspamd-Queue-Id: 63EAD6C009B
 
 
---Iu3PME21ajoZ7jPL
+--7R3iGmzIl153QvNt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Per Heiko's comments,
-pw-bot: changes-requested
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+pw-bot: not-applicable
 
-Cheers,
-Conor.
-
---Iu3PME21ajoZ7jPL
+--7R3iGmzIl153QvNt
 Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCajwHwAAKCRB4tDGHoIJi
-0t6UAQCGHAggz42SGgsn5kHWftoPdggs6Ej/e9AZZFp538uTbgEA9wRMI5IUOoth
-h0Ufb6nzQPziJL1JprN+zfmV4EYGGAQ=
-=PF6F
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCajwHzwAKCRB4tDGHoIJi
+0hN+AP4pHYjmTYkx8NmigTz4jNMzRk/K1+zEkTRcxRZH3NYuzgEAvcdfNlPvw9o/
+FbZgTWC2paNK/w1CV6+u3VrqW6MGuws=
+=IXtP
 -----END PGP SIGNATURE-----
 
---Iu3PME21ajoZ7jPL--
+--7R3iGmzIl153QvNt--
 
