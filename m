@@ -1,143 +1,178 @@
-Return-Path: <netdev+bounces-301702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PuimEIf7O2qxhQgAu9opvQ
-	(envelope-from <netdev+bounces-301702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:45:11 +0200
+	id BNRvGMP7O2rZhQgAu9opvQ
+	(envelope-from <netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:46:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA1F6BFC09
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:45:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01D76BFC2E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:46:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=BtxnOHP1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301702-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301702-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=C64OKh33;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22FD2300B473
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:45:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9F3DE3011056
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5523D6CB4;
-	Wed, 24 Jun 2026 15:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3126F3DB310;
+	Wed, 24 Jun 2026 15:45:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3498B3BB112;
-	Wed, 24 Jun 2026 15:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C9D302742
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:45:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782315906; cv=none; b=c4GmUTFSNk8PGPW/q46nbcF1XGuZgVg2ZqPk8bnsJWZPclP072Fh8SMQkUvbTS8Eh6jKZUIT3KvThbfzN9XiZMOU+TC/5Rxk1lqQGYW+hI9oR+hqufm4G1I+q/K4rX9ffRWf3LLSDjyQz4/WvGcrgO7O6K6Gx3DVqX4E+Dia6FY=
+	t=1782315958; cv=none; b=hDJegVSal0P5EnSZ0gpg7Ox19fdBz6HEEEw5w2OmZIYuwVlv4gyug3xw1pRQx+hrEnmN84QZqzvpipcZr9GDJSa72FVMmZFD/Ku9z/6FnNdi591/Jr+XeW7mMfBvjddNWPk22DuFO4iwpLv/zHEg38WnEh94pS5wPs4XrlCX4K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782315906; c=relaxed/simple;
-	bh=ev79dUy3ZM1QzjkEIk1j5MMuBKZXUEwSes3AAEkdV7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ETvdWwpRaT6s1EwONFMLBeT7KVEZ6W/m+/azUqEjXxLQWFyThXp6Fc19qyXpakjAMDEWe3i+R75qy4h3NQiWzRX+0m4o3M4AvLp0+oIv1ACjKVaqpQX6TUJoVw8INxdPOJeIVsTrE6P8mWyRTZq28Be8CeYS8fT2v1eIgVGiZd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BtxnOHP1; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4HoG5nibkY73X5+Sim6btQdITTv97/tVHKTgeohtTGg=; b=BtxnOHP1PijdZwZuVcOKI5sK5c
-	54MUxwFe6LX9lO9Pmeo0BFQVIa2+yf4XeAstyWjbCgm9jMq8IzD7dil3cUJsGjnBOpScm4R7Ar7Lv
-	oyeZYEXG1rjg2PQBNMNnupaLRQ8zvVYxAcnKFMXOhp/Q576eiWf2LxAF45Nuk+DIxkSM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wcPmY-0096vk-Jm; Wed, 24 Jun 2026 17:44:54 +0200
-Date: Wed, 24 Jun 2026 17:44:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yanan He <grumpycat921013@gmail.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	heiko@sntech.de, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	david.wu@rock-chips.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 7/7] ARM: dts: rockchip: Add Alientek DLRV1126
-Message-ID: <f526c23f-2ead-4246-bfaf-5bf4fbaec29f@lunn.ch>
-References: <20260624-rv1126-alientek-dlrv1126-v1-0-dc42d99f75a7@gmail.com>
- <20260624-rv1126-alientek-dlrv1126-v1-7-dc42d99f75a7@gmail.com>
+	s=arc-20240116; t=1782315958; c=relaxed/simple;
+	bh=XS4cXPoFYvBnGja9W7ZfoGm9rgCHoBtJF3SZvGBRGag=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NrjT6Y7Abvo5oP+PiiWbdz3Msu9JekjK4rQAHkzwREoN8uYir5Lsj61NcNBliM4btNa1YI91nOpedjL8IDOpTWDEv7enTb+IBEthWKztm3HPjo9giK2iuVCtf7pPb7zbaBCKoaDen5QlqXhvpTi0urSKvzuCiCSe1jx9cAmiDHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C64OKh33; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356F81F000E9;
+	Wed, 24 Jun 2026 15:45:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782315956;
+	bh=5raUOPHCS85WUgQHYMDf0LuoM3ZQ2QYkF6jPBJ4qiTg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=C64OKh33mZ6EORsDD7WBtCyXRckNlNqFsMCbxBD1MiVAAnaNOvSkEQldjiRPXGoDN
+	 tJiGvVyOqiNoTXTeCxfTPGrrldCcIAVoRyfVac3gn2JUKa2qdl4YLFBJzAWLFQ8bDD
+	 NTzCoRQSUdQd3P3bJGMcTizlDG7rCHGP3EMs1PRIv/jNqxa9Jfo6iPSBJ5iFpXL7t8
+	 uIjMtb22cOUeH2Y6GM9JrG5QtuZLX71RzMMSWE2aOR+R5HDI5yj7O7pi+wgL1uzZXh
+	 PJnchlJ5IWP/G1VyQDmjYfPS8Uerbul2pwE9bUmAxGUXc5XRUZJwJcwuQL+UHZV/Oy
+	 rFjMBgTYa0g3w==
+From: Simon Horman <horms@kernel.org>
+To: 635381823cyj@gmail.com
+Cc: Simon Horman <horms@kernel.org>,
+	steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	moomichen@tencent.com
+Subject: Re: [PATCH] xfrm: iptfs: propagate SKBFL_SHARED_FRAG in iptfs_skb_add_frags()
+Date: Wed, 24 Jun 2026 16:45:31 +0100
+Message-ID: <20260624154531.1140374-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260623092258.70507-1-635381823cyj@gmail.com>
+References: <20260623092258.70507-1-635381823cyj@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624-rv1126-alientek-dlrv1126-v1-7-dc42d99f75a7@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301702-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301703-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:635381823cyj@gmail.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:moomichen@tencent.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:grumpycat921013@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:david.wu@rock-chips.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,sntech.de,lunn.ch,davemloft.net,google.com,redhat.com,rock-chips.com,gmail.com,foss.st.com,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7AA1F6BFC09
+X-Rspamd-Queue-Id: D01D76BFC2E
 
-> The board consists of a CLRV1126F core module and a DLRV1126 carrier
-> board. The core module contains the RV1126 SoC, eMMC and RK809 PMIC,
-> while the carrier board provides Ethernet, SD card, AP6212 WiFi and
-> Bluetooth, PCF8563 RTC, ADC keys, GPIO LEDs and audio connectors.
-> 
-> The board has been tested with Ethernet/NFS boot, eMMC, SD card, SDIO
-> WiFi enumeration, Bluetooth LE scanning, RTC, ADC keys, GPIO LEDs and
-> RK809 audio card registration.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+xfrm: iptfs: propagate SKBFL_SHARED_FRAG in iptfs_skb_add_frags()
 
-Ah, here is the networking nodes. But why was it not threaded to the
-rest of the series?
+This patch sets SKBFL_SHARED_FRAG on the destination SKB after
+iptfs_skb_add_frags() transfers frag references from a frag walk, to
+prevent ESP's no-COW fast path from decrypting in place over pages still
+referenced by the outer IPTFS SKB.
 
-> +&gmac {
-> +	phy-mode = "rgmii";
-> +	clock_in_out = "input";
-> +	assigned-clocks = <&cru CLK_GMAC_SRC>, <&cru CLK_GMAC_TX_RX>,
-> +			  <&cru CLK_GMAC_ETHERNET_OUT>;
-> +	assigned-clock-parents = <&cru CLK_GMAC_SRC_M1>,
-> +				 <&cru RGMII_MODE_CLK>;
-> +	assigned-clock-rates = <125000000>, <0>, <25000000>;
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&rgmiim1_miim &rgmiim1_bus2 &rgmiim1_bus4
-> +		     &clk_out_ethernetm1_pins>;
-> +	tx_delay = <0x2a>;
-> +	rx_delay = <0x1a>;
+> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+> index ad810d1f97c0..0e0dcf47a470 100644
+> --- a/net/xfrm/xfrm_iptfs.c
+> +++ b/net/xfrm/xfrm_iptfs.c
+> @@ -496,6 +496,10 @@ static int iptfs_skb_add_frags(struct sk_buff *skb,
+>  		walk->past += frag->len;	/* careful, use src bv_len */
+>  		walk->fragi++;
+>  	}
+> +
+> +	if (skb_shinfo(skb)->nr_frags)
+> +		skb_shinfo(skb)->flags |= SKBFL_SHARED_FRAG;
+> +
+>  	return len;
+>  }
 
-As i predicted, this is wrong.
+[High]
+Does this placement cover every path that adds frags to the destination
+SKB?  The new assignment sits after the while loop, but the loop has an
+earlier exit that returns once the requested length is satisfied
+mid-frag:
 
-https://elixir.bootlin.com/linux/v6.15/source/Documentation/devicetree/bindings/net/ethernet-controller.yaml#L287
+    while (len && walk->fragi < walk->nr_frags) {
+        skb_frag_t *frag = &walk->frags[walk->fragi];
+        skb_frag_t *tofrag = &shinfo->frags[shinfo->nr_frags];
 
-Please try removing rx_delay, rx_delay and setting phy-mode to
-rgmii-id.
+        *tofrag = *frag;
+        if (offset) {
+            tofrag->offset += offset;
+            tofrag->len -= offset;
+            offset = 0;
+        }
+        __skb_frag_ref(tofrag);
+        shinfo->nr_frags++;
 
-	Andrew
+        /* see if we are done */
+        fraglen = tofrag->len;
+        if (len < fraglen) {
+            tofrag->len = len;
+            skb->len += len;
+            skb->data_len += len;
+            return 0;
+        }
+        ...
+    }
+
+By this point __skb_frag_ref(tofrag) has run and shinfo->nr_frags has
+been incremented, so frags have been attached, but the early return 0
+bypasses the new SKBFL_SHARED_FRAG assignment.
+
+The caller iptfs_pskb_add_frags() typically requests fewer bytes than
+the current source frag holds, so this early-return path is the common
+termination of the loop.  In that case the destination SKB still appears
+to ESP as having privately owned frags, and the nested transport-mode
+esp_input() no-COW path described in the commit message can still
+decrypt in place over pages referenced by the outer IPTFS SKB.
+
+Would it be more robust to set the flag immediately after
+__skb_frag_ref(tofrag) / shinfo->nr_frags++, or duplicate the assignment
+before the inner return 0, so every path that attaches a frag also
+propagates SKBFL_SHARED_FRAG?
 
