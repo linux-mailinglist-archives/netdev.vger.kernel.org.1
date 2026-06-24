@@ -1,184 +1,164 @@
-Return-Path: <netdev+bounces-301545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301546-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LAPEOuN1O2oMYQgAu9opvQ
-	(envelope-from <netdev+bounces-301545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 08:14:59 +0200
+	id uS1WIql4O2qxYQgAu9opvQ
+	(envelope-from <netdev+bounces-301546-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 08:26:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C7EC6BBB41
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 08:14:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035BD6BBC0F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 08:26:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=pgTLVcnz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301545-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301545-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=pass header.d=linutronix.de header.s=2020 header.b="Juja3//w";
+	dkim=pass header.d=linutronix.de header.s=2020e header.b=defu1nJc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301546-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301546-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05114301906A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 06:14:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0934E301FC8F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 06:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877AD3815CB;
-	Wed, 24 Jun 2026 06:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C233876BA;
+	Wed, 24 Jun 2026 06:26:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A483812E4;
-	Wed, 24 Jun 2026 06:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C9D32AAB5;
+	Wed, 24 Jun 2026 06:26:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782281697; cv=none; b=E9znhJpQNUVfDDnJilgRBsMZoftWKUJyONXWiVRKPACzmuZbnNULqbuP5pmNRnNphSQ/SfFGQEyL9o+vU8f7jnNggbFC5t2oXLVpFD5FEWJNG4IcBonltFefutHEAzuCsGv3L+jed0gg0f4JS7+HZ/DE6bnUFZlCZmtXa8oYv3w=
+	t=1782282407; cv=none; b=Fd91PGEpf4mmT9yt7kdCtT765NO7YzzDRLKZhG46CqBiBZ8H2KO97rz0TnGCzdh7kfR7tLGpQnhp0t3oqkRXuy+r3Mpmm9wO53/wUVNkVa7fRAdbYXca2cY3F6ybIhdjcrnnFqWWhT3ZCSwFd6t5prCeRtAvqDN0KQNWTxuAZaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782281697; c=relaxed/simple;
-	bh=gt9JQW4adQN1JapWb+d2+uSABeDsB+A2SXWV7dr6128=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HGjP2QPOlmsx9fSha46PvfJepOK9wZ6Yr5NduVqe6BlSGt0LnoAdKgbeumq6DLySlWDCBsv5YJzz/68P8QwVVEPHOMdrYMn6VEL0J54QVGAAAyHo8FaZp5HX9JorFH5ldG8/wNFt1QrE7wS1qAfl1VAD4qgsmADAiCAr2SrKBs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pgTLVcnz; arc=none smtp.client-ip=148.163.158.5
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65O1mZFl3671388;
-	Wed, 24 Jun 2026 06:14:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=MsRELk
-	/CS1xzk+PAko3I6kg+AhHBmZcfDeT4wLZTtCM=; b=pgTLVcnz7KB6/FzC4uXzeZ
-	7XlQ8lunTFTvVE0cpoKtztMHfAn1+NTXv+y7RjMLphA2fUvlid89jLQPdmZwFcnd
-	J6c/Tgb603r81bbTuSxTfpYmSGS/AeGixJY12oEBD8LRGYSHhGIbiMpbC3M6fExY
-	VyZA2skME1aVyT+utRFJggf3D0SBWiV9PCQ+NoK5IUXqdu5gtWkXSUy0xVVti7p4
-	HBl7UjKTvBWNGGg1cpxw64OcH5EZoVoOldbf5Ug26TqFNcIARX16s5wSHYFnYiEi
-	etqgwyLvZ5xBsqOLLNU/F85qnS2HDOpFkcFVVRx0+Fj7xv9VlkxBROkujmqsYquQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ewg9htrrp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Jun 2026 06:14:48 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65O653VL021547;
-	Wed, 24 Jun 2026 06:14:47 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ex6phf4fp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Jun 2026 06:14:47 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65O6EkEx18088626
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Jun 2026 06:14:46 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DF44958058;
-	Wed, 24 Jun 2026 06:14:45 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C243F58063;
-	Wed, 24 Jun 2026 06:14:40 +0000 (GMT)
-Received: from [9.123.3.51] (unknown [9.123.3.51])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 24 Jun 2026 06:14:40 +0000 (GMT)
-Message-ID: <3a77aeb8-f2f1-4cc9-b5c1-2cc71e569602@linux.ibm.com>
-Date: Wed, 24 Jun 2026 11:44:39 +0530
+	s=arc-20240116; t=1782282407; c=relaxed/simple;
+	bh=0vjDpm2bKnUhT+EfFPRfJ1u5DQc74zrXkPdzkXOX5Co=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wgzchd06k2f5cQEqZdVLybbOv5rCBY6d59voXKyYXDAP7OxlgRql6+eM3aRw0e2104qkM6CYhU468MFFREccsRq57ys8cONkDOi6ZW6QAOADjpOu6p43l1nrjlnEJvrcPR3GSVycX+gS4q7ln5A4ws2butiiEuj1RUuHBlr8NH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Juja3//w; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=defu1nJc; arc=none smtp.client-ip=193.142.43.55
+Date: Wed, 24 Jun 2026 08:26:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1782282404;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UEwSwydbqyddg0x4WGqgKE9dtk0yX5ie6tfL0VulhhQ=;
+	b=Juja3//wAMtoqQ9BPBv8GnGjLzUs4cHvNu+MiAp1raa+aOuYzcgHGnpnK0PR9UoxnIaWSm
+	KnHqjI/GItmuSvC8UqLaCmju8Aj3LAvJCC1uLHQLNpaqA6HHgBYrjD+g7LcNMmj1xTQDj9
+	exkKkwFTfd4lWXYfSWABZsWnvLIuY9pf7p7pFcgowI0vulYbvuC4+FGWJEJAOr7udUXfci
+	yS+boDlanrogfe4D4dKtZckjjZ5/Bv89Aeb5nYBVaQyGPJYbCSqsQb+Az5fVkECc1s8wCH
+	bf/LZNLZtMjxU8xFx5yJ/rXVqcRlk3n1r108pLgeq3ZECooAQorWHiuKUxeTgw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1782282404;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UEwSwydbqyddg0x4WGqgKE9dtk0yX5ie6tfL0VulhhQ=;
+	b=defu1nJc+8utxGZI3K+aqFY0T0pIpJuycUiiStzL1lpqAw4pWEq86wVndS4WRZgCg/nDlw
+	lqWbWAicArExUlAQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sched-ext@lists.linux.dev, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Andrea Righi <arighi@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arnd Bergmann <arnd@arndb.de>, Ben Segall <bsegall@google.com>,
+	Breno Leitao <leitao@debian.org>,
+	Changwoo Min <changwoo@igalia.com>,
+	David Vernet <void@manifault.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Eric Dumazet <edumazet@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Juri Lelli <juri.lelli@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Simon Horman <horms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>, Tejun Heo <tj@kernel.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Vlad Poenaru <vlad.wing@gmail.com>
+Subject: Re: [PATCH 1/2] bug: Provide WARN_ON.*DEFERRED() macros for console
+ deferred output
+Message-ID: <20260624062642.5DER6vrP@linutronix.de>
+References: <20260623142650.265721-1-bigeasy@linutronix.de>
+ <20260623142650.265721-2-bigeasy@linutronix.de>
+ <038a11a7-4ced-49ae-b605-2058733e841a@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] Documentation: net/smc: correct old value of
- smcr_max_recv_wr
-To: Breno Leitao <leitao@debian.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
-        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
-        wintera@linux.ibm.com, pasic@linux.ibm.com, horms@kernel.org,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20260424052336.3262350-1-mjambigi@linux.ibm.com>
- <ajqh_3YDwz9q5Aiz@gmail.com>
-Content-Language: en-US
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-In-Reply-To: <ajqh_3YDwz9q5Aiz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: FewBYyPVJEnfWm8Royst2Iny7p7iGRHm
-X-Proofpoint-GUID: qkOC-oHEJTwkI4vdonJOqdjr5jreoF4u
-X-Authority-Analysis: v=2.4 cv=Y4XIdBeN c=1 sm=1 tr=0 ts=6a3b75d8 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=_QdjCJnycWTIf79EoOgA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI0MDA0NSBTYWx0ZWRfX+TQoaTxENRr3
- INNoLWUGNKNoa66ofextEcRna74/mzf3set7ffXC89vHg2Q5H+xBocioXJm+didwFjybIZoyO1i
- D68A7/+HgOcyUPq92FJ5srd3SbilH7FSXlQBEXdJO2PplPMkdgvJOyWcHJ0eUcgqjj50UDv56Yi
- roDUr4uVOk1szNyhaFXbVU25k9ES3GVr68V2o7t2G1x2P0ybyz5GnQm4bPWVUUtp186CxXaDEG0
- u+NJ8wbmgQzsFXDG8SC8ymxqltpE6dR8CXVlyxTm+dejha9gF5FB3c3r3yBtRTssaR/fcRnRUe1
- bp768RLsW/z3wCp435dSa+w+2ffVxab/SdwEcZYZjMm4GaFHIROY2TiiDrDAu7hNEFwPB3Omu1+
- NbUAXsQ4FMXPN+L9Z3TZm8klnmZObw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI0MDA0NSBTYWx0ZWRfX2S41vXoatTBr
- 0yWHDsG3/Umtwj5mcNizLynMH7FizyajIJY77Tn/3lmYwqnZIqEXtJalZOyRKtwgbcLNqeZ+5ho
- yBEKAk6hl57Lj7ebOltPDkapj58jH2s=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-24_01,2026-06-23_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 suspectscore=0
- phishscore=0 bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2606240045
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <038a11a7-4ced-49ae-b605-2058733e841a@amd.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301545-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:wintera@linux.ibm.com,m:pasic@linux.ibm.com,m:horms@kernel.org,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:netdev@vger.kernel.org,m:linux-s390@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.ibm.com:mid,linux.ibm.com:from_mime];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mjambigi@linux.ibm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301546-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_RECIPIENTS(0.00)[m:kprateek.nayak@amd.com,m:linux-arch@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sched-ext@lists.linux.dev,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:arighi@nvidia.com,m:akpm@linux-foundation.org,m:arnd@arndb.de,m:bsegall@google.com,m:leitao@debian.org,m:changwoo@igalia.com,m:void@manifault.com,m:dietmar.eggemann@arm.com,m:edumazet@google.com,m:mingo@redhat.com,m:kuba@kernel.org,m:john.ogness@linutronix.de,m:juri.lelli@redhat.com,m:pabeni@redhat.com,m:peterz@infradead.org,m:pmladek@suse.com,m:senozhatsky@chromium.org,m:horms@kernel.org,m:rostedt@goodmis.org,m:tj@kernel.org,m:vincent.guittot@linaro.org,m:vlad.wing@gmail.com,m:vladwing@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,davemloft.net,nvidia.com,linux-foundation.org,arndb.de,google.com,debian.org,igalia.com,manifault.com,arm.com,redhat.com,kernel.org,linutronix.de,infradead.org,suse.com,chromium.org,goodmis.org,linaro.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linutronix.de:dkim,linutronix.de:mid,linutronix.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4C7EC6BBB41
+X-Rspamd-Queue-Id: 035BD6BBC0F
 
+On 2026-06-23 20:24:02 [+0530], K Prateek Nayak wrote:
+> Hello Sebastian,
+Hi Prateek,
 
+> nit.
+>=20
+> Instead of replicating these bits, can we replace that return with a
+> "goto out" ...
 
-On 23/06/26 8:42 pm, Breno Leitao wrote:
-> On Fri, Apr 24, 2026 at 07:23:36AM +0200, Mahanta Jambigi wrote:
->> The smc-sysctl.rst documentation incorrectly stated that the previous
->> hardcoded maximum number of WR buffers on the receive path (smcr_max_recv_wr)
->> was 16. The correct historical value used before the introduction of the sysctl
->> control was 48. Update the documentation to reflect the accurate historical
->> value. Also fix a couple of minor typos.
->>
->> Fixes: aef3cdb47bbb net/smc: make wr buffer count configurable
-> 
-> This Fixes tag is broken. You probably want:
-> 
-> 	Fixes: aef3cdb47bbb ("net/smc: make wr buffer count configurable")
+sure
 
-I believe you are talking about the missing parenthesis & double quotes
-around the commit subject line? I verified the 12-character commit hash
-points to the correct commit.
+=E2=80=A6
+> ... and replace this return with a:
+>=20
+>     return (warning) ? BUG_TRAP_TYPE_WARN : BUG_TRAP_TYPE_BUG;
+>=20
+> Looks a tab bit cleaner to my eyes. Thoughts?
 
-> 
-> Other than that, it looks good, the corrected value checks out.
+It sure does.
+I wait for PeterZ' executive order to either do this and sprinkle sched/
+_or_ make legacy consoles deferred as it is done on RT.
 
+Petr, was there a big push back doing it unconditionally?
+
+> >  }
+> > =20
+
+Sebastian
 
