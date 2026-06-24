@@ -1,167 +1,183 @@
-Return-Path: <netdev+bounces-301641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3PHYBd7SO2oLdwgAu9opvQ
-	(envelope-from <netdev+bounces-301641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:51:42 +0200
+	id hbMKDm/UO2p1dwgAu9opvQ
+	(envelope-from <netdev+bounces-301642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:58:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB9A6BE479
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:51:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 879CE6BE547
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:58:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ON6ygssX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301641-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301641-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=l+ZHxSxQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301642-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301642-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C4273023F86
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:51:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 755353007362
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F687370AFB;
-	Wed, 24 Jun 2026 12:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7B53B0AC7;
+	Wed, 24 Jun 2026 12:56:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9110F2E54D3;
-	Wed, 24 Jun 2026 12:51:37 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782305498; cv=none; b=ljxh35FyyWyXQQkT7suWMqjtMZnm7ECACyT4vKemuJ/emwTrqActxRA3W2p3NhrdWL95VRl16SfAtmACBly8rJdLu9S7sh5qqilEFkJwyeOVjoPEuxUwM84HAeK5kbS+1GqbfAEoQNVlqmLRZCuAIMk159YG8XeYCPRGZCfVoSk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782305498; c=relaxed/simple;
-	bh=JygntB2Ne+3ZnglHYFvs0Go162WtvX+Sdc46OyaSRzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/IEMfuY9+aDAI6PE+rlixuOrqfn6wSC7Ir+Iifx+TjjmMzkbicuCm6C1XL8TAxP7K4hqEiWb1Ghu8sVUDsP4Q5Avf3BCtZQehQnCcpFh67uTc9+98v3/nKexlhVLFouzO3PANMRgNIE+wvs5Ix6Xn/7ieTI3TtElPiFQs9BXxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ON6ygssX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6EFD1F000E9;
-	Wed, 24 Jun 2026 12:51:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782305497;
-	bh=w2+WSbuWj3Br0/KAK+7wZ21RrMqXPS2FwVJuuRa7QiA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ON6ygssXOgNKZksSl4uMOYd1qwsq6crxZVz5+2UHZxVO+czY9zk8hYsuKi2EZyJxk
-	 N1T4zuD6o2i6a3dif8Cpw40gYvF9WYq7V3m/D9F+XcAnrvuvjQ7YnyX2so3V30S4Y/
-	 MtbOfW1zdgDxDdRyhYic8XPIef9T3itAvCGGwTNM1ORUwAXwitN64KPFJKt/0uO7NX
-	 xSGPLm8LNunYfHmJL58nXaBHUAvGYA+uZAqQhnTjvGkfKzczeRCYmR6KeHMEXPvMsQ
-	 AJE+WgZ5pijbBl9+aZwT1UlmbT4IOwGuLZGaXWo2nmE2pNOawccrTOPz1tDkkhRNZ2
-	 JrmxQM4YF7aCA==
-Date: Wed, 24 Jun 2026 13:51:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Nirmoy Das <nirmoyd@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests: tls: size splice_short pipe by page
- size
-Message-ID: <20260624125132.GN827683@horms.kernel.org>
-References: <20260622202847.3944076-1-nirmoyd@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8346E199EAD
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 12:56:34 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782305795; cv=pass; b=rSugbKVBiH7WELh6wHVnR0rGZi0k0s63eWuVWoSCDUnjwYslfiSj4ED+lT71pzP+F/v8DwFoMVv2PerJIgI1t6ke0GcgN44ckIYcUkQuAVPNiboKL0pTWCVXwWilD8J420s7SndWaWMkqExKZTkrw75mEliId8c413/XoMnEkAY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782305795; c=relaxed/simple;
+	bh=rE72onZAaewUaYsLPB/EuFRGj8uanPU6OeZhfBSRDss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TYFOlaoQHYX/IyqRS9HINxuiBrry4zKXRYuQlJ3yG2ugnFkKALdZ57zZjfBQ2kwcOHWQPyb/mNsCnU05WR2f9Rlh1GnlnW7HZuj//m9xhnnV3V1p1jwXIVR0Wjxv0XFSELqeJHcHM+NJC7npgF4vd5QAnGYk3PdSul0jC/kHlG8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l+ZHxSxQ; arc=pass smtp.client-ip=209.85.128.41
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-490aaeabdb4so6520375e9.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 05:56:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782305793; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hpiHC+5CUhvid0DEgNicig/Ist5IguUtrjOvSD2l24shYbnSXc/DLm7JoGty9OFjA4
+         oHjQ2l1wu+5CoAZ7LO1oHmFJduKvcEEvBHwmIQQBsArxGf6jGSEmwhk0luoE0w5aSisB
+         kP07o9qewPluVMo1ekJ0pxHayCkLmKIWdpb2jS6woYfDLWNPJAfkv3oOhIop764X6mHS
+         1SD/TaNmuXLTMCGyxo7o6Sdk83EvzdVTl1NH0WS1eqIV/bqNLCKC4fp+yBBKo+yejpnt
+         G/WUsVhnznIYQxhGSt7tQHBHsadzMEJjAHINbMUph1EOjeqzjHYKVW6Oxihvkap5NQlc
+         rC5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=rE72onZAaewUaYsLPB/EuFRGj8uanPU6OeZhfBSRDss=;
+        fh=YN0dys9NVEVRwT3PKjYtK7yv6VcsVk9AjzMqBnI7NbY=;
+        b=YXkStCMZTpZV5BOqhY7DY0wS9ckTE8+4QqncxMq82LGhOfdH+e8GCAiZ/B5b2bHZLi
+         aUKv0BYW33NzN0V5ZENipEQSsnz14o8ZJwprrvQMskdkjqy2ErY68XrKkHyB2hXjtSva
+         2sIefN+Bn1sYnU08f4lqIjmhPiiLHn7RgXpN5hlRAiwrXtWCLKcSctaT7P9WKdyiedWE
+         EBNcz7fyoI717dmGe9zWGJKJ+IJYbi8ABSjHkoIc+zs4tqeQ3mmBwCaqhBQ3dRRo8IJA
+         vzy/HR4PrHFPqVUSuyg49bteX3yn3/Sk/lSHXGkeQXjmeunzcZbjrP1RTUdpBNXvwjpU
+         Xv8g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782305793; x=1782910593; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rE72onZAaewUaYsLPB/EuFRGj8uanPU6OeZhfBSRDss=;
+        b=l+ZHxSxQu2I94JZluAgjgln6+dtWYaXE42gxQwPlbdhJ/W1Us0YxibzUq1ehB8YoxI
+         UuTjPAsMwXIA5VqVxEpuQUSuZsNrHVaXr247h7qG2T1x7hVpI7GxYc+VRt6oTeF5/GWN
+         qYMoq5WH87TsX5FIxPQi2rWaoemxpO6IA95IAozC7LoBZcIpNNy5VMW+keX5zfPjZy4J
+         X7iCCSwiupe17peIEMHSKGfZ7VJ/MQIJQEWJnvgtoI74yHtTG5gAES1KIQpxZ9ZLEH3b
+         Ck0arfl79ztaKCuKq+3r30ffpNggz3K8oQkz36h0colL2AjJgEMfwnYb0AXkLs7lUyJT
+         w4eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782305793; x=1782910593;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rE72onZAaewUaYsLPB/EuFRGj8uanPU6OeZhfBSRDss=;
+        b=ZtxVmArge7w5cOHcFHdad744hlU/7Bre+fB5n5mUFYlnyvFu/rw7BPYUhEKuJCNWvS
+         ebzrtp+SjjSb/3LbS/bWfLzNbEpEiZgrmrH46Mt9WHmO5rGttATa/f8H1yvrcsb4zUKT
+         RMQMaeCt/tG1BpKsG6IpeBrhV0thE1/UvO0KCWdkeNt6Leoae/ALU6lJhigb6lClTKVL
+         6gVVVPeGWJSBQyNtfzbHPrKqz/UQJzEiOBMDGRo5TKKcjIgsZzW68u3rdxsdZKj3GZnS
+         VPurNRX30mWCkdq5yfMxtb7zVf7ZF7zBUU/pYrBLgpQNDb3jtcHe8wTsTy0JQ8tv8laT
+         T85Q==
+X-Forwarded-Encrypted: i=1; AFNElJ88JoloBNC2jWwVCTKqep1PzWTvMbKAFVtBciA/foPH0cCrnJFTkGQnS/wM5treMlbAx30rgoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXyReYwi8Khq4HPmYIhsjwCiP7ft8dItgdXsfcdG6JYYVgyLaU
+	tNB1nshAn9x3/ETo5zaCmsFMzpXU4fYk+ZY0yBxx/AFv87Vmhbm16P1ZTmCRm7KE7nEBniDg3mQ
+	DvsKiJbAiICPNrLf7obg9RZyBkgvix2f/kMPqqm8=
+X-Gm-Gg: AfdE7cmJ5ki+OXrjjDh/ZxooMCx0/21066QdsirNx60Df1+1nM4DTKtuFL3GNsi8AZi
+	73vxiJGVVABA//D7SMncJhaS86nXziOnpbe9dmJ0KZFsEjQF6fzWE+O7BKRRjRR8VAXtzIWpqap
+	LU00BnUyFQsNGFQy0Cks1Y1oECa+GGYl2bjinKwCqCLspvNx35MTgteV4LVoVOO+oRv36nnzaBY
+	7/P4wPo2NRRjMtzVPfB9UxkihHxu0ZSobMITWgZwJvxiVa5BDwdjhxrcgZ9V297PelxJFNCItYI
+	JjWyQcxdB9CkDeBp3iSfKXhTTdeo/tk0l6JiWQ==
+X-Received: by 2002:a05:600c:8b66:b0:492:4c5d:4db3 with SMTP id
+ 5b1f17b1804b1-4926084a9afmr44666165e9.5.1782305792607; Wed, 24 Jun 2026
+ 05:56:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260622202847.3944076-1-nirmoyd@nvidia.com>
+References: <20260614054137.32181-1-atharvapotdar07@gmail.com>
+ <20260614220934.GA3575431@electric-eye.fr.zoreil.com> <CAF9AHva0TSFz5tedMEgJTkhThzDGqmW7MJshAtf3ULbLY4wd=w@mail.gmail.com>
+ <20260617222522.GA3712043@electric-eye.fr.zoreil.com>
+In-Reply-To: <20260617222522.GA3712043@electric-eye.fr.zoreil.com>
+From: Atharva Potdar <atharvapotdar07@gmail.com>
+Date: Wed, 24 Jun 2026 18:26:20 +0530
+X-Gm-Features: AVVi8CeiCiUD3JlzQQfBpKCKT0K2ht2-vitCZjFER1vekJT3oHocz7R0DzByvDk
+Message-ID: <CAF9AHvYWY0Byhf9zVH05tOJGJG0LDddsM6bC+J43A1Kbb==EBg@mail.gmail.com>
+Subject: Re: [PATCH net-next] r8169: migrate Rx path to page_pool
+To: Francois Romieu <romieu@fr.zoreil.com>
+Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301641-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:nirmoyd@nvidia.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:john.fastabend@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301642-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,queasysnail.net,gmail.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:romieu@fr.zoreil.com,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[atharvapotdar07@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[atharvapotdar07@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5DB9A6BE479
+X-Rspamd-Queue-Id: 879CE6BE547
 
-On Mon, Jun 22, 2026 at 01:28:47PM -0700, Nirmoy Das wrote:
-> splice_short grows its pipe with (MAX_FRAGS + 1) * 0x1000 so it can
-> queue one short vmsplice() buffer for each fragment before draining the
-> pipe. That assumes 4K pipe buffers.
-> 
-> On 64K-page kernels the request is rounded to 262144 bytes, which
-> provides only four pipe buffers. The fifth one-byte vmsplice() blocks in
-> pipe_wait_writable and the test times out before it reaches the TLS path.
-> 
-> Request enough bytes for the same number of pipe buffers using the
-> runtime page size, and assert that the kernel granted at least that much.
-> If an unprivileged run cannot raise the pipe above the system
-> pipe-max-size limit, skip the test because it cannot exercise the
-> intended path.
-> 
-> Fixes: 3667e9b442b9 ("selftests: tls: add test for short splice due to full skmsg")
-> Assisted-by: Codex:gpt-5
-> Signed-off-by: Nirmoy Das <nirmoyd@nvidia.com>
+Hi Francois, Heiner,
 
-The nit below not withstanding, this looks good to me.
+Francois:
+> Old chipsets did not correctly implement receive buffer size limit.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I understand how lowering the buffer size will reintroduce this bug.
+Thank you for showing me this patch.
 
-> ---
->  tools/testing/selftests/net/tls.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-> index 30a236b8e9f73..e3bf4ade0f770 100644
-> --- a/tools/testing/selftests/net/tls.c
-> +++ b/tools/testing/selftests/net/tls.c
-> @@ -997,6 +997,8 @@ TEST_F(tls, splice_short)
->  	char sendbuf[0x100];
->  	char sendchar = 'S';
->  	int pipefds[2];
-> +	int pipe_sz;
-> +	int ret;
->  	int i;
->  
->  	sendchar_iov.iov_base = &sendchar;
-> @@ -1005,7 +1007,12 @@ TEST_F(tls, splice_short)
->  	memset(sendbuf, 's', sizeof(sendbuf));
->  
->  	ASSERT_GE(pipe2(pipefds, O_NONBLOCK), 0);
-> -	ASSERT_GE(fcntl(pipefds[0], F_SETPIPE_SZ, (MAX_FRAGS + 1) * 0x1000), 0);
-> +	pipe_sz = (MAX_FRAGS + 1) * getpagesize();
-> +	ret = fcntl(pipefds[0], F_SETPIPE_SZ, pipe_sz);
-> +	if (ret < 0 && errno == EPERM)
-> +		SKIP(return, "insufficient pipe capacity");
-> +	ASSERT_GE(ret, 0);
+Heiner:
+> Is XDP in general not supported with bigger jumbo packets?
+> You should find a way to avoid the regression. Intentionally introducing
+> a regression I don't think is acceptable.
 
-nit: the line above seems redundant to me given the line below.
+In v2, I'll revert R8169_RX_BUF_SIZE to (SZ_16K - 1). I'll set up
+page_pool to allocate higher-order pages with get_order(SZ_16K)
+instead of limiting it to order-0 pages. This will match the old
+behaviour and avoid the MTU regression while still ensuring our
+migration to page_pool.
 
-> +	ASSERT_GE(ret, pipe_sz);
->  
->  	for (i = 0; i < MAX_FRAGS; i++)
->  		ASSERT_GE(vmsplice(pipefds[1], &sendchar_iov, 1, 0), 0);
-> -- 
-> 2.43.0
-> 
+> It's not only about ARM, I'm aware of at least loongarch systems with
+> such Realtek NICs.
+
+To make sure that this is safe across architectures, v2 will rely
+entirely on PP_FLAG_DMA_MAP and PP_FLAG_DMA_SYNC_DEV so the page_pool
+core handles the DMA mapping properly.
+
+I will test v2 locally and send it out soon.
+
+Thanks,
+Atharva
 
