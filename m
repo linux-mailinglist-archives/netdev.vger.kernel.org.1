@@ -1,144 +1,464 @@
-Return-Path: <netdev+bounces-301799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7/6gENxaPGqYnAgAu9opvQ
-	(envelope-from <netdev+bounces-301799-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:31:56 +0200
+	id yOadGuRcPGoOnQgAu9opvQ
+	(envelope-from <netdev+bounces-301800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:40:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECF26C1C4A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:31:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 758896C1CAE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:40:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KXiSDVgr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301799-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301799-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=mojatatu.com header.s=google header.b="T6whi/rI";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301800-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301800-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5319D3011861
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:31:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41B30302D0AF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DB139A7EF;
-	Wed, 24 Jun 2026 22:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA42F3B3BFA;
+	Wed, 24 Jun 2026 22:40:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04848261B9B
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151C33B3BF1
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:40:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782340307; cv=none; b=ejSUt8ahWPJA2bIn9tu8Cvr83BZ6DVucyw66WMlSp2MnYXBkUUxvqZ7YbKUW1YyHS54U9gQQpCo7sISY9Iht9LDKttaIxKgQYYdhWLcd11YFtbzkBygz/OddBRixBuG4ghGtqoj3i+Hym4rNNKcOoe7bcDmgZyNVlFEP4rwE2Wc=
+	t=1782340833; cv=none; b=PDRMvdm1/NpJxPLCp8f97k0pjSvsFbS3PqwOAzwGukhn+3K8kZ5M/dEoyn+bSF4KYyQQGA1Kes/55rXHvZvhO4MkJXd3sqg6JqXFDEW1im0yrcbQoJL9Sl3ZY3JUZoX9RqVshmSudUNh2Ti6xNnK1xvId32O7zJYG8GueY35CMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782340307; c=relaxed/simple;
-	bh=s8k3/6YIogxMvXLnwCat3AUIfmMsKkl7H7qfg4rEcpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SB6IYE1d0kGlM6lot+SuMEnHjbvCYL9sgWnKesGeo+xOd7PqE6QuV65GrkMbYmxOddod3qseMCsL/CzToBNeBNGx6r+CI0O2FE0S1kcPFBrJInMo1wpw0foPBAEsW1UKlUQHBJpwFho6OLjlaqSIBpHnCCvCwl/D9O+e3areaZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KXiSDVgr; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C5771F000E9;
-	Wed, 24 Jun 2026 22:31:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782340306;
-	bh=mqDU0jYT7fql0ZGUSAd4YOFzVEzIxtmqJobN1DH6XcI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KXiSDVgrG7pLxbQbzapAbBLTaHQBxEwYrQOmQPswMa8CHOoaVMhu6hl0ZI695ma7I
-	 KSUWZs1lGxRsAnUw368ecjZfCya9TBbNmn7rCRYuXzplqJf5/9xYvJb/d3NQ522Al6
-	 e/59VFoqmTgYXTcwXz1xsM1vgc9edhqfRGGqYHQlm44fh77qJzj20VHGJexphKnkoO
-	 bhV8i7PhzFHH16nhXTI4XJhsLrIZFVIoxg8N1f7xx+ccY7TeSNVC4TA2iMOIkEK1vD
-	 uko1sY77VMRC6amOOTg9WAE3UrFoh8i8c0vpq/Jomz7XL9EtUhKEf06dynZNOz814m
-	 KgBm7Yg/WrbGA==
-Date: Wed, 24 Jun 2026 15:31:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ido Schimmel
- <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, Yue Sun
- <samsun1006219@gmail.com>
-Subject: Re: [PATCH net] net: udp_tunnel: fix use-after-free by refcounting
- udp_tunnel_nic
-Message-ID: <20260624153145.3b0b9f49@kernel.org>
-In-Reply-To: <20260624145722.083632b6@kernel.org>
-References: <20260624171034.4117423-1-edumazet@google.com>
-	<20260624145722.083632b6@kernel.org>
+	s=arc-20240116; t=1782340833; c=relaxed/simple;
+	bh=3wihXAlk2zqaiyMnQua880sT4ShZNok22VdcJu+m0Vs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rL5XbzBGvsuKOrVW4J1rVw09q0QzZa0y6qMYCz4i6ACxI9lKoHlorupPKmmicMFTmWzQkL40mCtUdPFyI2Yvpa3XdPTY+Lcc1Gs+Yu2TkHclSzoJkNZ8BhUDPSIV6CAHcS0fvL13ua85ILNzSb2IqVHXCSi+UOAbpN1WyHzLtfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=T6whi/rI; arc=none smtp.client-ip=209.85.219.43
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8de412e58edso17559206d6.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:40:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1782340831; x=1782945631; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ShrCq9N2eaWr2Eu4mW42vOQni+stuP9/ZUI2U6Tccg=;
+        b=T6whi/rIJZWa2iezkGHCJbqQAFzuohrsq6O/4iIfKOcnzzlwhT6352+N2rjFdPYJ+5
+         KXMhpcCIWFjcprVjNV8Pc3zZe8ZV2+9kjfl8AsxoB3YvcOU2b2Q2sOzwNUfUg98tHXYv
+         Fi07mMk1FltdpighYl0e217hz5gf3UblWhxGQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782340831; x=1782945631;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ShrCq9N2eaWr2Eu4mW42vOQni+stuP9/ZUI2U6Tccg=;
+        b=UNMl9FqfssaV+Cc7SoB6TWmu5lxyvk8Mk05zUmeV2/GfAlOE/bxD0i78NhdyjOcLgi
+         Fck0CsqxOL5oNnn9bZo1rz3eIEbG5T8do7RLULnt1cWrUY433zkcjgC5ZyqXZZwpBuKS
+         DclgOVu1zr4XHM5nugZ97r6ES21YpICuV+aOc5tgZSN6OGqFdpCGz4L1R4baMrjoYdjR
+         AGJUxhtzb3u/8JejegrR+3CtRJDQIqXll+5pzaABy24+vB8k0P5ofzXQRTYrYCSrdHYP
+         zby1qkbHvemc0oDrJv0eS+OF3hT/hsSHO2lowmt8js0zmd682YmJBsVoMxW4Elc1rls2
+         fNpw==
+X-Gm-Message-State: AOJu0Yw3V4mYwUQRn4p5JX632WAdBDRaj7/TnmEgmuqkyDZRVd6Li+QM
+	xHA1mZpFwjcoJGLCQwxvyJPw5WNqcR8y2HBOJbtTCBx1rBZjPl8tZX2Iwg3x6qyS8tQPBK5htEl
+	HYKc=
+X-Gm-Gg: AfdE7cl+43Y2ctWhf/XNubFVbnJHLM3y8mfizt88JPvBa+VEscYtdpntoHRZde8etHv
+	Q7k5fXyCeeBW+9bKrFP2QtPk9TMW/PClmHJ7z3rKrqzoXjXWc1PrQ6+xCi/ftV7RNauqz2L03Od
+	oCXs5dgVjRVweklQHI9DgtlErc9k9tTyjiVCM2cjc0bFFR3/gAaaWx3Fn4QU2x1z5F78+YbPRI3
+	C43Jy6gFMY/w/htvgrZ+5TbpGqedbQ+uv2J2a1cT7rpFsYEt5va8qougJL/tbVr4XrvfLsb8PbO
+	Xg77Y7FRDbUtePKNxHp1cZYn6zKwnNL0i7pEIOz7mrSysR6O2dz0A9l4YfUS60o3x/WBxA/z88o
+	9msasXFXhYI4tlxLFGfQqq+GtuqtC3lH2NGLew2ln97sDQiNkBFQ092hnZ8ioEQVNC5pElDB5PJ
+	onzlPd9Q==
+X-Received: by 2002:ac8:5f88:0:b0:509:3cd:b22f with SMTP id d75a77b69052e-51a0675f987mr308710821cf.23.1782340830694;
+        Wed, 24 Jun 2026 15:40:30 -0700 (PDT)
+Received: from majuu.waya ([184.144.29.222])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8e231613af9sm104838306d6.38.2026.06.24.15.40.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 15:40:29 -0700 (PDT)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jiri@resnulli.us,
+	victor@mojatatu.com,
+	security@kernel.org,
+	zdi-disclosures@trendmicro.com,
+	stable@vger.kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net v2 1/1] net/sched: sch_teql: Introduce slaves_lock to avoid race condition and UAF
+Date: Wed, 24 Jun 2026 18:40:16 -0400
+Message-Id: <20260624224016.24018-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301799-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:samsun1006219@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,nvidia.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301800-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jiri@resnulli.us,m:victor@mojatatu.com,m:security@kernel.org,m:zdi-disclosures@trendmicro.com,m:stable@vger.kernel.org,m:jhs@mojatatu.com,m:lkp@intel.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email,vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:mid,mojatatu.com:from_mime,trendmicro.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9ECF26C1C4A
+X-Rspamd-Queue-Id: 758896C1CAE
 
-On Wed, 24 Jun 2026 14:57:22 -0700 Jakub Kicinski wrote:
-> so we just need:
-> 
-> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-> index 9944ed923ddf..d7db89a222f8 100644
-> --- a/net/ipv4/udp_tunnel_nic.c
-> +++ b/net/ipv4/udp_tunnel_nic.c
-> @@ -863,6 +863,7 @@ static void
->  udp_tunnel_nic_unregister(struct net_device *dev, struct udp_tunnel_nic *utn)
->  {
->         const struct udp_tunnel_nic_info *info = dev->udp_tunnel_nic_info;
-> +       bool pending;
->  
->         udp_tunnel_nic_lock(dev);
->  
-> @@ -899,12 +900,14 @@ udp_tunnel_nic_unregister(struct net_device *dev, struct udp_tunnel_nic *utn)
->          * from the work which we will boot immediately.
->          */
->         udp_tunnel_nic_flush(dev, utn);
-> +
-> +       pending = utn->work_pending;
->         udp_tunnel_nic_unlock(dev);
->  
->         /* Wait for the work to be done using the state, netdev core will
->          * retry unregister until we give up our reference on this device.
->          */
-> -       if (utn->work_pending)
-> +       if (pending)
->                 return;
->  
->         udp_tunnel_nic_free(utn);
+The teql master->slaves singly linked list is not protected against
+multiple writes. It can be mod'ed concurently from teql_master_xmit(),
+teql_dequeue(), teql_init() and teql_destroy() without holding any list
+lock or RCU protection.
 
-Maybe not even.. by definition the driver should not race with its own
-netdev's unregister? I don't get what the race is..
+zdi-disclosures@trendmicro.com has demonstrated that the qdisc is freed
+after an RCU grace period, but teql_master_xmit() running on another
+CPU can still hold a stale pointer into the list, resulting in a
+slab-use-after-free:
+
+BUG: KASAN: slab-use-after-free in teql_destroy+0x3ca/0x440 linux/net/sched/sch_teql.c:142
+Read of size 8 at addr ffff88802923aa80 by task ip/10024
+
+The zdi-disclosures@trendmicro.com repro created concurrent AF_PACKET
+senders on a teql device against a thread that repeatedly adds/deletes the
+slave qdisc, together with a SLUB spray that reclaims the freed slot; the
+resulting UAF is controllable enough to be turned into a read/write
+primitive against the freed qdisc object.
+
+The fix?
+Add a per-master slaves_lock spinlock that serializes all mutations of
+master->slaves and the NEXT_SLAVE() links in teql_destroy() and
+teql_qdisc_init(). teql_master_xmit() also takes the same slaves_lock
+around those updates.
+Annotate master->slaves and the per-slave ->next pointer with __rcu and
+use the appropriate RCU accessors everywhere they are touched:
+rcu_assign_pointer() on the writer side (under slaves_lock),
+rcu_dereference_protected() for the writer-side loads (also under
+slaves_lock), rcu_dereference_bh() for the loads in teql_master_xmit() and
+rtnl_dereference() for the loads in teql_master_open()/teql_master_mtu(),
+which run under RTNL.
+Pair this with rcu_read_lock_bh()/rcu_read_unlock_bh() around the list
+traversal in teql_master_xmit(), so that readers either observe a fully
+linked list or are deferred until the in-flight mutation completes. The two
+early-return paths in teql_master_xmit() are updated to release the RCU-bh
+read-side critical section before returning, since leaving it held would
+disable BH on that CPU for good.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: zdi-disclosures@trendmicro.com
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202606241501.XQBMu4b8-lkp@intel.com/
+Tested-by: Victor Nogueira <victor@mojatatu.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+Changes in v2:
+Address sparse issues found by kernel test robot <lkp@intel.com>
+ - rcu annotated struct teql_master->slaves and struct teql_sched_data->next
+ - teql_destroy/teql_qdisc_init: replace all READ/WRITE_ONCE() with rcu_dereference_protected()/rcu_assign_pointer()
+---
+ net/sched/sch_teql.c | 119 ++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 80 insertions(+), 39 deletions(-)
+
+diff --git a/net/sched/sch_teql.c b/net/sched/sch_teql.c
+index e7bbc9e5174d..f4654f1b1200 100644
+--- a/net/sched/sch_teql.c
++++ b/net/sched/sch_teql.c
+@@ -52,7 +52,8 @@
+ struct teql_master {
+ 	struct Qdisc_ops qops;
+ 	struct net_device *dev;
+-	struct Qdisc *slaves;
++	struct Qdisc __rcu	*slaves;
++	spinlock_t		slaves_lock;	/* serializes writes to ->slaves */
+ 	struct list_head master_list;
+ 	unsigned long	tx_bytes;
+ 	unsigned long	tx_packets;
+@@ -61,7 +62,7 @@ struct teql_master {
+ };
+ 
+ struct teql_sched_data {
+-	struct Qdisc *next;
++	struct Qdisc __rcu	*next;
+ 	struct teql_master *m;
+ 	struct sk_buff_head q;
+ };
+@@ -101,7 +102,9 @@ teql_dequeue(struct Qdisc *sch)
+ 	if (skb == NULL) {
+ 		struct net_device *m = qdisc_dev(q);
+ 		if (m) {
+-			dat->m->slaves = sch;
++			spin_lock_bh(&dat->m->slaves_lock);
++			rcu_assign_pointer(dat->m->slaves, sch);
++			spin_unlock_bh(&dat->m->slaves_lock);
+ 			netif_wake_queue(m);
+ 		}
+ 	} else {
+@@ -132,34 +135,49 @@ teql_destroy(struct Qdisc *sch)
+ 	struct Qdisc *q, *prev;
+ 	struct teql_sched_data *dat = qdisc_priv(sch);
+ 	struct teql_master *master = dat->m;
++	struct netdev_queue *txq = NULL;
++	bool reset_master_queue = false;
+ 
+ 	if (!master)
+ 		return;
+ 
+-	prev = master->slaves;
++	spin_lock_bh(&master->slaves_lock);
++	prev = rcu_dereference_protected(master->slaves,
++					 lockdep_is_held(&master->slaves_lock));
+ 	if (prev) {
+ 		do {
+-			q = NEXT_SLAVE(prev);
+-			if (q == sch) {
+-				NEXT_SLAVE(prev) = NEXT_SLAVE(q);
+-				if (q == master->slaves) {
+-					master->slaves = NEXT_SLAVE(q);
+-					if (q == master->slaves) {
+-						struct netdev_queue *txq;
+-
+-						txq = netdev_get_tx_queue(master->dev, 0);
+-						master->slaves = NULL;
+-
+-						dev_reset_queue(master->dev,
+-								txq, NULL);
+-					}
+-				}
+-				skb_queue_purge(&dat->q);
+-				break;
++			struct Qdisc *head, *next;
++
++			q = rcu_dereference_protected(NEXT_SLAVE(prev),
++						      lockdep_is_held(&master->slaves_lock));
++			if (q != sch) {
++				prev = q;
++				continue;
+ 			}
+ 
+-		} while ((prev = q) != master->slaves);
++			next = rcu_dereference_protected(NEXT_SLAVE(q),
++							 lockdep_is_held(&master->slaves_lock));
++			rcu_assign_pointer(NEXT_SLAVE(prev), next);
++
++			head = rcu_dereference_protected(master->slaves,
++							 lockdep_is_held(&master->slaves_lock));
++			if (q == head) {
++				rcu_assign_pointer(master->slaves, next);
++				if (q == next) {
++					txq = netdev_get_tx_queue(master->dev, 0);
++					rcu_assign_pointer(master->slaves, NULL);
++					reset_master_queue = true;
++				}
++			}
++			skb_queue_purge(&dat->q);
++			break;
++		} while (prev != rcu_dereference_protected(master->slaves,
++							   lockdep_is_held(&master->slaves_lock)));
+ 	}
++	spin_unlock_bh(&master->slaves_lock);
++
++	if (reset_master_queue)
++		dev_reset_queue(master->dev, txq, NULL);
+ }
+ 
+ static int teql_qdisc_init(struct Qdisc *sch, struct nlattr *opt,
+@@ -168,6 +186,7 @@ static int teql_qdisc_init(struct Qdisc *sch, struct nlattr *opt,
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct teql_master *m = (struct teql_master *)sch->ops;
+ 	struct teql_sched_data *q = qdisc_priv(sch);
++	struct Qdisc *first;
+ 
+ 	if (dev->hard_header_len > m->dev->hard_header_len)
+ 		return -EINVAL;
+@@ -184,7 +203,9 @@ static int teql_qdisc_init(struct Qdisc *sch, struct nlattr *opt,
+ 
+ 	skb_queue_head_init(&q->q);
+ 
+-	if (m->slaves) {
++	spin_lock_bh(&m->slaves_lock);
++	first = rcu_dereference_protected(m->slaves, lockdep_is_held(&m->slaves_lock));
++	if (first) {
+ 		if (m->dev->flags & IFF_UP) {
+ 			if ((m->dev->flags & IFF_POINTOPOINT &&
+ 			     !(dev->flags & IFF_POINTOPOINT)) ||
+@@ -192,8 +213,10 @@ static int teql_qdisc_init(struct Qdisc *sch, struct nlattr *opt,
+ 			     !(dev->flags & IFF_BROADCAST)) ||
+ 			    (m->dev->flags & IFF_MULTICAST &&
+ 			     !(dev->flags & IFF_MULTICAST)) ||
+-			    dev->mtu < m->dev->mtu)
++			    dev->mtu < m->dev->mtu) {
++				spin_unlock_bh(&m->slaves_lock);
+ 				return -EINVAL;
++			}
+ 		} else {
+ 			if (!(dev->flags&IFF_POINTOPOINT))
+ 				m->dev->flags &= ~IFF_POINTOPOINT;
+@@ -204,14 +227,17 @@ static int teql_qdisc_init(struct Qdisc *sch, struct nlattr *opt,
+ 			if (dev->mtu < m->dev->mtu)
+ 				m->dev->mtu = dev->mtu;
+ 		}
+-		q->next = NEXT_SLAVE(m->slaves);
+-		NEXT_SLAVE(m->slaves) = sch;
++		rcu_assign_pointer(q->next,
++				   rcu_dereference_protected(NEXT_SLAVE(first),
++							     lockdep_is_held(&m->slaves_lock)));
++		rcu_assign_pointer(NEXT_SLAVE(first), sch);
+ 	} else {
+-		q->next = sch;
+-		m->slaves = sch;
++		rcu_assign_pointer(q->next, sch);
++		rcu_assign_pointer(m->slaves, sch);
+ 		m->dev->mtu = dev->mtu;
+ 		m->dev->flags = (m->dev->flags&~FMASK)|(dev->flags&FMASK);
+ 	}
++	spin_unlock_bh(&m->slaves_lock);
+ 	return 0;
+ }
+ 
+@@ -285,7 +311,9 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int subq = skb_get_queue_mapping(skb);
+ 	struct sk_buff *skb_res = NULL;
+ 
+-	start = master->slaves;
++	rcu_read_lock_bh();
++
++	start = rcu_dereference_bh(master->slaves);
+ 
+ restart:
+ 	nores = 0;
+@@ -317,10 +345,14 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
+ 				    netdev_start_xmit(skb, slave, slave_txq, false) ==
+ 				    NETDEV_TX_OK) {
+ 					__netif_tx_unlock(slave_txq);
+-					master->slaves = NEXT_SLAVE(q);
++					spin_lock_bh(&master->slaves_lock);
++					rcu_assign_pointer(master->slaves,
++							   rcu_dereference_bh(NEXT_SLAVE(q)));
++					spin_unlock_bh(&master->slaves_lock);
+ 					netif_wake_queue(dev);
+ 					master->tx_packets++;
+ 					master->tx_bytes += length;
++					rcu_read_unlock_bh();
+ 					return NETDEV_TX_OK;
+ 				}
+ 				__netif_tx_unlock(slave_txq);
+@@ -329,14 +361,18 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
+ 				busy = 1;
+ 			break;
+ 		case 1:
+-			master->slaves = NEXT_SLAVE(q);
++			spin_lock_bh(&master->slaves_lock);
++			rcu_assign_pointer(master->slaves,
++					   rcu_dereference_bh(NEXT_SLAVE(q)));
++			spin_unlock_bh(&master->slaves_lock);
++			rcu_read_unlock_bh();
+ 			return NETDEV_TX_OK;
+ 		default:
+ 			nores = 1;
+ 			break;
+ 		}
+ 		__skb_pull(skb, skb_network_offset(skb));
+-	} while ((q = NEXT_SLAVE(q)) != start);
++	} while ((q = rcu_dereference_bh(NEXT_SLAVE(q))) != start);
+ 
+ 	if (nores && skb_res == NULL) {
+ 		skb_res = skb;
+@@ -345,29 +381,32 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	if (busy) {
+ 		netif_stop_queue(dev);
++		rcu_read_unlock_bh();
+ 		return NETDEV_TX_BUSY;
+ 	}
+ 	master->tx_errors++;
+ 
+ drop:
+ 	master->tx_dropped++;
++	rcu_read_unlock_bh();
+ 	dev_kfree_skb(skb);
+ 	return NETDEV_TX_OK;
+ }
+ 
+ static int teql_master_open(struct net_device *dev)
+ {
+-	struct Qdisc *q;
++	struct Qdisc *q, *first;
+ 	struct teql_master *m = netdev_priv(dev);
+ 	int mtu = 0xFFFE;
+ 	unsigned int flags = IFF_NOARP | IFF_MULTICAST;
+ 
+-	if (m->slaves == NULL)
++	first = rtnl_dereference(m->slaves);
++	if (!first)
+ 		return -EUNATCH;
+ 
+ 	flags = FMASK;
+ 
+-	q = m->slaves;
++	q = first;
+ 	do {
+ 		struct net_device *slave = qdisc_dev(q);
+ 
+@@ -389,7 +428,7 @@ static int teql_master_open(struct net_device *dev)
+ 			flags &= ~IFF_BROADCAST;
+ 		if (!(slave->flags&IFF_MULTICAST))
+ 			flags &= ~IFF_MULTICAST;
+-	} while ((q = NEXT_SLAVE(q)) != m->slaves);
++	} while ((q = rtnl_dereference(NEXT_SLAVE(q))) != first);
+ 
+ 	m->dev->mtu = mtu;
+ 	m->dev->flags = (m->dev->flags&~FMASK) | flags;
+@@ -417,14 +456,15 @@ static void teql_master_stats64(struct net_device *dev,
+ static int teql_master_mtu(struct net_device *dev, int new_mtu)
+ {
+ 	struct teql_master *m = netdev_priv(dev);
+-	struct Qdisc *q;
++	struct Qdisc *q, *first;
+ 
+-	q = m->slaves;
++	first = rtnl_dereference(m->slaves);
++	q = first;
+ 	if (q) {
+ 		do {
+ 			if (new_mtu > qdisc_dev(q)->mtu)
+ 				return -EINVAL;
+-		} while ((q = NEXT_SLAVE(q)) != m->slaves);
++		} while ((q = rtnl_dereference(NEXT_SLAVE(q))) != first);
+ 	}
+ 
+ 	WRITE_ONCE(dev->mtu, new_mtu);
+@@ -444,6 +484,7 @@ static __init void teql_master_setup(struct net_device *dev)
+ 	struct teql_master *master = netdev_priv(dev);
+ 	struct Qdisc_ops *ops = &master->qops;
+ 
++	spin_lock_init(&master->slaves_lock);
+ 	master->dev	= dev;
+ 	ops->priv_size  = sizeof(struct teql_sched_data);
+ 
 
