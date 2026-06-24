@@ -1,199 +1,152 @@
-Return-Path: <netdev+bounces-301699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GnVDJ0n6O2oAhQgAu9opvQ
-	(envelope-from <netdev+bounces-301699-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:39:53 +0200
+	id /a/tIo76O2ofhQgAu9opvQ
+	(envelope-from <netdev+bounces-301700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:41:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6FD26BFB97
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:39:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26A86BFBA8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:41:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=XjTFPpK7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301699-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301699-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=ePY2ywc1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301700-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301700-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 202403007366
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:38:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08003300AB1A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9A73B8130;
-	Wed, 24 Jun 2026 15:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847D93C2BBE;
+	Wed, 24 Jun 2026 15:40:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28441A3160
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BEC3D6CB6;
+	Wed, 24 Jun 2026 15:39:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782315509; cv=none; b=UUjbEiG/E0jcmJevZsjxdNnrf8qkHfcCvx2NQCl3gLkH7JXQhEQYXq8jj5lD9GsRbFfCtXvpeYJXlyKts2KDhm94r1/v6z2rIG/V3kYjlLDLwxLxKH3LA2N0fBfDvS/tfCGUyelD6VaY5GgSA7DksiUn/mmyTbHh6xh6eSye2iY=
+	t=1782315601; cv=none; b=udXNcVyEbUip0sD262KkFmGcE8OsXm1dGN7VX7kDSHfxzUWzi1ONzM0QoB5DTMuFzW1kzlLVLtnVGMLBgW5EJKSD+5giOiuzSUfPpo6EQH3StPIbTCBFFNRQfeWtQn+PUPyJB8AVKwNfGAgLizOx89QSad9bNv1DhKPs0nR6Fvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782315509; c=relaxed/simple;
-	bh=jMQMrzTbpWoy7qpTtCXjVhtjJmgz81CeZ3D3zItZ9+Q=;
+	s=arc-20240116; t=1782315601; c=relaxed/simple;
+	bh=pCja0bMwasFN1DRcO6/tgjWRmJZBBZXfwggkYuX4OlE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IVgcPe2ZWoOseqEvPwtf51uERQJekfi0A11XN4XY4RzpXTUVijpXcj27N6BIol17BqRUFQpCQGdwWMMUHRcXI76ZyUsrXnjzz7oQZOeQ1l0IOJNNkqwI0s3GqqRvtuXuWMpR3swDWTqasPlcQQ2WrKH1qvZpaGOFEZGFXpch9JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XjTFPpK7; arc=none smtp.client-ip=209.85.216.65
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-37cab825ec9so972578a91.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 08:38:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782315507; x=1782920307; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m7clZiyk0OMH0b3QigtKufFqqXyOmFKPxCwbw/xgdsM=;
-        b=XjTFPpK7vXbY+OUV01tCzO23vHIyZAfrmUS4rnp13/dy/6Zl+doCiAotAJhGstxheF
-         92Uzv50TZaTv7ouvyKi1p9InndEYZSLrZt8O83biCyzp69yOQ94naHRjBxCyY6cIV5nz
-         zAvCduRyXgfTpX4isF+OA2tCldxR6t6l8LsP/Q1yevf4rAMvL2muKh9quYHYDQIAWOcs
-         lE0jRxcssk3KwWTk0qIkd821wtqC6MExVHHYsoAxUYECQvrQI6cl5kq9iYwBdkXxcU80
-         o5UNLHwCvzLW9RIb4SYSiuOCtXVEN3wA1G3JSenPCL4SPgw/255Ey8Ygc8i5iqYU9SHL
-         dNyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782315507; x=1782920307;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m7clZiyk0OMH0b3QigtKufFqqXyOmFKPxCwbw/xgdsM=;
-        b=miQeYEH8IFjeREBowFKwznQb5SHlPi51JFC4h3yuCZu7OuWUoIpL474TCavvcTucog
-         qsSo46d43zuGoKSidLfOsRMjfLhzrSx/BKkBdvCn6ozgrqd/C46XoTfhxQUB/Rfbs3c1
-         +j+kloXbB9G3NVRlWHN1C3yzVQ9773XrZZYFar/cVRc8X2ePF1H9Z8ccWa3bqCJu4uLG
-         yg0PEhi4s8RlutgFSOwIeM/JRgvAPBSfyI97J0Hlrf1XiujLJP6Xa1qBMjLWQ3w9g3VX
-         Skp5aumAes9RM7W0V1AMM2/CqihBnI/stYlcF/hcJjxk0UxydsGuDb1gQ/a1ufdB+YPr
-         qiBw==
-X-Gm-Message-State: AOJu0YzClm8YljS1sjY2zBt4UxzJf9eHrLZ4s0RFJrX7Gl+OQKX7M9F6
-	SfjsoSzxoSgCEBltFXT+Jf1xPOLUepdDUsp+yzsVPgdPx1T7iwUMAwl0
-X-Gm-Gg: AfdE7cm2XVDYrSt5eV5VG8sJFPQF5MGnnhZYnfsIbopEApfwuYTb8Au4d/wUdsBLecl
-	z3a0S/1zmCzQO9y8ksEAd6dNk+QupBVf1DrviWVCeIhstffOExfq5eeBvv3NZtCTIAhHKrPUS+U
-	AyGqxbC9a9kZ0PSyTBgNVme8sXaGFrBWFFejhtnCvcC3VA1aRp1Qn8hkq5p+pdItax/rfP0rEcJ
-	sMSBLoY9sOgDRKvl5PPMxiyKorPJVdnbq1u+K+YM2RVC79O7v2aTmNsN3vC2AcQYGKpsF4LBSkS
-	DWtDLLalbPg31Aau8+9VK8xrjNSfrA0QDLXBdDP46EwDJSnppCC8gkokKD/bXwgjLsX/W0hbmdd
-	MWLr+pM4CL/rpPExo3/P8EoLez019LksKteql3iWl6a5F7V7sSU+1twzikEZY8BGjgg1GYtUM78
-	vWZrn7L8WryQvK6p6T
-X-Received: by 2002:a17:90b:44:b0:36a:5d1f:7ac with SMTP id 98e67ed59e1d1-37de429f053mr4028561a91.3.1782315506896;
-        Wed, 24 Jun 2026 08:38:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:43::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37df39db8dfsm26648a91.2.2026.06.24.08.38.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 08:38:25 -0700 (PDT)
-Date: Wed, 24 Jun 2026 08:38:20 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com, 
-	stfomichev@gmail.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	kerneljasonxing@gmail.com, bjorn@kernel.org
-Subject: Re: [PATCH net 0/7] xsk: fix AF_XDP multi-buffer Tx descriptor
- reclaim
-Message-ID: <ajv23_r4M3FGrFNN@devvm7509.cco0.facebook.com>
-References: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcwEdmc7d/sBjE2ms5/Yxih3kWot43YD1DS8Kzd8ZWc8U1EbJf2YkVhszhfXBjyo78pYlnwb/j77vGNZzbaODTHbtRdUku9TowmlGUuGBjEPSwNyAUEMnjCnyP/j9pIyjg3MbF9IM4f78K6SzQCYECqsjD6vgPuXPE5Q+GP3lbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ePY2ywc1; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yHAPNcQ5EKyi7n1ik7WzWF+RwYT1Afv+h7uAsSVT37U=; b=ePY2ywc1fQl0LEsKtNKvYMHLoq
+	puhjGDFNEGFC4FwqspAIfys1IPAcHKK1DeRyboD+Jd/8E1mWjL4XTkueom1bn3nUD7DhacZv31AUP
+	SWTDPYLfX5jLbXN2TpZKB6UrFPgcqZ9o6tWnkQkEb29+dbQgSnS5omx9mK9GPQBqAr8I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wcPhP-0096s7-BA; Wed, 24 Jun 2026 17:39:35 +0200
+Date: Wed, 24 Jun 2026 17:39:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yanan He <grumpycat921013@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Wu <david.wu@rock-chips.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 4/7] net: stmmac: dwmac-rk: Enable refout clock for RGMII
+Message-ID: <bb50eb6a-561b-4e48-b8ed-2ed5a17b6a1c@lunn.ch>
+References: <20260624-rv1126-alientek-dlrv1126-v1-0-5aef608a3f64@gmail.com>
+ <20260624-rv1126-alientek-dlrv1126-v1-4-5aef608a3f64@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20260624-rv1126-alientek-dlrv1126-v1-4-5aef608a3f64@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301699-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-301700-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kerneljasonxing@gmail.com,m:bjorn@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:grumpycat921013@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:heiko@sntech.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:david.wu@rock-chips.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,sntech.de,lunn.ch,davemloft.net,google.com,redhat.com,rock-chips.com,gmail.com,foss.st.com,vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E6FD26BFB97
+X-Rspamd-Queue-Id: D26A86BFBA8
 
-On 06/23, Maciej Fijalkowski wrote:
-> Hi,
+On Wed, Jun 24, 2026 at 04:44:41PM +0800, Yanan He wrote:
+> Some Rockchip GMAC integrations use clk_mac_refout as an external PHY
+> reference clock even when the MAC is configured for RGMII.
 > 
-> This series fixes several AF_XDP multi-buffer Tx paths where descriptors
-> consumed from the Tx ring are not consistently returned to userspace
-> through the completion ring when the packet is later dropped as invalid.
+> RV1126 boards can route CLK_GMAC_ETHERNET_OUT to the external PHY as a
+> 25 MHz reference clock. If the driver does not acquire and enable this
+> clock in RGMII mode, the common clock framework may disable it as unused
+> and the PHY can lose its reference clock.
 > 
-> The affected cases are invalid or oversized multi-buffer Tx packets in
-> both the generic and zero-copy paths. In these cases, the kernel can
-> consume one or more Tx descriptors while building or validating a
-> multi-buffer packet, then drop the packet before it reaches the device.
-> Userspace still owns the UMEM buffers only after the corresponding
-> addresses are returned through the CQ. Missing completions therefore
-> make userspace lose track of those buffers.
+> Enable the refout clock handling for RGMII in addition to RMII.
 > 
-> The generic path fixes cover three related cases:
-> * partially built multi-buffer skbs dropped by xsk_drop_skb();
->   continuation descriptors left in the Tx ring after xsk_build_skb()
->   reports overflow;
-> * invalid descriptors encountered in the middle of a multi-buffer
->   packet, including the offending invalid descriptor itself.
+> Signed-off-by: Yanan He <grumpycat921013@gmail.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> The zero-copy path is handled separately. The batched Tx parser now
-> distinguishes descriptors that can be passed to the driver from
-> descriptors that are consumed only because they belong to an invalid
-> multi-buffer packet. Reclaim-only descriptors are written to the CQ
-> address area and published in completion order, after any earlier
-> driver-visible Tx descriptors.
-> 
-> The ZC batching path can also retain drain state when userspace has not
-> yet provided the end of an invalid multi-buffer packet. To keep this
-> state local to the singular batched path, the series prevents a second
-> Tx socket from joining the same pool while such drain state exists.
-> During the singular-to-shared transition, Tx batching is gated,
-> pre-existing readers are waited out, and bind fails with -EAGAIN if the
-> existing socket still has pending drain state. This avoids adding
-> multi-buffer drain handling to the shared-UMEM fallback path.
-> 
-> The last two patches update xskxceiver so the tests account invalid
-> multi-buffer Tx packets as descriptors that must be reclaimed, while
-> still not expecting those invalid packets on the Rx side.
-> 
-> This is a follow-up to Jason's changes [0] which were addressing generic
-> xmit only and this set allows me to pass full xskxceiver test suite run
-> against ice driver.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 8d7042e68926..f6fdc0c5b475 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1112,7 +1112,8 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+>  	bsp_priv->clk_enabled = false;
+>  
+>  	bsp_priv->num_clks = ARRAY_SIZE(rk_clocks);
+> -	if (phy_iface == PHY_INTERFACE_MODE_RMII)
+> +	if (phy_iface == PHY_INTERFACE_MODE_RMII ||
+> +	    phy_iface == PHY_INTERFACE_MODE_RGMII)
 
-There is a fair amount of feedback from sashiko already :-( So the meta
-question from me is: is it time to scrap our current approach where
-we parse descriptor by descriptor? (and maintain half-baked skb and
-half-consumed descriptor queues)
+Apart from Heiko commenting that this patch is completely wrong, there
+are 4 RGMII modes, not one. You should of used
+phy_interface_mode_is_rgmii().
 
-Should we:
+    Andrew
 
-1. do desc[MAX_SKB_FRAGS] and xskq_cons_peek_desc until we exhaust
-PKT_CONT (if the last packet has PKT_CONT, return EOVERFLOW to userspace
-and do a full stop here)
-2. now that we really know the number of valid descriptors -> reserve
-the cq space (if not -> EAGAIN)
-3. pre-allocate everything here (if at any point we have ENOMEM -> cleanup
-locally, don't ever create semi-initialized skb)
-4. construct the skb
-5. xmit
-
-If at any point there is an issue, the cleanup is straightforward. That
-whole xk->skb goes away, no state between syscalls. Thoughts?
+---
+pw-bot: cr
+ 
 
