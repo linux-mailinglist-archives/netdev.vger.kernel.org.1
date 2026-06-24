@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-301669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0uZZGkPmO2pGfAgAu9opvQ
-	(envelope-from <netdev+bounces-301669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:14:27 +0200
+	id dWnDJUjmO2pHfAgAu9opvQ
+	(envelope-from <netdev+bounces-301670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:14:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97926BF00D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:14:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBFE6BF012
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:14:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=Jygd5fOp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301669-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301669-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=huawei.com header.s=dkim header.b=WQbHfiwl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301670-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301670-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EEB553030746
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:13:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A364304B6B0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 14:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B283BE17D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B77A3BE627;
 	Wed, 24 Jun 2026 14:13:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2513B3BBFC1;
-	Wed, 24 Jun 2026 14:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4257B3BE168;
+	Wed, 24 Jun 2026 14:13:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782310426; cv=none; b=Yi4MOOAfEK0UBjGP36wNhmZxQaBpWpgqfhiiiTD+fG8S74JaPlgxCd0xKRH1iTbYJwpk+BVdP1Zjeh+ow28Nx7DE/Q9jYsWT1h41voWTOg5P1FXpXnGHMnVL8rZplcwGs2EP3WxOJhbhkgDBtpFOhdXKZ72zTb1I+CqvYXi0U9E=
+	t=1782310426; cv=none; b=pvtoKAYiGJPoAlXjLan7JyGmzKrAmWf2MxnNxvsw2SroTBv5+596CzBdF5/ZQBE8Zm3T9ORpCoB/WBw4/vu8uyIwcm3hIvRqbMCezI9LKHNVZXewqYaSg/nm0rzLTgb/aZIh1GDaAylwMX8W4LteOmsYIp7etvtT4UvI0i5dHgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782310426; c=relaxed/simple;
-	bh=+ykReh263zVhkT5BpVlbc1o72y7Pqyx63/3ScRJ57oY=;
+	bh=7cC15674Y9GiSjtEN1kqOwwY3kVDh8rcTItgSFd/Rg4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QgrmW+tiaNj/KbOd/K/GbSEbBYODCZWgxTRsbfmNcy0D4tu2qX+xd+t8pM4Pbfgtr/UdWaPhgbgIHeDQnm0dhTvJ8QT8GMHP4s8nrZBTsAyi2LpoLzqnVkJ60fQ0+BTkXa8z9CdX5L8BoGVCUgmgd5gNuAhpN37TQkh3YcE1ZCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Jygd5fOp; arc=none smtp.client-ip=113.46.200.224
+	 MIME-Version:Content-Type; b=NCHAtOzwb38pHlytBlis7r+fedvy1JX51MO2qJ4bylN4ZB8+nJ1z9KB3jK5xcu6HjUaJMB7RqSDuiV2t02Si9zF30LmR/NT/quRhWc0YkKs7af5tM/S+fLHv8dpjWDaXkwevRSgYq692/rWXRsHeoikMN+j7EvpxpyrV8QeQ4mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WQbHfiwl; arc=none smtp.client-ip=113.46.200.218
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=VmF1BOg0iSl0WxDVNJcuHj613vnybNB35fVJ+XHjddY=;
-	b=Jygd5fOp9wGHMurMCcea1aU70CouHdZRVq9jNGlvbO8+KPOBQ3YUIs7iPtGLZ1IvgPgWX/fbr
-	odGb9c2QtoN8SQ0gQFbibMiFBS8La22KubXz8xuNuIt7atmeExbe1mPn0oxucTTu8pqQJyqABhb
-	j1QelmwuNnXYaIZwkdjatXg=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4glkFv2sQCz1cyPh;
-	Wed, 24 Jun 2026 22:04:35 +0800 (CST)
+	bh=+olL4ps1TX322aeWVUXgKr+KyWMsiHBmrdhQM3xI+N0=;
+	b=WQbHfiwlHM106mX/Mu+3FjlbLBzz01KDrAd8tJn2ZTPfiNCPaaWJCuJFSBahs8TQQwFLEDzKv
+	0cm8zFAOINQiMt21ftiOlCcydiJnOhU9ptpcchNswrvS2vXhv6Ej0nCmVo70zl2zOVxE502mr7h
+	xCn6CN6spnaPldY0FRCmeQs=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4glkGr0dDGzpT0J;
+	Wed, 24 Jun 2026 22:05:24 +0800 (CST)
 Received: from kwepemo500018.china.huawei.com (unknown [7.202.195.199])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6800540539;
+	by mail.maildlp.com (Postfix) with ESMTPS id DECC940538;
 	Wed, 24 Jun 2026 22:13:39 +0800 (CST)
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemo500018.china.huawei.com (7.202.195.199) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 24 Jun 2026 22:13:38 +0800
+ 15.2.1544.36; Wed, 24 Jun 2026 22:13:39 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
@@ -58,9 +58,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
 	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V2 net 1/4] net: hns3: unify copper port ksettings configuration path
-Date: Wed, 24 Jun 2026 22:13:16 +0800
-Message-ID: <20260624141319.271439-2-shaojijie@huawei.com>
+Subject: [PATCH V2 net 2/4] net: hns3: refactor MAC autoneg and speed configuration
+Date: Wed, 24 Jun 2026 22:13:17 +0800
+Message-ID: <20260624141319.271439-3-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260624141319.271439-1-shaojijie@huawei.com>
 References: <20260624141319.271439-1-shaojijie@huawei.com>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301669-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301670-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	TO_DN_NONE(0.00)[];
@@ -107,174 +107,162 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime,h-partners.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,h-partners.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C97926BF00D
+X-Rspamd-Queue-Id: 0FBFE6BF012
 
 From: Shuaisong Yang <yangshuaisong@h-partners.com>
 
-Refactor hns3_set_link_ksettings() and hclge_set_phy_link_ksettings()
-to unify the configuration path for copper ports.
+Extract the MAC autoneg and speed/duplex/lane configuration logic out
+of hclge_mac_init() and encapsulate it into a new dedicated helper
+function hclge_set_autoneg_speed_dup().
 
-Previously, netdevs with a native kernel phy attached bypassed the main
-MAC parameter caching logic and returned early via
-phy_ethtool_ksettings_set(). This prevented the driver from updating
-hdev->hw.mac.req_xxx variables for kernel PHY setups, leaving them
-out-of-sync during reset recovery.
+In the init path (hclge_init_ae_dev), this helper is now called after
+hclge_update_port_info() so that firmware-reported autoneg values are
+already populated before applying the link configuration.
 
-Clean this up by routing all copper port configurations through
-ops->set_phy_link_ksettings(), and perform driver-level or kernel-level
-PHY arbitration inside hclge_set_phy_link_ksettings() via
-hnae3_dev_phy_imp_supported(). This ensures that the user's intended link
-profiles (req_speed, req_duplex, req_autoneg) are uniformly recorded
-across all copper and fiber deployment topologies, laying the groundwork
-for stable reset recovery.
+Introduce a separate req_lane_num field in struct hclge_mac to isolate
+the user-requested lane count from mac.lane_num, which firmware may
+overwrite via hclge_get_sfp_info() with stale values from a prior link
+lifecycle (e.g., lane_num=4 from 100G). During probe, req_lane_num is
+initialized to 0, which instructs firmware to auto-select the correct
+lane count for the current speed, rather than reusing the firmware-
+reported mac.lane_num that may be inconsistent with the target speed.
+This prevents probe failures from mismatched (speed, lane_num) pairs.
 
-For copper ports where neither IMP firmware nor a kernel PHY is available
-(e.g. PHY_INEXISTENT), hclge_set_phy_link_ksettings() returns -ENODEV.
-In hns3_set_link_ksettings(), this is caught so the configuration falls
-through to the existing MAC-level path (check_ksettings_param ->
-cfg_mac_speed_dup_h), preserving compatibility with PHY-less copper
-deployments.
+In the reset path (hclge_reset_ae_dev), it runs immediately after
+hclge_mac_init(), using the previously cached req_* values to restore
+the link without re-querying firmware.
 
 Signed-off-by: Shuaisong Yang <yangshuaisong@h-partners.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
 Changes in V2:
-- Add NULL phydev guard in hclge_set_phy_link_ksettings() to prevent
-  kernel panic when firmware reports PHY_INEXISTENT on a copper port.
-- For PHY_INEXISTENT copper ports, return -ENODEV from
-  hclge_set_phy_link_ksettings() and catch it in
-  hns3_set_link_ksettings() to fall through to the existing MAC-level
-  path, preserving compatibility with PHY-less copper deployments.
-- Preserve the 1000BASE-T forced-mode (SPEED_1000 + AUTONEG_DISABLE)
-  rejection in the kernel PHY path, closing a validation gap.
+- Squashed the former patch 5 ("fix init failure caused by lane_num
+  contamination") into this patch. The req_lane_num separation is
+  introduced here to avoid a bisect-time regression where an
+  intermediate commit could fail probe with an inconsistent
+  (speed, lane_num) pair.
+- Rewrote the commit message to accurately describe the init/reset
+  path asymmetry and the req_lane_num rationale.
 ---
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    | 31 +++++++++----------
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 28 +++++++++++++++--
- 2 files changed, 40 insertions(+), 19 deletions(-)
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 55 ++++++++++++++-----
+ .../hisilicon/hns3/hns3pf/hclge_main.h        |  1 +
+ 2 files changed, 42 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index 9cb7ce9fd311..64bee0e78db3 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -811,12 +811,11 @@ static int hns3_get_link_ksettings(struct net_device *netdev,
- }
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index 9fe6bc02d71e..fb12ba77228c 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -1504,6 +1504,11 @@ static int hclge_configure(struct hclge_dev *hdev)
+ 	hdev->hw.mac.req_autoneg = AUTONEG_ENABLE;
+ 	hdev->hw.mac.req_duplex = DUPLEX_FULL;
  
- static int hns3_check_ksettings_param(const struct net_device *netdev,
--				      const struct ethtool_link_ksettings *cmd)
-+				      const struct ethtool_link_ksettings *cmd,
-+				      u8 media_type)
- {
- 	struct hnae3_handle *handle = hns3_get_handle(netdev);
- 	const struct hnae3_ae_ops *ops = hns3_get_ops(handle);
--	u8 module_type = HNAE3_MODULE_TYPE_UNKNOWN;
--	u8 media_type = HNAE3_MEDIA_TYPE_UNKNOWN;
- 	u32 lane_num;
- 	u8 autoneg;
- 	u32 speed;
-@@ -836,9 +835,6 @@ static int hns3_check_ksettings_param(const struct net_device *netdev,
- 			return 0;
- 	}
++	/* When lane_num is 0, the firmware will automatically
++	 * select the appropriate lane_num based on the speed.
++	 */
++	hdev->hw.mac.req_lane_num = 0;
++
+ 	hclge_parse_link_mode(hdev, cfg.speed_ability);
  
--	if (ops->get_media_type)
--		ops->get_media_type(handle, &media_type, &module_type);
--
- 	if (cmd->base.duplex == DUPLEX_HALF &&
- 	    media_type != HNAE3_MEDIA_TYPE_COPPER) {
- 		netdev_err(netdev,
-@@ -863,6 +859,8 @@ static int hns3_set_link_ksettings(struct net_device *netdev,
- 	struct hnae3_handle *handle = hns3_get_handle(netdev);
- 	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
- 	const struct hnae3_ae_ops *ops = hns3_get_ops(handle);
-+	u8 module_type = HNAE3_MODULE_TYPE_UNKNOWN;
-+	u8 media_type = HNAE3_MEDIA_TYPE_UNKNOWN;
- 	int ret;
- 
- 	/* Chip don't support this mode. */
-@@ -878,22 +876,23 @@ static int hns3_set_link_ksettings(struct net_device *netdev,
- 		  cmd->base.autoneg, cmd->base.speed, cmd->base.duplex,
- 		  cmd->lanes);
- 
--	/* Only support ksettings_set for netdev with phy attached for now */
--	if (netdev->phydev) {
--		if (cmd->base.speed == SPEED_1000 &&
--		    cmd->base.autoneg == AUTONEG_DISABLE)
--			return -EINVAL;
-+	if (!ops->get_media_type)
-+		return -EOPNOTSUPP;
-+	ops->get_media_type(handle, &media_type, &module_type);
- 
--		return phy_ethtool_ksettings_set(netdev->phydev, cmd);
--	} else if (test_bit(HNAE3_DEV_SUPPORT_PHY_IMP_B, ae_dev->caps) &&
--		   ops->set_phy_link_ksettings) {
--		return ops->set_phy_link_ksettings(handle, cmd);
-+	if (media_type == HNAE3_MEDIA_TYPE_COPPER) {
-+		if (!ops->set_phy_link_ksettings)
-+			return -EOPNOTSUPP;
-+		ret = ops->set_phy_link_ksettings(handle, cmd);
-+		if (ret != -ENODEV)
-+			return ret;
-+		/* PHY_INEXISTENT, use MAC-level configuration */
- 	}
- 
- 	if (ae_dev->dev_version < HNAE3_DEVICE_VERSION_V2)
- 		return -EOPNOTSUPP;
- 
--	ret = hns3_check_ksettings_param(netdev, cmd);
-+	ret = hns3_check_ksettings_param(netdev, cmd, media_type);
+ 	hdev->hw.mac.max_speed = hclge_get_max_speed(cfg.speed_ability);
+@@ -2579,6 +2584,7 @@ static int hclge_cfg_mac_speed_dup_h(struct hnae3_handle *handle, int speed,
  	if (ret)
  		return ret;
  
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 2f1984930da2..9fe6bc02d71e 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -3285,8 +3285,8 @@ static int hclge_get_phy_link_ksettings(struct hnae3_handle *handle,
++	hdev->hw.mac.req_lane_num = lane_num;
+ 	hdev->hw.mac.req_speed = (u32)speed;
+ 	hdev->hw.mac.req_duplex = duplex;
+ 
+@@ -2884,20 +2890,6 @@ static int hclge_mac_init(struct hclge_dev *hdev)
+ 	if (!test_bit(HCLGE_STATE_RST_HANDLING, &hdev->state))
+ 		hdev->hw.mac.duplex = HCLGE_MAC_FULL;
+ 
+-	if (hdev->hw.mac.support_autoneg) {
+-		ret = hclge_set_autoneg_en(hdev, hdev->hw.mac.autoneg);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	if (!hdev->hw.mac.autoneg) {
+-		ret = hclge_cfg_mac_speed_dup_hw(hdev, hdev->hw.mac.req_speed,
+-						 hdev->hw.mac.req_duplex,
+-						 hdev->hw.mac.lane_num);
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	mac->link = 0;
+ 
+ 	if (mac->user_fec_mode & BIT(HNAE3_FEC_USER_DEF)) {
+@@ -9316,6 +9308,27 @@ static int hclge_set_wol(struct hnae3_handle *handle,
+ 	return ret;
  }
  
- static int
--hclge_set_phy_link_ksettings(struct hnae3_handle *handle,
--			     const struct ethtool_link_ksettings *cmd)
-+hclge_ethtool_ksettings_set(struct hnae3_handle *handle,
-+			    const struct ethtool_link_ksettings *cmd)
- {
- 	struct hclge_desc desc[HCLGE_PHY_LINK_SETTING_BD_NUM];
- 	struct hclge_vport *vport = hclge_get_vport(handle);
-@@ -3327,10 +3327,32 @@ hclge_set_phy_link_ksettings(struct hnae3_handle *handle,
- 		return ret;
- 	}
- 
-+	linkmode_copy(hdev->hw.mac.advertising, cmd->link_modes.advertising);
++static int hclge_set_autoneg_speed_dup(struct hclge_dev *hdev)
++{
++	int ret;
++
++	if (hdev->hw.mac.support_autoneg) {
++		ret = hclge_set_autoneg_en(hdev, hdev->hw.mac.autoneg);
++		if (ret)
++			return ret;
++	}
++
++	if (!hdev->hw.mac.autoneg) {
++		ret = hclge_cfg_mac_speed_dup_hw(hdev, hdev->hw.mac.req_speed,
++						 hdev->hw.mac.req_duplex,
++						 hdev->hw.mac.req_lane_num);
++		if (ret)
++			return ret;
++	}
++
 +	return 0;
 +}
 +
-+static int
-+hclge_set_phy_link_ksettings(struct hnae3_handle *handle,
-+			     const struct ethtool_link_ksettings *cmd)
-+{
-+	struct hclge_vport *vport = hclge_get_vport(handle);
-+	struct hclge_dev *hdev = vport->back;
-+	int ret = -ENODEV;
-+
-+	if (hnae3_dev_phy_imp_supported(hdev)) {
-+		ret = hclge_ethtool_ksettings_set(handle, cmd);
-+	} else if (handle->netdev->phydev) {
-+		if (cmd->base.speed == SPEED_1000 &&
-+		    cmd->base.autoneg == AUTONEG_DISABLE)
-+			return -EINVAL;
-+		ret = phy_ethtool_ksettings_set(handle->netdev->phydev, cmd);
-+	}
-+	if (ret)
-+		return ret;
-+
- 	hdev->hw.mac.req_autoneg = cmd->base.autoneg;
- 	hdev->hw.mac.req_speed = cmd->base.speed;
- 	hdev->hw.mac.req_duplex = cmd->base.duplex;
--	linkmode_copy(hdev->hw.mac.advertising, cmd->link_modes.advertising);
+ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
+ {
+ 	struct pci_dev *pdev = ae_dev->pdev;
+@@ -9477,6 +9490,13 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
+ 	if (ret)
+ 		goto err_ptp_uninit;
  
- 	return 0;
- }
++	ret = hclge_set_autoneg_speed_dup(hdev);
++	if (ret) {
++		dev_err(&pdev->dev,
++			"failed to set autoneg speed duplex, ret = %d\n", ret);
++		goto err_ptp_uninit;
++	}
++
+ 	INIT_KFIFO(hdev->mac_tnl_log);
+ 
+ 	hclge_dcb_ops_set(hdev);
+@@ -9807,6 +9827,13 @@ static int hclge_reset_ae_dev(struct hnae3_ae_dev *ae_dev)
+ 		return ret;
+ 	}
+ 
++	ret = hclge_set_autoneg_speed_dup(hdev);
++	if (ret) {
++		dev_err(&pdev->dev,
++			"failed to set autoneg speed duplex, ret = %d\n", ret);
++		return ret;
++	}
++
+ 	ret = hclge_tp_port_init(hdev);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "failed to init tp port, ret = %d\n",
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+index 87adeb64e6ea..7419481422c3 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+@@ -287,6 +287,7 @@ struct hclge_mac {
+ 	u8 support_autoneg;
+ 	u8 speed_type;	/* 0: sfp speed, 1: active speed */
+ 	u8 lane_num;
++	u8 req_lane_num;
+ 	u32 speed;
+ 	u32 req_speed;
+ 	u32 max_speed;
 -- 
 2.33.0
 
