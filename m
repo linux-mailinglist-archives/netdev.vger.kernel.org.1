@@ -1,166 +1,126 @@
-Return-Path: <netdev+bounces-301655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UT80DVbWO2r1dwgAu9opvQ
-	(envelope-from <netdev+bounces-301655-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:06:30 +0200
+	id 4HUVMPPXO2pLeAgAu9opvQ
+	(envelope-from <netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:13:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A904C6BE6C5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:06:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1358C6BE7A8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:13:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=t7N5AMoP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301655-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301655-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301656-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 393153025170
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:06:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 350C83038A5A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B493B38B7;
-	Wed, 24 Jun 2026 13:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAEB3B19B1;
+	Wed, 24 Jun 2026 13:10:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982563B0AC7;
-	Wed, 24 Jun 2026 13:06:09 +0000 (UTC)
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16513285C8B;
+	Wed, 24 Jun 2026 13:10:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782306371; cv=none; b=YfZ7b2yWAb4hRChOlzKzuxREajt7l/752OXNhoaE9WvbCo7vwgqNbRfnTFCIMEF0vXBiEq5AKAxHhOPsmkcIxob6rpUmaDHLOxqkf0ph29DyNuN2X9wZHDEoRqfb2Hjj7+lNQMnjAjhtORu6eyrTrVZZcrGXV6xXdI3+Vg45BWs=
+	t=1782306640; cv=none; b=DqVqByAHzCeYE5ZZC387zUZZ0pOpNN+17SOa27Do4PNWTRiYD/VaA1neEWViOj0vzASl8GuFRhYo2fqQ5DNXIgj2xlcLemjOZ90TS9Za3FgGUou1muueHJ/JKyvSMFB2RiK+oWyNJXpjfKEq42GYE/wZ3HmbOltuobLon1uMvjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782306371; c=relaxed/simple;
-	bh=DuA83fRrvg9FcK3+uKVtP7zDj3cARtxSAMCxIPj6Ris=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=isKrKv66aLcbXc3RyIKqUVQ08wM/kk4IT8Gxs/s3LtMkr+cskLDfvUbUeTi3I1A08gWu3aCptvNWpKPVSHfEdB4KkYoq++MHZJ4qLdyqIY59m7+leDIDscvxu7sBp976sVs4RT184PNe/Rk2K5x+0oLjKd/CiCT43whlZ0Gs62U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t7N5AMoP; arc=none smtp.client-ip=91.218.175.184
-Message-ID: <96334e07-dbd9-47a0-93f5-ac4762b7b919@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782306356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2iAFOHBRMR/Xa17pT7sXAqMACpdvIbkzmpfw9EGJVs=;
-	b=t7N5AMoP0/i8dFY3FrC7HO2yNmLfeZFETlWYqXUODrlmNpqyaftZywjo0y9UNn13O8QGRa
-	AXb39zIwwMhdHGGwdLIWZOxZlc/RB5gme76K1wm+eYFw8s2/p0wLK8vNz3AEO2CElTbLsC
-	uEFuGXWFUWXMM2nzKZ+r26KvGnuXTwQ=
-Date: Wed, 24 Jun 2026 21:05:32 +0800
+	s=arc-20240116; t=1782306640; c=relaxed/simple;
+	bh=Dtqkm98qhW+borrxFVxoJCwjgCy+xhriedBY9aDty/M=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=qiBIhNJmJfr4MgiEMtYK9kem50zoEvJelfyZ+u2Tx5EepYfMzD49Yu85AGfjL8hjDMSv9BFbpW4gHeSCKxyDdR9i+ng9LZmqSVlS3sAoqibn6EPUXd0LcMnBYVPOBYrGkFaSWa1y9mGINlctcQRD31zxHyBoi3rHisdVbUjNh2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 9937492009D; Wed, 24 Jun 2026 15:10:36 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 95E2892009C;
+	Wed, 24 Jun 2026 14:10:36 +0100 (BST)
+Date: Wed, 24 Jun 2026 14:10:36 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v1] ethernet: 3c509: Improve style of pnp_device_id
+ array terminator
+In-Reply-To: <a0cd057e6a24b9d355b5e4bdfcdb812cdd1e4652.1781082923.git.u.kleine-koenig@baylibre.com>
+Message-ID: <alpine.DEB.2.21.2606241407580.58268@angie.orcam.me.uk>
+References: <a0cd057e6a24b9d355b5e4bdfcdb812cdd1e4652.1781082923.git.u.kleine-koenig@baylibre.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
- state
-To: Jani Nikula <jani.nikula@linux.intel.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Shakeel Butt <shakeel.butt@linux.dev>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: David Howells <dhowells@redhat.com>,
- Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, chengkaitao <chengkaitao@kylinos.cn>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8BIT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	CTE_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301655-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301656-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jani.nikula@linux.intel.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:christian.koenig@amd.com,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-perf-users@vger.kernel.org,m:linu
- x-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:u.kleine-koenig@baylibre.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[orcam.me.uk];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[52];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,orcam.me.uk:from_mime,orcam.me.uk:email,angie.orcam.me.uk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A904C6BE6C5
+X-Rspamd-Queue-Id: 1358C6BE7A8
 
+On Wed, 10 Jun 2026, Uwe Kleine-König (The Capable Hub) wrote:
 
-
-在 2026/6/22 16:37, Jani Nikula 写道:
-> On Mon, 22 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
->> Add *_mutable() iterator variants for list, hlist and llist.  The new
->> helpers are variadic and support both forms.  In the common case, the
->> caller omits the temporary cursor and the macro creates a unique internal
->> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
->> explicit temporary cursor, the caller can still pass it and the helper
->> keeps the existing *_safe() behaviour.
->>
->> For example, a call site may use the shorter form:
->>
->>   list_for_each_entry_mutable(pos, head, member)
->>
->> or keep the explicit temporary cursor form:
->>
->>   list_for_each_entry_mutable(pos, tmp, head, member)
+> To match how device-id array terminators look like for other device
+> types drop `.id = ""` from it and let the compiler care for zeroing the
+> entry.
 > 
-> I'm unconvinced it's a good idea to allow two forms with macro trickery,
-> *especially* when it's not the last argument you can omit. I think it's
-> a footgun.
+> There are no changes in the compiled drivers, only the source looks
+> nicer.
 > 
-> IMO stick with the first form only, and there'll always be the _safe
-> variant that can be used when the temp pointer is needed.
+> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
+> ---
+> Hello,
+> 
+> I'm currently working on changing various *_device_id definitions.
+> This patch is irrelevant for this quest and a pure style update for
+> consistency reasons without further dependencies on it. I just stumbled
+> over this while working on that quest.
+> 
+> So if you don't like this patch, I won't insist.
 
-Could we go back to the v1 version? What do you think of that
-implementation approach?
+ Absolutely fine with me, though I can see it's been taken already in my 
+absence.  So for the record only:
 
-https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+Acked-by: Maciej W. Rozycki <macro@orcam.me.uk>
 
--- 
-Thanks
-Kaitao Cheng
+ Thanks,
 
+  Maciej
 
