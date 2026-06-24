@@ -1,142 +1,239 @@
-Return-Path: <netdev+bounces-301618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 68XlLxjDO2q9cQgAu9opvQ
-	(envelope-from <netdev+bounces-301618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:44:24 +0200
+	id JhhIB43DO2rtcQgAu9opvQ
+	(envelope-from <netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10BC76BDC52
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:44:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4366BDC88
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=NPYrFECx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301618-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301618-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b="JbEa/v98";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C46503006966
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:41:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C9564302E91C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1E4388E7D;
-	Wed, 24 Jun 2026 11:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659A033A9FE;
+	Wed, 24 Jun 2026 11:44:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3878C31AF14;
-	Wed, 24 Jun 2026 11:41:20 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782301281; cv=none; b=pWT5Pm18/3zEj+Y4CczECv5ySmgANfYsF/gWoY2smRHiG+PNCZ5WqPS7W1cLLNuCZkDSvFm/mv96189bD5rfV0b2hNXmtGhGLmLc3sTRw8TQjqTaYvjHB2DV3DFpQCoy7+WqM5xDnJGbVcNnBzil5IJwOhhdYU8ry1RsQO3Glco=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782301281; c=relaxed/simple;
-	bh=EbppwMMx6kcSCLHNbvURyZoQ8qsMQf5wBt3iwmIWxi8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bNdOT61vi5gqPpYPweJXI3WckTJ77W+ehSMRmGCiw7YvHEbeyyN6W4kMp+2UXhFQobv9mzTkBZeYKQ0BILUg61Qktq2yNa2JB/S8crCKGxxDPaFPjUJYAi2jT8A5I1VD57CE2RTlefazr9fzXMjmpGydhlHGSQT3FY9Bqp/hGkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=NPYrFECx; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=VxN0qk85a4KaEZ4beGoJZYkJZYlvHUzEO8KiTN9KR7Q=; b=NPYrFECxK0qN509i16ARJvCtmS
-	S8ljuzBwE9teLj/LhZoCcPqRdPcNHrJ4WmINhE0+fbrv5rc3dkAnkuYzXXC8APPLfDqhQL9e9b3eQ
-	yg9gv4xH/5fDACRk4PwHFcrGNwEPNEw8ESstT+rS078QtedBscv6EXPRde+upDy0yUp4yQU9hAwtm
-	roS0SDqPsDQNPUT98W0klduyzv/s8ma9ATz2IeroS/BpFwcfMN8BCNdnQyO8KlJ5RWkI02S9w1+sG
-	9w7dv4xePzcNvQPuEWxHH5LdOK/p9X3vdUMHDPctTWP/eSivYXsjO9oleHogAAe5TDGnsYsc+CHN4
-	BxXLheMg==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wcLyZ-002Okr-1f;
-	Wed, 24 Jun 2026 11:41:03 +0000
-Date: Wed, 24 Jun 2026 04:40:57 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: madalin.bucur@nxp.com, sean.anderson@linux.dev, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	florinel.iordache@nxp.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: Re: [PATCH net v2] fsl/fman: Free init resources on KeyGen failure
- in fman_init()
-Message-ID: <ajvBQie3IacYTxCT@gmail.com>
-References: <20260624055119.2776641-1-haoxiang_li2024@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0445A2E7393
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 11:44:13 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782301455; cv=pass; b=kOrxdlFa49Y7phFS8TzpZcszeOsQPypF1Vrzdb3RgMfgp0JoiCkcg7Fzsz0woUOr6IUNrG2os2e8A0p838vLYDw7Ha/guNKMdUCZ5a9LpLb6wIRc+PIJIajF4icgFZTmfFkH0iOpKpen8AY64sceSaQkp6gbRV2uwWaTDeqd97o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782301455; c=relaxed/simple;
+	bh=HPhL8+5/p/3nQJ2JE7IFtOQzfkid4Dt9nhNzaNvAvHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e67ahLuiU9iAg/lmlPXaIoU0LGh7msbZYjqHaP4DbBB3tuP7TVDEjimmTk7AUO7EH+jqJr2FKZnMMhtw0Eg/bgPW30Ut8JsEPoLnYBjwwSeVNPv0qQGb1QiWDeJjE/Jc80a0n6lt7o5mXIStH4es8lYhdi5vstQa2rFTtaWMJEY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JbEa/v98; arc=pass smtp.client-ip=209.85.160.169
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51788280e71so9703441cf.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 04:44:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782301453; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DGsaFfaMqG0qlEMQImT2Yrv4ZtyuaoSCHDMz2xR/GVvjJZ3GuZ+yVtYsR1flx4Qzyp
+         K1xBNylcQ0+6kHqihcnWwrZTfSy1I0w672GXkFgZls84Xm6ka5LRgAk+PAHBzxE0V9b6
+         YHJj4JNMQ+RnDfPAYkammQVFovIdqSuBXXvM/SOLFRr2pvQDqfWOqz1DWe6qGIM8ixZa
+         acQxEmHe4sjJtTo35aVWqQWML90ECWiY8Ukopeoc8x72wXqxLBbcGp/ipyk4Fl4xE8sy
+         4HXS7pxQCz6A0sqNZW8/Wt8TXogJcxV6ihNFGI947GN4vvNKMyI6iuqWDNCvlMsbBi2c
+         Ku7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=SYKIW7EuCluCK1+AMpF6IlhuvP6pgcSAPlY8DCxfyjU=;
+        fh=gk6wb7ylpy+UJ+qhdcuKMUT++M73CFfoAVHfzNKhgDE=;
+        b=jAalKwP5ftJ9NzUKSaGZgmgnXwYhPxFIEBN+Qil5iIJ2k2+MLJ2HhDVGZ9L4v4mVdN
+         xq1HjaxtfcoZllVKkvCB5D8CJLCrco+IVUGnPNF3pAKFda00eowgbPj9k3j2a7Q3rtvQ
+         6wyjTuWm1M60Q106Jo9zqfYU9VVFm4ei7WqwStjcYC4wi1v55PN1NY+GpRy4jwsCLFK4
+         AxSp2qkfzGKgMsuf0Qjzp7RPSisPw8CziFDRzB4aYKF2BOtzWaa4rfhYjRoFu1gTvZNn
+         QmBkqGh/aX29w5yvabD9rS2E9PX32foeKRWnIJkkrpRv4Lv+0R+V0vnGPiQl65eAbuqn
+         k8zw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782301453; x=1782906253; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SYKIW7EuCluCK1+AMpF6IlhuvP6pgcSAPlY8DCxfyjU=;
+        b=JbEa/v98yd3vkFsanNl2tqEzFqFYj2K+b1f/mh9QPLAltF2zPDim5XA0sDiE4rHeOb
+         5FIiT2dOc4r0Oi3IepzjHKiDJZGC9J/uChOtKmOmkZ+SnbouLshRwvF+wY20NeHFT+Fp
+         0pDA6bXixD2KhDEoPYxAkNEkLS/Zduy0u+3rwqJLrjIOJdC5oqxhT4Miw/W6A+wG80KR
+         /zTDz44VHr4meTNe5pqvi51ElwRFD3Zw1WnNd0bVds4vJql+oUpieYqfLbIrKkSZq7V9
+         JeyURnOVzgGL4FD294fKC/wRLxRtEaXM3sUf8vsU9qhWqCgqmS6+FAwZZwHyeECcUwPn
+         SPiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782301453; x=1782906253;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SYKIW7EuCluCK1+AMpF6IlhuvP6pgcSAPlY8DCxfyjU=;
+        b=qRL2K33E/JKjQ3KE/NBfewzBwDdDZOfBZdZKVSwMRE/6qOHFlG705rlZ4JAvwJvJvB
+         9bGRlMV9sAhmRSc55T7DjMpdME4K8aqn4eOgDV6ql4ylcAUXIpleFWyKzhQ8ALTp8AwL
+         /QOANxXQ2nCLNCWKoSid37qZqfE19fN9H64a1flanJUlHKHiJvrZEZuSvnUG0vg9/Rwn
+         8Xp2/k0VOYww5dyyCUFj55tRKmpA1pQogGB1rPX8NhY3HF1i2cPFOODvrEfpJC6ZXeo7
+         dcHwhmGFBNk0NlJQR46q1S4uhyKul84vlDQSD7HNGyMYB4wJ2S/z1VvmyYr3J29QKwcr
+         GB5g==
+X-Forwarded-Encrypted: i=1; AFNElJ/izcfpWV/LH8fxo9ts0WITwWpav+WTX6xudHMLKupcJQxSSdig5H3YlwyD0TVn+PLWp6GZOLU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw452Tts01ECybHtLFGyW7RLcXe4FBJX9WnXg71UF8QfVP9Ukzl
+	C+oZ+Han0rnDr3N1UW1WtDHHGliVqz3Ooj1MN3ZBr8wMBSEW45plSIyQeY3tMI3FNPVbdPPWpzf
+	PX9B2mYLKRH7pcpiPuAq+xs1sfZsYM8LsSDS8nHGp
+X-Gm-Gg: AfdE7cnkNJh0+CadlsfevdCJ38uOE+EibXf+rAWTnfpRoJ/u1Rbmo5kYVvTZHa96UXl
+	i3AF9v/CeiFSeW1vx21BTqoEsa0+0EHeUbaTWV+cOFgkqW92fwpfPG34QoNYuWj2e17SGkQUrcO
+	dGZwWHJOGf+ViwRJhvLUm4pqFULAn5mpsW2XYe3eP+4ZQ5Rrx5W6vkq2ijtlQhWs8CGFZtea9bO
+	58eYfbxfH7ym/3oeBw27ogyuWHVAbbJiorNTcNbXFa2xhdYg8Jf9OKGUujW9C2HmEWiz9HQMcl3
+	hITti0U1x+9ecOOyeP02t3jbKy+GmeHRFXdGKB1ve0E9Ocgv0kEj8MKewU8PoieQEuDgu+SFv7X
+	CYJyNAMWmqQ==
+X-Received: by 2002:a05:622a:1f0c:b0:517:2a27:bc84 with SMTP id
+ d75a77b69052e-51a0698442dmr272402721cf.35.1782301452352; Wed, 24 Jun 2026
+ 04:44:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624055119.2776641-1-haoxiang_li2024@163.com>
-X-Debian-User: leitao
+References: <20260624073209.3703492-1-edumazet@google.com> <95a719af-c9d3-4bce-995b-c6ffce15739c@linux.dev>
+In-Reply-To: <95a719af-c9d3-4bce-995b-c6ffce15739c@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 24 Jun 2026 04:44:01 -0700
+X-Gm-Features: AVVi8CeZ4KK3I6lMHwi0QawrfMceBnOvbtvE1qZea2Ud9O4YloTsFaOnAnhnmFM
+Message-ID: <CANn89i+XuH6_B9QYjT5F7+9gkwV=PMy-qWsFskZfekDRG4ak4w@mail.gmail.com>
+Subject: Re: [PATCH net] net: clear transport header during tunnel decapsulation
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:haoxiang_li2024@163.com,m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:florinel.iordache@nxp.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@kernel.org,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301618-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301619-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[163.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,nvidia.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev,d5d0d598a4cfdfafdc3b];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,appspotmail.com:email,linux.dev:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 10BC76BDC52
+X-Rspamd-Queue-Id: 7C4366BDC88
 
-On Wed, Jun 24, 2026 at 01:51:19PM +0800, Haoxiang Li wrote:
-> diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-> index 013273a2de32..3a2a57207e55 100644
-> --- a/drivers/net/ethernet/freescale/fman/fman.c
-> +++ b/drivers/net/ethernet/freescale/fman/fman.c
-> @@ -1995,12 +1995,12 @@ static int fman_init(struct fman *fman)
->  
->  	/* Init KeyGen */
->  	fman->keygen = keygen_init(fman->kg_regs);
-> -	if (!fman->keygen)
-> +	if (!fman->keygen) {
-> +		free_init_resources(fman);
+On Wed, Jun 24, 2026 at 3:41=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
+>
+>
+> On 6/24/26 3:32 PM, Eric Dumazet wrote:
+> > Syzbot triggered a DEBUG_NET_WARN_ON_ONCE(len > INT_MAX) assertion in
+> > pskb_may_pull_reason() called from qdisc_pkt_len_segs_init().
+> >
+> > The root cause is a stale, negative transport header offset carried ove=
+r
+> > during tunnel decapsulation. When a tunnel receiver (e.g., VXLAN or Gen=
+eve)
+> > decapsulates a packet, it pulls the outer headers but leaves the transp=
+ort
+> > header pointing to the outer UDP header. This offset becomes negative
+> > relative to the new skb->data (inner IP header).
+> >
+> > If the packet bypasses GRO (e.g., an untrusted GSO packet flagged as
+> > "unexpected GSO" by udp_unexpected_gso() due to missing tunnel GSO bits=
+),
+> > it is flushed directly to the stack as GRO_NORMAL. On ingress, Layer 2 =
+Qdisc
+> > processing (sch_handle_ingress) happens before Layer 3 IP reception
+> > (ip_rcv_core) can run and reset the transport header. Consequently,
+> > qdisc_pkt_len_segs_init() attempts to validate the transport header usi=
+ng
+> > pskb_may_pull(skb, hdr_len + sizeof(tcphdr)). The negative hdr_len over=
+flows
+> > the unsigned cast in pskb_may_pull(), triggering the assertion.
+> >
+> > Fix this by clearing the transport header to the ~0U sentinel value dur=
+ing
+> > decapsulation. This ensures that:
+> > 1) The ingress Qdisc safely skips validation via !skb_transport_header_=
+was_set()
+> >     and returns early without warning.
+> > 2) The IP layer (ip_rcv_core) later correctly resets the transport head=
+er
+> >     to the inner L4 header offset.
+> >
+> > Introduce skb_unset_transport_header() helper and apply it in the main
+> > decapsulation paths:
+> > 1) __iptunnel_pull_header() (covering Geneve, GRE, IPIP, SIT, etc.)
+> > 2) vxlan_rcv() (covering VXLAN)
+> >
+> > This restores skb invariants at the decapsulation boundary without addi=
+ng
+> > overhead to the Qdisc fast path.
+> >
+> > Fixes: 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
+> > Reported-by: syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/netdev/6a3b853b.52ae72c2.136ac7.000c.GA=
+E@google.com/T/#u
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Assisted-by: Gemini:gemini-3.1-pro
+>
+>
+> I think a negative skb_transport_offset() should break something else too=
+,
+> so the Fixes tag looks wrong, but I couldn't find any actual breakage
+> (luck, or I'm missing it).
 
-That makes sense, fman_init() is doing the same earlier when "MURAM
-alloc for BMI FIFO failed".
+Read again the changelog: transport header is set (in ingress) a bit
+later in the stack.
 
-For this patch only, please feel free to add Reviewed-by: Breno Leitao <leitao@debian.org>
+Nothing needs it before, but  qdisc_pkt_len_segs_init() if/when it is
+called in ingress.
 
->  		return -EINVAL;
-> +	}
->  
-> -	err = enable(fman, cfg);
-> -	if (err != 0)
-> -		return err;
-> +	enable(fman, cfg);
+>
+> Hope sashiko read this reply and confirm it....
 
-I understand the "while at it", but this should be a separate patch,
-and it isn't a fix for 7472f4f281d0 ("fsl/fman: enable FMan Keygen")
+On older kernels (before  7fb4c1967011 ("net: pull headers in
+qdisc_pkt_len_segs_init()"),
+the bug is completely latent and harmless.
 
-Separate this in a different patch, targeting net-next. Also, enable()
-might return "void" instead of "int", given it only returns 0.
+This prevents unnecessary backporting churn and potential merge conflicts o=
+n
+very old kernels where skb_unset_transport_header() doesn't exist.
+
+The Historical Option (a6d5bbf34efa / d342894c5d28):
+
+If we point to the original commits that introduced the tunnels,
+we are historically accurate, but we risk stable scripts trying to
+backport this fix all the way back to 2012/2016
+(e.g. kernel 3.7 or 4.6), which is unnecessary and highly likely to
+fail to apply.
 
