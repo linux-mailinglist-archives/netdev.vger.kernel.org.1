@@ -1,162 +1,156 @@
-Return-Path: <netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2s4CLzW0O2pebggAu9opvQ
-	(envelope-from <netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:40:53 +0200
+	id JAg5BFu0O2ppbggAu9opvQ
+	(envelope-from <netdev+bounces-301613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:41:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583B76BD6FD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:40:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777DB6BD71B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:41:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=DS3UbwvU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301612-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b="s3JwpXA/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301613-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301613-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 307BF3028C9E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:40:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7EFB530055E4
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F82129D265;
-	Wed, 24 Jun 2026 10:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A7B2BDC1C;
+	Wed, 24 Jun 2026 10:41:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18243248F72
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 10:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9D72C11E7
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 10:41:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782297612; cv=none; b=BXoF20T9Yasxq7ctDK0lHf1SPKZ1L7ZxLCxrE70TWqrf3ug9bh1DiF4WIQWGyDTrlioUSSWdq7coyYC+TQLBB/qHEDlN2kufQ7oxTGRG10gMCU1kfeNBx9Y2YD56DY3jTvAtpHiOcgmaWl8oB9V37WSXqxSAj40cx1fZKK7A29A=
+	t=1782297685; cv=none; b=QtFrXAbxzjh+nMkOyg3CU/TBXGbNir8oCbGpC3PNEhkEZCr9Vkv0/Ph3/EJL1g2x/oHOxICJ90EJMHaHxjhwYwErTXJYsfbrXEQzJn3UE/bEiThjAyOkC0FEupDjWLUAD14RhnKdWmG5hgG61E13EViY4j5fSkkSWPNmb75PlGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782297612; c=relaxed/simple;
-	bh=SzwY0ArSkepQcN7OqNhWKPW3eLo9VWe8c4Ja3adS3cU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hgzolYfjob2Wm24zAzAxOukszckft4DsjdnUkea6nHjGDwTayulqiBrLwCyc/VZW8QVbfdub4ObL0ZDyWG41d/asrWbkPjCuoNOQgYet73qeskxvO2sZfLzdXJ9rPmDC3sBpWdIVXjV6vCkD4hH4ZXqzEpytHdNwW1Wr9trc1OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DS3UbwvU; arc=none smtp.client-ip=209.85.218.47
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-bed19623d6eso111888166b.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 03:40:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1782297609; x=1782902409; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SzwY0ArSkepQcN7OqNhWKPW3eLo9VWe8c4Ja3adS3cU=;
-        b=DS3UbwvUuClnt0f0ojHK2TcomlHSFCkVepvSFhJLCQx+7xeFSVcCyv6KHqasAdI5Sz
-         9sDxDWWZGHvn9gAGBOcvaGcUiwpWxybjIo5wySO3hWzUUIWgG7m8VOr4vVOKcNEyRi+R
-         8RiZ0lX3FmsVZk1ZdZ4AuO0bVWitpK34vvxg5clhJQqn5/7+h4D6pzduBjx6J9SAYsQ7
-         o+9nstQVX4ZIqlzce78UYJSpOQ/CnQ+Ogu38kvXQQWMtPPcr8aCRx7uWlJbMx/3jez8b
-         Tk8Z8EHPM98kVcfb5WC+jSAAXh0SzToeKePiLeX2mMgMMyHSD7o/BI/T3ULMI6hUyn6z
-         pP2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782297609; x=1782902409;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SzwY0ArSkepQcN7OqNhWKPW3eLo9VWe8c4Ja3adS3cU=;
-        b=iJGqjA/yFBnS8CejMS3Kb70WeS4zT9V06It/naQ2lyiwZ2E/Sp1d2l4AJit6ZP1/75
-         Im8Ab5MyU4MrCXJU7vRILZ/uC4fHbd0Mj/8BqhRp+UxozXg/y2htJF6q/njJgXPIW4wT
-         CqdZf6EuBl0tiuC1IwJ0jir25uDELG4EVmxCwOKqeTaKOAo2PTJwUIGKizN4nbAnEPen
-         5tdJzdZQzIU1Dcy6f6iHhS4JO4e9mJchP5hPK+Hdt2E0W3gCF/rl0UuTzhMs+Y68GFVk
-         +AZPtKh0xHkJp8/fBn8qaiSMi+XuU68kOSWOunAmigT9WpdNhCbWxdFb3QGXDkuX75Mo
-         v8Cw==
-X-Forwarded-Encrypted: i=1; AFNElJ9VbuTuiDnSQCobR6pvyW33yxXJaFzuZJESL9eA8v9eQktxns5HQvBW2FGbQj4Pw4+SZm2zTXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw60GbCBSBLQG+6rq9dgoKE2vhtTb5ua6tdYT9V1RrdX3xmS6d/
-	ag2hdKJHqFkumC+ww/JksNMG5lAB/wYMqUBnSAGh2SM2o6/lQ6FfCaIumi314iFPns8=
-X-Gm-Gg: AfdE7cn0rkj53hEDG9nV3FVXB4NJ6+2BBZybEtvjkroVGxbns+/MUI39CVzVA4TO5+Q
-	L/0EvX2eJsXsE3mKN6koOrP+YGQATCDqvpOJnVbfJkhun5X/Q5iTPzDdhQV/SDOiSAdEzVjsgxb
-	EohQfUcEEjJ3gylM9I9QelLI2xemyDAu3HmcuMqyapkOiGCsq1roLF5cQzgWFZsiLEKQY8qlCe0
-	AT1Nmm4t20gI7I4TEwOeE2flejGC44aEj6ehv4pSnhpnElr4oSsD8O+2q47sX4ZgX1lSK+GgUna
-	foqZ6xBFZ66fISmGjZi1n9JVaLEfkT0YOr8noJuz1E/sWs4+M74P1X9N9DcNA6fj8vesqYRHP7L
-	1eCYADDFGzJM5zeLbMD6gIZmwmU+8qFzgtuSvQoJZx6nCnRx34ygep7xfZEoDXUoIEJaCfcQuye
-	F+G9Lzbry16oT8jEc=
-X-Received: by 2002:a17:906:c10b:b0:c05:b9db:68cc with SMTP id a640c23a62f3a-c107a353073mr371151966b.0.1782297609382;
-        Wed, 24 Jun 2026 03:40:09 -0700 (PDT)
-Received: from cloudflare.com ([104.28.21.182])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c5e498807sm621703466b.1.2026.06.24.03.40.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 03:40:08 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Amery Hung <ameryhung@gmail.com>,  Kuniyuki Iwashima
- <kuniyu@google.com>,  bpf <bpf@vger.kernel.org>,  Alexei Starovoitov
- <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Jakub Kicinski
- <kuba@kernel.org>,  Jiayuan Chen <jiayuan.chen@linux.dev>,  John Fastabend
- <john.fastabend@gmail.com>,  Network Development <netdev@vger.kernel.org>,
-  kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH bpf-next v2] bpf, unix: Guard sk_msg-dependent code
- behind CONFIG_NET_SOCK_MSG
-In-Reply-To: <CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
-	(Alexei Starovoitov's message of "Tue, 23 Jun 2026 14:26:06 -0700")
-References: <20260623-bpf-sk_msg-split-unix-v2-1-ca7a626a94a5@cloudflare.com>
-	<CAAVpQUBsQFFxJFDnJzxmsER3bOjm=zqJ5P5MSeW_T9v-4639cw@mail.gmail.com>
-	<87v7b9ysep.fsf@cloudflare.com>
-	<CAAVpQUBARp1qCEomgzWXVe35WatdaswujVLku+RESm_LW0dE7Q@mail.gmail.com>
-	<CAADnVQL2pfQ0BoN-vWcuCpbOBBKq_rM7Bp7P4XdLMFER5LGSDg@mail.gmail.com>
-	<87mrwlyqg4.fsf@cloudflare.com>
-	<CAMB2axMVhJJpP5HZtDFyQLLbKoRxhW08rj1zGRtWtgDkfYaVNA@mail.gmail.com>
-	<878q85yoy5.fsf@cloudflare.com>
-	<CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
-User-Agent: mu4e 1.14.1; emacs 30.2
-Date: Wed, 24 Jun 2026 12:40:08 +0200
-Message-ID: <8733ycz0fr.fsf@cloudflare.com>
+	s=arc-20240116; t=1782297685; c=relaxed/simple;
+	bh=c9qMwmCt/iy2GnXvOyHjy8P1f1SEsB0yA2ABh3fEVQE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EYtKNYKU/q38asvRqb2207djWcwUUjQts7cnPW9XK67vopMcpaJw7MSxUsA8hWAuOITLXPFD2T4w8NcfqaFKOywqZ1tX54dCeTlIT77T4Ix3mfwSY2u0SGAcsZ7ADnVemCGMDzJcFG/d1vIvfDZeuTenvAr4VkwUUABtP8T6GbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s3JwpXA/; arc=none smtp.client-ip=95.215.58.178
+Message-ID: <95a719af-c9d3-4bce-995b-c6ffce15739c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782297681;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ncPNYn+/b9unbk/5AZNDdu13Zw0UIm2rwxmBuVx34B4=;
+	b=s3JwpXA/x2whE6OsjbHvojTNqey8UL7QJoBCGQN+1df5w9hUHLL32gatIdFTK8TFIWrBgl
+	fwfmLfD/PLpVIThZnoTerzlXmoji1gBHReJPh/hvctI8ZZs+lM84cGALgrqTChyL0xsbZ3
+	c57ni2lAZHFFoI/ngRiDzlmme8RDBPk=
+Date: Wed, 24 Jun 2026 18:41:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net] net: clear transport header during tunnel
+ decapsulation
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com
+References: <20260624073209.3703492-1-edumazet@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260624073209.3703492-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,cloudflare.com];
-	TAGGED_FROM(0.00)[bounces-301612-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:ameryhung@gmail.com,m:kuniyu@google.com,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:jiayuan.chen@linux.dev,m:john.fastabend@gmail.com,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:alexeistarovoitov@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301613-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:from_mime]
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev,d5d0d598a4cfdfafdc3b];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,linux.dev:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 583B76BD6FD
+X-Rspamd-Queue-Id: 777DB6BD71B
 
-On Tue, Jun 23, 2026 at 02:26 PM -07, Alexei Starovoitov wrote:
-> On Tue, Jun 23, 2026 at 1:36=E2=80=AFPM Jakub Sitnicki <jakub@cloudflare.=
-com> wrote:
->>
->> This is a follow up from discussions at BPF summit with Alexei & John.
+
+On 6/24/26 3:32 PM, Eric Dumazet wrote:
+> Syzbot triggered a DEBUG_NET_WARN_ON_ONCE(len > INT_MAX) assertion in
+> pskb_may_pull_reason() called from qdisc_pkt_len_segs_init().
 >
-> Not quite. The discussion was to disable pieces of sockmap
-> that are causing trouble.
-> Not to move them under config knobs, but disable them.
+> The root cause is a stale, negative transport header offset carried over
+> during tunnel decapsulation. When a tunnel receiver (e.g., VXLAN or Geneve)
+> decapsulates a packet, it pulls the outer headers but leaves the transport
+> header pointing to the outer UDP header. This offset becomes negative
+> relative to the new skb->data (inner IP header).
+>
+> If the packet bypasses GRO (e.g., an untrusted GSO packet flagged as
+> "unexpected GSO" by udp_unexpected_gso() due to missing tunnel GSO bits),
+> it is flushed directly to the stack as GRO_NORMAL. On ingress, Layer 2 Qdisc
+> processing (sch_handle_ingress) happens before Layer 3 IP reception
+> (ip_rcv_core) can run and reset the transport header. Consequently,
+> qdisc_pkt_len_segs_init() attempts to validate the transport header using
+> pskb_may_pull(skb, hdr_len + sizeof(tcphdr)). The negative hdr_len overflows
+> the unsigned cast in pskb_may_pull(), triggering the assertion.
+>
+> Fix this by clearing the transport header to the ~0U sentinel value during
+> decapsulation. This ensures that:
+> 1) The ingress Qdisc safely skips validation via !skb_transport_header_was_set()
+>     and returns early without warning.
+> 2) The IP layer (ip_rcv_core) later correctly resets the transport header
+>     to the inner L4 header offset.
+>
+> Introduce skb_unset_transport_header() helper and apply it in the main
+> decapsulation paths:
+> 1) __iptunnel_pull_header() (covering Geneve, GRE, IPIP, SIT, etc.)
+> 2) vxlan_rcv() (covering VXLAN)
+>
+> This restores skb invariants at the decapsulation boundary without adding
+> overhead to the Qdisc fast path.
+>
+> Fixes: 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
+> Reported-by: syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6a3b853b.52ae72c2.136ac7.000c.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Assisted-by: Gemini:gemini-3.1-pro
 
-I really don't see how we can remove a feature that has users.
-I guess we will just have to weather out the bug wave.
+
+I think a negative skb_transport_offset() should break something else too,
+so the Fixes tag looks wrong, but I couldn't find any actual breakage 
+(luck, or I'm missing it).
+
+Hope sashiko read this reply and confirm it....
+
+
 
