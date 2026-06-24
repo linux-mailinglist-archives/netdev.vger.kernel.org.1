@@ -1,211 +1,212 @@
-Return-Path: <netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RVNQCjsFPGrOiggAu9opvQ
-	(envelope-from <netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:26:35 +0200
+	id 3rPZNlsGPGouiwgAu9opvQ
+	(envelope-from <netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:31:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC496BFF5D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:26:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C5AA6BFFBD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:31:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mandelbit.com header.s=MBO0001 header.b=SG4LA9ij;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301713-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=avUXvY8w;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 81BE4301CC49
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:26:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C94313009989
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999C22BDC2A;
-	Wed, 24 Jun 2026 16:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE3A2BD58A;
+	Wed, 24 Jun 2026 16:31:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADDF1C84A6;
-	Wed, 24 Jun 2026 16:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF5B2F7EE8
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 16:31:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782318390; cv=none; b=tznEoFEofqH1TmESMB//ytq+ccdKePb8UZDL5swvM25yVjQh8xp3IIuQqcu9v3G0XRv94JbLBkX0y1xCYxE2HF3XPUDH8aRp0sPsylPLNCu5Le07zeMhyFqo5/wEs67m+kO8MeGnQ9Dv9voVZ3osjj6kDGCF+kS8Oh1pr6mXdvM=
+	t=1782318680; cv=none; b=P1AqKbD5P6VaXetn6mc2/rsGPP62QynrMw9gtmFOsEkWun2MOR2cnT39pkJbChrEEdStsk0rcMZ9cZC/3CDVkEU9w02WlFb3Qi+1RMaSLelH3C4FUv1toMI2C5NoxXS7tc68yGFsLh5Eg3fYDXvTwi0q3xWUO44o+cz3Uv92te8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782318390; c=relaxed/simple;
-	bh=dqheWV0MoBE8GFdeH5pTuxFjJ46lZ7tAJI2rPyDPQ1g=;
+	s=arc-20240116; t=1782318680; c=relaxed/simple;
+	bh=OoZJTggCVtnrc1vhjX0fS3oe8NmGPp2spvl0vbKitYY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u+gio+VUMH1xy36S0JX2A7Tw6IegcNUCXYt2LeAnrwh6+hnc9ODYsL3S/eMEbZ8jThOc3XH0TORVFZfXRm+H9WHwv+o7EqfeofTpOT1DXGer32nKdyhFR4iHOl4CWXIeGcjHbmPCuoJZTc7KzV3DEUujgrW9JYTrgOloQOuy5Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=SG4LA9ij; arc=none smtp.client-ip=195.10.208.40
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4glnFB0stVzMm3v;
-	Wed, 24 Jun 2026 18:19:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1782317950;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F/WLT1yFW6o+7ddGyEm3OpCyzzUL7JiZATagfJStkU4=;
-	b=SG4LA9ij845HuzjRwxoIBCYwje70OKH3X50VitM6aC0Gte3nWwQCsTltezpxxP1Zk5IVsM
-	uBosnlUJ324e/7+SLIYEUf5A0RinQM6rpi5eYnYW4fGQDPloMDqW9RhsJ4r0QTYMPndGaH
-	czZI+NMVWhO2yrKavOyLnrnYohkA6lbgvsym/TnldIIA1NZWfFiSwGVKydUDQaHu6HXSA8
-	WmdTwcuKibIb5J5cmtwhd/D3ebL0i602An8LgJ+KqEgcfkKUNFy0It/SeVz0bfSaxulhYK
-	FEAehBqlEQAenOhMqioTV+qAoD95xm9u7Z1OAnhFjY7DsxdyLgjx+HhsDmDSGA==
-From: Ralf Lici <ralf@mandelbit.com>
-To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: netdev@vger.kernel.org,
-	=?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	Beniamino Galvani <bgalvani@redhat.com>
-Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and dispatch core
-Date: Wed, 24 Jun 2026 18:18:52 +0200
-Message-ID: <20260624161854.686569-1-ralf@mandelbit.com>
-In-Reply-To: <87v7b9c9jj.fsf@toke.dk>
-References: <87v7b9c9jj.fsf@toke.dk>
+	 MIME-Version; b=aDpcidhCy/QdiSyUds8Hd9PC96RXzAayr64RY/WheLhj8yFDHejvxbTVpZabhog/6P2Aj6pogmuqH7rCp8mYn2geBjmCmKs/kV8q2tWWSRWUxzoJP2KqLav7Yc1MIszCLC6lHI40fd57a3oyvDjxcSa+wIlOuzE+gYCd+PSaJbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avUXvY8w; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B89D1F000E9;
+	Wed, 24 Jun 2026 16:31:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782318678;
+	bh=wazYbUJgqhR8xpd0IySqVbbECzd3A9b0ORDczmzdtjE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=avUXvY8w1AXOVduxO/tTRy1iRjmdGJhuo4pzWmoXFrM6oHXianuWIienD9U4+MB0+
+	 EMHNKKrr9zq5OkrZxvSPUxrOmavv8u3H0+XqIkX3TPjCfgSi1ZMFEzY62+ywdmT0Nu
+	 uYB6Qpr36+TsACDN9cxsuI57L4Uttu5q3lfiye5sgze2xNMdv+hLfjyhnmjMr/ZCXv
+	 gZrDK4N8SVhCNyfgD1legdXXGwVfNoWUcGb0gXBu1SwNWxmDAaWi2mP9mqaBJzIyce
+	 GK93JWkM6QYmk9+ybrunZoXa5wBN3yK08iFEpiHHx5BpZfTs8o7/LycVQy/Q8iCQAB
+	 i0R2BSFhPTAqA==
+From: Simon Horman <horms@kernel.org>
+To: jtornosm@redhat.com
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	przemyslaw.kitszel@intel.com,
+	aleksandr.loktionov@intel.com,
+	jacob.e.keller@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [Intel-wired-lan] [PATCH net v7 2/4] i40e: skip unnecessary VF reset when setting trust
+Date: Wed, 24 Jun 2026 17:30:50 +0100
+Message-ID: <20260624163050.1145761-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260623101800.991293-3-jtornosm@redhat.com>
+References: <20260623101800.991293-3-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:toke@kernel.org,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:bgalvani@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301713-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mandelbit.com];
-	FORGED_SENDER(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301714-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jtornosm@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:przemyslaw.kitszel@intel.com,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mandelbit.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7CC496BFF5D
+X-Rspamd-Queue-Id: 5C5AA6BFFBD
 
-On Tue, 23 Jun 2026 21:59:44 +0200, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
-> Ralf Lici <ralf@mandelbit.com> writes:
-> > On the BPF point specifically: I agree a BPF program should be able to
-> > decide whether to translate. What I am less sure about is whether
-> > redirecting to a netdevice is the best way to expose that. A TC action
-> > (yet another model, I know :)) gives you the same thing in-pipeline and
-> > more directly:
-> >
-> >     tc filter add dev wwan0 egress \
-> >         bpf obj match.o action ipxlat4to6 domain clat0
-> >
-> > Let BPF make the policy decision, with the native action doing the
-> > translation work that the current BPF CLAT implementations have trouble
-> > with: fragmentation, checksum corner cases, and ICMP error inner
-> > headers (as explained by Beniamino).
-> >
-> > So TC clsact looks like the natural in-kernel replacement for today's
-> > TC-BPF CLAT programs: no extra netdev, you attach to the existing
-> > uplink, direction is explicit, and on egress you sit on the real route
-> > dst, so the synthetic-dst and double-routing problems above just don't
-> > arise. The cost is more moving parts than a single bpf_redirect since
-> > userspace has to manage clsact, filters, priorities and action
-> > lifecycle/cleanup.
->
-> Hmm, so no one really uses the bpf filter mechanism, since you can just
-> do everything from an action anyway (and with TCX attachment, you can
-> even avoid the overhead of the TC filter/action infrastructure
-> entirely). However, point taken wrt how to integrate this with BPF. I
-> guess the most flexible thing would be to expose the functionality
-> directly (as a kfunc callable from a BPF program). Which also fits with
-> your point below:
->
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+---
+i40e: skip unnecessary VF reset when setting trust
 
-Ah, I see, the cls_bpf example was dated, and I like the kfunc angle
-better than a new TC action.
+This patch avoids the ~10 second VF reset delay on trust changes by
+flipping the I40E_VIRTCHNL_VF_CAP_PRIVILEGE bit directly, and only
+resorting to a full reset when revoking trust from a VF that has
+advanced features (ADQ, cloud filters, UC/MC promisc) configured.
 
-I would probably keep that as the minimal per-packet interface: BPF can
-decide whether a packet should be translated, and the kfunc can do the
-actual translation work for packets whose translated form still fits the
-output MTU. The full 4->6 fragmentation case still looks like
-output-path/harness territory to me, since it is a 1->N fan-out
-operation.
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index a26c3d47ec15..0cc434b26eb8 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> @@ -4987,19 +5004,20 @@ int i40e_ndo_set_vf_trust(struct net_device *netdev, int vf_id, bool setting)
+>  	set_bit(__I40E_MACVLAN_SYNC_PENDING, pf->state);
+>  	pf->vsi[vf->lan_vsi_idx]->flags |= I40E_VSI_FLAG_FILTER_CHANGED;
+>  
+> -	i40e_vc_reset_vf(vf, true);
+> +	/* Reset only if revoking trust and VF has advanced features configured */
+> +	if (!setting &&
+> +	    (vf->adq_enabled || vf->num_cloud_filters > 0 ||
+> +	     test_bit(I40E_VF_STATE_UC_PROMISC, &vf->vf_states) ||
+> +	     test_bit(I40E_VF_STATE_MC_PROMISC, &vf->vf_states))) {
 
-> > For a gateway translator, though, I still think a device-bound model is
-> > less natural. There the translation point is more like a forwarding
-> > decision across routes and nexthops, so a route/LWT attachment, or
-> > possibly a netfilter attachment seems easier to reason about. Also, as
-> > you already pointed out while discussing LWT, an admin setting up NAT64
-> > is more likely to reach for an nft rule than for a clsact filter on a
-> > specific device.
-> >
-> > Taking a step back, ipxlat is really a generic translation engine plus a
-> > thin harness around it. So rather than pick one attachment, it might be
-> > worth structuring the engine so different harnesses can drive it.
-> > There's interesting precedent for this shape:
-> >
-> > - ILA, again, is the closest sibling: stateless IPv6 address translation
-> >   with a shared core in ila_common.c, driven both by an LWT frontend in
-> >   ila_lwt.c and by an inline netfilter hook with a netlink-configured
-> >   mapping table in ila_xlat.c.
-> >
-> > - act_ct is the precedent for the TC side specifically: a TC action that
-> >   reuses the netfilter conntrack engine rather than reimplementing it.
-> >
-> > And act_nat is the cautionary counter-example: a standalone TC
-> > reimplementation of stateless NAT that shares no code with nf_nat, and
-> > carries a "would be nice to share code" comment :)
-> >
-> > So I am wondering whether the right direction is to factor the
-> > translation engine cleanly, land it with one harness first, and keep the
-> > other attachment points as follow-up work once the core semantics are
-> > settled.
-> >
-> > Does that direction seem reasonable to you?
->
-> Yes, reusable functionality that can be called from multiple places
-> sounds like a good fit; let's try to structure it that way!
->
+[High]
+Does this revoke-trust heuristic miss MAC/VLAN filters that were only
+installable while the VF was trusted?
 
-Great, that's the direction I'll take then.
+A trusted VF is allowed to add many more MAC addresses than
+I40E_VC_MAX_MAC_ADDR_PER_VF (i40e_check_vf_permission() uses
+I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF) and more than I40E_VC_MAX_VLAN_PER_VF
+VLANs.  These quotas are enforced only at add-time.
 
-> As for which hook to start with, well, let's see if we hear back from
-> the netfilter devs, but either netfilter or the routing subsystem (LWT
-> style) would be OK for me I think.
->
+The previous always-reset path went through i40e_vc_reset_vf() ->
+i40e_cleanup_reset_vf() -> i40e_free_vf_res() -> i40e_vsi_release(),
+which destroyed the VSI and its mac_filter_hash, and reset
+vf->num_vlan = 0.
 
-Works for me. The engine factoring is common to all of them, so I'll
-start there. Once it's in shape I can sketch a harness against it to
-sanity-check the interface.
+The new fast path only flips the PRIVILEGE bit, leaving any
+trusted-quota MAC/VLAN filters installed in hardware on an
+now-untrusted VF.  Should the heuristic also check
+vf->num_vlan > I40E_VC_MAX_VLAN_PER_VF or the size of the lan VSI's
+MAC filter hash before taking the no-reset branch?
 
--- 
-Ralf Lici
-Mandelbit Srl
+[Medium]
+Is the sampling of vf->adq_enabled, vf->num_cloud_filters and the
+UC/MC_PROMISC bits race-free against the admin queue worker?
+
+i40e_ndo_set_vf_trust() runs under rtnl_lock and
+__I40E_VIRTCHNL_OP_PENDING, but i40e_vc_process_vf_msg() (called from
+i40e_clean_adminq_subtask() in the service workqueue) takes neither.
+A virtchnl handler such as i40e_vc_config_promiscuous_mode_msg(),
+i40e_vc_add_cloud_filter() or i40e_vc_add_qch_msg() can be running
+concurrently and may have already passed its CAP_PRIVILEGE gate but
+not yet set vf_states / num_cloud_filters / adq_enabled when this
+ndo samples them.
+
+In that window the ndo would observe a "clean" VF, take the no-reset
+branch, and clear CAP_PRIVILEGE while the in-flight handler still
+goes on to enable promisc / install a cloud filter / set
+adq_enabled = true on the now-untrusted VF.
+
+The previous always-reset behaviour masked this because the reset
+moved the VF to I40E_VF_STATE_DISABLED, after which
+i40e_vc_process_vf_msg() rejects further messages.  Is some additional
+serialization (or a recheck after clearing the bit) needed here?
+
+> +		i40e_vc_reset_vf(vf, true);
+> +		i40e_del_all_cloud_filters(vf);
+> +	} else {
+> +		i40e_setup_vf_trust(vf, setting);
+> +	}
+> +
+>  	dev_info(&pf->pdev->dev, "VF %u is now %strusted\n",
+>  		 vf_id, setting ? "" : "un");
+>  
+> -	if (vf->adq_enabled) {
+> -		if (!vf->trusted) {
+> -			dev_info(&pf->pdev->dev,
+> -				 "VF %u no longer Trusted, deleting all cloud filters\n",
+> -				 vf_id);
+> -			i40e_del_all_cloud_filters(vf);
+> -		}
+> -	}
+> -
+
+[Low]
+The dedicated "VF %u no longer Trusted, deleting all cloud filters"
+dev_info() is dropped in this hunk, and the commit message does not
+mention the logging change.  Operators or log scrapers that key on
+this specific string for audit of cloud filter teardown will no
+longer see it; only the generic "VF %u is now untrusted" line
+remains.  Was removing this message intentional, and if so could
+that be called out in the changelog?
+
+>  out:
+>  	clear_bit(__I40E_VIRTCHNL_OP_PENDING, pf->state);
+>  	return ret;
 
