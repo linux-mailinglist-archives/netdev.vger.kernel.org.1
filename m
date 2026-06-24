@@ -1,154 +1,151 @@
-Return-Path: <netdev+bounces-301623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301624-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NSqhK5PEO2pUcggAu9opvQ
-	(envelope-from <netdev+bounces-301623-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:50:43 +0200
+	id Tn02Br7EO2qIcggAu9opvQ
+	(envelope-from <netdev+bounces-301624-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:51:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01DB16BDD5E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:50:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B97406BDD87
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:51:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b=ehpe0eWz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301623-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301623-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=secunet.com;
+	dkim=pass header.d=sntech.de header.s=gloria202408 header.b=JS+xJ88s;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301624-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301624-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=sntech.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 05ACF300B29A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:50:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4F10F3041B83
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E57C2BEC23;
-	Wed, 24 Jun 2026 11:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655FD2DECBF;
+	Wed, 24 Jun 2026 11:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00708194C98
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 11:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F492194C98;
+	Wed, 24 Jun 2026 11:50:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782301803; cv=none; b=NQ2bsOFH7XVkEeKwlibJsC2cUvuwKk6ou2lEQ0LFjCuTl0yiXsRo49z5rOk8gnmjCcdP1HCRCdh1iUI6kJFFwo6EHa8b3Oa2Qz4oVYzZDaqaV4vZgrsPNVlInYDfwdlIzXGEe8pJhKYKosFXNUBRTohRswaI3ACAb5A+B0Nc8u4=
+	t=1782301829; cv=none; b=tcEfHnFTP9isu05qfmnbkGFAXvojnEkEZKAqBwjhfhla2NrbzRb1ndnMPMCEG8a0mWmK6A7vwSK7AoXuTEV+DUJYFJozFffRasTqkyjd+r6EHRCOO7u0+ufje0YQfRqc5hfGoNv1I7axn2BCuMybKsnkoB0YBmQ8kstuuT+rq/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782301803; c=relaxed/simple;
-	bh=kcMsLWjwESVlkS7eJg9kdfJwAj1KJu+Gv0hON/ykfqw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W+7VI3xpkV6JM8x3Wtc7DVrBOXksLfJIEQtB/cebz5TqnT/a6Emhynntg1RBNoq9z1c2Y5E5e4eLm3UzGiEK19hQcrRZ/fE1sXdqYuselJhwJ8as8ljZ8JTjGfWGFnOdsyIg4TsUSaCcr/WR1Y69s1FqAh8E7hyVFHAo51YTGvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ehpe0eWz; arc=none smtp.client-ip=62.96.220.36
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 5DBE920719;
-	Wed, 24 Jun 2026 13:49:53 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d1y61Cwxl4zB; Wed, 24 Jun 2026 13:49:51 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 43C9F20612;
-	Wed, 24 Jun 2026 13:49:51 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 43C9F20612
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1782301791;
-	bh=V9N9+Sj/8/K5UuRDhgiFqOCl2hjjt7bL6CXb77ilMTY=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ehpe0eWzCDvOBfBikUHRpIlUf7yQ83Yar39PxdYUBZVUQtrEczW7SuRAaXME12Wi8
-	 Mn3AaiTj/fnWTvstwaIRGEbQlfDh52P+gSqO6fRKxBsocH+RWAXJ/BT0spnmKJREUJ
-	 R442zFtEarXVy4qrMghiksaFe7UKIVdQgiBdWa8O1YEXrLSa0qLYGcDylg+vSCZOyt
-	 ZYG0qNgC4710J7qstmsjKOCfAkkskteEGfOadPHS9n40MvH8V/x5qUy6dmAC5NwZvf
-	 lYZe1jXTbMco0pzHmO4cu4DVvEKRql4d5R6LTInY6UPFgaIFLvnI/kiyoJVvDueKHN
-	 Af1UOL0tY5Wmg==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 24 Jun
- 2026 13:49:50 +0200
-Received: (nullmailer pid 2712676 invoked by uid 1000);
-	Wed, 24 Jun 2026 11:49:50 -0000
-Date: Wed, 24 Jun 2026 13:49:50 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Qianyu Luo <qianyuluo3@gmail.com>
-CC: Eyal Birger <eyal.birger@gmail.com>, Ren Wei <n05ec@lzu.edu.cn>,
-	<netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <yuantan098@gmail.com>, <bird@lzu.edu.cn>
-Subject: Re: [PATCH 1/1] xfrm: nat_keepalive: avoid double free on send error
-Message-ID: <ajvEXryefFCo5B6Q@secunet.com>
-References: <cover.1781788385.git.qianyuluo3@gmail.com>
- <46eb334399ce0e25e0897b42f21020541d159300.1781788385.git.qianyuluo3@gmail.com>
- <CAHsH6Gvsf-JEQyetucAVT6mjaJDi=gMT1pDWFDagb1fhjmveGg@mail.gmail.com>
- <CAPOno=q0NxA_LOJ3QaM9Jgk1oM4ZQiW9igipGfxV7+yGvjr+0g@mail.gmail.com>
+	s=arc-20240116; t=1782301829; c=relaxed/simple;
+	bh=b7o9n0s7UOikx/wyEZYrKOmML/ARCFoQ9cl3aVk9rBg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EDAs5KwTMqV6IejJFm49cQqm5lS71sxEbecp4WI1Mgzfl5BFBKFce092dtekQY1IPIzI4ZQG8o7zO+pqcOBDOfePAdszpgXxxIk6TTnrXgdiWbsU/qMkkdWAvMAJ35oSs3JIAPnzAJIwYa+VsxHKa+SCmdyO58hBwyDUVjZyEO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=JS+xJ88s; arc=none smtp.client-ip=185.11.138.130
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Reply-To;
+	bh=lO0hgqE9Avytw8qlzJRPWePoOJiVJlIHiSjn9i+FEbY=; b=JS+xJ88sBGk93oWMEscysoluuC
+	658s0tG+Eb4BXXO3akz+agVe/Jt+aXOYv2fXFLbrdICbc+MuROfcLS3A/nh3BBKYkgEuDGb/WFDDG
+	PATyEu5Fnzn8oWGgZvdczD+JRj5myMae9Mz66E4XTxUE0lXwVL3nqes7544YKUN3wgh/pKysIX99R
+	7ev3OruvWpvTIqHLBkN90QmQTLzqyml9JRnFcPZfbWaUew/Y+KcMHuaGTPre8O7357Rj9QJjcsBO/
+	3cvZJbi+WdsmL5vQiofJInlGVAc7GDPseiPSKDh2HyhsipnxgugUCx642Gpkk+R/qzRwbV4InFP5M
+	5TDFFbvg==;
+From: Heiko =?UTF-8?B?U3TDvGJuZXI=?= <heiko@sntech.de>
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Wu <david.wu@rock-chips.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Yanan He <grumpycat921013@gmail.com>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ Yanan He <grumpycat921013@gmail.com>
+Subject: Re: [PATCH 3/7] dt-bindings: net: rockchip-dwmac: Allow 9 clocks
+Date: Wed, 24 Jun 2026 13:50:18 +0200
+Message-ID: <3779785.hdfAi7Kttb@diego>
+In-Reply-To: <20260624-rv1126-alientek-dlrv1126-v1-3-5aef608a3f64@gmail.com>
+References:
+ <20260624-rv1126-alientek-dlrv1126-v1-0-5aef608a3f64@gmail.com>
+ <20260624-rv1126-alientek-dlrv1126-v1-3-5aef608a3f64@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPOno=q0NxA_LOJ3QaM9Jgk1oM4ZQiW9igipGfxV7+yGvjr+0g@mail.gmail.com>
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[sntech.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[sntech.de:s=gloria202408];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301623-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:david.wu@rock-chips.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:grumpycat921013@gmail.com,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301624-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:qianyuluo3@gmail.com,m:eyal.birger@gmail.com,m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:eyalbirger@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,lzu.edu.cn,vger.kernel.org,gondor.apana.org.au,davemloft.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,lzu.edu.cn:email];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[heiko@sntech.de,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,rock-chips.com,gmail.com,foss.st.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[heiko@sntech.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,gmail.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[sntech.de:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sntech.de:dkim,sntech.de:from_mime,diego:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01DB16BDD5E
+X-Rspamd-Queue-Id: B97406BDD87
 
-On Fri, Jun 19, 2026 at 05:06:40PM +0800, Qianyu Luo wrote:
-> On Fri, Jun 19, 2026 at 1:21 AM Eyal Birger <eyal.birger@gmail.com> wrote:
-> >
-> > On Thu, Jun 18, 2026 at 9:36 AM Ren Wei <n05ec@lzu.edu.cn> wrote:
-> > >
-> > > From: Qianyu Luo <qianyuluo3@gmail.com>
-> > >
-> > >         skb_dst_set(skb, &rt->dst);
-> > >
-> > > @@ -100,6 +102,7 @@ static int nat_keepalive_send_ipv6(struct sk_buff *skb,
-> > >         sock_net_set(sk, net);
-> > >         dst = ip6_dst_lookup_flow(net, sk, &fl6, NULL);
-> > >         if (IS_ERR(dst)) {
-> > > +               kfree_skb(skb);
-> > >                 local_unlock_nested_bh(&nat_keepalive_sk_ipv6.bh_lock);
-> >
-> > Any reason to do the kfree under lock?
-> >
-> 
-> Thank you for your reply! I did this without particular reason.
-> Just to keep the pre-handoff cleanup in the same error path.
-> kfree_skb() does not need the bh lock there, so I can move it after the
-> unlock in v2 if you need!
+Am Mittwoch, 24. Juni 2026, 10:44:40 Mitteleurop=C3=A4ische Sommerzeit schr=
+ieb Yanan He:
+> RV1126 has a separate GMAC Ethernet output clock used as the external
+> PHY reference clock. This clock is described in addition to the existing
+> GMAC clocks.
 
-Then move it after the unlock to make it clear it is not needed.
+AS stated in the driver patch, this is the input clock for the phy
+and ethernet phys are perfectly capable of handling their input
+clocks. See reference in the driver patch.
+
+
+Heiko
+
+
+> Signed-off-by: Yanan He <grumpycat921013@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/=
+Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> index 80c252845349..86a7e83675ae 100644
+> --- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> @@ -71,7 +71,7 @@ properties:
+> =20
+>    clocks:
+>      minItems: 4
+> -    maxItems: 8
+> +    maxItems: 9
+> =20
+>    clock-names:
+>      contains:
+>=20
+>=20
+
+
+
+
 
