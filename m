@@ -1,312 +1,333 @@
-Return-Path: <netdev+bounces-301665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wuo5Ai3iO2rreggAu9opvQ
-	(envelope-from <netdev+bounces-301665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:57:01 +0200
+	id MO9XONbiO2omewgAu9opvQ
+	(envelope-from <netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:59:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C8DE6BEE18
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:57:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62AD36BEE53
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:59:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bynar.io header.s=google header.b=XtvFVpO0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301665-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301665-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bynar.io;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=ECZhB04C;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301666-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 85DD93028C2F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:56:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6DC363025F4F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172C53B8409;
-	Wed, 24 Jun 2026 13:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5843B95F2;
+	Wed, 24 Jun 2026 13:59:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4DD3624C2
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 13:56:55 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782309419; cv=none; b=Ke38bxVKxCcKlK5n4ctp8TxKmzrZUgwmXT8v8OUm4rDyJ3ChhX/yrc5+hiexo+fpdXDgp/L8gCTpvifVhtGETyanpum1shOPlwPjBCzbM+Uh23UWJz6tWfkTKGDzNh/548B+NZdOsFvOgv2cFIWHFa7MTrpR4A1FBNzI9L7UDr8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782309419; c=relaxed/simple;
-	bh=XyPA09EsfnnBTiPxZeuSKRTW2G1xE6GNAnIbgWP8cjI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fW1J/6tdMkQS7vft8UNeJlvLDL+Lh7u/2EG6hhPJ3RRhK56eY5497zoQqE83MxmiC+qqJ4dkbhzBy4CKbLi7j40m/cFUSuZkyHDgDrRlwG0auGrSSh3tnT+NTrzyliDkFBWIehbGEq2BzW3yRa0wZkWzKDGxhuJv8LucEDmQMAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=XtvFVpO0; arc=none smtp.client-ip=209.85.208.50
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-68852b58d87so38583a12.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 06:56:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0494E3B7B7B
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 13:59:46 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782309588; cv=pass; b=Ae/v/i4L95eeqDgtNGGO3r82ksOUTICm+aJ4ixb3ykd1GJbsWsMrPUM9B4pHKDaPls6Terq4YGHSJei2VW9O0UEq6C7GFZQfQ8xi8xortN9iD4z7JreTIO8UXBkG/nYvoEJYglL9vFxBuvdI/tgknk/KVN3q5ZPDBJyFXw1+T38=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782309588; c=relaxed/simple;
+	bh=V2EUYSdGtW7m3Aw4m6n9WbdlxjOlAz7SU+/a3C1AnzY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ajR+p4YHEoIeMJaWfdZ/0Np6YQRf+tzR/xcbcCXVJccAHaTqWnw91ThPU7IhLPResUXkdIuTaCaAIe/ORydmuxGg2+wVtk/KdWX4v9Hyc1QnLGfuSMATJgNIfgSwgO1eE3brgoLqGXQstYhBnupxcO6TamEmj7znjUHlX4AdaA4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ECZhB04C; arc=pass smtp.client-ip=209.85.160.176
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-517dc520840so9723421cf.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 06:59:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782309586; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FetTSlgSirxcqgXHC5rpcxPiAdGOX6W8zboe7986y0uXuyQSuzr+BS5rukPc9+6np2
+         dQt6dBr27iWYWsQ0NnJtWgUiBuTcw+RJP4/bBQC3GPVykOuTdZ8AQO6gR2Y2rbbJcXLL
+         qUpj20440mLqy9ZJ97U/TQnlcAbELbW0eBha8BLbk6Cmlyhb4qccMPGVb9bxSpzmkIdy
+         IBfBxzKI3X+2IEdoc3JwBs87z/aaP7KDX7X4YAsFP+2s90pzEU1YVyygBWuTfGnRXoNH
+         i2t6+D4BCAIklKU9cs6/8gnWKjb/YRo+YLG4c7AldRVmLyOWDjHpL1ixpPDfzl0qRxGa
+         j9qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IPjZx587TohMDbgAlzqgaOnK/IpS5K+mfsCogDhtDgk=;
+        fh=22emKQCdCwvaVfmfg07j/HUi64lqp5cAracPlTX+PSo=;
+        b=Gb/M8ZxjhoGrTcZn92a8VPzSQU3DVaJjZ8anR+3FqUPXnsgmYt+Umv3igtYXEENsF9
+         dYdz5aNuMpj5tXCbw17Bt1UAPZ3+hJMx1VXcLRHH+a6P/lrf9cEWT4n+spMs2elKq3Cp
+         3WUb2rHu+JI03lgWrjqcXI6cVvQSYEvIgk47yE1HK2LYXRDUMCBRI4b19VxmXgIjqNNH
+         eVea3za2Wpswxsw0/74onfZM1fwGVVXudyKjbEumTJh/F4ryR3kC24g5/WfjGJBaY2hc
+         fksCdhd2NaxP6EXqItQkopDqX+RaIzFaAWJuldVNfsQWrjfyGEHU2M4tiPnmKYqM/a3Z
+         uUrw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bynar.io; s=google; t=1782309414; x=1782914214; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lm01Y/DJLrHEEgweXFUzCh3ZAl1l/CJchkZn/ZcRYCg=;
-        b=XtvFVpO0C7EIdZ+4M/m7F7ni7BRAB5XYFbs8xszxb5aok4MsD3dFglEipBqHc9CLye
-         CkB+lT6IdyTfxmsmP4v8ew0qbNiXHA3wi8cjiUY2vDepnmxpTOhyF5tx99wurNU9Hfdu
-         cRan/DYsOtrjFoUsk+DAV3/JYmEP/QN3NlnH/kHe8jD4s+NZ7Jz590DLu9yMpoGPzytc
-         aO1D4xGj6unE0g/9mp3eU7z7R93RwpP+spv9hNO4MBfT4oc28N5QlxANJ7GM3TWN4WTb
-         eeFXOn8vu3y0EVb0ItuyUum+VRGcV/8/2xgovqPIdBaMNo5aGK+IZIqC5ahmSq8o87pk
-         RCPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782309414; x=1782914214;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1782309586; x=1782914386; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lm01Y/DJLrHEEgweXFUzCh3ZAl1l/CJchkZn/ZcRYCg=;
-        b=drjYJ+50xWpeIc1UO1TMhmf90psn1O2mQbJikYIEOxGeX3RjFOdVnCZBOSIE2BAQYf
-         eCG2NNzohZyKn9ffSSl55nwMEW3E7TV3gPPv6jwZ3bXCxA7IqPF32LOjYqxo2F/ZWwe7
-         mofuIK1ws2PzAeXggrqnbRbVS7dzQiViXqh9mrr+VgSPW+gB4V9bbaJA6fR59nJzyh9l
-         59Or3HTUf8GLPXbClcmtxE0iE/An/ojP/Vya5MSJBoWUo5AOMWDCIhIS8iK6XxvigDG7
-         P9iphZzYZtOWP9M9GICUYWbJbv0zgwE4HRclaxLa71Vmvckhi0roJyxNLDKB7sNZLvB1
-         iTcQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8m2+o1B08Z4YukvGXDQb+Oclw//uxSn+jYjwhIVP22iNHtQTXppElveXdpT4tnWTdR8Puo1nw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqsOE1sgxwi9vpoOI9ET9EDJjRNO3etyPzKxOr883jha5spVLo
-	4DCLlGtZNvxVQJ2FldX9IA3e9JM4CBjw7rD50e+1IGW1PPsB1wMqBVd/l5+8f5uBV8ob
-X-Gm-Gg: AfdE7ck/kEeLvjKzVEQcsoekxpGLeDN+CIUqeyg9LnP8ua43GXIY4i0j6BCZCF3JeEu
-	INrS8SRmnlFgfwpsD3Cc/t3ePt/7tM9DY3FDR700puCkQX/C5L+mvJtd+IW8Bzv8gRmrTwweNQ2
-	05ZdJt9cw37FZLyuWC+lgSP6amJXRILYCk3PGdqKON/g0GTijprkUp++vq8uGQJqJiV/SArESt0
-	TvFezsSfvm8e5T6WW46NsifBtpHpB3FMDiuJjFF/AZgPdNAYh0LMLW+iA3akI+nE9yhOtM+AAlG
-	2PevWxlvRGsC7dnIUs7MUZLIN/MaK1f3J3ihDgMN2t2FF5XKFfJipJt2dCac165qyImYW+22RH4
-	qwPUcMHSk7mT0DXSos7kXWF5qV6W/DRqX06r4KdPzYkfNQtTiLZe0TRD6ki4aK+UKDSw3RCLdx5
-	SexKC9KY8WdsA=
-X-Received: by 2002:a17:907:6b07:b0:c11:3fc9:ef65 with SMTP id a640c23a62f3a-c119e764e4cmr187614566b.36.1782309414141;
-        Wed, 24 Jun 2026 06:56:54 -0700 (PDT)
-Received: from localhost ([2a06:61c2:d427:0:b321:1c7a:b072:326e])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c60ac9e77sm656316066b.37.2026.06.24.06.56.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 06:56:53 -0700 (PDT)
-From: Samuel Page <sam@bynar.io>
-To: Jon Maloy <jmaloy@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	Samuel Page <sam@bynar.io>
-Subject: [PATCH net v2] tipc: fix out-of-bounds read in broadcast Gap ACK blocks
-Date: Wed, 24 Jun 2026 14:56:29 +0100
-Message-ID: <20260624135629.727262-1-sam@bynar.io>
-X-Mailer: git-send-email 2.54.0
+        bh=IPjZx587TohMDbgAlzqgaOnK/IpS5K+mfsCogDhtDgk=;
+        b=ECZhB04C1Le/GUG/id3Csa0Jo3cg/BGPfpPl06qgx90TslehBrAuvT5vO0jVHwFYCi
+         X5vWzI7FK3WD+p/06sozo9turnnCrS5KiuNBmNIAuiDIX3cD2S7WF9lR0mDQPxCRpFDW
+         9SYzTAL43v+oI7qhnsPSNiocEXdC5fU9ZkGU8Uj4qL4M1qXoM8z03XTnl6M3rLvo5lVz
+         HLNMN0OdwFq9T5sfa6E6M6qFUVnLICK5sJHRD7Wce+9F4aPg9JmeMZ2/cYpuVZNP7mgD
+         3U6Bn/OfRZY2//DKGO644bicFSC7dLJqkZOMvBmqUjLBjpfsat1k7gtznCRdpyFzpw1z
+         7/jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782309586; x=1782914386;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IPjZx587TohMDbgAlzqgaOnK/IpS5K+mfsCogDhtDgk=;
+        b=UN0JTOxKq6XdcwBT1DVG7ctnIEU9MaoxKKRv12kGLg2/23/qBHZsLPnnX6bGR5Qp1H
+         iezdV76c1EUzy4p8Pai5faoMjqY8n94v3CJ9Y8aaMgGU4Y9VtRqVhWer7d2JqXPp6g8j
+         oDsc2rzNn13bhl4s94K9PPLxS3gJBRwQzPv5BAVYrGy4RDYRIAUNZTzwzWpy8GWik6n5
+         np+wgvTapsdOE7LAqkgibFHwD9mynhAxlztFdEBznTWzO2ma8TOnXtrQi8yC5PRIQioe
+         E898x0FRd6cU0t8WS/M0p5VNN5gy7wVOXjZEgXMwRE0XTvNGV8mFLUug7gvhNlKRyeQ6
+         8Mhw==
+X-Forwarded-Encrypted: i=1; AFNElJ8nlPHxY/KjeEyZx+SuaVM/d2Ddte97FpIgim+5kkRUKZo/BaOb8XbTIxafUDR++5j07PR0V6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8rog/rd2aYg/gWHiihJBIahJt2v7n6zHq3dgb8eAS8e8pVBAf
+	L6/KdJaRk9mfhJvQEb2y4ljTboixZSZCM+Ez7mBvBiiozTFABIzKvqAzK0W77ShrqOM+oLvtn8X
+	S3RjvNF4poOw/awFyVYhw6IAK4oxu7S/goigeHz1w
+X-Gm-Gg: AfdE7ckhz0dTVlXFABPvBo9yTowoid+e77BKv6Yv37zH273B+PaVqc5hDeaWmpRqhQF
+	U9/ixsKhU4RGkTWhME7QJ5/XTFxjSZgOLKY6Pkm8uUuqI5HmgvMj8Bsrapp0Lgu9gNzZaxwtlDD
+	OvGixjKgp9Z27b1fa2cnwVG1ChXU2Z5EnLwprgoB8xaT2ZoeedVyC2jRd2xwOxBdmr47DIo0u7x
+	YnwtHUZNF0C8Rl8ux5ubd+ul8votfrFrfkTO/gTy1E5qi3PLGaXWtSGYtYXj8GJEEKZu2E/QAUw
+	pielF2mKkLLy5Vt4fIx8uWl7pHGGS7ecYvMeM3f1rg60iXmMiE1RhOEv5ETPHDU8X+3KxOHF5dj
+	HIzJwzrF+Gw==
+X-Received: by 2002:a05:622a:1101:b0:517:29f6:cee5 with SMTP id
+ d75a77b69052e-51a61c70f0dmr50950161cf.49.1782309584831; Wed, 24 Jun 2026
+ 06:59:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260624090135.95763-1-samsun1006219@gmail.com>
+ <CANn89iKD=4_A+7K2erw5AZPnzvBrQqTKXJyfKN5ZfNpAYZ+y3A@mail.gmail.com> <CAEkJfYN4Uep_WEzZyaDGkW5p4rW+oVRqq2DgBt2xiYp9ARt0GA@mail.gmail.com>
+In-Reply-To: <CAEkJfYN4Uep_WEzZyaDGkW5p4rW+oVRqq2DgBt2xiYp9ARt0GA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 24 Jun 2026 06:59:33 -0700
+X-Gm-Features: AVVi8CfNruVRxa-vPHeF0EFoTPk0YineqVA770lzyibgRqaNz2z7UDVceVDj4EY
+Message-ID: <CANn89iJ5wKuvKy=Ed-JkeyzKYaEoA_8S=mEMBicMjEPxLCY0Vw@mail.gmail.com>
+Subject: Re: [BUG] KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
+To: Sam Sun <samsun1006219@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301665-lists,netdev=lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_SENDER(0.00)[sam@bynar.io,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:samsun1006219@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzkaller@googlegroups.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:sam@bynar.io,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301666-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[bynar.io:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bynar.io:dkim,bynar.io:email,bynar.io:mid,bynar.io:from_mime]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6C8DE6BEE18
+X-Rspamd-Queue-Id: 62AD36BEE53
 
-A broadcast PROTOCOL/STATE_MSG can carry a Gap ACK blocks record in its
-data area. tipc_get_gap_ack_blks() only verifies that the record's len
-field is self-consistent with its ugack_cnt/bgack_cnt counts
-(sz == struct_size(p, gacks, ugack_cnt + bgack_cnt)); it does not check
-that the record actually fits in the message data area, msg_data_sz().
+On Wed, Jun 24, 2026 at 6:42=E2=80=AFAM Sam Sun <samsun1006219@gmail.com> w=
+rote:
+>
+> On Wed, Jun 24, 2026 at 6:01=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Wed, Jun 24, 2026 at 2:01=E2=80=AFAM Yue Sun <samsun1006219@gmail.co=
+m> wrote:
+> > >
+> > > Hello,
+> > >
+> > > I hit a reproducible use-after-free in the UDP tunnel NIC offload wor=
+k item.
+> > > The original local crash was reported by KFENCE as:
+> > >
+> > >   KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
+> > >
+> > > On current mainline, the C reproducer below triggers the same lifetim=
+e bug,
+> > > reported by KASAN before KFENCE samples the object:
+> > >
+> > >   BUG: KASAN: slab-use-after-free in __mutex_lock
+> > >   Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_work
+> > >
+> > > Tested kernel:
+> > >
+> > >   840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of git://git.linux-nfs.org=
+/projects/anna/linux-nfs")
+> > >   Linux 7.1.0-11240-g840ef6c78e6a #31 SMP PREEMPT_DYNAMIC
+> > >
+> >
+> >
+> > Thanks or the report.
+> >
+> > Can you test the following patch?
+> >
+> > diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
+> > index 9944ed923ddfd10f9adf6ad788c0740daeaf2adb..c5f8d2f9d325de8f4d2247d=
+daa52e33378851857
+> > 100644
+> > --- a/net/ipv4/udp_tunnel_nic.c
+> > +++ b/net/ipv4/udp_tunnel_nic.c
+> > @@ -304,8 +304,8 @@ udp_tunnel_nic_device_sync(struct net_device *dev,
+> > struct udp_tunnel_nic *utn)
+> >         if (!utn->need_sync)
+> >                 return;
+> >
+> > -       queue_work(udp_tunnel_nic_workqueue, &utn->work);
+> >         utn->work_pending =3D 1;
+> > +       queue_work(udp_tunnel_nic_workqueue, &utn->work);
+> >  }
+> >
+> >  static bool
+> > @@ -866,6 +866,11 @@ udp_tunnel_nic_unregister(struct net_device *dev,
+> > struct udp_tunnel_nic *utn)
+> >
+> >         udp_tunnel_nic_lock(dev);
+> >
+> > +       if (utn->work_pending) {
+> > +               udp_tunnel_nic_unlock(dev);
+> > +               return;
+> > +       }
+> > +
+> >         /* For a shared table remove this dev from the list of sharing =
+devices
+> >          * and if there are other devices just detach.
+> >          */
+> > @@ -901,12 +906,6 @@ udp_tunnel_nic_unregister(struct net_device *dev,
+> > struct udp_tunnel_nic *utn)
+> >         udp_tunnel_nic_flush(dev, utn);
+> >         udp_tunnel_nic_unlock(dev);
+> >
+> > -       /* Wait for the work to be done using the state, netdev core wi=
+ll
+> > -        * retry unregister until we give up our reference on this devi=
+ce.
+> > -        */
+> > -       if (utn->work_pending)
+> > -               return;
+> > -
+> >         udp_tunnel_nic_free(utn);
+> >  release_dev:
+> >         dev->udp_tunnel_nic =3D NULL;
+>
+> I tested the patch, but unfortunately the C reproducer still triggers the
+> same use-after-free for me.
+>
+> Tested on top of:
+>
+>   840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of
+> git://git.linux-nfs.org/projects/anna/linux-nfs")
+>
+> I booted the kernel with KASAN/KFENCE enabled and:
+>
+>   panic_on_warn=3D1 panic_on_oops=3D1 kfence.sample_interval=3D1
+>
+> Then I ran the same C reproducer:
+>
+>   timeout -k 10 360 /root/repro
+>
+> The VM panicked after about 236 seconds:
+>
+> [ 236.471119][ T58] BUG: KASAN: slab-use-after-free in
+> __mutex_lock+0x16d0/0x1d80
+> [ 236.473404][ T58] Read of size 8 at addr ff11000076a63ea8 by task
+> kworker/u16:3/58
+> [ 236.476455][ T58] Hardware name: QEMU Standard PC (i440FX + PIIX,
+> 1996), BIOS 1.15.0-1 04/01/2014
+> [ 236.476478][ T58] Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_=
+work
+> [ 236.476787][ T58] __mutex_lock+0x16d0/0x1d80
+> [ 236.477020][ T58] udp_tunnel_nic_device_sync_work+0x32/0x9c0
+> [ 236.477068][ T58] process_one_work+0x9de/0x1bf0
+>
+> The allocation/free stacks are still the same shape:
+> ```
+> Allocated by task 11563:
+> __kmalloc_noprof
+> udp_tunnel_nic_netdevice_event+0x12d8/0x1e80
+> register_netdevice
+> nsim_create
+> nsim_dev_reload_up
+> devlink_reload
+>
+> Freed by task 11609:
+> kfree
+> udp_tunnel_nic_netdevice_event+0xc26/0x1e80
+> unregister_netdevice_many_notify
+> nsim_destroy
+> nsim_dev_reload_down
+> devlink_reload
+>
+> Last potentially related work creation:
+> queue_work_on
+> __udp_tunnel_nic_del_port+0x2af/0x320
+> udp_tunnel_notify_del_rx_port
+> __geneve_sock_release.part.0
+> geneve_stop
+>
+> Second to last potentially related work creation:
+> queue_work_on
+> __udp_tunnel_nic_add_port+0x6ec/0xd70
+> udp_tunnel_notify_add_rx_port
+> geneve_open
+> ```
+>
+> My read of the patch is that it closes the small window where queue_work(=
+)
+> can publish the work before utn->work_pending is set, and it also prevent=
+s
+> udp_tunnel_nic_unregister() from flushing/freeing the object when
+> work_pending is already set.
+>
+> However, the test above suggests that work_pending still does not fully
+> protect the lifetime of struct udp_tunnel_nic. The crashing work was stil=
+l
+> queued through udp_tunnel_nic_device_sync() at line 308, so the patched p=
+ath
+> was exercised. One suspicious point is that udp_tunnel_nic_device_sync_wo=
+rk()
+> clears utn->work_pending at the beginning of the worker, while the same w=
+ork
+> item can still interact with replay/add/del-port state. The reproducer ca=
+n
+> still end up with udp_tunnel_nic_unregister() freeing utn while a
+> udp_tunnel_nic_device_sync_work item later runs and dereferences the free=
+d
+> utn->lock.
+>
+> So this patch does not seem to be sufficient for this reproducer.
+>
 
-The unicast caller tipc_link_proto_rcv() bounds it ("if (glen > dlen)
-break;"), but the broadcast caller tipc_bcast_sync_rcv() discards the
-returned size, so tipc_link_advance_transmq() copies the record off the
-receive skb with an attacker-controlled count:
+Oh well.
 
-	this_ga = kmemdup(ga, struct_size(ga, gacks, ga->bgack_cnt),
-			  GFP_ATOMIC);
+u8 need_sync:1;
+u8 need_replay:1;
+u8 work_pending:1;
 
-A TIPC neighbour that negotiated TIPC_GAP_ACK_BLOCK triggers it with one
-ordinary broadcast STATE_MSG (msg_bc_ack_invalid() clear), sized so its
-data area is short, carrying a Gap ACK record with len = 0x400,
-bgack_cnt = 0xff and ugack_cnt = 0. len then equals
-struct_size(p, gacks, 255), so the consistency check passes and ga is
-non-NULL; kmemdup() reads struct_size(ga, gacks, 255) = 1024 bytes out
-of the much smaller skb:
+These bitfields are not safe, obviously :/
 
-  BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x48/0x60
-  Read of size 1024 at addr ffff0000c7030d38 by task poc864/69
-  Call trace:
-   kmemdup_noprof+0x48/0x60
-   tipc_link_advance_transmq+0x86c/0xb80
-   tipc_link_bc_ack_rcv+0x19c/0x1e0
-   tipc_bcast_sync_rcv+0x1c4/0x2c4
-   tipc_rcv+0x85c/0x1340
-   tipc_l2_rcv_msg+0xac/0x104
-  The buggy address belongs to the object at ffff0000c7030d00
-   which belongs to the cache skbuff_small_head of size 704
-  The buggy address is located 56 bytes inside of
-   allocated 704-byte region [ffff0000c7030d00, ffff0000c7030fc0)
-
-The copied-out bytes are subsequently consumed as gap/ack values, but
-the read is already out of bounds at the kmemdup() regardless of how
-they are used.
-
-The unicast STATE path drops such a message: "if (glen > dlen) break;"
-skips the rest of STATE_MSG handling and the skb is freed. Make the
-broadcast path drop it too. tipc_bcast_sync_rcv() now bounds the record
-against msg_data_sz() and, when it does not fit, reports it back through
-tipc_node_bc_sync_rcv() to tipc_rcv() so the skb is discarded rather than
-processed. ga is not cleared on this path: ga == NULL already means
-"legacy peer without Selective ACK", a distinct legitimate state.
-
-Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
-Cc: stable@vger.kernel.org
-Assisted-by: Bynario AI
-Signed-off-by: Samuel Page <sam@bynar.io>
----
-v2, per review of v1 [1]:
- - v1 cleared 'ga' on an oversized Gap ACK record, which let the malformed
-   STATE message be processed as a legacy (no Selective ACK) one rather than
-   dropped.  v2 drops it instead, matching the unicast STATE path:
-   tipc_bcast_sync_rcv() reports the bad record through a bool output
-   parameter, propagated by tipc_node_bc_sync_rcv() to tipc_rcv(), which
-   discards the skb.
- - v1 touched only net/tipc/bcast.c; v2 also touches net/tipc/{bcast.h,node.c}.
-
-[1] https://lore.kernel.org/netdev/20260623134137.3641275-1-sam@bynar.io/
-
-For reference, an earlier thread proposed validating inside
-tipc_get_gap_ack_blks():
-  https://lore.kernel.org/netdev/1316452e465e9a96fce44ec15130a14f3872149f.1775809727.git.caoruide123@gmail.com/
-
- net/tipc/bcast.c | 22 ++++++++++++++--------
- net/tipc/bcast.h |  2 +-
- net/tipc/node.c  | 13 ++++++++++---
- 3 files changed, 25 insertions(+), 12 deletions(-)
-
-diff --git a/net/tipc/bcast.c b/net/tipc/bcast.c
-index 76a1585d3f6b..08637c3c9db0 100644
---- a/net/tipc/bcast.c
-+++ b/net/tipc/bcast.c
-@@ -497,11 +497,12 @@ void tipc_bcast_ack_rcv(struct net *net, struct tipc_link *l,
-  */
- int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
- 			struct tipc_msg *hdr,
--			struct sk_buff_head *retrq)
-+			struct sk_buff_head *retrq, bool *valid)
- {
- 	struct sk_buff_head *inputq = &tipc_bc_base(net)->inputq;
- 	struct tipc_gap_ack_blks *ga;
- 	struct sk_buff_head xmitq;
-+	u16 glen;
- 	int rc = 0;
- 
- 	__skb_queue_head_init(&xmitq);
-@@ -510,13 +511,18 @@ int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
- 	if (msg_type(hdr) != STATE_MSG) {
- 		tipc_link_bc_init_rcv(l, hdr);
- 	} else if (!msg_bc_ack_invalid(hdr)) {
--		tipc_get_gap_ack_blks(&ga, l, hdr, false);
--		if (!sysctl_tipc_bc_retruni)
--			retrq = &xmitq;
--		rc = tipc_link_bc_ack_rcv(l, msg_bcast_ack(hdr),
--					  msg_bc_gap(hdr), ga, &xmitq,
--					  retrq);
--		rc |= tipc_link_bc_sync_rcv(l, hdr, &xmitq);
-+		glen = tipc_get_gap_ack_blks(&ga, l, hdr, false);
-+		if (glen > msg_data_sz(hdr)) {
-+			/* Malformed Gap ACK blocks; caller drops the msg */
-+			*valid = false;
-+		} else {
-+			if (!sysctl_tipc_bc_retruni)
-+				retrq = &xmitq;
-+			rc = tipc_link_bc_ack_rcv(l, msg_bcast_ack(hdr),
-+						  msg_bc_gap(hdr), ga, &xmitq,
-+						  retrq);
-+			rc |= tipc_link_bc_sync_rcv(l, hdr, &xmitq);
-+		}
- 	}
- 	tipc_bcast_unlock(net);
- 
-diff --git a/net/tipc/bcast.h b/net/tipc/bcast.h
-index 2d9352dc7b0e..55d17b5413e1 100644
---- a/net/tipc/bcast.h
-+++ b/net/tipc/bcast.h
-@@ -97,7 +97,7 @@ void tipc_bcast_ack_rcv(struct net *net, struct tipc_link *l,
- 			struct tipc_msg *hdr);
- int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
- 			struct tipc_msg *hdr,
--			struct sk_buff_head *retrq);
-+			struct sk_buff_head *retrq, bool *valid);
- int tipc_nl_add_bc_link(struct net *net, struct tipc_nl_msg *msg,
- 			struct tipc_link *bcl);
- int tipc_nl_bc_link_set(struct net *net, struct nlattr *attrs[]);
-diff --git a/net/tipc/node.c b/net/tipc/node.c
-index 97aa970a0d83..2887f94ee28f 100644
---- a/net/tipc/node.c
-+++ b/net/tipc/node.c
-@@ -1831,12 +1831,13 @@ static void tipc_node_mcast_rcv(struct tipc_node *n)
- }
- 
- static void tipc_node_bc_sync_rcv(struct tipc_node *n, struct tipc_msg *hdr,
--				  int bearer_id, struct sk_buff_head *xmitq)
-+				  int bearer_id, struct sk_buff_head *xmitq,
-+				  bool *valid)
- {
- 	struct tipc_link *ucl;
- 	int rc;
- 
--	rc = tipc_bcast_sync_rcv(n->net, n->bc_entry.link, hdr, xmitq);
-+	rc = tipc_bcast_sync_rcv(n->net, n->bc_entry.link, hdr, xmitq, valid);
- 
- 	if (rc & TIPC_LINK_DOWN_EVT) {
- 		tipc_node_reset_links(n);
-@@ -2140,12 +2141,18 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
- 
- 	/* Ensure broadcast reception is in synch with peer's send state */
- 	if (unlikely(usr == LINK_PROTOCOL)) {
-+		bool valid = true;
-+
- 		if (unlikely(skb_linearize(skb))) {
- 			tipc_node_put(n);
- 			goto discard;
- 		}
- 		hdr = buf_msg(skb);
--		tipc_node_bc_sync_rcv(n, hdr, bearer_id, &xmitq);
-+		tipc_node_bc_sync_rcv(n, hdr, bearer_id, &xmitq, &valid);
-+		if (!valid) {
-+			tipc_node_put(n);
-+			goto discard;
-+		}
- 	} else if (unlikely(tipc_link_acked(n->bc_entry.link) != bc_ack)) {
- 		tipc_bcast_ack_rcv(net, n->bc_entry.link, hdr);
- 	}
-
-base-commit: a986fde914d88af47eb78fd29c5d1af7952c3500
--- 
-2.54.0
-
+Time to convert them to atomic bit operations.
 
