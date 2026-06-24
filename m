@@ -1,239 +1,320 @@
-Return-Path: <netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JhhIB43DO2rtcQgAu9opvQ
-	(envelope-from <netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:21 +0200
+	id cedQAazDO2oFcggAu9opvQ
+	(envelope-from <netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C4366BDC88
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 545216BDCAD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 13:46:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="JbEa/v98";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301619-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=TLNIv8rC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301620-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9564302E91C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:44:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6121C301A3A5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 11:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659A033A9FE;
-	Wed, 24 Jun 2026 11:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0533923815B;
+	Wed, 24 Jun 2026 11:45:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0445A2E7393
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 11:44:13 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782301455; cv=pass; b=kOrxdlFa49Y7phFS8TzpZcszeOsQPypF1Vrzdb3RgMfgp0JoiCkcg7Fzsz0woUOr6IUNrG2os2e8A0p838vLYDw7Ha/guNKMdUCZ5a9LpLb6wIRc+PIJIajF4icgFZTmfFkH0iOpKpen8AY64sceSaQkp6gbRV2uwWaTDeqd97o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782301455; c=relaxed/simple;
-	bh=HPhL8+5/p/3nQJ2JE7IFtOQzfkid4Dt9nhNzaNvAvHU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e67ahLuiU9iAg/lmlPXaIoU0LGh7msbZYjqHaP4DbBB3tuP7TVDEjimmTk7AUO7EH+jqJr2FKZnMMhtw0Eg/bgPW30Ut8JsEPoLnYBjwwSeVNPv0qQGb1QiWDeJjE/Jc80a0n6lt7o5mXIStH4es8lYhdi5vstQa2rFTtaWMJEY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JbEa/v98; arc=pass smtp.client-ip=209.85.160.169
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-51788280e71so9703441cf.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 04:44:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782301453; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DGsaFfaMqG0qlEMQImT2Yrv4ZtyuaoSCHDMz2xR/GVvjJZ3GuZ+yVtYsR1flx4Qzyp
-         K1xBNylcQ0+6kHqihcnWwrZTfSy1I0w672GXkFgZls84Xm6ka5LRgAk+PAHBzxE0V9b6
-         YHJj4JNMQ+RnDfPAYkammQVFovIdqSuBXXvM/SOLFRr2pvQDqfWOqz1DWe6qGIM8ixZa
-         acQxEmHe4sjJtTo35aVWqQWML90ECWiY8Ukopeoc8x72wXqxLBbcGp/ipyk4Fl4xE8sy
-         4HXS7pxQCz6A0sqNZW8/Wt8TXogJcxV6ihNFGI947GN4vvNKMyI6iuqWDNCvlMsbBi2c
-         Ku7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=SYKIW7EuCluCK1+AMpF6IlhuvP6pgcSAPlY8DCxfyjU=;
-        fh=gk6wb7ylpy+UJ+qhdcuKMUT++M73CFfoAVHfzNKhgDE=;
-        b=jAalKwP5ftJ9NzUKSaGZgmgnXwYhPxFIEBN+Qil5iIJ2k2+MLJ2HhDVGZ9L4v4mVdN
-         xq1HjaxtfcoZllVKkvCB5D8CJLCrco+IVUGnPNF3pAKFda00eowgbPj9k3j2a7Q3rtvQ
-         6wyjTuWm1M60Q106Jo9zqfYU9VVFm4ei7WqwStjcYC4wi1v55PN1NY+GpRy4jwsCLFK4
-         AxSp2qkfzGKgMsuf0Qjzp7RPSisPw8CziFDRzB4aYKF2BOtzWaa4rfhYjRoFu1gTvZNn
-         QmBkqGh/aX29w5yvabD9rS2E9PX32foeKRWnIJkkrpRv4Lv+0R+V0vnGPiQl65eAbuqn
-         k8zw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DFF276028
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 11:45:12 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782301513; cv=none; b=rrcEI4Hf1CPqqbIoNd+YIu9XAO60JE2/yDdMoYyAHiABFNw+OGeXICpXk6aRqwj1QrVVFqTdpqZpqfzSE8YMN/iv2c6C9UUX43jpz3QGhZ8tAaAThk9bpH/7e/L6LRpOcFmlEbSbvO3XMHZT9cj6MZwQM8B2ZrzGToRUdJdCy0I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782301513; c=relaxed/simple;
+	bh=H0MRJG2B1K/Bvnq9zsM3jp2THI6jTdOIvZbAQF4IfXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kdi/NJN6JS+SOa6rkCNtmQubYERZsu+zNnE2aH4GLr5ZICRVEn+bPhRgWw5Hmm40DvVbDn1mWuxs1U2hDLU45COD1DCkX6kefzGhtlHDHeFFVJzjTCIVPVThsJFinZEIWRxrWKL6hNHdgtgeIPr3LWCgDQZMRt+c9vgG+mUUSR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TLNIv8rC; arc=none smtp.client-ip=209.85.128.54
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4923fb1f095so9440975e9.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 04:45:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782301453; x=1782906253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SYKIW7EuCluCK1+AMpF6IlhuvP6pgcSAPlY8DCxfyjU=;
-        b=JbEa/v98yd3vkFsanNl2tqEzFqFYj2K+b1f/mh9QPLAltF2zPDim5XA0sDiE4rHeOb
-         5FIiT2dOc4r0Oi3IepzjHKiDJZGC9J/uChOtKmOmkZ+SnbouLshRwvF+wY20NeHFT+Fp
-         0pDA6bXixD2KhDEoPYxAkNEkLS/Zduy0u+3rwqJLrjIOJdC5oqxhT4Miw/W6A+wG80KR
-         /zTDz44VHr4meTNe5pqvi51ElwRFD3Zw1WnNd0bVds4vJql+oUpieYqfLbIrKkSZq7V9
-         JeyURnOVzgGL4FD294fKC/wRLxRtEaXM3sUf8vsU9qhWqCgqmS6+FAwZZwHyeECcUwPn
-         SPiw==
+        d=gmail.com; s=20251104; t=1782301511; x=1782906311; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eDHdE2/Ft54Y11URM0gtdL1NQZS1frqRaxNwltOdGA0=;
+        b=TLNIv8rCVLkYh+LyX0Ix7lUnkuVLsy1hJMyWWMgnbfdaig4Zc4iTEdlvN9fMDYc74y
+         rC93pcEeh+ZwKCYTqrUR9tq8WDoNAHb47TJhHbeVi3nb8FHfJIvIjBGA4UGcAttZnhIL
+         so9A0HPk16ttKoLS+t/i9BHdscAVBqT6/lB6kJhDXtnb4q+h9ISL+ma5yJOKbNSfA/VZ
+         9dSZrieI8GcoZkEM89x7xIZWAdW0iiOgnAIxKcosB+tciKSGFZU1ufZA4q33LxbUlbio
+         0nPj5eK6fFkfoRYDMP3WxJw9a1BlfRWtXwYuIvEpSuw0DxjNCFtYBnW5+o50bi8gocTz
+         q33g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782301453; x=1782906253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SYKIW7EuCluCK1+AMpF6IlhuvP6pgcSAPlY8DCxfyjU=;
-        b=qRL2K33E/JKjQ3KE/NBfewzBwDdDZOfBZdZKVSwMRE/6qOHFlG705rlZ4JAvwJvJvB
-         9bGRlMV9sAhmRSc55T7DjMpdME4K8aqn4eOgDV6ql4ylcAUXIpleFWyKzhQ8ALTp8AwL
-         /QOANxXQ2nCLNCWKoSid37qZqfE19fN9H64a1flanJUlHKHiJvrZEZuSvnUG0vg9/Rwn
-         8Xp2/k0VOYww5dyyCUFj55tRKmpA1pQogGB1rPX8NhY3HF1i2cPFOODvrEfpJC6ZXeo7
-         dcHwhmGFBNk0NlJQR46q1S4uhyKul84vlDQSD7HNGyMYB4wJ2S/z1VvmyYr3J29QKwcr
-         GB5g==
-X-Forwarded-Encrypted: i=1; AFNElJ/izcfpWV/LH8fxo9ts0WITwWpav+WTX6xudHMLKupcJQxSSdig5H3YlwyD0TVn+PLWp6GZOLU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw452Tts01ECybHtLFGyW7RLcXe4FBJX9WnXg71UF8QfVP9Ukzl
-	C+oZ+Han0rnDr3N1UW1WtDHHGliVqz3Ooj1MN3ZBr8wMBSEW45plSIyQeY3tMI3FNPVbdPPWpzf
-	PX9B2mYLKRH7pcpiPuAq+xs1sfZsYM8LsSDS8nHGp
-X-Gm-Gg: AfdE7cnkNJh0+CadlsfevdCJ38uOE+EibXf+rAWTnfpRoJ/u1Rbmo5kYVvTZHa96UXl
-	i3AF9v/CeiFSeW1vx21BTqoEsa0+0EHeUbaTWV+cOFgkqW92fwpfPG34QoNYuWj2e17SGkQUrcO
-	dGZwWHJOGf+ViwRJhvLUm4pqFULAn5mpsW2XYe3eP+4ZQ5Rrx5W6vkq2ijtlQhWs8CGFZtea9bO
-	58eYfbxfH7ym/3oeBw27ogyuWHVAbbJiorNTcNbXFa2xhdYg8Jf9OKGUujW9C2HmEWiz9HQMcl3
-	hITti0U1x+9ecOOyeP02t3jbKy+GmeHRFXdGKB1ve0E9Ocgv0kEj8MKewU8PoieQEuDgu+SFv7X
-	CYJyNAMWmqQ==
-X-Received: by 2002:a05:622a:1f0c:b0:517:2a27:bc84 with SMTP id
- d75a77b69052e-51a0698442dmr272402721cf.35.1782301452352; Wed, 24 Jun 2026
- 04:44:12 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782301511; x=1782906311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eDHdE2/Ft54Y11URM0gtdL1NQZS1frqRaxNwltOdGA0=;
+        b=htsI3LuQVtdnwwULxdYy9KXpfx5IiZFJCdeFkdlKV4+nfJqO9l87s/8u5Jz5EjAEhQ
+         scuYv1M1Mq6cXUptlbFY8ZRtv0XyVs+jOfszZYTb2+dR1Nc8RNr6PApn+DBMeMxgiA7f
+         l/7yAF+ctguGSNNsbOgvpMEKP3VCaouoBeirl89iC9vpLmTaBPr5UT7l7/DDy9NDqW6u
+         8zlX/e3FTaG4A2grL4BQKnLMLkcSYrmmCMAVXs9Qbfp8pyduwZEbjl+bW9++A1uH1dq1
+         FvCzQT6S0D0b5cXoGmU5iHpzfRBXBMouDv0EmL/MlBRPn6ze9QRWhR2f7e7owmQ76fvY
+         pkGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/6Lbqrdzv9l70VvpwOHxi1IDVBgd0i4rh+8WqpSX5PRZzJqQ1uBs5fS2lt5cwdI540WCv1XGs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgyFODISAtgme/PgeurWgkA96MghV/MYF039sO8wdI7MDItLuC
+	Rxf4P7ZIH8D6PBsbL4vR8BXiv/A8RbYe2HPPuoV5oVkxES5xyHxSCKpM
+X-Gm-Gg: AfdE7cnt+Y73Fmf3kg9PNNlnWunSmG7vADZazx7ah+YimZ0JmBI69ntOoTT3dqPdTut
+	Ri8lpm2oIYg4C/hcTB0KDv2uWAdQJtvqSnyqD0GdMCdG6sKOgHA4xqi3mKMnqip1A3L/Q71pxHt
+	0/7Fczs8/N+4wxFfrflKBCU+VjKOvT5BdYQeFxOxuCkKL555lhCU9BSFfpV3wutaiQNerdKy6RR
+	OLUDz7Lqt1dpWsIKqiY+3KrFZjvwrT4+uKy8kh9tHOQDcwohZsVYUvIA1mfGQMd8GSfuX7IOLla
+	OttXHT2YraU2BhNwbPRxNyhEXhUzCbaWSKOxivnZF5C2UmPcm5bIL6Fcr5wHQqhBeQp1Ua/547B
+	IuuhV9CB7cKg5YY/SpzyotpJ+BmoQsUxvFG4atn8OBZhZa4pAvvidJ3I6hBIXJYsvdvaPEUSInD
+	vGHvTJxPRRcQIV4twAIKXWOyTbWy/Ftiko1frQgfTirGLu
+X-Received: by 2002:a05:600c:1d0a:b0:492:409d:b7c3 with SMTP id 5b1f17b1804b1-4925b359fc2mr103143745e9.13.1782301510374;
+        Wed, 24 Jun 2026 04:45:10 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c225b2988sm5854285f8f.25.2026.06.24.04.45.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 04:45:09 -0700 (PDT)
+Date: Wed, 24 Jun 2026 13:45:08 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Emil Tsalapatis <emil@etsalapatis.com>
+Cc: bpf@vger.kernel.org, andrii@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, edumazet@google.com, john.fastabend@gmail.com,
+	jordan@jrife.io, kuba@kernel.org, martin.lau@linux.dev,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com, yonghong.song@linux.dev
+Subject: Re: [PATCH bpf-next v8 3/7] bpf: add bpf_icmp_send kfunc
+Message-ID: <ajvDRCw8cPqXAqQq@gmail.com>
+References: <20260622120515.137082-1-mahe.tardy@gmail.com>
+ <20260622120515.137082-4-mahe.tardy@gmail.com>
+ <DJGWWQQD3B0P.2O1D9MO17YRK4@etsalapatis.com>
+ <ajuqZMzqACLOijoC@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624073209.3703492-1-edumazet@google.com> <95a719af-c9d3-4bce-995b-c6ffce15739c@linux.dev>
-In-Reply-To: <95a719af-c9d3-4bce-995b-c6ffce15739c@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jun 2026 04:44:01 -0700
-X-Gm-Features: AVVi8CeZ4KK3I6lMHwi0QawrfMceBnOvbtvE1qZea2Ud9O4YloTsFaOnAnhnmFM
-Message-ID: <CANn89i+XuH6_B9QYjT5F7+9gkwV=PMy-qWsFskZfekDRG4ak4w@mail.gmail.com>
-Subject: Re: [PATCH net] net: clear transport header during tunnel decapsulation
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ajuqZMzqACLOijoC@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301619-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301620-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,nvidia.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:emil@etsalapatis.com,m:bpf@vger.kernel.org,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:jordan@jrife.io,m:kuba@kernel.org,m:martin.lau@linux.dev,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:pabeni@redhat.com,m:yonghong.song@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,google.com,gmail.com,jrife.io,linux.dev,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev,d5d0d598a4cfdfafdc3b];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,appspotmail.com:email,linux.dev:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7C4366BDC88
+X-Rspamd-Queue-Id: 545216BDCAD
 
-On Wed, Jun 24, 2026 at 3:41=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
->
-> On 6/24/26 3:32 PM, Eric Dumazet wrote:
-> > Syzbot triggered a DEBUG_NET_WARN_ON_ONCE(len > INT_MAX) assertion in
-> > pskb_may_pull_reason() called from qdisc_pkt_len_segs_init().
-> >
-> > The root cause is a stale, negative transport header offset carried ove=
-r
-> > during tunnel decapsulation. When a tunnel receiver (e.g., VXLAN or Gen=
-eve)
-> > decapsulates a packet, it pulls the outer headers but leaves the transp=
-ort
-> > header pointing to the outer UDP header. This offset becomes negative
-> > relative to the new skb->data (inner IP header).
-> >
-> > If the packet bypasses GRO (e.g., an untrusted GSO packet flagged as
-> > "unexpected GSO" by udp_unexpected_gso() due to missing tunnel GSO bits=
-),
-> > it is flushed directly to the stack as GRO_NORMAL. On ingress, Layer 2 =
-Qdisc
-> > processing (sch_handle_ingress) happens before Layer 3 IP reception
-> > (ip_rcv_core) can run and reset the transport header. Consequently,
-> > qdisc_pkt_len_segs_init() attempts to validate the transport header usi=
-ng
-> > pskb_may_pull(skb, hdr_len + sizeof(tcphdr)). The negative hdr_len over=
-flows
-> > the unsigned cast in pskb_may_pull(), triggering the assertion.
-> >
-> > Fix this by clearing the transport header to the ~0U sentinel value dur=
-ing
-> > decapsulation. This ensures that:
-> > 1) The ingress Qdisc safely skips validation via !skb_transport_header_=
-was_set()
-> >     and returns early without warning.
-> > 2) The IP layer (ip_rcv_core) later correctly resets the transport head=
-er
-> >     to the inner L4 header offset.
-> >
-> > Introduce skb_unset_transport_header() helper and apply it in the main
-> > decapsulation paths:
-> > 1) __iptunnel_pull_header() (covering Geneve, GRE, IPIP, SIT, etc.)
-> > 2) vxlan_rcv() (covering VXLAN)
-> >
-> > This restores skb invariants at the decapsulation boundary without addi=
-ng
-> > overhead to the Qdisc fast path.
-> >
-> > Fixes: 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
-> > Reported-by: syzbot+d5d0d598a4cfdfafdc3b@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/netdev/6a3b853b.52ae72c2.136ac7.000c.GA=
-E@google.com/T/#u
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Assisted-by: Gemini:gemini-3.1-pro
->
->
-> I think a negative skb_transport_offset() should break something else too=
-,
-> so the Fixes tag looks wrong, but I couldn't find any actual breakage
-> (luck, or I'm missing it).
+On Wed, Jun 24, 2026 at 11:59:00AM +0200, Mahe Tardy wrote:
+> On Tue, Jun 23, 2026 at 10:09:20PM -0400, Emil Tsalapatis wrote:
+> > On Mon Jun 22, 2026 at 8:05 AM EDT, Mahe Tardy wrote:
+> 
+> [...]
+> 
+> > > +#if IS_ENABLED(CONFIG_IPV6)
+> > > +	case htons(ETH_P_IPV6):
+> > > +		if (type != ICMPV6_DEST_UNREACH)
+> > > +			return -EOPNOTSUPP;
+> > > +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
+> > > +			return -EINVAL;
+> > > +
+> > > +		nskb = skb_clone(skb, GFP_ATOMIC);
+> > > +		if (!nskb)
+> > > +			return -ENOMEM;
+> > > +
+> > > +		if (!pskb_network_may_pull(nskb, sizeof(struct ipv6hdr))) {
+> > 
+> > Minor nit, but this may also fail with SKB_DROP_REASON_NOMEM. Now this is only
+> > possible if the IP header is not in the linear space which may well be
+> > impossible (?), but do we want to differentiate with
+> > pskb_network_may_pull_reason()?
+> 
+> Indeed, I think for the IP header is should be fine, but I replaced it
+> with the reason variant. Thanks!
+>  
+> > > +			kfree_skb(nskb);
+> > > +			return -EBADMSG;
+> > > +		}
+> > > +
+> 
+> [...]
+> 
+> > >  static int __init bpf_kfunc_init(void)
+> > >  {
+> > >  	int ret;
+> > > @@ -12639,6 +12745,9 @@ static int __init bpf_kfunc_init(void)
+> > >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+> > >  					       &bpf_kfunc_set_sock_addr);
+> > >  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> > > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
+> > > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
+> > > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
+> > 
+> > Based on Sashiko's feedback, since we mostly care about cgroup_skb
+> > should we just make it exclusive to them and drop CLS_ACT?
+> 
+> This would indeed simplify this patchset, I could drop most of the
+> complication induced by tc ingress routing. But I think having both
+> cgroup_skb and tc support would be nice as a first implem. I'll try
+> again in a new version as I added a test for ingress tc and could
+> actually fix the routing based on sashiko's feedback (this also drop the
+> first two patches that were partially wrong).
 
-Read again the changelog: transport header is set (in ingress) a bit
-later in the stack.
+tl;dr: I'll remove the tc support as it feels difficult (impossible
+without major plumbing changes?) to get right.
 
-Nothing needs it before, but  qdisc_pkt_len_segs_init() if/when it is
-called in ingress.
+Here are the details:
 
->
-> Hope sashiko read this reply and confirm it....
+Initially I ended up removing the first two patch set as they were
+technically wrong (see explanations after), I added this small helper:
 
-On older kernels (before  7fb4c1967011 ("net: pull headers in
-qdisc_pkt_len_segs_init()"),
-the bug is completely latent and harmless.
+	#if IS_ENABLED(CONFIG_INET) || IS_ENABLED(CONFIG_IPV6)
+	static bool skb_dst_validate_and_hold(struct sk_buff *skb)
+	{
+	       bool ret;
 
-This prevents unnecessary backporting churn and potential merge conflicts o=
-n
-very old kernels where skb_unset_transport_header() doesn't exist.
+	       rcu_read_lock();
+	       ret = skb_valid_dst(skb) && skb_dst_force(skb);
+	       rcu_read_unlock();
 
-The Historical Option (a6d5bbf34efa / d342894c5d28):
+	       return ret;
+	}
+	#endif
 
-If we point to the original commits that introduced the tunnels,
-we are historically accurate, but we risk stable scripts trying to
-backport this fix all the way back to 2012/2016
-(e.g. kernel 3.7 or 4.6), which is unnecessary and highly likely to
-fail to apply.
+And then the body of the kfunc would do something like this (instead of
+calling the removed helpers):
+
+	reason = pskb_network_may_pull_reason(nskb, sizeof(struct iphdr));
+	if (reason) {
+		kfree_skb_reason(nskb, reason);
+		return -EBADMSG;
+	}
+
+	memset(IPCB(nskb), 0, sizeof(struct inet_skb_parm));
+	IPCB(nskb)->iif = nskb->skb_iif;
+
+	if (!skb_dst_validate_and_hold(nskb)) {
+		if (!nskb->dev) {
+			kfree_skb(nskb);
+			return -ENODEV;
+		}
+
+		iph = ip_hdr(nskb);
+		reason = ip_route_input(nskb, iph->daddr, iph->saddr,
+					ip4h_dscp(iph), nskb->dev);
+		if (reason) {
+			kfree_skb_reason(nskb, reason);
+			return -EHOSTUNREACH;
+		}
+	}
+
+	icmp_send(nskb, type, code, 0);
+
+Then I added a tc ingress test to showcase the issue with the previous
+helpers and trigger the routing in the kfunc, with this steup:
+
+	  client ns:                    test ns:
+	  icmp_peer                     ns_icmp_send_unreach_route_ingress
+	+------------+                +-------------------------+
+	| icmp_cli   |                | icmp_srv                |
+	| 198.18.0.1 |--------------->| primary:   198.18.0.254 |
+	+------------+ TCP SYN        | local dst: 198.18.0.2   |
+		       dst=198.18.0.2 +-------------------------+
+					  | tc ingress BPF
+					  | calls bpf_icmp_send()
+					  | -> icmp src=198.18.0.2
+					  v
+
+With the previous helpers, the icmp would route by reverting the daddr
+immediately, and then asking for the route. Thus we would "forget" about
+the actual source address, and in this case we would end up with the
+icmp control message src IP being the primary address and not the one we
+wanted: 198.18.9.2. Turns out route input was sufficient to give the
+needed _correct_ information to icmp_send that would invert the address
+for us and route the packet again.
+
+Then I submitted that for more review by sashiko and it found this new
+thing (which is orthogonal to the previous issue):
+
+	> @@ -12639,6 +12788,9 @@ static int __init bpf_kfunc_init(void)
+	>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+	>  					       &bpf_kfunc_set_sock_addr);
+	>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+	> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SKB, &bpf_kfunc_set_icmp_send);
+	> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_icmp_send);
+	> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &bpf_kfunc_set_icmp_send);
+
+	Can exposing net/core/filter.c:bpf_icmp_send() to sched_cls and sched_act
+	deadlock a non-lockless qdisc?
+
+	A cls_bpf program can run from a qdisc enqueue classifier while the qdisc
+	root lock is held.  If it calls bpf_icmp_send(), the kfunc synchronously
+	goes through icmp_send()/icmpv6_send() and then normal transmit.  If the
+	reply routes back through the same qdisc, the inner transmit can try to take
+	the same root lock again.
+
+	One possible path is:
+
+	__dev_xmit_skb()
+	  q->enqueue()
+	  prio_enqueue()
+	  tcf_classify()
+	  cls_bpf_classify()
+	  bpf_icmp_send()
+	  icmp_send()/icmpv6_send()
+	  dev_queue_xmit()
+	  __dev_xmit_skb()
+
+	Is this kfunc safe in enqueue classifier/action contexts, or should this
+	registration be limited to contexts that cannot run under the qdisc root
+	lock?
+
+I managed to indeed reproduce this deadlock. So I think there's no way
+to implement this safely, we would either need:
+- make the kfunc only available to tcx only (and then prevent program
+  verified as TCX from being reused as legacy qdisc classifiers...)
+- do some crazy runtime guard, exposing the lock.
+
+So I will give up on tc support for now as it's more difficult than
+expected.
+
+> 
+> > >  	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, &bpf_kfunc_set_sock_ops);
+> > >  }
+> > >  late_initcall(bpf_kfunc_init);
+> > > --
+> > > 2.34.1
+> > 
 
