@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-301538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301539-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wT/oOMJJO2pgVggAu9opvQ
-	(envelope-from <netdev+bounces-301538-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 05:06:42 +0200
+	id qHeABQFKO2pyVggAu9opvQ
+	(envelope-from <netdev+bounces-301539-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 05:07:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4FC6BB060
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 05:06:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D926BB071
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 05:07:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=nBfjOHuc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301538-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301538-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=VJkZz3wk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301539-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301539-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65CDD302659F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 03:05:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66C2330CD0EC
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 03:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB240304976;
-	Wed, 24 Jun 2026 03:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FFD30566A;
+	Wed, 24 Jun 2026 03:06:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3053019D6
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 03:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9F23019D6
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 03:06:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782270354; cv=none; b=fk8n+fnFmNAgkbBDH+85oLfOu43O/qNg1TKo8DYsTSMwQMPUJ5JVLPlVgm7xuTmt5ryfpQMia/OKUOwGKm28XrKWF+kssF2UNW2Al+LAkv6r3YqjYU/6muDTMakYL5S9W5t9nIso5hVXfiWZWED6fJJKeHIN/7xA+ss7spICyRQ=
+	t=1782270363; cv=none; b=YQoCYgPAty2aEa2tGGXirK+q5PcoQ2I3Q2IMAOlBbAu8XZxMiiTLMhhsyPkb0kGVcad4Kad6rzQLWl+LoOBynJXjoXz3XJsg48PYsDxVukRd87cKd1KEAmn7NyBRRB1G73IvfjbWsvnSDxCEpxhY57rkyN/iBfkbEMkc4h9QhPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782270354; c=relaxed/simple;
-	bh=NpvB0xE2j36NNxyMfJhegkMSNr0LsOJXaLeixwDqxBE=;
+	s=arc-20240116; t=1782270363; c=relaxed/simple;
+	bh=TjVPCx6BVY0JzHDD6qXkRdiB19ETycmEaeTFJ/wPv5I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Eg3B6Xp8l18QGsUilraAUmRTxYWsY5FpMA09m9YSYV9Dim8zvcHJ0cdYPHzlzXzESenpnh0ZGS5tL1Oo3guLnHKFO6afCb8/U9QlfmjxvV0POZlzjZiG8U7HpV8UoiWiAcNDrp+T56P74TUvQMvLHYQ0KsU7jMTG3kZwr2r402c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nBfjOHuc; arc=none smtp.client-ip=209.85.214.171
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2bf22d29dabso2358585ad.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 20:05:52 -0700 (PDT)
+	 MIME-Version:Content-Type; b=qAIKXNLo8jVKDvESBTBOV7a8Gimx9OkFPUeDX98VEUj9UHfP2+JTT3IxXgjbA+FqC7l5NCnZKvPc+Zp4LbfEVZ5vcFziCHSwuNd2U5r/+pq7pmTXpoaxQY7MuV//BIaj67iwwUnzvUkV0DNDBdjRYekUUM+YQtt56LCtz9jGdtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VJkZz3wk; arc=none smtp.client-ip=209.85.214.179
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2c168baac83so2104215ad.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jun 2026 20:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782270352; x=1782875152; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782270361; x=1782875161; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aVW7tbBHcxzzBSSvPPgmKKf7XnAZKbMzn5qxfIOF5wA=;
-        b=nBfjOHucpVThVYT7fXBYG1ZRewFVvXJ9G/Bkb0pO+ltJ2tBRrVhdNwWagc4LFtKY1m
-         A7igtyxytxf9fL47EohoNzPzUHXH5y4CD7MJ0/phTdFoi2d21KxmZbSV2BIUu8GMker4
-         Y8le/aRpyuEiGXkOYzbvHIyyWX2yvbDyQ8CNDEQNGnY7/unhN+ggez3R9Vg9/CTPeIr1
-         0PFTfRoVapmPgKmC+K94k3a+P/piNciWxEtx9AqeZcW7ypeppApBvUwJsgShHrjkLFYI
-         mPge59q9GfgirlypSDkUgv1g5Dk+GHUvx+7avyd1xoa+kka2SvderqABreA5qWLPOxby
-         XntQ==
+        bh=aLXP2Bo7LMERVfH5vttQtBbuvmboIZR9vfAdIu9vkNY=;
+        b=VJkZz3wkMlEd9e5ixvBfbacilei11zlN/mf9e5cEX22cZb4LhTVWCwFoQ8BNCblmUR
+         dnaUp4d48+mLez8gPIVhlbytXtViWm/V66XJR95336wtOS+umyJDlTJ27XOFhy3POagi
+         y4focMu8dXUcyYiA2fqo/ju8A3PqBDNX6Mnay0/VNNZNOUReoYmKpKi3uHfv5tMpRU1E
+         cVuXImwZ4SyOhPWx2q1KkwayB5adpuweG7kCN+zwAth9gGIwAVupXgLrH0kbkbYCxltT
+         d+g3O+cL826Xa/vAO5cMuyr3M1Qa6TXmxZRBqSz4we/d6P5si+d1FWG7sGprtPVL3WCw
+         THPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782270352; x=1782875152;
+        d=1e100.net; s=20251104; t=1782270361; x=1782875161;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=aVW7tbBHcxzzBSSvPPgmKKf7XnAZKbMzn5qxfIOF5wA=;
-        b=dOzItg7wHPURHDEBA3QDN/kNqV7X9mQWLOG/gRzL5FBOI4yafQ/tWLvohDCid6rRJk
-         uRWVhUJFo5COgZp2Wr1QyLdNKgo6GsBGswC+cUVIz8xdqV+2gjzINgFzhkAleBUxGgsu
-         h5VRhewIYqaSVAakl0jYaZ8xFUr1pRqY3TAiXbZfc6dtxpMmrCxlHdXt/oKOiPmGeGUC
-         xsv8qgbjdwqNgXdkiUm19LCHkwoRvyLhqVNUs3Kw/kKcawt10cTQnt6+QZj5RVKzGoF+
-         N9PXKIf4OsVgjEID5I/JhuvL4Dfk4mw5g8wL+eW3xUs+X9ihZvWUY+PB8IEtQ6rxMXQz
-         d3zQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpzqWR7p8oidMQmqZcHP8Gz98gfI6Ch7eNIRRzBYYLXXzEULE/vswC01u7XaPnd4fKHHe5slZo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfInXgLw+OYhZFruvZD75vUd2XZTvIDUtoi7/vL3Q/EwOwWjnc
-	nFCjBU6GgfWZmUw63JgXr6spR5/Rh5bwfyF7ONXGyF9KZqHCdrBeBxz+sGisdIrW
-X-Gm-Gg: AfdE7cmyPjU4bHdqlADRf83sc5HWSnVUF7tvDUcrOwxvY8ibG8bS+oZLTRqJMaCxxPj
-	BmAn+sjI6vUpGIeW+qofzagQqOLpE2XZBaEbYv5SyCHBHqB7bk2+oyR9+FtMkyHgim4rdRY0jP3
-	FiOMs38bU7XOyMWaRaJQMxYlZ41OEb7KM9wSqjzes05LVkj1W2wp8graL0mNbZp7jyPQ4yH6zcG
-	SraxogsFgOzVjkWfUjfIffPoq4Sgmw2986NNr9Hvy+xQutq/AydmMqAW5uL/VOD0Fg22ZweaeyY
-	eQnq0XgDRTiXZ4Xi+zcCElMYPOMvsI/8YEeNgHjrtEBvGBhqeXiPDdYjX5Ot6XDU3bfmuHiE+EY
-	hVv9SIsSVmsfYac+EOcubzERNgqFwnrwqUAzcLXwBK+bganTeXiGHc3oWcL1Oy1uAOH1YVkksKO
-	4QKRPk8mmANnsRJz9bAS9umenByvF6q78SqHixa/LYYk/f8yIlmP9aUqHzldn8
-X-Received: by 2002:a17:902:ef03:b0:2c0:c2c7:58ad with SMTP id d9443c01a7336-2c7425d524fmr177293425ad.13.1782270352115;
-        Tue, 23 Jun 2026 20:05:52 -0700 (PDT)
+        bh=aLXP2Bo7LMERVfH5vttQtBbuvmboIZR9vfAdIu9vkNY=;
+        b=KegqgydPPS94hHEzMOoHT9qgAeGhv19a2B3h0GY7luuZ816+wpaJ6sRTixKeUvzVhK
+         tUJoO9z+7CEDqCxlWtz3PihHUxgltcpBFuew4ll+VvsWFT0VEqvfqwq9usVZ6qfhNxeD
+         Jfh+pm6CglRoXWQQnZ0zZT36MVc+7sK+EAPp2vVhzM+tT0RpMSgsHc2JUPHLyn7ZhjlY
+         5CSthZLtdSprgH4KD3btqu8q6GV8e94C69xNa3xcl9dgr+9OdXByqSgHL05roHxiLy3B
+         JZucOEM+MEwfwzQ9k6fQl+hLvv705xQG6zb22w/buL4EgtWb/gaN7YPuan8GfVTBXWTc
+         UAtw==
+X-Forwarded-Encrypted: i=1; AHgh+RoXo6ACta0vQ5WHS/Y3MIDF3PKAYg53XqawRBACUiz1p6tkc8jjn9DSqg1x64r0N++BHvpamF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuosIX1I9TyjAFooOiRel4Q0tfW8wO/iae7gRGCWnlcwigPjrt
+	ThA/RIz/NIyXZeo7yOrno2rXBnj0bLLjt28G9drS42v4jWByzHGo63Fk
+X-Gm-Gg: AfdE7cnnZf9poexopyqnJqcy6akkV3n9xY5HCUOzx2rbq+Y+oTk0+eR4eVNfxUiOKc5
+	3LQUCyvUTzqPkYHf9ANkMCHx/K0IKADzQIraxOFXLRbxLzwbCKT0i6NoqlrLAPb/LBzh+tnSnvC
+	G45PYtw7phUIG2UgvxdY8zP3TYbzJ6Djm+ZAjasRKDQEYfQxfIbRPrdUUCSG5+fu6g9SJp1zNSa
+	phKwtnFwzn1Z0w+rYNN7Y6BjWgie/QkYHGovZ+lu2iQlKDvgoYXD1KWOU0kfdlS6I+uOypWNKqP
+	Yf76q6K/SFIO/eNnYpEV6aDPdFhM6JOsyEKTGqUqw1omfZeso03QkdIfhC8knrzXoBsytOpufPl
+	3ULHfGjhOvhWRHcssuio1Pi0zKocSM05ECstysf5ZBzk+D9wxVHlTQIgy0xtDgorYNui5QnaeZ/
+	MTrEwFYTX19Wpn1fnocQrM7zU/K2oshmYF2GAU8lBjdyMrQ2KQ7P+lKdKQXMW2
+X-Received: by 2002:a17:902:e5ca:b0:2c2:75c4:4b0f with SMTP id d9443c01a7336-2c7e13bbc21mr16165635ad.2.1782270361332;
+        Tue, 23 Jun 2026 20:06:01 -0700 (PDT)
 Received: from r912.tailbb6e1e.ts.net ([182.70.116.80])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7436d6c16sm122243995ad.23.2026.06.23.20.05.43
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7436d6c16sm122243995ad.23.2026.06.23.20.05.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 20:05:51 -0700 (PDT)
+        Tue, 23 Jun 2026 20:06:00 -0700 (PDT)
 From: Avinash Duduskar <avinash.duduskar@gmail.com>
 To: ast@kernel.org,
 	daniel@iogearbox.net,
@@ -109,9 +109,9 @@ Cc: eddyz87@gmail.com,
 	linux-kselftest@vger.kernel.org,
 	toke@redhat.com,
 	dsahern@kernel.org
-Subject: [PATCH bpf-next v5 1/3] bpf: Add BPF_FIB_LOOKUP_VLAN flag to bpf_fib_lookup() helper
-Date: Wed, 24 Jun 2026 08:35:28 +0530
-Message-ID: <20260624030530.3342884-2-avinash.duduskar@gmail.com>
+Subject: [PATCH bpf-next v5 2/3] bpf: Add BPF_FIB_LOOKUP_VLAN_INPUT flag to bpf_fib_lookup() helper
+Date: Wed, 24 Jun 2026 08:35:29 +0530
+Message-ID: <20260624030530.3342884-3-avinash.duduskar@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260624030530.3342884-1-avinash.duduskar@gmail.com>
 References: <20260624030530.3342884-1-avinash.duduskar@gmail.com>
@@ -135,7 +135,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301538-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301539-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[avinashduduskar@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[32];
@@ -157,289 +157,288 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7D4FC6BB060
+X-Rspamd-Queue-Id: 61D926BB071
 
-bpf_fib_lookup() returns the FIB-resolved egress ifindex straight
-from the fib result. When the egress is a VLAN device, the returned
-ifindex is the VLAN netdev's, which has no XDP xmit handler; XDP
-programs that want to forward the frame (e.g. xdp-forward) must
-instead target the underlying physical device and push the VLAN tag
-themselves. Today the program has no way to learn either the
-underlying ifindex or the VLAN tag without maintaining its own
-VLAN-to-ifindex map in userspace and refreshing it on netlink
-events.
+BPF_FIB_LOOKUP_VLAN resolves a VLAN egress. The reverse is also
+useful: an XDP program receiving a VLAN-tagged frame on a physical
+device wants the lookup to behave as if the packet had arrived on the
+corresponding VLAN subinterface, so iif-based policy routing and VRF
+table selection use the right ingress.
 
-Add BPF_FIB_LOOKUP_VLAN. When the caller sets this flag and the fib
-result is a VLAN device whose immediate parent is a real (non-VLAN)
-device in the same network namespace, populate the existing output
-fields params->h_vlan_proto and params->h_vlan_TCI from the VLAN
-device and replace params->ifindex with the parent's ifindex.
-params->h_vlan_TCI carries the VID only, with PCP and DEI bits zero; a
-consumer wanting to set egress priority writes PCP itself.
-params->smac is the VLAN device's own address, which can differ from
-the parent's.
+Add BPF_FIB_LOOKUP_VLAN_INPUT. When set, params->h_vlan_proto and
+params->h_vlan_TCI are read as an input VLAN tag and the matching VLAN
+device of params->ifindex is resolved with __vlan_find_dev_deep_rcu().
+The device must be up and in the same network namespace as
+params->ifindex (a VLAN device can be moved to another netns while
+registered on its parent; receive would deliver into that other
+namespace, which a lookup here cannot represent). If params->ifindex
+is itself a VLAN device, its inner (QinQ) subinterface is matched.
+For a bond or team, a tag on a port matches no device and returns
+NOT_FWDED; pass the master's ifindex.
+The lookup then runs with the resolved device as the ingress;
+params->ifindex itself is not modified on the input side. When the
+resolved device is enslaved to a VRF, both the full lookup (via the
+l3mdev rule) and BPF_FIB_LOOKUP_DIRECT (via l3mdev_fib_table_rcu())
+select the VRF's table from the resolved ingress. That follows from
+feeding the resolved device to the flow as the ingress
+(fl4.flowi4_iif = dev->ifindex), which is what makes l3mdev resolve
+the VRF master from the subinterface rather than from
+params->ifindex.
 
-Only the immediate parent is resolved, via vlan_dev_priv(dev)->real_dev
-and not vlan_dev_real_dev(), which walks to the bottom of a stack. When
-the immediate parent is not a real device in the same namespace, the
-lookup returns BPF_FIB_LKUP_RET_VLAN_FAILURE and leaves params->ifindex
-at the input. This covers a stacked VLAN (QinQ), where the immediate
-parent is itself a VLAN device and one h_vlan_proto/h_vlan_TCI pair
-cannot describe two tags, and a parent in another network namespace (a
-VLAN device can be moved while its parent stays), whose ifindex would
-be meaningless in the caller's namespace. A program that wants the VLAN
-device's own ifindex re-issues the lookup without BPF_FIB_LOOKUP_VLAN,
-so the unreducible case stays distinct from a physical egress. That
-distinction matters for XDP: a program cannot xmit on a VLAN device, so
-a success carrying the VLAN ifindex would make it redirect to a device
-with no ndo_xdp_xmit and drop the frame at xdp_do_flush(). The swap and
-the vlan fields are written only on the reduce path; other output
-fields keep their existing behaviour, so a frag-needed result still
-reports the route mtu in params->mtu_result.
+The two failure classes get different treatment on purpose. A
+h_vlan_proto other than 802.1Q/802.1ad is API misuse and returns
+-EINVAL, since it would otherwise reach the WARN in vlan_proto_idx()
+with a program-controlled value. An unmatched VID, a device that is
+down, or one in another namespace is a data outcome and returns
+BPF_FIB_LKUP_RET_NOT_FWDED, matching the DIRECT path when
+fib_get_table() finds no table and mirroring real ingress, where the
+receive path drops such frames. A VID of 0 (a priority tag) is looked
+up literally and normally fails the same way; receive instead
+processes such frames untagged, so callers should not set the flag for
+priority tags. Proceeding on the physical device for any of these
+would be fail-open for the policy-routing cases above.
 
-BPF_FIB_LOOKUP_VLAN is only useful to XDP, which cannot redirect to a
-VLAN device. A tc program can redirect to the VLAN device directly, so
-bpf_skb_fib_lookup() rejects the flag with -EINVAL; bpf_xdp_fib_lookup()
-accepts it. When the flag is not set, behaviour is unchanged:
-h_vlan_proto and h_vlan_TCI are zeroed and ifindex is left at the FIB
-result.
+The h_vlan fields share a union with tbid, so the flag cannot be
+combined with BPF_FIB_LOOKUP_TBID. It describes ingress, so it also
+cannot be combined with BPF_FIB_LOOKUP_OUTPUT. Both combinations
+return -EINVAL; restricting now keeps a later relaxation backward
+compatible. Combining with BPF_FIB_LOOKUP_VLAN is allowed: the tag is
+consumed on the ingress side and the egress tag is written on
+success.
 
-The new block is compiled only under CONFIG_VLAN_8021Q since
-vlan_dev_priv() is not defined otherwise; without that config
-is_vlan_dev() is constant false and the flag is accepted but never
-acts. That is safe because no VLAN device can exist there, so every
-egress is already physical.
-
-This lets an XDP redirect target the physical device and learn the
-tag to push in a single lookup, which xdp-forward's optional VLAN
-mode (xdp-project/xdp-tools#504) wants from the kernel side.
-
-The helper's input semantics are unchanged; the reverse direction
-(supplying a tag as lookup input) is added in the following patch.
+Under !CONFIG_VLAN_8021Q the __vlan_find_dev_deep_rcu() stub returns
+NULL, so every lookup with the flag returns NOT_FWDED, which is
+correct since no VLAN device can exist.
 
 Suggested-by: Toke Høiland-Jørgensen <toke@redhat.com>
+Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
 Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
 ---
- include/uapi/linux/bpf.h       | 31 ++++++++++++++++++++++++++++++-
- net/core/filter.c              | 33 +++++++++++++++++++++++++++++----
- tools/include/uapi/linux/bpf.h | 31 ++++++++++++++++++++++++++++++-
- 3 files changed, 89 insertions(+), 6 deletions(-)
+ include/uapi/linux/bpf.h       | 21 ++++++++++-
+ net/core/filter.c              | 66 +++++++++++++++++++++++++++++++---
+ tools/include/uapi/linux/bpf.h | 21 ++++++++++-
+ 3 files changed, 101 insertions(+), 7 deletions(-)
 
 diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 89b36de5fdbb..e00f0392e728 100644
+index e00f0392e728..d4218954c50f 100644
 --- a/include/uapi/linux/bpf.h
 +++ b/include/uapi/linux/bpf.h
-@@ -3532,6 +3532,29 @@ union bpf_attr {
-  *			Use the mark present in *params*->mark for the fib lookup.
-  *			This option should not be used with BPF_FIB_LOOKUP_DIRECT,
-  *			as it only has meaning for full lookups.
-+ *		**BPF_FIB_LOOKUP_VLAN**
-+ *			If the fib lookup resolves to a VLAN device whose
-+ *			parent is a real (non-VLAN) device, set
-+ *			*params*->h_vlan_proto and *params*->h_vlan_TCI from
-+ *			the VLAN device and replace *params*->ifindex with the
-+ *			parent's ifindex. *params*->h_vlan_TCI carries the VID
-+ *			only, with PCP and DEI bits zero; a consumer wanting to
-+ *			set egress priority writes PCP itself. *params*->smac is
-+ *			the VLAN device's own address, which can differ from the
-+ *			parent's. Only the immediate parent is resolved; if it
-+ *			is itself a VLAN device (QinQ) or in another namespace,
-+ *			the egress cannot be reduced to a physical device plus
-+ *			one tag and the lookup returns
-+ *			**BPF_FIB_LKUP_RET_VLAN_FAILURE** with *params*->ifindex
-+ *			left at the input. Re-issue without
-+ *			**BPF_FIB_LOOKUP_VLAN** to obtain the VLAN device's own
-+ *			ifindex. The swap and the vlan fields
-+ *			are written only on success; other output fields keep
-+ *			the helper's existing behaviour, so a frag-needed result
-+ *			still reports the route mtu in *params*->mtu_result.
-+ *			This flag is only valid for XDP programs; tc programs
-+ *			receive -EINVAL since they can redirect to the VLAN
-+ *			device directly.
+@@ -3555,6 +3555,22 @@ union bpf_attr {
+  *			This flag is only valid for XDP programs; tc programs
+  *			receive -EINVAL since they can redirect to the VLAN
+  *			device directly.
++ *		**BPF_FIB_LOOKUP_VLAN_INPUT**
++ *			Treat *params*->h_vlan_proto and *params*->h_vlan_TCI
++ *			as an input VLAN tag and run the lookup as if ingress
++ *			had happened on the VLAN subinterface carrying that tag
++ *			on *params*->ifindex. The VID is the low 12 bits of
++ *			*params*->h_vlan_TCI; *params*->h_vlan_proto must be
++ *			ETH_P_8021Q or ETH_P_8021AD in network byte order, else
++ *			**-EINVAL**. If *params*->ifindex is itself a VLAN
++ *			device, its inner (QinQ) subinterface is matched; for a
++ *			bond or team, pass the master's ifindex. An unmatched
++ *			tag, a down device, or one in another namespace returns
++ *			**BPF_FIB_LKUP_RET_NOT_FWDED**, mirroring real ingress.
++ *			A VID of 0 is looked up literally, so do not set this
++ *			flag for priority-tagged frames. Cannot be combined with
++ *			**BPF_FIB_LOOKUP_TBID** or **BPF_FIB_LOOKUP_OUTPUT**
++ *			(returns **-EINVAL**).
   *
   *		*ctx* is either **struct xdp_md** for XDP programs or
   *		**struct sk_buff** tc cls_act programs.
-@@ -7327,6 +7350,7 @@ enum {
- 	BPF_FIB_LOOKUP_TBID    = (1U << 3),
+@@ -7351,6 +7367,7 @@ enum {
  	BPF_FIB_LOOKUP_SRC     = (1U << 4),
  	BPF_FIB_LOOKUP_MARK    = (1U << 5),
-+	BPF_FIB_LOOKUP_VLAN    = (1U << 6),
+ 	BPF_FIB_LOOKUP_VLAN    = (1U << 6),
++	BPF_FIB_LOOKUP_VLAN_INPUT = (1U << 7),
  };
  
  enum {
-@@ -7340,6 +7364,7 @@ enum {
- 	BPF_FIB_LKUP_RET_NO_NEIGH,     /* no neighbor entry for nh */
- 	BPF_FIB_LKUP_RET_FRAG_NEEDED,  /* fragmentation required to fwd */
- 	BPF_FIB_LKUP_RET_NO_SRC_ADDR,  /* failed to derive IP src addr */
-+	BPF_FIB_LKUP_RET_VLAN_FAILURE, /* VLAN egress, parent unresolvable */
- };
- 
- struct bpf_fib_lookup {
-@@ -7393,7 +7418,11 @@ struct bpf_fib_lookup {
- 
- 	union {
- 		struct {
--			/* output */
-+			/*
-+			 * output with BPF_FIB_LOOKUP_VLAN: set from the
-+			 * resolved egress VLAN device (see the flag); zeroed
-+			 * on other successful lookups.
-+			 */
+@@ -7421,7 +7438,9 @@ struct bpf_fib_lookup {
+ 			/*
+ 			 * output with BPF_FIB_LOOKUP_VLAN: set from the
+ 			 * resolved egress VLAN device (see the flag); zeroed
+-			 * on other successful lookups.
++			 * on other successful lookups. input with
++			 * BPF_FIB_LOOKUP_VLAN_INPUT: the VLAN tag to scope
++			 * the lookup by.
+ 			 */
  			__be16	h_vlan_proto;
  			__be16	h_vlan_TCI;
- 		};
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 2e96b4b847ce..b5a45485a54b 100644
+index b5a45485a54b..0ea362fa4287 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -6201,10 +6201,29 @@ static const struct bpf_func_proto bpf_skb_get_xfrm_state_proto = {
+@@ -6229,6 +6229,25 @@ static int bpf_fib_set_fwd_params(struct net_device *dev,
+ 
+ 	return 0;
+ }
++
++static struct net_device *bpf_fib_vlan_input_dev(struct net_device *dev,
++						 const struct bpf_fib_lookup *params)
++{
++	__be16 proto = params->h_vlan_proto;
++	struct net_device *vlan_dev;
++	u16 vid;
++
++	if (proto != htons(ETH_P_8021Q) && proto != htons(ETH_P_8021AD))
++		return ERR_PTR(-EINVAL);
++
++	vid = ntohs(params->h_vlan_TCI) & VLAN_VID_MASK;
++	vlan_dev = __vlan_find_dev_deep_rcu(dev, proto, vid);
++	if (!vlan_dev || !(vlan_dev->flags & IFF_UP) ||
++	    !net_eq(dev_net(vlan_dev), dev_net(dev)))
++		return NULL;
++
++	return vlan_dev;
++}
  #endif
  
- #if IS_ENABLED(CONFIG_INET) || IS_ENABLED(CONFIG_IPV6)
--static int bpf_fib_set_fwd_params(struct bpf_fib_lookup *params, u32 mtu)
-+static int bpf_fib_set_fwd_params(struct net_device *dev,
-+				  struct bpf_fib_lookup *params,
-+				  u32 flags, u32 mtu, u32 in_ifindex)
- {
- 	params->h_vlan_TCI = 0;
- 	params->h_vlan_proto = 0;
-+
-+#if IS_ENABLED(CONFIG_VLAN_8021Q)
-+	if ((flags & BPF_FIB_LOOKUP_VLAN) && is_vlan_dev(dev)) {
-+		struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
-+
-+		if (!is_vlan_dev(real_dev) &&
-+		    net_eq(dev_net(real_dev), dev_net(dev))) {
-+			params->h_vlan_proto = vlan_dev_vlan_proto(dev);
-+			params->h_vlan_TCI = htons(vlan_dev_vlan_id(dev));
-+			params->ifindex = real_dev->ifindex;
-+		} else {
-+			params->ifindex = in_ifindex;
-+			return BPF_FIB_LKUP_RET_VLAN_FAILURE;
-+		}
+ #if IS_ENABLED(CONFIG_INET)
+@@ -6249,6 +6268,14 @@ static int bpf_ipv4_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
+ 	if (unlikely(!dev))
+ 		return -ENODEV;
+ 
++	if (flags & BPF_FIB_LOOKUP_VLAN_INPUT) {
++		dev = bpf_fib_vlan_input_dev(dev, params);
++		if (IS_ERR(dev))
++			return PTR_ERR(dev);
++		if (!dev)
++			return BPF_FIB_LKUP_RET_NOT_FWDED;
 +	}
-+#endif
 +
- 	if (mtu)
- 		params->mtu_result = mtu; /* union with tot_len */
+ 	/* verify forwarding is enabled on this interface */
+ 	in_dev = __in_dev_get_rcu(dev);
+ 	if (unlikely(!in_dev || !IN_DEV_FORWARD(in_dev)))
+@@ -6258,7 +6285,11 @@ static int bpf_ipv4_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
+ 		fl4.flowi4_iif = 1;
+ 		fl4.flowi4_oif = params->ifindex;
+ 	} else {
+-		fl4.flowi4_iif = params->ifindex;
++		/*
++		 * dev->ifindex, not params->ifindex: VLAN_INPUT may have
++		 * resolved dev to a subinterface above.
++		 */
++		fl4.flowi4_iif = dev->ifindex;
+ 		fl4.flowi4_oif = 0;
+ 	}
+ 	fl4.flowi4_dscp = inet_dsfield_to_dscp(params->tos);
+@@ -6395,6 +6426,14 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
+ 	if (unlikely(!dev))
+ 		return -ENODEV;
  
-@@ -6216,6 +6235,7 @@ static int bpf_fib_set_fwd_params(struct bpf_fib_lookup *params, u32 mtu)
- static int bpf_ipv4_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
- 			       u32 flags, bool check_mtu)
- {
-+	u32 in_ifindex = params->ifindex;
- 	struct neighbour *neigh = NULL;
- 	struct fib_nh_common *nhc;
- 	struct in_device *in_dev;
-@@ -6347,7 +6367,7 @@ static int bpf_ipv4_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
- 	memcpy(params->smac, dev->dev_addr, ETH_ALEN);
- 
- set_fwd_params:
--	return bpf_fib_set_fwd_params(params, mtu);
-+	return bpf_fib_set_fwd_params(dev, params, flags, mtu, in_ifindex);
- }
- #endif
- 
-@@ -6357,6 +6377,7 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
- {
- 	struct in6_addr *src = (struct in6_addr *) params->ipv6_src;
- 	struct in6_addr *dst = (struct in6_addr *) params->ipv6_dst;
-+	u32 in_ifindex = params->ifindex;
- 	struct fib6_result res = {};
- 	struct neighbour *neigh;
- 	struct net_device *dev;
-@@ -6486,13 +6507,14 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
- 	memcpy(params->smac, dev->dev_addr, ETH_ALEN);
- 
- set_fwd_params:
--	return bpf_fib_set_fwd_params(params, mtu);
-+	return bpf_fib_set_fwd_params(dev, params, flags, mtu, in_ifindex);
- }
- #endif
- 
++	if (flags & BPF_FIB_LOOKUP_VLAN_INPUT) {
++		dev = bpf_fib_vlan_input_dev(dev, params);
++		if (IS_ERR(dev))
++			return PTR_ERR(dev);
++		if (!dev)
++			return BPF_FIB_LKUP_RET_NOT_FWDED;
++	}
++
+ 	idev = __in6_dev_get_safely(dev);
+ 	if (unlikely(!idev || !READ_ONCE(idev->cnf.forwarding)))
+ 		return BPF_FIB_LKUP_RET_FWD_DISABLED;
+@@ -6403,7 +6442,12 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
+ 		fl6.flowi6_iif = 1;
+ 		oif = fl6.flowi6_oif = params->ifindex;
+ 	} else {
+-		oif = fl6.flowi6_iif = params->ifindex;
++		/*
++		 * dev->ifindex, not params->ifindex: VLAN_INPUT may have
++		 * resolved dev to a subinterface above.
++		 */
++		oif = dev->ifindex;
++		fl6.flowi6_iif = oif;
+ 		fl6.flowi6_oif = 0;
+ 		strict = RT6_LOOKUP_F_HAS_SADDR;
+ 	}
+@@ -6514,7 +6558,19 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
  #define BPF_FIB_LOOKUP_MASK (BPF_FIB_LOOKUP_DIRECT | BPF_FIB_LOOKUP_OUTPUT | \
  			     BPF_FIB_LOOKUP_SKIP_NEIGH | BPF_FIB_LOOKUP_TBID | \
--			     BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_MARK)
-+			     BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_MARK | \
-+			     BPF_FIB_LOOKUP_VLAN)
+ 			     BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_MARK | \
+-			     BPF_FIB_LOOKUP_VLAN)
++			     BPF_FIB_LOOKUP_VLAN | BPF_FIB_LOOKUP_VLAN_INPUT)
++
++static bool bpf_fib_lookup_flags_ok(u32 flags)
++{
++	if (flags & ~BPF_FIB_LOOKUP_MASK)
++		return false;
++
++	if ((flags & BPF_FIB_LOOKUP_VLAN_INPUT) &&
++	    (flags & (BPF_FIB_LOOKUP_TBID | BPF_FIB_LOOKUP_OUTPUT)))
++		return false;
++
++	return true;
++}
  
  BPF_CALL_4(bpf_xdp_fib_lookup, struct xdp_buff *, ctx,
  	   struct bpf_fib_lookup *, params, int, plen, u32, flags)
-@@ -6541,6 +6563,9 @@ BPF_CALL_4(bpf_skb_fib_lookup, struct sk_buff *, skb,
- 	if (flags & ~BPF_FIB_LOOKUP_MASK)
+@@ -6522,7 +6578,7 @@ BPF_CALL_4(bpf_xdp_fib_lookup, struct xdp_buff *, ctx,
+ 	if (plen < sizeof(*params))
  		return -EINVAL;
  
-+	if (flags & BPF_FIB_LOOKUP_VLAN)
-+		return -EINVAL;
-+
- 	if (params->tot_len)
- 		check_mtu = true;
+-	if (flags & ~BPF_FIB_LOOKUP_MASK)
++	if (!bpf_fib_lookup_flags_ok(flags))
+ 		return -EINVAL;
  
+ 	switch (params->family) {
+@@ -6560,7 +6616,7 @@ BPF_CALL_4(bpf_skb_fib_lookup, struct sk_buff *, skb,
+ 	if (plen < sizeof(*params))
+ 		return -EINVAL;
+ 
+-	if (flags & ~BPF_FIB_LOOKUP_MASK)
++	if (!bpf_fib_lookup_flags_ok(flags))
+ 		return -EINVAL;
+ 
+ 	if (flags & BPF_FIB_LOOKUP_VLAN)
 diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index 89b36de5fdbb..e00f0392e728 100644
+index e00f0392e728..d4218954c50f 100644
 --- a/tools/include/uapi/linux/bpf.h
 +++ b/tools/include/uapi/linux/bpf.h
-@@ -3532,6 +3532,29 @@ union bpf_attr {
-  *			Use the mark present in *params*->mark for the fib lookup.
-  *			This option should not be used with BPF_FIB_LOOKUP_DIRECT,
-  *			as it only has meaning for full lookups.
-+ *		**BPF_FIB_LOOKUP_VLAN**
-+ *			If the fib lookup resolves to a VLAN device whose
-+ *			parent is a real (non-VLAN) device, set
-+ *			*params*->h_vlan_proto and *params*->h_vlan_TCI from
-+ *			the VLAN device and replace *params*->ifindex with the
-+ *			parent's ifindex. *params*->h_vlan_TCI carries the VID
-+ *			only, with PCP and DEI bits zero; a consumer wanting to
-+ *			set egress priority writes PCP itself. *params*->smac is
-+ *			the VLAN device's own address, which can differ from the
-+ *			parent's. Only the immediate parent is resolved; if it
-+ *			is itself a VLAN device (QinQ) or in another namespace,
-+ *			the egress cannot be reduced to a physical device plus
-+ *			one tag and the lookup returns
-+ *			**BPF_FIB_LKUP_RET_VLAN_FAILURE** with *params*->ifindex
-+ *			left at the input. Re-issue without
-+ *			**BPF_FIB_LOOKUP_VLAN** to obtain the VLAN device's own
-+ *			ifindex. The swap and the vlan fields
-+ *			are written only on success; other output fields keep
-+ *			the helper's existing behaviour, so a frag-needed result
-+ *			still reports the route mtu in *params*->mtu_result.
-+ *			This flag is only valid for XDP programs; tc programs
-+ *			receive -EINVAL since they can redirect to the VLAN
-+ *			device directly.
+@@ -3555,6 +3555,22 @@ union bpf_attr {
+  *			This flag is only valid for XDP programs; tc programs
+  *			receive -EINVAL since they can redirect to the VLAN
+  *			device directly.
++ *		**BPF_FIB_LOOKUP_VLAN_INPUT**
++ *			Treat *params*->h_vlan_proto and *params*->h_vlan_TCI
++ *			as an input VLAN tag and run the lookup as if ingress
++ *			had happened on the VLAN subinterface carrying that tag
++ *			on *params*->ifindex. The VID is the low 12 bits of
++ *			*params*->h_vlan_TCI; *params*->h_vlan_proto must be
++ *			ETH_P_8021Q or ETH_P_8021AD in network byte order, else
++ *			**-EINVAL**. If *params*->ifindex is itself a VLAN
++ *			device, its inner (QinQ) subinterface is matched; for a
++ *			bond or team, pass the master's ifindex. An unmatched
++ *			tag, a down device, or one in another namespace returns
++ *			**BPF_FIB_LKUP_RET_NOT_FWDED**, mirroring real ingress.
++ *			A VID of 0 is looked up literally, so do not set this
++ *			flag for priority-tagged frames. Cannot be combined with
++ *			**BPF_FIB_LOOKUP_TBID** or **BPF_FIB_LOOKUP_OUTPUT**
++ *			(returns **-EINVAL**).
   *
   *		*ctx* is either **struct xdp_md** for XDP programs or
   *		**struct sk_buff** tc cls_act programs.
-@@ -7327,6 +7350,7 @@ enum {
- 	BPF_FIB_LOOKUP_TBID    = (1U << 3),
+@@ -7351,6 +7367,7 @@ enum {
  	BPF_FIB_LOOKUP_SRC     = (1U << 4),
  	BPF_FIB_LOOKUP_MARK    = (1U << 5),
-+	BPF_FIB_LOOKUP_VLAN    = (1U << 6),
+ 	BPF_FIB_LOOKUP_VLAN    = (1U << 6),
++	BPF_FIB_LOOKUP_VLAN_INPUT = (1U << 7),
  };
  
  enum {
-@@ -7340,6 +7364,7 @@ enum {
- 	BPF_FIB_LKUP_RET_NO_NEIGH,     /* no neighbor entry for nh */
- 	BPF_FIB_LKUP_RET_FRAG_NEEDED,  /* fragmentation required to fwd */
- 	BPF_FIB_LKUP_RET_NO_SRC_ADDR,  /* failed to derive IP src addr */
-+	BPF_FIB_LKUP_RET_VLAN_FAILURE, /* VLAN egress, parent unresolvable */
- };
- 
- struct bpf_fib_lookup {
-@@ -7393,7 +7418,11 @@ struct bpf_fib_lookup {
- 
- 	union {
- 		struct {
--			/* output */
-+			/*
-+			 * output with BPF_FIB_LOOKUP_VLAN: set from the
-+			 * resolved egress VLAN device (see the flag); zeroed
-+			 * on other successful lookups.
-+			 */
+@@ -7421,7 +7438,9 @@ struct bpf_fib_lookup {
+ 			/*
+ 			 * output with BPF_FIB_LOOKUP_VLAN: set from the
+ 			 * resolved egress VLAN device (see the flag); zeroed
+-			 * on other successful lookups.
++			 * on other successful lookups. input with
++			 * BPF_FIB_LOOKUP_VLAN_INPUT: the VLAN tag to scope
++			 * the lookup by.
+ 			 */
  			__be16	h_vlan_proto;
  			__be16	h_vlan_TCI;
- 		};
 -- 
 2.54.0
 
