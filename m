@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-301529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301530-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oAgGJjg/O2qeUQgAu9opvQ
-	(envelope-from <netdev+bounces-301529-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 04:21:44 +0200
+	id 39ISGmM/O2q3UQgAu9opvQ
+	(envelope-from <netdev+bounces-301530-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 04:22:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002196BAE8E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 04:21:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5B26BAE9C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 04:22:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jGluRis+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301529-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301529-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=NCaqVmmQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301530-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301530-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B7FE309D211
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 02:20:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E576730C63E9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 02:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D82A2F7478;
-	Wed, 24 Jun 2026 02:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF972F5487;
+	Wed, 24 Jun 2026 02:20:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809C12F5A06;
-	Wed, 24 Jun 2026 02:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C862F7EF8;
+	Wed, 24 Jun 2026 02:20:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782267657; cv=none; b=et3/gvvgS0SX2kdHo9LIGbZcc21yqgutnHJFdmk/5qRbzEAzMjrXCFFtShlMi9lhjJvg4PIhGlVLC074paLrLK4PeETiwTknL+ekv6mEek+VkByVikNPE6TSqzHJ1A+LMPGPVOLG5467jK5W2SXfJCKEZCYvTBzTDJd79zbYle0=
+	t=1782267659; cv=none; b=fBGDDdQiixJ6s0Bx+n/xUNtIWsyWdRmG36bUffNZPvN3YSimQdX4stRh3enJOxvW0NMVdKSmnlwRzttk6NHqFsGYAetpesokK7ZJMF1dcQZAIwKSZIR5iwe8cJNMmA+V+soHKUEC0x2KWzXSNwmYD9b9nMwl9X+77Lrgq8Gx6es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782267657; c=relaxed/simple;
-	bh=Byt/a5YwQm/EbwETwfYl3nWaMfwquFX0yVQBFnyXY3c=;
+	s=arc-20240116; t=1782267659; c=relaxed/simple;
+	bh=S8mQWUG2xdWqD0xKmTxiVna4Q2173cdbX3sJgid8E0w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=biNdp28LVJADhSy82a+/5Mi4ViOnHkad6RgwhA/QR9u5jAu9rNqQaoO1LZ+gRzbyFimdGW17QTYDv6LTppcR7gnu2mmYvjyFRVbaatWLHzOb7X5xdWVD5lwxZhbyEbmm3sEgDpB6vv1qlmY+WfgEM8U/827sKSQNNRotx32sKY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGluRis+; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 287D71F000E9;
-	Wed, 24 Jun 2026 02:20:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ef+RFtnXIllEYg3fHa9/oXT4MX7Qg8byKjucAKaxoItem/A15KETLFY5C0Dlm+RLkW2mLGtEk242hugBLUoJw5VjSzCkk3OoXaamPR8h6gphw17kJPszxB7ILJao4jgBpDwBgvT9NAsKpsO/r9COl2q3KtmDmIAxrp4d1HmIyvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NCaqVmmQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E02CE1F000E9;
+	Wed, 24 Jun 2026 02:20:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782267656;
-	bh=8iv5NZ0EhjGf04DMhe6kkoG+u1oTq9Sgycti5VptFuU=;
+	s=k20260515; t=1782267657;
+	bh=20qhPFs4jfS6A2FZHHt9pJpxY+Ulu5XXoPBBKDJcdHs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=jGluRis+/NBJFDkJeRk23Bpx+TQDW8Ooq2S3tbRmwMv6TqWew9T0nYuxHRh0BDDj5
-	 JWRVEj6IhBYdNGiheQcZ3C7xmzJ6QFqdwQuslzklmv0tzo01bhkjroImGTtqkC+FoS
-	 8MptUCBlfkOpxJV/InHJ71m4SoCKap6o7xsvIulCzH0uSHoQ68T/V3iZZwUR0bhZUW
-	 8hGmiMZWfoiBCu8+z2e5HZUecf/ym2SEzSu4mGGB43DtKg2U5evrP2uhPDE2k/AY0J
-	 zefadzhz6/DjNm/7Y2ppEFa1qOPl+lm/15z+naO9+AOTtMQjKAS7L5tIjkp2SxNbzg
-	 wainOGAJ/ITYQ==
+	b=NCaqVmmQmAOd7/v9XIjsFrOKoZyv8UVia1oCSIJYhPCq6+VxPITgSOh7Rw7Wuycr7
+	 gfp0yGaMjMhlqkvEvSv9F8yPQ/qaxtNWddg2KW9fNB0XpeFUaCsVHEYoERAFZ5l3S0
+	 3j5u145fMOTZzg4DNvR962p8zRIjihhSe1vYfMKclmbEu2J/qciYluWv7rEEA2hu90
+	 7UaoftLsmQhyBA1LyipixaUH8f8gbIYlOd5SOzYs3vh0GS+e4BJvEZ9SGTFqBW2e13
+	 NE5Dd/v1beddo9WiSHBDGAGBR7We3J1K8ALUxV9zMs0c3OvlCY1KHpm8Vunelw960W
+	 98FT4czApFbBw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938A8393102A;
-	Wed, 24 Jun 2026 02:20:46 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568DB393102A;
+	Wed, 24 Jun 2026 02:20:48 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,18 +57,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] MAINTAINERS: Orphan SUNPLUS ETHERNET DRIVER
+Subject: Re: [PATCH net] sctp: fix err_chunk memory leaks in INIT handling
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178226764506.2513445.9930233925704678428.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Jun 2026 02:20:45 +0000
-References: <20260622180721.28334-1-wellslutw@gmail.com>
-In-Reply-To: <20260622180721.28334-1-wellslutw@gmail.com>
-To: Wells Lu <wellslutw@gmail.com>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- shital.gandhi45@gmail.com, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- shitalkumar.gandhi@cambiumnetworks.com
+ <178226764683.2513445.821387304486136433.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Jun 2026 02:20:46 +0000
+References: 
+ <0656704f1b0158287c98aec09ba36c83e4a537ab.1781970534.git.lucien.xin@gmail.com>
+In-Reply-To: 
+ <0656704f1b0158287c98aec09ba36c83e4a537ab.1781970534.git.lucien.xin@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ marcelo.leitner@gmail.com
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -81,20 +82,20 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,cambiumnetworks.com];
-	TAGGED_FROM(0.00)[bounces-301529-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-301530-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shital.gandhi45@gmail.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,m:shitalgandhi45@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:lucienxin@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -107,25 +108,27 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 002196BAE8E
+X-Rspamd-Queue-Id: EA5B26BAE9C
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 23 Jun 2026 02:07:21 +0800 you wrote:
-> I have left Sunplus and no longer have access to the relevant hardware
-> to test or maintain this driver. Mark the driver as orphaned.
+On Sat, 20 Jun 2026 11:48:54 -0400 you wrote:
+> When sctp_verify_init() encounters unrecognized parameters, it allocates an
+> err_chunk to report them. However, this chunk is leaked in several code
+> paths:
 > 
-> Signed-off-by: Wells Lu <wellslutw@gmail.com>
-> ---
->  MAINTAINERS | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> 1. In sctp_sf_do_5_1B_init(), if security_sctp_assoc_request() fails after
+>    sctp_verify_init() has populated err_chunk, the function returns
+>    immediately without freeing it.
+> 
+> [...]
 
 Here is the summary with links:
-  - MAINTAINERS: Orphan SUNPLUS ETHERNET DRIVER
-    https://git.kernel.org/netdev/net/c/89adcf17ee7a
+  - [net] sctp: fix err_chunk memory leaks in INIT handling
+    https://git.kernel.org/netdev/net/c/9f58a0a4d6c2
 
 You are awesome, thank you!
 -- 
