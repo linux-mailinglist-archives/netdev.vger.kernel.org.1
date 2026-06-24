@@ -1,211 +1,164 @@
-Return-Path: <netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301796-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id s0nJD7ZYPGoDnAgAu9opvQ
-	(envelope-from <netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:22:46 +0200
+	id aEy/HrJZPGpJnAgAu9opvQ
+	(envelope-from <netdev+bounces-301796-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:26:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59ED6C1BB3
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA416C1BE8
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:26:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JKj7yS1M;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301795-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=microsoft.com (policy=reject);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301796-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301796-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1BAE9301C2D9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:22:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8E1873026FCE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 22:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481FB2F5474;
-	Wed, 24 Jun 2026 22:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB90A3254B0;
+	Wed, 24 Jun 2026 22:26:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5943286415
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:22:40 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782339762; cv=pass; b=Jm5TLDPyU8udkBgjSpRPUVPiqWe6HmlPTgk4EXPsR9th972j0OprEysj0CBucPp/lz8oFrSyNSzWT0wuQJ0O8L9a0SRzT82oSHYTNyJHLgz0G5d8guKMPSabw3GcIeA5xIO1l8rzRsMj5o/5ivUdfU5V2wjgbKstVDz9Ylfh0qY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782339762; c=relaxed/simple;
-	bh=5VlpqCGU1q1I49q7nKHuT13zBfrNqDmjX6Vl4W3t8rw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zn5yhhkhqRKKVAYnE1XP6yaBRC8YdsHGKtQRddFgIJXmOSYuJCD54BRoW0GyvITWSO0cLB9etn1yRxcfS2QKY9mU9+5Z3BnWYv9v7+n8xUYhCpJhU+yfzFAgRQBMww4hL+dqeFm/wyhSPGswc9BtOK27gshtbEJMRaPXYR5WY1c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKj7yS1M; arc=pass smtp.client-ip=209.85.221.52
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-46cdcec58c2so151548f8f.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:22:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782339759; cv=none;
-        d=google.com; s=arc-20240605;
-        b=C4wQ97yH/AXX7ZB4djUXKCYcZ20g4dAXp3AP7tgIFwmfVVw27IEcu1+2CRjWznHKzt
-         P24VXlShHk7Bq+T9dpE+STRn9g1/eXyoekcgimpEk0v6fblK2w3bU9ubd30BRKOppKGI
-         1eu6F1Sawxc/3u3R6pxxIROx7s+fkh90tkJ5w1A6kUV83cQ6UrQvBID6LxODbgS9XDjn
-         xmmZsIioexaHehdwaPOXSNckNj5qsGCBl0Tyfz7HwTGBojKITtcZydWtE16lLc4CEHJB
-         rOyxFo1AC/A79fx85YEEP/mefuOkBUkVCb2PE6sz5g72Rfvp88oRa+swNUJlVt8K5hLo
-         AXAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vuJl+Bg+2bV1wge+DbmfgL7AjZRt4WMMPEu+xxJXlSU=;
-        fh=YUTz5FIFFh7C2Yp+6B0aLY9woBEZ1pV6jregA8FE3hE=;
-        b=I0FXH8CLBzPqn5BT+hJPHKur/brF54n5JpOWocWOzqnYFVIV9aFcjSR89C9rSSI0pj
-         sXmqwHAzX+HyrgJu/NM0jNvOzTROQF+teBGQirtyqfwIN9S/HzP9/CspPkMM8hivffV8
-         3eAiIVpfy/yhRDaAVNLIV3e/tn04ZJtxlqn8N9OVvaeq+Hpesy3mlICgEBUglq2YFO1A
-         +GudeKoFgtVqF3VcWK+YW0IyPOCrouNLSQAbhuWCrqcaryVZSWTO1k98ukd7udRLj6xH
-         uJCD74ZLc7lsa1Bwj8AwjgHbAgPsYI81yb4k8xkIWKLZTXOXqqNoxCbmVez9AL6iNfXj
-         nOAQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782339759; x=1782944559; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vuJl+Bg+2bV1wge+DbmfgL7AjZRt4WMMPEu+xxJXlSU=;
-        b=JKj7yS1MWq5SnXx4qXLG+j5MbvwxK8Nd9H7q8lBnEtM6hfxtgCO/z+nfhJ3dZaSBW7
-         RI1GBu+bDmK1cTq5dHW1iwC/o1Oeo2u8NEm2LhN2bqPkexyR5w8e047u1KPLd9ppXPrQ
-         KxI2V1LeTjltpxAvGVqr09jNT4T2dleHS3qIQsq0dlmkjeBaqcCElE2QBDC9gheHeYNE
-         XQz9kGR7YY3TG1W4F6J54rsMj+8JW+o3NFHKLYAo6vDB27nnqJR7b1oyQyisXzxeC8XK
-         /CBR8ziql5+OI7he+6P3AMtbhK6fx8RWzJH+wlXNT6Bk2rJimPGOw+2BrasX3dyvDA45
-         OYug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782339759; x=1782944559;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vuJl+Bg+2bV1wge+DbmfgL7AjZRt4WMMPEu+xxJXlSU=;
-        b=prd0rl3Jxtjv2/1K3ag36Pgh0aW+mlkPGNLVhFh8x2S26y5JqZQKsT+JDhPrndD7j4
-         5uqoqdw3C1Eep4fu66B4ODrJVKHfpDoIiSSEzcU1X57+/bQnzNF44VWmGTS2ciHb+9es
-         m2eQ0CVtOzdQ95RA6jBVw/W3pJ4emW1Vj+dAWZsfHv2rNvhZ9Bw+4xVCYFwVdNmOWqhw
-         kPDCS7J+8uLZiZMoaogt8m+BXAIr0uzOPmHi6FZix7kvSdiEmYwi/SKK+vZ40Rbn0yMk
-         4JNgaRINImVM56HsKJRD2f6Hl3VSiOAMS0LtAfBl/EfNGAEGWgyduo86/FbgqB5oEHJ0
-         5umw==
-X-Forwarded-Encrypted: i=1; AHgh+RrUrtHIawG//QfjiZrvSMTaqLu+Aiawvk2xme6/3EM/R/NQQLDw/GIlkEFu43e0ddTGq61DT4Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDJo4+rLTd2gXvtKLxYBNBEsbfqSoj86Z6PGbhJ1ItijLX0yTT
-	gK+DwK4wIAqwC3FyMKLCv0N7ewrwjr1IYtURTlsU2uhTdHInq8GRfzztlveFHRNB2DvgKGqR2Pk
-	Bna/mnUnJyD2ht0azfbEI/ag1NxigpJI=
-X-Gm-Gg: AfdE7ckTyoQtQMzy9hsoObRDmH7kxYFL9AQrD78FyxvUW8DHRHz47RJfVhMQtIfi0dm
-	wmxd0ARklS7V7ROVlYqrOm4e+9YGMxKB3Aivi1zprcvsa9TUyruRRlCbpXOZiCNLlJJtaJkIkCQ
-	JfBLjQkdZYEu8cpRLkl8uMU3pAmlgqI+jnMmMMilKi3zNWmhJFFWDm0L2TLa3MHQfcD098iQ/nu
-	kWL7JMW6ZciHn/0qCbhXcYxjduonrtwEhxKGQPieK3QCpH53QVzG7ClaxOzE4a9GgyaBJc2JSTi
-	PXxYTdcy1As70lmfDjSFvWEPn337nAl8oD67UQQxjuwEjLbOBnMqVg==
-X-Received: by 2002:a05:6000:2488:b0:464:c5be:37fe with SMTP id
- ffacd0b85a97d-46d04d45829mr2957273f8f.15.1782339759159; Wed, 24 Jun 2026
- 15:22:39 -0700 (PDT)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E5E2C08CF;
+	Wed, 24 Jun 2026 22:26:52 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782340013; cv=none; b=GnpXV2UyppwiX2Cbuk5z8ZVdADUUJL72XfkEIcEmdo2EHouonCobHd8OQCvwkiDfAbHaviRgby3ZFGDvsdr2b0lz9PBk3+Mxd3sRm5BmZwOzci+kBRpP13d7YvxoN4gKmrSLpJVLOkhcdZw5TYa8MuumHlryknqHJqHQS0mMxxE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782340013; c=relaxed/simple;
+	bh=Dcemh5adW4aUAyKSjdTU9WEGDohpJ/2reiBtr58yTn4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=O5JdFLdIzG7BgspkCeOSGIft6h19dSiR5/1P15whmkBndTv3zBItYajZH1qfl4MGCo/C7svhsMSw5D/RwaspXV49Cxf3Bd7Cjw/Yj70sxt2vtnVfMPbruANWdDhg+oas7/JVzLiRMUrL7Bb5kkrosCygNrUMpi4SS4KQLL2/G/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1009)
+	id DA54520B7166; Wed, 24 Jun 2026 15:26:47 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DA54520B7166
+From: Dexuan Cui <decui@microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	kees@kernel.org,
+	jacob.e.keller@intel.com,
+	ssengar@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net v2 0/2] Fix MANA RX with bounce buffering
+Date: Wed, 24 Jun 2026 15:26:03 -0700
+Message-ID: <20260624222605.1794719-1-decui@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624200514.1332788-1-zinclim@meta.com> <0673af7d-51a6-484c-be38-3f46849ebb30@lunn.ch>
- <f2ecb668-ec56-4c84-ac97-474a2d761005@lunn.ch>
-In-Reply-To: <f2ecb668-ec56-4c84-ac97-474a2d761005@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 24 Jun 2026 15:22:01 -0700
-X-Gm-Features: AVVi8Cc-lGFigjd_GNJEAb-CaiVR2AemzJb_22M2NOs-5hBez_OQRdMgtyJ7NRk
-Message-ID: <CAKgT0UeU=8b6a3w6GA-0fB2bU12HsREZphchojoYW0h6wr8Qag@mail.gmail.com>
-Subject: Re: [PATCH net] eth: fbnic: fix race between concurrent hwmon sensor reads
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Zinc Lim <limzhineng2@gmail.com>, Alexander Duyck <alexanderduyck@fb.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, kernel-team@meta.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zinclim@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:limzhineng2@gmail.com,m:alexanderduyck@fb.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:kernel-team@meta.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zinclim@meta.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301795-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:jacob.e.keller@intel.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301796-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[decui@microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,fb.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,meta.com,vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[decui@microsoft.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,lunn.ch:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	PRECEDENCE_BULK(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C59ED6C1BB3
+X-Rspamd-Queue-Id: 1EA416C1BE8
 
-On Wed, Jun 24, 2026 at 2:56=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Wed, Jun 24, 2026 at 11:51:29PM +0200, Andrew Lunn wrote:
-> > On Wed, Jun 24, 2026 at 01:05:14PM -0700, Zinc Lim wrote:
-> > > From: Zinc Lim <limzhineng2@gmail.com>
-> > >
-> > > Reading an hwmon sensor
-> >
-> > Since this is a hwmon related patch, it is a good idea to Cc: the
-> > hwmon Maintainer.
-> >
-> > I don't know hwmon too well, i've never had to look at locking, but...
-> >
-> > static int hwmon_thermal_get_temp(struct thermal_zone_device *tz, int *=
-temp)
-> > {
-> >       struct hwmon_thermal_data *tdata =3D thermal_zone_device_priv(tz)=
-;
-> >       struct hwmon_device *hwdev =3D to_hwmon_device(tdata->dev);
-> >       int ret;
-> >       long t;
-> >
-> >       guard(mutex)(&hwdev->lock);
-> >
-> >       ret =3D hwdev->chip->ops->read(tdata->dev, hwmon_temp, hwmon_temp=
-_input,
-> >                                    tdata->index, &t);
-> >
-> > Could you explain why this lock in the hwmon core is not sufficient?
-> > It could be i'm reading it wrong, but it looks like the lock is shared
-> > by all hwmon instanced registered by a
-> > hwmon_device_register_with_info() call.
->
-> Documentation/hwmon/hwmon-kernel-api.rst
->
-> When using ``[devm_]hwmon_device_register_with_info()`` to register the
-> hardware monitoring device, accesses using the associated access function=
-s
-> are serialised by the hardware monitoring core. If a driver needs locking
-> for other functions such as interrupt handlers or for attributes which ar=
-e
-> fully implemented in the driver, hwmon_lock() and hwmon_unlock() can be u=
-sed
-> to ensure that calls to those functions are serialized.
+With swiotlb=force, the MANA NIC fails to work properly due to commit
+730ff06d3f5c ("net: mana: Use page pool fragments for RX buffers instead
+of full pages to improve memory efficiency.")
 
-I did some digging and it looks like 3ad2a7b9b15d ("hwmon: Serialize
-accesses in hwmon core") landed into 6.18. This was a patch put
-together based on issues reported in an earlier kernel version and
-explains how this got missed. So what we have is a redundant fix. We
-can drop this for upstream and probably look at pulling the upstream
-fix into our kernels that were having the issues.
+Dipayaan tried to fix this by avoiding page pool frags when bounce
+buffering is in use [1][2]. However, that is not a clean solution: no
+other NIC drivers need to explicitly check whether bounce buffering is
+in use. It is also not good for throughput, since
+dma_map_single()/dma_unmap_single() are then called for each incoming
+packet.
 
-Thanks for the review feedback.
+In fact, page pool frags can still be used with the standard MTU of
+1500: all we need is to add page_pool_dma_sync_for_cpu() before the CPU
+reads the incoming packet, so I implemented that in v1 [3].
 
-- Alex
+As Simon suggested [4], this version splits v1 into two patches:
+Patch 1 adds page_pool_dma_sync_for_cpu().
+Patch 2 validates the packet length reported by the NIC.
+
+There is no functional difference between v1 and v2, so I am keeping
+Haiyang's Reviewed-by tag in v2.
+
+Please review. Thanks!
+
+Note that, with jumbo MTU and XDP, page pool frags are not used, and
+dma_map_single()/dma_unmap_single() are still called for each incoming
+packet, causing poor throughput with swiotlb=force; see
+mana_get_rxbuf_cfg() and mana_refill_rx_oob() -> mana_get_rxfrag().
+The jumbo MTU/XDP issue will be addressed later since that needs more
+consideration if we want to use page pool with PP_FLAG_DMA_MAP there:
+e.g., for XDP, the received packet can be transmitted in place, i.e. the
+same RX buffer can be used as a TX buffer:
+mana_rx_skb() -> mana_xdp_tx() -> mana_start_xmit() -> mana_map_skb().
+
+In mana_create_page_pool(), we may have to set pprm.dma_dir to
+DMA_BIDIRECTIONAL if XDP is in use:
+pprm.dma_dir = mana_xdp_get(mpc) ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+
+In the case of XDP, the next issue is that mana_rx_skb() -> ... ->
+mana_map_skb() appears to call dma_map_single() on an RX buffer allocated
+from a page pool created with PP_FLAG_DMA_MAP, which seems incorrect.
+Any thoughts?
+
+[1] https://lore.kernel.org/all/ae91hyrLf4n23XE6@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net/#r
+[2] https://lore.kernel.org/all/ae9pxvJfkAZYfKMf@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net/
+[3] https://lore.kernel.org/all/20260618035029.249361-1-decui@microsoft.com/
+[4] https://lore.kernel.org/all/20260619090514.GT827683@horms.kernel.org/
+
+Dexuan Cui (2):
+  net: mana: Sync page pool RX frags for CPU
+  net: mana: Validate the packet length reported by the NIC
+
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 61 +++++++++++++++----
+ include/net/mana/mana.h                       |  8 +++
+ 2 files changed, 58 insertions(+), 11 deletions(-)
+
+-- 
+2.34.1
+
 
