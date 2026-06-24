@@ -1,226 +1,354 @@
-Return-Path: <netdev+bounces-301601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301602-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YAgaEBurO2pJbAgAu9opvQ
-	(envelope-from <netdev+bounces-301601-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:02:03 +0200
+	id 7w+vG9SrO2p8bAgAu9opvQ
+	(envelope-from <netdev+bounces-301602-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:05:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE0F6BD288
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:02:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C01E26BD2FF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 12:05:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=n62s9mBU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301601-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301601-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=Kd+6zp42;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301602-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301602-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A135F3003827
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:01:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C000304CA76
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 10:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07D7258EF3;
-	Wed, 24 Jun 2026 10:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3813AFD07;
+	Wed, 24 Jun 2026 10:04:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB4F2F1FE3
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 10:01:28 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782295289; cv=pass; b=nkUAudbdRdoCI/T85AOxYPfVweR7CsPYWwJziIKdoz68g1oHCkNt7b+cWbEPL83f7s6Kwt964xHq4snr2D51bVTuGtERzUalVE6yArSNLntDDJxRwtPQExLF45llrv4V43QwMHmQ63XFM/uc2s6gdAb7fh5AzUyq5FMtLXfqF70=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782295289; c=relaxed/simple;
-	bh=lgvozL3AL/CqJKA/D/C1TAp8M44/N8ufUjVFRQElJsQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YkSNncZrtsUb+T93J4BDQ+emSCPskPEcHMqUmz+6AqUrjzEzFMzNFoJW+JFXCvQRp9QBjZtJ04nksUajnmZt4EkGOniOOBaWNVUgerKKO92+QXr0d4h/9Et0DAntRHhTOoEo+ON1h4z3lw93Z0v+SA3PIsghWLamDt9UtJkk4JM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n62s9mBU; arc=pass smtp.client-ip=209.85.222.173
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-9157b949fc7so81017985a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 03:01:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782295287; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jnQs/bQEnhsV+pt3O06PJ5aIMqPbtd6D9zc6KI1j2hr0ZhdGkXMdRj8MQ3k20EM11w
-         5GqP6+8o0DFxT4Y8C83IjD/GJIYiGDyEoem1MjafZOXpSFfnKjoC0FmeLIGhf3B0kQJi
-         jGDhsI0JSN6/Gp4WHOiclFo1Ut0/U4oNm7MQIxC+HRJjaSW0c254DKplVBDEY0PS7ZEY
-         wGnk1lGlisYZ0IkEuD1VrgtwjisehNCXNxZ5LCuM06Og2iuB/NSZ5Z4UWmVsEO305CS7
-         1r2CUUqDA4RuHPdZkkA1bol16QblXBxwuW3SJOsK4XuySU3n+xQlRNYkQurfrY/g9wr1
-         J7zA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WF9rIgAhDmPKPEQxYijzUCxIXmPIr8nHRirezEH6n2c=;
-        fh=NoDPXHxuW+mARAXqA/whCOjJrf1pCnsjdYV/VtkaLn4=;
-        b=HACKL7V3uFHAlRmlOOeGWZW0smk0Cyrd9c+ksHqynjq/854HFHDA5j34SC4MsLteLP
-         D/BYV04+8CsTsMYG0hwhvFAvaj/C8UFgjr44Wdym3FwpxRHNnJFjFtSNl2MDxjr8t/A5
-         4iiKY4g8I2OkVN+Z3iOKiDL75dwowzlHy0QvPiWczfN1L1/y4Rq6IbvoTuIBBsQMhPuq
-         oqWBPMl21tF1uBvVOV4JnDAu5VOqD81VHUKIx7Cy36+I9e0N69h2piyLFS3GyH+VB/pl
-         GWijFpRXWxKPC2UuCFeJO4a/GLDCfFLDwTbkvEVuTh302/JE6R3tMPCMS3jFC7/qYUpc
-         UH8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782295287; x=1782900087; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WF9rIgAhDmPKPEQxYijzUCxIXmPIr8nHRirezEH6n2c=;
-        b=n62s9mBUh39yrs1bmkfPnmNNeedICMan4hBuv64/+J5cH5va+psfTGVIiGH/ahsp/G
-         DWn8rqB042A/taoMN8lGKZkgILST5ZD2fvmIkGjLhIw22mtplKuPoUdk2YeSYTSReaXx
-         8z+0eAz2CHDHM5Em2Y7ixaxTnOKIUk8Ji3HhrCka55tDsby1MDkM2xM0K9IazEJSJbbW
-         N8X4VySeN6B04F7zJdeOu3bwyMBP3bdY1rjYN91IIIZumEkGahZ6xePnKwye4tLMlPgJ
-         L94fpv2ubDC1Y1MCUwdFWZADxbsbtQ/9dUCpAOWVFGC6p9vj9yVHvckwkGo6KkUmrq8R
-         0RlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782295287; x=1782900087;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WF9rIgAhDmPKPEQxYijzUCxIXmPIr8nHRirezEH6n2c=;
-        b=luvgfn1qXZ3QwRFmTX+3OvAsB9gaacKv1s2M+yStyZlIRFKcIOJ9NnU+/bdEXzUPE9
-         T55Os1i08H3xgSJFsMvnZcegdDfWWFhkJgz8hCTERoANjBZ+qPl1nHJdEBhJLGriYgCs
-         2+cdY7BrNQkER55bdt89lJVX/zEPQCucQAFPuc9vWiTHXjNNxFfiM2Czfavv6+GaqAoO
-         Y5mV7yxtM8A6UJgqN3snPmOyNsny1E7ImU9hb0YH5Xkjp4JeNAQfLoLHgfXs2S1fH06D
-         DxZyb6O0+E6wc+/K5w7U/3tHHtxmwAUfMUMRd3pF9QjTWI9O6IqfdMd+nvKvwOcsa9py
-         4Pcw==
-X-Forwarded-Encrypted: i=1; AFNElJ+JZssHXKD7VDQt423LaPgt5oPgKVGTMpvLB+Ue4cCMTsTcvUNVNAoMI0+G3KJo7LRedXHWexk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2ZuR5SKOgga6dMI37yyxqLo+5y7ITInmwgKWB9lKQWHzvko1k
-	JFkXv3lE3MerTrtFf4rZjksXCkfj84lSFNXx3+TKHBlT+/ffzdRTzJ1CejfNCME2tE70kiEsTxT
-	EKbG5BJOpZCK6wZfCkkc3WO/eiHdfCKsCsLiQVsSF
-X-Gm-Gg: AfdE7ckWmrCq0liNLuo6YExalQ3QjLyIcEINJIzzTBsWaHznkEk1KFWB2jgnjV2QG4h
-	bgr7ZRWTxEZ12C6hnyy4IahnH9Y1l4XvoiGlQ1qUUybvJdRG2eN5qKemYb5kSXPncpvEANypeno
-	60HkKk94kFrv3+VDTq8p/n6ax2ZvbFVt4mn8KQSfzUtPia+eybTxmVE7VzsrDhxLEpKt2p6rNxe
-	OpuaO9in+wObzJh2r2qbe6zfpG2oi9qobY79Paeb5VpBUn4mfdgrQSaqM5G6jT0WnFpEGwWjPF4
-	UFQr/fLgX/6YrM4UmKh+Gp9RHkmRMMUIhK5LRwY/icrZWQvKUTEHmboS23sbjnT9k8Xcf2Tf0vj
-	wkk58savk
-X-Received: by 2002:a05:620a:19a8:b0:915:c4de:7ada with SMTP id
- af79cd13be357-921d29f75demr2745314185a.27.1782295279563; Wed, 24 Jun 2026
- 03:01:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5413A05C2;
+	Wed, 24 Jun 2026 10:04:17 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782295457; cv=none; b=Df+V3RnH77dFiYDo9n/5pscRsez6BERp5SttScg1D+2v6yLD/TGGx7rAvcrjTcGYkEptApE9+U4G3nm8osmPUryC18zHgP4AikTymhdwZZM4OQZLbsZNugi1pc4Z0cAnq5BW8kEqafhV9QeJbOHMM/fIV6v8XAYcXPQ3nPsvDHQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782295457; c=relaxed/simple;
+	bh=wkVjtgalCZbQSoIpv9CwBCZjvSYX3+Cp4uEVA8TMu7k=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WsZ6K73fIQhtNBHki4rCZrfqUsKaYzVLlH/UJPSBs5oIB9rDj/3AVN3U1QMqECzMtLezrxECW3LjLQziyKInxVBqWoxj9UYADD9F3yPeg38aDo0BflB+fSPVDuvwUYY4xSkEQ3TxOWf4wCW7U4uF2szkqGmn6X8NHkgNGJL47aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kd+6zp42; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FFCBC2BCB7;
+	Wed, 24 Jun 2026 10:04:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782295457;
+	bh=wkVjtgalCZbQSoIpv9CwBCZjvSYX3+Cp4uEVA8TMu7k=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=Kd+6zp42TLJ9Vj1RhBmssJDOPbMoFPKBiScH2VRXdBiajdClbuYazdwKGLnJRaBA7
+	 FFNiP1pdHZOxjXgKngRaXscYsLHfijukC08IoMG0hVJoIVKM7Bf39xp7epVURT+i+C
+	 xePUsd26Z3vTk0AfMI1rcpmamKAONrc5qIE4NaACXZuoDy/yVqyzX04Ho03ttroUqA
+	 XrtfJmOsLi2KR++k/cKxlnTFV1UBOjzikAbffzEHp0M6ReSfwx6Vvdc5ZEX0OHsXU8
+	 4GoXcV63CuFlHe/bb3my9/2oArclzrb099mlRQv39Zbcx5L7FYHu4g/6svH4Rlq3vR
+	 RAFYvEJhACCrg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A71BCDE000;
+	Wed, 24 Jun 2026 10:04:17 +0000 (UTC)
+From: Jack Wu via B4 Relay <devnull+jackbb_wu.compal.com@kernel.org>
+Subject: [PATCH v3 0/7] net: wwan: t9xx: Add MediaTek T9XX WWAN driver
+Date: Wed, 24 Jun 2026 18:04:06 +0800
+Message-Id: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624090135.95763-1-samsun1006219@gmail.com>
-In-Reply-To: <20260624090135.95763-1-samsun1006219@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jun 2026 03:01:07 -0700
-X-Gm-Features: AVVi8CfU9POL6E8q4FxG5_3bQNxeCG6Jq-h718d5-dzl909b9xk3HUFcfjzwKmo
-Message-ID: <CANn89iKD=4_A+7K2erw5AZPnzvBrQqTKXJyfKN5ZfNpAYZ+y3A@mail.gmail.com>
-Subject: Re: [BUG] KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
-To: Yue Sun <samsun1006219@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJarO2oC/3WNWwrCMBREtyL5NpJH21i/3IdIyePGRrQtSQ2V0
+ r2b1A8RES4MA3POnVEA7yCgw2ZGHqILru9S4dsN0q3sLoCdSR0xwipSshqP9TQ1xrsIvokUU1E
+ Udi+tELxGCRo8WDetwtP53cNDXUGP2ZIXrQtj75/rx0jz7q88HcHKKAtMEwqlOOr+PsjbLgXK9
+ sg+fEXJD88Sr6tSGmMZV9x+8cuyvACNvY/m/wAAAA==
+X-Change-ID: 20260529-t9xx_driver_v1-1744f8af7739
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Jack Wu <jackbb_wu@compal.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>, 
+ Shi-Wei Yeh <shi-wei.yeh@mediatek.com>, 
+ Minano Tseng <Minano.tseng@mediatek.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ linux-doc@vger.kernel.org
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782295454; l=13177;
+ i=jackbb_wu@compal.com; s=20260526; h=from:subject:message-id;
+ bh=wkVjtgalCZbQSoIpv9CwBCZjvSYX3+Cp4uEVA8TMu7k=;
+ b=jPZka2HnEi+K+CbV2Jywm3Mrp5Qd3gOkA5PmGzVD32JJuUfAPPdLYsawrAo9Hw8HHi2bSqKlz
+ ssBbVetjNJQCqRBRstFy4adm0Ra8tfI7w9HHrdsaeH5TUTYXiEeiPjV
+X-Developer-Key: i=jackbb_wu@compal.com; a=ed25519;
+ pk=VH1prTWixNl8OEUPPSfII3p46MzJpQN8J3+ecE1tZXg=
+X-Endpoint-Received: by B4 Relay for jackbb_wu@compal.com/20260526 with
+ auth_id=793
+X-Original-From: Jack Wu <jackbb_wu@compal.com>
+Reply-To: jackbb_wu@compal.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:samsun1006219@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:syzkaller@googlegroups.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301601-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301602-lists,netdev=lfdr.de,jackbb_wu.compal.com];
+	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jackbb_wu@compal.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,compal.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	HAS_REPLYTO(0.00)[jackbb_wu@compal.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,compal.com:replyto,compal.com:email,compal.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2CE0F6BD288
+X-Rspamd-Queue-Id: C01E26BD2FF
 
-On Wed, Jun 24, 2026 at 2:01=E2=80=AFAM Yue Sun <samsun1006219@gmail.com> w=
-rote:
->
-> Hello,
->
-> I hit a reproducible use-after-free in the UDP tunnel NIC offload work it=
-em.
-> The original local crash was reported by KFENCE as:
->
->   KFENCE: use-after-free read in udp_tunnel_nic_device_sync_work
->
-> On current mainline, the C reproducer below triggers the same lifetime bu=
-g,
-> reported by KASAN before KFENCE samples the object:
->
->   BUG: KASAN: slab-use-after-free in __mutex_lock
->   Workqueue: udp_tunnel_nic udp_tunnel_nic_device_sync_work
->
-> Tested kernel:
->
->   840ef6c78e6a ("Merge tag 'nfs-for-7.2-1' of git://git.linux-nfs.org/pro=
-jects/anna/linux-nfs")
->   Linux 7.1.0-11240-g840ef6c78e6a #31 SMP PREEMPT_DYNAMIC
->
+T9XX is the PCIe host device driver for MediaTek's
+t900 modem. The driver uses the WWAN framework
+infrastructure to create the following control ports
+and network interfaces for data transactions.
+* /dev/wwan0at0 - Interface that supports AT commands.
+* /dev/wwan0mbim0 - Interface conforming to the MBIM
+  protocol.
+* wwan0-X - Primary network interface for IP traffic.
+
+The main blocks in the T9XX driver are:
+* HW layer - Abstracts the hardware bus operations for
+   the device, and provides generic interfaces for the
+   transaction layer to get the device's information and
+   control the device's behavior. It includes:
+
+   * PCIe - Implements probe, removal and interrupt
+     handling.
+   * MHCCIF (Modem Host Cross-Core Interface) - Provides
+     interrupt channels for bidirectional event
+     notification such as handshake and port enumeration.
+
+* Transaction layer - Implements data transactions for
+   the control plane and the data plane. It includes:
+
+   * DPMAIF (Data Plane Modem AP Interface) - Controls
+     the hardware that provides uplink and downlink
+     queues for the data path. The data exchange takes
+     place using circular buffers to share data buffer
+     addresses and metadata to describe the packets.
+   * CLDMA (Cross Layer DMA) - Manages the hardware
+     used by the port layer to send control messages to
+     the device using MediaTek's CCCI (Cross-Core
+     Communication Interface) protocol.
+   * TX Services - Dispatch packets from the port layer
+     to the device.
+   * RX Services - Dispatch packets to the port layer
+     when receiving packets from the device.
+
+* Port layer - Provides control plane and data plane
+   interfaces to userspace. It includes:
+
+   * Control Plane - Provides device node interfaces
+     for controlling data transactions.
+   * Data Plane - Provides network link interfaces
+     wwanX (0, 1, 2...) for IP data transactions.
+
+* Core logic - Contains the core logic to keep the
+   device working. It includes:
+
+   * FSM (Finite State Machine) - Monitors the state
+     of the device, and notifies each module when the
+     state changes.
+
+The compilation of the T9XX driver is enabled by the
+CONFIG_MTK_T9XX and CONFIG_MTK_T9XX_PCI config option
+which depends on CONFIG_WWAN.
+
+This v2 submission covers the control plane only
+(patches 1-6). The data plane will follow in a
+separate series once the control plane is accepted.
+
+---
+Changes in v3:
+- Address sashiko AI code review comments and fix sparse warnings
+- Patch 1 (Add PCIe core):
+  - Move extern declaration of mtk_dev_cfg_0900 from mtk_pci.c to mtk_pci.h to fix sparse warning
+  - Remove mtk_pci_bar_exit(): pcim_iounmap_region() was called with bitmask instead of BAR index, and pcim_iomap_regions() is devres-managed so manual unmap is redundant [sashiko]
+  - Remove pci_disable_device() from probe error path and remove path: pcim_enable_device() registers devres cleanup, manual disable causes enable_cnt underflow [sashiko]
+- Patch 3 (Add control DMA interface):
+  - Add #include "mtk_cldma.h" in mtk_cldma_drv_m9xx.c to fix sparse undeclared symbol warnings for mtk_cldma_regs_m9xx and cldma_drv_ops_m9xx
+  - Move extern declaration of mtk_ctrl_info_m9xx from mtk_trans_ctrl.c to mtk_trans_ctrl.h to fix sparse undeclared symbol warning
+  - Replace kcalloc + radix_tree_gang_lookup with radix_tree_for_each_slot() in mtk_ctrl_remove_radix_tree() to eliminate allocation in teardown path [sashiko]
+  - Add missing mtk_pci_dev_exit() call in mtk_pci_remove() to properly clean up FSM and trans_ctrl resources before device removal [sashiko]
+- Patch 4 (Add control port):
+  - Replace kcalloc + radix_tree_gang_lookup with radix_tree_for_each_slot() and single-entry gang_lookup in mtk_port_tbl_destroy() to eliminate allocation failure in teardown path [sashiko]
+  - Add port = NULL after mtk_port_put_locked() in mtk_port_internal_open() error path to prevent returning un-refcounted pointer [sashiko]
+  - Restore skb_unlink + trb_complete for non-EAGAIN errors in mtk_ctrl_trb_handler() TX path to prevent infinite retry loop [sashiko]
+- Patch 5 (Add FSM thread):
+  - Check mtk_pci_register_irq() return value in mtk_cldma_dev_init() and add err_destroy_wq error label to fix unreachable dead code [sashiko]
+  - Propagate specific error codes (ENOMEM/EIO/EINVAL) from mtk_cldma_dev_init() error paths instead of generic -EIO [sashiko]
+  - Free head SKB after detaching frag_list in mtk_cldma_rxq_free() scatter-gather mode to fix memory leak [sashiko]
+- Patch 6 (Add AT & MBIM WWAN ports):
+  - Remove unused write_lock mutex from struct mtk_port and its mutex_init call [sashiko]
+- Link to v2: https://patch.msgid.link/20260610-t9xx_driver_v1-v2-0-c65addf23b3f@compal.com
+
+Changes in v2:
+- Split series into control plane (this v2) and data plane (follow-up)
+- Patch 1 (Add PCIe core):
+  - Rename BAR_NUM to MTK_PCI_BAR_NUM for driver prefix consistency
+  - Replace magic numbers in mtk_pci_setup_atr() with named defines
+  - Remove redundant ATR register comments, use blank line separators
+  - Add kernel-doc comments to all non-static functions
+  - Convert 4 MMIO wrapper functions to static inline in header [sashiko]
+  - Remove unnecessary unlikely() from IRQ validation paths
+  - Add irq_cnt == 0 and irq_id < 0 guards in mtk_pci_get_virq_id() [sashiko]
+  - Initialize hw_bits at declaration for consistency
+  - Merge same-type variable declarations into single lines
+  - Add #else/#endif comments for CONFIG_ACPI blocks
+  - Add newlines in mtk_pci_pldr() for readability
+  - Move return into default case in mtk_pci_dev_reset()
+  - Simplify mtk_mhccif_init() error path to use direct returns
+  - Change -EFAULT to -ENOLINK for PCIe link check failure
+  - Rename goto label "out" to "log_err" in mtk_pci_probe()
+  - Wrap long lines to stay within 80 columns
+  - Fix IRQ vector leak: add pci_free_irq_vectors() on error path [sashiko]
+  - Fix mtk_pci_remove() ordering: free IRQ before cancel_work_sync [sashiko]
+  - Fix mtk_pci_pldr() ACPI buffer leak: free first result before second call [sashiko]
+  - Replace msleep(500) with MTK_PLDR_POWER_OFF_DELAY_MS define
+  - Remove unused EXT_EVT_H2D_DRM_DISABLE_AP and related register define [sashiko]
+  - Increase MTK_IRQ_NAME_LEN from 20 to 32 to fix W=1 format-truncation warning [sashiko]
+- Patch 2 (Add control plane transaction layer):
+  - Add kernel-doc comments to mtk_ctrl_init() and mtk_ctrl_exit()
+  - Change mtk_ctrl_exit() return type from int to void
+  - Set mdev->ctrl_blk to NULL after freeing in mtk_ctrl_exit() [sashiko]
+  - Change ctrl_blk from void* to typed struct mtk_ctrl_blk* [sashiko]
+  - Remove redundant "depends on MTK_T9XX" from MTK_T9XX_PCI Kconfig [sashiko]
+  - Use mtk_dev_free() instead of devm_kfree() in mtk_pci_probe() error path [sashiko]
+- Patch 3 (Add control DMA interface):
+  - Add @ops kernel-doc parameter for mtk_ctrl_init()
+  - Rename 'err' to 'ret' consistently throughout the patch
+  - Reorder variable declarations to follow reverse Christmas tree style
+  - Change mtk_cldma_txq_free() return type from int to void
+  - Change mtk_cldma_rxq_free() return type from int to void
+  - Change mtk_cldma_exit() return type from int to void
+  - Remove unnecessary zero-initialization of ret in mtk_cldma_start_xfer()
+  - Remove unnecessary zero-initialization of ret in mtk_cldma_tx()
+  - Use direct return instead of goto out in mtk_cldma_submit_tx() error paths
+  - Move software state before HWO flag in mtk_cldma_submit_tx()
+  - Squash variable declarations in mtk_cldma_check_intr_status()
+  - Remove unlikely() from validation paths in mtk_cldma_check_ch_cfg()
+  - Clamp data_recv_len with min_t to prevent skb_over_panic in mtk_cldma_rx_skb_adjust() [sashiko]
+  - Use READ_ONCE() for HWO flag polling in mtk_cldma_check_rx_req() [sashiko]
+  - Fix mtk_cldma_rx_done_work() to always unmask interrupt on error path [sashiko]
+  - Add DMA address guard in mtk_cldma_txq_free() teardown loop [sashiko]
+  - Add IS_ERR() check for kthread_run() in mtk_ctrl_trb_srv_init() [sashiko]
+  - Fix queue_info memory leak on validation failure in mtk_pcie_hif_init() [sashiko]
+  - Handle non-EAGAIN errors in mtk_ctrl_trb_handler() TX path [sashiko]
+  - Fix 'err' typo to 'ret' in mtk_cldma_txbuf_set() error message
+  - Remove unused variable mdev in mtk_cldma_rx_check_again() [sashiko]
+  - Remove unused variables trans and ctrl_blk in mtk_cldma_txq_free() and mtk_cldma_rxq_free() [sashiko]
+- Patch 4 (Add control port):
+  - Add @cfg kernel-doc parameter for mtk_ctrl_init()
+  - Update mtk_ctrl_init() return description to cover additional error codes
+  - Fix double list_del in mtk_port_stale_list_grp_cleanup() [sashiko]
+  - Fix direct mtk_port_trb_free() call to use kref_put() in mtk_port_ch_enable() error path [sashiko]
+  - Fix direct mtk_port_trb_free() call to use kref_put() in mtk_port_ch_disable() error path [sashiko]
+  - Add mtk_port_tbl_destroy() in mtk_port_mngr_init() error path to prevent port memory leak [sashiko]
+  - Change port_ops exit/reset/enable/disable callbacks from int to void
+  - Move -EIO dispatch comment to where the code was introduced
+- Patch 5 (Add FSM thread):
+  - Add bounds check for rtft_entry in mtk_fsm_parse_hs2_msg() [sashiko]
+  - Add skb length validation before accessing ctrl_msg_header in mtk_fsm_sap_ctrl_msg_handler() [sashiko]
+  - Fix skb leak on CTRL_MSG_HS2 mismatch return in mtk_fsm_sap_ctrl_msg_handler() [sashiko]
+  - Add skb length validation before accessing ctrl_msg_header in mtk_fsm_md_ctrl_msg_handler() [sashiko]
+  - Replace devm_kzalloc/devm_kfree with kzalloc/kfree for FSM events [sashiko]
+  - Fix mtk_fsm_evt_submit() to return -ETIMEDOUT on blocking event timeout [sashiko]
+  - Change FSM kthread from TASK_INTERRUPTIBLE to TASK_UNINTERRUPTIBLE [sashiko]
+  - Remove unused variable hw_id in mtk_cldma_dev_exit() [sashiko]
+- Patch 6 (Add AT & MBIM WWAN ports):
+  - Use imperative mode in commit message
+  - Remove unnecessary zero-initialization of ret in mtk_port_copy_data_from()
+  - Change copy_from_user() error code from -EFAULT to -EINVAL in mtk_port_copy_data_from()
+  - Return -EINVAL for zero-length write in mtk_port_common_write()
+  - Change mtk_port_wwan_exit/enable/disable() return type from int to void
+  - Fix packet_size to account for CCCI header reservation in mtk_port_common_write() [sashiko]
+  - Fix WWAN tx callbacks to consume skb and return 0 per wwan_port_ops contract [sashiko]
+  - Fix wwan_create_port() error path: clear ERR_PTR to NULL and call mtk_port_ch_disable() [sashiko]
+- Patch 7 (Add maintainers entry): new patch
+- Link to v1: https://patch.msgid.link/20260529-t9xx_driver_v1-v1-0-bdbfe2c01e57@compal.com
+
+---
+Jack Wu (7):
+      net: wwan: t9xx: Add PCIe core
+      net: wwan: t9xx: Add control plane transaction layer
+      net: wwan: t9xx: Add control DMA interface
+      net: wwan: t9xx: Add control port
+      net: wwan: t9xx: Add FSM thread
+      net: wwan: t9xx: Add AT & MBIM WWAN ports
+      net: wwan: t9xx: Add maintainers entry
+
+ MAINTAINERS                                     |    9 +
+ drivers/net/wwan/Kconfig                        |   17 +
+ drivers/net/wwan/Makefile                       |    1 +
+ drivers/net/wwan/t9xx/Makefile                  |   14 +
+ drivers/net/wwan/t9xx/mtk_ctrl_plane.c          |  111 ++
+ drivers/net/wwan/t9xx/mtk_ctrl_plane.h          |   88 ++
+ drivers/net/wwan/t9xx/mtk_dev.c                 |   55 +
+ drivers/net/wwan/t9xx/mtk_dev.h                 |  114 ++
+ drivers/net/wwan/t9xx/mtk_fsm.c                 |  948 +++++++++++++++
+ drivers/net/wwan/t9xx/mtk_fsm.h                 |  140 +++
+ drivers/net/wwan/t9xx/mtk_port.c                |  968 +++++++++++++++
+ drivers/net/wwan/t9xx/mtk_port.h                |  174 +++
+ drivers/net/wwan/t9xx/mtk_port_io.c             |  573 +++++++++
+ drivers/net/wwan/t9xx/mtk_port_io.h             |   41 +
+ drivers/net/wwan/t9xx/mtk_utility.h             |   33 +
+ drivers/net/wwan/t9xx/pcie/Makefile             |   15 +
+ drivers/net/wwan/t9xx/pcie/mtk_cldma.c          | 1420 +++++++++++++++++++++++
+ drivers/net/wwan/t9xx/pcie/mtk_cldma.h          |  173 +++
+ drivers/net/wwan/t9xx/pcie/mtk_cldma_drv.c      |  371 ++++++
+ drivers/net/wwan/t9xx/pcie/mtk_cldma_drv.h      |  174 +++
+ drivers/net/wwan/t9xx/pcie/mtk_cldma_drv_m9xx.c |  178 +++
+ drivers/net/wwan/t9xx/pcie/mtk_cldma_drv_m9xx.h |  101 ++
+ drivers/net/wwan/t9xx/pcie/mtk_ctrl_cfg_m9xx.c  |   55 +
+ drivers/net/wwan/t9xx/pcie/mtk_pci.c            | 1102 ++++++++++++++++++
+ drivers/net/wwan/t9xx/pcie/mtk_pci.h            |  234 ++++
+ drivers/net/wwan/t9xx/pcie/mtk_pci_drv_m9xx.c   |   69 ++
+ drivers/net/wwan/t9xx/pcie/mtk_pci_reg.h        |   71 ++
+ drivers/net/wwan/t9xx/pcie/mtk_trans_ctrl.c     |  603 ++++++++++
+ drivers/net/wwan/t9xx/pcie/mtk_trans_ctrl.h     |  107 ++
+ 29 files changed, 7959 insertions(+)
+---
+base-commit: eb3f4b7426cfd2b79d65b7d37155480b32259a11
+change-id: 20260529-t9xx_driver_v1-1744f8af7739
+
+Best regards,
+--  
+Jack Wu <jackbb_wu@compal.com>
 
 
-Thanks or the report.
-
-Can you test the following patch?
-
-diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-index 9944ed923ddfd10f9adf6ad788c0740daeaf2adb..c5f8d2f9d325de8f4d2247ddaa5=
-2e33378851857
-100644
---- a/net/ipv4/udp_tunnel_nic.c
-+++ b/net/ipv4/udp_tunnel_nic.c
-@@ -304,8 +304,8 @@ udp_tunnel_nic_device_sync(struct net_device *dev,
-struct udp_tunnel_nic *utn)
-        if (!utn->need_sync)
-                return;
-
--       queue_work(udp_tunnel_nic_workqueue, &utn->work);
-        utn->work_pending =3D 1;
-+       queue_work(udp_tunnel_nic_workqueue, &utn->work);
- }
-
- static bool
-@@ -866,6 +866,11 @@ udp_tunnel_nic_unregister(struct net_device *dev,
-struct udp_tunnel_nic *utn)
-
-        udp_tunnel_nic_lock(dev);
-
-+       if (utn->work_pending) {
-+               udp_tunnel_nic_unlock(dev);
-+               return;
-+       }
-+
-        /* For a shared table remove this dev from the list of sharing devi=
-ces
-         * and if there are other devices just detach.
-         */
-@@ -901,12 +906,6 @@ udp_tunnel_nic_unregister(struct net_device *dev,
-struct udp_tunnel_nic *utn)
-        udp_tunnel_nic_flush(dev, utn);
-        udp_tunnel_nic_unlock(dev);
-
--       /* Wait for the work to be done using the state, netdev core will
--        * retry unregister until we give up our reference on this device.
--        */
--       if (utn->work_pending)
--               return;
--
-        udp_tunnel_nic_free(utn);
- release_dev:
-        dev->udp_tunnel_nic =3D NULL;
 
