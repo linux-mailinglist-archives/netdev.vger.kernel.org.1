@@ -1,192 +1,195 @@
-Return-Path: <netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301555-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YcqoIW2DO2pEZAgAu9opvQ
-	(envelope-from <netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:12:45 +0200
+	id /FGTF7qDO2pXZAgAu9opvQ
+	(envelope-from <netdev+bounces-301555-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:14:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C086BC0E2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:12:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9DEB6BC111
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 09:14:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=NEk6jZgM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301554-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301555-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301555-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ECF37302F4D7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:12:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75F903017266
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 07:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F9738D401;
-	Wed, 24 Jun 2026 07:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF2538B7CD;
+	Wed, 24 Jun 2026 07:13:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6524638B7D6
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EED38B7A1
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 07:13:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782285156; cv=none; b=eiyPBitwdGQ2r4Qyr9QDcRzJwxzetDgMnrRITeeeq0AjyGS1nkSeXJ0Elv63i7SwUjlHeg02mIcXl+P6Qx6qm40f4aA5gX2MkjE4OPpz2rT6WW7BlCZOGuPBmePl4QEns9gd21PR3YEhlpCXYF9A2evQQwMDuxcWFqYUimOR/lI=
+	t=1782285198; cv=none; b=aExgGegECaO2GYpBf+ZhBrcaCrZwjZUVA4CU1icn4Ffn3hg/3TkfL+gM6Kq2WKa3H8d8zusyxgxEtiquDv/JfBEUUyeiWaUxfXJ5h1nix5pA6JL6MLquG2PePq1UwcVYMQMdALe3x9hIewiV7KwDF+/+QML70hebVGTmiUzLD9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782285156; c=relaxed/simple;
-	bh=T+oTEsZifQSSjkTTm8dieBj546vS01rprc6FRMPpgRY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NTxZFCjrnA21B3nZUVhz9O9ewUkswllHpKn5fPpY2l/j/ntlqKj2muXKkQ0ZujJGbd3dBnBEFPlpBgJBChNNSLiPNPsmSVgVKJv6v1fPYqRsTHcE8oKE831ikKfIcCghPLHijezIoYL3xG5wzRs6uhdm4tDTWzS48xVsDAyOCH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEk6jZgM; arc=none smtp.client-ip=209.85.221.41
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4633193af19so509439f8f.2
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 00:12:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782285153; x=1782889953; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VhG9FcF945Re4Q58PUpr7BwlsxWpmlT6fgah9/vT28s=;
-        b=NEk6jZgMulgJqN17XPHyzxZWrjC3SRgX+YSWsZTjYh/fBnelCNZujLrpG/e+mFyoF7
-         f1Gq3XqQrb60v77rGI8/iNo2sqx2/b7UaQAXvH3QITshpe3OUojUSyJlLvUAe2/GpKjU
-         SE3hQWJrn17c9XTEnFuUX50Exw4ddu2TEcs+Jh3H2E1/KEmNBi8R2E1viN8X/RS/F8hf
-         ArU9eVXTMzswldd/Um38NKIYizUTz23JNVE2PVtj38Gk/Zuo1ygshyyt6BVLAHby6pN0
-         x3Dfz9pBCe5euKHjThKElffKbbO9TKgxcg8aVoI/xbwPxYjVbF266rAnHHl+iApuV2NX
-         Ru3A==
+	s=arc-20240116; t=1782285198; c=relaxed/simple;
+	bh=D5x3bMnC7ssQUxkomi6+PpKQQaU7Xoq+nvNPzzgbtlE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=B93OdfCqKg/XujLmlo0g4KkWUr2o6qOjeMV+DpXY/4ej9jgZVqM+4bda3o0lVaxUgXfI8ckXz9AIlVGB8rDsq2njiN/AUfxhERxoWN/eSK/8exxGPAGuSor9bI17HyXJt9kvdQc/DW7eTbLB3XTJvUeSz2zzd3QUEeDGw1aM9Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-48952d1c293so1202279b6e.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 00:13:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782285153; x=1782889953;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VhG9FcF945Re4Q58PUpr7BwlsxWpmlT6fgah9/vT28s=;
-        b=Qg3QOnVVS82mJJqnLfkZ1xwP5ZEksMypsPgwK8fKoxYyja4ZTmbomH+P6g8vt+8aWu
-         XYprn0+XikF+6hBBmDdZtxAtg/NM0CO771qZAQQBeYUufpRrWXhs3saqmoMF28xYAia+
-         gFzh/RWHrqiohkTGVpx6CV8OD3+rtn5hKvkWFnkH+SG7vwCGbIorYbC+X2XeA0G9b4PA
-         gKUC1RxBkqOfzMCLXQAeIKI1WRi3hGI36xa7h2omZDB3naXtnEuhIbWpinKGIvL4YUs0
-         APKm7itEfX/cnWOMUq5+hAjD0ykfejZC44D0FjZ3TusDDz/DrxeIU2469rnwsyIDWCh8
-         AWcw==
-X-Forwarded-Encrypted: i=1; AHgh+Rr7IN/nwpMSch6B1Q4KUeEvDNznaJleQsCJ62AeddXEYXu0VZ9D3GNgHIly4LOKNwiFhH969M0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4ZV4BEs9Csqwxkcw8EdGwogyP44U3RvsQ2t4cpzWWk8oZVr7e
-	53KZSC04Cu2C68+p9Uw08fMlJ5hhz1biwB05Pmv1TIYVh3Porcm0bUrx
-X-Gm-Gg: AfdE7ckseCr38ApjH37Fy1zZn9lLf+P0h+9MATWUeCqZJRoBlgbWbzBcxflBT7UN7Ve
-	nUWEGbtqZ/imuFRmL6cO7x4uIovdG94JLgU75mkxX0bUBpVwkPBRNl8XFkV+Qo226rMKHhbHraU
-	/TmYBsQ00U3np4sGc1UNSl4q/F5GP9OXoHHMnIklpZAJJpIZawiFmYLAsMUo8Ny2Ej3nTFybDao
-	m6ocdhWY0NrP6Ccd7a/srUgeGTvmuQytGaShn6Ki5V+e9F9XpFC7DoenWKgO+TwSmnarmRBdwu0
-	PX28qPpkesHF982txSFroHA2lJqHectnhvPlk5cH4cCcU/G1+hZn++KICe27wKTC3T5nxZzuG9A
-	4V12UNMABLoFIpVKkAvcVd8hSC0ZbDIvn4PXR4Syyyr88DLnDAaqZYChSsoxh+IL33eO1tH0JIO
-	k7Ll4fL4K7
-X-Received: by 2002:a05:6000:4683:b0:46a:1f35:113f with SMTP id ffacd0b85a97d-46a1f35172dmr8359155f8f.21.1782285152523;
-        Wed, 24 Jun 2026 00:12:32 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46c1ee0189esm4296531f8f.9.2026.06.24.00.12.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jun 2026 00:12:32 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: avagin@gmail.com
-Cc: akpm@linux-foundation.org,
-	alexander@mihalicyn.com,
-	axboe@kernel.dk,
-	bernd@bsbernd.com,
-	brauner@kernel.org,
-	criu@lists.linux.dev,
-	david@kernel.org,
-	dhowells@redhat.com,
-	fuse-devel@lists.linux.dev,
-	hch@infradead.org,
-	jack@suse.cz,
-	joannelkoong@gmail.com,
-	linux-api@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	miklos@szeredi.hu,
-	netdev@vger.kernel.org,
-	patches@lists.linux.dev,
-	pfalcato@suse.de,
-	rostedt@goodmis.org,
-	safinaskar@gmail.com,
-	torvalds@linux-foundation.org,
-	val@packett.cool,
-	viro@zeniv.linux.org.uk,
-	willy@infradead.org
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-Date: Wed, 24 Jun 2026 10:12:26 +0300
-Message-ID: <20260624071226.2272209-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <CANaxB-zK5q=Xw6UZTmeFtXsDZjUsPkFk=p485m-wtNTBnf4hgg@mail.gmail.com>
-References: <CANaxB-zK5q=Xw6UZTmeFtXsDZjUsPkFk=p485m-wtNTBnf4hgg@mail.gmail.com>
+        d=1e100.net; s=20251104; t=1782285196; x=1782889996;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bBoFAIV4uqiLRHVMXBdmCTKrSw3E3vg+XbDQ1EwUBeo=;
+        b=Ajt440e4LSNPnOXgsbHgAmQRrb6IfssIQid3ivDQ+CJ1y5wxA7+fnspuDSEg6IYk3i
+         cVMX9rIxNCuPmlEFIK7RaJeG872C2Y6qH2UUC1ollhCkKy/99TmfL9uZyjjyNy5/nS7X
+         V8gJDfzAQmjAWzwIhe+QY/uWDvNk10fFlu+qMjZaz/z76DhSPZdxcazKvE79xmHC+M3A
+         IjBBB2yKpbbxYA7kzROTIEXPCTYtGDG6IepcJhcK7q25gF2H8O+qvqjtWlSYy5B10OFP
+         cvhpIRB9ow9lJ6XTv9Q3gozuHJjQcyRk8wuFcdpo10Cfl2JlzAmK5eejw5N700vqZeaT
+         oK7A==
+X-Forwarded-Encrypted: i=1; AFNElJ/+mZRgeiHFWfeMhVwAbc3maYufjA8WqGCOP+LaW9RWK7pxuZHwihHiAJV2fMvv5CniVrNbtug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHlQf1CBhvnl0/ZR0HUJLs451/cIcwHwT99bDA1ggPC+HSeBiX
+	wBDfZrCXiynJAcqxMhK0GmHhRfxPuszhw/sktk+16Tes+mVdv3HTy7XD4qD3V9b1CVpFWwJPmK+
+	hiXjz6DIGw300MFaQKM/rv9GrYWWUYhA1vBHJSWz3V0iD9u65lbsZplbPDeA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:1496:b0:48c:3b4:2b95 with SMTP id
+ 5614622812f47-48c03b4480emr14653928b6e.29.1782285195953; Wed, 24 Jun 2026
+ 00:13:15 -0700 (PDT)
+Date: Wed, 24 Jun 2026 00:13:15 -0700
+In-Reply-To: <20260623222402.175798-1-sam@bynar.io>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a3b838b.c358b6d0.89040.0007.GAE@google.com>
+Subject: [syzbot ci] Re: nfc: nci: fix uninit-value in nci_core_init_rsp_packet()
+From: syzbot ci <syzbot+cie92d4e0088e1c4d0@syzkaller.appspotmail.com>
+To: davem@davemloft.net, david@ixit.cz, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	oe-linux-nfc@lists.linux.dev, pabeni@redhat.com, sam@bynar.io, 
+	stable@vger.kernel.org
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TAGGED_FROM(0.00)[bounces-301554-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux-foundation.org,mihalicyn.com,kernel.dk,bsbernd.com,kernel.org,lists.linux.dev,redhat.com,infradead.org,suse.cz,gmail.com,vger.kernel.org,kvack.org,szeredi.hu,suse.de,goodmis.org,packett.cool,zeniv.linux.org.uk];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:avagin@gmail.com,m:akpm@linux-foundation.org,m:alexander@mihalicyn.com,m:axboe@kernel.dk,m:bernd@bsbernd.com,m:brauner@kernel.org,m:criu@lists.linux.dev,m:david@kernel.org,m:dhowells@redhat.com,m:fuse-devel@lists.linux.dev,m:hch@infradead.org,m:jack@suse.cz,m:joannelkoong@gmail.com,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:rostedt@goodmis.org,m:safinaskar@gmail.com,m:torvalds@linux-foundation.org,m:val@packett.cool,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:david@ixit.cz,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:oe-linux-nfc@lists.linux.dev,m:pabeni@redhat.com,m:sam@bynar.io,m:stable@vger.kernel.org,m:syzbot@lists.linux.dev,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301555-lists,netdev=lfdr.de,cie92d4e0088e1c4d0];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email,syzbot.org:url,googlegroups.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 24C086BC0E2
+X-Rspamd-Queue-Id: B9DEB6BC111
 
-Andrei Vagin <avagin@gmail.com>:
-> The CRIU fifo test fails with this change. The problem is that vmsplice
-> with SPLICE_F_NONBLOCK to a fifo file descriptor fails with -EOPNOTSUPP.
-> 
-> It seems we need a fix like this one:
-> 
-> diff --git a/fs/pipe.c b/fs/pipe.c
-> index 429b0714ec57..6fc49e933727 100644
-> --- a/fs/pipe.c
-> +++ b/fs/pipe.c
-> @@ -1253,6 +1253,7 @@ static int fifo_open(struct inode *inode, struct
-> file *filp)
-> 
->         /* We can only do regular read/write on fifos */
->         stream_open(inode, filp);
-> +       filp->f_mode |= FMODE_NOWAIT;
-> 
->         switch (filp->f_mode & (FMODE_READ | FMODE_WRITE)) {
->         case FMODE_READ:
+syzbot ci has tested the following series
 
-Does CRIU actually rely on ability to do SPLICE_F_NONBLOCK vmsplice into
-named fifos? Or this is merely a test?
+[v1] nfc: nci: fix uninit-value in nci_core_init_rsp_packet()
+https://lore.kernel.org/all/20260623222402.175798-1-sam@bynar.io
+* [PATCH net] nfc: nci: fix uninit-value in nci_core_init_rsp_packet()
 
-If this is just a test, I think we need not to preserve this behavior.
+and found the following issue:
+UBSAN: array-index-out-of-bounds in nci_init_complete_req
 
-I did debian code search with regex "vmsplice.*SPLICE_F_NONBLOCK" and I
-found very few packages. And it seems all them use pipes, not named fifos.
+Full report is available here:
+https://ci.syzbot.org/series/2a9a8657-37a3-4dce-8cb5-2035027791dd
 
-(On speed: I still think that my vmsplice patches are good thing,
-despite performance regressions in CRIU.)
+***
 
--- 
-Askar Safin
+UBSAN: array-index-out-of-bounds in nci_init_complete_req
+
+tree:      linux-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next
+base:      a986fde914d88af47eb78fd29c5d1af7952c3500
+arch:      amd64
+compiler:  Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+config:    https://ci.syzbot.org/builds/80f835c3-e998-47ff-aaa5-24c578af3b4e/config
+syz repro: https://ci.syzbot.org/findings/65008893-2498-4786-b913-f2c474a7b34a/syz_repro
+
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in net/nfc/nci/core.c:192:7
+index 4 is out of range for type '__u8[4]' (aka 'unsigned char[4]')
+CPU: 0 UID: 0 PID: 5905 Comm: syz.1.33 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ ubsan_epilogue+0xa/0x30 lib/ubsan.c:233
+ __ubsan_handle_out_of_bounds+0xe8/0xf0 lib/ubsan.c:455
+ nci_init_complete_req+0x255/0x460 net/nfc/nci/core.c:192
+ __nci_request+0x7d/0x300 net/nfc/nci/core.c:108
+ nci_open_device net/nfc/nci/core.c:529 [inline]
+ nci_dev_up+0x8c3/0xdc0 net/nfc/nci/core.c:643
+ nfc_dev_up+0x165/0x350 net/nfc/core.c:118
+ nfc_genl_dev_up+0x89/0xe0 net/nfc/netlink.c:775
+ genl_family_rcv_msg_doit+0x233/0x340 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x614/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+ sock_sendmsg_nosec net/socket.c:775 [inline]
+ __sock_sendmsg net/socket.c:790 [inline]
+ ____sys_sendmsg+0x9b9/0xa20 net/socket.c:2684
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+ __sys_sendmsg net/socket.c:2770 [inline]
+ __do_sys_sendmsg net/socket.c:2775 [inline]
+ __se_sys_sendmsg net/socket.c:2773 [inline]
+ __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f55ead9ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f55ebcb9028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f55eb015fa0 RCX: 00007f55ead9ce59
+RDX: 0000000004008054 RSI: 0000200000000200 RDI: 0000000000000005
+RBP: 00007f55eae32e6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f55eb016038 R14: 00007f55eb015fa0 R15: 00007ffcba11c798
+ </TASK>
+---[ end trace ]---
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
