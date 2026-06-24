@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301733-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3rPZNlsGPGouiwgAu9opvQ
-	(envelope-from <netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:31:23 +0200
+	id vcPsM1oKPGpKjAgAu9opvQ
+	(envelope-from <netdev+bounces-301733-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:48:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C5AA6BFFBD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:31:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E6B6C0135
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 18:48:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=avUXvY8w;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301714-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YKXSriNJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301733-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301733-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C94313009989
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:31:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CE6530903B1
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 16:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE3A2BD58A;
-	Wed, 24 Jun 2026 16:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13DE32ED54;
+	Wed, 24 Jun 2026 16:40:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF5B2F7EE8
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 16:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF7B329C71
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 16:40:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782318680; cv=none; b=P1AqKbD5P6VaXetn6mc2/rsGPP62QynrMw9gtmFOsEkWun2MOR2cnT39pkJbChrEEdStsk0rcMZ9cZC/3CDVkEU9w02WlFb3Qi+1RMaSLelH3C4FUv1toMI2C5NoxXS7tc68yGFsLh5Eg3fYDXvTwi0q3xWUO44o+cz3Uv92te8=
+	t=1782319241; cv=none; b=qT0hr6I7BpU8Btnzd0AYxFys4ADM149l6ZU+Bzn1fYObOub1yPVjvcGBqGcWrCN+FUguv8S5+lKRXQGKsOSShhlxtrz5IH//zr0E/G0p+AWNdx5FdFAd+6GWI37fz/r+vLqwo7SdkmjsPMlzRcQP4tQmtMX8laL+kRuJM9jdIhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782318680; c=relaxed/simple;
-	bh=OoZJTggCVtnrc1vhjX0fS3oe8NmGPp2spvl0vbKitYY=;
+	s=arc-20240116; t=1782319241; c=relaxed/simple;
+	bh=ERgO9fR+JNxq7Wf7Mihb00HfnEaaOROeM3Vj1Fmqhnc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aDpcidhCy/QdiSyUds8Hd9PC96RXzAayr64RY/WheLhj8yFDHejvxbTVpZabhog/6P2Aj6pogmuqH7rCp8mYn2geBjmCmKs/kV8q2tWWSRWUxzoJP2KqLav7Yc1MIszCLC6lHI40fd57a3oyvDjxcSa+wIlOuzE+gYCd+PSaJbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avUXvY8w; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B89D1F000E9;
-	Wed, 24 Jun 2026 16:31:16 +0000 (UTC)
+	 MIME-Version; b=BD3aALWiElljSXdeNjB2x1up+hit59DxlROOd2+0EubYSIdEbm1p8/DnoWsbzEuvfBjbVR7QQ1BQO72Gh+XObUD6Qcnwrq4/8HxzxDMXFV01+MqNXUwJ64lR8FgsRF5eT3MxKMSpzswiAL7mM8sKFYH7CeNC3ynmVRzIszPW5QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKXSriNJ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1401D1F00A3A;
+	Wed, 24 Jun 2026 16:40:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782318678;
-	bh=wazYbUJgqhR8xpd0IySqVbbECzd3A9b0ORDczmzdtjE=;
+	s=k20260515; t=1782319240;
+	bh=Vn4fFZoy5PlSeydUMxpIJV+IuqKhUGEhHOXrG3ACH98=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=avUXvY8w1AXOVduxO/tTRy1iRjmdGJhuo4pzWmoXFrM6oHXianuWIienD9U4+MB0+
-	 EMHNKKrr9zq5OkrZxvSPUxrOmavv8u3H0+XqIkX3TPjCfgSi1ZMFEzY62+ywdmT0Nu
-	 uYB6Qpr36+TsACDN9cxsuI57L4Uttu5q3lfiye5sgze2xNMdv+hLfjyhnmjMr/ZCXv
-	 gZrDK4N8SVhCNyfgD1legdXXGwVfNoWUcGb0gXBu1SwNWxmDAaWi2mP9mqaBJzIyce
-	 GK93JWkM6QYmk9+ybrunZoXa5wBN3yK08iFEpiHHx5BpZfTs8o7/LycVQy/Q8iCQAB
-	 i0R2BSFhPTAqA==
+	b=YKXSriNJ2iEGZzOocLfUXXQEv0axYK9sWp7ILG6hS3ZRG9dkoH/OqQLvQ/2oWSQfg
+	 NyNiIGXaczJ2H/5073TQJ7IaHIvYUTgSpfAxJFOXN656nAqWpLw/hJHKZtyW8hQUW1
+	 EhCJ3s+bbTpATKV+Yy20Etj0zAm89cYf1T0jtFYWitIHCN7jmWW28E1aEokea2+dzH
+	 iDYaBnp+phUcbiF/pzivdX6oN7Adi/OFt6gN+TphZKQOuThfOudQQrbWKKsap8QKdT
+	 bs1U4u7HsnpPCXWXsEeIAR3iJsp5KHt3aV8yxY/gZAj7Ok+MmBa93iMndgR4FHhriH
+	 85uoMQq+pGAiw==
 From: Simon Horman <horms@kernel.org>
 To: jtornosm@redhat.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -59,12 +59,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: Re: [Intel-wired-lan] [PATCH net v7 2/4] i40e: skip unnecessary VF reset when setting trust
-Date: Wed, 24 Jun 2026 17:30:50 +0100
-Message-ID: <20260624163050.1145761-1-horms@kernel.org>
+Subject: Re: [PATCH net v7 3/4] iavf: send MAC change request synchronously
+Date: Wed, 24 Jun 2026 17:31:49 +0100
+Message-ID: <20260624163148.1146093-2-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260623101800.991293-3-jtornosm@redhat.com>
-References: <20260623101800.991293-3-jtornosm@redhat.com>
+In-Reply-To: <20260623101800.991293-4-jtornosm@redhat.com>
+References: <20260623101800.991293-4-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,13 +79,13 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301714-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301733-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -103,110 +103,159 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:url,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C5AA6BFFBD
+X-Rspamd-Queue-Id: 35E6B6C0135
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+Full review at: https://sashiko.dev
 ---
-i40e: skip unnecessary VF reset when setting trust
+iavf: send MAC change request synchronously
 
-This patch avoids the ~10 second VF reset delay on trust changes by
-flipping the I40E_VIRTCHNL_VF_CAP_PRIVILEGE bit directly, and only
-resorting to a full reset when revoking trust from a VF that has
-advanced features (ADQ, cloud filters, UC/MC promisc) configured.
+This commit fixes a deadlock in iavf_set_mac() by making the MAC
+address change synchronous. It introduces iavf_poll_virtchnl_response()
+to directly poll the admin queue instead of waiting on the watchdog task.
 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index a26c3d47ec15..0cc434b26eb8 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -4987,19 +5004,20 @@ int i40e_ndo_set_vf_trust(struct net_device *netdev, int vf_id, bool setting)
->  	set_bit(__I40E_MACVLAN_SYNC_PENDING, pf->state);
->  	pf->vsi[vf->lan_vsi_idx]->flags |= I40E_VSI_FLAG_FILTER_CHANGED;
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 630388e9d28cb..3fa288e3798ae 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+[ ... ]
+> @@ -1049,25 +1103,23 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
+>  		return -EADDRNOTAVAIL;
 >  
-> -	i40e_vc_reset_vf(vf, true);
-> +	/* Reset only if revoking trust and VF has advanced features configured */
-> +	if (!setting &&
-> +	    (vf->adq_enabled || vf->num_cloud_filters > 0 ||
-> +	     test_bit(I40E_VF_STATE_UC_PROMISC, &vf->vf_states) ||
-> +	     test_bit(I40E_VF_STATE_MC_PROMISC, &vf->vf_states))) {
-
-[High]
-Does this revoke-trust heuristic miss MAC/VLAN filters that were only
-installable while the VF was trusted?
-
-A trusted VF is allowed to add many more MAC addresses than
-I40E_VC_MAX_MAC_ADDR_PER_VF (i40e_check_vf_permission() uses
-I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF) and more than I40E_VC_MAX_VLAN_PER_VF
-VLANs.  These quotas are enforced only at add-time.
-
-The previous always-reset path went through i40e_vc_reset_vf() ->
-i40e_cleanup_reset_vf() -> i40e_free_vf_res() -> i40e_vsi_release(),
-which destroyed the VSI and its mac_filter_hash, and reset
-vf->num_vlan = 0.
-
-The new fast path only flips the PRIVILEGE bit, leaving any
-trusted-quota MAC/VLAN filters installed in hardware on an
-now-untrusted VF.  Should the heuristic also check
-vf->num_vlan > I40E_VC_MAX_VLAN_PER_VF or the size of the lan VSI's
-MAC filter hash before taking the no-reset branch?
-
-[Medium]
-Is the sampling of vf->adq_enabled, vf->num_cloud_filters and the
-UC/MC_PROMISC bits race-free against the admin queue worker?
-
-i40e_ndo_set_vf_trust() runs under rtnl_lock and
-__I40E_VIRTCHNL_OP_PENDING, but i40e_vc_process_vf_msg() (called from
-i40e_clean_adminq_subtask() in the service workqueue) takes neither.
-A virtchnl handler such as i40e_vc_config_promiscuous_mode_msg(),
-i40e_vc_add_cloud_filter() or i40e_vc_add_qch_msg() can be running
-concurrently and may have already passed its CAP_PRIVILEGE gate but
-not yet set vf_states / num_cloud_filters / adq_enabled when this
-ndo samples them.
-
-In that window the ndo would observe a "clean" VF, take the no-reset
-branch, and clear CAP_PRIVILEGE while the in-flight handler still
-goes on to enable promisc / install a cloud filter / set
-adq_enabled = true on the now-untrusted VF.
-
-The previous always-reset behaviour masked this because the reset
-moved the VF to I40E_VF_STATE_DISABLED, after which
-i40e_vc_process_vf_msg() rejects further messages.  Is some additional
-serialization (or a recheck after clearing the bit) needed here?
-
-> +		i40e_vc_reset_vf(vf, true);
-> +		i40e_del_all_cloud_filters(vf);
-> +	} else {
-> +		i40e_setup_vf_trust(vf, setting);
-> +	}
-> +
->  	dev_info(&pf->pdev->dev, "VF %u is now %strusted\n",
->  		 vf_id, setting ? "" : "un");
->  
-> -	if (vf->adq_enabled) {
-> -		if (!vf->trusted) {
-> -			dev_info(&pf->pdev->dev,
-> -				 "VF %u no longer Trusted, deleting all cloud filters\n",
-> -				 vf_id);
-> -			i40e_del_all_cloud_filters(vf);
-> -		}
-> -	}
+>  	ret = iavf_replace_primary_mac(adapter, addr->sa_data);
 > -
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue,
+> -					       iavf_is_mac_set_handled(netdev, addr->sa_data),
+> -					       msecs_to_jiffies(2500));
+> -
+> -	/* If ret < 0 then it means wait was interrupted.
+> -	 * If ret == 0 then it means we got a timeout.
+> -	 * else it means we got response for set MAC from PF,
+> -	 * check if netdev MAC was updated to requested MAC,
+> -	 * if yes then set MAC succeeded otherwise it failed return -EACCES
+> -	 */
+> -	if (ret < 0)
+> +	ret = iavf_set_mac_sync(adapter, addr->sa_data);
+> +	if (ret) {
+> +		/* Rollback only if send failed (message never reached PF).
+> +		 * Don't rollback on timeout (-EAGAIN) because the message was
+> +		 * sent and PF will eventually respond. When the response arrives,
+> +		 * iavf_virtchnl_completion() will handle rollback (on PF error)
+> +		 * or acceptance (on PF success) automatically.
+> +		 */
+> +		if (ret != -EAGAIN) {
+> +			iavf_mac_add_reject(adapter);
+> +			ether_addr_copy(adapter->hw.mac.addr, netdev->dev_addr);
+> +		}
+>  		return ret;
+> -
+> -	if (!ret)
+> -		return -EAGAIN;
+>  
+>  	if (!ether_addr_equal(netdev->dev_addr, addr->sa_data))
+>  		return -EACCES;
 
-[Low]
-The dedicated "VF %u no longer Trusted, deleting all cloud filters"
-dev_info() is dropped in this hunk, and the commit message does not
-mention the logging change.  Operators or log scrapers that key on
-this specific string for audit of cloud filter teardown will no
-longer see it; only the generic "VF %u is now untrusted" line
-remains.  Was removing this message intentional, and if so could
-that be called out in the changelog?
+[Severity: High]
+Will this cause a persistent state mismatch if a timeout is followed by a
+retry?
 
->  out:
->  	clear_bit(__I40E_VIRTCHNL_OP_PENDING, pf->state);
->  	return ret;
+If iavf_set_mac_sync() times out, it returns -EAGAIN and bypasses this
+rollback, leaving adapter->hw.mac.addr updated but netdev->dev_addr at the
+old MAC.
+
+If the user then retries before the PF asynchronously completes the original
+request, iavf_add_ether_addrs() returns -EBUSY. Since -EBUSY != -EAGAIN,
+the rollback runs, forcibly reverting adapter->hw.mac.addr to the old MAC.
+
+When the PF's delayed success response finally arrives,
+iavf_virtchnl_completion() sees the old MAC in both hw.mac.addr and
+netdev->dev_addr, bypassing the netdev MAC update. The PF hardware is now
+programmed with the new MAC, but the kernel retains the old MAC, dropping
+traffic.
+
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> index ec234cc8bd9db..e6b7e8f82c7c1 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+[ ... ]
+> @@ -555,20 +556,23 @@ iavf_set_mac_addr_type(struct virtchnl_ether_addr *virtchnl_ether_addr,
+>   * @adapter: adapter structure
+>   *
+>   * Request that the PF add one or more addresses to our filters.
+> - **/
+> -void iavf_add_ether_addrs(struct iavf_adapter *adapter)
+> + *
+> + * Return: 0 on success, negative on failure
+> + */
+> +int iavf_add_ether_addrs(struct iavf_adapter *adapter)
+>  {
+>  	struct virtchnl_ether_addr_list *veal;
+>  	struct iavf_mac_filter *f;
+>  	int i = 0, count = 0;
+>  	bool more = false;
+>  	size_t len;
+> +	int ret;
+>  
+>  	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
+>  		/* bail because we already have a command pending */
+>  		dev_err(&adapter->pdev->dev, "Cannot add filters, command %d pending\n",
+>  			adapter->current_op);
+> -		return;
+> +		return -EBUSY;
+>  	}
+
+[Severity: High]
+Could routine background tasks cause MAC changes to frequently fail?
+
+The watchdog task routinely sets adapter->current_op for background commands
+like VIRTCHNL_OP_GET_STATS. If iavf_set_mac() is called during this window,
+iavf_set_mac_sync() will hit this check and immediately fail the MAC change
+with -EBUSY.
+
+Because there is no retry logic in iavf_set_mac(), this error propagates
+directly to userspace, making MAC address configuration randomly fail based
+on watchdog timing.
+
+[ ... ]
+> @@ -712,8 +724,8 @@ static void iavf_mac_add_ok(struct iavf_adapter *adapter)
+>   * @adapter: adapter structure
+>   *
+>   * Remove filters from list based on PF response.
+> - **/
+> -static void iavf_mac_add_reject(struct iavf_adapter *adapter)
+> + */
+> +void iavf_mac_add_reject(struct iavf_adapter *adapter)
+>  {
+>  	struct net_device *netdev = adapter->netdev;
+>  	struct iavf_mac_filter *f, *ftmp;
+
+[Severity: Medium]
+Does exporting and reusing iavf_mac_add_reject() for local rollback cause
+unintended background MAC changes?
+
+When the user requests a MAC address that is already in the filter list
+(e.g., a secondary MAC), iavf_add_filter() sets f->is_new_mac = false and
+f->add = true, and flags IAVF_FLAG_AQ_ADD_MAC_FILTER.
+
+If the synchronous operation fails locally (like the -EBUSY return above),
+iavf_set_mac() calls this function. However, iavf_mac_add_reject() only
+clears the pending state and removes the filter if f->is_new_mac is true:
+
+    if (f->is_new_mac) {
+        list_del(&f->list);
+        kfree(f);
+    }
+
+Reused filters are ignored, leaving f->add = true and the
+IAVF_FLAG_AQ_ADD_MAC_FILTER flag active. The background watchdog task will
+eventually process this flag and blindly send the MAC configuration to the
+PF, even though the VF already aborted the operation locally.
 
