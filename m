@@ -1,177 +1,212 @@
-Return-Path: <netdev+bounces-301766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Zv7wBRgrPGphkwgAu9opvQ
-	(envelope-from <netdev+bounces-301766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 21:08:08 +0200
+	id g0jYCwQ2PGpClQgAu9opvQ
+	(envelope-from <netdev+bounces-301767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 21:54:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A68C6C0DF1
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 21:08:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846186C11D8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 21:54:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=j9Xee0b2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301766-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301766-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=OZjT31w4;
+	dkim=pass header.d=redhat.com header.s=google header.b=swPeArCF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301767-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301767-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7EF0C30237C5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 19:08:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 01C3E304F225
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 19:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9414331ECF;
-	Wed, 24 Jun 2026 19:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638863CEB9B;
+	Wed, 24 Jun 2026 19:53:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9542732E743
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 19:08:04 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782328085; cv=pass; b=KAHDxICX5q16wZkalaa75Xel8fzCNpK2oY7GQZxvqjp0S8JjFBDWC9qltBbQZJnKOWooxntJjzZPRM1FoDrAqcAK+Ml8DShSmZUAC8KTbhU7sOat/WlKXzd4eZ+ESD81eKwX5z/RAJwLlkz1ZYiXK1oX2Ng6DtPNPixbWcnM7mc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782328085; c=relaxed/simple;
-	bh=a/LXfwsYk03RG+j05HejQJt9P+Em4FQt7v8Wo2dT34c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XU5VS3bJ2npgp4bo5mL+REuad44cIE+V6wYKWyFYrPAiRBsR0mzY0dyrJAWWBZdS/SJS/60IcyFQ/Rf/AlzpMgK0rx+42X52Bl/3nl0pAr7s49O/BkxMWgaqTkm++YsX9SuwlXcBwEpQ1jHZJjiKUJpY6Fh30fezWYUJabfnvhs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j9Xee0b2; arc=pass smtp.client-ip=209.85.217.42
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-7276a7aefefso552193137.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 12:08:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782328083; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WdEuFSHksqUgHz8rf57NbZbGgO8xhFRv4o9Hz6/M3ubyKyivjMSTk1IvQvylTcORRM
-         v0EabE3hHcUhV8nYnoBjUO2+oCb8qEQJwHx9RTm+kKrX9GOPHpco8aBqDj4ExMp5iUBM
-         KrkgFLcFa9BkzhjVRPNkAzBbo5o9XmsZQpKeUJbR52eYKFRrEG27KwbtufaWXxcVc3V1
-         kzhir2AOT1H3Dn1GIa9SohYm7qrPL22/epoEwiHh3vr9ic+YMRhfmSauH9bCCneqAiJu
-         F9vdTJH5WZEbO2L+zgXBTXBSibUaYpMr2XdyDyH0y94GsPGOS72hjKbjF4WQEOzTbzJ5
-         KUsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7yvOePNFOw/xDYjvVuPFW0GtX2+mt0frb/jI2djDuck=;
-        fh=LFt3vGNUQeVXgdXz+KpTN8enDKGxxqQ0pkfAkpS372c=;
-        b=Tq6Iz26Q/mAqVPCJfmfYgTdsS9nj4JVFFRBZO7/TZMe2LCNoFVpmH19FaAXK53qkcA
-         C4lrDg/PdJl4x0p9yCcPwCn6ulW4dY1qKf/rLmVvcrNVk55zDIcsOsUbZSXEwJGltNKK
-         nZziRrdV7/UeAhiMEt8WH3LMRkZJAXd2rGtK8/you69bItjKKx1HDAokRmDCBtCeTGPQ
-         J0UgXItj9EyaTqmIZSeri17KIcbBdSmQrcFu7yOVFtJ3Fp279Wqb2ET8FFFE5EcgL3o+
-         72iiXv0o8bM7dSn8h1iL5KAGjigh8HRZk3b8ByOuFLXCrmuFD5tTkVDNwmSP4FGeQKrI
-         PCAw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBE93CDBC0
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 19:53:47 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782330829; cv=none; b=g5iIia0+NZ4HSZxnVh6eay1qBTS3ZSHfWIl1U8CntGJDizeEdHwq51WTsz+l0fARHzaepQihstJwkyAF8YnX6xQ+3f9BjJQNJ/nEUFimZJAhWZC/P+LPq7wyHtPksZek0qTHonphr6hK8CzLuWyAUQauf7LUsLr+5hwzab3ncIM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782330829; c=relaxed/simple;
+	bh=0sw9vdmmHIrg289S7LBhBP3TAeh5HlhPIfC0XvwKSeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NeA+dWoFuXKamVRuU3h1cEryUDDW6lMz4zp7DDS0seESHIt6feh4pA83vcqVXe5O/ULvjNWwyd48wQ75d9ZCXbsLb0Ob9f/wiTAfYkEBT1dBU+m+PthLR0S/6tlg4OX0fv3nnX5LGwRmazMF4F3zLTezm4Cxm0ZNIViqBSk0uR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZjT31w4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=swPeArCF; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782330827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hQwXPDQFNRwXTCwtbeb7bS0lb7BdO0SS5von3s4mxo4=;
+	b=OZjT31w4T3Df9mAnHts2uNCc8bpuSSl+fa91lrXjNDaQEf3ygGjRjO0tiXGgjNhvJRWoaU
+	rm2T+ERxQMHe3WoLI4fGKkjX6AU6CPOlEM7MKMySP240FPOg9fMlia8Sa3TJmFFSh69TmV
+	SHsdRkUu1efdq5FBhdp8gGltGQOcoh8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-ilIiAPJjOEaCa9q8WJN3nQ-1; Wed, 24 Jun 2026 15:53:44 -0400
+X-MC-Unique: ilIiAPJjOEaCa9q8WJN3nQ-1
+X-Mimecast-MFC-AGG-ID: ilIiAPJjOEaCa9q8WJN3nQ_1782330823
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-490a060eb84so9015205e9.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 12:53:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782328083; x=1782932883; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7yvOePNFOw/xDYjvVuPFW0GtX2+mt0frb/jI2djDuck=;
-        b=j9Xee0b2WMsJiYELfzhtcS5gk9+03RtJCSM3L0fgsG0j79iPA6fJa0D3EDgD1zJXFy
-         ylN3ksXJZXx7IBbxqkMCnhL8w9eK8ZsLFcYooy3nSpA47fDwXViM4eFHcbLBWJqA8Fqm
-         PdVKWhIaRaxkezG96itirbj5HUC7WrruL3SBdZEfR/2vDCJ5LjO6fwVt6vwj0fXmSGxN
-         JDD1hwtOlH8uLMjMGWePQJ5eBZ0/59UHvtFqx0BHgbxjQhLHyKiA/ZdWGj9eLqUtQKfX
-         OIXKSokPtGjq42kT4HFldLzZ22Xy2TBttPo4l9hJnYJJEx8rI1LTnLnVTMye0nZnucCU
-         pkyg==
+        d=redhat.com; s=google; t=1782330823; x=1782935623; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hQwXPDQFNRwXTCwtbeb7bS0lb7BdO0SS5von3s4mxo4=;
+        b=swPeArCF1ipP67Vhjm78dHJ970rMBZ00ss9gJc1WKGlq5puf4NXjOqoPkHLB83YXLK
+         vRtIHq0X3w1xngyrq6fRW78+AG1y+V7X2m7s4Jw0e8PMnYwA5ccU66wzziJVV4KyLCYT
+         iZYxwZpUkVrvd/koVWHs7CAaZBFsPNRXAafDiF/tcEZF24zSV+eGADhi8eGm8fjgXW9L
+         OHfa2E/rbmcUu0EySMu6AOdWwV1DQI8+Sl+XFpBXi6gSlnK4pd2Vhf6EsRbDdMXFoIwR
+         oHQVdeHLHTxeX49D6ZvXIwl6W8bJ2JCX3Jg/LxtraEO386fWmKRWLPyWDYBNWsc3mKdU
+         K8Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782328083; x=1782932883;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7yvOePNFOw/xDYjvVuPFW0GtX2+mt0frb/jI2djDuck=;
-        b=ljMF4E9n7tqARPz2mZcPtlgr/QXJgmNpSy+x37fnAONmQyMM6oq9TFgskc9C92Q+HY
-         Wy6RIvA3s4hlANYCBgzkd8Mk031duGFvdj6iDLjmrZHK4HaOOzWj7osp24qC9pJC1FwM
-         4YTE27aCeIN6G5g8D9Nd47HUE+kHpQuZJI0etlr7b/o8tiYeahh78av9+1F7xwTewx+t
-         mVw4pQ1nJlP9fqf+uIMvmViIu5VU/XGcxWZfS7eC+ihrBMDgSx9H9TFu7654OwrJ70lJ
-         jBrH84i4m7Jz18nAIoGQ7NM9jZqGZK4aQ/LEZxG4b3bVZg+o7fs0xQvv/ZQ4+sGQwN71
-         vePg==
-X-Forwarded-Encrypted: i=1; AHgh+RpZc135bnvobtnRRxAsYiOwG0vWJhBROEuKUMek1YdS8d0/VZaXKt42fLuH9nNM/YDWy29N3I0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw06goZBFTtS60NW9SPPihRVU7IAuXxDcektUYYyAGoSmHl4PP+
-	+QnEhjrMxkA4qq1g3Pl9Dec8iK8CU0t8T/ndnl9QNbvjoABoqkwfH4A2QLLiQXzyqM8+vLeu7Ba
-	7dux+JsM5xMJX7jlnrNbrxMu7UK6xDoY=
-X-Gm-Gg: AfdE7cmjibgdVa6FEZvEWJn1m1sHHYWNr6c5FHnyU91QtfLcQrUPR9CrUuRyA2fFXiT
-	0SaEy9yJFoqj9ItqG5n6kQJzqJfBC232yJz+PwLVb99iX15mfw9aSMokz2McI6YwbpwW/1Axa1+
-	e2pVNu4HFiXZuKnLSSPlWAdgy8KK6d1nqF7tE//cxDITNpg0rUG83SfRTwMTCAUtBc4q2cOVGct
-	JgWCn7i6LmMKxIJnZ0fz3SlSzGMe1ViNA7SM9Zob0F84zKkh1BH3vqEPpNHMP4Nd6aXlYsLK3Kl
-	jsnM90NiH0claEAa7Mq1tdE3twJwhmQ9p0Ib19In9jMNO8GSsqbnua0Ig+kuMLUDvxCPJpai7PO
-	gFG84VJU=
-X-Received: by 2002:a05:6102:3f52:b0:6c5:d55d:c090 with SMTP id
- ada2fe7eead31-72fd548f071mr5681782137.3.1782328083555; Wed, 24 Jun 2026
- 12:08:03 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782330823; x=1782935623;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hQwXPDQFNRwXTCwtbeb7bS0lb7BdO0SS5von3s4mxo4=;
+        b=HlL2a9t+4ZDCk9/9z5o7MjeSqu/sLgfzTol0/++drnVtJ/W0C5APi3rIqknb0/Lyel
+         pSR1rmdt2VkrmzjFk854rMyjXJjTBzucyBr1EYSX/nPgkPX8K16YJRTXyLliVvteypvY
+         UsE2MC0sHphXALoHfdMAsXxuy1ab0MlB3AfvzkRy7iLKymdKtgVF+FWRx4KwU8ipXR4O
+         /D3VQikIUD4dRY7AOJY3Yx3/Nw/qwSwHf2vG0lwbawUg1nhAMNGc2LkZbHUyiUzpgmq2
+         a1kRTFVsdJCGiVDg3kznSnAhjp0XPZozs4thS8grgV/pkPYcRUDEMaUgzaxpxGxpwJhY
+         EUJQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+Tj0aT8KPQbFz3/3Lktgso/WnVziujAC5DlLbXicpb2a38PLkfEIrs/saZ9CbcNk3hXtqDhJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDA6yPt8FVgwrG/dvy73PNNNF1xW04MPu2e8uGU7yDkl0okchJ
+	+V2yAsgcHx4aWCxlqx3Ijz8NyynIjpVk/aVEXcXdnQ7a+hocnei73qhosLiSfc4NtEhQddwPz/r
+	YtvGYOlsoHX0YSa7N6mIT2MymU+VakU/EOkPrunwAoG3HOSQf8bf8qsVib/buBkiLig==
+X-Gm-Gg: AfdE7ckSO8mCneG3MQpopjz2eghwMCJ7+jWuCNKoV4uyOelZ8ADibF6vAzRk+CAQ888
+	GKHLnQfXIM52MLpG4QmfnbsZ0IT43Xah5dturKUZTvz4rtqFfB5T2jsGNFUwD6CFfKq/55wE/iY
+	pYVmUGwC1Q+Tpnf7DcJsRET1U21ZbtVPdaXJzryDS2pXjByVpP130wJLD6cc+IsoTjU9S67kVzw
+	miQWC7cm0YHzMTDnWE99LWoKaV2Q7APL7Nsyuc5cZl2CCCz4DATMU4xQfyXMF0/0MHR7RJb3f9P
+	qISF5bkWMPGEGabnwZtDwHLNKQbsfyuzMoFWglm+wDzBnc0jzrpUcCV8L7HgAQqgwjuew70m0y2
+	lGoC/sl3OVIUTo7pYD2YQ7niFlaEyosV9
+X-Received: by 2002:a05:600c:8716:b0:490:e196:eaee with SMTP id 5b1f17b1804b1-4925b359af6mr134949985e9.10.1782330822570;
+        Wed, 24 Jun 2026 12:53:42 -0700 (PDT)
+X-Received: by 2002:a05:600c:8716:b0:490:e196:eaee with SMTP id 5b1f17b1804b1-4925b359af6mr134949745e9.10.1782330822030;
+        Wed, 24 Jun 2026 12:53:42 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49264011d5fsm16636315e9.1.2026.06.24.12.53.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 12:53:41 -0700 (PDT)
+Date: Wed, 24 Jun 2026 15:53:38 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yousef Alhouseen <alhouseenyousef@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/vdpa: reject overflowing PA map page counts
+Message-ID: <20260624153850-mutt-send-email-mst@kernel.org>
+References: <20260624190653.2893-1-alhouseenyousef@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260623173030.2925059-1-edumazet@google.com>
-In-Reply-To: <20260623173030.2925059-1-edumazet@google.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 24 Jun 2026 15:07:50 -0400
-X-Gm-Features: AVVi8Cc7g9HynwWv3noKDUA_HTIXkRh4QG0NE4vGm8qvUGWCoPR6K6tHKtK6PbA
-Message-ID: <CADvbK_enr9GFw34DSRYA24kVKp9UKFggHwMEMXEs-XTD_vhSUQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net 0/2] tipc: syzbot related fixes
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Jon Maloy <jmaloy@redhat.com>, 
-	tipc-discussion@lists.sourceforge.net, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260624190653.2893-1-alhouseenyousef@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301767-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301766-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,lists.sourceforge.net,vger.kernel.org,gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:jmaloy@redhat.com,m:tipc-discussion@lists.sourceforge.net,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:alhouseenyousef@gmail.com,m:jasowang@redhat.com,m:eperezma@redhat.com,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7A68C6C0DF1
+X-Rspamd-Queue-Id: 846186C11D8
 
-On Tue, Jun 23, 2026 at 1:30=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> First patch fixes a recent syzbot report.
->
-> Second patch is inspired by numerous syzbot soft lockup
-> reports with RTNL pressure.
->
-> Eric Dumazet (2):
->   tipc: fix UAF in cleanup_bearer() due to premature dst_cache_destroy()
->   tipc: avoid busy looping in tipc_exit_net()
->
->  net/tipc/core.c      |  4 ++--
->  net/tipc/udp_media.c | 19 ++++++++++++++-----
->  2 files changed, 16 insertions(+), 7 deletions(-)
->
-> --
-> 2.55.0.rc0.799.gd6f94ed593-goog
->
+On Wed, Jun 24, 2026 at 09:06:53PM +0200, Yousef Alhouseen wrote:
+> vhost_vdpa_pa_map() adds the IOVA page offset to the user-controlled map
+> size before computing the number of pages to pin. If that addition wraps,
+> the code can pin and map fewer pages than the requested IOTLB range.
+> 
+> Reject sizes that overflow the page-count calculation.
 
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
+You should add "on 32 bit systems" - I do not see how it can
+overflow on 64 bit.
+
+> Also make the
+> memlock check subtraction-based so a large page count cannot wrap the
+> pinned page total.
+
+I don't see how this can happen at all - pinned_vm is in units of pages.
+
+> Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
+> ---
+>  drivers/vhost/vdpa.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index ac55275fa..090cb8693 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1102,6 +1102,8 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
+>  	unsigned int gup_flags = FOLL_LONGTERM;
+>  	unsigned long npages, cur_base, map_pfn, last_pfn = 0;
+>  	unsigned long lock_limit, sz2pin, nchunks, i;
+> +	unsigned long page_offset;
+> +	u64 pinned_vm;
+>  	u64 start = iova;
+>  	long pinned;
+>  	int ret = 0;
+> @@ -1114,7 +1116,12 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
+>  	if (perm & VHOST_ACCESS_WO)
+>  		gup_flags |= FOLL_WRITE;
+>  
+> -	npages = PFN_UP(size + (iova & ~PAGE_MASK));
+> +	page_offset = iova & ~PAGE_MASK;
+> +	if (size > ULONG_MAX - page_offset) {
+> +		ret = -EINVAL;
+> +		goto free;
+> +	}
+> +	npages = PFN_UP(size + page_offset);
+>  	if (!npages) {
+>  		ret = -EINVAL;
+>  		goto free;
+> @@ -1123,7 +1130,8 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
+>  	mmap_read_lock(dev->mm);
+>  
+>  	lock_limit = PFN_DOWN(rlimit(RLIMIT_MEMLOCK));
+> -	if (npages + atomic64_read(&dev->mm->pinned_vm) > lock_limit) {
+> +	pinned_vm = atomic64_read(&dev->mm->pinned_vm);
+> +	if (npages > lock_limit || pinned_vm > lock_limit - npages) {
+>  		ret = -ENOMEM;
+>  		goto unlock;
+>  	}
+> -- 
+> 2.54.0
+
 
