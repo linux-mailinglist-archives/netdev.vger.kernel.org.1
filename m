@@ -1,178 +1,179 @@
-Return-Path: <netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BNRvGMP7O2rZhQgAu9opvQ
-	(envelope-from <netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:46:11 +0200
+	id SzN+CAP8O2oDhggAu9opvQ
+	(envelope-from <netdev+bounces-301704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:47:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D01D76BFC2E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:46:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4558F6BFC45
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 17:47:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=C64OKh33;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301703-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=kcxXEc95;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301704-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301704-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9F3DE3011056
-	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:46:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C9FC3011BD9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jun 2026 15:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3126F3DB310;
-	Wed, 24 Jun 2026 15:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88903C8716;
+	Wed, 24 Jun 2026 15:47:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C9D302742
-	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:45:56 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782315958; cv=none; b=hDJegVSal0P5EnSZ0gpg7Ox19fdBz6HEEEw5w2OmZIYuwVlv4gyug3xw1pRQx+hrEnmN84QZqzvpipcZr9GDJSa72FVMmZFD/Ku9z/6FnNdi591/Jr+XeW7mMfBvjddNWPk22DuFO4iwpLv/zHEg38WnEh94pS5wPs4XrlCX4K8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782315958; c=relaxed/simple;
-	bh=XS4cXPoFYvBnGja9W7ZfoGm9rgCHoBtJF3SZvGBRGag=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NrjT6Y7Abvo5oP+PiiWbdz3Msu9JekjK4rQAHkzwREoN8uYir5Lsj61NcNBliM4btNa1YI91nOpedjL8IDOpTWDEv7enTb+IBEthWKztm3HPjo9giK2iuVCtf7pPb7zbaBCKoaDen5QlqXhvpTi0urSKvzuCiCSe1jx9cAmiDHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C64OKh33; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356F81F000E9;
-	Wed, 24 Jun 2026 15:45:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782315956;
-	bh=5raUOPHCS85WUgQHYMDf0LuoM3ZQ2QYkF6jPBJ4qiTg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=C64OKh33mZ6EORsDD7WBtCyXRckNlNqFsMCbxBD1MiVAAnaNOvSkEQldjiRPXGoDN
-	 tJiGvVyOqiNoTXTeCxfTPGrrldCcIAVoRyfVac3gn2JUKa2qdl4YLFBJzAWLFQ8bDD
-	 NTzCoRQSUdQd3P3bJGMcTizlDG7rCHGP3EMs1PRIv/jNqxa9Jfo6iPSBJ5iFpXL7t8
-	 uIjMtb22cOUeH2Y6GM9JrG5QtuZLX71RzMMSWE2aOR+R5HDI5yj7O7pi+wgL1uzZXh
-	 PJnchlJ5IWP/G1VyQDmjYfPS8Uerbul2pwE9bUmAxGUXc5XRUZJwJcwuQL+UHZV/Oy
-	 rFjMBgTYa0g3w==
-From: Simon Horman <horms@kernel.org>
-To: 635381823cyj@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	moomichen@tencent.com
-Subject: Re: [PATCH] xfrm: iptfs: propagate SKBFL_SHARED_FRAG in iptfs_skb_add_frags()
-Date: Wed, 24 Jun 2026 16:45:31 +0100
-Message-ID: <20260624154531.1140374-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260623092258.70507-1-635381823cyj@gmail.com>
-References: <20260623092258.70507-1-635381823cyj@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055453CC7EA
+	for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 15:47:02 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782316026; cv=pass; b=Pyvqdob8QuOzLb2ZtJVEmbuGrN+PVRWN7f2ROuzUOw6ydDR10hqPHYw1Gi5XaW38tL9N3cZ52KDsC1Wy/7eHlQXANiS0HyI6suGHUOK5W5qzODf+BuhV2M3dWRLVPq9qvm4cSVrpYYBFq1FJc8n3c82/NwrQ4MISPouc1YNHIZc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782316026; c=relaxed/simple;
+	bh=znUxrD+rX+i/jcgUUcYUF+WyNVpxg3869R1rpe5nPjI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pDf37FmKDb/MMXmtA3V4VhdqRZUkIdA1J02At1P5zDGlUpgW6hbWpn1eqHpsNjIdURfKqt5XQRv+XYfA0sGAOEIPXzIOP3RIKZM6LOYrWys7jynXdsD1SDEFq6ruRu0PgdzYhVrhkqup94BwLBYGaEveA9Pu6RcbWw71okr8YsY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kcxXEc95; arc=pass smtp.client-ip=209.85.215.171
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c891d27b10eso714355a12.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 08:47:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782316022; cv=none;
+        d=google.com; s=arc-20240605;
+        b=PgzbCgjZKACf3bnBrEUBMkuPUKAqq1rLk/mc2xJAI5SAjioMSTTuJEUtkhsad5Kc6k
+         uAQv5oQcDnsIsBXTnJ/Alq/WMhZXXazkE6wne51haL7BHzzeiMHO7DunZfaQ95KNOnqi
+         t4jaNrw6Q3zGTFIXKtJ9DxDjRxtAIMKZdp2UVZ6UlXzMGTV0HTSUblesvT3DizseJVb8
+         daGaTZJjH8ibXDUp5E62/4RNrR8f4qsmXn8vWi1BJzTDaGQ4ZNWEhL/Iy0XWWOEiCm2j
+         d8JBie9vrwpSVWk2zVdYRrOIkmYCuBccaLsf6JQ1vjvzq+QqguPXutDTjVGqbxpO/39Z
+         lRGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8d/r44UUrv5OQGX8QnhBsaeNXrdn7O0arE90X+fL80s=;
+        fh=OBHI+JIEoV86mph6Ys87VZX8lDkkUod3CbQAPyhuOLI=;
+        b=DH27zRXEbCNdI87/tQf5LF9CwjhyRn5ds6UXcylxiK6szJaPIiYq2pfT7hne6wv7ZL
+         fjYv5riOjFCpWxJk7EiZ4ASSnTyV/aP/7wREFc0OmyxiXV07PZb0r2k8/XEkb73w++oi
+         8jd0sr7Owb12b9tOnzWFOruDlVO78mnaGUzHDmSnN3eCEtjNY77ps1R7lBRwN0W527vd
+         aufJAyBCaCE+BNZyDfT7GROYa/5LVwTRfrmD/qKFpMYVGEdrm0qgJeQVZyt61Jiz5Qr3
+         d6lO2EljkucaQCtSfzO2+UKtpzdvJvqM3XRhPq9siGaPFLCAoLnDXTwclE/LxaAVPj59
+         orQQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782316022; x=1782920822; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8d/r44UUrv5OQGX8QnhBsaeNXrdn7O0arE90X+fL80s=;
+        b=kcxXEc95NLLp8KsrKMWU+POlguXr6cFInNmY5G6UforbDFASoqOPb7/FxnWMR0frJy
+         sRNgzOMPPWQyx1SlApBJ7cmBRFm4/EzvlNsp+/yX7Z6T32Z871Z5SfqOCxQTDcx5ByAp
+         f+tIweHGmU6jJX3Wae40z5nQ3UXZWr8gHb1MpEwv4baTcIn6ZnXCw0FEZHAY1HFxGS86
+         8OsGcph5SjswZuk2rGOPNeFpRhYtXbDu5s3bjdY6H4gFh/72fJf376iTVLbZjkaY4Fao
+         8em1wB4GCanZunELRts6lOLyas5Vofkdiir51eNMomkCBijE1YX22wZEbrlsGPcoyQdM
+         19Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782316022; x=1782920822;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8d/r44UUrv5OQGX8QnhBsaeNXrdn7O0arE90X+fL80s=;
+        b=sIunRFZ0DNtFyU2yR3R2ky90cu3noTFlDtqNS8dGn73/8dOstFSwjuwg95YkQjP+oD
+         mSx4sUrcBPk4KVyat+GKopGlrI2FtWpXHd2tI3y/GsB4ze+RYqaVGH/gpnO9v6Brjpl8
+         Wae9r86yqO/jkMIjQM7gS4RqoEJoj7N7t4pnqPafHPMDcqiLyRzOzs6gMwZAZHjYiEkE
+         hmCGn9078KovLUQDVne/iNso37FrkWB5NiB/XUrmqAa7R4vohXCHT65ac8u764QrFPfR
+         hkHC3OR7owSTmZmpUuxf9s7FxzRymiFT4mmZmT7TkkMIwgMO6PC/5NDwC6XTZbE8Ty/9
+         Oauw==
+X-Gm-Message-State: AOJu0YyjgivROP2yQO1zrjp0bzSzWN9moIrzQwbWJSE9653tpw1gu2M6
+	pYz6KZV9cHojtMDBDN8pCDb4jdFHzU753SSYOnpCeYN4RtDFEvsM+VqYqRf4eNJ5tBpOy5LBm1y
+	v4Pvh73E1e5xq3gEd5Pk0KXNm5lUx+r3JLyoQ
+X-Gm-Gg: AfdE7ck5vkb+fro2L/N2wwqolFUXZoIUge5NVPd/pbqzeZBjvVW4juP3HAy7M/qVYw1
+	WupsmGD07VkarmlbigPXYOsc7l8EK8ODTEWnUxaMCaAr7pcEoSJpdVjtYvlS6GAkhYR8+zRH2F6
+	jpFo5w0FO/Yh2H+J2WzNRDuKk/uSz0opLcPR80i/2I5PdfKMkACXC/AO09TFSJmzi+gVZKYewMH
+	QGbQRWvBowDT8bwrpUJNbIxY1E95SqBCRGfa782d1q2jwxUTgYCPIIWaDJlme9ie/4rcKeVAxaN
+	0BHXwPf9P9Xf1sQ6Mo73DcsnzBb/NyFPHhgiPifnVhyqE87S/qeZ+MsYauGrw9ZMfOnjNVT8MB8
+	ilcTD
+X-Received: by 2002:a05:6a00:e88:b0:842:459b:d61b with SMTP id
+ d2e1a72fcca58-845a2794eb8mr5393941b3a.32.1782316021875; Wed, 24 Jun 2026
+ 08:47:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1781968162.git.lucien.xin@gmail.com>
+In-Reply-To: <cover.1781968162.git.lucien.xin@gmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 24 Jun 2026 11:46:49 -0400
+X-Gm-Features: AVVi8Cc8PzO46k6yEZ6LLOuvoH5XLopWZO-tuRx__W0v_vZgFLXs5tHhAMxdpIk
+Message-ID: <CADvbK_e7806edOZ7xxV-JBdK4hTeFUPwf4=Vt7k=OZF7PWauEA@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/2] sctp: validate INIT in COOKIE-ECHO when auth disabled
+To: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-301704-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301703-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:635381823cyj@gmail.com,m:horms@kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:moomichen@tencent.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D01D76BFC2E
+X-Rspamd-Queue-Id: 4558F6BFC45
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-xfrm: iptfs: propagate SKBFL_SHARED_FRAG in iptfs_skb_add_frags()
+On Sat, Jun 20, 2026 at 11:10=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wr=
+ote:
+>
+> This series fixes a security gap in SCTP's COOKIE-ECHO handling when
+> cookie authentication is disabled.
+>
+> Currently, INIT chunks embedded in cookies are not re-verified after
+> unpacking, creating a vulnerability when cookie_auth_enable=3D0. This
+> series first refactors error handling, then adds the missing validation.
+>
+> Changes in v2: see individual patch changelogs for details.
+>
+> Xin Long (2):
+>   sctp: factor out INIT verification failure handling
+>   sctp: add INIT verification after cookie unpacking
+>
+I will drop Patch 1/2, and call sctp_sf_pdiscard() for err path in Patch
+2/2 on v3, as it makes more sense to discard the packet if embedded INIT
+chunk validation fails, consistent with malformed cookie handling.
 
-This patch sets SKBFL_SHARED_FRAG on the destination SKB after
-iptfs_skb_add_frags() transfers frag references from a frag walk, to
-prevent ESP's no-COW fast path from decrypting in place over pages still
-referenced by the outer IPTFS SKB.
-
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-> index ad810d1f97c0..0e0dcf47a470 100644
-> --- a/net/xfrm/xfrm_iptfs.c
-> +++ b/net/xfrm/xfrm_iptfs.c
-> @@ -496,6 +496,10 @@ static int iptfs_skb_add_frags(struct sk_buff *skb,
->  		walk->past += frag->len;	/* careful, use src bv_len */
->  		walk->fragi++;
->  	}
-> +
-> +	if (skb_shinfo(skb)->nr_frags)
-> +		skb_shinfo(skb)->flags |= SKBFL_SHARED_FRAG;
-> +
->  	return len;
->  }
-
-[High]
-Does this placement cover every path that adds frags to the destination
-SKB?  The new assignment sits after the while loop, but the loop has an
-earlier exit that returns once the requested length is satisfied
-mid-frag:
-
-    while (len && walk->fragi < walk->nr_frags) {
-        skb_frag_t *frag = &walk->frags[walk->fragi];
-        skb_frag_t *tofrag = &shinfo->frags[shinfo->nr_frags];
-
-        *tofrag = *frag;
-        if (offset) {
-            tofrag->offset += offset;
-            tofrag->len -= offset;
-            offset = 0;
-        }
-        __skb_frag_ref(tofrag);
-        shinfo->nr_frags++;
-
-        /* see if we are done */
-        fraglen = tofrag->len;
-        if (len < fraglen) {
-            tofrag->len = len;
-            skb->len += len;
-            skb->data_len += len;
-            return 0;
-        }
-        ...
-    }
-
-By this point __skb_frag_ref(tofrag) has run and shinfo->nr_frags has
-been incremented, so frags have been attached, but the early return 0
-bypasses the new SKBFL_SHARED_FRAG assignment.
-
-The caller iptfs_pskb_add_frags() typically requests fewer bytes than
-the current source frag holds, so this early-return path is the common
-termination of the loop.  In that case the destination SKB still appears
-to ESP as having privately owned frags, and the nested transport-mode
-esp_input() no-COW path described in the commit message can still
-decrypt in place over pages referenced by the outer IPTFS SKB.
-
-Would it be more robust to set the flag immediately after
-__skb_frag_ref(tofrag) / shinfo->nr_frags++, or duplicate the assignment
-before the inner return 0, so every path that attaches a frag also
-propagates SKBFL_SHARED_FRAG?
+>  net/sctp/sm_make_chunk.c |   3 +-
+>  net/sctp/sm_statefuns.c  | 220 ++++++++++++++++++++-------------------
+>  2 files changed, 117 insertions(+), 106 deletions(-)
+>
+> --
+> 2.47.1
+>
 
