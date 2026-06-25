@@ -1,166 +1,157 @@
-Return-Path: <netdev+bounces-302062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KLZoGGtwPWqp3AgAu9opvQ
-	(envelope-from <netdev+bounces-302062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 20:16:11 +0200
+	id hBDoGtZxPWrn3AgAu9opvQ
+	(envelope-from <netdev+bounces-302065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 20:22:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885E96C8212
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 20:16:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BECBC6C82A6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 20:22:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=uYvgCGwt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302062-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302062-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=nbNcI+hD;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302065-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302065-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF5E7302307E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:16:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 957023018AD4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0221330276A;
-	Thu, 25 Jun 2026 18:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C5931355B;
+	Thu, 25 Jun 2026 18:22:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B282A221DB6
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 18:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD83123395F;
+	Thu, 25 Jun 2026 18:22:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782411365; cv=none; b=UCmnsOQS3tMZ48PJX3cfslZxuz7EVtnEvIbRfGFmmlEz5zgNdv70WsJdto06R1YyXdRdNQpKDZjZTP2wMytQS3xf4pxzZYawvBXMsY6Cbkw20fIm3NP+Fnd+UV6Vum1sqi46EjvokfwiGBdSTx7zwmjTfDzNQ4DGi1bK65Tlzeo=
+	t=1782411723; cv=none; b=H4Ig6SEoLy53rx2OUDVTbk429kwPC8Ixr/dA4I9vDTy3Qm/unCI8p9C4Pum9zZng7cXbRl5rmf7vyfbxthJcB4Q0k8uRxV2oZvvy8CZE9UaWbqb3+jIpbyduhAm1qaR/4j6mU4mQDxMqQu2K6dkmwOZ7ZX2tjKalVTPe0tcu+4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782411365; c=relaxed/simple;
-	bh=R4zMRsC5dgEt3GQ1wY+GOgTcL+mtlusQkycwEbXBb0s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VmdpX1wsEjQbSeemKIw9sBL+RI9k1NGlHX3NkdTUtxivzNVno6o+/qOBvwHqJyiYf7Qu96FBC7oT62Oryr4/cIJ3vbt2eOwfqdG7m1bOn0Y7qgJBsqfLYarADgX54FgWu2vkK6hXXvZtEH7WO94xlAOxNyPT3WN7undCnSnJqig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tjmercier.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uYvgCGwt; arc=none smtp.client-ip=209.85.216.73
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-37e09f9c4dbso100906a91.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 11:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782411364; x=1783016164; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Hbt4jAxuO3yIsMnFSQ/zOto2meD/sUjo/A+mTkmLM7Y=;
-        b=uYvgCGwt85R1MSPJg9ffGwiyALwqY/ladzGbWwfSFILpgyLHrrkfcuTXzGLzTTnnd3
-         Hk+wYStyrKokFa7eGH6722hearuTQVLF6uY9fHVMOi0b2X1nnAFBQcqZYhQzMgTzKnIe
-         0qrVQadYPxE9YkBcKqD0Po8aNZMdiUYfBXr72TM3LGvoCp1Lf0ehQPx/gbLDQRjRA2M7
-         V4nlN0jC22keZCOHTcnE3yjKoQaNf5XfYUtGMWjY8xcSDWFm5C40kUVwPGlH2yMdbNx6
-         unlIguNHENRUahx7hMGGh2v/Ts63ehEwRvJ0TtXPb93vc9oUw6UXrSMYs0VhOFCPss6F
-         g4Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782411364; x=1783016164;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Hbt4jAxuO3yIsMnFSQ/zOto2meD/sUjo/A+mTkmLM7Y=;
-        b=PlSLt28HDVhWY/RQfL7iek841xyRsq0mITht0o3a4Uq/1BKeylZWQlI6VxnvxNL8Hs
-         tSNDvtNlTdS3Jo67GS/aysFOXBrhpmFMpH+FT/7U6KGjRejQd3MsQ5PAPHE1En06iJPT
-         hwHiVrdjtTjtg9w2eHjdFX7bkdVPB6MajZiV39Pkf42Xg/59R2Kql3fcxqPCOJb3lhg8
-         m6l7LmtGSeLzSuj5zHWcnhz/hsarze5z4fMncP/mFPZTxUoNsJaboIwUDp1Gjn+YkTQB
-         n9Cw+Eh9wfjyrp47mdk13PvNMjWo8Vy8lBJ5ctbAeLvPr7aVTrTQumvkrfLBLu/GeAdS
-         zGCQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpzGbmPbXg1aPvN0K25X5ogJw494io5RMP0kJYZYv7rvdRDJvjFeqFuWquRuQ7MEEmGeL/EDTI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqjV7u0LzpTijuGcBYJDAi1GFtVHRKVuLaVpy4BSmfpsNNwOb1
-	1LifOq0X4A95/NYO2Z4HldVkvC+2ToJzXWt9b4BfEKCvHz25NTbHMMBZBhmmfIUZKWfsRatDBLb
-	FTuLhhrEn8tNgs2Xg/Q==
-X-Received: from pjqa10.prod.google.com ([2002:a17:90a:a50a:b0:36b:a5eb:cb3c])
- (user=tjmercier job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3509:b0:36b:b1f4:e0ac with SMTP id 98e67ed59e1d1-37dfa25191amr3459010a91.14.1782411363681;
- Thu, 25 Jun 2026 11:16:03 -0700 (PDT)
-Date: Thu, 25 Jun 2026 11:15:55 -0700
+	s=arc-20240116; t=1782411723; c=relaxed/simple;
+	bh=XQ53pe/Jq8Z+Ffdi2ZgG+P8nlFouXKNplbiEL69TedA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YCXQb//IEi8LpmW1CTQIR7l/Wj4xGOy9yofqU9F0u2FwNNWrHmW/wPbEz+HmYlDT8SZZxXHNn7PuQAlaGrfH6bMTCTFcFpQ300VeyRsK42Olm12AZvBngDhbMsT5CUCLEVZ+PfPvOTpJlAcl9KBVKWGUb9JnTiCdFzBCn106ync=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nbNcI+hD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F9A2C2BCB3;
+	Thu, 25 Jun 2026 18:22:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782411723;
+	bh=XQ53pe/Jq8Z+Ffdi2ZgG+P8nlFouXKNplbiEL69TedA=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=nbNcI+hD4YojfcmBlTQ8EkFwujbVSf7ym/7ciFmh63AIWyeCsKElzLxFT7bYDb8A8
+	 64T7quoyA9KN8UuLkYqRoIN7W136C29w/12j+e6uLILe2xcFI4JGzWtcj5eUUUAefn
+	 UcXdcNEshGCtU4vej9fbzGKED2l0zmtni2YXEbzqZTnBiBYI+9MV0V3Lb1YhBzVTZF
+	 jaFzp2L0SSDkTXa3d/0qqyie9ATmB0WABaNkIysWs6wmb36XMpB59HleCVjey7Xywh
+	 Dqngly8XZc3mYj+Sg8+N1rX1EwIjOZV367gamPQKEX76dT8ECinzkhu7tjQgRDiqyj
+	 zwSNo7ZooWDaw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4CACDE00B;
+	Thu, 25 Jun 2026 18:22:03 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Subject: [PATCH net v3 0/3] tcp: TCP-AO connect() fixes
+Date: Thu, 25 Jun 2026 19:21:38 +0100
+Message-Id: <20260625-tcp-md5-connect-v3-0-1fd313d6c1e0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260625181557.1086105-1-tjmercier@google.com>
-Subject: [PATCH] selftests: Open /dev/udmabuf O_RDONLY
-From: "T.J. Mercier" <tjmercier@google.com>
-To: kraxel@redhat.com, vivek.kasireddy@intel.com, 
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: "T.J. Mercier" <tjmercier@google.com>, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALJxPWoC/yWMQQ6CMBBFr0Jm7UQsUKNXMS7a6SBjwkDaakwId
+ 7fV5Xt5/2+QOAonuDYbRH5LkkULdIcGaHL6YJRQGExrbGvNgJlWnMOAtKgyZQxkOnsJ57E/9VB
+ Wa+RRPr/HGyhnuP9levln6etXzbxLjD46pamqEh5nJwr7/gWAJJKUkwAAAA==
+X-Change-ID: 20260625-tcp-md5-connect-dc2369d7f414
+To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Salam Noureddine <noureddine@arista.com>
+Cc: Michael Bommarito <michael.bommarito@gmail.com>, 
+ Qihang <q.h.hack.winter@gmail.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>, 
+ stable@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782411722; l=762;
+ i=0x7f454c46@gmail.com; s=20260625; h=from:subject:message-id;
+ bh=XQ53pe/Jq8Z+Ffdi2ZgG+P8nlFouXKNplbiEL69TedA=;
+ b=Y7z8nzcRMUDzxvqM7RljOh8KweK3DMHV8ICMaFA05PjJgEO3zSkUJxtrhQHXWTzSkEoIp7UgX
+ d88tq5AcaTEDzlQwBvZq1J6tg9JGtkqXSqsrxf0ShwkFRsiYIrfbX8b
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=clHVGbfKfZMeCUp+xCL/096jI68XK5EZLytgy6lSyrc=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20260625 with
+ auth_id=841
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:shuah@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:tjmercier@google.com,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_REPLYTO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[tjmercier@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-302065-lists,netdev=lfdr.de,0x7f454c46.gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:noureddine@arista.com,m:michael.bommarito@gmail.com,m:q.h.hack.winter@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:0x7f454c46@gmail.com,m:stable@vger.kernel.org,m:michaelbommarito@gmail.com,m:qhhackwinter@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302062-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[google.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tjmercier@google.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	HAS_REPLYTO(0.00)[0x7f454c46@gmail.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 885E96C8212
+X-Rspamd-Queue-Id: BECBC6C82A6
 
-Write permissions on the /dev/udmabuf device file are not required to
-issue ioctls and allocate udmabufs. Applications should be opening this
-file as O_RDONLY. The BPF dmabuf_iter selftest already does this. [1]
+Resending v3.
 
-Remove the write access mode from the drivers/dma-buf/udmabuf.c and
-drivers/net/hw/ncdevmem.c selftests.
+I've addeded credits to Qihang on patch 2; and a third patch/fix
+for static key decrement.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/testing/selftests/bpf/prog_tests/dmabuf_iter.c?h=v7.1#n49
-
-Signed-off-by: T.J. Mercier <tjmercier@google.com>
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
 ---
- tools/testing/selftests/drivers/dma-buf/udmabuf.c | 2 +-
- tools/testing/selftests/drivers/net/hw/ncdevmem.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Dmitry Safonov (1):
+      tcp: Decrement tcp_md5_needed static branch
 
-diff --git a/tools/testing/selftests/drivers/dma-buf/udmabuf.c b/tools/testing/selftests/drivers/dma-buf/udmabuf.c
-index d78aec662586..ced0b95c876c 100644
---- a/tools/testing/selftests/drivers/dma-buf/udmabuf.c
-+++ b/tools/testing/selftests/drivers/dma-buf/udmabuf.c
-@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
- 	ksft_print_header();
- 	ksft_set_plan(7);
- 
--	devfd = open("/dev/udmabuf", O_RDWR);
-+	devfd = open("/dev/udmabuf", O_RDONLY);
- 	if (devfd < 0) {
- 		ksft_print_msg(
- 			"%s: [skip,no-udmabuf: Unable to access DMA buffer device file]\n",
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index e098d6534c3c..8114a29692fd 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -149,7 +149,7 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
- 
- 	ctx->size = size;
- 
--	ctx->devfd = open("/dev/udmabuf", O_RDWR);
-+	ctx->devfd = open("/dev/udmabuf", O_RDONLY);
- 	if (ctx->devfd < 0) {
- 		pr_err("[skip,no-udmabuf: Unable to access DMA buffer device file]");
- 		goto err_free_ctx;
--- 
-2.55.0.rc0.799.gd6f94ed593-goog
+Michael Bommarito (2):
+      tcp: restore RCU grace period in tcp_ao_destroy_sock
+      tcp: defer md5sig_info kfree past RCU grace period in tcp_connect
+
+ include/net/tcp_ao.h  | 1 +
+ net/ipv4/tcp_ao.c     | 5 +++--
+ net/ipv4/tcp_ipv4.c   | 4 ++--
+ net/ipv4/tcp_output.c | 8 ++++++--
+ 4 files changed, 12 insertions(+), 6 deletions(-)
+---
+base-commit: 02f144fbb4c86c360495d33debe307cb46a57f95
+change-id: 20260625-tcp-md5-connect-dc2369d7f414
+
+Best regards,
+--  
+Dmitry Safonov <0x7f454c46@gmail.com>
+
 
 
