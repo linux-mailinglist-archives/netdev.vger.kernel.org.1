@@ -1,232 +1,161 @@
-Return-Path: <netdev+bounces-301878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qwL5JlzTPGrKswgAu9opvQ
-	(envelope-from <netdev+bounces-301878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:06:04 +0200
+	id KV8xA8fTPGrlswgAu9opvQ
+	(envelope-from <netdev+bounces-301879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:07:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA0B6C33F8
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:06:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BAB26C3420
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:07:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=rSFM7YCk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301878-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301878-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=njkmDsA5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301879-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301879-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F531300F9DD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:05:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A87A3014124
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFEA2F5A36;
-	Thu, 25 Jun 2026 07:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667BB26CE1E;
+	Thu, 25 Jun 2026 07:07:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDB32DF136
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 07:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7840C24CEEA
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 07:07:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782371127; cv=none; b=sVJnlb80q0QZ515T/MQq2lQ1z3mXbjJfqZY0vdtxpthI9hj5i3NUTUOS6eG//FlsF8Egay9smTlsBtU8hIucCJV2Wxd+1uQqd16l1X+AnKIJNY4/2q9d8cfR7skXk+3Yrw9UAr2ZRwfGDWgP5++ncYbkopV+af4z03Vwk4SyMug=
+	t=1782371267; cv=none; b=V0IIClFL1yMAral6w2h2Jw9WUqxF5QNxLkont1J5TZtLMtO6Yf8Av9sVvNMg8ui876u/Q+PeWi+Vk7k1A00/8/UPQYeEU0mBrK144aly9clI/+hqZIlM4bwxEk4nSPOqqiDOKDZ2gkkiG7O/J5tKi3Ue032CStMc3jXNMawaTLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782371127; c=relaxed/simple;
-	bh=sozevHDQszseOf1dQTv17dZ96y/NfOOSZzfBF4CtGIY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MQv8NCOll3fp8awERJkaf8tlSa+0HAf3xEwKfGqZ5NinqtbxgTsG1/5gopZRZzpe06XU6W7UvCN9cPyUqHxgmFfrvCygCAw7iAYv9xVApMXPjJ5sTr/KlsTznqrlHxduJnbqR5cZs50b1wfYxGMB1eUhjLnCV2fe78iPfq4sngU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rSFM7YCk; arc=none smtp.client-ip=209.85.214.172
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c7f385883cso4272985ad.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 00:05:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782371124; x=1782975924; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3myBgouSemGQyy63uNOanLWZfrnwzbhR0El07JRzF80=;
-        b=rSFM7YCkO4Oll8rFlcXWVmDVRECV4Es6Ua67Dzkasfjj6tOyC1GUhkIWaAFG1DNQqC
-         2k7pbFfIjGDxJn1Hke5VxmWUCHP1m56f3qhI9JdhBijmCk1pJ7soGIo044i2uZOHEFyT
-         q02xrQuw+nmrp0b/jvJdfB5/RJp4Xr+pbcfz7QHe6ZJSRY9tEEfMZGb4jn+XinYEJkOe
-         eCohWl7L8KVTtGnPK7mFFyJW6BNYIfzZfG0OnHvdPEoiSiFYEZyD8TW5wzGW1OvSZhF4
-         EVljw9+9gZThdgrwMlaPRN1IIxz/qwos5nUSZmCza6ufD4sgcFQUtGuHVVcxkclnM162
-         28mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782371124; x=1782975924;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3myBgouSemGQyy63uNOanLWZfrnwzbhR0El07JRzF80=;
-        b=QIs4iT16I40NIib8c7ezKgJttF8kenRV8jKj7im0aWHG8Jq/6NXd555Zyyeh/rV5jL
-         9+pHqysAzVcY+ft2tpz1ltn6A6bTHrahI1T2k8f6zQHYK2IWkBgHixE/YRM4h9H+bfBt
-         6CRyp9UV1RzD5KqdgUuk7+k6kQ2BwAUhd9ObVceyRIlhZmsFnlfynZTaiqCBTetR4POR
-         hSJR+YqRIn1vUkNIp5ZVmGv9RMXyzxTMk5am/+mubqk5RTVjbPut4crEGXiasOBAAJ3B
-         tPwWeza4FS9mmRRWlsOUB3LxvLnMgkNriKm1hh7bBTHSVK1WQ/rZ+LXrjR18fY95XKGm
-         b6UQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoXoWO9TFYTZ+J2UIRmaEe337Yxw/A52EtwkEa5HQ9D8VmSKYQ8tzUeJ30lrTto9HBM8kLD3Ww=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAp6M/t2jQdTBDXBWXvYwn7ZG0aeEshoL/xpaMejLU4fQuLXZy
-	AY/O2SDr2EVe6f8GQTwldeL5pClNAbmqY1Hs0/HN5gfugGKtT9GK8LWt
-X-Gm-Gg: AfdE7ckLptSxhQCfwxMneXq2lMK9Tsg70rjXD8T3/MILbesgUHVb45b9detKAHTIw5i
-	zm88FdGlD3nch9/6WcWLNMKWCSNjkkJXoy/Lo6s5FWFmTt8pWoUPLktgj7FmiiSBQE/wOIR7u+v
-	hlzgUCHh53sWrocXM0xUH64oQrs7sjzfmm6fNWFixKSh1eATN+zDe94VLNKGRgmXCcjwm9Ud3Cm
-	1F+avbafn+p7YmBRCMO+lGQAmvkn5EtnJV4ZuiRtqNV7wRGeLx/YUAlVaTW8+gJwqT8MZ2E/DBL
-	1bA6hufZDmkxyObqJPBlElwJ0lqhxMHp6EMiX5KnWjcpznUvmEE0LW+6IamMfD2LRQ+BOtI6S9o
-	2DBMfwJwZKIO7QL/G+RqfuBP04so9WPI3b1UGp/N5e6jlU+RWi8PBx3j3kv04s3PhBlUzbhzMuS
-	rRO0oUj+EUXp0G3ivjYiaN33jnRYU=
-X-Received: by 2002:a17:903:2286:b0:2c1:d49c:8397 with SMTP id d9443c01a7336-2c7fc68d9a2mr15417205ad.12.1782371124237;
-        Thu, 25 Jun 2026 00:05:24 -0700 (PDT)
-Received: from online.mioffice.cn ([43.224.245.228])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7f5ac8e3csm13539915ad.10.2026.06.25.00.05.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 00:05:23 -0700 (PDT)
-From: Pengfei Zhang <zhangfeionline@gmail.com>
-To: dsahern@kernel.org,
-	idosch@nvidia.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chenzhangqi@xiaomi.com,
-	baohua@kernel.org,
-	Pengfei Zhang <zhangfeionline@gmail.com>
-Subject: [PATCH v3 net] ipv6: fib6: fix NULL deref in fib6_walk_continue() on multi-batch dump
-Date: Thu, 25 Jun 2026 15:05:17 +0800
-Message-Id: <20260625070517.965597-1-zhangfeionline@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1782371267; c=relaxed/simple;
+	bh=GNJpm7UipZKsLqGbcfp/Di7PVldLUWQjenpnWyM4sCY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f0yDYYhJeLlC8rhjXsKzeDTzjJsXkoGUFf6+ANWZyoeSKAFx20JrddDQ1dJOQ2PbGVbjmAoh6ETUcEUpNINy/DWmsIXeNn634pGE6zROOPD1QZxNzwsLQPIFVUhcXYmMhmVclnenBPoW2J1pKPXaW7ouucHaB/wumsUq32foC7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=njkmDsA5; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id C1206C5CD4A;
+	Thu, 25 Jun 2026 07:07:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 73EA05FF03;
+	Thu, 25 Jun 2026 07:07:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 82406106C84DD;
+	Thu, 25 Jun 2026 09:07:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782371261; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=HKhlYO1rWwC1+kuhbZdMLAovIe+I8+auK56i6UqdxkU=;
+	b=njkmDsA57+ghNCGe6eKbMng2cExlwQSFlMa2v9ma8N9ihXXLAquwJMSQW1SeP2sWl3dijT
+	9penFFUrSGsFD+fdJMrDAQAr7oxudkV38rDxir3nKfhqI9chafzMDZq2d0XMA8MEr2K3OR
+	ePw7YOSo/d5AqTz6rkcqcb8j54f/pm+Vv36B24KppvdfKyaR5ePLF3xLgGvMq3ZDG48brq
+	YqV6EmqQUCSDa1QJf4MUAHOWyGk4Uou3HOi2qTGGO2U4bTSwJUEQ2+LEFUCqA2FjUeLQLy
+	DaMXHvArxM0vlYr/QyB8PjiYwXipakxHWoZZl8iZa3JeOQQu3+PCBdP5wKPKLQ==
+Message-ID: <2a92fd9d-42b3-4564-b784-ec504d4d82b8@bootlin.com>
+Date: Thu, 25 Jun 2026 09:07:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: stmmac: fix missed le32_to_cpu()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ben Dooks <ben.dooks@codethink.co.uk>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260622143707.497198-1-ben.dooks@codethink.co.uk>
+ <b375d36c-112e-4662-b538-fd10fa927ecc@bootlin.com>
+ <20260624192205.4485cd61@kernel.org>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260624192205.4485cd61@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,xiaomi.com,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301878-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:chenzhangqi@xiaomi.com,m:baohua@kernel.org,m:zhangfeionline@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[zhangfeionline@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301879-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:ben.dooks@codethink.co.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[codethink.co.uk,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhangfeionline@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EFA0B6C33F8
+X-Rspamd-Queue-Id: 6BAB26C3420
 
-inet6_dump_fib() saves its progress in cb->args[1] as a positional
-index within the current hash chain.  Between batches, a concurrent
-fib6_new_table() can insert a new table at the chain head, shifting
-all existing entries.  The saved index then lands on a different
-table, causing fib6_dump_table() to set w->root to the wrong table
-while w->node still points into the previous one.
-fib6_walk_continue() dereferences w->node->parent (NULL) and panics:
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000008
-  RIP: 0010:fib6_walk_continue+0x6e/0x170
-  Call Trace:
-   <TASK>
-   fib6_dump_table.isra.0+0xc5/0x240
-   inet6_dump_fib+0xf6/0x420
-   rtnl_dumpit+0x30/0xa0
-   netlink_dump+0x15b/0x460
-   netlink_recvmsg+0x1d6/0x2a0
-   ____sys_recvmsg+0x17a/0x190
 
-Fix by storing tb->tb6_id in cb->args[1] instead of a positional
-index.  On resume, skip entries until the id matches; a concurrent
-head-insert can never match the saved id, so the walker always
-resumes on the correct table.
+On 6/25/26 04:22, Jakub Kicinski wrote:
+> On Mon, 22 Jun 2026 19:51:39 +0200 Maxime Chevallier wrote:
+>> Hi Ben,
+>>
+>> On 6/22/26 16:37, Ben Dooks wrote:
+>>> The print in ndesc_display_ring() sends the des2 and des3
+>>> to the pr_info() without passing them through the relevant
+>>> conversion to cpu order.
+>>>
+>>> Fix the (prototype) sparse warnings by using le32_to_cpu():
+>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorrect type in argument 6 (different base types)
+>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected unsigned int
+>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restricted __le32 [usertype] des2
+>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorrect type in argument 7 (different base types)
+>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected unsigned int
+>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restricted __le32 [usertype] des3
+>>>
+>>> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>  
+>>
+>> I agree on the principle, but this isn't a fix so this'll have to wait
+>> until net-next re-opens :)
+> 
+> Humpf, why are we not seeing this on x86 allmodconfig ? 🤔️
+> 
+> $ make C=1 W=1 drivers/net/ethernet/stmicro/stmmac/norm_desc.o 
+>   DESCEND objtool
+>   CC [M]  drivers/net/ethernet/stmicro/stmmac/norm_desc.o
+>   CHECK   drivers/net/ethernet/stmicro/stmmac/norm_desc.c
+> $
 
-Fixes: 1b43af5480c3 ("[IPV6]: Increase number of possible routing tables to 2^32")
-Signed-off-by: Pengfei Zhang <zhangfeionline@gmail.com>
----
-v3:
- - Fix Author/SOB email mismatch (use gmail for both)
- - Drop "RTNL lock is released" from commit message (RTNL removed from IPv6 FIB)
- - Reorder local variables to follow reverse xmas tree
- - Move blank line after continue for readability
+Heh good point indeed !
+  
+>>> Fix the (prototype) sparse warnings by using le32_to_cpu():
 
-v2:
- - Add Fixes tag
+Ben, what's this "prototype" sparse ? a custom tool of yours that
+you used to find that ?
 
-v2: https://lore.kernel.org/netdev/20260625044101.939070-1-zhangfeionline@gmail.com/
-v1: https://lore.kernel.org/netdev/20260624171156.822055-1-zhangfeionline@gmail.com/
+Maxime
 
- net/ipv6/ip6_fib.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index fc95738de..a130cdfae 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -636,12 +636,12 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	};
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
--	unsigned int e = 0, s_e;
- 	struct hlist_head *head;
- 	struct fib6_walker *w;
- 	struct fib6_table *tb;
- 	unsigned int h, s_h;
- 	int err = 0;
-+	u32 s_id;
- 
- 	rcu_read_lock();
- 	if (cb->strict_check) {
-@@ -701,23 +701,22 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	}
- 
- 	s_h = cb->args[0];
--	s_e = cb->args[1];
-+	s_id = cb->args[1];
- 
--	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_e = 0) {
--		e = 0;
-+	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_id = 0) {
- 		head = &net->ipv6.fib_table_hash[h];
- 		hlist_for_each_entry_rcu(tb, head, tb6_hlist) {
--			if (e < s_e)
--				goto next;
-+			if (s_id && tb->tb6_id != s_id)
-+				continue;
-+
-+			s_id = 0;
-+			cb->args[1] = tb->tb6_id;
- 			err = fib6_dump_table(tb, skb, cb);
- 			if (err != 0)
- 				goto out;
--next:
--			e++;
- 		}
- 	}
- out:
--	cb->args[1] = e;
- 	cb->args[0] = h;
- 
- unlock:
--- 
-2.34.1
 
 
