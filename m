@@ -1,236 +1,353 @@
-Return-Path: <netdev+bounces-302076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RTATLGWyPWoC5wgAu9opvQ
-	(envelope-from <netdev+bounces-302076-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:57:41 +0200
+	id kmTDHM+yPWoL5wgAu9opvQ
+	(envelope-from <netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:59:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196686C9145
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:57:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D48136C915A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:59:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=everpuredata.com header.s=google header.b=XoyEJGZo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302076-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302076-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=everpuredata.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=lAOGMDN8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FAD03028839
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 22:57:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DF6943033AF8
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 22:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAC03B8D5C;
-	Thu, 25 Jun 2026 22:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5E026A08F;
+	Thu, 25 Jun 2026 22:59:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D503B8130
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 22:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B9620E023
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 22:59:23 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782428239; cv=pass; b=LNvrRBSGe7uV7dSp9tj//1vSRyDEOqwOpPlOaxyzKoT7l1ZtUWhaWQZt1n1OgSNqqsVBM6EEa/6VafLYUrp2xZUtAnIKXFSYvt0kUf4Ld7qeDAxJfYnkJLaF56jNZPYBydxbOtRrQjKk1pkfmUVjluERVGyDXqmG+FvZVE9Da+I=
+	t=1782428365; cv=pass; b=J0GeXLkP1+dDvJVnMlDg8Z8WovRqmOsBf6bM9729ihkNIf20PTKlB46FCegl1NiN2L0rVkwK0eDJIzVRS4ImZWW5y0H3Hfb7zYPgzaVzhUlwob0xHe9StitdFHW1is7faKKfd704zTVyC3BQSEcXOxj1iEILoKWDKQA6yS7nHWU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782428239; c=relaxed/simple;
-	bh=xkH15FZFPfzdbt7oqrjJ4BwR0haRCPDMfbq8JYs5Gaw=;
+	s=arc-20240116; t=1782428365; c=relaxed/simple;
+	bh=oYKlnirB3SN6iJnr9X9rSaE7esSFAc4YDY/wagy3y8I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=daYg7yjwU/e168UBgcwp8KzjnxcOp7/A+ap9pgqjkA32sSYhzX9lTtL9o1p9aGwYAMxxvJhSTmQJdShvGAMTjBHEyvapeYtdFX1j4s7NPBJEJT+q5hOyvzlBgq+8ybz2sdgrb8VUZvZhp+VwJ1ExvD/3KDzlIAb8O6E3W4A11pc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=everpuredata.com; spf=pass smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=everpuredata.com header.i=@everpuredata.com header.b=XoyEJGZo; arc=pass smtp.client-ip=209.85.217.41
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-7353fc918d9so267920137.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 15:57:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782428235; cv=none;
+	 To:Cc:Content-Type; b=DfpehJAYbjkubQbKN/Z4GJJXo005S2bzwc9yFy/tHKtfbUU/HAZxguOylGpBo2PFRkx+aGetdbErEC6q4kSjWXnu4ZojTvqm9wPDjIvK6k3U0YqCLDAbtQ/bNBZ5PBMOqf0fOrNS7eh0ZnfZx4BmE1cxf8dZBdUzJwgbt4cnQAU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lAOGMDN8; arc=pass smtp.client-ip=209.85.214.173
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c6b7bd4e8dso22855ad.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 15:59:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782428363; cv=none;
         d=google.com; s=arc-20260327;
-        b=GKxtyVhLYV/mxyx0fcAwRf/vjeVUOYMHKNlFv1La7DlSm4rvjp+Ulk7sfotGScId3P
-         U14Y4bMph6ZXAb7LuY+WKweBvQw0ut8dS9497KWjotSnFw7AIR/X/W4Eit3cpcnTCu4v
-         IugE0P/Z3XqdlOHJW2QiVLCHcnfCMc0MLR1R+gvYYCeghwOay4AKRyu7nYdc4uRb10PT
-         yLuji3rlvrsgYlnDyxiSLNX/WQsI7OOnfRZjyksHzTRfMjSQ+rSztovKCQMwSA8lZzMu
-         PnD51+ZXjzmsXCDPGU+yCHqJIPKtFH17yRnONWkkjHmD/c0v19jrNq6apEVKarSTLrIa
-         ckRg==
+        b=egOattn+IRDhVGsYbDVjYUvzqdwVlFT5BPH0VxxSbhdR8z7h9gSDOhIwCutpuAdgRo
+         L37KnD66kN4AiGnM9wLyK53zpspur2uY/mze6ppOFCmL7d1rubU1b3/bww7XuBPK0/wH
+         icOX4X1wcTTNs6jMuuf/OnskWU/tvAh9ono5R+ZI7G1G4gT/aXrqYTBaQLXlvooeVFPy
+         O7m23Pe3Mu+5KhesAqxwfzgjt2/1R2YDn/hUwG3sDmpmmfrSHnNeRytGwu/mBS8rC5VI
+         xcJc0Ac4Vlg73YQSOTQCuUWm/wBW2ZzM1hMUGJaBeH8KTi6J5qcoOkKFn4mbPaqyeAuv
+         ve8A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=xkH15FZFPfzdbt7oqrjJ4BwR0haRCPDMfbq8JYs5Gaw=;
-        fh=LU11JMcjY9vo5ppFJ6akUH2cvBnFemuXZu0FQ67UH9I=;
-        b=q8Rv7if3KEf+Mx4ryuHL5yFE10njmXmj7N/IY2HHwFKpJ+7mtt4e+hKFGJwMZ+pL7U
-         Mbl25Bk45TCW5Xt58xTCdeiJqUYdH7U/9cEHpgAwwGBTKXVIfO1OoOX9EbH7lGha9VVv
-         l3X9dG+SfQ4a0I8/9DzmlmjLKMOueXx+2Iq3FbARPIK8raOaQO0i4AsZlL8pyEq9Pv1w
-         McO00LEnUeIRHrRl2FBwUCXNpEDqM31+gmAb0PkhZaYfJaa9leoiaVa1eKbrV2WhxjzJ
-         f/JUu1u6ebEXLDvU8zFqt2MJkMrkOAUGj2XAVmkj8vazv/ObcdmfWW2sk2Lg0vvlDkew
-         9PWg==;
+        bh=/gX7hQHyvfb4Ci0nY3Fxsfc2Doou++pLUQ8Pual9WtQ=;
+        fh=M3q6RMsTp+DCTUTIR9Mo7raai0gJUsOyeuXOgYZbw9M=;
+        b=TXJpbEb0z8NnFa+hHGKo6sfJB4QqVeP5cEd8VizsjIdnQ1rgh9y9eomG3weMmKNqMi
+         NDRSpa/2uJ91F2X6ocvvbbcRouxMOksQSkapi2GUl4LeYK/PtPjUubqaoI78SbwjD+K9
+         MRB4ir0RCeWyGUSRQSn63Cnz8UF3wbmdE8SMdZTBg8s/szqxP6H+R18ynTrvFDTQCh4o
+         W3zvG1NSCOmgcpQ6y0AKbDbRuGFrdeBe+1upQGoNCRl/QQSg2kulQXfaYdNnmAXcNv8i
+         1xfkeldzvLcrPtXQfo8YrXKF0P+flcjNmpjXU9YqqewGDsdlPuY86NQLN86CnCIPzANi
+         Cipw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=everpuredata.com; s=google; t=1782428235; x=1783033035; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xkH15FZFPfzdbt7oqrjJ4BwR0haRCPDMfbq8JYs5Gaw=;
-        b=XoyEJGZoELhVRJBEti/SB2KEYsxlvd1GLFDJY1ASCovzeGDvXc6FGAbrCzuCbBkSzS
-         oin1+OZao27xLq/ce0K/K4vCwlUFtmOkd0GyeolDB/byUI1S69gbua4rZ2+OFsJv7Y/n
-         fcDrgBcUiWoAjVmIHhzZiLn0NozHWeIOH1eG7vBfFimN+zr6l9o905yygehdNAtHYF5e
-         91wyr7umX7lbNUwIZFReDcI4fjkQzarAbPGLQ0/2aJINW9K4cXXa/GZTdM7XK5H1drct
-         sU67Wvz4Yw0kh+CxTKgSZQrH0h7upcmuX0z6SXg/vA6pA5/pDJ6QAPm/bxyHTvGTB3XI
-         W7mg==
+        d=google.com; s=20251104; t=1782428363; x=1783033163; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=/gX7hQHyvfb4Ci0nY3Fxsfc2Doou++pLUQ8Pual9WtQ=;
+        b=lAOGMDN8ynA5eQbM/WGC+EL201uY/Lb4gU2KWo1zLJE9CbJnR1eY/BnMg3SK2/0+Z9
+         Rj6ZQfNpYaq3RAKzLU2gt2C9AscYYvkMZZ5X1C21/oo+jvHR4v7bxmUXifgpifSVPrZK
+         ALWQiCgGy2uGwT02OSE/vPJtjhWvno7/OLHh/mywcPeH3QdDivVJLCz5jzd+eARI/ncM
+         MWv2gVmbJNh752QrXSgR+R8LDqoXhrbkqaI3hW4ru6AbsAzTPQ21S7pRAa1gx9oJFAkP
+         kY7UIyHEeJKL6dM4ghxlILO4evpzCM0Ixy2gQGHipM5/1oQNy6so6wHheXVev9FFXM0y
+         s3Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782428235; x=1783033035;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xkH15FZFPfzdbt7oqrjJ4BwR0haRCPDMfbq8JYs5Gaw=;
-        b=G6U8XzBvPyBeQvwc35QNl8AOur9ZQIJSkMtyAlx0DHIgRnvXsa6uHLMhRkhtz4CAFK
-         FX072ff2wzgeShWX6lRWxp721r90CKkOmTim91PmYKBs5rK/ScrcNoXs463qwWk5tChl
-         1xneOTTWkzkyLT9ifEpuEzsdWrEF1mAMwXq5YhC5KwLDwlnhplCsDTx/j4PFnsVGDEQD
-         ezc7u761G+9OgdQXcu3OcTsUtAYFUfp9y9B9GKesRtozB65+8wmafNQeoWqJnIXOltQ4
-         HKz1eC24JWHikYTdy20OO3FqhQ6jqZxJ0fmmBprAslDikeJhpC6bTbJ2OYoOHDDW+8e9
-         JVOA==
-X-Gm-Message-State: AOJu0YyUAYYTqPdIoNEgDr+5IfO0ymh5KNfCnvi/3MsLhfWhL4VeI/Ay
-	h4/zuWTsec9ZhV8DjsdovMi6Iq5fjbyc6yADwvY2H2X5qJFOcvV7iYXC3ogTReXrFARtq0f+kPq
-	O72WDB0lkvhf2NBRfhyN8Lk2sad7vkZ1YZKIYIjMz9g==
-X-Gm-Gg: AfdE7cm6DTSZLKNzmOj5g47Smg93O/garFZ/IdeKU9kWaL1WdWX1SagZYs+HoHl/hCX
-	azL8R2B9yDrkgOI2u2f7721jfR06Y+5d45TjHF7VwqOpVwPCT0fQCL97lWKALaSc1PYEG6k1UxF
-	cHH8QCMpvU6YH2xtXtFJ+joCXeTrBPdLwF3ONkIVCDUi79r1rd1o1WGaaOwp36swZJJ/IRMIkir
-	oF5xTpurZS5aVb70tlF9RtOoiINa6UNClwuIhXhAty58i0b9JjfkC3DCJ0Ij8W/slPLCFH7
-X-Received: by 2002:a05:6102:5344:b0:727:a787:608a with SMTP id
- ada2fe7eead31-734362a8192mr2593744137.20.1782428234988; Thu, 25 Jun 2026
- 15:57:14 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782428363; x=1783033163;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/gX7hQHyvfb4Ci0nY3Fxsfc2Doou++pLUQ8Pual9WtQ=;
+        b=d/ALqnkyr9WcmYrXdOoas+SyiZPZ7qjFTBrBbaGqlEbQzkTbwp3G1dKHeHrgNq/com
+         GGbq27+7MOe7Xlmg0aOK3WPKKBXkw7VcX1y8OlXi6VvKmLUOesf/jx8Bni6Cek51yJM/
+         FMsJv+mK6GQ50FDINn4HsNLcvlkF0bhVL3ciVwDGI6PYdWDRDnq6Tkw6+rBtosdnZucH
+         bYyc/3aiCqo2PDgbOER5QRSK26oUG7mPX7eZRTmvGGdUW6J0f8dtJUiDaozdrwxYq4O7
+         O2AgfEW+mbtj05q/oHzxWBZ3AECIlPpSKqVovgaFyV7vMTQNc2txhFYmOv2+3UBTkGCj
+         bKyA==
+X-Forwarded-Encrypted: i=1; AHgh+Rr2Ndtx86c2jIi8ZicjGHuCCa5wGixAV9S910Y7gsRG/KTGanmauOzywLUdTYin78dIbJ2DSQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNQ7cMdtLl0nyWc8kmaYX0mOGcW+H4Ty6+paalDjLSNGDd+TBx
+	r8koRfXE5yFcCTAg4UZou3AFokGPcakMEV8/jJJdx0MjtxzXBJkjEwUYDL1XD01/qg5G6c3DMNc
+	9lSaTi4lsLVvlk1QXqj/j65f5hZogkaK5h+jJS1el
+X-Gm-Gg: AfdE7cnOv9O21SPtfms3YwWeEY+NhObfhBbFCOx7HU1lcBFPv+JZcketCtZmb2+3sGe
+	wOXjt0mdX2U5uQKydlbiiFi3f9g9VdS7Rdb/Dg6uTcE6v00iMTN5VXM/xFSOcJg8k6atS7iH58g
+	oNfcvkvAMLw0oLieR+QftXF/uybUtsAdXrE3RtyPJMiAdJX4Igb13nAELRpJl+bhiiUiUofw0gW
+	djVl72Q5AD066Xy/82oWQRmbwD6s9GecjNhLKLZJ9mGJ9wiEBHA2Cie9Uj2teAUwuE+ftcnKOhZ
+	+cI05C4NJ2jLND/9zD97ue3my2MRZdV4SHnunoUp9+9rkOCfdmr+9ahaUkHZ7WstQVjaQgo=
+X-Received: by 2002:a17:902:fc4d:b0:2bf:193b:a195 with SMTP id
+ d9443c01a7336-2c813e4f6c6mr855945ad.11.1782428362363; Thu, 25 Jun 2026
+ 15:59:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMPsyauZ+jzG9AysO0FWv6ZY0kvCUpjX_U7o=oOjCuOQ87BCgg@mail.gmail.com>
-In-Reply-To: <CAMPsyauZ+jzG9AysO0FWv6ZY0kvCUpjX_U7o=oOjCuOQ87BCgg@mail.gmail.com>
-From: Rishikesh Jethwani <rjethwani@everpuredata.com>
-Date: Thu, 25 Jun 2026 15:57:04 -0700
-X-Gm-Features: AVVi8CdOdcZMRgjrwL6pVY-FchRTaQef4J1jPkos5-zV80YQV-CAjS13UQl5OWQ
-Message-ID: <CAKaoeS1dxK+SLrUPdE1J16TpL_M5mj8JTccL7C2OzfnNQEFNSQ@mail.gmail.com>
-Subject: Re: [PATCH v14 0/9] tls: Add TLS 1.3 hardware offload support
-To: Nils Juenemann <nils.juenemann@gmail.com>
-Cc: netdev@vger.kernel.org, borisp@nvidia.com, davem@davemloft.net, 
-	edumazet@google.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	leon@kernel.org, mbloch@nvidia.com, saeedm@nvidia.com, sd@queasysnail.net, 
-	tariqt@nvidia.com
+References: <20260625-airoha-eth-skb_frag_dma_map-v1-1-31d9e460aae6@kernel.org>
+In-Reply-To: <20260625-airoha-eth-skb_frag_dma_map-v1-1-31d9e460aae6@kernel.org>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Thu, 25 Jun 2026 15:59:10 -0700
+X-Gm-Features: AVVi8CeiefQknrcxxwnBcBr19FhEdmLlZYqiKgArFjpWRrvJ_M8y2FZe1GT04Ic
+Message-ID: <CAEAWyHfyWrSdKziDg3SOnx3QRfd6uu6YXtJV85OgqWEQSJykmQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: airoha: dma map xmit frags with skb_frag_dma_map()
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[everpuredata.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[everpuredata.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:nils.juenemann@gmail.com,m:netdev@vger.kernel.org,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:nilsjuenemann@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302076-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302077-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[everpuredata.com:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rjethwani@everpuredata.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,queasysnail.net];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 196686C9145
+X-Rspamd-Queue-Id: D48136C915A
 
-On Tue, Jun 23, 2026 at 10:53=E2=80=AFAM Nils Juenemann
-<nils.juenemann@gmail.com> wrote:
+On Thu, Jun 25, 2026 at 2:43=E2=80=AFAM Lorenzo Bianconi <lorenzo@kernel.or=
+g> wrote:
 >
-> Hi Rishikesh, all,
+> Map xmit skb fragments using skb_frag_dma_map() instead of
+> dma_map_single(skb_frag_address()). skb_frag_address() relies on
+> page_address() to obtain a kernel virtual address, which is not
+> guaranteed to work for all page types (e.g. highmem pages or
+> user-pinned pages from MSG_ZEROCOPY).
+> skb_frag_dma_map() maps the fragment directly via its struct page and
+> offset through dma_map_page(), avoiding the need for a kernel virtual
+> address entirely.
+> Introduce an enum airoha_dma_map_type to track how each queue entry was
+> mapped (single vs page), so that the matching unmap function is called
+> on completion and in error paths.
 >
-> we have been testing the v14 TLS 1.3 HW offload series on a ConnectX-6
-> DX and hit a sendfile() final-record loss on the device TX path. We
-> reduced it to a self-contained C reproducer and characterized it;
-> reporting it here with the analysis and a question on where a fix belongs=
-.
->
-> Setup:
->
-> NIC: ConnectX-6 DX (crypto enabled), FW 22.47.1026, SR-IOV VF,
-> TX offload only
->
-> Kernel: net-next + this v14 series
->
-> TLS 1.3, AES-128-GCM, kTLS installed via setsockopt(TLS_TX) on the
-> sending side with fixed test crypto material and no handshake, like
-> tools/testing/selftests/net/tls
->
-> a server sends a file with the raw sendfile(2) syscall; a client on
-> another host reads the decrypted stream and counts the bytes
->
-> Trigger: sendfile(2) with a count larger than the bytes remaining in
-> the file (count > EOF). This is what a generic copy loop / Go's
-> net.TCPConn.ReadFrom passes for a file of unknown length (~2 GiB). The
-> kernel sends up to EOF, but the connection's final TLS record then
-> appears not to be put on the wire unless a subsequent write flushes it.
-> An abrupt close() appears to drop it, and the peer receives the whole
-> body except the last record's bytes.
->
-> Reproducer results (two hosts over the ConnectX - a loopback/same-host
-> connection stays on TLS_SW and does not show it). Same file, 226965
-> bytes (=3D 13*16384 + 13973):
->
-> TLS_HW count>EOF close() -> 212992 short
-> TLS_HW count>EOF close(), no zerocopy -> 212992 same
-> TLS_HW count=3D=3Dexact close() -> 226965 full
-> TLS_HW count>EOF close_notify, then close() -> 226965 full
-> TLS_SW count>EOF close(), hw-tx-offload off -> 226965 full
->
-> So it is specific to the device-offload TX path: the final record of a
-> count > EOF sendfile() appears not to be finalized/flushed at EOF, only
-> by a following write. A bounded count, a trailing write (close_notify),
-> or software kTLS all avoid it. TLS_TX_ZEROCOPY_RO makes no difference.
-> We are currently using the exact-count workaround in a preview environmen=
-t.
->
-> We may be misreading the code, so this is only a pointer: with
-> count > EOF tls_push_data() fills the last record without reaching the
-> size=3D=3D0 case; on the device path tls_device_record_close() for that
-> pending record appears to run only on the next push, and an abrupt
-> teardown appears to discard it. The software path seems to flush
-> pending TX records on close (tls_sw_release_resources_tx), which would
-> explain why it is unaffected.
->
-> Reproducer:
-> https://gist.github.com/totallyunknown/a8f0ad3c54e40befde2f5a8d360fa6be
->
-> It installs kTLS with fixed test crypto material via
-> setsockopt(TLS_TX/TLS_RX), sends a file using the raw sendfile(2)
-> syscall, and compares count > EOF against exact-count and close_notify.
-> The v14 selftest (patch 9/9) sends via send() only and ends cleanly, so
-> it misses this; a sendfile() + count > EOF case reproduces it
-> deterministically for us.
->
-> Question: should the device offload finalize and flush the connection's
-> final record at EOF / on close, the way software kTLS does, or is a
-> trailing write required by contract? And should a fix live in net/tls
-> (device record close on the final partial record / the close path) or
-> on the mlx5 side?
->
+> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 =
+SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-close() should be sufficient here.
-I will fix this in net/tls/tls_device.c:tls_device_splice_eof().
-tls_device_splice_eof() only checked tls_is_partially_sent_record(),
-but it also needs to handle tls_is_pending_open_record()
-(pending_open_record_frags). On the device TX path, that state occurs
-when tls_push_data() exits with MSG_MORE set, which is what
-splice/sendfile does while count > EOF still leaves requested bytes
-outstanding.
-So EOF can be reached with a final open record still pending. The fix
-is to close and push that record from tls_device_splice_eof(), so
-close() remains sufficient and no trailing write is required.
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 61 ++++++++++++++++++++------=
+------
+>  drivers/net/ethernet/airoha/airoha_eth.h |  7 ++++
+>  2 files changed, 45 insertions(+), 23 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 932b3a3df2e5..1caf6766f2c0 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -944,6 +944,25 @@ static void airoha_qdma_wake_netdev_txqs(struct airo=
+ha_queue *q)
+>         q->txq_stopped =3D false;
+>  }
+>
+> +static void airoha_unmap_xmit_buf(struct airoha_eth *eth,
+> +                                 struct airoha_queue_entry *e)
+> +{
+> +       switch (e->dma_type) {
+> +       case AIROHA_DMA_MAP_PAGE:
+> +               dma_unmap_page(eth->dev, e->dma_addr, e->dma_len,
+> +                              DMA_TO_DEVICE);
+> +               break;
+> +       case AIROHA_DMA_MAP_SINGLE:
+> +               dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
+> +                                DMA_TO_DEVICE);
+> +               break;
+> +       case AIROHA_DMA_UNMAPPED:
+> +       default:
+> +               break;
+> +       }
+> +       e->dma_type =3D AIROHA_DMA_UNMAPPED;
+> +}
+> +
+>  static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget=
+)
+>  {
+>         struct airoha_tx_irq_queue *irq_q;
+> @@ -1006,9 +1025,7 @@ static int airoha_qdma_tx_napi_poll(struct napi_str=
+uct *napi, int budget)
+>                 skb =3D e->skb;
+>                 e->skb =3D NULL;
+>
+> -               dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
+> -                                DMA_TO_DEVICE);
+> -               e->dma_addr =3D 0;
+> +               airoha_unmap_xmit_buf(eth, e);
+>                 list_add_tail(&e->list, &q->tx_list);
+>
+>                 WRITE_ONCE(desc->msg0, 0);
+> @@ -1177,12 +1194,10 @@ static void airoha_qdma_tx_cleanup(struct airoha_=
+qdma *qdma)
+>                         struct airoha_qdma_desc *desc =3D &q->desc[j];
+>                         struct sk_buff *skb =3D e->skb;
+>
+> -                       if (!e->dma_addr)
+> +                       if (e->dma_type =3D=3D AIROHA_DMA_UNMAPPED)
+>                                 continue;
+>
+> -                       dma_unmap_single(qdma->eth->dev, e->dma_addr,
+> -                                        e->dma_len, DMA_TO_DEVICE);
+> -                       e->dma_addr =3D 0;
+> +                       airoha_unmap_xmit_buf(qdma->eth, e);
+>                         list_add_tail(&e->list, &q->tx_list);
+>
+>                         WRITE_ONCE(desc->ctrl, 0);
+> @@ -2193,8 +2208,8 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *=
+skb,
+>         struct netdev_queue *txq;
+>         struct airoha_queue *q;
+>         LIST_HEAD(tx_list);
+> +       dma_addr_t addr;
+>         int i =3D 0, qid;
+> -       void *data;
+>         u16 index;
+>         u8 fport;
+>
+> @@ -2250,24 +2265,22 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff=
+ *skb,
+>                 return NETDEV_TX_BUSY;
+>         }
+>
+> -       len =3D skb_headlen(skb);
+> -       data =3D skb->data;
+> -
+>         e =3D list_first_entry(&q->tx_list, struct airoha_queue_entry,
+>                              list);
+> +       len =3D skb_headlen(skb);
+> +       addr =3D dma_map_single(netdev->dev.parent, skb->data, len,
+> +                             DMA_TO_DEVICE);
+> +       if (unlikely(dma_mapping_error(netdev->dev.parent, addr)))
+> +               goto error_unlock;
+> +
+> +       e->dma_type =3D AIROHA_DMA_MAP_SINGLE;
+>         index =3D e - q->entry;
+>
+>         while (true) {
+>                 struct airoha_qdma_desc *desc =3D &q->desc[index];
+>                 skb_frag_t *frag =3D &skb_shinfo(skb)->frags[i];
+> -               dma_addr_t addr;
+>                 u32 val;
+>
+> -               addr =3D dma_map_single(netdev->dev.parent, data, len,
+> -                                     DMA_TO_DEVICE);
+> -               if (unlikely(dma_mapping_error(netdev->dev.parent, addr))=
+)
+> -                       goto error_unmap;
+> -
+>                 list_move_tail(&e->list, &tx_list);
+>                 e->skb =3D i =3D=3D nr_frags - 1 ? skb : NULL;
+>                 e->dma_addr =3D addr;
+> @@ -2291,8 +2304,13 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff =
+*skb,
+>                 if (++i =3D=3D nr_frags)
+>                         break;
+>
+> -               data =3D skb_frag_address(frag);
+>                 len =3D skb_frag_size(frag);
+> +               addr =3D skb_frag_dma_map(netdev->dev.parent, frag, 0, le=
+n,
+> +                                       DMA_TO_DEVICE);
+> +               if (unlikely(dma_mapping_error(netdev->dev.parent, addr))=
+)
+> +                       goto error_unmap;
+> +
+> +               e->dma_type =3D AIROHA_DMA_MAP_PAGE;
+>         }
+>         q->queued +=3D i;
+>
+> @@ -2313,11 +2331,8 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff =
+*skb,
+>         return NETDEV_TX_OK;
+>
+>  error_unmap:
+> -       list_for_each_entry(e, &tx_list, list) {
+> -               dma_unmap_single(netdev->dev.parent, e->dma_addr, e->dma_=
+len,
+> -                                DMA_TO_DEVICE);
+> -               e->dma_addr =3D 0;
+> -       }
+> +       list_for_each_entry(e, &tx_list, list)
+> +               airoha_unmap_xmit_buf(dev->eth, e);
+>         list_splice(&tx_list, &q->tx_list);
+>  error_unlock:
+>         spin_unlock_bh(&q->lock);
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index d7ff8c5200e2..2765244d937c 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -170,12 +170,19 @@ enum trtcm_param {
+>  #define TRTCM_TOKEN_RATE_MASK                  GENMASK(23, 6)
+>  #define TRTCM_TOKEN_RATE_FRACTION_MASK         GENMASK(5, 0)
+>
+> +enum airoha_dma_map_type {
+> +       AIROHA_DMA_UNMAPPED,
+> +       AIROHA_DMA_MAP_SINGLE,
+> +       AIROHA_DMA_MAP_PAGE,
+> +};
+> +
+>  struct airoha_queue_entry {
+>         union {
+>                 void *buf;
+>                 struct {
+>                         struct list_head list;
+>                         struct sk_buff *skb;
+> +                       enum airoha_dma_map_type dma_type;
+>                 };
+>         };
+>         dma_addr_t dma_addr;
+>
+> ---
+> base-commit: 232c4ca2343d1181cbfc061f9856d9591e397579
+> change-id: 20260625-airoha-eth-skb_frag_dma_map-bcccd5d6e4b1
+>
+> Best regards,
+> --
+> Lorenzo Bianconi <lorenzo@kernel.org>
+>
+>
 
