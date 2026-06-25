@@ -1,104 +1,60 @@
-Return-Path: <netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FEF9N3bLPGrtsAgAu9opvQ
-	(envelope-from <netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:32:22 +0200
+	id G2EGMk3NPGrGsQgAu9opvQ
+	(envelope-from <netdev+bounces-301872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:40:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8B86C30AE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:32:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6169A6C3159
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:40:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="Si/QbojX";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301872-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301872-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86FD53023346
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:31:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CFC9E3017B8B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E5631328E;
-	Thu, 25 Jun 2026 06:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E073C0A1F;
+	Thu, 25 Jun 2026 06:40:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73DC2874E6
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 06:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A73F2FD681;
+	Thu, 25 Jun 2026 06:40:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782369089; cv=none; b=ZBhCKoBgRQ3GJuxe1S4+TI9U+alEkTWQ21FPRDTlKDFj2zMegNKrWsYTM7lIIcTBrUJuCPDJeFZcPr0YPNXH/Ff2OUnKKQ90AoW8OLAHDzQT29nbSSSYrHSKDLX9dtajroBZx4iS6m1Dq3t14A85qpXxTIiDzprx9JMKBSzE8qc=
+	t=1782369609; cv=none; b=OgO/GXa3PgQlLUknalRP9RfcHbcketuK4T4adKa/T2BecFWy9yBDXRV6IQW9EXDnnvyiDMP/1TRTpaoykXTH5dCgdycAUK2m7JIGOaZ+tDWrmIXo2H21gsA4zQOHrtLhWm1ZvWGZpE3g2z8hRkR43fZwwUrihmvA8dtLqvMNxds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782369089; c=relaxed/simple;
-	bh=h9ayyCO19b4D8SnctXO7asTtcaRk3bUGigIyeLr8zQk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s0iNx9ctzKLKJBbtAeCTQtjYJn2hwfErd4EEN78cKD0IRxF0i9YPpFruMhdg7rPqYdKxfO6zdiSiUdtixn3GA0BROG0HWBOMkgKvKJSWTgnpBGsB959ItRu1ArSTM/Fa6f97x08sK6c2cDAu7YVGK2dIOUTA0CPdGyi0WPfSMWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Si/QbojX; arc=none smtp.client-ip=209.85.128.46
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-490b3637b90so12126235e9.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 23:31:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782369086; x=1782973886; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/dL5E5/PAVvSoAmR+aoTsLP141NGqcao3RnOAEaH2u8=;
-        b=Si/QbojXaDFSHvSiVuRjKnLzhJbR+gerUCNc93mGkvSQkbbK/jEpa9E39iu6hbbfhY
-         aN9cWtvq4LdN6K4YqIF+T0POSlKQuW3Ilmb4mIhRji7uXwVcpXGosl27FfnDv59D2bSg
-         oUwC3nAw8htMCCLroCundv8Hn6rRzUVdLXBrrIIEIHTyGDz1GUwCNjOoaWgSLn1tQgGy
-         HIOs2mQ727C6Xd+sAgpll51lQl0000HqN83GtW9D/otXKQ//um2/znaHaJzrXGdY2Pz2
-         uLieHFZv6TSI+tS/Vofkr84qNGfsuGpIReTVi8Ks5tWQ3LrDTUKujQSQ2OfGpur0uF1y
-         He4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782369086; x=1782973886;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/dL5E5/PAVvSoAmR+aoTsLP141NGqcao3RnOAEaH2u8=;
-        b=nhiAUhNgbu5oBxBEjP2xb2EUVpfhKw/LU/Prgbbn6wEvQadVeOATn85I0hVnoqsuE/
-         qKHm+90gql40lptkjKw4YZtNzYqDIQ9e/3jRT4mX1VWcSQ3Eph6ieJoUYytPfim7mQ0o
-         RPLxksHBfsVdDnIbdtn5tjW1Ql8jVW6NRhikQrxab4qtb9D1SthlF6nWfCboKaNI4tew
-         EN+pXZXne4mHA3N/YigPbTkwYfbesql3R9gIWM3B+/dWIS04UtaI5DVfh84UlmfvBNEg
-         obUBbprqH7BqF+4TamIUpbuiMive53Ze6yhDgLmfAPlk/hkJad38myiSKO9uzUVQxskT
-         vYVA==
-X-Forwarded-Encrypted: i=1; AFNElJ99btNYCzGyHTeMXBGsRNJzz1n7lsHQ0cLi08UOC3+C7FPtyJ3bDFYPwJr6DeFll9UX5qfAyrw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIppADuuzjbqkef4soW861Ep5QXp2zMshkjOn9qDPWfrsEy3Jq
-	+rwznNkHYI9uqY1JBf0qQX+72/4V8M/NEWc7HJEIG+FUTYMqBtYTdxyY
-X-Gm-Gg: AfdE7ckhtFVLP6g88eAzZQ2OX1CR3tih+7j1wl5JrWtCkog7aYnX89ZhxqR1+8wqItE
-	IQrscdjVBvL7fYiCsIWy2lhIlu/c2+R4KrhYGNZbwFw4EgULliNUkZ49s6LZgN0sM8ivsa6EnIQ
-	2zpT+V77gYwPt2SBU6IrYzq+vdTaiW9cPZner2gMAlPhcZhEscPznr5Aw/sp7uukPLa9/KvGk9F
-	E3YsXRqzz78uKQ/J5qKcHwfoMCgyCo9xykqw+KSou378gsYODX4E8i9qFah9GykRnieRBWB6fxp
-	ahDl5h1SZr/ynwikgW8ZpaeTfgA9gXR8SIQjrn7X+EeNAioDrW24A1+xzAz9yQR7qChyXA5j3Vu
-	+6Op8yiZplp8PB/+Yli1mazRMjpWJYpZB1uxxJThyGH4gi0n/z3ccJCnR+MIaIKDPEq4Xh7lLB8
-	jWGtEjLBdgdWY0d8c586HR2LJsi/XjAc4nwyGC6HLYvzZLIW1RMtTqw5RHPIkuIpT70YvhO+A4
-X-Received: by 2002:a05:600c:4e4b:b0:490:b724:5085 with SMTP id 5b1f17b1804b1-4926689ab05mr13119825e9.33.1782369085712;
-        Wed, 24 Jun 2026 23:31:25 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c1ee01c6csm13625247f8f.14.2026.06.24.23.31.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 23:31:25 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	m-malladi@ti.com,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1782369609; c=relaxed/simple;
+	bh=2JMoRHKUQ/kQHqvaMEdRcJ0m8VcfYZX/7FHNM/oWlks=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k5pLMxV6M+u287cFtDJ90TdfJh9nbFIgzRL+CCf6pxW5HA3PY2Q1ooEi8PxIe8AH9jmrE/n1WIlCEIQ0BvZtln2AcrE3RWGOSbVl910CPdg3Tc1H5SR28nfH56Nyc4HTd2MYt8sKxweg53D+wMRcGoAhDeO60p9usZak+bnJJuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Received: from localhost.localdomain (unknown [117.182.75.66])
+	by APP-05 (Coremail) with SMTP id zQCowAAXbhE6zTxqV6YpFQ--.19217S2;
+	Thu, 25 Jun 2026 14:39:56 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH net v3] net: ti: icssg-prueth: fix XDP_TX from the AF_XDP zero-copy RX path
-Date: Thu, 25 Jun 2026 07:31:21 +0100
-Message-ID: <20260625063121.24746-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] octeontx2-af: Fix pci_dev reference leak in cgx_print_dmac_flt
+Date: Thu, 25 Jun 2026 14:39:51 +0800
+Message-Id: <20260625063951.44361-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,167 +62,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAAXbhE6zTxqV6YpFQ--.19217S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFy7tFW8AFy3Jr1xuw4DArb_yoW8Aw4kpa
+	1Y9a4rArW8tryftw4UJa10yr98Ga1vq393K3y8Cw1F93WrJr1Fqa48KayUKF1SyFWkW3W3
+	tF1Y9a1xua1Dt3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAcJA2o8pXKEjgABsL
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301871-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,ti.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,lists.infradead.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:danishanwar@ti.com,m:rogerq@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:m-malladi@ti.com,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:ast@kernel.org,m:daniel@iogearbox.net,m:bpf@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:devnexen@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301872-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,ti.com:email]
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3B8B86C30AE
+X-Rspamd-Queue-Id: 6169A6C3159
 
-On XDP_TX from the zero-copy RX path, emac_run_xdp() converts the xsk
-buffer via xdp_convert_zc_to_xdp_frame(), which clones the data into a
-fresh MEM_TYPE_PAGE_ORDER0 page that is not DMA mapped. Transmitting it
-as PRUETH_TX_BUFF_TYPE_XDP_TX derives the DMA address with
-page_pool_get_dma_addr(), reading an uninitialized page->dma_addr, so
-the device DMAs from a bogus address (corrupt TX, or an IOMMU fault).
+In cgx_print_dmac_flt(), pci_get_device() is called to look up the AF
+PCI device, but its return value is passed directly to pci_get_drvdata()
+without saving the pointer. This means pci_dev_put() can never be called
+for the obtained device, causing a reference count leak.
 
-Pick the TX buffer type from the frame's memory type: keep
-PRUETH_TX_BUFF_TYPE_XDP_TX for page_pool frames and use
-PRUETH_TX_BUFF_TYPE_XDP_NDO for the cloned zero-copy frame, which is then
-DMA mapped through the NDO path and unmapped on completion.
+Fix it by saving the return value of pci_get_device() in a local variable
+and releasing it via pci_dev_put() after the drvdata is extracted.
 
-While at it, fix the page_pool XDP_TX completion path. A
-PRUETH_TX_BUFF_TYPE_XDP_TX frame carries a page_pool-owned DMA mapping
-(established against rx_chn->dma_dev), yet prueth_xmit_free()
-unconditionally calls dma_unmap_single() on it with tx_chn->dma_dev,
-tearing down a mapping the driver does not own; xdp_return_frame()
-already recycles the page back to the pool. Tag such frames with a
-dedicated PRUETH_SWDATA_XDPF_TX type so the completion path skips the
-unmap, the same way PRUETH_SWDATA_XSK buffers are handled.
-
-Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
-Fixes: 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support")
 Cc: stable@vger.kernel.org
-Signed-off-by: David Carlier <devnexen@gmail.com>
-Reviewed-by: Meghana Malladi <m-malladi@ti.com>
+Fixes: dbc52debf95f ("octeontx2-af: Debugfs support for DMAC filters")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
-v3:
- - address Meghana Malladi review nits: split the prueth_xmit_free()
-   guard to stay under 80 columns, parenthesize the swdata->type
-   ternary (and the matching tx_buff_type one for consistency).
- - no functional change; carry Reviewed-by.
-v2: https://lore.kernel.org/netdev/20260623112225.303930-1-devnexen@gmail.com
-v1: https://lore.kernel.org/netdev/20260620213756.87499-1-devnexen@gmail.com
- drivers/net/ethernet/ti/icssg/icssg_common.c | 21 +++++++++++++++++---
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  1 +
- 2 files changed, 19 insertions(+), 3 deletions(-)
+ .../net/ethernet/marvell/octeontx2/af/rvu_debugfs.c   | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index 82ddef9c17d5..64ae3704481e 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -185,7 +185,8 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
- 	first_desc = desc;
- 	next_desc = first_desc;
- 	swdata = cppi5_hdesc_get_swdata(first_desc);
--	if (swdata->type == PRUETH_SWDATA_XSK)
-+	if (swdata->type == PRUETH_SWDATA_XSK ||
-+	    swdata->type == PRUETH_SWDATA_XDPF_TX)
- 		goto free_pool;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index fa461489acdd..90dc13df9ff9 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -2949,7 +2949,7 @@ RVU_DEBUG_SEQ_FOPS(cgx_stat, cgx_stat_display, NULL);
  
- 	cppi5_hdesc_get_obuf(first_desc, &buf_dma, &buf_dma_len);
-@@ -259,6 +260,7 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
- 			napi_consume_skb(skb, budget);
- 			break;
- 		case PRUETH_SWDATA_XDPF:
-+		case PRUETH_SWDATA_XDPF_TX:
- 			xdpf = swdata->data.xdpf;
- 			dev_sw_netstats_tx_add(ndev, 1, xdpf->len);
- 			total_bytes += xdpf->len;
-@@ -769,7 +771,8 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
- 	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
- 	cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
- 	swdata = cppi5_hdesc_get_swdata(first_desc);
--	swdata->type = PRUETH_SWDATA_XDPF;
-+	swdata->type = (buff_type == PRUETH_TX_BUFF_TYPE_XDP_TX ?
-+		PRUETH_SWDATA_XDPF_TX : PRUETH_SWDATA_XDPF);
- 	swdata->data.xdpf = xdpf;
- 
- 	/* Report BQL before sending the packet */
-@@ -804,6 +807,7 @@ EXPORT_SYMBOL_GPL(emac_xmit_xdp_frame);
-  */
- static u32 emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp, u32 *len)
+ static int cgx_print_dmac_flt(struct seq_file *s, int lmac_id)
  {
-+	enum prueth_tx_buff_type tx_buff_type;
- 	struct net_device *ndev = emac->ndev;
- 	struct netdev_queue *netif_txq;
- 	int cpu = smp_processor_id();
-@@ -826,11 +830,21 @@ static u32 emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp, u32 *len
- 			goto drop;
- 		}
+-	struct pci_dev *pdev = NULL;
++	struct pci_dev *af_pdev, *pdev = NULL;
+ 	void *cgxd = s->private;
+ 	char *bcast, *mcast;
+ 	u16 index, domain;
+@@ -2958,8 +2958,13 @@ static int cgx_print_dmac_flt(struct seq_file *s, int lmac_id)
+ 	u64 cfg, mac;
+ 	int pf;
  
-+		/* In AF_XDP zero-copy mode xdp_convert_buff_to_frame()
-+		 * clones the xsk buffer into a fresh MEM_TYPE_PAGE_ORDER0
-+		 * page that is not DMA mapped. Such a frame must be mapped
-+		 * via the NDO path; only a page pool-backed frame already
-+		 * carries a usable page_pool DMA address.
-+		 */
-+		tx_buff_type = (xdpf->mem_type == MEM_TYPE_PAGE_POOL ?
-+				PRUETH_TX_BUFF_TYPE_XDP_TX :
-+				PRUETH_TX_BUFF_TYPE_XDP_NDO);
+-	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
++	af_pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
++				 PCI_DEVID_OCTEONTX2_RVU_AF, NULL);
++	if (!af_pdev)
++		return -ENODEV;
 +
- 		q_idx = cpu % emac->tx_ch_num;
- 		netif_txq = netdev_get_tx_queue(ndev, q_idx);
- 		__netif_tx_lock(netif_txq, cpu);
- 		result = emac_xmit_xdp_frame(emac, xdpf, q_idx,
--					     PRUETH_TX_BUFF_TYPE_XDP_TX);
-+					     tx_buff_type);
- 		__netif_tx_unlock(netif_txq);
- 		if (result == ICSSG_XDP_CONSUMED) {
- 			ndev->stats.tx_dropped++;
-@@ -1395,6 +1409,7 @@ void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
- 		dev_kfree_skb_any(skb);
- 		break;
- 	case PRUETH_SWDATA_XDPF:
-+	case PRUETH_SWDATA_XDPF_TX:
- 		xdpf = swdata->data.xdpf;
- 		xdp_return_frame(xdpf);
- 		break;
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index df93d15c5b78..00bb760d68a9 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -153,6 +153,7 @@ enum prueth_swdata_type {
- 	PRUETH_SWDATA_CMD,
- 	PRUETH_SWDATA_XDPF,
- 	PRUETH_SWDATA_XSK,
-+	PRUETH_SWDATA_XDPF_TX,
- };
++	rvu = pci_get_drvdata(af_pdev);
++	pci_dev_put(af_pdev);
+ 	if (!rvu)
+ 		return -ENODEV;
  
- enum prueth_tx_buff_type {
 -- 
-2.53.0
+2.39.5 (Apple Git-154)
 
 
