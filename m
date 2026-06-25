@@ -1,258 +1,198 @@
-Return-Path: <netdev+bounces-301880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 18f9NJ/UPGoHtAgAu9opvQ
-	(envelope-from <netdev+bounces-301880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:11:27 +0200
+	id 9EVjJzfZPGojtQgAu9opvQ
+	(envelope-from <netdev+bounces-301882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:31:03 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C8E56C345F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBFAE6C35EA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:31:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=VeVOCeZd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301880-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301880-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=blackhole.kfki.hu header.s=20151130 header.b=mlMi4KQj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301882-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301882-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=blackhole.kfki.hu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DADA93029ADD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:11:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 54B9B3012B3D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96417332623;
-	Thu, 25 Jun 2026 07:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861EA334C3D;
+	Thu, 25 Jun 2026 07:30:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C4A390C84
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 07:11:22 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782371484; cv=fail; b=pO5bcCatTO6t+c9YwUdGJmvsuLpMMJiITrO2h4eJdHMs480pHxbmhzKCXFm+TdIu83Bgo3j/F/XhN6cgi9UyAig12CAeLtIsuPUFKFcKHCr/H8L3m1oMI5UqwaPf+amPr7O20c9Cxpzs/gDKZ1tT1qhSn7ag0oifl2n5etFQwBU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782371484; c=relaxed/simple;
-	bh=YX4IPsk9PeVuXQ7HTlhr0w2Jd/zoH3AxmWhb5hzLfqo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Shyc2CDuHCLCS4czm9D+pVAP6GkDXf3Y8dRHLaHJmBn8NftJ+QHZWQB9PZsowxgOOKagy1FMvllQkUaD5tM5C1UN0xET8OlN7M/WyOPUMI/yTR9bgGN7EyUnYtjsWcqpSTj+1CrdYI3yk0Q7Uu8sP5cXuIAXlkacfFdijEnsmwY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VeVOCeZd; arc=fail smtp.client-ip=192.198.163.12
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782371483; x=1813907483;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=YX4IPsk9PeVuXQ7HTlhr0w2Jd/zoH3AxmWhb5hzLfqo=;
-  b=VeVOCeZd2ptLjURVBXWGo3BeT6t//PB57gIo4zkvDHwRHg7AVmiLKnUP
-   lHWz2pR2wTEX6vLczT1nufjc9rIVp6199P4b/PLUVopZ3XyQT+V6aUXh/
-   stRJ8SoS4j6c7XhaVOe7iCUP9e3u7NTwLl8a0UllgBIubiuhTHSRbbM0y
-   8LqHd5GApetafPeld9io4D8psnuF0k+2djlUB0cEak4N9D8ixNrCD2EKy
-   5J7Y4d+2BnPSagOi18DPr4TUeABOhBRXnOEevwAxmIY4u+heOt2DL+I8j
-   WIX3WFKBJ14p0lvxu8osJkuGbjXa7BRhDRjd5+10KWcU5iomfSS4y7SaW
-   Q==;
-X-CSE-ConnectionGUID: z5wNMcSsQk6xOPD52MERnQ==
-X-CSE-MsgGUID: KEpj476aQaS2avRaQNbMow==
-X-IronPort-AV: E=McAfee;i="6800,10657,11827"; a="86987354"
-X-IronPort-AV: E=Sophos;i="6.24,224,1774335600"; 
-   d="scan'208";a="86987354"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2026 00:11:22 -0700
-X-CSE-ConnectionGUID: Ky/clQqXRnSQaVoou2WnkQ==
-X-CSE-MsgGUID: xYoB4K28T/+oqdcURYsRrw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,224,1774335600"; 
-   d="scan'208";a="250787964"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2026 00:11:22 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 25 Jun 2026 00:11:22 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 25 Jun 2026 00:11:22 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.49) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 25 Jun 2026 00:11:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Qe/UtDEA5gLEVLUT4gv1PeojSxKcKq3HFHSA8pnOmtAYN5JuARHHbYitdkDcUJT6iBq7VYq543szqBORAMuw4g+qDTC89fTQcFzittSReBUTwDZgFGjPxA/SHufMZoufrev0dWxVrQlBJwiqnNU7PImgs8YwfOWl+LIfO9FRCA15JPcMJIYQ7fR6LErQGcHy1OMJZ3jMC+mKKZespmg3krAOhs7OT/1zpIIOBqC9D4vKgaXMneMNigWnq1AXtMKjJVPTHvre3CWjTPdhFNfAKvFmV3gWPowVSmq5/buUS7ybbuOoSp7jv8P2EwtlWBiNn0xXuIcfE5eTXgLvchA5yg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YX4IPsk9PeVuXQ7HTlhr0w2Jd/zoH3AxmWhb5hzLfqo=;
- b=ryROec4oGRm9RQrntlYXy+AIE/gbVfFqCQAC7NdwXBNP9f1r4qFHrgQ65DjiHv9OHxPoqgR96vXFZCOkYoQYGRThOeyCsV7ClImYptCySBx0vVLb0BJeaKXG6mpO+AI/R+X0dSXfKyVDcTcskX2j3k+jRTwuKpci8g/SyW3wI9GCr6WnpwXNqDj6qTp2Ape9keLKp8dsexSq1zYVef4zUEUr1oggnY1UZ/dsnD7Zr4TNsZgi4EzoyjoWhcQVlYRWmMmEO/p14z7EqmfR3Np+MDEaOoC3NKeYZFfNVghfWAYWO6JjDp6oXM7sPlV9Y+7oU/iM85OxPzHWs0O1y40ddw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS4PPF7551E6552.namprd11.prod.outlook.com
- (2603:10b6:f:fc02::31) by IA4PR11MB9084.namprd11.prod.outlook.com
- (2603:10b6:208:562::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.13; Thu, 25 Jun
- 2026 07:11:20 +0000
-Received: from DS4PPF7551E6552.namprd11.prod.outlook.com
- ([fe80::62a:1a7c:6360:a580]) by DS4PPF7551E6552.namprd11.prod.outlook.com
- ([fe80::62a:1a7c:6360:a580%8]) with mapi id 15.21.0159.015; Thu, 25 Jun 2026
- 07:11:14 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>, "Pielech, Adrian"
-	<adrian.pielech@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Subject: RE: [Intel-wired-lan] [TEST] Weird RSS state on ice
-Thread-Topic: [Intel-wired-lan] [TEST] Weird RSS state on ice
-Thread-Index: AQHdA+55jK0wtvXicUe3gb30kirvm7ZO22bg
-Date: Thu, 25 Jun 2026 07:11:14 +0000
-Message-ID: <DS4PPF7551E65529A34C04A73F4287C2B4EE5EC2@DS4PPF7551E6552.namprd11.prod.outlook.com>
-References: <20260624083020.131a75fe@kernel.org>
-In-Reply-To: <20260624083020.131a75fe@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS4PPF7551E6552:EE_|IA4PR11MB9084:EE_
-x-ms-office365-filtering-correlation-id: 240d82af-c059-4db5-7475-08ded288f188
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|56012099006|11063799006|6133799003|38070700021|18002099003|22082099003;
-x-microsoft-antispam-message-info: urxba96Ms5Dw3sz0gMKrhci2Stq7HnnPwyYEH/uOJeMLgjpblM+UFI1xRGCTu4brMoYfhmn52sEcu3rcGeMjXI8kvUjDVqn/pm8LtbU3Ep1F+ApdHjE/wM2KSo1hkuyiCWmiQ/vpCadlKl0aUGd8XUDMlJsFcXSm6Q68KXBu1+XykASiK9umK2pSzhxAD0bwoiX9wc/Z4ZnL+Z/u4NwCh/1V/IRABlthEBwdOaiGjM3Mm+1WQO36woprvR6LI2t3+QjqHRQKJs8Go+58oNRld3rA0wPUrknadspYA4xQ+D4GYMxVh4G7tYSMUlJGSQPZr6MdnXLmCimWR8ySmXXHMV6gXQqNFZGcVSTbHwunmNDxLJVYrNxqRvXqxh+cOGkNEI86aAsfiesExXnmYiznDiTUSa0Quy7ltTvTgXgsxNTDEXrsQsfgpzBXsSj3Oip0SL0RhKwJjFSIUfBHLLEFB+y3SJEitLnwKY7hzYmN4q5rHSnC4/x3mwBe5OhARRgQIaV38YVDgtgm3c3keA4hS35T5wu3WOUkIzJmSRE/sIOslrOyV3b+QHBZBpq6Ikt2CwHnLoq/yuuPN6SjXyK007JbmDrGbvg+8WhIEdZutkTmcnwgiVQT2rWfsSk6TqSJLnrcHxqlkMsHdOgsFY72MJQC3bCtE3wDcEvaEEt36yiDjGY5n0076L22EPUXN91DR4kY067QkFeCGroSruEuwbX/0VnMml3M2HzCl5GJoOg=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPF7551E6552.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(56012099006)(11063799006)(6133799003)(38070700021)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hWlKvw/JmM0tS1ynCEEXZZm7Ph+fXGLJbh06Y2ioh3SNEf+C0TDtlQoUQQL2?=
- =?us-ascii?Q?li5pr82EvqEHsy3KgeMMzVVm3GNyF3CVWnunvpk/YgIFDCLxLv360GI6DM0C?=
- =?us-ascii?Q?w62oACohXLtioa8orDJJC2G048Lv/+Kl/1ADPczbJxC8KdxvZMr7GPszyLYI?=
- =?us-ascii?Q?gFKO5pu9vUT1Bq0oW8E26kjHqlXwnw1A0IQdPdEC7P9flOh/OF7BrYfxza/z?=
- =?us-ascii?Q?9Zr8BJ8Dlb1ODGuTLzYFyjijXDkPyr83c4nDSdwCR39YnCMAbcfSeD0I8jZa?=
- =?us-ascii?Q?TtnoZf1jreyxJGEi/wZisMFrZEg7TV561MDBtD/o3cMBer8nClA+53ZBKmxs?=
- =?us-ascii?Q?oDD3sZv/QCRBE0tnOk1L5J1a4qFbIuVii3DCYUhnFl5M5Uq/VwxNZYNxnYb7?=
- =?us-ascii?Q?CErTFjXxaxgZdo9YAzp2YLbGh00yp6XtMqiHQUelqTSeXNO46vOFu/N4LPjK?=
- =?us-ascii?Q?CDPpMO9F6bseB3+nj4TKlHo2rEOW4CyBGsN7j3IXSCxkKE5tYmcolYT+R043?=
- =?us-ascii?Q?WuJXR8WmkocdjcipyQWdx6A3v9JXahWvjlYejHaq42aQHzG4sWTbcXqjvd1y?=
- =?us-ascii?Q?9t/4exXf1+2WObOV6hGrsnILsrU1weZjfr+nbKD/BhU/jFcgLnQJVD27W6kK?=
- =?us-ascii?Q?ORcbsse69wNs1p6yVhm20BSO1N8NxA4oDDGPtBSv4/8uRIRYRSc954/+z1/r?=
- =?us-ascii?Q?3C4ql/Y8ackrCD/MbpLVoGAFTXZAgieNcPJRuvCkOZ/lPPn0w2f/QQbw8gqo?=
- =?us-ascii?Q?rTiUFTHKdWDN6yk/MAMAh8zL2ZC0X4wTnNP65cUMp7ziY3KaQ6T0BdUX6Xf/?=
- =?us-ascii?Q?1lMV6FkgFqp+ri6eXAmOwC4EmQscch/p0O8eARQTajyUO1Y+JvrwijHUY4hp?=
- =?us-ascii?Q?5ykf/X1cMZCeIGUI70jK9OukFjbHJEmQRnEPHqyhG2UFzEs846Gg3t1UlRUr?=
- =?us-ascii?Q?QpBGzsuMv7N4P6/D/hy45T1Ru2nXnuYbHdH2HbShgUQ0we1cvTyUoyhOM840?=
- =?us-ascii?Q?C5ri99/KSHS5CABpMrmhgHsVliK11xDbLNeRI4/KN/LB22o3nFMr2Oj+pQMZ?=
- =?us-ascii?Q?QxjcJJ6MBU7IguBHvK5UWOtQi3pW1o4r8ME4fAEjN7hMggmCdzUVDI1IE9h2?=
- =?us-ascii?Q?SpmESpL8xh4YyKWQ52A1lUIdmBmLT+XtxIhD97mYK++paSMphdEcS3IbKuRk?=
- =?us-ascii?Q?xn2Qt8k8t7s9MHw3BRK2cAd4IpmqA7HbF2EufF0BW0/CJ2glhvzfDIV05FM2?=
- =?us-ascii?Q?CRo72pjbBfo8une+AWnOpup5lyp73+N3aGHxHOAdfUcFR2ytdJlf/ihPHZ9f?=
- =?us-ascii?Q?slNCVGX3dLDmw1517NoXvq1QkU+OdYQ+B49L/nL4Klj1QsI0AnIocIqNmd/T?=
- =?us-ascii?Q?l01jhU7CM1KWlylNWv6ZTDG1YtDfGfEiZX6CT60xjwUgUbbhUHkzQgJ7qVvS?=
- =?us-ascii?Q?gXc9Lfw/ehgvAw1M/y/7fae9dnDEUV3O02TxM+ies7++rayd02mkCfKHnMoX?=
- =?us-ascii?Q?ZI/s2tw2yBgTFfoTQVr0UZmwU304NHccwiJX0BFBK6tsClGXkxoOizZ/Emt5?=
- =?us-ascii?Q?oC5rNaKb784KQwPg7Ilc+ZPls2QEoSvYIJ8nYUT5G8V4cPzf9bCTB3kcCjqq?=
- =?us-ascii?Q?RE3GwKY8rwj3QXH8SO/fzPcpNccyAdGW2n6EqicrRMt3T30gvfp8TeWdOdvf?=
- =?us-ascii?Q?nMtFHMf+qoCrfNLI0S7wLBlcswY5a3a0eR0RWlFGtgGkSi98z8x/+IuBAXI+?=
- =?us-ascii?Q?rxuuJO7HzCJ/NjVEngZHmYaDgHWo8Zs=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4090D7260D;
+	Thu, 25 Jun 2026 07:30:55 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782372659; cv=none; b=S1utWJLCrbvkKm951O7FRmRJhwWObttraQsa9GVu0hx4XBo3pY7M5ojIPk3lUN45jc7LTOiROWtbs1kC0sjvnuSIWOUbixhraULrbgaPky1CHaC/4LegSXBX1AqBHRY3MvKrs/olvDjByKwQZuiiVzmnb+AnXdNJLKqyyHfImU0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782372659; c=relaxed/simple;
+	bh=L0353zEMEtdSh7bVVdcWIzM0c9UguQfgQW33erWXeSE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=L8+3GHN7aitSvspQJY5SvhATIGgl5c64IxTx9yqIPRNrdQChxCrFatHxkIpRpxjfy+atyuChaM92Wc0n5qnmOCfBLlSixmh6i1SZpdfFWxYLkVqub4t7PLS8SNwPY0XkmTP5cGp48qAGHsF1no4itDPNqIVueCmAhWnoACCukVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=mlMi4KQj; arc=none smtp.client-ip=148.6.0.51
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 4gm9GM3khDz7s7wk;
+	Thu, 25 Jun 2026 09:21:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	blackhole.kfki.hu; h=mime-version:references:message-id
+	:in-reply-to:from:from:date:date:received:received:received
+	:received; s=20151130; t=1782372089; x=1784186490; bh=bRSr6OoZ9J
+	JPnp3T3cmji4ZfZNrVf7E0txBMBISE3Zg=; b=mlMi4KQjQavRrlko1sMJG1eojF
+	B6JiNHsN2TdnkDMTgAWJz8f/cDu7t+qoN33eiXQrD5Q6HSalEuq8kerBs1nRxKRm
+	o5SOT9jspEPVlEc4/i8FJVT3J7kw2BslH+UTVF7AkfOdOZmVDnT2feRz5sw7GkPR
+	1K3Pf0H91vKaL6iG0=
+X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+ by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id fABJDYI3Poh3; Thu, 25 Jun 2026 09:21:29 +0200 (CEST)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [IPv6:2001:738:5001:1::240:2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 4gm9GJ6tlSz7s7wR;
+	Thu, 25 Jun 2026 09:21:28 +0200 (CEST)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id D161F34317F; Thu, 25 Jun 2026 09:21:28 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id CF0EA34317E;
+	Thu, 25 Jun 2026 09:21:28 +0200 (CEST)
+Date: Thu, 25 Jun 2026 09:21:28 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+To: Xiang Mei <xmei5@asu.edu>
+cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+    Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>, 
+    netfilter-devel@vger.kernel.org, kees@kernel.org, horms@kernel.org, 
+    Weiming Shi <bestswngs@gmail.com>, coreteam@netfilter.org, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: ipset: fix race between dump and ip_set_list
+ resize
+In-Reply-To: <20260625010006.1448558-1-xmei5@asu.edu>
+Message-ID: <0cc0f340-3b68-13ab-cbb7-a6904fdae396@blackhole.kfki.hu>
+References: <20260625010006.1448558-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: INyB60mN/cjr8o8hcNBZibaT437uXan091juxA50c4G+gNjkPBN7CCbS14FAx7F5tHAbpBPllXJfRNxtRaX5JMKPQSSfJ77EqosgMevORk1bHLnYw6j04YLtjw/uZAkQyEuX4wOClAFwxp/R24wLvIaUyvh5XPd5SDu0jj6weZW8bAPlWBL+67l2e2TOTuOsTnAa/eIeBjjcoQ+XgcrbFOoeLIFx0w8a6ryVE4Vh/DIaqsR0x0nir8Y5TkfQgxllmr4eRsQJfJAfLv02blUiItnx8RIGyd3lKDdWSFsfBqWnEZRvPJuy6D0rZ+c9XtJ1XLGy1husw5HIiMrkJ9Tm9g==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS4PPF7551E6552.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 240d82af-c059-4db5-7475-08ded288f188
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2026 07:11:14.2194
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: R5Nyn2C5kaSy9AcUhFIHdbzMIrJbiPr9hKKwOVzP5angB//ChsG5+GsVXZzJkWbLh0IYUU3PS3sphw4xNdM43Xrt63TLOkf4dHQienLK9uc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9084
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[blackhole.kfki.hu,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[blackhole.kfki.hu:s=20151130];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:adrian.pielech@intel.com,m:przemyslaw.kitszel@intel.com,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301882-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[kadlec@blackhole.kfki.hu,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[strlen.de,netfilter.org,nwl.cc,vger.kernel.org,kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:fw@strlen.de,m:pablo@netfilter.org,m:kadlec@netfilter.org,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:kees@kernel.org,m:horms@kernel.org,m:bestswngs@gmail.com,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-301880-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kadlec@blackhole.kfki.hu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[blackhole.kfki.hu:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6C8E56C345F
+X-Rspamd-Queue-Id: DBFAE6C35EA
 
+Hi,
 
+On Wed, 24 Jun 2026, Xiang Mei wrote:
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Jakub Kicinski
-> Sent: Wednesday, June 24, 2026 5:30 PM
-> To: Pielech, Adrian <adrian.pielech@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>
-> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org
-> Subject: [Intel-wired-lan] [TEST] Weird RSS state on ice
->=20
-> Hi!
->=20
-> I noticed in the netdev CI that the ice runner fails to run the
-> toeplitz tests because of the RSS config.
->=20
-> https://netdev-ci-results.intel.com/ice-results/net-next-hw-2026-06-
-> 23--00-00/ice-E810-CQ2/toeplitz.py/stdout
->=20
-> I added some extra debug on the branch:
->=20
-> net.lib.ynl.pyynl.lib.ynl.NlError: Netlink error: hash field config is
-> not symmetric 16 304: Invalid argument {'bad-attr': '.input-xfrm'}
->=20
-> 16, 304 means GTP flow, GTP_TEID field. So we are trying to disable
-> symmetric RSS, but the field configuration contains TEID. The problem
-> is this is an illegal configuration in the first place. We are
-> _disabling_ symmetric RSS, but the kernel tries to make sure that both
-> before and after states are correct (because the configuration
-> involves multiple calls to the drivers and may fail half-way-thru). If
-> the current config is illegal net/ethtool/ won't even let us restore
-> it to sane state.
->=20
-> So the question is how we got into this state. It does not happen on
-> netdev machines. And on Intel machines it happens randomly around 30%
-> of the time.
->=20
-> I tried to look thru the driver code and I don't see how we could end
-> up with such a config.
->=20
-> Could y'all have a look and figure out / fix this? This has been
-> happening for a while back but I was waiting until the merge window to
-> poke at it first.
+> The release path of ip_set_dump_do() and ip_set_dump_done() read
+> inst->ip_set_list via ip_set_ref_netlink(), a plain rcu_dereference_raw()
+> of the array pointer. These run from netlink_recvmsg() without the nfnl
+> mutex and without an RCU read-side critical section.
+>
+> A concurrent ip_set_create() can grow the array: it publishes the new
+> array, calls synchronize_net() and then kvfree()s the old one. Since the
+> dump paths read the array outside any RCU reader, synchronize_net() does
+> not wait for them and the old array can be freed while they still index
+> into it, causing a use-after-free.
+>
+> The dumped set itself stays pinned via set->ref_netlink, so only the
+> array load needs protecting. Take rcu_read_lock() around it, matching
+> ip_set_get_byname() and __ip_set_put_byindex().
+>
+>  BUG: KASAN: slab-use-after-free in ip_set_dump_do (net/netfilter/ipset/ip_set_core.c:1697)
+>  Read of size 8 at addr ffff88800b5c4018 by task exploit/150
+>  Call Trace:
+>   ...
+>   kasan_report (mm/kasan/report.c:595)
+>   ip_set_dump_do (net/netfilter/ipset/ip_set_core.c:1697)
+>   netlink_dump (net/netlink/af_netlink.c:2325)
+>   netlink_recvmsg (net/netlink/af_netlink.c:1976)
+>   sock_recvmsg (net/socket.c:1159)
+>   __sys_recvfrom (net/socket.c:2315)
+>   ...
+>  Oops: general protection fault, probably for non-canonical address ... KASAN NOPTI
+>  KASAN: maybe wild-memory-access in range [0x02d6...d0-0x02d6...d7]
+>  RIP: 0010:ip_set_dump_do (net/netfilter/ipset/ip_set_core.c:1698)
+>  Kernel panic - not syncing: Fatal exception
+>
+> Fixes: 8a02bdd50b2e ("netfilter: ipset: Fix calling ip_set() macro at dumping")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-Good day, Jakub
+Thank you for the nice report and fix, good catch.
 
-The patchset didn't help?=20
+Acked-by: Jozsef Kadlecsik <kadlec@netfilter.org>
 
-[PATCH iwl-next v5 2/2] ice: implement symmetric RSS hash configuration
-
-With the best regards
-Alex
+Best regards,
+Jozsef
+> ---
+> net/netfilter/ipset/ip_set_core.c | 8 +++++++-
+> 1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
+> index a531b654b8d9..6cfad152d7d1 100644
+> --- a/net/netfilter/ipset/ip_set_core.c
+> +++ b/net/netfilter/ipset/ip_set_core.c
+> @@ -1480,7 +1480,11 @@ ip_set_dump_done(struct netlink_callback *cb)
+> 		struct ip_set_net *inst =
+> 			(struct ip_set_net *)cb->args[IPSET_CB_NET];
+> 		ip_set_id_t index = (ip_set_id_t)cb->args[IPSET_CB_INDEX];
+> -		struct ip_set *set = ip_set_ref_netlink(inst, index);
+> +		struct ip_set *set;
+> +
+> +		rcu_read_lock();
+> +		set = ip_set_ref_netlink(inst, index);
+> +		rcu_read_unlock();
+>
+> 		if (set->variant->uref)
+> 			set->variant->uref(set, cb, false);
+> @@ -1686,7 +1690,9 @@ ip_set_dump_do(struct sk_buff *skb, struct netlink_callback *cb)
+> release_refcount:
+> 	/* If there was an error or set is done, release set */
+> 	if (ret || !cb->args[IPSET_CB_ARG0]) {
+> +		rcu_read_lock();
+> 		set = ip_set_ref_netlink(inst, index);
+> +		rcu_read_unlock();
+> 		if (set->variant->uref)
+> 			set->variant->uref(set, cb, false);
+> 		pr_debug("release set %s\n", set->name);
+> -- 
+> 2.43.0
+>
+>
+>
 
