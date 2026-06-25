@@ -1,154 +1,140 @@
-Return-Path: <netdev+bounces-301807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oiIKJD57PGoyoggAu9opvQ
-	(envelope-from <netdev+bounces-301807-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:50:06 +0200
+	id XZfyJt17PGpWoggAu9opvQ
+	(envelope-from <netdev+bounces-301808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:52:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B976C208D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:50:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 139036C20A0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:52:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b="JgBKV9/b";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301807-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301807-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=163.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WxBuM8Z7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301808-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301808-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7C29C30250A6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:50:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E58C23020115
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 00:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F6B3655C0;
-	Thu, 25 Jun 2026 00:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA893655F4;
+	Thu, 25 Jun 2026 00:52:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E0E363C7C;
-	Thu, 25 Jun 2026 00:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FF025B0B2;
+	Thu, 25 Jun 2026 00:52:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782348603; cv=none; b=iRAd7UEGp+vXPinx/PJ1Z5T5StoAM3R0bZcuDIhnMl/GseFOV59OZJ3vjyPureKZc6eeAYvW1g+y/2YjPuY+EYW7pUaWOk8MhhVE1TsJMX2Q2x8olVwSsZPW4XgrITN6HkHs1ZNaQtd70OzDqjYeu1sjcf/K0TV/kTHjYjfjvLc=
+	t=1782348762; cv=none; b=XF0oRSssby8JwvA+D3SuR3wfzsC1pNxmqutX44sVqaL0Oc2tnJxkO8V4FZKBPUHn8Pa23JZ2x2fXgVeSxxyY/fRdSnq7VGI6/BKrI7a1HpuybMczYGErldKAdlWU9ZEfIdp3TCK5S2VgMJmAP44mH5rKzuXixz0f9fcOZAJYw5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782348603; c=relaxed/simple;
-	bh=KjS8bjrLQ47IpSuAbKHQ+le1r6uhzYWGJ8jYhJyDc40=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r9QYbvtR8h8E6/kZNylAf+AIMvBkzlWSa5dxndLtsCP6y2TkxDNHSYfqt3uE4P8e8JfX0i5/0Cym/GJs8BlLBmIfrM8SPUXl+GayBuRwRR5ACOwGlKE5JF3esE2MVcing3dvG+oDMj8jEaUpG0M/rUBfsMZ4Wj7fTE3G8GsN6Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JgBKV9/b; arc=none smtp.client-ip=220.197.31.2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Z9
-	CihbKf0KMh5fxT6qRpFD+f2CqMulU+O29ueGod2rM=; b=JgBKV9/baABLk9fUbk
-	gRoiaGvJnRa28BMov1+oQ1bnB2+Rl8YP6WzSNzCi/BQGFUYsg1IvOOfVJORijjzq
-	fOlFVksgjz+wz7dFEe66HEnRauZVkqv5J7TVge5/dhrrJhq4STKaIvbBRILdOZv8
-	zX1WvUyH0yMBo/d56+fOs32Wg=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wDnvwTjejxqOTmnFA--.59108S2;
-	Thu, 25 Jun 2026 08:48:37 +0800 (CST)
-From: Haoxiang Li <haoxiang_li2024@163.com>
-To: madalin.bucur@nxp.com,
-	sean.anderson@linux.dev,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	florinel.iordache@nxp.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <haoxiang_li2024@163.com>,
-	stable@kernel.org,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Breno Leitao <leitao@debian.org>
-Subject: [PATCH net v3] fsl/fman: Free init resources on KeyGen failure in fman_init()
-Date: Thu, 25 Jun 2026 08:48:34 +0800
-Message-Id: <20260625004834.3394389-1-haoxiang_li2024@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1782348762; c=relaxed/simple;
+	bh=0AMKS7tX3e7fNO25+P+PqfA4uB818tZGJjQJOji2fIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YWf8Lax0DKD7waYN2sC5HOyhYCblkqeqJ+D+Bsl1gZCrc+QxAyBy+o3p+eIsMd94t6BCADoIJaSghX88OCs1Vk5bx+T95uhEDX+YaC8S2r6dV0W1bc38m/JuBzhxHWyALbv2lZOmZT4/MjkMyMpxC1MOo2GDjd4rByzfRBpLf/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WxBuM8Z7; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC2FF1F000E9;
+	Thu, 25 Jun 2026 00:52:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782348761;
+	bh=VrwdlgDz+t1t50+a4QFA6MhIfgM+szbN6Qir7v/5OhY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=WxBuM8Z78ShcLFmBvjwBYuGOEXUjF2i0NFuhMDGtiJdKYdN8fqJUBDSNJvNuPP0ID
+	 EjvnaRWy8/fnsCPzJHMLzaEuAr4twxjnijW84+PAHJowJZvV4bIcHM54pR8T2mqtXc
+	 W54tH/8ovxcwbiQpDyvVUGYSs9LqwA2XmpXR41JUoYdsuVveKbA2Rb/oDXvWpDLEPi
+	 w3oGOUUQjVp6paYiLn03qjSPCvWhved66LSY02nUzmxIoAikl4M6ystaDqhCrTjT4T
+	 4GEpj5u717ZfsKg0UQRWuaav3kyHCHP8n1AKN3UWXV4oOzqt5MzVcYtK4Xxjp8oU91
+	 83WP1nQzU0/5A==
+Date: Wed, 24 Jun 2026 17:52:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] net: dsa: mxl862xx: avoid unaligned 16-bit
+ access in api_wrap
+Message-ID: <20260624175239.1b97aaa6@kernel.org>
+In-Reply-To: <20260619100154.794168e5@pumpkin>
+References: <599327521db465a534d277de53ab9b6cac01928b.1781702256.git.daniel@makrotopia.org>
+	<20260619100154.794168e5@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnvwTjejxqOTmnFA--.59108S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Kw1rXryxCrWfKF45CrW5Awb_yoW8Gr4rpr
-	W3K3y3CrW8Jry3G3ZrXw40yFW8ua1xKrWDWr9Iywnaq34ayr1UtF4xKrW8Wrn2vFWxWF43
-	try7Zr1akFn8AwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piyxR3UUUUU=
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbCxQWB72o8euV9gwAA3Z
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:florinel.iordache@nxp.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:haoxiang_li2024@163.com,m:stable@kernel.org,m:pavan.chebbi@broadcom.com,m:leitao@debian.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301808-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-301807-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,163.com,kernel.org,broadcom.com,debian.org];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DKIM_TRACE(0.00)[163.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haoxiang_li2024@163.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,broadcom.com:email]
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A5B976C208D
+X-Rspamd-Queue-Id: 139036C20A0
 
-fman_muram_alloc() allocates initialization resources before
-initializing the KeyGen block. If keygen_init() fails, the
-function returns -EINVAL directly and leaves those resources
-allocated. Free the initialization resources before returning
-from the KeyGen failure path.
+On Fri, 19 Jun 2026 10:01:54 +0100 David Laight wrote:
+> > The MXL862XX_API_* macros pass the address of a stack-allocated, __packed
+> > firmware-ABI struct to mxl862xx_api_wrap() as a void *. The struct has an
+> > alignment of 1, so the compiler is free to place it at an odd address.
+> > 
+> > mxl862xx_api_wrap() reinterprets that buffer as a __le16 * and accesses it
+> > with data[i], for which the compiler assumes the natural 2-byte alignment
+> > of __le16 and emits aligned 16-bit loads/stores (e.g. lhu/sh on MIPS).
+> > When the buffer lands on an odd address these fault on architectures that
+> > do not support unaligned access, such as MIPS32.  
+> 
+> Isn't the correct fix to not pack the structure?
+> (or probably any of the associated structures??)
 
-Fixes: 7472f4f281d0 ("fsl/fman: enable FMan Keygen")
-Cc: stable@kernel.org
-Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Reviewed-by: Breno Leitao <leitao@debian.org>
----
-Changes in v2:
- - Add "net" to patch title. Thanks, Pavan!
-Changes in v3:
- - Drop the unrelated enable() cleanup from this fix. Thanks, Breno!
----
- drivers/net/ethernet/freescale/fman/fman.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Agreed, this is very silly:
 
-diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-index 013273a2de32..299bab043175 100644
---- a/drivers/net/ethernet/freescale/fman/fman.c
-+++ b/drivers/net/ethernet/freescale/fman/fman.c
-@@ -1995,8 +1995,10 @@ static int fman_init(struct fman *fman)
- 
- 	/* Init KeyGen */
- 	fman->keygen = keygen_init(fman->kg_regs);
--	if (!fman->keygen)
-+	if (!fman->keygen) {
-+		free_init_resources(fman);
- 		return -EINVAL;
-+	}
- 
- 	err = enable(fman, cfg);
- 	if (err != 0)
--- 
-2.25.1
+struct mxl862xx_register_mod {
+	__le16 addr;
+	__le16 data;
+	__le16 mask;
+} __packed;
 
+But some structs won't get aligned:
+
+struct mxl862xx_mac_table_clear {
+	u8 type;
+	u8 port_id;
+} __packed;
+
+So I guess the "just don't pack" will have some corner cases, too.
 
