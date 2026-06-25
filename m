@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3mhbEE3oPGruuAgAu9opvQ
-	(envelope-from <netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:35:25 +0200
+	id h/oJAkjoPGrsuAgAu9opvQ
+	(envelope-from <netdev+bounces-301894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:35:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9138F6C3DD5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:35:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D986C3DCF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:35:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=AhN20rf5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=IvVtfjAn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301894-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301894-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2B543009B27
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:34:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 229F4300DEFD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF54380FEB;
-	Thu, 25 Jun 2026 08:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3379B380FFA;
+	Thu, 25 Jun 2026 08:35:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9AC37D132
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C0237AA97
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:35:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782376489; cv=none; b=GtQIGdZLwLkaZH3GejwipBTK0xy9v9HdvScqn2NIZOjLLV/HnkgW5OvYhFVTPr/fNsxyNDXAFaSB/jFTdvjHgze0r04fyQtphhtGlwCPK4VR6dnJKIBgOalB0OXvttNTJfEBK8ZHu1dApDej73kzn9x5uKfroE1CYwlveMOMMWo=
+	t=1782376516; cv=none; b=ZQHGwnFFECStd/FAbO3DGi34YYZJ+21gxtVEu8bD6bAPxpOZaDHu5FWkNSOOertmNgZtweM7ceM4U5ZwflLV+gdKHBHJFHUZ4Z8+XzbjWZwNZRlf1PHzSVrpuybp9COeeTfuCR8E/Vkg2/RTVSVvLUOri1/hDkIw2xvQ2m4Ig8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782376489; c=relaxed/simple;
-	bh=7BEwt6eYwfYFJfykt1yWvyBcAyXt9b2E6Fr7Bm2s5hY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vg+zaQBiud6oAjNZbDNnEbQ3iiG2hXLpskoxHXUbWV5jYK8bl4DLVEoOmDmP0Mw+B1YP47T+VHcEJbQxO3Ze0jQYLaEGhDrq3E4ebBmScTOxBhrKaht8T2Dk6D1M6CavRYiY3B3QEcDkyb3/Vc/bqO2WqLO+Ti0cCr6jczp3RHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhN20rf5; arc=none smtp.client-ip=209.85.221.52
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4629d80fa08so1808329f8f.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:34:48 -0700 (PDT)
+	s=arc-20240116; t=1782376516; c=relaxed/simple;
+	bh=QtIkhOcb4XuSPNMSHsQTam2xRok/IOw4SC1HUoDCl24=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gljhm2Z+xYM+M56ZoQyoJcOmGqgc/eeDiepK14NKg3cnGOb2CFpOslG68xjHexOGRqqKBq+VXefzqt0+xC2kOtQb/whxpPLSu7eQcOTQ+KmFTSe6Qzr1+yKFskudBC6v++/iZ0OupFggwjViodK5Zi/aa33zmS7VvBnvF/vHc/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IvVtfjAn; arc=none smtp.client-ip=209.85.221.44
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-46cacc39191so253575f8f.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:35:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782376487; x=1782981287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cwuPvDSXXbiyOTdpO1yF6fW9CB9apWEc+I7V+XWMZf0=;
-        b=AhN20rf5CJgZHlVu8rhuRPe2lvfLF0OcT28yLQ/pGxRJ2t4hwB9zSqto0j/OnuFEHt
-         fhAAkhHuWrzsyCitxbVSTKCDu/gCzDfP4CWGJliLCAezpSODB4OwczwuOw/wkHvcIDCE
-         gdYDbvMe3jxuNPve1Kn8CWeMq50B0dPAZzCmyJiLWORgWr7fWdwebh4GOzFYqzqvaAf6
-         JwlaZS3CVPiMpo43J0Ihn7i8J2/jtpAD19c6egRqSFNl1GY/1EIxMyDNX3m7BXxfA4Uh
-         bhC2Z2iL9eoBk3R+71HMx9BMIBZPMs7ZkchaoGxe4SpiBU7RJOyzuUqU23mnUiT3x7e4
-         Ayjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782376487; x=1782981287;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782376513; x=1782981313; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cwuPvDSXXbiyOTdpO1yF6fW9CB9apWEc+I7V+XWMZf0=;
-        b=I2JkBBSZG+qTEiippnV2SWaxvmgOjl4Ejk6nemOhuhq+z9kYXnVqzAgQ7abXO5E2h3
-         e0OcAZZS5MqNmkZDaqjJ9n2AWkjvpbmmnmnuKf7rc47rcrfinVqtwXCoSwYiXMs3Rhco
-         XoWgws36Z5Mt8dNx1kmIQsJwnO5x4SxmFGxq/GwGIUsUpKSAnf1SOE4Or8Lk0AUC9gYv
-         rnITz0t+vbGbafJc5npK3dlZVevRdXn8lQdoH+fjjJHkG/Q/EM30jLnw7lubf0Cv3lgr
-         m8yTga4oZvm1BlT+ufvrLZuQjzss9e5+3DkP3+2KLPAkD/IDQaB7enM/fWXpd5siJv39
-         4lfw==
-X-Forwarded-Encrypted: i=1; AHgh+RpMnShV05AwjYBPnfOHoHihAappWEyz6IpvNqg7hQxOlP10l6Kw7IyRADwvUxCxyHSSzmU8cLo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA5kGBzxeVXa/1ruoSrfz2Lp6rhY2w3O/RPdFnSuoiZK74239o
-	KfDBne9Lo+56UdJnZ52dgPGKO5aigaURppgviml0JDBOAmJU48+kcE4c
-X-Gm-Gg: AfdE7ckBljxDknHOwEv4wemGGtQ7xpKZtyrFEyiOsveeSYl2kOAoDjJavzgPutmLNgD
-	YENG/c1kZTuoCJaeLbVqEOskIXa8OtFr3ASwxIHmgCypzAZVkTF2dvypLk86CCEtitmiikEIUBD
-	LHsQI9zydT5Ah/BeTEgHMa4KUo9PSdkZSLYUfyA/klXbztH8gbu9UnQjqMzFNb6tC56p2DAtWZZ
-	0ygXSSQcusEiTvjIdczsneuhw7ka+Tm8Pa0ASj4G2gvD0fBFhl0BXepJm8QJyYwV+CQMcH+o3t5
-	RM2vecwKQwv8QLXVnTEShkoaBbux4EfUJwLgWWPRTESKKv4vmrSWrw2mLm+UXjtwONUpwiAs/Qe
-	vuzxPVxYwB4jSWHwpWUsEFAG7lkcJfUEoeGcyjPTvK5ldT+U0bkRRrzwv+4fu6/u0cAHHRmXGJA
-	KEcUlPne6G
-X-Received: by 2002:a05:6000:2f8a:b0:46d:d6c1:8383 with SMTP id ffacd0b85a97d-46dd6c18494mr1746107f8f.44.1782376486646;
-        Thu, 25 Jun 2026 01:34:46 -0700 (PDT)
+        bh=T2cQgCHbxQom2kVIv1Cvt6Y9CPEs8rn7euaXGTL0+j8=;
+        b=IvVtfjAnKaBK/0oQMtnLDiuV4uWEGKXPXAe+AlxRHG6MnbRdOnwIUfAKJjX57utGZS
+         RA93kED8fJa9O5rFjZ+0xpmGWVHSGJekcF4QjLRE+9tIfLia59YTnsl5uCFNeaniCHYM
+         5ZzmM6WJ/eA/ZQgbCsLgjOKHc5QpvB8SEkaetLP6sDVxwCT9Xbf79YBfNv/qFqmFb1eR
+         GqdtIomwz2L9o19YnNZzwc8yfe+1sOCd2S9kf+44M9mXX/WaaS9HEOsL1d9bD/AsSE7U
+         LxGhViFq3CN1cDSLLxRgrgwei7VAOJ71DV4FvcjrUCQB/zwz2D3jyNKU/qsz7in7C5lc
+         AwHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782376513; x=1782981313;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=T2cQgCHbxQom2kVIv1Cvt6Y9CPEs8rn7euaXGTL0+j8=;
+        b=Srijweq3/noh0DFL2htdQgUBuq2pltMYoxHYiozFyacYME+OoSJPYWugXs3jWrV7E2
+         98Fs7tMQZ59C2SUrWIlHc2FvW379Xo2L6SFl8QQzTmn464P9DhNVkm/Nqq7JZpddL3vZ
+         ngscKx5RkjAnpHN7HL4V6ASYClRPZXNwzetF8i6Q+AMbzKfD9OyMUy9EinoRB9RjU43/
+         TCRO7OIoAqRyT6WNXPNjBRyP1Gd4Gwok2rCLZmiiCQTPEJum+l/QINPOHXi80ZDfEAu0
+         zd8rGyJEsAMF7qwD7X+6DvXd5w5/Uzod0ZosrPu3ZwXa1eU4/dDRSJZqr4WPjQHaMcTZ
+         pl/A==
+X-Forwarded-Encrypted: i=1; AHgh+RqSip1WCOUo5TGjuWOF8nGN1QBcE/SH+WHYKmBoN1OaFf9cgYHlX3x7QFDtSVdE2a902/gsMkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQ1S1JDykMgj/3ezE2OtC+pxWRinaeknpHIAQM3ekhtwxc2p8O
+	ATI4zIEphaw9VudHDmFJVoVVjy1ddZnz6tMgikVsd0732el90lBbOQg3
+X-Gm-Gg: AfdE7cni/mLfQ/1ivDmw9iZHGZ6wMxAmdgdA/SuTN2b/PrHraoCfPsE7LlD5YFo3KK5
+	N9+mXfs+GJqNcI5lh03UwZgn5o32yEJrLB5nzgJPMOjD7Uu/Qg6TODpTxQ42YlKUAaafoS/1ITT
+	T2qgYxHpk/dp8gVDPaprqDJOZMUSUy33uE5PlmqcQAWqPapO6UEYc66jhTzHOWMcQwPk5kEWG5R
+	A5T0DgFOBJWN7TRSGaRiBWEf8+Lyok+KvUpzbg3EeE4cqsMa96zgZz3QGtQzyBKruFI41rpqf2I
+	PH1+AEVHGXWhrQrm7ec2FHQbZY1KzzOfoWoQFv/JHyrAXf8wUfo0dF9qKb6UrWutRqiLqu+Scrw
+	rmmlytymTsekjZsn1Wj8sCHaGyNRVZjmV4ey6WoHw8TlrRQGtw/rt83RCEWoQKbFpRH26kk1Gwv
+	OqnUTJJy/P
+X-Received: by 2002:a05:6000:4603:b0:460:602f:85a6 with SMTP id ffacd0b85a97d-46da34965dbmr2376831f8f.0.1782376512951;
+        Thu, 25 Jun 2026 01:35:12 -0700 (PDT)
 Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46c221d998esm13183555f8f.24.2026.06.25.01.34.43
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46c9ed7491esm9926887f8f.37.2026.06.25.01.35.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2026 01:34:46 -0700 (PDT)
+        Thu, 25 Jun 2026 01:35:11 -0700 (PDT)
 From: Askar Safin <safinaskar@gmail.com>
 To: linux-fsdevel@vger.kernel.org,
 	Christian Brauner <brauner@kernel.org>,
@@ -103,10 +105,12 @@ Cc: linux-kernel@vger.kernel.org,
 	Val Packett <val@packett.cool>,
 	Andrei Vagin <avagin@gmail.com>,
 	patches@lists.linux.dev
-Subject: [PATCH v2 0/7] vmsplice: fix some problems in my previous vmsplice patchset
-Date: Thu, 25 Jun 2026 08:34:02 +0000
-Message-ID: <20260625083409.3769242-1-safinaskar@gmail.com>
+Subject: [PATCH v2 1/7] vmsplice: open-code do_writev and do_readv
+Date: Thu, 25 Jun 2026 08:34:03 +0000
+Message-ID: <20260625083409.3769242-2-safinaskar@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260625083409.3769242-1-safinaskar@gmail.com>
+References: <20260625083409.3769242-1-safinaskar@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,13 +125,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301893-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301894-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[28];
@@ -147,89 +151,77 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9138F6C3DD5
+X-Rspamd-Queue-Id: A2D986C3DCF
 
-This patchset is for VFS. Of course, it depends on my previous vmsplice
-patchset ( https://lore.kernel.org/all/20260531010107.1953702-1-safinaskar@gmail.com/ ).
+My previous vmsplice patch did the following mistake: I did
+"CLASS(fd, f)(fd)", then did some checks on resulting "struct file",
+then passed numeric (!) file descriptor to a function.
 
-I fix some problems in my previous patchset.
+This is somewhat okay in this particular case, but I still think
+this is code smell, so I fix this by open-coding do_writev and do_readv.
 
-1. Fix problem with CLASS(fd, f)(fd). See first patch in this patchset
-for details. This is probably not so important, but I fix it anyway.
+Also I insert a comment to warn other developers to keep
+do_writev and do_readv in sync with vmsplice(2).
 
-2. Change "unsigned long" back to "int". See second patch for details.
-Again, this is probably not important, but I want to fix this anyway.
+Signed-off-by: Askar Safin <safinaskar@gmail.com>
+---
+ fs/read_write.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-3. Fix that LTP vmsplice01 bug.
-
-4. libfuse relies on sharing vmsplice behavior. So we detect particular
-combination of flags to pipe2(2) and vmsplice(2) and return -EINVAL.
-This forces libfuse to fail back to non-vmsplice code path.
-I. e. we fix libfuse-related regression [1].
-I did debian code search for regex "vmsplice.*SPLICE_F_NONBLOCK" and
-I found no other packages with this particular combination of flags
-except for fuse itself. (Okay, other packages are fio and stress-ng,
-but these are merely testers.) So, I think this is okay to return
-EINVAL here, breakage will be minimal.
-
-5. Set FMODE_NOWAIT for named FIFOs. CRIU relies on ability to do
-vmsplice(SPLICE_F_NONBLOCK) on named FIFOs. So, I fix this CRIU-related
-regression [2]. But there is another CRIU-related regression, which I do not
-fix [3]: CRIU behavior in splice mode becomes so slow that splice mode
-becomes useless. I personally still believe that removing vmsplice is
-right thing to do. Other option is doing nothing. Yet another option
-is to implement some deprecation period [3]. Let other developers
-decide.
-
-See patches for details.
-
-Please, run that LTP vmsplice01 test again.
-
-Notes:
-
-- I want to repeat: I change behavior around SPLICE_F_NONBLOCK.
-Previously, vmsplice ignored whether pipe itself was opened as
-non-blocking file. Now it is not ignored. And in my opinion
-new behavior is better.
-- vmsplice(2) now is in fs/read_write.c . It is very similar to
-preadv2 and pwritev2 now, so I think it belongs to fs/read_write.c now.
-
-Please, review this patchset carefully. I'm still new contributor.
-In particular, please, review that do-while loop, I'm not sure I did
-everything right.
-
-Tested in Qemu.
-
-[1] https://lore.kernel.org/all/CAJnrk1Y9egYizkx1H9K0cqxSYuB+7vLvQbV7Tf4C5eHFqnnC-A@mail.gmail.com/
-[2] https://lore.kernel.org/all/CANaxB-zK5q=Xw6UZTmeFtXsDZjUsPkFk=p485m-wtNTBnf4hgg@mail.gmail.com/
-[3] https://lore.kernel.org/all/CANaxB-xUrLQYGiRJZc4Boi+KX=0TJSWymErNovANVko20fMDVA@mail.gmail.com/
-
-v1: https://lore.kernel.org/lkml/20260606061031.3744880-1-safinaskar@gmail.com/
-
-Changes since v1: fix fuse-related and CRIU-related regressions (see above).
-
-Askar Safin (7):
-  vmsplice: open-code do_writev and do_readv
-  vmsplice: change argument type back to "int"
-  splice: turn wait_for_space flags argument into bool
-  pipe: move wait_for_space to fs/pipe.c and rename it
-  vmsplice: make sure we don't wait after writing some data
-  vmsplice: return -EINVAL for particular combination of flags
-  pipe: set FMODE_NOWAIT for named FIFOs
-
- fs/pipe.c                 | 23 +++++++++++++
- fs/read_write.c           | 71 +++++++++++++++++++++++++++++++++++----
- fs/splice.c               | 19 +----------
- include/linux/pipe_fs_i.h |  2 ++
- include/linux/syscalls.h  |  2 +-
- 5 files changed, 91 insertions(+), 26 deletions(-)
-
-
-base-commit: 8d86fcfc2857d64af85f5c87c193c25655c970af
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 1e5444f4d..e224e7cb8 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -1070,6 +1070,7 @@ static ssize_t vfs_writev(struct file *file, const struct iovec __user *vec,
+ static ssize_t do_readv(unsigned long fd, const struct iovec __user *vec,
+ 			unsigned long vlen, rwf_t flags)
+ {
++	/* All future changes to this function should be kept in sync with vmsplice(2). */
+ 	CLASS(fd_pos, f)(fd);
+ 	ssize_t ret = -EBADF;
+ 
+@@ -1093,6 +1094,7 @@ static ssize_t do_readv(unsigned long fd, const struct iovec __user *vec,
+ static ssize_t do_writev(unsigned long fd, const struct iovec __user *vec,
+ 			 unsigned long vlen, rwf_t flags)
+ {
++	/* All future changes to this function should be kept in sync with vmsplice(2). */
+ 	CLASS(fd_pos, f)(fd);
+ 	ssize_t ret = -EBADF;
+ 
+@@ -1226,14 +1228,24 @@ SYSCALL_DEFINE4(vmsplice, unsigned long, fd, const struct iovec __user *, vec,
+ 	if (fd_empty(f))
+ 		return -EBADF;
+ 
+-	/* We do do_writev/do_readv, so it is okay to pass "false" here */
++	/* We do vfs_writev/vfs_readv, so it is okay to pass "false" here */
+ 	if (!get_pipe_info(fd_file(f), /* for_splice = */ false))
+ 		return -EBADF;
+ 
+-	if (fd_file(f)->f_mode & FMODE_WRITE)
+-		return do_writev(fd, vec, vlen, (flags & SPLICE_F_NONBLOCK) ? RWF_NOWAIT : 0);
+-	else
+-		return do_readv(fd, vec, vlen, (flags & SPLICE_F_NONBLOCK) ? RWF_NOWAIT : 0);
++	if (fd_file(f)->f_mode & FMODE_WRITE) {
++		ssize_t ret = vfs_writev(fd_file(f), vec, vlen, NULL, (flags & SPLICE_F_NONBLOCK) ? RWF_NOWAIT : 0);
++		if (ret > 0)
++			add_wchar(current, ret);
++		inc_syscw(current);
++		return ret;
++	} else {
++		ssize_t ret = vfs_readv(fd_file(f), vec, vlen, NULL, (flags & SPLICE_F_NONBLOCK) ? RWF_NOWAIT : 0);
++
++		if (ret > 0)
++			add_rchar(current, ret);
++		inc_syscr(current);
++		return ret;
++	}
+ }
+ 
+ /*
 -- 
 2.47.3
 
