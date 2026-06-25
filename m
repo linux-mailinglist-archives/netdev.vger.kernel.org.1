@@ -1,251 +1,257 @@
-Return-Path: <netdev+bounces-301991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id j2R1FvtCPWrc0QgAu9opvQ
-	(envelope-from <netdev+bounces-301991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:02:19 +0200
+	id kgJPB2ZEPWoh0ggAu9opvQ
+	(envelope-from <netdev+bounces-301992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:08:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B186A6C6E87
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:02:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657ED6C6F0F
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:08:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Psi9Oqa8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301991-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301991-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=uclouvain.be header.s=selector1 header.b=X3csyrHB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301992-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301992-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=uclouvain.be;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37979303BB94
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 15:02:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8DFE3023DD0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 15:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3BD3E7BC2;
-	Thu, 25 Jun 2026 15:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C2F39281F;
+	Thu, 25 Jun 2026 15:07:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11023139.outbound.protection.outlook.com [52.101.83.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CDD3DC856
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 15:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228292E7394
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 15:07:46 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782399735; cv=pass; b=TXdNMdBhZYS8Q2lZ/jGgSiZlLsjZKq4EQMDcY2KyBSn+CpECWbCGk3Kqcnlsk7mcy9mZo6X9NkAfKP3+xb+JwbgnGC7R/OcBDH6tJOi08qFy/9d3R1x4edNVYeukX9U5sgNGbvb3wxYVvcvp21AGFlZ8omtEUgFoz2IyS4mQ1DI=
+	t=1782400071; cv=fail; b=Xn+7zM6FuE8KN/8ptWGbGcu8rA/fv5p4HuWBOYAwfUtTzUgkDdYFXS60/2Hj3maQTmFOi4sdUCojZcvycSEzjAAQoooKpSpI8rkhtf9MRJG+oC6G5a/FYdZGIn4cz0fsQHXT8fJcRgJ8vUq4MX0moP22prOljaxoXL87yZvC8Ro=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782399735; c=relaxed/simple;
-	bh=HIeVhErbP2tFuXUakeJ57jOMeSSFkYm+yxSGx4IMpYM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fWQCLTmW+/q0MxNYHaZRbi554CkFWinkXw33NH7UXfLbaj1/5z/Tp+s8eRYksyb5x3+b94hp04PcqinDypsBH8wmcVLjPCg6e6k2TW82DuQUPS5q5h8GZU1XbKUZXBrjA2emANx3SknZ6AGZObweMB6TOWNoRFuHNgM8Znjkt38=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Psi9Oqa8; arc=pass smtp.client-ip=209.85.219.52
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-8ddd7bad263so21612546d6.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:02:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782399732; cv=none;
-        d=google.com; s=arc-20260327;
-        b=ozaXJa5b8bjPkSm8q4YvwH8tis0A2Zu4SXXYoSbmDy1CCyN5mhg53wGNDiLuEZA4bJ
-         5Tn7ADwQmNgMBC70xf1otuNdxb8uyF5ZOyH3q2qXnC8Z/L/K4P2tVLaAoTHfxJYriU6H
-         s5lyHKGU18gTA8v9EjIcVZcGF7IJKdf/7DJVa6lC4h32wLUfYUge4eXOoRGwS3AhPIms
-         5qSA9b8y5CPu10PQoljos+yW+0yXhbimoR7i5WSARRD2zlRI+aVu1t6n0+zApKxXn+dJ
-         i43RsYNTEPVl6gUBr796J+V4WczCZccKwptf5nTUv164fJoTSCHen35GS/EvhBmlZC4D
-         0SkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=hdsXaMcfpS69v0Arn3SsCt3rcRq1UgYdzoDCfYVoQuo=;
-        fh=KTp19Zd5iMnVIT0VmGC9Qjrn6tEqvtrRF8bLnNiyb+E=;
-        b=farJrF3xFhOiym8Eg+raKSyWJE+oiY/pGqRAWYHmF53AUu54DxsF2qZICx9ZcYb7P3
-         R/g2c8MHnmB3VfV9dTYa5QTndwf6mURgO9iQfDeaT3jmY6GymtIR2MYV7F0AIhMeJKBH
-         5BOZa/hwbAwNhOy+9+/vfx5O9ZsOLLzfc74KTyWpDNZrf7V6NAmYz4gzqBfNd40H45X2
-         sslgcl66b6mRI/YMKMRMJ980v7+K1+JxjE2pS9ELxB2UCKZBZhQ4ytRuz+lgiu3j7wSw
-         UFS2+UtbX5NVjZQRL3rt6oQxtQ4YDUOH8rBdORqe/yUCR24sj4HLhgYR0lBK2QDeWVwL
-         YG6Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782399732; x=1783004532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hdsXaMcfpS69v0Arn3SsCt3rcRq1UgYdzoDCfYVoQuo=;
-        b=Psi9Oqa8XNFsXuTbqP20KWonAzkR5ygGhRoCfjqAncjpkql8RBe1nW1AH9qlVzS4eJ
-         J+f8KjOK7KS982POOE0/DBAe+mcNWOErjXMimDGgramL+dd8HodZMu9G0c1q/v7QJXau
-         fnhU+NXNBnjqLNZ+aCraIde1i34dRHPZvkUlGGSLHE+66ytsh7lM7NpsKce/TB9LPnav
-         tgzMnlNMWTr312bxKxF3khIkR5ktnsb8rgYP3VjZAacSu0MTlA2HBEzLhdA9e5YNRNd2
-         5yVBESYkLW2OwZLLUO6+vX/28MrgH1yj5BbO4mPfFMA1re2spsaTafIfzmvHbFx/gINW
-         3qwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782399732; x=1783004532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hdsXaMcfpS69v0Arn3SsCt3rcRq1UgYdzoDCfYVoQuo=;
-        b=Kof3nFJVCaLSX17zlmKk8vQA9M3NE9k55rPu7bOjk8CIycN+HYrd0zSW6Tr8bUCt1n
-         kAGL67KZliaxyUSBV2pxrx25I5eb0bbXrC/e/oVNe3bc+mgS7QYuXOHx5428ifKVhELk
-         s0sGbcjY/kdfbDqLmR8v2cDGPSk+bgk/XrYX2MvaWJr35r+NycyT3v9MNTy5uQ9ayB9n
-         miLLSAC3csfHdX2HoS47NjXzBr42VmWnkTLXyHG9nOqnoT+2i70ExUKqUYMhALw1jMq8
-         fpi88DkvjRbpwMMbW2YRK6Pyh3ylkWZsXgHmRdffy3njLPSV8aWgKeXPW05vOEBtWazP
-         rIKA==
-X-Forwarded-Encrypted: i=1; AHgh+Rq0Kx/tpXbOPSOccEEV4xAx3K81n9ptWeMhsM5oiM3LzxcqmwiwccnMs9l9qAin6xJfrFkdt2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyC/zeZ6IjEVIrgsFibgo+WSoOmHYMvxGGilHXENEg+y2YP+qG
-	/2D/UwSPChkShdkm6aCE3EHSsikAOB7jGSV0vqfrzii1/ueHaGVOR8X6UXZzkWzx7by+EkMVpP+
-	btiJ/Wgya03kQ2ber9trgM83swDg6hbFf+juw
-X-Gm-Gg: AfdE7ckFo/VF39bnK2CC1k4GeSOIKzvB4mER3TSJpeZRCGwuVjCiYfgtO48V7oWMgij
-	L8rw7wYfwjP/0L202BF54e4skOeD784YLQuDmvuOjWG+gO/lJWdJiQWH8dmAV6EKvICYTv4lGIj
-	wMGym6ct7JWIr9rTZpZomvgReukxXI3UzbvAZaXh8+izUtOJPVyEnaNapQGMATD2hxUaQAaJHg0
-	tSQr458ly6I1Kd59Wtt0uTNoy9qDqlqQh1rpVopiJSUZXjbEKAj8DehSMpCveTBOWH9mZ36phyH
-	Uc3zYBkVornB3sbA2L/QFbpO2DWfOyz9QXJfcnO/yyLET8fInmDaI7Vk
-X-Received: by 2002:a05:6214:3bc2:b0:8c7:76cf:5088 with SMTP id
- 6a1803df08f44-8e6cfb6e1f9mr59877076d6.0.1782399731573; Thu, 25 Jun 2026
- 08:02:11 -0700 (PDT)
+	s=arc-20240116; t=1782400071; c=relaxed/simple;
+	bh=XG2mckQjASRolrrlamGVP6YOzni4oy1B1GIg3OpJmJg=;
+	h=Message-ID:Date:From:Subject:To:Cc:Content-Type:MIME-Version; b=NIQZXiFKhYbVbxFY9D0JPaCL7Y8RPYF2IyGyow5pr5ZLkrh+18zv3/0jTyZcvV6VyXmnQ2gUi7/WcWtVNxdX9rq0nx2eFHM9BlDQRLKknNsoH9C6e1GDhTBDd0b/thw0X0/UlphE49oKKu09xdnv8BP+JztRrIox1IdFXBUVkV8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=uclouvain.be; spf=pass smtp.mailfrom=uclouvain.be; dkim=pass (2048-bit key) header.d=uclouvain.be header.i=@uclouvain.be header.b=X3csyrHB; arc=fail smtp.client-ip=52.101.83.139
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JwPoiBL0EstwLSYH40A38ugtXd/KvzxBsesqGjXu5Ov/IkMuuo/bxe8Z5gi2KhrpZt9s5naCCILHqpw1nF5YdVHtsqDsEn2PXmze60nKV/ffkMPn0nD1N9oJKTsZZVQukpbZVXD38Ak8MH80nAvlaM3LXI5ROpKE9eiu1VdeaW7fokN3fO+rhlmEibh7K2t7i1zvTQSnBJE3URIxlNQFYaeHa6Wn4/gYkKJX/41nWnBYzJWouCn3hYe7oLFgwqegGf+w4jK6bhkq6No9fEzPtho6pIHskX6HBPxOVoHJ7ITAi+YId1cBPl1UcosoOPoTIYOiQQVVt9/YslrxIPzePQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bpND3ahC3nX4HxXhaiIBXvo5MEGnzuqfzZGNFBvYM5A=;
+ b=WTBOjsUOlC4cVgSIlrLLgoTwWp+UAxk56H1/VlvSbWoOEYdcu+NBkdlfosZxsD8f82vkh4HFVlwpyAOHyigH7MJxvtamTaE+Pb6tdZkcdcl8pxmQaAXpTU5etvXeqpc9kVgi6KLKSw5wj7qs2xX049ZI0BXlFz0uMdSrQgx2GFM34AyGEEg98qObrtEq0sPSV5ZjELpVGFj4XF4nVWvn3fSsVI61S9dwnm8EgD+0843JqMJn91FzK1qg6b3n0YW1JC1RZkmkJ1lrVJeiZLKts4cuUbeX3REzSr5qR0YGLUfcS7ELZjtYIbE0Ksgajmos86EtkqwAHx+BM3JF6EjnCA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=uclouvain.be; dmarc=pass action=none header.from=uclouvain.be;
+ dkim=pass header.d=uclouvain.be; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uclouvain.be;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bpND3ahC3nX4HxXhaiIBXvo5MEGnzuqfzZGNFBvYM5A=;
+ b=X3csyrHBFumYgqZWfhEebNvsnNA7zCgcTVc68SB5SLroP/a9sT76RCccpLcIsL6qzaMiwEFX0aH7lXwiaG2IrcnzlDk+/owpYHcGaQrwXSkpyKUdBfqZINHUmFvxvMFGlIBRYwfcAAEDBnYJfIjp/IPTBsGJmJhFGiJoupRoCJclIiLKU1+ALzzDvWbmOn7iOCfNNK6cOXrKsWj+4YRelOq3QW1aHIw1kluWmOP7WJDdKrkBl/1o54PObg5ui6NtQZCNCZ3YOv8IXxdE+Uv1aqVV2CzC7zoMTZgjIcQNscCt+PUQww3acF403ek8MAMUVP82IdSVJxESwZORXDpwEA==
+Received: from DU7PR03MB10969.eurprd03.prod.outlook.com (2603:10a6:10:5b2::20)
+ by AM9PR03MB7489.eurprd03.prod.outlook.com (2603:10a6:20b:272::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.14; Thu, 25 Jun
+ 2026 15:07:44 +0000
+Received: from DU7PR03MB10969.eurprd03.prod.outlook.com
+ ([fe80::75fe:525a:1f14:22cc]) by DU7PR03MB10969.eurprd03.prod.outlook.com
+ ([fe80::75fe:525a:1f14:22cc%7]) with mapi id 15.21.0139.009; Thu, 25 Jun 2026
+ 15:07:44 +0000
+Message-ID: <036a0c95-f5d4-46ab-88e7-1eab567d7a84@uclouvain.be>
+Date: Thu, 25 Jun 2026 17:07:41 +0200
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Anthony Doeraene <anthony.doeraene@uclouvain.be>
+Subject: [Regression] Broken MPLS routes with multiple nexthops
+To: davem@davemloft.net
+Cc: kuniyu@google.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS8PR04CA0114.eurprd04.prod.outlook.com
+ (2603:10a6:20b:31e::29) To DU7PR03MB10969.eurprd03.prod.outlook.com
+ (2603:10a6:10:5b2::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260530224646.160777-1-manishbaing2789@gmail.com>
- <20260531101237.13c5580d@pumpkin> <CAJvdc_fwRc8QH=DHPtTNiWEg3bm0qqs_-jOwDQ4frUJLLfCQPQ@mail.gmail.com>
- <CAJvdc_fTNPbJcgVv4kTe7VP9ibrzECHkad8Uyan8KrP-=WTyOQ@mail.gmail.com>
-In-Reply-To: <CAJvdc_fTNPbJcgVv4kTe7VP9ibrzECHkad8Uyan8KrP-=WTyOQ@mail.gmail.com>
-From: Manish Baing <manishbaing2789@gmail.com>
-Date: Thu, 25 Jun 2026 20:31:59 +0530
-X-Gm-Features: AVVi8Ce2ZLFOBGb781YNFuMp_wrhWJ56VvqEoDXJhZi6wLgoLv6ZFZC5TMHzsvw
-Message-ID: <CAJvdc_ek_UY9TU7+6Ng6dcofwHu7wxpTCq3QwAuPHGrVGZ=ADg@mail.gmail.com>
-Subject: Re: [PATCH v2] mctp: serial: replace memset with zero-initialization
-To: David Laight <david.laight.linux@gmail.com>
-Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU7PR03MB10969:EE_|AM9PR03MB7489:EE_
+X-MS-Office365-Filtering-Correlation-Id: 68429750-0f11-4ad0-8bdb-08ded2cb823c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|23010399003|786006|1800799024|56012099006|11063799006|18002099003|3023799007;
+X-Microsoft-Antispam-Message-Info:
+	ffdw8uIKPczrV/wolt/UXNMWbadcfmA9+WK5AnfL4DCpZCR+mZzuj5svRyYtnPqQOlWWz5TKyWt7JMaxz9B/BUKi1B1gUZXtwV9V1LkEyqrIzn3vI+cDG1TQXor2m3kOpCQyAL+KIg6Kb9kEuN7GFDicQpKYKLcdOtyoL68rEzsTtTfovPmNimuCohsAN4/pILIoCaFW9PYubJH9bDrDFcjAwH4IrqRR7HUbf9p9LEVzmC5/Z6k0U5BoygTJSJ3Hrv7N62UpX8an6D3l557xjBoa2EnLrdNFvtuOrpvJEZX9SWxT/7pwaL12AUGjZqbV2vgDGMwnpeVUY0gVqtjrZi2vOv1GgkmnotujOBQluRkLYTlo3kVXpSFvT63F2bkoKZrNhhANMM1xxGCLWzzfcSVxjz7/8mRBsS+CKO37b0/S7xw+nRbW383F6kFlKkYTYFJuZ7p4w5SfGeFpnJUc5d76g0WhiIi/eAY5knlBas3p5XiLKJUiGuzG/KM/PNw1NPjNYRkDTePgyK6rw8yhmBlX+n4lbMom0lop3CXxV9ra53ADf+b19oLQCF6uXIjeYPrM63rsi7ziadNXc2sq99QtmW3wbFGtlVE1Lew0agrdcW9TLw7LVFFKD7NLIafhms7OiuAnYNt321QegoRQR/WVzlmy9oi8x2AuCXItQEQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU7PR03MB10969.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(23010399003)(786006)(1800799024)(56012099006)(11063799006)(18002099003)(3023799007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NjhmVTMydUUxZ0JIV0Nlbnh2WGgxRHA4RXJNQW9BS2g1SUtZeXZYRFFuYU9I?=
+ =?utf-8?B?Z2d6R1hEWkg3ZGNOMHFBUldiUzRpY0JuNmRyb0dUOXpNUnFLeEN0RVpZckY2?=
+ =?utf-8?B?QnpXZ0VxOEJqYi9jRlhiMzNib1RMSVRYeStWVG9qb3ExdUVXWS9sc3RnaVlm?=
+ =?utf-8?B?RDNUL0RZOVZ2NTNicjBNOFdwb2ZLN0drbG42VUNlZ3YvZDNmdlFQcVVKZVhu?=
+ =?utf-8?B?UHBtZndYTmZLUlFtNWZKa3NKNUZRMnV5MDFTcWN6aVBSOUEyZDVnWVNQeUln?=
+ =?utf-8?B?V21WRnFMUWFFd0dXRHFIZUFoR1NXUWJUUHUwNXV1U2VwYlJGT3R0d0taNnYz?=
+ =?utf-8?B?K2doMUpQbzRKZEkzS0V2aVh4QTBPUXJJdlFuYTlhdEk3OWVWTXY4bXA2cmhq?=
+ =?utf-8?B?bitQNWJOd1BnejhoTUNscnhndUlkeng2b2haaHB1RkhUY3JFKzIxL0oxdm0v?=
+ =?utf-8?B?dFJiTTl4YmhJUTVkSHA2TGJGSHIwN1dseFZSRCtrMHR3Y1lreG90VmIzQXZF?=
+ =?utf-8?B?T1MxeThyaFBENnl2MTR1eU9jMWc4ZitWRVIvOUlPY1ArcWxONHV5MkdkSS9U?=
+ =?utf-8?B?ZHp0Wk9jV2Y1RmlNSHBKSU1JRlB4ZmRHcVVSSzliR0pWUkdVb1FHUWJNblVE?=
+ =?utf-8?B?azltSmhuTFRrNVYrMkJ3aVczeDZJSVJJMXZoUVR1bWZIaEJiL3BES0dNeThw?=
+ =?utf-8?B?YWdKNmFjWURYM3pSVGJlM0dmV29zR0dwSTFYenF6dHJHSkFmWFArMUVMbHRY?=
+ =?utf-8?B?VkI2TW1jWmxTS25zMHUyV2cxTTlDZUErWTFuY3pJOUp0cC9mMWNDZHd1TGZW?=
+ =?utf-8?B?Y0VZUUJvZytzVTVSSFl2ZW0yZ1d1OGdkZ0N6bi9BVDVOMElsN3hDcCtkOEpB?=
+ =?utf-8?B?Qmx1aStnNXFaMmdaRkFrS0g3Q2J3V3IvWFdHNGtYdnFBb05xVkNuZW5xKzdh?=
+ =?utf-8?B?RHBDc3VtQ1QwRS9lczRQL0NEaDFXa0F6VzBDZVk3STMvTXh0QndsU2ZmWlRZ?=
+ =?utf-8?B?dG5aYUJrRTlzWkREeGJZNjdaZ3dvQ01LR2xqSmdIekZzUUUxYTdTWUdGVkRW?=
+ =?utf-8?B?OGFpTU5ZSDN1cVJsWjlKTDEwR1hlU24zQXJ4Qml1Yjk3ZEM3MzdPaW14Y1Zh?=
+ =?utf-8?B?QXNta2tsbTBOaTFLNEpXUWJJZkRDZWQvYlhXeXFROTdJT0FsKythZjlRcGsz?=
+ =?utf-8?B?THpGVVc0VnBoaWwwYkhFam9pYTdNZlBQOHBSYTJPTzlZbitUcm1YRVREUEx2?=
+ =?utf-8?B?YVJYcVZBR3NvTzRNTy8ybUtBZEVxOHU3RjJjNnliK1gwTW5XcWQ3RVhxM1Rq?=
+ =?utf-8?B?SWxFSURjZ3VhUmsyMWtmWWlCdFp2RmM0MzZoK2Zvcm5Gb2pQL3Q3OEVJV2k5?=
+ =?utf-8?B?eWN0ZElXanRsZVo3ejFqajJ6dDI1Tyt6cStnbXBiblNYVk5ocFh0VUpKWExZ?=
+ =?utf-8?B?aVRJdnZWSklBK2hYSXFCNlhMQ2hnbWFhSFhleHFHams1dnBsNHA2Qjh6Vk02?=
+ =?utf-8?B?VnBxRHIvdDZpMGtqMWhVZ0tHb042NU5VekNzK1NzZGRpOEM5MiswTnkxcno3?=
+ =?utf-8?B?T1djSHVaVXdHSkZZZWRpczRRcVJCYXN1KzJ6TzFoWHdzYWpwcWxiR1M0eUMz?=
+ =?utf-8?B?Ym5nOVVjMWwyTlltdFkxeWE0UDNMTEMwdmlETkt4aCtYeG96NUc0bzZCTEFp?=
+ =?utf-8?B?ZjJpeXJnM0Z4VXovb2hTcFVBU21UZW9MRm5KNUZOalhwaU5GYU1TVG5iSnhm?=
+ =?utf-8?B?MHIwblZPLzBtbXcwdE5SNFBMS2VBZE8wZ3lvOUpmSTNXUmJHZDE1Y2JIYWpK?=
+ =?utf-8?B?QzM4ejk4RENFYTBJOVpaYzZ0L2lPZllXenRJUjhLNHBlbWV4NmJJT055VmVY?=
+ =?utf-8?B?ZEFrRjhJbmtUQTdheDdsOW8rMUwyTHA1NjlPTTdnVGRTQkFQSUNGcENRb29m?=
+ =?utf-8?B?Tm96MGRiTnk5NiswOGxiR25haFVXZk5wQ0FzVlhIcnIwZ0p6Q2pIUmo1Tkda?=
+ =?utf-8?B?MGFObEZNNXlBY0JMYTdXZmVJUHdDWGRPOXNNM1NQcjJmeFBCMDVydWJ0Nm8z?=
+ =?utf-8?B?aS9tVUYwUmwxVm9GTEdtampHNUNaRzhubXpZN0lKZnNRcnY4R1pEcVNGRUlZ?=
+ =?utf-8?B?TkNDRFpJdW9VK01hbk92UjVoeEZxcXM0c2k4MVlaNTZic05FbFV2Nko5U3BP?=
+ =?utf-8?B?YVorQUdTYkJUbGRHVjlmeDJCZWFmSWxUQWFWaGZsOUNzMXpwVjhTY3g1V0VE?=
+ =?utf-8?B?Q21ZbWduSFhSQUdHVy9reTY3TUxPYzBac2xIR09TYjNUS1plT3BXemZZYmJw?=
+ =?utf-8?B?RStuSXVSSzV3SnVDUkJLYXdabjdlcWRGL2FRYk9qTG80ZG5nbTIzL1FFc0lh?=
+ =?utf-8?Q?U5elkQlNWEFcrVDg=3D?=
+X-OriginatorOrg: uclouvain.be
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68429750-0f11-4ad0-8bdb-08ded2cb823c
+X-MS-Exchange-CrossTenant-AuthSource: DU7PR03MB10969.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2026 15:07:44.2911
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 7ab090d4-fa2e-4ecf-bc7c-4127b4d582ec
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s9AKY4u7zGK/B0HfhDFEiogwoZUbB4UobJe2sJyedY5+tsPFfqkFNZSPbApyJJhEYptKpoOI9kvlg4yDGTKMjIrJfJXCcVom8MpYUuwpaRg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7489
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[uclouvain.be,quarantine];
+	R_DKIM_ALLOW(-0.20)[uclouvain.be:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-301991-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[manishbaing2789@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:jk@codeconstruct.com.au,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davidlaightlinux@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-301992-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuniyu@google.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[anthony.doeraene@uclouvain.be,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[uclouvain.be:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manishbaing2789@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[anthony.doeraene@uclouvain.be,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,uclouvain.be:dkim,uclouvain.be:mid,uclouvain.be:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B186A6C6E87
+X-Rspamd-Queue-Id: 657ED6C6F0F
 
-Hi David,
-Just a quick follow-up on this thread.
-Please let me know how you would like me to proceed with this patch.
+Hello all,
 
-Thanks & Regards ,
-Manish
+According to my experiments, it seems that ECMP with MPLS (i.e. an MPLS 
+route with multiple
+nexthops) is broken on the master branch of the kernel.
 
-On Sun, Jun 7, 2026 at 1:20=E2=80=AFAM Manish Baing <manishbaing2789@gmail.=
-com> wrote:
->
-> Hi David,
->
-> Just a quick follow-up on this thread. When you have a moment, I would
-> love to hear your thoughts on my previous email.
-> Please let me know how you would like me to proceed with this patch.
->
-> Thanks & Regards ,
->  Manish
->
-> On Sun, May 31, 2026 at 3:06=E2=80=AFPM Manish Baing <manishbaing2789@gma=
-il.com> wrote:
-> >
-> > Hi David,
-> >
-> > I understand that this might just be unnecessary churn for the
-> > networking subsystem, and I am perfectly fine dropping the patch if
-> > that is the case.
-> >
-> > However, for my own learning, I would love to get your perspective on
-> > this. I was carrying over a pattern from recent cleanups in the IIO
-> > subsystem [1],
-> > as empty brace initialization was noted as the preferred approach in
-> > those discussions (including by Kees Cook [2]).
-> >
-> > Is the reasoning behind that recommendation just not applicable to
-> > netdev,or is the policy here strictly against code churn unless it
-> > fixes a tangible bug?
-> >
-> > Thanks for the guidance.
-> >
-> > [1]: https://lore.kernel.org/all/20250611-iio-zero-init-stack-with-inst=
-ead-of-memset-v1-0-ebb2d0a24302@baylibre.com/
-> > [2]: https://lore.kernel.org/linux-iio/202505090942.48EBF01B@keescook/
-> >
-> > Regards,
-> > Manish
-> >
-> >
-> > On Sun, May 31, 2026 at 2:42=E2=80=AFPM David Laight
-> > <david.laight.linux@gmail.com> wrote:
-> > >
-> > > On Sat, 30 May 2026 22:46:46 +0000
-> > > Manish Baing <manishbaing2789@gmail.com> wrote:
-> > >
-> > > > Use empty brace initialization (=3D {}) instead of explicit memset(=
-)
-> > > > to zero-initialize stack memory to simplify the code.
-> > > >
-> > > > No functional change.
-> > >
-> > > Isn't it also entirely pointless?
-> > >
-> > > -- David
-> > >
-> > > >
-> > > > Signed-off-by: Manish Baing <manishbaing2789@gmail.com>
-> > > > ---
-> > > > Changes in v2:
-> > > > - Fixed a compilation error caused by a duplicate variable declarat=
-ion caught
-> > > >   by the kernel test robot.
-> > > >
-> > > >  drivers/net/mctp/mctp-serial.c | 3 +--
-> > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp=
--serial.c
-> > > > index 26c9a33fd636..df721ca4e07b 100644
-> > > > --- a/drivers/net/mctp/mctp-serial.c
-> > > > +++ b/drivers/net/mctp/mctp-serial.c
-> > > > @@ -536,13 +536,12 @@ struct test_chunk_tx {
-> > > >
-> > > >  static void test_next_chunk_len(struct kunit *test)
-> > > >  {
-> > > > -     struct mctp_serial devx;
-> > > > +     struct mctp_serial devx =3D { };
-> > > >       struct mctp_serial *dev =3D &devx;
-> > > >       int next;
-> > > >
-> > > >       const struct test_chunk_tx *params =3D test->param_value;
-> > > >
-> > > > -     memset(dev, 0x0, sizeof(*dev));
-> > > >       memcpy(dev->txbuf, params->input, params->input_len);
-> > > >       dev->txlen =3D params->input_len;
-> > > >
-> > >
+Indeed, whenever adding an MPLS route with multiple nexthops, ip route 
+show the route as
+a dead route/link down, even if nexthops are reachable.
+
+Example to reproduce the error (tested with virtme-ng and the master 
+branch of the kernel):
+```
+modprobe mpls_iptunnel mpls_router
+sysctl net.mpls.platform_labels=100000
+ip link set dummy0 up
+ip addr add fc00:1::1/112 dev dummy0
+ip addr add fc00:2::1/112 dev dummy0
+ip -M route add 16000 \
+     nexthop via inet6 fc00:1::2 as 16001 \
+     nexthop via inet6 fc00:2::2 as 16002
+
+# Check the route
+ip -M route
+# Output:
+#     16000 dead linkdown
+#
+# Route is not present, even if accepted
+```
+
+ From a git blame, it seems that commit 
+f0914b8436c589b7ab32c614d8d7868eb4ebd5bf
+broke the core logic for building nexthops.
+
+This commit modified function `mpls_nx_build_multi` by setting 
+`rt->rt_nhn` to 0 at the
+start of the function. However, the loop `change_nexthops` just below 
+depends on
+`rt->rt_nhn` to know the actual number of nexthops that it should build. 
+As `rt->rt_nhn`
+is set to 0 just before, **no nexthop is ever built**, leading to a dead 
+route. Even if we
+remove this modification, this commit incorrectly increments 
+`rt->rt_nhn` at the end of
+the loop (`rt->rt_nhn++`),  such that the loop always end with an error 
+as it tries to
+constructs more nexthops that actually provided.
+
+Commenting these two lines fix the issue, and allows to create once 
+again MPLS routes
+with multiple nexthops:
+
+```
+modprobe mpls_iptunnel mpls_router
+sysctl net.mpls.platform_labels=100000
+ip link set dummy0 up
+ip addr add fc00:1::1/112 dev dummy0
+ip addr add fc00:2::1/112 dev dummy0
+ip -M route add 16000 \
+     nexthop via inet6 fc00:1::2 as 16001 \
+     nexthop via inet6 fc00:2::2 as 16002
+
+# Check the route
+ip -M route
+# Output:
+#     16000
+#            nexthop as to 16001 via inet6 fc00:1::2 dev dummy0
+#            nexthop as to 16002 via inet6 fc00:2::2 dev dummy0
+#
+# Route is accepted and present !
+```
+
+Overall, I think it would be interesting to discuss what this patch was 
+trying to achieve,
+and how we can conciliate both use-cases.
+
+Best regards and looking forward to hearing from you,
+Doeraene Anthony
+
+
 
