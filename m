@@ -1,479 +1,185 @@
-Return-Path: <netdev+bounces-301857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vQ00NSyhPGqupwgAu9opvQ
-	(envelope-from <netdev+bounces-301857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:31:56 +0200
+	id xRUNFpCiPGropwgAu9opvQ
+	(envelope-from <netdev+bounces-301858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:37:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 310736C293B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:31:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A5F86C298E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:37:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=auristor.com header.s=MDaemon header.b=cYziI7LR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301857-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301857-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=auristor.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=uUz9NM0r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301858-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301858-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 74E583013460
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:31:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3D678300ADA7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E682DAFA9;
-	Thu, 25 Jun 2026 03:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6F72C0303;
+	Thu, 25 Jun 2026 03:37:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from monticello.secure-endpoints.com (monticello.secure-endpoints.com [208.125.0.237])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA922E2EEE
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 03:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1B120E702
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 03:37:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782358312; cv=none; b=E9LBnI8l43tMY9F8NOZ6RShp3wALHT/FaBFlsAC2FHdYx5y7h0EMDT0mxGtjioWKxxphmUx4qqrT9y+igxA5kEfAXkObWcCGPRBWyDdTD02PBhyiti6KWGuwU1X3anRBU1QQ7prUrJSvY07WGCKLEppuunuiTjOQhEy6uIL5OvM=
+	t=1782358666; cv=none; b=pvRsQOAQ28nlVx+aORUI2dX1cB8W0iaj3AtMdYuqYLP5NwJwEqWEgf0WU65DLiwK9uxSdWG+goV0yBUFI7WEg/n9XLjTO3w1EoMNwfhlSJRbX07ovsOCps+wEpdKJdtmx5MTJxwf+D2LEgYlB43Yhbfk1pfoSNtT3rnG3ZA3UYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782358312; c=relaxed/simple;
-	bh=OVsa337kl6HutEKwoFAFR95PYhRLtWEWJVogpvG5w50=;
+	s=arc-20240116; t=1782358666; c=relaxed/simple;
+	bh=yNSdL2jeXaw2zEU4y1EU+2q083XD+wgFTn/Us9DKqYU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P/9Ov0bv/hCHg5SuHMahF3TNutI4jLQ1SyUeZ3bcH3aJLe/MveqmDkKMoMlm26H8+Crs3DM8st0voMskhhbcsvaMxZpNBolKTS+rR8DHuOV/DV7ARn/n0bwVGs6sxNqmsf9GfZAKz/hloIF41vdNOf9XLXZB4XRTebNHbuQt7cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com; spf=pass smtp.mailfrom=auristor.com; dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b=cYziI7LR; arc=none smtp.client-ip=208.125.0.237
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=auristor.com; s=MDaemon; r=y; l=9742; t=1782358263;
-	x=1782963063; i=jaltman@auristor.com; q=dns/txt; h=Message-ID:
-	Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	Content-Language:From:Autocrypt:Organization:
-	Disposition-Notification-To:In-Reply-To:Content-Type:
-	Content-Transfer-Encoding; z=Received:=20by=20auristor.com=20(20
-	8.125.0.237)=20(MDaemon=20PRO=20v26.0.3)=20with=20ESMTPSA=20id=2
-	0md5001005395154.msg=3B=20=0D=0A=09Wed,=2024=20Jun=202026=2023=3
-	A31=3A02=20-0400|Message-ID:=20<4dc5ae26-ef2d-494b-afdd-c723de8b
-	d059@auristor.com>|Date:=20Wed,=2024=20Jun=202026=2023=3A31=3A32
-	=20-0400|MIME-Version:=201.0|User-Agent:=20Mozilla=20Thunderbird
-	|Subject:=20Re=3A=20[PATCH=20net=20v3=2001/11]=20rxrpc=3A=20Fix=
-	20ACKALL=20packet=20handling|To:=20David=20Howells=20<dhowells@r
-	edhat.com>,=20netdev@vger.kernel.org|Cc:=20Marc=20Dionne=20<marc
-	.dionne@auristor.com>,=20Jakub=20Kicinski=20<kuba@kernel.org>,=0
-	D=0A=20"David=20S.=20Miller"=20<davem@davemloft.net>,=20Eric=20D
-	umazet=20<edumazet@google.com>,=0D=0A=20Paolo=20Abeni=20<pabeni@
-	redhat.com>,=20Simon=20Horman=20<horms@kernel.org>,=0D=0A=20linu
-	x-afs@lists.infradead.org,=20linux-kernel@vger.kernel.org,=0D=0A
-	=20Wyatt=20Feng=20<bronzed_45_vested@icloud.com>,=20Yuan=20Tan=2
-	0<yuantan098@gmail.com>,=0D=0A=20Yifan=20Wu=20<yifanwucs@gmail.c
-	om>,=20Juefei=20Pu=20<tomapufckgml@gmail.com>,=0D=0A=20Zhengchua
-	n=20Liang=20<zcliangcn@gmail.com>,=20Xin=20Liu=20<bird@lzu.edu.c
-	n>,=0D=0A=20Ren=20Wei=20<n05ec@lzu.edu.cn>,=20stable@vger.kernel
-	.org|References:=20<20260624163819.3017002-1-dhowells@redhat.com
-	>=0D=0A=20<20260624163819.3017002-2-dhowells@redhat.com>|Content
-	-Language:=20en-US|From:=20Jeffrey=20E=20Altman=20<jaltman@auris
-	tor.com>|Autocrypt:=20addr=3Djaltman@auristor.com=3B=20keydata=3
-	D=0D=0A=20xsFNBEwLlO0BEACu6yWFkd1+qwsGg8ZzgslSkcAKhSegWt5j86DpaR
-	L0W8fxg6YjxwEPvwoH=0D=0A=20BGa/rpSdBd1gkmzeYxD3hVZdj75r6nVS9f/mx
-	NQzW+o1sW4vaeSxKgZSQz5RqHmwPDcqQP66=0D=0A=20+ZSnjV+G88MKwZ9DIzA9
-	AwpJhNAAlAlj3OvsQVsxd1ipc6C4/U3qjHL7Ih22UbPBM71ltIZx=0D=0A=20kqc
-	rAlXPnUTeraJXtfzYbq4mJFJ9JC6/o1NRSjsBvRD+ADxlG50+KccZN4SS5xxdGuh
-	1tA9U=0D=0A=20TydYBQB3YtJbq7CYau2kIYt/3HnyLYGo1s6Ti6cuAJJ/40iIE1
-	xkqhvMiIz/Q+1ztmksJbLQ=0D=0A=20aCtW8kF42nF8MpPdIPTSPr2uGvpRtCjRb
-	h4lgMXgyNUx1wpCEY0X11xce++H8HySmFwryE2y=0D=0A=20kkxUQeMUjaaXZDHY
-	USyQz7riChFiZ9ax9dmX0wUY/A05v0qcualglpk4wJ2kcsGKUEGkLvnV=0D=0A=2
-	0wwvya8zifPwKOw5JlGPvzX8t2m7jB2GXKzvVAsImqOqnDBTKUXWQQZCW9Rqt7ac
-	dE8bQ2vqr=0D=0A=20vP+3Ykf4SrPwcuNCDt6QSgjVbhc3hA3hCtE1iW/HhuBAzK
-	iuzJ9era+q9QjTtLPIkQDHRpcC=0D=0A=20MMWvK0Y1uQ34Ql1BfKRA4gc8A7CuV
-	UY6+Ga7PuJWd+FSglvmKQARAQABzTZKZWZmcmV5IEFs=0D=0A=20dG1hbiAoQXVy
-	aVN0b3IsIEluYy4pIDxqYWx0bWFuQGF1cmlzdG9yLmNvbT7CwXkEEwECACMF=0D=
-	0A=20AlY2YwgCGyMHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRD3enNVkra
-	aBDdzD/0XQUDW=0D=0A=20UWXrpapHdvZaHzPHc3xobRi4PABWfLW1jfMK5Xy4DP
-	/x7x3I2qAqTD6vv/OPFMx8gG6+Xeod=0D=0A=20Mj5vE7+7ZRd+J76J4DJH2qoaX
-	X8qnUEABUJHZYDhw2/Ij5AQ6ZsuSwXuURGEMi0vu1ihBbP6=0D=0A=203bt4LRIa
-	+F60ebDvCl9po+UB7TrjQCs+YV1r1YeCSv9hEHBly/W0u1OrnNCMWRcq7dmTCbZ0
-	=0D=0A=20R5w6VJ/+QEio+T6paGGMjJmrNw2qUeuK+SxOOxOWS8lgdqzjcK3Nsfi
-	ERrVbOWM83ZVy0/GN=0D=0A=20vpusjhI/3Q8lbV/p+IsJk/v1grkRzgU0frES2A
-	NEPTpC4j2ggPOSMpsz3BZ8wIOg17rIWnK+=0D=0A=20gNLQe+XN7kvDwGu0jYhTI
-	ZO10jcVsRSrAJGtgBNrYxOjEUhpnaSJDVcjapRvRPCQumA13Zkl=0D=0A=20nm4A
-	Yjp7L2oOIeOGcKRZwbrGDakksa5iaSIoywpwECWh2l9V0W3SeynBgPtR4qpt4N8y
-	KCcw=0D=0A=20suLCAKfBv9RcL641XZi/Fp9btSuTPUm5Lw3SIGr5U+Syezmhzlw
-	sObIF9W624aorriWoXNf3=0D=0A=20GgH9ZH0Hkc6aS99pIZhh5USWRO/pS+lv5e
-	NkEdf9LUBGX9b6ZMan0fpoEayqUejtZw3O2rgs=0D=0A=20zA+pTSA+/HobvtL6L
-	3XtlPJ1NXlkgM7BTQRMC5TtARAA88hJdpgcg2RU/uAWfAL46XZHA59c=0D=0A=20
-	VpPNNly1tPWCSbG6+ONH6nOG/NarmNVxX6Mb9YRkEU6wmrZS85inz3otdyz/zlyN
-	SWma8qGN=0D=0A=20UlMbiwFQqfXWVBAPGoRC0a0aJrd4IayLuvv1UqEwx7Otp7y
-	5RNHtRv35/kho0Z+UheYVdGm2=0D=0A=20I06xIc+aNKW2LO7R5BNtjpADPIG+NS
-	dsVIeamhAWPvLrwbf6mUb//eA9pF0w0QixLVrH/cCo=0D=0A=20z+S27gCGJvY6z
-	F22NgdhnkIqNz8E/LKt6S36ZI9Mw/ixpQTozqRmdNzVQNgTHUZClbJj4iq1=0D=0
-	A=20EPHB7XqpxOv+awrxSxq2jt8GFD0rU+sAuzW+F7cBoIw434/IrxKYwcPHpHLE
-	VQ1tLP7d3ZpZ=0D=0A=20R30p3oqoliGiLsWvHHxyXjuMBF4XJ6MRXmD65/qOhuo
-	2DKduHMNlmxzgSzvWgXZeNJq+OcS8=0D=0A=20jQZDt2Na2pMKjWytau7xQu2ndm
-	0FwS48ngMrDYRQMxzL1NfnBnT9BCwjiU+/6NBSwcNKIqye=0D=0A=20a9IpTwsVf
-	kF4/iui7xD9+LtzqeUkBAe7q5jEJmJMZhAfh7usZGT8TGxXegCaF4Jwz2nxS4Fv=
-	0D=0A=207VRza/yUAOJlc0daR11TPeiUNCQWY7PpL1AXO9vaSyjFuOzTnU8vzXvI
-	9fGoxIxKGRQpKMU8=0D=0A=20PROIFw0AEQEAAcLBXwQYAQIACQUCTAuU7QIbDAA
-	KCRD3enNVkraaBIxXD/4xlaBwW2TLFfMv=0D=0A=20lcY/2XDSm6NO4JaJG2Nzp3
-	5xaaBVwMVzWvI+GgTgKNSFot9f4jiLBNQdnq3UKoEThR2ORKVL=0D=0A=200ZJS1
-	QYR7yyrOo0MteDSy8ofU1FJ6xu4ND3ekOjP20BTrihDpqUdahir2uaRfMkwM+0im
-	Olc=0D=0A=20utGMhJNF/LAjrhoDp9SeDMYBXZ1wfrbrEo/EEu0PbkGyzqPyEPqw
-	N1iSJkcAnjuIA0rTf1jQ=0D=0A=20tJAaDov7yHsSRwUM+qTGsjOGQAN3wtYwjPp
-	w7hI01sE+x0uq0pVeo4qeWTZ2TE4Vtp8FKXFA=0D=0A=20kqnP878q+kNk9Ve+DR
-	s8UlRfa9Lgf5ETjXOTVGaT/UGxi9B4oo8k0lzvM/A1txexL/lLw8AU=0D=0A=20L
-	hUeGtyS6D2X9vFi6azna+o918R9BV86uXPiDOf1nMwqKchNCxmgH9vd0aQm8TKCr
-	WAW4kU1=0D=0A=20Ig6aMNuZiWloVZfKrmWizbgeGKE9rhNPNqxkqBaA4lrJ8L6b
-	dKbhAOe3NQjO2vUAXB53Jphl=0D=0A=20F74GwEsh+85i9/yIbvwJVcsFYhdZz7f
-	CAUOcnFkGnyrwIgkizQ3xXShPW8mqkgUk4kYMnucC=0D=0A=204kG/E7pI/4lke5
-	X5X9vroXRHB7tkpAgT46SqSM/XTwCaseXG9orDgz3duRTUp6K0++S/qsqT=0D=0A
-	=20akGVmjD5917A1HqWfMmiKA=3D=3D|Organization:=20AuriStor,=20Inc.
-	|Disposition-Notification-To:=20Jeffrey=20E=20Altman=20<jaltman@
-	auristor.com>|In-Reply-To:=20<20260624163819.3017002-2-dhowells@
-	redhat.com>|Content-Type:=20text/plain=3B=20charset=3DUTF-8=3B=2
-	0format=3Dflowed|Content-Transfer-Encoding:=207bit; bh=lBsoaxBCJ
-	HhzOM+AWOoXnwOJChO51HzklwN0V6WOf7Y=; b=cYziI7LRfN23WiN4Kb22/hRLh
-	9POCFIP5MOj27eJU9BdVQCJOnANQVQkbmIHAUKcxyUFZDSQaX9pX8CB0fNzyuuYN
-	8NuIbJElaaGMktt7AvZ7L5+yutYlH5mcmjFKSEMhKRnNha3eobUaji5VULM0qjd9
-	4CpxKQpwqubN6pVEbE=
-X-MDAV-Result: clean
-X-MDAV-Processed: monticello.secure-endpoints.com, Wed, 24 Jun 2026 23:31:03 -0400
-Received: by auristor.com (208.125.0.237) (MDaemon PRO v26.0.3) with ESMTPSA id md5001005395154.msg; 
-	Wed, 24 Jun 2026 23:31:02 -0400
-X-Spam-Processed: monticello.secure-endpoints.com, Wed, 24 Jun 2026 23:31:02 -0400
-	(not processed: message from trusted or authenticated source)
-X-MDRemoteIP: 66.108.136.248
-X-MDArrival-Date: Wed, 24 Jun 2026 23:31:02 -0400
-X-MDOrigin-Country: US, NA
-X-Authenticated-Sender: jaltman@auristor.com
-X-Return-Path: prvs=16369f4862=jaltman@auristor.com
-X-Envelope-From: jaltman@auristor.com
-X-MDaemon-Deliver-To: netdev@vger.kernel.org
-Message-ID: <4dc5ae26-ef2d-494b-afdd-c723de8bd059@auristor.com>
-Date: Wed, 24 Jun 2026 23:31:32 -0400
+	 In-Reply-To:Content-Type; b=lnbFzH0NXRSn+a0nABdeMu6UGXus3Q5uq0bAGOkQF9PGRKh9GCPjgWixy4HEnYxuEknBgBq+cK9m0/DVtlfixz4GOeJG9NiX7xVNzVt6eAs3pyYjqp6imT0Qsg11nX0C66lYRkni7DARnTGCJ+YVF7O/xvIr3thKXbhkNVuJlOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uUz9NM0r; arc=none smtp.client-ip=91.218.175.178
+Message-ID: <184b1d3c-a9cd-436a-b2b2-c5bac488859b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782358662;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LLC4woZWpOCsOMgiHjNXcQjJ+5Cp5MOUCJPQZtPdNEA=;
+	b=uUz9NM0rIBIUkVy0lZ1yq98dfh9Bb4qcQ/qVXyjzQ9uTOBV8xI7sySzY7waZ3kGlQn/BPu
+	4p+WvsJZCP1DHHztVdGkwAM8rCn/2WNxv3aUhlGjZ0hWcb1+vpyhN8eI5raWTgHQU2w/0N
+	+a61XEi7DRYZlT2/+aXrAMHnLyolTlA=
+Date: Thu, 25 Jun 2026 11:37:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 01/11] rxrpc: Fix ACKALL packet handling
-To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Cc: Marc Dionne <marc.dionne@auristor.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
- Wyatt Feng <bronzed_45_vested@icloud.com>, Yuan Tan <yuantan098@gmail.com>,
- Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
- Zhengchuan Liang <zcliangcn@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- Ren Wei <n05ec@lzu.edu.cn>, stable@vger.kernel.org
-References: <20260624163819.3017002-1-dhowells@redhat.com>
- <20260624163819.3017002-2-dhowells@redhat.com>
-Content-Language: en-US
-From: Jeffrey E Altman <jaltman@auristor.com>
-Autocrypt: addr=jaltman@auristor.com; keydata=
- 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
- akGVmjD5917A1HqWfMmiKA==
-Organization: AuriStor, Inc.
-Disposition-Notification-To: Jeffrey E Altman <jaltman@auristor.com>
-In-Reply-To: <20260624163819.3017002-2-dhowells@redhat.com>
+Subject: Re: [PATCH v2 bpf-next 1/2] bpf: Support BPF_F_EGRESS with
+ bpf_redirect_peer
+To: Jordan Rife <jordan@jrife.io>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Stanislav Fomichev
+ <sdf@fomichev.me>, Jiayuan Chen <jiayuan.chen@linux.dev>,
+ Paul Chaignon <paul.chaignon@gmail.com>
+References: <20260618182035.43811-1-jordan@jrife.io>
+ <20260618182035.43811-2-jordan@jrife.io>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260618182035.43811-2-jordan@jrife.io>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-MDCFSigsAdded: auristor.com
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	HEADER_FORGED_MDN(2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[auristor.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
-	R_DKIM_ALLOW(-0.20)[auristor.com:s=MDaemon];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-301858-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-301857-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[jaltman@auristor.com,netdev@vger.kernel.org];
-	HAS_X_AS(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:bronzed_45_vested@icloud.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:n05ec@lzu.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,fomichev.me,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jordan@jrife.io,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:sdf@fomichev.me,m:jiayuan.chen@linux.dev,m:paul.chaignon@gmail.com,m:paulchaignon@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[auristor.com,kernel.org,davemloft.net,google.com,redhat.com,lists.infradead.org,vger.kernel.org,icloud.com,gmail.com,lzu.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jaltman@auristor.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[auristor.com:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,icloud.com:email,infradead.org:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,jrife.io:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 310736C293B
+X-Rspamd-Queue-Id: 1A5F86C298E
 
-On 6/24/2026 12:38 PM, David Howells wrote:
 
-> From: Wyatt Feng <bronzed_45_vested@icloud.com>
+On 6/19/26 2:20 AM, Jordan Rife wrote:
+> We have several use cases where a pod injects traffic into the datapath
+> of another so that the traffic appears to have originated from that
+> pod. One such use case is a synthetic flow generator which injects
+> synthetic traffic into a pod's datapath to enable dynamic probing and
+> debugging. Another is a transparent proxy where connections originating
+> from one pod are redirected towards another which proxies that
+> connection. The new connection is bound to the IP of the original pod
+> using IP_TRANSPARENT and its traffic is injected into that pod's
+> datapath and handled as if it had originated there. This can be used for
+> mTLS, etc.
 >
-> rxrpc_input_ackall() accepts ACKALL packets without checking whether the
-> call is in a state that can legitimately have outstanding transmit buffers.
-> A forged ACKALL can therefore reach a new service call in
-> RXRPC_CALL_SERVER_RECV_REQUEST before any reply packets have been queued.
+[...]
 >
-> In that state call->tx_top is zero and call->tx_queue is NULL, so
-> rxrpc_rotate_tx_window() dereferences a NULL txqueue and triggers a
-> null-pointer dereference.
+>    [ ID] Interval           Transfer     Bitrate         Retr
+>    [  5]   0.00-60.00  sec   272 GBytes  38.9 Gbits/sec    0       sender
+>    [  5]   0.00-60.00  sec   272 GBytes  38.9 Gbits/sec            receiver
 >
-> Fix the handling of ACKALL packets by the following means:
+> In this test, using bpf_redirect_peer(BPF_F_EGRESS) for the hop from
+> [iperf pod] to [pod b] led to ~18% more throughput compared to
+> bpf_redirect(BPF_F_INGRESS).
 >
->   (1) Add two new call states: RXRPC_CALL_CLIENT_PRE_SEND which indicates
->       that the client call is connected, but nothing has been transmitted as
->       yet; and RXRPC_CALL_CLIENT_AWAIT_ACK, which indicates that everything
->       has been transmitted at least once, but we're now waiting for the
->       stuff remaining in the Tx buffer to be ACK'd (retransmissions may
->       still happen).
->
->       The RXRPC_CALL_CLIENT_PRE_SEND state is set when the call is assigned
->       a channel and transitions to RXRPC_CALL_CLIENT_SEND_REQUEST when the
->       first packet is transmitted.
->
->       RXRPC_CALL_CLIENT_AWAIT_REPLY is then narrowed in scope to indicate
->       that all Tx packets have been ACK'd and we're now waiting for the
->       reply to be received.
->
->   (2) As per Wyatt Feng's original patch[1], the ACKALL handler then checks
->       that the call state is one in which there might be stuff in the Tx
->       buffer to ACK, but now this includes AWAIT_ACK rather than
->       AWAIT_REPLY.  ACKALL packets are ignored if received in the wrong
->       state.
->
->       Note that unlike Wyatt Feng's patch, it's no longer necessary to check
->       to see if the Tx buffer exists as this the state set now covers this.
->
->   (3) Make the ACKALL handler use call->tx_transmitted rather than
->       call->tx_top as the former is explicitly the highest packet seq number
->       transmitted, whereas the latter has a looser definition.
->
-> Thanks to Jeffrey Altman for a description of the history of the ACKALL
-> packet[1].
-
-The Link reference should be [2] instead of [1].
-
-> Fixes: b341a0263b1b ("rxrpc: Implement progressive transmission queue struct")
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-> Co-developed-by: David Howells <dhowells@redhat.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Ren Wei <n05ec@lzu.edu.cn>
-> cc: Marc Dionne <marc.dionne@auristor.com>
-> cc: linux-afs@lists.infradead.org
-> Cc: stable@vger.kernel.org
-> Link: https://lore.kernel.org/r/20260616155749.2125907-2-dhowells@redhat.com/ [1]
-> Link: https://lore.kernel.org/r/c0fd4fec-1576-4070-b31e-a37d5506f5ed@auristor.com/ [2]
+> Signed-off-by: Jordan Rife <jordan@jrife.io>
 > ---
->   net/rxrpc/ar-internal.h |  2 ++
->   net/rxrpc/call_event.c  |  5 ++++-
->   net/rxrpc/call_object.c |  2 ++
->   net/rxrpc/conn_client.c |  2 +-
->   net/rxrpc/input.c       | 23 +++++++++++++++++++----
->   net/rxrpc/sendmsg.c     |  3 ++-
->   6 files changed, 30 insertions(+), 7 deletions(-)
+>   include/uapi/linux/bpf.h       | 19 +++++++++++--------
+>   net/core/filter.c              | 12 +++++++-----
+>   tools/include/uapi/linux/bpf.h | 19 +++++++++++--------
+>   3 files changed, 29 insertions(+), 21 deletions(-)
 >
-> diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-> index 98f2165159d7..b6ccd8a8199b 100644
-> --- a/net/rxrpc/ar-internal.h
-> +++ b/net/rxrpc/ar-internal.h
-> @@ -650,7 +650,9 @@ enum rxrpc_call_event {
->   enum rxrpc_call_state {
->   	RXRPC_CALL_UNINITIALISED,
->   	RXRPC_CALL_CLIENT_AWAIT_CONN,	/* - client waiting for connection to become available */
-> +	RXRPC_CALL_CLIENT_PRE_SEND,	/* - client is connected, but hasn't sent anything yet */
->   	RXRPC_CALL_CLIENT_SEND_REQUEST,	/* - client sending request phase */
-> +	RXRPC_CALL_CLIENT_AWAIT_ACK,	/* - client awaiting ACKs of request */
->   	RXRPC_CALL_CLIENT_AWAIT_REPLY,	/* - client awaiting reply */
->   	RXRPC_CALL_CLIENT_RECV_REPLY,	/* - client receiving reply phase */
->   	RXRPC_CALL_SERVER_PREALLOC,	/* - service preallocation */
-> diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-> index fec59d9338b9..21be9c86d7a7 100644
-> --- a/net/rxrpc/call_event.c
-> +++ b/net/rxrpc/call_event.c
-> @@ -178,7 +178,7 @@ static void rxrpc_close_tx_phase(struct rxrpc_call *call)
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 89b36de5fdbb..c91b5a4bda03 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -5079,17 +5079,19 @@ union bpf_attr {
+>    * 	Description
+>    * 		Redirect the packet to another net device of index *ifindex*.
+>    * 		This helper is somewhat similar to **bpf_redirect**\ (), except
+> - * 		that the redirection happens to the *ifindex*' peer device and
+> - * 		the netns switch takes place from ingress to ingress without
+> - * 		going through the CPU's backlog queue.
+> + * 		that the redirection happens to the *ifindex*' peer device. If
+> + * 		*flags* is 0, the netns switch takes place from ingress to
+> + * 		ingress without going through the CPU's backlog queue. If the
+> + * 		**BPF_F_EGRESS** flag is provided then redirection happens in
+> + * 		the egress direction of the peer device.
+>    *
+>    * 		*skb*\ **->mark** and *skb*\ **->tstamp** are not cleared during
+>    * 		the netns switch.
+>    *
+> - * 		The *flags* argument is reserved and must be 0. The helper is
+> - * 		currently only supported for tc BPF program types at the
+> - * 		ingress hook and for veth and netkit target device types. The
+> - * 		peer device must reside in a different network namespace.
+> + * 		If the *flags* argument is 0, the helper is currently only
+> + * 		supported for tc BPF program types at the ingress hook and for
+> + * 		veth and netkit target device types. The peer device must reside
+> + * 		in a different network namespace.
+>    * 	Return
+>    * 		The helper returns **TC_ACT_REDIRECT** on success or
+>    * 		**TC_ACT_SHOT** on error.
+> @@ -6336,9 +6338,10 @@ enum {
+>   /* Flags for bpf_redirect and bpf_redirect_map helpers */
+>   enum {
+>   	BPF_F_INGRESS		= (1ULL << 0), /* used for skb path */
+> +	BPF_F_EGRESS		= (1ULL << 1), /* used for skb path */
+>   	BPF_F_BROADCAST		= (1ULL << 3), /* used for XDP path */
+>   	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4), /* used for XDP path */
+> -#define BPF_F_REDIRECT_FLAGS (BPF_F_INGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
+> +#define BPF_F_REDIRECT_FLAGS (BPF_F_INGRESS | BPF_F_EGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
+>   };
 >   
->   	switch (__rxrpc_call_state(call)) {
->   	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-> -		rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_AWAIT_REPLY);
-> +		rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_AWAIT_ACK);
->   		break;
->   	case RXRPC_CALL_SERVER_SEND_REPLY:
->   		rxrpc_set_call_state(call, RXRPC_CALL_SERVER_AWAIT_ACK);
-> @@ -244,6 +244,8 @@ static void rxrpc_transmit_fresh_data(struct rxrpc_call *call, unsigned int limi
->   				break;
->   		} while (req.n < limit && before(seq, send_top));
->   
-> +		if (__rxrpc_call_state(call) == RXRPC_CALL_CLIENT_PRE_SEND)
-> +			rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_SEND_REQUEST);
->   		if (txb->flags & RXRPC_LAST_PACKET) {
->   			rxrpc_close_tx_phase(call);
->   			tq = NULL;
-> @@ -267,6 +269,7 @@ void rxrpc_transmit_some_data(struct rxrpc_call *call, unsigned int limit,
->   		fallthrough;
->   
->   	case RXRPC_CALL_SERVER_SEND_REPLY:
-> +	case RXRPC_CALL_CLIENT_PRE_SEND:
->   	case RXRPC_CALL_CLIENT_SEND_REQUEST:
->   		if (!rxrpc_tx_window_space(call))
->   			return;
-> diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
-> index fcb9d38bb521..817ed9acb91e 100644
-> --- a/net/rxrpc/call_object.c
-> +++ b/net/rxrpc/call_object.c
-> @@ -18,7 +18,9 @@
->   const char *const rxrpc_call_states[NR__RXRPC_CALL_STATES] = {
->   	[RXRPC_CALL_UNINITIALISED]		= "Uninit  ",
->   	[RXRPC_CALL_CLIENT_AWAIT_CONN]		= "ClWtConn",
-> +	[RXRPC_CALL_CLIENT_PRE_SEND]		= "ClPreSnd",
->   	[RXRPC_CALL_CLIENT_SEND_REQUEST]	= "ClSndReq",
-> +	[RXRPC_CALL_CLIENT_AWAIT_ACK]		= "ClAwtAck",
->   	[RXRPC_CALL_CLIENT_AWAIT_REPLY]		= "ClAwtRpl",
->   	[RXRPC_CALL_CLIENT_RECV_REPLY]		= "ClRcvRpl",
->   	[RXRPC_CALL_SERVER_PREALLOC]		= "SvPrealc",
-> diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
-> index 9b757798dedd..48519f0de185 100644
-> --- a/net/rxrpc/conn_client.c
-> +++ b/net/rxrpc/conn_client.c
-> @@ -449,7 +449,7 @@ static void rxrpc_activate_one_channel(struct rxrpc_connection *conn,
->   	trace_rxrpc_connect_call(call);
->   	call->tx_last_sent = ktime_get_real();
->   	rxrpc_start_call_timer(call);
-> -	rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_SEND_REQUEST);
-> +	rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_PRE_SEND);
->   	wake_up(&call->waitq);
->   }
->   
-> diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
-> index ce761466b02d..2eedab1b0919 100644
-> --- a/net/rxrpc/input.c
-> +++ b/net/rxrpc/input.c
-> @@ -181,7 +181,8 @@ void rxrpc_congestion_degrade(struct rxrpc_call *call)
->   	if (call->cong_ca_state != RXRPC_CA_SLOW_START &&
->   	    call->cong_ca_state != RXRPC_CA_CONGEST_AVOIDANCE)
->   		return;
-> -	if (__rxrpc_call_state(call) == RXRPC_CALL_CLIENT_AWAIT_REPLY)
-> +	if (__rxrpc_call_state(call) == RXRPC_CALL_CLIENT_AWAIT_ACK ||
-> +	    __rxrpc_call_state(call) == RXRPC_CALL_CLIENT_AWAIT_REPLY)
->   		return;
->   
->   	rtt = ns_to_ktime(call->srtt_us * (NSEC_PER_USEC / 8));
-> @@ -356,6 +357,7 @@ static void rxrpc_end_tx_phase(struct rxrpc_call *call, bool reply_begun,
->   
->   	switch (__rxrpc_call_state(call)) {
->   	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-> +	case RXRPC_CALL_CLIENT_AWAIT_ACK:
->   	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
->   		if (reply_begun) {
->   			rxrpc_set_call_state(call, RXRPC_CALL_CLIENT_RECV_REPLY);
-> @@ -694,6 +696,7 @@ static void rxrpc_input_data(struct rxrpc_call *call, struct sk_buff *skb)
->   
->   	switch (__rxrpc_call_state(call)) {
->   	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-> +	case RXRPC_CALL_CLIENT_AWAIT_ACK:
->   	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
->   		/* Received data implicitly ACKs all of the request
->   		 * packets we sent when we're acting as a client.
-> @@ -1154,10 +1157,12 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
->   	if (hard_ack + 1 == 0)
->   		return rxrpc_proto_abort(call, 0, rxrpc_eproto_ackr_zero);
->   
-> -	/* Ignore ACKs unless we are or have just been transmitting. */
-> +	/* Ignore ACKs unless we are transmitting or are waiting for
-> +	 * acknowledgement of the packets we've just been transmitting.
-> +	 */
->   	switch (__rxrpc_call_state(call)) {
->   	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-> -	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
-> +	case RXRPC_CALL_CLIENT_AWAIT_ACK:
->   	case RXRPC_CALL_SERVER_SEND_REPLY:
->   	case RXRPC_CALL_SERVER_AWAIT_ACK:
->   		break;
-> @@ -1215,7 +1220,17 @@ static void rxrpc_input_ackall(struct rxrpc_call *call, struct sk_buff *skb)
->   {
->   	struct rxrpc_ack_summary summary = { 0 };
->   
-> -	if (rxrpc_rotate_tx_window(call, call->tx_top, &summary))
-> +	switch (__rxrpc_call_state(call)) {
-> +	case RXRPC_CALL_CLIENT_SEND_REQUEST:
-> +	case RXRPC_CALL_CLIENT_AWAIT_ACK:
-> +	case RXRPC_CALL_SERVER_SEND_REPLY:
-> +	case RXRPC_CALL_SERVER_AWAIT_ACK:
-> +		break;
-> +	default:
-> +		return;
-> +	}
-> +
-> +	if (rxrpc_rotate_tx_window(call, call->tx_transmitted, &summary))
->   		rxrpc_end_tx_phase(call, false, rxrpc_eproto_unexpected_ackall);
->   }
->   
-> diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
-> index c35de4fd75e3..ed2c9a51005a 100644
-> --- a/net/rxrpc/sendmsg.c
-> +++ b/net/rxrpc/sendmsg.c
-> @@ -366,7 +366,8 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
->   	if (state >= RXRPC_CALL_COMPLETE)
->   		goto maybe_error;
->   	ret = -EPROTO;
-> -	if (state != RXRPC_CALL_CLIENT_SEND_REQUEST &&
-> +	if (state != RXRPC_CALL_CLIENT_PRE_SEND &&
-> +	    state != RXRPC_CALL_CLIENT_SEND_REQUEST &&
->   	    state != RXRPC_CALL_SERVER_ACK_REQUEST &&
->   	    state != RXRPC_CALL_SERVER_SEND_REPLY) {
->   		/* Request phase complete for this client call */
->
-Thanks for the update patch.
 
-Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
+Thanks, BPF_F_EGRESS is clearer.
 
-
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
 
