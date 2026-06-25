@@ -1,228 +1,212 @@
-Return-Path: <netdev+bounces-302027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eJWQMEdSPWow1QgAu9opvQ
-	(envelope-from <netdev+bounces-302027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:07:35 +0200
+	id gZQPOARUPWqw1QgAu9opvQ
+	(envelope-from <netdev+bounces-302028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:15:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC776C751B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:07:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510416C762B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:15:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LMvqr0q5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302027-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302027-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=wPPmattY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302028-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302028-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D7710302B760
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:06:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CDE2F30078B0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF76D3E8357;
-	Thu, 25 Jun 2026 16:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961733E717F;
+	Thu, 25 Jun 2026 16:12:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0353E6396
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 16:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5B13E7BA6;
+	Thu, 25 Jun 2026 16:12:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782403550; cv=none; b=RGxJlQ8PA8GYkyTdJxgKth9AUE99pIgSJHeai289tbxzeZODkSq5fcI4XcJp5FMwZEiUs41K6YfhWhkZlyM0YvfRnKWuS18ZQaOf0L4ZMtDSMMwARYj5/M+RqOY/dOHp5vv1LAaM9OUwFZ9FcHU/k+Yb7CvMlmueFo4C5lVwI48=
+	t=1782403955; cv=none; b=mJ/zBE81WC7hOmIfN3mWymhbY0MkbmOKNrqSKytvC592EW68Ey2DniUYAWkulayd5hdtjylx4Hjv9NLfjKeGmmOzb3P91fzkWPFx09AfeUHq0KJPHJGaERVQ3OYXBGlYohjkifl8g/WV4w9vWw1euG2TkfD0EnOxa9oCWBx5y4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782403550; c=relaxed/simple;
-	bh=HqA2syi3fWc1e8sLEbaM7wYJoTGSZDfwgwmK26oflkw=;
+	s=arc-20240116; t=1782403955; c=relaxed/simple;
+	bh=nuEQl8tmi4PUjefQwgETQMtKZH+Awnmm7DZAsMlhLuk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XfioCwdsrLj08IFG8T367w5ONIBsZtw4z6Ogb55yWSrczecTGfw949Gt0IF+QsZQdb5qxzHvl66GnKdmz7mh6uw+vjBb882p68r2vOQU2ONaA8NfDlV8m1OSO/Aq8mhMl4et1HEj4h3tDJjzrGplxmFa8BERTC+mwNlRL+ssoTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMvqr0q5; arc=none smtp.client-ip=209.85.214.196
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2c6c101aeafso708485ad.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 09:05:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782403546; x=1783008346; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tXmRvL9EL1hwxlK3wjXlOdCXiCuQDXgSKjUEyrxUuTg=;
-        b=LMvqr0q5GLgwhOom972umnLDit2Og7KGeRKAm2Ekh4KUssb3Txstp/3vzv8CZ3PcOA
-         0cW/YS9UsQ3Q2Ut/sHKxbObUbyJKnyaoy8UWV/L1MGnNnri5pIkUJ9GH21RDWg1dVX2z
-         fCXVRwgsh66KxvpKwi+hnvWdWsNbLUKeVAuroAq3bNO7g+iF78kTCbQm11nWU2bBQAOH
-         qRLgWpoTW6N6qrBzTCgEHy26q2/GjDsE+gnHTBycbmB4NIC+ccGRAtfLV00RfCr3YtOH
-         ZzZFkKnBVVbcrSngGw12Hvy4M29GPXyAG+a6qG9DGgz6hpbi1Ruxrsix6c4A7lkcXBPn
-         2PDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782403546; x=1783008346;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tXmRvL9EL1hwxlK3wjXlOdCXiCuQDXgSKjUEyrxUuTg=;
-        b=AAQaKwDp8YYulJEPy8fA91KJqD6JCujHEEjylPI2ruqe252TpepH0umW9mHKSGGSZd
-         ev4ai+cEiwvkygx2mUA6kLRiDpLUd2j7Sk6Xl588pzLWPQ5YLAbPJUi92SYSlLlFUJ7r
-         AH1YF6rnmjvNCyAY8aWNvMRHv67Xs+02zwipvmhy/C/rDRaodQljVtJiobMSkbszHovR
-         jEdHuctsAbYr0JuNXZeAx8Uwl/jnUcQ4KpPFRppKq03Sr+iN3l2XgEcXPf62uknrNq3V
-         YEdAczLKfAh8B2FZ42dguBI26E7okJJOJJKHKiIx3t51pb108gR4NU8fyXLNiAH0YIGG
-         MiPw==
-X-Forwarded-Encrypted: i=1; AHgh+RqDDZfD/tJ3fW4X/L2M4cmn5vysjOwb1M1UGOGx2M6PALY9XhJw+1+ZTw3ADv5aPJT8zOFQGSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySLicYHyiKaoajWTkSUb+vypiyivnFgWW22yuyyHD8HEKIiieb
-	c+GjQtiRFhD107HVvGV8y8pFjA6FaVKxLwpMf+V2UR8AoV1PkA4WBRcY
-X-Gm-Gg: AfdE7cm45FXZEE2A+mcXmJadLkLyh6G/wVjFtvc58ti3iv5u2wlEhVNu8D0fITN7Ls6
-	TE4aBwT4Rr2ZOU6tW8wE1ZvVnGfHgJWVKzBLbDOppc51Qiqy3RoIXSbyv2g9lNnVaRliriAl/SJ
-	LFUW1VRioH5usXZBxtaK2SH2eTQGAVuLbt1ecfO3mnVMiZ3efU07ISs+JLxC00Q2wKrKjNjOuPS
-	A7sa0TfNGzuHwNbl6U5hfa3mav6h7LNtqEJ3ZzZf/2uV7w2vb9Xz6RhnBJ0Qd9L7br8wK2Y2zoU
-	omlmb4zXqOZn0LaR1v4xawq3XCY1KWzj0yAtYTE/uGjdjS6GJPIfXfnIVfaOVJTXBACms79MzH6
-	/4SwepS1rYtyayNzc4uHvS8+4r9JCgwomI7mlpwhAkI2Tk4eypy6psW/baLbZqVE/V/U+nHKOug
-	vWmp44/A==
-X-Received: by 2002:a17:902:f68c:b0:2c6:bb31:4564 with SMTP id d9443c01a7336-2c7fc88dfdcmr31945275ad.34.1782403545537;
-        Thu, 25 Jun 2026 09:05:45 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:4d::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7f64dcc30sm22787485ad.66.2026.06.25.09.05.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 09:05:44 -0700 (PDT)
-Date: Thu, 25 Jun 2026 09:05:28 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com, 
-	stfomichev@gmail.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	bjorn@kernel.org
-Subject: Re: [PATCH net 0/7] xsk: fix AF_XDP multi-buffer Tx descriptor
- reclaim
-Message-ID: <aj1O4vKzCuodwgYL@devvm7509.cco0.facebook.com>
-References: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
- <ajv23_r4M3FGrFNN@devvm7509.cco0.facebook.com>
- <ajwHuCp82SazSwKv@boxer>
- <CAL+tcoC789GrOXvvYVOfxhL4iLCdFEAZQ+WCENsMjbLrJnfiYw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=a4JW/OmYDpAoAT8XWsM2ZeWizZj1+7G+GJ3IfPC5mGJ962OFYv3LDB1V3z5uVM0R0fAyjSR30DQZ1kLc+MhQWH8CP9Rt2mqJ/fWKR7vo5fO0ho4rDj2Spg8yOVWHKQHxvBG3KSMmHkohp+nKzYsdFQp17MxwSeLcE9T5AfE8eHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wPPmattY; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SjSnpDcd/nnOyv3A51l5TDSAZxIAPfoeJIYXW95Ak+g=; b=wPPmattY9V9C7LKAFqV+sEQJTv
+	1hN2Un6obtE1QG8nfATQkbhpbNtZ5BWRfdLF1Yr+nGGQSC+xkVqNt5/HaJBGqEVycgxD71a8VrWv7
+	tD+/0xcNutB0wwxZOaLmm09N9BlJNH/Ah19tSghjjSkWkfcugVlJJr6WPThNTKlUNL18=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wcmgf-009GEq-Sr; Thu, 25 Jun 2026 18:12:21 +0200
+Date: Thu, 25 Jun 2026 18:12:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
+ ethtool pause validation
+Message-ID: <58f37d6e-973b-4242-be82-0561ccdb1a6f@lunn.ch>
+References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
+ <20260526172447.10ca4b9e@kernel.org>
+ <5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
+ <38bafe7e-d419-46f7-8fa7-87e9183e578c@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoC789GrOXvvYVOfxhL4iLCdFEAZQ+WCENsMjbLrJnfiYw@mail.gmail.com>
+In-Reply-To: <38bafe7e-d419-46f7-8fa7-87e9183e578c@bootlin.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302027-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302028-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,gmail.com,kernel.org,redhat.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kerneljasonxing@gmail.com,m:maciej.fijalkowski@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bjorn@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:o.rempel@pengutronix.de,m:vladimir.oltean@nxp.com,m:f.fainelli@gmail.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BDC776C751B
+X-Rspamd-Queue-Id: 510416C762B
 
-On 06/25, Jason Xing wrote:
-> On Thu, Jun 25, 2026 at 12:37 AM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
-> >
-> > On Wed, Jun 24, 2026 at 08:38:20AM -0700, Stanislav Fomichev wrote:
-> > > On 06/23, Maciej Fijalkowski wrote:
-> > > > Hi,
-> > > >
-> > > > This series fixes several AF_XDP multi-buffer Tx paths where descriptors
-> > > > consumed from the Tx ring are not consistently returned to userspace
-> > > > through the completion ring when the packet is later dropped as invalid.
-> > > >
-> > > > The affected cases are invalid or oversized multi-buffer Tx packets in
-> > > > both the generic and zero-copy paths. In these cases, the kernel can
-> > > > consume one or more Tx descriptors while building or validating a
-> > > > multi-buffer packet, then drop the packet before it reaches the device.
-> > > > Userspace still owns the UMEM buffers only after the corresponding
-> > > > addresses are returned through the CQ. Missing completions therefore
-> > > > make userspace lose track of those buffers.
-> > > >
-> > > > The generic path fixes cover three related cases:
-> > > > * partially built multi-buffer skbs dropped by xsk_drop_skb();
-> > > >   continuation descriptors left in the Tx ring after xsk_build_skb()
-> > > >   reports overflow;
-> > > > * invalid descriptors encountered in the middle of a multi-buffer
-> > > >   packet, including the offending invalid descriptor itself.
-> > > >
-> > > > The zero-copy path is handled separately. The batched Tx parser now
-> > > > distinguishes descriptors that can be passed to the driver from
-> > > > descriptors that are consumed only because they belong to an invalid
-> > > > multi-buffer packet. Reclaim-only descriptors are written to the CQ
-> > > > address area and published in completion order, after any earlier
-> > > > driver-visible Tx descriptors.
-> > > >
-> > > > The ZC batching path can also retain drain state when userspace has not
-> > > > yet provided the end of an invalid multi-buffer packet. To keep this
-> > > > state local to the singular batched path, the series prevents a second
-> > > > Tx socket from joining the same pool while such drain state exists.
-> > > > During the singular-to-shared transition, Tx batching is gated,
-> > > > pre-existing readers are waited out, and bind fails with -EAGAIN if the
-> > > > existing socket still has pending drain state. This avoids adding
-> > > > multi-buffer drain handling to the shared-UMEM fallback path.
-> > > >
-> > > > The last two patches update xskxceiver so the tests account invalid
-> > > > multi-buffer Tx packets as descriptors that must be reclaimed, while
-> > > > still not expecting those invalid packets on the Rx side.
-> > > >
-> > > > This is a follow-up to Jason's changes [0] which were addressing generic
-> > > > xmit only and this set allows me to pass full xskxceiver test suite run
-> > > > against ice driver.
-> > >
-> > > There is a fair amount of feedback from sashiko already :-( So the meta
-> > > question from me is: is it time to scrap our current approach where
-> > > we parse descriptor by descriptor? (and maintain half-baked skb and
-> > > half-consumed descriptor queues)
-> > >
-> > > Should we:
-> > >
-> > > 1. do desc[MAX_SKB_FRAGS] and xskq_cons_peek_desc until we exhaust
-> > > PKT_CONT (if the last packet has PKT_CONT, return EOVERFLOW to userspace
-> > > and do a full stop here)
-> > > 2. now that we really know the number of valid descriptors -> reserve
-> > > the cq space (if not -> EAGAIN)
-> > > 3. pre-allocate everything here (if at any point we have ENOMEM -> cleanup
-> > > locally, don't ever create semi-initialized skb)
-> > > 4. construct the skb
-> > > 5. xmit
-> >
-> > Yeah generic xmit became utterly horrible, haven't gone through sashiko
-> > reviews yet, but bare in mind this set also aligns zc side to what was
-> > previously being addressed by Jason.
-> >
-> > I believe planned logistics were to get these fixes onto net and then
-> > Jason had an implementation of batching on generic xmit, directed towards
-> > -next and that's where we could address current flow.
+> This isn't sphynx, but I've come-up with something like this for a
+> test definition :
 > 
-> Agreed. That's what I'm hoping for. There would be much more
-> discussion on how to do batch xmit in an elegant way, I believe.
+> 
+> @ksft_ethtool_needs_supported_anyof([Pause, Asym_Pause])
+> def test_ethtool_pause_advertising(cfg, peer) -> None:
+>     """Pause advertisement
+> 
+>     Validate that changing pause params through the ETHTOOL_MSG_PAUSE command
+>     translates to a change in the advertised pause params, and that these
+>     parameters are correct w.r.t the supported pause params and requested pause
+>     params.
+>     
+>     This exercises the .set_pauseparams() ethtool ops for MAC configuration,
+>     as well as the reconfiguration of the PHY's advertising and negociation.
+>     
+>     On non-phylink MACs, the MAC should call phy_set_sym_pause() to update the
+>     PHY's advertising, and restart a negotiation with phy_start_aneg() if
+>     need be. Failure to do so will result on the wrong advertising parameters.
+>     
+>     Pn phylink-enabled MACs, phylink deals with the PHY reconfiguration provided
 
-This doesn't have to depend on the batch rewrite, we should be able to rewrite
-this non-zc in net, this is still technically fixes, not feature work..
+On 
 
-There was already a couple of revisions with this drain_cont approach
-and every time I look at it feels like the cure is worse than the
-decease :-( Obviously not gonna stop you from going with the current approach,
-but these fixes feel a bit of a wasted effort to me (since the bugs keep
-coming and we are piling more complexity).
+>     the MAC driver calls phylink_ethtool_set_pauseparam().
+>     
+>     Failing this test likely means that the PHY driver is not correctly advertising
+>     pause settings, either due to the MAC not triggering a PHY reconfiguration,
+>     a misconficonfiguration of the advertising registers by the PHY, or by
+>     mis-handling the phydev->advertising bitfield in the PHY driver directly.
+>     
+>     The validation is made by looking at the advertised modes locally, as well as
+>     what the peer's 'lp_advertising' values report.
+> 
+>     cfg -- local device's interface configuration
+>     peer -- peer device handle
+
+Plain Sphinx can be made to pick up this method documentation and
+include it the generated documentation. You would use something like
+
+.. automethod:: test_ethtool_pause_advertising
+
+in the .rst file.
+
+I've no idea if the kernel configuration of sphinx allows this. At the
+moment, i would not spend too much time on getting sphinx to generate
+documentation. I would say that is nice to have. The description
+itself is more important.
+
+>     """
+> 
+>     # Initial conditions :
+>     # - Local interface is admin UP, and reports lowlayer link UP
+>     # - Remote interface is adming UP, and reports lowlayer link UP
+>     #
+>     # Test 1
+>     # - SKIP if supported doesn't contain "Pause"
+>     # - run 'ethtool -A ethX rx on tx on autoneg on'
+>     # - FAIL if the return isn't 0
+>     # - FAIL if ETHTOOL_A_LINKMODES_OURS's advertised values does not contain
+>     #   "Pause" or contains "Asym_Pause"
+>     # - FAIL if peer's lp_advertising doesn't contain "Pause" or contains
+>     #   "Asym_Pause"
+>     # - Succeed otherwise
+>     #
+>     # Test 2
+>     # - SKIP uif supported doesn't contain both "Pause" and "Asym_Pause"
+>     # - run 'ethtool -A ethX rx on tx on autoneg on'
+>     # - FAIL if the return isn't 0
+>     # - FAIL if ETHTOOL_A_LINKMODES_OURS's advertised values does not contain
+>     #   "Pause" or contains "Asym_Pause"
+>     # - FAIL if peer's lp_advertising doesn't contain "Pause" or contains
+>     #   "Asym_Pause"
+>     #
+>     # ...
+>    
+> The annotation defines the pre-requisites in terms of locally supported
+> linkmodes, we have a docstring containing information for developpers
+> to debug their drivers, what I'm unsure about is the commented-out part
+> below, so either one big function testing multiple adjacent scenarios
+> or indivitual functions.
+
+Sphinx follows pythons object orientate structure. So you could have a
+class test_ethtool_pause_advertising, with class documentation. And
+then methods within the class which are individual tests.  The
+commented out section would then be method documentation.
+
+However, i've no idea if the selftest code allows for classes of test
+methods? It looks like ksft_run() takes a list of methods. So you can
+probably instantiate the class, and then pass it methods from the
+class?
+
+I would say you are right about picking one of the simple test case,
+and playing with it, define and implement it, and see what comes out
+at the end. 
+
+	Andrew
 
