@@ -1,151 +1,225 @@
-Return-Path: <netdev+bounces-301867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2NuQHzvHPGqZrwgAu9opvQ
-	(envelope-from <netdev+bounces-301867-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:14:19 +0200
+	id 2BjLNQ/IPGrqrwgAu9opvQ
+	(envelope-from <netdev+bounces-301868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:17:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45836C2F08
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:14:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4143E6C2F74
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:17:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301867-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301867-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=CpAN85Jl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301868-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301868-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6712B303D09B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:13:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6636306C85F
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C6C3BF660;
-	Thu, 25 Jun 2026 06:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3584F3C063A;
+	Thu, 25 Jun 2026 06:16:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48803BF673;
-	Thu, 25 Jun 2026 06:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D454F2DECC2
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 06:16:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782367996; cv=none; b=QvxOdQT6XRrFweOPG0QtlAVCtnEAT3uHLr5Dt+sTw+1+KE4hywiXf3li2lOw3c3SFj+ODKIOynA8ov/504ZXMRwOluNfJHjOku9yIROTsrHC1vFrkOx2dtlt0XblxB7JTgVOfvfXUcMUkG8Rg6IzKwYTkmgwG6v1y1uFrJp19oo=
+	t=1782368202; cv=none; b=o1kQRTg6l1SzvxFqkw/djo8L1it2fhvm5zvOBuS4CtS5N9PVdZCTZcu9kckuKzxFyvr8esqSaS7wPotBAibMq/XOTZdAx0CPBvRcXoi/JNVasI0AUXA3QQaRduYHwNGj8UK8kNhi/vlvmP7/3cGj4qen5M5Jz5fh7tyITlvUJTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782367996; c=relaxed/simple;
-	bh=/6uYjYuSdMURY4H0scc6TmqCQ+g/KxjEmmXCgx/FdtQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ruJZpVlWFlswGLwgckORdvAnhhKTHFgWdtTc+zAwcnoyT1egL6qIwN5BICNeRsY4Wy5Ay1LbVGB+AXK78iyJb5swjfBFtCgVc7TpTck9samQhRaBSnhKRb0UpfdlLiyFsqXTS19YWFGwyIbWpj2TfmXnTIcOWKxSgBsO4h/nDiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Received: from localhost.localdomain (unknown [111.196.245.140])
-	by APP-05 (Coremail) with SMTP id zQCowAD3YOTxxjxqHrQoFQ--.8832S2;
-	Thu, 25 Jun 2026 14:13:05 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pengpeng Hou <pengpeng@iscas.ac.cn>
-Subject: [RFC PATCH] net/iucv: Descend into net/iucv when AFIUCV is enabled
-Date: Thu, 25 Jun 2026 14:13:03 +0800
-Message-ID: <20260625061303.36326-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1782368202; c=relaxed/simple;
+	bh=SKZt+ayUSCTuRumRsFqB9wLA4N9rIlZ/RoTT4PFHuHU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tJaLFt7TV/4qAcR2OnhFdYkM/XB9VFniuL0ZHLBS8Npbuh8ilXZzMqaX0XUY2jPWq8Vw2MP1SH9SuXk6yfJXskMvza4wSu/KD7l7VntD9G7+k6DLz5pGl+3FiOMMHEU2nvNG0dobEwSqbcVXoMbqAVmm2tY0hb4OtlG+C4uOCLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CpAN85Jl; arc=none smtp.client-ip=209.85.214.202
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2c7eefa8f93so6086565ad.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 23:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782368200; x=1782973000; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Lk0bV8WkRC+OR9Z7n7Ljwn1YzQFmz8/4oLWZZDNXuQ=;
+        b=CpAN85Jlca+7CaoQAJi1q1ziNdCQxnURTFfWN4lt8H/oTj/qt36xKnekmoCYkgIgPd
+         8Vb/jTxwKRxovWaiXUw2wjfhW4+TrvQUH7pCZcFhmKvR30xDf35i4dAiQBJ2p41dZEK8
+         jxxiTyeVuy6reOmxL8cO5V3zjY6rW2Dmju2teSinh8twGgoJtxJDLpDE08VwKeGKVSuC
+         yhbs2CtahFmywv7G/0GPyYxrgGYVVp+/sXfedGJI/3J2ifORshuDVp6MAFDyamokB78R
+         79xwzNAP+2csCae4helnmhxDS/kjExGNSE3ncUP3XSJCgxKkRhP7hGgy6b34fM50KArj
+         uc9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782368200; x=1782973000;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Lk0bV8WkRC+OR9Z7n7Ljwn1YzQFmz8/4oLWZZDNXuQ=;
+        b=bvOPwhAbaTHOwAqpJwb2pG1USWJiJmyeo+TCYxuz95AsFXybVshl/BBXE6chv39Xgh
+         BSiq/neu5l6viy9CItm1UPqGCSNSdXYTV5C1O6qR2QLxB4XFnAxPMFpSu0Jk5R/3rAci
+         FqELrTEdfU52uQ+88gsPLjPa0TdH0rGE384grSALCn3Wq7OI/CQfcdD2+MhQZWHxKNAJ
+         5k47uXzxtTkeDBsypPHj24WaZB4oo+3IWGpcwnH1u2iiPIFox4ebDGyQTwpnk2hcwcAN
+         6W7TepsGYVdayf86NcbqJ8I4C4PHjC8n4Gx1OhizlZUxLIuRbwxzGu4dy9Pboz6E5tpV
+         Ny4A==
+X-Forwarded-Encrypted: i=1; AHgh+RoHB2TS/HIcFcarhHlxz0gXEjLwff+lGOk9SFRKeHH9tomfrQAyJ4Z2Y9g9UHxuFX8BhAG64rI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVDb/z3toZBFDAaxzBdSRiHcDJ2hI1Ep5rOtZdGP60+9fLndjj
+	v0uWg4Ow5wew3oH0BoKIHV1YFqJUiQg6BGwW8SF1HeNhMbq4QMcJQioin1xS0dPunRDGRqwWM0M
+	JLLF72g==
+X-Received: from plmt4.prod.google.com ([2002:a17:903:3d44:b0:2c7:ed23:f48b])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2441:b0:2c0:d29b:34ff
+ with SMTP id d9443c01a7336-2c7c3d5fe99mr88048745ad.10.1782368199653; Wed, 24
+ Jun 2026 23:16:39 -0700 (PDT)
+Date: Thu, 25 Jun 2026 06:15:07 +0000
+In-Reply-To: <20260625044101.939070-1-zhangfeionline@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAD3YOTxxjxqHrQoFQ--.8832S2
-X-Coremail-Antispam: 1UD129KBjvJXoWrur1kGFW5Gr4kGry3tr47urg_yoW8Jryxpw
-	s5KF45J3ykJrWFkFWkZFn5Kry5t3ySy3y3Ga4UZr4jkryvgw4UXrnakrW0vF1xuws3JF43
-	u3Z29asxAF1YkwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr
-	1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
-	JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x0JUgXocUUUUU=
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+Mime-Version: 1.0
+References: <20260625044101.939070-1-zhangfeionline@gmail.com>
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260625061639.407719-1-kuniyu@google.com>
+Subject: Re: [PATCH v2 net] ipv6: fib6: fix NULL deref in fib6_walk_continue()
+ on multi-batch dump
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: zhangfeionline@gmail.com
+Cc: baohua@kernel.org, chenzhangqi@xiaomi.com, davem@davemloft.net, 
+	dsahern@kernel.org, edumazet@google.com, horms@kernel.org, idosch@nvidia.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, zhangpengfei16@xiaomi.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_RECIPIENTS(0.00)[m:wintera@linux.ibm.com,m:twinkler@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hca@linux.ibm.com,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:pengpeng@iscas.ac.cn,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301867-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301868-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:zhangfeionline@gmail.com,m:baohua@kernel.org,m:chenzhangqi@xiaomi.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:idosch@nvidia.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:zhangpengfei16@xiaomi.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,xiaomi.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D45836C2F08
+X-Rspamd-Queue-Id: 4143E6C2F74
 
-AFIUCV can be enabled by the QETH_L3/HiperSockets path even when IUCV
-itself is not enabled.  However, the top-level net Makefile only descends
-into net/iucv/ under CONFIG_IUCV.
+From: Pengfei Zhang <zhangfeionline@gmail.com>
+Date: Thu, 25 Jun 2026 12:41:01 +0800
+> From: Pengfei Zhang <zhangpengfei16@xiaomi.com>
+> 
+> inet6_dump_fib() saves its progress in cb->args[1] as a positional
+> index within the current hash chain.  Between batches the RTNL lock
+> is released,
 
-That creates a Kconfig/Kbuild carrier mismatch: CONFIG_AFIUCV=m can be
-selected, but af_iucv.o is never considered because the containing
-directory is skipped.
+nit: RTNL has been removed from IPv6 FIB, simply say like
 
-This RFC uses an always-descend model for net/iucv/.  The subdirectory
-Makefile already gates iucv.o and af_iucv.o on their own Kconfig symbols,
-so entering the directory does not force either provider object on.
+  Between batches, a concurrent fib6_new_table() can insert ...
 
-This is intentionally RFC because s390 maintainers should confirm whether
-the QETH_L3-only AF_IUCV configuration is intended to build af_iucv.o
-without the base IUCV object.
+> so a concurrent fib6_new_table() can insert a new table
+> at the chain head, shifting all existing entries.  The saved index
+> then lands on a different table, causing fib6_dump_table() to set
+> w->root to the wrong table while w->node still points into the
+> previous one.  fib6_walk_continue() dereferences w->node->parent
+> (NULL) and panics:
+> 
+>   BUG: kernel NULL pointer dereference, address: 0000000000000008
+>   RIP: 0010:fib6_walk_continue+0x6e/0x170
+>   Call Trace:
+>    <TASK>
+>    fib6_dump_table.isra.0+0xc5/0x240
+>    inet6_dump_fib+0xf6/0x420
+>    rtnl_dumpit+0x30/0xa0
+>    netlink_dump+0x15b/0x460
+>    netlink_recvmsg+0x1d6/0x2a0
+>    ____sys_recvmsg+0x17a/0x190
+> 
+> Fix by storing tb->tb6_id in cb->args[1] instead of a positional
+> index.  On resume, skip entries until the id matches; a concurrent
+> head-insert can never match the saved id, so the walker always
+> resumes on the correct table.
+> 
+> Fixes: 1b43af5480c3 ("[IPV6]: Increase number of possible routing tables to 2^32")
+> Signed-off-by: Pengfei Zhang <zhangfeionline@gmail.com>
 
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
----
- net/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+SOB does not match the Author of the patch (the first From: line).
 
-diff --git a/net/Makefile b/net/Makefile
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -45,7 +45,7 @@
- obj-$(CONFIG_MAC80211)		+= mac80211/
- obj-$(CONFIG_TIPC)		+= tipc/
- obj-$(CONFIG_NETLABEL)		+= netlabel/
--obj-$(CONFIG_IUCV)		+= iucv/
-+obj-y				+= iucv/
- obj-$(CONFIG_SMC)		+= smc/
- obj-$(CONFIG_RFKILL)		+= rfkill/
- obj-$(CONFIG_NET_9P)		+= 9p/
--- 
-2.39.5
 
+> ---
+>  net/ipv6/ip6_fib.c | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index fc95738de..bda492634 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -636,11 +636,11 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+>  	};
+>  	const struct nlmsghdr *nlh = cb->nlh;
+>  	struct net *net = sock_net(skb->sk);
+> -	unsigned int e = 0, s_e;
+>  	struct hlist_head *head;
+>  	struct fib6_walker *w;
+>  	struct fib6_table *tb;
+>  	unsigned int h, s_h;
+> +	u32 s_id;
+
+nit: please keep the reverse xmas tree order.
+https://docs.kernel.org/7.1/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+
+
+>  	int err = 0;
+>  
+>  	rcu_read_lock();
+> @@ -701,23 +701,22 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+>  	}
+>  
+>  	s_h = cb->args[0];
+> -	s_e = cb->args[1];
+> +	s_id = cb->args[1];
+>  
+> -	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_e = 0) {
+> -		e = 0;
+> +	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_id = 0) {
+>  		head = &net->ipv6.fib_table_hash[h];
+>  		hlist_for_each_entry_rcu(tb, head, tb6_hlist) {
+> -			if (e < s_e)
+> -				goto next;
+> +			if (s_id && tb->tb6_id != s_id)
+> +				continue;
+> +			s_id = 0;
+> +
+> +			cb->args[1] = tb->tb6_id;
+>  			err = fib6_dump_table(tb, skb, cb);
+>  			if (err != 0)
+>  				goto out;
+> -next:
+> -			e++;
+>  		}
+>  	}
+>  out:
+> -	cb->args[1] = e;
+>  	cb->args[0] = h;
+>  
+>  unlock:
+> -- 
+> 2.34.1
 
