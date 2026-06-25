@@ -1,75 +1,71 @@
-Return-Path: <netdev+bounces-301835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301836-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YzVKBwyRPGq7pQgAu9opvQ
-	(envelope-from <netdev+bounces-301835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:23:08 +0200
+	id lcRMFpqRPGrcpQgAu9opvQ
+	(envelope-from <netdev+bounces-301836-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:25:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725C66C25D2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:23:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0AAE6C2600
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:25:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HiOavYNd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301835-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301835-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VhzAUM+y;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301836-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301836-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77E1E30075C0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:22:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92DBD3009B04
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95EC3A3E68;
-	Thu, 25 Jun 2026 02:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133C22D780C;
+	Thu, 25 Jun 2026 02:25:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDAF19C54E;
-	Thu, 25 Jun 2026 02:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A5419C54E;
+	Thu, 25 Jun 2026 02:25:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782354127; cv=none; b=Ww2vG61Jcja/1CEXIqUrnuSKlu8hAEw1YHEkR5FEQhHkyGywekGIZ+tAFuzKsYAoW4Va/sbV9+f0y+VV5dSrG9TdVFKWqF4+bdnAj3dFn7xJoFOSH/n+N0Dt0/7fsrq+fZxHxc17giW/b3ZcViPO7H3AmiBJ1+6Bt6ABg0dkznY=
+	t=1782354316; cv=none; b=BKMcCR5Vlfu4UYQUPT3wPCeLJqh34MH9m7NwD3TjR7W63ZxrQxRzReVnpq/CMNx7lgp+RVVyNqvgMGv5urWOkCQJP3u1IIq59rJIQsHJeC60Rfj9BEvT2qFeoAmwZkneGty4tN2IpJtUVVfwjfTM7Qh6JpBz2oAZjONH2dDTsrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782354127; c=relaxed/simple;
-	bh=mrCD9REILvQ7ytkuNxk1sAWwsznOhzIhvtqZMRthRkA=;
+	s=arc-20240116; t=1782354316; c=relaxed/simple;
+	bh=fNNJnh667D4SGrad3vyQ7ShgISCq7vKlq7l3BQhOo8Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KcZSS94YN3GCNclWDVrWr3a/9zceOhFvkRi+6L6MV/d15TbM1vhM7/CQ0jd37XWOXRSuGpZD1jf6B5QTMwTHBCWSemSyxLuny6BixUz1oU1lu8/S8XmQl+1HlompDGGM4Kl+UnkzsOhyjZsME7DlZiG0exifZrh6xRkb76eYHBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HiOavYNd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE40A1F000E9;
-	Thu, 25 Jun 2026 02:22:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=beQFOR7XjReEGKPq0sTnp9xC4h2jR8+5B31993E6e7z781bMV1dDE20rKLnXq42xhmYnhrEax4ir1jPwf4YKzuRAwpPrWTbXgH5G5tzER71fBkK0TgPrAtIt9lJlNjoS1PzDMs06csCouMhmfLqLajCEuYvahXMNunJo0X0iG7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VhzAUM+y; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449C01F000E9;
+	Thu, 25 Jun 2026 02:25:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782354126;
-	bh=UlrC4XUDtorWQW364JN0VeT9+sVnJidBJZvQBFd/jWU=;
+	s=k20260515; t=1782354314;
+	bh=tGSgxbQOZ/A/Rx2qFngn3z7HrOY74eUjampP2chvJqM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=HiOavYNdbdkx11uI3Z7iAu3Qr+Vw+lNFKBH5kxQwAHLtGi8sTYQFSblscjPerahV8
-	 3SXc/H+XSsYx1QjjkBQHPtR0TOS/H7pdRKXl9va4pzL60yYe9X6oDu8VIpy5VzmIhl
-	 oeG8ZSGjblxHCO6ixyCLeGbenNyIKRcA4sFj04cqHth2B6vUcuW5ozkPtax89wo0W9
-	 J69L2VeRA5/9TcOwUMS+Qbff5CiZKPWH6Ip8JydeUXavGLwDx7Bqf5f3FUWJzIafrG
-	 vpA6AE+Zz65Bj+JmhZWhZHRRlOAfN1JbjPPcsI8uUs74hlPbVJCJF0l1qTQ70hwkRc
-	 2sx0qwAn3VAfg==
-Date: Wed, 24 Jun 2026 19:22:05 -0700
+	b=VhzAUM+yQqbkWsU/q0sNWkuc3rOVIrO3s4DOLtGKCfMjSFNHUuJMRK3z2JRDDhjs1
+	 GSdnuNMzSMXJs+FT+JPvW/No/ZAL8Si7hlOxBs5nJY/PcWLWzadmrKSG9jSD8fQUOw
+	 gnbrZaK2n1SVU0BrAKtcJJy1xBHgKM13TqvHKPsGeNNgd9oj0M0q8I+LUzby5XYkNc
+	 RvTLEXMy0S4uT1yDzurCf95S0hA/dT6CkmEC/HQFedQmORGCXD9/tFNInmsjJnOmJP
+	 /zmrzM90mb0a+1LY5aRf4m8JDYMzaWfO7iT3ejRFFpSlu9eH+WvGBGfbhhnsx5Ogvv
+	 Yykm/b407/77A==
+Date: Wed, 24 Jun 2026 19:25:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Ben Dooks <ben.dooks@codethink.co.uk>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, "Russell King (Oracle)"
- <rmk+kernel@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: fix missed le32_to_cpu()
-Message-ID: <20260624192205.4485cd61@kernel.org>
-In-Reply-To: <b375d36c-112e-4662-b538-fd10fa927ecc@bootlin.com>
-References: <20260622143707.497198-1-ben.dooks@codethink.co.uk>
-	<b375d36c-112e-4662-b538-fd10fa927ecc@bootlin.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Amerigo Wang <amwang@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, vlad.wing@gmail.com,
+ asantostc@gmail.com, kernel-team@meta.com, stable@vger.kernel.org
+Subject: Re: [PATCH net] netpoll: fix a use-after-free on shutdown path
+Message-ID: <20260624192513.33023e54@kernel.org>
+In-Reply-To: <20260622-netpoll_rcu_fix-v1-1-15c3285e92e6@debian.org>
+References: <20260622-netpoll_rcu_fix-v1-1-15c3285e92e6@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -81,17 +77,17 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301835-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301836-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:ben.dooks@codethink.co.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:amwang@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vlad.wing@gmail.com,m:asantostc@gmail.com,m:kernel-team@meta.com,m:stable@vger.kernel.org,m:vladwing@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[codethink.co.uk,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org,gmail.com,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -100,48 +96,24 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[codethink.co.uk:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 725C66C25D2
+X-Rspamd-Queue-Id: D0AAE6C2600
 
-On Mon, 22 Jun 2026 19:51:39 +0200 Maxime Chevallier wrote:
-> Hi Ben,
->=20
-> On 6/22/26 16:37, Ben Dooks wrote:
-> > The print in ndesc_display_ring() sends the des2 and des3
-> > to the pr_info() without passing them through the relevant
-> > conversion to cpu order.
-> >=20
-> > Fix the (prototype) sparse warnings by using le32_to_cpu():
-> > drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorr=
-ect type in argument 6 (different base types)
-> > drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected uns=
-igned int
-> > drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restrict=
-ed __le32 [usertype] des2
-> > drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorr=
-ect type in argument 7 (different base types)
-> > drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected uns=
-igned int
-> > drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restrict=
-ed __le32 [usertype] des3
-> >=20
-> > Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk> =20
->=20
-> I agree on the principle, but this isn't a fix so this'll have to wait
-> until net-next re-opens :)
+On Mon, 22 Jun 2026 08:01:23 -0700 Breno Leitao wrote:
+> +		 * synchronize_net() does not protect the worker
+> +		 * (queue_process() is not an RCU reader). It fences the
+> +		 * senders -- the real RCU readers -- so they cannot re-arm
+> +		 * tx_work after the np->dev->npinfo was set to NULL.
+> +		 */
+> +		synchronize_net();
+> +		cancel_delayed_work_sync(&npinfo->tx_work);
 
-Humpf, why are we not seeing this on x86 allmodconfig ? =F0=9F=A4=94=EF=B8=
-=8F
-
-$ make C=3D1 W=3D1 drivers/net/ethernet/stmicro/stmmac/norm_desc.o=20
-  DESCEND objtool
-  CC [M]  drivers/net/ethernet/stmicro/stmmac/norm_desc.o
-  CHECK   drivers/net/ethernet/stmicro/stmmac/norm_desc.c
-$
+Maybe we can avoid the sync_net and the comment by using
+disable_delayed_work_sync() ?
 
