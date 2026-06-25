@@ -1,97 +1,76 @@
-Return-Path: <netdev+bounces-301859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1vwdKGmxPGqOqggAu9opvQ
-	(envelope-from <netdev+bounces-301859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:41:13 +0200
+	id Zq81IM6yPGrSqggAu9opvQ
+	(envelope-from <netdev+bounces-301860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:47:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C1A6C2AD9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:41:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA1E6C2B02
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:47:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=iu+3Fx8c;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301859-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301859-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=Pi0ryUOR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301860-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301860-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5BC23302A6F9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:41:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 01493300B83D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44412D97BA;
-	Thu, 25 Jun 2026 04:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE772DECD3;
+	Thu, 25 Jun 2026 04:46:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96C17993
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 04:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1524F2475CF;
+	Thu, 25 Jun 2026 04:46:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782362470; cv=none; b=Kq3QfcBVYsCI+N7TEVpWjszqijY2qpnDia9uF0s4PnykABfrqsCSOQQQnC++2UsaQEb/YChofci/bEE49S1yQBsPqNFhueBmeMfTBRWvKC7twlVUo4ZT/gSoxTiVOTnuadGc5vFMAB3vVXwrPZuBqihhyP0IM/QtYO1rP+k/IXc=
+	t=1782362813; cv=none; b=Yza5igti+5rhjevKZaPBGN1Q+X9EIhw3cg3dcrctmVIlcNCY4tbRabQ+1lXH0o3gmwHdSoU9LmdP2Y8I7EpeffEXSaHuw7CMnfwkR038sIl3ik5j3ACV6dlEOfmDc63yCrlzvZc25QarTF81y43J429Wrv0xORaMFNrwrl/C+E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782362470; c=relaxed/simple;
-	bh=T9SXqfsO/EFq+dYj0i1JvBToxhsvtWDwvs2JRGi+kgM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=riWaVk/OT8fBTvs1o+3HL9uvQ5s35jpqyvw/qiVFqzLgpBTWUIP3rT74oii7brP10g3+PM1+0Te5KPrYz+FTV4Qvf8v9hxJIjeL1KWHAcCbzN3XQw74Uoiev6UkPfGM1kv+/Qn8zJRfG81iPOY+V5uIpVkHg3gL5QVxVmsL+QmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iu+3Fx8c; arc=none smtp.client-ip=209.85.216.41
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-37cbcf49deaso1186625a91.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 21:41:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782362468; x=1782967268; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XWrI8sitTaDcWEaHG+ZnIRCNC7VJeTwjUrHgR3uWgo8=;
-        b=iu+3Fx8coAKV5knhsLFROxTWx0fLwI0N/ouJgZEzDtLv9DIVB9iBq3IXQuzaGoADW8
-         5FO86ON8sozd14NygaxVmx+i6fOp/GkaUgWQfqbf4GWF3YAz+7O1VtLUFVi754dG9+GD
-         SDtWmu+ZlZjSW9hqIxWQZHy4wG+aVDKEQgkXNnJzE63T+owMTHYfanxbA06gYMUPtur2
-         WLdKkKLJQbKLExVd8ic4nYjSEAG7QLv7Tr7cJ+19dcvMWxQHeOUjYQLDzcZdLREuKBuR
-         UkORohXuwndO5GmaKNN/4LZw8dTSVyidMbOoC1h/COHzf+SSw7hwHBN+k22F8jhT37fX
-         RXSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782362468; x=1782967268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XWrI8sitTaDcWEaHG+ZnIRCNC7VJeTwjUrHgR3uWgo8=;
-        b=lX9H4iBHV/SK3QY8gPE6J803X1aZOUra4Lsurt/XkPvugCvbl9RCcR8xBC3A/dFgRm
-         X2Pz/B098B3xKuZOe1PbF9mzPfkPY6jDsOcu0XfZHUTkuqyh2ZQAsLi6tcgiGFDab31G
-         pDbYtq+ZlikdnYdGpL/cOBZ/UXjccdoRxc7pX753RTpHk9Ib6DK3+CtReMzAMeBcoFEl
-         cPmUzI2cHRLO/ponVqOI/h6pOYUy2bjha1XbA7CklGqp7DW9NTMsD4EIEdJqEE93rLPK
-         SWSK0mCx9MctZ6oYNIshW1ERXBfNoCRLX9hQNQMi7pT6Fw4NQzhPnMrPUqdwxNJjQokz
-         Pxow==
-X-Forwarded-Encrypted: i=1; AHgh+RqK9zgJ++Vooa6l+8BqLVkYgVaVtWItlJEGFDXeKJGZfPfS33cUKFhuy3sRtpMMFto8MQLELSk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh7LVNjbqTs4L7wUtQiNlF2ZeVGGdnFfoXMbN2r4VsmXIqNXG0
-	8hfzJEyJ2A1FK9SczU+Rc9RrrX312OAMvKtiTXvlie7h8yUQkzghV012h4YcZU9U0jI=
-X-Gm-Gg: AfdE7cknq0H53ROwwV9uxFkl6eE2d4lVmb+vy596anGrACFaqIrUX1vqPNT9UsSZPmH
-	4/rxmlqeZ1AzDsDCcO4y3C4LeJ6NsiOL1ujzraSoki7lC+gOIUSXehCg/7dqFKvaOKTWLax/BeR
-	9GuHAtneOqRKj17/3U4g8n2aW7y9eEzTADTEcXC7orzpsthlkxelUmB8bPeUSRkYdrVa5kNTUg2
-	aSCK8s+XNx6sZMyfgm1MZq5BuUQG/WXzL7oOOvNRvxYKQT4CHjFkxCK5BWsEN2GLlG4oNc8AHxx
-	Xe+hQwpm6e9gchzyjLdOhDWNopHxSNha3V6ZsAGV1uvXCxMaDkA2kyCp0A7bB4djOLbwalAyWlc
-	WZYyUb7utR0m2IJtptTt6ENji6e4JC32WrKUmK5zElXpKkmI4RXwUCsNmeF8wB/alDOwhaGPyfP
-	twmXqB0mDQP6hYFxGhNlqFv6upj3s=
-X-Received: by 2002:a17:90b:50cc:b0:37c:60da:a9f3 with SMTP id 98e67ed59e1d1-37dfa263e84mr833019a91.20.1782362468449;
-        Wed, 24 Jun 2026 21:41:08 -0700 (PDT)
-Received: from online.mioffice.cn ([43.224.245.228])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c92b96ec739sm887723a12.2.2026.06.24.21.41.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 21:41:07 -0700 (PDT)
-From: Pengfei Zhang <zhangfeionline@gmail.com>
-To: dsahern@kernel.org,
-	idosch@nvidia.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chenzhangqi@xiaomi.com,
-	baohua@kernel.org,
-	Pengfei Zhang <zhangpengfei16@xiaomi.com>,
-	Pengfei Zhang <zhangfeionline@gmail.com>
-Subject: [PATCH v2 net] ipv6: fib6: fix NULL deref in fib6_walk_continue() on multi-batch dump
-Date: Thu, 25 Jun 2026 12:41:01 +0800
-Message-Id: <20260625044101.939070-1-zhangfeionline@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1782362813; c=relaxed/simple;
+	bh=Eg2ksXbwEzVUGMnASw8uwRPQ4gNOywjuQfCdO6C1LeE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eQE7ctYm37kAUD8GRx4vn3VHIFwZzGSyY0iSp8LhV+uXocbkGFXi/jRZiCAby4ZrTLd5sOv4ryc1DcKxOn/ohoDz6B3y1WG4m5Qr4heOwRK1iBNZgS9nm0NRQBM4PUUosEvyEVj+tKr6fuqsZVHYjApcokhyBqfGcgQ9LgWDinY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Pi0ryUOR; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65P3eMl74155074;
+	Wed, 24 Jun 2026 21:46:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=TzDymsTuPBqgKW4cYc223sd
+	9Vivj2aNf7U8tu3a9UEY=; b=Pi0ryUORQ1FXtq65JGx0CwqMbL1uuMaYyE8vwXP
+	8woPteqYeiJVeK0Np/j3kq0funJWecgW/qu91g3321L7m5XKW+Z9Gbp3W2YoCzWH
+	z8J9IYFg7IvAOWGctl8cxHqHZCMD+0a1iU6KtLQSmbxs2R1kIqcOpm1oCQJgUvyH
+	GbJ+WsP7/JCauSQa+KFspWBhk0PN41gvW4lgvwH4YL71ryoy1gXBEQ8SixRJ7HWZ
+	fTGiVyfrs5PBUX/l7xCVYGRpcd4E8Bml+eICgHO2BQ2pWB0crzaOW6Pmos2NEvGH
+	+DL2ZlU6RmW9+mPOtKT9eUlmnI57E8kpMVGnytwL5VmxBeQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f03u84vfj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jun 2026 21:46:36 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 24 Jun 2026 21:46:35 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 24 Jun 2026 21:46:35 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id E53A65B6930;
+	Wed, 24 Jun 2026 21:46:31 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <davem@davemloft.net>, <gakula@marvell.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <sgoutham@marvell.com>
+CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, Hariprasad Kelam <hkelam@marvell.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net v2] octeontx2-af: Block VFs from clobbering special CGX PKIND state
+Date: Thu, 25 Jun 2026 10:16:21 +0530
+Message-ID: <20260625044621.2841831-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,126 +78,239 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI1MDAzOSBTYWx0ZWRfX5opTBHUPMrqx
+ vmShdlZ8jR3rhTrFl3g6luXEwkt9sxo96r3bdTa+nQ/JoBPy87kAT7CFtTJW/V2yjUPwSsHi680
+ FH2tSg0T0jDA72Twu3Htss4ZdBwuN9kw9tcWolEEVCGrBYgl7znORbRBKku0V1kVGuhPEbZnSC2
+ RSJPIH2EII1M25OMwEeCJgMghMlUYL74sPm2LWBRwAvabjOE6ZZCdqPOCVF45RuMvtne35AocHI
+ /lL3F2wfCJX9hJ4UDngqvF5Sx0vP8lGY3T38dPEUqZLU4GXAWbVuyht8SV7aOfdlu6hd+0BAtO1
+ vzFnSlUTu/WeySkwUqlpDHq38WJkDsOq5bKBy9XNKwMoJpgDTIT7CkU3CWlg3BGxm8A1svjyct2
+ xFo6BqZ+2Nik9hsiZ5MZsQfQ89c5ISa8F42Nj9/Va1OAphWVBaG6WBy1uUFz03PU2DRZDzDtG+O
+ 2PbQenqL4HUTegwbdPw==
+X-Authority-Analysis: v=2.4 cv=D9N37PRj c=1 sm=1 tr=0 ts=6a3cb2ac cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=LrO3M-Q9EsTHprfRnCQA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: hFBhqKi-b48ZacSEspPEQa24H-XMNp3q
+X-Proofpoint-ORIG-GUID: hFBhqKi-b48ZacSEspPEQa24H-XMNp3q
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI1MDAzOSBTYWx0ZWRfXxYwQYVhem0QG
+ xQDul3L8qSe6KeTDcMT6b+6BorfuysC+02zbvlm+feJu6nnP+7glxpslYJrtfUJ75C/IfWv+Csx
+ RuSKwDWXzfg68zGZreZpAhWsSUPTWgg=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-25_01,2026-06-24_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,xiaomi.com,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-301859-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:chenzhangqi@xiaomi.com,m:baohua@kernel.org,m:zhangpengfei16@xiaomi.com,m:zhangfeionline@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[zhangfeionline@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301860-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:gakula@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hkelam@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhangfeionline@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,xiaomi.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E9C1A6C2AD9
+X-Rspamd-Queue-Id: 7CA1E6C2B02
 
-From: Pengfei Zhang <zhangpengfei16@xiaomi.com>
+From: Hariprasad Kelam <hkelam@marvell.com>
 
-inet6_dump_fib() saves its progress in cb->args[1] as a positional
-index within the current hash chain.  Between batches the RTNL lock
-is released, so a concurrent fib6_new_table() can insert a new table
-at the chain head, shifting all existing entries.  The saved index
-then lands on a different table, causing fib6_dump_table() to set
-w->root to the wrong table while w->node still points into the
-previous one.  fib6_walk_continue() dereferences w->node->parent
-(NULL) and panics:
+PF and VF NIX LFs that share a CGX LMAC reuse the same hardware PKIND
+programming. When HiGig2 or EDSA parsing is enabled, a VF NIX LF alloc must
+not reset the LMAC RX PKIND or default TX parse config over the PF setup.
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000008
-  RIP: 0010:fib6_walk_continue+0x6e/0x170
-  Call Trace:
-   <TASK>
-   fib6_dump_table.isra.0+0xc5/0x240
-   inet6_dump_fib+0xf6/0x420
-   rtnl_dumpit+0x30/0xa0
-   netlink_dump+0x15b/0x460
-   netlink_recvmsg+0x1d6/0x2a0
-   ____sys_recvmsg+0x17a/0x190
+Add cgx_get_pkind() and rvu_cgx_is_pkind_config_permitted() so VFs skip
+cgx_set_pkind(), rvu_npc_set_pkind(), and NIX_AF_LFX_TX_PARSE_CFG updates
+when the LMAC is using NPC_RX_HIGIG_PKIND or NPC_RX_EDSA_PKIND.
 
-Fix by storing tb->tb6_id in cb->args[1] instead of a positional
-index.  On resume, skip entries until the id matches; a concurrent
-head-insert can never match the saved id, so the walker always
-resumes on the correct table.
+Fixes: 94d942c5fb97 ("octeontx2-af: Config pkind for CGX mapped PFs")
+Cc: Geetha sowjanya <gakula@marvell.com>
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-Fixes: 1b43af5480c3 ("[IPV6]: Increase number of possible routing tables to 2^32")
-Signed-off-by: Pengfei Zhang <zhangfeionline@gmail.com>
 ---
- net/ipv6/ip6_fib.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+v1 -> v2: Addressed simon comments
+	https://lore.kernel.org/netdev/20260619041002.1773822-1-rkannoth@marvell.com/
+---
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   | 12 +++++++
+ .../net/ethernet/marvell/octeontx2/af/cgx.h   |  1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  1 +
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 32 +++++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 28 +++++++++++++---
+ 5 files changed, 70 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index fc95738de..bda492634 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -636,11 +636,11 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	};
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
--	unsigned int e = 0, s_e;
- 	struct hlist_head *head;
- 	struct fib6_walker *w;
- 	struct fib6_table *tb;
- 	unsigned int h, s_h;
-+	u32 s_id;
- 	int err = 0;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 2e94d5105016..f5fd6138c352 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -518,6 +518,18 @@ int cgx_set_pkind(void *cgxd, u8 lmac_id, int pkind)
+ 	return 0;
+ }
  
- 	rcu_read_lock();
-@@ -701,23 +701,22 @@ static int inet6_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
- 	}
- 
- 	s_h = cb->args[0];
--	s_e = cb->args[1];
-+	s_id = cb->args[1];
- 
--	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_e = 0) {
--		e = 0;
-+	for (h = s_h; h < FIB6_TABLE_HASHSZ; h++, s_id = 0) {
- 		head = &net->ipv6.fib_table_hash[h];
- 		hlist_for_each_entry_rcu(tb, head, tb6_hlist) {
--			if (e < s_e)
--				goto next;
-+			if (s_id && tb->tb6_id != s_id)
-+				continue;
-+			s_id = 0;
++int cgx_get_pkind(void *cgxd, u8 lmac_id, int *pkind)
++{
++	struct cgx *cgx = cgxd;
 +
-+			cb->args[1] = tb->tb6_id;
- 			err = fib6_dump_table(tb, skb, cb);
- 			if (err != 0)
- 				goto out;
--next:
--			e++;
- 		}
- 	}
- out:
--	cb->args[1] = e;
- 	cb->args[0] = h;
++	if (!is_lmac_valid(cgx, lmac_id))
++		return -ENODEV;
++
++	*pkind = cgx_read(cgx, lmac_id, cgx->mac_ops->rxid_map_offset);
++	*pkind = *pkind & 0x3F;
++	return 0;
++}
++
+ static u8 cgx_get_lmac_type(void *cgxd, int lmac_id)
+ {
+ 	struct cgx *cgx = cgxd;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
+index 92ccf343dfe0..8411a75dd723 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
+@@ -141,6 +141,7 @@ int cgx_get_cgxid(void *cgxd);
+ int cgx_get_lmac_cnt(void *cgxd);
+ void *cgx_get_pdata(int cgx_id);
+ int cgx_set_pkind(void *cgxd, u8 lmac_id, int pkind);
++int cgx_get_pkind(void *cgxd, u8 lmac_id, int *pkind);
+ int cgx_lmac_evh_register(struct cgx_event_cb *cb, void *cgxd, int lmac_id);
+ int cgx_lmac_evh_unregister(void *cgxd, int lmac_id);
+ int cgx_get_tx_stats(void *cgxd, int lmac_id, int idx, u64 *tx_stat);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index 7f3505ae6860..bb671e2150aa 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -1115,6 +1115,7 @@ void npc_read_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
+ 			 u8 *intf, u8 *ena);
+ int npc_config_cntr_default_entries(struct rvu *rvu, bool enable);
+ bool is_cgx_config_permitted(struct rvu *rvu, u16 pcifunc);
++bool rvu_cgx_is_pkind_config_permitted(struct rvu *rvu, u16 pcifunc);
+ bool is_mac_feature_supported(struct rvu *rvu, int pf, int feature);
+ u32  rvu_cgx_get_fifolen(struct rvu *rvu);
+ void *rvu_first_cgx_pdata(struct rvu *rvu);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+index 4ff3935ed3fe..2be1da3476ac 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+@@ -1355,3 +1355,35 @@ void rvu_mac_reset(struct rvu *rvu, u16 pcifunc)
+ 	if (mac_ops->mac_reset(cgxd, lmac, !is_vf(pcifunc)))
+ 		dev_err(rvu->dev, "Failed to reset MAC\n");
+ }
++
++/* Do not allow CGX-mapped VFs to overwrite PKIND when special parse kinds
++ * (HiGig, EDSA, etc.) are in use on the shared LMAC.
++ */
++bool rvu_cgx_is_pkind_config_permitted(struct rvu *rvu, u16 pcifunc)
++{
++	int pf, err, rxpkind;
++	u8 cgx_id, lmac_id;
++	void *cgxd;
++
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
++
++	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
++		return true;
++
++	if (!is_pf_cgxmapped(rvu, pf))
++		return true;
++
++	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
++	cgxd = rvu_cgx_pdata(cgx_id, rvu);
++	err = cgx_get_pkind(cgxd, lmac_id, &rxpkind);
++	if (err)
++		return false;
++
++	switch (rxpkind) {
++	case NPC_RX_HIGIG_PKIND:
++	case NPC_RX_EDSA_PKIND:
++		return false;
++	default:
++		return true;
++	}
++}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index d8989395e875..40f5b25eafb1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -338,6 +338,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
+ 	struct sdp_node_info *sdp_info;
+ 	int pkind, pf, vf, lbkid, vfid;
+ 	u8 cgx_id, lmac_id;
++	struct cgx *cgxd;
+ 	bool from_vf;
+ 	int err;
  
- unlock:
+@@ -363,8 +364,15 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
+ 		pfvf->tx_chan_cnt = 1;
+ 		rsp->tx_link = cgx_id * hw->lmac_per_cgx + lmac_id;
+ 
+-		cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id, pkind);
+-		rvu_npc_set_pkind(rvu, pkind, pfvf);
++		cgxd = rvu_cgx_pdata(cgx_id, rvu);
++
++		mutex_lock(&cgxd->lock);
++		if (rvu_cgx_is_pkind_config_permitted(rvu, pcifunc)) {
++			cgx_set_pkind(rvu_cgx_pdata(cgx_id, rvu), lmac_id,
++				      pkind);
++			rvu_npc_set_pkind(rvu, pkind, pfvf);
++		}
++		mutex_unlock(&cgxd->lock);
+ 		break;
+ 	case NIX_INTF_TYPE_LBK:
+ 		vf = (pcifunc & RVU_PFVF_FUNC_MASK) - 1;
+@@ -1508,7 +1516,10 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
+ 	struct rvu_block *block;
+ 	struct rvu_pfvf *pfvf;
+ 	u64 cfg, ctx_cfg;
++	struct cgx *cgxd;
+ 	int blkaddr;
++	u8 cgx;
++	int pf;
+ 
+ 	if (!req->rq_cnt || !req->sq_cnt || !req->cq_cnt)
+ 		return NIX_AF_ERR_PARAM;
+@@ -1680,8 +1691,17 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
+ 	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_CFG(nixlf), req->rx_cfg);
+ 
+ 	/* Configure pkind for TX parse config */
+-	cfg = NPC_TX_DEF_PKIND;
+-	rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
++	if (is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc))) {
++		pf = rvu_get_pf(rvu->pdev, pcifunc);
++		cgxd = rvu_cgx_pdata(cgx, rvu);
++
++		mutex_lock(&cgxd->lock);
++		if (rvu_cgx_is_pkind_config_permitted(rvu, pcifunc)) {
++			cfg = NPC_TX_DEF_PKIND;
++			rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
++		}
++		mutex_unlock(&cgxd->lock);
++	}
+ 
+ 	if (is_rep_dev(rvu, pcifunc)) {
+ 		pfvf->tx_chan_base = RVU_SWITCH_LBK_CHAN;
 -- 
-2.34.1
+2.43.0
 
 
