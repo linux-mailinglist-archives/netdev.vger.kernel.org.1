@@ -1,240 +1,236 @@
-Return-Path: <netdev+bounces-301892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7/qABr3nPGqzuAgAu9opvQ
-	(envelope-from <netdev+bounces-301892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:33:01 +0200
+	id 3mhbEE3oPGruuAgAu9opvQ
+	(envelope-from <netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:35:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF466C3D4F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:33:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9138F6C3DD5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:35:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=OiDXltOr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301892-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301892-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=AhN20rf5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301893-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6C947301C2F4
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:33:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2B543009B27
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697333769EC;
-	Thu, 25 Jun 2026 08:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF54380FEB;
+	Thu, 25 Jun 2026 08:34:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EB735DA5B;
-	Thu, 25 Jun 2026 08:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9AC37D132
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:34:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782376376; cv=none; b=GtQr4ZbJAOxfq5B7VQoUfLKClrfHk5HqvFWklYEyySJ/ezVm4f/yETst7HVv8QeVwwP2beywiU5fCp0Xj/CxBlhEuHk28/AEOuuz04OwwxNphq7HG/jsR7pVVKOJi/PwRQyDAGui9djIdwe2FDFgkX4HtpgVMWQyw8OOf0Y6yDI=
+	t=1782376489; cv=none; b=GtQIGdZLwLkaZH3GejwipBTK0xy9v9HdvScqn2NIZOjLLV/HnkgW5OvYhFVTPr/fNsxyNDXAFaSB/jFTdvjHgze0r04fyQtphhtGlwCPK4VR6dnJKIBgOalB0OXvttNTJfEBK8ZHu1dApDej73kzn9x5uKfroE1CYwlveMOMMWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782376376; c=relaxed/simple;
-	bh=vxAqKqHaGz7NXLdQ1go42ReEIBp782jSBRm+6F6iGz4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dq5SYxT4m/meCxKmGa9c5ZHjvKgUNthDkj6huVxFlV5keZw25VhPnbpJ7kE+VGZqvoGQlC4ACIb794Fc5jT04S0LhijuzfUO5x2j1wJn1ibH3H8eeHxC5OEx3VTRWxMlln5tdQqwj0EVHgUAIMmDyZ1mdIpyAA+n0Zbf/gLQ0U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OiDXltOr; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65P3mMxb3185507;
-	Thu, 25 Jun 2026 08:32:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=mCrR8I
-	urneLBowxIgFvA95tQoKFx9He7WISMZo2sX7I=; b=OiDXltOrOyJZpMzpvB4q2y
-	gnoXGkfxlfj7vCYnNeTnjzdHlwmaBC8XQhH66pcm6Aa8kUSvftIJ9Gt68SSAmh1Q
-	KOkE3g1b+gI2x39uh87Ugh3lTJSyQYVu2PeCvb2Dbbe4BRLd8DmXdLmR9xPI69iO
-	zzyL5Q8ayFGj4ODWuMDp5sdeuOhzmx1bt7nE2AIojXq+v1KxMwXmzThMr4tCya7p
-	WFaeH2Pt0EYgDgcCYpGZlJhJeFtwXK/x7CG1XFpRm20MHJ4in3ykPF6GnsHmAAYd
-	+nBrJbQ0wgbS+acl+Ktq+sMFIAZOn1bdXNoyvwao38jSkUljwFsn3RAJRO5l9rSQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ewjhr0pbp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jun 2026 08:32:34 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65P8JeM8007543;
-	Thu, 25 Jun 2026 08:32:34 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ex56qneng-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jun 2026 08:32:33 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65P8WUb256230202
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Jun 2026 08:32:30 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 60D102004D;
-	Thu, 25 Jun 2026 08:32:30 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8A5A920040;
-	Thu, 25 Jun 2026 08:32:26 +0000 (GMT)
-Received: from [9.123.14.166] (unknown [9.123.14.166])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 25 Jun 2026 08:32:26 +0000 (GMT)
-Message-ID: <17c1cbac-de30-4372-8c24-2acd755f503e@linux.ibm.com>
-Date: Thu, 25 Jun 2026 14:02:25 +0530
+	s=arc-20240116; t=1782376489; c=relaxed/simple;
+	bh=7BEwt6eYwfYFJfykt1yWvyBcAyXt9b2E6Fr7Bm2s5hY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vg+zaQBiud6oAjNZbDNnEbQ3iiG2hXLpskoxHXUbWV5jYK8bl4DLVEoOmDmP0Mw+B1YP47T+VHcEJbQxO3Ze0jQYLaEGhDrq3E4ebBmScTOxBhrKaht8T2Dk6D1M6CavRYiY3B3QEcDkyb3/Vc/bqO2WqLO+Ti0cCr6jczp3RHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhN20rf5; arc=none smtp.client-ip=209.85.221.52
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4629d80fa08so1808329f8f.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:34:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782376487; x=1782981287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cwuPvDSXXbiyOTdpO1yF6fW9CB9apWEc+I7V+XWMZf0=;
+        b=AhN20rf5CJgZHlVu8rhuRPe2lvfLF0OcT28yLQ/pGxRJ2t4hwB9zSqto0j/OnuFEHt
+         fhAAkhHuWrzsyCitxbVSTKCDu/gCzDfP4CWGJliLCAezpSODB4OwczwuOw/wkHvcIDCE
+         gdYDbvMe3jxuNPve1Kn8CWeMq50B0dPAZzCmyJiLWORgWr7fWdwebh4GOzFYqzqvaAf6
+         JwlaZS3CVPiMpo43J0Ihn7i8J2/jtpAD19c6egRqSFNl1GY/1EIxMyDNX3m7BXxfA4Uh
+         bhC2Z2iL9eoBk3R+71HMx9BMIBZPMs7ZkchaoGxe4SpiBU7RJOyzuUqU23mnUiT3x7e4
+         Ayjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782376487; x=1782981287;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cwuPvDSXXbiyOTdpO1yF6fW9CB9apWEc+I7V+XWMZf0=;
+        b=I2JkBBSZG+qTEiippnV2SWaxvmgOjl4Ejk6nemOhuhq+z9kYXnVqzAgQ7abXO5E2h3
+         e0OcAZZS5MqNmkZDaqjJ9n2AWkjvpbmmnmnuKf7rc47rcrfinVqtwXCoSwYiXMs3Rhco
+         XoWgws36Z5Mt8dNx1kmIQsJwnO5x4SxmFGxq/GwGIUsUpKSAnf1SOE4Or8Lk0AUC9gYv
+         rnITz0t+vbGbafJc5npK3dlZVevRdXn8lQdoH+fjjJHkG/Q/EM30jLnw7lubf0Cv3lgr
+         m8yTga4oZvm1BlT+ufvrLZuQjzss9e5+3DkP3+2KLPAkD/IDQaB7enM/fWXpd5siJv39
+         4lfw==
+X-Forwarded-Encrypted: i=1; AHgh+RpMnShV05AwjYBPnfOHoHihAappWEyz6IpvNqg7hQxOlP10l6Kw7IyRADwvUxCxyHSSzmU8cLo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxA5kGBzxeVXa/1ruoSrfz2Lp6rhY2w3O/RPdFnSuoiZK74239o
+	KfDBne9Lo+56UdJnZ52dgPGKO5aigaURppgviml0JDBOAmJU48+kcE4c
+X-Gm-Gg: AfdE7ckBljxDknHOwEv4wemGGtQ7xpKZtyrFEyiOsveeSYl2kOAoDjJavzgPutmLNgD
+	YENG/c1kZTuoCJaeLbVqEOskIXa8OtFr3ASwxIHmgCypzAZVkTF2dvypLk86CCEtitmiikEIUBD
+	LHsQI9zydT5Ah/BeTEgHMa4KUo9PSdkZSLYUfyA/klXbztH8gbu9UnQjqMzFNb6tC56p2DAtWZZ
+	0ygXSSQcusEiTvjIdczsneuhw7ka+Tm8Pa0ASj4G2gvD0fBFhl0BXepJm8QJyYwV+CQMcH+o3t5
+	RM2vecwKQwv8QLXVnTEShkoaBbux4EfUJwLgWWPRTESKKv4vmrSWrw2mLm+UXjtwONUpwiAs/Qe
+	vuzxPVxYwB4jSWHwpWUsEFAG7lkcJfUEoeGcyjPTvK5ldT+U0bkRRrzwv+4fu6/u0cAHHRmXGJA
+	KEcUlPne6G
+X-Received: by 2002:a05:6000:2f8a:b0:46d:d6c1:8383 with SMTP id ffacd0b85a97d-46dd6c18494mr1746107f8f.44.1782376486646;
+        Thu, 25 Jun 2026 01:34:46 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46c221d998esm13183555f8f.24.2026.06.25.01.34.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jun 2026 01:34:46 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-api@vger.kernel.org,
+	netdev@vger.kernel.org,
+	fuse-devel@lists.linux.dev,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	David Howells <dhowells@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Collin Funk <collin.funk1@gmail.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	The 8472 <kernel@infinite-source.de>,
+	Willy Tarreau <w@1wt.eu>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Val Packett <val@packett.cool>,
+	Andrei Vagin <avagin@gmail.com>,
+	patches@lists.linux.dev
+Subject: [PATCH v2 0/7] vmsplice: fix some problems in my previous vmsplice patchset
+Date: Thu, 25 Jun 2026 08:34:02 +0000
+Message-ID: <20260625083409.3769242-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: avoid recursive sk_callback_lock in listen
- data_ready
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>,
-        "D. Wythe"
- <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Simon Horman <horms@kernel.org>, Karsten Graul <kgraul@linux.ibm.com>,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jianhao.xu@seu.edu.cn, stable@vger.kernel.org
-References: <20260617152855.1039151-1-runyu.xiao@seu.edu.cn>
-Content-Language: en-US
-From: Sidraya Jayagond <sidraya@linux.ibm.com>
-In-Reply-To: <20260617152855.1039151-1-runyu.xiao@seu.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=I4VVgtgg c=1 sm=1 tr=0 ts=6a3ce7a3 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
- a=51JgxwwAL-zXi2UjDcgA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI1MDA3MSBTYWx0ZWRfXyEcLcEW349B2
- k8Sc5c6yGobuuxdwMbCKN0pmwLsXMT5k6IraB4ZNqXSVgIzBwDLIZGtrsA0AVmEvaEBKVlB9iQc
- xRQkXGodzOLxqNHaY10jDHl0yPXyZxJOSQIJiIzQO/vva0helg9BPpoGFi69PtyE4zRBHLtjq6/
- ljZsm//hlr6hRAOQcxGfWuDCpfkt3eiAYrS3QZ29ABXJcFX5glHBjVgph+ZzwS95CWCUG1aipMO
- Grf5zBAbRVS5MeqBNHF5aeHrHDel0I9alRLfZcQBZgVUgUvtGe0zPKJNBFz+k1aqvacU+pVb5lf
- Y0l3DV/DjX0cLbgolFxVebdkVcnIC4YSIR54gZHCy5xOe7dBRcRitib2BlrHqGg7gg7V2nq0NjL
- S24JiwDI3gsYnNC+8BDD3QoYmTwn41iRtE67TyfZvRiNVmeC9cOpp2mPBZWyiQAOHjhatOURB+i
- IQNo/1RxlYQGk/nQD8g==
-X-Proofpoint-GUID: 5rbcDbwbMeYSIbrFeDOqZ8cZZrPr0N_U
-X-Proofpoint-ORIG-GUID: tacv5n88DyUZAzK4jWQzlIHZ0bBwgxVI
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI1MDA3MSBTYWx0ZWRfXxhI+PZVfK5Yr
- yxi61okkU5RTcO0gnPynvcTGS7uF8D0iSqHmBVxcjz7rgxzRc0SaJUyAGSs6bBPLBSF0ISZrmRD
- ggvggaSdwbMKMe3pdquAUvPrrxHr19w=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-25_01,2026-06-24_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 malwarescore=0 clxscore=1011 impostorscore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 priorityscore=1501
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2606250071
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301892-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:runyu.xiao@seu.edu.cn,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.ibm.com:mid,linux.ibm.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_SENDER(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301893-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:linux-fsdevel@vger.kernel.org,m:brauner@kernel.org,m:viro@zeniv.linux.org.uk,m:jack@suse.cz,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-api@vger.kernel.org,m:netdev@vger.kernel.org,m:fuse-devel@lists.linux.dev,m:torvalds@linux-foundation.org,m:willy@infradead.org,m:axboe@kernel.dk,m:hch@infradead.org,m:dhowells@redhat.com,m:akpm@linux-foundation.org,m:david@kernel.org,m:pfalcato@suse.de,m:miklos@szeredi.hu,m:luto@amacapital.net,m:collin.funk1@gmail.com,m:david.laight.linux@gmail.com,m:metze@samba.org,m:kernel@infinite-source.de,m:w@1wt.eu,m:joannelkoong@gmail.com,m:val@packett.cool,m:avagin@gmail.com,m:patches@lists.linux.dev,m:collinfunk1@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,lists.linux.dev,linux-foundation.org,infradead.org,kernel.dk,redhat.com,kernel.org,suse.de,szeredi.hu,amacapital.net,gmail.com,samba.org,infinite-source.de,1wt.eu,packett.cool];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EFF466C3D4F
+X-Rspamd-Queue-Id: 9138F6C3DD5
+
+This patchset is for VFS. Of course, it depends on my previous vmsplice
+patchset ( https://lore.kernel.org/all/20260531010107.1953702-1-safinaskar@gmail.com/ ).
+
+I fix some problems in my previous patchset.
+
+1. Fix problem with CLASS(fd, f)(fd). See first patch in this patchset
+for details. This is probably not so important, but I fix it anyway.
+
+2. Change "unsigned long" back to "int". See second patch for details.
+Again, this is probably not important, but I want to fix this anyway.
+
+3. Fix that LTP vmsplice01 bug.
+
+4. libfuse relies on sharing vmsplice behavior. So we detect particular
+combination of flags to pipe2(2) and vmsplice(2) and return -EINVAL.
+This forces libfuse to fail back to non-vmsplice code path.
+I. e. we fix libfuse-related regression [1].
+I did debian code search for regex "vmsplice.*SPLICE_F_NONBLOCK" and
+I found no other packages with this particular combination of flags
+except for fuse itself. (Okay, other packages are fio and stress-ng,
+but these are merely testers.) So, I think this is okay to return
+EINVAL here, breakage will be minimal.
+
+5. Set FMODE_NOWAIT for named FIFOs. CRIU relies on ability to do
+vmsplice(SPLICE_F_NONBLOCK) on named FIFOs. So, I fix this CRIU-related
+regression [2]. But there is another CRIU-related regression, which I do not
+fix [3]: CRIU behavior in splice mode becomes so slow that splice mode
+becomes useless. I personally still believe that removing vmsplice is
+right thing to do. Other option is doing nothing. Yet another option
+is to implement some deprecation period [3]. Let other developers
+decide.
+
+See patches for details.
+
+Please, run that LTP vmsplice01 test again.
+
+Notes:
+
+- I want to repeat: I change behavior around SPLICE_F_NONBLOCK.
+Previously, vmsplice ignored whether pipe itself was opened as
+non-blocking file. Now it is not ignored. And in my opinion
+new behavior is better.
+- vmsplice(2) now is in fs/read_write.c . It is very similar to
+preadv2 and pwritev2 now, so I think it belongs to fs/read_write.c now.
+
+Please, review this patchset carefully. I'm still new contributor.
+In particular, please, review that do-while loop, I'm not sure I did
+everything right.
+
+Tested in Qemu.
+
+[1] https://lore.kernel.org/all/CAJnrk1Y9egYizkx1H9K0cqxSYuB+7vLvQbV7Tf4C5eHFqnnC-A@mail.gmail.com/
+[2] https://lore.kernel.org/all/CANaxB-zK5q=Xw6UZTmeFtXsDZjUsPkFk=p485m-wtNTBnf4hgg@mail.gmail.com/
+[3] https://lore.kernel.org/all/CANaxB-xUrLQYGiRJZc4Boi+KX=0TJSWymErNovANVko20fMDVA@mail.gmail.com/
+
+v1: https://lore.kernel.org/lkml/20260606061031.3744880-1-safinaskar@gmail.com/
+
+Changes since v1: fix fuse-related and CRIU-related regressions (see above).
+
+Askar Safin (7):
+  vmsplice: open-code do_writev and do_readv
+  vmsplice: change argument type back to "int"
+  splice: turn wait_for_space flags argument into bool
+  pipe: move wait_for_space to fs/pipe.c and rename it
+  vmsplice: make sure we don't wait after writing some data
+  vmsplice: return -EINVAL for particular combination of flags
+  pipe: set FMODE_NOWAIT for named FIFOs
+
+ fs/pipe.c                 | 23 +++++++++++++
+ fs/read_write.c           | 71 +++++++++++++++++++++++++++++++++++----
+ fs/splice.c               | 19 +----------
+ include/linux/pipe_fs_i.h |  2 ++
+ include/linux/syscalls.h  |  2 +-
+ 5 files changed, 91 insertions(+), 26 deletions(-)
 
 
-
-On 17/06/26 8:58 pm, Runyu Xiao wrote:
-> smc_listen() installs smc_clcsock_data_ready() as the underlying TCP
-> listen socket's sk_data_ready callback.  smc_clcsock_data_ready() then
-> immediately takes sk_callback_lock before looking up the SMC listener and
-> queuing smc_tcp_listen_work().
-> 
-> That is unsafe once the TCP listen socket is leaving TCP_LISTEN.  The TCP
-> close/flush path can run the installed sk_data_ready callback with
-> sk_callback_lock already held, so entering smc_clcsock_data_ready() again
-> tries to take the same rwlock recursively in the same thread.  The nvmet
-> TCP listener had to make the same state check before taking
-> sk_callback_lock for this reason.
-> 
-> This issue was found by our static analysis tool and then manually
-> reviewed against the current tree.
-> 
-> The grounded PoC kept the SMC listen callback installation path:
-> 
->   smc_listen()
->   smc_clcsock_replace_cb()
->   sk_data_ready = smc_clcsock_data_ready()
-> 
-> It then modeled the close/flush carrier that invokes the installed
-> sk_data_ready callback while sk_callback_lock is already held.  Lockdep
-> reported the same-thread recursive acquisition:
-> 
->   WARNING: possible recursive locking detected
->   smc_clcsock_data_ready+0xa/0x4d [vuln_msv]
->   smc_close_flush_work+0x1f/0x30 [vuln_msv]
->   *** DEADLOCK ***
-> 
-> Return before taking sk_callback_lock when the underlying TCP socket is no
-> longer in TCP_LISTEN.  In that state there is no listen accept work to
-> queue for SMC, and avoiding the callback lock mirrors the fix used by the
-> TCP nvmet listener.
-> 
-> Fixes: 0558226cebee ("net/smc: Fix slab-out-of-bounds issue in fallback")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-> ---
->  net/smc/af_smc.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 6421c2e1c84d..1af4e3c333ff 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -2631,6 +2631,9 @@ static void smc_clcsock_data_ready(struct sock *listen_clcsock)
->  {
->  	struct smc_sock *lsmc;
->  
-> +	if (READ_ONCE(listen_clcsock->sk_state) != TCP_LISTEN)
-> +		return;
-> +
-
-In smc_close_active(), the TCP socket remains in TCP_LISTEN state while
-holding write_lock_bh(&smc->clcsock->sk->sk_callback_lock);. The patch's
-state check would pass during this window, not preventing the recursive
-lock scenario.
-It's unclear whether it fully prevents the recursive locking scenario
-described in the commit message for the specific code path in
-smc_close_active().
-Could you come up with exact deadlock scenario and how the patch
-addresses it?
-
->  	read_lock_bh(&listen_clcsock->sk_callback_lock);
->  	lsmc = smc_clcsock_user_data(listen_clcsock);
->  	if (!lsmc)
+base-commit: 8d86fcfc2857d64af85f5c87c193c25655c970af
+-- 
+2.47.3
 
 
