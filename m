@@ -1,147 +1,230 @@
-Return-Path: <netdev+bounces-302044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302045-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P2vPEcBbPWox1wgAu9opvQ
-	(envelope-from <netdev+bounces-302044-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:48:00 +0200
+	id 4VfnButbPWo+1wgAu9opvQ
+	(envelope-from <netdev+bounces-302045-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:48:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3946C78B7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:48:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 948436C78CA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:48:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b="L3fcd1+/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302044-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302044-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=BbTceOUm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302045-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302045-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 09E433037B8C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:47:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D11BD301CFF4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DFA93EB0EE;
-	Thu, 25 Jun 2026 16:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106DC3E9C1D;
+	Thu, 25 Jun 2026 16:48:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9E01F1534;
-	Thu, 25 Jun 2026 16:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CB51A9F87
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 16:48:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782406074; cv=none; b=lL8pxaIv+KGrp7+mR+isU40xm2OCXgxQ8tHTkMuGTXXx5C5sdaJT7VHToyoNOKDsmJT+F1hkiJVfBDknYOmy/3tnIZBJvjWBDGURS8hTPg89VPUZPchHi2KQI9z9CHEjnFdoKbQdQMKxy4I3gssiNO9Md8xWb7fRfHg8AszvS68=
+	t=1782406091; cv=none; b=jY1qQOMpTO5LAAUD0x0BlDUkO/p/zhCuzi6LInZFKUDlVqvf20rXXzM43P4uoxrFSxcLafdExOuwtQXSf3ruqUXKGnuxl5fTa4umbHOJ0rtHBarhDP5K7f2g2mmS55x3iI7oQ7exP/szJp4yLm4JwgdE8HeGrxGcpYdU+t03SqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782406074; c=relaxed/simple;
-	bh=6nx+0OO4UdD24tZ8q/MQ027UX9B3EPpe+eGnGMmyyHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G2iGo3y3UtHfrPAs4TmI3Av7xYxpg+RyQwXUs+t+U08LdqlQ/wD3byTNGY1nzgyh4EePH97m5/nuRwpkbk8sarTnLyAbByxlai5KCkn8lEtKwnDsXudm/0Q7QH58VSqQNgXz5OoUyjQZZe1ihPLHvseBXXtpUegEt0jB45OIt04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=L3fcd1+/; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=dUVqNH0sF2VDjlyOlgXl2DQF+Wyz+CjJZf1nWQi/wOQ=; b=L3fcd1+/5LLlT6wYCHAy3dPMKK
-	LLoHntODYesRlKMRDjShUJQOXbCBsJKgZcf7dalxdUtppecXk5+cJ2WFc3unsg1d3yg2lW2s1OMs3
-	YqiUobpw1zSPGeU6ktVYY6NKklIW+j9g+vpr0tzuADTIQCmJC8//+61kcrHrX3Fn1BcxYwZlOiyhy
-	rDnyAqCq7WF5qKUe7iUKVBqyGGToRmkLaocUomcfwkQRzxQzB5xscVTOGOfS+klz6hUJsG9uJ+GsW
-	MvQWtyFT/X76LeYtrjBK0SE+YypkYBZEV0sEgCHyitPmAVTvkAbxC4Ql82y6c6FmJ8ziDHTLmP8LG
-	F/6Si45Q==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wcnEr-003Kz3-2N;
-	Thu, 25 Jun 2026 16:47:41 +0000
-Date: Thu, 25 Jun 2026 09:47:33 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
-	horms@kernel.org, joshwash@google.com, hramamurthy@google.com, 
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, saeedm@nvidia.com, 
-	tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org, alexanderduyck@fb.com, 
-	kernel-team@meta.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
-	decui@microsoft.com, longli@microsoft.com, jordanrhee@google.com, 
-	jacob.e.keller@intel.com, nktgrg@google.com, debarghyak@google.com, mohsin.bashr@gmail.com, 
-	ernis@linux.microsoft.com, sdf@fomichev.me, gal@nvidia.com, linux-rdma@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH net] net: ethtool: keep rtnl_lock for ops using
- ethtool_op_get_link()
-Message-ID: <aj1bi7xuFlRZGxar@gmail.com>
-References: <20260624190439.2521219-1-kuba@kernel.org>
- <aj1Nqe3RoITzxSEb@devvm7509.cco0.facebook.com>
+	s=arc-20240116; t=1782406091; c=relaxed/simple;
+	bh=qJXI9cST/Ra4iPabxPsgyOZ02qsLz7Yx5c5nuJyWipc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Y8N07IY06ODHjnVBTtJL3kZeFKawTclKoAlLD9tbRd43PRRXyoFdg7J04KnJesqZXmKe3HZL5TjNbufRs5Y7f7TgqgxrPnakVF05vQmXXjM4UxchZhhozPUUo3oOdV2u1jFING5TGiwLL8sDS0kf4dZe1Ka9l2I1hSRRn24LdsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BbTceOUm; arc=none smtp.client-ip=209.85.208.182
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-3996c9eeebeso1371131fa.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 09:48:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782406088; x=1783010888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3pAbo57p2f1Q9HCCJXSOkq8MR7Ngd8saF5gl2eKPd+4=;
+        b=BbTceOUmtGQvPj5dQ4/HO469r73QPy1QKeBBapzHSVHuaB8Je2a+DhP85Ikvm3vgyg
+         bYRWIB8yJJrzax3iiW89TCj9joiRuKs+Q/RcXKqYLEm27SNJ6l92T+KL3qVR6U6Gpea0
+         iPJGhSfTkySq+abPKMvswVLv0PId8lmK/u5NtgfmPLRY9c7pgdjk6hIES4HF7YhFQOqx
+         2gMz/h8PCj1SAWU943cvEtelazpaIPb2dz1xV+36Ys/EzCnyx0y2vtHkMgl+WRruNdsL
+         0g3TysQqTZ/KIoncx8f3LRch5oElY6KtkyhFMCWjd179/CZl7eIye++8P7TooP1xQuLu
+         tCeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782406088; x=1783010888;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3pAbo57p2f1Q9HCCJXSOkq8MR7Ngd8saF5gl2eKPd+4=;
+        b=QU//e4BxrXBDiwzkzFJ5DHFuw2KHbryYiIEucS4C61R3Zcg4Nzo8SXI9QpVa5dT6kh
+         sXqoYnb9lAS/Iirb7uyBmQIGa6HzqH/JxFeWbFmdzBbg75o7zigmFgaDRD+Dk9/lwbM6
+         OqyS51lvjC2kpNVchO8UBGNj4L/kcjj20wk+krZrONUTIpytTCBMamtcxj9dRyoHoXkL
+         AM43funrXas6PLIN5gC+Lsz9ma405Om6eRIxD7XPBJ88AASQg3IiQ44xfA9v4jlA0H2/
+         iNPy67GRvep9Vq8Dum3cguwuUZcLJebIClqh+no+xTlP0LFNFfgoNvBDvlWfOdjIbu68
+         7frg==
+X-Forwarded-Encrypted: i=1; AHgh+RrE3O5L0KpWci7VWBNhwXVTF2yJr/C2TxpBx09LjK22jyagciFlg8f8pTv4f3N+BTLnZ31JOtQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPI5LToTZmgx/u7egBiHcVYdPi6rHzZc7b+AE6eiU6CQsnWs6J
+	DmCs/l/rPV9iAjakqVcDrpNacZQqmSMz3DfCCN47Hpwin0seMnN3ZMIl
+X-Gm-Gg: AfdE7ckWDVufU5w0IYu96y1ihfYHltkFHqOzoOPe4EE6wvzK3sF2tbs9aVbl7LRZq3D
+	kkNDaLFryGMbDsRPB/3ifjh+Jeu7Zomox9MvomV9OtA6X3lu81lfP+Rszl+PvY9HqhEYrrPQkMM
+	7NjW01wNUlP5omzJkFjOqqJQona0EgFvfiuFbBGYmYG65v8iXP0grGjoJM8oxYGmHtuVMVYwAf3
+	P1iK0zlDwln7pPCak/lhRXCS+QbPRNZMZhndBUzC6IDVn15SYuo9Xij4fMrZnLpwwuqRZrCuu2o
+	dw3z+uAGTAoeSKAzuLISnhvz9kS5DxVVCWvHodKlb7ayXnISmzbRak1oTAPwod6Yl5suP2VbFpu
+	OyZqTG4q9qYk/p4/3lnQ7s5aOxaLZbQmMsVAqK0m0X3z0CQqTyjVO+NOvFLoQE+VmBR5GDXegHO
+	sYOM8CzHRyYgnmahEyjwnJXFNZj5foZBdff/wRrbI=
+X-Received: by 2002:a05:6512:228e:b0:5aa:6b0b:1f40 with SMTP id 2adb3069b0e04-5aea1f3481dmr1155973e87.2.1782406087610;
+        Thu, 25 Jun 2026 09:48:07 -0700 (PDT)
+Received: from grower.astra-academy.ru ([185.32.135.49])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad69555c45sm2785934e87.36.2026.06.25.09.48.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jun 2026 09:48:07 -0700 (PDT)
+From: Alexander Martyniuk <alexevgmart@gmail.com>
+To: sashal@kernel.org
+Cc: alexevgmart@gmail.com,
+	bestswngs@gmail.com,
+	coreteam@netfilter.org,
+	davem@davemloft.net,
+	fw@strlen.de,
+	gregkh@linuxfoundation.org,
+	kaber@trash.net,
+	kadlec@netfilter.org,
+	kuba@kernel.org,
+	kuznet@ms2.inr.ac.ru,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel,
+	pablo@netfilter.org,
+	stable@vger.kernel.org,
+	xmei5@asu.edu,
+	yoshfuji@linux-ipv6.org
+Subject: [PATCH v2] netfilter: nf_log: validate MAC header was set before dumping it
+Date: Thu, 25 Jun 2026 19:47:55 +0300
+Message-ID: <20260625164755.161383-1-alexevgmart@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260625054005.0003.nflog-510@kernel.org>
+References: <20260625054005.0003.nflog-510@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aj1Nqe3RoITzxSEb@devvm7509.cco0.facebook.com>
-X-Debian-User: leitao
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_MATCH_TO(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:joshwash@google.com,m:hramamurthy@google.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:alexanderduyck@fb.com,m:kernel-team@meta.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:jordanrhee@google.com,m:jacob.e.keller@intel.com,m:nktgrg@google.com,m:debarghyak@google.com,m:mohsin.bashr@gmail.com,m:ernis@linux.microsoft.com,m:sdf@fomichev.me,m:gal@nvidia.com,m:linux-rdma@vger.kernel.org,m:linux-hyperv@vger.kernel.org,m:sdfkernel@gmail.com,m:andrew@lunn.ch,m:mohsinbashr@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302044-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sashal@kernel.org,m:alexevgmart@gmail.com,m:bestswngs@gmail.com,m:coreteam@netfilter.org,m:davem@davemloft.net,m:fw@strlen.de,m:gregkh@linuxfoundation.org,m:kaber@trash.net,m:kadlec@netfilter.org,m:kuba@kernel.org,m:kuznet@ms2.inr.ac.ru,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel,m:pablo@netfilter.org,m:stable@vger.kernel.org,m:xmei5@asu.edu,m:yoshfuji@linux-ipv6.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[gmail.com,netfilter.org,davemloft.net,strlen.de,linuxfoundation.org,trash.net,kernel.org,ms2.inr.ac.ru,vger.kernel.org,vger.kernel,asu.edu,linux-ipv6.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302045-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,intel.com,nvidia.com,fb.com,meta.com,microsoft.com,gmail.com,linux.microsoft.com,fomichev.me];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,fomichev.me:email,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2B3946C78B7
+X-Rspamd-Queue-Id: 948436C78CA
 
-On Thu, Jun 25, 2026 at 08:48:03AM -0700, Stanislav Fomichev wrote:
-> On 06/24, Jakub Kicinski wrote:
-> > Breno reports following splats on mlx5:
-> > 
-> >   RTNL: assertion failed at net/core/dev.c (2241)
-> >   WARNING: net/core/dev.c:2241 at netif_state_change+0xed/0x130, CPU#5: ethtool/1335
-> >   RIP: 0010:netif_state_change+0xf9/0x130
-> >   Call Trace:
-> >     <TASK>
-> >      __linkwatch_sync_dev+0xea/0x120
-> >      ethtool_op_get_link+0xe/0x20
-> >      __ethtool_get_link+0x26/0x40
-> >      linkstate_prepare_data+0x51/0x200
-> >      ethnl_default_doit+0x213/0x470
-> >      genl_family_rcv_msg_doit+0xdd/0x110
-> > 
-> > Looks like I missed ethtool_op_get_link() trying to sync linkwatch,
-> > which needs rtnl_lock. Not all drivers do this - bnxt doesn't,
-> > it just returns the link state, so add an opt-in bit.
-> > 
-> > Reported-by: Breno Leitao <leitao@debian.org>
-> > Fixes: 45079e00133e ("net: ethtool: optionally skip rtnl_lock on Netlink path for GET ops")
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+From: Xiang Mei <xmei5@asu.edu>
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+commit a84b6fedbc97078788be78dbdd7517d143ad1a77 upstream.
+
+The fallback path of dump_mac_header() guards the MAC header access
+only with "skb->mac_header != skb->network_header", without checking
+skb_mac_header_was_set(). When the MAC header is unset, mac_header is
+0xffff, so the test passes and skb_mac_header(skb) returns
+skb->head + 0xffff, ~64 KiB past the buffer; the loop then reads
+dev->hard_header_len bytes out of bounds into the kernel log.
+
+This is reachable via the netdev logger: nf_log_unknown_packet() calls
+dump_mac_header() unconditionally, and an skb sent through AF_PACKET
+with PACKET_QDISC_BYPASS reaches the egress hook with mac_header still
+unset (__dev_queue_xmit(), which would reset it, is bypassed).
+
+Add the skb_mac_header_was_set() check the ARPHRD_ETHER path already
+uses, and replace the open-coded MAC header length test with
+skb_mac_header_len(). Only skbs with an unset MAC header are affected;
+valid ones are dumped as before.
+
+ BUG: KASAN: slab-out-of-bounds in dump_mac_header (net/netfilter/nf_log_syslog.c:831)
+ Read of size 1 at addr ffff88800ea49d3f by task exploit/148
+ Call Trace:
+  kasan_report (mm/kasan/report.c:595)
+  dump_mac_header (net/netfilter/nf_log_syslog.c:831)
+  nf_log_netdev_packet (net/netfilter/nf_log_syslog.c:938 net/netfilter/nf_log_syslog.c:963)
+  nf_log_packet (net/netfilter/nf_log.c:260)
+  nft_log_eval (net/netfilter/nft_log.c:60)
+  nft_do_chain (net/netfilter/nf_tables_core.c:285)
+  nft_do_chain_netdev (net/netfilter/nft_chain_filter.c:307)
+  nf_hook_slow (net/netfilter/core.c:619)
+  nf_hook_direct_egress (net/packet/af_packet.c:257)
+  packet_xmit (net/packet/af_packet.c:280)
+  packet_sendmsg (net/packet/af_packet.c:3114)
+  __sys_sendto (net/socket.c:2265)
+
+Fixes: 7eb9282cd0ef ("netfilter: ipt_LOG/ip6t_LOG: add option to print decoded MAC header")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Alexander Martyniuk <alexevgmart@gmail.com>
+---
+ net/ipv4/netfilter/nf_log_ipv4.c | 4 ++--
+ net/ipv6/netfilter/nf_log_ipv6.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/netfilter/nf_log_ipv4.c b/net/ipv4/netfilter/nf_log_ipv4.c
+index d07583fac8f8..d6164e8e2c73 100644
+--- a/net/ipv4/netfilter/nf_log_ipv4.c
++++ b/net/ipv4/netfilter/nf_log_ipv4.c
+@@ -296,8 +296,8 @@ static void dump_ipv4_mac_header(struct nf_log_buf *m,
+ 
+ fallback:
+ 	nf_log_buf_add(m, "MAC=");
+-	if (dev->hard_header_len &&
+-	    skb->mac_header != skb->network_header) {
++	if (dev->hard_header_len && skb_mac_header_was_set(skb) &&
++	    skb_mac_header_len(skb) != 0) {
+ 		const unsigned char *p = skb_mac_header(skb);
+ 		unsigned int i;
+ 
+diff --git a/net/ipv6/netfilter/nf_log_ipv6.c b/net/ipv6/netfilter/nf_log_ipv6.c
+index 8210ff34ed9b..cc724870a467 100644
+--- a/net/ipv6/netfilter/nf_log_ipv6.c
++++ b/net/ipv6/netfilter/nf_log_ipv6.c
+@@ -309,8 +309,8 @@ static void dump_ipv6_mac_header(struct nf_log_buf *m,
+ 
+ fallback:
+ 	nf_log_buf_add(m, "MAC=");
+-	if (dev->hard_header_len &&
+-	    skb->mac_header != skb->network_header) {
++	if (dev->hard_header_len && skb_mac_header_was_set(skb) &&
++	    skb_mac_header_len(skb) != 0) {
+ 		const unsigned char *p = skb_mac_header(skb);
+ 		unsigned int len = dev->hard_header_len;
+ 		unsigned int i;
+-- 
+2.43.0
+
 
