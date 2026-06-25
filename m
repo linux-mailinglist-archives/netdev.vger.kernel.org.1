@@ -1,240 +1,323 @@
-Return-Path: <netdev+bounces-301985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HG5vC0c9PWrHzwgAu9opvQ
-	(envelope-from <netdev+bounces-301985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:37:59 +0200
+	id 6x/UKZw+PWpL0AgAu9opvQ
+	(envelope-from <netdev+bounces-301986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:43:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A986C6B91
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:37:58 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDD876C6C58
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:43:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=garyguo.net header.s=selector1 header.b="cyP/bcjf";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301985-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301985-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=garyguo.net;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=bynar.io header.s=google header.b=MXz0cxjF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301986-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301986-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bynar.io;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2FE533003828
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 14:37:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 57ECA3007205
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 14:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190203E5EE9;
-	Thu, 25 Jun 2026 14:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9C13E6396;
+	Thu, 25 Jun 2026 14:38:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021093.outbound.protection.outlook.com [52.101.100.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A781F03DE;
-	Thu, 25 Jun 2026 14:37:55 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782398277; cv=fail; b=HEbGDHhXxAATVwUrcfdpaLLq7DR/ALWMWjs2xBUfsQErnuqz7wU6MGh2xTkDoZLTG1Ytg0ZOaoAsLRSwBqknXKFQxxXVqsxk8pQO6Y9fYL/GH9yRoyoWIGBbcf/0EHVTzgkTbjBuwwqcL44A6rG8VCJP9QGADRRP+oq+jmo+nDw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782398277; c=relaxed/simple;
-	bh=PiPyOVIug+sEhJq3B14v4cwsuNtZX6IUM+98dR49lVs=;
-	h=Content-Type:Date:Message-Id:From:To:Cc:Subject:References:
-	 In-Reply-To:MIME-Version; b=j74wPZsPNlMwoUqYM2dcixnhZQGG+pTroxNs6aRgqXmrt9U5BTjyZEc/GNo12afR6C+4Ey5cLt4ZJuXvgf1SvUimioJoKM9k5q3VUfnPzcbovCyKdYo+RgLv/CNqOYR2F7YRmgdTxpLmVp/Vv9AFHicx4M4VCjbdBKJIhxfTsx4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=cyP/bcjf; arc=fail smtp.client-ip=52.101.100.93
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=I90heEliB6oC5xwTh08QJEQg7pXIWfu+c9Y6oJM1Ou/88EtN0jTrxlXax9HiIHMXZKFHhiaVJE14MixiBSDcm71AXe3x58TQ9QAMlckbEnmH59IoDnokHeB8wrKYkqOmEcbE9nti+pTAXu5uaCSIcoxmqVN3R/pGmbmbQlEyKvKYcivTvAiZvGU3O5poJDGSRHyP++OXAk23E2zAHFG8AS7oD0eqysCAizcpixauzRtCAb16lPuUxz1Qs6qR7uypf47E2zkMqHZaLCcnl4nt4tOhMeJpJxNfBg1HJJXE8GctfoUSbnHhPKR0GHNRHK1GsWQiaB0iMEoHdZ1Zt43yww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jeZ46F5NU2IQYCQYOMIdAtXEWTjT1aICWq5YUy5nZFk=;
- b=gJ99x058vgcf4gFNhzd7YCECpbs6XH/OJ5kZjm03rvWLfqDwKfWofDAL8kXVasTVkM4nGv0s9y7UmSYpKUlqaLGszAA8WN9+hhIkbEXbxM8XGVxNUmerBPtP6pZMJN7zwupAP+uJrKBljPBpkRsVcv+rARUm14VYdpiHNE6MZngI+jYo6b2UngaRvWv9u7MAllRHwzCE4eqig0rt/ycNVnkhu6tO5gasyr+zCpqOd3PF4GM+YIuESVN/FUlYAjtC4HpxTOWNw3mFsZBZkZzJ22lukiwR4Z3sF1Z8jFuw41gUo/7u84QT+pm6fxTxjKQ8J5fokCiRbvb8u3nA4F+MxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jeZ46F5NU2IQYCQYOMIdAtXEWTjT1aICWq5YUy5nZFk=;
- b=cyP/bcjfFQ2gRpzXfFbY7PY1+1/u26XjvYIc8if0vo+IPajGhpB8nYP6aUU+xFOjJRzuPGta7Xyw0Sj3xxXnmINnetUYB8uF8afVwDLuZpJVcXy7xI8KuhLN4xtUp65lAKKN3iopOC3xfedc4vXw/oJIbA+vYKNW/e5Wr4MApps=
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by CWLP265MB5852.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1a5::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.16; Thu, 25 Jun
- 2026 14:37:51 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0159.015; Thu, 25 Jun 2026
- 14:37:51 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 25 Jun 2026 15:37:50 +0100
-Message-Id: <DJI7GDLWO14I.2Z3XN62XCNVP9@garyguo.net>
-From: "Gary Guo" <gary@garyguo.net>
-To: "Alvin Sun" <alvin.sun@linux.dev>, "Miguel Ojeda" <ojeda@kernel.org>,
- "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
- Krummrich" <dakr@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
- Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
- Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Arnd
- Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
- "David Gow" <david@davidgow.net>, "Rae Moar" <raemoar63@gmail.com>, "Breno
- Leitao" <leitao@debian.org>, "Jens Axboe" <axboe@kernel.dk>, "Dave Ertman"
- <david.m.ertman@intel.com>, "Leon Romanovsky" <leon@kernel.org>, "Igor
- Korotin" <igor.korotin@linux.dev>, "FUJITA Tomonori"
- <fujita.tomonori@gmail.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, "Todd Kjos"
- <tkjos@android.com>, "Christian Brauner" <brauner@kernel.org>, "Carlos
- Llamas" <cmllamas@google.com>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-modules@vger.kernel.org>,
- <driver-core@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
- <nova-gpu@lists.linux.dev>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, <linux-block@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v6 01/10] rust: module: move module types into
- `module.rs`
-X-Mailer: aerc 0.21.0
-References: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
- <20260624-fix-fops-owner-v6-1-5295e333cb3e@linux.dev>
-In-Reply-To: <20260624-fix-fops-owner-v6-1-5295e333cb3e@linux.dev>
-X-ClientProxiedBy: LO4P265CA0281.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:37a::13) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E4332470E
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 14:38:41 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782398324; cv=none; b=Oxdbk/PVkOC9Xbgua5LKyzmfv3BOF9dqrVkIhhGWf4Xmq2ibk0TJDabVT0kdCWvUt/H3sUJEiRIah11N/DKfbBuzOpErW7ExhQ2xlbdSLaIc9Rc7zg+EtR4LfLPv1m8oodCLOvDDz64ps452p7l8xIZQ0wQoPYaNO2ggds3X1ag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782398324; c=relaxed/simple;
+	bh=kupFyLYKcr2diQnDTbCsXEeLmkCvBNTpUv66NvQ0gBM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XOJTTrVLKfDR7TAY2egDLAu9OvyhUGRKhp94RQG1mkyjhArP6xA46wTORaAxIoM159itmFWlH4zeh1nvzPkN+y15E6f4mDiCps03bxBlBFPfLhYbqrU6PtNwrDwg5OM31ExkV0awa1rRU4E6kVHnKIaZqs4rmDDEWGmQ5PeUemg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=MXz0cxjF; arc=none smtp.client-ip=209.85.218.43
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c0c41ff84a6so550286966b.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 07:38:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bynar.io; s=google; t=1782398320; x=1783003120; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XY4ljmmJfRdzZN+EfM21UiZLHHqxIilAOQkRMOvqbIw=;
+        b=MXz0cxjFXHc8hWgJiK/KpwFVFKPN20rD2Mgy3XH/H6JEjf5vSlCaKmlJEEmNBxx1Kd
+         G0e41R+AxJvpdnaPcv5G92UPNoyNsWxs8J3Cqj+5qbHLcSXXDpuT7yABdnVyCrlj3SSn
+         sYIM3KoBHkDv10yKs23JNo/0avk7SDC6G9lLACVwYbMDoC9dhUOmMV/cWoudVqGr2R0Z
+         gTpPLVFLisg1WePbrTI+L8x+Tv66ergw94PnlPvSdV13wPdRpSEiHHEYm0MtJQCfBYY9
+         tf4HflrEmBpN7XqroSdPaboPEC7wAh/YUY9VjOxKC6J6GLlWfiJNOZsTwvyl8+39X9a6
+         2a/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782398320; x=1783003120;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XY4ljmmJfRdzZN+EfM21UiZLHHqxIilAOQkRMOvqbIw=;
+        b=lGMYD8tv6xjZQ2HL7YO8zWq2DCDDDDcs14Y8CEalrHzLb0TCCRuKu23CiEyDDj+U6b
+         ch2Z16khjhxWdLafxOdrEmTVYTt7q9/Jccm7IbwrnbEFbSw6M0YKD7wLfSMOtLTPTD2H
+         jTxd3gEqgybJd4zsNpKRyahnxLqZ7QAPGr4YOw0lQbIa3obhb6icjqDW8+1T8RH/0abu
+         E4MiLED6vsBmOuysoea2MTU/rOTLcNU86gYqRjucwcCg4ejr8eAmutaEq51G8stnTMIS
+         w8f4lt5HNqsPZjEgbg+PNBKUHXG+OXS2KWaqndhfpIJFDOBW7v1yuZreqqaA4vYZ8nzL
+         MCSQ==
+X-Forwarded-Encrypted: i=1; AHgh+RplJTWVtAP+bI8ZhUypmZECJ7/LCO7d1ics+QQH3vw0lhfaZjCskU1/d53VxIGhxUadj+WuuT8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziamIDKIzyYu8uqoVxt27pbmDHMlNqyPFcyad2Ui8+q8EVwvqb
+	Nfz3GW2KtZvC4FQqqZMc1BWtAcjz0OKlNXB4xcSxPc5clKo7YDOCBbgQ3igwIEmrtMnU
+X-Gm-Gg: AfdE7clxD55l6Hlaq6rOATFps0CcCpllA5FDDRGlUWP9e4wQUzjSXdIXrTJ8Zf3EMrP
+	aheB8R3kTL18R3XzgI4LXBSxMOekMYqM+RVxBAnKgq+HjRsiDOEc5c+grS2NzPVHXgsSdWDjXFI
+	Sbj3fwdgNGd0WOWPPYSwZRL/qXwVE2gowyGlwcfoDrYH5iYdEAR/iCShr09X/cPJlaTs66MAHD+
+	L7jhjV/FaihW0pQlmzw/xS/AaOEF8jQA+xRQqB9wpuaHGCgG/MckTHI8krC1zG5cmLxI3SCSn7o
+	Nhxj7qohO7Bel9bnEzQV7mZdw5AplIOsR3ABQGrD3b6hUttrF6xXSaNo6yjtKaSGtU+nsBzMy2j
+	DprjWNnxOBQjHL1Aeq6PyiQXjq6RtS4TcjpKO5FDp6gN95H3/Ag+OyC0gFdH4XgwGAdLhwuWuGp
+	Ug
+X-Received: by 2002:a17:907:9715:b0:c12:17d3:31df with SMTP id a640c23a62f3a-c1217d334ecmr51157466b.7.1782398319793;
+        Thu, 25 Jun 2026 07:38:39 -0700 (PDT)
+Received: from localhost ([2a06:61c2:d427:0:b321:1c7a:b072:326e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c11fbba6787sm214080166b.6.2026.06.25.07.38.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jun 2026 07:38:39 -0700 (PDT)
+From: Samuel Page <sam@bynar.io>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Samuel Page <sam@bynar.io>
+Subject: [PATCH net v3] tipc: fix out-of-bounds read in broadcast Gap ACK blocks
+Date: Thu, 25 Jun 2026 15:38:15 +0100
+Message-ID: <20260625143815.1525412-1-sam@bynar.io>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CWLP265MB5852:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7424d797-c0af-49d4-e23c-08ded2c755e7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|376014|7416014|366016|23010399003|1800799024|56012099006|921020|4143699003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	HdKWcFtQMcLKOrjpP//YXO/DGO5/s94FhF/KS+sW+C6cO62qB9RaiKLnAKV97wV3vf+cXI5FlLxNHW+dsgvZcov1uqJYqZXC71Zpg3cu4rqRSCx3K8dxNLT3jEdK4byFvbhkaqLWF+9Q5mW7tNW+JM+2xsGGLKiRvm/nGnZK+SYpcKOJYr62m7QwgVcLHUZm9bJ4mX0UPFj6RZM8CCKGjL5MNr1V+/X9uo+QekEYbiCyved41mxkcfkk2wZXeTSU1vHG76QYUM6CTnOLDNbEse1L2VUwCuWnyROIAVEtv+vgJopaYidkgX7bApjJ0oyWW9okySNMqeIblhd1tGu1FDU62DErbzYwKTxN8IMQ6QKAp/Zq+mA4VhzTyTflU158XxTCAhnxpgKfI02cUqFSo1lobKk0PRXI8W1xiLGb0/xWf7qAjCObsWw4eUrOayuFJAusQz29zF8t5xEL4X6luvMT6yv7z8uY/wzxMWqUk8iTDgucjGMreZUD0dTkcrYp59ZRKCdQ8bqwlecjqLFgH94OFjtElL0SeUFq3Bx4Hz39129opwLBGygsDb9ntGJkO76MG3/DLtqPvLOYHkKwGVY+FVAhGKOvwrsWBmV5FvN1ht15RkiRwwahpuS75k+nmwIvLHxhMjDCzNEtg2x1py4m/2Jp4SHcl6cIHyPJ1Wurf/61lkw4wFuVRkqaA2Vrv203jqDJAhK5PynjCP7NKg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(7416014)(366016)(23010399003)(1800799024)(56012099006)(921020)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MHRHVFRNSXlvMXhIcVBYQXJMTU81QngyM0l2SUd5bVFsQjlvWERYT3c5YlpB?=
- =?utf-8?B?NlBuTWpkS0tCOTVQRUovRTE3QXJBVnNXMmhmckFKcjN2NGszamZjMG5HbUp2?=
- =?utf-8?B?YWtjQXFhOExaemZvQWd5aktqU0ZNcEdUTW5XL3FWcGM4Z1NlZXJLSmY2bnB5?=
- =?utf-8?B?ZzdqS2Y0MkZtRERvNlQrVG16NUk5dktIb3lBY0c1cVR4V1BiTkpxTHhoL21h?=
- =?utf-8?B?TWVOTzdpWG1rSWhyZHR6bTdhMy9yWUxqZkVjL2k2RUtRdmF3aEhrZW8xdVZn?=
- =?utf-8?B?dFY0OWc1K3YvOFBMa1QxdURKVjQ2T09ybWxBMTk0eHZYR2dpclRtdDZuZmF1?=
- =?utf-8?B?VHVVRWZuNzhTWDFZSzNBMTcxMFY5VDk1M3lyTktRN3VIbVBGblZJT3lZOUdW?=
- =?utf-8?B?eG9BcUJjWGcwc0hZZEVsUjNwVFpZMzV1Lzc3dVJVcjIvbnc3ZVU2VXB1L3oz?=
- =?utf-8?B?TnZIMC9Ma2JjRno0aUVOR1RXYUtUWldlcFZhT0p4M2ROcGlla0dnQUcwb21F?=
- =?utf-8?B?Rk95d2N2dk9Yb2RYZlpYYVFlNHZ4TVM3ZUNBSENVTEVxbFNkdERmSFJEVnFL?=
- =?utf-8?B?Mko2ckZ2bFBUQ0E4dG5PbUpEUk1yTVJsR2JRZE45M0c4RGpIRUlua0dyOUJS?=
- =?utf-8?B?MDYwMDI2eVZRUHNGa3FXRTVqNlFXTWRJYXdNYWhHOXUzL1U4cmFWUEN5Q0Rx?=
- =?utf-8?B?bjA1aUs0Yktsb3NqWHVQWjNOUnVod0JRVWNpTEZRNUpVNUprR2V5ZEVibGJo?=
- =?utf-8?B?MGZETU12RkJmb0RFZGlWdXczQU9Ea2hHeTZrUGg5OFFMc3FhUHNmR3lFUlFt?=
- =?utf-8?B?a1J1V2FGSHBKV0daaTZpeGplUTQ5QTV1WHlIVExSVGVmdXJLRDRMM0JuNUQ0?=
- =?utf-8?B?ak9ZNExEV3E1SWJHcG1JcHJ2NzVNS0J5UUFhY1BKZmxJZFYxaWJaVVhPVmVj?=
- =?utf-8?B?K3I4aTk0K2NNQUNhdWFYem9JMHZlOUkraTUzdS9UdDloMitoMUEya2NoS1Jq?=
- =?utf-8?B?dXNqNVplcmVsdG44M2U3TmZ3dEVzRlQrdmk0NDJISWdEZjBEYjNZdFRERTky?=
- =?utf-8?B?UHpCUGVXYit1cHdRbDR0WXNjMjVQMVk0OEZ0bVM2ejFOZlVFek93VzYxMGcw?=
- =?utf-8?B?eU1kaUo5SzVLNG9uRis4dnVab1p1bEdvSUhwK1R3WExUOS9KTmthVzBUQk9Z?=
- =?utf-8?B?YUdkSVBXZzMvd3B4Yy9ndlVUWGlKR01tLy84NGZLbUY1eFVrcmdBTFlzZ0M0?=
- =?utf-8?B?YkdSeW51Z2kwNHRUSFdScVBSa3I2eS80aVJQTHBoTFUrYTNBN3NuU2psU0lY?=
- =?utf-8?B?S1FVMHZua0JiMGtaUUQvYkFFaVdyZUxvNHRXalk5N1NLcHVaanoyRi9tR2ZW?=
- =?utf-8?B?ZWE5ajJQbkRMSmhWTDdJUXE5MlBvZUJBdzdYTVlHSjFmeWRLdGpLeDFsM3pH?=
- =?utf-8?B?Q0ZtSzJ6YkpBdmdKQ3dpR0V2RnU5a0Q5RHlWS21YMDZROWk1anYzdytCWThU?=
- =?utf-8?B?T3Fldno0V3FEWUhwN1dReCtRK1kreHI3dm5JcUNkVDAweGo0S2VWYU53V0ow?=
- =?utf-8?B?VGJwT3FGTEN4RGo0V3UwQmJuNHc4ODBwZngyUHF1OFRzdURaajZudTdaRkdz?=
- =?utf-8?B?TDlxa01rQXJ4OEhpZHFoQmcxaWRzYlZ2SUR6NnRDSll0ckJZSkhxSjdVVVhU?=
- =?utf-8?B?VVh4RGRzMk5xRHJWRGY2RnlyWmxjU1VweFB2S2o1Z2JnMWtpWmRCOFVMeExQ?=
- =?utf-8?B?SlN5SlBaZjQ2dnRnM2ZVd3EreVJDNUZBUlpiclpjQTFjTksramxIUnpubGJL?=
- =?utf-8?B?UTFUMVEyaGVTaUVrNDhjVVdtYWFBcjc2cDB4YUc2bHFxQmxQOVpEWHFSNGZM?=
- =?utf-8?B?UmxiM2RWWC83bnR3UTFDNmQ1UVQ4N293elhrTTFNelJlbU5ZeW5vUjQyWEds?=
- =?utf-8?B?K01qWG1LYWcvUCtJQXlZWmxsY01rUGhiNUhtVHlQakN5d3lCcXNPeWxINEEz?=
- =?utf-8?B?QkEzWjdTS3Fha1dDeS9rdWduOG9hUUFSRWRZZyttazFqRjFubzBObnFRVVdQ?=
- =?utf-8?B?MnNCMlpWSkVDWk5DQnB2SzV5a09hQThyWmZRcHFDQlMzL2k5YTdMcXJWVzB3?=
- =?utf-8?B?ajhHdk9XaFgxV1l4aTI1ME9SODk0QnV6cWpDSCt6UUtIdllrWUNiZXBjaFJ2?=
- =?utf-8?B?ell1bWcxcWVCNllrNi80ZTdIcGNja21hcTc0YVVGaExFYkZpckRpbEtvd3lY?=
- =?utf-8?B?SmlnSitNb0kwaUUyeVJZVTJNemJpLzVPRHd2b0lTYUozRkE3ZENSNGZnZW1L?=
- =?utf-8?B?WXp3Ung0R29FZ0pWVlRXOGRRRjJHTG4yVW9aVmRFcHVKS2R5VWpXUT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7424d797-c0af-49d4-e23c-08ded2c755e7
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2026 14:37:51.5446
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Xa0M+OlPuxB8Wu4J5DLAlGDE1IyUEMdusI34WQJXWuTDAcF8svRY0T26eu6fLvW3/adm5od112sQHZdUGeACVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB5852
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
-	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[47];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301985-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[linux.dev,kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,davidgow.net,debian.org,kernel.dk,intel.com,android.com];
-	FORGED_RECIPIENTS(0.00)[m:alvin.sun@linux.dev,m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:dakr@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:leon@kernel.org,m:igor.korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.k
- ernel.org,m:kunit-dev@googlegroups.com,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[garyguo.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301986-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tung.quang.nguyen@est.tech,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:sam@bynar.io,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[bynar.io:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:email,garyguo.net:dkim,garyguo.net:email,garyguo.net:mid,garyguo.net:from_mime]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,bynar.io:dkim,bynar.io:email,bynar.io:mid,bynar.io:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B7A986C6B91
+X-Rspamd-Queue-Id: BDD876C6C58
 
-On Wed Jun 24, 2026 at 4:00 PM BST, Alvin Sun wrote:
-> Move `Module`, `InPlaceModule`, `ModuleMetadata` and `ThisModule` from
-> `lib.rs` into a new `rust/kernel/module.rs`. Re-export them from `lib.rs`
-> to avoid tree-wide changes.
->=20
-> Switch six bus driver registrations from `module.0` to the public
-> `ThisModule::as_ptr()` accessor, since the field is no longer visible
-> outside the new `module` submodule.
->=20
-> No functional change.
->=20
-> Assisted-by: opencode:glm-5.2
-> Acked-by: Danilo Krummrich <dakr@kernel.org>
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+A broadcast PROTOCOL/STATE_MSG can carry a Gap ACK blocks record in its
+data area. tipc_get_gap_ack_blks() only verifies that the record's len
+field is self-consistent with its ugack_cnt/bgack_cnt counts
+(sz == struct_size(p, gacks, ugack_cnt + bgack_cnt)); it does not check
+that the record actually fits in the message data area, msg_data_sz().
 
-Suggested-by: Gary Guo <gary@garyguo.net>
-Link: https://lore.kernel.org/all/DJFIQPLOVO4T.1K8T0VZM30LDA@garyguo.net/
-Reviewed-by: Gary Guo <gary@garyguo.net>
+The unicast caller tipc_link_proto_rcv() bounds it ("if (glen > dlen)
+break;"), but the broadcast caller tipc_bcast_sync_rcv() discards the
+returned size, so tipc_link_advance_transmq() copies the record off the
+receive skb with an attacker-controlled count:
 
-> ---
->  rust/kernel/auxiliary.rs |  2 +-
->  rust/kernel/i2c.rs       |  2 +-
->  rust/kernel/lib.rs       | 75 +++++-------------------------------------=
-------
->  rust/kernel/module.rs    | 71 ++++++++++++++++++++++++++++++++++++++++++=
-+++
->  rust/kernel/net/phy.rs   |  6 +++-
->  rust/kernel/pci.rs       |  2 +-
->  rust/kernel/platform.rs  |  2 +-
->  rust/kernel/usb.rs       |  2 +-
->  8 files changed, 88 insertions(+), 74 deletions(-)
+	this_ga = kmemdup(ga, struct_size(ga, gacks, ga->bgack_cnt),
+			  GFP_ATOMIC);
+
+A TIPC neighbour that negotiated TIPC_GAP_ACK_BLOCK triggers it with one
+ordinary broadcast STATE_MSG (msg_bc_ack_invalid() clear), sized so its
+data area is short, carrying a Gap ACK record with len = 0x400,
+bgack_cnt = 0xff and ugack_cnt = 0. len then equals
+struct_size(p, gacks, 255), so the consistency check passes and ga is
+non-NULL; kmemdup() reads struct_size(ga, gacks, 255) = 1024 bytes out
+of the much smaller skb:
+
+  BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x48/0x60
+  Read of size 1024 at addr ffff0000c7030d38 by task poc864/69
+  Call trace:
+   kmemdup_noprof+0x48/0x60
+   tipc_link_advance_transmq+0x86c/0xb80
+   tipc_link_bc_ack_rcv+0x19c/0x1e0
+   tipc_bcast_sync_rcv+0x1c4/0x2c4
+   tipc_rcv+0x85c/0x1340
+   tipc_l2_rcv_msg+0xac/0x104
+  The buggy address belongs to the object at ffff0000c7030d00
+   which belongs to the cache skbuff_small_head of size 704
+  The buggy address is located 56 bytes inside of
+   allocated 704-byte region [ffff0000c7030d00, ffff0000c7030fc0)
+
+The copied-out bytes are subsequently consumed as gap/ack values, but
+the read is already out of bounds at the kmemdup() regardless of how
+they are used.
+
+The unicast STATE path drops such a message: "if (glen > dlen) break;"
+skips the rest of STATE_MSG handling and the skb is freed. Make the
+broadcast path drop it too. tipc_bcast_sync_rcv() now bounds the record
+against msg_data_sz() and, when it does not fit, reports it back through
+tipc_node_bc_sync_rcv() to tipc_rcv() so the skb is discarded rather than
+processed. ga is not cleared on this path: ga == NULL already means
+"legacy peer without Selective ACK", a distinct legitimate state.
+
+Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
+Cc: stable@vger.kernel.org
+Assisted-by: Bynario AI
+Signed-off-by: Samuel Page <sam@bynar.io>
+---
+v3, per review of v2 [2]:
+ - reverse-xmas-tree order for the new 'glen' declaration in
+   tipc_bcast_sync_rcv().
+ - tipc_node_bc_sync_rcv() now checks the validity flag and returns
+   immediately when the Gap ACK record is malformed, rather than relying on
+   the (zero) return code to fall through.
+
+v2, per review of v1 [1]:
+ - v1 cleared 'ga' on an oversized Gap ACK record, which let the malformed
+   STATE message be processed as a legacy (no Selective ACK) one rather than
+   dropped.  v2 drops it instead, matching the unicast STATE path:
+   tipc_bcast_sync_rcv() reports the bad record through a bool output
+   parameter, propagated by tipc_node_bc_sync_rcv() to tipc_rcv(), which
+   discards the skb.
+ - v1 touched only net/tipc/bcast.c; v2 also touches net/tipc/{bcast.h,node.c}.
+
+[1] https://lore.kernel.org/netdev/20260623135443.3662041-1-sam@bynar.io/
+[2] https://lore.kernel.org/netdev/20260624135629.727262-1-sam@bynar.io/
+
+For reference, an earlier thread proposed validating inside
+tipc_get_gap_ack_blks():
+  https://lore.kernel.org/netdev/1316452e465e9a96fce44ec15130a14f3872149f.1775809727.git.caoruide123@gmail.com/
+
+ net/tipc/bcast.c | 22 ++++++++++++++--------
+ net/tipc/bcast.h |  2 +-
+ net/tipc/node.c  | 15 ++++++++++++---
+ 3 files changed, 27 insertions(+), 12 deletions(-)
+
+diff --git a/net/tipc/bcast.c b/net/tipc/bcast.c
+index 76a1585d3f6b..10d1ec593084 100644
+--- a/net/tipc/bcast.c
++++ b/net/tipc/bcast.c
+@@ -497,12 +497,13 @@ void tipc_bcast_ack_rcv(struct net *net, struct tipc_link *l,
+  */
+ int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
+ 			struct tipc_msg *hdr,
+-			struct sk_buff_head *retrq)
++			struct sk_buff_head *retrq, bool *valid)
+ {
+ 	struct sk_buff_head *inputq = &tipc_bc_base(net)->inputq;
+ 	struct tipc_gap_ack_blks *ga;
+ 	struct sk_buff_head xmitq;
+ 	int rc = 0;
++	u16 glen;
+ 
+ 	__skb_queue_head_init(&xmitq);
+ 
+@@ -510,13 +511,18 @@ int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
+ 	if (msg_type(hdr) != STATE_MSG) {
+ 		tipc_link_bc_init_rcv(l, hdr);
+ 	} else if (!msg_bc_ack_invalid(hdr)) {
+-		tipc_get_gap_ack_blks(&ga, l, hdr, false);
+-		if (!sysctl_tipc_bc_retruni)
+-			retrq = &xmitq;
+-		rc = tipc_link_bc_ack_rcv(l, msg_bcast_ack(hdr),
+-					  msg_bc_gap(hdr), ga, &xmitq,
+-					  retrq);
+-		rc |= tipc_link_bc_sync_rcv(l, hdr, &xmitq);
++		glen = tipc_get_gap_ack_blks(&ga, l, hdr, false);
++		if (glen > msg_data_sz(hdr)) {
++			/* Malformed Gap ACK blocks; caller drops the msg */
++			*valid = false;
++		} else {
++			if (!sysctl_tipc_bc_retruni)
++				retrq = &xmitq;
++			rc = tipc_link_bc_ack_rcv(l, msg_bcast_ack(hdr),
++						  msg_bc_gap(hdr), ga, &xmitq,
++						  retrq);
++			rc |= tipc_link_bc_sync_rcv(l, hdr, &xmitq);
++		}
+ 	}
+ 	tipc_bcast_unlock(net);
+ 
+diff --git a/net/tipc/bcast.h b/net/tipc/bcast.h
+index 2d9352dc7b0e..55d17b5413e1 100644
+--- a/net/tipc/bcast.h
++++ b/net/tipc/bcast.h
+@@ -97,7 +97,7 @@ void tipc_bcast_ack_rcv(struct net *net, struct tipc_link *l,
+ 			struct tipc_msg *hdr);
+ int tipc_bcast_sync_rcv(struct net *net, struct tipc_link *l,
+ 			struct tipc_msg *hdr,
+-			struct sk_buff_head *retrq);
++			struct sk_buff_head *retrq, bool *valid);
+ int tipc_nl_add_bc_link(struct net *net, struct tipc_nl_msg *msg,
+ 			struct tipc_link *bcl);
+ int tipc_nl_bc_link_set(struct net *net, struct nlattr *attrs[]);
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 97aa970a0d83..8e4ef2630ae4 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -1831,12 +1831,15 @@ static void tipc_node_mcast_rcv(struct tipc_node *n)
+ }
+ 
+ static void tipc_node_bc_sync_rcv(struct tipc_node *n, struct tipc_msg *hdr,
+-				  int bearer_id, struct sk_buff_head *xmitq)
++				  int bearer_id, struct sk_buff_head *xmitq,
++				  bool *valid)
+ {
+ 	struct tipc_link *ucl;
+ 	int rc;
+ 
+-	rc = tipc_bcast_sync_rcv(n->net, n->bc_entry.link, hdr, xmitq);
++	rc = tipc_bcast_sync_rcv(n->net, n->bc_entry.link, hdr, xmitq, valid);
++	if (!*valid)
++		return;
+ 
+ 	if (rc & TIPC_LINK_DOWN_EVT) {
+ 		tipc_node_reset_links(n);
+@@ -2140,12 +2143,18 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
+ 
+ 	/* Ensure broadcast reception is in synch with peer's send state */
+ 	if (unlikely(usr == LINK_PROTOCOL)) {
++		bool valid = true;
++
+ 		if (unlikely(skb_linearize(skb))) {
+ 			tipc_node_put(n);
+ 			goto discard;
+ 		}
+ 		hdr = buf_msg(skb);
+-		tipc_node_bc_sync_rcv(n, hdr, bearer_id, &xmitq);
++		tipc_node_bc_sync_rcv(n, hdr, bearer_id, &xmitq, &valid);
++		if (!valid) {
++			tipc_node_put(n);
++			goto discard;
++		}
+ 	} else if (unlikely(tipc_link_acked(n->bc_entry.link) != bc_ack)) {
+ 		tipc_bcast_ack_rcv(net, n->bc_entry.link, hdr);
+ 	}
+
+base-commit: 02f144fbb4c86c360495d33debe307cb46a57f95
+-- 
+2.54.0
 
 
