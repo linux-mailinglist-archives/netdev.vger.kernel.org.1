@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-301816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301817-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +lw3HhaDPGq1owgAu9opvQ
-	(envelope-from <netdev+bounces-301816-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:23:34 +0200
+	id uz2bMzCDPGq4owgAu9opvQ
+	(envelope-from <netdev+bounces-301817-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:24:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A656C21BF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:23:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D77A6C21CC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:24:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=scuo3Hrv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301816-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301816-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=LfFxJsMV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301817-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301817-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 930C0303259C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 01:23:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6B7633014246
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 01:23:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3161E368D7C;
-	Thu, 25 Jun 2026 01:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C9136F8E9;
+	Thu, 25 Jun 2026 01:23:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0CD1EDA32
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3534736A364
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:23:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782350612; cv=none; b=Uje9a8nD63KRexHT7g0KpDOxgkwE3NiNDzFRyYUFDRMMDdlVAQFrN/XFLwpOLiyfYFfoUU9XeZqp7jePHNdkQjNuJK2+81obOG4jvq5OycLxogNQqACoYvbymWY81ILDLaBv/gyT/WDXAVbyTx5Rx45lYJvMgq09Pqkf+AShmcQ=
+	t=1782350634; cv=none; b=b6OgELUT1JWN1RjUVERE1COmQO418MhiN9RaOaMSTwfBgcBV05vqZH52vXZ8r/859gxVqYkBN2QSO7Eh7XqvAyo+8mxN/kiXbD3xAxMLYRwHSULz1J4iqmlTVm/P3upaxhk9qA0oYb3iNTz2P52usZ7T7IQvDK5jjxx8P5mR+s0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782350612; c=relaxed/simple;
+	s=arc-20240116; t=1782350634; c=relaxed/simple;
 	bh=T9SXqfsO/EFq+dYj0i1JvBToxhsvtWDwvs2JRGi+kgM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dDUuVaoW0tWDHSV+NiV5Bro2x0yOi3SfWmWUblO8IcTA4eefqK5P55Hm5D0izL1DGNPkfQYHrku7pwLuiS+8T7LSIfuNzQVGVIKnvSy8d1mdtTRMqcZC4vT47jUf9Wqufqijor1ljBjP/LsS6OXtqiHJFMOm066RfHjlP+PAWKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=scuo3Hrv; arc=none smtp.client-ip=209.85.210.176
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-84231305a80so1288708b3a.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 18:23:30 -0700 (PDT)
+	 MIME-Version; b=PCu+wlp3BUkodXqM1NZKIpEuvx3TFMwK0fI2ZKovlRHz5AuCBlMpjZisoe4pUrKRAwL6XxgGpR5MTpVnIiHgyeqe2+rhVdVc8j1eAIB2uIrtSZY+iuTYADqnfQyL9V1Uy7vhjNFUuqqpdTk9PR6oC8s5VtiFa2c+YC9yLs+ahqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfFxJsMV; arc=none smtp.client-ip=209.85.216.46
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-37df0b86a82so229431a91.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 18:23:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782350610; x=1782955410; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782350631; x=1782955431; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
         bh=XWrI8sitTaDcWEaHG+ZnIRCNC7VJeTwjUrHgR3uWgo8=;
-        b=scuo3HrvN19gg3/FDGHEjXterTIX6YzCTf3YrL/mgSmklMg4Pteu1ASWq1ze0TSCI2
-         tOrTjJdKq+7S7XmstRqQr6yTDXDOSlx9cYtLYHXfxoV2/y1FczGB3ro2FfglXUwhmKab
-         LXLPT30WvAmspm8uTJpCYgjC+tXR/petEfS3eRhUkgJn7H63aH/T3VDvG/zW3HuGcvfj
-         xuS/20SWarkTSodAqtwWa74ZxVLOsyTSQNpk4wc0UtM+qbOJQMmrO7n5ObRwnoEXAF+R
-         zciHVu8KPB6yT5Zrf9r1ZmAfmrCIqqVBwPkytSNt4lsj1d3MRFnQp7sqAZCM0l16tC94
-         /0rA==
+        b=LfFxJsMVytxTBnqopl4HTZWKaCw7fr8/yIcl62JXLZeyiL1h1GTWPn2aNQg6tG5cPX
+         0KbSKI/KMuaptoAM4ts/UomQOSxJ9DMv2gGkSE9CFkgCn4pX2WE/N+TKyFOLho5RUBQk
+         E315W3LdoYVotNiWu71owoXTL+4L8j4NcUnRJhXMP4iYeTkPAFCOjL4gt0UX6+MuSbVR
+         0O2WkB/lNvQl/0RdIPh0KmEjs1AYw6N7soUEFwZr57REJ6kjt7IRxW3tUjChKBCsrGK7
+         7L+fVCFNnPf7hPBOpm5+GQbtMaeGmOEqTCZuJHcRIdg/l9+JE6UzbpYnERj/iKMTuVFX
+         ISZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782350610; x=1782955410;
+        d=1e100.net; s=20251104; t=1782350631; x=1782955431;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
         bh=XWrI8sitTaDcWEaHG+ZnIRCNC7VJeTwjUrHgR3uWgo8=;
-        b=PiV8RQTlU2fp4IVUAPP7Bw7okflcDyLdR8th5isAO5+/RmStidd0Kk34/sVvZHuRf6
-         0crc83cfhGdo2PAOFjV4PHl/8Ddm0OMQWs9UpmjGRn4rYWjSPZWkhcRhFZR39MRBkK7U
-         bYd92OpSxc0lQIhzDNL0T3sQf3aT/SjSi0HpDmESKGoFloXok/++4g9VowZk6ULnDQFA
-         rNWcuDZiQIV4dQkRLeDpCe89BwYs/DQfovRWRX2mwbreNDyxMUHsfql0EyU1jVYs9xC+
-         PuyAYGRn5IN4Sw68HDruyjcLmNhOwltNV/7F+S+37rY78BX85rGJpXHqyqlldzzktHLK
-         9OZg==
-X-Forwarded-Encrypted: i=1; AHgh+RowRWLWGuRTcvEraHWpUID2WOz2D9uD0D4Bog6aatLPbs5OkRA/fb3bJEtDKjgupZxAj8EZdoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydZ914pjJmXtKghVOTQiz5qTtEbjBH2edEquzEN+IYkacpHG5G
-	Jic3LEoPWPC+VTkYkXmHiGPTftKGuzG5kC+dC+q98hKd2u7AEmkTLUEM
-X-Gm-Gg: AfdE7ckO67WAmI1wlRJH0rc3/AFKd/ghyHrsWJB+66vxxrXgeaK1+8GJJnqYbJh+rDw
-	Xs3jgFvBaw12Vyu4wlKKd5fUBlxHfvsT6FBviOY3yGaiUNj/xxJLlBOjlJvMDO3emhGLDN0aGs6
-	n6hxhTmX5ml4hzu9nCPDDNoqGdsNLADb48B2ypGl+LsGHFkCVWZrthWBNze/SxRymGLgaDQF45D
-	U1X5Nr3KeEtt4L90WOOLMnBEjIfxzArAITo20GJpJZUfZ3cCx8NbreVwuChDpItv7SPGhA4Xh9z
-	FXwZccpAjgeSmRA93+pDjXRw9fdQ3W58aMiC6lFWCUpAW+ayUSj9wYsUBIusk+oWMieoW5eUpRV
-	1g+kGjjfB4gSrSNUD9WSBMb0b5qneX9qfhKQ7cfhu23/+sSSXwlcaDrtBXuF+9sVIYl+jGHBzMG
-	1RPYOgkPCTXkgFzX0m7Ox4N2giXDE=
-X-Received: by 2002:a05:6a00:2396:b0:842:377a:4dcd with SMTP id d2e1a72fcca58-845b3b1dc40mr642354b3a.43.1782350609949;
-        Wed, 24 Jun 2026 18:23:29 -0700 (PDT)
+        b=nhV3AHsbdA9T6b2G9Eq+abUR5bf5rv+ohZ1eepdVJWsnBVjD5Q2EW5/KqVlWmfPMc8
+         00AfihFKQy9IY4jdY0i9Ya4Li0Xfhuq9HxCedXQNshw51mNHW3deowaFnBy4V2hS7n09
+         BPMpE4qMVmOA5UZq0LLFvqCqDPdE8h14QMDb9QfGF9648eumyRib/8F536NR3WWRwaiV
+         L7ReM/NXqm8uaSN1ysbHcVH9AO+Q4UAd7hiTD5iZoBTgB+vheS+EPJ6OVpF99Zt8tdWW
+         krlNp6/TFQnZA2K5RQnEVyivTd2/bIlZBPvabzDglK//zMF140/Kg3rFdz4ExFLjxFY0
+         uhYg==
+X-Forwarded-Encrypted: i=1; AHgh+RqtKFC7EmqOI1fUZhAFkQGlzW1ZEXqjOTF+YOy/4CubzzXNLpDLY9CjQ1xsSiyRDI6rPHq2VHQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLLwVeMQvsO6F7seJv/8xynNY38GgbgFknVMEuSC52uPtcM2nK
+	CNBss/bX4ZeFbQi/zrcaorgCprEhMJX1sMhWQdyQ40/fbj1d5i6q5yWbTquBw3JM7/c=
+X-Gm-Gg: AfdE7cm2S7I9ndsGMSC3fnIlwc6Sogf09qrIFgifEoCoDpyPUj0ZCj0tfhU8veiRDsN
+	P6tj6OCBaMYfNlZDrzj2+TxVLR7tdIgf53JwqvEOQ0vkTQSuISluXwLl/oU4VlmpqGvGTgsbm2s
+	89Vei+jiJYuEAadAWTFWnRyiukcpSKthuDGVw4y9Xex5B8gS5p6uKpCIG1GviY6X4fVM2Tpmr+H
+	t+LG4PvPyKW5SW8mbYlik5bCV42cl0qtRucpLhySUlZB8PNA+ns65TU5KMfcdWVhqjmMTMZ+rsB
+	pElWvxciSSWXKV5Gft+8enewnaa6BCcWl4TiPmSmlL5QkcQyKCRiabC7ZK7i8jKfPYdskJOVtpX
+	2UWkfPLBQD+bz6tpG2qjQ6HqnPgNY0rsNp+DF4Hz7MVrB7afwTnG2VXXv9aISQJkFY6HhEY4uAJ
+	1xNdz/zHtVZ4m1Gd7cdp1rG6xzE54=
+X-Received: by 2002:a17:90b:48d0:b0:373:302d:3ce6 with SMTP id 98e67ed59e1d1-37df911f73bmr384288a91.8.1782350631330;
+        Wed, 24 Jun 2026 18:23:51 -0700 (PDT)
 Received: from online.mioffice.cn ([43.224.245.228])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-845a4002bf0sm3272475b3a.25.2026.06.24.18.23.26
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37df613b3a2sm158588a91.0.2026.06.24.18.23.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 18:23:29 -0700 (PDT)
+        Wed, 24 Jun 2026 18:23:50 -0700 (PDT)
 From: Pengfei Zhang <zhangfeionline@gmail.com>
 To: dsahern@kernel.org,
 	idosch@nvidia.com
@@ -90,9 +90,9 @@ Cc: davem@davemloft.net,
 	baohua@kernel.org,
 	Pengfei Zhang <zhangpengfei16@xiaomi.com>,
 	Pengfei Zhang <zhangfeionline@gmail.com>
-Subject: [PATCH] ipv6: fib6: fix NULL deref in fib6_walk_continue() on multi-batch dump
-Date: Thu, 25 Jun 2026 09:23:23 +0800
-Message-Id: <20260625012323.892346-1-zhangfeionline@gmail.com>
+Subject: [PATCH v2] ipv6: fib6: fix NULL deref in fib6_walk_continue() on multi-batch dump
+Date: Thu, 25 Jun 2026 09:23:44 +0800
+Message-Id: <20260625012344.892480-1-zhangfeionline@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260624171156.822055-1-zhangfeionline@gmail.com>
 References: <20260624171156.822055-1-zhangfeionline@gmail.com>
@@ -110,14 +110,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,xiaomi.com,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-301816-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301817-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:chenzhangqi@xiaomi.com,m:baohua@kernel.org,m:zhangpengfei16@xiaomi.com,m:zhangfeionline@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -133,13 +133,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,xiaomi.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C3A656C21BF
+X-Rspamd-Queue-Id: 6D77A6C21CC
 
 From: Pengfei Zhang <zhangpengfei16@xiaomi.com>
 
