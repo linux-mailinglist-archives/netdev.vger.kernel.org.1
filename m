@@ -1,177 +1,166 @@
-Return-Path: <netdev+bounces-301907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301908-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MjYqBdXuPGpruggAu9opvQ
-	(envelope-from <netdev+bounces-301907-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:03:17 +0200
+	id LO+zM53xPGoeuwgAu9opvQ
+	(envelope-from <netdev+bounces-301908-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:15:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 792EA6C40C0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:03:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B966C420D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:15:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=lOXJoCtW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301907-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301907-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301908-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301908-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CA98E3000FC6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:03:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA82F304C2F1
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 09:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB53036F426;
-	Thu, 25 Jun 2026 09:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90665373BEA;
+	Thu, 25 Jun 2026 09:10:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B81532B105
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 09:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9521335AC00
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 09:10:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782378191; cv=none; b=k0VrQBDXET7hzsBLqkJSAtu3eSmGvaJM6Tgy0le4FqFyacOBnAxUzVYEUyBj/wCMTbD/sxBykuXpyvvERcPk4nlua5kGCEUM54piYMtGhjUmvvX3FrsgcLkWBdlvXOexzIGzMYnnGWlSP7bded0rEMvFVSINNDQLKm9w9lEgfbU=
+	t=1782378626; cv=none; b=ayJc16pt+kk2UwlZGN3+FTbETQ3uvoWJ482Ughl2MSOPn2lUMByZHCR9y9TSQYcgVhTI8su1R0bvF3KqEefUOtg3hBKftkjEHB/foQ1vRaeM8dH/N1M4/B+UF2hGH+TbkPv54soFyOFUBNMLJSLYDcYKyk5ziIOlLJfzfIlOMwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782378191; c=relaxed/simple;
-	bh=FguPNFEFgDgE8rgvKN7AiVQat7qypuBZ+3etEcHfrYM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VYV+uTBXyWZwnV7e0aqRlCCXXsEQylcRN9evt14OtbYInrGS6v/5eY5RWXGQ0lPD8Ka/CgU4udbcg6bFNJeTmzsvpF1T2cxdSXqYZZM4/jii8+kVHFKute6wK9Lw14pAIJU5Aq+7Lsz2QycXh8OZCAb20wgQMYyFjeG1guI8PZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lOXJoCtW; arc=none smtp.client-ip=209.85.128.43
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490b3637b90so13139265e9.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 02:03:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782378189; x=1782982989; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HBSEPUdUYWVlvar6bWIrKaomQq421L3gUjBqqjys/Kg=;
-        b=lOXJoCtW3HddOvhqI21M0MrdbMGEeCA203jHr464PdrunmvNXlIQvSoKPMYGOwu4m4
-         RFwzCGN4SEIzuyefzRGvqyCJB/GtkeMBWZzjp4qmsNb6mas2NSkYMNhJavf0maEmpgGq
-         0vvVPDFPNdbWI17P5aDEiI8RSUl8o1BtTA3eX3kxrgBI6XMsaISmMPROcZfJK7G1h09P
-         RzBwVnOWIQCPYHq67uns8cLfchsPhr8HW69dmF0nK2HkL0V+pgurnozJUMe39BUxWAvU
-         RpjIZlh296DGwdKkfZklxNtaZWULelbrJR/kq7UqaUkZhA0GlrrRQyRyaByTUYa6sM2A
-         BNwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782378189; x=1782982989;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HBSEPUdUYWVlvar6bWIrKaomQq421L3gUjBqqjys/Kg=;
-        b=frO+qAT0KKRvndL2JsEyA/mcBEFTZkRkd9+hCrzae7o+KkczhWfrrLtR+KQ5bGVMRH
-         U83dzTePuaGkwZsfio4j4LNoOMHylxJB9Q34BCjmF/WcNko7l4QRdylb3S16jZvx3ukv
-         bu83NJH/WsSgTfVw7ibcbOR+mQtOQFnn8A0o8AYu0KnZzXXomFv2JGD0/rh5t+xC79Ct
-         i3CdFD2pd8dagm19f+LC4jNwhaRfiXkcXsLUyEumupkZSb0CLTD4AuJCXjfMAUQXmMQe
-         OqAG0uSYVCGasfEoFtFFTxCu+VwjJ3mBHGDb0TOl1PypTfNni6nG889AlIBWZQv2BjFE
-         dv+g==
-X-Forwarded-Encrypted: i=1; AFNElJ9Z1sx3c/D+eRj9FSYWuG+OuTCemkm68CkOB+BE3tVFppWM5zBN8wsC1WoUhYRCS3zX//PVdto=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVgueqJNdDxIK/mDCJYbT1kLMlobteQynENoEEwZuDhFGZfXlJ
-	j73zH1A6l1yJI7bsNenKGqYKFE79BRFohRE9n3yxL7Ac6/1h7c/15vZC
-X-Gm-Gg: AfdE7cmqpPazkoXGAFPSQCpPQmFB4Uq9+14aq8IczmUOHgSKyUdCqkSOdX+bE2bE1ye
-	DwkIS/z3IrL6zIkOeZQk2VLpMjWic12dZjwbqKMjU4yQ4bsom+nd5aW+j3d7TEyP0qTpGpn1rel
-	GTJTEnk2mT0MdxBYnfI1ZdTmrIlNIvtwm4Zaw9Z9d1G2ZC5jiN6ql8bfzLxxjm3mGleALaP1gvJ
-	GBM33yYnVlEdOogE/sz+Mc3r7qXQovwPJkyrU5H07fmgfLoOG93W+5RuB+ZneabHjM/eDTX9Ykm
-	27lyshg+Mk7mvmIN7rUIwR/xNzJnZDyqGGsciWXSfiTVs30VM6UayscXzPOGRdyLS933BW+Heew
-	seqCQQpzkbbS+xOZDsHqWfk02iMaMjpI20il8o2IC2ljIXtUou4dd8qwqzmzhBwbV/H99lTe6mI
-	HLoErIKZzECfETn9GVZyQ=
-X-Received: by 2002:a05:600c:c059:20b0:490:bb3e:30c2 with SMTP id 5b1f17b1804b1-49266885955mr16491185e9.18.1782378187463;
-        Thu, 25 Jun 2026 02:03:07 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-49265975147sm55948915e9.5.2026.06.25.02.03.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2026 02:03:06 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: val@packett.cool
-Cc: akpm@linux-foundation.org,
-	axboe@kernel.dk,
-	brauner@kernel.org,
-	david@kernel.org,
-	dhowells@redhat.com,
-	fuse-devel@lists.linux.dev,
-	hch@infradead.org,
-	jack@suse.cz,
-	joannelkoong@gmail.com,
-	linux-api@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	miklos@szeredi.hu,
-	netdev@vger.kernel.org,
-	patches@lists.linux.dev,
-	pfalcato@suse.de,
-	rostedt@goodmis.org,
-	safinaskar@gmail.com,
-	torvalds@linux-foundation.org,
-	viro@zeniv.linux.org.uk,
-	willy@infradead.org
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for preadv2/pwritev2
-Date: Thu, 25 Jun 2026 12:03:01 +0300
-Message-ID: <20260625090303.3796964-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <83f05c55-efba-4bf5-abfe-d2ab0819e904@packett.cool>
-References: <83f05c55-efba-4bf5-abfe-d2ab0819e904@packett.cool>
+	s=arc-20240116; t=1782378626; c=relaxed/simple;
+	bh=PEBEmMy90gH/VhkxoRHvNdAN5Mi8ama6b4nY5UPxTdE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MxXO5DArUB82fd/PiJW/ofhsTUtR7/QDMKIs7ORJve6R5rNfm54nChbHh0eP62PrPotouBGnMN9ArDKFgxjc/GRAL4BHQJAh4Ydtmd4TZFDfNXbIGjklQG7pKtpzzjq/TJs/7z9YqQbsXNraffhH3xd6UImz7uhOW09esApZakg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.19.206
+X-QQ-mid: zesmtpgz4t1782378540t9e8d38c7
+X-QQ-Originating-IP: YBh5evtk62P4jHOxlaba8OdhCzi35ewp6JCcmARGh70=
+Received: from w-MS-7E16.trustnetic.com ( [115.204.248.247])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 25 Jun 2026 17:08:53 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 7305110803469154808
+EX-QQ-RecipientCnt: 11
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Kees Cook <kees@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net] net: libwx: fix VMDQ mask for 1-queue mode
+Date: Thu, 25 Jun 2026 17:08:51 +0800
+Message-ID: <60D88ADD3E295420+20260625090851.539640-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NNHaSqFB0TH+6FKDqaHSIXlbwgtswPdDsSGAYTxi/MilrKBgyYDSIqC8
+	UgdiAU3gaypk2mS7Ma3PDQr511zz86zF+y9OQ7+JJPcKzdFKXnonUl9/3Auled32Xcrb65s
+	Khv9WmbduG7wrNY0sbXnh4DOyOvs4Uba0vYgV+M5kF2wuWkRP+xVH1F8qSwPL4lBr5gccSa
+	77IY1FUh9z+odipfpGpqCGEsE6ubR2UsEXnBkylJwOilHYtT9lM3FAM6L2NDYihzZjRfAJV
+	Z/WW9mZyMfml5LdEt6giuvq/ReFPNc9hXrKuIaxFx2J0grEsBw6b+7GepmIu/jLyZb/wOWa
+	lE98KTu7kBAi5T/24VOBSLYt9TC2nVfWuC0Y4BmCKhocL1ZIofLMCbGTMVypr3Een8tl1TB
+	N/LZKmS9FosK83Hnr2OO81H8cskX4CKn/3MQoiIAr7xwkMVxOcjVjYA4glSjQfVYNVi6FfS
+	M1VEnlwJXzeNZl0djY8T9sshhBzKDMH5J280cHz1tQBrN4jwN0yVPfFuCgB5JsiOz2hc0aq
+	/+CpYvMYNJTLs1QpTbX25GIbK5HiS3DCQ+/0Ory0F3XsGnIo/jGqMirzvN3CObfoSJ7RBCz
+	Dw7uIQx+Pc5EHSANKHtsoK0vFp4uyiODWzmEPJF+wsoNHcjhSDsoCTttr/47lQlLzruni2+
+	OShtdxscncr44/xlXlSlAd3/I1/EaxeTIqldZ71U2Mv/rTgFNdFtm+219CfQvbOPrTc1fAu
+	f3B+hJ3GvtKMwwHWoD5CjWCjYXZwo1aBObblYGkK8dfB7nnzfq+okQa47l2BZdzIyLA+qDY
+	ZbbP91TRMw5uaxoKH5NoeT5MSttMKyzd+g4enmLmE34+70rVKkfCSFW8I6t3DYVlWxH2UPg
+	EAVD/oPHF1b00qnQeQoXwrpZ711DpubAz3AY/S6VQsCNGC/dSwgINsE248Dnlfkti007OKC
+	JC4pA/FZ9aXSq7M1df+adUaC6m13VG30wE6GtW9TcVXQe40UGERTX07a5TyJgHI9v0tD/Td
+	uKc9NFKUFbDcKko4/CL6owBfjXid/zTwFAndKVLHxDfjS6ST6NyTFqDrP2YC3zeyUunWzW7
+	DOmA8ImdjGAL2dQQ5GDdRta3gcsVH8LTw==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-301907-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux-foundation.org,kernel.dk,kernel.org,redhat.com,lists.linux.dev,infradead.org,suse.cz,gmail.com,vger.kernel.org,kvack.org,szeredi.hu,suse.de,goodmis.org,zeniv.linux.org.uk];
-	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:val@packett.cool,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:brauner@kernel.org,m:david@kernel.org,m:dhowells@redhat.com,m:fuse-devel@lists.linux.dev,m:hch@infradead.org,m:jack@suse.cz,m:joannelkoong@gmail.com,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:rostedt@goodmis.org,m:safinaskar@gmail.com,m:torvalds@linux-foundation.org,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301908-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:larysa.zaremba@intel.com,m:kees@kernel.org,m:jiawenwu@trustnetic.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,packett.cool:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 792EA6C40C0
+X-Rspamd-Queue-Id: 18B966C420D
 
-Val Packett <val@packett.cool>:
-> speaking of fuse_dev_splice……_write actually, this series has broken 
-> xdg-document-portal!
-> 
-> https://github.com/flatpak/xdg-desktop-portal/issues/2026
-> 
-> Specifically what happens is that the EINVAL is returned due to oh.len 
-> != nbytes:
-> 
-> fuse_dev_do_write: oh.len 16400 != nbytes 15526
-> 
-> (where 16400 == 16384 (read len) + 16, 15526 == 15510 (file len) + 16)
-> 
-> After reverting the series, there is no error because oh.len 
-> becomes 15526 too.
+In wx_set_vmdq_queues(), the VMDQ mask was not set for the devices not
+support WX_FLAG_MULTI_64_FUNC, i.e., NGBE devices. A mask of 0 causes
+__ALIGN_MASK(1, ~vmdq->mask) to return 0, which incorrectly sets
+q_per_pool to 0 in wx_write_qde().
 
-Please, test v2 version of my fixes:
-https://lore.kernel.org/lkml/20260625083409.3769242-1-safinaskar@gmail.com/ .
+Fix the VMDQ 1-queue mask to 0x7F then ensures that __ALIGN_MASK(1,
+0x7F) correctly evaluates to 1.
 
-This should fix this bug.
+Fixes: c52d4b898901 ("net: libwx: Redesign flow when sriov is enabled")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h | 1 +
+ 2 files changed, 2 insertions(+)
 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index d042567b8128..814d88d2aee4 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -1802,6 +1802,7 @@ static bool wx_set_vmdq_queues(struct wx *wx)
+ 			rss_i = 4;
+ 		}
+ 	} else {
++		vmdq_m = WX_VMDQ_1Q_MASK;
+ 		/* double check we are limited to maximum pools */
+ 		vmdq_i = min_t(u16, 8, vmdq_i);
+ 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index c7befe4cdfe9..65e3e55db1cf 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -486,6 +486,7 @@ enum WX_MSCA_CMD_value {
+ 
+ #define WX_VMDQ_4Q_MASK              0x7C
+ #define WX_VMDQ_2Q_MASK              0x7E
++#define WX_VMDQ_1Q_MASK              0x7F
+ 
+ /****************** Manageablility Host Interface defines ********************/
+ #define WX_HI_MAX_BLOCK_BYTE_LENGTH  256 /* Num of bytes in range */
 -- 
-Askar Safin
+2.51.0
+
 
