@@ -1,170 +1,198 @@
-Return-Path: <netdev+bounces-302020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302021-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9H7HBIlRPWrx1AgAu9opvQ
-	(envelope-from <netdev+bounces-302020-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:04:25 +0200
+	id R05pBCVSPWoj1QgAu9opvQ
+	(envelope-from <netdev+bounces-302021-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:07:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A133B6C7475
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:04:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6296C7504
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:07:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=O1CuqApn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302020-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302020-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="UpyAnn/g";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302021-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302021-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 17CFE302A4DA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:04:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 668563091538
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C723E8338;
-	Thu, 25 Jun 2026 16:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAAC3264FF;
+	Thu, 25 Jun 2026 16:05:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA683E6DC6;
-	Thu, 25 Jun 2026 16:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B4E3C10A1
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 16:05:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782403461; cv=none; b=khbrr7HBKhtQCZQbE4C6hB/TQ4BKZEsBGPT6XW1Jo3JK0rAO/H0V+OEjAmWBcNjCtEkWTbk5c35QcD0EW81OwxGqEnRwZB6FRZb10Na+kYB/9q5Qac1INXvO77K7lP5sBK5LdKEVKGd9gCU2jKSdquym5wdbBWYjWt8LEvOF0w4=
+	t=1782403515; cv=none; b=iCTBYEeddNg/u4zptw6/AoluSl+nKV2zGRU7afbck2zOFlOa6CxNFGPNPed/5AxKvUguu6c6sP7GGC6hxZEweHsaH+6JkjrbI0rJhWjm4bIK6HLC2Vc1L8+4yQtzMbcSOF0AkUmmp1QLPzBxs215oExiMGSplj2LVfy9iYQDDqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782403461; c=relaxed/simple;
-	bh=XW3SzIEXudbXYq7PqSSb1LBoVhsyZbg4Bfj+ybVG9kQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AnLpG6kqdj4yP+0IGgrUIuGcqSC046u/lQE1Fx3NPjogqN3Z21B6Cju0CnuHiitOxeLB/5GIKDNTFzNtFo7L+Nf+dLuKg0KuDdkpyDY78n84FEZYuXjkYn5kj/8qfVqwd4glxNeovIYq99FN+A7nV5tzDkalSSfF/8z8vVrJtJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O1CuqApn; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id D1FEFC5CD54;
-	Thu, 25 Jun 2026 16:04:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 37CA960220;
-	Thu, 25 Jun 2026 16:04:10 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BC886104C974F;
-	Thu, 25 Jun 2026 18:03:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782403448; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=rj4K5nBqdL50bEj1X13u+dnWAqWMlIUbG7uN0Y70STY=;
-	b=O1CuqApnXCMMrvrHYXL1wRPyPgifoZSIg3AMIdGY6ee1lLC2yxnQkrTUu27eWupa3VdrSj
-	0VxUp6cPCDNusNd8CuUnj9wtYOeMvDlWFNzvua+93+jmHoiYW8dAjKzuVBa/o6d/ANaUwj
-	wShZhnK5YAMzURy66mXbBXIuI8MwtuJMK4JjMfLgXx84uSgWJRVQn5+FRkSohcjM1ah18d
-	Mxs3uzffS3xzDti6moRmT8W37djHQ5roZ8A8HsuME+/z33Nmsj2c68u8mgY1kSzlghn/2a
-	Wr1tqntjb7ZbEcvvw6mxKY/C9Vzh8ixGBtHQNHbMLbxr5YBps4bm1QvIs2LIVQ==
-Message-ID: <a343776c-02ea-475c-a354-7cdfc647afeb@bootlin.com>
-Date: Thu, 25 Jun 2026 18:03:57 +0200
+	s=arc-20240116; t=1782403515; c=relaxed/simple;
+	bh=2zknjp4KEwoStsh3baAqtyrh88HafZb5I4gpP6cPQWE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OnWP7MUf6vFSzgjBX5YUNH2j7jLiHIEvYKs4LwCblfUkBbWcaoYtEbhyQhXHhCUh3yttn1seWGvNoU3U/EoGDDJqV2wjXPeJSbno3jFg+L3dz3PeWVPsqkIn6ssoekR/9O4J6BCTfStUzoynD4iqTZNKVh1Zj2NOOgmdm4dbBG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UpyAnn/g; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B1C51F000E9;
+	Thu, 25 Jun 2026 16:05:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782403512;
+	bh=T1gW0Cc9o60Vp4qxG4NmhRcqrLFX/LrDP+KCQYtN4sA=;
+	h=From:To:Cc:Subject:Date;
+	b=UpyAnn/gpPHRBz3iN8cxSomyv8a1nOqASvPIb9195Nf+4KHvWDBfhZXXp14tcRF2S
+	 GSYFVeNUg8T+BfNr+j9mzuGl2Lqv8jYjd5s2NFQBxgacrAzETisf7MVplZPnC+rJ2O
+	 lVl8qdzUqo3tTpHvSkCsE0WAwNNCqKiCzlcveU56dQafRWSzucv5fc1ATM56ZuqJsu
+	 O0gHbdfJupDiIwtX85/3fSo4oM4299Y46Mt0pjyN6rEeEuMcQZKw1tbTudo8qDXQtU
+	 skLF8kDjSAl3+ZybfV2QnR8lPSXSgpClOoun8k7D5dL/hYJfCPpME/G/dB7jIGILoo
+	 kDXLyZn/vgJTQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	kernel-team@meta.com,
+	mohsin.bashr@gmail.com
+Subject: [PATCH net] eth: fbnic: don't cache shinfo across skb realloc
+Date: Thu, 25 Jun 2026 09:05:08 -0700
+Message-ID: <20260625160508.3327986-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Florian Fainelli <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
- <2293244a-c6a9-4642-a721-dada8a081dbc@lunn.ch>
- <adb69dee-2737-46ca-a92b-aae1ea7f5989@bootlin.com>
- <b7de216a-fd1a-42a0-8711-d822a1ad9319@lunn.ch>
- <7a88fee8-bbb3-480f-9c93-677b7270a940@bootlin.com>
- <dfee1484-fa2a-4b98-af5a-1e67ac716905@lunn.ch>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <dfee1484-fa2a-4b98-af5a-1e67ac716905@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302020-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302021-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:o.rempel@pengutronix.de,m:vladimir.oltean@nxp.com,m:f.fainelli@gmail.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuba@kernel.org,m:alexanderduyck@fb.com,m:kernel-team@meta.com,m:mohsin.bashr@gmail.com,m:andrew@lunn.ch,m:mohsinbashr@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,fb.com,meta.com,gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A133B6C7475
+X-Rspamd-Queue-Id: 8E6296C7504
 
+fbnic_tx_lso() calls skb_cow_head() which may reallocate the skb
+including the shared info. We can't use the pointer calculated
+before the call.
 
-> 
-> Does it even make sense to advertise this when in HD? But i don't
-> think we need to consider this now. I consider HD low priority, i
-> doubt it is actually used very often. We should concentrate on FD
-> testing.
+    BUG: KASAN: slab-use-after-free in fbnic_tx_lso.isra.0+0x668/0x8e0
+    Read of size 4 at addr ff110000262edd98 by task swapper/5/0
+    Call Trace:
+     fbnic_tx_lso.isra.0+0x668/0x8e0
+     fbnic_xmit_frame+0x622/0xba0
+     dev_hard_start_xmit+0xf4/0x620
 
-That's fine by me as well, let's keep it simple, we may revisit that if
-we really need to.
+    Allocated by task 8653:
+     __alloc_skb+0x11e/0x5f0
+     alloc_skb_with_frags+0xcc/0x6c0
+     sock_alloc_send_pskb+0x327/0x3f0
+     __ip_append_data+0x188b/0x47a0
+     ip_make_skb+0x24a/0x300
+     udp_sendmsg+0x14d2/0x21e0
 
-> 
->> # ethtool -a eth2
->> Autonegotiate:	on
->> RX:		off
->> TX:		off
->> RX negotiated: on
->> TX negotiated: on
->>
->>
->> Sure, pause and HD don't make sense, however what I find confusing to some
->> extent is that the only place we have information about the *actual* pause
->> settings is the "link is Up" log in dmesg.
-> 
-> Maybe we should extend ksetting get to return the resolved pause
-> parameters? But i'm not sure how much that actually gives us. Anything
-> using phylink will just ask phylink to fill in the ksettings
-> information, and it seems unlikely phylink gets it wrong. What we are
-> really trying to test is drivers which don't user phylink, those are
-> the ones which are generally broken, and they are not going to
-> implement anything new in ksettings.
+    Freed by task 0:
+     kfree+0x123/0x5a0
+     pskb_expand_head+0x36c/0xfa0
+     fbnic_tx_lso.isra.0+0x500/0x8e0
+     fbnic_xmit_frame+0x622/0xba0
+     dev_hard_start_xmit+0xf4/0x620
+     sch_direct_xmit+0x25b/0x1100
 
-Correct yes. If the MAC driver uses phylink and a test fails, it very likely
-means that the PHY driver is doing shady stuff (and some are/were for pause)
+    The buggy address belongs to the object at ff110000262edc40
+     which belongs to the cache skbuff_small_head of size 640
+    The buggy address is located 344 bytes inside of
+     freed 640-byte region [ff110000262edc40, ff110000262ede
 
-> So i think the test has to look
-> at:
-> 
->> 	Advertised pause frame use: Symmetric Receive-only
->> 	Link partner advertised pause frame use: Symmetric Receive-only
-> 
-> and check these match what we expect.
+Link: https://netdev.bots.linux.dev/logs/vmksft/fbnic-qemu-dbg/results/705762/15-uso-py/stderr
+Fixes: b0b0f52042ac ("eth: fbnic: support TCP segmentation offload")
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: kernel-team@meta.com
+CC: mohsin.bashr@gmail.com
+---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-All good for me :) thanks for you feedback,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index 9cd85a0d0c3a..401f8b8ae1ca 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -194,16 +194,18 @@ static bool fbnic_tx_tstamp(struct sk_buff *skb)
+ 
+ static bool
+ fbnic_tx_lso(struct fbnic_ring *ring, struct sk_buff *skb,
+-	     struct skb_shared_info *shinfo, __le64 *meta,
+-	     unsigned int *l2len, unsigned int *i3len)
++	     __le64 *meta, unsigned int *l2len, unsigned int *i3len)
+ {
+ 	unsigned int l3_type, l4_type, l4len, hdrlen;
++	struct skb_shared_info *shinfo;
+ 	unsigned char *l4hdr;
+ 	__be16 payload_len;
+ 
+ 	if (unlikely(skb_cow_head(skb, 0)))
+ 		return true;
+ 
++	shinfo = skb_shinfo(skb);
++
+ 	if (shinfo->gso_type & SKB_GSO_PARTIAL) {
+ 		l3_type = FBNIC_TWD_L3_TYPE_OTHER;
+ 	} else if (!skb->encapsulation) {
+@@ -258,7 +260,6 @@ fbnic_tx_lso(struct fbnic_ring *ring, struct sk_buff *skb,
+ static bool
+ fbnic_tx_offloads(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ {
+-	struct skb_shared_info *shinfo = skb_shinfo(skb);
+ 	unsigned int l2len, i3len;
+ 
+ 	if (fbnic_tx_tstamp(skb))
+@@ -273,8 +274,8 @@ fbnic_tx_offloads(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
+ 	*meta |= cpu_to_le64(FIELD_PREP(FBNIC_TWD_CSUM_OFFSET_MASK,
+ 					skb->csum_offset / 2));
+ 
+-	if (shinfo->gso_size) {
+-		if (fbnic_tx_lso(ring, skb, shinfo, meta, &l2len, &i3len))
++	if (skb_is_gso(skb)) {
++		if (fbnic_tx_lso(ring, skb, meta, &l2len, &i3len))
+ 			return true;
+ 	} else {
+ 		*meta |= cpu_to_le64(FBNIC_TWD_FLAG_REQ_CSO);
+-- 
+2.54.0
 
-Maxime
 
