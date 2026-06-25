@@ -1,57 +1,77 @@
-Return-Path: <netdev+bounces-301861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Gv48MX67PGpmrAgAu9opvQ
-	(envelope-from <netdev+bounces-301861-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:24:14 +0200
+	id RN3BEey7PGqArAgAu9opvQ
+	(envelope-from <netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:26:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 534A76C2C7B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:24:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E3D6C2C8E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:26:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=ba1gn6eR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301861-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301861-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=MpmiA6JZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 80DB33017442
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:24:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED8CD3018740
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46AC2C15AC;
-	Thu, 25 Jun 2026 05:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7042DCF57;
+	Thu, 25 Jun 2026 05:26:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B2D17D2;
-	Thu, 25 Jun 2026 05:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09702C15AC;
+	Thu, 25 Jun 2026 05:25:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782365050; cv=none; b=CjpZ5/eJtXZGTI92sKWKHghnqswTb0/ZNdm42nyeu3De/MhKxwok52vSU+33dK9JwZySh2OjtDYJvJpOP943uMPmxSMR4RNpGZAcIJiSVOQJLnaSwLQ7TFysv88XBN9UHZnTYaTVuSofig5MAkYOGmVriLUiI668Bw8oeDN9vK8=
+	t=1782365161; cv=none; b=GZNBgnUiCuhGls+iYduGl5abwyOVZezSjNcd/XkRMXz4ngtIuO6falr/G/kRJiOJDRLyOAmSbWX08OYY2ML0RPE5Ra8hXGjvLhalcOlS1RYiSd4agOwPXwITA0dC8PxcjZHWeu7jQtfC1ax54PV07rGPmxUv3HV0Z2DaheCmtVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782365050; c=relaxed/simple;
-	bh=aW1/nKWCMH/ml7XFGrgw6NSHQMxG+oaTKC0rssB3PYs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hy1GZy0fap/bo9e/QzIQx8ZNCizuKkfiFz/YilQqvLJMBJjJfsM2b6g5MNjcgNFo3aGBQgjBtLVgh1fnXezQ5sErcUCxdyzx4zh8LMQnvpDXL53FhsPYNhXZRXcPHKup8j5UU2GWIxCFvd5Sv4gXsCPf5TVNBvm+nBO+ySa3xHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ba1gn6eR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 025D7C2BCB4;
-	Thu, 25 Jun 2026 05:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782365050;
-	bh=aW1/nKWCMH/ml7XFGrgw6NSHQMxG+oaTKC0rssB3PYs=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=ba1gn6eRVrGAuQMhwb1ugbbzHx9avhVpmWneoDc3R6LqmxWR/ZaDKLEmH0SIHvA5U
-	 ShjJA2hwFh6wRcO9hUjj8NnkXjM7LnYVz+sR9vRLepoXuYj7OMv+xA5lhIcQk+VlcM
-	 wozNfjMotGzkVuTAdSMzCwuHhKjO1VarjSWcvUoWU/Ai7Ep641svvew7Ngvcjr4QSm
-	 TZbrdr/D0ro7F4dO3nqYWk+QPHdoqmEpHLmzeDicqRO7btkC+CoW7+L0zLFR/tKLBl
-	 pc+g/GB92K3ifhcBXxju0CAM2yR7U95GEMw3uZRtgJkI3LgFgF1O8/z0s+hrUNWurp
-	 gFs7kVpSxrhkg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99F7CDB47F;
-	Thu, 25 Jun 2026 05:24:09 +0000 (UTC)
-From: Tjerk Kusters via B4 Relay <devnull+tkusters.aweta.nl@kernel.org>
-Date: Thu, 25 Jun 2026 07:24:06 +0200
-Subject: [PATCH net v3] igb: only strip Rx timestamp header on the first
- buffer of a frame
+	s=arc-20240116; t=1782365161; c=relaxed/simple;
+	bh=NvIL4IMa+G9g/EXudvS/VwgBjoWxZ2qJZ2+uKT1nQTs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gip63AZ8lCJks0BqjtP6X06biDCzvDLjQwc98vn1jqa282ML799LKUZgsJfU1rd3XqJjefBQ9KIY+boZQJnZNuxmKcIbiXHStjIcZJgcd0bpogIiazo0l9K3Ehk5l1AlVWVpXqqmv1JhwJk9s2D978DR/Pi8Y8ZH2S2vj60c6nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=MpmiA6JZ; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65P3eMpA4155074;
+	Wed, 24 Jun 2026 22:25:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=y
+	ZmR54zijcjBucAA0EL2V8gzRYT4uYEWtgosI695QOs=; b=MpmiA6JZ/bsEu3YK8
+	yOrrt1KcugB2EICG3OJHp70nYuSHx0R9GJMf1XiCDMTWWMikZhSmE9odATKS0WrF
+	ZDsJi+W+rD7OloS1u5RVPeR63mkyz8Hs/2LrIMgk6JdKti9GvC9F0/W9Oqk1o/5y
+	SfjeoAow5GgeDLj+IgMFFMD4CMacwvNCjt3dgIXYlGCNr9SOfOwTf1DV4/9ajS7h
+	baZosAHyYGlfu1bYSxPzko2qBt/xpPOpol8HxhMy99WCVDwDHwByoeqxm0dcVQgZ
+	Tpg0oywv+26yRYL2yu5TVs2k7oUEt/667ZMy8YJNQqCbQJ/iqNhne2VQyvEZO+8+
+	VQUBA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f03u84yh8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jun 2026 22:25:51 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 24 Jun 2026 22:25:50 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 24 Jun 2026 22:25:49 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 1822E3F706D;
+	Wed, 24 Jun 2026 22:25:46 -0700 (PDT)
+Date: Thu, 25 Jun 2026 10:55:46 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <davem@davemloft.net>, <gakula@marvell.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <sgoutham@marvell.com>
+CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: [PATCH net v2] octeontx2-af: Block VFs from clobbering special
+ CGX PKIND state
+Message-ID: <ajy72q43tVFSeLE8@rkannoth-OptiPlex-7090>
+References: <20260625044621.2841831-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,172 +79,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260625-igb-rx-ts-fix-v3-1-99b3efa08dca@aweta.nl>
-X-B4-Tracking: v=1; b=H4sIAHW7PGoC/3WNwQ6CMBBEf4Xs2TWlhIqe/A/DobQrrDGFtBUxp
- P9uwbPHmbx5s0IgzxTgUqzgaebAo8uhOhRgBu16QrY5gxRSCVWekfsO/YIx4J0XNPYk6qYmqko
- FeTN5yvXuu4GjCO2vDK/uQSZupg0bOMTRf/bXWe7wn4NZYom26hqrRG20klf9pqiP7gltSukL1
- xF4scAAAAA=
-X-Change-ID: 20260619-igb-rx-ts-fix-cd70585ee316
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- Kurt Kanzenbach <kurt@linutronix.de>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Tjerk Kusters <tkusters@aweta.nl>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782365048; l=4324;
- i=tkusters@aweta.nl; s=20260619; h=from:subject:message-id;
- bh=QXi/sQ73rXUilm750LFxDKqWGpv73iTpHTzOn0DFvnk=;
- b=bhY0yP8fX23eKVecpe+7M7mHyZD21AUKMLaA4/ynXISYboagzoNyKWC8WpxhwgUp9rsyUdirz
- 4tShZ6rbyvlBXmYZ6K3uGLNTm8ViMvhk66Pf4SWdIGfWB0rI947+p7u
-X-Developer-Key: i=tkusters@aweta.nl; a=ed25519;
- pk=JYRpYQ3+LrphEabgnxcbiOUpwvNP8WDDMcLzz+cwKsk=
-X-Endpoint-Received: by B4 Relay for tkusters@aweta.nl/20260619 with
- auth_id=831
-X-Original-From: Tjerk Kusters <tkusters@aweta.nl>
-Reply-To: tkusters@aweta.nl
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260625044621.2841831-1-rkannoth@marvell.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI1MDA0NCBTYWx0ZWRfX9ZNWzgfMhWEo
+ fDzuoOz2/5Pq3ejvFQe3p4MIBQUOkzDbkePaJFFNODU7pi6LQ09sfFBd03jZZJlFIv0X+FfiXNu
+ 1HKl2YEPEqn0+yX08cOvpzgkKkj8EWSGDEp1SotYHVtorjA9t0xmkLT7TI11zZStUAcZC+CHH65
+ k2v0zs//4HaCQLzkOn0XlandQStQqhj5JSnc878wwLc8QbfVw0ekLoIh8xO0JIOXzeY+K/6cNtQ
+ mrjiZzyOSRwWm7JuafRfmbKe9wM4qveZqsV8VZqLoWn8vqgdIlsyXJUipoi/CgZRUmPLg+9BssJ
+ HiF7f4AAaefFG5/wwKHAVDDLx/kU5Qfv/8lyNbuv/X/1fgSBY5bHk6UlSKk4r7M51nlvXxlD9BO
+ nfvPw8KFrkTK7kHW0hPTjD0hO6Fp3A/s9eVA39nxTbtDmIIry7CeW5atsrW0JiQQIZ9VmKk9PX4
+ GD8DuLy06FY6Z7adyJw==
+X-Authority-Analysis: v=2.4 cv=D9N37PRj c=1 sm=1 tr=0 ts=6a3cbbdf cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
+ a=M5GUcnROAAAA:8 a=yjNKIy0og1E6pNJisW4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=Oh551-UHZqmTy8JkqTUo:22
+X-Proofpoint-GUID: 8rylDWr-Kb_J-9W_DS06bmsFXOO1qorp
+X-Proofpoint-ORIG-GUID: 8rylDWr-Kb_J-9W_DS06bmsFXOO1qorp
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI1MDA0NCBTYWx0ZWRfXzBT2eF5f+MHo
+ VWS9wbc5GYgKdVHco40gGF+D6I/3WTZVXN3B5O2z0p9TRq6mrj1bEKvw4H4ks2wf3yGJdy8pZAv
+ e1ZbCJcje7hQJT36OC/MKW2J/EAFTc0=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-25_01,2026-06-24_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-301862-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301861-lists,netdev=lfdr.de,tkusters.aweta.nl];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:hawk@kernel.org,m:kurt@linutronix.de,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:piotr.kwapulinski@intel.com,m:aleksandr.loktionov@intel.com,m:tkusters@aweta.nl,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,rkannoth-OptiPlex-7090:mid];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[tkusters@aweta.nl];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:gakula@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hkelam@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 534A76C2C7B
+X-Rspamd-Queue-Id: A6E3D6C2C8E
 
-From: Tjerk Kusters <tkusters@aweta.nl>
+On 2026-06-25 at 10:16:21, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> From: Hariprasad Kelam <hkelam@marvell.com>
+>
+> PF and VF NIX LFs that share a CGX LMAC reuse the same hardware PKIND
+> programming. When HiGig2 or EDSA parsing is enabled, a VF NIX LF alloc must
+> not reset the LMAC RX PKIND or default TX parse config over the PF setup.
+>
+> Add cgx_get_pkind() and rvu_cgx_is_pkind_config_permitted() so VFs skip
+> cgx_set_pkind(), rvu_npc_set_pkind(), and NIX_AF_LFX_TX_PARSE_CFG updates
+> when the LMAC is using NPC_RX_HIGIG_PKIND or NPC_RX_EDSA_PKIND.
+>
+> Fixes: 94d942c5fb97 ("octeontx2-af: Config pkind for CGX mapped PFs")
+> Cc: Geetha sowjanya <gakula@marvell.com>
+> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+>
+> ---
+> v1 -> v2: Addressed simon comments
+> 	https://lore.kernel.org/netdev/20260619041002.1773822-1-rkannoth@marvell.com/
+> ---
 
-When Rx hardware timestamping is enabled (e.g. ptp4l, which configures
-HWTSTAMP_FILTER_ALL), the NIC prepends a 16-byte timestamp header to the
-first Rx buffer of every received frame. igb_clean_rx_irq() strips this
-header inside its per-buffer loop:
+Apologies for the inconvenience — it appears I submitted an incorrect patch.
+I will abandon it and post a revised one later. Thanks.
 
-	if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
-		ts_hdr_len = igb_ptp_rx_pktstamp(rx_ring->q_vector,
-						 pktbuf, &timestamp);
-		pkt_offset += ts_hdr_len;
-		size -= ts_hdr_len;
-	}
-
-For a frame that spans more than one Rx buffer (e.g. a jumbo frame), this
-block runs once per buffer. The timestamp header only exists at the start
-of the first buffer, but igb_ptp_rx_pktstamp() is called for every buffer.
-
-On a continuation buffer the data is packet payload, not a timestamp
-header. igb_ptp_rx_pktstamp() already has two guards against acting on a
-non-header buffer: it returns 0 if PTP is disabled, and returns 0 if the
-reserved dwords (the first 8 bytes) are non-zero. Neither is sufficient
-here: PTP is enabled, and a continuation buffer whose payload happens to
-begin with 8 zero bytes passes the reserved-dword check. In that case the
-payload is mistaken for a valid timestamp header and igb_ptp_rx_pktstamp()
-returns IGB_TS_HDR_LEN, so the caller strips 16 bytes of real data from
-that buffer. A frame spanning N buffers whose continuation buffers start
-with zero bytes therefore loses 16 * (N - 1) bytes from its tail.
-
-This is easily triggered by a GigE Vision camera streaming dark frames
-(mostly 0x00 pixel data) over jumbo UDP with PTP active on the receiver:
-the all-zero frames arrive truncated while frames with non-zero content
-are fine. There is no error indication.
-
-No content-based check can reliably tell a continuation buffer that begins
-with zero bytes from a real timestamp header, because both are all zero.
-Fix it structurally instead: only attempt the strip on the first buffer of
-a frame, which is the only buffer that can contain a timestamp header. In
-igb_clean_rx_irq() skb is NULL until the first buffer has been processed,
-so guarding the strip with !skb restricts it to the first buffer
-regardless of payload content.
-
-Fixes: 5379260852b0 ("igb: Fix XDP with PTP enabled")
-Cc: stable@vger.kernel.org
-Reviewed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-Signed-off-by: Tjerk Kusters <tkusters@aweta.nl>
----
-Changes in v3:
-- update the rx-timestamp comment to note it only applies to the first
-  buffer of a frame (Piotr Kwapulinski)
-- add Reviewed-by from Aleksandr Loktionov and Piotr Kwapulinski
-- no functional change
-- Link to v2: https://patch.msgid.link/20260619-igb-rx-ts-fix-v2-1-d3b8d605ca62@aweta.nl
-
-igb: only strip Rx timestamp header on the first buffer of a frame
-
-Changes in v2:
- - resend via b4 (v1 was sent with a mail client)
- - use full author name "Tjerk Kusters" (Jacob Keller)
- - add Reviewed-by from Kurt Kanzenbach
- - no functional change
-
-Link to v1: https://lore.kernel.org/all/PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com/
----
- drivers/net/ethernet/intel/igb/igb_main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index ce91dda00ec0..539bf5389a24 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -9060,8 +9060,11 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
- 		rx_buffer = igb_get_rx_buffer(rx_ring, size, &rx_buf_pgcnt);
- 		pktbuf = page_address(rx_buffer->page) + rx_buffer->page_offset;
- 
--		/* pull rx packet timestamp if available and valid */
--		if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
-+		/* pull rx packet timestamp if available and valid; it is only
-+		 * present on the first buffer of a frame
-+		 */
-+		if (!skb &&
-+		    igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
- 			int ts_hdr_len;
- 
- 			ts_hdr_len = igb_ptp_rx_pktstamp(rx_ring->q_vector,
-
----
-base-commit: 2d3090a8aeb596a26935db0955d46c9a5db5c6ce
-change-id: 20260619-igb-rx-ts-fix-cd70585ee316
-
-Best regards,
---  
-Tjerk Kusters <tkusters@aweta.nl>
-
-
+pw-bot: changes-requested
 
