@@ -1,244 +1,200 @@
-Return-Path: <netdev+bounces-302013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QI5JOO9OPWpP1AgAu9opvQ
-	(envelope-from <netdev+bounces-302013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:53:19 +0200
+	id A0VBDIJPPWpm1AgAu9opvQ
+	(envelope-from <netdev+bounces-302015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:55:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55AEF6C72FC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:53:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890F26C7336
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:55:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=Vfec3vHM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302013-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302013-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=virtuozzo.com header.s=selector2 header.b=BanvHn+W;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302015-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302015-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=virtuozzo.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5BF5D304F418
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 15:53:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18CF830AED9D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 15:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA792E6116;
-	Thu, 25 Jun 2026 15:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B4430EF91;
+	Thu, 25 Jun 2026 15:54:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11020095.outbound.protection.outlook.com [52.101.84.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BA123BD1B
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 15:53:14 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782402796; cv=none; b=Hc3L4cZ5bzwpvLiTn5o1pRKJBJlf7XJraWvGrkG5vaI5nMyzxys0zhfOdfrx8XLRxfVUg7osJF1FFEAr7eA5JyIavlZKqdciG82sG8AZu6B2rFdCH/zBYwfhcH4DgT1Q75qwFrJiXOOdynWyMXL4+ozuFSniGu1TgRlOGkT/PmY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782402796; c=relaxed/simple;
-	bh=Og4C+MaKmLZf2JGAM2OHBn7Ig4cAXYb1eQ5nglnohRE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yz4q/sve9FYdZtxMF+XS+RDrp0qfwSKepLg/rp5007oBeB6Ep10oqMjT2sUifgvfvKrfoYW/HA0lS4cMYfwHjaFRex1TYhFOUshCYS0Rmm15E4vmAzef/lsH003ZTUqr2Trf7CVb0WN9qfFb5XQy6Av8ef+1sukRrpKJTSwcoC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vfec3vHM; arc=none smtp.client-ip=209.85.210.201
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-84540760dc9so3281073b3a.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:53:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782402794; x=1783007594; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rqq6IGdnrj8L6K/Vi13GJ/747gQZalzJyYJwzbs/ueg=;
-        b=Vfec3vHMDJyrBz7aiZGFzK20XD8SlSlqdv2tAqRia9pE0THxPko95iOaIFEse6hhDn
-         UKZR0EbpbxerMF6PW98ApbhAUzeOk9Ru8pn6k+Ni3GRt7Mal8M913t3ZVt/v3XBalmA3
-         +aRTCCGgK2uao866zmS/Zx0xAR0VRME2cX8nADxoz6/Z6C00TQvyM5j4CBUCMO8MmowO
-         pJAoT3a+MFDFFDHDCxOswkuv7WHNpgr3KmfM3yn/qo0aBfUKC9JxG5KMtnB92VATrPrM
-         2prc5zHz0I/NHHd95ukr2WZw7cs7K5xXFp7upomLKMvQnHSLwLgSVYV1kDa9DyMGf0T3
-         j5pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782402794; x=1783007594;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rqq6IGdnrj8L6K/Vi13GJ/747gQZalzJyYJwzbs/ueg=;
-        b=Fnbqh5vQPueaOcHqCWMUZ0U4u6/X/ACPHhhNWuI1gDohJOIm8HBb3Ou2sIeS+atO2K
-         VeH3LUusK1A0/Kw9jeVhw56r1pUt36EtJ0R0gISkACpQyBooqSK8pGL7zjM9tnEsabiM
-         AAg8UMJEev2chQfu2/Iwjj3QtH/kegTusrlGAQ/Y9cTyvpYFFJ6OXGDIYO/gaFyzGZlQ
-         W4RO6ctiPq+Ylje9lS8X3Zq6a0W4t9Hou/WAEHxNvdCZK1NtAKOEEf1iT23fWnlle15p
-         eQE85fXjLsXrLxzTOmwxbR/J2wHELzU+vUpEcNkgJecmQe6OUAF3XsvlkiLF6qUdvp7n
-         I59A==
-X-Forwarded-Encrypted: i=1; AFNElJ/6Ol+Qq8vCBdfJHdwcXAx+CVo+/gTOM7bhr0HL5qxjeMid6IG2N0K6ubB71F8Ei/8D4PKe3cE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgOsevPXUChPKgbuVn0OHNOUUbDm3+K3XEQz7Hb1JP55HEhpaU
-	jPAOxTutb7YpFNvxaaAjmt+8zQJe+EguNeXuxbVhVhYyPAkwemDsRTFafPZ6/dZQ+TpunwIpUHz
-	b6w74cQ==
-X-Received: from pgc15.prod.google.com ([2002:a05:6a02:2f8f:b0:c8b:d999:75ee])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9183:b0:3b4:b276:a789
- with SMTP id adf61e73a8af0-3bd4af04b93mr3574816637.36.1782402793879; Thu, 25
- Jun 2026 08:53:13 -0700 (PDT)
-Date: Thu, 25 Jun 2026 15:51:54 +0000
-In-Reply-To: <036a0c95-f5d4-46ab-88e7-1eab567d7a84@uclouvain.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092F824A076;
+	Thu, 25 Jun 2026 15:54:32 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782402875; cv=fail; b=uhlP7XQAA1k9thFp2zpS6ZZc9M83u1V/IEFP82jFuZK8YGi6FkaMCx46KbLYgwNUioN9aEK1fScoBupqCJuiqSj2GK0QEzSlIY303kTfzd8QlsBJ1hrlnDLRjluUTwPR8nFPvNSQe5rwIVnwuiPU3wiMvyZTYoL6pzD+wM9i/w0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782402875; c=relaxed/simple;
+	bh=P9v8Fs2lxN672pn0HxSya5Q05J/FpPD4eqiKrHbmJN8=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=GCQ+TNoQqF6UDednHYP6HfxcAxNSgR04UxzNmaw9zM79BcIJmAifidPcBwFh0C+Xd95FR9ukrvZDQfCsNZKE0ovwQ335ZInPkG6LF3KHypZQ4/ORiHuoGxjuw7MSRiaYScE1902bxbxWd6ry039JMwwN1ZUOuDbqCgzR7C1JCQ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=BanvHn+W; arc=fail smtp.client-ip=52.101.84.95
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lkNtK/pwBXrwiGCJSbjq081CgiL2hVdwPO0VUEeXnqqkkrTRYWGYzyLD15GtGFHzS564uuJiUv6vGd+Ybc5AmXzBNRLNRZxm9uQPbg5IcUVtImbCOGalQ1RQnyi7eTTALWLptJlqPK96T1qRe/lJfTEY6cFDea3vpOR63lrGjXUjPGMH1o8iPT6W4MYMEGOgo247OaiMVGRbDud2bzmmGyTwPihX18fDHzsEwXJPjXpDvjZTy4Nvy5wJPFx7uUqKvzlndq0kShXrCivKHP4fsDwtqcygvJbqICIDSeuIaWLbSATCA0fbrXKp9/1GrFs4hOiFsqJ4n+V1wnIlYSc6Mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jBKFCEfmCQvHhePt+LD6twX7zu4dY6N0nMWFL1ely10=;
+ b=TSfsKwWax1IFNFI0adLhk97PFlguZ7pXTDdM6prBoEujthS1lYqY+WkWdHrJMCrM40Gn5zFvDaV0woZw9HXjZhvyNKoCtMtUQmRo/P3/VP8BHv5QdksN7D0cziro8qirKxqxRVgnHU1xcR+/cXiqZthD15P+rXM0DTrT8aMRbDKwSibTOJ0tue4krbaONNo+i36XM1y0/lARoF/pomflEVq+wsAXT5l7JGaLJ7/2gBY7pGrl2qoIuuXYfELklXvOzkBjL2ToMDh8BD7EF3q13Ao0losZKX0m0rPs2J1GfJVgwEEnx+Yet5lNARrK7bKs9F28Gsd6ud79hcOZn1GXsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jBKFCEfmCQvHhePt+LD6twX7zu4dY6N0nMWFL1ely10=;
+ b=BanvHn+WI9dyt/cEwZ1vpS6G6i6ZGw5IiuyKRf5wv4crdg6lx1zZYadr4oIPpFTly6h4yQMxRCD1dq9v3fKjw9EIl2S9r/ANpaRc7r60LE6s9s03v7xcxjn084jDoOTVH6dqxoZEMMBmujvmvEAXP0htMODLplFykM7+H4qXNFVUUoAaAFr/MRHil9JuIR6CwQfgzA18bidgzsGLW833Xg9RN/D36SUSyygLqbDU2h3/AR4KhUI03EFVXu3y0qpxh+2FhSrhuOW2Kq8wB50BlegAAS5WO/eH97jaPiCmjAqi8CFFUhXrcuMTkWm3Eliw6JTChnfc4UK8siD44f5ihQ==
+Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
+ (2603:10a6:800:20a::12) by AS8PR08MB6566.eurprd08.prod.outlook.com
+ (2603:10a6:20b:33a::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.16; Thu, 25 Jun
+ 2026 15:54:29 +0000
+Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
+ ([fe80::4e37:b189:ddcd:3dd8]) by VI0PR08MB10656.eurprd08.prod.outlook.com
+ ([fe80::4e37:b189:ddcd:3dd8%5]) with mapi id 15.21.0159.013; Thu, 25 Jun 2026
+ 15:54:29 +0000
+From: Andrey Drobyshev <andrey.drobyshev@virtuozzo.com>
+To: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	sgarzare@redhat.com,
+	mst@redhat.com,
+	stefanha@redhat.com,
+	dongli.zhang@oracle.com,
+	maciej.szmigiero@oracle.com,
+	bchaney@akamai.com,
+	mark.kanda@oracle.com,
+	ptikhomirov@virtuozzo.com,
+	den@openvz.org,
+	andrey.drobyshev@virtuozzo.com
+Subject: [PATCH v3 0/4] vhost/vsock: add support for VHOST_RESET_OWNER and CPR migration
+Date: Thu, 25 Jun 2026 18:54:12 +0300
+Message-ID: <20260625155416.480669-1-andrey.drobyshev@virtuozzo.com>
+X-Mailer: git-send-email 2.47.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VIYP296CA0007.AUTP296.PROD.OUTLOOK.COM
+ (2603:10a6:800:29d::12) To VI0PR08MB10656.eurprd08.prod.outlook.com
+ (2603:10a6:800:20a::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <036a0c95-f5d4-46ab-88e7-1eab567d7a84@uclouvain.be>
-X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260625155313.847098-1-kuniyu@google.com>
-Subject: Re: [Regression] Broken MPLS routes with multiple nexthops
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: anthony.doeraene@uclouvain.be
-Cc: davem@davemloft.net, kuniyu@google.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI0PR08MB10656:EE_|AS8PR08MB6566:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e8b492b-3b04-4fbf-2720-08ded2d20a80
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|366016|376014|7416014|52116014|38350700014|56012099006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	rOELQV+IwdsedWtLXbN9iz7I609Bw/WpQOpIf7w+91G4JcJJzGGSa5Zg+PJqKrn9VxCO7ZAjPUeagqF7pP8kgfUxKU4BEyC9EqEe6FJJxm2nb2blkCKanyVS1P0hfJFYjd19iYiAFTXNaRwI/r3uLOOenYUxFEQMveoa8LgkkOIQpkbs+W+hruJY4XOI/3CKvAl28vuUwq9nVrn7GCaGbeJzttkmLqj9ol+JzwvW/BwpQ4zSBnuG7YtZSlD+3UvBYrBtYQGBhpN5DjSFw80JRXu1bt1iSXWDjEj+aWTnUbXbAEBvYSTqUAvkup90oHbcA5mu8ISHR9iRr/Mk6G/qPrSk8fxLeWK6neuFr6CAKOy/0JSCLcSOw7l/Ljtkv7LHJkYxcrrUEhAgxcVuf47vTYwUx1rTrnuWNOfsyZQtEcDQXzWmTB+89Ie1ImAz5kMV4HNl/xjQAP/AT6FK4Hgynp6nPa3Z9BNprjrnzGV8sHK18pUVkhCbOIII3O2kEWL+O63Ti+OQmHz1J20DeXd9NtnNAtuSeVhcH5sq90MgfqK8/Hb2HMPnUL0Q3AeGIz1izqi+CjqhUpNxE3LG7/4Tl+htLH65dBVWWoZqhtwXHjTxuK25TUzSi+m2ofOjYKj6SwIRy/++Dk9lXRMkhvevI5wD4ugN62hxY0OzGRZVKr9x63tbj4zHUaHElCFMhZPg+b4i891xt/+ZPMaLLL12QPlvzUIeaSWgudrU1L/UuBE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR08MB10656.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(366016)(376014)(7416014)(52116014)(38350700014)(56012099006)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QfMjtz/e3DwgtYJeULugmHyPIRFVx/cR3hYnPcFjbqR1vj6vmoHN1zCXdHSS?=
+ =?us-ascii?Q?5qSEyWc2fERF/Sn4pdGLw4CAb8a7alL17XIxjcCzGzEa6HYIZgPEnYEHk1TC?=
+ =?us-ascii?Q?bpHSyhyO61wk30IadgCSDBlLl1uBtdMo1hm1zvMBSe2Pl/dtBtnvSREYw7Vf?=
+ =?us-ascii?Q?K9oscunyUvIm3R/h/zddJY+QC5MM742MEgDTSRb6qyA7jIWz2eLPo4g0B9An?=
+ =?us-ascii?Q?lujO0P98dsbqsIKRLch/LYEMmIUOAvmUn74XZzHJDqc8Gwg+Zk95Hn6K0/d2?=
+ =?us-ascii?Q?Qq0o4euxZwUdLVX6UnagLK3/WDjQz/Ny+VG8WT+Ur6Ne5bwMuR3xCaedbNoq?=
+ =?us-ascii?Q?CXfa5dC8wpisNUNoGuJTwTo014BcrCqoJ62df38cDEsekoxt9HACo1tmh58h?=
+ =?us-ascii?Q?OEh0FoO3+AUz1oDnPhXSKi6TKH9oodT/Y1YCOlKHtC8ZhFKlDt7G6r+eTlYi?=
+ =?us-ascii?Q?02crQ8tOj1sBrYqvDNbUZkvMVy3qA/eTmQFT2/25J4bFbzHiVa2Nl+G1quuZ?=
+ =?us-ascii?Q?k3K90G+BIAG307qgH9BPP3sSNS/sU/N8CVKhjrL1PJcqTqFZ7zrcMdgrMpTr?=
+ =?us-ascii?Q?sUpBjvUXXlSXQUduck4xPywJaZ0hu3qFYbVa8uOHVGVFcfg2pg7lGDPQtfVk?=
+ =?us-ascii?Q?EKtIaqagHhFI1ftGg4E78kMdDuPPTFR5I5APWoTICMruf0+eqyXgjrsoaLyz?=
+ =?us-ascii?Q?tEZyEX0nL/pQX0dhjBpyOkJQz5i5Qh6jOhEokkjS9UB3LK4UCCWvDAa6xWvM?=
+ =?us-ascii?Q?SghryunloBsWzi1YIXc9FBbc+0EmDQev5/WfCwLyut086/ZYllZmZOCqPoP1?=
+ =?us-ascii?Q?FjkMRz0nGauJK7EaQVg+yFBM5RlOb5cHpQrtNs1l1TF/MCyy15JoaffTSBuB?=
+ =?us-ascii?Q?zlcYl97xDgZOoDBe8B3gXhk73fz+KcR92l/AvYEu6evMsJf4TROpliMf2dK0?=
+ =?us-ascii?Q?idMPnWCc0ZPFqoCcfCGK+TxbWnmW4yWmqJiiygCPk78Jq02/n/+HkaZEGxky?=
+ =?us-ascii?Q?8rr6ifpYL8Tqwit+hDBNOcfFmKkGEm49UN+nvQ7L6ox3eM2A7A1TTZ4z7Jc5?=
+ =?us-ascii?Q?9VVlYkQKRCI+O2Fhmz40HBblTKxw0SO/XDLxcaQF7NmvwxImKmFEe1DlEUbW?=
+ =?us-ascii?Q?CHwCH/rvF0Ex9EvoAwg5M6D13JwQsgfboZZNOrGSI2cpbelybhCdugaYEA9M?=
+ =?us-ascii?Q?yHSx0UUfqNlMVvuHuEPIISLyTGtQVTIMKcmB/Cvw8R1qO0OYK6D3/ULHt+VQ?=
+ =?us-ascii?Q?R9iALP/sUun1N264Cz/oZSGgIium1RnKrRAUZl1xjeYv8T+6dsxJaFgKV1Q/?=
+ =?us-ascii?Q?aGLl7dEAL1/YUyUtO6zuuSo1GShdoSIFxa5nBhZhywpyo+wfrNZPIxb4SRpF?=
+ =?us-ascii?Q?EVwE/oktA8P3yLGoIdDYVX+mJRxJXM18A7wBqIfQeZGSv8KiY+6MYBoZ+1GS?=
+ =?us-ascii?Q?yVP2atwWsROAuX40Znd6FsNu/qyZ+uEpSCjN4DTZS0ZV7ywoYs4doroNc2g0?=
+ =?us-ascii?Q?zVtDQ+7r5DwBoCOCT/NkCuN83w/fO1lvdM6h1kSZKHJiwIYNDM6e9URk73/5?=
+ =?us-ascii?Q?7bs+gf+I6CmUG/4BtDhMMRpmkbXKDIUJc7xCdhqG+GJQ7AIvPerwGWPZZ6tD?=
+ =?us-ascii?Q?3NxETIwx+XJk0uEmbP1n5DiQq047CgIKU9jPzWMH8qGhu5bHw50Ga9G52YbT?=
+ =?us-ascii?Q?+aXO50E1o0cHf5YN5XlL5NpiUf4vNf8YB1+iDoqDO2ZAJ3dD7hiCCQm3KCUi?=
+ =?us-ascii?Q?gV2FH7+7Ui9jXSY93prmgRO/hOd3Ni8=3D?=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e8b492b-3b04-4fbf-2720-08ded2d20a80
+X-MS-Exchange-CrossTenant-AuthSource: VI0PR08MB10656.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2026 15:54:29.6481
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lRMLFqJ5q5MTWjxxxMpjSd6r2x+9172BcySy+v+XFzs5kSD3Lk+QDDAMJnKM1sju90+C3lS9c6lAWl1yoZc0WffQHNMFOcZ9NBIZjLg8qNs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6566
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:sgarzare@redhat.com,m:mst@redhat.com,m:stefanha@redhat.com,m:dongli.zhang@oracle.com,m:maciej.szmigiero@oracle.com,m:bchaney@akamai.com,m:mark.kanda@oracle.com,m:ptikhomirov@virtuozzo.com,m:den@openvz.org,m:andrey.drobyshev@virtuozzo.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302015-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anthony.doeraene@uclouvain.be,m:davem@davemloft.net,m:kuniyu@google.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-302013-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 55AEF6C72FC
+X-Rspamd-Queue-Id: 890F26C7336
 
-From: Anthony Doeraene <anthony.doeraene@uclouvain.be>
-Date: Thu, 25 Jun 2026 17:07:41 +0200
-> Hello all,
-> 
-> According to my experiments, it seems that ECMP with MPLS (i.e. an MPLS 
-> route with multiple
-> nexthops) is broken on the master branch of the kernel.
-> 
-> Indeed, whenever adding an MPLS route with multiple nexthops, ip route 
-> show the route as
-> a dead route/link down, even if nexthops are reachable.
-> 
-> Example to reproduce the error (tested with virtme-ng and the master 
-> branch of the kernel):
-> ```
-> modprobe mpls_iptunnel mpls_router
-> sysctl net.mpls.platform_labels=100000
-> ip link set dummy0 up
-> ip addr add fc00:1::1/112 dev dummy0
-> ip addr add fc00:2::1/112 dev dummy0
-> ip -M route add 16000 \
->      nexthop via inet6 fc00:1::2 as 16001 \
->      nexthop via inet6 fc00:2::2 as 16002
-> 
-> # Check the route
-> ip -M route
-> # Output:
-> #     16000 dead linkdown
-> #
-> # Route is not present, even if accepted
-> ```
-> 
->  From a git blame, it seems that commit 
-> f0914b8436c589b7ab32c614d8d7868eb4ebd5bf
-> broke the core logic for building nexthops.
+v2 -> v3:
 
-Thanks for the report !
+  * Patch 4: skip the kick of TX VQ worker once backend is gone - add
+    to cancel_pkt() the same guard as in send_pkt().
+    (Reported by Sashiko AI)
 
-It was to balance refcount with netdev_put() in mpls_rt_alloc().
-I'll post the patch below.
+v2: https://lore.kernel.org/virtualization/20260622175808.508084-1-andrey.drobyshev@virtuozzo.com
 
-(Updating rt->rt_nhn is not strictlly needed for netdev_put()
- because it has NULL check and rt is allocated with kzalloc(),
- but it's a bit error prone, so I'll keep it)
+Andrey Drobyshev (2):
+  vhost/vsock: suppress EHOSTUNREACH fast-fail during CPR pause
+  vhost/vsock: re-scan TX virtqueue on device start
 
----8<---
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index ca504d9626cf..4a81514e919a 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -922,8 +922,7 @@ static int mpls_nh_build_multi(struct mpls_route_config *cfg,
- 	struct nlattr *nla_via, *nla_newdst;
- 	int remaining = cfg->rc_mp_len;
- 	int err = 0;
--
--	rt->rt_nhn = 0;
-+	u8 nhs = 0;
- 
- 	change_nexthops(rt) {
- 		int attrlen;
-@@ -959,12 +958,15 @@ static int mpls_nh_build_multi(struct mpls_route_config *cfg,
- 			rt->rt_nhn_alive--;
- 
- 		rtnh = rtnh_next(rtnh, &remaining);
--		rt->rt_nhn++;
-+		nhs++;
- 	} endfor_nexthops(rt);
- 
-+	rt->rt_nhn = nhs;
-+
- 	return 0;
- 
- errout:
-+	rt->rt_nhn = nhs;
- 	return err;
- }
- 
----8<---
+Pavel Tikhomirov (2):
+  vhost/vsock: split out vhost_vsock_drop_backends helper
+  vhost/vsock: add VHOST_RESET_OWNER ioctl
 
+ drivers/vhost/vsock.c | 106 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 85 insertions(+), 21 deletions(-)
 
-> 
-> This commit modified function `mpls_nx_build_multi` by setting 
-> `rt->rt_nhn` to 0 at the
-> start of the function. However, the loop `change_nexthops` just below 
-> depends on
-> `rt->rt_nhn` to know the actual number of nexthops that it should build. 
-> As `rt->rt_nhn`
-> is set to 0 just before, **no nexthop is ever built**, leading to a dead 
-> route. Even if we
-> remove this modification, this commit incorrectly increments 
-> `rt->rt_nhn` at the end of
-> the loop (`rt->rt_nhn++`),  such that the loop always end with an error 
-> as it tries to
-> constructs more nexthops that actually provided.
-> 
-> Commenting these two lines fix the issue, and allows to create once 
-> again MPLS routes
-> with multiple nexthops:
-> 
-> ```
-> modprobe mpls_iptunnel mpls_router
-> sysctl net.mpls.platform_labels=100000
-> ip link set dummy0 up
-> ip addr add fc00:1::1/112 dev dummy0
-> ip addr add fc00:2::1/112 dev dummy0
-> ip -M route add 16000 \
->      nexthop via inet6 fc00:1::2 as 16001 \
->      nexthop via inet6 fc00:2::2 as 16002
-> 
-> # Check the route
-> ip -M route
-> # Output:
-> #     16000
-> #            nexthop as to 16001 via inet6 fc00:1::2 dev dummy0
-> #            nexthop as to 16002 via inet6 fc00:2::2 dev dummy0
-> #
-> # Route is accepted and present !
-> ```
-> 
-> Overall, I think it would be interesting to discuss what this patch was 
-> trying to achieve,
-> and how we can conciliate both use-cases.
-> 
-> Best regards and looking forward to hearing from you,
-> Doeraene Anthony
+-- 
+2.47.1
+
 
