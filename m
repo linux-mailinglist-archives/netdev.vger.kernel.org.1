@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-301829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CqxEKNGLPGoWpQgAu9opvQ
-	(envelope-from <netdev+bounces-301829-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:00:49 +0200
+	id K4/lI9yLPGoYpQgAu9opvQ
+	(envelope-from <netdev+bounces-301828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:01:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F15A66C2473
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:00:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8745A6C2479
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:00:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=fOBC0eaq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301829-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301829-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="Q/wJ/J7+";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301828-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301828-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E5DC3015852
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:00:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CBD79300F251
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A6A3A759D;
-	Thu, 25 Jun 2026 02:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0FB3A759D;
+	Thu, 25 Jun 2026 02:00:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BC23A7F72;
-	Thu, 25 Jun 2026 02:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A53E3A2E28
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 02:00:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782352837; cv=none; b=isuANyAV2foxKYQ13K6NFETFfWzv+BgS3n5rsj7I6j3BJWM2jEDUCVG0JmE45UuKvwn1czZTudszGmgYpKBZScHk3CirfmEX8+LHMBeQPfzmi6EHBsEJgg4VRGFFMUNC1dAMwrYhKMN9sL7ylu3jB8W/9j3oru7X1/YvSXeY8K4=
+	t=1782352834; cv=none; b=DXV6VIqhpYfdGRTATX3a+KdCQ4KjW5NClilZxPfpejsFWghQ156qKm14LLAnV62lcbKYItrQGMpVSqoSLEEvafM52wQgb+X77J0X1PFXJjmQZkG2TO1D5tbLE837fbFhfbLeO1N49nISZ8odlGXdiq/X40qPJlv7PZdcmgGfeOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782352837; c=relaxed/simple;
-	bh=975sQuwo80I0EU6ZpZjfglBn1vQTBlLV8RJh06nw32o=;
+	s=arc-20240116; t=1782352834; c=relaxed/simple;
+	bh=LfsfaccsY1IdBKJhQFBHt+8RW4wuDxF3NIp7aisJ51A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nMI8GTX3/5E0/XghfgIvFNCc4XLVB3UsTk25ebhVvcT1Q+DzUFokE3GfRX3mkhn+T7JO+zvh95/T1Y9/DUWz0XBIXNYbgRhKlAjobL3FoLN7JxQmhK2eJoshLrQLLVb0xP5aybrGmxiBVV+mVHnxLSFoaShEIUFpCLXQIXEY8wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOBC0eaq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20FA61F000E9;
-	Thu, 25 Jun 2026 02:00:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=U0KrMsKZh6QFr4CLqyU+F91KCRZDP2YUSDEAmCO5fjKoDCx/06B0r+nq3cB/0itQ0zAIZZjOFrol9jovx/pEI2eTvt16GwoWAi2LthMmJtfsKURR000HLukU290J/vejpuFdbgmd4Fd2yazo+ygXiQUFuDSNy8p5RafOUcEU20c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/wJ/J7+; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F0F1F00A3A;
+	Thu, 25 Jun 2026 02:00:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782352829;
-	bh=WWNX5zIuzAuAK/UOwrsV7r8JbUomActzaBQdI5UHQcw=;
+	s=k20260515; t=1782352831;
+	bh=AFRvaNN957BKinEjtYyb+MFHmqdiS2LpJw69b6EOj+s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fOBC0eaqAwpOrFsSWklf3XRA34/u3ZxodtkW0qf2CHzz8kE9lpP5lO6hR8Ycaj8jZ
-	 ZOHdhtinf5+palTviwB6UQRMPF8gYB968Ly6G5MSXNlmEPg0ab89KstUIL8nggoa1t
-	 gUy36Z2omzz5H6a3IjGv4pN3Mnm4NS9ZFo7Acm4SB3mnIuh2bwuTKcfHhk7OUuoICa
-	 8HfkVmQZhOQlXmiS090R+x0Nq9X0nY54MJd1yiasxQTQVEzLpMi+TFgRTSCpYsA1b2
-	 BCtzBkVLxU6ZsL96A307mVg34T7VT2iPNMauBkNH/8qoyVeund4fXFCn1T/OuhLkUS
-	 7WXIo0MY6K31g==
+	b=Q/wJ/J7+zgvVnhDluJT0DRc+fakfEO32e9R/YJkUAQPTTzlNdLD6TVdtjNODjldUh
+	 IqPtZYyiUKCa8woU4VcURtexFIHW3b60HhPWg87ivNzcZvD00gEYut8XpnGnK6/BYL
+	 A0DmHwY9WQEbhsS0StEBlTWrZLFRy1HNlwc8VmexilUpjkMdlICATD7TO8+vi186ZM
+	 +vfE/207Cz3m9NxcAcjechrmrcGo/sM1kBH8JgRpBCYKogW/+t7hZY2KaFtCH17Z3+
+	 LF55wQ8tis90/2qKxCCkpvgdKNzK4O9ANSpFpdGXMJAfBLDBeTTt7GdA0LYiPJ3L70
+	 wXyclq4cJrjWw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93BC93AAA6D4;
-	Thu, 25 Jun 2026 02:00:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B523AAA6D4;
+	Thu, 25 Jun 2026 02:00:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,18 +57,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH v4] octeontx2-af: Validate NIX maximum LFs correctly
+Subject: Re: [PATCH net v3] net: airoha: fix BQL underflow in shared QDMA TX
+ ring
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178235281728.3078979.15467412971095949192.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Jun 2026 02:00:17 +0000
-References: <1782082853-6941-1-git-send-email-sbhatta@marvell.com>
-In-Reply-To: <1782082853-6941-1-git-send-email-sbhatta@marvell.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
+ <178235281922.3078979.12001514996584548357.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jun 2026 02:00:19 +0000
+References: <20260620-airoha-bql-fixes-v3-1-76b95374e63e@kernel.org>
+In-Reply-To: <20260620-airoha-bql-fixes-v3-1-76b95374e63e@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
- bbhushan2@marvell.com, rkannoth@marvell.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ kuba@kernel.org, pabeni@redhat.com, win847@gmail.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -76,56 +77,70 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301829-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:gakula@marvell.com,m:bbhushan2@marvell.com,m:rkannoth@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.infradead.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301828-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:win847@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,marvell.com:email]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F15A66C2473
+X-Rspamd-Queue-Id: 8745A6C2479
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 22 Jun 2026 04:30:53 +0530 you wrote:
-> NIX maximum number of LFs can be set via devlink command
-> but that can be done before assigning any LFs to a PF/VF.
-> The condition used to check whether any LFs are assigned is
-> incorrect. This patch fixes that condition.
+On Sat, 20 Jun 2026 17:04:51 +0200 you wrote:
+> When multiple netdevs share a QDMA TX ring and one device is stopped,
+> netdev_tx_reset_subqueue() zeroes that device's BQL counters while its
+> pending skbs remain in the shared HW TX ring. When NAPI later completes
+> those skbs via netdev_tx_completed_queue(), the already-zeroed
+> dql->num_queued counter underflows.
 > 
-> Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> Fix the issue:
+> - Remove netdev_tx_reset_subqueue() from airoha_dev_stop() so pending
+>   skbs are completed naturally by NAPI with proper BQL accounting.
+> - Rework airoha_qdma_tx_cleanup() to disable TX DMA, flush BQL
+>   counters, DMA-unmap and free all pending skbs while skb->dev
+>   references are still valid. Use a per-queue flushing flag checked
+>   under q->lock in airoha_dev_xmit() to prevent races between teardown
+>   and transmit. Call airoha_qdma_stop_napi() before
+>   airoha_qdma_tx_cleanup() at the call sites.
+> - Move DMA engine start into probe. Split DMA teardown so TX DMA is
+>   disabled in airoha_qdma_tx_cleanup() and RX DMA in
+>   airoha_qdma_cleanup().
+> - Remove qdma->users counter since DMA lifetime is now tied to
+>   probe/cleanup rather than per-netdev open/stop.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v4] octeontx2-af: Validate NIX maximum LFs correctly
-    https://git.kernel.org/netdev/net/c/1576d12a3986
+  - [net,v3] net: airoha: fix BQL underflow in shared QDMA TX ring
+    https://git.kernel.org/netdev/net/c/611709830945
 
 You are awesome, thank you!
 -- 
