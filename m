@@ -1,209 +1,163 @@
-Return-Path: <netdev+bounces-301944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rLdYCxwMPWp3wQgAu9opvQ
-	(envelope-from <netdev+bounces-301944-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:08:12 +0200
+	id KqigH+sOPWr3wQgAu9opvQ
+	(envelope-from <netdev+bounces-301945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:20:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EC96C4FCE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:08:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E3D6C50F4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:20:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b="A54WRRX/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301944-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301944-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301945-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301945-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D0FD630380CA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:07:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 663AB3008099
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690FC3AD517;
-	Thu, 25 Jun 2026 11:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9983D7D90;
+	Thu, 25 Jun 2026 11:20:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0733A451D;
-	Thu, 25 Jun 2026 11:07:35 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7CD2D7D47
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 11:20:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782385657; cv=none; b=SCvPp8eM4+AMUPdlpcC6x/p/4jIOM+HLD9xNXXN3ECS8AvfCNg/dK5SAbLqbkD+i5dKY4p7zvxjxziTPSJ+SHPbfOZE9WPZihzfc+k7SQlDH+sb3gJ8CpeWHFuUFc/OzcV5Kv+txJLUZHQ0pqCwFOP5oXUVaardjgezV/oT0Sew=
+	t=1782386405; cv=none; b=tP5dRfJb3m/3KESpRoTVDVlsrRdZlOlaCzp/lq0vh7Dtsq3NFbcojNL78jcbOb9csqrz9JJhzl9fNcLYFu7/azSRPok6+SoCBcK2IErmve6DvJGust1t9c9zNla2mDnTSeF7Ej5/C/XciiA42st4RgxYo4ZyA5mzBtq3bLPoDKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782385657; c=relaxed/simple;
-	bh=1DKzcgPw0xfGQ3vVU4fzu+gAjQMxLf9uPhSMmZQA5UA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nYgL07LEjJvQfHc+YlAbxQkqpZByvB7pWGfKOBrXO4NHqz0JL7cSJpD8nclR91sI9wmwMFZ0PYBCXAyYklErA9foFCPHKpnVv72dzGG7onn5cHJApUg1MsTTYxDFU36xMl25JLiDS1bFNCMBsD7gUXvBqENRNiYpdCnzE5BXFFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A54WRRX/; arc=none smtp.client-ip=198.175.65.11
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782385656; x=1813921656;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1DKzcgPw0xfGQ3vVU4fzu+gAjQMxLf9uPhSMmZQA5UA=;
-  b=A54WRRX/KdxgxJ4/yYTb4WNyIEW0Vl3DXdOZpSisJd3jQ4Rb9iV5PW5b
-   /FmXifZFq66nN8WBzKE7WWXV3M1Bx/PJUcicrRt2Le5pHb7c16X9p3Liw
-   b85weAXYqpC8zweCZb7dF2qEaABYYtr9ZAL9GZSlPYxdeoshGNg/3UkQ6
-   7hdjvbQ85wex3ocFX+rWYc5jb8HaR62LMto8QWM8UqVByZlrpBt9Z6OjK
-   D8EbUQML3De04bFBHEatHMUCSLUciRMxtEQ/6tboXDkObzaqEveqymvYc
-   R6ruR/zXh98rZQHK1HYwDEkPoxZnzXrxykV/UdHiofdw10tIPVfn6X91E
-   w==;
-X-CSE-ConnectionGUID: P+cYg6fnT9awpAxSBZz6zg==
-X-CSE-MsgGUID: qvEJI4X0RyaIu06ZSulwaw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11827"; a="93515283"
-X-IronPort-AV: E=Sophos;i="6.24,224,1774335600"; 
-   d="scan'208";a="93515283"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2026 04:07:36 -0700
-X-CSE-ConnectionGUID: UBL7DbuESgmqSE+sM3lTCg==
-X-CSE-MsgGUID: 9cqH5KWLSAODmTeGA7j2lg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,224,1774335600"; 
-   d="scan'208";a="250755331"
-Received: from mszycik-desk.igk.intel.com (HELO [10.217.160.239]) ([10.217.160.239])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2026 04:07:32 -0700
-Message-ID: <f9a090bd-08ea-47e6-8dee-cf4f828fdced@linux.intel.com>
-Date: Thu, 25 Jun 2026 13:07:26 +0200
+	s=arc-20240116; t=1782386405; c=relaxed/simple;
+	bh=POMXdWhfI8qBwKUl1nNS6A3c2JppL3Vs6FUZFJgcmC8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sVT5MPrEPxUtIn3p5YeyJM/kfTdy3PIJ/7EZE3IWahSAeJHB03H8fUz/7lXOt6R1dYpdGVFErgAnfQS1Jwn5nsnHs9Z/LEVAKTePb8E31JjTXgGV2zmW7dopKyFL6JRx9KcBBF3A56WfXCMZOi0bOzVdztwO7WWE3JgO/hfnuEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hust.edu.cn; spf=pass smtp.mailfrom=hust.edu.cn; arc=none smtp.client-ip=13.75.44.102
+Received: from hust.edu.cn (unknown [172.16.0.50])
+	by app2 (Coremail) with SMTP id HwEQrAB3_zW7Dj1q+GQ+AA--.53363S2;
+	Thu, 25 Jun 2026 19:19:23 +0800 (CST)
+Received: from uu22.. (unknown [38.79.119.137])
+	by gateway (Coremail) with SMTP id _____wAH4RGxDj1q5h1bAA--.1028S2;
+	Thu, 25 Jun 2026 19:19:22 +0800 (CST)
+From: Yinhao Hu <dddddd@hust.edu.cn>
+To: netdev@vger.kernel.org
+Cc: david@ixit.cz,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	dzm91@hust.edu.cn,
+	hust-os-kernel-patches@googlegroups.com,
+	Yinhao Hu <dddddd@hust.edu.cn>
+Subject: [PATCH net] nfc: clear active_target when the target list is replaced
+Date: Thu, 25 Jun 2026 04:18:35 -0700
+Message-ID: <20260625111835.2411251-1-dddddd@hust.edu.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net] igc: Fix RX HW timestamp reporting
- when NET_RX_BUSY_POLL is disabled
-To: Florian Bezdeka <florian.bezdeka@siemens.com>,
- "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>,
- Ding Meng <meng.ding@siemens.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "Kiszka, Jan" <jan.kiszka@siemens.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "wq.wang@siemens.com" <wq.wang@siemens.com>
-References: <20260622041718.6106-1-meng.ding@siemens.com>
- <BL1PR11MB59796B99C5A7709B07000D68F3EE2@BL1PR11MB5979.namprd11.prod.outlook.com>
- <d058b0fa9ad923514084a44f51c78ae8355c4ebb.camel@siemens.com>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <d058b0fa9ad923514084a44f51c78ae8355c4ebb.camel@siemens.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:HwEQrAB3_zW7Dj1q+GQ+AA--.53363S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KrWruFykXrWUCFykXr1rXrb_yoW8WrWxpa
+	93JFn3tFWUXrWxA3yfAF1UXr1ru3WkGFyUCryIk34rC3Z8G34xJ3WfGryfXFyjyFZ8CFW3
+	AF1jyr4rGrZ8uF7anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm2b7Iv0xC_tr1lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
+	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
+	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1ln4kS14v26r
+	126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I8C
+	rVACY4xI64kE6c02F40Ex7xfMcIj64x0Y40En7xvr7AKxVW8Jr0_Cr1UMcIj6x8ErcxFaV
+	Av8VW8uFyUJr1UMcIj6xkF7I0En7xvr7AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8
+	JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04
+	k20xvE74AGY7Cv6cx26r4fZr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAF
+	wI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+	AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1l
+	IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVF
+	xhVjvjDU0xZFpf9x07j-Z2-UUUUU=
+X-CM-SenderInfo: bgsqjkiyqyjko6kx23oohg3hdfq/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-301944-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:florian.bezdeka@siemens.com,m:piotr.kwapulinski@intel.com,m:meng.ding@siemens.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jan.kiszka@siemens.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:wq.wang@siemens.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[hust.edu.cn];
+	TAGGED_FROM(0.00)[bounces-301945-lists,netdev=lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:david@ixit.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dzm91@hust.edu.cn,m:hust-os-kernel-patches@googlegroups.com,m:dddddd@hust.edu.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,hust.edu.cn:email,hust.edu.cn:mid,hust.edu.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C0EC96C4FCE
+X-Rspamd-Queue-Id: 44E3D6C50F4
 
+nfc_activate_target() and nfc_dep_link_up() cache dev->active_target as a
+raw pointer into the dev->targets array. When a later poll reports new
+targets, nfc_targets_found() frees and replaces dev->targets but does not
+clear dev->active_target, so the cached pointer is left dangling into
+freed memory. Any subsequent NFC core path that dereferences
+dev->active_target->idx then reads the freed memory, e.g.
+nfc_deactivate_target(), nfc_data_exchange().
 
+When nfc_targets_found() is about to free the current target array, clear
+dev->active_target if it points into that array, and tear down the
+associated active state (stop the presence-check timer, drop the DEP link
+and reset the RF mode) as nfc_deactivate_target() does.
 
-On 24/06/2026 11:05, Florian Bezdeka via Intel-wired-lan wrote:
-> On Tue, 2026-06-23 at 09:46 +0000, Kwapulinski, Piotr wrote:
->>> -----Original Message-----
->>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of Ding Meng via Intel-wired-lan
->>> Sent: Monday, June 22, 2026 6:13 AM
->>> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Kiszka, Jan <jan.kiszka@siemens.com>; Bezdeka, Florian <florian.bezdeka@siemens.com>
->>> Cc: intel-wired-lan@lists.osuosl.org; linux-kernel@vger.kernel.org; netdev@vger.kernel.org; meng.ding@siemens.com; wq.wang@siemens.com
->>> Subject: [Intel-wired-lan] [PATCH net] igc: Fix RX HW timestamp reporting when NET_RX_BUSY_POLL is disabled
->>>
->>> When CONFIG_NET_RX_BUSY_POLL is deactivated, fetching RX HW timestamps from the NIC no longer works as expected.
->>>
->>> This occurs because disabling CONFIG_NET_RX_BUSY_POLL disables the SKB NAPI mapping in __skb_mark_napi_id(). Consequently, get_timestamp() fails to perform its driver lookup, and the igc driver's struct net_device_ops::ndo_get_tstamp is never invoked.
->>>
->>> Instead, get_timestamp() falls back to use shhwtstamps(skb)->hwtstamp, a field that the driver has not populated.
->>>
->>> Fix this by populating the hwtstamp field with the correct timestamp in the default timer when CONFIG_NET_RX_BUSY_POLL is disabled.
->>>
->>> Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
->>> Co-developed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
->>> Signed-off-by: Florian Bezdeka <florian.bezdeka@siemens.com>
->>> Signed-off-by: Ding Meng <meng.ding@siemens.com>
->>> ---
->>> drivers/net/ethernet/intel/igc/igc_main.c | 38 ++++++++++++++++-------
->>> 1 file changed, 26 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
->>> index 8ac16808023..1da8d7aa76d 100644
->>> --- a/drivers/net/ethernet/intel/igc/igc_main.c
->>> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
->>> @@ -1992,7 +1992,26 @@ static struct sk_buff *igc_build_skb(struct igc_ring *rx_ring,
->>> 	return skb;
->>> }
->>>
->>> -static struct sk_buff *igc_construct_skb(struct igc_ring *rx_ring,
->>> +static void igc_construct_skb_timestamps(struct igc_adapter *adapter,
->>> +					 struct sk_buff *skb,
->>> +					 struct igc_xdp_buff *ctx)
->>> +{
->>> +	if (!ctx->rx_ts)
->>> +		return;
->>> +#ifdef CONFIG_NET_RX_BUSY_POLL
->>> +	skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
->>> +	skb_hwtstamps(skb)->netdev_data = ctx->rx_ts; #else
->>> +	struct igc_inline_rx_tstamps *tstamps;
->> Please move at the top of the function and add:
-> 
-> That would trigger a "unused variable" warning in the
-> CONFIG_NET_RX_BUSY_POLL case.
+Fixes: 900994332675 ("NFC: Cache the core NFC active target pointer instead of its index")
+Signed-off-by: Yinhao Hu <dddddd@hust.edu.cn>
+---
+ net/nfc/core.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Put it under #ifndef CONFIG_NET_RX_BUSY_POLL. Variable declarations
-need to be on top.
-
-Thanks,
-Marcin
-
-> Btw: I was really confused that the #else statement moved to the end of
-> the previous line. Might someone be using a wrongly configured mail
-> client here?
-> 
-> Florian
-> 
->> Reviewed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com
->>
->>> +
->>> +	tstamps = ctx->rx_ts;
->>> +	skb_hwtstamps(skb)->hwtstamp = igc_ptp_rx_pktstamp(adapter,
->>> +							   tstamps->timer0);
->>> +#endif
->>> +}
->>> +
-> 
-> [snip]
+diff --git a/net/nfc/core.c b/net/nfc/core.c
+index a92a6566e6a0..950807906645 100644
+--- a/net/nfc/core.c
++++ b/net/nfc/core.c
+@@ -786,6 +786,21 @@ int nfc_targets_found(struct nfc_dev *dev,
+ 
+ 	dev->targets_generation++;
+ 
++	if (dev->active_target && dev->targets) {
++		for (i = 0; i < dev->n_targets; i++) {
++			if (dev->active_target != &dev->targets[i])
++				continue;
++
++			if (dev->ops->check_presence)
++				timer_delete_sync(&dev->check_pres_timer);
++
++			dev->active_target = NULL;
++			dev->dep_link_up = false;
++			dev->rf_mode = NFC_RF_NONE;
++			break;
++		}
++	}
++
+ 	kfree(dev->targets);
+ 	dev->targets = NULL;
+ 
+-- 
+2.43.0
 
 
