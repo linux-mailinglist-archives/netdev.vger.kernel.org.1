@@ -1,105 +1,99 @@
-Return-Path: <netdev+bounces-301890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ce74H+7lPGowuAgAu9opvQ
-	(envelope-from <netdev+bounces-301890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:25:18 +0200
+	id Deu9NgTnPGqAuAgAu9opvQ
+	(envelope-from <netdev+bounces-301891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:29:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB306C3C0B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:25:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373F06C3CEA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:29:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=lxfWE3wX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301890-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301890-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=BM9QD2FS;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301891-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301891-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB964301664A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:25:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A43BF3107B5D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7943803DA;
-	Thu, 25 Jun 2026 08:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD30380FDB;
+	Thu, 25 Jun 2026 08:25:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0FC37F01C
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB693806DD
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:25:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782375915; cv=none; b=MXwTUkqBQ78Z0eQ/V2qwhFopbNWmNCG+qVSyHD1Vmru//9qngX+fFdLP5LE4Dy1nMkEiUKakiddCehIaKMnEaEG44H8avCquVCsJVtzTgvsb7ctBIJS1TKOX3GAPka6Axd8lXMhTvQfFn0rbYeoVrZJBBRG3RsvcxVjufhCNX8g=
+	t=1782375921; cv=none; b=DDt+o0V7Rn0IxMPY3+mez4fUvne0RURnP681ckYyP5P1sMG3NyfrwI1chKPfnobvctu9fwJ4uoQ2yHf2duJkWv9h8MiEsko65jF3G2hoyJwMXRKs5b/qKn4quuGsqny/Vt7OQWXoBHuK52Sec2XJSdErRIHCFDblnvFxqkgK2jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782375915; c=relaxed/simple;
-	bh=FttxWcQB/hNn+4s9v0hsj+DpOXG7C6zn1XazAFM7dH4=;
+	s=arc-20240116; t=1782375921; c=relaxed/simple;
+	bh=N5soKUtSuwwQrMT2T7V6ESS7YgqojhHhVowe5dyJBfE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D26eCnLmRqwMEktKt6mwtMjUci5E65mr+yc/HlTy+Ru/BMzgcJpw2u95qioxvdbguqcbI8IXghmIzoJCTTQjv9h/RxGXFAYzActFkKGejg3IfBC4jujl6t/VubDbPtBQjqzJHKqdJ4cvcchF4JuLv4cBZpu3Yde6OMNg2YJWss0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxfWE3wX; arc=none smtp.client-ip=209.85.208.180
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-39676ff4674so17652721fa.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:25:14 -0700 (PDT)
+	 MIME-Version; b=UHHk8b/2wB4gupGAanV8bfwl1yoIATD7RJ+wC6pXJ3NzCrzMZxjciV4Y2bijlS0MVtL7BbmX7n5nR38uilFTKO3b3uMVHA9slRjyhNE88gQUn1EH0joVqmmowHyof6Tr/Q3LA+R09aoOtZOmLFViqO+z8qKoQ7K9yC/FzsWLOvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BM9QD2FS; arc=none smtp.client-ip=209.85.208.182
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-39ad1d2555aso1738751fa.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:25:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782375912; x=1782980712; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782375917; x=1782980717; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YNsZSX3/QBjqrDIvX4drEF9Odl8RtjkKP8nQ70A9iWI=;
-        b=lxfWE3wXOPqeE/e51favXN6jlbuBkWkaWVrfdA1/4TTbjaGumbP2VPamidjALhrg5e
-         caq/MgRnP7+INT4a4QVtS6zy8yF7n4qNB7yR4mpgATEMF2/pfN0bSPwhAF9V+cP8y9Ki
-         aN1AcuTMN3mfUY3u6c2nY7gTQ3CSFziVJlaRrXoariu8wIIzyurG7Ny+qQ1TNOuhVt2z
-         zmjq53KrcqIR7uqPBiKiLNRxxSG09MLt8JNpcxOecYErnmsSwFtMMlcWZ6dquyraQ5UI
-         bqdrEGsl0985UBaYUSIg3DtoRbIdd7Zj7Qe4BtBjzKtO+9AD1X3vyCK+EiykwvwZ6bM7
-         2Zlw==
+        bh=HDCoYVBjQzZ+2LVFbZQGc2v/ECMbMCzgWa8ygBvGziA=;
+        b=BM9QD2FS0fNbB+1yZP0H7rtV4vPiPh462laUpaxOcOK+VwgG3s3e7XmeeHZp+nljhk
+         nCytwEuSQYb1FinforY0l4H9tbCTRIy+vk2wkqPCqXWqCIRGu2RfmphGaFGZpcfGwFej
+         w7rqMhV1z4xxpDFRn93baKBhXAQvnCMTogM9ekBcv3tnrjuJDvb7DAGMffDdjJtDvS4A
+         18zKTFQ9cW8Wes44aCTyFnPphoSnv4b4/YwV0EUMz+1VXhpXkBfnvdWKG0b/mK5iuqCp
+         d4yx1oGxXU6qD1TrC02cha5OCc8/vvOp353Bygu7TmZMlZ09KX+MPlXvfxd1ZCR/N9f0
+         93ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782375912; x=1782980712;
+        d=1e100.net; s=20251104; t=1782375917; x=1782980717;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=YNsZSX3/QBjqrDIvX4drEF9Odl8RtjkKP8nQ70A9iWI=;
-        b=J9CkaZvZheKqwrOgO+n8amHbLL9B68HH6+Ofd4g91zijKRC/eJFG+aHTyifMHyJKG9
-         cI35v78/KUI1blYWg+vmuWN3J+CQI6T3EIn5uJlV4kSEuODc5/EZQMEWenPLfnvVFkgN
-         IrbvuwnjQGOv+icogO62aNqcpevta7uyXSXtYLkgOpkUn6HLPqUrHPawtMcIbw4oGBJ4
-         fp1VYR6bD73KCquOYqGmNeADn8O630adTUATfCBpPQhIRnF7ffnfFTpCa5DW2GuMODkQ
-         zKuAAc/UMcfd+hkY01hzFqGuMq+L00+BPHXvMS5MIkoSlIM0bgeTaVj2Pyrieww0iykO
-         ek1A==
-X-Forwarded-Encrypted: i=1; AHgh+Rp5XhjqJZAQbPXMj/5ikgFzKswn0Sv1QSNSxUSYWcOPHwmA9e8SPHSjpkULJ3K2Az0RUaEoJqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy2QOwxRsW/jjRxMZKW6GwaI64/XbWyu09BEM77bGHUWSfBbyY
-	4BxnkeyOYiCiRq/5YfItukBWlt4Q4zRvWVnb+Liz672+bJiySmlOtBf2
-X-Gm-Gg: AfdE7clRCiAdMg9WxBGsSPrNRenzkPFWJHuSOJzm0ajT1Q8oLwP0gQBlpn+0UKGe48e
-	JMoHy29eM22u+a0oNeikXE9gdxmDFLwmKWYRGAL/hzyOflsI7l1DW3fJjzF06kLgZYD3qWxefUK
-	g2U12WKokqKVST2lmbqX3flBnujaY840O6abMvjEH73pt/yVtlbSu9PaJD0dDOoexm+cjTmfO/J
-	SpGeVnFrqJ75YJlMa3F/vbxzywvJVa7kcCP4zoptqomNyAaLzz9nI9vbsjwSt/y5puL9qQvOlbz
-	4vYLHRMIsC0HbRuum8dPfUT2dgH5G/VGrqmKDT5LAp1iOTwdqPAWcrnCNf7Z3twnfQUnt+YlEkW
-	kCLQDqq2YYwjgtySfqrdrU76ztScwltVUkJj/nJvHGXxhODJM+qFs/bADRk4jQMZ1942M2e1lYd
-	PMS2Qw5Z6/LHMEpfVNUTlYgBYexgYB
-X-Received: by 2002:a05:6512:b8b:b0:5aa:6df7:4eac with SMTP id 2adb3069b0e04-5aea1f2d8famr531570e87.20.1782375912271;
-        Thu, 25 Jun 2026 01:25:12 -0700 (PDT)
+        bh=HDCoYVBjQzZ+2LVFbZQGc2v/ECMbMCzgWa8ygBvGziA=;
+        b=rsQEkmVEfgQ28eTK+d+znkLgmK82CZXP/0JKMhh/7EzOi801Ul7Z6BKFzPSeZ7Hdwg
+         fpS+S634QozvuKlyZOx2Q3fu70dfZgJL64Q9nF3tOIk5p7OZb2FgB4z/XXwNob5fK0CA
+         rt+IAQfsYZrUFw5Vqev3s2kizNhjgg7fhKWbQNEsCoCtcRUswnLi1blAR/7YmAfPi7n3
+         FHV3mTdpuVvjk2wUIKZq+oCZR/jKqRFSeqR85jKXObRWb3V3X3oNJVaOVyZHom9mHGeb
+         iOWDqLCgYHrVlr6qp+NuejXuPXEYV/stPRAMgWFSgQ9pyyf9nzejjygLsJFi70DzLQA6
+         rKZA==
+X-Forwarded-Encrypted: i=1; AHgh+Rpc+iSheBS2sAAPhiu9PQM23e5nvrMWFjTis/CXJ7r6yThIrti/NHpWpiyaL8TLl5s0AS7/sGc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg2R52a1J8Z6WRv3tLKxpNI7+qJdzRMQ3cbXqR5EB+C596449E
+	MCsdh/ul+AgQfAb9Z/JxVqlVDEeMkmNM54mzvm8yKsvwS4h77Eos7Fx1
+X-Gm-Gg: AfdE7cntmfomiqKh+QDZkC1Ba9Ye0KCg0FG/5Fe7fUec2PAtsncoD/PYZn4o/2eOL4N
+	l5c0BADBI9JybQtH6k5g3L6B8B/bEluJOnPafspnsqLTqyj+3csVyUMK9TvNFGw6xKb69VaSbO0
+	q6PauXNf5Pf3guGiBXc64EEpisa7UlItZshqlsZ0awUc9dF/JxIwufwLF7p4h8H0xEC9S0PhFJb
+	CrxEBlno6Xr4aOPolJFkZtjx6t0QPRAJ/PX3SOMwrNC0WkEsGbkQqJrQs2Eq/KwHxADBqNPAZam
+	JJZqGRhTuJOoZCUrKvIvnYy8P84NlFj2/W96Y8Vt+a9E8v0UyVLAm4GmQoa78grX2PngMwQQA8N
+	At8wqGXKMtpveBmJEqAFPmwVDI1MdKBdiKnv2vTiwMGsVBA6pb79prkioWZeoEUUmUQMY3Ht+Zw
+	SKOvd0mPHlPkyMPL45nNqfZKUMkuFxSKDvPX5eFs0=
+X-Received: by 2002:a2e:a547:0:b0:399:876b:3a9c with SMTP id 38308e7fff4ca-39acb69d932mr3596731fa.16.1782375916764;
+        Thu, 25 Jun 2026 01:25:16 -0700 (PDT)
 Received: from grower.astra-academy.ru ([185.32.135.49])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39ad31a81adsm566391fa.28.2026.06.25.01.25.11
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-39ad31a81adsm566391fa.28.2026.06.25.01.25.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 01:25:11 -0700 (PDT)
+        Thu, 25 Jun 2026 01:25:16 -0700 (PDT)
 From: Alexander Martyniuk <alexevgmart@gmail.com>
 To: stable@vger.kernel.org,
 	gregkh@linuxfoundation.org
 Cc: Alexander Martyniuk <alexevgmart@gmail.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Jon Maloy <jmaloy@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	Weiming Shi <bestswngs@gmail.com>,
 	linux-sctp@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	Petr Machata <petrm@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH 6.12 1/2] net: ipv6: Make udp_tunnel6_xmit_skb() void
-Date: Thu, 25 Jun 2026 11:24:41 +0300
-Message-ID: <20260625082442.96390-2-alexevgmart@gmail.com>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6.12 2/2] sctp: disable BH before calling udp_tunnel_xmit_skb()
+Date: Thu, 25 Jun 2026 11:24:42 +0300
+Message-ID: <20260625082442.96390-3-alexevgmart@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260625082442.96390-1-alexevgmart@gmail.com>
 References: <20260625082442.96390-1-alexevgmart@gmail.com>
@@ -117,18 +111,18 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301890-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301891-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,windriver.com,vger.kernel.org,lists.sourceforge.net,nvidia.com,blackwall.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:alexevgmart@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:jmaloy@redhat.com,m:ying.xue@windriver.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:petrm@nvidia.com,m:idosch@nvidia.com,m:razor@blackwall.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:alexevgmart@gmail.com,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bestswngs@gmail.com,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -141,151 +135,98 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,blackwall.org:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3BB306C3C0B
+X-Rspamd-Queue-Id: 373F06C3CEA
 
-From: Petr Machata <petrm@nvidia.com>
+From: Xin Long <lucien.xin@gmail.com>
 
-commit 6a7d88ca15f73c5c570c372238f71d63da1fda55 upstream.
+commit 2cd7e6971fc2787408ceef17906ea152791448cf upstream.
 
-The function always returns zero, thus the return value does not carry any
-signal. Just make it void.
+udp_tunnel_xmit_skb() / udp_tunnel6_xmit_skb() are expected to run with
+BH disabled.  After commit 6f1a9140ecda ("add xmit recursion limit to
+tunnel xmit functions"), on the path:
 
-Most callers already ignore the return value. However:
+  udp(6)_tunnel_xmit_skb() -> ip(6)tunnel_xmit()
 
-- Refold arguments of the call from sctp_v6_xmit() so that they fit into
-  the 80-column limit.
+dev_xmit_recursion_inc()/dec() must stay balanced on the same CPU.
 
-- tipc_udp_xmit() initializes err from the return value, but that should
-  already be always zero at that point. So there's no practical change, but
-  elision of the assignment prompts a couple more tweaks to clean up the
-  function.
+Without local_bh_disable(), the context may move between CPUs, which can
+break the inc/dec pairing. This may lead to incorrect recursion level
+detection and cause packets to be dropped in ip(6)_tunnel_xmit() or
+__dev_queue_xmit().
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://patch.msgid.link/7facacf9d8ca3ca9391a4aee88160913671b868d.1750113335.git.petrm@nvidia.com
+Fix it by disabling BH around both IPv4 and IPv6 SCTP UDP xmit paths.
+
+In my testing, after enabling the SCTP over UDP:
+
+  # ip net exec ha sysctl -w net.sctp.udp_port=9899
+  # ip net exec ha sysctl -w net.sctp.encap_port=9899
+  # ip net exec hb sysctl -w net.sctp.udp_port=9899
+  # ip net exec hb sysctl -w net.sctp.encap_port=9899
+
+  # ip net exec ha iperf3 -s
+
+- without this patch:
+
+  # ip net exec hb iperf3 -c 192.168.0.1 --sctp
+  [  5]   0.00-10.00  sec  37.2 MBytes  31.2 Mbits/sec  sender
+  [  5]   0.00-10.00  sec  37.1 MBytes  31.1 Mbits/sec  receiver
+
+- with this patch:
+
+  # ip net exec hb iperf3 -c 192.168.0.1 --sctp
+  [  5]   0.00-10.00  sec  3.14 GBytes  2.69 Gbits/sec  sender
+  [  5]   0.00-10.00  sec  3.14 GBytes  2.69 Gbits/sec  receiver
+
+Fixes: 6f1a9140ecda ("net: add xmit recursion limit to tunnel xmit functions")
+Fixes: 046c052b475e ("sctp: enable udp tunneling socks")
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Link: https://patch.msgid.link/c874a8548221dcd56ff03c65ba75a74e6cf99119.1776017727.git.lucien.xin@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Alexander Martyniuk <alexevgmart@gmail.com>
 ---
- include/net/udp_tunnel.h  | 14 +++++++-------
- net/ipv6/ip6_udp_tunnel.c | 15 +++++++--------
- net/sctp/ipv6.c           |  7 ++++---
- net/tipc/udp_media.c      | 10 +++++-----
- 4 files changed, 23 insertions(+), 23 deletions(-)
+ net/sctp/ipv6.c     | 2 ++
+ net/sctp/protocol.c | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index 6e2c5c77031f..8ed36ec520d7 100644
---- a/include/net/udp_tunnel.h
-+++ b/include/net/udp_tunnel.h
-@@ -152,13 +152,13 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
- 			 __be16 df, __be16 src_port, __be16 dst_port,
- 			 bool xnet, bool nocheck);
- 
--int udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
--			 struct sk_buff *skb,
--			 struct net_device *dev,
--			 const struct in6_addr *saddr,
--			 const struct in6_addr *daddr,
--			 __u8 prio, __u8 ttl, __be32 label,
--			 __be16 src_port, __be16 dst_port, bool nocheck);
-+void udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
-+			  struct sk_buff *skb,
-+			  struct net_device *dev,
-+			  const struct in6_addr *saddr,
-+			  const struct in6_addr *daddr,
-+			  __u8 prio, __u8 ttl, __be32 label,
-+			  __be16 src_port, __be16 dst_port, bool nocheck);
- 
- void udp_tunnel_sock_release(struct socket *sock);
- 
-diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
-index 2acf1bb93fc0..f22eff2ba77c 100644
---- a/net/ipv6/ip6_udp_tunnel.c
-+++ b/net/ipv6/ip6_udp_tunnel.c
-@@ -74,13 +74,13 @@ int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
- }
- EXPORT_SYMBOL_GPL(udp_sock_create6);
- 
--int udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
--			 struct sk_buff *skb,
--			 struct net_device *dev,
--			 const struct in6_addr *saddr,
--			 const struct in6_addr *daddr,
--			 __u8 prio, __u8 ttl, __be32 label,
--			 __be16 src_port, __be16 dst_port, bool nocheck)
-+void udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
-+			  struct sk_buff *skb,
-+			  struct net_device *dev,
-+			  const struct in6_addr *saddr,
-+			  const struct in6_addr *daddr,
-+			  __u8 prio, __u8 ttl, __be32 label,
-+			  __be16 src_port, __be16 dst_port, bool nocheck)
- {
- 	struct udphdr *uh;
- 	struct ipv6hdr *ip6h;
-@@ -109,7 +109,6 @@ int udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
- 	ip6h->saddr	  = *saddr;
- 
- 	ip6tunnel_xmit(sk, skb, dev);
--	return 0;
- }
- EXPORT_SYMBOL_GPL(udp_tunnel6_xmit_skb);
- 
 diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
-index 9f835e674c59..b4c321bad033 100644
+index b4c321bad033..b45cc51dfc35 100644
 --- a/net/sctp/ipv6.c
 +++ b/net/sctp/ipv6.c
-@@ -261,9 +261,10 @@ static int sctp_v6_xmit(struct sk_buff *skb, struct sctp_transport *t)
+@@ -261,9 +261,11 @@ static int sctp_v6_xmit(struct sk_buff *skb, struct sctp_transport *t)
  	skb_set_inner_ipproto(skb, IPPROTO_SCTP);
  	label = ip6_make_flowlabel(sock_net(sk), skb, fl6->flowlabel, true, fl6);
  
--	return udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr,
--				    &fl6->daddr, tclass, ip6_dst_hoplimit(dst),
--				    label, sctp_sk(sk)->udp_port, t->encap_port, false);
-+	udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr, &fl6->daddr,
-+			     tclass, ip6_dst_hoplimit(dst), label,
-+			     sctp_sk(sk)->udp_port, t->encap_port, false);
-+	return 0;
++	local_bh_disable();
+ 	udp_tunnel6_xmit_skb(dst, sk, skb, NULL, &fl6->saddr, &fl6->daddr,
+ 			     tclass, ip6_dst_hoplimit(dst), label,
+ 			     sctp_sk(sk)->udp_port, t->encap_port, false);
++	local_bh_enable();
+ 	return 0;
  }
  
- /* Returns the dst cache entry for the given source and destination ip
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index 258d6aa4f21a..1b8d6bbf8a8e 100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -172,7 +172,7 @@ static int tipc_udp_xmit(struct net *net, struct sk_buff *skb,
- 			 struct udp_media_addr *dst, struct dst_cache *cache)
- {
- 	struct dst_entry *ndst;
--	int ttl, err = 0;
-+	int ttl, err;
+diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
+index 39ca5403d4d7..6ea15361088b 100644
+--- a/net/sctp/protocol.c
++++ b/net/sctp/protocol.c
+@@ -1086,9 +1086,11 @@ static inline int sctp_v4_xmit(struct sk_buff *skb, struct sctp_transport *t)
+ 	skb_reset_inner_mac_header(skb);
+ 	skb_reset_inner_transport_header(skb);
+ 	skb_set_inner_ipproto(skb, IPPROTO_SCTP);
++	local_bh_disable();
+ 	udp_tunnel_xmit_skb(dst_rtable(dst), sk, skb, fl4->saddr,
+ 			    fl4->daddr, dscp, ip4_dst_hoplimit(dst), df,
+ 			    sctp_sk(sk)->udp_port, t->encap_port, false, false);
++	local_bh_enable();
+ 	return 0;
+ }
  
- 	local_bh_disable();
- 	ndst = dst_cache_get(cache);
-@@ -217,13 +217,13 @@ static int tipc_udp_xmit(struct net *net, struct sk_buff *skb,
- 			dst_cache_set_ip6(cache, ndst, &fl6.saddr);
- 		}
- 		ttl = ip6_dst_hoplimit(ndst);
--		err = udp_tunnel6_xmit_skb(ndst, ub->ubsock->sk, skb, NULL,
--					   &src->ipv6, &dst->ipv6, 0, ttl, 0,
--					   src->port, dst->port, false);
-+		udp_tunnel6_xmit_skb(ndst, ub->ubsock->sk, skb, NULL,
-+				     &src->ipv6, &dst->ipv6, 0, ttl, 0,
-+				     src->port, dst->port, false);
- #endif
- 	}
- 	local_bh_enable();
--	return err;
-+	return 0;
- 
- tx_error:
- 	local_bh_enable();
 -- 
 2.43.0
 
