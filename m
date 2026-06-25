@@ -1,167 +1,180 @@
-Return-Path: <netdev+bounces-301926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id S65GFiABPWqlvggAu9opvQ
-	(envelope-from <netdev+bounces-301926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:21:20 +0200
+	id N6bFCQQEPWo2vwgAu9opvQ
+	(envelope-from <netdev+bounces-301927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:33:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F156C49CC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:21:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 622536C4AE0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:33:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=j4otTKTn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301926-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301926-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=siemens.com header.s=fm2 header.b=tGJizTwj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301927-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301927-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=siemens.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 07D403037993
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:20:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09F1A3034B19
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9293CF686;
-	Thu, 25 Jun 2026 10:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDD33CC310;
+	Thu, 25 Jun 2026 10:33:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEF8373C0E
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 10:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413D4373BE7
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 10:33:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782382840; cv=none; b=LdSl3ST4JcePeOmnD6/4sWKkZxyomnEq5jqdCtq/VFn/kz72sDEZPLD7KsYhNeOga4jrZAC19PNV4bx1ZL4oyP5f4eat81LA7dJF7UBk/4ub6Q/OSzSOFZ9ViImRcDJgN55lw+/3SrGztr2j7yjm+ckFaMMs6ACfgajlSvMys/E=
+	t=1782383616; cv=none; b=X0JZ5nqV2X/asVZkZQb7Xx7Q6Z4/dav5ejDH49VqGQehogTjSbkcjD5vN6NIUlaPufv+rtwlbhefYuS1ugL6i+la0uZanmXQp+vHoK7yFXq2Y+NNHyF7I8jRnRQ/OzJ99dppJOlZNbFG4+fRFcKEucC7gwdlxzvpFXbFIpQrgtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782382840; c=relaxed/simple;
-	bh=hpdunQZeDol5jGOum6exlQkX5KKwm2jdFhKqGmcCsfI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=PxUS+Mckq14Nn8d8DaUlBnzIOctw50XQhtxmaWgZ0xCibrDAWseY5zAeFoqqi4IAUaelj0+vlliCP54yVqTVmVC+s3yNeV/5exb6x78eOVwA0Csds2YuAzopMxq6cmBTE3xKmGnUwRlAyxwU3kZdKGQMZUvLr329/gjGCRLCq4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4otTKTn; arc=none smtp.client-ip=209.85.160.170
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-517dc520840so18694211cf.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 03:20:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782382838; x=1782987638; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cxR5cHIOGl4c9Qw3KbJRtqqizdF1jtJEz4y2CfGovZo=;
-        b=j4otTKTnNwHdqp6GCQkIH8A2n/YRz7a1hMQ5mMzsseiR0RuI0nC4TB4yr8rudz6N9f
-         RUXrhDpoHknEKuhaFJ9NVGUzCRLiEGVfUDIIkrOqrJ+pf16R0hD9hoq7mUo3yD5nd/XL
-         FszrLmGWHlXo9wk9qz8kjiP8IS0pnVAv1y3rWElVZ+kRGfyCzSuP42z8MT/2gohBcNAY
-         LIb3x+adYI2xFR5Gx+zgm4uUuyQOWGz8HO3hlDzjZoR+3V95+m70/sfRGxtwNleDVhi6
-         SNlqpaAjyfo1VHSd+PufPFILIQOMU2Iq2/e/BGwu03KMpOrY34ip1tycT1I18P3QsnyH
-         0kxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782382838; x=1782987638;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cxR5cHIOGl4c9Qw3KbJRtqqizdF1jtJEz4y2CfGovZo=;
-        b=eMUiOi0/ESxF2xEYcxgq7nXnLqnv+YKoxlpJDPZBJgugmrSqc8AUyinIaj4lFBSgQ2
-         aWncSx2tWSWIu9PlbLHE5VFbX8AnaDhq0xGw6dJl5vaMDbjZh875rnfp9HemVe69zSfZ
-         PMDWx9+WdHkN9Kf6Z8mgq0hSOmiJt8rwSSmS6OZC1LZJawZBwjrTVBUyUFO1I6YjF+TE
-         wvn+AqHf+Se88qu0e737Q6f63d5GPVYa60+/nW2Nygg3N2Odj+L1tMXFworT4+NhuN/7
-         vQ2t8+NLEN00BwMkdI4o1vA7gtvmRn11wGbfr1qBxV/PZmn9/zgcd0Qt5EYaBwSode/c
-         hrnw==
-X-Gm-Message-State: AOJu0Yy4YyGkonXY8FTAn8PXWD9uu/O25tbe8AxUJDrFLAirWgEqf1hT
-	kQo1TDvwO+iFGOkR46966b49V4SXsNnFWqJ/5R9c1reKeyMavsFxAiItZZfwMctT
-X-Gm-Gg: AfdE7cnrskHeBX2Ood528j0KxU8JjjEkVPZlxE5lX2mqZQiXiB48uz/28t2WnKiCW/5
-	67MPkFDCYkW3LirFiD5m6pgx4rjLppkGOZazoLCet1C2St7XHKRIWpoXoU+z1Bt6PE8eXDfucbj
-	wjL1bCTvF5CM2OJErMWgzd4swsrcOb4o8xuI4FBQVRRZowHkBsvOl9L7PpHwrj3CcEgmWHrCs0D
-	UanBcswWzG5pejT55ZIsrtw23/LRbpU2xHpfR0koBiI8vdvqDGbnJA0BnltADW61ZUcvs478tp9
-	e7R9drck9uRsI/ReW068lTRmpXISubRhGonshTRuiPFnwbQUU+GZgzQ6gVSZKDCO6CpORGZVf26
-	SJdT+gO4Miymb2h4mkaEmwlQNetXxcG/1NjjboKQpdI+5edAysUGc3znBt+8FlwpyhVsO0evmeM
-	kjs5Ssk+yuf1VubA3pyt58bmIyf5nSWA==
-X-Received: by 2002:ac8:584c:0:b0:517:97f9:78f5 with SMTP id d75a77b69052e-51a726e28b6mr25158291cf.10.1782382838453;
-        Thu, 25 Jun 2026 03:20:38 -0700 (PDT)
-Received: from localhost.localdomain ([66.198.16.131])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8df7fbdd5f1sm179259076d6.21.2026.06.25.03.20.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 03:20:38 -0700 (PDT)
-From: Vimal Agrawal <avimalin@gmail.com>
-X-Google-Original-From: Vimal Agrawal <vimal.agrawal@sophos.com>
-To: netdev@vger.kernel.org
-Cc: kuniyu@google.com,
-	edumazet@google.com,
-	vimal.agrawal@sophos.com,
-	avimalin@gmail.com
-Subject: [PATCH net-next] net: neigh: avoid calling neigh_forced_gc on every alloc when table is full
-Date: Thu, 25 Jun 2026 10:20:20 +0000
-Message-Id: <20260625102020.92814-1-vimal.agrawal@sophos.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com>
-References: <CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com>
+	s=arc-20240116; t=1782383616; c=relaxed/simple;
+	bh=OQFcZG9mWR4m4AcJJ1kpIjFnswXPritMasjmR+UTr1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sVo8/Kx+uu2lKtdqd04hJfHMI5tiKEZRiyHnDG+2LK8h/imDEfLwzT1z3VseZvVC53dVQ8rdfEKGXRADR9pV2rcxnmyMFiTt/CbOfHYbpDPrUdJ7n9xSmoUnWViDtWIjdXCicsL5chpNNKTHO21R6w9k+69AwpcHuKc+HJwbTfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=meng.ding@siemens.com header.b=tGJizTwj; arc=none smtp.client-ip=185.136.64.225
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 2026062510332265121b3cfb0002070e
+        for <netdev@vger.kernel.org>;
+        Thu, 25 Jun 2026 12:33:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=meng.ding@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Cc:References:In-Reply-To;
+ bh=TEQzGGFrxNtB6gMa9EEbVW6dodrdivVnbfUJXkNVajM=;
+ b=tGJizTwjajXkLUyXQ7+sSEQj7hAdSllHPHz0LNjsFt/xqf+XDKzvaivZAIL3QBrg09Qyxk
+ 1XaxIWfsEjYnZEffaZ5dL3vjZfxWzyIFco75yVhOb5q7AzDOdvu4dvxzgXTIGX5YnQ5z885c
+ YZ/9SYuHoz5/tadqXwXzVzYxLnP7HcfkJ+pX6ZEUvyKDGvc3hPMAonSdqo2HmQd55SvscbeR
+ ddr/3qBtf22rxnrCeKn2wb16Rvg4WFe2x/BGFV4Rt/sFQr9kSGuZhTwqwh0SMCCXa/LPs9iP
+ 940TJzzziXEIXKdPgqQb6FAcm6WUE2oyo6MU6rLTGVm6Yi/kiiuguzMw==;
+Date: Thu, 25 Jun 2026 18:33:14 +0800
+From: Ding Meng <meng.ding@siemens.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Florian Bezdeka <florian.bezdeka@siemens.com>, 
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	jan.kiszka@siemens.com, intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, wq.wang@siemens.com
+Subject: Re: [Intel-wired-lan] [PATCH net] igc: Fix RX HW timestamp reporting
+ when NET_RX_BUSY_POLL is disabled
+Message-ID: <guqc6o3b7hfl66qiuglb46apqdlufiuyhxeuhme66jvjkb67a7@owd45vcy7uv6>
+References: <20260622041718.6106-1-meng.ding@siemens.com>
+ <40abd0b5-7f3f-4cd4-9975-9db4498d15d3@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <40abd0b5-7f3f-4cd4-9975-9db4498d15d3@molgen.mpg.de>
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1335312:519-21489:flowmailer
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[siemens.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuniyu@google.com,m:edumazet@google.com,m:vimal.agrawal@sophos.com,m:avimalin@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-301926-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301927-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pmenzel@molgen.mpg.de,m:florian.bezdeka@siemens.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jan.kiszka@siemens.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:wq.wang@siemens.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[google.com,sophos.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[meng.ding@siemens.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[meng.ding@siemens.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[siemens.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sophos.com:mid,sophos.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,siemens.com:dkim,siemens.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A1F156C49CC
+X-Rspamd-Queue-Id: 622536C4AE0
 
-Once the neighbour table exceeds gc_thresh3, neigh_forced_gc() is called
-on every allocation attempt with no rate limiting. In workloads with mostly
-active/reachable entries, the GC walk traverses a large portion of the
-neighbour table without reclaiming entries, holding tbl->lock for an
-extended period. This causes severe lock contention and allocation
-latencies exceeding 16ms under sustained neighbour creation.
+Dear Paul,
 
-Add a pre-lock check in neigh_forced_gc() to skip the GC run if one was
-performed within the last second, avoiding repeated full table scans and
-lock acquisitions on the hot allocation path.
+Thanks for your comments.
 
-Profiling of neigh_create() shows ~3 orders of magnitude latency
-improvement with this change.
+On Mon, Jun 22, 2026 at 05:59:53PM +0200, Paul Menzel wrote: 
+> Am 22.06.26 um 06:13 schrieb Ding Meng via Intel-wired-lan:
+> > When CONFIG_NET_RX_BUSY_POLL is deactivated, fetching RX HW timestamps
+> > from the NIC no longer works as expected.
+> 
+> Maybe paste some logs/errors, so it can be easier found by people with the
+> same issue.
 
-Link:https://lore.kernel.org/netdev/CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com/
-Signed-off-by: Vimal Agrawal <vimal.agrawal@sophos.com>
----
- net/core/neighbour.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 1349c0eedb64..078842db3c5f 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -260,6 +260,9 @@ static int neigh_forced_gc(struct neigh_table *tbl)
- 	int shrunk = 0;
- 	int loop = 0;
+Will do.
  
-+	if (!time_after(jiffies, READ_ONCE(tbl->last_flush) + HZ))
-+		return 0;
-+
- 	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
- 
- 	spin_lock_bh(&tbl->lock);
--- 
-2.17.1
+> > This occurs because disabling CONFIG_NET_RX_BUSY_POLL disables the
+> > SKB NAPI mapping in __skb_mark_napi_id(). Consequently, get_timestamp()
+> > fails to perform its driver lookup, and the igc driver's struct
+> > net_device_ops::ndo_get_tstamp is never invoked.
+> > 
+> > Instead, get_timestamp() falls back to use shhwtstamps(skb)->hwtstamp,
+> > a field that the driver has not populated.
+> > 
+> > Fix this by populating the hwtstamp field with the correct timestamp
+> > in the default timer when CONFIG_NET_RX_BUSY_POLL is disabled.
+> 
+> Maybe detail, why the adapter needs to be passed now.
+> 
+> Also, please describe a test case to check the change.
 
+Will do.
+
+> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> > index 8ac16808023..1da8d7aa76d 100644
+> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> > @@ -1992,7 +1992,26 @@ static struct sk_buff *igc_build_skb(struct igc_ring *rx_ring,
+> >   	return skb;
+> >   }
+> > -static struct sk_buff *igc_construct_skb(struct igc_ring *rx_ring,
+> > +static void igc_construct_skb_timestamps(struct igc_adapter *adapter,
+> > +					 struct sk_buff *skb,
+> > +					 struct igc_xdp_buff *ctx)
+> > +{
+> > +	if (!ctx->rx_ts)
+> > +		return;
+> > +#ifdef CONFIG_NET_RX_BUSY_POLL
+> 
+> Is there a way to do this in C instead of the pre-processor. That way all
+> the code gets build tested. (Is there a config with disabled
+> NET_RX_BUSY_POLL?)
+> 
+ 
+How about defining a function to replace the pre-processor:
+
+static inline bool is_net_rx_busy_poll()
+{
+#ifdef CONFIG_NET_RX_BUSY_POLL
+        return true;
+#else
+        return false;
+#endif
+}
+
+CONFIG_PREEMPT_RT=y && CONFIG_NETCONSOLE=y will cause NET_RX_BUSY_POLL
+disabled.
+
+
+Kind regards,
+ 
+Ding Meng
 
