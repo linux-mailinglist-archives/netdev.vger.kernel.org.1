@@ -1,168 +1,174 @@
-Return-Path: <netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301863-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RN3BEey7PGqArAgAu9opvQ
-	(envelope-from <netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:26:04 +0200
+	id 78OiMs7CPGoErggAu9opvQ
+	(envelope-from <netdev+bounces-301863-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:55:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6E3D6C2C8E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:26:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3629F6C2DC3
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 07:55:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=MpmiA6JZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301862-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=d2WUHTFB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301863-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301863-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED8CD3018740
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:26:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2602D302F7F2
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 05:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7042DCF57;
-	Thu, 25 Jun 2026 05:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556CC3009CB;
+	Thu, 25 Jun 2026 05:55:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09702C15AC;
-	Thu, 25 Jun 2026 05:25:59 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782365161; cv=none; b=GZNBgnUiCuhGls+iYduGl5abwyOVZezSjNcd/XkRMXz4ngtIuO6falr/G/kRJiOJDRLyOAmSbWX08OYY2ML0RPE5Ra8hXGjvLhalcOlS1RYiSd4agOwPXwITA0dC8PxcjZHWeu7jQtfC1ax54PV07rGPmxUv3HV0Z2DaheCmtVU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782365161; c=relaxed/simple;
-	bh=NvIL4IMa+G9g/EXudvS/VwgBjoWxZ2qJZ2+uKT1nQTs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gip63AZ8lCJks0BqjtP6X06biDCzvDLjQwc98vn1jqa282ML799LKUZgsJfU1rd3XqJjefBQ9KIY+boZQJnZNuxmKcIbiXHStjIcZJgcd0bpogIiazo0l9K3Ehk5l1AlVWVpXqqmv1JhwJk9s2D978DR/Pi8Y8ZH2S2vj60c6nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=MpmiA6JZ; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65P3eMpA4155074;
-	Wed, 24 Jun 2026 22:25:51 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=y
-	ZmR54zijcjBucAA0EL2V8gzRYT4uYEWtgosI695QOs=; b=MpmiA6JZ/bsEu3YK8
-	yOrrt1KcugB2EICG3OJHp70nYuSHx0R9GJMf1XiCDMTWWMikZhSmE9odATKS0WrF
-	ZDsJi+W+rD7OloS1u5RVPeR63mkyz8Hs/2LrIMgk6JdKti9GvC9F0/W9Oqk1o/5y
-	SfjeoAow5GgeDLj+IgMFFMD4CMacwvNCjt3dgIXYlGCNr9SOfOwTf1DV4/9ajS7h
-	baZosAHyYGlfu1bYSxPzko2qBt/xpPOpol8HxhMy99WCVDwDHwByoeqxm0dcVQgZ
-	Tpg0oywv+26yRYL2yu5TVs2k7oUEt/667ZMy8YJNQqCbQJ/iqNhne2VQyvEZO+8+
-	VQUBA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f03u84yh8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Jun 2026 22:25:51 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 24 Jun 2026 22:25:50 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 24 Jun 2026 22:25:49 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 1822E3F706D;
-	Wed, 24 Jun 2026 22:25:46 -0700 (PDT)
-Date: Thu, 25 Jun 2026 10:55:46 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <davem@davemloft.net>, <gakula@marvell.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <sgoutham@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, Hariprasad Kelam <hkelam@marvell.com>
-Subject: Re: [PATCH net v2] octeontx2-af: Block VFs from clobbering special
- CGX PKIND state
-Message-ID: <ajy72q43tVFSeLE8@rkannoth-OptiPlex-7090>
-References: <20260625044621.2841831-1-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E602F3600
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 05:55:20 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782366922; cv=pass; b=CNTwIpt6zPARHEX+1KdUaIZQ/FIvf2XsI0rqG05jBi9605gt9cgQ4lR2xmzeXbezVjEwYMpi04DWM3Bol6UOoZZufXmCPBlyAzhB2qpBDI1U7l69rpoacVqYlpiM3cuyZEhRosa9ABAS0c2hqUJKrhrFobFfWnhkqMKDrarEgkk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782366922; c=relaxed/simple;
+	bh=FOd/5VUXOmiJYUuOVSJphK/mYpX+tPhqsX43fAqse30=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cJPjWKwU6j0klPmvH3Ys17h52OVxjrXiZ/fOjY13Qiv+Vo12XMVYaxCYX9MoiItfv3ixcn+7DF7Nl1jtmnRj8QGhC8VppYTEv9f4QOtsmBxceug7y9Wm2f7zfEoLHSY4baGQmuSCFekokpOEx9WG8H9qvLz/evKrEIRF0sQFVzI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d2WUHTFB; arc=pass smtp.client-ip=74.125.82.43
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1397e093f90so5311714c88.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 22:55:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782366920; cv=none;
+        d=google.com; s=arc-20260327;
+        b=aTTPYD8bG3LXQ06WXm95kz6x/kx1mp3G9w/kh3kt0ErUabp9attwhclTE+rWwfpjU+
+         l1pEMLbp8r20I/EFziojoKnpxAPo1SnbnqyMi545/gKWop0rDrJw1p4D7rWsw9q4Xb64
+         d79a8t32w8QeaAL7rvabGj31yFXGKFGMGh9650lKU8HwWMyq6huEnN4hukCs/ptS05cT
+         7NCtIvd0katTgkkFYFP0kd4kNMfLWuNm/HCtni/0Ej5DXJKerS4wJI4pWRFbINNWDkpC
+         bn83eWwskQG1hmm7EzzyW3BmD1Mb9M14q95/IwGg994PffabVu5B36aKTlGwiii/MR9Y
+         3QNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FOd/5VUXOmiJYUuOVSJphK/mYpX+tPhqsX43fAqse30=;
+        fh=7ekdXJcec0y6qT3bFXo5Tv+kiwJemHozG2NP4NulLf8=;
+        b=HqWjIcv4TejL7uyJtUjOrTFhqV+8BjbpE1fks8zlQluzI3QY2MC9a38LM4y7wwtQgR
+         TkNA6QznbGRrD6XHtUc6sCMGMSawQGicwC1BO9bcEqvCnwMEu3KfCdVaPqCS0S5QsjHX
+         /OAGg9QtFFoQNnEqBZAyfmCgHCvWWUTFmyYJMRqXrZQHb1LkP9UC6k+G6ek2AS7lnRiy
+         VPUD/UqhN+Tn+aH0yW4zNFtviK2dTxpSct75zjVaMn/bzUtg9x54OklRjpF7WmaXOwtR
+         oqqOXGFS1MYVmdUTmjZlBmXHrWDvl0O7astajINr90NJeTafskNAVYvsKpafvksKd2gI
+         Ej1w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782366920; x=1782971720; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FOd/5VUXOmiJYUuOVSJphK/mYpX+tPhqsX43fAqse30=;
+        b=d2WUHTFB9yIS5uy5yRXwoMqMx8lUEN5rlMJGS/SX9syrS3hZnm3pN9oP/Gn4oHxTdU
+         BC8Ao+g8aG34f4TLBKxl2mbVFjLf37OwvfeACeZiZPYncOHFHPppZI14ReDP6u80ANgc
+         r36/ox0MwRSIyGA6ftfeXlQzNOTkA9cl2n63ZH6Tts86tSlMUfLGs886SSSc5GFdTFpV
+         QP7O59EMUCvFK0pG3FTIoY9eH7dh7u07fhMqu160gb2P6KPiu3uEnLPHtgc1w6B1Hzcx
+         zugybMuXUE8lSFzcxj4uJzVNu90iLrsN+4LmN29qN6xfH8S8iUyS7EOUHbzP2VrJGDSP
+         dEDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782366920; x=1782971720;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FOd/5VUXOmiJYUuOVSJphK/mYpX+tPhqsX43fAqse30=;
+        b=XLobh/v58tYRNlcd8ec/xweSCs2GqF/zzzSIuja0RZsWAOfGZwVSaxE1gJ4XezcvSA
+         RGFt+mypggpjPtVzrYduGvizKrTGaMbpyiUQJHPHbUYCePZTpIkXoLmYG+eU060EcSOE
+         6lJjC6HSonFQVxWPNyKE6sN11DUutV24lWlCrUIPav7D/QaUNtIrijbI5ggQJJgMFZZI
+         yTqDsPR3LfJaDSJdt67fMKz1DhMvOemtGwQ6yfnHJCyV5AbxpTz3peOyImtYmQ8CsTFm
+         2RNE2Wvp8vu/9MKu/9e1m2T5Yp/TRy95cWi8Wsu+7W54ZbQZxdUzp8W7fwKsHlfVgXdh
+         DUgA==
+X-Forwarded-Encrypted: i=1; AFNElJ88TXbGV1UPGdbpHdxSAb4yFS9ALExtjLlD8BC1nrgV3Q/MoaxTp7MgxkLDK9e/QG58rfJufbg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHBFne3o+rFTL+JGthhwzqomvjwG9NeWEMANEjpEsE63W3DnpH
+	7n3yeEqPE7FgeWYvsgAw2mtNqsy6XW5boRSCeXrsJoWu4q0LkTdc3szQtf+n5dEcs1bBAUQaz4h
+	vg69nCYQk3n0QDU2Z+ymglY12NL1eXza80+EWsRhDadlV6j2Ll3Fcpbi3cg8=
+X-Gm-Gg: AfdE7cn3NdTu/PppsanLbTfQ05VWKNhN2Vgri5+m/cWzzoLicvF4VdMc4KuqwmDhsbs
+	UxPsaZGjnWuTgS9qJ1u4aagODO8DjXLp6mwBNX/VYPZ0EsqFM/r0T6+d7Lk1iR1ZUXo0m4kTgKq
+	PraIsIg202R6GXWwzofHBftIweoAtWdPpJYjzh4jWv7H70qfluyxelFpgoj7vCV0iSF4hoMQqYy
+	iHfFDj+g3eh+BMoLweqhqqabClfdkv8EfQBmIWmaVemqe4wRCcCpucORmz8nz1PmvGxJdct7iba
+	tOaXf2nZANh6BIHK/ZmIh4IRdlyAOt7h8RH3Ek+rGWvCuspJzR0irjrpoiv38DzRbBpY+Zo63hy
+	DQHmQe1x/UXcYa46xQv1JdAv1wHKOsB+HxvI18fle4w==
+X-Received: by 2002:a05:7022:50e:b0:137:99bd:d156 with SMTP id
+ a92af1059eb24-139db9ee306mr1184473c88.7.1782366918578; Wed, 24 Jun 2026
+ 22:55:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260625044621.2841831-1-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI1MDA0NCBTYWx0ZWRfX9ZNWzgfMhWEo
- fDzuoOz2/5Pq3ejvFQe3p4MIBQUOkzDbkePaJFFNODU7pi6LQ09sfFBd03jZZJlFIv0X+FfiXNu
- 1HKl2YEPEqn0+yX08cOvpzgkKkj8EWSGDEp1SotYHVtorjA9t0xmkLT7TI11zZStUAcZC+CHH65
- k2v0zs//4HaCQLzkOn0XlandQStQqhj5JSnc878wwLc8QbfVw0ekLoIh8xO0JIOXzeY+K/6cNtQ
- mrjiZzyOSRwWm7JuafRfmbKe9wM4qveZqsV8VZqLoWn8vqgdIlsyXJUipoi/CgZRUmPLg+9BssJ
- HiF7f4AAaefFG5/wwKHAVDDLx/kU5Qfv/8lyNbuv/X/1fgSBY5bHk6UlSKk4r7M51nlvXxlD9BO
- nfvPw8KFrkTK7kHW0hPTjD0hO6Fp3A/s9eVA39nxTbtDmIIry7CeW5atsrW0JiQQIZ9VmKk9PX4
- GD8DuLy06FY6Z7adyJw==
-X-Authority-Analysis: v=2.4 cv=D9N37PRj c=1 sm=1 tr=0 ts=6a3cbbdf cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
- a=M5GUcnROAAAA:8 a=yjNKIy0og1E6pNJisW4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22 a=Oh551-UHZqmTy8JkqTUo:22
-X-Proofpoint-GUID: 8rylDWr-Kb_J-9W_DS06bmsFXOO1qorp
-X-Proofpoint-ORIG-GUID: 8rylDWr-Kb_J-9W_DS06bmsFXOO1qorp
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI1MDA0NCBTYWx0ZWRfXzBT2eF5f+MHo
- VWS9wbc5GYgKdVHco40gGF+D6I/3WTZVXN3B5O2z0p9TRq6mrj1bEKvw4H4ks2wf3yGJdy8pZAv
- e1ZbCJcje7hQJT36OC/MKW2J/EAFTc0=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-25_01,2026-06-24_01,2025-10-01_01
+References: <20260624182018.2445732-1-kuba@kernel.org> <20260624182018.2445732-2-kuba@kernel.org>
+In-Reply-To: <20260624182018.2445732-2-kuba@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 24 Jun 2026 22:55:06 -0700
+X-Gm-Features: AVVi8CcneuSra4RYyQ3E1DagzzlKOkzrLxygM4cc3N00dd19Hy5wApyOkF5FK6o
+Message-ID: <CAAVpQUCbT1Q9BPTLrVCjpt2vcJiWsYKa0onJ_vwnq86L73m8mw@mail.gmail.com>
+Subject: Re: [PATCH net 1/4] net: turn the rx_mode work into a generic
+ netdev_work facility
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, jv@jvosburgh.net, 
+	sdf@fomichev.me, dongchenchen2@huawei.com, idosch@nvidia.com, 
+	n05ec@lzu.edu.cn, yuantan098@gmail.com, nb@tipi-net.de, 
+	aleksandr.loktionov@intel.com, dtatulea@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301862-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jv@jvosburgh.net,m:sdf@fomichev.me,m:dongchenchen2@huawei.com,m:idosch@nvidia.com,m:n05ec@lzu.edu.cn,m:yuantan098@gmail.com,m:nb@tipi-net.de,m:aleksandr.loktionov@intel.com,m:dtatulea@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301863-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,rkannoth-OptiPlex-7090:mid];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:gakula@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hkelam@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,jvosburgh.net,fomichev.me,huawei.com,nvidia.com,lzu.edu.cn,gmail.com,tipi-net.de,intel.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A6E3D6C2C8E
+X-Rspamd-Queue-Id: 3629F6C2DC3
 
-On 2026-06-25 at 10:16:21, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> From: Hariprasad Kelam <hkelam@marvell.com>
+On Wed, Jun 24, 2026 at 11:20=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
 >
-> PF and VF NIX LFs that share a CGX LMAC reuse the same hardware PKIND
-> programming. When HiGig2 or EDSA parsing is enabled, a VF NIX LF alloc must
-> not reset the LMAC RX PKIND or default TX parse config over the PF setup.
+> The rx_mode update runs from a workqueue: drivers have their
+> ndo_set_rx_mode_async() callback executed by a single global
+> work item under RTNL and ops lock. This is a useful pattern.
 >
-> Add cgx_get_pkind() and rvu_cgx_is_pkind_config_permitted() so VFs skip
-> cgx_set_pkind(), rvu_npc_set_pkind(), and NIX_AF_LFX_TX_PARSE_CFG updates
-> when the LMAC is using NPC_RX_HIGIG_PKIND or NPC_RX_EDSA_PKIND.
+> Support multiple "events" that need to be serviced and make RX_MODE
+> sync the first one. Call the events "core" because later on
+> we will let drivers define and schedule their own.
 >
-> Fixes: 94d942c5fb97 ("octeontx2-af: Config pkind for CGX mapped PFs")
-> Cc: Geetha sowjanya <gakula@marvell.com>
-> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
->
-> ---
-> v1 -> v2: Addressed simon comments
-> 	https://lore.kernel.org/netdev/20260619041002.1773822-1-rkannoth@marvell.com/
-> ---
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Apologies for the inconvenience — it appears I submitted an incorrect patch.
-I will abandon it and post a revised one later. Thanks.
+Oh very nice !
 
-pw-bot: changes-requested
+I was drafting almost the same change for dev_set_rx_mode()
+in mcast path and some ipvlan changes.
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
