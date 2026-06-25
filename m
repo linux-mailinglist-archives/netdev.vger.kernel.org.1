@@ -1,407 +1,226 @@
-Return-Path: <netdev+bounces-302074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vQ0SJPeePWqD4wgAu9opvQ
-	(envelope-from <netdev+bounces-302074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 23:34:47 +0200
+	id 3KU3OdihPWq64wgAu9opvQ
+	(envelope-from <netdev+bounces-302075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 23:47:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 427CF6C8C4C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 23:34:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598276C8C7E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 23:47:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b="QpS/JOYV";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302074-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302074-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
+	dkim=pass header.d=google.com header.s=20251104 header.b=E5ZImCgi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302075-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302075-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5F4F03015C9A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 21:34:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6481C303EDAD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 21:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98352FC898;
-	Thu, 25 Jun 2026 21:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7062A362130;
+	Thu, 25 Jun 2026 21:47:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8DF1C84A2
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 21:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1930C30D3ED
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 21:47:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782423281; cv=none; b=PY/LuHobrEmNGEMXukRNG2TyO7FMcsuhRJ+9uXO+DWgSuGqp4RV2GLNTVGYqmBdG9TVGz6YX8Bu9IN86P6Unkf2T4StcnJSqUypvJ77wTCSAqcWEzt/0Q6IfKxhVwSo0kbR4UneGTEhTXASEBh6+FaCx1QO3sIrJMOgw3sf7gp8=
+	t=1782424022; cv=none; b=G0q5Y194gQdQ4is8ByDs6wQcjnscC0O+4utiYyXPYhspDJB6uVsL4cHuP+nVEZ85rc76+l9qcMPKkpu6eREaBIunFYT4w2PG1mrn20Mf4lU+pjTQobF+AnwIOo4TGzNVx027dI5xm9Q02fd79DsezdD55TxtctoNdTRyoRi0XDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782423281; c=relaxed/simple;
-	bh=m7riEsHTEU0WwlQdON33yglybPtxhEV4cOV/iQTL6mA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=okGpj4qfgzhBi10FSToXFbpHlyYeJzbL6QwIPWhFDdmbcEszeUjjxxsK1hMWbERjh6y/iLz4gUUGtVyNqWsGal1l2fwfTN3I5hSKA7faAWwybqG91ztzKPZMG52vUowIsBLEbe699+mMrhVALMgxz0cF/AKYmnrQdWMHBXzZq68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=QpS/JOYV; arc=none smtp.client-ip=74.125.82.43
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1390f75d8bbso85067c88.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 14:34:39 -0700 (PDT)
+	s=arc-20240116; t=1782424022; c=relaxed/simple;
+	bh=c1MC181yZIzXA4ZUsLaxd9Gq6FhcOsFP0Ajkdy90Qhc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tQmAZJVfKjPHuVzfV1io8nIKcxWWkN9hMh7O6VEmAb3PFaa7m6DChWcdxgpRidPD/uK03kZ7KqmtzLT2UjBRIbdROl0hGdau4zsagUyaj4nvdW5AgOcwhJU9zp+B8zOT8MRHZMjZ2p4hwyZ/n7ewvaipviB4ENZDHFddve/vV3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E5ZImCgi; arc=none smtp.client-ip=209.85.210.201
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-84534f17866so156615b3a.2
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 14:47:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1782423279; x=1783028079; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ljH/KMgLH7Lrbue8zNvL1sbxgsVhEOc7v3lh4fLKh4k=;
-        b=QpS/JOYVXbi0Jaucgm3n2eOBjilIPnE70j+z5TyLKksiG+cIjGt2I4b3w6b04gkvDq
-         6ekCQOByIqDBw7jSjf7Rfck8O1KA5uGhjsblT1pY8xsI2SN7bjrK3IBgQdltGtbec4aV
-         ngFf9JdXQim4YQaeqzgm/RHoeE2qa1R4mWRHql0TK3066DbPU/v3mw648Bbg9Bud17Xn
-         Dv1yWLd9AeW1hEbD5r7xIG01dAXQw+taThM4T8c2UgdHejGT6D1phlrwQ57rweOTNLsM
-         NtnpGWD+EB3+232v1dv8r9MzmtZMZkzdj6QcNbOQd/3KiJM1TRQq4qe/RHBm1d6/e1KL
-         4dLg==
+        d=google.com; s=20251104; t=1782424020; x=1783028820; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8V8sc1LmQm4BcogFj5Lnpd5H/dBgiB5XaIP9R5SNrgI=;
+        b=E5ZImCgiydbeb7vE6PKk+0LpCxOJY36gxjtQ5YdNMzF7mJBSYK7WY2wYk5fBvdNDi3
+         oTPeo5ulVezMfL+IB5t6KBv+7MLWku9JMx1c2l4/f/JUnEa+VtWeStOOgs5cLZfwIeI8
+         DR36t7clz6GAKBKeGOg3sznlJmeHnRq3628qAVJ0Jc3xeBJo4AzdUUsgYhq4lOL9p9Kd
+         LjlH+K27+KYLmJGWdb8L7mjMAp02nZP4sX3DfK13OpiSh2bnMDtFmoEYq94LfrOmpfSy
+         cwoXsMvybK9PqrzAHrt4Rl4Z46++H7O5/wRN3zX32JlSiKPvMkWZiAkL4+PqBBzeahcK
+         pHJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782423279; x=1783028079;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ljH/KMgLH7Lrbue8zNvL1sbxgsVhEOc7v3lh4fLKh4k=;
-        b=G+Xv9Za8gPye6u56V1nMN85cS0Lo8IJaUVbyuUtUihEX/ZUAU3JFvhqCIE3PHwBACX
-         tG7GBtDewNtOARbgLRZE2QMoYVmigskkzT+Gif4vCOIvQg/HjiL/6oWg4iVrIFl+IVce
-         ga/wJwJXUCMaZFRtyBFg90Na1Ky0oIZLUSQXq6GnMn65TjICeUEWsFDqbtSk9Zb8LtqD
-         vpItrMUjn/rOXHQZpMScJd65AcVte5DzI8KqbJatcd921levRX5JlFZDR5keDuLaPUft
-         3vs/6JMqabiV3briM5qsC5niGOz+psk7Fp5A48rW+R/T7PmaBgegTAPLthV36gDTEF8R
-         K3GA==
-X-Gm-Message-State: AOJu0YzhjH9oMg0oJU2X5Wh4ULp6r6WBiR3MmPkayc72m+XOgk/FsTpF
-	+ONPvK0YYy8Hu1mH44KR9NfDqdV9gBcBL877oxVJKzjjfeQbFw+GKXIomMU9nWia70I=
-X-Gm-Gg: AfdE7cnEUbn/TBsng1DHmFINn6B5LquClrFo+daKMHTsRbsh/+XLYWE/7Qw5a83oMmT
-	geyscdIo4AGSOoQt5IiiJLqtl6ThlhbgzcqvA2dLjmjlP6xhlc6uld4YduMuPnndfFr1cbjmQjX
-	WuiCgIiaYO8whoAC0mmDLKpZ+pj+T79qI2bp8CRtM1/NmC08w+f4+hD5Yi8GWMwXh6JFejkmwaM
-	KqSMx88w3ZyIfqqMka4kGFVXl8Q0y3epPBrRCX46JgY3UeKeHY84MmuVCZwM72QeQlzs314JPP4
-	0l5o2dTwZ/BMgJGKJYOX7akJUipEp6RZPoKBlhuj9JsOIltfFGGX5bfgtYl4v3cdxZEzj/7WB8l
-	r7ycCEccCmn9ewh/5oC+jlRh9zRuwnyq80va+p6nKGFXUb4k850J4L+e7uVF8t8+/VShdX2Tphf
-	5geZvisZjS8gZJUInctaicnXBIfSCCJPgEsUsl8KPc7JlkJOilXIac2w==
-X-Received: by 2002:a05:7022:7f15:b0:139:819b:3b86 with SMTP id a92af1059eb24-139dbb6ace5mr2520082c88.32.1782423278809;
-        Thu, 25 Jun 2026 14:34:38 -0700 (PDT)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139d91006bcsm12076300c88.13.2026.06.25.14.34.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 14:34:38 -0700 (PDT)
-Date: Thu, 25 Jun 2026 14:34:35 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Dmitri Seletski <drjoms@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] "ip help" wrong output, exit code.
-Message-ID: <20260625143435.6147e1d9@phoenix.local>
-In-Reply-To: <65f53987-c992-41b9-9603-9e9a448e469d@gmail.com>
-References: <62f09fe8-899c-4d22-b7a1-67e2745613df@gmail.com>
-	<20260621082105.1196ef72@phoenix.local>
-	<069b13e1-f689-410b-bd40-b5e5831b67e7@gmail.com>
-	<20260622075700.27806286@phoenix.local>
-	<20260622174454.576b3580@pumpkin>
-	<3d6f256c-3bd0-441a-bece-8692985c5ddc@gmail.com>
-	<65f53987-c992-41b9-9603-9e9a448e469d@gmail.com>
+        d=1e100.net; s=20251104; t=1782424020; x=1783028820;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8V8sc1LmQm4BcogFj5Lnpd5H/dBgiB5XaIP9R5SNrgI=;
+        b=WsmArGw9RX5KYm7WFvH/7u2V2CUvnqV1M1vLBMXNg0cG6JHLKEYhhUGRHYRJDnhuHZ
+         qGdqdOwieD1OWLUr2f0RkQGOcXyv4x2GJmcZskbAtBKpPWGxf+wyO0sHoFnveBhaYOiY
+         WMMVUO5D3ElpYEc85ZvnjEnQKerYmJFRTwvcK5VbRL9hN2mNUfI66330AQKzeLBHImYa
+         Dmdq8k4Yvvno8vZG8Q7cxWDoE4rrh+NWvcwRRhGGVmwDKNybqBEl3VaROlL9mbh2UG7W
+         7YbgKXqIMMM5pdgtxg1rpBBcq6xolaCNMEzExPmMJ8iMKfVM5fIGPARlEMK88Mu8FFTD
+         2tIw==
+X-Forwarded-Encrypted: i=1; AHgh+RpgDfX6YPjpf4GKpAMHzLq3SnszXLR1JZmVv3D4AKIxTcoLxX+eNDkk8eEzg7XCDSjrrab21ns=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8dDrej2JixXct7iazlntrujmEQtC92XCzawO/6n52cPTYX8pj
+	G6HrfPtsltud6LwkmWOHlTM70t1ndwFTqtdbYwsv7Y3vg2stHTkW91z/0ilOuu9BSkmUAmpjYTw
+	cPlmnvQ==
+X-Received: from pfbcb7.prod.google.com ([2002:a05:6a00:4307:b0:842:2f38:1f3c])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1415:b0:836:3f6a:3e7a
+ with SMTP id d2e1a72fcca58-845b3aaf048mr4662847b3a.26.1782424019962; Thu, 25
+ Jun 2026 14:46:59 -0700 (PDT)
+Date: Thu, 25 Jun 2026 21:45:30 +0000
+In-Reply-To: <20260625102020.92814-1-vimal.agrawal@sophos.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20260625102020.92814-1-vimal.agrawal@sophos.com>
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260625214659.1115819-1-kuniyu@google.com>
+Subject: Re: [PATCH net-next] net: neigh: avoid calling neigh_forced_gc on
+ every alloc when table is full
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: avimalin@gmail.com
+Cc: edumazet@google.com, kuniyu@google.com, netdev@vger.kernel.org, 
+	vimal.agrawal@sophos.com, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:drjoms@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302074-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302075-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:avimalin@gmail.com,m:edumazet@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:vimal.agrawal@sophos.com,m:kuba@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,phoenix.local:mid]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,sophos.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 427CF6C8C4C
+X-Rspamd-Queue-Id: 598276C8C7E
 
-On Thu, 25 Jun 2026 16:54:29 +0100
-Dmitri Seletski <drjoms@gmail.com> wrote:
+From: Vimal Agrawal <avimalin@gmail.com>
+Date: Thu, 25 Jun 2026 10:20:20 +0000
+> Once the neighbour table exceeds gc_thresh3, neigh_forced_gc() is called
+> on every allocation attempt with no rate limiting. In workloads with mostly
+> active/reachable entries, the GC walk traverses a large portion of the
+> neighbour table without reclaiming entries, holding tbl->lock for an
+> extended period. This causes severe lock contention and allocation
+> latencies exceeding 16ms under sustained neighbour creation.
+> 
+> Add a pre-lock check in neigh_forced_gc() to skip the GC run if one was
+> performed within the last second, avoiding repeated full table scans and
+> lock acquisitions on the hot allocation path.
+> 
+> Profiling of neigh_create() shows ~3 orders of magnitude latency
+> improvement with this change.
+> 
+> Link:https://lore.kernel.org/netdev/CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com/
 
-> I am confused.
->=20
-> Whats the next step here?
->=20
-> Regards
->=20
-> Dmitri
->=20
-> On 6/22/26 18:47, Dmitri Seletski wrote:
-> > Hello David,
-> >
-> >
-> > Based on change introduced:
-> >
-> > Two samples of "ip help" with demonstration of exit code and standard=20
-> > output are below.
-> >
-> > This is in line with what expect.
-> >
-> >
-> > dimkosPC~/compiled/iproute2-next #if ./ip/ip help a >>/dev/null =C2=A0;=
-=20
-> > then echo help triggered =C2=A0; else echo error code triggered =C2=A0;=
-fi =C2=A0#this=20
-> > redirects standard output =C2=A0to /dev/null, so text missing is not er=
-ror,
-> > but standard text
-> > help triggered
-> >
-> > dimkosPC~/compiled/iproute2-next #if ./ip/ip help =C2=A0=C2=A0; then ec=
-ho help=20
-> > triggered =C2=A0; else echo error code triggered =C2=A0;fi
-> > Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip [ -force ] -batch filename
-> > where =C2=A0OBJECT :=3D { address | addrlabel | fou | help | ila | ioam=
- |=20
-> > l2tp | link |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0macsec | maddress | monitor | mptcp =
-| mroute | mrule |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0neighbor | neighbour | netconf | net=
-ns | nexthop |=20
-> > ntable |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ntbl | route | rule | sr | stats | t=
-ap | tcpmetrics |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0token | tunnel | tuntap | vrf | xfrm=
- }
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0OPTIONS :=3D { -V[ersion] | -s[tati=
-stics] | -d[etails] | -r[esolve] |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-h[uman-readable] | -iec | -j[=
-son] | -p[retty] |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-f[amily] { inet | inet6 | mpl=
-s | bridge | link } |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-4 | -6 | -M | -B | -0 |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-l[oops] { maximum-addr-flush-=
-attempts } | -echo |=20
-> > -br[ief] |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-o[neline] | -t[imestamp] | -t=
-s[hort] | -b[atch]=20
-> > [filename] |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-rc[vbuf] [size] | -n[etns] na=
-me | -N[umeric] |=20
-> > -a[ll] |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-c[olor]}
-> > help triggered
-> >
-> > Two samples of command that is broken on purpose.
-> >
-> > dimkosPC~/compiled/iproute2-next #if ./ip/ip idontexist =C2=A0=C2=A0; t=
-hen echo=20
-> > help triggered =C2=A0; else echo error code triggered =C2=A0;fi
-> > Object "idontexist" is unknown, try "ip help".
-> > error code triggered
-> >
-> > dimkosPC~/compiled/iproute2-next #if ./ip/ip idontexist =C2=A0>>/dev/nu=
-ll=20
-> > =C2=A0; then echo help triggered =C2=A0; else echo error code triggered=
- =C2=A0;fi=20
-> > =C2=A0#this redirects standard output =C2=A0to /dev/null, so text missi=
-ng is not=20
-> > error, but standard text
-> > Object "idontexist" is unknown, try "ip help".
-> > error code triggered
-> >
-> > This works as expected as per my understanding.
-> >
-> >
-> > Not everything is fixed, but chunk of things fixed is better than non=20
-> > of it.
-> >
-> > for example:
-> >
-> > if ip =C2=A0add help =C2=A0=C2=A0=C2=A0; then echo help triggered =C2=
-=A0; else echo error code=20
-> > triggered =C2=A0;fi =C2=A0#this redirects standard output =C2=A0to /dev=
-/null, so text=20
-> > missing is not error, but standard text
-> > Usage: ip address {add|change|replace} IFADDR dev IFNAME [ LIFETIME ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0[ CONFFLAG-LIST ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip address del IFADDR dev IFNAME [m=
-ngtmpaddr]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip address {save|flush} [ dev IFNAM=
-E ] [ scope SCOPE-ID ] [ to=20
-> > PREFIX ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0[ FLAG-LIST ] [ label LABEL ] [ { up | down=20
-> > } ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip address [ show [ dev IFNAME ] [ =
-scope SCOPE-ID ] [ master=20
-> > DEVICE ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-[ nomaster ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-[ type TYPE ] [ to PREFIX ] [ FLAG-LIST ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-[ label LABEL ] [ { up | down } ] [ vrf NAME ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-[ proto ADDRPROTO ] ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip address {showdump|restore}
-> > IFADDR :=3D PREFIX | ADDR peer PREFIX
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[ broadcast ADDR =
-] [ anycast ADDR ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[ label IFNAME ] =
-[ scope SCOPE-ID ] [ metric METRIC ]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[ proto ADDRPROTO=
- ]
-> > SCOPE-ID :=3D [ host | link | global | NUMBER ]
-> > FLAG-LIST :=3D [ FLAG-LIST ] FLAG
-> > FLAG =C2=A0:=3D [ permanent | dynamic | secondary | primary |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[-]tentativ=
-e | [-]deprecated | [-]dadfailed | temporary |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CONFFLAG-LI=
-ST ]
-> > CONFFLAG-LIST :=3D [ CONFFLAG-LIST ] CONFFLAG
-> > CONFFLAG =C2=A0:=3D [ home | nodad | mngtmpaddr | noprefixroute | autoj=
-oin ]
-> > LIFETIME :=3D [ valid_lft LFT ] [ preferred_lft LFT ]
-> > LFT :=3D forever | SECONDS
-> > ADDRPROTO :=3D [ NAME | NUMBER ]
-> > TYPE :=3D { amt | bareudp | bond | bond_slave | bridge | bridge_slave |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dsa | dummy | ers=
-pan | geneve | gre | gretap | gtp | hsr |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ifb | ip6erspan |=
- ip6gre | ip6gretap | ip6tnl |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ipip | ipoib | ip=
-vlan | ipvtap |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0macsec | macvlan =
-| macvtap | netdevsim |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0netkit | nlmon | =
-pfcp | rmnet | sit | team | team_slave |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcan | veth | vla=
-n | vrf | vti | vxcan | vxlan | wwan |
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xfrm | virt_wifi }
-> > error code triggered
-> >
-> > This is still problematic.
-> >
-> >
-> > But so far code leaves "ip help" command/argument in better shape than=
-=20
-> > it found it in.
-> >
-> >
-> > I may try improve things more, but lets submit what we already have=20
-> > "better", please.
-> >
-> > Kind Regards
-> >
-> > Dmitri Seletski
-> >
-> >
-> > On 6/22/26 17:44, David Laight wrote: =20
-> >> On Mon, 22 Jun 2026 07:57:00 -0700
-> >> Stephen Hemminger <stephen@networkplumber.org> wrote:
-> >> =20
-> >>> On Sun, 21 Jun 2026 22:48:59 +0100
-> >>> Dmitri Seletski <drjoms@gmail.com> wrote:
-> >>> =20
-> >>>> =C2=A0From 0805e07105cd15c5b94271a4706e50e3c65dbde5 Mon Sep 17 00:00=
-:00=20
-> >>>> 2001
-> >>>> From: Dmitri Seletski <drjoms@gmail.com>
-> >>>> Date: Sun, 21 Jun 2026 22:12:43 +0100
-> >>>> Subject: [PATCH iproute2-next] =C2=A0"ip help" wrong output, exit co=
-de.
-> >>>>
-> >>>> Changed output of "ip help" from standard error to standard output.=
-=20
-> >>>> And
-> >>>> Exit is now 0 instead of -1. "ip help|grep bridge" - now gives bridge
-> >>>> syntax instead of flooding user with everything from "ip help".
-> >>>> ---
-> >>>> ip/ip.c | 4 ++--
-> >>>> 1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/ip/ip.c b/ip/ip.c
-> >>>> index e4b71bde..4627b61c 100644
-> >>>> --- a/ip/ip.c
-> >>>> +++ b/ip/ip.c
-> >>>> @@ -56,7 +56,7 @@ static void usage(void) __attribute__((noreturn));
-> >>>>
-> >>>> static void usage(void)
-> >>>> {
-> >>>> -fprintf(stderr,
-> >>>> +fprintf(stdout,
-> >>>> "Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }\n"
-> >>>> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ip [ -force ] -batch filename\=
-n"
-> >>>> "where =C2=A0OBJECT :=3D { address | addrlabel | fou | help | ila | =
-ioam |=20
-> >>>> l2tp
-> >>>> | link |\n"
-> >>>> @@ -72,7 +72,7 @@ static void usage(void)
-> >>>> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-o[neline] | -t[imestamp] |=
- -ts[hort] | -b[atch]
-> >>>> [filename] |\n"
-> >>>> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-rc[vbuf] [size] | -n[etns]=
- name | -N[umeric] |
-> >>>> -a[ll] |\n"
-> >>>> " =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-c[olor]}\n");
-> >>>> -exit(-1);
-> >>>> +exit(0);
-> >>>> } =20
-> >>> Your mailer damages white space.
-> >>> =20
-> >> The output also needs to depend on whether these is a 'usage' error or
-> >> if 'help' is requested.
-> >> Code code is correct for the former - except it should do exit(1).
-> >>
-> >> =C2=A0=C2=A0=C2=A0=C2=A0David
-> >>
-> >> =20
->=20
+From the thread, these look misconfigured.
 
-We need to have a broad solution that doesn't look ugly.
-There are a couple problems with current code:
-  1. Help should exit with 0 (ok); invalid argument should exit with non-ze=
-ro
-     by Gnu convention that is 2 but other commands like git use 129
-  2. help should go to stdout; usage on error should go to stderr
+---8<---
+net.ipv6.neigh.default.gc_thresh2 = 32768
+net.ipv6.neigh.default.gc_thresh3 = 32768
+---8<---
 
-The solution should work across iproute2 commands: ip, tc, dpll, tipc, brid=
-ge, ...
-and the sub commands.
+If gc_thresh3 is larger enough, gc_thresh2 will give you 5s
+rate limiting.
 
-So far the mailing list patches were kind of messy and limited.
+If the number of active neigh entries constantly exceeds
+gc_thresh3, it will be the correct gc_thresh2 for you.
+
+Also, I guess you want a new kernel param for the first
+neigh_hash_alloc(), which is currently fixed for 3, which
+is too small for some hosts.
+
+50000 entries require neigh_hash_grow() 13 times.
+
+Can you test this on your real workload, starting from
+neigh_hash_shift=16 and appropriate gc_thresh2/3 ?
+
+---8<---
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 1349c0eedb64..a75b3750eec9 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -1817,6 +1817,22 @@ EXPORT_SYMBOL(neigh_parms_release);
+ static struct lock_class_key neigh_table_proxy_queue_class;
+ 
+ static struct neigh_table __rcu *neigh_tables[NEIGH_NR_TABLES] __read_mostly;
++static __initdata unsigned long neigh_hash_shift = 3;
++
++static int __init neigh_set_hash_shift(char *str)
++{
++	ssize_t ret;
++
++	if (!str)
++		return 0;
++
++	ret = kstrtoul(str, 0, &neigh_hash_shift);
++	if (ret)
++		return 0;
++
++	return 1;
++}
++__setup("neigh_hash_shift=", neigh_set_hash_shift);
+ 
+ void neigh_table_init(int index, struct neigh_table *tbl)
+ {
+@@ -1843,7 +1859,7 @@ void neigh_table_init(int index, struct neigh_table *tbl)
+ 		panic("cannot create neighbour proc dir entry");
+ #endif
+ 
+-	RCU_INIT_POINTER(tbl->nht, neigh_hash_alloc(3));
++	RCU_INIT_POINTER(tbl->nht, neigh_hash_alloc(neigh_hash_shift));
+ 
+ 	phsize = (PNEIGH_HASHMASK + 1) * sizeof(struct pneigh_entry *);
+ 	tbl->phash_buckets = kzalloc(phsize, GFP_KERNEL);
+---8<---
+
+
+
+> Signed-off-by: Vimal Agrawal <vimal.agrawal@sophos.com>
+> ---
+>  net/core/neighbour.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index 1349c0eedb64..078842db3c5f 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -260,6 +260,9 @@ static int neigh_forced_gc(struct neigh_table *tbl)
+>  	int shrunk = 0;
+>  	int loop = 0;
+>  
+> +	if (!time_after(jiffies, READ_ONCE(tbl->last_flush) + HZ))
+> +		return 0;
+> +
+>  	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
+>  
+>  	spin_lock_bh(&tbl->lock);
+> -- 
+> 2.17.1
+> v
 
