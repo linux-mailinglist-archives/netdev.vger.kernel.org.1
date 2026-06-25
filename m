@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-301930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301931-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0BDYMgMGPWqyvwgAu9opvQ
-	(envelope-from <netdev+bounces-301930-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:42:11 +0200
+	id hPvGACMGPWq9vwgAu9opvQ
+	(envelope-from <netdev+bounces-301931-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:42:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5469D6C4B9C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:42:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCA26C4BBE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 12:42:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Q887776v;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301930-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301930-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="oaPH1vz/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301931-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301931-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B100A3022B67
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:42:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 45B6C3043EF7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFBC374E64;
-	Thu, 25 Jun 2026 10:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A803D5647;
+	Thu, 25 Jun 2026 10:42:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CB538A72A;
-	Thu, 25 Jun 2026 10:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E93C378839;
+	Thu, 25 Jun 2026 10:42:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782384129; cv=none; b=C0vzENsIdwULSA1X/H97c4VSXPjUMj1ykFeuQ6CC5PJi39XlBvmJrPEm25Qh6/taV5eArKTpxoHEXv+JTnIbagvh76y0+Ago7S5JRok9yF768V8GSOH4+3hz6AEgNiIelGOPXeRpLf/pxZTiK8sFP61DoV9uyhJcfJMWWtqclIU=
+	t=1782384136; cv=none; b=qOUd8hNOWBk+qdtgQ0QEy9DtAzoS4uOGCPMoSqNZFj+qZC2PIw6XNuCu9JV7q9JOQCSr2uMkl3ADapBYYY6BrBu9sJadh6FEnN5IR6oGpKzs489WRJjArFo+mEl7WeYl3RTMzc58uHlmLNcw7U/bAptGHjQ05Th7HOCqOxNelXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782384129; c=relaxed/simple;
-	bh=RJbzB444OWrgTxvsYUH/llEvnk5lqYsfA9FXH00KzmU=;
+	s=arc-20240116; t=1782384136; c=relaxed/simple;
+	bh=nd+/EIfepnNIo5PLnS9kqP0mPMVtpLh+XEgbKruww+A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JoNn8mcbkSbO2tR2ro0C+2BCWi3Rv7OWakcbVv1dagsxTGQvkj2kGhU7VUxB7ppYEkPfpTyESDcQcNAvj7fwZwp2A3HFanpLkGsemGCLcI14k0Hc0VUEkT+eFO/Kg6sB/k34uVCBMOqFhgZutKS4RUE3zW3s5xUIkJ1SJN4qhyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q887776v; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED841F00A3A;
-	Thu, 25 Jun 2026 10:42:05 +0000 (UTC)
+	 MIME-Version; b=fsj7ivpoPnOvR/laSswH/FKxTatZ+7Swc9D9a1+gvwG5WQPrcq8nRYiyySDE7BbBgQ12TmRhcEGE8R0FmNQSNSHqLZIjsGlIPrX07Q/dzpUOipwU8i+JFsWNxFJdT55oPXbfJ9wphICrzqYura5tJWKrZYwBn8HuXfHzS485pzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oaPH1vz/; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D061F00A3A;
+	Thu, 25 Jun 2026 10:42:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782384127;
-	bh=RJbzB444OWrgTxvsYUH/llEvnk5lqYsfA9FXH00KzmU=;
+	s=k20260515; t=1782384133;
+	bh=nd+/EIfepnNIo5PLnS9kqP0mPMVtpLh+XEgbKruww+A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Q887776vUMG3Au1XXl8ruHpHXSLJBXoTWwGgBC2GkpS76taI0r3CtcP4ONfBYk0nl
-	 MxnT4LvMooak966yROgF84LrHgXNQY3kPj+pD6X6EE/zdpGN2h7APaImin06wg/9fL
-	 xezZOLja3iQCVI4KQDn2akVUNMa/N0s2MyxA+mUJ3rn4kX5uiPnKybTWxrYjhkaQ6Z
-	 EiMBGA2r5pofOQ1UA4JN+Wl5yaa1vfibz0LjwsLtt+AtXBbOGH+lgVUyE0rOkJyMav
-	 fM0HYtPGNwwJqvM/PfdgpSxDbf3cCJd6ckYgeoLZV73YHaUJpkfsFK9Vfn8I1OvcRr
-	 YTEppl7KhC46w==
+	b=oaPH1vz/FlHyDa4xVMnd6XNR4n2mOFsocCXHFj6LHlktoNcphIMlf2NurP6oqqhox
+	 cZmtw3vmb4K6fMbG8anblK8XlzxLAw2GYuOxN+Zf6BNNPHRHV7UoM4F0fU3u+j5WGb
+	 uJFo/lIG1rlnN8bZOY4jidmRnptl185c00XEUfpoEDzQHi6Zc/gxPOvdHf9sZxYbif
+	 REkm9/BbRreD2laLjG6QjChTgesy/Qz9NeOeDD/vDFmLXdDwT4u7hsiFCqfP5+XVfC
+	 Ul9zReYKQoktkAPG6BnsV9bFrxf2o9ciC8HLG9r2tUepC7wZ79yEVwSwEosSVrQdpu
+	 tG+FeDT887a0A==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Sasha Levin <sashal@kernel.org>,
 	Alexander Martyniuk <alexevgmart@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Patrick McHardy <kaber@trash.net>,
-	netfilter-devel@vger.kernel,
-	coreteam@netfilter.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Jann Horn <jannh@google.com>,
+	Lee Jones <lee@kernel.org>,
+	Rao Shoaib <rao.shoaib@oracle.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>,
-	Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH 5.10] netfilter: nf_log: validate MAC header was set before dumping it
-Date: Thu, 25 Jun 2026 06:41:50 -0400
-Message-ID: <20260625054005.0003.nflog-510@kernel.org>
+	stable@kernel.org,
+	Yuan Tan <yuantan098@gmail.com>,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
+	Jiexun Wang <wangjiexun2025@gmail.com>,
+	Ren Wei <n05ec@lzu.edu.cn>
+Subject: Re: [PATCH 5.15/6.1/6.6] af_unix: Reject SIOCATMARK on non-stream sockets
+Date: Thu, 25 Jun 2026 06:41:54 -0400
+Message-ID: <20260625054005.0007.afunix-siocatmark@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260624140117.19799-1-alexevgmart@gmail.com>
-References: <20260624140117.19799-1-alexevgmart@gmail.com>
+In-Reply-To: <20260624151651.38894-1-alexevgmart@gmail.com>
+References: <20260624151651.38894-1-alexevgmart@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,19 +87,19 @@ X-Spamd-Result: default: False [-4.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301930-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-301931-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:sashal@kernel.org,m:alexevgmart@gmail.com,m:pablo@netfilter.org,m:kadlec@netfilter.org,m:fw@strlen.de,m:davem@davemloft.net,m:kuznet@ms2.inr.ac.ru,m:yoshfuji@linux-ipv6.org,m:kuba@kernel.org,m:kaber@trash.net,m:netfilter-devel@vger.kernel,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:sashal@kernel.org,m:alexevgmart@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:jannh@google.com,m:lee@kernel.org,m:rao.shoaib@oracle.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@kernel.org,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:bird@lzu.edu.cn,m:wangjiexun2025@gmail.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,netfilter.org,strlen.de,davemloft.net,ms2.inr.ac.ru,linux-ipv6.org,trash.net,vger.kernel,vger.kernel.org,asu.edu];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,davemloft.net,redhat.com,google.com,oracle.com,vger.kernel.org,lzu.edu.cn];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -108,26 +110,20 @@ X-Spamd-Result: default: False [-4.66 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5469D6C4B9C
+X-Rspamd-Queue-Id: 7FCA26C4BBE
 
-> [PATCH 5.10] netfilter: nf_log: validate MAC header was set before
-> dumping it
+> [PATCH 5.15/6.1/6.6] af_unix: Reject SIOCATMARK on non-stream sockets
 >
-> --- a/net/ipv4/netfilter/nf_log_ipv4.c
-> +++ b/net/ipv4/netfilter/nf_log_ipv4.c
+> Backport fix for CVE-2026-52928. Reject SIOCATMARK in unix_ioctl()
+> for non-stream sockets.
 
-Thanks for the backport - the retarget to nf_log_ipv4.c is right for 5.10.
-
-One gap though: upstream fixed both loggers via the consolidated
-nf_log_syslog.c, but in 5.10 the IPv6 logger (net/ipv6/netfilter/
-nf_log_ipv6.c) still has the identical unguarded fallback and is left
-vulnerable here - which is also Pablo's "why only 5.10?" point.
+Queued for 6.6, 6.1 and 5.15, thanks!
 
 --
 Thanks,
