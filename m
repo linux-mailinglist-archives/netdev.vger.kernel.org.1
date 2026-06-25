@@ -1,137 +1,155 @@
-Return-Path: <netdev+bounces-301833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301834-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /nM3ICSOPGplpQgAu9opvQ
-	(envelope-from <netdev+bounces-301833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:10:44 +0200
+	id ziC/JSeOPGpnpQgAu9opvQ
+	(envelope-from <netdev+bounces-301834-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:10:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941F86C254A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:10:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C836C254F
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 04:10:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=m8bdBche;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301833-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-301833-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VVh6sl1Q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301834-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301834-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3A80F3008C83
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:10:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05F7C301C977
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 02:10:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9C23A9856;
-	Thu, 25 Jun 2026 02:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4453A8FE9;
+	Thu, 25 Jun 2026 02:10:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE503A9615;
-	Thu, 25 Jun 2026 02:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5803A838A;
+	Thu, 25 Jun 2026 02:10:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782353431; cv=none; b=MFrbKj51jPqn9Ml6jsU2WYKoR+AuPGPsrOVlkkJKGM+hysyB5GqwzmpYMXu+ViskdGRaSnuMFzgI/edgiJVESnNuNO4goyKibesia8ZMzaJEzmz4fQKVpICbXOaAsLA3A6CbHPYNKnITczOFwm82V4RA/xW1dVzrZJ071BOBk+8=
+	t=1782353442; cv=none; b=WyMzA1kb3h6lTCSNMvtylX513rY8LYsigC3T3R2wFEZjVNXenGczeNNiJW3+zuPNxdyZV4OyHh/VpauxEbJlJyRbXklhEYlQcH0ppa5QqJxYse2hQUf0acZYQVHRx1etvtJ+61Fo7cSF1p42AniCugY0qa81jTPmLEgvX0VJcMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782353431; c=relaxed/simple;
-	bh=vUQ+GNW+9GoZ1bBTqXqLJWo/WogleoR97speMN87xOA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=URZAyCRtmHNX80lhfjOmr9XWZnaYjbf7qqWWXej5HzJjL56yhJYG2Fi9gHRcaTISu0E5sTUyeamB2OQUDVa7W7A8N3s3dSpTsHY9XwyNQe+5fPJ9i9ZTaFNqVPi9QuaUGOVLJHzf0xHjdauvH18sMVlOEfmWl3vqYMp9dNnrBdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m8bdBche; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216311F000E9;
-	Thu, 25 Jun 2026 02:10:30 +0000 (UTC)
+	s=arc-20240116; t=1782353442; c=relaxed/simple;
+	bh=uxAqeyPjQ0tfnxnBVbhZaOPqYgpmeYZ9cUe4DB/rbt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BAwrfZZLAtQDB2cuvE7JKp9dtP5VRJQpJQRoQCZ7zG0X3VDXkRsxnjylEgfs5eRGdSMOTPrusWUvy6NzObeLbcP4w8fYS/j/vZxanfvJLkua6vMWoSGFS9T5g/NByQyAR5rU0nxomNu2kznscc+oCCE4HlQ2fWwRwwIRytYr9Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VVh6sl1Q; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E4A11F000E9;
+	Thu, 25 Jun 2026 02:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782353430;
-	bh=UqbZL7BWYZ7QqBCbFrb/Fv38IFOYv3GEAYWURv1o8Eg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=m8bdBchek5O+Kf1TkPqzTT273/0iBbBxCgb3YjgsRrAcqicfwK4klrkbu5x0DDoKO
-	 IilYPjfemJ3kbC/504m3J7cK6HdEInOfDAiPs13dK16A9k/rIdOecptuY1bDBQrTwu
-	 t0xwnkSyXcAWeihMZibnGZjg1rIMb7Amrq+17SuxJqSUj7F4hWX69OMg4FemhCmvct
-	 fFywnZriV2cnIlmdhDnxg87ckvL7VHuruVUVFcZ1yo2FCvsLXTBlBqyPfRz0VLPont
-	 AoU/VsyOxYF4+L8pIVOM5RGMmuoP3oQ8GNtMIcNbeyOxSafllWreqI0GwmiXNPIPNa
-	 q3jv69Ex7NT9g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938D63AAA6D4;
-	Thu, 25 Jun 2026 02:10:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1782353441;
+	bh=44WIcoDZw9y50a9k0zd/sE64+MgyRy7AHjMamNR0HuI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=VVh6sl1QaGYaFDNOh04tWgvdFWR2RbJOfmFMZSRtR6feKUeL3APwdhQEoej0Pra6C
+	 xwQ/wTKEe8H1O/H5tSOBuu1RqARx7GqD6/R5yFns/B/LNxxwZxKF8Zh+5gvBUaDUPv
+	 xJmOu+f+tnOa1mj0U4MCZF3CdD5KG4M53BncDAPKl0XOL7belMvLYvJuZzp0T5Iy+F
+	 r/2d87mAeDJAEEdU9fCV9XrOD77EPT7PI/8noe8R3fLqN180grOv7p0iGZ4VJIFzf9
+	 P9G+TpQriYlCujsj0OPKLE2of2wVURspmD4xcC7PltG7V5iLNFy1/jlQJR5vBHKCRg
+	 3nlnQWI6zr3hQ==
+Date: Wed, 24 Jun 2026 19:10:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Lazar
+ <alazar@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, Mark Bloch <mbloch@nvidia.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net 2/3] net/mlx5e: Validate bandwidth for non-ETS
+ traffic classes
+Message-ID: <20260624191039.4724950c@kernel.org>
+In-Reply-To: <20260622112925.624795-3-tariqt@nvidia.com>
+References: <20260622112925.624795-1-tariqt@nvidia.com>
+	<20260622112925.624795-3-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re:
- [PATCH net] net: usb: kalmia: bound RX frame length in kalmia_rx_fixup()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178235341814.3082498.6889909573598271946.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Jun 2026 02:10:18 +0000
-References: <178211531778.2216480.12637613349790980750@maoyixie.com>
-In-Reply-To: <178211531778.2216480.12637613349790980750@maoyixie.com>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301833-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:oneukum@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-301834-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:alazar@nvidia.com,m:cjubran@nvidia.com,m:leon@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:mbloch@nvidia.com,m:saeedm@nvidia.com,m:gal@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,nvidia.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 941F86C254A
+X-Rspamd-Queue-Id: E1C836C254F
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 22 Jun 2026 16:01:57 +0800 you wrote:
-> kalmia_rx_fixup() computes usb_packet_length = skb->len - (2 *
-> KALMIA_HEADER_LENGTH) as a u16, guarded only by a pre-loop check that
-> skb->len is at least KALMIA_HEADER_LENGTH, which is 6. A device can
-> deliver a short bulk-IN frame with skb->len in the 6 to 11 range, or
-> leave a short trailing remainder on a later loop iteration. Either case
-> underflows usb_packet_length to about 65530.
+On Mon, 22 Jun 2026 14:29:24 +0300 Tariq Toukan wrote:
+> From: Alexei Lazar <alazar@nvidia.com>
 > 
-> [...]
+> The IEEE 802.1Qaz standard defines that bandwidth allocation percentages
+> only apply to ETS traffic classes.
+> 
+> Reject ETS configurations that specify non-zero bandwidth for traffic
+> classes.
+> 
+> Fixes: 08fb1dacdd76 ("net/mlx5e: Support DCBNL IEEE ETS")
+> Signed-off-by: Alexei Lazar <alazar@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c b/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c
+> index 762f0a46c120..e4161603cdc0 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c
+> @@ -324,6 +324,17 @@ static int mlx5e_dbcnl_validate_ets(struct net_device *netdev,
+>  		}
+>  	}
+>  
+> +	/* Validate Non ETS BW */
+> +	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
+> +		if (ets->tc_tsa[i] != IEEE_8021QAZ_TSA_ETS &&
+> +		    ets->tc_tx_bw[i]) {
+> +			netdev_err(netdev,
+> +				   "Failed to validate ETS: tc=%d BW is not 0 for non-ETS TC (tsa=%u, bw=%u)\n",
+> +				   i, ets->tc_tsa[i], ets->tc_tx_bw[i]);
+> +			return -EINVAL;
+> +		}
+> +	}
 
-Here is the summary with links:
-  - [net] net: usb: kalmia: bound RX frame length in kalmia_rx_fixup()
-    https://git.kernel.org/netdev/net/c/47b6bcef6e67
+Can we pull this check out into the shared dcbnl handling?
+There seems to be zero mlx5 specific logic in this patch,
+and the motivation.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+>  	/* Validate Bandwidth Sum */
+>  	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
+>  		if (ets->tc_tsa[i] == IEEE_8021QAZ_TSA_ETS) {
 
 
