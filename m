@@ -1,305 +1,824 @@
-Return-Path: <netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id n11ZOylrPWrI2wgAu9opvQ
-	(envelope-from <netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 19:53:45 +0200
+	id 3YzAELdpPWpd2wgAu9opvQ
+	(envelope-from <netdev+bounces-302059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 19:47:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5309C6C808C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 19:53:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A58516C7FE4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 19:47:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=phenome.org header.s=oak1 header.b=k6ubPquj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=phenome.org;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HFMEO2do;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302059-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302059-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 942AD30D8FC5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:43:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EDC8D3054EB4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2879F3EB0FC;
-	Thu, 25 Jun 2026 17:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676293ED122;
+	Thu, 25 Jun 2026 17:45:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3902C1684B0
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 17:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437C42F7F04;
+	Thu, 25 Jun 2026 17:45:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782409437; cv=none; b=pvXF2lyxUwUSIDm9kf+s8U9UyOgzv9wLnJMpzDc4MgdY0Z3K9zj93iepOzZV2DR5iFiCABLgLLglfnHXB+KytdaXBXZb/E+ZJ0wxwarfRqZ1Dx3ebRwO5K3FfQjkMMPdVBgqcZ+DZFpdTBT1w4Jb5+NswntY43+yj6lIzLQnJoI=
+	t=1782409514; cv=none; b=T6b11xZLl+ChR/iuW44rlT3/pbFYdOuxjEmIORGma7w02U7nzSy0D1BUkSRt9JUcrmbYnlsQ8guKWM5qE84IarGvFLtXFMcIFexu2yivjYMr7PoAClndSZwWttPLM7Lv4EgztgWU/IfM9GMMtoeeOOG069SJyN+fXzw0yH7jpaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782409437; c=relaxed/simple;
-	bh=fea3ohHdie/L+zImwKQNsGutZYTSPDT5wQXrCTomoRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aDcFE6iktIcPd9vVG9IkGash41onuJvMueDatniJVKQzBYVj9Z4M0C7MemZ+M7yog90hRBlMHfqEPB9VwiJVh7hjFu7xd5G2IzhEu8faTRnUL8QVMq6DWDTPmwfVxkCUta3vsxFDwziU6V/s8bMLwvULWjJg4lReXrwEvtsbAus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=k6ubPquj; arc=none smtp.client-ip=193.110.157.52
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-disposition:content-type:content-type
-	:mime-version:references:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1782409424; x=1783273425; bh=fea3
-	ohHdie/L+zImwKQNsGutZYTSPDT5wQXrCTomoRE=; b=k6ubPquj7wWVyr16Fgwm
-	Xd7tg9ml/dDJ5dvzbkBgbAhDj1clQLQzl4rDyHCd1gQitXGam8+EBlemZ8SYLnH6
-	TUC6NspkRoPshg9MkNfeq38DHsO5wLTjS8ZoA5ocD6n43+X2c4/yCGp8Q9vml4MR
-	ox2IIGyHhDBkE3QelVGbUx4i/05j2Q64L9MPO/gvT+yVOro0xOb5PySi24MxlDBt
-	InzQoTxhEx/cr0g3u+IG2ZnVFLNAXWVvKUqCZ2H5rqk4Crcc8NQp/dISRFoB0BAp
-	TFBEe7sCUnn05neS98HCoU1vA7Gt7VbYBcYBn3ZyoZSLuNd7ql2/uhm5C/0CT4jd
-	VQ==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Thu, 25 Jun 2026 19:43:43 +0200 (CEST)
-Date: Thu, 25 Jun 2026 19:43:41 +0200
-From: Antony Antony <antony@phenome.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com,
-	syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Tobias Brunner <tobias@strongswan.org>,
-	Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH net] xfrm: fix stack-out-of-bounds in
- xfrm_tmpl_resolve_one
-Message-ID: <aj1ozZ8VCwno_myC@Antony2201.local>
-References: <20260625092417.890245-1-edumazet@google.com>
+	s=arc-20240116; t=1782409514; c=relaxed/simple;
+	bh=bIFrMN7HbNyANSQ6sMOj0JVB3/8P3DsimkiSzYvIUcs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NVDV8jVxoSehITluRHYOpkEgX8PMStztV80jkoARVqLODXPNOEno+ClYe5xoWJuLLbLaA62abxnuWqB1ZYa/DfHnZVRpGO4GV0G+QrRv/ViqQ4RNTch1go1XyoCYfiI8AovxWEnLK1d7tLLCwkc94Bt9zrn38AIcurakj35m4j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFMEO2do; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B15A61F000E9;
+	Thu, 25 Jun 2026 17:45:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782409511;
+	bh=apv7aBo3JOIBuQuawDbGXJIOxWmcHv9SMP/VZrOIsT8=;
+	h=From:To:Cc:Subject:Date;
+	b=HFMEO2domLI4jeLjDW3QE23eOz8BVrc4jEWAAfhwdGq2CMgnjfhIT5yv/9/Wmn4Vm
+	 OQCBW56C42QZei8BTBV1XibzOGDZXHy/5XTM8itwdyfoLH+imKvlFtlLnj38YhbLDB
+	 XEyvYNMVhJr51gewrQrMoEAHsMvhNIVRf58hDs43HMAgxYLO9cCB8Wrj5P+Ab09pn4
+	 8+Tda+RSexp6fDLwj77NAKJzgd2vCgRfSgoZcgzuZ/1KNQj8+xnXHlohTMk9i2G61E
+	 j9Qu6N4dx7KYGICTZJNmgfKLInxC5z1vvang/tTQrP8HfMIDDNI8tUAE1SrBlzN5y8
+	 DwS8TP9EMGYCw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v7.2-rc1
+Date: Thu, 25 Jun 2026 10:45:11 -0700
+Message-ID: <20260625174511.745883-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260625092417.890245-1-edumazet@google.com>
-X-Mutt-References: <20260625092417.890245-1-edumazet@google.com>
-X-Mutt-Fcc: ~/sent
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
-	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:tobias@strongswan.org,m:chopps@labn.net,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302058-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-302059-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:torvalds@linux-foundation.org,m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[phenome.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,secunet.com,gondor.apana.org.au,strongswan.org,labn.net];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,0ac4d84afe1066a1f3e9];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,open-mesh.org:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5309C6C808C
+X-Rspamd-Queue-Id: A58516C7FE4
 
-Hi Eric,
+Hi Linus!
 
-On Thu, Jun 25, 2026 at 09:24:17AM +0000, Eric Dumazet wrote:
-> syzbot reported a stack-out-of-bounds read in xfrm_state_find()
-> which flows from xfrm_tmpl_resolve_one().
-> 
-> The issue occurs when a policy has a mix of family-changing templates
-> (e.g. BEET or IPTFS) and transport templates. If an optional
-> family-changing template is skipped because no state is found, the
-> current family of the flow (`family`) is not updated. The subsequent
-> transport template is then evaluated using the unchanged family (e.g.
-> AF_INET), but it uses the template's `encap_family` (e.g. AF_INET6)
-> to perform the state lookup.
+The following changes since commit b85966adbf5de0668a815c6e3527f87e0c387fb4:
 
-Thank you for the quick fix. I would like to look at it from a
-different angle.
+  Merge tag 'net-next-7.2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2026-06-17 08:17:00 +0100)
 
-The commit message mentions BEET as a trigger, but I notice BEET
-optional templates in outbound policies are already rejected since:
+are available in the Git repository at:
 
-commit 3d776e31c841 ("xfrm: Reject optional tunnel/BEET mode templates in outbound policies")
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.2-rc1
 
-Here is the effect of blocker for BEET mode. 
+for you to fetch changes up to fe9f4ee6c61a1410afd73bf011de5ae618004796:
 
-ip netns exec ns_a ip link add dummy0 type dummy
-ip netns exec ns_a ip link set dummy0 up
-ip netns exec ns_a ip addr add 10.1.1.1/24 dev dummy0
-ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl \
-  src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode beet \
-  level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 \
-  mode transport
-Error: Mode in optional template not allowed in outbound policy.
+  Merge branch 'net-avoid-nested-up-notifier-events' (2026-06-25 10:18:41 -0700)
 
-However, IPTF is allowed. I think fix should include this.
-Does syzbot give a clue which mode was used? I am new syzbot postmartum!
-Any way look cordump or so tsee the which mode was actually used?
-I suspect it is IPTFS, other mode would not tirgger this code path.
+----------------------------------------------------------------
+Including fixes from netfilter and IPsec.
 
-In practice, only IPTFS can still reach xfrm_tmpl_resolve_one() with
-the family-mismatch condition, since xfrm_user.c has no equivalent
-guard for XFRM_MODE_IPTFS.
+Current release - regressions:
 
-ip link add dummy0 type dummy
-ip link set dummy0 up
-ip addr add 10.1.1.1/24 dev dummy0
-ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl  \
- src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs \ 
- level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 \
- mode transport
+ - net: do not acquire dev->tx_global_lock in netdev_watchdog_up()
 
-ping -W 1 -c 1 10.1.1.2
-PING 10.1.1.2 (10.1.1.2) 56(84) bytes of data.
+ - net: ethtool: keep rtnl_lock for ops using ethtool_op_get_link()
 
-[    3.477151] Adding 998396k swap on /dev/vda5.  Priority:-1 extents:1 across:998396k
-[   17.565672] ==================================================================
-[   17.567270] BUG: KASAN: stack-out-of-bounds in __xfrm6_addr_hash+0x11e/0x170
-[   17.567270] Read of size 4 at addr ffff88800f79fd20 by task ping/2777
+ - net: fix deadlock in nested UP notifier events
 
-[   17.567270] CPU: 1 UID: 0 PID: 2777 Comm: ping Not tainted 7.1.0-rc7-02029-gfb92cc029b34-dirty #94 PREEMPT(full)
-[   17.567270] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   17.567270] Call Trace:
-[   17.567270]  <TASK>
-[   17.567270]  dump_stack_lvl+0x47/0x70
-[   17.567270]  ? __xfrm6_addr_hash+0x11e/0x170
-[   17.567270]  print_report+0x152/0x4b0
-[   17.567270]  ? ksys_mmap_pgoff+0x6d/0xa0
-[   17.567270]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   17.567270]  ? rcu_read_unlock_sched+0xa/0x20
-[   17.567270]  ? __virt_addr_valid+0x21b/0x230
-[   17.567270]  ? __xfrm6_addr_hash+0x11e/0x170
-[   17.567270]  kasan_report+0xa8/0xd0
-[   17.567270]  ? __xfrm6_addr_hash+0x11e/0x170
-[   17.567270]  __xfrm6_addr_hash+0x11e/0x170
-[   17.567270]  __xfrm_dst_hash+0x24/0xc0
-[   17.567270]  xfrm_state_find+0xa2d/0x2f90
-[   17.567270]  ? __pfx_xfrm_state_find+0x10/0x10
-[   17.567270]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
-[   17.567270]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
-[   17.567270]  xfrm_tmpl_resolve_one+0x210/0x570
-[   17.567270]  ? __pfx_xfrm_tmpl_resolve_one+0x10/0x10
-[   17.567270]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-[   17.567270]  ? kernel_text_address+0x5b/0x80
-[   17.567270]  ? __kernel_text_address+0xe/0x30
-[   17.567270]  ? unwind_get_return_address+0x5e/0x90
-[   17.567270]  ? arch_stack_walk+0x8c/0xe0
-[   17.567270]  xfrm_tmpl_resolve+0x130/0x200
-[   17.567270]  ? __pfx_xfrm_tmpl_resolve+0x10/0x10
-[   17.567270]  ? __pfx_xfrm_policy_inexact_lookup_rcu+0x10/0x10
-[   17.567270]  ? __refcount_add_not_zero.constprop.0+0xb2/0x110
-[   17.567270]  ? __pfx___refcount_add_not_zero.constprop.0+0x10/0x10
-[   17.567270]  xfrm_resolve_and_create_bundle+0xd5/0x310
-[   17.567270]  ? __pfx_xfrm_resolve_and_create_bundle+0x10/0x10
-[   17.567270]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
-[   17.567270]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
-[   17.567270]  xfrm_lookup_with_ifid+0x3d7/0xb80
-[   17.567270]  ? __pfx_xfrm_lookup_with_ifid+0x10/0x10
-[   17.567270]  ? ip_route_output_key_hash+0xc6/0x110
-[   17.567270]  ? kasan_save_track+0x10/0x30
-[   17.567270]  xfrm_lookup_route+0x18/0xe0
-[   17.567270]  ip4_datagram_release_cb+0x4c9/0x530
-[   17.567270]  ? __pfx_ip4_datagram_release_cb+0x10/0x10
-[   17.567270]  ? do_raw_spin_lock+0x71/0xc0
-[   17.567270]  ? __pfx_do_raw_spin_lock+0x10/0x10
-[   17.567270]  release_sock+0xb0/0x170
-[   17.567270]  udp_connect+0x43/0x50
-[   17.567270]  __sys_connect+0xa6/0x100
-[   17.567270]  ? alloc_fd+0x2e9/0x300
-[   17.567270]  ? __pfx___sys_connect+0x10/0x10
-[   17.567270]  ? preempt_latency_start+0x1f/0x70
-[   17.567270]  ? fd_install+0x7e/0x150
-[   17.567270]  ? rcu_read_unlock_sched+0xa/0x20
-[   17.567270]  ? __sys_socket+0xdf/0x130
-[   17.567270]  ? __pfx___sys_socket+0x10/0x10
-[   17.567270]  ? vma_refcount_put+0x43/0xa0
-[   17.567270]  __x64_sys_connect+0x7e/0x90
-[   17.567270]  do_syscall_64+0x11b/0x2b0
-[   17.567270]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   17.567270] RIP: 0033:0x7f6604eb0570
-[   17.567270] Code: 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 80 3d f9 ca 0d 00 00 74 17 b8 2a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 54
-[   17.567270] RSP: 002b:00007ffd02bdf658 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-[   17.567270] RAX: ffffffffffffffda RBX: 00007ffd02bdf690 RCX: 00007f6604eb0570
-[   17.567270] RDX: 0000000000000010 RSI: 00007ffd02bdf690 RDI: 0000000000000005
-[   17.567270] RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
-[   17.567270] R10: 0000000000000006 R11: 0000000000000202 R12: 0000000000000005
-[   17.567270] R13: 0000000000000000 R14: 0000557fb777a340 R15: 0000000000000000
-[   17.567270]  </TASK>
+Current release - new code bugs:
 
-[   17.567270] The buggy address belongs to stack of task ping/2777
-[   17.567270]  and is located at offset 88 in frame:
-[   17.567270]  ip4_datagram_release_cb+0x0/0x530
+ - eth: cn20k: fix subbank free list indexing for search order
 
-[   17.567270] This frame has 1 object:
-[   17.567270]  [32, 88) 'fl4'
+ - eth: airoha: fix BQL underflow in shared QDMA TX ring
 
-[   17.567270] The buggy address belongs to the physical page:
-[   17.567270] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xf79f
-[   17.567270] flags: 0x4000000000000000(zone=1)
-[   17.567270] raw: 4000000000000000 0000000000000000 ffffea00003de7c8 0000000000000000
-[   17.567270] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-[   17.567270] page dumped because: kasan: bad access detected
+Previous releases - regressions:
 
-[   17.567270] Memory state around the buggy address:
-[   17.567270]  ffff88800f79fc00: f2 f2 00 00 f3 f3 00 00 00 00 00 00 00 00 00 00
-[   17.567270]  ffff88800f79fc80: 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00
-[   17.567270] >ffff88800f79fd00: 00 00 00 00 f3 f3 f3 f3 f3 00 00 00 00 00 00 00
-[   17.567270]                                ^
-[   17.567270]  ffff88800f79fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
-[   17.567270]  ffff88800f79fe00: f1 f1 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[   17.567270] ==================================================================
-[   17.658376] Disabling lock debugging due to kernel taint
+ - netfilter:
+   - flowtable: fix offloaded ct timeout never being extended
+   - nf_conncount: prevent connlimit drops for early confirmed ct
 
+Previous releases - always broken:
 
-I have another proposed fix:
-https://lore.kernel.org/all/20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-v1-1-814861129086@secunet.com/
+ - require CAP_NET_ADMIN in the originating netns when modifying
+   cross-netns devices
 
-After this IPTF wouldn't be allowed.
+ - report NAPI thread PID in the caller's pid namespace
 
-ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl \
- src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs \
- level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 mode transport
+ - mac802154: fix dirty frag in in-place crypto for IOT radios
 
-  Error: Mode in optional template not allowed in outbound policy.
+ - sctp: hold socket lock when dumping endpoints in sctp_diag,
+   avoid an overflow
 
-> 
-> This causes `xfrm_state_find()` to interpret the IPv4 flow addresses
-> (allocated on the stack as `struct flowi4` in `raw_sendmsg` or
-> `udp_sendmsg`) as IPv6 addresses (`xfrm_address_t`), leading to a
-> 16-byte read from the 4-byte stack variables, triggering KASAN.
-> 
-> Fix this by tracking the active family of the flow (`cur_family`)
-> during template resolution:
-> 1. Initialize `cur_family` to the flow's original family.
-> 2. For transport templates, verify that `tmpl->encap_family` matches
->    `cur_family`. If they mismatch, abort with -EINVAL.
-> 3. When a template that can change the family (tunnel, beet, iptfs) is
->    successfully resolved, update `cur_family` to `tmpl->encap_family`.
-> 4. If a template is skipped (optional), `cur_family` remains unchanged.
-> 
-> This prevents mismatched transport lookups and makes the resolution
-> robust against any family-transition gaps.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com
-> Closes: https://www.spinics.net/lists/netdev/msg1200923.html
-> Assisted-by: Jetski:gemini-3.1-pro-preview
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
+ - eth: gve: fix header buffer corruption with header-split and HW-GRO
 
+ - af_key: initialize alg_key_len for IPComp states, prevent OOB read
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Abdun Nihaal (1):
+      bnx2x: fix potential memory leak in bnx2x_alloc_mem_bp()
+
+Adrian Bente (1):
+      netfilter: flowtable: fix offloaded ct timeout never being extended
+
+Aleksandr Nogikh (1):
+      ieee802154: fix kernel-infoleak in dgram_recvmsg()
+
+Aleksandrova Alyona (1):
+      net: dsa: sja1105: round up PTP perout pin duration
+
+Ankit Garg (1):
+      gve: fix header buffer corruption with header-split and HW-GRO
+
+Arnd Bergmann (1):
+      eth: mlx5: fix macsec dependency
+
+Breno Leitao (1):
+      netconsole: don't drop the last byte of a full-sized message
+
+Christian Marangi (1):
+      net: ethernet: mtk_eth_soc: fix supported_interface set after phylink_create
+
+Cosmin Ratiu (2):
+      devlink: Fix parent ref leak in devl_rate_node_create()
+      devlink: Fix parent ref leak on tc-bw failure
+
+Daniel Golle (2):
+      net: dsa: mxl862xx: avoid unaligned 16-bit access in api_wrap
+      net: dsa: mxl862xx: fix use-after-free of DSA ports in crc_err_work
+
+Daniel Zahka (1):
+      eth: fbnic: take netif_addr_lock_bh() around rx mode address programming
+
+David Howells (10):
+      rxrpc: Fix leak of connection from OOB challenge
+      rxrpc: Fix double unlock in rxrpc_recvmsg()
+      afs: Fix further netns teardown to cancel the preallocation charger
+      afs: Fix uncancelled rxrpc OOB message handler
+      rxrpc: Fix the reception of a reply packet before data transmission
+      rxrpc: Fix oob challenge leak in cleanup after notification failure
+      rxrpc: Fix potential infinite loop in rxrpc_recvmsg()
+      rxrpc: Fix socket notification race
+      rxrpc: Fix leak of released call in recvmsg(MSG_PEEK)
+      rxrpc: Fix rxrpc_rotate_tx_rotate() to check there's something to rotate
+
+David Yang (1):
+      net: dsa: realtek: fix memory leak in rtl8366rb_setup_led()
+
+Dawei Feng (1):
+      net: ena: clean up XDP TX queues when regular TX setup fails
+
+Dawid Osuchowski (1):
+      ice: fix FDIR CTRL VSI resource leak in ice_reset_all_vfs()
+
+Dima Ruinskiy (1):
+      e1000e: Reconfigure PLL clock gate timeout and re-enable K1 on Meteor Lake
+
+Dong Chenchen (1):
+      xfrm: Fix dev use-after-free in xfrm async resumption
+
+Doruk Tan Ozturk (2):
+      tipc: fix slab-use-after-free Read in tipc_aead_decrypt_done
+      mac802154: llsec: add skb_cow_data() before in-place crypto
+
+Eric Dumazet (7):
+      xfrm: annotate data-races around xfrm_policy_count[] and xfrm_policy_default[]
+      xfrm: validate selector family and prefixlen during match
+      net: do not acquire dev->tx_global_lock in netdev_watchdog_up()
+      veth: fix NAPI leak in XDP enable error path
+      net: udp_tunnel: prevent double queueing in udp_tunnel_nic_device_sync
+      tipc: fix UAF in cleanup_bearer() due to premature dst_cache_destroy()
+      tipc: avoid busy looping in tipc_exit_net()
+
+Erni Sri Satya Vennela (1):
+      net: mana: Fall back to standard MTU when PF reports adapter_mtu of 0
+
+Fan Wu (1):
+      hdlc_ppp: sync per-proto timers before freeing hdlc state
+
+Fernando Fernandez Mancera (7):
+      netfilter: nf_conncount: prevent connlimit drops for early confirmed ct
+      ipv6: fix error handling in disable_ipv6 sysctl
+      ipv6: fix error handling in ignore_routes_with_linkdown sysctl
+      ipv6: fix error handling in forwarding sysctl
+      ipv6: fix error handling in disable_policy sysctl
+      ipv6: fix state corruption during proxy_ndp sysctl restart
+      ipv6: fix missing notification for ignore_routes_with_linkdown
+
+Florian Westphal (9):
+      netfilter: nft_payload: reject offsets exceeding 65535 bytes
+      netfilter: nft_meta_bridge: add validate callback for get operations
+      netfilter: nft_flow_offload: zero device address for non-ether case
+      netfilter: nf_reject: skip iphdr options when looking for icmp header
+      netfilter: nft_meta_bridge: fix NFT_META_BRI_IIFPVID stack leak
+      netfilter: nft_compat: ebtables emulation must reject non-bridge targets
+      selftests: nft_queue.sh: add a bridge queue test
+      netfilter: conntrack: add deprecation warnings for irc and pptp trackers
+      netfilter: nft_ct: expectation timeouts are passed in milliseconds
+
+Geetha sowjanya (2):
+      octeontx2-af: mcs: Fix unsupported secy stats read
+      octeontx2-pf: mcs: Fix mcs resources free on PF shutdown
+
+Greg Thelen (1):
+      tools: ynl: build archives with $(AR)
+
+HanQuan (1):
+      net/tcp-ao: fix use-after-free of key in del_async path
+
+Haoxiang Li (4):
+      net: ixp4xx_hss: fix duplicate HDLC netdev allocation
+      net: wwan: t7xx: destroy DMA pool on CLDMA late init failure
+      octeontx2-af: Free BPID bitmap on setup failure
+      net: sparx5: unregister blocking notifier on init failure
+
+Haoze Xie (1):
+      netfilter: nf_queue: pin bridge device while NFQUEUE holds fake dst
+
+Herbert Xu (1):
+      xfrm: Fix xfrm state cache insertion race
+
+Ido Schimmel (1):
+      selftests: vlan_bridge_binding: Fix flaky operational state check
+
+Ilya Maximets (1):
+      net: dst_metadata: fix false-positive memcpy overflow in tun_dst_unclone
+
+Inochi Amaoto (2):
+      net: stmmac: dwmac-spacemit: Fix wrong phy interface definition
+      net: stmmac: dwmac-spacemit: Fix wrong irq definition
+
+Ioana Ciornei (2):
+      dpaa2-switch: fix VLAN upper check not rejecting bridge join
+      dpaa2-switch: do not accept VLAN uppers while bridged
+
+Ivan Abramov (3):
+      ieee802154: Restore initial state on failed device_rename() in cfg802154_switch_netns()
+      ieee802154: Avoid calling WARN_ON() on -ENOMEM in cfg802154_switch_netns()
+      ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
+
+Jakub Kicinski (27):
+      Merge branch 'net-require-cap_net_admin-in-the-device-netns-for-tunnel-changelink'
+      net: psample: fix info leak in PSAMPLE_ATTR_DATA
+      Merge branch 'net-sched-act_ct-preserve-tc_skb_cb-across-defragmentation'
+      Merge branch 'devlink-fix-a-couple-parent-ref-leaks'
+      Merge tag 'batadv-net-pullrequest-20260619' of https://git.open-mesh.org/batadv
+      Merge tag 'ieee802154-for-net-next-2026-06-20' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next
+      Merge branch 'ipv4-ipv6-account-for-fraggap-on-paged-allocation-paths'
+      Merge tag 'nf-26-06-21' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      eth: bnxt: improve the timing of stats
+      Merge branch 'selftests-xsk-stabilize-timeout-test-behavior'
+      Merge tag 'ipsec-2026-06-22' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
+      Merge branch 'drop-skb-metadata-before-lwt-encapsulation'
+      Merge branch 'ipv6-fix-error-handling-in-disable_ipv6-sysctl'
+      eth: fbnic: fix ordering of heartbeat vs ownership
+      Merge branch 'airoha-fixes-for-sched-htb-offload-support'
+      Merge branch 'net-stmmac-dwmac-spacemit-fix-wrong-macro-definition'
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge tag 'nf-26-06-23' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch 'tipc-syzbot-related-fixes'
+      Merge branch 'net-hns3-fix-configuration-deadlocks-and-refactor-link-setup'
+      Merge branch 'rxrpc-miscellaneous-fixes'
+      net: ethtool: keep rtnl_lock for ops using ethtool_op_get_link()
+      net: turn the rx_mode work into a generic netdev_work facility
+      net: add the driver-facing netdev_work scheduling API
+      vlan: defer real device state propagation to netdev_work
+      selftests: bonding: add a test for VLAN propagation over a bonded real device
+      Merge branch 'net-avoid-nested-up-notifier-events'
+
+Jakub Sitnicki (2):
+      net: lwtunnel: Drop skb metadata before LWT encapsulation
+      selftests/bpf: Add LWT encap tests for skb metadata
+
+Jamal Hadi Salim (1):
+      net/sched: cls_api: Handle TC_ACT_CONSUMED in tcf_qevent_handle
+
+Jan Klos (1):
+      net: phy: realtek: Clear MDIO_AN_10GBT_CTRL_ADV10G bit
+
+Jiayuan Chen (1):
+      ipv6: ioam: fix type confusion of dst_entry
+
+Jozsef Kadlecsik (4):
+      netfilter: ipset: Don't use test_bit() in lockless RCU readers in hash types
+      netfilter: ipset: Don't use test_bit() in lockless RCU readers in bitmap types
+      netfilter: ipset: fix order of kfree_rcu() and rcu_assign_pointer()
+      netfilter: ipset: make sure gc is properly stopped
+
+Junrui Luo (1):
+      octeontx2-af: cn10k: restrict VF LMTLINE sharing to its own PF
+
+Krzysztof Kozlowski (1):
+      net: ethernet: qualcomm: ppe: Demote from supported and fix maintainer addresses
+
+Kuniyuki Iwashima (1):
+      ipv4: fib: Don't ignore error route in local/main tables.
+
+Li RongQing (1):
+      net/mlx5: Remove broken and unused mlx5_query_mtppse()
+
+Lorenzo Bianconi (5):
+      netfilter: flowtable: fix and simplify IP6IP6 tunnel handling
+      netfilter: flowtable: Validate iph->ihl in nf_flow_ip4_tunnel_proto()
+      net: airoha: Fix off-by-one in airoha_tc_remove_htb_queue()
+      net: airoha: fix netif_set_real_num_tx_queues for sparse QoS channels
+      net: airoha: fix BQL underflow in shared QDMA TX ring
+
+Lukasz Czapnik (1):
+      ice: fix AQ error code comparison in ice_set_pauseparam()
+
+Lukasz Raczylo (1):
+      net: macb: add TX stall timeout callback to recover from lost TSTART write
+
+Maoyi Xie (11):
+      net: ip_gre: require CAP_NET_ADMIN in the device netns for changelink
+      net: ipip: require CAP_NET_ADMIN in the device netns for changelink
+      net: ip_vti: require CAP_NET_ADMIN in the device netns for changelink
+      net: ip6_tunnel: require CAP_NET_ADMIN in the device netns for changelink
+      net: ip6_gre: require CAP_NET_ADMIN in the device netns for changelink
+      net: ip6_vti: require CAP_NET_ADMIN in the device netns for changelink
+      xfrm: xfrm_interface: require CAP_NET_ADMIN in the device netns for changelink
+      netdev-genl: report NAPI thread PID in the caller's pid namespace
+      net: thunderbolt: Fix frags[] overflow by bounding frame_count
+      net: sit: require CAP_NET_ADMIN in the device netns for changelink
+      net: usb: kalmia: bound RX frame length in kalmia_rx_fixup()
+
+Marcin Szycik (1):
+      ice: call netif_keep_dst() once when entering switchdev mode
+
+Mathias Krause (1):
+      netfilter: nf_nat: avoid invalid nat_net pointer use on failed nf_nat_init()
+
+Meghana Malladi (1):
+      net: ti: icssg: Fix XSK zero copy TX during application wakeup
+
+Michael Bommarito (4):
+      net: rds: check cmsg_len before reading rds_rdma_args in size pass
+      ieee802154: admin-gate legacy LLSEC dump operations
+      ieee802154: allow legacy LLSEC ADD/DEL ops to pass strict validation
+      net/sched: act_ct: fix nf_connlabels leak on two error paths
+
+Mohamed Khalfella (1):
+      i40e: Fix i40e_debug() to use struct i40e_hw argument
+
+Nicolai Buchwitz (1):
+      net: usb: lan78xx: restore VLAN and hash filters after link up
+
+Nirmoy Das (1):
+      selftests: tls: size splice_short pipe by page size
+
+Pablo Neira Ayuso (5):
+      netfilter: nf_conntrack_expect: use conntrack GC to reap expectations
+      netfilter: ctnetlink: do not allow to reset helper on existing conntrack
+      netfilter: nf_conntrack_expect: store master_tuple in expectation
+      netfilter: nf_conntrack_expect: run expectation eviction with no helper
+      netfilter: nf_conntrack_helper: cap maximum number of expectation at helper registration
+
+Paul Greenwalt (1):
+      ice: fix ice_init_link() error return preventing probe
+
+Pengpeng Hou (1):
+      net: ehea: unwind probe_port sysfs file on failure
+
+Philippe Schenker (1):
+      net: ethernet: ti: icssg: guard PA stat lookups
+
+Randy Dunlap (1):
+      netfilter: x_tables.h: fix all kernel-doc warnings
+
+Ratheesh Kannoth (5):
+      octeontx2-pf: Fix leak of SQ timestamp buffer on teardown
+      octeontx2-af: npc: Log successful MCAM drop-on-non-hit install at debug level
+      octeontx2-af: npc: cn20k: fix NPC defrag
+      octeontx2-af: npc: cn20k: Fix subbank free list indexing for search order
+      octeontx2-af: fix CGX debugfs RVU AF PCI reference leaks
+
+Rob Herring (Arm) (1):
+      dt-bindings: net: renesas,ether: Drop example "ethernet-phy-ieee802.3-c22" fallback
+
+Robert Marko (1):
+      net: pse-pd: set user byte command SUB2 field
+
+Robertus Diawan Chris (1):
+      mac802154: Prevent overwrite return code in mac802154_perform_association()
+
+Rongguang Wei (1):
+      net: wangxun: don't advertise IFF_SUPP_NOFCS
+
+Rosen Penev (1):
+      net: emac: Fix NULL pointer dereference in emac_probe
+
+Ross Porter (1):
+      selftests: net: fix file owner for broadcast_ether_dst test
+
+Runyu Xiao (3):
+      netfilter: nft_synproxy: stop bypassing the priv->info snapshot
+      net: au1000: move free_irq out of the close-time spinlocked section
+      openvswitch: conntrack: annotate ct limit hlist traversal
+
+Ruoyu Wang (3):
+      net: pch_gbe: handle TX skb allocation failure
+      net: marvell: prestera: initialize err in prestera_port_sfp_bind
+      net: sungem: fix probe error cleanup
+
+Sabrina Dubroca (1):
+      espintcp: use sk_msg_free_partial to fix partial send
+
+Sanman Pradhan (1):
+      xfrm: use compat translator only for u64 alignment mismatch
+
+Shitalkumar Gandhi (3):
+      ieee802154: ca8210: fix cas_ctl leak on spi_async failure
+      ieee802154: ca8210: fix pointer truncation in kfifo on 64-bit
+      net: ethernet: sunplus: spl2sw: fix phy_node refcount leak in remove
+
+Shradha Gupta (1):
+      net: mana: Optimize irq affinity for low vcpu configs
+
+Shuaisong Yang (4):
+      net: hns3: unify copper port ksettings configuration path
+      net: hns3: refactor MAC autoneg and speed configuration
+      net: hns3: fix permanent link down deadlock after reset
+      net: hns3: differentiate autoneg default values between copper and fiber
+
+Subbaraya Sundeep (2):
+      octeontx2-pf: Clear stats of all resources when freeing resources
+      octeontx2-af: Validate NIX maximum LFs correctly
+
+Sven Eckelmann (15):
+      batman-adv: gw: don't deselect gateway with active hardif
+      batman-adv: ensure bcast is writable before modifying TTL
+      batman-adv: fix (m|b)cast csum after decrementing TTL
+      batman-adv: frag: ensure fragment is writable before modifying TTL
+      batman-adv: frag: avoid underflow of TTL
+      batman-adv: v: prevent OGM aggregation on disabled hardif
+      batman-adv: tp_meter: restrict number of unacked list entries
+      batman-adv: tp_meter: annotate last_recv_time access with READ/WRITE_ONCE
+      batman-adv: tp_meter: prevent parallel modifications of last_recv
+      batman-adv: tp_meter: handle overlapping packets
+      batman-adv: tt: don't merge change entries with different VIDs
+      batman-adv: tt: track roam count per VID
+      batman-adv: dat: prevent false sharing between VLANs
+      batman-adv: tvlv: enforce 2-byte alignment
+      batman-adv: tvlv: avoid race of cifsnotfound handler state
+
+Thorsten Leemhuis (1):
+      tools/ynl: add missing uapi header deps in Makefile.deps
+
+Tushar Vyavahare (3):
+      selftests/xsk: make poll timeout mode explicit
+      selftests/xsk: fix timeout thread harness sequencing
+      selftests/xsk: restore shared_umem after POLL_TXQ_FULL
+
+Wayen Yan (4):
+      net: airoha: fix foe_check_time allocation size
+      net: ethernet: mtk_ppe: Fix rhashtable leak in mtk_ppe_init error paths
+      net: airoha: Fix skb->priority underflow in airoha_dev_select_queue()
+      net: airoha: Fix TX scheduler queue mask loop upper bound
+
+Wei Fang (1):
+      net: enetc: fix potential divide-by-zero when num_vsi is zero
+
+Weiming Shi (2):
+      tipc: fix use-after-free of the discoverer in tipc_disc_rcv()
+      ipv6: ndisc: fix NULL deref in accept_untracked_na()
+
+Wells Lu (1):
+      MAINTAINERS: Orphan SUNPLUS ETHERNET DRIVER
+
+Wentao Guan (1):
+      net: llc: make empty have static storage duration
+
+Willem de Bruijn (1):
+      selftests: drv-net: so_txtime: relax variance bounds
+
+Wongi Lee (2):
+      ipv4: account for fraggap on the paged allocation path
+      ipv6: account for fraggap on the paged allocation path
+
+Wyatt Feng (3):
+      net: ipv4: bound TCP reordering sysctl writes and MTU probe sizes
+      netfilter: xt_cluster: reject template conntracks in hash match
+      rxrpc: Fix ACKALL packet handling
+
+Xiang Mei (5):
+      virtio-net: fix len check in receive_big()
+      ipv6: Fix null-ptr-deref in fib6_nh_mtu_change().
+      net, bpf: check master for NULL in xdp_master_redirect()
+      geneve: gate GRO hint in geneve_gro_complete() on gs->gro_hint
+      geneve: validate inner network offset in geneve_gro_complete()
+
+Xin Long (2):
+      sctp: hold socket lock when dumping endpoints in sctp_diag
+      sctp: fix err_chunk memory leaks in INIT handling
+
+Xingquan Liu (2):
+      net/sched: dualpi2: fix GSO backlog accounting
+      selftests/tc-testing: Add DualPI2 GSO backlog accounting test
+
+Yi Chen (1):
+      selftests: netfilter: conntrack_sctp_collision.sh: Introduce SCTP INIT collision test
+
+Yun Zhou (2):
+      flow_dissector: check device type before reading ETH_ADDRS
+      net: mvneta: re-enable percpu interrupt on resume
+
+ZhaoJinming (2):
+      ice: dpll: set pointers to NULL after kfree in ice_dpll_deinit_info
+      ice: dpll: fix memory leak in ice_dpll_init_info error paths
+
+Zihan Xi (2):
+      net/sched: act_ct: preserve tc_skb_cb across defragmentation
+      selftests/tc-testing: act_ct: add TDC test for skb cb preservation across defrag
+
+Zijing Yin (1):
+      net: af_key: initialize alg_key_len for IPComp states
+
+Ziran Zhang (1):
+      rocker: Fix memory leak in ofdpa_port_fdb()
+
+ .mailmap                                           |   3 +-
+ .../bindings/clock/qcom,ipq9574-cmn-pll.yaml       |   2 +-
+ .../bindings/clock/qcom,qca8k-nsscc.yaml           |   2 +-
+ .../devicetree/bindings/net/qcom,ipq9574-ppe.yaml  |   2 +-
+ .../devicetree/bindings/net/renesas,ether.yaml     |   3 +-
+ Documentation/networking/netdevices.rst            |   2 +
+ MAINTAINERS                                        |   7 +-
+ drivers/net/dsa/mxl862xx/mxl862xx-host.c           |  18 +-
+ drivers/net/dsa/realtek/rtl8366rb-leds.c           |   8 +-
+ drivers/net/dsa/sja1105/sja1105_ptp.c              |   2 +-
+ drivers/net/ethernet/airoha/airoha_eth.c           | 201 ++++++++++++---------
+ drivers/net/ethernet/airoha/airoha_eth.h           |   3 +-
+ drivers/net/ethernet/airoha/airoha_ppe.c           |   3 +-
+ drivers/net/ethernet/amazon/ena/ena_netdev.c       |  23 ++-
+ drivers/net/ethernet/amd/au1000_eth.c              |   3 +-
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c    |   3 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  48 ++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h          |   5 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |   1 +
+ drivers/net/ethernet/cadence/macb_main.c           |   8 +
+ .../net/ethernet/freescale/dpaa2/dpaa2-switch.c    |  10 +-
+ drivers/net/ethernet/freescale/enetc/enetc4_pf.c   |   3 +
+ drivers/net/ethernet/google/gve/gve_ethtool.c      |   3 +-
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c       |  28 ++-
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c |  31 ++--
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    | 108 ++++++++---
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |   1 +
+ drivers/net/ethernet/ibm/ehea/ehea_main.c          |   2 +
+ drivers/net/ethernet/ibm/emac/core.c               |  13 +-
+ drivers/net/ethernet/intel/e1000e/ich8lan.c        |   3 +
+ drivers/net/ethernet/intel/e1000e/netdev.c         |  15 +-
+ drivers/net/ethernet/intel/i40e/i40e_debug.h       |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |   1 +
+ drivers/net/ethernet/intel/ice/ice_common.c        |   1 -
+ drivers/net/ethernet/intel/ice/ice_dpll.c          |  20 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c       |   4 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c       |  12 +-
+ drivers/net/ethernet/intel/ice/ice_main.c          |  16 +-
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c        |   2 +-
+ drivers/net/ethernet/marvell/mvneta.c              |   3 +
+ .../net/ethernet/marvell/octeontx2/af/cn20k/npc.c  |  60 ++++--
+ drivers/net/ethernet/marvell/octeontx2/af/mcs.c    |   6 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_cn10k.c  |   9 +
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    |  59 +++---
+ .../ethernet/marvell/octeontx2/af/rvu_devlink.c    |  27 ++-
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  11 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c |   2 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k_macsec.c  |  10 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |   1 +
+ .../net/ethernet/marvell/prestera/prestera_main.c  |   2 +-
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c        |  10 +-
+ drivers/net/ethernet/mediatek/mtk_ppe.c            |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/Kconfig    |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |   3 +-
+ .../ethernet/mellanox/mlx5/core/ipoib/ethtool.c    |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   1 -
+ drivers/net/ethernet/mellanox/mlx5/core/port.c     |  19 --
+ drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c    |   3 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c         |   9 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c     |   7 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c        |   4 +
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c        |   2 +
+ .../ethernet/microchip/sparx5/sparx5_switchdev.c   |   4 +-
+ drivers/net/ethernet/microsoft/mana/gdma_main.c    |  78 ++++++--
+ drivers/net/ethernet/microsoft/mana/mana_bpf.c     |   3 +-
+ drivers/net/ethernet/microsoft/mana/mana_en.c      |  16 +-
+ drivers/net/ethernet/microsoft/mana/mana_ethtool.c |   3 +-
+ .../net/ethernet/oki-semi/pch_gbe/pch_gbe_main.c   |  38 +++-
+ drivers/net/ethernet/rocker/rocker_ofdpa.c         |   3 +
+ .../net/ethernet/stmicro/stmmac/dwmac-spacemit.c   |  13 +-
+ drivers/net/ethernet/sun/sungem.c                  |  13 +-
+ drivers/net/ethernet/sunplus/spl2sw_phy.c          |   6 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c       |  72 ++++----
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c      |   1 -
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c    |   1 -
+ drivers/net/geneve.c                               |  18 +-
+ drivers/net/ieee802154/ca8210.c                    |   9 +-
+ drivers/net/netconsole.c                           |  12 +-
+ drivers/net/phy/realtek/realtek_main.c             |   3 +-
+ drivers/net/pse-pd/pd692x0.c                       |   2 +-
+ drivers/net/thunderbolt/main.c                     |   8 +-
+ drivers/net/usb/kalmia.c                           |   8 +
+ drivers/net/usb/lan78xx.c                          |  37 +++-
+ drivers/net/veth.c                                 |   2 +
+ drivers/net/virtio_net.c                           |   9 +-
+ drivers/net/wan/hdlc_ppp.c                         |  15 +-
+ drivers/net/wan/ixp4xx_hss.c                       |   4 +-
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.c             |   3 +
+ fs/afs/cm_security.c                               |   3 +-
+ fs/afs/rxrpc.c                                     |  10 +-
+ include/linux/ethtool.h                            |   2 +
+ include/linux/netdevice.h                          |  21 ++-
+ include/linux/netfilter/x_tables.h                 |  29 ++-
+ include/net/dst_metadata.h                         |   7 +-
+ include/net/ip_fib.h                               |   7 +-
+ include/net/netfilter/nf_conntrack_expect.h        |  17 +-
+ include/net/netfilter/nf_conntrack_helper.h        |   4 +
+ include/net/netfilter/nf_queue.h                   |   1 +
+ include/net/netfilter/nft_meta.h                   |   2 +
+ include/net/rtnetlink.h                            |   2 +
+ include/net/sctp/sctp.h                            |   3 +-
+ include/net/xfrm.h                                 |  15 +-
+ include/uapi/linux/netfilter/nf_conntrack_common.h |   1 +
+ net/8021q/vlan.c                                   |  76 +-------
+ net/8021q/vlan.h                                   |  11 ++
+ net/8021q/vlan_dev.c                               |  60 ++++++
+ net/batman-adv/bat_iv_ogm.c                        |  11 +-
+ net/batman-adv/bat_v.c                             |   1 +
+ net/batman-adv/bat_v_ogm.c                         |  23 ++-
+ net/batman-adv/distributed-arp-table.c             |  12 +-
+ net/batman-adv/fragmentation.c                     |  22 ++-
+ net/batman-adv/fragmentation.h                     |   3 +-
+ net/batman-adv/hard-interface.c                    |  28 +--
+ net/batman-adv/routing.c                           |  73 +++++++-
+ net/batman-adv/tp_meter.c                          |  74 +++++---
+ net/batman-adv/translation-table.c                 |  12 +-
+ net/batman-adv/tvlv.c                              |  69 ++++++-
+ net/batman-adv/types.h                             |  21 ++-
+ net/bridge/netfilter/nft_meta_bridge.c             |  23 ++-
+ net/core/Makefile                                  |   2 +-
+ net/core/dev.c                                     |   2 +
+ net/core/dev.h                                     |  11 +-
+ net/core/dev_addr_lists.c                          |  77 +-------
+ net/core/filter.c                                  |   2 +-
+ net/core/flow_dissector.c                          |  12 +-
+ net/core/lwtunnel.c                                |   6 +
+ net/core/netdev-genl.c                             |   4 +-
+ net/core/netdev_work.c                             | 162 +++++++++++++++++
+ net/core/rtnetlink.c                               |   8 +
+ net/devlink/rate.c                                 |  25 +--
+ net/ethtool/common.h                               |   4 +
+ net/ieee802154/core.c                              |  49 ++---
+ net/ieee802154/header_ops.c                        |   9 +-
+ net/ieee802154/ieee802154.h                        |  17 ++
+ net/ieee802154/netlink.c                           |  36 ++--
+ net/ipv4/ip_gre.c                                  |   6 +
+ net/ipv4/ip_output.c                               |   7 +-
+ net/ipv4/ip_vti.c                                  |   3 +
+ net/ipv4/ipip.c                                    |   3 +
+ net/ipv4/netfilter/nf_reject_ipv4.c                |   2 +-
+ net/ipv4/sysctl_net_ipv4.c                         |  10 +-
+ net/ipv4/tcp_ao.c                                  |   4 +
+ net/ipv4/tcp_output.c                              |   4 +-
+ net/ipv4/udp_tunnel_nic.c                          |   2 +-
+ net/ipv4/xfrm4_input.c                             |   2 -
+ net/ipv6/addrconf.c                                |  42 +++--
+ net/ipv6/ioam6_iptunnel.c                          |   8 +-
+ net/ipv6/ip6_gre.c                                 |   6 +
+ net/ipv6/ip6_output.c                              |   9 +-
+ net/ipv6/ip6_tunnel.c                              |  10 +
+ net/ipv6/ip6_vti.c                                 |   3 +
+ net/ipv6/ndisc.c                                   |   8 +-
+ net/ipv6/route.c                                   |   3 +
+ net/ipv6/sit.c                                     |   3 +
+ net/ipv6/xfrm6_input.c                             |   2 -
+ net/key/af_key.c                                   |   1 +
+ net/llc/sysctl_net_llc.c                           |   2 +-
+ net/mac802154/llsec.c                              |  14 ++
+ net/mac802154/scan.c                               |   1 +
+ net/netfilter/Kconfig                              |  11 +-
+ net/netfilter/ipset/ip_set_bitmap_gen.h            |   4 +-
+ net/netfilter/ipset/ip_set_bitmap_ip.c             |   2 +-
+ net/netfilter/ipset/ip_set_bitmap_ipmac.c          |   2 +-
+ net/netfilter/ipset/ip_set_bitmap_port.c           |   2 +-
+ net/netfilter/ipset/ip_set_core.c                  |   4 +-
+ net/netfilter/ipset/ip_set_hash_gen.h              |  12 +-
+ net/netfilter/nf_conncount.c                       |  11 +-
+ net/netfilter/nf_conntrack_broadcast.c             |   1 +
+ net/netfilter/nf_conntrack_core.c                  |  33 +++-
+ net/netfilter/nf_conntrack_expect.c                | 155 ++++++++--------
+ net/netfilter/nf_conntrack_h323_main.c             |   4 +-
+ net/netfilter/nf_conntrack_helper.c                |  19 +-
+ net/netfilter/nf_conntrack_irc.c                   |   2 +
+ net/netfilter/nf_conntrack_netlink.c               |  45 ++---
+ net/netfilter/nf_conntrack_pptp.c                  |   2 +
+ net/netfilter/nf_conntrack_sip.c                   |  13 +-
+ net/netfilter/nf_flow_table_core.c                 |  13 +-
+ net/netfilter/nf_flow_table_ip.c                   |  88 +++------
+ net/netfilter/nf_flow_table_path.c                 |   4 +-
+ net/netfilter/nf_nat_core.c                        |  10 +
+ net/netfilter/nf_queue.c                           |  14 ++
+ net/netfilter/nfnetlink_queue.c                    |   3 +
+ net/netfilter/nft_compat.c                         |  24 ++-
+ net/netfilter/nft_ct.c                             |  22 ++-
+ net/netfilter/nft_meta.c                           |   5 +-
+ net/netfilter/nft_payload.c                        |  16 +-
+ net/netfilter/nft_synproxy.c                       |   9 +-
+ net/netfilter/xt_cluster.c                         |   2 +-
+ net/openvswitch/conntrack.c                        |   3 +-
+ net/psample/psample.c                              |   6 +-
+ net/rds/send.c                                     |   2 +
+ net/rxrpc/ar-internal.h                            |   6 +-
+ net/rxrpc/call_event.c                             |   5 +-
+ net/rxrpc/call_object.c                            |   2 +
+ net/rxrpc/conn_client.c                            |   2 +-
+ net/rxrpc/conn_event.c                             |   9 +-
+ net/rxrpc/input.c                                  |  39 +++-
+ net/rxrpc/oob.c                                    |  12 +-
+ net/rxrpc/recvmsg.c                                |  10 +-
+ net/rxrpc/sendmsg.c                                |   3 +-
+ net/sched/act_ct.c                                 |  13 +-
+ net/sched/cls_api.c                                |   3 +
+ net/sched/sch_dualpi2.c                            |  11 +-
+ net/sched/sch_generic.c                            |   7 +-
+ net/sctp/diag.c                                    |  67 ++++---
+ net/sctp/sm_statefuns.c                            |   5 +
+ net/sctp/socket.c                                  |  29 ++-
+ net/tipc/core.c                                    |   9 +-
+ net/tipc/crypto.c                                  |   9 +
+ net/tipc/discover.c                                |  14 +-
+ net/tipc/udp_media.c                               |  19 +-
+ net/xfrm/espintcp.c                                |  34 +---
+ net/xfrm/xfrm_input.c                              |  29 +--
+ net/xfrm/xfrm_interface_core.c                     |   3 +
+ net/xfrm/xfrm_policy.c                             |  27 +--
+ net/xfrm/xfrm_state.c                              |  23 ++-
+ net/xfrm/xfrm_user.c                               |  20 +-
+ tools/net/ynl/Makefile                             |   2 +-
+ tools/net/ynl/Makefile.deps                        |   2 +
+ tools/net/ynl/generated/Makefile                   |   2 +-
+ tools/net/ynl/lib/Makefile                         |   2 +-
+ tools/testing/selftests/bpf/config                 |   3 +
+ tools/testing/selftests/bpf/prog_tests/test_xsk.c  |  96 +++++-----
+ tools/testing/selftests/bpf/prog_tests/test_xsk.h  |   2 +
+ .../bpf/prog_tests/xdp_context_test_run.c          | 175 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 123 +++++++------
+ .../testing/selftests/drivers/net/bonding/Makefile |   1 +
+ .../drivers/net/bonding/bond_vlan_real_dev.sh      | 180 ++++++++++++++++++
+ tools/testing/selftests/drivers/net/so_txtime.c    |   2 +-
+ tools/testing/selftests/net/broadcast_ether_dst.sh |   2 +-
+ .../net/netfilter/conntrack_sctp_collision.sh      |  89 ++++++---
+ .../selftests/net/netfilter/nft_flowtable.sh       |   8 +-
+ tools/testing/selftests/net/netfilter/nft_queue.sh |  66 ++++++-
+ tools/testing/selftests/net/tls.c                  |   8 +-
+ tools/testing/selftests/net/vlan_bridge_binding.sh |   2 +-
+ .../selftests/tc-testing/tc-tests/actions/ct.json  |  38 ++++
+ .../tc-testing/tc-tests/qdiscs/dualpi2.json        |  44 +++++
+ tools/testing/selftests/tc-testing/tdc_gso.py      |  43 +++++
+ 239 files changed, 3041 insertions(+), 1290 deletions(-)
+ create mode 100644 net/core/netdev_work.c
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_vlan_real_dev.sh
+ create mode 100755 tools/testing/selftests/tc-testing/tdc_gso.py
 
