@@ -1,408 +1,305 @@
-Return-Path: <netdev+bounces-302068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SbToCLh2PWq83QgAu9opvQ
-	(envelope-from <netdev+bounces-302068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 20:43:04 +0200
+	id n11ZOylrPWrI2wgAu9opvQ
+	(envelope-from <netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 19:53:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D034D6C8451
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 20:43:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5309C6C808C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 19:53:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=email-od.com header.s=dkim header.b="jdbz/jn/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302068-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302068-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=phenome.org header.s=oak1 header.b=k6ubPquj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302058-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=phenome.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0DBB0304A68A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 18:43:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 942AD30D8FC5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 17:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB05325706;
-	Thu, 25 Jun 2026 18:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2879F3EB0FC;
+	Thu, 25 Jun 2026 17:43:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from s1-ba86.socketlabs.email-od.com (s1-ba86.socketlabs.email-od.com [142.0.186.134])
+Received: from oak.phenome.org (oak.phenome.org [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4C631985D
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 18:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3902C1684B0
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 17:43:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782412980; cv=none; b=oS85+VlXHzFIxMAjTJpS6r4Ssiz6rxAjmpI8/sHGG9VNlttHnYyeDBucVFY+NKZ176fZs3PHlRwQKeTAnRR0dqIfcPEnQmHo1ygb1q8cXjqQXxFjntv9hCc1C+GNbUEh4KX/UqsCTYDzPgTjlHlou675Wx826l6nxTlRU/ECWbQ=
+	t=1782409437; cv=none; b=pvXF2lyxUwUSIDm9kf+s8U9UyOgzv9wLnJMpzDc4MgdY0Z3K9zj93iepOzZV2DR5iFiCABLgLLglfnHXB+KytdaXBXZb/E+ZJ0wxwarfRqZ1Dx3ebRwO5K3FfQjkMMPdVBgqcZ+DZFpdTBT1w4Jb5+NswntY43+yj6lIzLQnJoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782412980; c=relaxed/simple;
-	bh=GT8u7mWM6cT3S3Y9PxcMxX/0ui/zRmL3vJl3WUePj0o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fh11rNclwMlWqUsEFiYx9o3eRpbOle9L35xAIcklaqkK/bNbcVyUpGPXyiET4Pjn5uFvZm0eN+2cn01dA2i9lMZmllL2I4tj6+4fv4gWA+DZ2bP5LofMq5EUriFqU61fr7ETz1Nooql71ZwAlJjVK2QS9Ut382njfiPah4RvVAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nalramli.com; spf=pass smtp.mailfrom=email-od.com; dkim=pass (1024-bit key) header.d=email-od.com header.i=@email-od.com header.b=jdbz/jn/; arc=none smtp.client-ip=142.0.186.134
-DKIM-Signature: v=1; a=rsa-sha256; d=email-od.com;i=@email-od.com;s=dkim;
-	c=relaxed/relaxed; q=dns/txt; t=1782412979; x=1785004979;
-	h=content-transfer-encoding:mime-version:references:in-reply-to:message-id:date:subject:cc:to:from:x-thread-info:subject:to:from:cc:reply-to;
-	bh=3C5qRbHhtN/26vwfZpMmakIFWHIGq8A0GwYGf+u29XU=;
-	b=jdbz/jn/RE748p8aItfa4aoHfpQGecdLdmBMyzKfu7ddCfJeZUyzeNeJrsTQuZ7j2yPCf/PDlNsJqPCx9f0ZB7U9nKIbPPqQ/hpyWs4c5TItHjNtUC3VjkbuRNdjTz5VHyIcohsKXmk984FuDNGS25zbwZHeKTD/5wxK3aeWIXE=
-X-Thread-Info: NDUwNC4xMi4zNWM4MzAwMDFmNjYwMDkubmV0ZGV2PXZnZXIua2VybmVsLm9yZw==
-x-xsSpam: eyJTY29yZSI6MCwiRGV0YWlscyI6bnVsbH0=
-Received: from nalramli-fst-tp.. (d4-50-191-215.clv.wideopenwest.com [50.4.215.191])
-	by nalramli.com (Postfix) with ESMTPSA id BBD1E2CE01A2;
-	Thu, 25 Jun 2026 13:42:31 -0400 (EDT)
-From: "Nabil S. Alramli" <dev@nalramli.com>
-To: saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	dtatulea@nvidia.com
-Cc: dev@nalramli.com,
-	nalramli@fastly.com,
-	leon@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [mellanox/mlx5-next RFC 1/1] net/mlx5: RX, Fix refcount warning on frag page release
-Date: Thu, 25 Jun 2026 13:40:59 -0400
-Message-ID: <20260625174059.2879717-2-dev@nalramli.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260625174059.2879717-1-dev@nalramli.com>
-References: <20260625174059.2879717-1-dev@nalramli.com>
+	s=arc-20240116; t=1782409437; c=relaxed/simple;
+	bh=fea3ohHdie/L+zImwKQNsGutZYTSPDT5wQXrCTomoRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aDcFE6iktIcPd9vVG9IkGash41onuJvMueDatniJVKQzBYVj9Z4M0C7MemZ+M7yog90hRBlMHfqEPB9VwiJVh7hjFu7xd5G2IzhEu8faTRnUL8QVMq6DWDTPmwfVxkCUta3vsxFDwziU6V/s8bMLwvULWjJg4lReXrwEvtsbAus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=k6ubPquj; arc=none smtp.client-ip=193.110.157.52
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-disposition:content-type:content-type
+	:mime-version:references:message-id:subject:subject:from:from
+	:date:date:received; s=oak1; t=1782409424; x=1783273425; bh=fea3
+	ohHdie/L+zImwKQNsGutZYTSPDT5wQXrCTomoRE=; b=k6ubPquj7wWVyr16Fgwm
+	Xd7tg9ml/dDJ5dvzbkBgbAhDj1clQLQzl4rDyHCd1gQitXGam8+EBlemZ8SYLnH6
+	TUC6NspkRoPshg9MkNfeq38DHsO5wLTjS8ZoA5ocD6n43+X2c4/yCGp8Q9vml4MR
+	ox2IIGyHhDBkE3QelVGbUx4i/05j2Q64L9MPO/gvT+yVOro0xOb5PySi24MxlDBt
+	InzQoTxhEx/cr0g3u+IG2ZnVFLNAXWVvKUqCZ2H5rqk4Crcc8NQp/dISRFoB0BAp
+	TFBEe7sCUnn05neS98HCoU1vA7Gt7VbYBcYBn3ZyoZSLuNd7ql2/uhm5C/0CT4jd
+	VQ==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Thu, 25 Jun 2026 19:43:43 +0200 (CEST)
+Date: Thu, 25 Jun 2026 19:43:41 +0200
+From: Antony Antony <antony@phenome.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Tobias Brunner <tobias@strongswan.org>,
+	Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH net] xfrm: fix stack-out-of-bounds in
+ xfrm_tmpl_resolve_one
+Message-ID: <aj1ozZ8VCwno_myC@Antony2201.local>
+References: <20260625092417.890245-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260625092417.890245-1-edumazet@google.com>
+X-Mutt-References: <20260625092417.890245-1-edumazet@google.com>
+X-Mutt-Fcc: ~/sent
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[email-od.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
+	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:tobias@strongswan.org,m:chopps@labn.net,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302058-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302068-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[dev@nalramli.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[antony@phenome.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[nalramli.com: no valid DMARC record];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:dtatulea@nvidia.com,m:dev@nalramli.com,m:nalramli@fastly.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dev@nalramli.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[email-od.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[phenome.org:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,email-od.com:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,secunet.com,gondor.apana.org.au,strongswan.org,labn.net];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,0ac4d84afe1066a1f3e9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D034D6C8451
+X-Rspamd-Queue-Id: 5309C6C808C
 
-Under memory pressure, mlx5 driver has WARNING during fragmented page
-release. This happens because there is a discrepency between what mlx5
-thinks the page fragment counter is vs what the page_pool actually says i=
-t
-is.
+Hi Eric,
 
-The cause of the issue is page allocations on concurrent cpus, which
-increment the non-atomic u16 page counter mlx5e_frag_page.frags, while at
-the same time the page reference counter net_iov.pp_ref_count is atomical=
-ly
-incremented. That sometimes leads to a difference in the counts and
-therefore triggers the warning in page_pool_unref_netmem:
+On Thu, Jun 25, 2026 at 09:24:17AM +0000, Eric Dumazet wrote:
+> syzbot reported a stack-out-of-bounds read in xfrm_state_find()
+> which flows from xfrm_tmpl_resolve_one().
+> 
+> The issue occurs when a policy has a mix of family-changing templates
+> (e.g. BEET or IPTFS) and transport templates. If an optional
+> family-changing template is skipped because no state is found, the
+> current family of the flow (`family`) is not updated. The subsequent
+> transport template is then evaluated using the unchanged family (e.g.
+> AF_INET), but it uses the template's `encap_family` (e.g. AF_INET6)
+> to perform the state lookup.
 
-```
-	ret =3D atomic_long_sub_return(nr, pp_ref_count);
-	WARN_ON(ret < 0);
-```
+Thank you for the quick fix. I would like to look at it from a
+different angle.
 
-The actual stack trace looks like this:
+The commit message mentions BEET as a trigger, but I notice BEET
+optional templates in outbound policies are already rejected since:
 
-```
-WARNING: CPU: 37 PID: 447795 at include/net/page_pool/helpers.h:277 mlx5e=
-_page_release_fragmented.isra.0+0x51/0x60 [mlx5_core]
-Tainted: [S]=3DCPU_OUT_OF_SPEC, [O]=3DOOT_MODULE
-Hardware name: *
-RIP: 0010:mlx5e_page_release_fragmented.isra.0+0x51/0x60 [mlx5_core]
-RSP: 0018:ffffc90019814d98 EFLAGS: 00010293
-RAX: 000000000000003f RBX: ffff88c0993d0a10 RCX: ffffea02424592c0
-RDX: 0000000000000001 RSI: ffffea02424592c0 RDI: ffff88c090e20000
-RBP: 000000000000000a R08: 0000000000001409 R09: 0000000000000006
-R10: 0000000000000000 R11: ffff88c095fbc040 R12: 000000000000141f
-R13: 0000000000000009 R14: ffff88c090e20000 R15: 0000000000000001
-FS:  00007f34149fa6c0(0000) GS:ffff89200fa40000(0000) knlGS:0000000000000=
-000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ed0265eb000 CR3: 0000005091cbe000 CR4: 0000000000350ef0
-Call Trace:
- <IRQ>
- mlx5e_free_rx_wqes+0x7b/0xa0 [mlx5_core]
- mlx5e_post_rx_wqes+0x1ac/0x5a0 [mlx5_core]
- mlx5e_napi_poll+0x5e5/0x6f0 [mlx5_core]
- __napi_poll+0x2b/0x1a0
- net_rx_action+0x30e/0x370
- ? sched_clock+0x9/0x10
- ? sched_clock_cpu+0xf/0x170
- handle_softirqs+0xe2/0x2a0
- common_interrupt+0x85/0xa0
- </IRQ>
- <TASK>
- asm_common_interrupt+0x26/0x40
-RIP: 0010:page_counter_uncharge+0x34/0x90
-RSP: 0018:ffffc900e728bb00 EFLAGS: 00000213
-RAX: ffff88aff4762000 RBX: ffff88aff4762100 RCX: 0000000000000304
-RDX: 0000000000000001 RSI: 00000000004e9e1a RDI: ffff88aff4762100
-RBP: 0000000000000001 R08: ffff891ea0560048 R09: 00007ffffffff000
-R10: 0000000000001000 R11: ffff891ae8061b00 R12: ffffffffffffffff
-R13: ffff89107fcfd4c0 R14: ffff891ae8061b00 R15: ffff892002fe1400
- uncharge_batch+0x40/0xd0
-```
+commit 3d776e31c841 ("xfrm: Reject optional tunnel/BEET mode templates in outbound policies")
 
-The fix is to use an atomic page fragment counter, so it will always matc=
-h
-the number of references held in the page_pool.
+Here is the effect of blocker for BEET mode. 
 
-Signed-off-by: Nabil S. Alramli <dev@nalramli.com>
-Fixes: 6f5742846053 ("net/mlx5e: RX, Enable skb page recycling through th=
-e page_pool")
----
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 39 ++++++++++---------
- 3 files changed, 22 insertions(+), 21 deletions(-)
+ip netns exec ns_a ip link add dummy0 type dummy
+ip netns exec ns_a ip link set dummy0 up
+ip netns exec ns_a ip addr add 10.1.1.1/24 dev dummy0
+ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl \
+  src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode beet \
+  level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 \
+  mode transport
+Error: Mode in optional template not allowed in outbound policy.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/e=
-thernet/mellanox/mlx5/core/en.h
-index 2270e2e550dd..c164106eb85d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -568,7 +568,7 @@ struct mlx5e_icosq {
-=20
- struct mlx5e_frag_page {
- 	netmem_ref netmem;
--	u16 frags;
-+	atomic_long_t frags;
- };
-=20
- enum mlx5e_wqe_frag_flag {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_main.c
-index 5a46870c4b74..571a0df9f604 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -400,7 +400,7 @@ static int mlx5e_rq_alloc_mpwqe_linear_info(struct ml=
-x5e_rq *rq, int node,
- 	rq->mpwqe.linear_info =3D li;
-=20
- 	/* Set to max to force allocation on first run. */
--	li->frag_page.frags =3D li->max_frags;
-+	atomic_long_set(&li->frag_page.frags, li->max_frags);
-=20
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/ne=
-t/ethernet/mellanox/mlx5/core/en_rx.c
-index 5b60aa47c75b..ee360fa0c316 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -284,7 +284,7 @@ static int mlx5e_page_alloc_fragmented(struct page_po=
-ol *pp,
-=20
- 	*frag_page =3D (struct mlx5e_frag_page) {
- 		.netmem	=3D netmem,
--		.frags	=3D 0,
-+		.frags	=3D ATOMIC_LONG_INIT(0),
- 	};
-=20
- 	return 0;
-@@ -293,7 +293,7 @@ static int mlx5e_page_alloc_fragmented(struct page_po=
-ol *pp,
- static void mlx5e_page_release_fragmented(struct page_pool *pp,
- 					  struct mlx5e_frag_page *frag_page)
- {
--	u16 drain_count =3D MLX5E_PAGECNT_BIAS_MAX - frag_page->frags;
-+	u16 drain_count =3D MLX5E_PAGECNT_BIAS_MAX - atomic_long_read(&frag_pag=
-e->frags);
- 	netmem_ref netmem =3D frag_page->netmem;
-=20
- 	if (page_pool_unref_netmem(netmem, drain_count) =3D=3D 0)
-@@ -304,7 +304,7 @@ static int mlx5e_mpwqe_linear_page_refill(struct mlx5=
-e_rq *rq)
- {
- 	struct mlx5e_mpw_linear_info *li =3D rq->mpwqe.linear_info;
-=20
--	if (likely(li->frag_page.frags < li->max_frags))
-+	if (likely(atomic_long_read(&li->frag_page.frags) < li->max_frags))
- 		return 0;
-=20
- 	if (likely(li->frag_page.netmem)) {
-@@ -323,7 +323,8 @@ static void *mlx5e_mpwqe_get_linear_page_frag(struct =
-mlx5e_rq *rq)
- 	if (unlikely(mlx5e_mpwqe_linear_page_refill(rq)))
- 		return NULL;
-=20
--	frag_offset =3D li->frag_page.frags << MLX5E_XDP_LOG_MAX_LINEAR_SZ;
-+	frag_offset =3D atomic_long_read(&li->frag_page.frags) <<
-+		      MLX5E_XDP_LOG_MAX_LINEAR_SZ;
- 	WARN_ON(frag_offset >=3D BIT(rq->mpwqe.page_shift));
-=20
- 	return netmem_address(li->frag_page.netmem) + frag_offset;
-@@ -568,7 +569,7 @@ mlx5e_add_skb_frag(struct mlx5e_rq *rq, struct sk_buf=
-f *skb,
- 		return;
- 	}
-=20
--	frag_page->frags++;
-+	atomic_long_inc(&frag_page->frags);
- 	skb_add_rx_frag_netmem(skb, next_frag, netmem,
- 			       frag_offset, len, truesize);
- }
-@@ -744,7 +745,7 @@ void mlx5e_mpwqe_dealloc_linear_page(struct mlx5e_rq =
-*rq)
- 	 * things in a good state for re-allocation.
- 	 */
- 	li->frag_page.netmem =3D 0;
--	li->frag_page.frags =3D li->max_frags;
-+	atomic_long_set(&li->frag_page.frags, li->max_frags);
- }
-=20
- INDIRECT_CALLABLE_SCOPE bool mlx5e_post_rx_wqes(struct mlx5e_rq *rq)
-@@ -1615,7 +1616,7 @@ mlx5e_skb_from_cqe_linear(struct mlx5e_rq *rq, stru=
-ct mlx5e_wqe_frag_info *wi,
-=20
- 	/* queue up for recycling/reuse */
- 	skb_mark_for_recycle(skb);
--	frag_page->frags++;
-+	atomic_long_inc(&frag_page->frags);
-=20
- 	return skb;
- }
-@@ -1683,7 +1684,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
-truct mlx5e_wqe_frag_info *wi
- 				struct mlx5e_wqe_frag_info *pwi;
-=20
- 				for (pwi =3D head_wi; pwi < wi; pwi++)
--					pwi->frag_page->frags++;
-+					atomic_long_inc(&pwi->frag_page->frags);
- 			}
- 			return NULL; /* page/packet was consumed by XDP */
- 		}
-@@ -1702,7 +1703,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
-truct mlx5e_wqe_frag_info *wi
- 		return NULL;
-=20
- 	skb_mark_for_recycle(skb);
--	head_wi->frag_page->frags++;
-+	atomic_long_inc(&head_wi->frag_page->frags);
-=20
- 	if (xdp_buff_has_frags(&mxbuf->xdp)) {
- 		/* sinfo->nr_frags is reset by build_skb, calculate again. */
-@@ -1711,7 +1712,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
-truct mlx5e_wqe_frag_info *wi
- 					  xdp_buff_get_skb_flags(&mxbuf->xdp));
-=20
- 		for (struct mlx5e_wqe_frag_info *pwi =3D head_wi + 1; pwi < wi; pwi++)
--			pwi->frag_page->frags++;
-+			atomic_long_inc(&pwi->frag_page->frags);
- 	}
-=20
- 	return skb;
-@@ -1760,7 +1761,7 @@ static void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq=
-, struct mlx5_cqe64 *cqe)
- 	if (!skb) {
- 		/* probably for XDP */
- 		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags))
--			wi->frag_page->frags++;
-+			atomic_long_inc(&wi->frag_page->frags);
- 		goto wq_cyc_pop;
- 	}
-=20
-@@ -1808,7 +1809,7 @@ static void mlx5e_handle_rx_cqe_rep(struct mlx5e_rq=
- *rq, struct mlx5_cqe64 *cqe)
- 	if (!skb) {
- 		/* probably for XDP */
- 		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags))
--			wi->frag_page->frags++;
-+			atomic_long_inc(&wi->frag_page->frags);
- 		goto wq_cyc_pop;
- 	}
-=20
-@@ -2011,9 +2012,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq =
-*rq, struct mlx5e_mpw_info *w
- 				struct mlx5e_frag_page *pfp;
-=20
- 				for (pfp =3D head_page; pfp < frag_page; pfp++)
--					pfp->frags++;
-+					atomic_long_inc(&pfp->frags);
-=20
--				linear_page->frags++;
-+				atomic_long_inc(&linear_page->frags);
- 			}
- 			return NULL; /* page/packet was consumed by XDP */
- 		}
-@@ -2035,7 +2036,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq =
-*rq, struct mlx5e_mpw_info *w
- 			return NULL;
-=20
- 		skb_mark_for_recycle(skb);
--		linear_page->frags++;
-+		atomic_long_inc(&linear_page->frags);
-=20
- 		if (xdp_buff_has_frags(&mxbuf->xdp)) {
- 			struct mlx5e_frag_page *pagep;
-@@ -2048,7 +2049,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq =
-*rq, struct mlx5e_mpw_info *w
-=20
- 			pagep =3D head_page;
- 			do
--				pagep->frags++;
-+				atomic_long_inc(&pagep->frags);
- 			while (++pagep < frag_page);
-=20
- 			headlen =3D min_t(u16, MLX5E_RX_MAX_HEAD - len,
-@@ -2068,7 +2069,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq =
-*rq, struct mlx5e_mpw_info *w
-=20
- 			pagep =3D frag_page - sinfo->nr_frags;
- 			do
--				pagep->frags++;
-+				atomic_long_inc(&pagep->frags);
- 			while (++pagep < frag_page);
- 		}
- 		/* copy header */
-@@ -2121,7 +2122,7 @@ mlx5e_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq=
-, struct mlx5e_mpw_info *wi,
- 				 cqe_bcnt, mxbuf);
- 		if (mlx5e_xdp_handle(rq, prog, mxbuf)) {
- 			if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags))
--				frag_page->frags++;
-+				atomic_long_inc(&frag_page->frags);
- 			return NULL; /* page/packet was consumed by XDP */
- 		}
-=20
-@@ -2136,7 +2137,7 @@ mlx5e_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq=
-, struct mlx5e_mpw_info *wi,
-=20
- 	/* queue up for recycling/reuse */
- 	skb_mark_for_recycle(skb);
--	frag_page->frags++;
-+	atomic_long_inc(&frag_page->frags);
-=20
- 	return skb;
- }
---=20
-2.43.0
+However, IPTF is allowed. I think fix should include this.
+Does syzbot give a clue which mode was used? I am new syzbot postmartum!
+Any way look cordump or so tsee the which mode was actually used?
+I suspect it is IPTFS, other mode would not tirgger this code path.
+
+In practice, only IPTFS can still reach xfrm_tmpl_resolve_one() with
+the family-mismatch condition, since xfrm_user.c has no equivalent
+guard for XFRM_MODE_IPTFS.
+
+ip link add dummy0 type dummy
+ip link set dummy0 up
+ip addr add 10.1.1.1/24 dev dummy0
+ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl  \
+ src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs \ 
+ level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 \
+ mode transport
+
+ping -W 1 -c 1 10.1.1.2
+PING 10.1.1.2 (10.1.1.2) 56(84) bytes of data.
+
+[    3.477151] Adding 998396k swap on /dev/vda5.  Priority:-1 extents:1 across:998396k
+[   17.565672] ==================================================================
+[   17.567270] BUG: KASAN: stack-out-of-bounds in __xfrm6_addr_hash+0x11e/0x170
+[   17.567270] Read of size 4 at addr ffff88800f79fd20 by task ping/2777
+
+[   17.567270] CPU: 1 UID: 0 PID: 2777 Comm: ping Not tainted 7.1.0-rc7-02029-gfb92cc029b34-dirty #94 PREEMPT(full)
+[   17.567270] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   17.567270] Call Trace:
+[   17.567270]  <TASK>
+[   17.567270]  dump_stack_lvl+0x47/0x70
+[   17.567270]  ? __xfrm6_addr_hash+0x11e/0x170
+[   17.567270]  print_report+0x152/0x4b0
+[   17.567270]  ? ksys_mmap_pgoff+0x6d/0xa0
+[   17.567270]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   17.567270]  ? rcu_read_unlock_sched+0xa/0x20
+[   17.567270]  ? __virt_addr_valid+0x21b/0x230
+[   17.567270]  ? __xfrm6_addr_hash+0x11e/0x170
+[   17.567270]  kasan_report+0xa8/0xd0
+[   17.567270]  ? __xfrm6_addr_hash+0x11e/0x170
+[   17.567270]  __xfrm6_addr_hash+0x11e/0x170
+[   17.567270]  __xfrm_dst_hash+0x24/0xc0
+[   17.567270]  xfrm_state_find+0xa2d/0x2f90
+[   17.567270]  ? __pfx_xfrm_state_find+0x10/0x10
+[   17.567270]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
+[   17.567270]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
+[   17.567270]  xfrm_tmpl_resolve_one+0x210/0x570
+[   17.567270]  ? __pfx_xfrm_tmpl_resolve_one+0x10/0x10
+[   17.567270]  ? __pfx_stack_trace_consume_entry+0x10/0x10
+[   17.567270]  ? kernel_text_address+0x5b/0x80
+[   17.567270]  ? __kernel_text_address+0xe/0x30
+[   17.567270]  ? unwind_get_return_address+0x5e/0x90
+[   17.567270]  ? arch_stack_walk+0x8c/0xe0
+[   17.567270]  xfrm_tmpl_resolve+0x130/0x200
+[   17.567270]  ? __pfx_xfrm_tmpl_resolve+0x10/0x10
+[   17.567270]  ? __pfx_xfrm_policy_inexact_lookup_rcu+0x10/0x10
+[   17.567270]  ? __refcount_add_not_zero.constprop.0+0xb2/0x110
+[   17.567270]  ? __pfx___refcount_add_not_zero.constprop.0+0x10/0x10
+[   17.567270]  xfrm_resolve_and_create_bundle+0xd5/0x310
+[   17.567270]  ? __pfx_xfrm_resolve_and_create_bundle+0x10/0x10
+[   17.567270]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
+[   17.567270]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
+[   17.567270]  xfrm_lookup_with_ifid+0x3d7/0xb80
+[   17.567270]  ? __pfx_xfrm_lookup_with_ifid+0x10/0x10
+[   17.567270]  ? ip_route_output_key_hash+0xc6/0x110
+[   17.567270]  ? kasan_save_track+0x10/0x30
+[   17.567270]  xfrm_lookup_route+0x18/0xe0
+[   17.567270]  ip4_datagram_release_cb+0x4c9/0x530
+[   17.567270]  ? __pfx_ip4_datagram_release_cb+0x10/0x10
+[   17.567270]  ? do_raw_spin_lock+0x71/0xc0
+[   17.567270]  ? __pfx_do_raw_spin_lock+0x10/0x10
+[   17.567270]  release_sock+0xb0/0x170
+[   17.567270]  udp_connect+0x43/0x50
+[   17.567270]  __sys_connect+0xa6/0x100
+[   17.567270]  ? alloc_fd+0x2e9/0x300
+[   17.567270]  ? __pfx___sys_connect+0x10/0x10
+[   17.567270]  ? preempt_latency_start+0x1f/0x70
+[   17.567270]  ? fd_install+0x7e/0x150
+[   17.567270]  ? rcu_read_unlock_sched+0xa/0x20
+[   17.567270]  ? __sys_socket+0xdf/0x130
+[   17.567270]  ? __pfx___sys_socket+0x10/0x10
+[   17.567270]  ? vma_refcount_put+0x43/0xa0
+[   17.567270]  __x64_sys_connect+0x7e/0x90
+[   17.567270]  do_syscall_64+0x11b/0x2b0
+[   17.567270]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   17.567270] RIP: 0033:0x7f6604eb0570
+[   17.567270] Code: 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 80 3d f9 ca 0d 00 00 74 17 b8 2a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 54
+[   17.567270] RSP: 002b:00007ffd02bdf658 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
+[   17.567270] RAX: ffffffffffffffda RBX: 00007ffd02bdf690 RCX: 00007f6604eb0570
+[   17.567270] RDX: 0000000000000010 RSI: 00007ffd02bdf690 RDI: 0000000000000005
+[   17.567270] RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
+[   17.567270] R10: 0000000000000006 R11: 0000000000000202 R12: 0000000000000005
+[   17.567270] R13: 0000000000000000 R14: 0000557fb777a340 R15: 0000000000000000
+[   17.567270]  </TASK>
+
+[   17.567270] The buggy address belongs to stack of task ping/2777
+[   17.567270]  and is located at offset 88 in frame:
+[   17.567270]  ip4_datagram_release_cb+0x0/0x530
+
+[   17.567270] This frame has 1 object:
+[   17.567270]  [32, 88) 'fl4'
+
+[   17.567270] The buggy address belongs to the physical page:
+[   17.567270] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xf79f
+[   17.567270] flags: 0x4000000000000000(zone=1)
+[   17.567270] raw: 4000000000000000 0000000000000000 ffffea00003de7c8 0000000000000000
+[   17.567270] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+[   17.567270] page dumped because: kasan: bad access detected
+
+[   17.567270] Memory state around the buggy address:
+[   17.567270]  ffff88800f79fc00: f2 f2 00 00 f3 f3 00 00 00 00 00 00 00 00 00 00
+[   17.567270]  ffff88800f79fc80: 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00
+[   17.567270] >ffff88800f79fd00: 00 00 00 00 f3 f3 f3 f3 f3 00 00 00 00 00 00 00
+[   17.567270]                                ^
+[   17.567270]  ffff88800f79fd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+[   17.567270]  ffff88800f79fe00: f1 f1 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+[   17.567270] ==================================================================
+[   17.658376] Disabling lock debugging due to kernel taint
+
+
+I have another proposed fix:
+https://lore.kernel.org/all/20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-v1-1-814861129086@secunet.com/
+
+After this IPTF wouldn't be allowed.
+
+ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl \
+ src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs \
+ level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 mode transport
+
+  Error: Mode in optional template not allowed in outbound policy.
+
+> 
+> This causes `xfrm_state_find()` to interpret the IPv4 flow addresses
+> (allocated on the stack as `struct flowi4` in `raw_sendmsg` or
+> `udp_sendmsg`) as IPv6 addresses (`xfrm_address_t`), leading to a
+> 16-byte read from the 4-byte stack variables, triggering KASAN.
+> 
+> Fix this by tracking the active family of the flow (`cur_family`)
+> during template resolution:
+> 1. Initialize `cur_family` to the flow's original family.
+> 2. For transport templates, verify that `tmpl->encap_family` matches
+>    `cur_family`. If they mismatch, abort with -EINVAL.
+> 3. When a template that can change the family (tunnel, beet, iptfs) is
+>    successfully resolved, update `cur_family` to `tmpl->encap_family`.
+> 4. If a template is skipped (optional), `cur_family` remains unchanged.
+> 
+> This prevents mismatched transport lookups and makes the resolution
+> robust against any family-transition gaps.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com
+> Closes: https://www.spinics.net/lists/netdev/msg1200923.html
+> Assisted-by: Jetski:gemini-3.1-pro-preview
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
 
 
