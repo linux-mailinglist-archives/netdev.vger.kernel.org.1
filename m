@@ -1,219 +1,238 @@
-Return-Path: <netdev+bounces-301977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301978-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id b8nVOc45PWoKzggAu9opvQ
-	(envelope-from <netdev+bounces-301977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:23:10 +0200
+	id kXmeLMQ4PWqVzQgAu9opvQ
+	(envelope-from <netdev+bounces-301978-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:18:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 487D76C6964
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:23:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C9D6C6872
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 16:18:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=cdKspgzo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301977-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301977-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301978-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301978-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D0140300E3B2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 14:16:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CE7F4300CEBD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 14:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5099234B66F;
-	Thu, 25 Jun 2026 14:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED16136DA04;
+	Thu, 25 Jun 2026 14:18:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.white.stw.pengutronix.de (mx1.white.stw.pengutronix.de [185.203.200.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEDC347529
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 14:16:55 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782397017; cv=pass; b=j/JZwLFgTDLVM/uJy008SglVWqN1IRRT5Clt7YWKhGr4wO/LPnPMcax12DEX+uxfrhajJ3IPxaefIacxg3nga8tW0h4S0ScnyhaWhum77HVwQ9h7EYvuSGM5MKKCDrP4QRzR/bWJoL3mXNS9dDn9iJYIH+24m+WhUpZhrM4FxZE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782397017; c=relaxed/simple;
-	bh=W0vyq7YcmuC8WwkEvuR1qfqmZYoRCHyHLzHmSmSPVfI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KG6GHckLAidd5dB6kB7Iwjg/R2indFoxhE9jdXxUcbWy2UlyqmLWEanA5DKi90rMQd333RCIv42KzBpvJzOpPWkVZjG9FZYwdRmGeeS1P3w8qSa3rtuWcoCSZrU2RuwAKb3AdAvsbqWXqNO27NPxLZo5rpMnjpUENZkN047iv7g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cdKspgzo; arc=pass smtp.client-ip=209.85.167.51
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5aea0fff535so1079010e87.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 07:16:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782397014; cv=none;
-        d=google.com; s=arc-20260327;
-        b=gntKT0MGHvYlibkgVs3NBnwPgXZOyA0h6E0sYFVx0gLCmiW66ObtjMJSYjyEQIQTBy
-         kvteAb01MmMubIpsFup2L7iLPU9Darsary/6wYzRRHTtchPdb77P8aius6atgqlLu02h
-         0AObzNf1BlG1iD2HEJDsJraemHygGxHVNPGDZ8p8ND7fHyVSkSH2YzTKXdqe37L2TLcN
-         889luWugFTgOOwSwyFz8dtOmGZh/d0FTS1uS9rXXvJru6Kf4VTQvDho0kUhwetJMODsr
-         magAlJGXEQ1mzcrTICGMTrz/JrJV5X4zbg4/XfnLSgVzSkPtJaqwXlkHSuiBVAW0Re6h
-         gv/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NUdiuz8qbKtiMLpjLc1BMMRAUrUbvhCkX1W9M3zTK+I=;
-        fh=JI3h9u+zcTfgqfsrvii+M2LwYW6m91hHHyR7PjAVQZI=;
-        b=VkNzKlQ5fguwqlXu8q/KH5zXD/30+c22eor33Z5qxexSnicZpUgsHaFkN8bH/VzrXg
-         h0WjY/IuUnhWbtbPhlrBp0ynLDiY3Izk/pHB2MGTdO4dzJo8XjyS9ijt4fI0PV6BsToD
-         3H6EAH3zselTNtnqQVTdacaeCE4qSSS8r9dwaMphU7aoM0x5OZCGN27yDx41VtF7968L
-         bAUu4XLms4I8eBaS9740UietUstZHkbfCUixa+0pQMV5pCHbLcZOwYl/LysSUVE9aeVG
-         Ssoz4d8QxWiIaA7ICiIdpFlwOwDrJnL/n7SKKww2BmakMEynV+82+BZVvX04vId8X5qK
-         8sOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782397014; x=1783001814; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NUdiuz8qbKtiMLpjLc1BMMRAUrUbvhCkX1W9M3zTK+I=;
-        b=cdKspgzo0+lxk5lvyCmvDveIeIjbHy69toCrTbln4p4VIRTFPSVn+/yWGjkIk1JjCf
-         HthWRH0Yzu9+mkO84Rrcc4R/B51nozmhsvqJ0NexuZR7uhfphCnUDGqxWxY4pbgYXVRd
-         oO9IvkzhMs03ZaixYZV8iThA4gcI61LZVh7GIYOUwNlPgKA15MwjWtsKAPFIjIM04jpj
-         2YW+kkN5qCmNulKd92DnjmxJeowjLAV+0Gv+AF9ZqNixWkfOv50V3SeMAd4x2307aC2j
-         JNdS8tGvIPtoOpaIUoal1exSi9uiyr5/GDTh8Vw0IAfwmWK2NY5oWBockujGPoJB6vZb
-         uVUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782397014; x=1783001814;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NUdiuz8qbKtiMLpjLc1BMMRAUrUbvhCkX1W9M3zTK+I=;
-        b=f5s1Ifu3HoY+buVquQsn6ApRX7czRw/Hfw3yXIGms2xF+afTx4EyVqVrvOUkeGZ4O9
-         t1NyVZo6vOqXRNUhEqThzTmgth7Ef9QemBHLNOdKCfK2DH51RMttUOi10ZTbemhmegDe
-         ZmHYxPomGCECejb3JG0CWhBnkpuIMVnffFmGBwCHJ2KiJUGaQd6Nz20vq/E4DUQASsgU
-         voHNgbF3C0hA7HMtgSw6H4+w9d/RRx7bY6+xiknjCzIngoKZGjOy/2shJwink/TpXDRm
-         iqj8kXlKSqMg8F9n+UJno4iZ9GFrnz/pclG+8/cC2qtX5On+WBen2OGq2Wc5cC7LSiWQ
-         wd5g==
-X-Gm-Message-State: AOJu0YwnhvsHQ+mBzzDeM5rLg6TRC/OnYGr9A0/5wPdAULyrJxh5GYRl
-	xIerl7VAN0Hpwo84Vat4j0+rwTzEWeJhFkA4wCJCdsxaacpwnCiEN/hJkEUWaO5ME29x2FpblXe
-	5/J8MSLKXITSWCJi1h6+seYObJQT0ZKU=
-X-Gm-Gg: AfdE7clOFBKmocVrYzUNgdNRsOyxysvV7f8XSoTqEgpHoiT65EPtMu6tAcyxPk8f79M
-	Rwwwa1i8pXauiVzab6moQHXDapd/NKkUe+l3lZCnetpzIHJeuchf7HyyNfPTxx7OVUlokttgorn
-	S5m0bJnphgKlM9HVMA/dLKss1CtZdiHH1cd6oc2/RrFUcftj+9c8LNwMQPotOhOxs9gKjjyPKCh
-	QFuoRsrYjCtwOZ6postRBE6baA4gFY1K7NZXtmczCd2042CqXAcFddfuFKnijEo6pnZ82yHHiKF
-	zAUZfkSaGC2nGKHpvi28vty2wjiyKUhZM+SgKnz2v0gL+tjZQLxrEgRHRNQiYbQcZgbN4y9NRa8
-	SS4wBsxggCO3+5HPb69kf
-X-Received: by 2002:a05:6512:839b:b0:5ae:9c19:165c with SMTP id
- 2adb3069b0e04-5aea1f28dbdmr659555e87.7.1782397013921; Thu, 25 Jun 2026
- 07:16:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2671B1A6813;
+	Thu, 25 Jun 2026 14:18:16 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782397100; cv=none; b=gWnUaJLdU+1FOJkVgL8T8pcxLZfcc08wQ4TycRk3RT1T87j4es7G++PF9S1pzhUw7xAeih/ecqjkE5BbqHjMa8PzcBtWSdVekgHHMGxRf293rmvHfRxrSck4I6PFPeAi+I1H/bEx5EDhk4xVdUnfRcffixPYJ4PKYBAAzzlBZ8g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782397100; c=relaxed/simple;
+	bh=FuI9btH6ISg//bdXjsmacyGvB29103IhiXLEnOLVPYg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ev3r5YIq+IwfkINy7PMK6c4jcsQHvoqhXvCyTpuRGZAn6NHdVg+K4llC0JIuDCYuiBT1rT+Xf3aowsgOpkIEwKUUU+xdbfHkjJ4NhqUt1a4L2rTxeyDpO/r7s1H06CDExyEYzCwM03Wzpa4DiJzjykEsATtB1plcXSW/ZqxRS78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.200.13
+Received: from drehscheibe.grey.stw.pengutronix.de (drehscheibe.grey.stw.pengutronix.de [IPv6:2a0a:edc0:0:c01:1d::a2])
+	(Authenticated sender: relay-from-drehscheibe.grey.stw.pengutronix.de)
+	by mx1.white.stw.pengutronix.de (Postfix) with ESMTPSA id F13B320007B;
+	Thu, 25 Jun 2026 16:18:14 +0200 (CEST)
+Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1wckuE-004bXk-2s;
+	Thu, 25 Jun 2026 16:18:14 +0200
+Received: from pza by lupine with local (Exim 4.98.2)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1wckuE-00000000DcK-3Bh1;
+	Thu, 25 Jun 2026 16:18:14 +0200
+Message-ID: <439f76c3fcafdfb91cca426fcae17ef776776eab.camel@pengutronix.de>
+Subject: Re: [PATCH 2/6] remoteproc: qcom: Add M0 BTSS secure PIL driver
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: george.moussalem@outlook.com, Jens Axboe <axboe@kernel.dk>, Ulf Hansson	
+ <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski	
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Johannes Berg	
+ <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>, Bartosz
+ Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Luiz
+ Augusto von Dentz	 <luiz.dentz@gmail.com>, Balakrishna Godavarthi
+ <quic_bgodavar@quicinc.com>,  Rocky Liao <quic_rjliao@quicinc.com>,
+ Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller"	 <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>, Bjorn
+ Andersson <andersson@kernel.org>, Konrad Dybcio	 <konradybcio@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
+Date: Thu, 25 Jun 2026 16:18:14 +0200
+In-Reply-To: <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
+References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
+	 <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260623133240.1048434-1-maciej.fijalkowski@intel.com> <20260623133240.1048434-5-maciej.fijalkowski@intel.com>
-In-Reply-To: <20260623133240.1048434-5-maciej.fijalkowski@intel.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 25 Jun 2026 22:16:16 +0800
-X-Gm-Features: AVVi8Cd_eNsml4y9VUFBX08VAzVlAbKnlPEBr2spRpxaaelvJdAWps3GMzCudr4
-Message-ID: <CAL+tcoBapOxuWXyCJMNJ5ECeJ7XHFZ4K_Y1nvQ6LRZCEJUL7yw@mail.gmail.com>
-Subject: Re: [PATCH net 4/7] xsk: reclaim offending invalid desc in generic
- multi-buffer Tx
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com, 
-	stfomichev@gmail.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	bjorn@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bjorn@kernel.org,s:lists@lfdr.de];
+	DMARC_NA(0.00)[pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-301978-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301977-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[outlook.com,kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org];
+	FORGED_SENDER(0.00)[p.zabel@pengutronix.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	FROM_NEQ_ENVFROM(0.00)[p.zabel@pengutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,outlook.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 487D76C6964
+X-Rspamd-Queue-Id: 60C9D6C6872
 
-On Tue, Jun 23, 2026 at 9:33=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> After an invalid descriptor is found in __xsk_generic_xmit(),
-> xskq_cons_peek_desc() returns false and the loop body is not entered.
-> Jason's drain fixes reclaim descriptors already attached to xs->skb and
-> later continuation descriptors handled through drain_cont, but the
-> offending descriptor that made peek fail is only released from the Tx
-> ring.
->
-> This loses one completion for each invalid multi-buffer packet in the
-> generic path. Userspace then waits forever for a descriptor that has
-> already been consumed by the kernel.
->
-> If the failed descriptor belongs to an already-started or already-drainin=
-g
-> multi-buffer packet, publish its address to the completion ring before
-> releasing it. Standalone invalid descriptors keep the existing behavior.
->
-> Fixes: cf24f5a5feea ("xsk: add support for AF_XDP multi-buffer on Tx path=
-")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Do, 2026-06-25 at 18:10 +0400, George Moussalem via B4 Relay wrote:
+> From: George Moussalem <george.moussalem@outlook.com>
+>=20
+> Add support to bring up the M0 core of the bluetooth subsystem found in
+> the IPQ5018 SoC.
+>=20
+> The signed firmware loaded is authenticated by TrustZone. If successful,
+> the M0 core boots the firmware and the peripheral is taken out of reset
+> using a Secure Channel Manager call to TrustZone.
+>=20
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
 > ---
->  net/xdp/xsk.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index c489fadc3608..43791647cf18 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -1125,8 +1125,22 @@ static int __xsk_generic_xmit(struct sock *sk)
->         }
->
->         if (xskq_has_descs(xs->tx)) {
-> +               bool reclaim_desc =3D xs->skb || xs->drain_cont;
+>  drivers/remoteproc/Kconfig            |  12 ++
+>  drivers/remoteproc/Makefile           |   1 +
+>  drivers/remoteproc/qcom_m0_btss_pil.c | 261 ++++++++++++++++++++++++++++=
+++++++
+>  3 files changed, 274 insertions(+)
+>=20
+[...]
+> diff --git a/drivers/remoteproc/qcom_m0_btss_pil.c b/drivers/remoteproc/q=
+com_m0_btss_pil.c
+> new file mode 100644
+> index 000000000000..7168e270e4d4
+> --- /dev/null
+> +++ b/drivers/remoteproc/qcom_m0_btss_pil.c
+> @@ -0,0 +1,261 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2026 The Linux Foundation. All rights reserved.
+> + */
 > +
-> +               if (reclaim_desc) {
-> +                       err =3D xsk_cq_reserve_locked(xs->pool);
-> +                       if (err) {
-> +                               err =3D -EAGAIN;
-
-xs->tx->invalid_descs--;
-
-If the same descriptor is peeked N times due to repeated CQ reserve
-failures, invalid_descs will be over-counted by N-1.
-
-Thanks,
-Jason
-
-> +                               goto out;
-> +                       }
-> +               }
+> +#include <linux/clk.h>
+> +#include <linux/delay.h>
+> +#include <linux/elf.h>
+> +#include <linux/firmware/qcom/qcom_scm.h>
+> +#include <linux/io.h>
+> +#include <linux/kernel.h>
+> +#include <linux/of_reserved_mem.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/reset.h>
+> +#include <linux/soc/qcom/mdt_loader.h>
 > +
->                 if (xs->skb)
->                         xsk_drop_skb(xs->skb);
+> +#include "qcom_common.h"
 > +
-> +               if (reclaim_desc)
-> +                       xsk_cq_submit_addr_single_locked(xs->pool, &desc)=
-;
+> +#define BTSS_PAS_ID	0xc
 > +
->                 xskq_cons_release(xs->tx);
->                 xs->drain_cont =3D xp_mb_desc(&desc);
->         }
-> --
-> 2.43.0
->
+> +struct m0_btss {
+> +	struct device *dev;
+> +	phys_addr_t mem_phys;
+> +	phys_addr_t mem_reloc;
+> +	void __iomem *mem_region;
+> +	size_t mem_size;
+> +	struct reset_control *btss_reset;
+
+Why is this stored here? It doesn't seem to be used.
+
+[...]
+> +static int m0_btss_pil_probe(struct platform_device *pdev)
+> +{
+> +	// struct reset_control *btss_reset;
+
+It looks like this shouldn't be commented out.
+
+> +	struct device *dev =3D &pdev->dev;
+> +	const char *fw_name =3D NULL;
+> +	struct m0_btss *desc;
+> +	struct clk *lpo_clk;
+> +	struct rproc *rproc;
+> +	int ret;
+> +
+> +	ret =3D of_property_read_string(dev->of_node, "firmware-name",
+> +				      &fw_name);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	rproc =3D devm_rproc_alloc(dev, "m0btss", &m0_btss_ops,
+> +				 fw_name, sizeof(*desc));
+> +	if (!rproc) {
+> +		dev_err(dev, "failed to allocate rproc\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	desc =3D rproc->priv;
+> +	desc->dev =3D dev;
+> +
+> +	ret =3D m0_btss_alloc_memory_region(desc);
+> +	if (ret)
+> +		return ret;
+> +
+> +	lpo_clk =3D devm_clk_get_enabled(dev, "btss_lpo_clk");
+> +	if (IS_ERR(lpo_clk))
+> +		return dev_err_probe(dev, PTR_ERR(lpo_clk),
+> +				     "Failed to get lpo clock\n");
+> +
+> +	desc->btss_reset =3D devm_reset_control_get(dev, "btss_reset");
+
+Please use devm_reset_control_get_exclusive() directly.
+
+> +	if (IS_ERR_OR_NULL(desc->btss_reset))
+> +		return dev_err_probe(dev, PTR_ERR(desc->btss_reset),
+> +				     "unable to acquire btss_reset\n");
+> +
+> +	ret =3D reset_control_deassert(desc->btss_reset);
+> +	if (ret)
+> +		return dev_err_probe(rproc->dev.parent, ret,
+> +				     "Failed to deassert reset\n");
+
+Shouldn't this be asserted on remove? Otherwise after an unbind/bind
+cycle probe will enable the clock with reset already deasserted.
+That may or may not be problematic.
+
+Consider using devm_reset_control_get_exclusive_deasserted().
+
+
+regards
+Philipp
 
