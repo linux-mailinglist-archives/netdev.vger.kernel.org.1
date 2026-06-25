@@ -1,175 +1,127 @@
-Return-Path: <netdev+bounces-301946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zFEgNbETPWrHwggAu9opvQ
-	(envelope-from <netdev+bounces-301946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:40:33 +0200
+	id 07kEEQIVPWoWwwgAu9opvQ
+	(envelope-from <netdev+bounces-301948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:46:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8516C5338
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:40:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5A46C53F9
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 13:46:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=K1fCw4Xo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301946-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301946-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=Znl0J5WX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301948-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301948-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linuxfoundation.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 312B53058891
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:37:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D9F633049727
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 11:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17DA23DC84C;
-	Thu, 25 Jun 2026 11:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B233DD53B;
+	Thu, 25 Jun 2026 11:45:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7883CDBD3
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 11:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755113DD509;
+	Thu, 25 Jun 2026 11:45:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782387473; cv=none; b=uJX/U56bdpJ3dXwSpYB/fUKD7nT6ya2DZH0HJ8lpV7IEA0bY+gq1Qo+abLQX0hbjIqMuWJBtYecWvdKkuiw4FaiSyyxuLYgJjt/J52xS+8bteDSsnqDfvWAJVQRgRLdYD4JjpUNYTUZZgiCnHabvG+AbZvPe17te2exCxv79RAc=
+	t=1782387958; cv=none; b=gvGILitB7Y8bguFiEQmUbIiv2OhCtAVsTvIrddgNSV3AzPKhKxTwEWpe5+mFtalWcfgSP78Jn0kkj3Pv94L1ELI7bY+yW9OpdaTPfeM6KKlHmGPoHjJLlNyAOXz/hdPOVn6bwUO4IpmLBqwQKHT1jtG5tE8zR3QghtpWDQooD6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782387473; c=relaxed/simple;
-	bh=cF8ABWT+HMyamWTf0qy0N9g3VZHpF7rJcGUwn8QT1es=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=p30x0FFMNgmTz2aACdI9fNhLmZyevbBEiJI83unjPohCW2OQbkWsQLir5HUizU1VzRC9ahN1Ayx2CBqNm1rECTzMqbZxzLADG+9VdR9WgFUmXMM4v7I0qk22L8oIf9AbvJ9j2U51P63ZpZN3m0m6zX3zwJB5tUELYAKyieX0FOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=K1fCw4Xo; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3680FA3ED1;
-	Thu, 25 Jun 2026 13:37:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1782387460; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=3PsuiJMX7K0gsO2erZaFsQtKtSASmz0tXod/eQxJiNA=;
-	b=K1fCw4XoVm3oQCCSsns1TpAbGjNOfeGyoNBziKlyQKKP8jHItPc+ppMXf5WDBG6z4vQbbe
-	g6KItTkbr+igQeQr2IfR5iHpmPBMlX3H/MqMsHvCOwkqwEP7xj6GL7UEcVMy0r3O2xSJsd
-	+xKahdP3opVG/BDwpJF7MOVnpMToQxVGpxJOjXzsDvcZ59ol3L1F4rbe/pEPqgQgvgPJGM
-	1VeBz/rEf15oMgq3yZPlims2NOjyDzOgJXfMpGb2j4Su1ZSggFOW27+x5h/ny2qWHA9Dxs
-	paPK3wz1ok4Y5B9ZAGNxqT4x/nsS4+yLVP5eR8bAYmr7t98f6UHZuPHlHpLNfg==
+	s=arc-20240116; t=1782387958; c=relaxed/simple;
+	bh=Nd8YdKOzt+Ca9w1TBuYqUtzZR7XwfY1USeE0VwvaT6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u99wDeQiMpgSFgZsKatsufulilodh3dCvp83WYBjM59fEF8gkrV/Di9+1mrnz5malQqq4U6O13avo6RsI9nlvnBIL34x3Y2PMdcM8k6oKfkSnWg8vsiyOkayfTohe7jiMg7dFB6KVcjVihUZ5o8MZmLGqkngzI9bAIu0WJ2QZcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Znl0J5WX; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B1F1F00A3A;
+	Thu, 25 Jun 2026 11:45:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1782387957;
+	bh=O5Nsrv7dbKI0TRU5J5+1J9WSCqQWpJP9oDy03m9SzNA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Znl0J5WXUw2BJePR4uI199t/XyfCjUR1y2S0ZdLOBKfKzFKxD0zqS/V8CB2IYvHNB
+	 d9HimkDYCBzFzBmV7ttG+L7jwRZALoWqvFG0jKBefPxxhwZqAvnbzahqYyj9sYsErX
+	 TfsI9prfOT9Apmv68QSqkDKVko2x38Kx4r0AYTcU=
+Date: Thu, 25 Jun 2026 12:37:31 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Maximilian Heyne <mheyne@amazon.de>
+Cc: stable@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"Eric W. Biederman" <ebiederm@aristanetworks.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH 6.12.y] net: add missing ns_capable check for peer netns
+Message-ID: <2026062556-residue-anybody-e756@gregkh>
+References: <20260617-pats-coif-316245c6@mheyne-amazon>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 25 Jun 2026 13:37:31 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jv@jvosburgh.net, sdf@fomichev.me, dongchenchen2@huawei.com,
- idosch@nvidia.com, n05ec@lzu.edu.cn, yuantan098@gmail.com,
- kuniyu@google.com, aleksandr.loktionov@intel.com, dtatulea@nvidia.com,
- syzbot+09da62a8b78959ceb8bb@syzkaller.appspotmail.com,
- syzbot+cb67c392b0b8f0fd0fc1@syzkaller.appspotmail.com,
- syzbot+9bb8bd77f3966641f298@syzkaller.appspotmail.com
-Subject: Re: [PATCH net 3/4] vlan: defer real device state propagation to
- netdev_work
-In-Reply-To: <20260624182018.2445732-4-kuba@kernel.org>
-References: <20260624182018.2445732-1-kuba@kernel.org>
- <20260624182018.2445732-4-kuba@kernel.org>
-Message-ID: <dd271c70bbcdedf79940e013523451b7@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260617-pats-coif-316245c6@mheyne-amazon>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:jv@jvosburgh.net,m:sdf@fomichev.me,m:dongchenchen2@huawei.com,m:idosch@nvidia.com,m:n05ec@lzu.edu.cn,m:yuantan098@gmail.com,m:kuniyu@google.com,m:aleksandr.loktionov@intel.com,m:dtatulea@nvidia.com,m:syzbot+09da62a8b78959ceb8bb@syzkaller.appspotmail.com,m:syzbot+cb67c392b0b8f0fd0fc1@syzkaller.appspotmail.com,m:syzbot+9bb8bd77f3966641f298@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-301946-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-301948-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:mheyne@amazon.de,m:stable@vger.kernel.org,m:mkl@pengutronix.de,m:mailhol.vincent@wanadoo.fr,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:daniel@iogearbox.net,m:razor@blackwall.org,m:ebiederm@aristanetworks.com,m:linux-can@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,jvosburgh.net,fomichev.me,huawei.com,nvidia.com,lzu.edu.cn,gmail.com,intel.com,syzkaller.appspotmail.com];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,pengutronix.de,wanadoo.fr,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,blackwall.org,aristanetworks.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,09da62a8b78959ceb8bb,cb67c392b0b8f0fd0fc1,9bb8bd77f3966641f298];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:from_mime,appspotmail.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,gregkh:mid,linuxfoundation.org:dkim,linuxfoundation.org:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4C8516C5338
+X-Rspamd-Queue-Id: CF5A46C53F9
 
-On 24.6.2026 20:20, Jakub Kicinski wrote:
-> vlan_device_event() generates nested UP/DOWN, MTU and feature
-> change events. It executes an event for the VLAN device directly
-> from the notifier - while the locks of the lower device are held.
-> 
-> This causes deadlocks, for example:
-> 
->   bond    (3) bond_update_speed_duplex(vlan)
->     |           ^                v
->   vlan    (2) UP(vlan)    (4) vlan_ethtool_get_link_ksettings()
->     |           ^                v
->   dummy   (1) UP(dummy)   (5) __ethtool_get_link_ksettings()
-> 
-> The dummy device is ops locked, vlan creates a nested event (2),
-> then bond wants to ask vlan for link state (3). bond uses the
-> "I'm already holding the instance lock" flavor of API. But in
-> this case the lock held refers to vlan itself. We hit vlan's
-> link settings trampoline (4) and call __ethtool_get_link_ksettings()
-> which tries to lock dummy. Deadlock. There's no clean way for us
-> to tell the vlan_ethtool_get_link_ksettings() that the caller
-> is already in lower device's critical section.
-> 
-> Defer the propagation to the per-netdev work facility instead:
-> the notifier only schedules netdev_work_sched(vlandev, VLAN_WORK_*),
-> and ndo_work (vlan_dev_work) applies the change later. Hopefully
-> nobody expects the VLAN state changes to be instantaneous.
-> 
-> If someone does expect the changes to be instantaneous we will
-> have to do the same thing Stan did for rx_mode and "strategically"
-> place sync calls, to make sure such delayed works are executed
-> after we drop the ops lock but before we drop rtnl_lock.
-> 
-> Stan suggests that if we need that down the line we may
-> consider reshaping the mechanism into "async notifications".
-> AFAICT only vlan does this sort of netdev open chaining,
-> so as a first try I think that sticking the complexity into
-> the vlan code makes sense.
-> 
-> One corner case is that we need to cancel the event if user
-> explicitly changes the state before work could run. Consider
-> the following operations with vlan0 on top of dummy0:
-> 
->   ip link set dev dummy0 up    # queues work to up vlan0
->   ip link set dev vlan0 down   # user explicitly downs the vlan
->   ndo_work                     # acts on the stale event
-> 
-> Reported-by: syzbot+09da62a8b78959ceb8bb@syzkaller.appspotmail.com
-> Reported-by: syzbot+cb67c392b0b8f0fd0fc1@syzkaller.appspotmail.com
-> Reported-by: syzbot+9bb8bd77f3966641f298@syzkaller.appspotmail.com
-> Fixes: 9f275c2e9020 ("net: ethtool: make sure 
-> __ethtool_get_link_ksettings() is ops-locked")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
+On Wed, Jun 17, 2026 at 08:25:31AM +0000, Maximilian Heyne wrote:
+> The upstream commit 7b735ef81286 ("rtnetlink: add missing
+> netlink_ns_capable() check for peer netns") doesn't apply on older
+> stable kernels due to refactoring. Therefore, this patch is an attempt
+> to implement the same capability check just directly in the respective
+> interface types.
 
-> [...]
+Why can't we take the full series of patches instead?  Otherwise this is
+going to be a pain over time for any other fixes/updates in this area,
+right?
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+And if not, then we need acks from the maintainers here...
 
-Thanks
-Nicolai
+thanks,
+
+greg k-h
 
