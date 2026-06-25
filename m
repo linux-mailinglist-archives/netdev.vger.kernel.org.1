@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-301895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aa8KGovoPGoAuQgAu9opvQ
-	(envelope-from <netdev+bounces-301895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:36:27 +0200
+	id ga0PAMjoPGonuQgAu9opvQ
+	(envelope-from <netdev+bounces-301896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:37:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D59926C3DF9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 771946C3E41
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 10:37:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=KYbfVK4G;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301895-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301895-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ubondpu6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301896-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301896-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 829B430316C7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:35:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AF1FF301CC25
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7AE380FFA;
-	Thu, 25 Jun 2026 08:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0640F3812C8;
+	Thu, 25 Jun 2026 08:36:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DC437DE83
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:35:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE27337DE83
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 08:36:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782376540; cv=none; b=OmaMaaOdXHjOjIdq0qXb0qppU+d3mF9ScADQZLcM61OHoDKwrbpLhKEZR86ucRrxCiFfyZ0Y859ItqG+USTm81tgG0dshygewgYU9I9x92C2n5ZigRpX1w59DQSk/5cKNGZRY4tvY7NrGIQUCIjcU78ivfRWL4Q3zx3ec/Q3S6Q=
+	t=1782376563; cv=none; b=kZeArg0iTuQdJfQ6VYrJYIlOj+swyt51BRBqLCb6Ghp89DZZGOK1zl3pPoFjZJXmcLhUlNYooxMr2VprHDvMm8HnOn+q9kh+LlPIT/Dex+s4P9PPen/xD+OZhRs1+uImx/KyQg7XDACAJuvsKkhUctkzNYxrt3p4xmOH7s2K9Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782376540; c=relaxed/simple;
-	bh=x+w9SGxZBWO4hPXg8E+A/q/4ScS0BqeDSCrwJNo6iBs=;
+	s=arc-20240116; t=1782376563; c=relaxed/simple;
+	bh=cFehA3I9prjpPS9MpvxHw5vuJaTELUrjhx5IPWyT2q8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JxEuAvoWRQ/ah924hOfCLEWy9XJEUe6IuYs5K63LKQ8E43i7bmEek95sDXJh4WPl/h8HTbog115nsCYSAbNYZtjiH2ULtsrMXhWcw4ASQZS7ywle1AK91c69dNHlr350luiIhl4ZDjlho62wusm4ZSSZDyUv1UvwHvF0IlrFyQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KYbfVK4G; arc=none smtp.client-ip=209.85.221.51
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-46cbe01d4b6so966608f8f.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:35:38 -0700 (PDT)
+	 MIME-Version; b=TgzPnKCRdWtpKBE7zoz85x8+TB/hIKRHFESO3BTD7agHjRT22nbDZsdwelAmVb8KdfPBAxbg4wgMobk/fp5ZudXU2clDERIKX9chelBPC2YMjQBvemae9CPXLJfOQx8U2OmDKf8A28qGXdOj/zlA8VEkLaCsVt/ntudxtgl1bKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ubondpu6; arc=none smtp.client-ip=209.85.128.50
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4922244f7c7so17509405e9.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:36:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782376537; x=1782981337; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782376561; x=1782981361; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0+ggg4zFesK0IrYb2saIE8cPaSi4XEf6KWehvtWp5AY=;
-        b=KYbfVK4GpuwSiN5c3R2ornN6UuY9+Rb7Ddw36+XX0K4/PfGZJDPrDvwYN1ut2x+M6j
-         oolzOP8CQt0yFF4dGEUsMvdlLh13OMvAXZXCqKj8PX7SudG+aC6WYqzN45Np4gXZmhmF
-         Wo70q/X6K/PPukycdtCTRXjbkwzONwXI057xLHhncpSU7FdvJpra4Z54dwZe6jg7bNS7
-         lBCI3sBejIu4W+gNsIMuLtcdLxIRkKAZYQlgj33/hHE/nDZQzZPz3+jeGBLIqIlkZKqa
-         E7s1wsGqGBeUnwfLRmftLjpSGS2sgl8PFrEAZjEj6AzHi70tTIcJaA2b6ySiNLt/x5ht
-         9Xxw==
+        bh=ybLyqkJC8PpxOPGtytqXN1jytQgb2AKCO5QalzHljcA=;
+        b=Ubondpu6xJgw/p84wAy8wNH/JR5wUCsCd/5xeQSpoNrfjzYHLUwW8PBbPetdv0J4jl
+         O94zcjadi65puUvpau74wT5BgSn//VHTqqIGGsONw3MI/n/FrxOrqCrhL7VyTXvLWGnE
+         HPDOMUBZB9AYgKkkkyyVAxnQTkdR/cRFmGfInKWLNmBYNAThciWyKzYzkDFCSrEg4WzM
+         WZavq5gQo95nHZcd7d8LuTkVUcPnP9kN0A7XjFPa2MgBiW2JiQ9CZBp+Jxw54vN4GFV7
+         IG/oHhjwJVK88hdwkyQdESlXyM1I/7dDyaEQ0s6mkM9fLog6IlI//dvhOP/fAoQLTnJt
+         3+5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782376537; x=1782981337;
+        d=1e100.net; s=20251104; t=1782376561; x=1782981361;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0+ggg4zFesK0IrYb2saIE8cPaSi4XEf6KWehvtWp5AY=;
-        b=hdxYvTxjdbK+BsawZqoy1Eo1wEmxJoD3Hcd2wfd+bne7dmgRg2JR+tXts4iWeuij72
-         83OfSP/qMhuEhXuwGXGSLulVtIC9wojHl48w5fs/Qrw6kjGcAuTBSZbI7EOfoUzG4Lo2
-         nC748SHnJ/g5v4ooXsB5dmTmwyKunRlcYAdMb4fx2rhFUAM3Je4gFVM9yYayCz72dvrj
-         S7ALyYBcuiESnxV+inEdMcvEPe3wFwei/87EMXKCqr1kxSwybRCMp948jxksen7L04jj
-         1iIN5BxHgUkzJVWd5ZKcjo8h+Y1JXmGZXk9A9uAF0HshUP/q+UvTPQeG8mIJ+aWJj/Iu
-         aY3w==
-X-Forwarded-Encrypted: i=1; AHgh+RpUotTuxkytZnKr+W4+6s7xWLK4KvX7hRjUJCV6dBk6wL7lUBYV2zdoodHF0w1Z/n6ff/6/BeQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw98sdGx1OdSzrrl/9M++ghe3qI7iz2lTyZs7eevBjBKGJICSed
-	jeL3l23xELEAwZwuNfpmZdp7ufKgnoHJeAFNvLze0787I3mYvJYXMscm
-X-Gm-Gg: AfdE7cmLBYeUKHpeEjRAAuUx/T9mmAPjgpKfsG6k9LAspOKPDLfILBkMC4XUWoYDLVm
-	SbF/TqrQcuSfyyRKokjtzssreLvUrcSGFnGG+QICHN6uoCovHXcl3gEmN69HiCS52Nn4QjZkdKl
-	QQa3ewKr7F2DdRZ/uZscLeQFWeuquQv1YGVwOTpMeQJEiuuh97H+YFC1mZFOGd5ZUJdSoWn845A
-	19E2JjKn3aTOGhCPnIZV5jhJ6riwb5mrXXuvWjAC7qTuFkG6snOi9fEyjbxjic5zrywDyPjCppk
-	QXKoBda8jN8v7Lnw6WwvixvtRKsYO4sGlNbVIr79SEOpNr/cHBGdOUcvgbFTe3pOcoqjnTYcE3U
-	YOxgg42w6c+pUtXskeFwvoH21uxa442RNak8KbPEtCrIQHWcYDO3Ti5dZDIY9wy4F4jUNt7uH9K
-	PptrtjrJQY
-X-Received: by 2002:a05:6000:1841:b0:451:3b12:9bca with SMTP id ffacd0b85a97d-46dc20763ecmr2315779f8f.25.1782376537012;
-        Thu, 25 Jun 2026 01:35:37 -0700 (PDT)
+        bh=ybLyqkJC8PpxOPGtytqXN1jytQgb2AKCO5QalzHljcA=;
+        b=d3ZB9i9rGhK/3tNMrWBO9rI1Du/TfOnaUwwXfvezSW9B0SzBreKOWuHKgNYT3JEbyZ
+         xC2yRLxEtu3v0VYTEVeli3QJn/TbNp9O8SpU0dcq65BgJpWBqVifjoUzBq+966OslXu4
+         X6s559l2Mxf911rzVzas6Nqr6KrizyobTVuz//XxOusCA8eLwqbaodymc0tWx5+oG4Dy
+         Lnd7xLtZSwGiRy+gihVlpbzU41PPzcnZVzcdf/g7+oOB8VZJUp9FyRWT7ZfC7oY7gNP+
+         sOPQN2OQIyrHCEImcS3dZHNnZQFMaz7AGM+j5tPRZDncM81SIOIBZEfGqxrD7O4dPfsT
+         dlTQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9SwSN8QPa5AGT7u9jQDNGNh79IFMf/P15X+mopdQHVfXxd9ZiUx6eKDew/u7VZpwpKVmcmDxU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxeUyIpG7Uu66OIoivpXuY84CVVe40geYhwSiC0CToIuSbTNWl
+	9PC2cf7zTwxv2GGymDFve9BFl8q2Vust3pr5HsVAGIfE8EeFprFUxoBdH57Jio4Udw0=
+X-Gm-Gg: AfdE7ckbu8V5/dG22iqyoO3O7iG/tpr/6v70nddcDgDV9KDiuv9/DTSVYZJKDszu97E
+	33cyl5sp2NQeZ7eJn6rR0mBgTWXcgRyVi14hLNsf/ElKCPMtt6iSLKoBP6syZMKHUJVrxjJtgqt
+	jh2l30Qcs2XfXypzJl1LTL/HzROYRvfYomU/0Gv/VJQkr7czXKP12KQ0SX3blbj4vAUMeRDdlzx
+	6Ft5qHu8w9SKDt8FoI7MUqqWqqJLRTFyZy9VrRq3LKqMEJejKXFkgIlVI7e/MuXaBVBVXfjy8Ha
+	c4xOKoLk8WOZ8Uo+ung1PUxu62phwAjNqL4pSpcmuDtUcJLWYa29pU/b4GoGo74NPmtKnHq1KyR
+	P/GBtWtB/EIaLZTcEfqpa5sWZzkfP9kkt7mQat7EjSXippq+uWhtckEJKCau0CeZhZB4CJAQqF5
+	0RDE/0lGV7
+X-Received: by 2002:a05:600c:c0d2:20b0:492:41c9:886b with SMTP id 5b1f17b1804b1-4926684c948mr14881805e9.14.1782376560755;
+        Thu, 25 Jun 2026 01:36:00 -0700 (PDT)
 Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-46c2279b85csm13357402f8f.28.2026.06.25.01.35.34
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4926401a2e7sm80070205e9.3.2026.06.25.01.35.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2026 01:35:36 -0700 (PDT)
+        Thu, 25 Jun 2026 01:36:00 -0700 (PDT)
 From: Askar Safin <safinaskar@gmail.com>
 To: linux-fsdevel@vger.kernel.org,
 	Christian Brauner <brauner@kernel.org>,
@@ -105,9 +105,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Val Packett <val@packett.cool>,
 	Andrei Vagin <avagin@gmail.com>,
 	patches@lists.linux.dev
-Subject: [PATCH v2 2/7] vmsplice: change argument type back to "int"
-Date: Thu, 25 Jun 2026 08:34:04 +0000
-Message-ID: <20260625083409.3769242-3-safinaskar@gmail.com>
+Subject: [PATCH v2 3/7] splice: turn wait_for_space flags argument into bool
+Date: Thu, 25 Jun 2026 08:34:05 +0000
+Message-ID: <20260625083409.3769242-4-safinaskar@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260625083409.3769242-1-safinaskar@gmail.com>
 References: <20260625083409.3769242-1-safinaskar@gmail.com>
@@ -131,7 +131,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-301895-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301896-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[28];
@@ -155,44 +155,46 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D59926C3DF9
+X-Rspamd-Queue-Id: 771946C3E41
 
-My previous vmsplice patchset changed vmsplice argument from
-"int" to "unsigned long". This may cause problems, so let's
-change it back.
+I want to do this, because I will move this function to fs/pipe.c.
 
 Signed-off-by: Askar Safin <safinaskar@gmail.com>
 ---
- fs/read_write.c          | 2 +-
- include/linux/syscalls.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/splice.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index e224e7cb8..77487b307 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -1218,7 +1218,7 @@ SYSCALL_DEFINE6(pwritev2, unsigned long, fd, const struct iovec __user *, vec,
- /*
-  * Legacy preadv2/pwritev2 wrapper.
-  */
--SYSCALL_DEFINE4(vmsplice, unsigned long, fd, const struct iovec __user *, vec,
-+SYSCALL_DEFINE4(vmsplice, int, fd, const struct iovec __user *, vec,
- 		unsigned long, vlen, unsigned int, flags)
+diff --git a/fs/splice.c b/fs/splice.c
+index 6ddf7dd72..707db2c2c 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -1239,7 +1239,7 @@ ssize_t splice_file_range(struct file *in, loff_t *ppos, struct file *out,
+ }
+ EXPORT_SYMBOL(splice_file_range);
+ 
+-static int wait_for_space(struct pipe_inode_info *pipe, unsigned flags)
++static int wait_for_space(struct pipe_inode_info *pipe, bool non_block)
  {
- 	if (unlikely(flags & ~SPLICE_F_ALL))
-diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index a86a88207..46a3ec954 100644
---- a/include/linux/syscalls.h
-+++ b/include/linux/syscalls.h
-@@ -514,7 +514,7 @@ asmlinkage long sys_ppoll_time32(struct pollfd __user *, unsigned int,
- 			  struct old_timespec32 __user *, const sigset_t __user *,
- 			  size_t);
- asmlinkage long sys_signalfd4(int ufd, sigset_t __user *user_mask, size_t sizemask, int flags);
--asmlinkage long sys_vmsplice(unsigned long fd, const struct iovec __user *vec,
-+asmlinkage long sys_vmsplice(int fd, const struct iovec __user *vec,
- 			     unsigned long vlen, unsigned int flags);
- asmlinkage long sys_splice(int fd_in, loff_t __user *off_in,
- 			   int fd_out, loff_t __user *off_out,
+ 	for (;;) {
+ 		if (unlikely(!pipe->readers)) {
+@@ -1248,7 +1248,7 @@ static int wait_for_space(struct pipe_inode_info *pipe, unsigned flags)
+ 		}
+ 		if (!pipe_is_full(pipe))
+ 			return 0;
+-		if (flags & SPLICE_F_NONBLOCK)
++		if (non_block)
+ 			return -EAGAIN;
+ 		if (signal_pending(current))
+ 			return -ERESTARTSYS;
+@@ -1268,7 +1268,7 @@ ssize_t splice_file_to_pipe(struct file *in,
+ 	ssize_t ret;
+ 
+ 	pipe_lock(opipe);
+-	ret = wait_for_space(opipe, flags);
++	ret = wait_for_space(opipe, flags & SPLICE_F_NONBLOCK);
+ 	if (!ret)
+ 		ret = do_splice_read(in, offset, opipe, len, flags);
+ 	pipe_unlock(opipe);
 -- 
 2.47.3
 
