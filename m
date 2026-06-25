@@ -1,148 +1,200 @@
-Return-Path: <netdev+bounces-301820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301821-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ScvAFIeGPGpMpAgAu9opvQ
-	(envelope-from <netdev+bounces-301820-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:38:15 +0200
+	id X5CkBIeHPGpzpAgAu9opvQ
+	(envelope-from <netdev+bounces-301821-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:42:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63806C22A4
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:38:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 002816C2303
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 03:42:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b=hAIGINI2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301820-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-301820-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=163.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Ae9x9g3E;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301821-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-301821-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4FDC03008D69
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 01:38:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 046373002785
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 01:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161AB36F902;
-	Thu, 25 Jun 2026 01:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFE23750CC;
+	Thu, 25 Jun 2026 01:42:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABC6EEC3
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 01:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40101375ABE;
+	Thu, 25 Jun 2026 01:42:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782351493; cv=none; b=UapG4eBob1zV++wxRTcbkZiFBpHCVhzc2ugXyBY4DWVPIhyO2j2DxnRGOBnWoNTOkT5S+/CFAGGryZby445JOINkwiXvHn8ITBKheLWhveRAZg97pXb60lsVmSI+SrR3Q4Gxil1sa+nQMwSM2pVL1iZc5eXkezNt01o0WA6swj8=
+	t=1782351745; cv=none; b=nppHn94SPVLGaGndy7JokFwdK4xiXWDFQwgnfuOKwsYz0nhCRLXvTiMEbVl2SzYpS780opnvagHswVSkTkSXlBT1GBz1IhEqPaDvzjiNSejshpIF7sErhad2HtwSB7o2R850s/JneB//fVpQAdNhvQW9XWlSh6RQjn5H5+WKcT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782351493; c=relaxed/simple;
-	bh=gZuD8Vvgu+uyRPFcFvPFgy5+G3DNYykp5gSdfDaLGEA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AO2p48UTqh09u1qC6rP905XBwC6tN+3yPVt0yX+Vgyus6yngTjMspsAoQN8NcB2ptSHn2fZRhirjkhcnnwyep80fwk7orKBTFHFO+SC7mbYYvaFh9XS3gSqQCoHmsWDTC6iHMfpctwYROtIKM98PE1qoi0VgOgw2Fck0OxXIsYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=hAIGINI2; arc=none smtp.client-ip=117.135.210.3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=gY
-	0Fh4pgY/1ngQWWvSj+epDfJSoFfpNL30c1Mz3Qqx4=; b=hAIGINI2PJnF0GXXzU
-	yKjrMancxVZGNQXLftM2eRRzlK3ED7TXedtYBrsWIbqREStR/kJpUfSwy7ITxo0t
-	SSHvjN3zdAUR544xm3JcAkgHD54eK1vabHFVmcCkaBEItLNyYqnHJoIbcVD6Zwlh
-	YNYkXvXbm0wmknSIrTVlAnV5Y=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wDnIm1jhjxqJN6SFQ--.61028S2;
-	Thu, 25 Jun 2026 09:37:40 +0800 (CST)
-From: Longjun Tang <lange_tang@163.com>
-To: mst@redhat.com,
-	xuanzhuo@linux.alibaba.com
-Cc: jasowang@redhat.com,
+	s=arc-20240116; t=1782351745; c=relaxed/simple;
+	bh=XiSoS7kYjmSVTdF34rIAD/vbcoDiwLTje/ChX+DqAgY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jIhrJEZCWYPs2K5bUkaSrYoBirzmvdMdRknuBceleLbcqfGmmI/aWdNSwQ/fZdYO36xmf4iR7M92SPc64SqEYgcCSUiCBMfpzNGNmP473Ir5aA+M9Ivm1ATkBH9QRAjbf7yichd3EDHn6h6KToHRw9v23gH3n+sWlPxGMNEpx2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ae9x9g3E; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A37281F000E9;
+	Thu, 25 Jun 2026 01:42:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782351744;
+	bh=clTP1phHGX7USBYmYvhozxQUb7aSy62Sp83hMpW68/0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Ae9x9g3EL8xnCvPR/S/6UUr9nONNs4bnxjBMp1VYovXq81pGwqn0L+3t0mMgTkqNt
+	 joLjfOLRKz9a4LD+4QRax6NcL0YVl8ZaifbeZDvCPVVBgRYMYf3byJpKM7YXyp8SBn
+	 9Efslk9xMohTUNpmAQAhdykI24mS7AWfbWNTDbIS/ozzntDtchyGt6uSf2rBPM6GYH
+	 icVWyXzBbXW0sTQS+uVqKFzW5OsN9wEGKoI3jANrL9s+uGI4nJSrvjBoRoT5vJedhF
+	 FVkhQ6uKv313Wddw7BbyEkYYL+mS6LKyfUqvqqRvc2OlplTVU2AJcLpT+ey/qcjles
+	 rtSBrhXMEboPA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: maoyixie.tju@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	loic.poulain@oss.qualcomm.com,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
-	virtualization@lists.linux.dev,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org,
-	tanglongjun@kylinos.cn,
-	lange_tang@163.com
-Subject: [PATCH v4] virtio_net: disable cb when NAPI is busy-polled
-Date: Thu, 25 Jun 2026 09:37:33 +0800
-Message-Id: <20260625013733.29300-1-lange_tang@163.com>
-X-Mailer: git-send-email 2.25.1
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: wwan: iosm: bound device offsets in the MUX downlink decoder
+Date: Wed, 24 Jun 2026 18:42:21 -0700
+Message-ID: <20260625014222.2976678-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <178196118045.462404.11069139160448641355@maoyixie.com>
+References: <178196118045.462404.11069139160448641355@maoyixie.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnIm1jhjxqJN6SFQ--.61028S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Cw48WFWUXF4UurWxAFWxXrb_yoW8GryfpF
-	4jy3yUurn0grWIqa1kJF48XFy5uwn3GayfGw4Y9w45uFn8KrnxJry5tFyjya1avrs5ta43
-	ZFsYvryUGF18uFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRknY8UUUUU=
-X-CM-SenderInfo: 5odqwvxbwd0wi6rwjhhfrp/xtbC-QRkkmo8hmQEZgAA3Z
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,google.com,lists.linux.dev,vger.kernel.org,kylinos.cn,163.com];
-	TAGGED_FROM(0.00)[bounces-301820-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[lange_tang@163.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:xuanzhuo@linux.alibaba.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,m:lange_tang@163.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lange_tang@163.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:kuba@kernel.org,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-301821-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_FROM(0.00)[163.com];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,kylinos.cn:email,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D63806C22A4
+X-Rspamd-Queue-Id: 002816C2303
 
-From: Longjun Tang <tanglongjun@kylinos.cn>
-
-When busy-poll is active, napi_schedule_prep() returns false in
-virtqueue_napi_schedule(), so virtqueue_disable_cb() is skipped.
-The device may keep firing irqs until reaches virtqueue_napi_complete().
-Under load (received == budget), it will lead to a large number
-of spurious interrupts.
-
-Fix it by disabling the callback at the virtnet_poll() entry.
-This keeps the callback off while we poll and it is re-enabled by
-virtqueue_napi_complete() when going idle.
-
-Fixes: ceef438d613f ("virtio_net: remove custom busy_poll")
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Longjun Tang <tanglongjun@kylinos.cn>
-
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 ---
-V1 -> V2: Remain agnostic to busy polling
-V2 -> V3: Add fixes tag
-V3 -> V4: Update commit message and remove some comments
----
- drivers/net/virtio_net.c | 2 ++
- 1 file changed, 2 insertions(+)
+net: wwan: iosm: bound device offsets in the MUX downlink decoder
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index f4adcfee7a80..569e4db187d1 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3008,6 +3008,8 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 	unsigned int xdp_xmit = 0;
- 	bool napi_complete;
- 
-+	virtqueue_disable_cb(rq->vq);
-+
- 	virtnet_poll_cleantx(rq, budget);
- 
- 	received = virtnet_receive(rq, budget, &xdp_xmit);
+This patch validates device-supplied offsets and lengths in
+mux_dl_adb_decode() and mux_dl_process_dg() against skb->len so that a
+modem reporting an index or length past the downlink buffer cannot make
+the decoder read out of bounds. The block header, each table header,
+the datagram table, and each datagram index and length are now bounded
+against skb->len.
+
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+> index bff46f7ca59f..ff9a4bc52f29 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+
+[ ... ]
+
+> @@ -606,6 +612,11 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
+>  
+>  	/* Loop through mixed session tables. */
+>  	while (adth_index) {
+> +		/* The table header must lie within the received skb. */
+> +		if (adth_index < sizeof(struct mux_adbh) ||
+> +		    adth_index > skb->len - sizeof(struct mux_adth))
+> +			goto adb_decode_err;
+> +
+>  		/* Get the reference to the table header. */
+>  		adth = (struct mux_adth *)(block + adth_index);
+
+[High]
+The commit message frames the threat model as "A modem that reports an
+index or a length past the downlink buffer", and this patch bounds every
+device offset against skb->len. Could the same threat model also produce
+an infinite loop in this while (adth_index) loop?
+
+The loop continues as long as adth_index is non-zero, and each iteration
+sets:
+
+    adth_index = le32_to_cpu(adth->next_table_index);
+
+The new bounds check only requires that adth_index lies within
+[sizeof(struct mux_adbh), skb->len - sizeof(struct mux_adth)]. It does
+not require forward progress. Can a modem stage two valid struct mux_adth
+headers inside one downlink skb (each with the IOSM_AGGR_MUX_SIG_ADTH
+signature, a valid if_id, and table_length >= sizeof(struct mux_adth))
+where table A's next_table_index points to table B and table B's
+next_table_index points back to table A?
+
+Each adth_index passes the new range check, so the loop never terminates.
+mux_dl_adb_decode() runs in softirq context via:
+
+    ipc_task_queue_handler()
+      ipc_imem_tq_irq_cb()
+        ipc_imem_handle_irq()
+          ipc_imem_dl_pipe_process()
+            ipc_imem_dl_skb_process()
+              ipc_mux_dl_decode()
+                mux_dl_adb_decode()
+
+If the cycled tables also reference valid datagrams, each pass through
+the loop calls mux_dl_process_dg() -> ipc_mux_net_receive() which does
+skb_clone() per datagram, so the same skb produces unbounded clones for
+as long as the loop runs.
+
+This is not a regression introduced by this patch — the cycle was
+reachable before — but since the patch is hardening the decoder against
+modem-supplied offsets, would it make sense to also require strictly
+increasing next_table_index, cap the iteration count, or otherwise
+guarantee forward progress in the same change?
+
+> @@ -629,6 +640,10 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
+>  		if (le16_to_cpu(adth->table_length) < sizeof(struct mux_adth))
+>  			goto adb_decode_err;
+>  
+> +		/* The whole datagram table must fit in the received skb. */
+> +		if (le16_to_cpu(adth->table_length) > skb->len - adth_index)
+> +			goto adb_decode_err;
+> +
+>  		/* Calculate the number of datagrams. */
+>  		nr_of_dg = (le16_to_cpu(adth->table_length) -
+>  					sizeof(struct mux_adth)) /
 -- 
-2.43.0
-
+pw-bot: cr
 
