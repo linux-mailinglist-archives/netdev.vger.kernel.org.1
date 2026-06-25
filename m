@@ -1,222 +1,272 @@
-Return-Path: <netdev+bounces-301870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id u6hkGjHKPGqhsAgAu9opvQ
-	(envelope-from <netdev+bounces-301870-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:26:57 +0200
+	id FEF9N3bLPGrtsAgAu9opvQ
+	(envelope-from <netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:32:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77586C3052
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:26:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8B86C30AE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 08:32:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=wg+qyOGo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301870-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-301870-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="Si/QbojX";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-301871-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E8D56302ACCC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:26:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86FD53023346
+	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 06:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA123BE147;
-	Thu, 25 Jun 2026 06:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E5631328E;
+	Thu, 25 Jun 2026 06:31:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CAC6BB5B
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 06:26:52 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782368813; cv=pass; b=dnEhtrmZPGspIXF1XbUIPSFlPLoMagdIWMJSa+0SjXXB26Stjr8W55oX7mkVzstu3PH+5VeXD94qNXkSI5os+OOTUDcELmy5J8+poefMJbtD2AjwMVYfri3f0cjg75qqwzws747C0YonTCappZmBEebhsTI17Q9hwEgUiFaNlWg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782368813; c=relaxed/simple;
-	bh=4NVkWBUYlhNsfPOQpTcToy49QEVxH8RgprpZ/ztRv6w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VJEcLe+wTQ+DRw12HAqqbX7wMGa+dw70xxHVMtmJYe0551HCaAeX1ESQJNRboYAUN0UP+pRy7JGSQFg1rPIpv09kqckwxPfOoe1W1bCQiba81BZLEt6NpE21gXCWbXi3QCSeKOtNUXykbzA7AMS3Q13esXkva3dN4ZsRWZPcU7o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wg+qyOGo; arc=pass smtp.client-ip=209.85.160.171
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-519e7faecf1so22153261cf.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 23:26:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782368811; cv=none;
-        d=google.com; s=arc-20260327;
-        b=KPWouUwMIxFEwtxAXwYZ1pQMPfC/iHxyQKuv5iT9dOvy2Csv1FOHqWUHIEYHPdIyZ1
-         5+LgLjWNC4VuQdX+tXnNpR/WQ17KYsNNQSQDOlON80iYjQPRlr3NJhCXCFcZHuHqNV2w
-         OsDjtY9/A7hFX2IdAhnALS0iCBIOXcbu93EJUIwiu9AFiZjc/AwM/GUe7Q2zluENtUWf
-         SkXrEpI6m5gWz+Q79lO+1vWLnh6T5zU0FBIX3RZmkJSaVcGy8Ojmxz/o8VVyljQOvpAw
-         IhUa1JYzSCFGMpJ6srqIn0DDrhiYBDlAv7NbACRZo69Esebc79m1ApRgLTwF2vsI0OZu
-         Z5nA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GbYxvfOT8XBJThfC7sQQtWK6/QNhGfY5zbYS7EcsU6c=;
-        fh=T36oebHQKIGiSniszO/oCJTrG9hECuGaH0MCiPkDnHU=;
-        b=V7ct3nRyT91aJlC0rB7AKxKmX59oPFXq9cgXzb3N53fG3m7BCjuXlmNRIYew9LbMTF
-         Jk/39HUIYCcSenMSgnHkwysq8+jJXe3OGNYmuiG/49aeKCZwPRXfBwT/jXEWp7Qm0pH5
-         Lq7ly5j5JT4+viyQOWdVTWN5ophvZTYLzFSVX8rAl08iLoq2s0Rb3FsVT58veFYBYfbu
-         hqY4eGQSgSlce0ovXbwHNFzQY7eYaPCAExGxTCBx1oJ9hwEJq+OezGJ8YXx4UU1v/h3D
-         Ij9MgQOsHc2bVvktohLZSdjUcEOZGhH/9C+CYDJukQqycSYxYSgaHCw6UNK0/oC8wfgb
-         DzGQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73DC2874E6
+	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 06:31:27 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782369089; cv=none; b=ZBhCKoBgRQ3GJuxe1S4+TI9U+alEkTWQ21FPRDTlKDFj2zMegNKrWsYTM7lIIcTBrUJuCPDJeFZcPr0YPNXH/Ff2OUnKKQ90AoW8OLAHDzQT29nbSSSYrHSKDLX9dtajroBZx4iS6m1Dq3t14A85qpXxTIiDzprx9JMKBSzE8qc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782369089; c=relaxed/simple;
+	bh=h9ayyCO19b4D8SnctXO7asTtcaRk3bUGigIyeLr8zQk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s0iNx9ctzKLKJBbtAeCTQtjYJn2hwfErd4EEN78cKD0IRxF0i9YPpFruMhdg7rPqYdKxfO6zdiSiUdtixn3GA0BROG0HWBOMkgKvKJSWTgnpBGsB959ItRu1ArSTM/Fa6f97x08sK6c2cDAu7YVGK2dIOUTA0CPdGyi0WPfSMWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Si/QbojX; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-490b3637b90so12126235e9.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jun 2026 23:31:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782368811; x=1782973611; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GbYxvfOT8XBJThfC7sQQtWK6/QNhGfY5zbYS7EcsU6c=;
-        b=wg+qyOGouqauP8p0H+6E5TGiMbhG939oXY4QPJnMs4jdUu3t45eQBl2rI/1BIwwIwz
-         ry+PJvzylbOSJ1RQyGUQ6Skdvq29buP3QLIF/ba3Vz+hwnv39XDtRaASz7RqOzSLsHEk
-         qtdmMO3Gf8MWdob+47y7RLU4I7Dlqz+HL+TrUrcmQCTRXSDccgEK+hAAx+w4BEqEkz4I
-         WoMpgru0kg5NMo3agDu9shgq5PZI0X+tmubSP9ki+jDuVDlYQ5H8elfjxQordvFDu9uL
-         oJKg4Bs9PPA/afSt3OjgDxq3nlfgZ7+WFnmLLA+IXLMNsFoP6kIoVKTWpLI92YsHAN7T
-         3/uQ==
+        d=gmail.com; s=20251104; t=1782369086; x=1782973886; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/dL5E5/PAVvSoAmR+aoTsLP141NGqcao3RnOAEaH2u8=;
+        b=Si/QbojXaDFSHvSiVuRjKnLzhJbR+gerUCNc93mGkvSQkbbK/jEpa9E39iu6hbbfhY
+         aN9cWtvq4LdN6K4YqIF+T0POSlKQuW3Ilmb4mIhRji7uXwVcpXGosl27FfnDv59D2bSg
+         oUwC3nAw8htMCCLroCundv8Hn6rRzUVdLXBrrIIEIHTyGDz1GUwCNjOoaWgSLn1tQgGy
+         HIOs2mQ727C6Xd+sAgpll51lQl0000HqN83GtW9D/otXKQ//um2/znaHaJzrXGdY2Pz2
+         uLieHFZv6TSI+tS/Vofkr84qNGfsuGpIReTVi8Ks5tWQ3LrDTUKujQSQ2OfGpur0uF1y
+         He4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782368811; x=1782973611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GbYxvfOT8XBJThfC7sQQtWK6/QNhGfY5zbYS7EcsU6c=;
-        b=KXmutmgG54slk8LIxQ5mIsRblcsrOL3QH4W5VmvMOQEG48bhnR0e0TdfX4Ld8gVW7I
-         ks94b1su/tpYdqB8vfismenW9cEhNrYPKxkDR8odvKrjjcphUFRL1bKMVWBgOBJrCH9n
-         aFtticyp9JfULNsPaZ306i/JKInamOjUx4AAQm7U7zHskgjle+4FMVBKiD47p4T+3RNd
-         JvOQlZs/7XlWfFnUxZJFA3VxYwx7z4VVKoeLKY9/D+6DwJG8cNe7JiZHZ2Aoip6SAxXy
-         r3LV5A+O3V/Ur7W/PZ+QeWwBOD/IEthweTM2r6+nvM865wG5V3WLBLCafg/ouPzXIqRq
-         1LOg==
-X-Forwarded-Encrypted: i=1; AFNElJ/5eZXAuY/6SA8PmHwpMkPmZitK7EYWSYB6Of1OnADqDnl4bt/T9zLpTsAs7muBs+uJdjdWMbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjsEiOoE0R2rStvIRVpMHyNCqyM5fv9JAEt/0egFFK1xoFtKBl
-	wyzaVVyqXzRyFVDKmqZVi+haiLeRV4Lq4UyoBJMEXplQiq7A2OsjXmXRdRlRLVkdoCOozdCu+3s
-	+S84HFVOAcIkPbhvipxe1yiKaujpUqJwyN21tKt0d
-X-Gm-Gg: AfdE7ckOB8hWjs6NUSydGW+wQIyrjawr9Zg6EF4x9DY9JPbmUZ2bvEPPbJJbUzaNzBM
-	qMa9igCkbjTxKZT5wv4d6JVfeC1KGvhM16RYrNnn7FofA0tm1PRiPdoNF6tGFpNSl0i4rHKBpJ/
-	FpTtkiILcDJ+3z5A0GQDkGwutxo9QTtHP83AtIoxUe8r5izHIjpIOj+GZPnVvpQTS7xJ8g3l/Vs
-	kJGvcErQmKypXuJ14WRafXKNvqHr45EkYdWP4zPu1xHOKAorKwxI7/gM1SbU0lj19hw5MZ7LJg6
-	u/LE5v2PVT98BWVKWl9QKKICmqdethQVz3DAdPOXl3aRN6HKPrr69ggIwSVY4rnVAUQLEuTQxJQ
-	csst/XA==
-X-Received: by 2002:a05:622a:1c0f:b0:50e:635b:5579 with SMTP id
- d75a77b69052e-51a726ffb5dmr14550661cf.19.1782368810622; Wed, 24 Jun 2026
- 23:26:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782369086; x=1782973886;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/dL5E5/PAVvSoAmR+aoTsLP141NGqcao3RnOAEaH2u8=;
+        b=nhiAUhNgbu5oBxBEjP2xb2EUVpfhKw/LU/Prgbbn6wEvQadVeOATn85I0hVnoqsuE/
+         qKHm+90gql40lptkjKw4YZtNzYqDIQ9e/3jRT4mX1VWcSQ3Eph6ieJoUYytPfim7mQ0o
+         RPLxksHBfsVdDnIbdtn5tjW1Ql8jVW6NRhikQrxab4qtb9D1SthlF6nWfCboKaNI4tew
+         EN+pXZXne4mHA3N/YigPbTkwYfbesql3R9gIWM3B+/dWIS04UtaI5DVfh84UlmfvBNEg
+         obUBbprqH7BqF+4TamIUpbuiMive53Ze6yhDgLmfAPlk/hkJad38myiSKO9uzUVQxskT
+         vYVA==
+X-Forwarded-Encrypted: i=1; AFNElJ99btNYCzGyHTeMXBGsRNJzz1n7lsHQ0cLi08UOC3+C7FPtyJ3bDFYPwJr6DeFll9UX5qfAyrw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIppADuuzjbqkef4soW861Ep5QXp2zMshkjOn9qDPWfrsEy3Jq
+	+rwznNkHYI9uqY1JBf0qQX+72/4V8M/NEWc7HJEIG+FUTYMqBtYTdxyY
+X-Gm-Gg: AfdE7ckhtFVLP6g88eAzZQ2OX1CR3tih+7j1wl5JrWtCkog7aYnX89ZhxqR1+8wqItE
+	IQrscdjVBvL7fYiCsIWy2lhIlu/c2+R4KrhYGNZbwFw4EgULliNUkZ49s6LZgN0sM8ivsa6EnIQ
+	2zpT+V77gYwPt2SBU6IrYzq+vdTaiW9cPZner2gMAlPhcZhEscPznr5Aw/sp7uukPLa9/KvGk9F
+	E3YsXRqzz78uKQ/J5qKcHwfoMCgyCo9xykqw+KSou378gsYODX4E8i9qFah9GykRnieRBWB6fxp
+	ahDl5h1SZr/ynwikgW8ZpaeTfgA9gXR8SIQjrn7X+EeNAioDrW24A1+xzAz9yQR7qChyXA5j3Vu
+	+6Op8yiZplp8PB/+Yli1mazRMjpWJYpZB1uxxJThyGH4gi0n/z3ccJCnR+MIaIKDPEq4Xh7lLB8
+	jWGtEjLBdgdWY0d8c586HR2LJsi/XjAc4nwyGC6HLYvzZLIW1RMtTqw5RHPIkuIpT70YvhO+A4
+X-Received: by 2002:a05:600c:4e4b:b0:490:b724:5085 with SMTP id 5b1f17b1804b1-4926689ab05mr13119825e9.33.1782369085712;
+        Wed, 24 Jun 2026 23:31:25 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c1ee01c6csm13625247f8f.14.2026.06.24.23.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2026 23:31:25 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	m-malladi@ti.com,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	bpf@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH net v3] net: ti: icssg-prueth: fix XDP_TX from the AF_XDP zero-copy RX path
+Date: Thu, 25 Jun 2026 07:31:21 +0100
+Message-ID: <20260625063121.24746-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624171034.4117423-1-edumazet@google.com> <20260624145722.083632b6@kernel.org>
- <04d09dea-baa2-4c43-ada1-cd71579aad53@linux.dev> <20260624195521.5972a5a8@kernel.org>
-In-Reply-To: <20260624195521.5972a5a8@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jun 2026 23:26:38 -0700
-X-Gm-Features: AVVi8CflKmO8audpPAgnTXEN2Gh0lXsgq8GaE8hHSZhIy7A9c2SJ6u1ZYHxTKNE
-Message-ID: <CANn89iL7sNdc300WQniGuqDQLYCb1r48MgddLk-v7mF2pep7Lw@mail.gmail.com>
-Subject: Re: [PATCH net] net: udp_tunnel: fix use-after-free by refcounting udp_tunnel_nic
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, "David S . Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Yue Sun <samsun1006219@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-301870-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-301871-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,ti.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,lists.infradead.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,redhat.com,kernel.org,nvidia.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:samsun1006219@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:danishanwar@ti.com,m:rogerq@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:m-malladi@ti.com,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:ast@kernel.org,m:daniel@iogearbox.net,m:bpf@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:devnexen@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,ti.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D77586C3052
+X-Rspamd-Queue-Id: 3B8B86C30AE
 
-On Wed, Jun 24, 2026 at 7:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 25 Jun 2026 10:47:09 +0800 Jiayuan Chen wrote:
-> > On 6/25/26 5:57 AM, Jakub Kicinski wrote:
-> > > On Wed, 24 Jun 2026 17:10:34 +0000 Eric Dumazet wrote:
-> > >> Yue Sun reported a use-after-free and debugobjects warning in
-> > >> udp_tunnel_nic_device_sync_work() during concurrent device operation=
-s.
-> > >>
-> > >> The state flags of struct udp_tunnel_nic were originally bitfields
-> > >> sharing a byte, modified concurrently without locking (RCU vs worker=
-).
-> > > Can you clarify the path where the bits are modified without locks??
-> > > My mental model is that this is basically all under rtnl_lock, and
-> > > Stan added _another_ lock so that drivers can call "sync" / reply
-> > > without needing rtnl lock, but any changes are still under rtnl_lock.
-> > >
-> > > The gap seems to be that we don't check pending under Stan's new lock=
-,
-> > > since commit 1ead7501094c6 ("udp_tunnel: remove rtnl_lock dependency"=
-)
-> > > did:
-> >
-> >
-> > I think the real problem is that a single work_pending flag can't track
-> > the work being queued twice:
-> >
-> > 1. Thread A calls queue_work() -> work_pending =3D 1.
-> > 2. The worker gets picked up; workqueue clears the PENDING(internal wor=
-k
-> > queue flag) bit before running the work function.
-> >     The worker then blocks on rtnl/utn->lock.
-> > 3. Thread B calls queue_work() again. Since PENDING was already cleared=
-,
-> > it enqueues a second
-> >     instance and sets work_pending =3D 1.
-> > 4. A's worker finally gets the lock and does work_pending =3D 0, runs,
-> > returns.
-> > 5. Now work_pending =3D=3D 0 but B's instance is still queued. unregist=
-er
-> > sees 0, frees utn.
->
-> Ah, thanks, now I get it. Claude told me the same thing but in 10,000
-> words and I lost the thread before reading 'til the end...
->
-> In that case:
->
-> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-> index 9944ed923ddf..3b32a0afa979 100644
-> --- a/net/ipv4/udp_tunnel_nic.c
-> +++ b/net/ipv4/udp_tunnel_nic.c
-> @@ -301,7 +301,7 @@ __udp_tunnel_nic_device_sync(struct net_device *dev, =
-struct udp_tunnel_nic *utn)
->  static void
->  udp_tunnel_nic_device_sync(struct net_device *dev, struct udp_tunnel_nic=
- *utn)
->  {
-> -       if (!utn->need_sync)
-> +       if (!utn->need_sync || utn->work_pending)
->                 return;
->
->         queue_work(udp_tunnel_nic_workqueue, &utn->work);
+On XDP_TX from the zero-copy RX path, emac_run_xdp() converts the xsk
+buffer via xdp_convert_zc_to_xdp_frame(), which clones the data into a
+fresh MEM_TYPE_PAGE_ORDER0 page that is not DMA mapped. Transmitting it
+as PRUETH_TX_BUFF_TYPE_XDP_TX derives the DMA address with
+page_pool_get_dma_addr(), reading an uninitialized page->dma_addr, so
+the device DMAs from a bogus address (corrupt TX, or an IOMMU fault).
 
-Yep, this should do it. I will send a V2 with your suggestion.
+Pick the TX buffer type from the frame's memory type: keep
+PRUETH_TX_BUFF_TYPE_XDP_TX for page_pool frames and use
+PRUETH_TX_BUFF_TYPE_XDP_NDO for the cloned zero-copy frame, which is then
+DMA mapped through the NDO path and unmapped on completion.
 
-I will also send a separate patch for the ->missed part, since the bug
-came after  Stan commit.
+While at it, fix the page_pool XDP_TX completion path. A
+PRUETH_TX_BUFF_TYPE_XDP_TX frame carries a page_pool-owned DMA mapping
+(established against rx_chn->dma_dev), yet prueth_xmit_free()
+unconditionally calls dma_unmap_single() on it with tx_chn->dma_dev,
+tearing down a mapping the driver does not own; xdp_return_frame()
+already recycles the page back to the pool. Tag such frames with a
+dedicated PRUETH_SWDATA_XDPF_TX type so the completion path skips the
+unmap, the same way PRUETH_SWDATA_XSK buffers are handled.
+
+Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
+Fixes: 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support")
+Cc: stable@vger.kernel.org
+Signed-off-by: David Carlier <devnexen@gmail.com>
+Reviewed-by: Meghana Malladi <m-malladi@ti.com>
+---
+v3:
+ - address Meghana Malladi review nits: split the prueth_xmit_free()
+   guard to stay under 80 columns, parenthesize the swdata->type
+   ternary (and the matching tx_buff_type one for consistency).
+ - no functional change; carry Reviewed-by.
+v2: https://lore.kernel.org/netdev/20260623112225.303930-1-devnexen@gmail.com
+v1: https://lore.kernel.org/netdev/20260620213756.87499-1-devnexen@gmail.com
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 21 +++++++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |  1 +
+ 2 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 82ddef9c17d5..64ae3704481e 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -185,7 +185,8 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
+ 	first_desc = desc;
+ 	next_desc = first_desc;
+ 	swdata = cppi5_hdesc_get_swdata(first_desc);
+-	if (swdata->type == PRUETH_SWDATA_XSK)
++	if (swdata->type == PRUETH_SWDATA_XSK ||
++	    swdata->type == PRUETH_SWDATA_XDPF_TX)
+ 		goto free_pool;
+ 
+ 	cppi5_hdesc_get_obuf(first_desc, &buf_dma, &buf_dma_len);
+@@ -259,6 +260,7 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+ 			napi_consume_skb(skb, budget);
+ 			break;
+ 		case PRUETH_SWDATA_XDPF:
++		case PRUETH_SWDATA_XDPF_TX:
+ 			xdpf = swdata->data.xdpf;
+ 			dev_sw_netstats_tx_add(ndev, 1, xdpf->len);
+ 			total_bytes += xdpf->len;
+@@ -769,7 +771,8 @@ u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
+ 	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+ 	cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
+ 	swdata = cppi5_hdesc_get_swdata(first_desc);
+-	swdata->type = PRUETH_SWDATA_XDPF;
++	swdata->type = (buff_type == PRUETH_TX_BUFF_TYPE_XDP_TX ?
++		PRUETH_SWDATA_XDPF_TX : PRUETH_SWDATA_XDPF);
+ 	swdata->data.xdpf = xdpf;
+ 
+ 	/* Report BQL before sending the packet */
+@@ -804,6 +807,7 @@ EXPORT_SYMBOL_GPL(emac_xmit_xdp_frame);
+  */
+ static u32 emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp, u32 *len)
+ {
++	enum prueth_tx_buff_type tx_buff_type;
+ 	struct net_device *ndev = emac->ndev;
+ 	struct netdev_queue *netif_txq;
+ 	int cpu = smp_processor_id();
+@@ -826,11 +830,21 @@ static u32 emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp, u32 *len
+ 			goto drop;
+ 		}
+ 
++		/* In AF_XDP zero-copy mode xdp_convert_buff_to_frame()
++		 * clones the xsk buffer into a fresh MEM_TYPE_PAGE_ORDER0
++		 * page that is not DMA mapped. Such a frame must be mapped
++		 * via the NDO path; only a page pool-backed frame already
++		 * carries a usable page_pool DMA address.
++		 */
++		tx_buff_type = (xdpf->mem_type == MEM_TYPE_PAGE_POOL ?
++				PRUETH_TX_BUFF_TYPE_XDP_TX :
++				PRUETH_TX_BUFF_TYPE_XDP_NDO);
++
+ 		q_idx = cpu % emac->tx_ch_num;
+ 		netif_txq = netdev_get_tx_queue(ndev, q_idx);
+ 		__netif_tx_lock(netif_txq, cpu);
+ 		result = emac_xmit_xdp_frame(emac, xdpf, q_idx,
+-					     PRUETH_TX_BUFF_TYPE_XDP_TX);
++					     tx_buff_type);
+ 		__netif_tx_unlock(netif_txq);
+ 		if (result == ICSSG_XDP_CONSUMED) {
+ 			ndev->stats.tx_dropped++;
+@@ -1395,6 +1409,7 @@ void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
+ 		dev_kfree_skb_any(skb);
+ 		break;
+ 	case PRUETH_SWDATA_XDPF:
++	case PRUETH_SWDATA_XDPF_TX:
+ 		xdpf = swdata->data.xdpf;
+ 		xdp_return_frame(xdpf);
+ 		break;
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index df93d15c5b78..00bb760d68a9 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -153,6 +153,7 @@ enum prueth_swdata_type {
+ 	PRUETH_SWDATA_CMD,
+ 	PRUETH_SWDATA_XDPF,
+ 	PRUETH_SWDATA_XSK,
++	PRUETH_SWDATA_XDPF_TX,
+ };
+ 
+ enum prueth_tx_buff_type {
+-- 
+2.53.0
+
 
