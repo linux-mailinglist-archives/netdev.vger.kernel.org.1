@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-302223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9zxDHgOmPmp9JgkAu9opvQ
-	(envelope-from <netdev+bounces-302223-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:17:07 +0200
+	id L6LLKUqnPmrYJgkAu9opvQ
+	(envelope-from <netdev+bounces-302225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:22:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 808DA6CEE44
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:17:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E9916CEF55
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:22:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b="WwulOg/u";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302223-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302223-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=Cupxrwo3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302225-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302225-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D870A305089D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:12:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2AA5A3128A8D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D9A3FBEB0;
-	Fri, 26 Jun 2026 16:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9C83FFFAF;
+	Fri, 26 Jun 2026 16:12:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B0F3FAE1D;
-	Fri, 26 Jun 2026 16:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D393FFAAA;
+	Fri, 26 Jun 2026 16:12:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782490321; cv=none; b=IlaWf+R4QRPUJ6PNREZKekcPAJi8XeOq4qUDyQlYsAJGpGjLeHi3pBL3U2IDMzP/6tlWw2nATo1SB/Fc+XdQjDwJfTtAPXRnvGvW+neT0oA6OP9m6ncR2fcoEmHc07st9h53FwoxqLc4FC2l/PS7YHkbRCW5tNizxI6Ccx0DVDQ=
+	t=1782490338; cv=none; b=GYRn9/0rebUkpj1oWoLdIxTT6mKIu550QBf2n9tmb7g+W331gvXIOhIHO50J+/C+cPEYbiQyvKyHUPmU2KWoAdK+Q3eaOq28+QAwxwLDWbFIdfJP07uIhPGFrDatToSTf7PzcUGr1RdTudBi/5hDTDK/RbmbUXFZ48aeJyhP/AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782490321; c=relaxed/simple;
-	bh=iSfR+9zbKksmHcBVuOe/NurIL4kLG4GXXN2/ltuck8U=;
+	s=arc-20240116; t=1782490338; c=relaxed/simple;
+	bh=UnfWeBJE9qWardTh3ZWICGyqoW933As04tJPSFuFgU0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gbeDVVkMgQTWB3lyRho2rHh+1bSXnmNo0424tyxb1dMYHMnAYUh9KilqD/Bme6aPolyrTuBShtInLLZBCHTsL2z77buWC1mQAG4mCJWEeKAagyJCh48qmk20OIVdvnSLL7TLGsi8l5+ZjIJk2jFYzxuz12COubbDf/dfmDi26Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WwulOg/u; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=vAX8f0wShWMjtdB3nKJfTUAXg8y4gQip3Nqyu/V9Slu8ULJfxMAQ5TgvYPyruLQk6D3enJ0URJjlndcy4c1Hhwd8Ek/bEneO81fq5Zk6hajlA5w2ugJ4oDIU3hIW0rM7406JtslAf49QjKk6L0tHVVunf1OajLQtr4r7cEEA6nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Cupxrwo3; arc=none smtp.client-ip=156.67.10.101
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xpb0OgYrP34zH14FJQRa4tbViBikysXim0c8FtbtJd4=; b=WwulOg/ugjEm32QXtlxjbxk0wY
-	6x5bdZcw5jYLXj0wfIu9D7A7bSpXWwXPx3E49q6VCM/9FFU7hYCOMLVl/IPcpOGFAc2wOgumkZsfw
-	B10JCthIHCXibfxIE9H7eChT/CkJEVSnFjsFsN8qE68m4WJSWeNeQU3jJqe3p4f9q9hs=;
+	bh=o9Rylrd0yB6wm96yBWqeZ1NB9Ha5dTiEZdM6gjx8KlQ=; b=Cupxrwo3q7HKxXah4HMTaNSDk2
+	UiRrCC1HNnqRaQ0kBIcIo3cKEAcVoaJg6J2cZHwN8sT9SkfJXUaAwbdrfpZpFyzXe6QUnWpr0TDWf
+	UOVpKhqgbe74dR9tntbivbYuf8dtvExDMznQtzwHO9eFkAtf8inCye4SfYbDz+euXjmg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wd99g-009OGL-TV; Fri, 26 Jun 2026 18:11:48 +0200
-Date: Fri, 26 Jun 2026 18:11:48 +0200
+	id 1wd99x-009OGv-MF; Fri, 26 Jun 2026 18:12:05 +0200
+Date: Fri, 26 Jun 2026 18:12:05 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: WenTao Liang <vulab@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
 	linux-omap@vger.kernel.org, stable@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] fix: net: ti: cpts_of_mux_clk_setup: fix device_node
- reference leak on   success path
-Message-ID: <64f44697-ecdd-4324-8112-c26ddc46da01@lunn.ch>
-References: <20260626153148.52612-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH] fix: net: ti: cpsw_init_common: fix excess of_node_put
+ on parent node when   cpts child not found
+Message-ID: <52d1d43a-efff-40f4-b111-a90f0cdc2ffa@lunn.ch>
+References: <20260626152945.52192-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,54 +68,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260626153148.52612-1-vulab@iscas.ac.cn>
+In-Reply-To: <20260626152945.52192-1-vulab@iscas.ac.cn>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302223-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-302225-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:vulab@iscas.ac.cn,m:s-vadapalli@ti.com,m:rogerq@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-omap@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:vulab@iscas.ac.cn,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:grygorii.strashko@ti.com,m:linux-omap@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,iscas.ac.cn:email]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iscas.ac.cn:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 808DA6CEE44
+X-Rspamd-Queue-Id: 0E9916CEF55
 
-On Fri, Jun 26, 2026 at 11:31:48PM +0800, WenTao Liang wrote:
-> of_get_child_by_name acquires a device_node reference for refclk_np, and
->   of_clk_add_hw_provider additionally takes an extra reference internally.
->   On the success path, the function returns 0 without calling
->   of_node_put(refclk_np), leaking the initial reference.
+On Fri, Jun 26, 2026 at 11:29:45PM +0800, WenTao Liang wrote:
+> When no "cpts" child node exists in the device tree, cpts_node is
+>   assigned cpsw->dev->of_node without taking a reference via of_node_get.
+>   The function then unconditionally calls of_node_put(cpts_node) at the
+>   end, causing an excess put on the parent device node which can lead to a
+>   refcount underflow.
 > 
-> Add of_node_put(refclk_np) before returning success to properly release
->   the acquired reference.
+> Use of_node_get when falling back to the parent node to ensure the
+>   reference count is properly balanced with the subsequent of_node_put.
 > 
 > Cc: stable@vger.kernel.org
-> Fixes: a3047a81ba13 ("net: ethernet: ti: cpts: add support for ext rftclk selection")
+> Fixes: ed3525eda4c4 ("net: ethernet: ti: introduce cpsw switchdev based driver part 1 - dual-emac")
 > Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
 
 
