@@ -1,242 +1,214 @@
-Return-Path: <netdev+bounces-302232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yFfsLTupPmp6JwkAu9opvQ
-	(envelope-from <netdev+bounces-302232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:30:51 +0200
+	id IdkTA2SrPmoIKAkAu9opvQ
+	(envelope-from <netdev+bounces-302233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:40:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568A56CF15E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:30:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D9F6CF2DE
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:40:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Q9U2onHz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302232-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302232-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=grBVmmZd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302233-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302233-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D240630522CD
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:30:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F210312B1D9
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FE03FD125;
-	Fri, 26 Jun 2026 16:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD43D3FC5CE;
+	Fri, 26 Jun 2026 16:32:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj2-f4.google.com (mail-pj2-f4.google.com [74.125.227.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010022.outbound.protection.outlook.com [52.101.193.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B763FBEC3
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 16:30:06 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782491409; cv=none; b=VA7bCSyWtNDdNnTmicNV3y6jh0o0aOGl6juKps52PQpgdc+qJwNk87qqDVLitUNwm1iMprfYvf7cVSL45w/OdiOmeCTolT+Tm5ODlFdtJULGI3/0OhpWgNkj41WjrPvr1bwsIkLXRjWtMRHgn+zPLrzClI1X+BOAxVcwL1dQHmo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782491409; c=relaxed/simple;
-	bh=cHsycw6Dx/PvvgcoSTksoIIit6mKz6/9Xv9YLA3RYEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S90/h7R05gH8aWr9phh4BNvOp/uG06wsfnbYrFCUhBeNujwIZbvA8BU7zv652xKSzJITtO4MpOyvLw0mAmnMydJZpvmDBtpb68ObpzsHWvx9oNV1KoLMO0mB1YvMVbvlHDAfXSR47VwmxdzmPWKG7JPwwRONd97N66KxFXisTOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9U2onHz; arc=none smtp.client-ip=74.125.227.132
-Received: by mail-pj2-f4.google.com with SMTP id 98e67ed59e1d1-37d4eeb6d43so114587a91.1
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 09:30:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782491406; x=1783096206; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SmvSZXf/ou0b678tcR/y6c76H9T2F/pNhOOOVYqn/aA=;
-        b=Q9U2onHzSeDdr6/4Omm0icT039ESYXQe+d/7jidC5cmyeKXFf4XB+X6zvaNDm9/wJJ
-         9LiVVLx+5iGUNZEVo0XDynsch9EBo0ktpR/6xhSkDciirQXGw/KYTN5tGuqlbwvhXnQB
-         TZNuAxFk6PNVQaGt/XCns3o0SROoGxucAaexuGNjI/XJaFuHJX3YCDPk/KT5opZPasBN
-         Q8RqLA4p5RfOGej+3t067xZ/+R2QVI/8aztkFQuNUaQOagzmN1K0QQCHL2tHzpGIccYa
-         xCGIj4bFZUYZCalOsdTpY9/pHh+cnZoc4BMzqWMgjc+7Gd5jok9H24TLAtdPgR/vo4M6
-         2+yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782491406; x=1783096206;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SmvSZXf/ou0b678tcR/y6c76H9T2F/pNhOOOVYqn/aA=;
-        b=CUq3VQ+nWLHzZ3RKgzk4ymYW2Na58waeHId5UtdbD6HB3NOURCPW9DSts5h4NA+H1S
-         bDWZMldquKJkLMOR1B+ei4Q45A80fja/fFTuo8DqpESKs5zOYTVIIvwJYX3VWKoq25pP
-         /nOWtFbGwyS3ENb7MU/6RdD5S8cg5o6Ts67wjE+X9+J3hSf+wETmcp4dWwrobZiWeGDM
-         dPuXaycRgNUWogP7/kGc86zNqy1YiZSixV1mwuBNu203LbAXW4+ThOAE6xcXvr2e5Grr
-         o6pm8YkhcWe6OG1f/Dd6XPkGI14HSg17iZnNv2yYedLRmceogg/x8vCfdgCO0ZEoJv9u
-         q9WA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro2N1kYzc8r68oLIhjXGiFsM9BNO5MAnpUyDa4v82Kal5RKkjrXcmymHP1ay3focgd7JpugHm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIqEt9PPWmeSsYANPWR2Los00ghQifsNRf/UPcOcDzrxFF9vat
-	hMfV5g2CV8ENRA/Ruo9CtVGUzpGMQgQfTfC1mJZOl7mAQqI4NBP8LG9m
-X-Gm-Gg: AfdE7cn5HcYxY3sh4czqcdnO8aF/VyzYKdyV55DTxfVqq0FIWf7D+sEwyZvWV95kIh8
-	uhLVcnr/2QHo+div7QDEol7E0nsJJ9pBrUO5YLyoLiCMw8x7f9kD2Nd3Pl7czrBzHIa0hRtKoO0
-	BJPeCtfhY1n+qy/QLFQ7bIpvuJ2qv9O2/RGE3zvu/JOnuFsLrveWWCQPfqf/DqDzVgfb0jWSxCp
-	3xKMvDCdO1ePtV4QNsRPZSj7hICC3cmKGziJ1QuOWoBikBtoouf+0k6xlU5ivc4PxDz0713f1eI
-	YkweteJNvvf+qeEJqWuJv4/lLNCSVQ+Z95YPA49qx6fLtEKXPgaOKLYRPgOKEcWL0OEO0ZEGXhs
-	FDTAb0LxZ1q5eKIAjkLAwdbeSz6cGBOjGcqw5iH08cd+eixaVnN2jHsZ/pymc7q8lbIg2Hqqs5D
-	sxd3/meg==
-X-Received: by 2002:a17:90b:388a:b0:37e:a09:2640 with SMTP id 98e67ed59e1d1-37f7a5578e1mr953048a91.7.1782491406246;
-        Fri, 26 Jun 2026 09:30:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:44::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37e132ac1dbsm1496221a91.5.2026.06.26.09.30.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 09:30:05 -0700 (PDT)
-Date: Fri, 26 Jun 2026 09:30:00 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, bjorn@kernel.org
-Subject: Re: [PATCH net 0/7] xsk: fix AF_XDP multi-buffer Tx descriptor
- reclaim
-Message-ID: <aj6n48QAqDP85_-Q@devvm7509.cco0.facebook.com>
-References: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
- <ajv23_r4M3FGrFNN@devvm7509.cco0.facebook.com>
- <ajwHuCp82SazSwKv@boxer>
- <CAL+tcoC789GrOXvvYVOfxhL4iLCdFEAZQ+WCENsMjbLrJnfiYw@mail.gmail.com>
- <aj1O4vKzCuodwgYL@devvm7509.cco0.facebook.com>
- <aj4tUMqAXmQskO6r@boxer>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B4B3FBEC9;
+	Fri, 26 Jun 2026 16:32:41 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782491562; cv=fail; b=P7wF080fqK01lZ65rpJ9wOtayfJnfFy+eVy9vp1R7r9/BPs8Uf86IXZ/r1KR90CvyEk5E15QOpH3q3ByjDe00j4UMty6qORT0v7LOjE2Ey33pWbKWXMeVuPsFC6+o+I7esY1HApbIUN3G2Y1J/imAukYBapqumbxqaK/8BDNx/g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782491562; c=relaxed/simple;
+	bh=u1F/8OtB8/pRPvlsg0LFBAJlV9vVwXbwwgRKHFEI1/c=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HBxXvNuSyxeTMs5+UtnUWdgXEEX3FDVD+cMTehNXpMgQALlS+W3n0iKKaY5ElWpqY/pbofhpKTRMlEkN/ZEYJkvo5bYuJA+0M1Ya9lnYLzdiWCqo3abkRQJ4yopQnRk15VTgZpy0JmGvtMT6gSjOLo381uNfzsQMJDt5DY2Ahxw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=grBVmmZd; arc=fail smtp.client-ip=52.101.193.22
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WBMfONsJakTY81K/plzqsVSD3YfBNFGXXWb8YGQdroObn7GfehmWFXh3Lq3yPDBRVesgijrZR7Tv6vCBo0NPiB/GldAOmePl0THQ4l0xbZiZHVVXR0nQtUGOwl1LQrwgysqut7xG9HuJU52Pd4jAVH5vLXIylVkHM3uGlXAHyTeCcFffFOTbJg1L7EBGG+aNfrCs2Em8BUVGPl7uPe7FdxWuU1ghuNqzHycUpbR8cACq13kjFQ7ln9/JJAHeI64qdpFCdSfy3FFQ5gzeQHTrSLwxRIgWt7LLJH/f06WZqRZAsKQZe0lOIQVVS9cYSvMk6wiqWys3lXq+Xm6UJVfgxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XSIlHr7kx0dZmD+OMaY5AW9PzTaCou9d/KYZfhPsWkY=;
+ b=Z2u8oRHnGexEDAsn77rDSsDlzCjUBqCMa/NU6KK+gL/upU22P+xOt5sqB3Gt6CIjSGvT5vqy5gbZkMje8U0Jn9rfS5reonFbubWwzncVy2R53syUyxJuSWBEQInwd47cyJw6edVrgV6c4a5fWLjbXa85eowlz6++g6xD9B2AG2464mQhX4xAAsCOF/S7O3MiA3Q9+KnsBW4r+QiDIlACMovA7L6cTFulH3PGzvpq4InEK5gYnrdaEWr4FkgfsLa/+KXlTp1yHmXim7TbeS+2R28J7Eq2TAdVWmuS5cCuOvyKgbkV4zYN2gDqR1mzk0u3T57qtnBg8jB9gedNcqZ5hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XSIlHr7kx0dZmD+OMaY5AW9PzTaCou9d/KYZfhPsWkY=;
+ b=grBVmmZdnD3+5zMWNmYAY537xEfeEpT0NuLe/htj0fXF5cSBC2xIXlpYz0j/f11m+zYmJXNxNFGgWDJ55xSbsybW6nh9rWicg+UhX5jJD7tGxFriXNhTE3v1q+Fjf2LgIMyst5jsNK7w6bVqvWDNOlW7/fV8RAxaU6t5xMLxOhRDbHLCudrzqErRMxJgMx8OcyekEUNyNjeV63G0AyHE8R+mTB/XjJ8XhvJz5Jby0CwwW1C9bzWVajus3f9Qs88nCj46P1gmZzpfCcCDeUeApYttCZNNO4k91V2AfsbMysvmkvDDn5XgpNlK/jK6gRW/ukZgp8YcY7TXj52NhOrMaA==
+Received: from DM6PR12MB4827.namprd12.prod.outlook.com (2603:10b6:5:1d6::14)
+ by CH3PR12MB9252.namprd12.prod.outlook.com (2603:10b6:610:1ba::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.16; Fri, 26 Jun
+ 2026 16:32:35 +0000
+Received: from DM6PR12MB4827.namprd12.prod.outlook.com
+ ([fe80::6261:3040:864b:159c]) by DM6PR12MB4827.namprd12.prod.outlook.com
+ ([fe80::6261:3040:864b:159c%3]) with mapi id 15.21.0139.018; Fri, 26 Jun 2026
+ 16:32:34 +0000
+From: Andrea Righi <arighi@nvidia.com>
+To: Bryan Whitehead <bryan.whitehead@microchip.com>,
+	UNGLinuxDriver@microchip.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
+	David Thompson <davthompson@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: lan743x: Initialize eth_syslock spinlock before use
+Date: Fri, 26 Jun 2026 18:32:18 +0200
+Message-ID: <20260626163218.3591486-1-arighi@nvidia.com>
+X-Mailer: git-send-email 2.54.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MI3PEPF00007544.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:298:1::4cf) To DM6PR12MB4827.namprd12.prod.outlook.com
+ (2603:10b6:5:1d6::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aj4tUMqAXmQskO6r@boxer>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4827:EE_|CH3PR12MB9252:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94070c32-27f7-4e5b-c4e7-08ded3a08700
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|366016|18002099003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	TTii7PrCONRKgf4EKzWNpPMfkTIeX6WKt8kXL8Vt5D4dnRTGGPTNENA66GStCIcoCJSUTvMVfCr+y8jjwv1/XarwspmbEPkj42EIbq/gpwrYVYjjDcHdCVsstdKBCD7edAKvWmB1JmXRxGb+IM2hXbHmtligX2KI5NSfZN14ft1l6dBk5KItyhkb10JEmdp5oaU4ngLsD/RxiZkjT6diw6zGdRF98+KQkGJIZPXxC98LxX9QgGLGUSa5MUqe3RUcOJmV/zPEglZHIrRG63FhH3sjY4RQowAtS4uDc8dE9AtF0nVeIsUMLNqtT6r969atqr5S4w7i0UGz9OYc35OOC1aSdO21MrftwLOUgybfQWpL9JUzHoMjbSr9uRicoiw+We0bk/Uaqjb1Y9Y3arcW4j9SgHRcjbzW1vVWUXrfbfwPgc3zUA/wc8/WMTOSp+AlabCOpoRnUHYo4Zqt1NlnhSUEE5MCCKFLTITtcQCfjSatDlE5234eav8nmw2idNg3BXmIetKY8vZm7BBYPm6qPco4chaJtlAQQwxTQnK/74ZhxTuuqyaEtgADBzij/6+h5jENf74YXVfaiOpLIw5jPyCX+9v7RyD80KE6tYncryLQM7UFqTsfZgf/ltJnSotlybqM70m9FA7WojkTJa5Cb3/Bv/sbG3egBtfg+xSKm+Q=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4827.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(366016)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?i1AJCusVVmZS0wNrf4k908ZNLMQXsEi3Ze5XnKBxp00x2MLl7KsAf2U0/2bk?=
+ =?us-ascii?Q?NcM1BaR3Pu0w8eiHu2MmG9yaLHoTI70+owqbk0jPVc6/1E5DHkF3b8abHUrx?=
+ =?us-ascii?Q?WyGvLD1JZLB1kJGyF1orkwM1380yqhtCFpqz+DxLJM57wBG8tfcdA+Q67xrh?=
+ =?us-ascii?Q?CFbniijK/zHz9bsaLbS4Zcsc8fDkTObhBFCZW16n/mVxYpFjarHHJauWpS+/?=
+ =?us-ascii?Q?zRETT1mdsSPRr07Mtb7dQHYuaq0LAtfSyGF5zEAWeD8KYSIN/6ZIj9VkcDD7?=
+ =?us-ascii?Q?CGvYqYgAbUm+E/d65N97gZoHDdt5sA5SrMZgUT7VxrIIvgBUXiXy175DYjXk?=
+ =?us-ascii?Q?q4W42/nsP3yIHOWa5ZLbBA2Pq6rqVdWu30Zrw5+h9v0B2+rWYigXcJ7XJ9yF?=
+ =?us-ascii?Q?qGV5WRfSedIpTif6XQetuxr+Jea42I8Uc8/mqmikkMO0FQJtrahfeZqxMILK?=
+ =?us-ascii?Q?+iHZUVC5SgnQYJrE1J99YwqOYL0e44ot+qP2YUS9THbYValU8lWmQEegCD9H?=
+ =?us-ascii?Q?EPFJmYiXwpapR5S1e1JyDKBd/bgwenV+JU4iJa8N1hjri0KrqronXME7AWIr?=
+ =?us-ascii?Q?MMuNppHfzk/z4CBhBbQHLyH9i8AdlMv/0aHgy8IbUEmXeqr7XB2dasLamhsB?=
+ =?us-ascii?Q?Mpr9L2vLgmt53MVapLn03ydsxgV/9euXjFuLpg/Cy61XTGpVdjRJK/6P08fi?=
+ =?us-ascii?Q?z4Z3yG/HJNuvweJP9OosoBb5MXRr8Bxoc/SOrDmqou/xep3MdjzdgPPsTtdC?=
+ =?us-ascii?Q?9zygKS2TNnAVSBH4pX7gJwRXaFRR2hx+i5nnomTxlDgLjqzB5nW+InYaUVg/?=
+ =?us-ascii?Q?3Xv2pi5aX4vcig6FelBTITaLdwZ706ClgdXP9nQb2zRSbdRQDn4Y35C39Bi9?=
+ =?us-ascii?Q?uTfsYRe+tX4n9tQmquoo4y4/+FZYhphAhd8+CYHRDTwSfTKb4sIxMOL4lic8?=
+ =?us-ascii?Q?vayd0izg/sECPerTeClcGPoArLmu+DIr4vh8pfkeLSS3U2Du41/Ad6B0Rmvu?=
+ =?us-ascii?Q?e25yahIg3/7dP7/unMbxgwvYMYvVQwcXX4FjeX/y7yk52ogLH3w5SR+RvFQO?=
+ =?us-ascii?Q?VMKoALMBTApbw87mG/FUqNxqW3X7a0ZN/pXIwe9NxMmn/H1cRv0knoGysN+B?=
+ =?us-ascii?Q?1vGNBiCAgwKpJP8yHB7vUGmt9HgdKfyspqrrELkHvIz/RDEAm7m8Lr1AAxKt?=
+ =?us-ascii?Q?lIbPbjH8ub7YlYtBlho7cWPG2O4n1N2A8ao7YqaNtVF+twOes4EK3TT0SfDU?=
+ =?us-ascii?Q?+DhsWCw4Q8AQEYvT1kzHRIUobAzwiQAK6xxrOFtCXb8I/kJtK6c6TllKg4jI?=
+ =?us-ascii?Q?gK+oRdA8NAl3B2S2A62hZCOdzv1VV6yiMju18SeUzQuen+gqWFjbuJX34pUJ?=
+ =?us-ascii?Q?xlD9o6aW5f1FS55oHP7Zbwo+VEZ5LhqA4rWYhJ2fFaPHf0MW1GROhWpfV6YU?=
+ =?us-ascii?Q?e8snRAY5sSluQnfYl7j8yuIbizq/g0pH0oIOxKnoRQE6JuRbuYGVi23+VkqT?=
+ =?us-ascii?Q?20ns/TYKjJQxeLIXVWAL+LnTRjMQZk7MZOyR7L97i6gxJ6PY6DI9u1VVRz2B?=
+ =?us-ascii?Q?xF4yJ4GrRYM/5tKIRswzx8HZXA/SUPzIqFmIXuHGjXabsOAtSKDvjQWW9GVZ?=
+ =?us-ascii?Q?jLdL5HIOP3TAHgg/xtnHaOOTUR+grn2I8xf1FVuyFd9bgAUAiHBfnKvQpXvq?=
+ =?us-ascii?Q?9kknxDuJM2EHN2lOGFAya7ZbDFAl35hDTHfTzVREQlb96xqw?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94070c32-27f7-4e5b-c4e7-08ded3a08700
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4827.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2026 16:32:34.8804
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: d5A91fkm52Nf4VL/ZpYexf9EvNh3cwrqvFQysNM7kcBbcRIeH1QcwxVd3a8MfA51bl7WuEvAr7iiep3E1QwTPw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9252
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302232-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,intel.com,kernel.org,redhat.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:kerneljasonxing@gmail.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bjorn@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bryan.whitehead@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Raju.Lakkaraju@microchip.com,m:davthompson@nvidia.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[arighi@nvidia.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302233-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[arighi@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email,vger.kernel.org:from_smtp,devvm7509.cco0.facebook.com:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 568A56CF15E
+X-Rspamd-Queue-Id: 82D9F6CF2DE
 
-On 06/26, Maciej Fijalkowski wrote:
-> On Thu, Jun 25, 2026 at 09:05:28AM -0700, Stanislav Fomichev wrote:
-> > On 06/25, Jason Xing wrote:
-> > > On Thu, Jun 25, 2026 at 12:37 AM Maciej Fijalkowski
-> > > <maciej.fijalkowski@intel.com> wrote:
-> > > >
-> > > > On Wed, Jun 24, 2026 at 08:38:20AM -0700, Stanislav Fomichev wrote:
-> > > > > On 06/23, Maciej Fijalkowski wrote:
-> > > > > > Hi,
-> > > > > >
-> > > > > > This series fixes several AF_XDP multi-buffer Tx paths where descriptors
-> > > > > > consumed from the Tx ring are not consistently returned to userspace
-> > > > > > through the completion ring when the packet is later dropped as invalid.
-> > > > > >
-> > > > > > The affected cases are invalid or oversized multi-buffer Tx packets in
-> > > > > > both the generic and zero-copy paths. In these cases, the kernel can
-> > > > > > consume one or more Tx descriptors while building or validating a
-> > > > > > multi-buffer packet, then drop the packet before it reaches the device.
-> > > > > > Userspace still owns the UMEM buffers only after the corresponding
-> > > > > > addresses are returned through the CQ. Missing completions therefore
-> > > > > > make userspace lose track of those buffers.
-> > > > > >
-> > > > > > The generic path fixes cover three related cases:
-> > > > > > * partially built multi-buffer skbs dropped by xsk_drop_skb();
-> > > > > >   continuation descriptors left in the Tx ring after xsk_build_skb()
-> > > > > >   reports overflow;
-> > > > > > * invalid descriptors encountered in the middle of a multi-buffer
-> > > > > >   packet, including the offending invalid descriptor itself.
-> > > > > >
-> > > > > > The zero-copy path is handled separately. The batched Tx parser now
-> > > > > > distinguishes descriptors that can be passed to the driver from
-> > > > > > descriptors that are consumed only because they belong to an invalid
-> > > > > > multi-buffer packet. Reclaim-only descriptors are written to the CQ
-> > > > > > address area and published in completion order, after any earlier
-> > > > > > driver-visible Tx descriptors.
-> > > > > >
-> > > > > > The ZC batching path can also retain drain state when userspace has not
-> > > > > > yet provided the end of an invalid multi-buffer packet. To keep this
-> > > > > > state local to the singular batched path, the series prevents a second
-> > > > > > Tx socket from joining the same pool while such drain state exists.
-> > > > > > During the singular-to-shared transition, Tx batching is gated,
-> > > > > > pre-existing readers are waited out, and bind fails with -EAGAIN if the
-> > > > > > existing socket still has pending drain state. This avoids adding
-> > > > > > multi-buffer drain handling to the shared-UMEM fallback path.
-> > > > > >
-> > > > > > The last two patches update xskxceiver so the tests account invalid
-> > > > > > multi-buffer Tx packets as descriptors that must be reclaimed, while
-> > > > > > still not expecting those invalid packets on the Rx side.
-> > > > > >
-> > > > > > This is a follow-up to Jason's changes [0] which were addressing generic
-> > > > > > xmit only and this set allows me to pass full xskxceiver test suite run
-> > > > > > against ice driver.
-> > > > >
-> > > > > There is a fair amount of feedback from sashiko already :-( So the meta
-> > > > > question from me is: is it time to scrap our current approach where
-> > > > > we parse descriptor by descriptor? (and maintain half-baked skb and
-> > > > > half-consumed descriptor queues)
-> > > > >
-> > > > > Should we:
-> > > > >
-> > > > > 1. do desc[MAX_SKB_FRAGS] and xskq_cons_peek_desc until we exhaust
-> > > > > PKT_CONT (if the last packet has PKT_CONT, return EOVERFLOW to userspace
-> > > > > and do a full stop here)
-> > > > > 2. now that we really know the number of valid descriptors -> reserve
-> > > > > the cq space (if not -> EAGAIN)
-> > > > > 3. pre-allocate everything here (if at any point we have ENOMEM -> cleanup
-> > > > > locally, don't ever create semi-initialized skb)
-> > > > > 4. construct the skb
-> > > > > 5. xmit
-> > > >
-> > > > Yeah generic xmit became utterly horrible, haven't gone through sashiko
-> > > > reviews yet, but bare in mind this set also aligns zc side to what was
-> > > > previously being addressed by Jason.
-> > > >
-> > > > I believe planned logistics were to get these fixes onto net and then
-> > > > Jason had an implementation of batching on generic xmit, directed towards
-> > > > -next and that's where we could address current flow.
-> > > 
-> > > Agreed. That's what I'm hoping for. There would be much more
-> > > discussion on how to do batch xmit in an elegant way, I believe.
-> > 
-> > This doesn't have to depend on the batch rewrite, we should be able to rewrite
-> > this non-zc in net, this is still technically fixes, not feature work..
-> > 
-> > There was already a couple of revisions with this drain_cont approach
-> > and every time I look at it feels like the cure is worse than the
-> > decease :-( Obviously not gonna stop you from going with the current approach,
-> > but these fixes feel a bit of a wasted effort to me (since the bugs keep
-> > coming and we are piling more complexity).
-> 
-> Well this is my fault as I took Jason's patches as-is and did not realize
-> Sashiko had issues with it. I *think* I got ZC side almost right so I'd
-> like to have at least one last round with trying to make the generic side
-> right...
+lan743x_hardware_init() calls pci11x1x_strap_get_status() during the
+PCI11x1x probe sequence. That helper acquires the Ethernet subsystem
+hardware lock via lan743x_hs_syslock_acquire(), which relies on
+adapter->eth_syslock_spinlock to serialize access.
 
-You can have my ack on the series since I already did a few revisions
-on the original series from Jason, but it is still a very low confidence
-ack:
+The spinlock is currently initialized only after the strap status is
+read. With CONFIG_DEBUG_SPINLOCK enabled, taking the zeroed initialized
+spinlock can trip the spinlock debug check.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Fix by initializing adapter->eth_syslock_spinlock before reading the
+strap status so the probe path never attempts to lock an uninitialized
+spinlock.
+
+Fixes: 46b777ad9a8c ("net: lan743x: Add support to SGMII 1G and 2.5G")
+Cc: stable@vger.kernel.org # v6.0+
+Signed-off-by: Andrea Righi <arighi@nvidia.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 1cdce35e14239..e759171bfd766 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -3541,8 +3541,8 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
+ 		adapter->max_tx_channels = PCI11X1X_MAX_TX_CHANNELS;
+ 		adapter->used_tx_channels = PCI11X1X_USED_TX_CHANNELS;
+ 		adapter->max_vector_count = PCI11X1X_MAX_VECTOR_COUNT;
+-		pci11x1x_strap_get_status(adapter);
+ 		spin_lock_init(&adapter->eth_syslock_spinlock);
++		pci11x1x_strap_get_status(adapter);
+ 		mutex_init(&adapter->sgmii_rw_lock);
+ 		pci11x1x_set_rfe_rd_fifo_threshold(adapter);
+ 		sgmii_ctl = lan743x_csr_read(adapter, SGMII_CTL);
+-- 
+2.54.0
+
 
