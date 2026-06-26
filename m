@@ -1,80 +1,79 @@
-Return-Path: <netdev+bounces-302093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302094-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8+/+CbL3PWoB9ggAu9opvQ
-	(envelope-from <netdev+bounces-302093-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 05:53:22 +0200
+	id lEXYL5v4PWpf9ggAu9opvQ
+	(envelope-from <netdev+bounces-302094-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 05:57:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6396A6C9F6E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 05:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15D386C9F9C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 05:57:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=bDt2wv0T;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302093-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302093-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=FhMRmz9o;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302094-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302094-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=nvidia.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19A8230459E6
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 03:53:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6DFE303C639
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 03:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BFA396565;
-	Fri, 26 Jun 2026 03:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20028396565;
+	Fri, 26 Jun 2026 03:57:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012022.outbound.protection.outlook.com [52.101.53.22])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010045.outbound.protection.outlook.com [52.101.193.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D3B33F582;
-	Fri, 26 Jun 2026 03:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF962BD5A8;
+	Fri, 26 Jun 2026 03:57:10 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782445993; cv=fail; b=UO4a56RJ3EOxuLeyAAO5TB35CUQDVgwfJzOpsEWWl8wcL3liZaD53wXg6K+C4bi1yTzY9YmJ31qewDcncTHXhBvA41sLOyESwRfjW4rr03w6LmpFr9GV90F4wPnDlLPG7MbwZJTyxwfOvSC5zGDuvfZBn7+AWTu007ePJYgdXxM=
+	t=1782446232; cv=fail; b=k2kvBEgIdZzkY+hnSc3QR9MKT/8ZvU42+CPoURuhs1uA7995yySk3+23rC1fM/scRcPLB3VkPUPPAE8Zx2Tq2SuPOlp8U6YL5ssG2GuMfJR09TyFKxfRJkjldoEqVxyqvPDBJNqCR9/4ozAsZYShLZXODcr7Do88MhEff8l9VXM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782445993; c=relaxed/simple;
-	bh=vuGKmZTIc34c4nsL0U7yNGEKOOkYGM/p9p8GTUvKmh4=;
+	s=arc-20240116; t=1782446232; c=relaxed/simple;
+	bh=IG9cWY7lE2rTB+RGWHYOVBSrxyp2d74NaejiZSLrYXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ewdecgGDJEgZRo95yyrohZ0rcPxBH9EJHOEZ738mzjGD6xKCFs/Yia88wPO3lRuOkgaexJSewNwiRdnADPv1MWSl8CFLshwnBD8feU5gpe+rMI3aZH8Cs5pnz4iFtfG9X1+elrGfQJ+ZAxpD/r540woKg8a8e34sT2MT6a3OMyg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bDt2wv0T; arc=fail smtp.client-ip=52.101.53.22
+	 Content-Disposition:In-Reply-To:MIME-Version; b=W8J1zZrnwQSQmbtdDsP3cV746CTyJ/rH538P+Bsmxhl7GqXQwMFrfcKs8ax8mgeshaOs79EbVxMu7FbPp6if1y+yBwRKXfxlfeQNZMxtLUlRzlFL5B4W5j4qE5FLZ1MYfLy28hDDJS5aagnMbyKhB0ZTFgQ7dV3p+P7XS7QgfTQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FhMRmz9o; arc=fail smtp.client-ip=52.101.193.45
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=S7Q1joGlwRKCFXGcPVH4XfqGZGiDRpTnOx7t7aWwP5KDt4+KylOgeMBjrey5AOVIR8WXV6whh3IgQ6IgjBAmd+JWtR6AP5UvxlyPJ5wmV44599gvv8kRZ1uRTDD8QFV5SSL7mfAXQtkEHfLc/vKGE81u6IqlNgrugQvKa29GJvaGoJHepNvtkGN56gXdvsjr93TUNE+82NikTthjruf3TWZcD/aTKTj/94/G66PJb9tNcdZ0vvZWzqZr1h1M7Fx0Aga/Rr95UIvO4POPBL7UGU3R3ETILDNXDjfQeyn+pPOURjpuMLdWN0hVCZWOUcPltdGiPzSuXiYKHQuTwZr3sw==
+ b=wfZrIx9x1sjfG6W7Orfy/mavWKVb8YHxRDTnWqTjxS9f5nM/IDe4Ov4L5y/lY+WmZcpxlkdqaTle57WciVeJl+WuTR7oLBQ0/N7Bnc9YeJR4+hg1HG7GIL5PQvCYSN4+1/rt5a4EkdyUN4TsBZ8zDt3KLnPlGg0yM2kxc5XfBkekoW35Ri3MgZcTBvs9gqnxCRlr3i7ZVwIOI8txcJwSs8FafFXvVQFhn3WKGbYmpCXfqv2yAAdd2GMz3NO3hHqRZUwanEKw4Ud7G02Js/eDRc6B7Hx7vOe6QYS8jZ2vp+OQc0xeoXvG/x8m6s0AGhgmAK/SZe4wCPyg2LBuca/l/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dHyq107M5kLkM0Ofsel7KJjk8GndZT+AresbQWvPeDo=;
- b=amGbRWZMkOkLFT0yF4NyylR5tcb6UtAg7qSxML0F5kENln7DwtzO8iLEsMoynpq7jHJYj7kmxJlLJ8L+8aUIXabgGGkdtQ8y1IB4ZMHmGwRZI6hhbgbtmZAA99gsLy85Pg8ebJO1bzcGzgPLxH4fpxseT8aCyt/FuFr+O3AULlGT9+BpEPtDLA7XQaYse/K5IZ5hf0m6BcW7/AFUsuz5AvN7fGxlmXoVAZDpuiQx5vUQXHoNOYhQ9/SptFMa662NcK1VAWNrwVtk1QeB8Lj3aO1kKC9t88YcBlV5C4FKtBvofkInkuAZ27FNiYVV9xDXc7o8QTd3K98v+mNpUJbEHQ==
+ bh=aMajQ2Y+KyWa5MU1ffqY9sbh19mayXfpYn2g8RzX9Xo=;
+ b=mVtQkPMB+m9X/Oq30v5cxKrGNpCLc5PK5OHBDfUt9RZYMpJ/wSOx4USEDM5j6YY30VA8EUazDU+uzai54MAS1PuYf7FEhgL7M1NvcfihTrUodbJVdVSB/cRVjfbYgnZRtWtB+82Ck8Dz1kSSB+BbRO5j7Yd6YI9YvIsDAplZNjmJVharNFK4+A/pwu3wQA+x+oceitLuoyhgTxHhWWPZZUy4vrjpvrnQI7dh6uakGpI8UV41sm3ScyQNtl/SgYX+uPYGD8Ar+CUT08om4K4YIRCmxz7hkstxlotcQuqP/ZeEYKGN7+piJ9DpQNZ62wxW3k2kEjFe7FHeereQZPz9qw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dHyq107M5kLkM0Ofsel7KJjk8GndZT+AresbQWvPeDo=;
- b=bDt2wv0TPgOnWl+kLTQcUdk62CR66eOLcuUd9OXjFEeFJ4LGvCqiSeMHQwffyRyvUbxTsHG/21s5N7QcMKOgcj32eU0z9knKjM2VjK+P6mB+FzFUPR6GACJoZzp4ETteF3qMsqTfrd0n7PupO4I+k2mwBGpToJHtlxGguqMqVjD7ahZ6osTmUqRODcG15x7HBCRv68naCr0fGxd3W+6LLegKPGeST/dualfQ/NkXIOxxvZzND7F8Du4zLPAd3l0Pv/lxKAro1a2RAmFzs7HE46V15j9y22lrT3NNMwgly52yZoT5BHGoy6AMR50lNaxW7BaGHcbp+BLjS9+QC4SG6w==
+ bh=aMajQ2Y+KyWa5MU1ffqY9sbh19mayXfpYn2g8RzX9Xo=;
+ b=FhMRmz9orVUimb1maSL62wrJAiXlBSqADSFcK2a+8AItON6R3bMHXKz2EjBGU3odY00fhpbM0bTKAGlwXFjInndAZzAf3VOmEjxRvGUWL2uXAl6TlntUTkelfS6iV3oglvOwdaLhb2J3spipw+mNXxRSYuFaiKBKfREOHGYsK4d/vzaq/FFmYrKanPrBGjSgn8Z3NQMqArRSQ0AJLy9+afyxpkJtrRskFYzqQCbayNGonBf7bxHe49o9A6HSdu1BpihX8quDH9N0LaY8pGvhjoUpyv10yHM6F3gih15c4IGE30MOrxPaNKg6YnPNltOqb9++RSstrIgscrxFHfXNHw==
 Received: from MW2PR12MB2380.namprd12.prod.outlook.com (2603:10b6:907:4::32)
  by CH3PR12MB8354.namprd12.prod.outlook.com (2603:10b6:610:12f::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.17; Fri, 26 Jun
- 2026 03:53:06 +0000
+ 2026 03:57:05 +0000
 Received: from MW2PR12MB2380.namprd12.prod.outlook.com
  ([fe80::90d:c5c:6a5e:94a5]) by MW2PR12MB2380.namprd12.prod.outlook.com
  ([fe80::90d:c5c:6a5e:94a5%6]) with mapi id 15.21.0159.015; Fri, 26 Jun 2026
- 03:53:06 +0000
-Date: Fri, 26 Jun 2026 11:52:37 +0800
+ 03:57:05 +0000
+Date: Fri, 26 Jun 2026 11:56:21 +0800
 From: Richard Cheng <icheng@nvidia.com>
 To: alejandro.lucero-palau@amd.com
 Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org, 
 	dan.j.williams@kernel.org, edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org, 
 	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com, 
-	Alejandro Lucero <alucerop@amd.com>, Edward Cree <ecree.xilinx@gmail.com>
-Subject: Re: [PATCH v29 4/5] sfc: obtain and map cxl range using
- devm_cxl_probe_mem
-Message-ID: <aj32gUuoZuTUODry@MWDK4CY14F>
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v29 0/5] Type2 device basic support
+Message-ID: <aj33zZ_19GzRcRTn@MWDK4CY14F>
 References: <20260622124010.2192888-1-alejandro.lucero-palau@amd.com>
- <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
-X-ClientProxiedBy: SG2P153CA0019.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c7::6)
- To BL0PR12MB2370.namprd12.prod.outlook.com (2603:10b6:207:47::27)
+In-Reply-To: <20260622124010.2192888-1-alejandro.lucero-palau@amd.com>
+X-ClientProxiedBy: SI2P153CA0011.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::14) To BL0PR12MB2370.namprd12.prod.outlook.com
+ (2603:10b6:207:47::27)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,219 +82,166 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: MW2PR12MB2380:EE_|CH3PR12MB8354:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2d8d939-abc4-4a53-e5d7-08ded3366304
+X-MS-Office365-Filtering-Correlation-Id: 630c4124-55c7-4473-ed94-08ded336e73b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|366016|6133799003|18002099003|22082099003|56012099006|11063799006|4143699003;
+	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|366016|18002099003|22082099003|56012099006|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	nzKyoJU42gadQ5OdfRCcIH1dvFRrs41YIZlXEDlYMVWE7fyoi8R50zOXUs06l+7VDDzGPSOQ2ztBqQdL+UKz1BlRvxDoBXXw5mf/gmzQGsCYc6mZ/cDgVFMGyWnLGFtGreMVEsIcKIh5EDHly39ItthoScMgfkkbza6sqKc24+0dpw0Whz4y3R7nUGp223BUeAvdks10sGKVVkyIN47Ek6TB2Jr7Acq+cKdkaegm/cNXaq7gxnSNPDGGxQWr2egUyFeMXGt4OQy2n8VIoYXUDJwhn5ZnQZDmIPcQGCUyW+ahKM1kLQ5zRocclnYZtTJ0MXbUwBdi5fx+ljimk/IvCdJ2vfArst57Gb9o0t4zWIWMYhc1m3L9rNoH/Qew1/gefsmXrxb82bMuGxYGUY1/rJHqo8vFJJM3cfiVj6TvXPjb4/0HbCUf1+09oT3akgqXaUrLKvmTy9EOJ/PAiYMXQxrWZwPIcnnrzh/Y1NblP4g4yzXjPQuylUywVZhDEjiB4/xKTlv5YPhY2dNEb2659BblhWr6DGNCF+XxuUyINSHD9/P5/ZKQxzAd+m+Gmlz9DGoEEPds+M3fzSd++Sep/HYnLV42UMstxDwHELN7Yx/sm1bRJN82RQvIB/rO/StfXSTHEd5WYGTe+P3ewDUijZGpH333ybYmRHikPNs9tYY=
+	UfYghTp+y3VhVisyaefY5UV6UqAmFe8/5vJlaJEZJRoO7BW2qHr1FSfqER/Y+mERakFGAkvjfVkgC0fZ5agWdJozWEKJNZfatYoEC5pSZOuXCReukc/Low6SpzoaUrbaSqoqlLYPqjG7vmoOetAVY2gwiwiOqoWUzsk6B3282bYD4W01Fhbh/SgicWEomlyrhBxIRxg8bKxqYFSISb6XsVBF3y9Vg0Irpov6Y4iKq57CTeRb4vVEwUkB3AiZ4ss5V8sj6LrdP3FhpubyETxtUD1e2yWKTRX3Teo2UJAj+v0MIydr7f7m2f24ZxpuVPMY41+gMHWBRsZrl1gDfqt4Zef4f9KOuwOzXd1RBLj/Jn17eky2zxL0bAkLvG60CIt+O9DVYrhtCvq5CfGhly22CnsxvuIL66T40NhHteSVNmwMAowH3ozQP/JDwkuTp4Rb7aBkEZENYcnqlbdjCc5nKu+l0syuetxHhk8rkWxKIrqGL+6RO9yk+oCm8uW8M+xohqPnxlfkgAh9FxDnCSp3azfZQ5zNhtstNyuA2UlPS48lwHSfQjU8GjCNRA/DJjRJBsOejDEiTXlKyo6OSAcmEC4hEP8gZH3C77Dsgn7NvONycb2fKmD+Wunji7+QePW//ENgOuQ81FzmUxk0fHXae+2pbjxNw0fEDvTSTehY5Dc=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB2380.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(366016)(6133799003)(18002099003)(22082099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB2380.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(366016)(18002099003)(22082099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TG8z6F5tKOiDdoD6H5frbZonHdRaxA28KlWgtLszGd9OB7v2vjUp0bLaAdjE?=
- =?us-ascii?Q?+Aha2KXWyMVVhTkoYznzEJsiEZ4RNeDDZyZ1ufSqZP7Re7tPNW5obIZQivxj?=
- =?us-ascii?Q?Jpd3dL7Qz9e+Bw0njLAbU7N8RswDOuWGYUiQvr7kdYyD0KWlqRAEpFPehqAP?=
- =?us-ascii?Q?SdMfHC4gKv/aYBFi1tx5v3EZXW7LzyAT4p2jU6T9L8c6D+sU4SS2P8zGJ0F2?=
- =?us-ascii?Q?DaJ9BTFNhM4+Z3DiytlLBDeVdyjMCuha90ZqgUnf0CgH7RzMLdhYW0i2dAbC?=
- =?us-ascii?Q?b5KW7opIv0r6TWgu+YPrPXcFxLgtflH3dN4SkPqi6IlH2Fp28vkKR2yvXAtz?=
- =?us-ascii?Q?2T5huK288FieBn4Ok49LMjxgWF10iBjkRa6X7+yq40B3AN0s09mbeEzhiuRz?=
- =?us-ascii?Q?cYq+BPBaHW7fddtU0vnshiNUFYCtlvLXqe62LMthqqZgY2xcxaDzmqu9byEP?=
- =?us-ascii?Q?IAk/yHujCQjMxD7ZVwoWcqRGhwRE9kMipciGR/ZutytOm1RYK65HUX18Rsw0?=
- =?us-ascii?Q?p20VGOxi3JTQsBJr9l+wKWAGiT9q7E4RAhedJVsoceBTFtwA4LSpcLG4e5QM?=
- =?us-ascii?Q?yxh66dpXdYHZHyC65MJBU78f7q+4IUHSt+nUsja4+pXDHmBt1AXJGrCO2XTW?=
- =?us-ascii?Q?hhDseyRAlwoPdGwH1Q6J7WBIroFnm2maGmggHCuo7wNSW6f/ETQTCQn7dY7r?=
- =?us-ascii?Q?pLPj9fvSCyH/+w3/O2CzVD5EOC9grX+DlXEKJRL1CqasYQZP3Ov1HU51lB5W?=
- =?us-ascii?Q?wpf7a5P4Vh9VZKdD3XBuF+Bd4zeoN9PH8xbHPIhocpAOE6n1Doej4SCit6Fq?=
- =?us-ascii?Q?0ykdfCPoFz21dfgM0nw0km3YrnxbytmCiVKavKtFa+mksO0IikIzlLO6ppCD?=
- =?us-ascii?Q?xFY3Mw0Ghpt0+DD6XP3ekFLux25puFijqtjk9TPvrzvIBgnMK4hAJgzeR6Za?=
- =?us-ascii?Q?0KNTsAzj0LwMdF2OBfOsOUR/kOW//3A1BN/KYILnD8lXCOtcsI67tSoYbQlg?=
- =?us-ascii?Q?oxhau3iEKznchSZnDUI+M68rmOsSWhipMOE0YIWI17sw/9eV6izt+MH+4SQd?=
- =?us-ascii?Q?5wMnBx69+7jQxnbIYbqwNdslf4GtxkL5sGj55Dht78Wq3nUJ/WbL6aMwgPhN?=
- =?us-ascii?Q?sDpf2jQbtA7vsObWrHbt2ZScDFuUeHXFXmDq8mIkFmCmUJl2j+++MZssENuH?=
- =?us-ascii?Q?Hmsrd63tzc7k25C8VXlvKA9eR8FgoNWZsQ4Y3OMuHN/eohXjMu8hZtW7E7/x?=
- =?us-ascii?Q?WFXM6JPKlp/LsvfiUvX5vYJZUDzXzYgvH9BsyCudacAFC45Yoy6CBL5ZKDPA?=
- =?us-ascii?Q?+2UlgLSBTQYebpX/rANtdLVvvduGsGuMALTDs9cAZP2E/+jql1fZg1xzla2N?=
- =?us-ascii?Q?hG2UuKSgqGZiQYSCYdRJsV8YjubYpJlipLwLzB/44feQ57WY140nE0LGR3bP?=
- =?us-ascii?Q?pHnLKkVGNGiGg6Ww0o+u3EKCx4yKBU2rsj8O/gvU8kEpkvmNi1NghueXTlpn?=
- =?us-ascii?Q?/t/Gai7G7bLfNQ2hI4qQR4ToYo2WWE57JsiTVE5JIODPPFb1xFpXy5RcvTyW?=
- =?us-ascii?Q?0c5PlOQSCJLTbgO5VD4gA6CN6VMI6TPmFWKFvPxVapKGJqHAWgX2lR+ooZG+?=
- =?us-ascii?Q?n9xAs5SYHdvmAn4LJEyJNqF+X+WLdY9Mn//OSOlKKSbPLhwN7OhBYouOE+i7?=
- =?us-ascii?Q?GqMEX+cxParAFnHqseO8ox56KEhtnwGGrOw7mD/k8sD+RJq01QRWz6vjHTwy?=
- =?us-ascii?Q?JYEW5pjJNA=3D=3D?=
+	=?us-ascii?Q?U9hyj4XnrRX8X7IApY3VjgLDELNm/xQ7l7GKEvI+i6jfmQLpQuqLJ1BJEmQ1?=
+ =?us-ascii?Q?9bSCGnNjTvvKqIMDnbm2a/+VNMDHV/E2XECVT7wIlTwuRmOvevP0nZnZ1jSk?=
+ =?us-ascii?Q?crfHSJ2Qo3BW8wTC4da7lJNgGzafwd/Lf3iTKhtnp8a0bfry4IjhwGciHJI9?=
+ =?us-ascii?Q?jT/bqKjhsxGmp6igmX1y5KDnD8erqcVjjNCp0GHQiVeHipBV6WR8/i8n18BU?=
+ =?us-ascii?Q?cA9wvjGTohVOS2U14Vy9lSL7Xfb0GbtC6OabDcFl030M5ALthTvLjmWrwcgC?=
+ =?us-ascii?Q?3Q8B4O2RwERhsnDJ1oBk/FD92qPsxB7WJxnH7MbuxFI7hj4xr9V07Sqnn3Aa?=
+ =?us-ascii?Q?o+tLzonJh23W1NKiwBvGk2RKc4DwjGLQpfJ7jQ9BITuuYYoMKCE+G4gIHl+G?=
+ =?us-ascii?Q?r1A0lRZQwTQGrGl7fH9HM0zV+o0qcKicOOzm++XNrjqcLAMz0a3I9gbNfLmI?=
+ =?us-ascii?Q?xX/ipFznqn5sFJ83VwKPZLtAMROLTukAN2aZ3MtJ2knlssRXoAjOkMONrV90?=
+ =?us-ascii?Q?HkkMTTMB5dPO+dpnwXSTltGQuHnN/fr5oWBW2IZ4aDOJDNIRjRgSlqJqDTLv?=
+ =?us-ascii?Q?iMBWc61onYr1EMs6qUVEyDtwnlnsE8piU3hMvlgGNoTF586Qke7WhjPIllRq?=
+ =?us-ascii?Q?Jofv+cJDzjvZsj7QSpo5CkwR49a1km3qPBc+VqRBCmDWXwAfrtrfcPJd/JTZ?=
+ =?us-ascii?Q?V3umFW+mk3nuJHCYEj2Ub/nEDV2ZeNKuA2bXd03TtGCW6aopJrsq1Ms81s7j?=
+ =?us-ascii?Q?J0mSutZt8bHBX7ebUvGBb0QTb5NcRr9jiNrXC0JfC+7F7rEGKCigoZvC0JMl?=
+ =?us-ascii?Q?8fJur55QX9JurRwI30ITwQuUprYO5ToFOxGQs1K7cf3HNbSTGLkI9YkNdF5E?=
+ =?us-ascii?Q?2wPIMSYWBB/9NnVpLIIqRdZ8CG/mWvI94ga8SNwJepGMv87TrUehT+VEXcLB?=
+ =?us-ascii?Q?ry339sru3foyZ/TReZXda9Ih56DauEFpj/LhLJuXfxnkit+8j9c0OxfV7yKu?=
+ =?us-ascii?Q?I1czI/g+444Ji7yw81M2hfSxdbvHA6Efsakh1x4DoxoVIxPgTCYueog/WDD1?=
+ =?us-ascii?Q?0jmhpir87Ec3pMF+tH7ZyWOnVqrjqi+a7c3F5hgZFW+ACf5YVzxI3Hd1rwIb?=
+ =?us-ascii?Q?7JAVUaxeFSgFhad/TipdLhpR08OmkmIU21FlXJbAFzE0Zfm2nxKioz/2oE33?=
+ =?us-ascii?Q?kAjJFjvbjeVOHcBaCEoj0q5jANM3cNQNRjPVpkfbtaz+3HiAQKYD0wEqQrC0?=
+ =?us-ascii?Q?tpDgqgx25z1eEQFn3XvL0U6+rSdNLZ64sIewvc0lfyP6S1DwpZYiii/f/kYA?=
+ =?us-ascii?Q?Z4l1i45EUcOokmm0M9LZYpSUs/qWGmyw5cVb0zeD+wQhdBg0vLCAfbFFRKpd?=
+ =?us-ascii?Q?f/1n2UxN8N6DMk32fwQrbi6tOu07jFiZptLRjpIkhAJscPoo3x7koL8EWSES?=
+ =?us-ascii?Q?MEZuNUUs1vthc53Kz2aO0+tK8uFl1NG81cGdI7K173HWb8PowCCXL/htgJpr?=
+ =?us-ascii?Q?Hu4RF3t0eLVDo+yd2kgXYapeJ/jIu5q2ElwQHfq7sk8FUXG5meniPTXxCgIE?=
+ =?us-ascii?Q?41akCq1+kmTsFQMfcuBTQuPKQpARnqU2d8CWneK7pVUPFOmgyLjIKSRi9LVr?=
+ =?us-ascii?Q?NR+j84PtD7/uf43Ty4r3Qurbv6oa7YStfyc+03SPtrCCm5f/ZcorV6bfpAH/?=
+ =?us-ascii?Q?jdAoKJqtZd/nm931V9Ge7tOOSFtUFSnf9J3qan/y1cVTK6G9V9Zjz7kGz07L?=
+ =?us-ascii?Q?sAiOEM16ig=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2d8d939-abc4-4a53-e5d7-08ded3366304
+X-MS-Exchange-CrossTenant-Network-Message-Id: 630c4124-55c7-4473-ed94-08ded336e73b
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB2370.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2026 03:53:05.9178
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2026 03:57:05.7855
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H0JtTvroNgQHN4v0aHRGVN4JfVZbLIz5HydQvy+TE3ak/FrqvV/UxD5GCWVYo9rsxL7UENOUPWzog3PX5YY3hA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0NNhmicpqLo6v6/LUBoYbMfsnv4nit05tcZsfzK1L+oZln2Y8xMICFZnW9hvQmynL9IYLVzeJdhLat7qsu1GbA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8354
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-6.66 / 15.00];
 	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302094-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302093-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:dan.j.williams@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:alucerop@amd.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[icheng@nvidia.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:dan.j.williams@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:alucerop@amd.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[icheng@nvidia.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,amd.com,davemloft.net,redhat.com,google.com,intel.com,gmail.com];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim,amd.com:email,vger.kernel.org:from_smtp,nvidia.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6396A6C9F6E
+X-Rspamd-Queue-Id: 15D386C9F9C
 
-On Mon, Jun 22, 2026 at 01:40:09PM +0800, alejandro.lucero-palau@amd.com wrote:
+On Mon, Jun 22, 2026 at 01:40:05PM +0800, alejandro.lucero-palau@amd.com wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Use core API for safely obtain the CXL range linked to an HDM committed
-> by the BIOS. Map such a range for being used as the ctpio buffer.
+> This series adds the last bits for allowing a CXL Type2 driver to obtain
+> a CXL region linked to the device HDM decoders committed by the BIOS,
+> with the driver being the sfc network driver.
 > 
-> A potential user space action through sysfs unbinding or core cxl
-> modules remove will trigger sfc driver device detachment, with that case
-> not racing with this mapping as this is done during driver probe and
-> therefore protected with device lock against those user space actions.
+> Changes from v28:
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-> ---
->  drivers/net/ethernet/sfc/efx.c     |  2 ++
->  drivers/net/ethernet/sfc/efx_cxl.c | 23 +++++++++++++++++++++++
->  drivers/net/ethernet/sfc/efx_cxl.h |  3 +++
->  3 files changed, 28 insertions(+)
+>  - patch 1: 
+> 	fix doc (Ed Cree)
+> 	fix error path (Sashiko)
 > 
-> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-> index 61cbb6cfc360..3806cd3dd7f4 100644
-> --- a/drivers/net/ethernet/sfc/efx.c
-> +++ b/drivers/net/ethernet/sfc/efx.c
-> @@ -984,6 +984,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
->  	efx_fini_io(efx);
->  
->  	probe_data = container_of(efx, struct efx_probe_data, efx);
-> +	efx_cxl_exit(probe_data);
->  
->  	pci_dbg(efx->pci_dev, "shutdown successful\n");
->  
-> @@ -1242,6 +1243,7 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
->  	return 0;
->  
->   fail3:
-> +	efx_cxl_exit(probe_data);
->  	efx_fini_io(efx);
->   fail2:
->  	efx_fini_struct(efx);
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 18b535b3ea40..3e7c950f83e9 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -18,6 +18,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  {
->  	struct efx_nic *efx = &probe_data->efx;
->  	struct pci_dev *pci_dev = efx->pci_dev;
-> +	struct range cxl_pio_range;
->  	struct efx_cxl *cxl;
->  	u16 dvsec;
->  	int rc;
-> @@ -73,9 +74,31 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		return -ENODEV;
->  	}
->  
-> +	cxl->cxlmd = devm_cxl_probe_mem(&cxl->cxlds, &cxl_pio_range);
-> +	if (IS_ERR(cxl->cxlmd)) {
-> +		pci_err(pci_dev, "CXL accel memdev creation failed\n");
-> +		return PTR_ERR(cxl->cxlmd);
-> +	}
-> +
-> +	cxl->ctpio_cxl = ioremap_wc(cxl_pio_range.start,
-> +				    range_len(&cxl_pio_range));
+>  - patch 3:
+> 	removing extra + char (sashiko)
+> 
+>  - path5:
+> 	remove stray change (Ed Cree)
+> 
+> Changes from v27:
+> 
+>  - patch 1: make driver probe failing if error in efx_cxl_init (Dan)
+>  - patch 4: add unmapping if error after efx_cxl_init (Dave)
+>  - patch 4/5: move cxl_pio_initialised from patch 4 to patch 5 (Dave)
+> 
+> Tested in the cxl_for_7.3 branch.
+>
 
 Hi Alejandro,
 
-A small question here,
-Is it possible that the FW would commit a region bigger than the range ?
-The committed CXL region length is never validated against the PIO window size.
-The legacy patch sizes wc_mem_map_size to cover the VI-strided PIO offset, but
-here we ioremap whatever the BIOS comitted and assume it's EFX_CTPIO_BUFFER_SIZE.
+The series looks fine to me with one small question in patch 4.
+I don't have the required NIC to test it, and not enough knowledge to
+give a deep enough review, I can just say it LGTM at this point.
+I'll leave for other guru to give tags.
 
-Maybe adding
-"""
-if (range_len(&cxl_pio_range) < EFX_CTPIO_BUFFER_SIZE)
-    return -EINVAL;
-"""
-Would be worthy ?
-
-Let me know what you think.
+Thanks for this.
 
 Best regards,
-Richard Cheng
-
-> +	if (!cxl->ctpio_cxl) {
-> +		pci_err(pci_dev, "CXL ioremap region (%pra) failed\n",
-> +			&cxl_pio_range);
-> +		return -ENOMEM;
-> +	}
-> +
->  	probe_data->cxl = cxl;
->  
->  	return 0;
->  }
->  
-> +void efx_cxl_exit(struct efx_probe_data *probe_data)
-> +{
-> +	if (!probe_data->cxl)
-> +		return;
-> +
-> +	iounmap(probe_data->cxl->ctpio_cxl);
-> +}
-> +
->  MODULE_IMPORT_NS("CXL");
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
-> index 04e46278464d..3e2705cb063f 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.h
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.h
-> @@ -20,10 +20,13 @@ struct efx_probe_data;
->  struct efx_cxl {
->  	struct cxl_dev_state cxlds;
->  	struct cxl_memdev *cxlmd;
-> +	void __iomem *ctpio_cxl;
->  };
->  
->  int efx_cxl_init(struct efx_probe_data *probe_data);
-> +void efx_cxl_exit(struct efx_probe_data *probe_data);
->  #else
->  static inline int efx_cxl_init(struct efx_probe_data *probe_data) { return 0; }
-> +static inline void efx_cxl_exit(struct efx_probe_data *probe_data) {}
->  #endif
->  #endif
+Richard Cheng.
+ 
+> Alejandro Lucero (5):
+>   sfc: add cxl support
+>   cxl/sfc: Map cxl regs
+>   cxl/sfc: Initialize dpa without a mailbox
+>   sfc: obtain and map cxl range using devm_cxl_probe_mem
+>   sfc: support pio mapping based on cxl
+> 
+>  drivers/cxl/core/core.h               |   2 +
+>  drivers/cxl/core/mbox.c               |  51 +------------
+>  drivers/cxl/core/memdev.c             |  67 ++++++++++++++++
+>  drivers/cxl/core/pci.c                |   1 +
+>  drivers/cxl/core/port.c               |   1 +
+>  drivers/cxl/core/regs.c               |   1 +
+>  drivers/cxl/cxlpci.h                  |  12 ---
+>  drivers/cxl/pci.c                     |   1 +
+>  drivers/net/ethernet/sfc/Kconfig      |   9 +++
+>  drivers/net/ethernet/sfc/Makefile     |   1 +
+>  drivers/net/ethernet/sfc/ef10.c       |  41 ++++++++--
+>  drivers/net/ethernet/sfc/efx.c        |  18 ++++-
+>  drivers/net/ethernet/sfc/efx_cxl.c    | 105 ++++++++++++++++++++++++++
+>  drivers/net/ethernet/sfc/efx_cxl.h    |  32 ++++++++
+>  drivers/net/ethernet/sfc/net_driver.h |  10 +++
+>  drivers/net/ethernet/sfc/nic.h        |   3 +
+>  include/cxl/cxl.h                     |   2 +
+>  include/cxl/pci.h                     |  22 ++++++
+>  18 files changed, 309 insertions(+), 70 deletions(-)
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+>  create mode 100644 include/cxl/pci.h
+> 
+> 
+> base-commit: 9b1e70e8f9ec4b5c6ce7fa774a0023bb6894c686
 > -- 
 > 2.34.1
 > 
