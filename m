@@ -1,363 +1,185 @@
-Return-Path: <netdev+bounces-302249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JvamCx66PmozKwkAu9opvQ
-	(envelope-from <netdev+bounces-302249-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:42:54 +0200
+	id C8IZMnG7PmqDKwkAu9opvQ
+	(envelope-from <netdev+bounces-302250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:48:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F1A6CF71B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:42:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC736CF782
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:48:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=dK6ao2Su;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302249-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302249-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b="Wz/YUPbt";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302250-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302250-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0B68309BFE4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:41:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A3474306B665
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7E23FE35D;
-	Fri, 26 Jun 2026 17:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBC335F180;
+	Fri, 26 Jun 2026 17:47:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16A0401A02
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 17:41:45 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782495707; cv=none; b=PuI2G7p9WsqxUwlhyVK7MuoTbUZqei5hp+PyaS5cBC+ODvstvruA+yAPEOamKorhaksmkn39NZ9l5XV16UuvLUp+O8mI4HmE9yoLyBMoUaKy6zYinWLKXMagsjOTIWDWnjSOT9jE/jYckqh/8804ObiTSjgjGtOhfl/Fme3Jq98=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782495707; c=relaxed/simple;
-	bh=y783qvk1TjnNBeI8iZy2q5wNS26CgOBAitwbMeK6aQo=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=uIWEhunvzJr3FzYhuaXbmLqK2/hL9meNnJHDVAe9fNJR0zbo+BaTK+hTpxVCO7eEIpkVrEnDCU4QZeMBxrJkDhzgw1CxZY5vOOPee60D829a6Yg4lWuepAmnu//iSuEiz2kk7j9g1fg+r+f6Cp6Q2nhzbqaApHQjkl4+00m2GFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dK6ao2Su; arc=none smtp.client-ip=209.85.219.47
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8e423029db6so14472656d6.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 10:41:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664C639AD39
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 17:46:50 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782496024; cv=pass; b=skr7qcKi/5rXwzDc3NR3628G9Y1SDFb2Thq9H75uQl8H+WHlpMeTzufgXYzoDPM+Kmq1Sv5qY3JrwouPb8BXTlXhG7OJmu/u9jQjmz2+mYvS3Y6wm6MuWvFizBCnZH2/G2Q3w8hZCp6BmN/AQgVa7MlzDg+bfTI69RuIvByzA9w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782496024; c=relaxed/simple;
+	bh=x4AwvDQptVq6diWzZuTvXFdKURw6/fZbdm3DOwVB6xU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k9SZqjo9nPYWHGyxttogckuND1vvdszlnb6OsTrXq3pEnJgWPyicnR+loeiE7at8rOwzJ0sGdjtRH0o5us0GnaO8U4HxD4qbfEd6dFZb+UF08OoZWd0KS6OxFHohH5BBUp2V/8gU8dtjx1BviStEjKmHqhv56k4deCfcPvx/OPk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=Wz/YUPbt; arc=pass smtp.client-ip=209.85.210.182
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8453a67659fso712946b3a.1
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 10:46:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782496009; cv=none;
+        d=google.com; s=arc-20260327;
+        b=lLGIkl4OT7ifC/EYhEvu8vW/a6SZKjemSODuN/cb038PcH9AVJz4lryohTVzDZKuub
+         VW+K5fmpIk/kWTbLhcqvTRD2K18e0iJqydHhrbi68sV5VuWnqu5e1MilU1FE2K2eU62l
+         tCeE4/R5lbjESRjbQQaSxTFU2b7K914NLv+ZxOK8uSJrkmFAiU2lYM9lBonsY0RtNVHz
+         DvVqumNMtWwYu7ESC+N8uT79XNDXccxGNrauqzUA1JgthRwDbTs+NzuALj/HJsC+B7W5
+         dzXzqpaBhXb1dRuuJ4fK5BaKPf8e45VEFAt0eLQQ87/m8efXKaUD7eXxoSw0nt4wgIQC
+         MmwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=x4AwvDQptVq6diWzZuTvXFdKURw6/fZbdm3DOwVB6xU=;
+        fh=ML8JRSJ6H38D8XYhQI4ILa2a482PTOBNessAAHSC1r0=;
+        b=NnPlOZ7IQcN1NonDV5LShfj2f0ZkK5dJ9jEUG0/wFHot6tDYWHxytsCsnFffrh+Q7i
+         pyS6ieq8amKFxwrtdnav4XhHzYKS+JrZID/ucLguTSo8tnpsqe8jU88ozbZHt3moZfVP
+         JLuJl3oKxCNnNocLUnCDSHqb72BEqdI3QjGn5ELX5x1PC4tBlISr1zX0sAyezivRqysj
+         abeftrHIi1MeM6mRSNtsAzrh6yMjxooVP4CdAbiA1ZOuJ8U+Iu/Ti3N7d1ljEBJDdYVv
+         9tR8D59tWPcosT0L88ee/QLrkuJN30zJsFoMlRO5FD+6QoKmV01kmc8T/YVotsU1c35h
+         pX0w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782495705; x=1783100505; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+        d=mojatatu.com; s=google; t=1782496009; x=1783100809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lhLy5HGhlmHKNgyKg0Eoc8/OEklRulKzznkysm+tQX8=;
-        b=dK6ao2Su27ufaZVvcF6ZHMlBPzTKxyBPNiKD0RBtkjQrGZAiFFafcyGZD97UnxYe4k
-         cS2O4/kzFKwSibAY8ndRd23WOTm33pNlIMACLIf2aPvbPMYl/Z27RHuVyG/Wu0q1prD9
-         Wt2nr9HRas8osJnrPdLdTooub68X3G84bk9Q25VHtOEIA4VoDxAg8I2T936ReS57U8/v
-         Gj8yIbzAzw//Ox//zVXRdlmPgcwmft0n9Nr4LEQDXRaUsS5nEzCge8xCMwnk3swy293s
-         LN8GpJ7rLgR3dMYF1uJoP60OPE+IGRwb5q/mzLgKjlkOFKHWMBbFwsyJLRHT/VsOMd97
-         lMQw==
+        bh=x4AwvDQptVq6diWzZuTvXFdKURw6/fZbdm3DOwVB6xU=;
+        b=Wz/YUPbtKRbRl73P7vkopnJjZ74m/QR2LQ4NHH6Mb/R714OfKCD5iFER4t04fcxsMR
+         /EYMAC5BgfWeQ4di77dRUF0HjdWMTwlaFCIw6c3AdvdJL1mAqW1dDu99t4nBgpuiYTZg
+         FT3a52vcmiVR9MpzTL0BRWXmCoaX3iYSOt+EA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782495705; x=1783100505;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lhLy5HGhlmHKNgyKg0Eoc8/OEklRulKzznkysm+tQX8=;
-        b=NyNZ5qmFYQ+xvLIQidqkKPg67xCfo/X0P9fU5noi4N9Jo6Tfb1EM3VYUiYfzgh4FAo
-         Wf4UTW3q6BD0MvnHG9m4jbMSh5c7h0blSEcHupJdT1KkAN4qcOzB1Ks4FXlb1pxlO1hW
-         RObYIvRsibbFwOsfNFzUTVP0QdbiFU2+Y9cDsM0L9NrcPk3q92vkCDwL3EkpV7K66V5K
-         rODgbmJ9xey+icGwcwwNfJF+hoo3f97dmXmGDKhM8Fb3sLFZ17UbFH9h96W1MB48xRRP
-         yUF90G2nTSaCCEH9ScIeFTDokJshMBBlOe48zeqVWHQkrpPNvMM9cQylh3bJsU5RH4eo
-         +Y2w==
-X-Gm-Message-State: AOJu0Yw9A32xnWx04ykmzeMgRAVv8OVYsS3lufPhbeX8hq6UszEztah+
-	rbZlRgp87IspPXuY7FQHLRZ3Jn46RwdPUQmEPtrhiWej7VQ8o5Z7E77Y
-X-Gm-Gg: AfdE7ckD6+awS5dtGTI6FKLCT19bJSQaJy84vMyy6r2SqhwhUBY2uIyXu7tZs20TGwf
-	BZIdADnFiWw5Uddr1jpixX8EHrZ+OvPl4gr7ksu70FsuUfYfSwDkZThSR80mV7TtCoZck5r3+s8
-	pzT14BZQqWGB/7vdMKHuGcm2+051eab3OvICEJG7eOn6zsx4Yok04TDmTobIMf1h9XmMZ8V60Uo
-	2t34Wfhx83Q8rEXkXtencZCm90j2bvDQydjRGUnMz9/Tgn5Q/YJ4FkAitSzY17JUaF1joxmfBo4
-	KXSqiaddaYjbPYnFicefDNRKcQzBeMmiNiW9G1CjsV2hNIpfnjPPHGa0D2YmWkSNJCVB+HP3Wu7
-	ot2IRYjJo8LBZW1I0p1RL7sV7OTxv1sXKaQw4B7+/QC9biryrVFGglwQIVGBEI9tFgPA0CFd4Gd
-	rdAg8U1G/qOTWDfumfawtl9QO7EbVIVgvma2OIeGpvVjc=
-X-Received: by 2002:a05:6214:2aac:b0:8db:aaf1:c446 with SMTP id 6a1803df08f44-8e6d6581059mr134067166d6.38.1782495704750;
-        Fri, 26 Jun 2026 10:41:44 -0700 (PDT)
-Received: from smtpclient.apple ([104.39.15.240])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8df82d59cfcsm236600846d6.48.2026.06.26.10.41.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Jun 2026 10:41:44 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20251104; t=1782496009; x=1783100809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=x4AwvDQptVq6diWzZuTvXFdKURw6/fZbdm3DOwVB6xU=;
+        b=XVlUcE1R3t/52gw/N6YruU/CgM8IEcDUZyhDezp1AASVTqX4FQaqe2s8QYafYPXD7A
+         EDDKpPP1EMWXCt7QHjbCEzh9CE3NVgxJ/XeTch0ECRBqjUkvrr80MApJfS4LMeJir0dC
+         KT4YJPSlzV0hZZTtrY5N3wr/XhBJFsHy7hWptXLPG4NUINuxva9trhfl46ezGefteNYE
+         A08wVUu/ndksJCKOffsOFS8+NB8DN812u/NBWzkzkds0ThF7JmzqHbt6MoK5GiMdq7CP
+         K5j7aTMyNTuNNfz6ZuQ80ny76qc95Y7My++3FWRdI93s4tKVpGSaYimtzAYLp5t8Kejx
+         ZhYw==
+X-Forwarded-Encrypted: i=1; AFNElJ8hkvrFuAq7ED9VsMoK466sH7HOCRoXTLRWB+Lfia3B1HulAwpX90CVhUWiwXtGfgd+G3szjxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAJ9UEF36JtmOLBm5dMLZMGuUM76JtWj72irfCBzzjGGEtj8V5
+	XfZsSsQnGhr0ErdGvsJJFcWICN+hDjGdbKI9UYwjNE+FXPQ6bdBBhP/pkQISdWTua6iJUQ4yeud
+	NiMrZG0swz+LyUorAscsv0jOu94WNF6IIbxc/sfI/
+X-Gm-Gg: AfdE7cmAKmgMf5gmYB3Ueu5LWyvevLauo3Wlt5KSWaZ/TC3qxmkfIC25LeG7YKIzHTI
+	FJnTH0qZCLPcXp40gPEDE7+g7R0p9ZmnbKG/yZIYQqCpx6A1UgGMDeT1Jtyaeqq1spQWYafOC7D
+	epaN7LSjlmrr4bSd4tMf/agHrlmPPQBit5yO4GwVXBTIFyXhT+XW0oqXnyAV61C4orCXdrBf24T
+	Y+nXGlAk5YcZKfx5m4zkindMpWFc9Se/8oVeCX6yl405tc1TglW9sQmU6y1ZrIpatiSOg==
+X-Received: by 2002:a05:6a00:1382:b0:842:2419:6bfe with SMTP id
+ d2e1a72fcca58-845b39a255cmr10418895b3a.7.1782496009591; Fri, 26 Jun 2026
+ 10:46:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
-Subject: Re: [BUG] netdevsim: KASAN slab-use-after-free in ref_tracker_free
-From: Shuangpeng <shuangpeng.kernel@gmail.com>
-In-Reply-To: <CAHfVqdXqZkrp5Dm0a8BJU0Tbc_T09A=e02PenwxrZFDMQrEmyQ@mail.gmail.com>
-Date: Fri, 26 Jun 2026 13:41:13 -0400
-Cc: netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org
+MIME-Version: 1.0
+References: <20260625-b4-disp-31bcb279-v1-0-85c40b83c529@proton.me>
+ <20260625-b4-disp-31bcb279-v1-1-85c40b83c529@proton.me> <5d57e4ce-0460-4ad2-9891-1bc7d24020d8@mojatatu.com>
+In-Reply-To: <5d57e4ce-0460-4ad2-9891-1bc7d24020d8@mojatatu.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 26 Jun 2026 13:46:38 -0400
+X-Gm-Features: AVVi8Cei6xSt51UiXZ1BLZWtNoWfdbuGJGwWLQJhqn3TQ7-zZnSwGHoiGLSt7cI
+Message-ID: <CAM0EoM=E484np_auBPtjoE+tXLN=y7qhi11FDRwAxBehuMGUhw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] net/sched: sch_taprio: Replace direct dequeue call
+ with peek and qdisc_dequeue_peeked
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: hexlabsecurity@proton.me, Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Jarek Poplawski <jarkao2@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <2037CBE9-D72E-4E81-9B18-62AF3735306D@gmail.com>
-References: <178144969601.60470.14764529841344817811@gmail.com>
- <CAHfVqdXqZkrp5Dm0a8BJU0Tbc_T09A=e02PenwxrZFDMQrEmyQ@mail.gmail.com>
-To: saeed bishara <saeed.bishara.os@gmail.com>
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302249-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:saeed.bishara.os@gmail.com,m:andrew@lunn.ch,m:saeedbisharaos@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:victor@mojatatu.com,m:hexlabsecurity@proton.me,m:vinicius.gomes@intel.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:jarkao2@gmail.com,m:vladimir.oltean@nxp.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302250-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[proton.me,intel.com,redhat.com,resnulli.us,kernel.org,davemloft.net,google.com,vger.kernel.org,gmail.com,nxp.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[proton.me:email,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:from_mime,vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 81F1A6CF71B
+X-Rspamd-Queue-Id: 3EC736CF782
 
+On Fri, Jun 26, 2026 at 1:16=E2=80=AFPM Victor Nogueira <victor@mojatatu.co=
+m> wrote:
+>
+> On 25/06/2026 06:51, Bryam Vargas via B4 Relay wrote:
+> > From: Bryam Vargas <hexlabsecurity@proton.me>
+> >
+> > When taprio's software path peeks a non-work-conserving child qdisc, th=
+e
+> > child stashes the peeked skb in its gso_skb; taprio_dequeue_from_txq()
+> > then takes the packet with a direct child ->dequeue() call, which ignor=
+es
+> > that stash, orphans the peeked skb and desyncs the child's qlen/backlog=
+.
+> > With a qfq child this re-enters the child on an emptied list and
+> > dereferences NULL, panicking the kernel from softirq on ordinary egress=
+.
+> >
+> > Take the packet through qdisc_dequeue_peeked(), as sch_red and sch_sfb
+> > now do. The helper returns the child's stashed skb first and is a no-op
+> > when there is none, so a work-conserving child is unaffected and the
+> > gated path now consumes the skb whose length was charged to the budget.
+> >
+> > Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio schedu=
+ler")
+> > Cc: stable@vger.kernel.org
+> > Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+>
+> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
 
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-> On Jun 16, 2026, at 05:34, saeed bishara <saeed.bishara.os@gmail.com> =
-wrote:
->=20
-> I tried gemini, here its analysis and a fix suggestion:
->=20
-> This is a brilliant, subtle bug. Let's break this down with a rigorous
-> audit of the Linux network device refcounting architecture to see
-> exactly why this Use-After-Free is occurring.
-> The root cause is a classic "Reverse-Teardown Fallacy" colliding with
-> the kernel's dual-refcount lifecycle for network devices (pcpu_refcnt
-> vs. kobject refcount).
->=20
-> The Dual-Lifecycle Trap
-> In modern kernel networking, a struct net_device is kept alive by two
-> distinct mechanisms that must be carefully orchestrated:
-> dev->pcpu_refcnt (Operational Lifecycle): Managed by dev_hold() and
-> dev_put(). This tracks active operational references. The
-> unregister_netdevice sequence blocks in netdev_run_todo() waiting for
-> this to hit zero before it invokes free_netdev().
-> dev->dev.kobj (Memory Lifecycle): The underlying memory structure
-> manager. free_netdev() drops a reference to this. When the kobject
-> refcount hits 0, device_release() is synchronously triggered, and the
-> kmalloc-cg-8k slab is actually freed.
->=20
-> The Exact Race Sequence
-> Look at the teardown order in the error path of sysfs_rtnl_lock():
->=20
-> unbreak:
->    sysfs_unbreak_active_protection(kn);  // LINE 121
->    dev_put(ndev);                        // LINE 122
->=20
-> Normally, developers write error paths in the exact reverse order of
-> initialization. However, in this specific case, adhering to that
-> convention is fatal.
-> The Setup: sysfs_rtnl_lock starts by calling dev_hold(ndev),
-> incrementing the pcpu_refcnt. It then calls
-> sysfs_break_active_protection(), which explicitly calls kobject_get(),
-> elevating the kobj memory refcount.
-> The Unregister Race: In parallel, another CPU initiates device
-> teardown (e.g., echo 1 > del_device on netdevsim). The sysfs entries
-> are deleted, and device_del() drops its primary kobj reference. The
-> teardown thread hits netdev_run_todo() and blocks, waiting for
-> sysfs_rtnl_lock to release its dev_hold.
-> The Lock Fails: sysfs_rtnl_lock fails to get the rtnl lock and jumps =
-to unbreak.
-> The Fatal Drop (Line 121): sysfs_unbreak_active_protection(kn)
-> executes. It calls kobject_put(). Because the unregistration path
-> already dropped the standard kobject references, this is the absolute
-> last kobject reference. device_release() is synchronously invoked, and
-> the net_device memory is instantly freed to the slab.
-> The KASAN Trigger (Line 122): dev_put(ndev) executes. Under the hood,
-> it attempts to call netdev_tracker_free(&ndev->ref_tracker, ...). It
-> reads from the ndev structure that was just destroyed microseconds
-> earlier. KASAN screams.
->=20
-> To fix this, the teardown convention must be deliberately violated to
-> respect the underlying memory dependencies.
->=20
-
-Thanks for the analysis and patch suggestion.
-
-I tested the patch together with the local delay/debug patch that was
-used to trigger the original report.  I rebuilt the kernel, booted a
-fresh VM, and reran the same netdevsim reproducer.
-
-With the patched kernel, the original KASAN UAF was not reproduced in
-this run:
-
-  BUG: KASAN: slab-use-after-free in ref_tracker_free
-
-However, the same rx-0 create_dir failure path was still reached, and
-the run still produced a ref tracker warning:
-
-  kobject_add_internal create_dir failed for rx-0 ...
-  WARNING: lib/ref_tracker.c:295 at ref_tracker_free
-  sysfs_rtnl_lock
-  phys_port_name_show
-
-
-> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> index a1b2c3d4e5f6..7f8e9d0c1b2a 100644
-> --- a/net/core/net-sysfs.c
-> +++ b/net/core/net-sysfs.c
-> @@ -118,8 +118,8 @@ static int sysfs_rtnl_lock(struct kobject *kobj,
-> struct attribute *attr,
->  return 0;
->=20
-> unbreak:
-> - sysfs_unbreak_active_protection(kn);
->  dev_put(ndev);
-> + sysfs_unbreak_active_protection(kn);
->  return ret;
-> }
->=20
->=20
-> On Mon, Jun 15, 2026 at 4:18=E2=80=AFAM Shuangpeng Bai
-> <shuangpeng.kernel@gmail.com> wrote:
->>=20
->> Hi netdev maintainers,
->>=20
->> I hit the following KASAN report while testing an upstream kernel.
->>=20
->> The issue was reproduced with netdevsim. I have not confirmed whether =
-this is
->> specific to netdevsim or whether other net devices can trigger a =
-similar issue.
->>=20
->> The KASAN report shows a slab-use-after-free in ref_tracker_free(), =
-reached from
->> sysfs_rtnl_lock() while reading phys_port_name.
->>=20
->> I reproduced this on commit: e8c2f9fdadee7cbc75134dc463c1e0d856d6e5c7 =
-(May 25 2026)
->>=20
->> To help trigger the bug more reliably, we applied a minimal =
-diagnostic patch
->> that only adds delays and print statements.
->>=20
->> The reproducer and .config files are here.
->> =
-https://gist.github.com/shuangpengbai/b49765d646ec4610917015371aa1c3ca
->>=20
->> I'm happy to test debug patches or provide additional information.
->>=20
->> Reported-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
->>=20
->> [ 3145.449971][T17497] BUG: KASAN: slab-use-after-free in =
-ref_tracker_free (lib/ref_tracker.c:295)
->> [ 3145.452089][T17497] Read of size 1 at addr ffff888107678598 by =
-task cat/17497
->> [ 3145.454439][T17497]
->> [ 3145.454977][T17497] Tainted: [W]=3DWARN
->> [ 3145.454980][T17497] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX =
-+ PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->> [ 3145.454985][T17497] Call Trace:
->> [ 3145.454991][T17497]  <TASK>
->> [ 3145.454994][T17497]  dump_stack_lvl (lib/dump_stack.c:94 =
-lib/dump_stack.c:120)
->> [ 3145.455002][T17497]  print_report (mm/kasan/report.c:378 =
-mm/kasan/report.c:482)
->> [ 3145.455028][T17497]  kasan_report (mm/kasan/report.c:595)
->> [ 3145.455046][T17497]  ref_tracker_free (lib/ref_tracker.c:295)
->> [ 3145.455083][T17497]  sysfs_rtnl_lock =
-(include/linux/netdevice.h:4491 include/linux/netdevice.h:4508 =
-include/linux/netdevice.h:4534 net/core/net-sysfs.c:122)
->> [ 3145.455091][T17497]  phys_port_name_show =
-(net/core/net-sysfs.c:665)
->> [ 3145.455118][T17497]  dev_attr_show (drivers/base/core.c:2421)
->> [ 3145.455128][T17497]  sysfs_kf_seq_show (fs/sysfs/file.c:65)
->> [ 3145.455135][T17497]  seq_read_iter (fs/seq_file.c:231)
->> [ 3145.455144][T17497]  vfs_read (fs/read_write.c:493 =
-fs/read_write.c:574)
->> [ 3145.455169][T17497]  ksys_read (fs/read_write.c:717)
->> [ 3145.455181][T17497]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 =
-arch/x86/entry/syscall_64.c:94)
->> [ 3145.455188][T17497]  entry_SYSCALL_64_after_hwframe =
-(arch/x86/entry/entry_64.S:121)
->> [ 3145.455193][T17497] RIP: 0033:0x7fcf098c43ce
->> [ 3145.455200][T17497] Code: c0 e9 b6 fe ff ff 50 48 8d 3d 6e 08 0b =
-00 e8 69 01 02 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 =
-c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 =
-48 83 ec 28
->> [ 3145.455204][T17497] RSP: 002b:00007ffd05e76b98 EFLAGS: 00000246 =
-ORIG_RAX: 0000000000000000
->> [ 3145.455211][T17497] RAX: ffffffffffffffda RBX: 0000000000020000 =
-RCX: 00007fcf098c43ce
->> [ 3145.455214][T17497] RDX: 0000000000020000 RSI: 00007fcf095e4000 =
-RDI: 0000000000000003
->> [ 3145.455217][T17497] RBP: 00007fcf095e4000 R08: 00007fcf095e3010 =
-R09: 0000000000000000
->> [ 3145.455219][T17497] R10: fffffffffffffbc5 R11: 0000000000000246 =
-R12: 0000000000000000
->> [ 3145.455222][T17497] R13: 0000000000000003 R14: 0000000000020000 =
-R15: 0000000000020000
->> [ 3145.455227][T17497]  </TASK>
->> [ 3145.455229][T17497]
->> [ 3145.479014][T17497] Freed by task 17497 on cpu 0 at 3145.447575s:
->> [ 3145.479559][T17497]  kasan_save_track (mm/kasan/common.c:57 =
-mm/kasan/common.c:78)
->> [ 3145.479963][T17497]  kasan_save_free_info (mm/kasan/generic.c:584)
->> [ 3145.480411][T17497]  __kasan_slab_free (mm/kasan/common.c:253 =
-mm/kasan/common.c:285)
->> [ 3145.480813][T17497]  kfree (include/linux/kasan.h:235 =
-mm/slub.c:2689 mm/slub.c:6251 mm/slub.c:6566)
->> [ 3145.481148][T17497]  device_release (drivers/base/core.c:2542)
->> [ 3145.481567][T17497]  kobject_put (lib/kobject.c:689 =
-lib/kobject.c:720 include/linux/kref.h:65 lib/kobject.c:737)
->> [ 3145.481951][T17497]  sysfs_rtnl_lock (net/core/net-sysfs.c:121)
->> [ 3145.482351][T17497]  phys_port_name_show =
-(net/core/net-sysfs.c:665)
->> [ 3145.482782][T17497]  dev_attr_show (drivers/base/core.c:2421)
->> [ 3145.483154][T17497]  sysfs_kf_seq_show (fs/sysfs/file.c:65)
->> [ 3145.483586][T17497]  seq_read_iter (fs/seq_file.c:231)
->> [ 3145.483975][T17497]  vfs_read (fs/read_write.c:493 =
-fs/read_write.c:574)
->> [ 3145.484334][T17497]  ksys_read (fs/read_write.c:717)
->> [ 3145.484701][T17497]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 =
-arch/x86/entry/syscall_64.c:94)
->> [ 3145.485092][T17497]  entry_SYSCALL_64_after_hwframe =
-(arch/x86/entry/entry_64.S:121)
->> [ 3145.485592][T17497]
->> [ 3145.485794][T17497] The buggy address belongs to the object at =
-ffff888107678000
->> [ 3145.485794][T17497]  which belongs to the cache kmalloc-cg-8k of =
-size 8192
->> [ 3145.486991][T17497] The buggy address is located 1432 bytes inside =
-of
->> [ 3145.486991][T17497]  freed 8192-byte region [ffff888107678000, =
-ffff88810767a000)
->> [ 3145.488159][T17497]
->> [ 3145.488367][T17497] The buggy address belongs to the physical =
-page:
->>=20
->>=20
->> Best,
->> Shuangpeng
->>=20
-
+cheers,
+jamal
 
