@@ -1,185 +1,249 @@
-Return-Path: <netdev+bounces-302122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VGvsDy86Pmo4BwkAu9opvQ
-	(envelope-from <netdev+bounces-302122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:37:03 +0200
+	id T++iKes6PmpjBwkAu9opvQ
+	(envelope-from <netdev+bounces-302123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:40:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350076CB67A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:37:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 022016CB6EC
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:40:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302122-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302122-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=XQ4iLO3X;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302123-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302123-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4045530DFF98
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 08:32:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4C7E30841DD
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 08:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150A03BCD38;
-	Fri, 26 Jun 2026 08:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807882E6116;
+	Fri, 26 Jun 2026 08:34:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009533DCD97
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:32:32 +0000 (UTC)
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544063E5A11;
+	Fri, 26 Jun 2026 08:34:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782462758; cv=none; b=F7fp6+GMpvuNkNVuo8Z3AD/v/zENubrsEokpCNUm8tuVUhRtPQo/bHhbRlZxxX5oclggRZJZ/VfHgEBJBhAa7sGhGfjo0/9wZcXc6Myd/+lC4PwBBoX1SPJZ0OpaFhL13zt6utrYK1AVEqnQ1GMoMI/ViThKtqb3sCXyEhlCmFQ=
+	t=1782462847; cv=none; b=myD80hPXJmiOsCg1pI0WqNNwvr6Jp250+fUkPjQUxriUADSJKLFUgkzeh6IDOo8VHbZhliMAqmciR13KKyDS1Rv8s724iU1UKPW8F2cmDDWx3a8JsMwNM5CBJzHkMNZbeBjnMHG7Pl7Uov1REZfCoqR9TACNP17ZcBeCStPGbcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782462758; c=relaxed/simple;
-	bh=8d8KaIrSD1KGU1nWo5XUDQ8dNqbRwBhwQYmpOtneAZg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VBE7J/wCv0Ux5D/8BSfrs3h2cjMbP5pTZUjGDpb0OwxkWITsZcwXZtrtWA5LGrMdGnhZGwhp6fy2eFnt8nyfCP2qAUjqhlxw+s77QID7kBbnWlSo6trc8Jzn/dfBUt0p53ceMY2rP64Z+7eMkOvmIA/IhmJQ3QlCdiC73a4kxxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.76.78.106
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app2 (Coremail) with SMTP id zQmowAC3UwsKOT5quAM5AA--.2706S2;
-	Fri, 26 Jun 2026 16:32:11 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	petrm@mellanox.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	bronzed_45_vested@icloud.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net v2 1/1] net: sched: ets: avoid deficit wrap and bound empty dequeue  rounds
-Date: Fri, 26 Jun 2026 16:32:00 +0800
-Message-ID: <0e17a0309061300d31036a6a4c139919192f6373.1782379460.git.bronzed_45_vested@icloud.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1782462847; c=relaxed/simple;
+	bh=xdzlg1QpaIDIrRyGpdS3xwLhozduuRF0hDOjQLQNG5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SvIqidewIj39JoLLEhxLsp1EA0zdS7o6dPrOZbv6G3jyKbrX+ohGyZpHs/zckFn+hOY/Xw+nihzd+3kWd9nTfkR6m/R0T4ne7SaIx/whdb1bl8sPlhQrmIVrx4MhRGa+q549Is4n2RrVsz9eBsnlR5i5Q9bdTK8HLvAAoJMiPKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XQ4iLO3X; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 852794E40940;
+	Fri, 26 Jun 2026 08:33:58 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5795760232;
+	Fri, 26 Jun 2026 08:33:58 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0723C104C839C;
+	Fri, 26 Jun 2026 10:33:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782462837; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=Fl/6D2iiLAuBnGZZ9BAjfhN71sA1OHwcFqVLpgKZ0yQ=;
+	b=XQ4iLO3XnqhVIw2WQ96ldk8M4w0P8kAZe9BnJPaRFrcTTGuNDXwLkUS3lXGYp+sAjjRTM0
+	2ZWFym89G7dcjmavh1HF7Gh+DcC6JN3L/LbRJm2Z55xLk2btObpDlNXOi7d9ITpHHKrCuj
+	qdFWC6cRlLO0njOO1FQTqQ1Kfj1ozejbvFJtxdORedYEl3POYJlbFd+WXK3Y/qjEwHp9MI
+	XGuC45BhyahjzDBLwrMQDiQE2LfdBSYxZPOSR4dniQINIJG3ArJgt7D6f7s+6iDas8gmQ0
+	NWvfC40naxwycdUdIsvILCqeZspbgZ7FI9N7DP6soSqAkVqbl9cB4zOTzIZQUg==
+Message-ID: <65d26fd2-fbb3-49cd-a9ac-07863d9a8909@bootlin.com>
+Date: Fri, 26 Jun 2026 10:33:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowAC3UwsKOT5quAM5AA--.2706S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF1kGFWDtF4kKr45try7Wrg_yoW5Gr1kpF
-	97JFZrKFZ7Wr1xX3W0krW7u3y3CwsrGw17Grs5t3s0qrs8Wa1Fq34jga4a9rs8KrZ5Cay2
-	yF12q3sF9a1UAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsKCWo+NlQASgAAs1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
+ ethtool pause validation
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
+ <20260526172447.10ca4b9e@kernel.org>
+ <5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
+ <38bafe7e-d419-46f7-8fa7-87e9183e578c@bootlin.com>
+ <58f37d6e-973b-4242-be82-0561ccdb1a6f@lunn.ch>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <58f37d6e-973b-4242-be82-0561ccdb1a6f@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302123-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302122-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:petrm@mellanox.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:o.rempel@pengutronix.de,m:vladimir.oltean@nxp.com,m:f.fainelli@gmail.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,mellanox.com,gmail.com,lzu.edu.cn,icloud.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,icloud.com:mid,icloud.com:email,mojatatu.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 350076CB67A
-
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
-
-ETS keeps each DRR-style deficit in a u32 and replenishes it with
-the configured quantum whenever the head packet is too large. Both
-the quantum and qdisc_pkt_len() are user-controlled inputs: a large
-quantum can wrap the deficit counter, while a tiny quantum combined
-with an inflated qdisc_pkt_len() can force billions of iterations in
-softirq context before any packet becomes eligible.
-
-Store the deficit in u64 so replenishment cannot wrap the counter.
-This keeps the existing dequeue logic unchanged while fixing the
-overflow condition.
-
-Bound one dequeue attempt to at most nbands * 2 ETS rotations, as
-suggested in review. This avoids the livelock without adding heavier
-logic to the fast path.
-
-Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Suggested-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-changes in v2:
-  - Instead of doing a div() in the fast path, simply bound the loop per
-    dequeue
-  - v1 Link: https://lore.kernel.org/all/20260615103759.2404228-2-n05ec@lzu.edu.cn/
+X-Rspamd-Queue-Id: 022016CB6EC
 
 
- net/sched/sch_ets.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> Sphinx follows pythons object orientate structure. So you could have a
+> class test_ethtool_pause_advertising, with class documentation. And
+> then methods within the class which are individual tests.  The
+> commented out section would then be method documentation.
 
-diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-index cb8cf437ce87..12a156ccb0a6 100644
---- a/net/sched/sch_ets.c
-+++ b/net/sched/sch_ets.c
-@@ -40,7 +40,7 @@ struct ets_class {
- 	struct list_head alist; /* In struct ets_sched.active. */
- 	struct Qdisc *qdisc;
- 	u32 quantum;
--	u32 deficit;
-+	u64 deficit;
- 	struct gnet_stats_basic_sync bstats;
- 	struct gnet_stats_queue qstats;
- };
-@@ -463,6 +463,8 @@ ets_qdisc_dequeue_skb(struct Qdisc *sch, struct sk_buff *skb)
- static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
- {
- 	struct ets_sched *q = qdisc_priv(sch);
-+	unsigned int max_loops = READ_ONCE(q->nbands) * 2;
-+	unsigned int loops = 0;
- 	struct ets_class *cl;
- 	struct sk_buff *skb;
- 	unsigned int band;
-@@ -499,6 +501,8 @@ static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
- 
- 		cl->deficit += READ_ONCE(cl->quantum);
- 		list_move_tail(&cl->alist, &q->active);
-+		if (++loops > max_loops)
-+			goto out;
- 	}
- out:
- 	return NULL;
--- 
-2.47.3
+Good point, so maybe something along these lines :
 
+ - A class for the test
+ - methods for indivitual tests
+ - For readability, I've written what the internal test helper would look
+   like (_adv_test), and how a test would look like without the helper in
+   adv_rx_on_tx_on().
+
+I'm already diving into coding, but it helps me a bit in the definition of the
+"description" format :)
+
+this is what the class would look like :
+
+
+class test_ethtool_pause_advertising:
+    """Pause advertisement
+
+    Validate that changing pause params through the ETHTOOL_MSG_PAUSE command
+    translates to a change in the advertised pause params, and that these
+    parameters are correct w.r.t the supported pause params and requested pause
+    params.
+    
+    This exercises the .set_pauseparams() ethtool ops for MAC configuration,
+    as well as the reconfiguration of the PHY's advertising and negociation.
+    
+    On non-phylink MACs, the MAC should call phy_set_sym_pause() to update the
+    PHY's advertising, and restart a negotiation with phy_start_aneg() if
+    need be. Failure to do so will result on the wrong advertising parameters.
+    
+    Pn phylink-enabled MACs, phylink deals with the PHY reconfiguration provided
+    the MAC driver calls phylink_ethtool_set_pauseparam().
+    
+    Failing this test likely means that the PHY driver is not correctly advertising
+    pause settings, either due to the MAC triggering a PHY reconfiguration,
+    a misconficonfiguration of the advertising registers by the PHY, or by
+    mis-handling the phydev->advertising bitfield in the PHY driver directly.
+    
+    The validation is made by looking at the advertised modes locally, as well as
+    what the peer's 'lp_advertising' values report.
+
+    cfg -- local device's interface configuration
+    peer -- peer device handle
+    """
+
+    def _adv_test(cfg, peer, rx, tx, adv, not_adv):
+        ret = cfg.run(f"ethtool -A ethX rx {rx} tx {tx} autoneg on")
+        ksft_eq(ret, 0)
+
+        linkmodes = cfg.get_advertising()
+        if adv:
+            ksft_in(adv, linkmodes, f"rx {rx} tx {tx} must advertise {adv}")
+
+        if not_adv:
+            ksft_not_in(not_adv, linkmodes, f"rx {rx} tx {tx} must not advertise {not_adv}")
+
+        remote_linkmodes = peer.get_lp_advertising()
+
+        if adv:
+            ksft_in(adv, linkmodes, f"PHY does not advertise {adv}")
+
+        if not_adv:
+            ksft_not_in(not_adv, linkmodes, f"PHY incorrectly advertises {not_adv}")
+
+
+    @ksft_ethtool_needs_supported_allof([Pause])
+    def adv_rx_on_tx_on(cfg, peer) -> None:
+        """Advertising test with rx on tx on
+
+        - run 'ethtool -A ethX rx on tx on autoneg on'
+        - FAIL if the return isn't 0
+        - FAIL if ETHTOOL_A_LINKMODES_OURS's advertised values does not contain
+          "Pause" or contains "Asym_Pause"
+        - FAIL if peer's lp_advertising doesn't contain "Pause" or contains
+          "Asym_Pause"
+        - Succeed otherwise
+        """
+        ret = cfg.run('ethtool -A ethX rx on tx on autoneg on')
+        ksft_eq(ret, 0)
+
+        linkmodes = cfg.get_advertising()
+        ksft_in('Pause', linkmodes, "rx on tx on must advertise Pause")
+        ksft_not_in('Asym_Pause', linkmodes, "rx on tx on must not advertise Asym_Pause")
+
+        remote_linkmodes = peer.get_lp_advertising()
+        ksft_in('Pause', linkmodes, "PHY does not advertise Pause")
+        ksft_not_in('Asym_Pause', linkmodes, "PHY incorrectly advertises Asym_Pause")
+
+
+    @ksft_ethtool_needs_supported_allof([Pause, Asym_Pause])
+    def adv_rx_on_tx_off(cfg, peer) -> None:
+        """Advertising test with rx on tx off
+
+        - run 'ethtool -A ethX rx on tx off autoneg on'
+        - FAIL if the return isn't 0
+        - FAIL if ETHTOOL_A_LINKMODES_OURS's advertised values does not contain
+          "Pause" and "Asym_Pause"
+        - FAIL if peer's lp_advertising doesn't contain "Pause" and "Asym_Pause"
+        - Succeed otherwise
+        """
+
+        _adv_test(cfg, peer, 'on', 'off', ["Pause", "Asym_Pause"], [])
+
+    @ksft_ethtool_needs_supported_allof([Asym_Pause])
+    def adv_rx_off_tx_on(cfg, peer) -> None:
+        """Advertising test with rx off tx on
+
+        - run 'ethtool -A ethX rx off tx on autoneg on'
+        - FAIL if the return isn't 0
+        - FAIL if ETHTOOL_A_LINKMODES_OURS's advertised values does not contain
+          "Asym_Pause" or contains "Pause"
+        - FAIL if peer's lp_advertising doesn't contain "Pause" and "Asym_Pause"
+        - Succeed otherwise
+        """
+
+        _adv_test(cfg, peer, 'off', 'on', ["Asym_Pause"], ["Pause"])
+
+
+Maxime
 
