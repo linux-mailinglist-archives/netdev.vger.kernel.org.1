@@ -1,224 +1,229 @@
-Return-Path: <netdev+bounces-302144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302145-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7svuEUhaPmqQEQkAu9opvQ
-	(envelope-from <netdev+bounces-302144-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:54:00 +0200
+	id DTvACLVaPmq3EQkAu9opvQ
+	(envelope-from <netdev+bounces-302145-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:55:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AC66CC31E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:53:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 741C26CC38C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:55:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MyMyQ5k5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302144-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302144-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=diFhm5fv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302145-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302145-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0B6E43046152
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:53:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF13D300A747
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785013EFFDD;
-	Fri, 26 Jun 2026 10:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCB93ED122;
+	Fri, 26 Jun 2026 10:55:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550DA3EFFC4;
-	Fri, 26 Jun 2026 10:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3091A3160
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 10:55:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782471231; cv=none; b=jWsQH57JA5g/Uknm0+nLU5kRYaFHGjzpNtK8NJDxy7/xnpfaQWOSvQwuvnn/J4KMuLZCkhebp2MoEtd3yzUZ0CSF7gX6HwQhxjDt2bkQ0NMDFr0ElVuyEPHpYTqsrC2n2Yl34G5zHOKEfzyx9Gxi7hx4uZVneNTw5RN8pbb7ZUQ=
+	t=1782471307; cv=none; b=clWerSODeH7uwVhIfrk63Rhu6FDzKJP+plNwmyaOSeh+GdFSU75nzpKXwoyb2ap6ziyS6HGCzYlt0B1lOxj8ybTu7csMzLOezyld/QfyYsbnFXavM9/HY2RjBEWZFuqD+SUHSbCFB/w2HpV5CvnJqsFkl9LwG/4+0EHToEXbdbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782471231; c=relaxed/simple;
-	bh=buHFoFbfTBSfi9LRPdDkR5ZejiADqlu7Fa/JhVvyYGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kszCJCzOY4cktI76gFqjUVO1OvLbwADYYNaxZ5vZJmgbQuyuA7gko8KQaOVJjdIfGb+CJiFhwaoLIJULO18CYrLo4qSro8cReCBwto3bG828duDWgoPA9j7IO5kLXwbJevMQtDngsAJe3D7STi1GwvjiP98gYUBA1I9P9R3/ZCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MyMyQ5k5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B7CA1F000E9;
-	Fri, 26 Jun 2026 10:53:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782471230;
-	bh=Xs6FIqn23+iaFq+b1/TbaOk/+AW8nbnoFpHSIh+iuY4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MyMyQ5k5eC+YQNXJ3vov1PPg4H9nfA90hYwbEBY+Mt+75uH5zvIu0vDC1rzl7/UER
-	 RWeQyzy3ARhZaEokyNgcPSQvlvaSbsQpGnjuDLIH0jkSVYE4uXNa/80WW/Rk7RE8V2
-	 iZeiMC9PJ9nRkeA3lGSnaKlqCCSM/ZutmprVVXFLDhYF8YXuq45P1yLkW1HAS+uAcZ
-	 IIna8k9uLW2XXPP8smZx9yfNcM7xTVqcKDwYr5J1gQsjWZHtI5W7T4TovIr1+nw1pW
-	 as6PQ6QfwhFz+fkuqJrclbjRzywjzJ2lEwLl563AaALbDbEPt0gQ8xAkDGE3j9hMyD
-	 puZGXD4AeFwHw==
-Date: Fri, 26 Jun 2026 12:53:46 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: George Moussalem <george.moussalem@outlook.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org
-Subject: Re: [PATCH 4/6] dt-bindings: net: bluetooth: Document Qualcomm
- IPQ5018 Bluetooth controller
-Message-ID: <20260626-discerning-light-swan-6b599c@quoll>
-References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
- <20260625-ipq5018-bluetooth-v1-4-d999be0e04f7@outlook.com>
+	s=arc-20240116; t=1782471307; c=relaxed/simple;
+	bh=rZ08VcXOIrjOKCf/cAe0dTUIbyeOhQ4FOfMIPhkaGBY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Cnk0ZdTc9zvFxQzWR6X6fwJ4eq9sF4dlVUK0YYd5ejcO2mq1Ln7+uVd594Nm71Hd62PmqVSbeG3/tTjZQt6eBGoTNBQaiz0PpGvrqgoC7QPKcMKa7yfO8EOX9tWx2Talqet0tQPtY0EtI2sY/8k/bZLKmOnbHFYb0/i45Tj58KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=diFhm5fv; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782471304;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FDoLmRFdjTWaJPTg5Rz1/wyvQlw0NWoNDIzgPbuVeHs=;
+	b=diFhm5fvyMBRVrUTxbctVhb//hrSXyn4I63NKxt5O2mrXolIgrvYN0XAlzYABV1Dfb/B1U
+	Z+gnMLFRZbRacxkPwQH9g4hCfP23Zj1FX8Rsqxd1HW0GOfde9gFfLk293p8S9izBt6A2Ly
+	dFO19ax1x1xF29CwL51zvRRheud6xdQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-QwSM5qfePAyDVLZIptudnw-1; Fri,
+ 26 Jun 2026 06:55:00 -0400
+X-MC-Unique: QwSM5qfePAyDVLZIptudnw-1
+X-Mimecast-MFC-AGG-ID: QwSM5qfePAyDVLZIptudnw_1782471298
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B72E1955F26;
+	Fri, 26 Jun 2026 10:54:58 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.44.32.38])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 919EB1800361;
+	Fri, 26 Jun 2026 10:54:54 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: horms@kernel.org
+Cc: aleksandr.loktionov@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org,
+	jacob.e.keller@intel.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH net v7 3/4] iavf: send MAC change request synchronously
+Date: Fri, 26 Jun 2026 12:54:53 +0200
+Message-ID: <20260626105453.215716-1-jtornosm@redhat.com>
+In-Reply-To: <20260624163148.1146093-2-horms@kernel.org>
+References: <20260624163148.1146093-2-horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260625-ipq5018-bluetooth-v1-4-d999be0e04f7@outlook.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	FREEMAIL_TO(0.00)[outlook.com];
-	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302144-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de,vger.kernel.org,lists.infradead.org];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:aleksandr.loktionov@intel.com,m:anthony.l.nguyen@intel.com,m:davem@davemloft.net,m:edumazet@google.com,m:intel-wired-lan@lists.osuosl.org,m:jacob.e.keller@intel.com,m:jtornosm@redhat.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:przemyslaw.kitszel@intel.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302145-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,outlook.com:email,quoll:mid,devicetree.org:url]
+	RCVD_COUNT_FIVE(0.00)[6];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F1AC66CC31E
+X-Rspamd-Queue-Id: 741C26CC38C
 
-On Thu, Jun 25, 2026 at 06:10:08PM +0400, George Moussalem wrote:
-> Document the Qualcomm IPQ5018 Bluetooth controller.
+>>       if (!ether_addr_equal(netdev->dev_addr, addr->sa_data))
+>>               return -EACCES;
+
+> [Severity: High]
+> Will this cause a persistent state mismatch if a timeout is followed by a
+> retry?
+>
+> If iavf_set_mac_sync() times out, it returns -EAGAIN and bypasses this
+> rollback, leaving adapter->hw.mac.addr updated but netdev->dev_addr at the
+> old MAC.
+>
+> If the user then retries before the PF asynchronously completes the original
+> request, iavf_add_ether_addrs() returns -EBUSY. Since -EBUSY != -EAGAIN,
+> the rollback runs, forcibly reverting adapter->hw.mac.addr to the old MAC.
 > 
-> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-> ---
->  .../bindings/net/bluetooth/qcom,ipq5018-bt.yaml    | 63 ++++++++++++++++++++++
->  1 file changed, 63 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
-> new file mode 100644
-> index 000000000000..afd33f851858
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
-> @@ -0,0 +1,63 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/qcom,ipq5018-bt.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm IPQ5018 Bluetooth
-> +
-> +maintainers:
-> +  - George Moussalem <george.moussalem@outlook.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - qcom,ipq5018-bt
-> +
-> +  interrupts:
-> +    items:
-> +      - description:
-> +          Interrupt line from the M0 Bluetooth Subsystem to the host processor
+> When the PF's delayed success response finally arrives,
+> iavf_virtchnl_completion() sees the old MAC in both hw.mac.addr and
+> netdev->dev_addr, bypassing the netdev MAC update. The PF hardware is now
+> programmed with the new MAC, but the kernel retains the old MAC, dropping
+> traffic.
 
-What is M0?
+This scenario requires an extremely narrow timing window: a 2.5s PF timeout
+(rare in normal operation, PF typically responds much faster), followed by an
+immediate retry before adminq_task clears current_op (microsecond window).
 
-Anyway, this part feels completely redundant. Can "interrupts" property
-be anything else than an interrupt line from the device to the host
-processor?
+Even if this race occurs, it's recoverable - the retry fails with -EBUSY
+and the user retries again successfully. This is a transient failure, not
+permanent state corruption.
+
+>>       if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
+>>               /* bail because we already have a command pending */
+>>               dev_err(&adapter->pdev->dev, "Cannot add filters, command %d pending\n",
+>>                      adapter->current_op);
+>> -             return;
+>> +             return -EBUSY;
+>>       }
+>
+> [Severity: High]
+> Could routine background tasks cause MAC changes to frequently fail?
+>
+> The watchdog task routinely sets adapter->current_op for background commands
+> like VIRTCHNL_OP_GET_STATS. If iavf_set_mac() is called during this window,
+> iavf_set_mac_sync() will hit this check and immediately fail the MAC change
+> with -EBUSY.
+>
+> Because there is no retry logic in iavf_set_mac(), this error propagates
+> directly to userspace, making MAC address configuration randomly fail based
+> on watchdog timing.
+
+Background virtchnl operations (like GET_STATS) complete quickly, typically
+within milliseconds. The collision window is very small.
+
+Fail-fast with -EBUSY is semantically correct and allows user-space retry.
+If a collision occurs, it's spurious and recoverable immediately on retry.
+This is acceptable compared to the complexity and deadlock risks of queuing
+or waiting for background operations to complete while holding netdev_lock.
+
+>> -static void iavf_mac_add_reject(struct iavf_adapter *adapter)
+>> + */
+>> +void iavf_mac_add_reject(struct iavf_adapter *adapter)
+>>  {
+>>       struct net_device *netdev = adapter->netdev;
+>>       struct iavf_mac_filter *f, *ftmp;
+>
+> [Severity: Medium]
+> Does exporting and reusing iavf_mac_add_reject() for local rollback cause
+> unintended background MAC changes?
+>
+> When the user requests a MAC address that is already in the filter list
+> (e.g., a secondary MAC), iavf_add_filter() sets f->is_new_mac = false and
+> f->add = true, and flags IAVF_FLAG_AQ_ADD_MAC_FILTER.
+>
+> If the synchronous operation fails locally (like the -EBUSY return above),
+> iavf_set_mac() calls this function. However, iavf_mac_add_reject() only
+> clears the pending state and removes the filter if f->is_new_mac is true:
+>
+>    if (f->is_new_mac) {
+>        list_del(&f->list);
+>        kfree(f);
+>    }
+>
+> Reused filters are ignored, leaving f->add = true and the
+> IAVF_FLAG_AQ_ADD_MAC_FILTER flag active. The background watchdog task will
+> eventually process this flag and blindly send the MAC configuration to the
+> PF, even though the VF already aborted the operation locally.
+
+This scenario only occurs when setting the primary MAC to an address that
+already exists as a secondary MAC in the filter list - an extremely rare
+configuration.
+
+Even if this occurs and the watchdog later sends the MAC to the PF, it is
+harmless: the MAC is already configured on the PF (as a secondary), so the
+redundant ADD_ETH_ADDR message has no adverse effect.
+
+The common case - changing primary MAC to a new address - uses is_new_mac =
+true and is handled correctly by the rollback logic.
 
 
-> +          to notify it of events such as re
 
-This feels useful, but cut/incomplete.
-
-> +
-> +  qcom,ipc:
-> +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> +    items:
-> +      - items:
-> +          - description: phandle to a syscon node representing the APCS registers
-> +          - description: u32 representing offset to the register within the syscon
-> +          - description: u32 representing the ipc bit within the register
-> +    description: |
-> +      These entries specify the outgoing IPC bit used for signaling the remote
-> +      M0 BTSS core of a host event or for sending an ACK if the remote processor
-> +      expects it.
-> +
-> +  qcom,rproc:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Phandle to the remote processor node representing the M0 BTSS core.
-> +
-> +required:
-> +  - compatible
-> +  - interrupts
-> +  - qcom,ipc
-> +  - qcom,rproc
-> +
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +  - $ref: qcom,bluetooth-common.yaml
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +    bluetooth: bluetooth {
-
-Drop unused label
-
-> +      compatible = "qcom,ipq5018-bt";
-> +
-> +      qcom,ipc = <&apcs_glb 8 23>;
-> +      interrupts = <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>;
-
-No firmware to load?
-
-It feels like remoteproc node split is fake. The property qcom,rproc is
-even more supporting that case. Shouldn't this be simply one device -
-bluetooth? What sort of two devices do you have exactly? How can I
-identify them in the hardware?
-
-> +
-> +      qcom,rproc = <&m0_btss>;
-
-Best regards,
-Krzysztof
+These concerns represent theoretical edge cases that are extremely unlikely
+in practice. The synchronous approach fixes a reproducible deadlock affecting
+all users in production, allowing the user to retry and complete the
+operation. The trade-off is justified.
 
 
