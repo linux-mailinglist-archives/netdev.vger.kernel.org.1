@@ -1,58 +1,78 @@
-Return-Path: <netdev+bounces-302111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O/5AAtcrPmp1AwkAu9opvQ
-	(envelope-from <netdev+bounces-302111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 09:35:51 +0200
+	id ZKm4GVctPmq4AwkAu9opvQ
+	(envelope-from <netdev+bounces-302112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 09:42:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7128D6CAFE9
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 09:35:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465F66CB062
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 09:42:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302111-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302111-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mediatek.com header.s=dk header.b=Uk8XLpma;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302112-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302112-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mediatek.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E282C3011A60
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 07:35:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19562301FD66
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 07:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136553E1233;
-	Fri, 26 Jun 2026 07:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8293C3E2764;
+	Fri, 26 Jun 2026 07:42:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349F93DFC99
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 07:35:43 +0000 (UTC)
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D993E1233;
+	Fri, 26 Jun 2026 07:42:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782459349; cv=none; b=jGNGvcqvVCmM43EMgfIKhhK2xARdEfeDjZy/lEhOS/frnGxGX1rYfEzLAesIuaf1/BCrX3wJ7fV+bVWwNN4n+WsLWH79GPOqSh5e51HR8YdbaOL5/Nd9fVMRamFwQTFCZTDTtFx6GngtV2xplARp3m6Qi0lBcFvTFIO7DisyuIA=
+	t=1782459732; cv=none; b=Ijaf3RbGlas6l2YgCQX5TwrHrPN/GzwE6HCuaUD/8HVBavhkAuxIDAf3gi9OnfdwLXjm9/yvqTnUti+7CXD0/T8znWWdXAFaLIvyz/aEhWYmEyFGIkiesSo2E0pTuCpTp3fpA2n6ZOjQV8uEAwG0HNuBFVXs9zLq+k2t6eIVuYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782459349; c=relaxed/simple;
-	bh=eP30SICnZo6M5PNnkdKFYIzlhguK54IYXWNFZilzDhc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VTYFXbILav8jaagwXi0kwFV/N7vJk+PeKPqtOb3ysUJChxWWZV5mw9h2rFw4AR7dg5/E4Pof53/avjjWZLhXWwLOZB5LnZTYszevug3X3T9qWOFNoEQU/ZOW+drqy1J56zHygyc8kxtaS7eoUXVqI9oDVIJGdvjVDDdCmhG0/uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hust.edu.cn; spf=pass smtp.mailfrom=hust.edu.cn; arc=none smtp.client-ip=52.175.55.52
-Received: from hust.edu.cn (unknown [172.16.0.50])
-	by app1 (Coremail) with SMTP id HgEQrABnbCibKz5qKyIVAQ--.38701S2;
-	Fri, 26 Jun 2026 15:34:51 +0800 (CST)
-Received: from uu22.. (unknown [38.79.119.137])
-	by gateway (Coremail) with SMTP id _____wB3fxONKz5qFJxfAA--.21583S2;
-	Fri, 26 Jun 2026 15:34:50 +0800 (CST)
-From: Yinhao Hu <dddddd@hust.edu.cn>
-To: David Heidelberg <david@ixit.cz>
-Cc: Kees Cook <kees@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Dan Carpenter <error27@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Samuel Ortiz <sameo@linux.intel.com>,
-	Michael Thalmeier <michael.thalmeier@hale.at>,
-	netdev@vger.kernel.org,
-	dzm91@hust.edu.cn,
-	hust-os-kernel-patches@googlegroups.com,
-	Yinhao Hu <dddddd@hust.edu.cn>
-Subject: [PATCH net] nfc: pn533: hold a reference to the request skb during send_frame
-Date: Fri, 26 Jun 2026 00:34:34 -0700
-Message-ID: <20260626073434.3977525-1-dddddd@hust.edu.cn>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782459732; c=relaxed/simple;
+	bh=dMXfk3HlwY6A8X7XaGBJbZYq2iAMs1BJMxWHTq3Ios8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i8zqIT7RX0v4Qy5wzN8sFpAJOvby/QzB2nGcpjL7rK8o3XjFnEar5WmlI1E3OWMwr3iMixAt042YS+0WJHArwRwaIrknn6gC5evUODIaC+TGM5tLygT7eHqqdZEvFi7z1EAxn/Ru7lXXR0meiBcw9KIdTLb9cH5CZylz1eo0GZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Uk8XLpma; arc=none smtp.client-ip=60.244.123.138
+X-UUID: 87336378713211f1b1788b6acf885367-20260626
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=+G0uNszBCZbn+pbz/tbwkWd63bDos+8XW4wEVGaz6VI=;
+	b=Uk8XLpma+FIOON+o3in594yLedbj8ygROTeZ1SfcWVO06AtdwS6nmgxxQ+NByji4ub59XAOQ/7Shn4EgHHNcEsY4Q5+S2ZkOJrS2t5noN9klBxLljddyxdUqCQ/NYQG3DavTtV+coccbltwOejUfJiCqyK1Z+t+MLDlqhxVNrKA=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.17,REQID:0eb331d6-a465-4fad-98e8-eaca5d1b4eeb,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:d497b38,CLOUDID:573496da-5eb1-42d4-aa37-265f0625e786,B
+	ulkID:nil,BulkQuantity:0,SF:102|836|865|888|898,TC:-5,Content:0|15|50,EDM:
+	-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,AV:
+	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 87336378713211f1b1788b6acf885367-20260626
+Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1165511524; Fri, 26 Jun 2026 15:42:05 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Fri, 26 Jun 2026 15:42:05 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Fri, 26 Jun 2026 15:42:04 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<matthias.bgg@gmail.com>, <angelogioacchino.delregno@collabora.com>,
+	<willemb@google.com>, <imv4bel@gmail.com>, <alice@isovalent.com>,
+	<eilaimemedsnaimel@gmail.com>, <sd@queasysnail.net>
+CC: <lena.wang@mediatek.com>, <stable@vger.kernel.org>, Shiming Cheng
+	<shiming.cheng@mediatek.com>
+Subject: [PATCH] Subject: [PATCH] net: gro: fix double aggregation of flush-marked skbs
+Date: Fri, 26 Jun 2026 15:40:59 +0800
+Message-ID: <20260626074059.25244-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,138 +80,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:HgEQrABnbCibKz5qKyIVAQ--.38701S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFyUWF4fJw4UGFWruw4Uurg_yoW5XF4Dpa
-	9rZFyYkr1DWr4UZFsrG3yku345JF1kAry7K342g3Z3Jr95JrykJrWSyFy0qwn3ur97ury7
-	urWDXF45Ga4qyFDanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUm2b7Iv0xC_KF4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
-	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1ln4kS14v26r
-	126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I8C
-	rVACY4xI64kE6c02F40Ex7xfMcIj64x0Y40En7xvr7AKxVW8Jr0_Cr1UMcIj6x8ErcxFaV
-	Av8VW8uFyUJr1UMcIj6xkF7I0En7xvr7AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8
-	JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04
-	k20xvE74AGY7Cv6cx26r4fZr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAF
-	wI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
-	AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1l
-	IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
-	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVF
-	xhVjvjDU0xZFpf9x07jTa0QUUUUU=
-X-CM-SenderInfo: bgsqjkiyqyjko6kx23oohg3hdfq/
+Content-Type: text/plain
+X-MTK: N
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[hust.edu.cn];
-	TAGGED_FROM(0.00)[bounces-302111-lists,netdev=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:kees@kernel.org,m:krzk@kernel.org,m:error27@gmail.com,m:kuba@kernel.org,m:sameo@linux.intel.com,m:michael.thalmeier@hale.at,m:netdev@vger.kernel.org,m:dzm91@hust.edu.cn,m:hust-os-kernel-patches@googlegroups.com,m:dddddd@hust.edu.cn,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302112-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,isovalent.com,queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linux.intel.com,hale.at,vger.kernel.org,hust.edu.cn,googlegroups.com];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:willemb@google.com,m:imv4bel@gmail.com,m:alice@isovalent.com,m:eilaimemedsnaimel@gmail.com,m:sd@queasysnail.net,m:lena.wang@mediatek.com,m:stable@vger.kernel.org,m:shiming.cheng@mediatek.com,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,hust.edu.cn:email,hust.edu.cn:mid,hust.edu.cn:from_mime]
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mediatek.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7128D6CAFE9
+X-Rspamd-Queue-Id: 465F66CB062
 
-__pn533_send_async() publishes the command and then calls
-dev->phy_ops->send_frame(). Once dev->cmd is set, an incoming frame
-can be matched to this command: the I2C threaded IRQ runs
-pn533_recv_frame(), which queues cmd_complete_work, and
-pn533_send_async_complete() frees cmd->req with consume_skb().
+The new skb_gro_receive_list() function is missing a critical safety check
+present in the legacy skb_gro_receive() path. Specifically, it does not
+validate NAPI_GRO_CB(skb)->flush before allowing packet aggregation.
 
-On the I2C transport, pn533_i2c_send_frame() still dereferences the same
-skb after i2c_master_send() returns, so a completion that races the
-send can free the skb while the transport is still using it.
+This allows already-GRO'd packets with existing frag_list to be
+re-aggregated into a new GRO session, corrupting the frag_list chain
+structure. When skb_segment() attempts to unpack these malformed packets,
+it encounters invalid state and triggers a kernel panic.
 
-The request skb is owned by the command object and may be freed by
-command completion at any time after dev->cmd is published, so the
-transport send path must not assume it stays alive. Hold a temporary
-reference to the request skb across the send_frame() call so the
-transport always sees a live skb even if completion races the send.
-Add a pn533_send_cmd_frame() helper and use it from all three send
-paths.
+Scenario (Tethering/Device forwarding):
+  1. Driver: Driver Generated aggregated packet P1 via LRO with frag_list
+  2. Dev A: Receives aggregated fraglist packet and flush flag set
+  2. Dev A: Re-enters GRO, skb_gro_receive_list() is called
+  4. Missing flush check allows re-aggregation despite flush flag
+  5. Frag_list chain becomes corrupted (loops or dangling refs)
+  6. Dev B: TX path calls skb_segment(), crashes on corrupted frag_list
 
-Fixes: 9815c7cf22da ("NFC: pn533: Separate physical layer from the core implementation")
-Signed-off-by: Yinhao Hu <dddddd@hust.edu.cn>
+Root cause in skb_segment():
+  The check at line ~4891:
+    if (hsize <= 0 && i >= nfrags && skb_headlen(list_skb) &&
+        (skb_headlen(list_skb) == len || sg)) {
+
+  When frag_list is corrupted by double aggregation, when list_skb is
+  a NULL pointer from skb->next, skb_headlen(list_skb) dereference
+  NULL/corrupted pointers occurs.
+
+Call Trace:
+ skb_headlen(NULL skb)
+ skb_segment
+ tcp_gso_segment
+ tcp4_gso_segment
+ inet_gso_segment
+ skb_mac_gso_segment
+ __skb_gso_segment
+ skb_gso_segment
+ validate_xmit_skb
+ validate_xmit_skb_list
+ sch_direct_xmit
+ qdisc_restart
+ __qdisc_run
+ qdisc_run
+ net_tx_action
+
+Fix: Add NAPI_GRO_CB(skb)->flush validation to the early-return check in
+skb_gro_receive_list(), matching the defensive programming pattern of
+skb_gro_receive().
+
+Fixes: 9dc2c3cd6c11 ("net: add fraglist GRO/GSO support")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
 ---
- drivers/nfc/pn533/pn533.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ net/core/gro.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nfc/pn533/pn533.c b/drivers/nfc/pn533/pn533.c
-index d7bdbc82e2ba..55bbfa32d695 100644
---- a/drivers/nfc/pn533/pn533.c
-+++ b/drivers/nfc/pn533/pn533.c
-@@ -434,6 +434,18 @@ static int pn533_send_async_complete(struct pn533 *dev)
- 	return rc;
- }
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 35f2f708f010..076247c1e662 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -229,7 +229,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
  
-+static int pn533_send_cmd_frame(struct pn533 *dev, struct pn533_cmd *cmd)
-+{
-+	struct sk_buff *req = cmd->req;
-+	int rc;
-+
-+	skb_get(req);
-+	dev->cmd = cmd;
-+	rc = dev->phy_ops->send_frame(dev, req);
-+	dev_kfree_skb(req);
-+	return rc;
-+}
-+
- static int __pn533_send_async(struct pn533 *dev, u8 cmd_code,
- 			      struct sk_buff *req,
- 			      pn533_send_async_complete_t complete_cb,
-@@ -458,8 +470,7 @@ static int __pn533_send_async(struct pn533 *dev, u8 cmd_code,
- 	mutex_lock(&dev->cmd_lock);
+ int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
+ {
+-	if (unlikely(p->len + skb->len >= 65536))
++	if (unlikely(p->len + skb->len >= 65536 ||
++		     NAPI_GRO_CB(skb)->flush))
+ 		return -E2BIG;
  
- 	if (!dev->cmd_pending) {
--		dev->cmd = cmd;
--		rc = dev->phy_ops->send_frame(dev, req);
-+		rc = pn533_send_cmd_frame(dev, cmd);
- 		if (rc) {
- 			dev->cmd = NULL;
- 			goto error;
-@@ -529,8 +540,7 @@ static int pn533_send_cmd_direct_async(struct pn533 *dev, u8 cmd_code,
- 
- 	pn533_build_cmd_frame(dev, cmd_code, req);
- 
--	dev->cmd = cmd;
--	rc = dev->phy_ops->send_frame(dev, req);
-+	rc = pn533_send_cmd_frame(dev, cmd);
- 	if (rc < 0) {
- 		dev->cmd = NULL;
- 		kfree(cmd);
-@@ -569,8 +579,7 @@ static void pn533_wq_cmd(struct work_struct *work)
- 
- 	mutex_unlock(&dev->cmd_lock);
- 
--	dev->cmd = cmd;
--	rc = dev->phy_ops->send_frame(dev, cmd->req);
-+	rc = pn533_send_cmd_frame(dev, cmd);
- 	if (rc < 0) {
- 		dev->cmd = NULL;
- 		dev_kfree_skb(cmd->req);
+ 	if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
 -- 
-2.43.0
+2.45.2
 
 
