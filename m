@@ -1,353 +1,298 @@
-Return-Path: <netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kmTDHM+yPWoL5wgAu9opvQ
-	(envelope-from <netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:59:27 +0200
+	id itRgN+jGPWqr6QgAu9opvQ
+	(envelope-from <netdev+bounces-302078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 02:25:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D48136C915A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:59:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 503C86C9468
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 02:25:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=lAOGMDN8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302077-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="WappjDp/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302078-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302078-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DF6943033AF8
-	for <lists+netdev@lfdr.de>; Thu, 25 Jun 2026 22:59:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0F9D1302A737
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 00:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5E026A08F;
-	Thu, 25 Jun 2026 22:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90EC25B663;
+	Fri, 26 Jun 2026 00:25:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B9620E023
-	for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 22:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035B412CDA5
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 00:25:05 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782428365; cv=pass; b=J0GeXLkP1+dDvJVnMlDg8Z8WovRqmOsBf6bM9729ihkNIf20PTKlB46FCegl1NiN2L0rVkwK0eDJIzVRS4ImZWW5y0H3Hfb7zYPgzaVzhUlwob0xHe9StitdFHW1is7faKKfd704zTVyC3BQSEcXOxj1iEILoKWDKQA6yS7nHWU=
+	t=1782433507; cv=pass; b=CTSwimuh+VuWnYJToIyuMsveQ4Dg7DDTJO/XXGjyKVA7F33w2VnAHVkjuI6Z2UhYGlZOmEvViMsNJwZFh53iXBx367gaR1iEzFRYifyRTco6c6INw8tdCJV40SjOwnD8Q4pdolqy7hJWMNEgVzdnBZh0Mz01KLvoznx8XsANJOk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782428365; c=relaxed/simple;
-	bh=oYKlnirB3SN6iJnr9X9rSaE7esSFAc4YDY/wagy3y8I=;
+	s=arc-20240116; t=1782433507; c=relaxed/simple;
+	bh=tm/9ng6QXFy/yxdcAYME2k/dGepHGP2ultLBruVBzUk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DfpehJAYbjkubQbKN/Z4GJJXo005S2bzwc9yFy/tHKtfbUU/HAZxguOylGpBo2PFRkx+aGetdbErEC6q4kSjWXnu4ZojTvqm9wPDjIvK6k3U0YqCLDAbtQ/bNBZ5PBMOqf0fOrNS7eh0ZnfZx4BmE1cxf8dZBdUzJwgbt4cnQAU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lAOGMDN8; arc=pass smtp.client-ip=209.85.214.173
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c6b7bd4e8dso22855ad.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 15:59:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782428363; cv=none;
+	 To:Cc:Content-Type; b=I1az1Vg0o+Hnu0uOgvVJ/SOtH0pIdEHVGtc32QDpfcJOeO9QMXN6haBZDseOiYVZviL4wledHoDGvw7B180MOoyRV0mXeuHRZ3m7k7EbEzDd044MdD3CGdQEib4Ynwuh5aa9CUHUwqEjyEH7RA/bqmfSNzt7DBv8ppVfAmr6GSc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WappjDp/; arc=pass smtp.client-ip=209.85.208.171
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-39ad188f6d8so4008481fa.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jun 2026 17:25:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782433504; cv=none;
         d=google.com; s=arc-20260327;
-        b=egOattn+IRDhVGsYbDVjYUvzqdwVlFT5BPH0VxxSbhdR8z7h9gSDOhIwCutpuAdgRo
-         L37KnD66kN4AiGnM9wLyK53zpspur2uY/mze6ppOFCmL7d1rubU1b3/bww7XuBPK0/wH
-         icOX4X1wcTTNs6jMuuf/OnskWU/tvAh9ono5R+ZI7G1G4gT/aXrqYTBaQLXlvooeVFPy
-         O7m23Pe3Mu+5KhesAqxwfzgjt2/1R2YDn/hUwG3sDmpmmfrSHnNeRytGwu/mBS8rC5VI
-         xcJc0Ac4Vlg73YQSOTQCuUWm/wBW2ZzM1hMUGJaBeH8KTi6J5qcoOkKFn4mbPaqyeAuv
-         ve8A==
+        b=NSGPJ0fNSQiOmc3EhCyX2xJ6OF/8ajjbqeLylJh6eABxztYpEVcXNpoZCmGzcEJQ/H
+         6YfAGD5mw42kd/ebD7vrMcCLCdJkEWr62h+chFAO6dOkzZBl4U0fjk4Pjpk/+hHRPwHe
+         Urf7blmiIylklJdXJBItOtJkYvK6NJWYdtOq6B0Ht8NPSs12mQ093e4Vnj7EaK6ZGRNH
+         i+yDqEtpp6jU3MLuRT7lDjruyTuggzEzEE6Lmo5dEKQF0+MxiYWbzsTEzR4X73OxcWzs
+         WolqXdrjPFL6mkv3LggZrV7fWTJRAvX7BVuEeAJQOS4RMxcddbIwmWZYJ4jpHMbgebZi
+         cLeQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=/gX7hQHyvfb4Ci0nY3Fxsfc2Doou++pLUQ8Pual9WtQ=;
-        fh=M3q6RMsTp+DCTUTIR9Mo7raai0gJUsOyeuXOgYZbw9M=;
-        b=TXJpbEb0z8NnFa+hHGKo6sfJB4QqVeP5cEd8VizsjIdnQ1rgh9y9eomG3weMmKNqMi
-         NDRSpa/2uJ91F2X6ocvvbbcRouxMOksQSkapi2GUl4LeYK/PtPjUubqaoI78SbwjD+K9
-         MRB4ir0RCeWyGUSRQSn63Cnz8UF3wbmdE8SMdZTBg8s/szqxP6H+R18ynTrvFDTQCh4o
-         W3zvG1NSCOmgcpQ6y0AKbDbRuGFrdeBe+1upQGoNCRl/QQSg2kulQXfaYdNnmAXcNv8i
-         1xfkeldzvLcrPtXQfo8YrXKF0P+flcjNmpjXU9YqqewGDsdlPuY86NQLN86CnCIPzANi
-         Cipw==;
+        bh=jWB/65iCNGVpgG5qvQh/EqdccH9lpCvvVXNz6Hio+Y0=;
+        fh=5EYkW9yVxODaH2SKcC5G59cm+3YBX7tLwNyJmwYCBrI=;
+        b=NG0ZaJ/ASfGBCWHqfBJ1S9ct/d2NsFH23Bc3lXM40+nSXA461Gbi/yIbs3iWpESHb7
+         diAKzAaQeDD/r/EsioxXelFdbQ45zKL+5jYO3CMMSosjB667zhgnlqR7sTOmMLnzr6pD
+         cHy1xMAxxyXk75ZJhAPBCo98D/8SACaq66XZTHyJbN6RvXjFpvFQLH8WovYVlHNtJPKM
+         j8nsUyv7StZLgUwt2JM8TsaJ4AUX3wBu0J6PqpV0riterYGTUti8A0CuwfM1/giChPZK
+         DuhWuSO9ojMxUL3Yqmwikm9zjUQz/Md1DfLfwylpkLGO3Eth9qu1VXmROcdUTYyr93rK
+         buRQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782428363; x=1783033163; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=/gX7hQHyvfb4Ci0nY3Fxsfc2Doou++pLUQ8Pual9WtQ=;
-        b=lAOGMDN8ynA5eQbM/WGC+EL201uY/Lb4gU2KWo1zLJE9CbJnR1eY/BnMg3SK2/0+Z9
-         Rj6ZQfNpYaq3RAKzLU2gt2C9AscYYvkMZZ5X1C21/oo+jvHR4v7bxmUXifgpifSVPrZK
-         ALWQiCgGy2uGwT02OSE/vPJtjhWvno7/OLHh/mywcPeH3QdDivVJLCz5jzd+eARI/ncM
-         MWv2gVmbJNh752QrXSgR+R8LDqoXhrbkqaI3hW4ru6AbsAzTPQ21S7pRAa1gx9oJFAkP
-         kY7UIyHEeJKL6dM4ghxlILO4evpzCM0Ixy2gQGHipM5/1oQNy6so6wHheXVev9FFXM0y
-         s3Zw==
+        d=gmail.com; s=20251104; t=1782433504; x=1783038304; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jWB/65iCNGVpgG5qvQh/EqdccH9lpCvvVXNz6Hio+Y0=;
+        b=WappjDp/3a8DXz73rBdAYr2m+md6mqy8AvIAtJ/ONV3PzIRbiYEfSjxKohCBC8OCH7
+         brp5yy+T4kCkr2dPqZLkuqZ/81UFQMC0CLSaRc1z+dWvECbdCki7W5iJ05FXldUXnvIB
+         6B8NBPPqbHuKRwxgEdYZHYoqjgUq5bEL8x7HoYAGReQu0njY2KN3gh8pzPPz5Xha9sd2
+         Hbnd5a9daRTp72wzd3mHpYQDEVfkevnAF62l1B24cEwo//nf+nRS810ZYMFWlN7dZ+5x
+         eQxjFbux4RnTGuyd9EqDey3dm5vnK42sk9aEUzNX+wdtfs83r95edL6pQ0H6O0tmU7P9
+         DogA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782428363; x=1783033163;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/gX7hQHyvfb4Ci0nY3Fxsfc2Doou++pLUQ8Pual9WtQ=;
-        b=d/ALqnkyr9WcmYrXdOoas+SyiZPZ7qjFTBrBbaGqlEbQzkTbwp3G1dKHeHrgNq/com
-         GGbq27+7MOe7Xlmg0aOK3WPKKBXkw7VcX1y8OlXi6VvKmLUOesf/jx8Bni6Cek51yJM/
-         FMsJv+mK6GQ50FDINn4HsNLcvlkF0bhVL3ciVwDGI6PYdWDRDnq6Tkw6+rBtosdnZucH
-         bYyc/3aiCqo2PDgbOER5QRSK26oUG7mPX7eZRTmvGGdUW6J0f8dtJUiDaozdrwxYq4O7
-         O2AgfEW+mbtj05q/oHzxWBZ3AECIlPpSKqVovgaFyV7vMTQNc2txhFYmOv2+3UBTkGCj
-         bKyA==
-X-Forwarded-Encrypted: i=1; AHgh+Rr2Ndtx86c2jIi8ZicjGHuCCa5wGixAV9S910Y7gsRG/KTGanmauOzywLUdTYin78dIbJ2DSQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNQ7cMdtLl0nyWc8kmaYX0mOGcW+H4Ty6+paalDjLSNGDd+TBx
-	r8koRfXE5yFcCTAg4UZou3AFokGPcakMEV8/jJJdx0MjtxzXBJkjEwUYDL1XD01/qg5G6c3DMNc
-	9lSaTi4lsLVvlk1QXqj/j65f5hZogkaK5h+jJS1el
-X-Gm-Gg: AfdE7cnOv9O21SPtfms3YwWeEY+NhObfhBbFCOx7HU1lcBFPv+JZcketCtZmb2+3sGe
-	wOXjt0mdX2U5uQKydlbiiFi3f9g9VdS7Rdb/Dg6uTcE6v00iMTN5VXM/xFSOcJg8k6atS7iH58g
-	oNfcvkvAMLw0oLieR+QftXF/uybUtsAdXrE3RtyPJMiAdJX4Igb13nAELRpJl+bhiiUiUofw0gW
-	djVl72Q5AD066Xy/82oWQRmbwD6s9GecjNhLKLZJ9mGJ9wiEBHA2Cie9Uj2teAUwuE+ftcnKOhZ
-	+cI05C4NJ2jLND/9zD97ue3my2MRZdV4SHnunoUp9+9rkOCfdmr+9ahaUkHZ7WstQVjaQgo=
-X-Received: by 2002:a17:902:fc4d:b0:2bf:193b:a195 with SMTP id
- d9443c01a7336-2c813e4f6c6mr855945ad.11.1782428362363; Thu, 25 Jun 2026
- 15:59:22 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782433504; x=1783038304;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jWB/65iCNGVpgG5qvQh/EqdccH9lpCvvVXNz6Hio+Y0=;
+        b=LNHAq1nvDo1a02IatmfPOQiQ3UH1riuK2TR0K8M1aYX2FiMD0MWR6jawuQtTZUH5NJ
+         WPEwffLCRGPjaOSQonteiA9RgQvke9eJaApzz0lUZXX+JlQXzuYrg35xW03A9WOSUwHG
+         lBbMhnLdbybgoh30TXbXqcoLjm6oyM2bQXKLraZMDAD2+JP1XqtbszuZNo2Fp5+N+q01
+         kFpRh3OYQxRiHwt+edfIzmVXUIwOeOZihkbMbhNrA62ikqGhfWSOd77QhudjyhdwIMK7
+         ANTdiVTYNeYY53ZegfAi4WQA5Vne6qF7cyREUVmkPS5HSwzYxJfpwS/Ac4+bxfbhyiv7
+         1UIg==
+X-Forwarded-Encrypted: i=1; AHgh+RowzdIjQMIokzr/ndr88+tP+1M7o/W9CCy1Qd6PeWxrdzVEgNhJN2necsqRK94OptgkhhzVMUs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcBFCcqCqhNH7mCzjRwHNwSuF/QzMQ1C3jYzdU/iwBIgfuLGYI
+	IHi5EYFOQcXxTl0QsD9dTlx/XZbLcHELw/eiCvFI1xLH4oionfXi+15GCTpYvT5OfwkCTSzh2gu
+	tRdEvoEQY1RKgc3y5hTJTY0jKMtqbVXM=
+X-Gm-Gg: AfdE7cnR0QKgXXeJ27BqeiNgumxHxwf9sFFzbaDGlABgtdrJpE4vNl12t0KEh707s9h
+	qH/3gEsR4G2VqtBIjK6ZKZFBbPzoOAeD9p5fJz+1tnlWPiB0kBBgg7Iup78NJC96aDm/Bwaw5ax
+	BOa71ZLaaAATYBxsbAT1GszsSprWotEOXK5eL2TxqTRRpbzjVUR//uUylCY/Y4szEFP/889mCqx
+	2/ir5k8mf/eJ6GlCYnqdSW6b3GMuu0Akxviw+8hP1+aeRFRRX+xBRhwq166huF+RmO3cBqBIUzk
+	G7quQyN+QSZpqkLFsvLbFj+LHIl6N5HWgQxxy9OGFfheg8pV1uVaRI5DBfHGzADPPHkpz/c8vvx
+	Qc6Y0dx/isg==
+X-Received: by 2002:a05:6512:2514:b0:5aa:6c05:f0e with SMTP id
+ 2adb3069b0e04-5aea1f3a44dmr1939611e87.7.1782433503822; Thu, 25 Jun 2026
+ 17:25:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260625-airoha-eth-skb_frag_dma_map-v1-1-31d9e460aae6@kernel.org>
-In-Reply-To: <20260625-airoha-eth-skb_frag_dma_map-v1-1-31d9e460aae6@kernel.org>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Thu, 25 Jun 2026 15:59:10 -0700
-X-Gm-Features: AVVi8CeiefQknrcxxwnBcBr19FhEdmLlZYqiKgArFjpWRrvJ_M8y2FZe1GT04Ic
-Message-ID: <CAEAWyHfyWrSdKziDg3SOnx3QRfd6uu6YXtJV85OgqWEQSJykmQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: airoha: dma map xmit frags with skb_frag_dma_map()
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	netdev@vger.kernel.org
+References: <20260623133240.1048434-1-maciej.fijalkowski@intel.com>
+ <ajv23_r4M3FGrFNN@devvm7509.cco0.facebook.com> <ajwHuCp82SazSwKv@boxer>
+ <CAL+tcoC789GrOXvvYVOfxhL4iLCdFEAZQ+WCENsMjbLrJnfiYw@mail.gmail.com> <aj1O4vKzCuodwgYL@devvm7509.cco0.facebook.com>
+In-Reply-To: <aj1O4vKzCuodwgYL@devvm7509.cco0.facebook.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 26 Jun 2026 08:24:25 +0800
+X-Gm-Features: AVVi8CdGlH37vkcvNTjP4W11sfJkcnM8sH0E8DVFLnXKaCset2j3vqBKKK-QGP8
+Message-ID: <CAL+tcoDOFtTKavz8TWpU6BPrHCcL6TjY8xrmFA5y3P9Wn0T4ZA@mail.gmail.com>
+Subject: Re: [PATCH net 0/7] xsk: fix AF_XDP multi-buffer Tx descriptor reclaim
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, bjorn@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302077-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302078-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:maciej.fijalkowski@intel.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bjorn@kernel.org,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,gmail.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,mail.gmail.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D48136C915A
+X-Rspamd-Queue-Id: 503C86C9468
 
-On Thu, Jun 25, 2026 at 2:43=E2=80=AFAM Lorenzo Bianconi <lorenzo@kernel.or=
-g> wrote:
+On Fri, Jun 26, 2026 at 12:05=E2=80=AFAM Stanislav Fomichev
+<sdf.kernel@gmail.com> wrote:
 >
-> Map xmit skb fragments using skb_frag_dma_map() instead of
-> dma_map_single(skb_frag_address()). skb_frag_address() relies on
-> page_address() to obtain a kernel virtual address, which is not
-> guaranteed to work for all page types (e.g. highmem pages or
-> user-pinned pages from MSG_ZEROCOPY).
-> skb_frag_dma_map() maps the fragment directly via its struct page and
-> offset through dma_map_page(), avoiding the need for a kernel virtual
-> address entirely.
-> Introduce an enum airoha_dma_map_type to track how each queue entry was
-> mapped (single vs page), so that the matching unmap function is called
-> on completion and in error paths.
+> On 06/25, Jason Xing wrote:
+> > On Thu, Jun 25, 2026 at 12:37=E2=80=AFAM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> > >
+> > > On Wed, Jun 24, 2026 at 08:38:20AM -0700, Stanislav Fomichev wrote:
+> > > > On 06/23, Maciej Fijalkowski wrote:
+> > > > > Hi,
+> > > > >
+> > > > > This series fixes several AF_XDP multi-buffer Tx paths where desc=
+riptors
+> > > > > consumed from the Tx ring are not consistently returned to usersp=
+ace
+> > > > > through the completion ring when the packet is later dropped as i=
+nvalid.
+> > > > >
+> > > > > The affected cases are invalid or oversized multi-buffer Tx packe=
+ts in
+> > > > > both the generic and zero-copy paths. In these cases, the kernel =
+can
+> > > > > consume one or more Tx descriptors while building or validating a
+> > > > > multi-buffer packet, then drop the packet before it reaches the d=
+evice.
+> > > > > Userspace still owns the UMEM buffers only after the correspondin=
+g
+> > > > > addresses are returned through the CQ. Missing completions theref=
+ore
+> > > > > make userspace lose track of those buffers.
+> > > > >
+> > > > > The generic path fixes cover three related cases:
+> > > > > * partially built multi-buffer skbs dropped by xsk_drop_skb();
+> > > > >   continuation descriptors left in the Tx ring after xsk_build_sk=
+b()
+> > > > >   reports overflow;
+> > > > > * invalid descriptors encountered in the middle of a multi-buffer
+> > > > >   packet, including the offending invalid descriptor itself.
+> > > > >
+> > > > > The zero-copy path is handled separately. The batched Tx parser n=
+ow
+> > > > > distinguishes descriptors that can be passed to the driver from
+> > > > > descriptors that are consumed only because they belong to an inva=
+lid
+> > > > > multi-buffer packet. Reclaim-only descriptors are written to the =
+CQ
+> > > > > address area and published in completion order, after any earlier
+> > > > > driver-visible Tx descriptors.
+> > > > >
+> > > > > The ZC batching path can also retain drain state when userspace h=
+as not
+> > > > > yet provided the end of an invalid multi-buffer packet. To keep t=
+his
+> > > > > state local to the singular batched path, the series prevents a s=
+econd
+> > > > > Tx socket from joining the same pool while such drain state exist=
+s.
+> > > > > During the singular-to-shared transition, Tx batching is gated,
+> > > > > pre-existing readers are waited out, and bind fails with -EAGAIN =
+if the
+> > > > > existing socket still has pending drain state. This avoids adding
+> > > > > multi-buffer drain handling to the shared-UMEM fallback path.
+> > > > >
+> > > > > The last two patches update xskxceiver so the tests account inval=
+id
+> > > > > multi-buffer Tx packets as descriptors that must be reclaimed, wh=
+ile
+> > > > > still not expecting those invalid packets on the Rx side.
+> > > > >
+> > > > > This is a follow-up to Jason's changes [0] which were addressing =
+generic
+> > > > > xmit only and this set allows me to pass full xskxceiver test sui=
+te run
+> > > > > against ice driver.
+> > > >
+> > > > There is a fair amount of feedback from sashiko already :-( So the =
+meta
+> > > > question from me is: is it time to scrap our current approach where
+> > > > we parse descriptor by descriptor? (and maintain half-baked skb and
+> > > > half-consumed descriptor queues)
+> > > >
+> > > > Should we:
+> > > >
+> > > > 1. do desc[MAX_SKB_FRAGS] and xskq_cons_peek_desc until we exhaust
+> > > > PKT_CONT (if the last packet has PKT_CONT, return EOVERFLOW to user=
+space
+> > > > and do a full stop here)
+> > > > 2. now that we really know the number of valid descriptors -> reser=
+ve
+> > > > the cq space (if not -> EAGAIN)
+> > > > 3. pre-allocate everything here (if at any point we have ENOMEM -> =
+cleanup
+> > > > locally, don't ever create semi-initialized skb)
+> > > > 4. construct the skb
+> > > > 5. xmit
+> > >
+> > > Yeah generic xmit became utterly horrible, haven't gone through sashi=
+ko
+> > > reviews yet, but bare in mind this set also aligns zc side to what wa=
+s
+> > > previously being addressed by Jason.
+> > >
+> > > I believe planned logistics were to get these fixes onto net and then
+> > > Jason had an implementation of batching on generic xmit, directed tow=
+ards
+> > > -next and that's where we could address current flow.
+> >
+> > Agreed. That's what I'm hoping for. There would be much more
+> > discussion on how to do batch xmit in an elegant way, I believe.
 >
-> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 =
-SoC")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> This doesn't have to depend on the batch rewrite, we should be able to re=
+write
+> this non-zc in net, this is still technically fixes, not feature work..
+>
+> There was already a couple of revisions with this drain_cont approach
+> and every time I look at it feels like the cure is worse than the
+> decease :-( Obviously not gonna stop you from going with the current appr=
+oach,
+> but these fixes feel a bit of a wasted effort to me (since the bugs keep
+> coming and we are piling more complexity).
 
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+I see your point, but rewriting is something that cannot be easily
+applied to the stable branches? Until now, we fix issues one by one
+which have an explicit target branch (because of the fixes tag). Cross
+fingers :(
 
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 61 ++++++++++++++++++++------=
-------
->  drivers/net/ethernet/airoha/airoha_eth.h |  7 ++++
->  2 files changed, 45 insertions(+), 23 deletions(-)
->
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 932b3a3df2e5..1caf6766f2c0 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -944,6 +944,25 @@ static void airoha_qdma_wake_netdev_txqs(struct airo=
-ha_queue *q)
->         q->txq_stopped =3D false;
->  }
->
-> +static void airoha_unmap_xmit_buf(struct airoha_eth *eth,
-> +                                 struct airoha_queue_entry *e)
-> +{
-> +       switch (e->dma_type) {
-> +       case AIROHA_DMA_MAP_PAGE:
-> +               dma_unmap_page(eth->dev, e->dma_addr, e->dma_len,
-> +                              DMA_TO_DEVICE);
-> +               break;
-> +       case AIROHA_DMA_MAP_SINGLE:
-> +               dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
-> +                                DMA_TO_DEVICE);
-> +               break;
-> +       case AIROHA_DMA_UNMAPPED:
-> +       default:
-> +               break;
-> +       }
-> +       e->dma_type =3D AIROHA_DMA_UNMAPPED;
-> +}
-> +
->  static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget=
-)
->  {
->         struct airoha_tx_irq_queue *irq_q;
-> @@ -1006,9 +1025,7 @@ static int airoha_qdma_tx_napi_poll(struct napi_str=
-uct *napi, int budget)
->                 skb =3D e->skb;
->                 e->skb =3D NULL;
->
-> -               dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
-> -                                DMA_TO_DEVICE);
-> -               e->dma_addr =3D 0;
-> +               airoha_unmap_xmit_buf(eth, e);
->                 list_add_tail(&e->list, &q->tx_list);
->
->                 WRITE_ONCE(desc->msg0, 0);
-> @@ -1177,12 +1194,10 @@ static void airoha_qdma_tx_cleanup(struct airoha_=
-qdma *qdma)
->                         struct airoha_qdma_desc *desc =3D &q->desc[j];
->                         struct sk_buff *skb =3D e->skb;
->
-> -                       if (!e->dma_addr)
-> +                       if (e->dma_type =3D=3D AIROHA_DMA_UNMAPPED)
->                                 continue;
->
-> -                       dma_unmap_single(qdma->eth->dev, e->dma_addr,
-> -                                        e->dma_len, DMA_TO_DEVICE);
-> -                       e->dma_addr =3D 0;
-> +                       airoha_unmap_xmit_buf(qdma->eth, e);
->                         list_add_tail(&e->list, &q->tx_list);
->
->                         WRITE_ONCE(desc->ctrl, 0);
-> @@ -2193,8 +2208,8 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *=
-skb,
->         struct netdev_queue *txq;
->         struct airoha_queue *q;
->         LIST_HEAD(tx_list);
-> +       dma_addr_t addr;
->         int i =3D 0, qid;
-> -       void *data;
->         u16 index;
->         u8 fport;
->
-> @@ -2250,24 +2265,22 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff=
- *skb,
->                 return NETDEV_TX_BUSY;
->         }
->
-> -       len =3D skb_headlen(skb);
-> -       data =3D skb->data;
-> -
->         e =3D list_first_entry(&q->tx_list, struct airoha_queue_entry,
->                              list);
-> +       len =3D skb_headlen(skb);
-> +       addr =3D dma_map_single(netdev->dev.parent, skb->data, len,
-> +                             DMA_TO_DEVICE);
-> +       if (unlikely(dma_mapping_error(netdev->dev.parent, addr)))
-> +               goto error_unlock;
-> +
-> +       e->dma_type =3D AIROHA_DMA_MAP_SINGLE;
->         index =3D e - q->entry;
->
->         while (true) {
->                 struct airoha_qdma_desc *desc =3D &q->desc[index];
->                 skb_frag_t *frag =3D &skb_shinfo(skb)->frags[i];
-> -               dma_addr_t addr;
->                 u32 val;
->
-> -               addr =3D dma_map_single(netdev->dev.parent, data, len,
-> -                                     DMA_TO_DEVICE);
-> -               if (unlikely(dma_mapping_error(netdev->dev.parent, addr))=
-)
-> -                       goto error_unmap;
-> -
->                 list_move_tail(&e->list, &tx_list);
->                 e->skb =3D i =3D=3D nr_frags - 1 ? skb : NULL;
->                 e->dma_addr =3D addr;
-> @@ -2291,8 +2304,13 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff =
-*skb,
->                 if (++i =3D=3D nr_frags)
->                         break;
->
-> -               data =3D skb_frag_address(frag);
->                 len =3D skb_frag_size(frag);
-> +               addr =3D skb_frag_dma_map(netdev->dev.parent, frag, 0, le=
-n,
-> +                                       DMA_TO_DEVICE);
-> +               if (unlikely(dma_mapping_error(netdev->dev.parent, addr))=
-)
-> +                       goto error_unmap;
-> +
-> +               e->dma_type =3D AIROHA_DMA_MAP_PAGE;
->         }
->         q->queued +=3D i;
->
-> @@ -2313,11 +2331,8 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff =
-*skb,
->         return NETDEV_TX_OK;
->
->  error_unmap:
-> -       list_for_each_entry(e, &tx_list, list) {
-> -               dma_unmap_single(netdev->dev.parent, e->dma_addr, e->dma_=
-len,
-> -                                DMA_TO_DEVICE);
-> -               e->dma_addr =3D 0;
-> -       }
-> +       list_for_each_entry(e, &tx_list, list)
-> +               airoha_unmap_xmit_buf(dev->eth, e);
->         list_splice(&tx_list, &q->tx_list);
->  error_unlock:
->         spin_unlock_bh(&q->lock);
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index d7ff8c5200e2..2765244d937c 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -170,12 +170,19 @@ enum trtcm_param {
->  #define TRTCM_TOKEN_RATE_MASK                  GENMASK(23, 6)
->  #define TRTCM_TOKEN_RATE_FRACTION_MASK         GENMASK(5, 0)
->
-> +enum airoha_dma_map_type {
-> +       AIROHA_DMA_UNMAPPED,
-> +       AIROHA_DMA_MAP_SINGLE,
-> +       AIROHA_DMA_MAP_PAGE,
-> +};
-> +
->  struct airoha_queue_entry {
->         union {
->                 void *buf;
->                 struct {
->                         struct list_head list;
->                         struct sk_buff *skb;
-> +                       enum airoha_dma_map_type dma_type;
->                 };
->         };
->         dma_addr_t dma_addr;
->
-> ---
-> base-commit: 232c4ca2343d1181cbfc061f9856d9591e397579
-> change-id: 20260625-airoha-eth-skb_frag_dma_map-bcccd5d6e4b1
->
-> Best regards,
-> --
-> Lorenzo Bianconi <lorenzo@kernel.org>
->
->
+Sashiko has the magic to find out the hidden bugs more than ever and
+AF_XDP is not the only place where a pile of reports are coming in.
+
+My take is that batch xmit has been appending too long and at least so
+far less and less bugs are found by sashiko. I believe if the mode is
+changed to batch xmit, there are likely to be new and challenging
+problems to discuss. I prefer to solve questions of the batch xmit
+series.
+
+BTW, would you both come to Netdev 0x1a next month? I believe we could
+sit around the table and discuss some future plans there (in xdp
+workshop?).
+https://netdevconf.info/0x1A/sessions/workshop/xdp-workshop.html
+
+Thanks,
+Jason
 
