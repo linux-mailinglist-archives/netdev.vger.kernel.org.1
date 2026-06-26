@@ -1,162 +1,146 @@
-Return-Path: <netdev+bounces-302199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zTwRJPuXPmrqIgkAu9opvQ
-	(envelope-from <netdev+bounces-302199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:15 +0200
+	id 4ecaFtqXPmrYIgkAu9opvQ
+	(envelope-from <netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:16:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218376CE671
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:15 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB6756CE656
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:16:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=G1h62niQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302199-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302199-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CEF4230711CD
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:11:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 02DD0305726A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E986B37C906;
-	Fri, 26 Jun 2026 15:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98F33803CC;
+	Fri, 26 Jun 2026 15:15:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC7037BE8A;
-	Fri, 26 Jun 2026 15:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D717837DAAA;
+	Fri, 26 Jun 2026 15:14:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782486659; cv=none; b=CiN/jTodj69j+wvuMnOr4gfOL3ucVn6FvYqZjP8zffuCRkT+HDSl8AUi+SmzNPr65D1z5TKg9BZfhKQm1gvl+nniuOJAQ2eoZHAnCsZswdRIiTTvaRv1wf+M6HJQ5gLKzM9KLj1qOZztYHLlIRT939bJZmlbs7NgxP+JaxXyom0=
+	t=1782486903; cv=none; b=fX3sRWRvAO6iJ1KZMgRIbPw8dzYb6mhQ2M365jxAwliNgtmOosfsPRg0gIApqujXZ/B9g/nKmaFvlSm419ZxqRWaE/M3DVMsiJFRPxCGVwpO9gk29zuzn2A2OAdlr76bjuhzONIeCwqfZZxfeY+ToYlo52pSh/Nwr/TnI5uzShI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782486659; c=relaxed/simple;
-	bh=EXG0HhmVZnvqVgn/dshv6gKk0n1/VKraBkkrriRbZhA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I91GE1TkzV+HfpiUIqZyBMwXN0LogH3rLmDid/ORpxa60rAwrgM7s9/wptmscD7FLwtbjX6Lfqg8wdPYS7NoF/Z8Fw9BxJbz3OH1fEZWLuwSh/dTZH9j3/SHAqXWYo5jkTuNbleaCEHJ9nIx9g4CJlVh667dFo6Xn7dEe8FBSh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G1h62niQ; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id BCB881A09EB;
-	Fri, 26 Jun 2026 15:10:53 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8750960232;
-	Fri, 26 Jun 2026 15:10:53 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D5000104C976A;
-	Fri, 26 Jun 2026 17:10:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782486652; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=RIDSW4QSN+EL196dH0Hkhfs2WUAzhZ9MQ1BBZjgBM6k=;
-	b=G1h62niQqlh9fdwTRptlTS4dlNEaeDSca/KWRTACRbEf/8BU3A61klMmetMCWiFxjywELB
-	8AL3p/XkWsIa8g7+MWFuaL8aHrRXbVdtNsTPWxrEHZx3uZiNTDhSBUDxO4PHFPOx0uUcG0
-	KSDKXGC++qqDjaNzmEPK2U8nGqyh8h30Fh/Hu5Hzk5DEzO8ZaOb64Op/w05VRFlRIaW+wi
-	xJoheRJKHp+ZdUuwRsHOokMQpp+bDBOQspihj5C51dc7BC5JceVRqIKTdMe3wM5s4Veo9T
-	6WVdIVOdT5DKmsLUUVtBR4z1/zYVjYWtRcXbels8EDf1lilKLIobvsRv40XZrw==
-Message-ID: <f729897a-c2a5-4925-9d8a-9d29569113ec@bootlin.com>
-Date: Fri, 26 Jun 2026 17:10:45 +0200
+	s=arc-20240116; t=1782486903; c=relaxed/simple;
+	bh=VtnWEWRy+CVDljRKwa0JKskkVAFjQhUVahwJL6o5v2w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VcQA2sUn+l0zqd7s4YCJvz3G5ZZHiZ/jswNbmxyrwALJSjUL7mg8kMbFWcfN9qOrvDUFF2YWJDCASR5oFoAJVllzed+M0fSoh/up2OuEiDDmsIpFItLD/+kmAMTEO6QApH2YaLv+9akDxSsALjDvv6QanDp+9N4QT3ix4HUOA0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Received: from localhost.localdomain (unknown [117.182.75.66])
+	by APP-01 (Coremail) with SMTP id qwCowAA33NRplz5qarxrAw--.18895S2;
+	Fri, 26 Jun 2026 23:14:50 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
+To: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH] fix: net: cadence: macb_mii_init: fix double of_node_put on mdio_np after   macb_mdiobus_register
+Date: Fri, 26 Jun 2026 23:14:49 +0800
+Message-Id: <20260626151449.50969-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 2/2] net: phy: mdio-i2c: defer RollBall bridge
- probe to PHY discovery
-To: Petr Wozniak <petr.wozniak@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
- Bjorn Mork <bjorn@mork.no>, Aleksander Bajkowski <olek2@wp.pl>,
- Marek Behun <kabel@kernel.org>
-References: <20260624084814.20972-1-petr.wozniak@gmail.com>
- <20260624084814.20972-3-petr.wozniak@gmail.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260624084814.20972-3-petr.wozniak@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAA33NRplz5qarxrAw--.18895S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1rur15Aw1kXw1UJF13Jwb_yoW8Gr4Up3
+	yYkrW5Wrn7Jr4Iyw4kGa18AF90ga15trW8uFWjk3yrZFs8GFy8AryxWFy5urn8GrZ7CanF
+	yrn5A3Wqqas5Cw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	tVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUbUPED
+	UUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRQKA2o+iCgsEAABsd
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302199-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,armlinux.org.uk,lunn.ch];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:petr.wozniak@gmail.com,m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-phy@lists.infradead.org,m:bjorn@mork.no,m:olek2@wp.pl,m:kabel@kernel.org,m:petrwozniak@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302200-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_RECIPIENTS(0.00)[m:nicolas.ferre@microchip.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,lists.infradead.org,mork.no,wp.pl];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,wp.pl:email]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 218376CE671
+X-Rspamd-Queue-Id: EB6756CE656
 
-Hi Petr,
+After macb_mdiobus_register succeeds, the mdio_np reference ownership is
+  transferred to the mii_bus device (stored in mii_bus->dev.of_node). When
+  the subsequent macb_mii_probe fails, the error path jumps to
+  err_out_unregister_bus which calls mdiobus_free (releasing the node via
+  fwnode_handle_put) and then falls through to err_out which calls
+  of_node_put(mdio_np) again, causing a double put.
 
-On 6/24/26 10:48, Petr Wozniak wrote:
-> commit 8fe125892f40 ("net: phy: sfp: probe for RollBall I2C-to-MDIO
-> bridge in mdio-i2c") introduced a regression: the RollBall I2C-to-MDIO
-> bridge is not yet ready to respond to CMD_READ/CMD_DONE cycles when
-> sfp_sm_add_mdio_bus() runs in SFP_S_INIT.  The 200 ms probe times out,
-> i2c_mii_probe_rollball() returns -ENODEV, and sfp_sm_add_mdio_bus()
-> sets mdio_protocol = MDIO_I2C_NONE.  By the time sfp_sm_probe_for_phy()
-> runs (up to ~17 s later on affected hardware), the bridge is fully
-> initialized but PHY probing is skipped because the protocol has already
-> been changed to NONE.
-> 
-> This affects both modules inserted before boot and hotplugged modules on
-> hardware where bridge initialization exceeds the 200 ms probe window
-> (confirmed: FLYPRO SFP-10GT-CS-30M with Aquantia AQR113C, hotplugged).
-> 
-> Move the probe from i2c_mii_init_rollball(), called at bus-creation time,
-> to sfp_sm_probe_for_phy() in sfp.c, where it runs after the SFP state
-> machine module initialization delays.  Export the probe function as
-> mdio_i2c_probe_rollball() so sfp.c can call it.
-> 
-> For RTL8261BE-based modules the probe correctly returns -ENODEV at PHY
-> discovery time, causing sfp_sm_probe_for_phy() to destroy the MDIO bus
-> and set MDIO_I2C_NONE, eliminating the 5+ minute PHY probe retry loop.
-> 
-> For genuine RollBall modules (e.g. FLYPRO SFP-10GT-CS-30M with Aquantia
-> AQR113C) the probe now runs after initialization is complete and
-> correctly returns 0, so PHY detection proceeds normally.
-> 
-> Reported-by: Aleksander Bajkowski <olek2@wp.pl>
-> Fixes: 8fe125892f40 ("net: phy: sfp: probe for RollBall I2C-to-MDIO bridge in mdio-i2c")
-> Signed-off-by: Petr Wozniak <petr.wozniak@gmail.com>
-I finally got time to test this with a RollBall module, and I
-confirm what Aleksander says, the RollBall module's PHY doesn't
-get detected even with this patch.
+Move the of_node_put to only execute on paths where the reference was not
+  transferred (i.e., before successful macb_mdiobus_register).
 
-It does work on v7.0 though, so before the bridge probing was
-introduced.
+Cc: stable@vger.kernel.org
+Fixes: ef8a2e27289e ("net: macb: fix probing of PHY not described in the dt")
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Maxime
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index a12aa21244e8..c58e089e5888 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -1170,6 +1170,9 @@ static int macb_mii_init(struct macb *bp)
+ 	mdiobus_unregister(bp->mii_bus);
+ err_out_free_mdiobus:
+ 	mdiobus_free(bp->mii_bus);
++	of_node_put(mdio_np);
++	return err;
++
+ err_out:
+ 	of_node_put(mdio_np);
+ 
+-- 
+2.39.5 (Apple Git-154)
+
 
