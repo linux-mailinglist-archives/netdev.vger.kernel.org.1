@@ -1,301 +1,150 @@
-Return-Path: <netdev+bounces-302218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302219-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KYSRE3CePmrMJAkAu9opvQ
-	(envelope-from <netdev+bounces-302218-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:44:48 +0200
+	id D4iDBsGiPmqsJQkAu9opvQ
+	(envelope-from <netdev+bounces-302219-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:03:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424146CE9DB
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:44:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 673AA6CEC13
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:03:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=DoO69u83;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302218-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302218-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=jgc4Qmxw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302219-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302219-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5EC2A304AEC0
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:35:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D4A4B30098B2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F17E3E023A;
-	Fri, 26 Jun 2026 15:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD5B3E2AD1;
+	Fri, 26 Jun 2026 16:03:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C22D370D41;
-	Fri, 26 Jun 2026 15:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1E53BD241;
+	Fri, 26 Jun 2026 16:03:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782488142; cv=none; b=tSNyOBPWiHWEEhte8BJmrvIruHwTk+MOc6Ihl1PfGVAY3ZmC9nUoLMJQQGfbJj+GJyPp4RvNACE+8HQkDidZnwSrFgwr7Snt7Turf38UxyiiNTnzwni0NwcRu7GkT6pdwLHT8OYPxfPm8X5fDw6yuDj5EoC3mQXZkl/N+29To7o=
+	t=1782489788; cv=none; b=fQ7a3DVUYCjxJohv/rRzMvk6fdSe8DHGWoxRRPeR0kOH/KBS9YnfVsvfHgXTO9f50j0vAh5p83VKdIDi/VDLbVA94nji1AbqAGEgFIaidnjqzppHcBQV30tb4I8iM/UBck68wEeszcNiVHkjxXxAxAYyrbotW+xrPSfx8oPY52E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782488142; c=relaxed/simple;
-	bh=zRQ0UKHBOyhAvsRoQ7SvxLJa3k1UStC6RfoSTJnSVCQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Z6ZbJjlUT7j7Xv98SjGKstgAhFP1zjamuwpiAMX0hHguhYbSBX8Y6pO2HCQOnOIfshdCAhVkCbGlXvlMXNEBdAq3QsGMYlxXreapQTFQ/pLL4B/R7RTIro1Ig5+dU/gur9d7Ja/x98q8R5jXuF3Qi7fhUk8OAqfOoUU5n5Opw7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DoO69u83; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EC2DEC2BCF4;
-	Fri, 26 Jun 2026 15:35:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782488142;
-	bh=zRQ0UKHBOyhAvsRoQ7SvxLJa3k1UStC6RfoSTJnSVCQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=DoO69u83e2dVLCBxr6hccDx/ll97k5DJrArl+NkEUWJ++k051IGl0dym/QeTv4xLO
-	 QMuZbPUFD+dsmzBtg3ZcAnxqa9UFBP6GVUF5Td8GeeiTqztenB/Yd6ymUlfuqwlwC1
-	 lCP/3Jfwh4qnRoO03bo57raOJjdL4aqVc6IV3K8zUMSgE7ySNGDBTNg+YUxuuoT1m/
-	 A7B00eWCkae55KsYFt+yc3Br7V2SM8Zl4mTZvK/Til2oxk6GnnHLPf5Vhe7FsXRTjl
-	 Oh20DuuPZf+8FiJCLFVh1pId00qRCptglzu1Tp4QTm0UrVoCASscC5pc9umvMdOJqo
-	 GgPoU4TJSSByQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C63C43458;
-	Fri, 26 Jun 2026 15:35:41 +0000 (UTC)
-From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Fri, 26 Jun 2026 08:35:19 -0700
-Subject: [PATCH net v2 2/2] net: ethernet: oa_tc6: Improvement in buffer
- overflow handling
+	s=arc-20240116; t=1782489788; c=relaxed/simple;
+	bh=jWf1MStijQPKcnSM3z+OEQbw5Gy9SRweKjVitITEGLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WEeM4F3NYb4yQ3Urc58HTLawihXOQOdHuc7LLGQZydAHAPGw1EkiF3yLKab6AHlqUs4VGpYjf5L7oVZPKbsPiEgghmQDvsuLzUQ370C5Mwwzq8afCDN0TjxHsk4+efXakchuZ4Pq6u+vsc3LsYOOMwAP6mawik0WgChVlnLkOk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jgc4Qmxw; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gTeUwUU17Ccc7ENC5gMv0IOc+stImvQB65bzW9W2AmM=; b=jgc4QmxwJXE7IRUYeF6HTVKpTr
+	xbgYZUcGDRDwuR2Znqroc99br7SnWah0wxmSLCSkNMo+Y497C0GJIKNkm9KG5a160zayI7ZJhnEIm
+	lFLcCCJEbaeJxgfkSWGaLKrHc7uf9I+9EIkcL4cj7Pqb4QQ2cfpysOuHai3enBk96OoQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wd90w-009OC2-Ge; Fri, 26 Jun 2026 18:02:46 +0200
+Date: Fri, 26 Jun 2026 18:02:46 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: WenTao Liang <vulab@iscas.ac.cn>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] fix: net: cadence: macb_mii_init: fix double of_node_put
+ on mdio_np after   macb_mdiobus_register
+Message-ID: <40ee8ddb-74c5-44f6-9dba-0c50337e05fa@lunn.ch>
+References: <20260626151449.50969-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260626-fix-race-condition-and-crash-v2-2-b6c5c10e604f@onsemi.com>
-References: <20260626-fix-race-condition-and-crash-v2-0-b6c5c10e604f@onsemi.com>
-In-Reply-To: <20260626-fix-race-condition-and-crash-v2-0-b6c5c10e604f@onsemi.com>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Piergiorgio Beruto <pier.beruto@onsemi.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>, 
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
- Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782488122; l=6189;
- i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=vzS9RJeOBdUQy3PCfwKdvl0EddpgK2jpfjFglDZ/fH0=;
- b=grrPHh/Fp0ZPlhRIWryDtaZsMAGzEhOeGzs7+WmBRbVtFGX6j1Xx6NhJeNRQ9zDG1sAvgSh/f
- E8qaV7txLhjB9m1jUK2jUjP8UKGq4aGka+k9dQFPH2cpd3+NFuVH86I
-X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
- pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
-X-Endpoint-Received: by B4 Relay for
- Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
-X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Reply-To: Selvamani.Rajagopal@onsemi.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260626151449.50969-1-vulab@iscas.ac.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302218-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
-	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:pier.beruto@onsemi.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:Parthiban.Veerasooran@microchip.com,m:Selvamani.Rajagopal@onsemi.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302219-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:vulab@iscas.ac.cn,m:nicolas.ferre@microchip.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iscas.ac.cn:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 424146CE9DB
+X-Rspamd-Queue-Id: 673AA6CEC13
 
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+On Fri, Jun 26, 2026 at 11:14:49PM +0800, WenTao Liang wrote:
+> After macb_mdiobus_register succeeds, the mdio_np reference ownership is
+>   transferred to the mii_bus device (stored in mii_bus->dev.of_node). When
+>   the subsequent macb_mii_probe fails, the error path jumps to
+>   err_out_unregister_bus which calls mdiobus_free (releasing the node via
+>   fwnode_handle_put) and then falls through to err_out which calls
+>   of_node_put(mdio_np) again, causing a double put.
+> 
+> Move the of_node_put to only execute on paths where the reference was not
+>   transferred (i.e., before successful macb_mdiobus_register).
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: ef8a2e27289e ("net: macb: fix probing of PHY not described in the dt")
+> Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index a12aa21244e8..c58e089e5888 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -1170,6 +1170,9 @@ static int macb_mii_init(struct macb *bp)
+>  	mdiobus_unregister(bp->mii_bus);
+>  err_out_free_mdiobus:
+>  	mdiobus_free(bp->mii_bus);
+> +	of_node_put(mdio_np);
+> +	return err;
+> +
+>  err_out:
+>  	of_node_put(mdio_np);
 
-When oversubscribed traffic causes lot of buffer overflow errors,
-probably due to loss of data chunks, driver fails to find a
-data chunk with end_valid bit set, before it runs out of sk buffer
-space. As a result, assert is seen during skb_put.
+This does not look correct.
 
-Now check is made if tail + len > end, driver abandons the current
-data and starts look for a data chunk with start_valid bit,
-that is a new frame.
+You say if mdiobus_register() is successful, mdiobus_free() will
+release the reference.
 
-Fixes: d70a0d8f2f2d ("net: ethernet: oa_tc6: implement receive path to receive rx ethernet frames")
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+If macb_mii_probe() fails, we have successfully done
+mdiobus_register(). It does a goto err_out_unregister_bus, which calls
+mdiobus_unregister(), mdiobus_free() releasing the reference, and then
+with your patch of_node_put(). This looks like a double put to me.
 
----
-changes in v2
-  - Check rx_skb pointer before new allocation and NULL before use.
----
- drivers/net/ethernet/oa_tc6.c | 69 +++++++++++++++++++++++++++++++------------
- 1 file changed, 50 insertions(+), 19 deletions(-)
+I think i already said this once, consider the risk of your patches,
+particularly if you cannot test them.
 
-diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index 3fd4851ee66d..c59daa032e70 100644
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -692,6 +692,12 @@ static void oa_tc6_free_pending_skbs(struct oa_tc6 *tc6)
- 	oa_tc6_cleanup_waiting_tx_skb(tc6);
- }
- 
-+static void oa_tc6_look_for_new_frame(struct oa_tc6 *tc6)
-+{
-+	tc6->rx_buf_overflow = true;
-+	oa_tc6_cleanup_ongoing_rx_skb(tc6);
-+}
-+
- /* If the failure is at SPI interface level, masking and clearing
-  * the interrupt of the device won't work. Since SPI interrupt is
-  * disabled, it should stop the repeated interrupts.
-@@ -729,8 +735,7 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
- 	}
- 
- 	if (FIELD_GET(STATUS0_RX_BUFFER_OVERFLOW_ERROR, value)) {
--		tc6->rx_buf_overflow = true;
--		oa_tc6_cleanup_ongoing_rx_skb(tc6);
-+		oa_tc6_look_for_new_frame(tc6);
- 		net_err_ratelimited("%s: Receive buffer overflow error\n",
- 				    tc6->netdev->name);
- 		return -EAGAIN;
-@@ -811,13 +816,35 @@ static void oa_tc6_submit_rx_skb(struct oa_tc6 *tc6)
- 	tc6->rx_skb = NULL;
- }
- 
--static void oa_tc6_update_rx_skb(struct oa_tc6 *tc6, u8 *payload, u8 length)
-+/* On oversubscribed traffic condition, particularly with overwhelming rx
-+ * buffer overflow errors, there could be data chunk loss. If tail + length
-+ * goes beyond end pointer, that is an indication that the data chunk with
-+ * end_valid bit is lost. Time to look for a data chunk with start_valid bit.
-+ *
-+ * If rx_skb is NULL, it is time to start looking for data chunk with
-+ * start_bit.
-+ */
-+static int oa_tc6_update_rx_skb(struct oa_tc6 *tc6, u8 *payload, u8 length)
- {
-+	if (!tc6->rx_skb ||
-+	    (tc6->rx_skb->tail + length) > tc6->rx_skb->end) {
-+		oa_tc6_look_for_new_frame(tc6);
-+		return -EAGAIN;
-+	}
-+
- 	memcpy(skb_put(tc6->rx_skb, length), payload, length);
-+	return 0;
- }
- 
-+/* On overwhelming rx buffer overflow errors, due to data chunk loss, it is
-+ * possible that we get two data chunks with start_valid bit set, without
-+ * end_valid bit set in between. In this case, rx_skb would have a valid
-+ * buffer pointer. We should release, if a valid pointer is found before
-+ * allocating a new one.
-+ */
- static int oa_tc6_allocate_rx_skb(struct oa_tc6 *tc6)
- {
-+	oa_tc6_cleanup_ongoing_rx_skb(tc6);
- 	tc6->rx_skb = netdev_alloc_skb_ip_align(tc6->netdev, tc6->netdev->mtu +
- 						ETH_HLEN + ETH_FCS_LEN);
- 	if (!tc6->rx_skb) {
-@@ -837,7 +864,9 @@ static int oa_tc6_prcs_complete_rx_frame(struct oa_tc6 *tc6, u8 *payload,
- 	if (ret)
- 		return ret;
- 
--	oa_tc6_update_rx_skb(tc6, payload, size);
-+	ret = oa_tc6_update_rx_skb(tc6, payload, size);
-+	if (ret)
-+		return ret;
- 
- 	oa_tc6_submit_rx_skb(tc6);
- 
-@@ -852,22 +881,24 @@ static int oa_tc6_prcs_rx_frame_start(struct oa_tc6 *tc6, u8 *payload, u16 size)
- 	if (ret)
- 		return ret;
- 
--	oa_tc6_update_rx_skb(tc6, payload, size);
--
--	return 0;
-+	return oa_tc6_update_rx_skb(tc6, payload, size);
- }
- 
--static void oa_tc6_prcs_rx_frame_end(struct oa_tc6 *tc6, u8 *payload, u16 size)
-+static int oa_tc6_prcs_rx_frame_end(struct oa_tc6 *tc6, u8 *payload, u16 size)
- {
--	oa_tc6_update_rx_skb(tc6, payload, size);
-+	int ret;
- 
--	oa_tc6_submit_rx_skb(tc6);
-+	ret = oa_tc6_update_rx_skb(tc6, payload, size);
-+	if (!ret)
-+		oa_tc6_submit_rx_skb(tc6);
-+	return ret;
- }
- 
--static void oa_tc6_prcs_ongoing_rx_frame(struct oa_tc6 *tc6, u8 *payload,
--					 u32 footer)
-+static int oa_tc6_prcs_ongoing_rx_frame(struct oa_tc6 *tc6, u8 *payload,
-+					u32 footer)
- {
--	oa_tc6_update_rx_skb(tc6, payload, OA_TC6_CHUNK_PAYLOAD_SIZE);
-+	return oa_tc6_update_rx_skb(tc6, payload,
-+				    OA_TC6_CHUNK_PAYLOAD_SIZE);
- }
- 
- static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
-@@ -880,6 +911,7 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
- 	bool start_valid = FIELD_GET(OA_TC6_DATA_FOOTER_START_VALID, footer);
- 	bool end_valid = FIELD_GET(OA_TC6_DATA_FOOTER_END_VALID, footer);
- 	u16 size;
-+	int ret;
- 
- 	/* Restart the new rx frame after receiving rx buffer overflow error */
- 	if (start_valid && tc6->rx_buf_overflow)
-@@ -907,8 +939,7 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
- 	/* Process the chunk with only rx frame end */
- 	if (end_valid && !start_valid) {
- 		size = end_byte_offset + 1;
--		oa_tc6_prcs_rx_frame_end(tc6, data, size);
--		return 0;
-+		return oa_tc6_prcs_rx_frame_end(tc6, data, size);
- 	}
- 
- 	/* Process the chunk with previous rx frame end and next rx frame
-@@ -921,7 +952,9 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
- 		 */
- 		if (tc6->rx_skb) {
- 			size = end_byte_offset + 1;
--			oa_tc6_prcs_rx_frame_end(tc6, data, size);
-+			ret = oa_tc6_prcs_rx_frame_end(tc6, data, size);
-+			if (ret)
-+				return ret;
- 		}
- 		size = OA_TC6_CHUNK_PAYLOAD_SIZE - start_byte_offset;
- 		return oa_tc6_prcs_rx_frame_start(tc6,
-@@ -930,9 +963,7 @@ static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *data,
- 	}
- 
- 	/* Process the chunk with ongoing rx frame data */
--	oa_tc6_prcs_ongoing_rx_frame(tc6, data, footer);
--
--	return 0;
-+	return oa_tc6_prcs_ongoing_rx_frame(tc6, data, footer);
- }
- 
- static u32 oa_tc6_get_rx_chunk_footer(struct oa_tc6 *tc6, u16 footer_offset)
-
--- 
-2.43.0
-
-
+	Andrew
 
