@@ -1,50 +1,124 @@
-Return-Path: <netdev+bounces-302192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KcGICgePPmq8HwkAu9opvQ
-	(envelope-from <netdev+bounces-302192-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:39:03 +0200
+	id 5AuSI0KEPmqeHQkAu9opvQ
+	(envelope-from <netdev+bounces-302185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:53:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EAB16CE01E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:39:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA9146CDBB5
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:53:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=chelsio.com (policy=reject);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302192-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302192-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="YETV/LOX";
+	dkim=pass header.d=redhat.com header.s=google header.b=sHVioXrf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302185-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302185-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 106E3300988F
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 14:39:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AD3730C0153
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 13:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCD93F8890;
-	Fri, 26 Jun 2026 14:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC69D3F822D;
+	Fri, 26 Jun 2026 13:48:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stargate.chelsio.com (unknown [12.32.117.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4F43750D6
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 14:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0473F7897
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 13:48:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782484740; cv=none; b=JN6ufdSIIrMaN9+9lphGBKjj9rMfALXm9v15ZrPtsZIsOf3p6eXJSiPPuiykPGL2MtzBPQIEjQ3+TaiZPUU0x0Bh+HB96nistZ0ZxXzYJG7HUunMbwiTldMKAdghYWuIITXh8hUj06RJ7aropYFktVjRg9J8CXatpkrZOPXuDe8=
+	t=1782481716; cv=none; b=LENBhWJAwBrA6OJKBYUItKPSwrq87IYnkyuYcSsNeUC/JcPzcAM3IqJuAOHuB5zC1PAOagyB/G9SbQbyayp6L2Nv8JxSs6DI6IGpa3jQ3RB4IgH6aRO+66F40JWMzHkAeMk4F+Jk/MX31Y0Q2Hq5IjnOswK15ObMH+sAsYCodjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782484740; c=relaxed/simple;
-	bh=asDRLijXKz0PAu75f1PXRxhfXomGdPm/+X8Jw6/u84U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YVUgjOW9eXTNsw7kiDHk6C8ktsTckakzwuGQ8VXhGlISz49Ie1tvyteMXCmb0rLpbVAzZe2xCwiw+tbZiwy9+rPx57BjmEeSK8s5uKY4xBTp+2etRJYvZxyZEHpMVMqp0BRkfjFqlC4S12Xog5hCOOmQAyE8uPXWVwn+TZ2isI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
-Received: from fcoeperf6.blr.asicdesigners.com (fcoeperf6.blr.asicdesigners.com [10.193.187.161])
-	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 65QDn7aU014223;
-	Fri, 26 Jun 2026 06:49:08 -0700
-From: Harsha M <h.mahadeva@chelsio.com>
+	s=arc-20240116; t=1782481716; c=relaxed/simple;
+	bh=kSmbivb2F6tEki0ZApRG80IjPIDJaaZr+UzUkrZmWM0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LNWW8ZqOUEqx0Sih0TpU1gXLss6+kHxTC5nkgb5g5Dhhm6frOLJn6F2bTUQyHHGQUhkzALeOTh5KEDSxC3a2brQqhPVVOZxX24G9Wu3rkaPygkmvIFg2ewybX0Nt4ueUA5XaTgipSCwcfEb+IhcN60m/K4Rr0JYWuB4Dw0nL8Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YETV/LOX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sHVioXrf; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782481714;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tejkhLdr0HnxxaNJljV7nQeGEFCdocArjm/M5aIQb7c=;
+	b=YETV/LOX5srEfEoyBmdhBD/WGKCseugatTBEH4GnhVIxTzffLOjkDA2EW0TAoFtMvat5JW
+	xXC1sbp6FM5P0Go42LoxL/6Z1CSfN1jI++XYRT/kJoxYSoKidRfK6HeFflEcXaIA/fG58f
+	ef7/Ecj9EtGuBwoeShqCYeW6WRVsFdI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368-6qelFUe7PkK0T-mdGsyLuA-1; Fri, 26 Jun 2026 09:48:32 -0400
+X-MC-Unique: 6qelFUe7PkK0T-mdGsyLuA-1
+X-Mimecast-MFC-AGG-ID: 6qelFUe7PkK0T-mdGsyLuA_1782481712
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-46db5d470bfso693989f8f.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 06:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1782481711; x=1783086511; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tejkhLdr0HnxxaNJljV7nQeGEFCdocArjm/M5aIQb7c=;
+        b=sHVioXrfvlTjKJRSiyXEOBDhWbGBfjUTtuiMUL3+XC+w/SeuftPpAaMP8FQi3aRgTc
+         bwGMditapjsgKcbxeIPOBogVhra3rq7SlRD91OSnH/CotKbRlOojPlyg3MZwWJwB9ANc
+         xncASz5DNkGGkUNGFPmm8h5lWPULK7cEjnxJ5Ru3R3aUPf79ZG03QG36yOG4tI7Tdg9O
+         OKBgW1uSjG31gwKvDxaiZzhOgKmLGQTwaDY6+ek+0qKU7n5V9AEDnBiGTpFqLz1AwLzm
+         fTovBIytl8v52wUaEJOkUA2kAsvUn4Gbcd6kW1F104agk4ZC+cVvDe61K3FqLFb9uCrC
+         nfTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782481711; x=1783086511;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tejkhLdr0HnxxaNJljV7nQeGEFCdocArjm/M5aIQb7c=;
+        b=tXSiavz7vcDg42kb8dFojVX0dmnw0wzCT+2mgyOj6/Kwv0nyEGReDqShAiPjhorspH
+         oBChOAQ/mwQPn3MKzx2QJRg+uIkRHgwEoaDzSYBHdomIzI6uG5+XHIcj2prMB5NLh00G
+         BEwBuGlPU/KKYSPUP+IlGIsunm5up/QHBvX7RIkdll+YE+jLbDVevVfZzxXZkWrGwLHO
+         3rENVxKkhu4r3O/29HlOvd9XsIeDtJDq4uXj/ncAdjbo+SsbAJMOlxK+b9fLQ+OFxLIs
+         mCRfrbmpB2i2WWFCSN5tlPP0Wpouj1nT+UNRLxDWU2nulsHlsCWEwyJQFl7USYM5kZ4W
+         PU8g==
+X-Gm-Message-State: AOJu0Yyh5usETlsM4/AjDDC2xXq2Xczb4x9NMNQEnpL6rCd8GLRWfnbj
+	pzv534rdMKL0rocw47a2pFSrekxvtG2/sOtyT19rhVRrjy9ibsJWQiPMFFsnUDZftINAnqiVVuD
+	faKxXwu1xq2t5OOdxTKbIDTEa5M55/QS+JTM8xqDHclCGoULEE7JFF4jVf7RFIqVE8kJ69BxbYa
+	HTixGij69Lm1bZmQtelDXpuxJuS3CWEkjBznJdDDhXWw==
+X-Gm-Gg: AfdE7cnFhgVWIqPo4TWWUfNptCpJ4LjmA87GT9Q/1G7vqrH5ULX3UErg9nH6pKyUDMn
+	e7ermtdoo3EHS4rsYIojuWQdDIbEfWRP2ELMyfT0Se5d9BFNQu3mN/BCq/Offgggh6+3tzqJeMT
+	drADS1c0n3aDuQOAKuWImOVw1jpd0XQLt34lMZQuWdSZ3M/JxG9M0QQYk0+1gb/wwKYLOnUv1Jt
+	Pe+ubHHCpHcVeUrib8W9llUzqjoIdmK5fJn9FuDrSafm6JNjcJaoDSubTLYXzLpCpkAZ+jqTiOK
+	9qS8gu9CAmdX1UVhTA8FeLiBGHG71trAdioNgLWEmL+YVBQKazSEFg7yVLvRZav5DPNssxVkYrw
+	5xOD3ZL3cqOZ92nf8bOUAsf9ytMGNFIc5+n5kE3SqKcfFiWg=
+X-Received: by 2002:a05:6000:4552:b0:46d:cc92:e00d with SMTP id ffacd0b85a97d-46dcc92e132mr8992601f8f.43.1782481711464;
+        Fri, 26 Jun 2026 06:48:31 -0700 (PDT)
+X-Received: by 2002:a05:6000:4552:b0:46d:cc92:e00d with SMTP id ffacd0b85a97d-46dcc92e132mr8992542f8f.43.1782481710846;
+        Fri, 26 Jun 2026 06:48:30 -0700 (PDT)
+Received: from stex1 (host-79-34-22-35.business.telecomitalia.it. [79.34.22.35])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46dd5f9da4fsm16443364f8f.23.2026.06.26.06.48.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2026 06:48:29 -0700 (PDT)
+From: Stefano Garzarella <sgarzare@redhat.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-        pabeni@redhat.com, andrew+netdev@lunn.ch, bharat@chelsio.com,
-        Harsha M <h.mahadeva@chelsio.com>
-Subject: [PATCH net v1] cxgb4: flower: fix 802.1ad VLAN TPID matching in tc flower filters
-Date: Fri, 26 Jun 2026 19:18:22 +0530
-Message-ID: <20260626134848.91281-1-h.mahadeva@chelsio.com>
-X-Mailer: git-send-email 2.43.0
+Cc: Jason Wang <jasowang@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	stable@vger.kernel.org,
+	Brien Oberstein <brienpub@gmail.com>
+Subject: [PATCH net 1/2] vsock/virtio: collapse receive queue under memory pressure
+Date: Fri, 26 Jun 2026 15:48:22 +0200
+Message-ID: <20260626134823.206676-2-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260626134823.206676-1-sgarzare@redhat.com>
+References: <20260626134823.206676-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,155 +127,248 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [3.54 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[chelsio.com : SPF not aligned (relaxed), No valid DKIM,reject];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:bharat@chelsio.com,m:h.mahadeva@chelsio.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[h.mahadeva@chelsio.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302185-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,vger.kernel.org,lists.linux.dev,linux.alibaba.com,google.com,davemloft.net,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302192-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jasowang@redhat.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:xuanzhuo@linux.alibaba.com,m:edumazet@google.com,m:horms@kernel.org,m:sgarzare@redhat.com,m:linux-kernel@vger.kernel.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:eperezma@redhat.com,m:stable@vger.kernel.org,m:brienpub@gmail.com,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[h.mahadeva@chelsio.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,chelsio.com:email,chelsio.com:mid,chelsio.com:from_mime]
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9EAB16CE01E
+X-Rspamd-Queue-Id: DA9146CDBB5
 
-The cxgb4 driver does not correctly handle tc flower filters that
-match on an 802.1ad (Q-in-Q) outer VLAN tag. While the VLAN VID is
-processed, the specified 802.1ad TPID is not programmed into the
-adapter's outer VLAN matching configuration, resulting in incorrect
-filter matches.
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Fix this by configuring the port-specific OVLAN register with the
-requested TPID value and mask, enabling OVLAN matching through the RX
-control register, and populating the filter specification with the
-outer VLAN VID and valid-bit match fields when an 802.1ad TPID is
-requested.This restores correct matching for tc flower filters that
-specify an 802.1ad outer VLAN tag
+When many small packets accumulate in the receive queue, the skb overhead
+can exceed buf_alloc even while the payload is within bounds. This causes
+virtio_transport_inc_rx_pkt() to reject packets, leading to connection
+resets during large transfers under backpressure.
 
-Signed-off-by: Harsha M <h.mahadeva@chelsio.com>
-Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
+The issue was reported by Brien, who has a reproducer, but it is also
+easily reproducible with iperf-vsock [1] using a small packet size:
+
+  iperf3 --vsock -c $CID -l 129
+
+which fails immediately without this patch but with commit 059b7dbd20a6
+("vsock/virtio: fix potential unbounded skb queue").
+
+Inspired by TCP's tcp_collapse() which solves a similar problem, add
+virtio_transport_collapse_rx_queue() that walks the receive queue and
+re-copies data into compact linear skbs to reduce the overhead.
+
+The collapse is triggered from virtio_transport_recv_enqueue() when
+virtio_transport_inc_rx_pkt() fails. A pre-scan counts the eligible bytes
+to size each allocation precisely, avoiding waste for isolated small
+packets. Partially consumed skbs are kept as-is to preserve
+buf_used/fwd_cnt accounting, EOM-marked skbs to maintain SEQPACKET
+message boundaries, and skbs already larger than the collapse target
+because they already have a good data-to-overhead ratio.
+
+[1] https://github.com/stefano-garzarella/iperf-vsock
+
+Fixes: 059b7dbd20a6 ("vsock/virtio: fix potential unbounded skb queue")
+Cc: stable@vger.kernel.org
+Reported-by: Brien Oberstein <brienpub@gmail.com>
+Closes: https://lore.kernel.org/netdev/618701dd023e$063de350$12b9a9f0$@gmail.com/
+Tested-by: Brien Oberstein <brienpub@gmail.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- .../ethernet/chelsio/cxgb4/cxgb4_tc_flower.c  | 62 +++++++++++++------
- drivers/net/ethernet/chelsio/cxgb4/t4_regs.h  |  3 +
- 2 files changed, 47 insertions(+), 18 deletions(-)
+ net/vmw_vsock/virtio_transport_common.c | 148 +++++++++++++++++++++++-
+ 1 file changed, 146 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-index 3307e5042681..41a2998ee2a0 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
-@@ -40,6 +40,7 @@
- #include "cxgb4.h"
- #include "cxgb4_filter.h"
- #include "cxgb4_tc_flower.h"
-+#include "t4_regs.h"
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 09475007165b..304ea424995d 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -420,6 +420,137 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+ 	return ret;
+ }
  
- #define STATS_CHECK_PERIOD (HZ / 2)
- 
-@@ -266,24 +267,49 @@ static void cxgb4_process_flow_match(struct net_device *dev,
- 					       VLAN_PRIO_SHIFT);
- 		vlan_tci_mask = match.mask->vlan_id | (match.mask->vlan_priority <<
- 						     VLAN_PRIO_SHIFT);
--		fs->val.ivlan = vlan_tci;
--		fs->mask.ivlan = vlan_tci_mask;
--
--		fs->val.ivlan_vld = 1;
--		fs->mask.ivlan_vld = 1;
--
--		/* Chelsio adapters use ivlan_vld bit to match vlan packets
--		 * as 802.1Q. Also, when vlan tag is present in packets,
--		 * ethtype match is used then to match on ethtype of inner
--		 * header ie. the header following the vlan header.
--		 * So, set the ivlan_vld based on ethtype info supplied by
--		 * TC for vlan packets if its 802.1Q. And then reset the
--		 * ethtype value else, hw will try to match the supplied
--		 * ethtype value with ethtype of inner header.
--		 */
--		if (fs->val.ethtype == ETH_P_8021Q) {
--			fs->val.ethtype = 0;
--			fs->mask.ethtype = 0;
++static bool virtio_transport_can_collapse(struct sk_buff *skb,
++					  unsigned int size)
++{
++	/* skbs that are partially consumed, mark a SEQPACKET message boundary,
++	 * or are already large enough should not be collapsed: they either
++	 * need special accounting, carry protocol state, or already have a
++	 * good data-to-overhead ratio.
++	 */
++	if (VIRTIO_VSOCK_SKB_CB(skb)->offset)
++		return false;
++	if (le32_to_cpu(virtio_vsock_hdr(skb)->flags) & VIRTIO_VSOCK_SEQ_EOM)
++		return false;
++	if (skb->len >= size)
++		return false;
++	return true;
++}
 +
-+		if (be16_to_cpu(match.key->vlan_tpid) == ETH_P_8021AD) {
-+			struct adapter *adap = netdev2adap(dev);
-+			u32 ovlan_reg, ctl_reg, val, port_id;
++/* Iterate through the packets in the queue starting from the current skb to
++ * count the number of bytes we can collapse.
++ */
++static unsigned int
++virtio_transport_collapse_size(struct sk_buff *skb,
++			       struct sk_buff_head *queue,
++			       unsigned int max_size)
++{
++	unsigned int target = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset;
 +
-+			if (!adap) {
-+				netdev_err(dev, "%s: adap not found\n", __func__);
-+				return;
-+			}
++	while ((skb = skb_peek_next(skb, queue)) &&
++	       virtio_transport_can_collapse(skb, max_size)) {
++		unsigned int len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset;
 +
-+			val = (be16_to_cpu(match.mask->vlan_tpid) << 16) |
-+			      be16_to_cpu(match.key->vlan_tpid);
-+			port_id = netdev2pinfo(dev)->port_id;
-+			fs->val.ovlan = vlan_tci;
-+			fs->mask.ovlan = vlan_tci_mask;
-+			fs->val.ovlan_vld = 1;
-+			fs->mask.ovlan_vld = 1;
-+			ovlan_reg = PORT_REG(port_id, MPS_PORT_RX_OVLAN0_A);
-+			ctl_reg = PORT_REG(port_id, MPS_PORT_RX_CTL_A);
-+			t4_write_reg(adap, ovlan_reg, val);
-+			val = t4_read_reg(adap, ctl_reg);
-+			t4_write_reg(adap, ctl_reg, val | 1);
-+			t4_tp_wr_bits_indirect(adap, TP_INGRESS_CONFIG_A, 1U << 9, 0);
-+		} else {
-+			fs->val.ivlan = vlan_tci;
-+			fs->mask.ivlan = vlan_tci_mask;
-+			fs->val.ivlan_vld = 1;
-+			fs->mask.ivlan_vld = 1;
++		if (len > max_size - target)
++			return target;
 +
-+			/* Chelsio adapters use ivlan_vld bit to match vlan packets
-+			 * as 802.1Q. Also, when vlan tag is present in packets,
-+			 * ethtype match is used then to match on ethtype of inner
-+			 * header ie. the header following the vlan header.
-+			 * So, set the ivlan_vld based on ethtype info supplied by
-+			 * TC for vlan packets if its 802.1Q. And then reset the
-+			 * ethtype value else, hw will try to match the supplied
-+			 * ethtype value with ethtype of inner header.
++		target += len;
++	}
++
++	return target;
++}
++
++/* Called under lock_sock when skb overhead exceeds the budget. */
++static void virtio_transport_collapse_rx_queue(struct virtio_vsock_sock *vvs)
++{
++	/* Use the same linear allocation threshold as virtio_vsock_alloc_skb()
++	 * to avoid adding pressure on the page allocator.
++	 */
++	unsigned int collapse_max = SKB_MAX_ORDER(VIRTIO_VSOCK_SKB_HEADROOM,
++						  PAGE_ALLOC_COSTLY_ORDER);
++	struct sk_buff *skb, *next_skb, *new_skb = NULL;
++	struct sk_buff_head new_queue;
++
++	__skb_queue_head_init(&new_queue);
++
++	skb_queue_walk_safe(&vvs->rx_queue, skb, next_skb) {
++		struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
++		u32 src_off = VIRTIO_VSOCK_SKB_CB(skb)->offset;
++		u32 src_len = skb->len - src_off;
++		bool keep = false;
++
++		if (!virtio_transport_can_collapse(skb, collapse_max)) {
++			/* Finalize pending collapsed skb to preserve packet
++			 * ordering.
 +			 */
-+
-+			if (fs->val.ethtype == ETH_P_8021Q) {
-+				fs->val.ethtype = 0;
-+				fs->mask.ethtype = 0;
++			if (new_skb) {
++				__skb_queue_tail(&new_queue, new_skb);
++				new_skb = NULL;
 +			}
- 		}
- 	}
- 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
-index 695916ba0405..38c585f3b1ad 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
-@@ -1921,6 +1921,9 @@
- #define MAC_PORT_PTP_SUM_LO_A 0x990
- #define MAC_PORT_PTP_SUM_HI_A 0x994
- 
-+#define MPS_PORT_RX_OVLAN0_A 0x120
-+#define MPS_PORT_RX_CTL_A    0X100
++			keep = true;
++			goto next;
++		}
 +
- #define MPS_CMN_CTL_A	0x9000
++		/* Finalize if this packet won't fit in the remaining tailroom,
++		 * so we can allocate a right-sized new_skb.
++		 */
++		if (new_skb && src_len > skb_tailroom(new_skb)) {
++			__skb_queue_tail(&new_queue, new_skb);
++			new_skb = NULL;
++		}
++
++		if (!new_skb) {
++			unsigned int alloc_size;
++
++			alloc_size = virtio_transport_collapse_size(skb, &vvs->rx_queue,
++								    collapse_max);
++
++			/* Only this skb's data is eligible, nothing to merge
++			 * with. Keep as-is.
++			 */
++			if (alloc_size <= src_len) {
++				keep = true;
++				goto next;
++			}
++
++			new_skb = virtio_vsock_alloc_linear_skb(alloc_size +
++					VIRTIO_VSOCK_SKB_HEADROOM, GFP_KERNEL);
++			if (!new_skb)
++				goto out;
++
++			memcpy(virtio_vsock_hdr(new_skb), hdr,
++			       sizeof(struct virtio_vsock_hdr));
++			virtio_vsock_hdr(new_skb)->len = 0;
++		}
++
++		/* Cannot fail since src_off/src_len are within bounds, but if
++		 * it does, discard new_skb to avoid queuing corrupted data.
++		 */
++		if (WARN_ON_ONCE(skb_copy_bits(skb, src_off,
++					       skb_put(new_skb, src_len),
++					       src_len))) {
++			kfree_skb(new_skb);
++			new_skb = NULL;
++			goto out;
++		}
++
++		le32_add_cpu(&virtio_vsock_hdr(new_skb)->len, src_len);
++		virtio_vsock_hdr(new_skb)->flags |= hdr->flags;
++
++next:
++		__skb_unlink(skb, &vvs->rx_queue);
++		if (keep)
++			__skb_queue_tail(&new_queue, skb);
++		else
++			consume_skb(skb);
++	}
++out:
++	if (new_skb)
++		__skb_queue_tail(&new_queue, new_skb);
++
++	skb_queue_splice(&new_queue, &vvs->rx_queue);
++}
++
+ static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
+ 					u32 len)
+ {
+@@ -1363,8 +1494,21 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+ 	spin_lock_bh(&vvs->rx_lock);
  
- #define COUNTPAUSEMCRX_S    5
+ 	can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
+-	if (!can_enqueue)
+-		goto out;
++	if (!can_enqueue) {
++		/* Try to collapse the receive queue to reduce skb overhead and
++		 * make room for this packet.
++		 * Unlock rx_lock since the collapse may sleep or, in any case,
++		 * take some time to collapse the skbs, but this is safe, since
++		 * sk_lock is held by caller so no one else can enqueue or
++		 * dequeue.
++		 */
++		spin_unlock_bh(&vvs->rx_lock);
++		virtio_transport_collapse_rx_queue(vvs);
++		spin_lock_bh(&vvs->rx_lock);
++		can_enqueue = virtio_transport_inc_rx_pkt(vvs, len);
++		if (!can_enqueue)
++			goto out;
++	}
+ 
+ 	if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
+ 		vvs->msg_count++;
 -- 
-2.43.0
+2.54.0
 
 
