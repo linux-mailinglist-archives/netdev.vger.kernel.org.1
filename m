@@ -1,205 +1,247 @@
-Return-Path: <netdev+bounces-302278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id j1b4IcICP2qlOAkAu9opvQ
-	(envelope-from <netdev+bounces-302278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 00:52:50 +0200
+	id 7QfCDPQNP2rlOQkAu9opvQ
+	(envelope-from <netdev+bounces-302279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 01:40:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03E706D076A
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 00:52:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC196D0873
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 01:40:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RMajR2uP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302278-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302278-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=RFnbfnoj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302279-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302279-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1EAB302E7A4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 22:52:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0F13D3008689
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 23:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E2139D6C8;
-	Fri, 26 Jun 2026 22:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B421E30BB9B;
+	Fri, 26 Jun 2026 23:40:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92E8330659
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 22:52:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782514355; cv=none; b=j9Rb3repEk5X8KvzYJyNSkgsTI5J6zXuFxUQ1+IZSoblrj/pyePbsL91jwfuKeNCtn02PDiwRcSqHAL4mHJ2yXT+xp1/wqGfPGTCn2e51+c/DBDT0UFpVYUTi4j4w/12RjCUkEralWa0Z2VHG9bnRvmWJIAUAqaIRILmOZO8X94=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782514355; c=relaxed/simple;
-	bh=SwOPJqpg4b6qLai1Os6dv/e6e2ZIKWpVZgpCjMbs5k4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uuLZHJPTwc5UU3RqIqRLTr3I+9jNDF3gltxoPw9d5ncwNW67J1o+iYIwFZ8P5NnWN+QobMi9MI8Whd1VS+Z62vDltWuDEdjegPAHXdrnTrR2KYHIje32gBYlG28XzgUV36wjVfQ8I6G2OmmpSMWA0IEj+APqtHeQ5XLQyh5pz7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RMajR2uP; arc=none smtp.client-ip=209.85.210.169
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-845b965c1c4so840322b3a.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 15:52:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C0A28E0F
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 23:40:29 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782517230; cv=pass; b=jZ4KhDT7njupNPdFomhtc5PAmfzTrmrv1EDYG8F5fbTOPN+7OhcGLSkywctkKcUrPbjtGOvW07wkz5ytnB5IvqD1S4Llkjykgq9FO0y888sLvJotMv1mmWcw+OtjrVjuhKYneUFDaGRDR3culcj+aOQrA581B6N/EUwq7osvxEc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782517230; c=relaxed/simple;
+	bh=vOwNTWptAgYzKdREjHQnzWTq5/l5S6TcCLWGk01eaUc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RyWFhYJ/b4wF8TkKaSsaMszChb9ppzuJXo9v3mqZ0ie+IOkRlVvkQfkSmtGON0CJKzdtiz2dfUrgXiARNqTD3grwoEjDm1z4ARZN0l03bW2Lyi/JvTFcijfw9Rb9eDUzjsagGQBebJhJfSaxaeqf5UavH08XgAE3ghQ7nloy2h0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RFnbfnoj; arc=pass smtp.client-ip=74.125.82.52
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-139edc6bfc0so1201377c88.1
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 16:40:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782517228; cv=none;
+        d=google.com; s=arc-20260327;
+        b=XJr/xI/OsHXpxxTYaBTJQ3036+FCz21j0BRjUL4+AkVLuGHH4Hfkb5zfopMz/7kJRF
+         86HxKHje3LUOlwFFrkdihNWYqt4/XzqsblSCTplGjk9cojle6UVuLx5LTNETV2Y2Q8Kb
+         WFyRfs4CtCYvzW2eIKX7CAchpCXqi4/nOnnVHlx+0ne+q6JAz8uLCEd9Vh5UUcCQHo/x
+         EStyLmO+QATTubRXw9p7cetIWi6LapRvviWvfSSJ/nOSABEGa0v+lTc0G4i8tfan3NRI
+         /gEBrg6diBSJg7x8t3ggZ5vQEVQ5ke5A4j+1HVWQS1CUzlkIuu7sY1PGEL7CG301Z13F
+         1/Vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aOfrINdpJM+zKLAk//ftt1Vs/ii9P6kTgvF4dqWtGLU=;
+        fh=COCQ3EoS6tjjvBULIhjXEHfdz5vKUHlUCYF4D/iOS7I=;
+        b=qBSoxLlN0F3XvE7NfPU7wy1A+9T7bRQbA4Hr6YrRBofVAtahZNlW3WiFG4TvgtSG/W
+         U4UXM1Bo6AQTbOsrLHn/QOwDHNsyKCDUNY8h2w12hv/2ZN/T8UF/Etf472ppQ9qu3GtV
+         f6be9XOdoKGBeYxfubtXpnmRiYN+agMKAgsyV79o4AeaAhyydqz35ednYS/H4loLYUGY
+         3Bc9HrlzQouyd86LH5/DExonqOK8IILD+/EmgOm5r0VyfCqiksGTfozQoTujCp+sJga0
+         iN2ht7P1sQR186sAr7TjRanltMvRR5EpiSETl4s51jyrZXwckLNVDNNl7AZ14s8Ntt5W
+         bY+g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782514352; x=1783119152; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WcxVtojs1bzoEtQJKG5MqOp3NObqU50nISOInJcEpNA=;
-        b=RMajR2uPVVKx+FDbhADutccRzPyHpIaKpSuLj679zn8tV3ZeL3F7CltOFSir0Uf4rP
-         y7WOlpi+dHMtMt34XNjrLBuUU8xjwGX3U+o17+NCuUhjUwk0ncsDtGfCGoh6iAJtutVn
-         6WgSqNmFhOBNt4z3zb63mi3vMctMnWhpNU249qZk6g0N2iPUxNxlwQrORpk28e8KO+qh
-         c/f/AzlTFSO9Ep/inHfgwRki9tRbnZC+E2dQYYsDf6ctZ1LfW+WZVBwd1eMQEOdEuqHY
-         dhgGkmxurt8rLqnIauTacXGEKV6Y+rcbpcJNDIYfSZD3TQQsWPu4oMJ9XBznuFBATGnO
-         WNmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782514352; x=1783119152;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1782517228; x=1783122028; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WcxVtojs1bzoEtQJKG5MqOp3NObqU50nISOInJcEpNA=;
-        b=Mv7e2iEEM+FWIs/0Nrr0vKbhuXxzsNrmWtZAoLWlRneTjlBULBXdA+RJM5GRkRHJOj
-         tJ+ZHd+fQGuT2PFMUrGrYvimsMyKt8n9Jeu2zYLQu9NsllYHhJNxdDPM2X8cGXkCrtf+
-         SMa88l6zRXBoTUhEidTnPC2m7rxLWcWKsm4+1Dc2BcwYouaqYGBOec5CIw9BanhInpbU
-         MjtcKq1n80LRv3jfN8xFfhiEWu7Quqpe/DDDcNOa81FNguEdt74UwhBr5MCEfgTmuPGs
-         i/HHpL9sGiL01C2iFkUnBMKv0db0hZYhyeefBgQFpXdvPVwSikHhETx2/XiTuAfIz03I
-         c9Lw==
-X-Gm-Message-State: AOJu0YzjriRL8H4y03BRhLRyciZMpizpdWRXy2vKXOdIMffBgCFN6cRR
-	+O2axf/07/ZtHe0jt9pnRYRlz/uNUXG+8bkKGj39hhnFo1MIR3jEGKsMd11mrQ==
-X-Gm-Gg: AfdE7ckNbtye2N3U7umgmEXjw+CS8M/ZiW2Oq0SMBsLyuKKjCFOryrNhCPa+eJo12RD
-	RvjK0yQYdfZhEOGJ24rgma05BIZpt7e8l2h2ZNvJTn8mYb+Vs/cIWf/iPryA+5hsce1BenHLoZw
-	EU3rfkJ2IYpMSoaMO69fTa+ud1MlqXlB/FL/LKJwyvd0Mv2RcXi+9sLRH9rq/D48GftA+rGBEt+
-	V6rpNQkgDHpyWbBpMuu1fPOe+Wcat0qi9XqRpFIq8Bs7smVmnUDDj6rrFyKZa0ao1efsffsnyaV
-	4NVLSrM6MdU40FVCqxGuMtYFh1FBp+loh43Z8BpkFjYdUfK0YpE2usazBQktKkmUQia8ZCmWRzZ
-	v6WN/vOm5sAjcS8FIvShgfNgZgkLyuzD/l6+cpFVacTGPep6ynaiL44ZH5+bSEYv8bNjLVEf3LC
-	sK3y/5+5i3gdZT7j/HuXlGAITnTw+DojRPWbQBkGgxiljPw0zPRKIG8BosebxALhhp7InwvQdsy
-	2pYwvUGcw==
-X-Received: by 2002:a05:6a00:288d:b0:845:a24d:9b65 with SMTP id d2e1a72fcca58-845d1fcaa8emr1886069b3a.14.1782514351859;
-        Fri, 26 Jun 2026 15:52:31 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:5b5d::e34])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-845a3ec0ec9sm7427385b3a.0.2026.06.26.15.52.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 15:52:30 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Fleming <afleming@freescale.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: gianfar: dispose irq mappings on probe failure and device removal
-Date: Fri, 26 Jun 2026 15:52:28 -0700
-Message-ID: <20260626225228.427392-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        bh=aOfrINdpJM+zKLAk//ftt1Vs/ii9P6kTgvF4dqWtGLU=;
+        b=RFnbfnojLJFBigPZMRN/UxfOv7LLExCFq9SF4XscKJArbRE5PO2iVkPpRJLMmkRilo
+         amXzYoYbrtqA8muGXONxVXDMzURJQgG2+njHgcqzg0N1KU1yCNyptfX2qDXV6xoZ6GSa
+         lCMg8HR6BbQqpkessdBIwYRZYoPp58clHZ0yrPjGH/qe1q3xQdfjTFGsnwxpTuOVxPbT
+         ItDnZLi46MjgfofmREpCBQBNIpLr8Yikm+23q51GJzMR3NTC/8w3VhZOLhyf0SJrk3hT
+         YE/mhffHEpoTXHikzFVuHDUkdCaVCRuefdcZq7Wxk3DgjPw83dNAqourV8vEfTajlk/p
+         P2uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782517228; x=1783122028;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aOfrINdpJM+zKLAk//ftt1Vs/ii9P6kTgvF4dqWtGLU=;
+        b=YAYOk9QkYdsV6Zo7H+1rv3vMCcMiMCq4mu9CabwPUa+7qKSD8FXiRdPlDyrAUupZhI
+         Cu07rSL4RV647o8IJksSt9edghnZpLL+GLFd8r8djJVV68Y0faAOxBuHGXAatg2s2oNF
+         kePM12YfYbFQ6Ze3yW72zkHuM8Yn4pindOXHFnrtHWddYZzfZdDDsm0q396vcXUv9EPL
+         Gyq6pn11BaDkayOpmuV3nOWAt3TJLNsUZzvUoI7G3XvVIrNiW0ZdUhGXxO9JfPiJvx/N
+         0Xlf/sbYDJPPlsTVU1kKvswM8n/BT706ucZzze5eX4y1od3Ecg80urlwgT2HWwGL7Mcr
+         Iqag==
+X-Forwarded-Encrypted: i=1; AFNElJ/ARdbwOoVjdrXQZzJXNJeysWd6lQz/fs3EySAr4FnzB/V6dGtTbr88AdS+2vCdNiPa/kNOE3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAwrgLLKNWTXsLBk7SykITVOpFAh2RQocQ2PoXG4+31z1aF4cz
+	SH7VzElBp0/R89GGH0VsQqxGfo+sGqZMLqgdBHqcnh4rWZs/+7oe9SYs8eaochE1PIhhhP/XOvA
+	yqG5mYelrzaIcYQDeg72MJ5MV2xC82/Nyig7XmE5r
+X-Gm-Gg: AfdE7clMJC+/8lQzi8R5eLwR9KOrbQe4AmY+7+iYhPxNz7RQH0CbittaV42NdUowpto
+	1taNcImJgs1A60S7vHfWAAB8PLV1PFePkX1q5sWFfxdv0X7JpL/JCX9ei5ygUUoWxuMQuQz1uGn
+	xV0HL4qm5ZnBVSE/7LNKASec8UL3i3zWZfwz4NBxPnI3duJgICuUSF7i+XBnr9+psUYcOOBUnsV
+	7l+3D3QtxYNry9NDBGnikUgAw1IvoAA0pXRSxXYNXE8c9yygvGR7mEuskNBsEhv2GAYIKHfejSb
+	wnd1qGgEYWo/cpArLWoX3q6Lg6/M6jn7T6ePEh7EzQ1YIsEC+yV0b7whzdjXHSSQJPOgj29M1k/
+	cM/4MsYa7b2c0lxYa+R464+hcL1dSdPt6tnmF6k4=
+X-Received: by 2002:a05:7022:6626:b0:139:8172:76a6 with SMTP id
+ a92af1059eb24-139dbaa5c0fmr6979225c88.1.1782517226857; Fri, 26 Jun 2026
+ 16:40:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260626093856.61864-1-xuanqiang.luo@linux.dev>
+In-Reply-To: <20260626093856.61864-1-xuanqiang.luo@linux.dev>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Fri, 26 Jun 2026 16:40:14 -0700
+X-Gm-Features: AVVi8CdhF44udywOOBpjvR8ZTQpjpP1Xll4rjBb8Q8najFeZ8yAEAMuLRnNfllE
+Message-ID: <CAAVpQUCayy3o59i2vh9hHRPi-3pw1BJgEYMwZYRpZnYEUoqsGw@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] tcp/dccp: avoid parity split for socket-local
+ bind range
+To: xuanqiang.luo@linux.dev
+Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, luoxuanqiang <luoxuanqiang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:claudiu.manoil@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:afleming@freescale.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302279-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302278-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:xuanqiang.luo@linux.dev,m:edumazet@google.com,m:ncardwell@google.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:luoxuanqiang@kylinos.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,linux.dev:email,kylinos.cn:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 03E706D076A
+X-Rspamd-Queue-Id: 1FC196D0873
 
-irq_of_parse_and_map() creates irqdomain mappings that should be
-balanced with irq_dispose_mapping(). The driver never called
-irq_dispose_mapping(), leaking mappings on probe failure and
-device removal.
+On Fri, Jun 26, 2026 at 2:40=E2=80=AFAM <xuanqiang.luo@linux.dev> wrote:
+>
+> From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+>
+> IP_LOCAL_PORT_RANGE lets applications override the netns ephemeral port
+> range on a per-socket basis.  __inet_hash_connect() already treats such a
+> range as an explicit application partition and scans it with step 1 [1].
+>
+> Do the same in inet_csk_find_open_port():
 
-Fix by adding irq_dispose_mapping() in free_gfar_dev() and
-expanding its loop from priv->num_grps to MAXGROUPS so the
-error path also catches partially-initialized groups. All
-irqinfo pointers are pre-initialized to NULL in gfar_of_init(),
-making the NULL-guarded walk in free_gfar_dev() safe for every
-scenario.
+What's the use case of IP_LOCAL_PORT_RANGE + bind(, 0)
+without IP_BIND_ADDRESS_NO_PORT ?
 
-gfar_parse_group() itself is left as a simple parse function
-with no resource management; cleanup is centralized in the
-caller's error path.
 
-Assisted-by: opencode:big-pickle
-Fixes: b31a1d8b4151 ("gianfar: Convert gianfar to an of_platform_driver")
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/freescale/gianfar.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index 3271de5844f8..89215e1ddc2d 100644
---- a/drivers/net/ethernet/freescale/gianfar.c
-+++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -469,10 +469,13 @@ static void free_gfar_dev(struct gfar_private *priv)
- {
- 	int i, j;
- 
--	for (i = 0; i < priv->num_grps; i++)
-+	for (i = 0; i < MAXGROUPS; i++)
- 		for (j = 0; j < GFAR_NUM_IRQS; j++) {
--			kfree(priv->gfargrp[i].irqinfo[j]);
--			priv->gfargrp[i].irqinfo[j] = NULL;
-+			if (priv->gfargrp[i].irqinfo[j]) {
-+				irq_dispose_mapping(priv->gfargrp[i].irqinfo[j]->irq);
-+				kfree(priv->gfargrp[i].irqinfo[j]);
-+				priv->gfargrp[i].irqinfo[j] = NULL;
-+			}
- 		}
- 
- 	free_netdev(priv->ndev);
-@@ -616,7 +619,7 @@ static phy_interface_t gfar_get_interface(struct net_device *dev)
- static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
- {
- 	const char *model;
--	int err = 0, i;
-+	int err = 0, i, j;
- 	phy_interface_t interface;
- 	struct net_device *dev = NULL;
- 	struct gfar_private *priv = NULL;
-@@ -702,8 +705,11 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
- 	priv->rx_list.count = 0;
- 	mutex_init(&priv->rx_queue_access);
- 
--	for (i = 0; i < MAXGROUPS; i++)
-+	for (i = 0; i < MAXGROUPS; i++) {
- 		priv->gfargrp[i].regs = NULL;
-+		for (j = 0; j < GFAR_NUM_IRQS; j++)
-+			priv->gfargrp[i].irqinfo[j] = NULL;
-+	}
- 
- 	/* Parse and initialize group specific information */
- 	if (priv->mode == MQ_MG_MODE) {
--- 
-2.54.0
-
+> when a socket-local range is set,
+> walk the whole selected range instead of first splitting it by parity.
+> Keep the existing step-2 parity behavior for sockets using the netns rang=
+e,
+> so the default bind/connect separation remains unchanged.
+>
+> [1] https://lore.kernel.org/r/20231214192939.1962891-3-edumazet@google.co=
+m
+>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: luoxuanqiang <luoxuanqiang@kylinos.cn>
+> ---
+>  net/ipv4/inet_connection_sock.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
+ock.c
+> index 56902bba54838..ad8af70c92ca3 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -323,13 +323,16 @@ inet_csk_find_open_port(const struct sock *sk, stru=
+ct inet_bind_bucket **tb_ret,
+>         struct inet_bind2_bucket *tb2;
+>         struct inet_bind_bucket *tb;
+>         u32 remaining, offset;
+> +       bool local_ports;
+>         bool relax =3D false;
+> +       int step;
+>
+>         l3mdev =3D inet_sk_bound_l3mdev(sk);
+>  ports_exhausted:
+>         attempt_half =3D (sk->sk_reuse =3D=3D SK_CAN_REUSE) ? 1 : 0;
+>  other_half_scan:
+> -       inet_sk_get_local_port_range(sk, &low, &high);
+> +       local_ports =3D inet_sk_get_local_port_range(sk, &low, &high);
+> +       step =3D local_ports ? 1 : 2;
+>         high++; /* [32768, 60999] -> [32768, 61000[ */
+>         if (high - low < 4)
+>                 attempt_half =3D 0;
+> @@ -342,18 +345,19 @@ inet_csk_find_open_port(const struct sock *sk, stru=
+ct inet_bind_bucket **tb_ret,
+>                         low =3D half;
+>         }
+>         remaining =3D high - low;
+> -       if (likely(remaining > 1))
+> +       if (!local_ports && remaining > 1)
+>                 remaining &=3D ~1U;
+>
+>         offset =3D get_random_u32_below(remaining);
+>         /* __inet_hash_connect() favors ports having @low parity
+>          * We do the opposite to not pollute connect() users.
+>          */
+> -       offset |=3D 1U;
+> +       if (!local_ports)
+> +               offset |=3D 1U;
+>
+>  other_parity_scan:
+>         port =3D low + offset;
+> -       for (i =3D 0; i < remaining; i +=3D 2, port +=3D 2) {
+> +       for (i =3D 0; i < remaining; i +=3D step, port +=3D step) {
+>                 if (unlikely(port >=3D high))
+>                         port -=3D remaining;
+>                 if (inet_is_local_reserved_port(net, port))
+> @@ -384,9 +388,11 @@ inet_csk_find_open_port(const struct sock *sk, struc=
+t inet_bind_bucket **tb_ret,
+>                 cond_resched();
+>         }
+>
+> -       offset--;
+> -       if (!(offset & 1))
+> -               goto other_parity_scan;
+> +       if (!local_ports) {
+> +               offset--;
+> +               if (!(offset & 1))
+> +                       goto other_parity_scan;
+> +       }
+>
+>         if (attempt_half =3D=3D 1) {
+>                 /* OK we now try the upper half of the range */
+> --
+> 2.43.0
+>
 
