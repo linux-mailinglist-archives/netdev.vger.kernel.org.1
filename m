@@ -1,183 +1,220 @@
-Return-Path: <netdev+bounces-302251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Oqu4Ala8PmqyKwkAu9opvQ
-	(envelope-from <netdev+bounces-302251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:52:22 +0200
+	id HowxLki/Pmp7LAkAu9opvQ
+	(envelope-from <netdev+bounces-302252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 20:04:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518E36CF7C3
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:52:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE126CF97D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 20:04:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=I0mnwtcc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302251-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302251-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=email-od.com header.s=dkim header.b=PH0ev+zt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302252-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302252-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 545FB302DF98
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:47:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 181983052E63
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B987D3537F9;
-	Fri, 26 Jun 2026 17:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6A13B19A0;
+	Fri, 26 Jun 2026 18:02:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1-ba86.socketlabs.email-od.com (s1-ba86.socketlabs.email-od.com [142.0.186.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A38F19DF6A
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 17:47:27 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782496048; cv=pass; b=kHqk49getXsZ8FbyOVaQkmSNS5bF8RMP2SvFGRAAGUa7ZsckpNYDrFyDu75QGKb3Iqc8ayNWpgkdoZ5GnwMCBlaoF/sVWnjTFMygaA/31eUl1Qzr580Ule1zYKvlIso/e+uW+LOCBJzYXFtEEsNLdJbDKC6pOSEijG66U86q8C4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782496048; c=relaxed/simple;
-	bh=PuSJI3OyyRfbgtvsmwL7L4C4IypFpmXaiu8KzwyrNAI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qxhiOlZMCVPz1PpIfCvzaCLyhij4dWc7PKY85K29WJFV466ucDd3+fIa4XXiKXX9Hb9XAnGviojFtIONybXHsSKR25+g8pi8qQSXN2U4qKzGC/kVJNPXaADdKV1NQPc7zyvAopTdCqBvyCkcOiSkzJeAARoaVyOm9qpSK/K9/Y0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=I0mnwtcc; arc=pass smtp.client-ip=209.85.210.180
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-845537740ddso758197b3a.0
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 10:47:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782496047; cv=none;
-        d=google.com; s=arc-20260327;
-        b=XiQESQ+adczpf3vuCJU5FrsYbKKx8J4tLtnz2XXJrW98C0ngbt2ZTRQnSIQpI6qGlq
-         JgKLi3QoBb1GZlaa1vd4eTNYV6uwyOhZgg2Ewrbut/r19Ijlu7o3yYduvuqfUw6IllH9
-         Pjwro6EUz6xlBFB37o67v5UZYMGa3qjfAAl6Rw93F/oFvTNhnCM5jBLs/813ARUtcSyW
-         3JefvTW3fRn6ac32JZzS85j5/HCmKc7QNia2/3oRMWHV19z18Ds+vgkpOhAwOHV+UYMh
-         I7Ld+tZLWE677MKcTle1uXjp4te59bItTZ1WpUTNTdlnbjFDS8EduuzNoSyNQ3AS/4pa
-         3iiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PuSJI3OyyRfbgtvsmwL7L4C4IypFpmXaiu8KzwyrNAI=;
-        fh=KYQsX2wxKO0gG8Dl0hw2iAbRN48Tt768zvIa+ZPGggw=;
-        b=VwaclS/9c4Y/Gh+wwL1BTk4JGaAnKMKGvIT7BcMCtKQbGba6gv1MLbk7nk2S3XWaNH
-         ZgJGMdKOWv492CKibTqmOddGZ9f9RQRS30Y5ocj7+6dyEfNAYSSE7FZW/KecqECvc6T2
-         ayp8b2SdlXLgivETvViTP3CDtbfLOw0fWFsh/3ashx1KxH2YuXOpbvWImHUms9NiSrEh
-         EvDmPjz/S7s/r22om2PHXVa6lGYfMSuWx/1KxEcfAFcEViOeg4RyQVO0cita3yJybllo
-         CFvbopYT1WFpbDryH+cUayReVGwyuB+3WDilc9n5FADgaOmaGPZxUnuycrR0TOwnqe9n
-         75yg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782496047; x=1783100847; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PuSJI3OyyRfbgtvsmwL7L4C4IypFpmXaiu8KzwyrNAI=;
-        b=I0mnwtccTf6DVTi8nskfeh0+j/YdDxVlfaj+WH5gJ/7yKze1Tg0W2KPczVmuYqt/jW
-         Zx1glQKcnXk0WQDwiLKr8HsI3Ja+JiNtP8Owa/ih7LzCWi7yEf51WhedttZYYw7SCf3L
-         AYWxCPTShTwdqCsrJp6rT/CRJwlYMVshlYEps=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782496047; x=1783100847;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PuSJI3OyyRfbgtvsmwL7L4C4IypFpmXaiu8KzwyrNAI=;
-        b=bUS9GvXSvetApx2kGEbrkaXEbd7fowUOnLm9dNOI5XYBZtQ0KNOwh1y9wVKLcC8fU0
-         WyhEos6p6MR+fiWkSO903QfTRPW0NN4FmBYhoLNovik/pGEyGOQYON/zO6iKM4jlLk8+
-         hu+UBXpZBEyoK7qCx+JVAmXF1tE8fA0GQtg7PV4I2JgN1VKbNMIJ4GhYSw64UkaLQxLB
-         xAZmaUSZKX55B1R0RVVzRpTvcOQTfv/svaz+dUKPhGnPTuENg4SKKu7S+xX0smCqcvxj
-         YrS71hzv3u9MgaqTOCe8TZK0wJmS54cGLiw92PzrZYHQ8ol2aZviTjY04DwDEzRuXk9F
-         Ncsg==
-X-Forwarded-Encrypted: i=1; AHgh+Rr02Hj0lHI6xfTcwRtLJHJQoN59U4quUYYpfKEWbjjJ/TEOWmisSmRuOSKgw4OI4LsWDwaXL8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZLuu1fBEA9ufPWBGo9w4ltzNsWoud33A8ngIg1mabIqHYLuPC
-	C3AoFS2+I1olLk7esypeyIKk0DnEaPMCuAyNEPcl7fs++jQTche1HLddWKwSz2AxAl7Na0MhBqw
-	vDHuHwGaVI9qTKou4ZCkcOFCQu0Wxz20QbeXt/sxw
-X-Gm-Gg: AfdE7clqKuuc5R5Y7z2UeLZmNyu9HB9w8Rb2VteLHINGTgYUPLSv/CHULDtE6Zpt7pz
-	qK7C7sIs5vBnXvVBWZKNUetHV4gKfI5XaNRmapGb/RmJuQUESIkQ6ledSn/5pDE26pnerJgTzMH
-	2dqSqAgdcCZdnD9sBVtYTamNkmXOAW243OL/rsJ11eV6tmxGkKviqHklMEp+5Cunsc85KEz0DME
-	dNFzkJSluLZWNf18YmRE81vTlKJnj4XDeyq4lEqeIdwFAhUgXr5H5p6PsBgHaRRC+Bsjw==
-X-Received: by 2002:a05:6a00:914b:b0:845:ba6b:78ce with SMTP id
- d2e1a72fcca58-845ba6b7a3emr6025987b3a.19.1782496046830; Fri, 26 Jun 2026
- 10:47:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9263B1ED0
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 18:02:36 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782496957; cv=none; b=ralWQ3xgXH8pz54ElnVw6qnF0FB5WkjznCkhZixrCLBMvAjMqfxvDsbWCWT7AKSvjVMPwXzi4eKnmu7Nq76wzL8kMKOrn3OfprxFlVGkzkbIlXimDCHn68T7R/IgP8BpSNdZAhpjWxUE+mktodzx2IC/ioibEkR7/L6ziDtL4Ls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782496957; c=relaxed/simple;
+	bh=+0nIDz5/3v4pUWM78ysJXZEn71a7R2sVTE9U1GyN5Qo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JZM+u4A21eRQHbKECFKLGc5CjpUrNSyl8Wjf6pJXi/9oZGbqdaUmGc85GA+9gFb2dFuwkbYf5VpoPYVKVY0Cdo0an0mYdrlDMkzLrj3AbMrj9IeyftaHi85YZ91UJACMxGrkHK0OW26V6pxXuaf+ZgUP2LU4c8Xr/NlUlnFGPBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nalramli.com; spf=pass smtp.mailfrom=email-od.com; dkim=pass (1024-bit key) header.d=email-od.com header.i=@email-od.com header.b=PH0ev+zt; arc=none smtp.client-ip=142.0.186.134
+DKIM-Signature: v=1; a=rsa-sha256; d=email-od.com;i=@email-od.com;s=dkim;
+	c=relaxed/relaxed; q=dns/txt; t=1782496956; x=1785088956;
+	h=content-transfer-encoding:content-type:in-reply-to:from:content-language:references:cc:to:subject:mime-version:date:message-id:x-thread-info:subject:to:from:cc:reply-to;
+	bh=54noMUafHcisrmJLQeLAAZeIsyBBva5/RhjHOCmMG0g=;
+	b=PH0ev+ztZMlJtKa2MnlbIlihPME/MjKg5NYnpiiGgavHVSzoAou3HqsPkE9DVNWf2Q5b6Y8XTkGIQYs+dvnq2Bz2hYgAKV2JBGO2PpgXD2i6d1kdKHuG1rIKTEtAZeScAUHksQ+68qpj+3Jbcf3J+G9hJz6KpQVkL/qW1PJBDHc=
+X-Thread-Info: NDUwNC4xMi41ZjNlMTAwMDA0M2UzZTYubmV0ZGV2PXZnZXIua2VybmVsLm9yZw==
+x-xsSpam: eyJTY29yZSI6MCwiRGV0YWlscyI6IltdIn0=
+Received: from [192.168.0.207] (d4-50-191-215.clv.wideopenwest.com [50.4.215.191])
+	by nalramli.com (Postfix) with ESMTPSA id 3A4FF2CE04D9;
+	Fri, 26 Jun 2026 14:02:19 -0400 (EDT)
+Message-ID: <aa190e99-2ebf-4d59-a6c9-755ca181e16d@nalramli.com>
+Date: Fri, 26 Jun 2026 14:02:18 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260625-b4-disp-31bcb279-v1-0-85c40b83c529@proton.me>
- <20260625-b4-disp-31bcb279-v1-2-85c40b83c529@proton.me> <fc1b9963-2f69-4e47-bf59-6b668faedc0e@mojatatu.com>
-In-Reply-To: <fc1b9963-2f69-4e47-bf59-6b668faedc0e@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 26 Jun 2026 13:47:15 -0400
-X-Gm-Features: AVVi8CcVMyHMAJ-kaq_UC8PRA0bEi6kprXcXg4qIYYHS-l3dWoBPyXH4CtQX1E4
-Message-ID: <CAM0EoM=K5rvf5NHdmR2cXAt9drFkrfOi5TWj7dFqYN5pm82D4g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] net/sched: sch_multiq: Replace direct dequeue call
- with peek and qdisc_dequeue_peeked
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: hexlabsecurity@proton.me, Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Jarek Poplawski <jarkao2@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [mellanox/mlx5-next RFC 1/1] net/mlx5: RX, Fix refcount warning
+ on frag page release
+To: Dragos Tatulea <dtatulea@nvidia.com>, saeedm@nvidia.com,
+ tariqt@nvidia.com, mbloch@nvidia.com
+Cc: nalramli@fastly.com, leon@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260625174059.2879717-1-dev@nalramli.com>
+ <20260625174059.2879717-2-dev@nalramli.com>
+ <9f150145-d95c-4a90-a358-5b33ab78a8ef@nvidia.com>
+Content-Language: en-US
+From: "Nabil S. Alramli" <dev@nalramli.com>
+In-Reply-To: <9f150145-d95c-4a90-a358-5b33ab78a8ef@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[email-od.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:victor@mojatatu.com,m:hexlabsecurity@proton.me,m:vinicius.gomes@intel.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:jarkao2@gmail.com,m:vladimir.oltean@nxp.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:dtatulea@nvidia.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:nalramli@fastly.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[dev@nalramli.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302252-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DMARC_NA(0.00)[nalramli.com: no valid DMARC record];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302251-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[proton.me,intel.com,redhat.com,resnulli.us,kernel.org,davemloft.net,google.com,vger.kernel.org,gmail.com,nxp.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[dev@nalramli.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[email-od.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,proton.me:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 518E36CF7C3
+X-Rspamd-Queue-Id: 7BE126CF97D
 
-On Fri, Jun 26, 2026 at 1:18=E2=80=AFPM Victor Nogueira <victor@mojatatu.co=
-m> wrote:
->
-> On 25/06/2026 06:51, Bryam Vargas via B4 Relay wrote:
-> > From: Bryam Vargas <hexlabsecurity@proton.me>
-> >
-> > multiq_dequeue() takes a packet from a band's child with a direct
-> > ->dequeue() call after multiq_peek() peeked it. When the child is
-> > non-work-conserving the peek stashes the skb in the child's gso_skb, so
-> > the direct dequeue returns a different skb and orphans the stash,
-> > desyncing the child's qlen/backlog. With a qfq child reached through a
-> > peeking parent (e.g. tbf) this re-enters the child on an emptied list a=
-nd
-> > dereferences NULL, panicking the kernel from softirq on ordinary egress=
-.
-> >
-> > Take the packet through qdisc_dequeue_peeked(), as sch_prio already doe=
-s
-> > and as sch_red and sch_sfb were just fixed to do. The helper is a no-op
-> > when the child has no stash, so a work-conserving child is unaffected.
-> >
-> > Fixes: 77be155cba4e ("pkt_sched: Add peek emulation for non-work-conser=
-ving qdiscs.")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
->
-> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+On 6/26/26 09:12, Dragos Tatulea wrote:
+> 
+> 
+> On 25.06.26 19:40, Nabil S. Alramli wrote:
+>> Under memory pressure, mlx5 driver has WARNING during fragmented page
+>> release. This happens because there is a discrepency between what mlx5
+>> thinks the page fragment counter is vs what the page_pool actually says it
+>> is.
+>>
+> The mlx5 frag counter is not the same as pp_ref_count. The page gets
+> split into 64 parts during page allocation. The frag counter tracks how
+> many of those frags have been used.
+> 
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Thank you for explaining that to me. I thought it was the same because in
+mlx5e_page_release_fragmented, drain_count is computed from frag_page->frags
+and then passed into page_pool_unref_page as the nr parameter which is then
+compared to the refcount in the page_pool.
 
-cheers,
-jamal
+>> The cause of the issue is page allocations on concurrent cpus, which
+>> increment the non-atomic u16 page counter mlx5e_frag_page.frags, while at
+>> the same time the page reference counter net_iov.pp_ref_count is atomically
+>> incremented. That sometimes leads to a difference in the counts and
+>> therefore triggers the warning in page_pool_unref_netmem:
+>>
+> page_pool page allocations must not happen in parallel on different CPUs.
+> Each queue has its own page_pool and allocation happens within the NAPI of
+> that queue which sticks to a single CPU. The release path does support
+> releasing on another CPU (release to ring).
+> 
+> How did you encounter this scenario of having parallel allocations on
+> different CPUs from the same page_pool?
+> 
+
+Perhaps we didn't, I had assumed that the numbers must match. What we did
+encounter is these WARNINGs, and they seemed to go away with this patch but
+maybe it is a coincidence.
+
+>> ```
+>> 	ret = atomic_long_sub_return(nr, pp_ref_count);
+>> 	WARN_ON(ret < 0);
+>> ```
+>>
+>> The actual stack trace looks like this:
+>>
+>> ```
+>> WARNING: CPU: 37 PID: 447795 at include/net/page_pool/helpers.h:277 mlx5e_page_release_fragmented.isra.0+0x51/0x60 [mlx5_core]
+>> Tainted: [S]=CPU_OUT_OF_SPEC, [O]=OOT_MODULE
+>> Hardware name: *
+>> RIP: 0010:mlx5e_page_release_fragmented.isra.0+0x51/0x60 [mlx5_core]
+>> RSP: 0018:ffffc90019814d98 EFLAGS: 00010293
+>> RAX: 000000000000003f RBX: ffff88c0993d0a10 RCX: ffffea02424592c0
+>> RDX: 0000000000000001 RSI: ffffea02424592c0 RDI: ffff88c090e20000
+>> RBP: 000000000000000a R08: 0000000000001409 R09: 0000000000000006
+>> R10: 0000000000000000 R11: ffff88c095fbc040 R12: 000000000000141f
+>> R13: 0000000000000009 R14: ffff88c090e20000 R15: 0000000000000001
+>> FS:  00007f34149fa6c0(0000) GS:ffff89200fa40000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 00007ed0265eb000 CR3: 0000005091cbe000 CR4: 0000000000350ef0
+>> Call Trace:
+>>  <IRQ>
+>>  mlx5e_free_rx_wqes+0x7b/0xa0 [mlx5_core]
+>>  mlx5e_post_rx_wqes+0x1ac/0x5a0 [mlx5_core]
+>>  mlx5e_napi_poll+0x5e5/0x6f0 [mlx5_core]
+>>  __napi_poll+0x2b/0x1a0
+>>  net_rx_action+0x30e/0x370
+>>  ? sched_clock+0x9/0x10
+>>  ? sched_clock_cpu+0xf/0x170
+>>  handle_softirqs+0xe2/0x2a0
+>>  common_interrupt+0x85/0xa0
+>>  </IRQ>
+>>  <TASK>
+>>  asm_common_interrupt+0x26/0x40
+>> RIP: 0010:page_counter_uncharge+0x34/0x90
+>> RSP: 0018:ffffc900e728bb00 EFLAGS: 00000213
+>> RAX: ffff88aff4762000 RBX: ffff88aff4762100 RCX: 0000000000000304
+>> RDX: 0000000000000001 RSI: 00000000004e9e1a RDI: ffff88aff4762100
+>> RBP: 0000000000000001 R08: ffff891ea0560048 R09: 00007ffffffff000
+>> R10: 0000000000001000 R11: ffff891ae8061b00 R12: ffffffffffffffff
+>> R13: ffff89107fcfd4c0 R14: ffff891ae8061b00 R15: ffff892002fe1400
+>>  uncharge_batch+0x40/0xd0
+>> ```
+>>
+> Can you provide more data on how you reproduced this? This helps to
+> narrow down the bug. Reproduction steps would be ideal.
+> 
+
+I don't have clear steps to reproduce it, we just have seen it randomly on
+some servers that were under memory pressure. I will try to look into it more
+and find a way to reliably reproduce it. I agree that would be ideal to find a
+proper fix.
+
+>> The fix is to use an atomic page fragment counter, so it will always match
+>> the number of references held in the page_pool.
+>>
+> This is not the right fix. The mlx5 page frag counter is not atomic
+> on purpose because all changes to it happen only within the NAPI
+> context.
+> 
+
+That was a question that I had, is it ever possible for frag_page->frags to be
+incremented / set outside of NAPI context? I tried to answer that by looking
+at code and by tracing it but could not get a clear picture. If it's not
+possible then I agree, this is not the right fix.
+
+> Thanks,
+> Dragos
+
+Thanks again for your guidance.
+
+Nabil S. Alramli
+
 
