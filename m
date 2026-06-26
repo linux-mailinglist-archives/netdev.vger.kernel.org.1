@@ -1,222 +1,208 @@
-Return-Path: <netdev+bounces-302139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AroEJrVRPmr5DQkAu9opvQ
-	(envelope-from <netdev+bounces-302139-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:17:25 +0200
+	id 3oh4HZxRPmrzDQkAu9opvQ
+	(envelope-from <netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:17:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CEE6CBFA8
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:17:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC6E6CBF9A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:16:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=PFif3UjD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302139-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302139-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=microchip.com header.s=mchp header.b=oGVUk05U;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microchip.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6C7453025BF4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:17:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93097300BC6D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D263ED138;
-	Fri, 26 Jun 2026 10:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5403EC2D1;
+	Fri, 26 Jun 2026 10:16:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0BF3ED3B9
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 10:16:55 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782469017; cv=pass; b=WYbmVqPhRVq4MWl3tzy9XosP0bHIKv4PNTpmt6rflBvNWb8vEcQlKZSETmD+vRJyAeeX6vdkY+6lBbF3eha1JqkaBeRlpYpCCQBuFpExBiZvNaOpJyjTK1oEqOs7yNbPXu8bcXgGEyL9CeOocpJbvVjaTUKfdBjrkeSeCoJ0oW0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782469017; c=relaxed/simple;
-	bh=Q0VkRyZGMx8Ip+nI1uCNkWg9svwog6B4Nwe9YU0ExFM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MCmqf75epb4/IlpjazGJXvOyl7VvLhTxnFWlcAc4jDAL010SyN2EvkmG/eZIEjp1F7sm/Nuu2aNAoRiAfj3VlcfCCR+V8iGTY4ZnKzehp0hoLC2S263wscS7/cY0LJvLE3J0eRFqo4Z9Fu0wLjcrtqDKy8+MMapamTd/ctPWA2o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=PFif3UjD; arc=pass smtp.client-ip=209.85.210.171
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-84536ecfc5bso613619b3a.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 03:16:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782469015; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JvRTG/umNI7MzOI2WgBmjAdnp1nO6V0eHJO1Hm7mpbcGYjZeaVEzJ9Pvhr5Lg29esU
-         p3WHiX5WhiJz6jNxoLLSMl88RPcoX2Jhe50WJE0czECUps9JauWP7CE0DrhJA7hGiciS
-         EoeJ9CVtcSqjFFUZ+aJi3+X3QTQMTE/EsXOOvEHycSytxVMhFvhZQH7hYfFKfb4ZC3AW
-         EMF7087OOpNEZ4QLChUxYcjVBFCUWAGVCf8fL3hoLfEDfU9GE1xn6LKDNJxFyIj2BUWo
-         1bF2qoZcXXiYyiXnADzqKzm0lZgq0hLUIFxFD8thclfSXKetZh+VUe6L2dpGLUZ+eEo/
-         eZXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Q0VkRyZGMx8Ip+nI1uCNkWg9svwog6B4Nwe9YU0ExFM=;
-        fh=KRv1BJQB9N+Hx6F3XJrmjsu6+e+VwIymwxj2UtUwR0E=;
-        b=CJ7Ct4d/UWuNR8rYSh8WgIV8vKJc3ku14FNsGHRq1nRfjEXFTB1U4WD/kOcAXsrGE2
-         xnrFiDJklPk6XvYuVd9EnT3HbD2wxXY7HHSjeMvhLK+DyFAiJUo5+qeL14UbglT9c1ci
-         Ai1+luz5Ud8RShUE7Pd+V/l00FWkDcdmJUopJreELdcGzCWqHZfLZLe2a4vjrXnm5iHg
-         fPnUH77ntzWFqDinbdtzVrU+yv6mf8uAzlae9pECuuLo0k9jwj6Jsg6daDtXLxWk+++m
-         fO3e8IKxWB0idOnazAgTZJj1s2RxKPBaF7XFsTh5HeT1Trxrw0AZrmpFYqjzyLP1YfBg
-         Yu/w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782469015; x=1783073815; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q0VkRyZGMx8Ip+nI1uCNkWg9svwog6B4Nwe9YU0ExFM=;
-        b=PFif3UjDTqdX/mCLhIAN/C9cyGlL9i0cierzz341tur+BTBYQ524X2t8djIlEZWWSf
-         NhddQgXRaxqKG5r0hnFR50m6RR6AQZMulEmghsQKoWEpyJVi2EvpYJpAuYmdR8ENoV7x
-         4y5zwm45kQX0Mgksgw+5494nqoKhqGcL3NqVE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782469015; x=1783073815;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Q0VkRyZGMx8Ip+nI1uCNkWg9svwog6B4Nwe9YU0ExFM=;
-        b=RRQ4KdvDTqzQcxk6HcbXSBh7I4LbXCPr+ca0v3ILl3FvD1oMmrTWpskP7qZoe3C6LN
-         WPu2buBQ/cbG3s+SUIqv6RqJ1iHMZBLy8JpWaunLn6nK0Y0n9YusC+P33Id/20I7asLo
-         P8pEH48a3O24mJWrmJhvOWRmr02xvKMzXzvPTpQvDyJHWOXfywEh4/x0h89Fd+Z+8z65
-         nx4FDrUy5dIGRjd6HwO3NqCeyWX8NkmoW3PWV0bFaA5g+87+mEuOGY/x9ifjmTE5vvTg
-         CVUMkASqwabcTGzssPunI6KSSHt8XZOI+nJrbdFZH44U7hnMOQJUmoQSzpcKbVaHQ7MR
-         cpZg==
-X-Gm-Message-State: AOJu0YxSr1rMLgYZl2wxcrN1x8Bg1so/rwR0UOCGUsXqy6PM6kuWCka/
-	1rNXVgQubm/S2BDKcLcNirUeh5WOf/fbwnVzJW8djpVtE7wVOIeW33pRrfFA52r8q3GnDNXCXdQ
-	Bau8tUJaxyT7mdgvPMFOY8J+1Gt2LVCtzxERXLDPMoNYXoqodF1ogLA==
-X-Gm-Gg: AfdE7clL3SX3KAqeF6oX50Kzw0tAE3bq6CvpfW5hF7lL6ALLCiIHVyslFloaKni5Aei
-	lzgQlYvAzbmZHoZBGcv+ggvyAjqddHvQ634v9B/IpDTGWypHqVx9tVLOI+gIqLxjb0vuA0BHQ2n
-	BqghobQpnF3jibPP7UzCPGfgH7pXflH/BN8gd2CTqNvNTRtGNSm0zYzz+UAAkPm8QXpoYK0wNiu
-	/m5FhnkmNV7m2+pqyhTG+44ETFQEri1nkQdSnEsn1sPVuBDNik4a4+MSc+jxVeODBqL0j4/2g==
-X-Received: by 2002:a05:6a00:2389:b0:845:d0d6:b9 with SMTP id
- d2e1a72fcca58-845d0d601bbmr147884b3a.4.1782469015279; Fri, 26 Jun 2026
- 03:16:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791343EA967;
+	Fri, 26 Jun 2026 10:16:52 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782469013; cv=none; b=ZvU+6zy/qtTI+6Y8XM8qjDcaXv8bVPUvD5GZRTYHm6IJ9MMTnSC9qHdMvsWLWrdBsiLdK/54/Fg3m4trQdoiz0EcjJB4LOGYRqEuZDl7+a0+GTXAm/s18Yz0Gg7+aT+j7vzoHKO1TwGIfvcvWGYs2JVeFyaHhWITEHMFt8zx4Ro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782469013; c=relaxed/simple;
+	bh=zNOQKVs7mFtzvW7ZL9QiUwGBwaYNwddOXYQ6SUFj9VE=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=o7wRA51kY09p0F+Vh2nlbd56gbf8XVM2I0BA0nYJnWCYeYWPx0chMGZrRFbUp7iFmA7LpN0qXnXgbNXWdNnTeJyCGsXPfuf0DTcr9A5YCfK+HsdaeOGeS/+rBnwZjKEVWzb33ya/e5J24eZ45ABGgcON9GZy1aYFFUFq0qZpQPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oGVUk05U; arc=none smtp.client-ip=68.232.154.123
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1782469012; x=1814005012;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=zNOQKVs7mFtzvW7ZL9QiUwGBwaYNwddOXYQ6SUFj9VE=;
+  b=oGVUk05U8tIeR6MK2vZaJY1QW6nEPQUYMklI8bC/4qRW7Dd07Z577PTG
+   S5TN36DTeZ1JLBwWl/zA1ayZGMK4OOrjmE1aSmHsP0isZW2or8GQzInNP
+   aISU/peC1pCTCTrnalD7E5uI17vJwpmrnYVfO+YH6jJzmL5Rm665XMyWN
+   LtTL11VTh36pkY6ZqUBAXYYSrJGk2sp9Wb9Bp5501sflx4x75CAAAQqM2
+   NyksdOsgOUVyREl8pduwGfY9v1JMFNzSFxgpCbO1K59e2ucgtn0RWaowZ
+   ZUo5pq3zRa7mlRy+WmBr93yneeoerc+oF+Ba8bbHZFDagNueQFMVknIvd
+   g==;
+X-CSE-ConnectionGUID: 8bIlMgSjTJ2lCwvRkPA3WQ==
+X-CSE-MsgGUID: 8LxoRXNIQeaKlQiHcqlfEw==
+X-IronPort-AV: E=Sophos;i="6.24,226,1774335600"; 
+   d="scan'208";a="60080306"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jun 2026 03:16:51 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Fri, 26 Jun 2026 03:16:51 -0700
+Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Fri, 26 Jun 2026 03:16:48 -0700
+Message-ID: <ae037bec765ab2f660097edd61f02ec4d969098f.camel@microchip.com>
+Subject: Re: [PATCH net-next 6/9] net: sparx5: vcap: add lpm vcap
+ implementation
+From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <daniel.machon@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <kees@kernel.org>, <gustavoars@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-hardening@vger.kernel.org>
+Date: Fri, 26 Jun 2026 12:16:48 +0200
+In-Reply-To: <20260615233849.1042290-1-kuba@kernel.org>
+References: <20260612-sparx5_l3_routing-v1-6-fc3c10160f49@microchip.com>
+	 <20260615233849.1042290-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624224016.24018-1-jhs@mojatatu.com>
-In-Reply-To: <20260624224016.24018-1-jhs@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 26 Jun 2026 06:16:43 -0400
-X-Gm-Features: AVVi8Cf2P7f9br_adTOBaN-EcnhYa4YwGzb1Nua8DRNE1VC5vPu11kXmT85D-_I
-Message-ID: <CAM0EoMmJZxAbOsyW7bBp0DbTTiQKZeGaaBHPEw45D5b6DKDEvg@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] net/sched: sch_teql: Introduce slaves_lock to
- avoid race condition and UAF
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	security@kernel.org, zdi-disclosures@trendmicro.com, stable@vger.kernel.org, 
-	kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jiri@resnulli.us,m:victor@mojatatu.com,m:security@kernel.org,m:zdi-disclosures@trendmicro.com,m:stable@vger.kernel.org,m:lkp@intel.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-302138-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:horatiu.vultur@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:daniel.machon@microchip.com,m:Steen.Hegelund@microchip.com,m:kees@kernel.org,m:gustavoars@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-hardening@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302139-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,linux.dev:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,trendmicro.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid,microchip.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 94CEE6CBFA8
+X-Rspamd-Queue-Id: 6FC6E6CBF9A
 
-"
+On Mon, 2026-06-15 at 16:38 -0700, Jakub Kicinski wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content is safe
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net: sparx5: vcap: add lpm vcap implementation
+>=20
+> Add the implementation for the LPM VCAP for lan969x and sparx5. The LPM
+> VCAP has a static keyset configuration, and a single lookup dedicated to
+> LPM, so this is straight forward, and many functions can use existing
+> functionality.
+>=20
+> > diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c b=
+/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+> > index 95b93e46a41dc..e25e759c24f60 100644
+> > --- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+> > +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+> > @@ -1083,6 +1146,46 @@ static void sparx5_vcap_es2_cache_write(struct s=
+parx5 *sparx5,
+> >       }
+> >  }
+> >=20
+> > +static void sparx5_vcap_lpm_cache_write(struct sparx5 *sparx5,
+> > +                                     struct vcap_admin *admin,
+> > +                                     enum vcap_selection sel,
+> > +                                     u32 start,
+> > +                                     u32 count)
+> > +{
+> > +     u32 *keystr, *mskstr, *actstr;
+> > +     int idx;
+> > +
+> > +     keystr =3D &admin->cache.keystream[start];
+> > +     mskstr =3D &admin->cache.maskstream[start];
+> > +     actstr =3D &admin->cache.actionstream[start];
+> > +
+> > +     switch (sel) {
+> > +     case VCAP_SEL_ENTRY:
+> > +             for (idx =3D 0; idx < count; ++idx) {
+> > +                     /* Avoid 'match-off' by setting value & mask */
+> > +                     spx5_wr(keystr[idx] & mskstr[idx], sparx5,
+> > +                             VCAP_SUPER_VCAP_ENTRY_DAT(idx));
+>=20
+> [Severity: High]
+> Are concurrent writes to the shared VCAP_SUPER_VCAP_ENTRY_DAT registers
+> safe here without a global hardware lock across the different VCAP types?
+>=20
+> It looks like IS0 and IS2 rules are updated via vcap_add_rule() under the
+> rtnl_lock(). However, the LPM rules are updated under the
+> sparx5->router->lock inside a workqueue.
+>=20
+> Since both execution paths share the Super VCAP hardware block, could
+> concurrent updates from TC (IS0/IS2) and routing (LPM) race on these shar=
+ed
+> cache registers, and also on VCAP_SUPER_CTRL in sparx5_vcap_super_update(=
+),
+> garbling the hardware command and corrupting the cache memory?
+>=20
 
-On Wed, Jun 24, 2026 at 6:40=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> The teql master->slaves singly linked list is not protected against
-> multiple writes. It can be mod'ed concurently from teql_master_xmit(),
-> teql_dequeue(), teql_init() and teql_destroy() without holding any list
-> lock or RCU protection.
->
-> zdi-disclosures@trendmicro.com has demonstrated that the qdisc is freed
-> after an RCU grace period, but teql_master_xmit() running on another
-> CPU can still hold a stale pointer into the list, resulting in a
-> slab-use-after-free:
->
-> BUG: KASAN: slab-use-after-free in teql_destroy+0x3ca/0x440 linux/net/sch=
-ed/sch_teql.c:142
-> Read of size 8 at addr ffff88802923aa80 by task ip/10024
->
-> The zdi-disclosures@trendmicro.com repro created concurrent AF_PACKET
-> senders on a teql device against a thread that repeatedly adds/deletes th=
+Very nice catch, I missed this. This is even reachable before this series
+because the debugfs dump also uses these registers, and runs outside of
+rtnl.
+
+I will send a fix to net which replaces the per instance locks with a singl=
 e
-> slave qdisc, together with a SLUB spray that reclaims the freed slot; the
-> resulting UAF is controllable enough to be turned into a read/write
-> primitive against the freed qdisc object.
->
-> The fix?
-> Add a per-master slaves_lock spinlock that serializes all mutations of
-> master->slaves and the NEXT_SLAVE() links in teql_destroy() and
-> teql_qdisc_init(). teql_master_xmit() also takes the same slaves_lock
-> around those updates.
-> Annotate master->slaves and the per-slave ->next pointer with __rcu and
-> use the appropriate RCU accessors everywhere they are touched:
-> rcu_assign_pointer() on the writer side (under slaves_lock),
-> rcu_dereference_protected() for the writer-side loads (also under
-> slaves_lock), rcu_dereference_bh() for the loads in teql_master_xmit() an=
-d
-> rtnl_dereference() for the loads in teql_master_open()/teql_master_mtu(),
-> which run under RTNL.
-> Pair this with rcu_read_lock_bh()/rcu_read_unlock_bh() around the list
-> traversal in teql_master_xmit(), so that readers either observe a fully
-> linked list or are deferred until the in-flight mutation completes. The t=
-wo
-> early-return paths in teql_master_xmit() are updated to release the RCU-b=
-h
-> read-side critical section before returning, since leaving it held would
-> disable BH on that CPU for good.
->
+vcap_control global mutex.
 
-sashiko-gemini's complaints:
-https://sashiko.dev/#/patchset/20260624224016.24018-1-jhs%40mojatatu.com
-seem bogus to me (someone correct me if i am wrong). I am only going
-to address the first claim of "TOCTOU / "resurrection" race in
-teql_master_xmit()"
-teql_master_xmit() holds rcu_read_lock_bh() across the entire
-traversal. teql_destroy() freeing can only proceed once the qdisc's
-RCU grace period has elapsed - so where is this TOCTOU? Let's say this
-were true: both calls hold the slaves_lock.
-The other issues are of similar nature.
+> > +                     spx5_wr(~mskstr[idx], sparx5,
+> > +                             VCAP_SUPER_VCAP_MASK_DAT(idx));
+> > +             }
+> > +             break;
+>=20
+> [ ... ]
+>=20
+> > @@ -1379,6 +1523,7 @@ static void sparx5_vcap_update(struct net_device =
+*ndev,
+> >       struct sparx5 *sparx5 =3D port->sparx5;
+> >=20
+> >       switch (admin->vtype) {
+> > +     case VCAP_TYPE_LPM:
+> >       case VCAP_TYPE_IS0:
+> >       case VCAP_TYPE_IS2:
+> >               sparx5_vcap_super_update(sparx5, cmd, sel, addr);
 
-OTOH, sashiko-claude
-(https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260624224016.24018-1=
--jhs%40mojatatu.com)
-does make some valid claims which are low value, so not sure a resend
-is worth it.
-For example in claim 1 it says "Should the changelog mention this
-teql_dequeue() site too?" Sure I can - but just because I provided
-extra information in the commit log, which I could have omitted, now I
-have to add more info? ;-> The second claim is "rcu_dereference_bh()
-should be rcu_dereference_protected() on writer side". Sparse didnt
-complain and i dont see this as breakage rather a consistency measure.
-
-Unless I am missing something ..
-
-cheers,
-jamal
 
