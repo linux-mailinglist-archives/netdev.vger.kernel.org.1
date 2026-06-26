@@ -1,109 +1,79 @@
-Return-Path: <netdev+bounces-302240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id q/RmH2WuPmq0KAkAu9opvQ
-	(envelope-from <netdev+bounces-302240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:52:53 +0200
+	id M1CHJiWwPmoYKQkAu9opvQ
+	(envelope-from <netdev+bounces-302241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:00:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84B56CF471
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:52:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059AF6CF4F4
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:00:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=sN1m6Fvs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302240-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302240-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=szelinsky.de header.s=mail header.b=OjoBLhqR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302241-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302241-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=szelinsky.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B27343079244
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:52:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C059C303B18F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2E03FF1B7;
-	Fri, 26 Jun 2026 16:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522AE3FFAC5;
+	Fri, 26 Jun 2026 17:00:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EBD3E5585
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 16:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E0E3FE64E;
+	Fri, 26 Jun 2026 17:00:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782492732; cv=none; b=KJ3Z1LbM1i4cfhH1+FMWvUWzhfyK0v5JsQ13qc0Kfvc3H6wegHS6BGjAsgygVGbKFEJ5txvnI3qqGvJNHHAXnuAmSbRgKHXYg0J9IT6niPW0dv+wJO7NoDkKCbYGwBFln4eFuRfX3hOtlnNsnQWC85pZg+cabLQUV+CvnHZu6FA=
+	t=1782493202; cv=none; b=uszPN7iB13tAalZ9vTAVCOxBSx9T/AjnMVoz00NtQ8IMvn4TnbN3dDk8BwzCaMsi24tdbn/3ozttmuJQtroZ3qWaEz//vzUhwdi4erEjQXaPxEP2t7FLzCEe/uFYg2Z7p03Gm3xZuvW5IfU00CzCX0lp18tlaJOk0Twaev8inBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782492732; c=relaxed/simple;
-	bh=CQUwYczDqjfjuD5Q15kitxs30UGf97KDGIM1en49qEw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L87bcQSwXlnlYfuWVKYGk6W6bphev+XnLPNpFwjtv82/pZdOOEjenLh3ByVCEZL0eBcttOFfdBDPffD9Ay7wPvS5Gga0HKEBe/e+KVDwj4nIBJIy7vM0tB7D34FEtpoDddGBb63shPGORkCNsTpqTkAYremeb3lqvLAFsFL4kCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=sN1m6Fvs; arc=none smtp.client-ip=209.85.222.176
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-91588056619so79179085a.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 09:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782492729; x=1783097529; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OsKglxlBPMR4V7jm2F4Wm5zFEniVI7fM3hmQKeKcxa8=;
-        b=sN1m6FvsCA99E6ZBUTKqZ0N++F9NkLHiRrMc4KMo7FHN3HKxe+Unk3c3j1qeH6fhXt
-         vpXxGmJgQLItomBrqHMqnrYcgMo4RowHTN38LFvM4eKa7ASK7lkK1YxTUOnGUCH1xXHu
-         d3a9QCEusNHDlocJYi9jUQ5OWvtTDtnjaI/W4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782492729; x=1783097529;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OsKglxlBPMR4V7jm2F4Wm5zFEniVI7fM3hmQKeKcxa8=;
-        b=PG3g8Wkh7YHRYgcVNuMUmOoGat9AE1sAASYU9ymfLG7r7UVndlbhOxTxdm5UdKLg3O
-         TFvS6XMLZHoY5mxoJcutRYO5fJRUw4FRsEDGZIhII2iRxuMcCfHfNVX93ufpaPas/5aS
-         IGhwK9xJOArbVPrka5ovxDS8ysgTVXshVtqcxnTCk4NpD4Amp9r26hfjNdcVxb2PIyAE
-         i+aQMQ4qK8GIPeZdNuV1Ld5KkN05q6AJ3x8ao9zz9StAbPjDKFA79tw99zweUWpXMXmy
-         OgT/tJF7FhTsLJ/cysDUk5OPiBTkQ1qiQ61YEZXLz0yisCaYjzCclrqGD2vZs0lbiLod
-         pj3w==
-X-Gm-Message-State: AOJu0YzKIvZ2R93HWJ8DFp+z7N+mbUmmSfrR699SHa51wGHaqaSyxp32
-	A0a3ZEc6UpRtZCJeqaaVwSuL9oRT4pO8ILcz05WNORhJ0gix4N272PhroRFHxrsPEEcIkF6Sk7q
-	R7wwW/Q==
-X-Gm-Gg: AfdE7cki4ArAnCHUMIcGZcDTnRiNfWKpjKA9H90zVVsmjxCqAnjiC36olo9KUigHuBJ
-	Bwzg0IkCeUEv/TVEAmWD2+5saPNfGgYP8y1Ykl86LPF2/+iucHNq1KO5mKRvq6woPX3riJ0YDTp
-	CkwkJYupP7AxSr38d9EHZYPSgKt3IIziv8f98TNuhGfG6apWDV0FUKw76VR7ecd6YzJqMAavneK
-	75iJzHRSl5ZEjMbyaJX+5dKf8687jJOB0OMNz+BYfcWX49Gef2BC4gotkrv/VnWZkYnuv+NYNBt
-	+7wmsvGtuJUzNs8S5xb3oQdK1Z9LRTmf2hhbkV8BQIGzv+MG7++HUc0J3YhLlYqA1jq+D1bgVJK
-	UoK/i2RcFbNQFvfSOR4tSGIdJoS+wLK/E0nFOyl6DteFKNBDqdFvSDb0XEY2/WIXgx2Cr5XviIe
-	v6oR3x7A==
-X-Received: by 2002:a05:620a:4483:b0:926:f317:7c75 with SMTP id af79cd13be357-9293ddadbd2mr1179157585a.42.1782492729206;
-        Fri, 26 Jun 2026 09:52:09 -0700 (PDT)
-Received: from majuu.waya ([184.144.29.222])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-926004abe29sm1216957385a.33.2026.06.26.09.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 09:52:08 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	toke@toke.dk,
-	jiri@resnulli.us,
-	bigeasy@linutronix.de,
-	clrkwllms@kernel.org,
-	rostedt@goodmis.org,
-	kuniyu@google.com,
-	sdf.kernel@gmail.com,
-	skhawaja@google.com,
-	liuhangbin@gmail.com,
-	krikku@gmail.com,
-	mkarsten@uwaterloo.ca,
-	victor@mojatatu.com,
-	ast@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	daniel@iogearbox.net,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net 3/3] selftests/tc-testing: Verify bpf redirect on RED block with preceding clsact (egress) classifier
-Date: Fri, 26 Jun 2026 12:51:56 -0400
-Message-Id: <20260626165156.169012-4-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260626165156.169012-1-jhs@mojatatu.com>
-References: <20260626165156.169012-1-jhs@mojatatu.com>
+	s=arc-20240116; t=1782493202; c=relaxed/simple;
+	bh=FQkHWUzJBB2/z628wqG2IuYocn2yZt0Eh1WYROrR/gk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZfTCiOol4ktvRXKzO/Fhv6AVuU/XNV3Hr3imbzM65yrodLQNq5JI26LlIwsEBOy/HBUutKQyWNugaGetDbN4HRwzzD+wJ0OVuhHj/JQbu5/ckPGFSXxWpBKogsXppEMg2P2O4IyN4GnfWRosdOYZTKjPl54RkqtfomrhJcDaRJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=OjoBLhqR; arc=none smtp.client-ip=85.214.127.56
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id 300CFE83338;
+	Fri, 26 Jun 2026 18:59:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1782493192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nX6qkuRBO5lfmxLF+Ac/nHbJvTXJ1T6NWBM5C0QvoNY=;
+	b=OjoBLhqRJUNkm9OWKjOLrgGh8FXtd8YzAtti8a56ykBr1m/nDYfOKkKmCVEyoJYdMfPuoB
+	/RtPkfQ+QtF7fSac6y5J76vTvMWbzGQmM7GNcKnb972vrHa0C06hGAWiaUefkSkClcDCqP
+	3Hvtcw8T7aOZBVPqSdYwVkLw5z1C0vfxEYD4xkbXLzYFs5Lqk2CobIWa7t8r0FLCYMIKn4
+	EgRVrvfbo28SNhb6IA5VUvxGjjdJsGC8ATH0oOVQ7NoG9WpgkljmHYLJdrx0LfbRgezE8q
+	bDrzC3jaw7BlUjHcjvvToCcsVpG7ULST149gEf+IGao+p5ajp/8TK+YDl8Ak3g==
+X-Virus-Scanned: Debian amavis at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+ by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
+ id DmjNYrUrcMCC; Fri, 26 Jun 2026 18:59:52 +0200 (CEST)
+Received: from p14sgen5.lan (p5784dea5.dip0.t-ipconnect.de [87.132.222.165])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Fri, 26 Jun 2026 18:59:51 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Corey Leavitt <corey@leavitt.info>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: [PATCH net-next v3 0/3] net: pse-pd: decouple controller lookup from MDIO probe
+Date: Fri, 26 Jun 2026 18:59:26 +0200
+Message-ID: <20260626165929.2908782-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,221 +82,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-302241-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302240-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:toke@toke.dk,m:jiri@resnulli.us,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:victor@mojatatu.com,m:ast@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:daniel@iogearbox.net,m:jhs@mojatatu.com,m:sdfkernel@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DMARC_NA(0.00)[mojatatu.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,toke.dk,resnulli.us,linutronix.de,goodmis.org,gmail.com,uwaterloo.ca,mojatatu.com,iogearbox.net];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:corey@leavitt.info,m:jelonek.jonas@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:github@szelinsky.de,m:andrew@lunn.ch,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[pengutronix.de,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[leavitt.info,gmail.com,kernel.org,vger.kernel.org,szelinsky.de];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:mid,mojatatu.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D84B56CF471
+X-Rspamd-Queue-Id: 059AF6CF4F4
 
-From: Victor Nogueira <victor@mojatatu.com>
+This is v3 of Corey's series [1]. It takes the PSE controller lookup out
+of the MDIO probe path, so a modular PSE driver no longer makes the
+PHY/DSA probe spin on -EPROBE_DEFER until the PSE module loads.
 
-The bpf_net_context used by sch_handle_egress() is stack-allocated and torn
-down in that function. By the time tcf_qevent_handle() runs
-current->bpf_net_context is NULL.
+v2 was four patches. The first one (a regulator handle fix) is a
+self-contained bug fix, so on Jakub's suggestion it is going to net on
+its own [2] and is not part of this series. The three patches here are
+the notifier rework and target net-next. net-next was closed for the
+merge window when v2 was posted; it is open again now, so here they are.
 
-When a filter attached to a qevent block (e.g. RED's early_drop or mark
-qevents, which always uses shared blocks) returns TC_ACT_REDIRECT,
-tcf_qevent_handle() calls skb_do_redirect(), which in turn calls bpf helper
-bpf_net_ctx_get_ri(). That helper unconditionally dereferences
-current->bpf_net_context resulting in a NULL pointer dereference.
+How it works: pse_core gets a notifier chain (REGISTERED / UNREGISTERED).
+The phy layer subscribes, owns phydev->psec, and attaches the PSE handle
+when the controller shows up instead of during probe. fwnode_mdio loses
+its PSE awareness, so no -EPROBE_DEFER leaves it and the probe-retry loop
+is gone.
 
-Add a test case that reproduces this scenario by attaching a filter to
-clsact (egress) and a bpf filter to a block attached to RED. Use TBF as
-red's parent, so that  a traffic burst builds backlog and RED early-drops
-triggers the block filter.
+Tested on a Realtek rtl93xx PoE switch with two HS104 PSE controllers on
+i2c:
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
- .../testing/selftests/tc-testing/action-ebpf  | Bin 856 -> 9072 bytes
- tools/testing/selftests/tc-testing/action.c   |   5 +++
- .../tc-testing/tc-tests/infra/qdiscs.json     |  32 ++++++++++++++++++
- 3 files changed, 37 insertions(+)
+ - clean boot, no probe-retry loop, no watchdog reset
+ - 10G SFP+ port: module hotplug works, no deadlock
+ - ethtool --set-pse enable/disable cuts and restores power to a PD
+ - i2c unbind -> rmmod -> modprobe: PSE detaches on unbind and re-attaches
+   on reload with power restored, no reboot. No lockdep splats.
 
-diff --git a/tools/testing/selftests/tc-testing/action-ebpf b/tools/testing/selftests/tc-testing/action-ebpf
-index 4879479b2ee5c046279be0fe8f9ca313dfb7e618..52c47e42bf0af024a073cacc823c8270f906a8df 100644
-GIT binary patch
-literal 9072
-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
+Tested-by: Carlo Szelinsky <github@szelinsky.de>
 
-delta 317
-zcmez1c7tt#hG+yM0~|PjSq=;w6K#!|-2;3kf8>;vbYoy(U}5<9A1sGNNKf7<Ebhb3
-zz`!8HzycRnfU;~E7#IW@SfM<S2@oa|GYf-WNoqw2Lt=7CW`16Lc0QD)n?2b|MpptN
-zte4E7S6ot5l9<GxS6rD}l9)7kqm2C|E)G_I1_lP^$saj|Cx1|60h=E`IZ#f0vW2V#
-zqw3^BS$jso$s1+u8SN$;%84@;O!kyhXVjnkQAu3%1H=Uk%upKSbcV@=a>A_P3=9lR
-YATu>8pmH!86gW%_3=AAlaS1350I>8ljQ{`u
+Changes in v3:
+ - Drop patch 1 (regulator handle fix); it goes to net separately [2].
+ - Rebase on current net-next. No code changes to the three patches.
 
-diff --git a/tools/testing/selftests/tc-testing/action.c b/tools/testing/selftests/tc-testing/action.c
-index c32b99b80e19..350f2d36a773 100644
---- a/tools/testing/selftests/tc-testing/action.c
-+++ b/tools/testing/selftests/tc-testing/action.c
-@@ -20,4 +20,9 @@ __attribute__((section("action-ko"),used)) int action_ko(struct __sk_buff *s)
- 	return TC_ACT_OK;
- }
- 
-+__attribute__((section("action-redirect"), used)) int action_redirect(struct __sk_buff *s)
-+{
-+	return TC_ACT_REDIRECT;
-+}
-+
- char _license[] __attribute__((section("license"),used)) = "GPL";
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-index a1f97a4b606e..762f86ceab1c 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -1540,5 +1540,37 @@
-             "$TC qdisc del dev $DUMMY root",
-             "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-         ]
-+    },
-+    {
-+        "id": "fb8d",
-+        "name": "Verify bpf redirect on RED block with preceding clsact (egress) classifier",
-+        "category": [
-+            "qdisc",
-+            "red",
-+            "qevent",
-+            "clsact"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP addr add 10.10.10.1/24 dev $DUMMY",
-+            "$IP neigh add 10.10.10.2 lladdr 02:00:00:00:00:01 dev $DUMMY nud permanent",
-+            "$TC qdisc add dev $DUMMY handle 1: root tbf rate 1Mbit burst 10K limit 1M",
-+            "$TC qdisc add dev $DUMMY parent 1:1 handle 11: red limit 1M avpkt 1400 probability 1 burst 38 harddrop min 30000 max 30001 qevent early_drop block 10",
-+            "$TC qdisc add dev $DUMMY clsact",
-+            "$TC filter add dev $DUMMY egress protocol ip prio 1 matchall action gact pass",
-+            "$TC filter add block 10 protocol ip prio 1 matchall action bpf obj action-ebpf sec action-redirect"
-+        ],
-+        "cmdUnderTest": "bash -c 'data=$(head -c 1400 /dev/zero | tr \"\\0\" \"x\"); exec 3>/dev/udp/10.10.10.2/12345; for i in $(seq 1 8000); do printf \"%s\" \"$data\" >&3; done; exit 0'",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -s filter show block 10",
-+        "matchPattern": "Sent [1-9][0-9]* bytes [1-9][0-9]* pkt",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY clsact",
-+            "$TC qdisc del dev $DUMMY handle 1: root",
-+            "$IP addr del 10.10.10.1/24 dev $DUMMY"
-+        ]
-     }
- ]
+v1 was an RFC by Corey [3].
+
+[1] https://lore.kernel.org/netdev/20260620112440.1734404-1-github@szelinsky.de/
+[2] https://lore.kernel.org/netdev/20260624204017.2752934-1-github@szelinsky.de/
+[3] https://lore.kernel.org/netdev/20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info/
+
+Corey Leavitt (3):
+  net: pse-pd: add notifier chain for controller lifecycle events
+  net: pse-pd: fire lifecycle events on controller register/unregister
+  net: phy: own phydev->psec via PSE notifier and remove fwnode_mdio
+    hook
+
+ drivers/net/mdio/fwnode_mdio.c |  34 -------
+ drivers/net/phy/phy_device.c   | 168 +++++++++++++++++++++++++++++++--
+ drivers/net/phy/sfp.c          |   2 +-
+ drivers/net/pse-pd/pse_core.c  |  54 +++++++++++
+ include/linux/phy.h            |   2 +
+ include/linux/pse-pd/pse.h     |  41 ++++++++
+ 6 files changed, 258 insertions(+), 43 deletions(-)
+
+
+base-commit: 805185b7c7a1069e407b6f7b3bc98e44d415f484
 -- 
-2.54.0
+2.43.0
 
 
