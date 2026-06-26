@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-302085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302084-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nbBFNBTfPWp97QgAu9opvQ
-	(envelope-from <netdev+bounces-302085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 04:08:20 +0200
+	id oNDPINzePWpv7QgAu9opvQ
+	(envelope-from <netdev+bounces-302084-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 04:07:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C1436C9A7C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 04:08:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4226C9A6E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 04:07:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b=pWiiU50Z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302085-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302085-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=163.com header.s=s110527 header.b="mUlO9m/l";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302084-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302084-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=163.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C53430892E7
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 02:06:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14A953016C91
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 02:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5742EB5A6;
-	Fri, 26 Jun 2026 02:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E3E2F12AC;
+	Fri, 26 Jun 2026 02:06:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8C92F0661;
-	Fri, 26 Jun 2026 02:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2767E2E5B21;
+	Fri, 26 Jun 2026 02:06:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782439583; cv=none; b=PzKW0ggLnHHyAyVZ6y4TQRFVASTfZjNhgMdYE1s3rSRNeGtYyv0Yb+78Cbmdv+NWH2HSBSiGOqhTgKqOie12O98k1OX50HShZ9vivTaUEpCJaJzHKy3eCe0V594Mq/NrTGXOqBU4rmZkZj3thN2TPw5kytrBmgMPeGlTeqNoBHU=
+	t=1782439579; cv=none; b=Meewm0FxkjUQDDq53CyQyKZ40i7QnW/rKnLqZMw2QhAsgvusiiOntTa8CByIRON6EhbDvzWXRFsYc+7iX5aqBkP6CqEQR/QBaRa6SXlXSgO6EMB3www2Jm3iqrMbfv9iYB8q/xdn/jtHtGV1B4haeNrH1Ar0QQlakqDSjo7aI7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782439583; c=relaxed/simple;
-	bh=L28thVxDuPwu4W8UYQ3of1uvi9fpbjeAwjn5Ol+a02Q=;
+	s=arc-20240116; t=1782439579; c=relaxed/simple;
+	bh=4FXp5PQVJ76PQWdQb9EUxvO1upRB+jeYLoezL3xQtFU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dR6By1/5VQZ9IIdiy3FvWHofWm3yAtRmHiYMbMQftbVUYU1m6t5diYF97L9CQB9X7xd/b7Of9WnQZeBUZuPxdkdLCdsB7iErLBZEjsgbpKP8NDjYeZEL5l1/Pd1rg3pjWSM4SRuWNpgkYJrA9SGP38CVTLmEi9zqSL4Cfql4ebs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pWiiU50Z; arc=none smtp.client-ip=220.197.31.5
+	 MIME-Version; b=WE/56xoFDjbIUuw97MAL8zYHn2Xcmb+BR4KNHWmI987LMSHk3Ep9FfAHpyXhAWbsVUo1e8yDc/XThqXesnPRHu7WtMTov66lArnYStLQCuPvjdrHFsc+gGCLMLFDA2fmxy0gqwSIcXZFV8sYE2F0vEGjgkGpQf2lacz/FqMgaq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mUlO9m/l; arc=none smtp.client-ip=117.135.210.4
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=pl
-	cB/czLDn3eZAiAw8vFY41ABLwJ61bHMGAvnLvHR+8=; b=pWiiU50ZZSeGcRkGwc
-	EgjwxY/UA4NM2I0tPTCd2yQd867oYizX6YmVFk1ylaqGV3wYvBcaLoTF3jkH90jN
-	oAwXAIMPz/WVV+/msBnz3LEx3tv9oO7ndwB1Dvh1F0KnXvehJeMvJFVPTfX/ezQi
-	qD7WpOSC7r3YOjqlVsAhkp/W4=
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=cH
+	7aFmRWGYY6CfpfEv2VdnHPQeojmPM4ZBgcF3Q7Xgk=; b=mUlO9m/lOvAwJ8r7w4
+	wNYCMmUDGDTNcc6Ccw3BMco5L8dFMzOdr0pWCbwAmR9f080rKTln06lIO2jZzTKZ
+	7M249aSNZ7qNOwwokSaGTj84tNdY/u6/lg51EJ8zG1OVd+yHdZyJVvP12QGw/r/S
+	0jV+lNiu8q3rBFzKfcGoChIy4=
 Received: from xwm-TianYi510Pro-14IMB.. (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgBn4SB83j1qWhWLEA--.17305S3;
-	Fri, 26 Jun 2026 10:05:53 +0800 (CST)
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgBn4SB83j1qWhWLEA--.17305S4;
+	Fri, 26 Jun 2026 10:05:55 +0800 (CST)
 From: Xiong Weimin <15927021679@163.com>
 To: Jason Wang <jasowang@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Xiong Weimin <xiongweimin@kylinos.cn>
-Subject: [PATCH 1/2] vdpa_sim: clear pending_kick on device reset
-Date: Fri, 26 Jun 2026 10:05:44 +0800
-Message-ID: <20260626020545.607600-2-15927021679@163.com>
+Subject: [PATCH 2/2] vdpa_sim: hold iommu_lock across dma_unmap passthrough transition
+Date: Fri, 26 Jun 2026 10:05:45 +0800
+Message-ID: <20260626020545.607600-3-15927021679@163.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260626020545.607600-1-15927021679@163.com>
 References: <20260626020545.607600-1-15927021679@163.com>
@@ -63,12 +63,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgBn4SB83j1qWhWLEA--.17305S3
-X-Coremail-Antispam: 1Uf129KBjvdXoW7JFWUCry3Ar1kZF1xJFy3XFb_yoWkKFb_Kr
-	95uws7Ar43Gr40krykKryfAr90ka95WFW3uwn2qr4fJ34Ut3W5Wa1kWry3Ja97AFZ2ya4a
-	yrWYy34xCr1rCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8iZ23UUUUU==
-X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC9AHBSmo93oGYOgAA3U
+X-CM-TRANSID:QCgvCgBn4SB83j1qWhWLEA--.17305S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KFy7Kw1fur4xKw13Xw1UKFg_yoW8Gw1Upr
+	WjgFZ8K3WIqw48XFnrGw45ZF1vgwnYgF4FqF98tasrCrn8Jr1DXa93KasxXr1YyrWfAF13
+	Z3WkJ398uFW7WFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jzUDJUUUUU=
+X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0QPBSmo93oNoDgAA31
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -89,7 +89,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302085-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302084-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[163.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -101,42 +101,48 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,kylinos.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,kylinos.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2C1436C9A7C
+X-Rspamd-Queue-Id: CC4226C9A6E
 
 From: Xiong Weimin <xiongweimin@kylinos.cn>
 
-vdpasim_kick_vq() sets pending_kick when a virtqueue is kicked while
-the device is suspended (!running but DRIVER_OK).  vdpasim_resume()
-later replays kicks for all virtqueues when pending_kick is set.
+vdpasim_dma_map() updates the IOTLB and the passthrough (iommu_pt)
+state under iommu_lock.  vdpasim_dma_unmap() clears iommu_pt and
+resets the IOTLB before taking iommu_lock, then deletes the mapping
+while holding the lock.
 
-vdpasim_do_reset() clears running and status but leaves pending_kick
-unchanged.  If a kick is deferred during suspend and the device is
-reset before resume, a later resume can spuriously kick every
-virtqueue even though no new work was queued after reset.
+A concurrent dma_map(), dma_unmap(), or reset path that also touches
+the same address space can therefore observe or modify the IOTLB and
+iommu_pt state without consistent locking.
 
-Clear pending_kick in vdpasim_do_reset() together with the other
-device state that must not survive a reset.
+Perform the passthrough transition and range deletion under the same
+iommu_lock scope, matching dma_map().
 
 Tested-on: openEuler VM (6.16.8, /usr/src/linux-6.16.8)
 Tested-by: Xiong Weimin <xiongweimin@kylinos.cn>
 
 Signed-off-by: Xiong Weimin <xiongweimin@kylinos.cn>
 ---
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/vdpa/vdpa_sim/vdpa_sim.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
 +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -161,6 +161,7 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim, u32 flags)
- 	}
+@@ -736,12 +736,11 @@ static int vdpasim_dma_unmap(struct vdpa_device *vdpa, unsigned int asid,
+ 	if (asid >= vdpasim->dev_attr.nas)
+ 		return -EINVAL;
  
- 	vdpasim->running = false;
-+	vdpasim->pending_kick = false;
++	spin_lock(&vdpasim->iommu_lock);
+ 	if (vdpasim->iommu_pt[asid]) {
+ 		vhost_iotlb_reset(&vdpasim->iommu[asid]);
+ 		vdpasim->iommu_pt[asid] = false;
+ 	}
+-
+-	spin_lock(&vdpasim->iommu_lock);
+ 	vhost_iotlb_del_range(&vdpasim->iommu[asid], iova, iova + size - 1);
  	spin_unlock(&vdpasim->iommu_lock);
  
- 	vdpasim->features = 0;
 -- 
 2.43.0
 
