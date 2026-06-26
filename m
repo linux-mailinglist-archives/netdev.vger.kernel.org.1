@@ -1,221 +1,242 @@
-Return-Path: <netdev+bounces-302195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rw4PMYWUPmrAIQkAu9opvQ
-	(envelope-from <netdev+bounces-302195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:02:29 +0200
+	id mT08OmuTPmpfIQkAu9opvQ
+	(envelope-from <netdev+bounces-302196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:57:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EDEB6CE448
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:02:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0226CE377
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:57:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b="Lor/uiPk";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302195-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302195-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=iDZhI9iC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302196-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302196-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5D28D30965A3
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 14:51:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 67AB53078F43
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 14:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB053FDC0A;
-	Fri, 26 Jun 2026 14:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41405383C80;
+	Fri, 26 Jun 2026 14:50:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013056.outbound.protection.outlook.com [40.107.201.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400683FD94C;
-	Fri, 26 Jun 2026 14:49:40 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782485382; cv=fail; b=CtrDJXRX+p5PnDo0esdTzidazUQEzP3X+d396Zw56zaJiKykLg54BBEDCtqsMy62iHNNwbCi5SCZAvO2y6qoTzJud7uSvH6JtPuQYp6ESATe2pXGtFf+pBV6JswwQC81llSY+pbSluIciA884HlGGA5lwRteFTLYi9YhGWht2So=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782485382; c=relaxed/simple;
-	bh=2el/4BSnbCVPGnK6IouuS3pTaumCujWrvsmZu8NMiAE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d34QIVhoycGNndxzpP9dZ7xaesknjoAysKtVsinSrN4cHh6IuMKTubfDoIb5Y9or9j4WH7PzxrYUc97ryXRba0QhS8hEaiIgvaCB5/eNWwX7SrHulZdomEcUbXX6cjIM/VIl9TaAuOEj7Nt4SpK0e+cn4o4FWrfcrc764Z7UqBo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Lor/uiPk; arc=fail smtp.client-ip=40.107.201.56
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZpX77qq/I/pezLliAFF01XBYjOdeXnievymJYR/Aky5n6Gwi9TxjO9XRknsENv4RLIo7eU5/rBBSeNvblie2funwVCPOK7YYZ+BATKFJxh2bXozcay/FEX2aitLqNLjFsipBS723DXzrAM6FIBf1iNeh9SZX+w+rC9Q76GmoLncZ5KZ3rntmwW8wvqqQ0aPrc2u6QFXsksvGghN1/+IqWYpbg4XUPXvZRs+xxoNP30qmolPB06BWLKhyvRICSEwk84LYb/KtlWVGAVtFAm+Zmrtna23ARAZBqg5PLO/XCqRxXulMeqiVG4vPbcdTqL/1eMBSIeec61eMu6qSBVxjzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JF/L9eG6VKLkrq3rC39GxLpPmHsGXz2XN5aKGLq/lh4=;
- b=glZqK2hdyMg49Ie91tRTJT9bCn+KxJRy/VdEIu/ZrEUpMUcZQVc/N1yfcO+Tco0i9OjHPDmELhLlVWU1dLTukSG5aEa0LiOwt8iYr7rhI1656BKGiUSLWm9Z9QrKTGeFUVJK5oqCUhhjgZJS02M5F2hDQR0P9UnSA+d1yQipOuaCFyOev7FO0wSRLwd99xKcW21qU/zJFdK1yZgGmWE8e2YU35IA8/ieErE/2RMko0SxnZUWisTEPu/lzFd2Ubf5Vh5Q3jPks89eFAXi7pOI1ojb7Ayy8laLy63Bv9zRBGo8qfXVIB6HvHS9uu9L2oK3oD+Hqx9YhlTbbsrjcwAlTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JF/L9eG6VKLkrq3rC39GxLpPmHsGXz2XN5aKGLq/lh4=;
- b=Lor/uiPkCVRi24JbFpj9pFmAtUQFb3ANTzKNsGIHQpzgOslf7fX1pLfC6nGbIjbsGLLlQpKAh0IkvtkON5ecJsQgSXNChwYAM4hJr6YuwwsVuFg8wrUPwBqTg8oksMHZRu6e35nnobFyeHYbvVfkiNLnzh7KvNyFvh8Xe+yGhJuWJr5kTJ6EOiQ3z8grBuFVix4NMldR91HbkcKlPJZWVYqBVm91bXgU+cl9Iy8oV62baZl4GLmmklrs71PXmelyIwwpDUJV6N0moPI5OFrdr8VuCuNrbIAKkDGS4XOMWwI3iq4Pjm8qnjfWXv3BCE275oavu7dXKWRilLnkvbSRSQ==
-Received: from PH0PR07CA0101.namprd07.prod.outlook.com (2603:10b6:510:4::16)
- by MW4PR12MB7013.namprd12.prod.outlook.com (2603:10b6:303:218::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.17; Fri, 26 Jun
- 2026 14:49:32 +0000
-Received: from SN1PEPF00036F3D.namprd05.prod.outlook.com
- (2603:10b6:510:4:cafe::a) by PH0PR07CA0101.outlook.office365.com
- (2603:10b6:510:4::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.159.17 via Frontend Transport; Fri,
- 26 Jun 2026 14:49:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF00036F3D.mail.protection.outlook.com (10.167.248.21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Fri, 26 Jun 2026 14:49:31 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 26 Jun
- 2026 07:49:14 -0700
-Received: from 82875d6-lcedt.nvidia.com (10.126.231.37) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Fri, 26 Jun 2026 07:49:13 -0700
-From: Nirmoy Das <nirmoyd@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH net] selftests: net: make busywait timeout clock portable
-Date: Fri, 26 Jun 2026 07:49:02 -0700
-Message-ID: <20260626144902.3214350-1-nirmoyd@nvidia.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EB030B50F;
+	Fri, 26 Jun 2026 14:50:55 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782485456; cv=none; b=hFMzSPaZsA4xciwmSyMjofDwSxJvuAFpOMtH6mK6JGhywZw8p/Yul7isE6quCwRh3m0TpDqFqkf2O20F+a0o9yPp0Ju3G48LfQwJv8b+1yvW05gnxnOP1cwcIC84jh6+bJ2H9QzV8rnNIAj1EUXichMqpl+DgxAXM/M3sedvc3s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782485456; c=relaxed/simple;
+	bh=JCLAeQVKI++UFhHCy4DXgU0YkKin5C+cQ3159/WrbEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dC4m8m8/GfJ+bRGV34lcKo2DQI5sjaGIN8IQIu0/OBg0u+ERWe2AUjl+YISL1Tvx/XIMo5xYS2xfD+mZCBJ8dd3A+V6yiG551aF1UUdMZrW6Pl2xff4AQagZ2/kERd5FtDs2VcRRFX8lZbf3XHCr0RTfTdsQDCQVt7vmuTWbUDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDZhI9iC; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B42B1F000E9;
+	Fri, 26 Jun 2026 14:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782485454;
+	bh=eeYtlt82OtWBDyc4TXqVh3jBy3MFqJIuldO9muaK438=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=iDZhI9iCBbeqQkxKvBvis57YrHTKvs+WPaZHMNypJ1Js+vn7DCD5Brk/FbiipFdqK
+	 7SefG56wd3bw4RrAuVLdzGnlvdAeAc8VnW6ezs1MYEYVc0LlFBABtO/8Cjx89EfEbU
+	 5T2G73ufKK10xkqyZdxVTaSQpmR9O5OmzvhwGKEBYJy2tvTpFmiPxSRvE79IWMUaUT
+	 vkKpn0gog6prHrw9BS2SxCAD+wyEZ5E7XdL/0p4WZA3ugAbJ9Qlo/iE46KF+3eSE6j
+	 UHYI4A5fG24BkooovUKmWyrqUiA7qxUFeN54SbrG5j4Jpv3lri8mVmLJN0Uli43a7m
+	 OupEt1viH6pnw==
+Date: Fri, 26 Jun 2026 15:50:48 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dexuan Cui <decui@microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	longli@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	kotaranov@microsoft.com, ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com, kees@kernel.org,
+	jacob.e.keller@intel.com, ssengar@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] net: mana: Sync page pool RX frags for CPU
+Message-ID: <20260626145048.GB1310988@horms.kernel.org>
+References: <20260624222605.1794719-1-decui@microsoft.com>
+ <20260624222605.1794719-2-decui@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3D:EE_|MW4PR12MB7013:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2766afe5-b29f-463e-7a72-08ded39221a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|23010399003|36860700016|82310400026|13003099007|6133799003|18002099003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	V7uTBBVskuTK27DeV0tRRPqRRo0svzNotpMolTLbvrPJW6SUyh7X5rIxiPfynPcyt4SoKvjR2XbQIKix3eTdRMfuwNCwRHxeNl8lPAE/Y/3RYrlWaNswCBvyEXi77OUYVUKPs4XU9vFfD8pp40mFKWfYlsHeBsEs6pAKEYVgrtiNkfN066YPxKiMKeX0mjrbFTlwabO8tFtvsQplx6GhKJjEfvajF41R4Azrvfc8R7WnE8sIAR58z6k3KIiJ1MN0c1RztX1fU9CButnA9HljG7qi9+5PGQzt9jhi9Ic+Rtb3AL8mpAPGpUTU/pLDxCgZm0twqbsoGVI/cYsI3C6lQW/xmwGT4SXdnQqYWNVjK863pRadndImoVRXBFHapSbRn/wvbko9wfrIt5KpQEq2WWeL/P6jUjllNmLDOj0qWmmtt+agsEJzpe9xjtuLmJNvWPoq26iFU8fNedri9+5L9Ue9ot0jd3PL/Iw/cZIdqhzFpjU/GjuBGNzo1g72LWsq7XbSSG8zisb2hpvNnNcdArEjGezQICOq7W01O5xhszRppHxDbublkrbfzwamPCo45Zg5LvWDMf/xcrZ5+c/bAKFBDGBAVJfRhEnaW5MeYtOxHyGYFfxaoWVmFuG6gqL0Qx4ag3ojmx5qohf2uEwS8HXttyq1t5ZSCyfFEwdODJB2MfRauOh+cTHuRXtfXz8VZSJ+9o2iw3U0aa9u0j5VEw==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(36860700016)(82310400026)(13003099007)(6133799003)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	Tw9CnNB6YQgySXj8Al9HW79Wq8k+EzQdgLaEZ79darwv8y6sgjfBduZHn37PxzgNxAhqvCB1q5PDI8RyRH4zP2WLvjnDA7ZTjd7THEZryubCXsTYkr/Os8gXH5OFkVQJevONrk3X32MT0PtelS3EF6nmXwQz1/TtsNNN+qAW4IuelZsJGxXXjrbMOODnv7SDsPnc6I++XK32nfdnn37bC98R8cS312k9XfUF7HiO4Gh9q/Kenh63Q+MHPvbO6ogGLe13GzisB9xJ/gl5iDxfbqHAoun5j83YZEgxeB+5C5DBRReEVS84MSeYdvjwtd1uLFhdvy783H06akjY4ao0Bj7o8oI9vAkalJ19/ffon+51rjaFSptxh5r5v0tB3UVC19RT9q8Re1Iin2uiRhzNMDDVNIntulXBR11i7tcTDbhhvPr26sEXJmPDMIzBqd+I
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2026 14:49:31.4568
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2766afe5-b29f-463e-7a72-08ded39221a1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F3D.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7013
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260624222605.1794719-2-decui@microsoft.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302195-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[nirmoyd@nvidia.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-302196-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_RECIPIENTS(0.00)[m:decui@microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:jacob.e.keller@intel.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nirmoyd@nvidia.com,netdev@vger.kernel.org];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,vger.kernel.org:from_smtp,vlan_bridge_binding.sh:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:url,horms.kernel.org:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8EDEB6CE448
+X-Rspamd-Queue-Id: 8B0226CE377
 
-loopy_wait() expects millisecond timestamps. However, Ubuntu Resolute
-can use uutils date, where `date -u +%s%3N` returns seconds plus full
-nanoseconds instead of a 3-digit millisecond field. This makes
-busywait expire too early and can make vlan_bridge_binding.sh read a
-stale operstate.
+On Wed, Jun 24, 2026 at 03:26:04PM -0700, Dexuan Cui wrote:
+> MANA allocates RX buffers from page pool fragments when frag_count is
+> greater than 1. In that case the buffers remain DMA mapped by page pool
+> and the RX completion path does not call dma_unmap_single(). As a result,
+> the implicit sync-for-CPU normally performed by dma_unmap_single() is
+> missing before the packet data is passed to the networking stack.
+> 
+> This breaks RX on configurations which require explicit DMA syncing, for
+> example when booted with swiotlb=force.
+> 
+> Fix this by recording the page pool page and DMA sync offset when the RX
+> buffer is allocated, and syncing the received packet range for CPU access
+> before handing the RX buffer to the stack.
+> 
+> Fixes: 730ff06d3f5c ("net: mana: Use page pool fragments for RX buffers instead of full pages to improve memory efficiency.")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Signed-off-by: Dexuan Cui <decui@microsoft.com>
+> ---
+> 
+> Changes since v1:
+>     v1 is split into two patches in the v2.
+>     Add Haiyang's Reviewed-by.
+> 
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 39 +++++++++++++++----
+>  include/net/mana/mana.h                       |  8 ++++
+>  2 files changed, 40 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index c9b1df1ed109..1875bffd82b7 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -2044,12 +2044,16 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
+>  }
+>  
+>  static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
+> -			     dma_addr_t *da, bool *from_pool)
+> +			     dma_addr_t *da, bool *from_pool,
+> +			     struct page **pp_page, u32 *dma_sync_offset)
+>  {
+>  	struct page *page;
+>  	u32 offset;
+>  	void *va;
+> +
+>  	*from_pool = false;
+> +	*pp_page = NULL;
+> +	*dma_sync_offset = 0;
+>  
+>  	/* Don't use fragments for jumbo frames or XDP where it's 1 fragment
+>  	 * per page.
+> @@ -2087,31 +2091,47 @@ static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
+>  	va  = page_to_virt(page) + offset;
+>  	*da = page_pool_get_dma_addr(page) + offset + rxq->headroom;
+>  	*from_pool = true;
+> +	*pp_page = page;
+> +	*dma_sync_offset = offset + rxq->headroom;
+>  
+>  	return va;
+>  }
+>  
+>  /* Allocate frag for rx buffer, and save the old buf */
+>  static void mana_refill_rx_oob(struct device *dev, struct mana_rxq *rxq,
+> -			       struct mana_recv_buf_oob *rxoob, void **old_buf,
+> -			       bool *old_fp)
+> +			       struct mana_recv_buf_oob *rxoob, u32 pktlen,
+> +			       void **old_buf, bool *old_fp)
+>  {
+> +	struct page *pp_page;
+> +	u32 dma_sync_offset;
+>  	bool from_pool;
+>  	dma_addr_t da;
+>  	void *va;
+>  
+> -	va = mana_get_rxfrag(rxq, dev, &da, &from_pool);
+> +	va = mana_get_rxfrag(rxq, dev, &da, &from_pool, &pp_page,
+> +			     &dma_sync_offset);
+>  	if (!va)
+>  		return;
+> -	if (!rxoob->from_pool || rxq->frag_count == 1)
+> +	if (!rxoob->from_pool || rxq->frag_count == 1) {
+>  		dma_unmap_single(dev, rxoob->sgl[0].address, rxq->datasize,
+>  				 DMA_FROM_DEVICE);
+> +	} else {
+> +		/* The page pool maps the whole page and only syncs for device
+> +		 * automatically (PP_FLAG_DMA_SYNC_DEV). Sync the received bytes
+> +		 * for the CPU before they are read: this is required if DMA
+> +		 * is incoherent or bounce buffers are used.
+> +		 */
+> +		page_pool_dma_sync_for_cpu(rxq->page_pool, rxoob->pp_page,
+> +					   rxoob->dma_sync_offset, pktlen);
+> +	}
 
-Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
-Cc: stable@vger.kernel.org # 6.8+
-Link: https://github.com/uutils/coreutils/issues/11658
-Signed-off-by: Nirmoy Das <nirmoyd@nvidia.com>
----
- tools/testing/selftests/net/lib.sh | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index b40694573f4c7..fcaec058be6d0 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -70,12 +70,27 @@ ksft_exit_status_merge()
- 		$ksft_xfail $ksft_pass $ksft_skip $ksft_fail
- }
- 
-+timestamp_ms()
-+{
-+	local now=$(date -u +%s:%N)
-+	local seconds=${now%:*}
-+	local nanoseconds=${now#*:}
-+
-+	if [[ $nanoseconds =~ ^[0-9]+$ ]]; then
-+		nanoseconds=${nanoseconds:0:9}
-+	else
-+		nanoseconds=0
-+	fi
-+
-+	echo $((seconds * 1000 + 10#$nanoseconds / 1000000))
-+}
-+
- loopy_wait()
- {
- 	local sleep_cmd=$1; shift
- 	local timeout_ms=$1; shift
- 
--	local start_time="$(date -u +%s%3N)"
-+	local start_time=$(timestamp_ms)
- 	while true
- 	do
- 		local out
-@@ -84,7 +99,7 @@ loopy_wait()
- 			return 0
- 		fi
- 
--		local current_time="$(date -u +%s%3N)"
-+		local current_time=$(timestamp_ms)
- 		if ((current_time - start_time > timeout_ms)); then
- 			echo -n "$out"
- 			return 1
--- 
-2.43.0
+I'm sorry to be bothersome but I think that the order of the two patches
+that comprise this series should be reversed. Or if that is not possible,
+go back to a single patch.
 
+Because, as flagged by https://netdev-ai.bots.linux.dev/sashiko/
+
+  Is pktlen here bounded before it reaches page_pool_dma_sync_for_cpu()?
+  The value originates from oob->ppi[i].pkt_len in mana_process_rx_cqe()
+  and is forwarded straight into this call with no comparison against
+  rxq->datasize or (rxq->alloc_size - rxoob->dma_sync_offset).
+
+  When SWIOTLB is in use (the swiotlb=force case explicitly called out in
+  the commit message), page_pool_dma_sync_for_cpu() reaches
+  dma_sync_single_range_for_cpu() and copies dma_sync_size bytes from the
+  bounce buffer back into the original page.
+
+  Since alloc_size can be smaller than PAGE_SIZE and multiple fragments
+  share a single page_pool page, can a pktlen larger than the fragment
+  extent here cause the copy-back to spill past this fragment into
+  neighbouring fragments that belong to other rxoobs still in flight?
+
+  If so, those neighbours may already have been or may shortly be passed
+  up via napi_gro_receive() in mana_rx_skb(), so the over-sync would
+  silently overwrite their payloads before the eventual skb_put() in
+  mana_build_skb() trips skb_over_panic() on this oversized packet.
+
+  Would it make sense to validate pktlen against rxq->datasize before
+  calling mana_refill_rx_oob()?  The follow-up patch in this series,
+  "net: mana: Validate the packet length reported by the NIC" (commit
+  6c707fe658d6), adds exactly that check:
+      if (unlikely(pktlen > rxq->datasize))
+          ...
+  Could that validation be folded into this patch so that the sync-for-CPU
+  introduced here cannot be steered with an attacker-controlled length,
+  particularly given that the motivating scenario (swiotlb=force) is the
+  Confidential VM case where the hypervisor-supplied CQE is untrusted?
 
