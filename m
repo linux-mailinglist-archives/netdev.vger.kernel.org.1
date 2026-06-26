@@ -1,417 +1,451 @@
-Return-Path: <netdev+bounces-302120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302116-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id B3gfEnE5Pmr4BgkAu9opvQ
-	(envelope-from <netdev+bounces-302120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:33:53 +0200
+	id zRpvKAg2PmoUBgkAu9opvQ
+	(envelope-from <netdev+bounces-302116-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:19:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DA606CB614
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:33:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F040D6CB44C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:19:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=canonical.com header.s=20251003 header.b=RlPf++VJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302120-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302120-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=canonical.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="SnRcd/da";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302116-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302116-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8CBF030AF545
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 08:25:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C363A3005AC0
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 08:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C143E6DFF;
-	Fri, 26 Jun 2026 08:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6774A3D1CB2;
+	Fri, 26 Jun 2026 08:18:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774383E5A3B
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:24:04 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782462248; cv=pass; b=V1R8MioakUiScvC/hCH+9hvQgTmS9u8hxbKtHLczws2cic0z98fML/MSjcpUmKdTB+DaavVdPnT2rL0icJMGoWMms8N5lw36gB9LPVObEbjti6NmKKUITEhZ+ZrUs+uZp6IPqMOyzlqa+0migw9SRFXL4v/nSH9QsLGOi6ev2Ew=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782462248; c=relaxed/simple;
-	bh=/05R8D8Gj8PvLHvW7M8Nu0pFycvuXBG8B7/H+W9qCcM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fKGmomWvpGP07+xf0fK/5GooyTVVSd0B9mI+FG8zv+SHM1t3UvvF4Vtl37l9HJd8ZQXRCWC60JIUqC24wq8m/JogmiKJwRO0hlUB09/nrkLPKx+oBC+jWYedx0PVzL1o+WqtH5uUiMzB2ypjtXAZB3fgU05A8EoesZD/i7zz7pg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=RlPf++VJ; arc=pass smtp.client-ip=185.125.188.123
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 80B5A3F984
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:15:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1782461743;
-	bh=OgQYhnBPA9xSingLmEVDWnoZ9cbftBXdPmeGfHhGAH0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=RlPf++VJd/ixzaA2SQzpY8aiFX1GsRn/rDe+AFrWxZZRCV3BbaYaRAgPhI+GAnacv
-	 70JTBaBCHv1uTXd0Ybcdbo98tCy0vhgOHAiAc1cBxp/+5S/rIY8wleDbCDrKhStE2G
-	 ouQdLSThEpYa/yIHAwefEuiqN3aUue+Xcp99O6hS7AKAt37+cVfpliyuFjYfWtnDtl
-	 YqcTAdm7suz+Z+B0TnTJlS+QTtCnoYCn+fD7/fBSkHCnzGy2OInbrOtLGoi2D6rsM3
-	 l3weTOctJUHuGrSuslzLIjwaLMfpHFCGQZo0sEAw1wjaBCT4M2UtaOr2FM5VtBqp+i
-	 ZIQPmm+APCogHMuK2vF0JI2sm89mRpadionM3EBneZvZwFvE1+qa6QG4L3DljwOerW
-	 kv2hSQ5k+BfC9EpaUZAadMVWUO6S15KzDcp7qixsNZIf7KuGyEeflomQi3wRKyxJxj
-	 1t2DVO4fbB3uHy/ATJgVVEDu73XYmt/YDQiFiT4B/T+oyRq5vDbC2rEATY+qalTRQR
-	 WE0ztUZZsjeMnslbv5xo3nGmHFdE4IanV348PmXrHf5LxkSiNBC96h4+P/93bB7C1h
-	 XsmFy4LdfMTqNePQ3PJblHUe5XDel2yjnADjVuMK8k7zahHH+33BkN9C8ZAY+Ndjz3
-	 9PLjUn3IYwVvOHQBxWJD+9Fc=
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-39ad2e6474dso2801931fa.0
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 01:15:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782461742; cv=none;
-        d=google.com; s=arc-20260327;
-        b=InV8xBOqBkGHZkKgrxcolJRHKa3Kt73ip4FZ+ifHaORicLQrtl6Wc7ATmW+7fxi0Ar
-         zOcYNocD7NApxEjIoWKLgAlVCdXsxR6GV9oieH8vDqe0+ZKOlyNhQKwjjCuL+3ruHeSV
-         DjFmp+dMawvnphbamFyT+3Le/vZ98XZM1ijZkHHfw1lFh4igAanR3yNVbizdQ3jqXVJx
-         XcgemQ3ku2XMGvgc2bFjM1CNHPD0Wnb1psWipUak9K6BsYFPhHmyLaraYZs68nhDv/Bw
-         HbemVziZ/rth0VHX9BVr9VyAvfnv7Bg2fP6MDwv8YBzwPSIqAJFUVsgQaZNEJP8j6cWc
-         +4vw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=OgQYhnBPA9xSingLmEVDWnoZ9cbftBXdPmeGfHhGAH0=;
-        fh=bASxa9Xhgx4ottF9eDxJ3f7CHBQN5UTppsgX7dxJfyE=;
-        b=Ay7yuKBlH7HAxmJPtqq7+TWguIbOhOMGiR24CDxKjFlz2xHOYqPk/HysBHW/pERvla
-         AXOTYDh7lgJVDzakanXhSGitCWsktE7plPXiqxaq6ot2qA0kWQANCJ34YIsvZ73Jkjrz
-         zv5NPLOZfy7yse3t8pTMXTYUDyHY0tQrBimMxD/bKL2h99J6SbHwop+DLkpgxvk8jmEJ
-         8vJoLZnojEFJADAmoIwh7aOKNaRoIKG8WgJMnWOTGvV94Tn/OubGrGRGx3wUg7qGp30Z
-         qF2LhQHdcsbIzWiP/LCYdaHNyxTX2fr5t5JuRGCDA6OLUMVCcr2RdojW0w7v7mO5V6zG
-         Y3ag==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782461742; x=1783066542;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OgQYhnBPA9xSingLmEVDWnoZ9cbftBXdPmeGfHhGAH0=;
-        b=ZRVcAAk4o1O+ev8T5/kHhfpBOw3eeRYRmeZU+jWakQ354Ptzb/e+ndv/D9ahZ3fP4l
-         U+62X0QNHZJ1ggBGdMvbnAxxow8aQs1UAytnzIfE7tkFbmP9hOadb78HwSDXtaLOMGP9
-         9QiELOBII3siA8oivR9LHRvk6sHogsWBdeo2gvD5puWRI8LYu+RblCSb8RW/YqjDZjbE
-         DQRfB1q58XYCJofqVQfGAd7HkA6GVnCmqofi8X0L/iThu5SLgnmNFyIGl1jhy9TNhj7j
-         KXKPsQT/kGhQBDDu/1ux0R55ibWUCgQddIWDJoUZLlSSn+XYk3ZJtrh9U/FutgMjRdXN
-         N1dw==
-X-Forwarded-Encrypted: i=1; AHgh+Rq6vpQ3sCK2/ORGJG9J+S6NUPT6vcF9cvDjlWGHTIWjLt8Of+M5AutgBjX85joUZMwXb5d/O3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPMJMfFjtWVF/nfC6YzHag7TzZfmkC0I2f1QLMUSxELPkN5zjq
-	/gjrtIcNpQ5Wimk9yYo706kNxDPpvWszcWyVtxBRO6IZmYZdIlBn8R4ohj8BfCjWl9iyZ9U3udp
-	LBZOPoeuESsyXgeYtpcwlYmT+DLoE/yFpIILt03eq8yfZ7LL1J6eQxOwWy3CN3iuZNCcbbtidzk
-	wH3Y/9gd07LGLYlWYnU3zAB+SphGFo1nDngqtP7wNnYLJ99Beuzw9HpxVgxR8=
-X-Gm-Gg: AfdE7cmy9UBmOAdVCr1isJFeXsuCa/NwLt6OxdEulQ5YXkXY7c+Abl++K63L/eFr99w
-	oFdj5Ht6aeRhAVbp8uMAJTqdZ9f9KanK7CJsU/MTviZrzYkGL6r253+5ajiQlw2KeGHuk+ig/Wi
-	APiv0QX4w31AaiwOze6yI+H8KWwYn61xre26GlWHWw0TwPAsPuGzPYSCbqo9pmRazTjA==
-X-Received: by 2002:a05:651c:212a:b0:396:76f9:ac7e with SMTP id 38308e7fff4ca-39acb9235b0mr18271351fa.18.1782461742235;
-        Fri, 26 Jun 2026 01:15:42 -0700 (PDT)
-X-Received: by 2002:a05:651c:212a:b0:396:76f9:ac7e with SMTP id
- 38308e7fff4ca-39acb9235b0mr18271151fa.18.1782461741730; Fri, 26 Jun 2026
- 01:15:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1314249EB
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:18:45 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782461927; cv=none; b=e0c+tox6itWhFG2GLRhcnuFUzwRU9clQ4ciV2w4ORUb3b9x549qvFwMsokvJvkq/LO8WwfGKxwmeqmX6w4EXx+ZMIkDCb2hqEoPbynGs6FcRCYgzrzVuPTIsY9wePveHQrGCn5C2XNuRH7lb8vO0h1oMt5J8qLhEGRUOJSVHgMk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782461927; c=relaxed/simple;
+	bh=o7JHGSPEr05FmWr7e06PcVBRXc6RXcjzhcoE2AaXMVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F/QgqW+r/+H3HAvf85rJino5rUtJMPQr75k92l3y8t7GDOSylp6lpHFRuHo80tEVFZi1IlQ8UYBESvpbHhE0+XXzfW+JMf1gNenAhCjvNeSrys3lUd/jtfIHErU7T93NOStmQUfHnZnmYHsCl165tjV2yD6OinFp/oHOk3zrgXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnRcd/da; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 598BC1F000E9;
+	Fri, 26 Jun 2026 08:18:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782461925;
+	bh=ZtxQhPJu30QBa2gHBza3bH34Gpdki7PPc1OqZ0o6O+M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=SnRcd/da4ssM836Uj7Ka02pmNfKYkBanvDPZV/Qb97XwSBcdI6RxDOblxnKNdHPBo
+	 I/m8XAd2sbwuj1Qu01YSLqcwHUQeA/YfotV2/iU5gBnJTrfH36XhE9ZwysN8VOjekL
+	 gJ+CHyZ4u9Cn+D6BAoZJ+owrke+ZdSrUUvcIp+aBc9F9FX/d8taCAlKk+JL+3qgrDU
+	 GT2zy+SUwSpsrsUFbzS7lAybbR6oZQBm+RvqpQ+eM7UBsk1spDNX3ENRi4j5w0Li8a
+	 Ba4/LslxO7t1u+HiAO8sfIorU3DNx8OwRCgEpDKFvFBoZYAbxYTn/PcbzliveA1FRD
+	 XyS8aZHDlpztg==
+Date: Fri, 26 Jun 2026 10:18:43 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	Madhur Agrawal <madhur.agrawal@airoha.com>
+Subject: Re: [PATCH net] net: airoha: fix max receive size configuration
+Message-ID: <aj4145PuomGhMM1J@lore-desk>
+References: <20260625-airoha-fix-rx-max-len-v1-1-45b9b827358d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260617120753.1785565-1-robert.malz@canonical.com>
- <20260618152003.909400-1-horms@kernel.org> <CADcc-bydFL4KNDQEznStE41NFXuCey9S+kyXg0usbonwyWpiAQ@mail.gmail.com>
- <5658849b-0425-4132-ba32-5801e2907c60@intel.com> <CADcc-bwd2CcWJ1AFDm1GR1HBzo2OOh=Xr3moNS+-RVuai6yVBA@mail.gmail.com>
-In-Reply-To: <CADcc-bwd2CcWJ1AFDm1GR1HBzo2OOh=Xr3moNS+-RVuai6yVBA@mail.gmail.com>
-From: Robert Malz <robert.malz@canonical.com>
-Date: Fri, 26 Jun 2026 10:15:30 +0200
-X-Gm-Features: AVVi8CdsJw9dyW9R50Ina3FFrRwP7Eb30UB2Bd0WBDmOtq6je4hSoJyp5G--v_4
-Message-ID: <CADcc-bwC4FGQSGyRcnj2ZpGT5+0Q6mjQd-FTCB-mCmmwYrC8Qw@mail.gmail.com>
-Subject: Re: [PATCH iwl v3] ice: retry reading NVM if admin queue returns EBUSY
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Simon Horman <horms@kernel.org>, Grzegorz Nitka <grzegorz.nitka@intel.com>, 
-	anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BF1a/QprwyKDmdJk"
+Content-Disposition: inline
+In-Reply-To: <20260625-airoha-fix-rx-max-len-v1-1-45b9b827358d@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302120-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:przemyslaw.kitszel@intel.com,m:horms@kernel.org,m:grzegorz.nitka@intel.com,m:anthony.l.nguyen@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302116-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[robert.malz@canonical.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[canonical.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:madhur.agrawal@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robert.malz@canonical.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,canonical.com:dkim,canonical.com:email,canonical.com:from_mime]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp,airoha.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DA606CB614
+X-Rspamd-Queue-Id: F040D6CB44C
 
-Hey Przemek,
-I ran some tests and unfortunately, the following sentence from the
-datasheet is true:
-"For specific resources, such as Change Lock (0x0003) and Global Config Loc=
-k
-(0x0004), this field is used by software to override the default timeout fo=
-r the
-operation, and also to specify the timeout used for this operation."
 
-This means we can only change a default timeout for 0x0003 and 0x0004
-but not for 0x0001 (NVM resource).
-Whatever timeout I provide FW defaults to 0xB88
-Input:
-[ 2209.656758] ice 0000:31:00.0: CQ CMD: opcode 0x0008, flags 0x2000,
-datalen 0x0000, retval 0x0000
-[ 2209.656760] ice 0000:31:00.0:        cookie (h,l) 0x00000000 0x00000000
-[ 2209.656761] ice 0000:31:00.0:        param (0,1)  0x00010001 0x00000BB9
-Output:
-[ 2209.656927] ice 0000:31:00.0: CQ CMD: opcode 0x0008, flags 0x2003,
-datalen 0x0000, retval 0x0000
-[ 2209.656929] ice 0000:31:00.0:        cookie (h,l) 0x00000000 0x00000000
-[ 2209.656931] ice 0000:31:00.0:        param (0,1)  0x00010001 0x00000BB8
+--BF1a/QprwyKDmdJk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Correct me If I'm wrong, but the only way to properly handle it is to
-ensure the resource is locked and released between every
-ice_acquire_nvm call.
-I'll start working on this.
+> Set the GDM maximum receive size to AIROHA_MAX_RX_SIZE unconditionally
+> during hardware initialization instead of updating it according to the
+> configured MTU. This avoids dropping incoming frames that exceed the
+> current MTU but could still be processed by the networking stack, which
+> is able to fragment the reply on the TX side (e.g. ICMP echo requests).
+> Move the per-port MTU configuration to the PPE egress path where it
+> belongs, and set the tx frame size running airoha_ppe_set_xmit_frame_size=
+()
+> to dynamically track the maximum MTU across running interfaces sharing
+> the same PPE instance.
+> Fix the PPE MTU register addressing to pack two port entries per
+> register word and add WAN_MTU0 configuration for non-LAN GDM devices.
+
+commenting on sashiko's report:
+https://sashiko.dev/#/patchset/20260625-airoha-fix-rx-max-len-v1-1-45b9b827=
+358d%40kernel.org
+
+>=20
+> Fixes: 54d989d58d2a ("net: airoha: Move min/max packet len configuration =
+in airoha_dev_open()")
+> Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c  | 68 ++++++++++---------------=
+------
+>  drivers/net/ethernet/airoha/airoha_eth.h  |  2 +
+>  drivers/net/ethernet/airoha/airoha_ppe.c  | 39 +++++++++++++-----
+>  drivers/net/ethernet/airoha/airoha_regs.h |  9 ++--
+>  4 files changed, 58 insertions(+), 60 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 932b3a3df2e5..3f451c2d4c24 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -178,10 +178,15 @@ static void airoha_fe_maccr_init(struct airoha_eth =
+*eth)
+>  {
+>  	int p;
+> =20
+> -	for (p =3D 1; p <=3D ARRAY_SIZE(eth->ports); p++)
+> +	for (p =3D 1; p <=3D ARRAY_SIZE(eth->ports); p++) {
+>  		airoha_fe_set(eth, REG_GDM_FWD_CFG(p),
+>  			      GDM_TCP_CKSUM_MASK | GDM_UDP_CKSUM_MASK |
+>  			      GDM_IP4_CKSUM_MASK | GDM_DROP_CRC_ERR_MASK);
+> +		airoha_fe_rmw(eth, REG_GDM_LEN_CFG(p),
+> +			      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
+> +			      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
+> +			      FIELD_PREP(GDM_LONG_LEN_MASK, AIROHA_MAX_RX_SIZE));
+> +	}
+> =20
+>  	airoha_fe_rmw(eth, REG_CDM_VLAN_CTRL(1), CDM_VLAN_MASK,
+>  		      FIELD_PREP(CDM_VLAN_MASK, 0x8100));
+> @@ -1831,13 +1836,24 @@ static void airoha_update_hw_stats(struct airoha_=
+gdm_dev *dev)
+>  	spin_unlock(&port->stats_lock);
+
+- This is a pre-existing issue, but can the spin_lock() used in
+  airoha_update_hw_stats() cause a deadlock?
+  If a process context holds port->stats_lock via spin_lock() and is preemp=
+ted
+  by a networking softirq on the same CPU that calls dev_get_stats()
+  (which invokes ndo_get_stats64 -> airoha_update_hw_stats()), will the sof=
+tirq
+  spin forever trying to acquire the same lock? Should this use spin_lock_b=
+h()
+  instead?
+  - The reported issue has not been introduced by this patch. Moreover, I do
+    not think this is a real problem since in the current codebase
+    airoha_update_hw_stats() is always run in process context and not in-irq
+    context.
+
+>  }
+> =20
+> +static void airoha_dev_set_xmit_frame_size(struct net_device *netdev)
+> +{
+> +	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> +
+> +	airoha_ppe_set_xmit_frame_size(dev);
+> +	if (!airoha_is_lan_gdm_dev(dev))
+> +		airoha_fe_rmw(dev->eth, REG_WAN_MTU0, WAN_MTU0_MASK,
+> +			      FIELD_PREP(WAN_MTU0_MASK,
+> +					 VLAN_ETH_HLEN + netdev->mtu));
+> +}
+
+- Does this unconditional write to REG_WAN_MTU0 break sibling network devic=
+es
+  sharing the same WAN port?=20
+  If multiple interfaces share the same hardware port, this appears to over=
+write
+  the shared register using only the current interface's MTU, ignoring the
+  maximum MTU of any active sibling interfaces. Could this cause the hardwa=
+re to
+  drop frames for sibling interfaces if their MTU is larger than the most
+  recently configured interface?
+  - This is not a real issue since we can have at most a single WAN port in=
+ the
+    system
+
+> +
+>  static int airoha_dev_open(struct net_device *netdev)
+>  {
+> -	int err, len =3D ETH_HLEN + netdev->mtu + ETH_FCS_LEN;
+>  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+>  	struct airoha_gdm_port *port =3D dev->port;
+> -	u32 cur_len, pse_port =3D FE_PSE_PORT_PPE1;
+>  	struct airoha_qdma *qdma =3D dev->qdma;
+> +	u32 pse_port =3D FE_PSE_PORT_PPE1;
+> +	int err;
+> =20
+>  	netif_tx_start_all_queues(netdev);
+>  	err =3D airoha_set_vip_for_gdm_port(dev, true);
+
+[...]
+
+>  static int airoha_dev_stop(struct net_device *netdev)
+>  {
+>  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> @@ -1909,7 +1889,7 @@ static int airoha_dev_stop(struct net_device *netde=
+v)
+>  	airoha_set_vip_for_gdm_port(dev, false);
+> =20
+>  	if (--port->users)
+> -		airoha_set_port_mtu(dev->eth, port);
+> +		airoha_ppe_set_xmit_frame_size(dev);
+
+- Does this stop path fail to update the WAN MTU limit?
+  When an interface is stopped, airoha_ppe_set_xmit_frame_size() recalculat=
+es
+  the PPE MTU, but it looks like the global REG_WAN_MTU0 register is not up=
+dated
+  here. Will this prevent the MTU limit from correctly shrinking when an
+  interface is brought down?
+  - This is not a real issue since, as pointed out above, we can have at mo=
+st a
+    single WAN port in the system, so there is no point to reconfigure
+    REG_WAN_MTU0 if this interface is stopped.
+
+>  	else
+>  		airoha_set_gdm_port_fwd_cfg(qdma->eth,
+>  					    REG_GDM_FWD_CFG(port->id),
+> @@ -1962,10 +1942,6 @@ static int airoha_enable_gdm2_loopback(struct airo=
+ha_gdm_dev *dev)
+>  		      FIELD_PREP(LPBK_CHAN_MASK, chan) |
+>  		      LBK_GAP_MODE_MASK | LBK_LEN_MODE_MASK |
+>  		      LBK_CHAN_MODE_MASK | LPBK_EN_MASK);
+> -	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(AIROHA_GDM2_IDX),
+> -		      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
+> -		      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
+> -		      FIELD_PREP(GDM_LONG_LEN_MASK, AIROHA_MAX_MTU));
+>  	/* Forward the traffic to the proper GDM port */
+>  	pse_port =3D port->id =3D=3D AIROHA_GDM3_IDX ? FE_PSE_PORT_GDM3
+>  					       : FE_PSE_PORT_GDM4;
+> @@ -2098,7 +2074,7 @@ static int airoha_dev_change_mtu(struct net_device =
+*netdev, int mtu)
+> =20
+>  	WRITE_ONCE(netdev->mtu, mtu);
+>  	if (port->users)
+> -		airoha_set_port_mtu(dev->eth, port);
+> +		airoha_dev_set_xmit_frame_size(netdev);
+> =20
+>  	return 0;
+>  }
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index d7ff8c5200e2..0c3fb6e5d7f1 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -23,6 +23,7 @@
+>  #define AIROHA_MAX_DSA_PORTS		7
+>  #define AIROHA_MAX_NUM_RSTS		3
+>  #define AIROHA_MAX_MTU			9220
+> +#define AIROHA_MAX_RX_SIZE		16128
+>  #define AIROHA_MAX_PACKET_SIZE		2048
+>  #define AIROHA_NUM_QOS_CHANNELS		4
+>  #define AIROHA_NUM_QOS_QUEUES		8
+> @@ -676,6 +677,7 @@ int airoha_get_fe_port(struct airoha_gdm_dev *dev);
+>  bool airoha_is_valid_gdm_dev(struct airoha_eth *eth,
+>  			     struct airoha_gdm_dev *dev);
+> =20
+> +void airoha_ppe_set_xmit_frame_size(struct airoha_gdm_dev *dev);
+>  void airoha_ppe_set_cpu_port(struct airoha_gdm_dev *dev, u8 ppe_id, u8 f=
+port);
+>  bool airoha_ppe_is_enabled(struct airoha_eth *eth, int index);
+>  void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *sk=
+b,
+> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
+net/airoha/airoha_ppe.c
+> index 42f4b0f21d17..e7c78293002a 100644
+> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
+> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+> @@ -97,6 +97,33 @@ void airoha_ppe_set_cpu_port(struct airoha_gdm_dev *de=
+v, u8 ppe_id, u8 fport)
+>  		      __field_prep(DFT_CPORT_MASK(fport), fe_cpu_port));
+>  }
+> =20
+> +void airoha_ppe_set_xmit_frame_size(struct airoha_gdm_dev *dev)
+> +{
+> +	struct airoha_gdm_port *port =3D dev->port;
+> +	struct airoha_eth *eth =3D dev->eth;
+> +	int i, ppe_id, index;
+> +	u32 len =3D 0;
+> +
+> +	for (i =3D 0; i < ARRAY_SIZE(port->devs); i++) {
+> +		struct airoha_gdm_dev *d =3D port->devs[i];
+> +		struct net_device *netdev;
+> +
+> +		if (!d)
+> +			continue;
+> +
+> +		netdev =3D netdev_from_priv(d);
+> +		if (netif_running(netdev))
+> +			len =3D max_t(u32, len, netdev->mtu);
+> +	}
+> +	len +=3D VLAN_ETH_HLEN;
+> +
+> +	ppe_id =3D !airoha_is_lan_gdm_dev(dev) && airoha_ppe_is_enabled(eth, 1);
+> +	index =3D port->id =3D=3D AIROHA_GDM4_IDX ? 7 : port->id;
+> +	airoha_fe_rmw(eth, REG_PPE_MTU(ppe_id, index),
+> +		      FP_EGRESS_MTU_MASK(index),
+> +		      __field_prep(FP_EGRESS_MTU_MASK(index), len));
+
+- Does this leave the egress MTU limit uninitialized for other PPE engines?
+  The patch removes the loop in airoha_ppe_hw_init() that previously initia=
+lized
+  REG_PPE_MTU for all ports on all available PPEs. This function now only
+  configures it for a single ppe_id.
+  During cross-PPE routing (such as WAN-to-LAN), if PPE1 (WAN) forwards a p=
+acket
+  to a LAN port, it will check REG_PPE_MTU(1, LAN_port). Since this registe=
+r was
+  only configured for PPE0, will the uninitialized limit (0) cause the pack=
+et to
+  be dropped?
+  - This is not a real issue since every airoha_gdm_dev/net_device is
+    associated to a PPE engine/QDMA according to the logic in
+    airoha_dev_open()/airoha_dev_set_qdma(). The other PPE engine's MTU wil=
+l be
+    updated according to the assigned net_device.
 
 Regards,
-Robert
+Lorenzo
 
+> +}
+> +
+>  static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+>  {
+>  	u32 sram_ppe_num_data_entries =3D PPE_SRAM_NUM_ENTRIES, sram_num_entrie=
+s;
+> @@ -115,8 +142,6 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+>  		PPE_RAM_NUM_ENTRIES_SHIFT(sram_ppe_num_data_entries);
+> =20
+>  	for (i =3D 0; i < eth->soc->num_ppe; i++) {
+> -		int p;
+> -
+>  		airoha_fe_wr(eth, REG_PPE_TB_BASE(i),
+>  			     ppe->foe_dma + sram_tb_size);
+> =20
+> @@ -166,15 +191,6 @@ static void airoha_ppe_hw_init(struct airoha_ppe *pp=
+e)
+>  		airoha_fe_wr(eth, REG_PPE_HASH_SEED(i), PPE_HASH_SEED);
+>  		airoha_fe_clear(eth, REG_PPE_PPE_FLOW_CFG(i),
+>  				PPE_FLOW_CFG_IP6_6RD_MASK);
+> -
+> -		for (p =3D 0; p < ARRAY_SIZE(eth->ports); p++)
+> -			airoha_fe_rmw(eth, REG_PPE_MTU(i, p),
+> -				      FP0_EGRESS_MTU_MASK |
+> -				      FP1_EGRESS_MTU_MASK,
+> -				      FIELD_PREP(FP0_EGRESS_MTU_MASK,
+> -						 AIROHA_MAX_MTU) |
+> -				      FIELD_PREP(FP1_EGRESS_MTU_MASK,
+> -						 AIROHA_MAX_MTU));
+>  	}
+> =20
+>  	for (i =3D 0; i < ARRAY_SIZE(eth->ports); i++) {
+> @@ -196,6 +212,7 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+>  				 airoha_ppe_is_enabled(eth, 1);
+>  			fport =3D airoha_get_fe_port(dev);
+>  			airoha_ppe_set_cpu_port(dev, ppe_id, fport);
+> +			airoha_ppe_set_xmit_frame_size(dev);
+>  		}
+>  	}
+>  }
+> diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethe=
+rnet/airoha/airoha_regs.h
+> index 436f3c8779c1..6fed63d013b4 100644
+> --- a/drivers/net/ethernet/airoha/airoha_regs.h
+> +++ b/drivers/net/ethernet/airoha/airoha_regs.h
+> @@ -327,9 +327,8 @@
+>  #define PPE_SRAM_TABLE_EN_MASK			BIT(0)
+> =20
+>  #define REG_PPE_MTU_BASE(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x304)
+> -#define REG_PPE_MTU(_m, _n)			(REG_PPE_MTU_BASE(_m) + ((_n) << 2))
+> -#define FP1_EGRESS_MTU_MASK			GENMASK(29, 16)
+> -#define FP0_EGRESS_MTU_MASK			GENMASK(13, 0)
+> +#define REG_PPE_MTU(_m, _n)			(REG_PPE_MTU_BASE(_m) + (((_n) / 2) << 2))
+> +#define FP_EGRESS_MTU_MASK(_n)			GENMASK(13 + (((_n) % 2) << 4), ((_n) %=
+ 2) << 4)
+> =20
+>  #define REG_PPE_RAM_CTRL(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x31c)
+>  #define PPE_SRAM_CTRL_ACK_MASK			BIT(31)
+> @@ -377,6 +376,10 @@
+>  #define REG_SRC_PORT_FC_MAP6		0x2298
+>  #define FC_ID_OF_SRC_PORT_MASK(_n)	GENMASK(4 + ((_n) << 3), ((_n) << 3))
+> =20
+> +#define REG_WAN_MTU0			0x2300
+> +#define WAN_MTU1_MASK			GENMASK(29, 16)
+> +#define WAN_MTU0_MASK			GENMASK(13, 0)
+> +
+>  #define REG_CDM5_RX_OQ1_DROP_CNT	0x29d4
+> =20
+>  /* QDMA */
+>=20
+> ---
+> base-commit: fd1269e454089abda0e4f9e5e25ecd02a90ab009
+> change-id: 20260618-airoha-fix-rx-max-len-57654b661646
+>=20
+> Best regards,
+> --=20
+> Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
 
-On Thu, Jun 25, 2026 at 12:14=E2=80=AFPM Robert Malz <robert.malz@canonical=
-.com> wrote:
->
-> Hey Przemek,
-> Thanks a lot for the feedback.
-> I was sure that we use ICE_NVM_TIMEOUT (180s) as a timeout every time
-> (ice_acquire_nvm) but your proposal made me rethink it a little.
-> First of all, the datasheet for E810 specifies the timeout as: "As an
-> input, the software might specify timeout longer than the default
-> taken for this resource, and up to one minute."
-> 180s is greater than one minute so I took a look into AQC logs:
-> [  110.698471] ice 0000:05:00.0: CQ CMD: opcode 0x0008, flags 0x2000,
-> datalen 0x0000, retval 0x0000
-> [  110.698474] ice 0000:05:00.0:        cookie (h,l) 0x00000000 0x0000000=
-0
-> [  110.698477] ice 0000:05:00.0:        param (0,1)  0x00010001 0x0002BF2=
-0
-> [  110.698480] ice 0000:05:00.0:        addr (h,l)   0x00000000 0x0000000=
-0
-> [  110.698645] ice 0000:05:00.0: ATQ: desc and buffer writeback:
-> [  110.698648] ice 0000:05:00.0: CQ CMD: opcode 0x0008, flags 0x2003,
-> datalen 0x0000, retval 0x0000
-> [  110.698651] ice 0000:05:00.0:        cookie (h,l) 0x00000000 0x0000000=
-0
-> [  110.698654] ice 0000:05:00.0:        param (0,1)  0x00010001 0x00000BB=
-8
-> [  110.698657] ice 0000:05:00.0:        addr (h,l)   0x00000000 0x0000000=
-0
-> Based on the above, the driver requested a 0x0002BF20 timeout (180 000
-> ms) but the FW returned only 0x00000BB8 (3s).
-> I'm assuming this is expected behavior since the maximum timeout for
-> NVM read should be 60,000 ms.
->
-> If changing the timeout requested by the driver to 60s for read ops is
-> handled correctly by the FW and the FW respects that lock, the retry
-> patch submitted in this email thread might not be required at all.
-> Let me quickly prepare a new patch and test it. I'll update this
-> thread once I have a results.
->
-> Regards,
-> Robert
->
->
-> On Thu, Jun 25, 2026 at 9:51=E2=80=AFAM Przemek Kitszel
-> <przemyslaw.kitszel@intel.com> wrote:
-> >
-> > >> This is an AI-generated review of your patch. The human sending this
-> >
-> >
-> > >> [Severity: Low]
-> > >> Does this check allow an extra retry execution? Since retry_cnt star=
-ts at 0,
-> > >> using a strictly greater-than check allows the loop to retry 4 times
-> > >> (5 total executions) instead of the 3 executions intended by
-> > >> ICE_SQ_SEND_MAX_EXECUTE.
-> > >>
-> > >>> +                             break;
-> > >>> +                     ice_debug(hw, ICE_DBG_NVM,
-> > >>> +                               "NVM read EBUSY error, retry %d\n",
-> > >>> +                               retry_cnt + 1);
-> > >>> +                     last_cmd =3D false;
-> > >>> +                     ice_release_nvm(hw);
-> > >>> +                     msleep(ICE_SQ_SEND_DELAY_TIME_MS);
-> > >>
-> > > The review is correct that this allows one extra execution. However, =
-I
-> > > intentionally kept this verbatim from the OOT driver (1.15.4) to
-> >
-> > This OOT change was made entirely by Grzegorz, for E825C. Would be grea=
-t
-> > to acknowledge his authorship (+ SoB ofc, below).
-> > Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> >
-> > What was the platform that you have encountered the bug on?
-> >
-> > > retain the significant test exposure it has there. The absolute worst
-> > > case is one harmless extra retry before giving up. If you strongly
-> > > prefer strict adherence to ICE_SQ_SEND_MAX_EXECUTE, I can update the
-> > > condition in a v4.
-> >
-> > Please update (to have one attempt less).
-> >
-> > >
-> > >> [Severity: High]
-> > >> Does dropping the NVM lock here violate the caller's assumption of m=
-utual
-> > >> exclusion?
-> > >>
-> > >> Callers of ice_read_flat_nvm() typically acquire the NVM lock before=
-hand to
-> > >> ensure an atomic read of multiple sectors without interleaved writes=
-. By
-> > >> explicitly dropping the lock during the msleep() window, another thr=
-ead, VF,
-> > >> or PF could acquire the NVM lock and modify the NVM before the read =
-resumes,
-> > >> potentially resulting in reading torn or inconsistent NVM data.
-> > >>
-> > >>> +                     status =3D ice_acquire_nvm(hw, ICE_RES_READ);
-> > >>> +                     if (status)
-> > >>> +                             break;
-> > >>
-> > >
-> > > I don't think this is an issue. The NVM resource (req_res 0x0008) is
-> > > an ownership lease, not a content snapshot. The FW grants it with a
-> > > hold timeout (see the timeout field handling in ice_aq_req_res). It
-> > > never guaranteed a point-in-time view of the flash.
-> > > Very similar behavior already exists in ice_devlink_nvm_snapshot(),
-> > > which reads the NVM in chunks via ice_read_flat_nvm() and deliberatel=
-y
-> > > acquires/releases the lock between chunks (with a comment explaining
-> > > the FW reclaim).
-> > > Additionally, the lock is only dropped on the failure path, where
-> > > neither bytes_read nor offset have been advanced. The driver simply
-> > > re-reads the failed chunk after re-acquiring. So no data that is
-> > > returned to the caller is committed across the drop window.
-> > > Overall the lock drop does not weaken any guarantee callers actually
-> > > have. If we wanted to introduce a true snapshot guarantee, that would
-> > > probably require different approach and separate patch.
-> > >
-> > >
-> > >> [Severity: High]
-> > >> Can this lead to an unbalanced NVM resource lock release and potenti=
-al data
-> > >> corruption?
-> > >>
-> > >> If ice_acquire_nvm() fails here, the loop breaks and returns an erro=
-r with the
-> > >> lock currently unheld. However, callers like ice_read_flash_module()=
- are
-> > >> unaware of this internal lock state change and will unconditionally =
-call
-> > >> ice_release_nvm() upon failure:
-> > >>
-> > >> drivers/net/ethernet/intel/ice/ice_nvm.c:ice_read_flash_module() {
-> > >>          status =3D ice_acquire_nvm(hw, ICE_RES_READ);
-> > >>          if (status)
-> > >>                  return status;
-> > >>
-> > >>          status =3D ice_read_flat_nvm(hw, start + offset, &length, d=
-ata, false);
-> > >>
-> > >>          ice_release_nvm(hw);
-> > >>      ...
-> > >>
-> > >> Because firmware tracks resource locks per-PF rather than per-OS-thr=
-ead, this
-> > >> errant second release could forcefully strip the lock from another t=
-hread on
-> > >> the same PF that successfully acquired it, exposing the NVM to concu=
-rrent
-> > >> modification.
-> > >>
-> > >
-> > > Agreed, this might be a real bug, and the one of the three I think is
-> > > worth investigating.
-> > > If ice_acquire_nvm() fails after the drop, ice_read_flat_nvm() return=
-s
-> > > with the lock unheld while callers unconditionally call
-> > > ice_release_nvm(), so a stray release is issued.
-> > >
-> > > On probability, though, the window is very small. Reaching it require=
-s
-> > > sustained EBUSY across the retry budget plus a failed re-acquire
-> > > (which itself polls up to ICE_NVM_TIMEOUT), and concurrently another
-> > > requester taking the lock. Most reads happen during init (ice_probe,
-> > > and reset/rebuild via ice_init_nvm), and NVM writes only happen on an
-> > > already initialized driver. The devlink/ethtool nvm_read paths are
-> > > also exposed, but hitting this race would require precise timing
-> > > against a concurrent NVM owner on the device.
-> > >
-> > > I'd prefer to keep the scope of this patch limited to the EBUSY retry
-> > > path and not take on the unbalanced-release fix here. A proper fix
-> > > should change the lock-ownership contract of ice_read_flat_nvm() (on
-> > > error, the lock must be released by ice_read_flat_nvm(), callers
-> > > release only on success) and update all callers. Code change sould be
-> > > simple for all callers but ice_discover_flash_size(), it intentionall=
-y
-> > > holds one lease across a read loop and would need to re-acquire after
-> > > each expected boundary failure.
-> > >
-> > > Given how small the original window is, I'd rather not trade tested
-> > > OOT behavior for the risk of a complex unbalanced NVM lock fix. I
-> > > actually have a patch mostly ready that fixes the lock-ownership
-> > > contract, but I really don't like it. It changes the design of
-> > > ice_read_flat_nvm(), making it less intuitive for callers. More
-> > > importantly, I just don't have the resources or test coverage right
-> > > now to properly verify such change.
-> > >
-> > > However, I can modify the failure path for ice_acquire_nvm inside
-> > > ice_read_flat_nvm. Instead of bailing out immediately, we can just
-> > > retry it within the existing retry budget. In this case, the
-> > > probability of leaving ice_read_flat_nvm without holding the lock is
-> > > reduced even further without needing a refactor.
-> > >
-> > > Please let me know what you think about my thought process on this.
-> >
-> > I think that both AI-reported issues against the lock are valid
-> > concerns.
-> >
-> > I think that sleep was the actual fix, and re-locking were merely
-> > a necessity due to their expiration (as you said).
-> >
-> > A proper fix would be to just increase lock-timeout to accommodate all
-> > attempts (and still do the retries&sleep, but without unlocking).
-> >
-> >
-> > >
-> > >
-> > >
-> > >>> +                     retry_cnt++;
-> > >>> +             } else {
-> > >>> +                     bytes_read +=3D read_size;
-> > >>> +                     offset +=3D read_size;
-> > >>> +                     retry_cnt =3D 0;
-> > >>> +             }
-> > >>>        } while (!last_cmd);
-> > >>>
-> > >>>        *length =3D bytes_read;
-> > >
-> > > Thanks,
-> > > Robert
-> >
+--BF1a/QprwyKDmdJk
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaj414wAKCRA6cBh0uS2t
+rLvbAP94ZhyV7OMjBDV3xaCqtFSlUkd5Ry2z2BWqSZuABjs1OwEA2sf5yxm2DyBH
+I+O1FXfoDBvmOPl6x7yKZX4XXWiYrQM=
+=chVI
+-----END PGP SIGNATURE-----
+
+--BF1a/QprwyKDmdJk--
 
