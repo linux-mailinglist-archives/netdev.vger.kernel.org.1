@@ -1,151 +1,186 @@
-Return-Path: <netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RxVGN02sPmozKAkAu9opvQ
-	(envelope-from <netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:43:57 +0200
+	id BeuNODmuPmqnKAkAu9opvQ
+	(envelope-from <netdev+bounces-302237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:52:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF076CF34C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:43:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E9A6CF444
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:52:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="lCLfL4/0";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=mojatatu.com header.s=google header.b=JHtgD3Hf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302237-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302237-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EC1A300FEC1
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:37:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33BD9301232C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D873FD14F;
-	Fri, 26 Jun 2026 16:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5885537F8DA;
+	Fri, 26 Jun 2026 16:52:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBCB3FCB3A;
-	Fri, 26 Jun 2026 16:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8BC344DA4
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 16:52:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782491862; cv=none; b=EVLyAI+UmP2x14GhDxWwkXZZGy9hqAVhrkkFZw2eLljLDiAFiJwEeX6YGz0eTstbNEVfLh8mWhD61JcE43GmODkCbi7jJiPkbRN3MEws5HydfmkyVBpjf6n0/iQ2ry69ke11GK/JlBCLYiescWOt33Cb+1o6fMwt43H/0qWBP+s=
+	t=1782492726; cv=none; b=CGGO6M50y96PBiE3vvv5lMa/R4IBHKZWwKRhwMI1x2/FzmFOgPKIfxQXDX1cKuKMVqgcO6y6qqXymMz1/t1gWO9a7z3MEfJHSknHX8ktvd8djBB3Pb5ewG7hi7iLRG1d/M1VAtHlVBgrGrHQBCqbc4SGoWmvKEdci5+oA18zM90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782491862; c=relaxed/simple;
-	bh=lMuRHAfMuqNzny9sJY10zguaZtTrsML5NLnJR3unQpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NTqyPtDVTFAdLLkfVU0hOO0bLaNWf+XjhvjVxQqtcrdBV6+dLb82rZuMxiOb9ccMK7cnkgmmQV/ml+/e/lh1H4EfQexS+KEqID1Wx5ix7HiVrsdaKubkdN4QcHHFD/iX3iBDQd0C08ECpPMDsjDwsgvILrmFvkQVAaEKAxHhQIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lCLfL4/0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB4781F000E9;
-	Fri, 26 Jun 2026 16:37:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782491860;
-	bh=25YMHu8BkwQq3mf5EDMj4sWLLgI4tXtIXIuJSB0ZS+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lCLfL4/0rdTnXbCNVgvdlofIAhZnYNaJIroJwYdrng/hpzA8iQcwge5Es1y+yqq3s
-	 x3uNKxSptkheRPAcb/EBs7lODYXf3JVCa7yi2jZUjs2sgnipB4vqKULy6TRgzqSnd+
-	 wWU0iRcykU3nXB+HzDJMGJ6/xObGnmZLDoos8eKP2IfFKQql3xKphgFdF2XVvxeqcU
-	 gfsv6y7PJoTbFlFOLrnL0yjW6WEWzNzmGvZDrzZf/2IPqIu1fqLaHRU6jbUy0WJeix
-	 b1qzXFYUeIvyxbFcr3+96veMX78TxcqW6nFK19ru8D5iHJIZHJJbStFq/9m8Jq5IZi
-	 ms6wzfAtlasDA==
-Date: Fri, 26 Jun 2026 17:37:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net: wwan: iosm: bound device offsets in the MUX
- downlink decoder
-Message-ID: <20260626163735.GF1310988@horms.kernel.org>
-References: <178236824878.3259367.5389624724479864947@maoyixie.com>
+	s=arc-20240116; t=1782492726; c=relaxed/simple;
+	bh=S9nB4VMlAriZcGaoGUogPPb4VsgQmS8LzwAdJsq/Umc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G2oCcExTBJY7VxH5aOVXtH7h++VnpM/fjk65NkBrCqwowaGsFhJ9JAqtPsevk1k9yjRZahu6HS/tkFJJxk9Bi6r5w5z2wRP1gmYK1lPoFVWjQKQZyWZbS6XUihvOEIkhmBE2nmv387sqV3VAofhgpfBCS3usLQwRRsoIgZ5LGvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=JHtgD3Hf; arc=none smtp.client-ip=209.85.222.179
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9159da9bba5so117598485a.1
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 09:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1782492724; x=1783097524; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IQzfEj3d+U9QMkss37KHvB67s0TH/WA+OjBfTOeWvrU=;
+        b=JHtgD3HfNgNAZDWulKmid2PEnsMbFpE7Ef/yfCmFKJwLKcMPRpmw2peaADT3wzwLPg
+         4jzhXQh4QbQuo5N/BqNdpfFNs8kFnaMiV2ItxXCWtN24Ko2GBieFwd16+2l0ekoHrKZN
+         3PKWeFPZNLasHuHLeDmbBKs9+iJ24G7/9K62E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782492724; x=1783097524;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IQzfEj3d+U9QMkss37KHvB67s0TH/WA+OjBfTOeWvrU=;
+        b=VWLlZNdTFxZ1SlXZTXXwxeMNRLmjm4LnzMY3bWtfJHuvoeGerpIWqu8T4UsdBsm5e9
+         Dj9PpBf0D5WwYQuWzc1weoF4QMC6Y+GW6QUORRnDWv/AyF0sgUvrSFSuwayFm3xfsbNQ
+         DbdNI4eZ6WVWP5IOanuTpqSCX6yi1/2LVs0i4pIsdJ2Wt7wpD05+8Sch19EdhQJhXHZ3
+         GMVikVmjBuE4kDMqDrQPkaEinSBIF32t2lMzEcnk7p+KUV5U+ZvqRr++wEFgYqJvFUrI
+         q97l3B3yXaB8ZWWT8cpctrwvGJ4Q49LXDO9UWlSFvYlAWLG4FQhptb8RJkzpUn9yNK4w
+         P86w==
+X-Gm-Message-State: AOJu0YzJnbG7U4YRcFxrf4gePmbz4D9hOQFxVD9WL//n96/EgIOtSSh8
+	1E0dNZp8F0ji85eRddSjaDxYvvzkIdAeBrfBWcACf9vWJsYVuF+xsSHB9LPLkRErJ0Y8GELJN5f
+	STk2/hw==
+X-Gm-Gg: AfdE7cnOs8BkEaFOKaG0Cq0YwRGzuWAQx7aKgkbmg+xGBPQsaKzKVsfU5P10lhfIq7z
+	aKPNjeyJH8s6h9w8Rz2Z+eRJgZ4vB6UWgKf7zntf/YgclmUIkZeT9Uhsk/8g+/h1fCl1TKbXj1D
+	l6XAxPwtNkwsMPb75FQQqyJGEp8koUQUJr79UZqpAKPZb+3MbaECKb0luaZif2+0gkrW3F643U8
+	8p6DUCUE612cCAS5WDzsTUb6CszuTxXP6Z+3UFH/014baBK4NMbvaIX06qqiLURHZPXU8Nl+s/e
+	AIdZDmD7vFLBBXzzuEPE8+z/VUGH8putYEI2DyUME5mJsjKYtzTqJcUmm8LgrAfrfUTpU1NaVOY
+	DfXMnJ7oSaQ/EjsdJHtCxuculI7pplFyniTtUHIgFcXyH0xDUOcMPf2jasyrFvZ4H82DqpGmBol
+	cnLSat9w==
+X-Received: by 2002:a05:620a:43a8:b0:920:bbbc:fd01 with SMTP id af79cd13be357-9293bf2a5b5mr1220351485a.23.1782492723701;
+        Fri, 26 Jun 2026 09:52:03 -0700 (PDT)
+Received: from majuu.waya ([184.144.29.222])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-926004abe29sm1216957385a.33.2026.06.26.09.52.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2026 09:52:03 -0700 (PDT)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	toke@toke.dk,
+	jiri@resnulli.us,
+	bigeasy@linutronix.de,
+	clrkwllms@kernel.org,
+	rostedt@goodmis.org,
+	kuniyu@google.com,
+	sdf.kernel@gmail.com,
+	skhawaja@google.com,
+	liuhangbin@gmail.com,
+	krikku@gmail.com,
+	mkarsten@uwaterloo.ca,
+	victor@mojatatu.com,
+	ast@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	daniel@iogearbox.net,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH net 0/3] Fix broken TC_ACT_REDIRECT
+Date: Fri, 26 Jun 2026 12:51:53 -0400
+Message-Id: <20260626165156.169012-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <178236824878.3259367.5389624724479864947@maoyixie.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-302236-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-302237-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:toke@toke.dk,m:jiri@resnulli.us,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:victor@mojatatu.com,m:ast@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:daniel@iogearbox.net,m:jhs@mojatatu.com,m:sdfkernel@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_NA(0.00)[mojatatu.com];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,toke.dk,resnulli.us,linutronix.de,goodmis.org,gmail.com,uwaterloo.ca,mojatatu.com,iogearbox.net];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,vger.kernel.org:from_smtp,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2CF076CF34C
+X-Rspamd-Queue-Id: 21E9A6CF444
 
-On Thu, Jun 25, 2026 at 02:17:28PM +0800, Maoyi Xie wrote:
-> mux_dl_adb_decode() walks a chain of aggregated datagram tables using
-> offsets and lengths taken from the modem. first_table_index,
-> next_table_index, table_length, datagram_index and datagram_length are
-> all device supplied le values. Only first_table_index was checked, and
-> only for being non zero. The decoder then formed adth = block +
-> adth_index and read the table header and the datagram entries with no
-> bound against the received skb. A modem that reports an index or a
-> length past the downlink buffer makes the decoder read out of bounds.
-> 
-> The buffer is IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE and skb->len is at most
-> that, so skb->len is the real limit, but none of these in band offsets
-> were checked against it.
-> 
-> The table chain is also followed with no forward progress check. The loop
-> takes the next table from adth->next_table_index and stops only when that
-> reaches zero. A modem can stage two tables that point at each other, so
-> the loop never ends. It runs in softirq and clones the skb on every pass.
-> 
-> Validate every device offset and length against skb->len before use.
-> The block header must fit. Each table header, on entry and after every
-> next_table_index, must lie inside the skb. The datagram table must fit.
-> Each datagram index and length must stay inside the skb. The header
-> padding must not exceed the datagram length so the receive length does
-> not wrap. Require each next_table_index to move forward so the chain
-> cannot cycle.
-> 
-> This was reproduced under KASAN as a slab out of bounds read on a normal
-> downlink receive once the iosm net device is up.
-> 
-> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support")
-> Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+When sashiko-gemini[1] reviewed commit a8a02897f2b4
+("net/sched: cls_api: Handle TC_ACT_CONSUMED in tcf_qevent_handle") it
+ correctly pointed out the following:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+"
+This is a pre-existing issue, but does executing a redirect via a qevent
+filter cause a NULL pointer dereference?
+When tcf_qevent_handle() processes a TC_ACT_REDIRECT, it calls
+skb_do_redirect(). This eventually calls bpf_net_ctx_get_ri() which
+dereferences the task bpf_net_context:
+include/linux/filter.h:bpf_net_ctx_get_ri() {
+    ...
+    struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+    if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
+    ...
+}
+Since qevents are evaluated during enqueue, which runs within
+__dev_queue_xmit() after sch_handle_egress() has already executed and
+cleared the bpf_net_context pointer, will this dereference a NULL pointer?
+"
+
+That issue is fixed in patch 1. See the commit log for details.
+
+Upon further investigation it turns out that TC_ACT_REDIRECT being returned
+from the egress qdiscs never actually worked. When an action returns that
+code we would silently loose it and the packet will never be redirected.
+After all those years, if nobody complained, my gut feel is it was never
+used by anyone with serious need for it.
+Patch 2 fixes it by 1) putting a warning out when someone does and 2) asking
+the core to drop the packet. At least this would help whoever is
+misconfiguring to diagnose the issue much faster.
+I had initially attempted to "fix" this and make it work, but unfortunately
+it's a bit ugly so i left i didnt think it was worth fixing
+
+Apologies for the shotgun Cc - its what get_maintainer.pl told me to use.
+
+[1] https://sashiko.dev/#/patchset/20260620130749.226642-1-jhs%40mojatatu.com
 
 
