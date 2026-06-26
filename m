@@ -1,233 +1,159 @@
-Return-Path: <netdev+bounces-302259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id sr/0EongPmoKMgkAu9opvQ
-	(envelope-from <netdev+bounces-302259-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 22:26:49 +0200
+	id PuznMF3jPmp5MgkAu9opvQ
+	(envelope-from <netdev+bounces-302263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 22:38:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A860C6CFFDD
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 22:26:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25EEE6D009E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 22:38:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amazon.com header.s=amazoncorp2 header.b=K29RIxYU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302259-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302259-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amazon.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=rbox.co header.s=selector2 header.b=g3vLQTxf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302263-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302263-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=rbox.co;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AC1893014767
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 20:26:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2E893082E54
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 20:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD313A6B77;
-	Fri, 26 Jun 2026 20:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A373BFAC8;
+	Fri, 26 Jun 2026 20:37:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.1.125])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90311684BE;
-	Fri, 26 Jun 2026 20:26:44 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782505605; cv=fail; b=T3O3PF/jJ+5IjIXLo01IWDscIKks91LX7jOpJWOHszQeTwXAJ9h6FYLDI+xYKxglv20rDxoFmGVnzyriRQaruzxfM111hdD+zxBcCwDd6KH/AjG+WMF+7/X+dDz9Tdj4EN7B/bAxPae4MDclHYX9MeOwmh6z5rwffuo0Xiq9eqY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782505605; c=relaxed/simple;
-	bh=OeLpf3owf6b4m7XTu4mG5NvDNawAKzNCGvWk82r8zIA=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OkRT6UEDuO9mMH3wvq1N7GpfXUYwuIQ6kpV/bIdqWkCg7LfFyuBG46qciylGQIag6bKYs6EwheMt2qhQWLXhCBBg+riE05xMIC/mUs5esBF6e0KHh76eICg7pZ8hMk/zmj+ChPCzKTK+6W/qGnsCYjpeAyzv5R14RYFOXEHor7o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=K29RIxYU; arc=fail smtp.client-ip=44.246.1.125
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782505604; x=1814041604;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=OeLpf3owf6b4m7XTu4mG5NvDNawAKzNCGvWk82r8zIA=;
-  b=K29RIxYUoEjXO/uXWjMVN0Wr/4V1IPKz5DwMNwIUQrGJlMmsGrwMjXdB
-   jvkhpBqXGNhdvYY7gI5OBTOqOwm0iAQSV52RQUZnsFHk81ArNn9lWEeuU
-   UYIbu4XrnjPQqnbzcfPfmdTraY5XgeRekW4PH5Wqz4tdsitXnF/r0I7+b
-   TIWQRDRwC2o4N6dTTEeZUbneWcjCSc0LYS7A78DWA1/meJxVcpGtJnIMz
-   UqLutDoAjGaJkOxWiQy6RkcuBM7ZTdKVsmWnAGd+Sg27NXQN3W58deVAt
-   LvbG0JNiC9OPXnVDHfjC/zIMr1eDbIDDW6P5HOXPC9wmywTBSSzlZMYVZ
-   A==;
-X-CSE-ConnectionGUID: HdDATvn4QuWqj0VXWEWKiQ==
-X-CSE-MsgGUID: elavlT0bRySd6rUbd8xTjQ==
-X-IronPort-AV: E=Sophos;i="6.24,227,1774310400"; 
-   d="scan'208";a="22598990"
-Subject: Re: [BUG] net: tcp: SO_LINGER with l_linger=0 leaks memory when closing
- sockets with pending send data
-Thread-Topic: [BUG] net: tcp: SO_LINGER with l_linger=0 leaks memory when closing sockets
- with pending send data
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2026 20:26:44 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:29679]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.110:2525] with esmtp (Farcaster)
- id 5c7f9ca3-8a79-4269-ac54-bfcfad78360c; Fri, 26 Jun 2026 20:26:43 +0000 (UTC)
-X-Farcaster-Flow-ID: 5c7f9ca3-8a79-4269-ac54-bfcfad78360c
-Received: from EX19EXOUWB001.ant.amazon.com (10.250.64.229) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Fri, 26 Jun 2026 20:26:43 +0000
-Received: from EX19EXOUWB002.ant.amazon.com (10.250.64.247) by
- EX19EXOUWB001.ant.amazon.com (10.250.64.229) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Fri, 26 Jun 2026 20:26:43 +0000
-Received: from PH0PR07CU006.outbound.protection.outlook.com (10.250.64.168) by
- EX19EXOUWB002.ant.amazon.com (10.250.64.247) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43
- via Frontend Transport; Fri, 26 Jun 2026 20:26:43 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tpbJiugYTvvrUtfk+ShxzZ1hJWavRWe1jYGUTy9xLMPpzeCgA9F8+FArEuKIfv2gzRlIUeIZ+MusOT0uqVLjC6vQJ+YBGDD8KKMvhTN9bAN9+o6wey3aQ05qpvbaOPcntyxjSJ0AxFJeAJ9i42fCGloDRdnVbOqF4ICylrQ1H7udzSAwte0Iil31omwUdj5Crw8RfWyIAw0vn4vnOh2cw0qvV68onOdWKHd9W8yciY7fnLdCyMLRfFDX+Vno4H2aKKfij2fUng3VQFW+QRChCWlN7eNkYJGgYY2u3R7JYRl9UhwJumZxA7667r+jqm8IPmOYd9VfJfpHdLh3bA+WLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OeLpf3owf6b4m7XTu4mG5NvDNawAKzNCGvWk82r8zIA=;
- b=XqLexe7ACRrLRYdXvWG8CJdPei4LDKPp3CYUG5cFuMbIyPNOoU60e8rGW7UHEeRV9BufEG9aPVYa1FgWyaa91rxEWmOKvVjawTiJBT7hjdy9+vzCk+UuJXZa9pc1oPkvN6lHmB94js94LAnfgt/wZy1+iEmW3dVo41ro/0mahvlu1YhAMqpWMU1gLaUkvdeqFSdVGDXgmD2litsj0w3FjLE+Mu1j2TEsxMtfrz5iJFWIdKyumV3Q21jGiCYeZX20NuiIN5RY8uJlj2CMuqsi4RKDlsRjc8uvxVLHdM5ej9WmS7py8Q3lKKIjzKX22VoeF8mISbtBcjS0kTZjrCl3DA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amazon.com; dmarc=pass action=none header.from=amazon.com;
- dkim=pass header.d=amazon.com; arc=none
-Received: from SA1PR18MB4728.namprd18.prod.outlook.com (2603:10b6:806:1db::15)
- by DS0PR18MB5339.namprd18.prod.outlook.com (2603:10b6:8:115::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.17; Fri, 26 Jun
- 2026 20:26:39 +0000
-Received: from SA1PR18MB4728.namprd18.prod.outlook.com
- ([fe80::3fa5:9d2e:e6a6:67d5]) by SA1PR18MB4728.namprd18.prod.outlook.com
- ([fe80::3fa5:9d2e:e6a6:67d5%6]) with mapi id 15.21.0159.018; Fri, 26 Jun 2026
- 20:26:39 +0000
-From: "Ahmed, Aaron" <aarnahmd@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-CC: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ncardwell@google.com"
-	<ncardwell@google.com>, "edumazet@google.com" <edumazet@google.com>,
-	aws-binance-tam <aws-binance-tam@amazon.com>
-Thread-Index: AQHczskVAbHrfsqWm0ylDOIzc6Zy8LXj+36AgA8bggCAAJPFgIAtIPKAgAB9AQCAJSKfgIAK1ewA
-Date: Fri, 26 Jun 2026 20:26:38 +0000
-Message-ID: <7CA56AA9-49FD-4FD7-A132-D9D4930CCF58@amazon.com>
-References: <48BADABE-4DFB-4DAD-8248-E94D8F5238D2@amazon.com>
- <CAAVpQUCfMsWBpPpywbwBLRCdHUqWqFBoDK=17dwDkG6T0dQxzw@mail.gmail.com>
- <A7A3F2FE-B18C-4F6D-A5E4-78164D6904F5@amazon.com>
- <CAAVpQUCKQQF=noqxQwD=dJvO3tuhPZxssDygyuVaZxTQGKiWfQ@mail.gmail.com>
- <9E49374E-D1D6-4D41-BFE0-03EE734DF9F2@amazon.com>
- <CAAVpQUBtKBzq36Wz9p3MaHR=G10-NFBtQXgGW3S3QV5THW2iCg@mail.gmail.com>
- <34F462A1-CEB9-4812-8E98-239E38585F14@amazon.com>
-In-Reply-To: <34F462A1-CEB9-4812-8E98-239E38585F14@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels: MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Enabled=true;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_SetDate=2026-06-19T22:56:04Z;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_ContentBits=0;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Enabled=true;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Tag=50,
- 3, 0,
- 1;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Name=Confidential;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_ActionId=4c115a83-ccee-44f4-a87a-b6b536cf5017;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_SiteId=5280104a-472d-4538-9ccf-1e1d0efe8b1b;MSIP_Label_19e68092-05df-4271-8e3e-b2a4c82ba797_Method=Standard;
-user-agent: Microsoft-MacOutlook/16.109.26051019
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR18MB4728:EE_|DS0PR18MB5339:EE_
-x-ms-office365-filtering-correlation-id: 8a7ca263-cd07-4d50-1117-08ded3c13a0b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|1800799024|376014|366016|18002099003|22082099003|11063799006|56012099006|4143699003|38070700021;
-x-microsoft-antispam-message-info: yNynwToN1VzEHEhpDOlh9KEzF8qxz14yNu0vNJvuuNnHfzn/W091REWIxXUFD9Ng972OmEF0xm5fjmZKbkdZozN056lcEnbsZqdYfnRNjKmtaUfoAX8uWBlxjrJP/+DBLc/hG5aTyKiRO2PDfvuxNb1FWW+/ydXIMtQm6q1J6f7YvpvgUlIdX9bNpxnTZwlcLZqi7tjOVttE6ni6bazuPWk6GP7KMXTC73nXFLV2cc3K7dHulqH7oYTRm1bGb1DV9K969m/TfpbigyAYicq7d5bVEF2JfeGWHbHVk97iuPXEVKNk2wzod0d/eeWeSPs9fURTPOnPztfwIUONK2vFei6p/il2l8Aycm1Zyl3ZasfH8CwJ/21xwSh6D6yJHARYEw1gh3eBnmT+m30J8CUGaGmb16SXaQG8cLryhXL6kYCq5EtbUp2/Q7cwCMTUXi4EZYqpGWUSGRYT8CaMmv1ta+/x5YLeIrOvSB2fEDsaWgEiOp/4GaOkNca4zykTD6PK4StG1t27vBZmQ8pwhU3/rYKh0B8ry8Uu4tF/zEedap25zX0IOeZcUpkfpoOZJhWHJ0hqAr9a7CGZg7RhoAfe0u8DZTLgjhHJZz5/7BI6nRP2xrsrugHrgr3/6Ab0c+SqDa1KxgRue5fauZs/+SSqyWsuFTvagbvixv5AFgP9JKz8lmrl4c1eB/she3ICwGI3oXpfZPu4z5cqyPwqB0n86u7XXDcGpOvdBkvlOkG9SNE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR18MB4728.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(366016)(18002099003)(22082099003)(11063799006)(56012099006)(4143699003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dXhTdzJZRnZIQ0R0R2NVbHZDS0ZsNU90L20wMnVkNWFFVXBoZ2hCRlBVZ0No?=
- =?utf-8?B?a1VVZWtrWTNUbUlBeFZWNzEyUEp6a254MFMrQWVYVllWeitLeTBuMHh4elBC?=
- =?utf-8?B?U1ZjeWpEdDRLTzUyMDl3NWErS09sUDM1MmVRUk1mVS9RN1dEK0hxMXkwaHdE?=
- =?utf-8?B?bnNrQm1DZkM3aXpUd3FTemtnUExNdzlydWpFQ2dNSW52TnRjdmlCcldoOXV5?=
- =?utf-8?B?cVA2ZUFqZTZjZEVKL05DZEM4UWxkMEFtdWhIVnFTNndZMmxta2xnbWpoWHQ2?=
- =?utf-8?B?NjM2aVoyOHZZRCtKSlNYeHV2K1VmKzl5SCtYNE5VQ0pEc0FYbGRBSDROLzI3?=
- =?utf-8?B?NFQ1OGdJWXhtalNodmNKNVQvQ05jdFU2dzl5T2NacVh0Q1IxWXc1YjZrSXFO?=
- =?utf-8?B?Nk5WNmplNkNadFZ4MlBzZmNrN25mZWhzQlJLZ01iNFE0TnpoT2tDVjc1STdF?=
- =?utf-8?B?MEZ4SmJCVHkrNEkveDNwS2loTERyVFYyaWF5RkdDcVdsVGQ4T0FsRDFpaEEy?=
- =?utf-8?B?VU9EY25SK0orV2hnSEhhMTRWSEI5L1ZSdk00QXFrbUltT1lKdFp0SjZhWm1U?=
- =?utf-8?B?WXUwNDNQMlJJdXVOUGxnaDhhRGRZd1ZXODJMcS91SWNRZGJ4K1pZc3o0TkI2?=
- =?utf-8?B?QzZuaUxzK09Ud0pvb29nU0U3aGpPT3d5cmovcVhOUjZDTUFkQzNtclVXVmJm?=
- =?utf-8?B?TmVMd3VKV0FnMW9qKzY0VFJBUWdTVy9KUXFWaEtqL0MxUkRySWxpRDh1Ukdk?=
- =?utf-8?B?dFF5VXFHdVhxWHp3YUkyL2lseUV2ODNmclFkOWdBWjFHLzlYNnNONEFSMGQw?=
- =?utf-8?B?cmVXRFljbnhHS1VGVCsxd044ZTd6eEQ1MEYxMTlMK3VLRjhCaHZYL1pzUVhp?=
- =?utf-8?B?cE1vWEtJSDVmRHpXSGZvNllNNHI0SEl5eFRpQmpkN1dCSjlvOE9NRVQ3YnFy?=
- =?utf-8?B?M0ZpZVEzYkhqMDJvdjNTZkxMZDdCakVJQjRucGNmWks4QzhBOGZnczlVY1A1?=
- =?utf-8?B?anZhRzJscDFMM0ZnQ053ekJJQmh1c016UUxtMlgrUEU5dlZ3WHRWSVV6Y2RX?=
- =?utf-8?B?dFNkb3RhaUljRHZZMWRUYTMrTFROWE1td0RGWVRkTHpTWUYrSmZ1YUtNcyts?=
- =?utf-8?B?Y3FjM1dVbmdHdGFoZDllR292NXRoMlpFT3pTWmhheEZVbWNiMkE0eU1RSDlx?=
- =?utf-8?B?VHVSdjZtSVEvUE40RE9DNUFDbk9RRUdZaThwQTdsb0x0R3NJTjhCZzJMakU3?=
- =?utf-8?B?RFRRS2NJWWdCNlF1bnVKaXg3NERpNWRNU3JRVHZObXlWcnRMUUhnTm5rb2dC?=
- =?utf-8?B?N2NtRElQYTNsMTJiaElmSFVVSSt1WGoySzdndEpXa3ZxOGY1ZGhFMG5hdHpI?=
- =?utf-8?B?cDdUMkNNN3d1VFFmR1k0SFZMSVlrWnFHM2NkenJXNDM4TEJrcFYya0J2aUVY?=
- =?utf-8?B?dGorYlZWTTBscGVIU2JpL1pCTkJNY0lvR3FXOXZocmdjbHZtMy8wVVRoNGs2?=
- =?utf-8?B?R3JCQ2YyUk5Ieko4UG56SnJnZm9kQXlKczBJVWQxU2RLZXcwN3A5QlE2dysy?=
- =?utf-8?B?aDE1ZUcrQ1VLcnl0UjZlbjkwMEJibkdUMVBMaHh4Q0wrUVQvL0tRaCtWajhZ?=
- =?utf-8?B?MVgxOGNTK1NlcTlDanpVT2pFTEh4c0JBT1czU29PZlVuYnpNZTUxSE94YTJI?=
- =?utf-8?B?UjcxNDhqVUUvNU5XeFpmejc0NS9hTVllV2VZNHQvZGtDYklRSTgweHhKMmxp?=
- =?utf-8?B?N0tGUVZxRVRXVGxHYk40bCs2cnpUQlNIaVd1aGM0ckZzalFqMHFBVEVMaHU1?=
- =?utf-8?B?cTdVNWNDRUJJZUJDL1A0TFBVQ1E4NnQ2TitTd3JSMFprN0V6aEgwNFNaVHJq?=
- =?utf-8?B?OE90cldnRGYvRVQwanNLTDh4MnA1bzRic2dyM2RIWWxmamNINUNvNXlhV1p6?=
- =?utf-8?B?MWJTTzE3TjhmS0QzQUhKRjF5WFptUTNCajJiRmZOZlB0bmI5T3dJNXk3Ykw3?=
- =?utf-8?B?VkVWZlQ3cEdJOHN1K0pqcjNFVzlVNGVlRzlkV09yRUdjcEs4WmJBWmFEeVVS?=
- =?utf-8?B?ZU1aZ3RxMk9WKzJ4SHZwOStPK3VBMlJkU1VmYWgxWUl3bjZ0eWE1cElpbDJP?=
- =?utf-8?B?dnFPOEpRWmtFbld2VnBEaVpIU2VKL29iZDhnY1BKUVRZSmpqaW9RbFYxaTkw?=
- =?utf-8?B?TlFhMURzWE8yTCtCTkZ1MmNjZXY4M3Zud2lObFlsN3Yrcy9IVk5KRlZDWVFW?=
- =?utf-8?B?WVBZamtxVjE2MGQ0dVpYM2hwQlEvMEZxWitNSnpkbmNjQk5xbWlyOGZNTVRX?=
- =?utf-8?B?ZGczSUlTRVhxczBsRWtsMmg3ODVMVWg2M2hMK1dTaCtoeXNBUjNOUT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B5D6A471377CFC468B1A41299D474147@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB603B8921;
+	Fri, 26 Jun 2026 20:37:13 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782506246; cv=none; b=gU/+yIIY6NzfsUiBL2zKI/fvWWIKkVMf5Q+SkzXkjpIHrXFnSxXFIuepHwT1hSMvrp3y1GsHaaBCDhXfOZ7t0E6JcJO/4L/7MhJnNATrn6tHawPaGE9LoLb7kSWeB5c5ZQuWxlvbIx1axHA5i12RNPtWkiiFKtm/ovfVK0VFCJk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782506246; c=relaxed/simple;
+	bh=pKVjCjcmwgLFIBfm/gjvwtOU+DQ4pjGWSvVcM4JnwZY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Um8LEJsvPkrmgLyyLQ7lsv33hfw4zJLl3L7v71ree7HG1xgXJ6eJxQzWZ2vCqM1FNtQys5JJsMUJzDEgtxWjbsyE5qC1EWEJg5Mjok0sPeQrwoH8VxNaglMNXmVqIHLJ6B4gnT19BqjV17w1jmtCQ9rDaXm6RrKIrm3rWnzwBv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=g3vLQTxf; arc=none smtp.client-ip=185.226.149.37
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1wdDIJ-00AoOX-Qn; Fri, 26 Jun 2026 22:36:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=ly+rs5U3NFQZDhMCTmcjPlOV6xPqKVnp71dYXhsnJ9M=
+	; b=g3vLQTxfMgbgck9LjrMYPOiXAqzvpS1ZvYCYczUpEeiykwFrJADJUOSZCMCAEkPmd+Jg+C8Uk
+	G1rXCm21GeRGXULNkp+SXCogNP7fO9zQgcGxhK4uj1jGVMpP/ruwcCYe2V9NQqnsuZ0xeUMitz5GH
+	m7/3PbNw02CvVf/yFu9BBLtcRDrNwOeZfi5aOnz6H2a0SSYOqQ521FuQ2K5d65Vi8/AZodKXZY1Ay
+	KB1ActC51x9AQnnxzLmLoapiiMk0YRUbSD9X4CWuEFatJ36mARdDWMJEjcUuMBh4s/lN4rgvUpzuR
+	7M4A0LgV9Ol70upVBLhNu6cKTWG1enuF5Xt/Gg==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1wdDIH-0003ZS-S8; Fri, 26 Jun 2026 22:36:58 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.95)
+	id 1wdDI7-006anB-ML;
+	Fri, 26 Jun 2026 22:36:47 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH bpf v2 0/4] bpf, sockmap: Fix sockmap leaking UDP socks
+Date: Fri, 26 Jun 2026 22:36:28 +0200
+Message-Id: <20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: FsN4mm5wqvdl4Yx4kmnl0Gu3YScHy9F3TbbmVcC3qiwFTJaVS4PEp3Wfj+Sy32/Jgz+0QlaUIbCuHMDcKuzJAGO4Xkd6Yb17dPRokC305hGL66RhGTt5jj9B4ALKv4+MM/d0Qe36T6t4D+/lBq/GjkYtgtPGRqjk7kOuANaDXDrt6Dtr4hMUJWQ8lvh5W/+AQ5aMC+JOZnzex1OVeMoO6thgkOdJ+Sskrv+E6d0US0XZVcARyVITXZKReWt1g/fUFukf3R5NFjuZ1pT5eZJsqPZlzez0cBcvt52Ggh6c9Et3mMOSUFcdS6dTDxUZIlYFFBqis8LBbHzFUAwlixtSgg==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR18MB4728.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a7ca263-cd07-4d50-1117-08ded3c13a0b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2026 20:26:38.8087
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5280104a-472d-4538-9ccf-1e1d0efe8b1b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Hdh6wfyOKDLBEfsWrtExrZHCh6g+Ptpq6S1mrPl54L8R0Caknuoqs6xrMgxeMNWIoMeB8uPmiS1VGg7NR5dHXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR18MB5339
-X-OriginatorOrg: amazon.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNzQ6CMBCEX8Xs2TVtKT968j0MB1oWqShtWiAYw
+ rtb4OxtZjIz3wKBvKEAt9MCniYTjO2jEecT6Lbqn4Smjh4EExnLeI7B6u5TOXxb240OxzpKqjp
+ UWlKqU1nwOoe4dp4aM+/PD1CugfIIw6hepIftc6u1JgzWf3f+xPfygRLJX9TEkSFLCyaba8IKk
+ nev7HzRFsp1XX+eRwPL0wAAAA==
+X-Change-ID: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ Jiayuan Chen <jiayuan.chen@linux.dev>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+ Cong Wang <cong.wang@bytedance.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+ Emil Tsalapatis <emil@etsalapatis.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.15.2
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-10.06 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[amazon.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:ncardwell@google.com,m:edumazet@google.com,m:aws-binance-tam@amazon.com,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[aarnahmd@amazon.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302259-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aarnahmd@amazon.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302263-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[google.com,redhat.com,gmail.com,cloudflare.com,linux.dev,davemloft.net,kernel.org,bytedance.com,iogearbox.net,etsalapatis.com];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:ast@kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:mhal@rbox.co,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[rbox.co:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,rbox.co:dkim,rbox.co:email,rbox.co:mid,rbox.co:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A860C6CFFDD
+X-Rspamd-Queue-Id: 25EEE6D009E
 
-K0NDOiBhd3MtYmluYW5jZS10YW1AYW1hem9uLmNvbQ0KDQrvu79PbiA2LzE5LzI2LCAzOjU4IFBN
-LCAiQWhtZWQsIEFhcm9uIiA8YWFybmFobWRAYW1hem9uLmNvbSA8bWFpbHRvOmFhcm5haG1kQGFt
-YXpvbi5jb20+PiB3cm90ZToNCg0KPkhpIEt1bml5dWtpLA0KPg0KPlNvcnJ5IHRvIGtlZXAgYXNr
-aW5nLCB3ZXJlIHlvdSBhYmxlIHRvIHRha2UgYSBsb29rIGF0IHRoZSB1cGRhdGVkIHJlcHJvZHVj
-ZXI/IEkndmUgc3RpbGwgYmVlbiBhYmxlIHRvIHJlcHJvIHdpdGggdGhlIGxhdGVzdCA2LjE4IExU
-Uy4NCj4NCj4gVGhhbmtzLA0KPiBBYXJvbiANCg0KDQoNCg0KDQoNCg0K
+Fix for UDP sockets getting leaked during sockmap lookup/release.
+Accompanied by selftests updates.
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v2:
+- selftest: drop the original, adapt old tests
+- fix: change approach to rejecting unbound UDP [Kuniyuki]
+- Link to v1: https://patch.msgid.link/20260623-sockmap-lookup-udp-leak-v1-0-05804f9308e4@rbox.co
+
+---
+Michal Luczaj (4):
+      bpf, sockmap: Reject unhashed UDP sockets on sockmap update
+      selftests/bpf: Ensure UDP sockets are bound
+      selftests/bpf: Adapt sockmap update error handling
+      selftests/bpf: Fail unbound UDP on sockmap update
+
+ net/core/sock_map.c                                     |  2 ++
+ tools/testing/selftests/bpf/prog_tests/sockmap_basic.c  |  6 +++---
+ tools/testing/selftests/bpf/prog_tests/sockmap_listen.c | 17 +++++++++--------
+ tools/testing/selftests/bpf/test_maps.c                 |  6 +++---
+ 4 files changed, 17 insertions(+), 14 deletions(-)
+---
+base-commit: 26490a375cb9be9bac96b5171610fd85ca6c2305
+change-id: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
+
+Best regards,
+--  
+Michal Luczaj <mhal@rbox.co>
+
 
