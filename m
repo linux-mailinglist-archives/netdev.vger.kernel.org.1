@@ -1,196 +1,144 @@
-Return-Path: <netdev+bounces-302095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302096-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2EIAHBL+PWqK+AgAu9opvQ
-	(envelope-from <netdev+bounces-302095-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 06:20:34 +0200
+	id VHnhB1QAPmo++QgAu9opvQ
+	(envelope-from <netdev+bounces-302096-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 06:30:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBBCA6CA171
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 06:20:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093AA6CA1C1
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 06:30:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=D35NOrnB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302095-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302095-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=JgdkzGO2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302096-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302096-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9092B3030D23
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 04:20:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E2F5C300F26A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 04:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A2B211A14;
-	Fri, 26 Jun 2026 04:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E597737E307;
+	Fri, 26 Jun 2026 04:30:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8AD78F2B;
-	Fri, 26 Jun 2026 04:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E538235A398;
+	Fri, 26 Jun 2026 04:30:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782447629; cv=none; b=ktANKBBsBDPCVygY2w0BmR18dui5j85VF0BGchoTEhsxFuV1mvqx2kcJp96PHRtVV1laemQ2CB2QPgTpvSUUkG/ROD9ATYBoMJvbY93B8FD2004GSbbswJOokWAqMuJa2WKV0yux2DyQVi/CpRgCEaWVa+r1KCSRleN/ni2Rl/8=
+	t=1782448206; cv=none; b=HDO3Ajd4YhBeHWaYpnxs/SspO5aTyHt8xIJENqT6uz9+VLAdqKm1fgOvM1KzNmhWf5QH1pzSdCu+aLJJ69D1qgsLRMAQIbsQHoTQVafzspCXkeB5Y9TcvugJQL6DI3CbBg9ZvoxiBCDv8XE6Qvq7NdrET7Ciz1Sqme47uYmojr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782447629; c=relaxed/simple;
-	bh=R/gQ84rbKMT05VYw5tdAgyGqVLFfbIMcRcRFCySssLE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dr88EDxatjCARtTIw8w/D8c9DXEnJYpz7yutT/12hAtuOc9MhRNsifkfOPQ/Ext8nVZd25bUj9iw82XrWAbDpexsuU4SQZABChj6rj1SwTpsigjNKzZt+JM3HVxSlr3GeChwGeGaXDBSTpW2O3FVwIrbXN8F5EjVgLHGrFQzcZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=D35NOrnB; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65Q2q6hZ2487038;
-	Thu, 25 Jun 2026 21:20:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=z8xFpqAOQsWQ0PO6p2TwMB4Po
-	lTMKxGg+AKUihtCJa4=; b=D35NOrnB2oGrzw7DCiDcE54pY01L71xXBQVcXPzGx
-	O6cH7rFYxm+c4k71pf82fjeNftxN/ePbblCdavr1XtBzhYW0VmTW2NC3H/TkzO+n
-	79s/nnZEc2mwD2gAYz4cQZVM/vb1czL+9pzl2RsrEatyEAYhXDxXs+S2Z66vWVti
-	AdxTB6bj5Xxv95y5Hh1DkPdz//kpxZ+WoELkDVNpA9HXCDT5N5DabVVPXE1kzStC
-	2HAUF0XNCNAwdOWPhBFfYkVzZHJq5Q/+y87YHjWJ1haJ+4ouIIlCnklPEnCQzk/i
-	uVZWksUBjh50BdRdsvccyCwNYSXiD/GKg2y95DpIx+MnQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f11jpb8hr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jun 2026 21:20:15 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 25 Jun 2026 21:20:14 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 25 Jun 2026 21:20:14 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 1DC643F7058;
-	Thu, 25 Jun 2026 21:20:09 -0700 (PDT)
-Date: Fri, 26 Jun 2026 09:50:08 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Wentao Liang <vulab@iscas.ac.cn>
-CC: Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH] octeontx2-af: Fix pci_dev reference leak in
- cgx_print_dmac_flt
-Message-ID: <aj39-PTEOiZjyZBM@rkannoth-OptiPlex-7090>
-References: <20260625063951.44361-1-vulab@iscas.ac.cn>
+	s=arc-20240116; t=1782448206; c=relaxed/simple;
+	bh=X7WtzjFGjWsAJzn3xlEBeUS1W6k06h0Ut/0rut89SWE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y+7AhYQ7w4kWeml79yz2KpoMkFBmtoY7wuGH3YUuUCNQR3M4ic53legMbPgZ+htHKhRwLoxPm3yQdd8ZfkoceXewQNTw3PywA1DRSLK/3ekZxqcASHKSj3NOdwjOo2Dk7q7M5/HS1Av/x1FRjpGMTtCQ6+wAOsVaZ3FcT/zxLpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=JgdkzGO2; arc=none smtp.client-ip=45.254.49.198
+Received: from PC-202605011814.localdomain (unknown [223.112.146.162])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 43d953a3a;
+	Fri, 26 Jun 2026 12:24:44 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	runyu.xiao@seu.edu.cn,
+	jianhao.xu@seu.edu.cn
+Subject: [PATCH net-next] caif: annotate phyinfo lookup under config lock
+Date: Fri, 26 Jun 2026 12:24:40 +0800
+Message-Id: <20260626042440.2013499-1-runyu.xiao@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260625063951.44361-1-vulab@iscas.ac.cn>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI2MDAzMSBTYWx0ZWRfX95nZQU70dl+q
- kG7/QGtwA5ELU6v3xa6ZbsqFPbCW4NAAA49SIEyRHVVgmilI9Ee74Rv6xtb6PG51tDs+BwBKdTd
- JhIM+JkSWDngw8reODxh49rZmi/+AjsW75Tuou3ESz606Lk9CaYe+BgYD3Pe2dZ4SDco3brzTNs
- 250Rm/APwpjyKsMyYCot41Y13o9sm56BVudv6LD6koxLEcSzGsLVWdL0k3ORFzBd6dFMJOps56O
- Tf1ILh21h9fApQ2+oCrhMJipphFD2lzeS5ahznxc9o2FljtqIoV/bp2bkLI2GlneeZzbRgqdkVx
- ykiv46psLwYsnW7gEBHuCh1zECPHfr2PUiDwMdcnhcae7HqnpvKF6VStz1KjcTPSX2UE/7zHJQZ
- K1vkdp70WrG8XqLioHd06o5hj9Bnl4d3Lx0OF9XvL1hxHFxkBmlKXPVUCmzGfUEl8yBgdsjsfHu
- K8iczN7o5FyQPkm1Cpw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI2MDAzMSBTYWx0ZWRfX5iWTZKU6BaIm
- XX/AwhzRfjW5F2PMnPuf1z9eBl9Qr8pXfvqkc36yg3x4rDCxbI4ducOu6RuQrxRf+F0XJd0xQh3
- 7FL7A66EFifGhZ90muu2Ajy37tsC7Bk=
-X-Proofpoint-ORIG-GUID: YjQhefk4nsKgGsIN3mPVqHS-Dod4sTcr
-X-Authority-Analysis: v=2.4 cv=KIxqylFo c=1 sm=1 tr=0 ts=6a3dfdff cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
- a=gnFPaLZqP3XV3ePR1egA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: YjQhefk4nsKgGsIN3mPVqHS-Dod4sTcr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-26_01,2026-06-24_01,2025-10-01_01
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9f022c493903a1kunme7711fd48873a
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDGEMfVhlMSEJCTh8fSUJDHVYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSE
+	pPSExVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=JgdkzGO2m1tXaSY7EoVcDjfYzsC/nvLJCtscAYfMFpsCvQyxgXv93xPQ0wt7moflLozdcDfdLOUFF7ngMM563u/SfBOJHzR5X2EPIf2oePpcWPyilYc1MvtN0O/KgdAeYjOBiqKS4/cpMZk5IwkoH+TZLfSZm9pmt/o8MNWFRKc=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=HAHU7ANpHQzghwxPazOxwiWsGVS8V0sDL7Jr2kAIbgM=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302095-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:vulab@iscas.ac.cn,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302096-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:runyu.xiao@seu.edu.cn,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CBBCA6CA171
+X-Rspamd-Queue-Id: 093AA6CA1C1
 
-On 2026-06-25 at 12:09:51, Wentao Liang (vulab@iscas.ac.cn) wrote:
-> In cgx_print_dmac_flt(), pci_get_device() is called to look up the AF
-> PCI device, but its return value is passed directly to pci_get_drvdata()
-> without saving the pointer. This means pci_dev_put() can never be called
-> for the obtained device, causing a reference count leak.
->
-> Fix it by saving the return value of pci_get_device() in a local variable
-> and releasing it via pci_dev_put() after the drvdata is extracted.
->
-> Cc: stable@vger.kernel.org
-> Fixes: dbc52debf95f ("octeontx2-af: Debugfs support for DMAC filters")
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> ---
->  .../net/ethernet/marvell/octeontx2/af/rvu_debugfs.c   | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-> index fa461489acdd..90dc13df9ff9 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-> @@ -2949,7 +2949,7 @@ RVU_DEBUG_SEQ_FOPS(cgx_stat, cgx_stat_display, NULL);
->
->  static int cgx_print_dmac_flt(struct seq_file *s, int lmac_id)
->  {
-> -	struct pci_dev *pdev = NULL;
-> +	struct pci_dev *af_pdev, *pdev = NULL;
->  	void *cgxd = s->private;
->  	char *bcast, *mcast;
->  	u16 index, domain;
-> @@ -2958,8 +2958,13 @@ static int cgx_print_dmac_flt(struct seq_file *s, int lmac_id)
->  	u64 cfg, mac;
->  	int pf;
->
-> -	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
-> -					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
-> +	af_pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
-> +				 PCI_DEVID_OCTEONTX2_RVU_AF, NULL);
-> +	if (!af_pdev)
-> +		return -ENODEV;
-> +
-> +	rvu = pci_get_drvdata(af_pdev);
-> +	pci_dev_put(af_pdev);
->  	if (!rvu)
->  		return -ENODEV;
+cfcnfg_get_phyinfo_rcu() is used by both RCU read-side paths and config
+update paths that hold cnfg->lock before adding or deleting entries from
+cnfg->phys. The helper walks the list with list_for_each_entry_rcu(),
+but does not tell lockdep about the config-lock-protected callers.
 
-Thanks for bringing this up! It looks like this issue was resolved in a previous commit:
-469f4462ec83 ("octeontx2-af: fix CGX debugfs RVU AF PCI reference leaks").
+Pass lockdep_is_held(&cnfg->lock) to the iterator. RCU-reader callers
+remain valid, and CONFIG_PROVE_RCU_LIST can now see the non-RCU
+protection used by the add/delete paths.
 
->
-> --
-> 2.39.5 (Apple Git-154)
->
+This was found by our static analysis tool and then manually reviewed
+against the current tree. The dynamic triage evidence is a
+target-matched CONFIG_PROVE_RCU_LIST warning; the change is limited
+to documenting the existing protection contract.
+
+This is a lockdep annotation cleanup. It does not change CAIF phyinfo
+list lifetime or update ordering.
+
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+---
+ net/caif/cfcnfg.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/caif/cfcnfg.c b/net/caif/cfcnfg.c
+index 52509e185960..6966cc9ab640 100644
+--- a/net/caif/cfcnfg.c
++++ b/net/caif/cfcnfg.c
+@@ -135,7 +135,8 @@ static struct cfcnfg_phyinfo *cfcnfg_get_phyinfo_rcu(struct cfcnfg *cnfg,
+ {
+ 	struct cfcnfg_phyinfo *phy;
+ 
+-	list_for_each_entry_rcu(phy, &cnfg->phys, node)
++	list_for_each_entry_rcu(phy, &cnfg->phys, node,
++				lockdep_is_held(&cnfg->lock))
+ 		if (phy->id == phyid)
+ 			return phy;
+ 	return NULL;
+-- 
+2.34.1
+
 
