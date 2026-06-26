@@ -1,148 +1,220 @@
-Return-Path: <netdev+bounces-302211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302212-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yocbE6CbPmrxIwkAu9opvQ
-	(envelope-from <netdev+bounces-302211-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:32:48 +0200
+	id rkoBMaKbPmryIwkAu9opvQ
+	(envelope-from <netdev+bounces-302212-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:32:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6866CE85C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:32:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D62036CE861
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:32:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302211-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302211-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=ieee.org header.s=google header.b=fUonJIRq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302212-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302212-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=ieee.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD065302C6D4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:29:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2920A3017513
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9595F39FCBF;
-	Fri, 26 Jun 2026 15:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2E6387361;
+	Fri, 26 Jun 2026 15:31:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CEA38C2A7;
-	Fri, 26 Jun 2026 15:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445523BA22E
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 15:31:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782487798; cv=none; b=Znc+w/woSiIZfBUOfjWOQGNbEazsMsxUOxg1zNxrcT6o4ihQ+7wGZkJyOmcI3gqUXEDYxIl9/JMWvuH7Bf3nWQ+npTw4D2hI/T1UZoXxsmSOXfWglDgGxKHt5VKKX0D6gjUBtKP67lziXtm0cVfEoJ/ArIQZ5PTURHskewIam0k=
+	t=1782487877; cv=none; b=aevBk9D85X4nM7RWZSneORU4VUz4Y2ZlN9hupUNZEEI/gPfIo/eZCehHYr7th3/Tay+l0PNWU1Yn9e+slClNrgLxpQgZjOpxvFHsYNzi6saf/CTDo8PjGQusCTsSPtZU4Y/ZWEozC9TLecOeMTs47rs41oGcAdD7SIM1FKOBaWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782487798; c=relaxed/simple;
-	bh=XEEtySvz2H/5n7QxI6sUMxgO1+nX50dCkUnJfaDLMQw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U0PkTS6RHnJaCkeZb9q5LXl+BzHvEr5UcIe5KbiogQ8W0d3/o/FpxUE6cskoyasEkyBdX0OANMm588u/tQmSnhJ/3xC5hcyKKwBR1MYNNBbIOvuSpX7EF1wCdfcPqbhlFVsjmVD32ipSWjhNRgE9pdbRHD2/1NiRPsk0njLuUgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Received: from localhost.localdomain (unknown [117.182.75.66])
-	by APP-01 (Coremail) with SMTP id qwCowAAHpc3qmj5qUDxsAw--.54404S2;
-	Fri, 26 Jun 2026 23:29:47 +0800 (CST)
-From: WenTao Liang <vulab@iscas.ac.cn>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-omap@vger.kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	WenTao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH] fix: net: ti: cpsw_init_common: fix excess of_node_put on parent node when   cpts child not found
-Date: Fri, 26 Jun 2026 23:29:45 +0800
-Message-Id: <20260626152945.52192-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1782487877; c=relaxed/simple;
+	bh=tBmbcWBOxRB/KGcfDMzhMHFt0EK9TotdSB1CdL8k/vY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k2/CJt3TT55VAydRRFAj/3Eo7zL+sFGGA5AQXwHKnjU6d18gRS4TeQZgcJpAuZs3EHmBvjKrtCNRS8SrBrhe+8j7bEBj5UWs4xVtw26yXJDRyXPzGHNXbIkJIlF1Y/rUGqEppA+3iuq+wd5keIXzdtY0YNxJYxWksoEJ2t7RfAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=fUonJIRq; arc=none smtp.client-ip=209.85.219.45
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8dd20fa3c41so6311226d6.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ieee.org; s=google; t=1782487873; x=1783092673; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Myp1/AJ7+f45jiO/7vpdpmC9cty6oWFhDB31tMdKwqI=;
+        b=fUonJIRqCCj1KNtD2vbj9j32mKhBUCCve5SkhNzZ0+nUqE3YE7bwoyGCLrcHuZp8r8
+         jcy4UtnLR0ybfpVVSMrqncv2DNspfWWsx/a3S0lqLMykoWh6B5tSQ+/m1pQ8/fXFmWvJ
+         Jdiq41x+oSimz5b6ska3vnpn1bB6UlhXZPwXA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782487873; x=1783092673;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Myp1/AJ7+f45jiO/7vpdpmC9cty6oWFhDB31tMdKwqI=;
+        b=bAY8El6Wpp1XSstkH2xc1a5XMgLUZqk2e1GbrLVGf0BDm/x2af3oAvY+W64UE3VoHB
+         o8/EHjnp27xxBf6JIKmKqB0VCcITio46ZFardXCmpsCpvKKcV4Bho/nIzbdjaGoI+8jv
+         3qyVnnDAxAXmWuAlM/4ESJs2TK+WWiUKPMj49bo0UH0E0xULDgCB5CyNsBHzu/ifkqBN
+         WyPv/5c6H8c4zMrzohecHRBuoXYHCU3nslWkhbThoTpyKqOPHfgLcJPreuyLYULyVgZe
+         lq2f8DLeT4z1kcK5PAyezPmaPSgTD62gVsv55kM61YIgktOo9uNT3Qddx2BeYdq9W8W5
+         o/4g==
+X-Gm-Message-State: AOJu0YwChB7kS/tN/SvAlOyTyccsqthCwn19rUUgdusVX7P1JH43VTWu
+	0jv/YCFSo5bxp6s/jm+FVDPegLr8Yshura4unw5RkYX7AfEpYTNc1Knsc4L7KKYbHg==
+X-Gm-Gg: AfdE7cn7hYPxvFvGgX3CBgiJqTrbLe37ocX+6z036UegV4PdJeh+ErV4hBZLU5AujSd
+	31EIB+8x78wrTILuWUbBmEYjuCzkugfCa2Z8nU8jD+LKfYloL7tnbB5sDokCYp/zJGB2rdaFmGj
+	KIp1DPd8Z89hWkoUF3cVhAZYnA08Xn5uSGJDcGfOcMA0DkEtewyN4SiTXvkcoKCHMDQstCG62ur
+	yd7B6RCh2QkNVIlBb7YlHqmN/DKFokE5cYxt6CFbXQYaNDu8SGWCtYA5errsVYT3kUiBkjSClfF
+	vQwATei4dI18bzBnmeMFDJNqCVHSiRdQyCM3uCqll7+mClAQR/o/x+ZgUs0b+a3ACOfQUuRSpOS
+	AARxMMVj8mECpUdNBm6GMJjy0XCkRfzfhcmPuZslI8Z63BD3hLpoSOd0yN+YgRWuRac8Bjm8iUS
+	QUb8LShN8=
+X-Received: by 2002:a0c:fde2:0:b0:8e9:f62b:8fa3 with SMTP id 6a1803df08f44-8e9f62b91ecmr6028596d6.56.1782487873049;
+        Fri, 26 Jun 2026 08:31:13 -0700 (PDT)
+Received: from [172.22.22.28] ([73.62.185.64])
+        by smtp.googlemail.com with ESMTPSA id 6a1803df08f44-8df7ef1fe40sm213750836d6.4.2026.06.26.08.31.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jun 2026 08:31:11 -0700 (PDT)
+Message-ID: <51d2934f-0144-4303-af34-c7257ea02f24@ieee.org>
+Date: Fri, 26 Jun 2026 10:31:09 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAAHpc3qmj5qUDxsAw--.54404S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tryUXry8ArWfJrWxtrW5Wrg_yoW8Gry5p3
-	yFka43ZFn5Jr4vgwn7t3yFvFZIva1ktws093WxCa4fZ34qvry3JF1DXa4Yvrn8trZ5GF4Y
-	yr95Awn7J3WkGa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8Jw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VUbo5l5UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRMKA2o+iCg0iAAAsb
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: ipa: fix SMEM state handle leaks in SMP2P
+ init
+To: Haoxiang Li <haoxiang_li2024@163.com>, elder@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20260624065955.2822765-1-haoxiang_li2024@163.com>
+Content-Language: en-US
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20260624065955.2822765-1-haoxiang_li2024@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ieee.org,reject];
+	R_DKIM_ALLOW(-0.20)[ieee.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302212-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302211-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:s-vadapalli@ti.com,m:rogerq@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-omap@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[163.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:haoxiang_li2024@163.com,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[elder@ieee.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ieee.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[elder@ieee.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,riscstar.com:email,ieee.org:dkim,ieee.org:mid,ieee.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9E6866CE85C
+X-Rspamd-Queue-Id: D62036CE861
 
-When no "cpts" child node exists in the device tree, cpts_node is
-  assigned cpsw->dev->of_node without taking a reference via of_node_get.
-  The function then unconditionally calls of_node_put(cpts_node) at the
-  end, causing an excess put on the parent device node which can lead to a
-  refcount underflow.
+On 6/24/26 1:59 AM, Haoxiang Li wrote:
+> ipa_smp2p_init() acquires two Qualcomm SMEM state handles with
+> qcom_smem_state_get(). However, neither the init error paths
+> nor ipa_smp2p_exit() release them.
+> 
+> Release both handles with qcom_smem_state_put() in the init
+> error paths and in ipa_smp2p_exit().
+> 
+> Fixes: 530f9216a953 ("soc: qcom: ipa: AP/modem communications")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 
-Use of_node_get when falling back to the parent node to ensure the
-  reference count is properly balanced with the subsequent of_node_put.
+This looks good.  Thank you for the fix.
 
-Cc: stable@vger.kernel.org
-Fixes: ed3525eda4c4 ("net: ethernet: ti: introduce cpsw switchdev based driver part 1 - dual-emac")
-Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/ti/cpsw_priv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Alex Elder <elder@riscstar.com>
 
-diff --git a/drivers/net/ethernet/ti/cpsw_priv.c b/drivers/net/ethernet/ti/cpsw_priv.c
-index 1f6f374551cb..b20567f96d78 100644
---- a/drivers/net/ethernet/ti/cpsw_priv.c
-+++ b/drivers/net/ethernet/ti/cpsw_priv.c
-@@ -553,7 +553,7 @@ int cpsw_init_common(struct cpsw_common *cpsw, void __iomem *ss_regs,
- 
- 	cpts_node = of_get_child_by_name(cpsw->dev->of_node, "cpts");
- 	if (!cpts_node)
--		cpts_node = cpsw->dev->of_node;
-+		cpts_node = of_node_get(cpsw->dev->of_node);
- 
- 	cpsw->cpts = cpts_create(cpsw->dev, cpts_regs, cpts_node,
- 				 CPTS_N_ETX_TS);
--- 
-2.39.5 (Apple Git-154)
+> ---
+> Changes in v2:
+>   - Use explicit qcom_smem_state_put() calls instead of devm helpers.
+>     Thanks, Alex! Thanks, Jakub!
+> ---
+>   drivers/net/ipa/ipa_smp2p.c | 30 ++++++++++++++++++++++--------
+>   1 file changed, 22 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ipa/ipa_smp2p.c b/drivers/net/ipa/ipa_smp2p.c
+> index 2f0ccdd937cc..331c00ad02c0 100644
+> --- a/drivers/net/ipa/ipa_smp2p.c
+> +++ b/drivers/net/ipa/ipa_smp2p.c
+> @@ -232,19 +232,27 @@ ipa_smp2p_init(struct ipa *ipa, struct platform_device *pdev, bool modem_init)
+>   					  &valid_bit);
+>   	if (IS_ERR(valid_state))
+>   		return PTR_ERR(valid_state);
+> -	if (valid_bit >= 32)		/* BITS_PER_U32 */
+> -		return -EINVAL;
+> +	if (valid_bit >= 32) {		/* BITS_PER_U32 */
+> +		ret = -EINVAL;
+> +		goto err_valid_state_put;
+> +	}
+>   
+>   	enabled_state = qcom_smem_state_get(dev, "ipa-clock-enabled",
+>   					    &enabled_bit);
+> -	if (IS_ERR(enabled_state))
+> -		return PTR_ERR(enabled_state);
+> -	if (enabled_bit >= 32)		/* BITS_PER_U32 */
+> -		return -EINVAL;
+> +	if (IS_ERR(enabled_state)) {
+> +		ret = PTR_ERR(enabled_state);
+> +		goto err_valid_state_put;
+> +	}
+> +	if (enabled_bit >= 32) {		/* BITS_PER_U32 */
+> +		ret = -EINVAL;
+> +		goto err_enabled_state_put;
+> +	}
+>   
+>   	smp2p = kzalloc_obj(*smp2p);
+> -	if (!smp2p)
+> -		return -ENOMEM;
+> +	if (!smp2p) {
+> +		ret = -ENOMEM;
+> +		goto err_enabled_state_put;
+> +	}
+>   
+>   	smp2p->ipa = ipa;
+>   
+> @@ -289,6 +297,10 @@ ipa_smp2p_init(struct ipa *ipa, struct platform_device *pdev, bool modem_init)
+>   	ipa->smp2p = NULL;
+>   	mutex_destroy(&smp2p->mutex);
+>   	kfree(smp2p);
+> +err_enabled_state_put:
+> +	qcom_smem_state_put(enabled_state);
+> +err_valid_state_put:
+> +	qcom_smem_state_put(valid_state);
+>   
+>   	return ret;
+>   }
+> @@ -305,6 +317,8 @@ void ipa_smp2p_exit(struct ipa *ipa)
+>   	ipa_smp2p_power_release(ipa);
+>   	ipa->smp2p = NULL;
+>   	mutex_destroy(&smp2p->mutex);
+> +	qcom_smem_state_put(smp2p->enabled_state);
+> +	qcom_smem_state_put(smp2p->valid_state);
+>   	kfree(smp2p);
+>   }
+>   
 
 
