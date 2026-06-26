@@ -1,119 +1,152 @@
-Return-Path: <netdev+bounces-302207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id X0OIALOZPmpYIwkAu9opvQ
-	(envelope-from <netdev+bounces-302207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:24:35 +0200
+	id EZsUDBSbPmq2IwkAu9opvQ
+	(envelope-from <netdev+bounces-302208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:30:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 711C06CE73E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:24:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85B266CE7E5
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:30:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=bQDQlJkj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302207-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302207-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302208-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302208-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E697F3007AFA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:23:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D8EDF300A500
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2E937B020;
-	Fri, 26 Jun 2026 15:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490213998BE;
+	Fri, 26 Jun 2026 15:24:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BCD37AA83;
-	Fri, 26 Jun 2026 15:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0D7387361;
+	Fri, 26 Jun 2026 15:24:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782487417; cv=none; b=RqQ6ucoIIhUEnWRoVAqjsvFWtbIiFoH4ckjANSbeGjx5px/6E0TkhKEXwIPPTxFaaQTaE7LDg9/FOCYqUWP6Q1n+7tbmLWN+2RjovUdssARIdUf6BvXvmNo5hY0Fr/S6mu7vHiHk90+erl3+wMq9FrWjyabeuEZSO55D3cuVOng=
+	t=1782487480; cv=none; b=pf1pqHpzX46X6KEbMc/2JBU/OCtofSvzuQ3SZ0hzrGUmRnsrOPHdAgRSuTzGx0jluCdZMmzzG1+6Daeg3sMDKscEampIk3e2qqCANH5SRPpMKQmUXi1tce4jpxc1UWXP+VX0KRbznuLgueFbkAnmTf3ZzgkzJPxz57Kt8ethyN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782487417; c=relaxed/simple;
-	bh=bmOVwBc7W6hG2k4uI94bIn7gWV6EYU3fzxRLNlMRZq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tEjD5lOkrn3KVTU6vfR0RiqU/hhY8m1LPxjNzMEiu3cSXxsA9zO/tb6Oykkx3i5vKTmuE+XwivM7bOYTvgVfTEduFUx8Qomf4whxpjS3SLB4qzUhZwNdZpqWt/VL1IXmnjxUsUUJ8kPrYo4fmm4sxhNj97UPnDbuwZVdHCVsq8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bQDQlJkj; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE1A41F000E9;
-	Fri, 26 Jun 2026 15:23:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782487416;
-	bh=bmOVwBc7W6hG2k4uI94bIn7gWV6EYU3fzxRLNlMRZq0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=bQDQlJkjp6johkW7EbQcEFV5PE37jpMgJqZuUtq93ZFNtT39wmWmDmwbtaPL5KByv
-	 znz9mfj/t33i/OZloSnl5K8mVR173hmquzqV/NTGefgs2/ZxwnjNyobX+qZCs/yh/p
-	 txeYDptuNmRgXfdloDvyRCQJWTROiKO9XyqokBdw5uA8HBYRDWJnJ4Y9VMqd7Ya8Tk
-	 bqf33XLb3ujxgvR+g2T/UCdMZheVb8MBZYOn749RZTom6opdsPl3SPWqywTQxVkiIO
-	 iqz5Pjkz4wyvrJok+5k0kXopK2wODz9Itw5WSlZVdBqRmxaLcqtwAMX3CspotjX/04
-	 Zta7N6BuMqbjw==
-Date: Fri, 26 Jun 2026 16:23:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, claudiu.manoil@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, afleming@freescale.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: gianfar: use of_irq_get()
-Message-ID: <20260626152332.GD1310988@horms.kernel.org>
-References: <20260624032122.986986-1-rosenp@gmail.com>
- <20260625093630.1173136-1-horms@kernel.org>
- <CAKxU2N__hbPOrPe3JUeTLF6d6+=uN+p5ez78rVg6cnrekkvQPw@mail.gmail.com>
+	s=arc-20240116; t=1782487480; c=relaxed/simple;
+	bh=UaKX2v8Zde1/mEnCpoQ6ZNmMmzXgbSJt9HixAlTWVdM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Hiux/KzcISrLh6f8VxphRclLBN0d1uM8f5YiMNi4ggjn+26GNbS0lopecGvtPbQq0BInBnA8fp+6Ei8AZADN/PyFl7ev6DuY7r24Twd7E/tt0g4FKl1R4DmTQRfvatGLaN1CsX5gEbEpafETtW7AyvxA9jB9ZfsryFGWei7/Nhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Received: from localhost.localdomain (unknown [117.182.75.66])
+	by APP-01 (Coremail) with SMTP id qwCowABnB9CumT5qmQxsAw--.185S2;
+	Fri, 26 Jun 2026 23:24:31 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
+To: netdev@vger.kernel.org
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH] fix: net: renesas: rswitch_mii_register: fix double of_node_put after   of_mdiobus_register
+Date: Fri, 26 Jun 2026 23:24:30 +0800
+Message-Id: <20260626152430.51835-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N__hbPOrPe3JUeTLF6d6+=uN+p5ez78rVg6cnrekkvQPw@mail.gmail.com>
+X-CM-TRANSID:qwCowABnB9CumT5qmQxsAw--.185S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1rur15AFWkJFyDXr43Wrg_yoW8GF4rpr
+	Z8KrW7ZrykXr42qa1kGa1UuF9YyayFkrW5uF1jka9Y9anYyF98Ary0ga45ur45GFW8C3W3
+	tr1jyw18uas8AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUeTmhDU
+	UUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgUKA2o+h0E05AAAsI
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302207-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302208-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:yoshihiro.shimoda.uh@renesas.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:claudiu.manoil@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:afleming@freescale.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,horms.kernel.org:mid]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 711C06CE73E
+X-Rspamd-Queue-Id: 85B266CE7E5
 
-On Thu, Jun 25, 2026 at 05:42:05PM -0700, Rosen Penev wrote:
-> On Thu, Jun 25, 2026 at 2:36 AM Simon Horman <horms@kernel.org> wrote:
+After of_mdiobus_register succeeds, the mdio_np reference ownership is
+  transferred to the mii_bus device (released via fwnode_handle_put during
+  mdiobus_release). The success path calls of_node_put(mdio_np) which,
+  combined with the automatic release via bus teardown, results in a double
+  put and refcount underflow.
 
-...
+Move of_node_put so it is only called in the error path where
+  of_mdiobus_register failed. On success, the bus driver manages the
+  reference lifecycle.
 
-> Meh I'll submit to net-next. This is way too messy to fix for net.
+Cc: stable@vger.kernel.org
+Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for Ethernet Switch")
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/renesas/rswitch_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks. Be aware that net-next is currently closed for the merge window.
-I expect it will repoen next week.
+diff --git a/drivers/net/ethernet/renesas/rswitch_main.c b/drivers/net/ethernet/renesas/rswitch_main.c
+index 6fe964816322..c33add28a70c 100644
+--- a/drivers/net/ethernet/renesas/rswitch_main.c
++++ b/drivers/net/ethernet/renesas/rswitch_main.c
+@@ -1387,13 +1387,13 @@ static int rswitch_mii_register(struct rswitch_device *rdev)
+ 	err = of_mdiobus_register(mii_bus, mdio_np);
+ 	if (err < 0) {
+ 		mdiobus_free(mii_bus);
+-		goto out;
++		of_node_put(mdio_np);
++		return err;
+ 	}
+ 
+ 	rdev->etha->mii = mii_bus;
+ 
+-out:
+-	of_node_put(mdio_np);
++	return 0;
+ 
+ 	return err;
+ }
+-- 
+2.39.5 (Apple Git-154)
+
 
