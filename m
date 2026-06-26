@@ -1,65 +1,78 @@
-Return-Path: <netdev+bounces-302124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302125-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H4XoFdo6PmpeBwkAu9opvQ
-	(envelope-from <netdev+bounces-302124-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:39:54 +0200
+	id GSqTFhc8PmqRBwkAu9opvQ
+	(envelope-from <netdev+bounces-302125-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:45:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E216CB6DC
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:39:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372996CB74E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:45:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b="un/GEyo+";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302124-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302124-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=mediatek.com header.s=dk header.b=jb4N5yDH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302125-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302125-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mediatek.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6073B303B188
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 08:39:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2B4030075D7
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 08:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F0B7314A8E;
-	Fri, 26 Jun 2026 08:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7FD390C9F;
+	Fri, 26 Jun 2026 08:45:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7669B3E3D86
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FAD3BB681;
+	Fri, 26 Jun 2026 08:45:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782463189; cv=none; b=ZKtheSMK9uNhxPCPZfiWrSQjo7X7VgchEgVmVX4zJbINU4rcaM3b/0kbMAPPot4tR4tW4MfkqzAYhVkzWNnNNnAMASx0KIDtOHQgGOnKIyiStzh80TMZ3elcDArXFvAKSwK8xH2MKBPMUU75/xoqMkepEZA3lZ7UKImdloH+xYI=
+	t=1782463507; cv=none; b=E4d7jTBm5ULWIPL6ew6d9x8du+4OH0hoXwkASmIR/iht79QOJAAO6jKZ0HwbljHF6arG9hJroMoNBRxXw7q//azgE11dopK6v8ahgSVS3zR/XtMWe8L7bC7pI3v5Dc25x0dVwD/NX8t/Yhtrs1EzZgpVgJpQGRX67JVtJXSgFMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782463189; c=relaxed/simple;
-	bh=QKQjIOERkEL1hUXuP2xrqNYqby2u56uczdQvYl83iKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F23X+LftcFsOGdVfc2jBbOsDHdXX4hB9/Bg5BVln+wljleKVtPSh7mxcA7IIO3HfmmMYZjbOaacv75h820mR620F0nZAaMJKOK8yxqsTWVHAEQWU2RiHszMbliMqJbodUtn9GWgXXscdz1nFYbfpP1YYX9EKc94pbQwXn1NaFjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=un/GEyo+; arc=none smtp.client-ip=91.218.175.170
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782463175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PA6hCiGzE66fmjJHAfRH4gg5KTKAd+aVqbApVfB/ibk=;
-	b=un/GEyo+tKyJYyVyG8EPnO3Z1mA/K0zoVG4thj9w1rO2hP1RH/KrJBkl2TW3TeTyj7LST9
-	aeoRxwSaPhvEXQQQrzUcBehJzEbtNKW0OfC0xai39hKYxCesEEBSRJmwNxawy+e37Z2j+g
-	ZKXX1KUQ2+zM/kQLoTAxbkxwMJcBmKY=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jeff Garzik <jgarzik@redhat.com>,
-	Bruce Allan <bruce.w.allan@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] e1000e: fix IRQ leak when request_irq() fails in e1000_request_msix()
-Date: Fri, 26 Jun 2026 16:39:16 +0800
-Message-ID: <20260626083917.49745-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1782463507; c=relaxed/simple;
+	bh=P57UOKGR/1lJD0mKrus+RBayRSBuNY+kcCm/0HVEVrE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WZNa8OjbW+EMTIobDUOEEyTf+DlqoheAEyVnvG7ol/1P0mjsfNo5ghtp/uYtuabqJ3AI9Tx1jyN46Kuyo7wgkSRweuTXRLcyMeNklSLPELyfwtQL/+3taxSJ/tkv0hk+p5NHR6GPfYTxiFbcorZyiMPWpSjEIl8sf1U2khRC7CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=jb4N5yDH; arc=none smtp.client-ip=60.244.123.138
+X-UUID: 4f433af2713b11f1b1788b6acf885367-20260626
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=oZxFRT7y6QOtHKSYQsbCKdm/g4+aQqG38KozlNl6MJs=;
+	b=jb4N5yDH8kKRQ/fT8Q8bAtWHSXziRWBcw2UXyDZelqD7wtq1OPVpwz/ZmQcvmFmYtDyUnDPXMVIvg7jRPqQkl4rfmlRbJeHegqDAq3KQgtvwGiiliRB2gwFCTfnSDSyqUdEi2yWWDZs2/caN6zpxQs4+WDuSsQNFVe0rvCBUF+w=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.17,REQID:20a78760-6d8c-49b8-a904-b07db37cc47d,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:d497b38,CLOUDID:99bf23ee-45e6-4692-a476-3f71842ee83b,B
+	ulkID:nil,BulkQuantity:0,SF:102|836|865|888|898,TC:-5,Content:0|15|50,EDM:
+	-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,AV:
+	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 4f433af2713b11f1b1788b6acf885367-20260626
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 319282522; Fri, 26 Jun 2026 16:44:57 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Fri, 26 Jun 2026 16:44:56 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Fri, 26 Jun 2026 16:44:54 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<matthias.bgg@gmail.com>, <angelogioacchino.delregno@collabora.com>,
+	<willemb@google.com>, <imv4bel@gmail.com>, <alice@isovalent.com>,
+	<eilaimemedsnaimel@gmail.com>, <sd@queasysnail.net>
+CC: <lena.wang@mediatek.com>, <stable@vger.kernel.org>, Shiming Cheng
+	<shiming.cheng@mediatek.com>
+Subject: [PATCH v2] Subject: [PATCH] net: gro: fix double aggregation of flush-marked skbs
+Date: Fri, 26 Jun 2026 16:44:51 +0800
+Message-ID: <20260626084451.27699-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,139 +80,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-MTK: N
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiayuan.chen@linux.dev,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jgarzik@redhat.com,m:bruce.w.allan@intel.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302124-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302125-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,isovalent.com,queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:willemb@google.com,m:imv4bel@gmail.com,m:alice@isovalent.com,m:eilaimemedsnaimel@gmail.com,m:sd@queasysnail.net,m:lena.wang@mediatek.com,m:stable@vger.kernel.org,m:shiming.cheng@mediatek.com,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[mediatek.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E9E216CB6DC
+X-Rspamd-Queue-Id: 372996CB74E
 
-An internal syzbot instance reported the warning below.
+The new skb_gro_receive_list() function is missing a critical safety check
+present in the legacy skb_gro_receive() path. Specifically, it does not
+validate NAPI_GRO_CB(skb)->flush before allowing packet aggregation.
 
-comedi (comedi_parport) lets userspace request_irq() an arbitrary IRQ
-number and can thus grab one of e1000e's MSI-X vectors. When
-e1000_request_msix() then fails partway through, it returned without
-freeing the vectors it had already requested; pci_disable_msix() later
-tears those descriptors down while their irqaction is still attached,
-leaking the /proc/irq entry.
+This allows already-GRO'd packets with existing frag_list to be
+re-aggregated into a new GRO session, corrupting the frag_list chain
+structure. When skb_segment() attempts to unpack these malformed packets,
+it encounters invalid state and triggers a kernel panic.
 
-Free the already requested IRQs on the error path.
+Scenario (Tethering/Device forwarding):
+  1. Driver: Generated aggregated packet P1 via LRO with frag_list
+  2. Dev A: Receives aggregated fraglist packet and flush flag set
+  3. Dev A: Re-enters GRO, skb_gro_receive_list() is called
+  4. Missing flush check allows re-aggregation despite flush flag
+  5. Frag_list chain becomes corrupted (loops or dangling refs)
+  6. Dev B: TX path calls skb_segment(), crashes on corrupted frag_list
 
-genirq: Flags mismatch irq 28. 00200000 (eth1-tx-0) vs. 00200000 (comedi_parport)
+Root cause in skb_segment():
+  The check at line ~4891:
+    if (hsize <= 0 && i >= nfrags && skb_headlen(list_skb) &&
+        (skb_headlen(list_skb) == len || sg)) {
 
-remove_proc_entry: removing non-empty directory 'irq/27', leaking at least 'eth1-rx-0'
-WARNING: fs/proc/generic.c:742 at remove_proc_entry+0x436/0x560, CPU#3: ip/445
-Modules linked in:
-CPU: 3 UID: 0 PID: 445 Comm: ip Not tainted 7.1.0+ #284 PREEMPT
-RIP: 0010:remove_proc_entry (fs/proc/generic.c:742 (discriminator 4))
-PKRU: 55555554
+  When frag_list is corrupted by double aggregation, when list_skb is
+  a NULL pointer from skb->next, skb_headlen(list_skb) dereference
+  NULL/corrupted pointers occurs.
+
 Call Trace:
-<TASK>
-unregister_irq_proc (kernel/irq/proc.c:406)
-free_desc (kernel/irq/irqdesc.c:482)
-irq_free_descs (kernel/irq/irqdesc.c:874 kernel/irq/irqdesc.c:865)
-irq_domain_free_irqs (kernel/irq/irqdomain.c:1917)
-msi_domain_free_locked.part.0 (kernel/irq/msi.c:1619 kernel/irq/msi.c:1645)
-msi_domain_free_irqs_all_locked (kernel/irq/msi.c:1632)
-pci_msi_teardown_msi_irqs (drivers/pci/msi/irqdomain.c:28)
-pci_free_msi_irqs (drivers/pci/msi/msi.c:925)
-pci_disable_msix (drivers/pci/msi/api.c:200 drivers/pci/msi/api.c:193)
-e1000_request_irq (drivers/net/ethernet/intel/e1000e/netdev.c:2028)
-e1000e_open (drivers/net/ethernet/intel/e1000e/netdev.c:4681)
-__dev_open (net/core/dev.c:1702)
-netif_change_flags (net/core/dev.c:9806)
-do_setlink.isra.0 (net/core/rtnetlink.c:3207 (discriminator 1))
-rtnetlink_rcv_msg (net/core/rtnetlink.c:7068)
-netlink_rcv_skb (net/netlink/af_netlink.c:2556)
+ skb_headlen(NULL skb)
+ skb_segment
+ tcp_gso_segment
+ tcp4_gso_segment
+ inet_gso_segment
+ skb_mac_gso_segment
+ __skb_gso_segment
+ skb_gso_segment
+ validate_xmit_skb
+ validate_xmit_skb_list
+ sch_direct_xmit
+ qdisc_restart
+ __qdisc_run
+ qdisc_run
+ net_tx_action
 
-Fixes: 4662e82b2cb4 ("e1000e: add support for new 82574L part")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Assisted-by: Claude:claude-opus-4-8
+Fix: Add NAPI_GRO_CB(skb)->flush validation to the early-return check in
+skb_gro_receive_list(), matching the defensive programming pattern of
+skb_gro_receive().
+
+Fixes: 9dc2c3cd6c11 ("net: add fraglist GRO/GSO support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
 ---
- drivers/net/ethernet/intel/e1000e/netdev.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ net/core/gro.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 808e5cddd6a9..19b9823c5679 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -2099,7 +2099,7 @@ void e1000e_set_interrupt_capability(struct e1000_adapter *adapter)
- static int e1000_request_msix(struct e1000_adapter *adapter)
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 35f2f708f010..076247c1e662 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -229,7 +229,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 
+ int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
  {
- 	struct net_device *netdev = adapter->netdev;
--	int err = 0, vector = 0;
-+	int err = 0, vector = 0, i;
+-	if (unlikely(p->len + skb->len >= 65536))
++	if (unlikely(p->len + skb->len >= 65536 ||
++		     NAPI_GRO_CB(skb)->flush))
+ 		return -E2BIG;
  
- 	if (strlen(netdev->name) < (IFNAMSIZ - 5))
- 		snprintf(adapter->rx_ring->name,
-@@ -2111,7 +2111,7 @@ static int e1000_request_msix(struct e1000_adapter *adapter)
- 			  e1000_intr_msix_rx, 0, adapter->rx_ring->name,
- 			  netdev);
- 	if (err)
--		return err;
-+		goto err_free;
- 	adapter->rx_ring->itr_register = adapter->hw.hw_addr +
- 	    E1000_EITR_82574(vector);
- 	adapter->rx_ring->itr_val = adapter->itr;
-@@ -2127,7 +2127,7 @@ static int e1000_request_msix(struct e1000_adapter *adapter)
- 			  e1000_intr_msix_tx, 0, adapter->tx_ring->name,
- 			  netdev);
- 	if (err)
--		return err;
-+		goto err_free;
- 	adapter->tx_ring->itr_register = adapter->hw.hw_addr +
- 	    E1000_EITR_82574(vector);
- 	adapter->tx_ring->itr_val = adapter->itr;
-@@ -2136,11 +2136,16 @@ static int e1000_request_msix(struct e1000_adapter *adapter)
- 	err = request_irq(adapter->msix_entries[vector].vector,
- 			  e1000_msix_other, 0, netdev->name, netdev);
- 	if (err)
--		return err;
-+		goto err_free;
- 
- 	e1000_configure_msix(adapter);
- 
- 	return 0;
-+
-+err_free:
-+	for (i = vector - 1; i >= 0; i--)
-+		free_irq(adapter->msix_entries[i].vector, netdev);
-+	return err;
- }
- 
- /**
+ 	if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
 -- 
-2.43.0
+2.45.2
 
 
