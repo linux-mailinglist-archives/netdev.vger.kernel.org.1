@@ -1,208 +1,211 @@
-Return-Path: <netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302140-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3oh4HZxRPmrzDQkAu9opvQ
-	(envelope-from <netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:17:00 +0200
+	id PiO8M+lYPmocEQkAu9opvQ
+	(envelope-from <netdev+bounces-302140-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:48:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC6E6CBF9A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:16:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E1E06CC2BC
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 12:48:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=mchp header.b=oGVUk05U;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302138-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=microchip.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=fY082PXT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302140-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302140-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93097300BC6D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:16:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D73DA303130D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 10:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5403EC2D1;
-	Fri, 26 Jun 2026 10:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203CF3EFFA7;
+	Fri, 26 Jun 2026 10:48:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791343EA967;
-	Fri, 26 Jun 2026 10:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26E937C935;
+	Fri, 26 Jun 2026 10:47:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782469013; cv=none; b=ZvU+6zy/qtTI+6Y8XM8qjDcaXv8bVPUvD5GZRTYHm6IJ9MMTnSC9qHdMvsWLWrdBsiLdK/54/Fg3m4trQdoiz0EcjJB4LOGYRqEuZDl7+a0+GTXAm/s18Yz0Gg7+aT+j7vzoHKO1TwGIfvcvWGYs2JVeFyaHhWITEHMFt8zx4Ro=
+	t=1782470880; cv=none; b=sWRwQ2Lm32UCUhpU+juQzB4ieVVshWpU0SdbV8yVjoUtJ4/ydWqfxVzVfjLk+Wbm1+yRyiyeQaheBu88mVwyG7lG+JXBHK4XKtV5vB/1mKKzYBsmlTz5EoZ4c3xz0xbodaZp7ArDAcQc249RdkujobZnSiaTEmNnG0GPOdG2vag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782469013; c=relaxed/simple;
-	bh=zNOQKVs7mFtzvW7ZL9QiUwGBwaYNwddOXYQ6SUFj9VE=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=o7wRA51kY09p0F+Vh2nlbd56gbf8XVM2I0BA0nYJnWCYeYWPx0chMGZrRFbUp7iFmA7LpN0qXnXgbNXWdNnTeJyCGsXPfuf0DTcr9A5YCfK+HsdaeOGeS/+rBnwZjKEVWzb33ya/e5J24eZ45ABGgcON9GZy1aYFFUFq0qZpQPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oGVUk05U; arc=none smtp.client-ip=68.232.154.123
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1782469012; x=1814005012;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=zNOQKVs7mFtzvW7ZL9QiUwGBwaYNwddOXYQ6SUFj9VE=;
-  b=oGVUk05U8tIeR6MK2vZaJY1QW6nEPQUYMklI8bC/4qRW7Dd07Z577PTG
-   S5TN36DTeZ1JLBwWl/zA1ayZGMK4OOrjmE1aSmHsP0isZW2or8GQzInNP
-   aISU/peC1pCTCTrnalD7E5uI17vJwpmrnYVfO+YH6jJzmL5Rm665XMyWN
-   LtTL11VTh36pkY6ZqUBAXYYSrJGk2sp9Wb9Bp5501sflx4x75CAAAQqM2
-   NyksdOsgOUVyREl8pduwGfY9v1JMFNzSFxgpCbO1K59e2ucgtn0RWaowZ
-   ZUo5pq3zRa7mlRy+WmBr93yneeoerc+oF+Ba8bbHZFDagNueQFMVknIvd
-   g==;
-X-CSE-ConnectionGUID: 8bIlMgSjTJ2lCwvRkPA3WQ==
-X-CSE-MsgGUID: 8LxoRXNIQeaKlQiHcqlfEw==
-X-IronPort-AV: E=Sophos;i="6.24,226,1774335600"; 
-   d="scan'208";a="60080306"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jun 2026 03:16:51 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Fri, 26 Jun 2026 03:16:51 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Fri, 26 Jun 2026 03:16:48 -0700
-Message-ID: <ae037bec765ab2f660097edd61f02ec4d969098f.camel@microchip.com>
-Subject: Re: [PATCH net-next 6/9] net: sparx5: vcap: add lpm vcap
- implementation
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <daniel.machon@microchip.com>,
-	<Steen.Hegelund@microchip.com>, <kees@kernel.org>, <gustavoars@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-hardening@vger.kernel.org>
-Date: Fri, 26 Jun 2026 12:16:48 +0200
-In-Reply-To: <20260615233849.1042290-1-kuba@kernel.org>
-References: <20260612-sparx5_l3_routing-v1-6-fc3c10160f49@microchip.com>
-	 <20260615233849.1042290-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1782470880; c=relaxed/simple;
+	bh=vP2IdaVPbSZOk1XpzpIw7n5ZLCjv5/AMwDD8kEjAC3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BwUQ1BuHAVwruyRTMzVUYCJcNJbS74/IIL44/5aFhtCBjKfr3TqM9/cFBEp/O0oFjxYVBwvDhkT3AKJoJ3HDeQ12+XqilAKmvxYsnhCokWuamUYqueM20NeDtQ/VvEQSnVcRwge0U3iBlGuMAR+8SHrWgHWquQxFS782G6dAGMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fY082PXT; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60BC21F000E9;
+	Fri, 26 Jun 2026 10:47:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782470878;
+	bh=VYo3Ganq+WzA7X6u0ccLN2QJdHrunNuBmjyvihQ9bgU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fY082PXTc0XtaGqK1Hxo1xcbFPGuQTOnC+RsZjw9yja3eyqFAenyPMbvFNEemsn5Z
+	 w4gKJn3LogYURADXofWVfPjE+SzX1pyCBgzJEmkoc8aSozQ2j1SEfTFh8c0E0RhEag
+	 S/NsbXu+SpGb9H7LHESpq2ypWE5GeJHm6mONXHpXrZHfQEyZhUJLyNbCpZiUDfQMWV
+	 BwyueZHKfzhPI/qfKkfCXxm65Cp8zd69hD+Sf71y9NcZQunQzK9BXCDYV+sHXh+BLT
+	 WB+Xtgy1DyNTyNYjapjabA5G06SQ6AzSfqc4IDSCfwhh4mFAet8c1DA7SUgSWrcn/q
+	 taKGxC0Cj0RCw==
+Date: Fri, 26 Jun 2026 12:47:54 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: George Moussalem <george.moussalem@outlook.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-remoteproc@vger.kernel.org
+Subject: Re: [PATCH 1/6] dt-bindings: remoteproc: document M0 Bluetooth
+ Subsystem secure PIL
+Message-ID: <20260626-tiny-warm-jerboa-3ba57a@quoll>
+References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
+ <20260625-ipq5018-bluetooth-v1-1-d999be0e04f7@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260625-ipq5018-bluetooth-v1-1-d999be0e04f7@outlook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302138-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:horatiu.vultur@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:daniel.machon@microchip.com,m:Steen.Hegelund@microchip.com,m:kees@kernel.org,m:gustavoars@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-hardening@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	FREEMAIL_TO(0.00)[outlook.com];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302140-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid,microchip.com:from_mime]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de,vger.kernel.org,lists.infradead.org];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,devicetree.org:url,quoll:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,outlook.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6FC6E6CBF9A
+X-Rspamd-Queue-Id: 6E1E06CC2BC
 
-On Mon, 2026-06-15 at 16:38 -0700, Jakub Kicinski wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+On Thu, Jun 25, 2026 at 06:10:05PM +0400, George Moussalem wrote:
+> Document the M0 Bluetooth Subsystem remote processor core found in the
+> Qualcomm IPQ5018 SoC. Firmware loaded is authenticated via TrustZone.
+> The firmware running on the M0 core provides bluetooth functionality.
+> 
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
 > ---
-> net: sparx5: vcap: add lpm vcap implementation
->=20
-> Add the implementation for the LPM VCAP for lan969x and sparx5. The LPM
-> VCAP has a static keyset configuration, and a single lookup dedicated to
-> LPM, so this is straight forward, and many functions can use existing
-> functionality.
->=20
-> > diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c b=
-/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
-> > index 95b93e46a41dc..e25e759c24f60 100644
-> > --- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
-> > +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
-> > @@ -1083,6 +1146,46 @@ static void sparx5_vcap_es2_cache_write(struct s=
-parx5 *sparx5,
-> >       }
-> >  }
-> >=20
-> > +static void sparx5_vcap_lpm_cache_write(struct sparx5 *sparx5,
-> > +                                     struct vcap_admin *admin,
-> > +                                     enum vcap_selection sel,
-> > +                                     u32 start,
-> > +                                     u32 count)
-> > +{
-> > +     u32 *keystr, *mskstr, *actstr;
-> > +     int idx;
-> > +
-> > +     keystr =3D &admin->cache.keystream[start];
-> > +     mskstr =3D &admin->cache.maskstream[start];
-> > +     actstr =3D &admin->cache.actionstream[start];
-> > +
-> > +     switch (sel) {
-> > +     case VCAP_SEL_ENTRY:
-> > +             for (idx =3D 0; idx < count; ++idx) {
-> > +                     /* Avoid 'match-off' by setting value & mask */
-> > +                     spx5_wr(keystr[idx] & mskstr[idx], sparx5,
-> > +                             VCAP_SUPER_VCAP_ENTRY_DAT(idx));
->=20
-> [Severity: High]
-> Are concurrent writes to the shared VCAP_SUPER_VCAP_ENTRY_DAT registers
-> safe here without a global hardware lock across the different VCAP types?
->=20
-> It looks like IS0 and IS2 rules are updated via vcap_add_rule() under the
-> rtnl_lock(). However, the LPM rules are updated under the
-> sparx5->router->lock inside a workqueue.
->=20
-> Since both execution paths share the Super VCAP hardware block, could
-> concurrent updates from TC (IS0/IS2) and routing (LPM) race on these shar=
-ed
-> cache registers, and also on VCAP_SUPER_CTRL in sparx5_vcap_super_update(=
-),
-> garbling the hardware command and corrupting the cache memory?
->=20
+>  .../bindings/remoteproc/qcom,m0-btss-pil.yaml      | 72 ++++++++++++++++++++++
+>  1 file changed, 72 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/remoteproc/qcom,m0-btss-pil.yaml b/Documentation/devicetree/bindings/remoteproc/qcom,m0-btss-pil.yaml
+> new file mode 100644
+> index 000000000000..397bb6815d71
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/remoteproc/qcom,m0-btss-pil.yaml
 
-Very nice catch, I missed this. This is even reachable before this series
-because the debugfs dump also uses these registers, and runs outside of
-rtnl.
+Use compatible as filename.
 
-I will send a fix to net which replaces the per instance locks with a singl=
-e
-vcap_control global mutex.
+> @@ -0,0 +1,72 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/remoteproc/qcom,m0-btss-pil.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Qualcomm M0 BTSS Peripheral Image Loader
+> +
+> +maintainers:
+> +  - George Moussalem <george.moussalem@outlook.com>
+> +
+> +description:
+> +  Qualcomm M0 BTSS Peripheral Secure Image Loader loads firmware and powers up
+> +  the M0 BTSS remote processor core on the Qualcomm IPQ5018 SoC.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - qcom,ipq5018-btss-pil
+> +
+> +  firmware-name:
+> +    maxItems: 1
+> +    description: Firmware name for the M0 Bluetooth Subsystem core
 
-> > +                     spx5_wr(~mskstr[idx], sparx5,
-> > +                             VCAP_SUPER_VCAP_MASK_DAT(idx));
-> > +             }
-> > +             break;
->=20
-> [ ... ]
->=20
-> > @@ -1379,6 +1523,7 @@ static void sparx5_vcap_update(struct net_device =
-*ndev,
-> >       struct sparx5 *sparx5 =3D port->sparx5;
-> >=20
-> >       switch (admin->vtype) {
-> > +     case VCAP_TYPE_LPM:
-> >       case VCAP_TYPE_IS0:
-> >       case VCAP_TYPE_IS2:
-> >               sparx5_vcap_super_update(sparx5, cmd, sel, addr);
+You can drop description, pretty obvious.
+
+> +
+> +  clocks:
+> +    items:
+> +      - description: M0 BTSS low power oscillator clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: btss_lpo_clk
+
+Just "lpo"
+
+> +
+> +  memory-region:
+> +    items:
+> +      - description: M0 BTSS reserved memory carveout
+> +
+> +  resets:
+> +    items:
+> +      - description: M0 BTSS reset
+> +
+> +  reset-names:
+> +    items:
+> +      - const: btss_reset
+
+Drop names. Using block name as input name is not really useful.
+
+No supplies? no address space? How do you actually trigger remoteproc
+startup?
+
+> +
+> +required:
+> +  - compatible
+> +  - firmware-name
+> +  - clocks
+> +  - clock-names
+> +  - resets
+> +  - reset-names
+> +  - memory-region
+> +
+> +additionalProperties: false
+
+Best regards,
+Krzysztof
 
 
