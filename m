@@ -1,190 +1,151 @@
-Return-Path: <netdev+bounces-302235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rRfoMR2rPmr+JwkAu9opvQ
-	(envelope-from <netdev+bounces-302235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:38:53 +0200
+	id RxVGN02sPmozKAkAu9opvQ
+	(envelope-from <netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:43:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2BD6CF2C5
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:38:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF076CF34C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 18:43:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ImNjInA5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302235-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302235-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="lCLfL4/0";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302236-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B51BA300BCB9
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:35:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9EC1A300FEC1
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 16:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8803FC5B7;
-	Fri, 26 Jun 2026 16:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D873FD14F;
+	Fri, 26 Jun 2026 16:37:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC673FCB39
-	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 16:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBCB3FCB3A;
+	Fri, 26 Jun 2026 16:37:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782491727; cv=none; b=AM8+K3UWudM5PbljSnTfakYk6PwWVSqdJkcEMJWNN/r4C5c/sMSAmt2t0ioW+Vhhg/k6lQUyeXxoa+vl0TaE+9YGjZ2qwrd5jApgpJ9h7GZgxffVr0iWXJkW+9fnpAAsLdFiRzLmqpEDXDYrCo95SX6MAmrLnha0t/tn2rMhJOE=
+	t=1782491862; cv=none; b=EVLyAI+UmP2x14GhDxWwkXZZGy9hqAVhrkkFZw2eLljLDiAFiJwEeX6YGz0eTstbNEVfLh8mWhD61JcE43GmODkCbi7jJiPkbRN3MEws5HydfmkyVBpjf6n0/iQ2ry69ke11GK/JlBCLYiescWOt33Cb+1o6fMwt43H/0qWBP+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782491727; c=relaxed/simple;
-	bh=G0ur+VGsK5u8uehJUY577XPYpSiXqEDgqalyWKWqXew=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GDPLPK7cXyRpr0alJ8LJTCkfedGY6NiJoz2pkJjsQgTdvNMNs8uPQEIPLGRsJ6jGHeO6F0WQnXmqS/9Qdet2dLI/9fnG6QFAQDh4Boy616LkotYPgZEtC07irG4bfaOgYdd+8r3A2fiC8p/puK4Hr+cZmVZuNr7gLF7fnl6rSl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ImNjInA5; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4923fb1f095so11528715e9.1
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 09:35:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782491723; x=1783096523; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/9JIf9OJEzVS6CWv1FSk8ReHN3mioJ8+p1Xh5mgkJRk=;
-        b=ImNjInA5iKioWKD+XL+xYCLmU7oLyGLf25sa+a19d17uFXgl9+atFON9qKpenByXne
-         VKaI/Oi6oWkeM35rcLzmDSD1QytduBqaKSOd3H2iR0b/K8QAtXZGEn4mzD5n3j6TMLV2
-         A0FkOJPlBc/ClIXvxcW+U+gY3xgBwKoY3ehV7P56MajuvzcxC1zRjezzLBZ/WhGozvcj
-         Q5L8gcsmCGXHtFTpjwhKXVl9RuLbi3BJ2was23bzqwoo+xcloBBcrt1PJlhqdXs4PTC3
-         PgIGiFzb1QphOzS7UAu1siRgMMyMQB1I4gK0I68wpmjHcpKmQIaMHzIyqnPjU84BsS5j
-         zR7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782491723; x=1783096523;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/9JIf9OJEzVS6CWv1FSk8ReHN3mioJ8+p1Xh5mgkJRk=;
-        b=sEOV0mge3/0P3N6JVqGcHjF3khzKQ+2I+DU9tgRj7OhBKutZ6TumfPOQMzKzrXdIJJ
-         n8ZMezfRUY7futXBkkr0HEHOiliPU4acAv0oHdYT2OnGK9+zUz5q0qORNG1xUG+6Zlia
-         3PYVqmYwKhCnEf5Xu/GQsXgNPHvxqkKJKphttyoFexbsnluh4IL4dGn7MNfglpeBBBKF
-         EzFBbMYyeC4csDLgfwjwDH441lGUmH3aUu6tUX8kwUV6SKP2IbCxgOJhha19X2Z6pktq
-         K9apLl4ggyvWHfkpmDMdR96NTGoCYgPyewZi+ryq30r2UUDPkvuTIR6lM3KV/MbRp4z6
-         CX3Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9DVq39h6JnGDWRm58EQxoMQU6LETu3X/MTl4SCJeub8fOf8Mw7lzPu7+17nfHiv2ogc9uQOkQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4BrNXN/3TA6c+ZfyF9wKp1XuQyMo73vMJrjXLfkevzBMfMLPI
-	6bVCWearSIgVN7nSZjTeaoXUS5QyQP7fA8sawluXUW1hBRe8c+JXEodL
-X-Gm-Gg: AfdE7ckBCvqo4wpukF09xDAgbN1/b/KQzWI+VI/zhK+Lffur3NnHdsjg0OqpR9kF3Hq
-	IAzkXjNsd9RqNsOP6+0gi/UCzBc9lrOLLsQKLPPhSpUcwFZR0waN0f1FK+XtbrDsKN+6CU4m7/i
-	yDCG925Gcsv9311YbErAPIEXXE13Q9eomnMIvB5y8tPXVxt/mIpbkYcUkdOzQ8iWxLv0XHhMPiL
-	9Ff0rd1hAdyxGMFZmVQw58q60XvDIoAQSHtjMdooxmkwfNLS7g3/30TElPUqhSBYoMUgaKssww3
-	HtJV0ODtYgpPBUkSaksDx4Z0JvGu9B9AhEIh/VkuzOqH2IQGZJZ/1HNfWRie+58oeJeq4xPMJOz
-	PcZsiQZ5BadO0G0vsj0+XJclnADwZWPP1db2ofceHXsU3mxTgWu7Zc8T+1AZj1zMpM+RaUMf/Na
-	mdmw17WGh4GUYOAZfK7suBSmDNvgzqO2/CiZnJ8oRFwZyl6C9sXPxbtvXKzvIZnxujfBee8Si/M
-	xpDLf/DCENMJ6a8HA==
-X-Received: by 2002:a05:600c:34ca:b0:492:58d6:2565 with SMTP id 5b1f17b1804b1-4926689dfe6mr106861335e9.25.1782491722478;
-        Fri, 26 Jun 2026 09:35:22 -0700 (PDT)
-Received: from localhost.localdomain (ip-89-176-136-191.bb.vodafone.cz. [89.176.136.191])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49269071e49sm89894875e9.10.2026.06.26.09.35.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 09:35:21 -0700 (PDT)
-From: Petr Wozniak <petr.wozniak@gmail.com>
-To: maxime.chevallier@bootlin.com,
-	olek2@wp.pl,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	bjorn@mork.no,
-	kabel@kernel.org,
-	Petr Wozniak <petr.wozniak@gmail.com>
-Subject: Re: [PATCH net v4 2/2] net: phy: mdio-i2c: defer RollBall bridge probe to PHY discovery
-Date: Fri, 26 Jun 2026 18:35:19 +0200
-Message-ID: <20260626163519.10678-1-petr.wozniak@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260624084814.20972-3-petr.wozniak@gmail.com>
-References: <20260624084814.20972-3-petr.wozniak@gmail.com>
+	s=arc-20240116; t=1782491862; c=relaxed/simple;
+	bh=lMuRHAfMuqNzny9sJY10zguaZtTrsML5NLnJR3unQpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NTqyPtDVTFAdLLkfVU0hOO0bLaNWf+XjhvjVxQqtcrdBV6+dLb82rZuMxiOb9ccMK7cnkgmmQV/ml+/e/lh1H4EfQexS+KEqID1Wx5ix7HiVrsdaKubkdN4QcHHFD/iX3iBDQd0C08ECpPMDsjDwsgvILrmFvkQVAaEKAxHhQIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lCLfL4/0; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB4781F000E9;
+	Fri, 26 Jun 2026 16:37:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782491860;
+	bh=25YMHu8BkwQq3mf5EDMj4sWLLgI4tXtIXIuJSB0ZS+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lCLfL4/0rdTnXbCNVgvdlofIAhZnYNaJIroJwYdrng/hpzA8iQcwge5Es1y+yqq3s
+	 x3uNKxSptkheRPAcb/EBs7lODYXf3JVCa7yi2jZUjs2sgnipB4vqKULy6TRgzqSnd+
+	 wWU0iRcykU3nXB+HzDJMGJ6/xObGnmZLDoos8eKP2IfFKQql3xKphgFdF2XVvxeqcU
+	 gfsv6y7PJoTbFlFOLrnL0yjW6WEWzNzmGvZDrzZf/2IPqIu1fqLaHRU6jbUy0WJeix
+	 b1qzXFYUeIvyxbFcr3+96veMX78TxcqW6nFK19ru8D5iHJIZHJJbStFq/9m8Jq5IZi
+	 ms6wzfAtlasDA==
+Date: Fri, 26 Jun 2026 17:37:35 +0100
+From: Simon Horman <horms@kernel.org>
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net: wwan: iosm: bound device offsets in the MUX
+ downlink decoder
+Message-ID: <20260626163735.GF1310988@horms.kernel.org>
+References: <178236824878.3259367.5389624724479864947@maoyixie.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178236824878.3259367.5389624724479864947@maoyixie.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-302236-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-302235-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:olek2@wp.pl,m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-phy@lists.infradead.org,m:bjorn@mork.no,m:kabel@kernel.org,m:petr.wozniak@gmail.com,m:petrwozniak@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[bootlin.com,wp.pl,armlinux.org.uk,lunn.ch,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,lists.infradead.org,mork.no,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrwozniak@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,vger.kernel.org:from_smtp,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D2BD6CF2C5
+X-Rspamd-Queue-Id: 2CF076CF34C
 
-Maxime Chevallier wrote:
-> I finally got time to test this with a RollBall module, and I
-> confirm what Aleksander says, the RollBall module's PHY doesn't
-> get detected even with this patch. It does work on v7.0 though,
-> so before the bridge probing was introduced.
+On Thu, Jun 25, 2026 at 02:17:28PM +0800, Maoyi Xie wrote:
+> mux_dl_adb_decode() walks a chain of aggregated datagram tables using
+> offsets and lengths taken from the modem. first_table_index,
+> next_table_index, table_length, datagram_index and datagram_length are
+> all device supplied le values. Only first_table_index was checked, and
+> only for being non zero. The decoder then formed adth = block +
+> adth_index and read the table header and the datagram entries with no
+> bound against the received skb. A modem that reports an index or a
+> length past the downlink buffer makes the decoder read out of bounds.
+> 
+> The buffer is IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE and skb->len is at most
+> that, so skb->len is the real limit, but none of these in band offsets
+> were checked against it.
+> 
+> The table chain is also followed with no forward progress check. The loop
+> takes the next table from adth->next_table_index and stops only when that
+> reaches zero. A modem can stage two tables that point at each other, so
+> the loop never ends. It runs in softirq and clones the skb on every pass.
+> 
+> Validate every device offset and length against skb->len before use.
+> The block header must fit. Each table header, on entry and after every
+> next_table_index, must lie inside the skb. The datagram table must fit.
+> Each datagram index and length must stay inside the skb. The header
+> padding must not exceed the datagram length so the receive length does
+> not wrap. Require each next_table_index to move forward so the chain
+> cannot cycle.
+> 
+> This was reproduced under KASAN as a slab out of bounds read on a normal
+> downlink receive once the iosm net device is up.
+> 
+> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support")
+> Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
 
-Thanks a lot for taking the time to test, Maxime - and Aleksander
-for the original report.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-That settles it: the deferred-probe approach in patch 2/2 doesn't
-actually restore genuine RollBall PHY detection, and as you both
-confirm it worked before 8fe125892f40 introduced the bridge probing.
-Sashiko's static review flagged the same thing (the probe bypasses the
-PHY discovery retry loop for slow-initializing modules), so the static
-analysis and the two hardware reports all point at the same flaw.
-
-I only have RTL8261BE-based copper modules here, not a genuine RollBall
-one, so I can't develop and verify a proper slow-init timing fix
-(module_t_wait / a retry that waits for the bridge) without the
-hardware to test against.
-
-Given that, my suggestion:
-
-- Please drop patch 2/2 from the series.
-
-- Since 8fe125892f40 regressed genuine RollBall detection and the
-  deferred probe doesn't restore it, I think the cleanest fix is to
-  revert 8fe125892f40. I'm happy to send that revert if you'd prefer.
-  The 5-minute RTL8261BE probe loop it was addressing is handled in our
-  downstream tree, so reverting it upstream is fine on our side.
-
-- Patch 1/2 (the mii_bus leak fix) is independent of all this and
-  already has Reviewed-by from Maxime and Larysa - it would be good to
-  take that one regardless. I can resend it standalone if that's easier.
-
-A proper fix covering slow-firmware modules really needs a genuine
-RollBall module to validate, so it's better owned by someone who has
-that hardware - happy to help review.
-
-Thanks again,
-Petr
 
