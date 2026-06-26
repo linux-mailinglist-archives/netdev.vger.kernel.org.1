@@ -1,55 +1,67 @@
-Return-Path: <netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4ecaFtqXPmrYIgkAu9opvQ
-	(envelope-from <netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:16:42 +0200
+	id SX3bHQCYPmrsIgkAu9opvQ
+	(envelope-from <netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB6756CE656
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:16:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D8316CE67D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302200-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=EVjjbM26;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 02DD0305726A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:15:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BA3D4302E619
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98F33803CC;
-	Fri, 26 Jun 2026 15:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5E53839AE;
+	Fri, 26 Jun 2026 15:15:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D717837DAAA;
-	Fri, 26 Jun 2026 15:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB54A1A5B9E;
+	Fri, 26 Jun 2026 15:15:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782486903; cv=none; b=fX3sRWRvAO6iJ1KZMgRIbPw8dzYb6mhQ2M365jxAwliNgtmOosfsPRg0gIApqujXZ/B9g/nKmaFvlSm419ZxqRWaE/M3DVMsiJFRPxCGVwpO9gk29zuzn2A2OAdlr76bjuhzONIeCwqfZZxfeY+ToYlo52pSh/Nwr/TnI5uzShI=
+	t=1782486938; cv=none; b=BNdzb35cLJGGJYK541ZJxvaO0UVZ4+d6WZlxuPrIfjI9XUUCB8winyth9TSDLjn3xiLOlOjE2WV0bN2COh3AM8z3Zdov0LaeVj5ER9VeQYKAm6/Sh/7wdeOLidHmA+lO/vSAktpxvlnEmlnQPZQZeAobbA6sWKtAP00OmG37fNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782486903; c=relaxed/simple;
-	bh=VtnWEWRy+CVDljRKwa0JKskkVAFjQhUVahwJL6o5v2w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VcQA2sUn+l0zqd7s4YCJvz3G5ZZHiZ/jswNbmxyrwALJSjUL7mg8kMbFWcfN9qOrvDUFF2YWJDCASR5oFoAJVllzed+M0fSoh/up2OuEiDDmsIpFItLD/+kmAMTEO6QApH2YaLv+9akDxSsALjDvv6QanDp+9N4QT3ix4HUOA0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Received: from localhost.localdomain (unknown [117.182.75.66])
-	by APP-01 (Coremail) with SMTP id qwCowAA33NRplz5qarxrAw--.18895S2;
-	Fri, 26 Jun 2026 23:14:50 +0800 (CST)
-From: WenTao Liang <vulab@iscas.ac.cn>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	WenTao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH] fix: net: cadence: macb_mii_init: fix double of_node_put on mdio_np after   macb_mdiobus_register
-Date: Fri, 26 Jun 2026 23:14:49 +0800
-Message-Id: <20260626151449.50969-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1782486938; c=relaxed/simple;
+	bh=jA+LtT+w9ziFAv6SejZy4xHhQcaZUUtt+07+zT74GpQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HtbxPhdXd6+TLgHk/miOXJFxWS9Pb/MNbIGNuuoJAeYEzBNIJpuoxnPGOj418TzwYkN9By5187jR3C/5rFcZGeKNxTvfN9n8t5ovOPCFV/m/ARiF2ITAcb7JHFs7v56k+ff40UWycfRCbc+Pvzqrf8m75NfBGlZCeT/GN97waOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVjjbM26; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A3081F000E9;
+	Fri, 26 Jun 2026 15:15:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782486932;
+	bh=xMY3o3jBD4b25D29n1Y1hcy2n0lXYQS1LYHlfhK/gYA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=EVjjbM26lfY86Z2EOtyBuaAUSZlbBDEVn8wyO0rAeKKowe7XE055BXKlqUgLhfaGe
+	 0ATXsek9two9aM1KP+USC25qaYd5ShTQ/TpPiHBmpYVAkdndBPGi86rvG8kPT9Vxzo
+	 DQ9Ntn6lLkKepCSOwAQV9YrM3Ti6BWqGeIKg4TUOas1d5crz70Zdyj4lsiMXMW80f9
+	 9nleyzXTEDsdd9xrIWbZ8dbhsWvqyJIlmKWrm11ZWkf5CSfZomZ5/0QsnBLw91HQqb
+	 cPjbAR99qtLBJOhzR6qequiNBP3qX9YI9meZkyeowhN/05ujj9Exo9iOL/NbDSlFu5
+	 DANByD0lozLEg==
+From: Simon Horman <horms@kernel.org>
+To: lange_tang@163.com
+Cc: Simon Horman <horms@kernel.org>,
+	mst@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	jasowang@redhat.com,
+	edumazet@google.com,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	tanglongjun@kylinos.cn
+Subject: Re: [PATCH v4] virtio_net: disable cb when NAPI is busy-polled
+Date: Fri, 26 Jun 2026 16:15:08 +0100
+Message-ID: <20260626151508.1319440-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260625013733.29300-1-lange_tang@163.com>
+References: <20260625013733.29300-1-lange_tang@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,90 +69,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAA33NRplz5qarxrAw--.18895S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1rur15Aw1kXw1UJF13Jwb_yoW8Gr4Up3
-	yYkrW5Wrn7Jr4Iyw4kGa18AF90ga15trW8uFWjk3yrZFs8GFy8AryxWFy5urn8GrZ7CanF
-	yrn5A3Wqqas5Cw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	tVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUbUPED
-	UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRQKA2o+iCgsEAABsd
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302201-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302200-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_RECIPIENTS(0.00)[m:nicolas.ferre@microchip.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:lange_tang@163.com,m:horms@kernel.org,m:mst@redhat.com,m:xuanzhuo@linux.alibaba.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[163.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EB6756CE656
+X-Rspamd-Queue-Id: 0D8316CE67D
 
-After macb_mdiobus_register succeeds, the mdio_np reference ownership is
-  transferred to the mii_bus device (stored in mii_bus->dev.of_node). When
-  the subsequent macb_mii_probe fails, the error path jumps to
-  err_out_unregister_bus which calls mdiobus_free (releasing the node via
-  fwnode_handle_put) and then falls through to err_out which calls
-  of_node_put(mdio_np) again, causing a double put.
-
-Move the of_node_put to only execute on paths where the reference was not
-  transferred (i.e., before successful macb_mdiobus_register).
-
-Cc: stable@vger.kernel.org
-Fixes: ef8a2e27289e ("net: macb: fix probing of PHY not described in the dt")
-Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- drivers/net/ethernet/cadence/macb_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+virtio_net: disable cb when NAPI is busy-polled
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index a12aa21244e8..c58e089e5888 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -1170,6 +1170,9 @@ static int macb_mii_init(struct macb *bp)
- 	mdiobus_unregister(bp->mii_bus);
- err_out_free_mdiobus:
- 	mdiobus_free(bp->mii_bus);
-+	of_node_put(mdio_np);
-+	return err;
-+
- err_out:
- 	of_node_put(mdio_np);
- 
--- 
-2.39.5 (Apple Git-154)
+This commit disables the virtqueue callback at the entry of virtnet_poll().
+It aims to prevent a large number of spurious interrupts when busy-poll is
+active by keeping the callback off while polling.
 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 26afa6341d161..c1e252400c0fc 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3011,6 +3011,8 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+>  	unsigned int xdp_xmit = 0;
+>  	bool napi_complete;
+>  
+> +	virtqueue_disable_cb(rq->vq);
+> +
+
+[Severity: High]
+Can this unconditionally disable the RX callback and cause a permanent network
+stall when polled by netpoll?
+
+If the netpoll subsystem (e.g., used by netconsole) calls the NAPI poll
+function directly with a budget of 0, virtqueue_disable_cb() is called
+immediately. virtnet_receive() will then process 0 packets and return 0.
+
+Later in virtnet_poll(), the completion condition is checked:
+
+	if (received < budget) {
+		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
+        ...
+	}
+
+When both received and budget are 0, this condition evaluates to false. This
+skips virtqueue_napi_complete(), leaving the RX callback permanently disabled
+and preventing the device from raising further RX interrupts.
+
+>  	virtnet_poll_cleantx(rq, budget);
+>  
+>  	received = virtnet_receive(rq, budget, &xdp_xmit);
 
