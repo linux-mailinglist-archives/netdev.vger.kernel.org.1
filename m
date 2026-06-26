@@ -1,153 +1,1022 @@
-Return-Path: <netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SX3bHQCYPmrsIgkAu9opvQ
-	(envelope-from <netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:20 +0200
+	id 0qS6ABiYPmrxIgkAu9opvQ
+	(envelope-from <netdev+bounces-302202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D8316CE67D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C6C26CE692
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:17:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=EVjjbM26;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302201-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=AhFHLDNL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302202-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302202-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BA3D4302E619
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:16:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A758B304E94A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 15:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5E53839AE;
-	Fri, 26 Jun 2026 15:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA58137B02A;
+	Fri, 26 Jun 2026 15:15:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB54A1A5B9E;
-	Fri, 26 Jun 2026 15:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D1238399B
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 15:15:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782486938; cv=none; b=BNdzb35cLJGGJYK541ZJxvaO0UVZ4+d6WZlxuPrIfjI9XUUCB8winyth9TSDLjn3xiLOlOjE2WV0bN2COh3AM8z3Zdov0LaeVj5ER9VeQYKAm6/Sh/7wdeOLidHmA+lO/vSAktpxvlnEmlnQPZQZeAobbA6sWKtAP00OmG37fNY=
+	t=1782486951; cv=none; b=np3G5gGc3f3dGXIzzlorLvRKG7mCBWF/iAkAODNqwr7LdD62KbRmOQ1wFcZ/mn5w1kC9LBnrKz/KKmUdBf2QOIMq+wjAcyM0zowYzZ2dhk3dEaHq5mGGe3VqDWF/tMKB9H7NxaTSL1+2LTRX5HWaMR16uVVp6vMM5bvncO0CDTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782486938; c=relaxed/simple;
-	bh=jA+LtT+w9ziFAv6SejZy4xHhQcaZUUtt+07+zT74GpQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HtbxPhdXd6+TLgHk/miOXJFxWS9Pb/MNbIGNuuoJAeYEzBNIJpuoxnPGOj418TzwYkN9By5187jR3C/5rFcZGeKNxTvfN9n8t5ovOPCFV/m/ARiF2ITAcb7JHFs7v56k+ff40UWycfRCbc+Pvzqrf8m75NfBGlZCeT/GN97waOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVjjbM26; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A3081F000E9;
-	Fri, 26 Jun 2026 15:15:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782486932;
-	bh=xMY3o3jBD4b25D29n1Y1hcy2n0lXYQS1LYHlfhK/gYA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EVjjbM26lfY86Z2EOtyBuaAUSZlbBDEVn8wyO0rAeKKowe7XE055BXKlqUgLhfaGe
-	 0ATXsek9two9aM1KP+USC25qaYd5ShTQ/TpPiHBmpYVAkdndBPGi86rvG8kPT9Vxzo
-	 DQ9Ntn6lLkKepCSOwAQV9YrM3Ti6BWqGeIKg4TUOas1d5crz70Zdyj4lsiMXMW80f9
-	 9nleyzXTEDsdd9xrIWbZ8dbhsWvqyJIlmKWrm11ZWkf5CSfZomZ5/0QsnBLw91HQqb
-	 cPjbAR99qtLBJOhzR6qequiNBP3qX9YI9meZkyeowhN/05ujj9Exo9iOL/NbDSlFu5
-	 DANByD0lozLEg==
-From: Simon Horman <horms@kernel.org>
-To: lange_tang@163.com
-Cc: Simon Horman <horms@kernel.org>,
-	mst@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	jasowang@redhat.com,
-	edumazet@google.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	tanglongjun@kylinos.cn
-Subject: Re: [PATCH v4] virtio_net: disable cb when NAPI is busy-polled
-Date: Fri, 26 Jun 2026 16:15:08 +0100
-Message-ID: <20260626151508.1319440-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260625013733.29300-1-lange_tang@163.com>
-References: <20260625013733.29300-1-lange_tang@163.com>
+	s=arc-20240116; t=1782486951; c=relaxed/simple;
+	bh=xbXH/PFr4okXnWP9JjD07ErsLcwxph+90zKHB9n2N1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VgIv8uQuMT0YwpyMQtRPWhKl7iKztQkitjJ1w6N69Cpbq7P8xtFY6Is4iftBz2kkmDDlLEqMo0aHRTG0Nbk6udEJfeh5otIlLITfsk8fqppSacpZI/23L9aIxdD/hc7mAo1hXXwqjurnLq5xWYqWCTVARUM1v0eYjjr5WHNsCyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=AhFHLDNL; arc=none smtp.client-ip=74.125.82.43
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-139a5f4ca15so1254427c88.1
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 08:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1782486938; x=1783091738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kYCIiLqbcbgOVKZHwOs6ZNtcPcLxYV5FYCE34kStYiY=;
+        b=AhFHLDNLlyCuDlXrpNBSIr43gF7ovHMm9HyiL0husSYnLTPxs74IF6o/zP+zVD5vBu
+         qcs7qN0PkQ5s3mVzk7TbAiSv1V3PFvLBz1WPPtMz8A5IrK8xgHGih69LaHKUZD0/iMyD
+         +YMHGZYFddrYboHyWBMBeonuxIjxchyiV/XygkNnnyBc3in8DDYRsQd+/US46xB29xWe
+         5q5laxQcmTG1M8ScJAayX4KjFL+jF+NLarAGzRrgVmVwwFtZ2/kMIWbggAEjxkIwWo1S
+         DZMrOLx1E/2QFAS0hx3WR/4SLxCgijxhsVlEC6Y9mSxw1aZJ3X73G3JmOuTntvIWmYK0
+         5JwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782486938; x=1783091738;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kYCIiLqbcbgOVKZHwOs6ZNtcPcLxYV5FYCE34kStYiY=;
+        b=iQbd6DSK4T7j0LAZfayn0Ob6o1RxyEcZ3CzbloeTu6DPM/tzFQhcVV+R64agv5bONf
+         X3yRtGhXLYCV2KtIPP/ZLHLvP8OGe3FZI6beaJR8i/f6mEoCzwD5epaUlfqhFVUNTb+3
+         WKjrfSZAKUbLnDedMEIwxYdigk3e/W3lcvoRbaMtcMb/9ujDp+w0E0H6JsNlJzLalEi+
+         f08vJDQJKCWX5hOegIp90AE8dGcRh1kYS3X+mqQMjDZLrT5CgZWJL9LiCjZ7Zx5GFjre
+         z9df7GERkaulk5EEVPXWXBAtIH4MPWRwZO3GRAkXDtL043IS14cOHuFfjDOKy26/Yrnc
+         F9fg==
+X-Gm-Message-State: AOJu0Yxi8iNsTxlS4jawASL9EZtIb0PMcUDZ6fHvpUZnJ/NuJKLgG3d+
+	zShfy3SFoGxG26cim6dzdIcrhoG6p7/5uF3dFme/5Xw3RK18+T3a2HG8LE5DNsrsll8=
+X-Gm-Gg: AfdE7cltQsg9F8FBXAqvI6N7ObfFp8R7JbqJ5Qze4y0MvCP3z5fLyZHjsFDDdFmMBvM
+	2TfK9Vq6vYkkpoCMgDK85DwCpABwDci4mZPrqpT/2x2vhfvTqQ8hFKZuLYkr1GAakVJOLFIrfX9
+	WL2sI7ChegaIsNOall6Dnm8hojRdHzSGlwFDxumo/8ZvBV9yVsTXXA76OQrS9TO1dOfV2ZCd+Ed
+	dVZBQIw/zmpGdpzCI4lvJRBzduPqxzolFupMHXfCf1UBnUJTXA862nfyFZ/T4OClApWgqBI3NzS
+	nG6NMpS+ESWAQM/+gIsOG/tfz6JbKxSXmoWimqZAibmAyqiZMIVFfjKB5dnMok9+ByPfdhxHje8
+	Edb2Wx4uwcqzn8yu7AdOhEQsWB7Kw1qknuEx8NBuDJX6qm6fpFEFarFeglmuPxEcX086nE9A9GI
+	+USDHCYiS3a0076X+FRkTGri1EBusxmLbKwVP5Hh6NALT8JulfyQSDnA==
+X-Received: by 2002:a05:7022:2585:b0:137:9399:fc59 with SMTP id a92af1059eb24-139dbac8341mr5625903c88.21.1782486937485;
+        Fri, 26 Jun 2026 08:15:37 -0700 (PDT)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139d8f31866sm22111533c88.1.2026.06.26.08.15.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2026 08:15:37 -0700 (PDT)
+Date: Fri, 26 Jun 2026 08:15:34 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Bjarni Ingi Gislason <bjarniig@simnet.is>
+Cc: netdev@vger.kernel.org, Debian Bug Tracking System
+ <submit@bugs.debian.org>
+Subject: Re: iproute2: trailing whitespace in man pages
+Message-ID: <20260626081534.70b9f2ff@phoenix.local>
+In-Reply-To: <178243847243.6540.10252433987238870483.reportbug@kassi.invalid.is>
+References: <178243847243.6540.10252433987238870483.reportbug@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302201-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302202-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lange_tang@163.com,m:horms@kernel.org,m:mst@redhat.com,m:xuanzhuo@linux.alibaba.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[163.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:bjarniig@simnet.is,m:netdev@vger.kernel.org,m:submit@bugs.debian.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,networkplumber.org:from_mime,simnet.is:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D8316CE67D
+X-Rspamd-Queue-Id: 4C6C26CE692
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-virtio_net: disable cb when NAPI is busy-polled
+On Fri, 26 Jun 2026 01:54:52 +0000
+Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
 
-This commit disables the virtqueue callback at the entry of virtnet_poll().
-It aims to prevent a large number of spurious interrupts when busy-poll is
-active by keeping the callback off while polling.
+> Package: iproute2 (in Debian)
+> Version: 7.1.0-1
+> Severity: minor
+> 
+>   Additional remarks.
+> 
+>   Mails from me to "submit@bugs.debian.org" are no longer acknowledged.  A
+> Debian maintainer told me, that he would contact the mail administrator
+> about me not wanting to send bugs upstream.
+> 
+> -.-
+> 
+> Dear Maintainer,
+> 
+>    * What led up to the situation?
+> 
+>      Checking for defects with a new version
+> 
+> test-[g|n]roff -mandoc -t -K utf8 -rF0 -rHY=0 -rCHECKSTYLE=0 -ww -z < "man page"
+> 
+>   [Use 
+> 
+> grep -n -e ' $' -e '\\~$' -e ' \\f.$' -e ' \\"' <file>
+> 
+>   to find (most) trailing spaces.]
+> 
+>   ["test-groff" is a script in the repository for "groff"; is not shipped]
+> (local copy and "troff" slightly changed by me).
+> 
+>   [The fate of "test-nroff" was decided in groff bug #55941.]
+> 
+>    * What was the outcome of this action?
+> 
+> troff:/tmp/gz.roff.tw9zTq:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:20: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:38: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:41: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:43: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:45: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:46: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:47: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:48: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:49: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:50: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:55: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tw9zTq:57: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/bridge.8.gz
+> 
+> troff:/tmp/gz.roff.m7ah0F:12: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-app.8.gz
+> 
+> troff:/tmp/gz.roff.lEZOzh:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.lEZOzh:32: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-apptrust.8.gz
+> 
+> troff:/tmp/gz.roff.WIScEl:12: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-buffer.8.gz
+> 
+> troff:/tmp/gz.roff.lQyzHW:11: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-dcbx.8.gz
+> 
+> troff:/tmp/gz.roff.i604Vp:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.i604Vp:43: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-ets.8.gz
+> 
+> troff:/tmp/gz.roff.21mI9Z:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.21mI9Z:37: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-maxrate.8.gz
+> 
+> troff:/tmp/gz.roff.tNIhrB:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.tNIhrB:38: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-pfc.8.gz
+> 
+> troff:/tmp/gz.roff.rSgJgv:12: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb-rewr.8.gz
+> 
+> troff:/tmp/gz.roff.Q8vb3N:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Q8vb3N:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Q8vb3N:24: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dcb.8.gz
+> 
+> troff:/tmp/gz.roff.IodjFN:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:54: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:123: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:133: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:149: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.IodjFN:175: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-dev.8.gz
+> 
+> troff:/tmp/gz.roff.Nx3P7S:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Nx3P7S:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Nx3P7S:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Nx3P7S:32: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-dpipe.8.gz
+> 
+> troff:/tmp/gz.roff.f7fvNK:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:66: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:68: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:184: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:188: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:193: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.f7fvNK:197: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-health.8.gz
+> 
+> troff:/tmp/gz.roff.hTtjSy:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:50: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:54: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:55: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hTtjSy:68: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-lc.8.gz
+> 
+> troff:/tmp/gz.roff.soeA6o:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:50: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:66: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:68: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:69: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:71: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:74: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:77: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:80: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:83: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:86: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:91: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:101: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:127: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.soeA6o:167: warning: treating total indentation -72u as zero [-w range]
+> /usr/share/man/man8/devlink-port.8.gz
+> 
+> troff:/tmp/gz.roff.kYqBeN:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.kYqBeN:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.kYqBeN:26: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-rate.8.gz
+> 
+> troff:/tmp/gz.roff.9tHyhr:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9tHyhr:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9tHyhr:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9tHyhr:48: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-region.8.gz
+> 
+> troff:/tmp/gz.roff.9MYeZd:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9MYeZd:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-resource.8.gz
+> 
+> troff:/tmp/gz.roff.ZhPBEk:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:23: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:41: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:43: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:48: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:49: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:51: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:61: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:63: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:66: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:69: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZhPBEk:71: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-sb.8.gz
+> 
+> troff:/tmp/gz.roff.cbJFkk:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.cbJFkk:79: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.cbJFkk:114: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.cbJFkk:139: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.cbJFkk:143: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink-trap.8.gz
+> 
+> troff:/tmp/gz.roff.QOaboD:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.QOaboD:16: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/devlink.8.gz
+> 
+> troff:/tmp/gz.roff.m0E9ov:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.m0E9ov:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.m0E9ov:29: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/dpll.8.gz
+> 
+> troff:/tmp/gz.roff.hhba1k:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hhba1k:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hhba1k:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hhba1k:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.hhba1k:31: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/genl.8.gz
+> 
+> troff:/tmp/gz.roff.UspeXf:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:27: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:33: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:41: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:43: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:45: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:47: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:49: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:51: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:63: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:65: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:69: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:71: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:76: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.UspeXf:77: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-address.8.gz
+> 
+> troff:/tmp/gz.roff.ACnG5f:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ACnG5f:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ACnG5f:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ACnG5f:56: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-addrlabel.8.gz
+> 
+> troff:/tmp/gz.roff.5eqgIA:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:27: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:48: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:52: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5eqgIA:60: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-fou.8.gz
+> 
+> troff:/tmp/gz.roff.muormS:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.muormS:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.muormS:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.muormS:49: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-ioam.8.gz
+> 
+> troff:/tmp/gz.roff.YZqY4h:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.YZqY4h:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.YZqY4h:85: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.YZqY4h:232: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-l2tp.8.gz
+> 
+> troff:/tmp/gz.roff.x9nPAk:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:159: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:164: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:186: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:195: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:197: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:223: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:224: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:226: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:227: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:228: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:229: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:230: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:236: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:237: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:248: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:249: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.x9nPAk:256: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-link.8.gz
+> 
+> troff:/tmp/gz.roff.r9LukD:5: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:64: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:65: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:75: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:77: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:80: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:83: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.r9LukD:85: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-macsec.8.gz
+> 
+> troff:/tmp/gz.roff.fk7Uej:12: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-maddress.8.gz
+> 
+> troff:/tmp/gz.roff.OtuwHM:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.OtuwHM:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.OtuwHM:45: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.OtuwHM:51: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.OtuwHM:57: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.OtuwHM:58: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-monitor.8.gz
+> 
+> troff:/tmp/gz.roff.DLgQwy:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:30: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:37: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:45: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:52: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:88: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:89: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DLgQwy:92: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-mptcp.8.gz
+> 
+> troff:/tmp/gz.roff.Bf2muc:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Bf2muc:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Bf2muc:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Bf2muc:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Bf2muc:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Bf2muc:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-mroute.8.gz
+> 
+> troff:/tmp/gz.roff.aIjjMP:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:20: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:26: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:27: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:30: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:37: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.aIjjMP:39: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-neighbour.8.gz
+> 
+> troff:/tmp/gz.roff.sjvvc4:9: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-netconf.8.gz
+> 
+> troff:/tmp/gz.roff.bAu8qy:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bAu8qy:46: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-netns.8.gz
+> 
+> troff:/tmp/gz.roff.nM3cIw:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:23: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:46: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:48: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:49: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:53: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:60: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:62: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:64: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:65: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:68: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.nM3cIw:70: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-nexthop.8.gz
+> 
+> troff:/tmp/gz.roff.Kn3w81:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Kn3w81:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Kn3w81:57: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Kn3w81:59: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-ntable.8.gz
+> 
+> troff:/tmp/gz.roff.gv3LBB:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:33: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:38: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:46: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:60: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:62: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:64: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:66: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:68: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:70: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:72: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:74: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gv3LBB:84: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-route.8.gz
+> 
+> troff:/tmp/gz.roff.6owsuu:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:38: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:46: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:48: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:49: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:51: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:53: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:54: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:55: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:57: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:58: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.6owsuu:61: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-rule.8.gz
+> 
+> troff:/tmp/gz.roff.6yXkbF:10: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-sr.8.gz
+> 
+> troff:/tmp/gz.roff.glO7gb:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.glO7gb:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.glO7gb:20: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.glO7gb:28: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-stats.8.gz
+> 
+> troff:/tmp/gz.roff.XiAasB:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.XiAasB:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.XiAasB:26: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-tcp_metrics.8.gz
+> 
+> troff:/tmp/gz.roff.XtavYp:10: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-token.8.gz
+> 
+> troff:/tmp/gz.roff.TS3gWw:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:20: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:41: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:76: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TS3gWw:81: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-tunnel.8.gz
+> 
+> troff:/tmp/gz.roff.5llFkR:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.5llFkR:28: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-vrf.8.gz
+> 
+> troff:/tmp/gz.roff.91zMPC:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:103: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:158: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:171: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:175: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:183: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:198: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:240: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:274: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:325: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:327: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:345: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:363: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:367: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:371: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:427: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:448: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.91zMPC:564: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip-xfrm.8.gz
+> 
+> troff:/tmp/gz.roff.gY3yJ3:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gY3yJ3:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gY3yJ3:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gY3yJ3:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gY3yJ3:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gY3yJ3:169: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gY3yJ3:175: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ip.8.gz
+> 
+> troff:/tmp/gz.roff.j0dcO5:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.j0dcO5:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.j0dcO5:111: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.j0dcO5:112: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.j0dcO5:203: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.j0dcO5:204: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/netshaper.8.gz
+> 
+> troff:/tmp/gz.roff.EOKA9l:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EOKA9l:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma-dev.8.gz
+> 
+> troff:/tmp/gz.roff.j9CeKZ:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.j9CeKZ:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma-link.8.gz
+> 
+> troff:/tmp/gz.roff.NBliDx:16: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma-monitor.8.gz
+> 
+> troff:/tmp/gz.roff.n7n6Ij:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.n7n6Ij:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.n7n6Ij:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.n7n6Ij:21: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma-resource.8.gz
+> 
+> troff:/tmp/gz.roff.zNQGc9:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.zNQGc9:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.zNQGc9:85: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.zNQGc9:89: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.zNQGc9:93: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.zNQGc9:97: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma-statistic.8.gz
+> 
+> troff:/tmp/gz.roff.w2n0Tg:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.w2n0Tg:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma-system.8.gz
+> 
+> troff:/tmp/gz.roff.G452XU:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.G452XU:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.G452XU:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.G452XU:26: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rdma.8.gz
+> 
+> troff:/tmp/gz.roff.8E9eVD:10: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/rtmon.8.gz
+> 
+> troff:/tmp/gz.roff.cESP7P:447: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.cESP7P:607: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/ss.8.gz
+> 
+> troff:/tmp/gz.roff.ux4fN1:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ux4fN1:11: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-basic.8.gz
+> 
+> troff:/tmp/gz.roff.E5yQLK:9: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-cgroup.8.gz
+> 
+> troff:/tmp/gz.roff.xDoFMo:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.xDoFMo:49: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-connmark.8.gz
+> 
+> troff:/tmp/gz.roff.EPr6TY:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EPr6TY:26: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-csum.8.gz
+> 
+> troff:/tmp/gz.roff.ozliFK:7: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ozliFK:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ozliFK:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ozliFK:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ozliFK:18: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-ct.8.gz
+> 
+> troff:/tmp/gz.roff.NlhG4f:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.NlhG4f:39: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.NlhG4f:51: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-dualpi2.8.gz
+> 
+> troff:/tmp/gz.roff.AXC30K:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.AXC30K:20: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.AXC30K:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.AXC30K:33: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.AXC30K:73: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-ematch.8.gz
+> 
+> troff:/tmp/gz.roff.Xqn4yW:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:38: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:46: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:47: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:54: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:55: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.Xqn4yW:57: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-flow.8.gz
+> 
+> troff:/tmp/gz.roff.SN8HX6:8: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:26: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:30: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:38: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:41: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.SN8HX6:45: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-flower.8.gz
+> 
+> troff:/tmp/gz.roff.75BF9d:69: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-fq_codel.8.gz
+> 
+> troff:/tmp/gz.roff.ATqeiC:9: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-fw.8.gz
+> 
+> troff:/tmp/gz.roff.0gJmYD:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0gJmYD:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0gJmYD:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0gJmYD:24: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-gact.8.gz
+> 
+> troff:/tmp/gz.roff.1ht4Bu:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:26: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:36: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.1ht4Bu:67: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-ife.8.gz
+> 
+> troff:/tmp/gz.roff.eEZB5X:8: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.eEZB5X:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.eEZB5X:12: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-matchall.8.gz
+> 
+> troff:/tmp/gz.roff.BCTuKt:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.BCTuKt:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.BCTuKt:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.BCTuKt:26: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.BCTuKt:30: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-mirred.8.gz
+> 
+> troff:/tmp/gz.roff.KuFNwq:8: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:10: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:23: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:27: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:37: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:40: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:57: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:80: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.KuFNwq:81: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-mpls.8.gz
+> 
+> troff:/tmp/gz.roff.9RiFlD:235: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9RiFlD:237: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9RiFlD:254: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9RiFlD:274: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9RiFlD:282: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.9RiFlD:284: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-mqprio.8.gz
+> 
+> troff:/tmp/gz.roff.t0JWAM:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.t0JWAM:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.t0JWAM:23: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-nat.8.gz
+> 
+> troff:/tmp/gz.roff.ZHcyYL:6: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:26: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:34: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:35: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:37: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:41: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:45: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:47: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:51: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:55: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:56: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:59: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:60: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:63: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:383: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZHcyYL:387: warning [page 1, line 269]: cannot adjust line in b adjust mode; overset by 4n [-w break]
+> /usr/share/man/man8/tc-netem.8.gz
+> 
+> troff:/tmp/gz.roff.DJ46bB:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:22: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:48: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:53: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:57: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:62: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:63: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:67: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:71: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:77: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:79: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.DJ46bB:80: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-pedit.8.gz
+> 
+> troff:/tmp/gz.roff.HpJEdr:34: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-police.8.gz
+> 
+> troff:/tmp/gz.roff.JYFwIE:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.JYFwIE:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.JYFwIE:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.JYFwIE:15: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-route.8.gz
+> 
+> troff:/tmp/gz.roff.TQDw2w:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TQDw2w:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.TQDw2w:19: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-sample.8.gz
+> 
+> troff:/tmp/gz.roff.LzdwcT:69: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-skbedit.8.gz
+> 
+> troff:/tmp/gz.roff.EeoYee:8: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:23: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.EeoYee:26: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-skbmod.8.gz
+> 
+> troff:/tmp/gz.roff.LaXqMO:8: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.LaXqMO:12: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-tunnel_key.8.gz
+> 
+> troff:/tmp/gz.roff.0SnZpw:9: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:13: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:17: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:21: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:23: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:25: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:27: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:29: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:31: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:33: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:37: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:44: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:46: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:51: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:52: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.0SnZpw:53: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-u32.8.gz
+> 
+> troff:/tmp/gz.roff.ZLTTLY:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZLTTLY:16: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZLTTLY:20: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZLTTLY:24: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZLTTLY:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZLTTLY:30: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.ZLTTLY:33: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc-vlan.8.gz
+> 
+> troff:/tmp/gz.roff.bkv7BO:128: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bkv7BO:129: warning: ignoring escape character before ']' [-w escape]
+> troff:/tmp/gz.roff.bkv7BO:717: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bkv7BO:723: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tc.8.gz
+> 
+> troff:/tmp/gz.roff.My0dwn:57: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tipc-bearer.8.gz
+> 
+> troff:/tmp/gz.roff.bYd25b:18: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:27: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:28: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:30: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:32: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:42: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:53: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:62: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.bYd25b:66: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tipc-link.8.gz
+> 
+> troff:/tmp/gz.roff.rs4kL6:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tipc-media.8.gz
+> 
+> troff:/tmp/gz.roff.z8m3fR:15: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.z8m3fR:19: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.z8m3fR:23: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tipc-node.8.gz
+> 
+> an.tmac:/tmp/gz.roff.9VgwLV:30: warning: cannot call .SS while an input trap is pending
+> an.tmac:/tmp/gz.roff.9VgwLV:34: warning: cannot call .SS while an input trap is pending
+> /usr/share/man/man8/tipc-socket.8.gz
+> 
+> troff:/tmp/gz.roff.rBSHKg:14: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.rBSHKg:19: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/tipc.8.gz
+> 
+> troff:/tmp/gz.roff.gPfIxK:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gPfIxK:12: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.gPfIxK:17: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/vdpa-dev.8.gz
+> 
+> troff:/tmp/gz.roff.wHzGiy:11: warning: trailing whitespace [-w trail]
+> troff:/tmp/gz.roff.wHzGiy:16: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/vdpa-mgmtdev.8.gz
+> 
+> troff:/tmp/gz.roff.qSwXBM:10: warning: trailing whitespace [-w trail]
+> /usr/share/man/man8/vdpa.8.gz
+> 
+>    * What outcome did you expect instead?
+> 
+>      No output (no warnings).
+> 
+> -.-
+> 
+>   General remarks and further material, if a diff-file exist, are in the
+> attachments.
+> 
+> 
+> -- System Information:
+> Debian Release: forky/sid
+>   APT prefers testing
+>   APT policy: (500, 'testing')
+> Architecture: amd64 (x86_64)
+> 
+> Kernel: Linux 7.0.12+deb14.1-amd64 (SMP w/2 CPU threads; PREEMPT)
+> Locale: LANG=is_IS.iso88591, LC_CTYPE=is_IS.iso88591 (charmap=ISO-8859-1), LANGUAGE not set
+> Shell: /bin/sh linked to /usr/bin/dash
+> Init: sysvinit (via /sbin/init)
+> 
+> Versions of packages iproute2 depends on:
+> ii  debconf [debconf-2.0]  1.5.92
+> ii  libbpf1                1:1.7.0-1
+> ii  libc6                  2.42-17
+> ii  libcap2                1:2.78-1
+> ii  libcap2-bin            1:2.78-1
+> ii  libdb5.3t64            5.3.28+dfsg2-11+b1
+> ii  libelf1t64             0.195-1
+> ii  libmnl0                1.0.5-3+b2
+> ii  libselinux1            3.10-1
+> ii  libtirpc3t64           1.3.7+ds-1
+> ii  libxtables12           1.8.13-1
+> 
+> iproute2 recommends no packages.
+> 
+> Versions of packages iproute2 suggests:
+> ii  python3  3.13.9-3+b1
+> 
+> -- debconf information excluded
 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 26afa6341d161..c1e252400c0fc 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3011,6 +3011,8 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->  	unsigned int xdp_xmit = 0;
->  	bool napi_complete;
->  
-> +	virtqueue_disable_cb(rq->vq);
-> +
+Please send a patch as described in iproute2 
+The only place I found trailing whitespace on a man page source was
 
-[Severity: High]
-Can this unconditionally disable the RX callback and cause a permanent network
-stall when polled by netpoll?
-
-If the netpoll subsystem (e.g., used by netconsole) calls the NAPI poll
-function directly with a budget of 0, virtqueue_disable_cb() is called
-immediately. virtnet_receive() will then process 0 packets and return 0.
-
-Later in virtnet_poll(), the completion condition is checked:
-
-	if (received < budget) {
-		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
-        ...
-	}
-
-When both received and budget are 0, this condition evaluates to false. This
-skips virtqueue_napi_complete(), leaving the RX callback permanently disabled
-and preventing the device from raising further RX interrupts.
-
->  	virtnet_poll_cleantx(rq, budget);
->  
->  	received = virtnet_receive(rq, budget, &xdp_xmit);
+diff --git a/man/man8/tc-fq_codel.8 b/man/man8/tc-fq_codel.8
+index 78590636..6ed523c7 100644
+--- a/man/man8/tc-fq_codel.8
++++ b/man/man8/tc-fq_codel.8
+@@ -66,7 +66,7 @@ the local minimum queue delay that packets experience. Default value is 5ms.
+ has the same semantics as
+ .B codel
+ and is used to ensure that the measured minimum delay does not become too stale.
+-The minimum delay must be experienced in the last epoch of length 
++The minimum delay must be experienced in the last epoch of length
+ .BR interval .
+ It should be set on the order of the worst-case RTT through the bottleneck to
+ give endpoints sufficient time to react. Default value is 100ms.
 
