@@ -1,578 +1,181 @@
-Return-Path: <netdev+bounces-302242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4+hGGDGxPmpUKQkAu9opvQ
-	(envelope-from <netdev+bounces-302242-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:04:49 +0200
+	id GhXyLQKyPmqGKQkAu9opvQ
+	(envelope-from <netdev+bounces-302245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:08:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A47276CF54B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:04:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13F406CF58A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 19:08:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=szelinsky.de header.s=mail header.b=YVudfWHx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302242-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302242-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=szelinsky.de;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=PfGGy3dD;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302245-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302245-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CCB3930E0B7A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:00:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D411C3008A7B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jun 2026 17:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADC7401484;
-	Fri, 26 Jun 2026 17:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DEF93EAC76;
+	Fri, 26 Jun 2026 17:06:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szelinsky.de (szelinsky.de [85.214.127.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BE33FE645;
-	Fri, 26 Jun 2026 17:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EA53FFAC5
+	for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 17:06:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782493203; cv=none; b=krBGc37p1kbOT61IGbDVbXphCUObgmUlTp+LUbpy7SOvh5suVe3WIKpUq38zL9aHOEGeNSQJYlvUAyCId6UaO8KUlb0imEMi0+//GSzgK9OY2Ov9BZ3EC4qoAtytNsApnGXSRfbxwPU2KrIYdSY6d73LAlcwLsTbtFJnlsaNjT8=
+	t=1782493564; cv=none; b=SLeFIfdxPUXC9GNTPLylqYWOXxPVSTysug80PkLsox4dYRdFIEGEXyqZlAt4he+phrYyFGWYw9ChCi9ZOTvEWOd03a/NVyiUHrQaIjncozhZRrtOvWN+ZDYCwW32o/HS3uFwoqSE9RCXE5awNAO/ivaWadpbrKOIonu9VFkt4o4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782493203; c=relaxed/simple;
-	bh=O0wY4vBjhu3Dgk7W+ScinAJUyJ4rF5bIdBxzRzA26Jc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KOhgdcQKR2w0zjk/UirP8i0QVg+wkpUyCo+quKSLZw13Gz5q0SsTdE9SkbtZmf5UE3h4Cw2jMfW4oO52nNqD4iFARSqF8cm6/t2bpLMlkCU535rvBBffxLuM76OXUoGojMm0fmU4odl9zE1O80EAD9bvf/wDj1B5iv7wp6Z1gFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=YVudfWHx; arc=none smtp.client-ip=85.214.127.56
-Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id A4D89E83405;
-	Fri, 26 Jun 2026 18:59:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1782493199;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VcSiG/TjjtENoTCWNvAj0zhJwkH9HJIrEgHUx+gY008=;
-	b=YVudfWHxncekwv2C0F3js1juEhAqfphGwgerW7ODJq5iv2IIrwNs/mz/hv5W3F/E08ekQU
-	wGpIkvwfFY3pHgGmY1QGd0Ay0HGQfQQtMLfpGIOAT4ZTyVZsZiG955pmeLZ00GvD7rHmXn
-	fNgEphLLhMnZuvqjeq6vsi28RLWCxtLSLeA875Cp5IfEUe0SDMAuGKl+cgHtue28Ba1OyW
-	JECzRmggmPD3xVtce8pO+OTeD6jCgWZrxz8aXYjiEU6mc0Zxnz8OQFj8WijgJ8IdnAKU+k
-	ceZ/dULb+bpqS5eqo48sFR671nJr5VmBkFGJhPeZrRlT+tjkqFw1od0D6Rr9ig==
-X-Virus-Scanned: Debian amavis at szelinsky.de
-Received: from szelinsky.de ([127.0.0.1])
- by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
- id 0BeQRD7FfNqB; Fri, 26 Jun 2026 18:59:59 +0200 (CEST)
-Received: from p14sgen5.lan (p5784dea5.dip0.t-ipconnect.de [87.132.222.165])
-	by szelinsky.de (Postfix) with ESMTPSA;
-	Fri, 26 Jun 2026 18:59:58 +0200 (CEST)
-From: Carlo Szelinsky <github@szelinsky.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Corey Leavitt <corey@leavitt.info>,
-	Jonas Jelonek <jelonek.jonas@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Carlo Szelinsky <github@szelinsky.de>
-Subject: [PATCH net-next v3 3/3] net: phy: own phydev->psec via PSE notifier and remove fwnode_mdio hook
-Date: Fri, 26 Jun 2026 18:59:29 +0200
-Message-ID: <20260626165929.2908782-4-github@szelinsky.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260626165929.2908782-1-github@szelinsky.de>
-References: <20260626165929.2908782-1-github@szelinsky.de>
+	s=arc-20240116; t=1782493564; c=relaxed/simple;
+	bh=GQKFAfjK37kURb8eXgj/bP3eu1MfUrZ2X80i3UfUWBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p2y1jZT6v8sta7bvJeMfIjhkk+jNtV9jgPNLgXIKqs88ApRCVEPJuSRe79hQTusrGBcpU4nvHTKVAoR8g38kygzgOL0VuevjfqMIQrWr7DCp2n+477jv/sPw0CeHOCI2EZykM3qa6uSIa47C596tsQI3MwXSwPtvxdM3vZD6hRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PfGGy3dD; arc=none smtp.client-ip=209.85.128.51
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4926046fbc5so13851595e9.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 10:06:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782493559; x=1783098359; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=ctcxDsWWE5CsrZTwx1xGnbf39A7pUyPEOclo5R2hslQ=;
+        b=PfGGy3dDJntvUAhwdN74MoQyZ7Kb76WVRvfiYiz1r1uk3V/wjmc0ccylG8JVhL0+aO
+         9WSY+r+SENhfxJL8CUeOB1pmR59D9qbmsIm0QL0geqEQ3IJNFp5Fq7qrY/5fyGWdsqG0
+         nIyYMLaVYge3kigQjmdxvMGDVbUqMNI+4R/I6uQ1sMOrczr5lwCRWg+mi2S0BVuQYDKL
+         dDgqcqfyH8rsZo98a4Dkff0WHyw9Af1jwt2qhjUEWTtw3ws3bdrW5rBD3IoBPhrQQzZE
+         8/ce3DSxR7gM6HlnWvwnjDorWuEU3FMzRK5nbfmPEGSUPopV0SrDeRoc0yqUq7qQ+8gO
+         PhKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782493559; x=1783098359;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ctcxDsWWE5CsrZTwx1xGnbf39A7pUyPEOclo5R2hslQ=;
+        b=oLgDjAzuZZ87EwztE2gwSX8Qfb9GFqHtwLgv4RoP3ZFGNVq/1cz6SacXQXGXiZ2aF3
+         woL/UjXxlm+s82WkoABGoPOIaOylGsGOndHejBrGkzoRx0xWr96gAnr/NsbKTM5Nv4Ga
+         6/x469jfHI3dpnNwYTfbTeitdCzWkkVd372HHh7v7uEkzsUQywiIn4vVI+TonB2w5EWb
+         qarGaokNVzU9/XaOK2qgEboSOiMLg1Nqwjed04PpSgHUdxcEobtKzoMm8lJcFDpFEsH7
+         8dsQttNKu/J3wG2s5PpavQQOa2fHEPa9EukFjb8v5sTV9ZkHl9xpZjq8a34qkXJ4OVY9
+         A93Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9xusQ/Hn9DcUTsWQEvbCbsJwraOWVnKRX6mhxd7o1nDgmXOO3Ff/L+nGs5V6s0B4tBvH1bNqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxlaxpdk/eN/Kc8Cey1l5YGOVbfQ/PfIQyjn9dmHRQUxz7CDbky
+	QOJnBl1L/Xf8MHnnPlUSTTW9fMIaDWXUfZDoBGJrU1SD1eCM6aP1Ocuu
+X-Gm-Gg: AfdE7ckflVSxfcnG8oJTrL4Ljmu/M8AYzVJDA2byvGHThY0OkwtTzeBnC1YyAJ5c0hy
+	8emqocuFsHJI5fdgKbaC+3jaV9fzXrgXRVdb2MbdLCgZrHauETAzUTugYanWMBhzlixewKgPmYm
+	UdwLKqo7CnhJUVccSD4FYy7cqbLCHlPaDJKOUJ5xOs9iuX5zeUW5A6lmy36kkJgTGg7ZMhhmIYl
+	XUbgsgM9LW1ztFT9R3B5+/HFp30+30jJ5nNr7NHhCpM9RjrxeMV3BmsVMUC8m6auIIls+CF8ZF1
+	ZOHEAQFuweD9XTDbfWWWkyqQMFz7BstKBi2/asNyfuKD6+Ftgl+ehA5hCv1qAD1Ph8H7kJesap3
+	oY7P8H8F3ko3wIdN5qhNMJpU4IFmBYBDl9GLonTHBqIMkn6gn7xN3EpR+As3bnD8yP879wTiIUp
+	sL5qfs1mX3zvcF+UAH5eNvE48GxHJv2QPc2yHnR6BSjlWLYLb/ks3xR6IQsSVN//+7de8RtaL5s
+	naBvRyQ
+X-Received: by 2002:a05:600d:864a:20b0:492:5bf9:d149 with SMTP id 5b1f17b1804b1-4925bf9d18amr186215685e9.5.1782493559068;
+        Fri, 26 Jun 2026 10:05:59 -0700 (PDT)
+Received: from [10.128.11.240] (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46fe25429d5sm1694876f8f.7.2026.06.26.10.05.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jun 2026 10:05:57 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <ac8c92cb-21f2-4274-8fe6-f771fe48eec7@gmail.com>
+Date: Fri, 26 Jun 2026 18:05:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 02/14] firmware: qcom_scm: Migrate to generic PAS
+ service
+To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+ konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+ akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+ jesszhan0024@gmail.com, marijn.suijten@somainline.org, airlied@gmail.com,
+ simona@ffwll.ch, vikash.garodia@oss.qualcomm.com, bod@kernel.org,
+ mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+ trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+ pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+ tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+ srinivas.kandagatla@oss.qualcomm.com, amirreza.zarrabi@oss.qualcomm.com,
+ jens.wiklander@linaro.org, op-tee@lists.trustedfirmware.org,
+ apurupa@qti.qualcomm.com, skare@qti.qualcomm.com,
+ linux-kernel@vger.kernel.org, Sumit Garg <sumit.garg@oss.qualcomm.com>,
+ Harshal Dev <harshal.dev@oss.qualcomm.com>
+References: <20260626133440.692849-1-sumit.garg@kernel.org>
+ <20260626133440.692849-3-sumit.garg@kernel.org>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <20260626133440.692849-3-sumit.garg@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302242-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:corey@leavitt.info,m:jelonek.jonas@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:github@szelinsky.de,m:andrew@lunn.ch,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[pengutronix.de,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
+ comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:harshal.dev@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[leavitt.info,gmail.com,kernel.org,vger.kernel.org,szelinsky.de];
-	DKIM_TRACE(0.00)[szelinsky.de:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,nxp.com:email,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid,szelinsky.de:from_mime,leavitt.info:email]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A47276CF54B
+X-Rspamd-Queue-Id: 13F406CF58A
 
-From: Corey Leavitt <corey@leavitt.info>
+Hi Sumit,
 
-Transfer ownership of phydev->psec from fwnode_mdio to the phy
-subsystem itself. The phy subsystem now subscribes to the pse-pd
-notifier chain and manages psec attach/detach in response to PSE
-controller lifecycle events, while fwnode_mdio loses its PSE awareness
-entirely.
+On 6/26/26 14:34, Sumit Garg wrote:
 
-phydev->psec is attached after device_add() has made the phy visible
-on mdio_bus_type, under a narrow rtnl_lock() that covers only
-phy_try_attach_pse(). Ordering the attach after registration closes
-the race that would otherwise leave a phy unattached: a PSE_REGISTERED
-event firing during registration walks mdio_bus_type and either finds
-the phy already added (and attaches it) or runs before device_add(),
-in which case the post-add attach resolves it. The phydev->psec check
-in phy_try_attach_pse() makes the two paths idempotent. Holding rtnl
-across of_pse_control_get() is safe because pse_list_mutex is never
-taken in the opposite order.
+>  config QCOM_SCM
+> +	tristate "Qualcomm PAS SCM interface driver"
+> +	select QCOM_PAS
+>  	select QCOM_TZMEM
+> -	tristate
+I think QCOM_SCM is missing a 'select IRQ_DOMAIN'. Right now I get a
+build error without it:
 
-device_add() is deliberately left outside rtnl. Binding a phy that
-itself provides an SFP cage reaches sfp_bus_add_upstream() through
-phy_probe() -> phy_setup_ports() -> phy_sfp_probe(), and
-sfp_bus_add_upstream() takes rtnl_lock(); holding rtnl across
-device_add() would deadlock such phys (reported on RTL8214FC).
+drivers/firmware/qcom/qcom_scm.c: In function ‘qcom_scm_get_waitq_irq’:
+  drivers/firmware/qcom/qcom_scm.c:2512:16: error: implicit declaration
+of function ‘irq_create_fwspec_mapping’; did you mean
+‘irq_create_of_mapping’? [-Wimplicit-function-declaration]
+   2512 |         return irq_create_fwspec_mapping(&fwspec);
+        |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+        |                irq_create_of_mapping
 
-phy_device_register() is split into the public form, which takes the
-narrow rtnl_lock() around the attach, and a phy_device_register_locked()
-form for callers that already hold rtnl (the SFP module state machine
-via __sfp_sm_event). This pair mirrors the register_netdevice() /
-register_netdev() split convention already established in the core
-networking stack. The _locked form runs device_add() under the
-caller's rtnl, which is safe because a phy resident on an SFP module
-does not itself provide a downstream cage, so phy_sfp_probe() is a
-no-op there.
-
-  - On PSE_REGISTERED: an rtnl-guarded bus walk retries the attach for
-    every registered phy whose psec is still NULL. This is the "phy
-    was enumerated before the PSE controller loaded" case, the root
-    cause of the boot-time probe-retry storm on systems with a modular
-    PSE controller driver.
-
-  - On PSE_UNREGISTERED: an rtnl-guarded bus walk releases every
-    phydev->psec that targets the departing controller before
-    pse_release_pis() frees pcdev->pi. Without this, a phy still
-    holding a pse_control reference would cause a use-after-free in
-    __pse_control_release()'s pcdev->pi[psec->id] access, and the PSE
-    driver module could not finish unloading while any phy still held a
-    reference.
-
-A bad `pses` binding -- an error from of_pse_control_get() other than
--ENOENT (no phandle) or -EPROBE_DEFER (controller not yet registered)
--- is reported with phydev_warn() rather than silently dropped,
-preserving the diagnostic that the removed fwnode_mdio lookup used to
-provide.
-
-The final pse_control_put() of phydev->psec moves from
-phy_device_remove() to phy_device_release(), so it runs only after
-every reference on the device -- including the bus-iterator references
-taken by bus_for_each_dev() in the notifier walk -- has been dropped.
-
-Finally, delete fwnode_find_pse_control() and its call site in
-fwnode_mdiobus_register_phy(), and drop the PSE header from
-fwnode_mdio.c. The MDIO/DSA probe no longer sees any PSE-originated
--EPROBE_DEFER, so the probe-retry storm is gone and fwnode_mdio is
-now PSE-agnostic.
-
-Reported-by: Jonas Jelonek <jelonek.jonas@gmail.com>
-Closes: https://lore.kernel.org/netdev/e00048dd-1ed3-40c3-9912-59bccf015ad5@gmail.com/
-Signed-off-by: Corey Leavitt <corey@leavitt.info>
-Co-developed-by: Carlo Szelinsky <github@szelinsky.de>
-Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
----
- drivers/net/mdio/fwnode_mdio.c |  34 -------
- drivers/net/phy/phy_device.c   | 168 +++++++++++++++++++++++++++++++--
- drivers/net/phy/sfp.c          |   2 +-
- drivers/net/pse-pd/pse_core.c  |  14 +++
- include/linux/phy.h            |   2 +
- include/linux/pse-pd/pse.h     |   9 ++
- 6 files changed, 186 insertions(+), 43 deletions(-)
-
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index ba7091518265..7bd979b59f49 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -11,33 +11,11 @@
- #include <linux/fwnode_mdio.h>
- #include <linux/of.h>
- #include <linux/phy.h>
--#include <linux/pse-pd/pse.h>
- 
- MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
- 
--static struct pse_control *
--fwnode_find_pse_control(struct fwnode_handle *fwnode,
--			struct phy_device *phydev)
--{
--	struct pse_control *psec;
--	struct device_node *np;
--
--	if (!IS_ENABLED(CONFIG_PSE_CONTROLLER))
--		return NULL;
--
--	np = to_of_node(fwnode);
--	if (!np)
--		return NULL;
--
--	psec = of_pse_control_get(np, phydev);
--	if (PTR_ERR(psec) == -ENOENT)
--		return NULL;
--
--	return psec;
--}
--
- static struct mii_timestamper *
- fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
- {
-@@ -118,7 +96,6 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 				struct fwnode_handle *child, u32 addr)
- {
- 	struct mii_timestamper *mii_ts = NULL;
--	struct pse_control *psec = NULL;
- 	struct phy_device *phy;
- 	bool is_c45;
- 	u32 phy_id;
-@@ -159,14 +136,6 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 			goto clean_phy;
- 	}
- 
--	psec = fwnode_find_pse_control(child, phy);
--	if (IS_ERR(psec)) {
--		rc = PTR_ERR(psec);
--		goto unregister_phy;
--	}
--
--	phy->psec = psec;
--
- 	/* phy->mii_ts may already be defined by the PHY driver. A
- 	 * mii_timestamper probed via the device tree will still have
- 	 * precedence.
-@@ -176,9 +145,6 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 
- 	return 0;
- 
--unregister_phy:
--	if (is_acpi_node(child) || is_of_node(child))
--		phy_device_remove(phy);
- clean_phy:
- 	phy_device_free(phy);
- clean_mii_ts:
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 0615228459ef..f5febff4b00b 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -223,8 +223,19 @@ static void phy_mdio_device_free(struct mdio_device *mdiodev)
- 
- static void phy_device_release(struct device *dev)
- {
-+	struct phy_device *phydev = to_phy_device(dev);
-+
-+	/* bus_for_each_dev() holds get_device() across each iteration
-+	 * step, deferring this release callback until any in-flight PSE
-+	 * notifier walk has advanced past this phy. pse_control_put()
-+	 * takes pse_list_mutex, so this path must run in sleepable
-+	 * context.
-+	 */
-+	might_sleep();
-+	pse_control_put(phydev->psec);
-+
- 	fwnode_handle_put(dev->fwnode);
--	kfree(to_phy_device(dev));
-+	kfree(phydev);
- }
- 
- static void phy_mdio_device_remove(struct mdio_device *mdiodev)
-@@ -1102,11 +1113,103 @@ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
- }
- EXPORT_SYMBOL(get_phy_device);
- 
--/**
-- * phy_device_register - Register the phy device on the MDIO bus
-- * @phydev: phy_device structure to be added to the MDIO bus
-+/* Best-effort attach of phydev->psec from a DT `pses = <&...>` phandle.
-+ * Caller must hold rtnl. A missing phandle (-ENOENT) or a not-yet-registered
-+ * controller (-EPROBE_DEFER) is silent; the notifier retries the latter at
-+ * PSE_REGISTERED time. Any other error means a broken binding and is warned
-+ * about, but left non-fatal so the phy still registers.
-  */
--int phy_device_register(struct phy_device *phydev)
-+static void phy_try_attach_pse(struct phy_device *phydev)
-+{
-+	struct pse_control *psec;
-+	struct device_node *np;
-+
-+	ASSERT_RTNL();
-+
-+	np = phydev->mdio.dev.of_node;
-+	if (!np)
-+		return;
-+
-+	if (phydev->psec)
-+		return;
-+
-+	psec = of_pse_control_get(np, phydev);
-+	if (IS_ERR(psec)) {
-+		if (PTR_ERR(psec) != -EPROBE_DEFER && PTR_ERR(psec) != -ENOENT)
-+			phydev_warn(phydev, "failed to get PSE control: %pe\n",
-+				    psec);
-+		return;
-+	}
-+
-+	phydev->psec = psec;
-+}
-+
-+static int phy_pse_attach_one(struct device *dev, void *data __maybe_unused)
-+{
-+	ASSERT_RTNL();
-+
-+	if (dev->type != &mdio_bus_phy_type)
-+		return 0;
-+
-+	phy_try_attach_pse(to_phy_device(dev));
-+	return 0;
-+}
-+
-+static int phy_pse_detach_one(struct device *dev, void *data)
-+{
-+	struct pse_controller_dev *pcdev = data;
-+	struct phy_device *phydev;
-+	struct pse_control *psec;
-+
-+	ASSERT_RTNL();
-+
-+	if (dev->type != &mdio_bus_phy_type)
-+		return 0;
-+
-+	phydev = to_phy_device(dev);
-+	psec = phydev->psec;
-+	if (!psec || !pse_control_matches_pcdev(psec, pcdev))
-+		return 0;
-+
-+	phydev->psec = NULL;
-+	pse_control_put(psec);
-+	return 0;
-+}
-+
-+static int phy_pse_notifier_event(struct notifier_block *nb,
-+				  unsigned long event, void *data)
-+{
-+	switch (event) {
-+	case PSE_REGISTERED:
-+		rtnl_lock();
-+		bus_for_each_dev(&mdio_bus_type, NULL, NULL,
-+				 phy_pse_attach_one);
-+		rtnl_unlock();
-+		return NOTIFY_OK;
-+	case PSE_UNREGISTERED:
-+		rtnl_lock();
-+		bus_for_each_dev(&mdio_bus_type, NULL, data,
-+				 phy_pse_detach_one);
-+		rtnl_unlock();
-+		return NOTIFY_OK;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+}
-+
-+static struct notifier_block phy_pse_notifier __read_mostly = {
-+	.notifier_call = phy_pse_notifier_event,
-+};
-+
-+/* Core registration: add the phy to the MDIO bus. Does not touch rtnl or
-+ * PSE. phydev->psec is attached by the callers below, after device_add()
-+ * has made the phy visible on mdio_bus_type, so that a concurrent PSE
-+ * notifier walk and the attach can never leave the phy unattached. Keeping
-+ * device_add() out of rtnl also avoids deadlocking when binding a phy that
-+ * itself provides an SFP cage (phy_probe() -> phy_sfp_probe() ->
-+ * sfp_bus_add_upstream() takes rtnl).
-+ */
-+static int __phy_device_register(struct phy_device *phydev)
- {
- 	int err;
- 
-@@ -1135,10 +1238,54 @@ int phy_device_register(struct phy_device *phydev)
-  out:
- 	/* Assert the reset signal */
- 	phy_device_reset(phydev, 1);
--
- 	mdiobus_unregister_device(&phydev->mdio);
- 	return err;
- }
-+
-+/**
-+ * phy_device_register_locked - Register the phy device on the MDIO bus
-+ * @phydev: phy_device structure to be added to the MDIO bus
-+ *
-+ * Same as phy_device_register() but caller must already hold rtnl_lock().
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int phy_device_register_locked(struct phy_device *phydev)
-+{
-+	int err;
-+
-+	ASSERT_RTNL();
-+
-+	err = __phy_device_register(phydev);
-+	if (err)
-+		return err;
-+
-+	phy_try_attach_pse(phydev);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(phy_device_register_locked);
-+
-+/**
-+ * phy_device_register - Register the phy device on the MDIO bus
-+ * @phydev: phy_device structure to be added to the MDIO bus
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int phy_device_register(struct phy_device *phydev)
-+{
-+	int err;
-+
-+	err = __phy_device_register(phydev);
-+	if (err)
-+		return err;
-+
-+	rtnl_lock();
-+	phy_try_attach_pse(phydev);
-+	rtnl_unlock();
-+
-+	return 0;
-+}
- EXPORT_SYMBOL(phy_device_register);
- 
- /**
-@@ -1152,8 +1299,6 @@ EXPORT_SYMBOL(phy_device_register);
- void phy_device_remove(struct phy_device *phydev)
- {
- 	unregister_mii_timestamper(phydev->mii_ts);
--	pse_control_put(phydev->psec);
--
- 	device_del(&phydev->mdio.dev);
- 
- 	/* Assert the reset signal */
-@@ -3981,8 +4126,14 @@ static int __init phy_init(void)
- 	if (rc)
- 		goto err_c45;
- 
-+	rc = pse_register_notifier(&phy_pse_notifier);
-+	if (rc)
-+		goto err_genphy;
-+
- 	return 0;
- 
-+err_genphy:
-+	phy_driver_unregister(&genphy_driver);
- err_c45:
- 	phy_driver_unregister(&genphy_c45_driver);
- err_ethtool_phy_ops:
-@@ -3999,6 +4150,7 @@ static int __init phy_init(void)
- 
- static void __exit phy_exit(void)
- {
-+	pse_unregister_notifier(&phy_pse_notifier);
- 	phy_driver_unregister(&genphy_c45_driver);
- 	phy_driver_unregister(&genphy_driver);
- 	rtnl_lock();
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 03bfd8640db9..18868bdd6485 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -2083,7 +2083,7 @@ static int sfp_sm_probe_phy(struct sfp *sfp, int addr, bool is_c45)
- 	/* Mark this PHY as being on a SFP module */
- 	phy->is_on_sfp_module = true;
- 
--	err = phy_device_register(phy);
-+	err = phy_device_register_locked(phy);
- 	if (err) {
- 		phy_device_free(phy);
- 		dev_err(sfp->dev, "phy_device_register failed: %pe\n",
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 0190fac33c78..611540df43bb 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -2021,3 +2021,17 @@ bool pse_has_c33(struct pse_control *psec)
- 	return psec->pcdev->types & ETHTOOL_PSE_C33;
- }
- EXPORT_SYMBOL_GPL(pse_has_c33);
-+
-+/**
-+ * pse_control_matches_pcdev - Test whether a pse_control targets a controller
-+ * @psec: pse_control obtained from of_pse_control_get()
-+ * @pcdev: PSE controller to compare against
-+ *
-+ * Return: %true if @psec was obtained from @pcdev, %false otherwise.
-+ */
-+bool pse_control_matches_pcdev(struct pse_control *psec,
-+			       struct pse_controller_dev *pcdev)
-+{
-+	return psec->pcdev == pcdev;
-+}
-+EXPORT_SYMBOL_GPL(pse_control_matches_pcdev);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 199a7aaa341b..865b9baddb85 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2158,6 +2158,8 @@ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode);
- struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode);
- struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45);
- int phy_device_register(struct phy_device *phy);
-+/* Caller must hold rtnl_lock(); see phy_device_register() for the public form. */
-+int phy_device_register_locked(struct phy_device *phy);
- void phy_device_free(struct phy_device *phydev);
- void phy_device_remove(struct phy_device *phydev);
- int phy_get_c45_ids(struct phy_device *phydev);
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 78fe3a2b1ea8..d4310ca71a3e 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -385,6 +385,9 @@ int pse_ethtool_set_prio(struct pse_control *psec,
- bool pse_has_podl(struct pse_control *psec);
- bool pse_has_c33(struct pse_control *psec);
- 
-+bool pse_control_matches_pcdev(struct pse_control *psec,
-+			       struct pse_controller_dev *pcdev);
-+
- int pse_register_notifier(struct notifier_block *nb);
- int pse_unregister_notifier(struct notifier_block *nb);
- 
-@@ -438,6 +441,12 @@ static inline bool pse_has_c33(struct pse_control *psec)
- 	return false;
- }
- 
-+static inline bool pse_control_matches_pcdev(struct pse_control *psec,
-+					     struct pse_controller_dev *pcdev)
-+{
-+	return false;
-+}
-+
- static inline int pse_register_notifier(struct notifier_block *nb)
- {
- 	return 0;
--- 
-2.43.0
-
+- Julian Braha
 
