@@ -1,120 +1,221 @@
-Return-Path: <netdev+bounces-302290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302291-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id E3j0JBAsP2q/PgkAu9opvQ
-	(envelope-from <netdev+bounces-302290-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 03:49:04 +0200
+	id d8SBMVcsP2rYPgkAu9opvQ
+	(envelope-from <netdev+bounces-302291-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 03:50:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0496D0BBA
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 03:49:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 258726D0BD9
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 03:50:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=OaS4COb9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302290-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302290-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=asu.edu header.s=google header.b=S9aM0awI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302291-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302291-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F3B06302FA96
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 01:48:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0F0A3021729
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 01:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E4C223702;
-	Sat, 27 Jun 2026 01:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F361244667;
+	Sat, 27 Jun 2026 01:50:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C4F3C2D;
-	Sat, 27 Jun 2026 01:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDBD16DEB1
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 01:49:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782524939; cv=none; b=Z3CZ2wHiDDaHqWVRoaliDceuxVccgNv118xRcfRulYh0hu0n3T9ZUgW2VuOxvz3pFOtEqry31dQGZHvTV4VyTTXerQH88atR83euqwOHUJXtjyggF3wKEU98F4wpr4kvpySFfXLMxSNOnfvK2sp+OdbsTHF2oOu+R+WvWboeTPk=
+	t=1782525001; cv=none; b=mxkqbkp3R97EZ/kWuE5lTJnSX8yCKw9Ehq3S907CHIKawwa0gmQX5S0BwrUiZTRH6VhE+6o9GCOaq6vadI1r0cONS3ZPrHAVy75mOiS5nLU4wCIx+3mCKPrOAEcuej1GOJbSgEaU91VwS5uUFBAOwk9tT4sh4Sy0wxbMJqDl36M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782524939; c=relaxed/simple;
-	bh=tY+lEB1fVZf6CWjOO86JALvtnSr8NyG046MrlCmuTqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HQJKYLHPE2TPTnjunSw13T1IghqCl3E6G3WMNX0nG1/QWZoHU5t77H6atLTeUoewfYv/LNQxZ2CspNY6Qf08pe5l9KpWckvf0gwIqRnCXA0N1CwBPa4SYiOSuP/VakTbNGts8FL8h6t0Ho26dPxsy12DbXfYrsxIXxPcQiR2A1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OaS4COb9; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F0D11F000E9;
-	Sat, 27 Jun 2026 01:48:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782524937;
-	bh=qGuvAgmfPhtioQ+ccOiVR0g2fE1Chcr4teyYLHHEAjM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OaS4COb9c2t10ErVf8Tloketd8CgUu2/Y3/SqXTbI3O0dTQVjM6lE6i1+nARWiduR
-	 iadyrQumdNWzqc+o+TibehYZbLftw3+wB17uPWCfAc74OTk7kPbyrnXUzomw782r1z
-	 V7E+ICyFOpInt2rBUfMqgsMOzToS3sUdQBcDQCZgja1Gts8j8/dplhRGJuphWAqeeb
-	 d5yNfstggVSQeRnRyQsOmfZRon057ciZdvMMETHWyzkumpa6onSqWB1UOLqSxLSjVe
-	 LJ8tUrb0peIBnIRRG6ZhV3HJiIXC+PvjmVr4Z4urZ+dYTPUwzaDG7pANGFL3I1yCjp
-	 IXE0v3inrWBtg==
-Date: Fri, 26 Jun 2026 18:48:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hrushiraj Gandhi <hrushirajg23@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] netdevsim: fix use-after-free in nsim_create and
- __nsim_dev_port_del
-Message-ID: <20260626184856.4b7f5228@kernel.org>
-In-Reply-To: <20260623144447.255326-1-hrushirajg23@gmail.com>
-References: <20260623144447.255326-1-hrushirajg23@gmail.com>
+	s=arc-20240116; t=1782525001; c=relaxed/simple;
+	bh=xDiA5DuL4aSX/vjh9grRbpSo0KLZ0CotQ9L65uuTUbM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tvIOziiIL+mrj1GuceQqChSPWkDeXdPsGN9whUNWKPhqQDqr5zOGipdzJGBWWIs3C2YvgWkazCap0JXSRj++y1FYAsG9n/KgkAv9z46ae6+M2AuQZslmBiH/QD8kB2KkAQ6S/9WElL+js65qwtmCiFmsZq3niOXvpVQ/gzK5UUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=S9aM0awI; arc=none smtp.client-ip=209.85.214.181
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2c7f11646c3so11305555ad.3
+        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 18:49:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1782524998; x=1783129798; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0UXUHUjId2cfil9ag+usZlcPYF1aU0mFhw0ihbgDIPo=;
+        b=S9aM0awI95G7mptiCcJ+G2ETgRS/x7J+8Ql8Hu4IAfaY6auAxhZt9Ssxd6UwHfag6d
+         uUDhZR5rftaulBjB5vTevsGUXmoRUBRZrtw3xRnKUOk5qQcRlaio2aU4kFQY6RiJK7GI
+         zE+yXEcRaJRBc1EmKU5p0YT01dmCr+jSkQO/suQjAhOQAr9DEvWl1VDiDGGb26Jyh52/
+         oNfB6UJCPh6/U1DsILrFMCLXP156ZUpYjgCXkT/cJiKo9Pu+wNJB/srYNVE+czSgAqbI
+         /IvaU8HSCcuBYYbvNFTRHqGAg4sln+/wpmOolbcA3vqjpa0I8uMaAx0k89fnjJhg7aPT
+         GF1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782524998; x=1783129798;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0UXUHUjId2cfil9ag+usZlcPYF1aU0mFhw0ihbgDIPo=;
+        b=peWAj2voZI8ovl9j8oqpXX2LimdgksYR/M3eKBf0KAKdilZ641xJg3ky1cCTMpFB7N
+         snkJ3XOeUVaWbbl7Tixq6SPlHxqCmeBq0qNpULH6JLDCFzlnJgEBN90uEF31sCuUrLiv
+         PvQIwhadhU9thzxEKKdzEyCW4COncV8anrSiq71ke1zcCcSaXaZdf1/iZl88NK9iLOtL
+         LSjFviSALIK1zyZbLBHI2h3eI7kJbCps7cgiVFAH2ZlCj9Nwqh3Bz0zfm/iYL80jaNgj
+         uixVesheaF7K123nsMnvIhN731mn1ejK6wLWkv+IU7roqudxzuGf1FgxKf+ynfu+dYep
+         5XHQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpuFDDUSE2sxXDzDwLj0YxlhD3I5fPuDGT9Az90vl2nyAcl84Vdjdl3ZlYnsmubyIktnJq4yJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYfH4vxfCyCUNDfvWSxnTq89Lcb/ps0a+yhLcEYdx+xDWEmau3
+	n1XTaDOd1VGkCXaqKLabAgP1Yp2cvDvG3W42R2gEulu1UGG/3B+/4GaLQtkfcb4lVA==
+X-Gm-Gg: AfdE7ckN95yFt50akPb3quygVWy27Jb892Ohe5+NNrxAbfTvcgXL6wVw23dnzqFU5Bn
+	6pzH7WQXEq8pJZa7ugPG8M6h1D7ZYhUckbfIIfx/mYgdeWAF5v8NAERZ6felH8eJowVHmz3eOcx
+	MUgXsXcgezVol4+yCqRCBBpkLBbstxCyd+XrgUBYhPcA2ILFSQ6zYeyinMsXmO+eOnTowtH2xjL
+	XQkpzOidivSFyRI8jpmZc3tsI2k2p4lGyUZ0pTUYQasn0q/TlKYuWJ/iVCoiSek2WfZXFwlxMVe
+	sDjZMl3Jtp5O8ooMRcVkH3dsvp02t9LfFKTT2HqiGPmD9/0/4fN+GWAKiRlf7LNFMzECHoHC3KI
+	BHEWIIRpkYYSNeHI1HlBBULDlx6Bm52vG1VqGgF/dhfWY0/hozvPlrXnSeffUr1KM95uL0PXlyg
+	==
+X-Received: by 2002:a17:903:160c:b0:2c0:ca99:3d73 with SMTP id d9443c01a7336-2c7fc665c91mr88173025ad.8.1782524998436;
+        Fri, 26 Jun 2026 18:49:58 -0700 (PDT)
+Received: from p1.. ([2607:fb91:15af:c6b3:c760:3f53:87ef:d98c])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7f5afdd40sm48970995ad.33.2026.06.26.18.49.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2026 18:49:58 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: "D . Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hans Wippel <hwippel@linux.ibm.com>,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] net/smc: fix UAF in smc_cdc_rx_handler() by pinning the socket
+Date: Fri, 26 Jun 2026 18:49:48 -0700
+Message-ID: <20260627014948.3049512-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302290-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:hrushirajg23@gmail.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:syzbot+6c25f4750230faf70be9@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302291-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,gmail.com,asu.edu];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,6c25f4750230faf70be9];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hwippel@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA0496D0BBA
+X-Rspamd-Queue-Id: 258726D0BD9
 
-On Tue, 23 Jun 2026 20:14:47 +0530 Hrushiraj Gandhi wrote:
-> Fix both paths by calling debugfs_remove_recursive() on the port's
-> ddir before every free_netdev() call. The subsequent
-> nsim_dev_port_debugfs_exit() calls become harmless no-ops since ddir is
-> set to NULL.
+smc_cdc_rx_handler() looks up the connection by token under the link
+group's conns_lock, drops the lock, and then dereferences conn and the
+smc_sock derived from it, ending in sock_hold(&smc->sk) inside
+smc_cdc_msg_recv(). No reference is held across the lock release.
 
-Looks like the wrong fix. All features clean up after themselves with
-the exception of ethtool. Save the ethtool ddir and remove just that
-one. This will align with how the other features behave.
+The only reference pinning the socket while the connection is
+discoverable in the link group is taken in smc_lgr_register_conn()
+(sock_hold) and dropped in __smc_lgr_unregister_conn() (sock_put), both
+under conns_lock. Once the handler drops conns_lock, a concurrent
+close() -> smc_release() -> smc_conn_free() -> smc_lgr_unregister_conn()
+can drop that reference and free the smc_sock, so the handler's later
+sock_hold() runs on freed memory:
+
+  WARNING: lib/refcount.c:25 at refcount_warn_saturate
+  Workqueue: rxe_wq do_work
+   refcount_warn_saturate (lib/refcount.c:25)
+   smc_cdc_msg_recv (net/smc/smc_cdc.c:430)
+   smc_cdc_rx_handler (net/smc/smc_cdc.c:502)
+   smc_wr_rx_tasklet_fn (net/smc/smc_wr.c:445)
+   tasklet_action_common (kernel/softirq.c:938)
+   handle_softirqs (kernel/softirq.c:622)
+  Kernel panic - not syncing: panic_on_warn set
+
+Only SMC-R is affected. The SMC-D receive tasklet is stopped by
+tasklet_kill(&conn->rx_tsklet) in smc_conn_free() before the connection
+is unregistered, so it cannot run concurrently with the free.
+
+Take the socket reference while still holding conns_lock, so the
+registration reference can no longer be the last one, and drop it once
+the handler is done.
+
+Fixes: d7b0e37c1ac1 ("net/smc: restructure CDC message reception")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+ net/smc/smc_cdc.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+index 619b3bab3824..b809139d7e87 100644
+--- a/net/smc/smc_cdc.c
++++ b/net/smc/smc_cdc.c
+@@ -483,21 +483,27 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
+ 	lgr = smc_get_lgr(link);
+ 	read_lock_bh(&lgr->conns_lock);
+ 	conn = smc_lgr_find_conn(ntohl(cdc->token), lgr);
++	if (conn && !conn->out_of_sync)
++		sock_hold(&container_of(conn, struct smc_sock, conn)->sk);
++	else
++		conn = NULL;
+ 	read_unlock_bh(&lgr->conns_lock);
+-	if (!conn || conn->out_of_sync)
++	if (!conn)
+ 		return;
+ 	smc = container_of(conn, struct smc_sock, conn);
+ 
+ 	if (cdc->prod_flags.failover_validation) {
+ 		smc_cdc_msg_validate(smc, cdc, link);
+-		return;
++		goto out;
+ 	}
+ 	if (smc_cdc_before(ntohs(cdc->seqno),
+ 			   conn->local_rx_ctrl.seqno))
+ 		/* received seqno is old */
+-		return;
++		goto out;
+ 
+ 	smc_cdc_msg_recv(smc, cdc);
++out:
++	sock_put(&smc->sk);
+ }
+ 
+ static struct smc_wr_rx_handler smc_cdc_rx_handlers[] = {
 -- 
-pw-bot: cr
+2.43.0
+
 
