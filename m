@@ -1,312 +1,168 @@
-Return-Path: <netdev+bounces-302304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302305-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NsN8CjtJP2q8RAkAu9opvQ
-	(envelope-from <netdev+bounces-302304-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 05:53:31 +0200
+	id z3knMtZfP2pWSQkAu9opvQ
+	(envelope-from <netdev+bounces-302305-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 07:29:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F936D109E
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 05:53:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2242A6D12DE
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 07:29:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=HfXm0nH3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302304-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302304-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=i-love.sakura.ne.jp (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302305-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302305-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 009093018D17
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 03:53:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8F7B303277C
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 05:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE1B3769F5;
-	Sat, 27 Jun 2026 03:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D3E3101CE;
+	Sat, 27 Jun 2026 05:29:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B85369972
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 03:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAC3288530
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 05:29:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782532406; cv=none; b=rCEBd4HGGsM4PMAFA1cGj46ojj4BPW0E+ysoYVP7ojEdMIO1+8kr/Y7RzeIafoo9iyNJkVNdlBjMgQf4aNhN/xhZ5RyW7jS7Vw77vxa5G+D3/ROKATlqG/Aw//GqiNQpyaOH8V1h0+kXBXu0dqyTQxAqCFsRYdDjuOC1/nCjj8E=
+	t=1782538196; cv=none; b=fvlK+Ao3YIk9fMk5ZbwP3ZwY0sItcsElQDkvXNgnTGiJlL/tRznz6WrgYLCUv0HtRWb9e51Gh0Api+HFzu8dRMgZJX1l0uEcRjtFUC0try38xELoFNvvUO1aGTK7n4CpGBq+FUL3djesifi6WpXVxhQOtj+ha+hFzxKgM2uvc0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782532406; c=relaxed/simple;
-	bh=ETblho3kML3xNG+kPNK/R7JFDZnBj9K4luFtMCfdKlA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jxU9qnwUsEXqY20z/W34uuZHeIq6Ux/4+2BmBw8TlTES1gUa9egBMwpXeqiIGf4cbhyHUv128kbLVljEPdO03FTy49UH3ygOcA9GgWIo0aISKgZedycNGrM+/JxOGB5brQKvyeuSccPe4k2S0RwBNEDrB8jvjx2GIhGa7V5p6YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HfXm0nH3; arc=none smtp.client-ip=74.125.82.169
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-30bc871ecdfso2178026eec.1
-        for <netdev@vger.kernel.org>; Fri, 26 Jun 2026 20:53:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782532397; x=1783137197; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SQNrL9braNEccOjKmgbxk/VmLxwleiapiKYQvIiDJSQ=;
-        b=HfXm0nH3ma6/Qr/LTpwEeoDkFLtUB4eWDDjSeGbxsLHkxUCX2lAxa5eodMnL79p2vD
-         Ikqhpri6z+k3wXk2RzBu2tJJJ5c7aNAtji+guzyxW2sLZvRFnJ2uM9VTfbSUzVOHkPCl
-         QpK4n3lfX4o64g8mBGErz/03RPui5Anxdifsu+h9n5dzYS92L8aawZ2pZL+6fgWXF7NP
-         3Yjlm6IxkGuzM9SKhjP4GerXyHCskR47sNIs5xSmMebeFpLdNSqbfqvIwMcVm4FNTKd4
-         XojQp32VW8znurnQhqBQEnPJoXpKJJJx8SY+pJqc9lPJaokEn4q00XGlCd82Lp3HtJ8q
-         EK2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782532397; x=1783137197;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SQNrL9braNEccOjKmgbxk/VmLxwleiapiKYQvIiDJSQ=;
-        b=Z30622KGbX80xdUkXoah9dND8XpTFsodhdQ0Q+kKkfhqCaanPxDkXYqoUoiEKemlbZ
-         R9SA5fA8m6uYHzM39nQ4bLIAFXjKDG/QhURNrL3RTkKgf8B7qdyzAU+pLqy/G/LmcI6e
-         KfGABVlxrnohiT9C674hWlBubfaYExBf7AewMVuRR70lb8r5mpF3mf9VyvL0pNxt7sDg
-         gZ3kdRrrvcKhxL36cfoPrtCLjlgFuGrEhFxCgr+qIfGaztljuoyzwWvdHb8N8Gm/EbHz
-         ihTMUtdpLCT86lQ33frds8FnbtDc+C5LyVFzHgfqQS8xF+ER43yM29DpK/ve0LeFKjss
-         t/pA==
-X-Forwarded-Encrypted: i=1; AHgh+RoAXYMic+5iZM5oP8uTMJ9kXe4Xp/bWkHnhbAo1KllgzBlEY0ZvRxodTQyi4ulyGwB00IyWmgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIWcjcx49rTVyaWC40ResNNRARDmduh+0p4EKX6yzwRqzwAPyk
-	m4L5NrDMudeq65YW3KAOyDYqI2BmfSKTtk4N5/hRhTIKCM/nBk49NI8b
-X-Gm-Gg: AfdE7ck9YFrPcbKyu2HQCdvqPLAC+Dh4BIHTwhwH592UeMOYyrQqA/+bTPPRy/t0KiP
-	tA4daw/2PmDZ2uomIRreQ1kup6mQORs0pB3FpdXvkE0cEPycqFS5jrbJuYH+vQOlQqTVEHdg0IM
-	O8jAkRFwSyyDKfMJ79pmuxROgdcFJN1k9b7bwUS+FkzN3lJ4I5Id7bGp7HJ8G+i183+1eC/IM/l
-	bzm7zzHoSKt/h6Lae4HSVdM1UXJz4E503i0mT6S7qIYhH6tUVh7olSJeXju2/ctuuDy4kB7HLr+
-	AJCG6OnO1LGvvz778IQByqNH7GdvYmFvPSk1+q+sGkGsiTJJXM9n9sX/SHlvKw69GmAIeqDl6rG
-	DYTtojgcSlfWqnG+6+Gnd5LDU0GpWmfv5bZ7HwWK8bdLokuaR+2ugHulrD6MnYKFh/QgK0nyR8o
-	pAQxaRAk6DsGtbIpA=
-X-Received: by 2002:a05:7300:578f:b0:30c:7dcb:c8fb with SMTP id 5a478bee46e88-30c84d51fc8mr9403164eec.11.1782532397077;
-        Fri, 26 Jun 2026 20:53:17 -0700 (PDT)
-Received: from archbtw ([2405:201:22:b1c5:42c3:4851:cefc:8c57])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30d3af0d2e4sm1307957eec.22.2026.06.26.20.53.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 20:53:16 -0700 (PDT)
-From: atharva-potdar <atharvapotdar07@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-	nic_swsd@realtek.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Francois Romieu <romieu@fr.zoreil.com>,
-	netdev@vger.kernel.org,
-	atharvapotdar07@gmail.com
-Subject: [PATCH net-next v2] r8169: migrate Rx path to page_pool
-Date: Sat, 27 Jun 2026 09:22:41 +0530
-Message-ID: <20260627035241.59689-1-atharvapotdar07@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1782538196; c=relaxed/simple;
+	bh=D5s3R3niZVIUOGDu7mziXizVg0cziH2fG1zX+NAS5Vk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ra18ihyDMNhg1ofii3eEbz3BT5Ktn4f+ypvP5J32dioFdvSmwISUgG1hxlLU/Q/Kh7t2HwWB7D9a5pbmTqBS4v04H7DvzfEogF7QxZCe3b7Mw/3Nq9lVYUCXbnUN/E0ozCHqPcs1jXycnbww72pHm2oD5A4sh2Mwqgtd9kQyOIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 65R5SwGv004925;
+	Sat, 27 Jun 2026 14:28:58 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 65R5Svq0004920
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 27 Jun 2026 14:28:57 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <2951101e-d503-4a48-91b8-d6f041f0b1b6@I-love.SAKURA.ne.jp>
+Date: Sat, 27 Jun 2026 14:28:57 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tomoyo: Enforce connect policy in TCP Fast Open
+To: Matthieu Buffet <matthieu@buffet.re>
+Cc: Bryam Vargas <hexlabsecurity@proton.me>,
+        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>,
+        =?UTF-8?Q?G=C3=BCnther_Noack?=
+ <gnoack@google.com>,
+        linux-security-module@vger.kernel.org,
+        Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
+        Paul Moore <paul@paul-moore.com>, Yuchung Cheng <ycheng@google.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        Kentaro Takeda <takedakn@nttdata.co.jp>
+References: <20260619002207.61104-1-matthieu@buffet.re>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260619002207.61104-1-matthieu@buffet.re>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav301.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[i-love.sakura.ne.jp : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[fr.zoreil.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302304-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:romieu@fr.zoreil.com,m:netdev@vger.kernel.org,m:atharvapotdar07@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[atharvapotdar07@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[atharvapotdar07@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302305-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:matthieu@buffet.re,m:hexlabsecurity@proton.me,m:mic@digikod.net,m:gnoack@google.com,m:linux-security-module@vger.kernel.org,m:ivanov.mikhail1@huawei-partners.com,m:paul@paul-moore.com,m:ycheng@google.com,m:edumazet@google.com,m:netdev@vger.kernel.org,m:takedakn@nttdata.co.jp,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,params.dev:url]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,buffet.re:email,I-love.SAKURA.ne.jp:mid,I-love.SAKURA.ne.jp:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A9F936D109E
+X-Rspamd-Queue-Id: 2242A6D12DE
 
-Migrate the Rx path to use the page_pool API, replacing the legacy
-alloc_pages() + skb_copy() model with napi_build_skb() for zero-copy
-delivery. This prepares the driver for future XDP support.
+On 2026/06/19 9:22, Matthieu Buffet wrote:
+> Tomoyo restricted TCP connections in 2011 in commit
+> 059d84dbb389 ("TOMOYO: Add socket operation restriction support.")
+> using the socket_connect() LSM hook.
+> 
+> However, the MSG_FASTOPEN sendmsg() flag was added in 2012 to allow
+> combining connect() and the first sendmsg(). Tomoyo was not updated to
+> take this into account in its send hook.
+> 
+> This resulted in a TCP connect policy bypass similar to that reported in
+> Landlock in 2024 (see Link below), with the difference that Tomoyo was
+> fine when originally merged, and the problem got introduced when adding
+> fastopen support, possibly due to lack of synchronization between lsm
+> and netdev worlds.
+> 
+> Add MSG_FASTOPEN handling in Tomoyo's existing send hook.
+> 
+> Link: https://github.com/landlock-lsm/linux/issues/41
+> Link: https://lore.kernel.org/all/20260616201615.275032-1-hexlabsecurity@proton.me/
+> Fixes: cf60af03ca4e ("net-tcp: Fast Open client - sendmsg(MSG_FASTOPEN)")
+> Cc: stable@kernel.org
+> Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
+> ---
+>  security/tomoyo/network.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
 
-To prevent MTU regressions and DMA overflows on older MACs
-(CVE-2009-1389), the pool allocates higher-order pages using
-get_order(SZ_16K), matching the legacy driver behavior.
+Thank you for finding this problem and making a patch.
+I updated your patch like below in order to exclude kernel threads from this check.
+If we are OK to go with modifying individual LSM, I'll apply this change.
 
-DMA mapping and cache syncing are delegated to the page_pool core via
-PP_FLAG_DMA_MAP and PP_FLAG_DMA_SYNC_DEV to ensure safe operation across
-all architectures.
+ security/tomoyo/network.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Signed-off-by: atharva-potdar <atharvapotdar07@gmail.com>
----
-v2:
- - Reverted buffer size to SZ_16K and utilized get_order(SZ_16K) to 
-   prevent MTU regression and mitigate CVE-2009-1389.
- - Use napi_build_skb() instead of skb_add_rx_frag() to keep ethernet
-   headers in the linear data area.
-
- drivers/net/ethernet/realtek/r8169_main.c | 77 ++++++++++++++++-------
- 1 file changed, 54 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index ec4fc21fa..a9bedf93b 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -31,6 +31,7 @@
- #include <linux/unaligned.h>
- #include <net/ip6_checksum.h>
- #include <net/netdev_queues.h>
-+#include <net/page_pool/helpers.h>
- #include <net/phy/realtek_phy.h>
+diff --git a/security/tomoyo/network.c b/security/tomoyo/network.c
+index cfc2a019de1e..50d27c773b10 100644
+--- a/security/tomoyo/network.c
++++ b/security/tomoyo/network.c
+@@ -765,6 +765,15 @@ int tomoyo_socket_sendmsg_permission(struct socket *sock, struct msghdr *msg,
+ 	const u8 family = tomoyo_sock_family(sock->sk);
+ 	const unsigned int type = sock->type;
  
- #include "r8169.h"
-@@ -729,6 +730,7 @@ enum rtl_dash_type {
- };
- 
- struct rtl8169_private {
-+	struct page_pool *rx_pool;
- 	void __iomem *mmio_addr;	/* memory map physical address */
- 	struct pci_dev *pci_dev;
- 	struct net_device *dev;
-@@ -4161,21 +4163,14 @@ static void rtl8169_mark_to_asic(struct RxDesc *desc)
- static struct page *rtl8169_alloc_rx_data(struct rtl8169_private *tp,
- 					  struct RxDesc *desc)
- {
--	struct device *d = tp_to_dev(tp);
--	int node = dev_to_node(d);
- 	dma_addr_t mapping;
- 	struct page *data;
- 
--	data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
-+	data = page_pool_dev_alloc_pages(tp->rx_pool);
- 	if (!data)
- 		return NULL;
- 
--	mapping = dma_map_page(d, data, 0, R8169_RX_BUF_SIZE, DMA_FROM_DEVICE);
--	if (unlikely(dma_mapping_error(d, mapping))) {
--		netdev_err(tp->dev, "Failed to map RX DMA!\n");
--		__free_pages(data, get_order(R8169_RX_BUF_SIZE));
--		return NULL;
--	}
-+	mapping = page_pool_get_dma_addr(data);
- 
- 	desc->addr = cpu_to_le64(mapping);
- 	rtl8169_mark_to_asic(desc);
-@@ -4188,14 +4183,16 @@ static void rtl8169_rx_clear(struct rtl8169_private *tp)
- 	int i;
- 
- 	for (i = 0; i < NUM_RX_DESC && tp->Rx_databuff[i]; i++) {
--		dma_unmap_page(tp_to_dev(tp),
--			       le64_to_cpu(tp->RxDescArray[i].addr),
--			       R8169_RX_BUF_SIZE, DMA_FROM_DEVICE);
--		__free_pages(tp->Rx_databuff[i], get_order(R8169_RX_BUF_SIZE));
-+		page_pool_put_full_page(tp->rx_pool, tp->Rx_databuff[i], false);
- 		tp->Rx_databuff[i] = NULL;
- 		tp->RxDescArray[i].addr = 0;
- 		tp->RxDescArray[i].opts1 = 0;
- 	}
-+
-+	if (tp->rx_pool) {
-+		page_pool_destroy(tp->rx_pool);
-+		tp->rx_pool = NULL;
-+	}
- }
- 
- static int rtl8169_rx_fill(struct rtl8169_private *tp)
-@@ -4221,8 +4218,26 @@ static int rtl8169_rx_fill(struct rtl8169_private *tp)
- 
- static int rtl8169_init_ring(struct rtl8169_private *tp)
- {
-+	struct page_pool_params params = {0};
-+
- 	rtl8169_init_ring_indexes(tp);
- 
-+	params.order = get_order(SZ_16K);
-+	params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-+	params.pool_size = NUM_RX_DESC;
-+	params.dev = tp_to_dev(tp);
-+	params.nid = dev_to_node(tp_to_dev(tp));
-+	params.dma_dir = DMA_FROM_DEVICE;
-+	params.offset = 0;
-+	params.max_len = SZ_16K;
-+	tp->rx_pool = page_pool_create(&params);
-+	if (IS_ERR(tp->rx_pool)) {
-+		int err = PTR_ERR(tp->rx_pool);
-+
-+		tp->rx_pool = NULL;
-+		return err;
++	if ((msg->msg_flags & MSG_FASTOPEN) && msg->msg_name && type == SOCK_STREAM &&
++	    (family == PF_INET || family == PF_INET6) &&
++	    (sock->sk->sk_protocol == IPPROTO_TCP || sock->sk->sk_protocol == IPPROTO_MPTCP)) {
++		address.protocol = SOCK_STREAM;
++		address.operation = TOMOYO_NETWORK_CONNECT;
++		return tomoyo_check_inet_address((struct sockaddr *)msg->msg_name,
++						 msg->msg_namelen, 0, &address);
 +	}
 +
- 	memset(tp->tx_skb, 0, sizeof(tp->tx_skb));
- 	memset(tp->Rx_databuff, 0, sizeof(tp->Rx_databuff));
- 
-@@ -4777,6 +4792,7 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
- 		unsigned int pkt_size, entry = tp->cur_rx % NUM_RX_DESC;
- 		struct RxDesc *desc = tp->RxDescArray + entry;
- 		struct sk_buff *skb;
-+		struct page *new_page;
- 		const void *rx_buf;
- 		dma_addr_t addr;
- 		u32 status;
-@@ -4820,21 +4836,36 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
- 			goto release_descriptor;
- 		}
- 
--		skb = napi_alloc_skb(&tp->napi, pkt_size);
--		if (unlikely(!skb)) {
--			dev->stats.rx_dropped++;
--			goto release_descriptor;
--		}
--
- 		addr = le64_to_cpu(desc->addr);
- 		rx_buf = page_address(tp->Rx_databuff[entry]);
- 
- 		dma_sync_single_for_cpu(d, addr, pkt_size, DMA_FROM_DEVICE);
- 		prefetch(rx_buf);
--		skb_copy_to_linear_data(skb, rx_buf, pkt_size);
--		skb->tail += pkt_size;
--		skb->len = pkt_size;
--		dma_sync_single_for_device(d, addr, pkt_size, DMA_FROM_DEVICE);
-+
-+		new_page = page_pool_dev_alloc_pages(tp->rx_pool);
-+		if (unlikely(!new_page)) {
-+			skb = napi_alloc_skb(&tp->napi, pkt_size);
-+			if (unlikely(!skb)) {
-+				dev->stats.rx_dropped++;
-+				goto release_descriptor;
-+			}
-+			skb_copy_to_linear_data(skb, rx_buf, pkt_size);
-+			skb_put(skb, pkt_size);
-+			dma_sync_single_for_device(d, addr, pkt_size, DMA_FROM_DEVICE);
-+		} else {
-+			skb = napi_build_skb(page_address(tp->Rx_databuff[entry]), SZ_16K);
-+			if (unlikely(!skb)) {
-+				page_pool_recycle_direct(tp->rx_pool, new_page);
-+				dev->stats.rx_dropped++;
-+				goto release_descriptor;
-+			}
-+
-+			skb_put(skb, pkt_size);
-+			skb_mark_for_recycle(skb);
-+
-+			tp->Rx_databuff[entry] = new_page;
-+			desc->addr = cpu_to_le64(page_pool_get_dma_addr(new_page));
-+		}
- 
- 		rtl8169_rx_csum(skb, status);
- 		skb->protocol = eth_type_trans(skb, dev);
+ 	if (!msg->msg_name || !family ||
+ 	    (type != SOCK_DGRAM && type != SOCK_RAW))
+ 		return 0;
 -- 
 2.54.0
+
 
 
