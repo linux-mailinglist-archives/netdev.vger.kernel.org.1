@@ -1,357 +1,174 @@
-Return-Path: <netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +KlFNsY6QGpIdwkAu9opvQ
-	(envelope-from <netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:04:06 +0200
+	id wa/5HWo7QGp9dwkAu9opvQ
+	(envelope-from <netdev+bounces-302352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:06:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3414C6D2A71
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:04:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB816D2AAC
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:06:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=v6SKBx+A;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=UsREzLoY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302352-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302352-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 996E23008C28
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 21:04:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 90B543004043
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 21:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4397837E2E2;
-	Sat, 27 Jun 2026 21:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC8137F735;
+	Sat, 27 Jun 2026 21:06:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5804315F
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 21:04:01 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782594243; cv=pass; b=FHWA97eka72DL0v/3MFVyPWcDSkpXUaAIqls/WnHZUJUQyP0WqA7YpCY0RBsJ9ytsgQ8pKXYLMKDTZIXw+rCTWeN7pg3aTIMFhkKYfu5ifcGsd592Sm6WJtd2kzBQWaE2dmOc2vbntBXr8OiRY0ujcZDJ4ZyoB8vsN5uWRbdctI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782594243; c=relaxed/simple;
-	bh=MFPTZmygDB5eIaofxE2nBy2zz3SCsiq382k9t8M2MvA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OElbWJcMzWW0oKaS8P7+R0bcGVC4ZI0ilNljB6jkcmI+SzN5vo+lDrG2P4HBrfyBRgJW2lqpKkhfFlL9KKABWjsbcpwhCsVEFDHWFnjmVK5BiLNf7RdzOXOcJGooPObWbKi7Zusz6s+mHSt39q91MZUST7hPCURYu/5VYvhquzU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=v6SKBx+A; arc=pass smtp.client-ip=209.85.210.172
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-84347ad88edso1710450b3a.1
-        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 14:04:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782594241; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GNofPuRmhIdgOikwcYP8DwfHSKfoXx2H4Z/7nl3jNrROevlYESLgOC16JNpdvBbGHe
-         FjTZnvT9QSgLx01MKMN+qaI2hdz7R0VIdPj1qeeNtXEUTbMkcZ2ws/EG4AOfoknT5Plp
-         IALskkKFFEhRKNSdjQz9iw+Y8sBB/D8pvsxhT+w38ARs84eNNLk7EcXFWe1TJVJCenjs
-         ygaf82ffoVcvqSHLgl3xD+XgLu1cdlGgvBaqgv+WBtxKEbSdiGWVA83YYMsWzKTuhLiS
-         LwqiZWNJOgwz7MBJ04Hk1OiECR+mJHLaGGEYrdZWtiR6iJsrZKzrjJ26NxEDC30rOOfT
-         +5mQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Aw09dR/Zs90zrBnlxdIxEMTCBzgnoxukuT5GWdKhK6w=;
-        fh=7V41OBPjdslGFggioTxKS4i14shBp0V9+JFAiFx5oQY=;
-        b=NKYMyl5WQHxleERWYCk6lh3GWRx78br6baEiViP1m+g0klpe01RcinR1w38K0Dm6mx
-         5JNx/U2q9K9mXZn+3wQrLnINkIAQV4EJZXh1fHog2KluvX83yyKpioRIdFaquOwS9uQO
-         e/mVznXrnP2WxFG/WNyQjySrrz3LnQqxU3IwNGOKrXCi4dI1VwlqlvE+a6jpNEdp4LCf
-         LC24San/07G+DqnQ9kV2oAcPu/f+LHUqxun/oI+I2NYdR781tyPEiTgbq5dnvfB3LeFR
-         EUvanhPvth3pTUbG+3uJhx4JNSU351UeA/Z9zkSaxrC4LbDTDN57ei6iLFvmhv0R1/rj
-         gEiw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC553803C5
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 21:06:39 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782594403; cv=none; b=FhC3dGz9nef0DKwOvGkrBvsGGfVX0FnWL5i/RsVqQotUmaGKbZC/Fmj/2y5CqxZsbpWIrC7oQ53r0hOZIkdMODWBqX/+awKWQHbNcV3+r/XwuuaAXr7sCqjalISnlrgUBtGC0wQjdGU6YUjoKpWAJb8R3NLusUqwvksMsMezMjE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782594403; c=relaxed/simple;
+	bh=nILz1Z5b7EzsgPgmNo563wVi3lhcA2jWBLwDMyAkbT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q3MJ1Qr9KKt0leYgVFFc1Jmyfch+bgxdyKEkMJwdgMkpGMYhlex3ktjWJSdoiVNY2hJw6HkI8lXOiinn54E24GrSedcjBEdCLOAT/tDVDWl1B+MKKFi/wYASTSdMUTS02noQ056vmhrO1YL1bRm3iNnPSYyrvQAu7qfnjqxL5VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UsREzLoY; arc=none smtp.client-ip=209.85.128.53
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-493a41ff870so2189745e9.1
+        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 14:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782594241; x=1783199041; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782594397; x=1783199197; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Aw09dR/Zs90zrBnlxdIxEMTCBzgnoxukuT5GWdKhK6w=;
-        b=v6SKBx+A1QrtP5hOa/+roT9UueRthHofkTXS3BfDJeFN3Ymq3nQohN6WjMDMuEuoCE
-         viRPaCQMgYwuysjMIuAvFx7pvzvGnI94+zYcQiXTIcLVfiWgDPSROgNfHNnj/wiwP7Oj
-         Sket+QH9klEprsv1JES9AV6iawBgQ+eyw3518=
+        bh=nILz1Z5b7EzsgPgmNo563wVi3lhcA2jWBLwDMyAkbT0=;
+        b=UsREzLoYW1MrrAS5e/RIKH4fcuWYHmBECXCdw2/jqXVe2crDT1lE5ywVbfWeZseeVY
+         vo2O9GX6pQ2Bq9R2Es0i392/mGbfwsADM2Y6VjDet4Fro4s0zu3RkPE5/kALJ0Xnx7p8
+         vEBQHyBvH57v6aOIvXcYR6GZKmLHE4T3ecTCEdZU2ocdvTWrZWhQsknE9Lgaaq91PLSx
+         EVPo41FP7MYocEA4VoFmMBcPyNBEVVdXLkBLbs3cR7sarar7+ZOnKGFhhVXWvaU+UmL6
+         vFfMoM50CtBNxZzE1q2tft9KhXt74b1+U6rACoKEh4iMrr6e7zl2sjsxEDQq2G+044Mj
+         KXkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782594241; x=1783199041;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1782594397; x=1783199197;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Aw09dR/Zs90zrBnlxdIxEMTCBzgnoxukuT5GWdKhK6w=;
-        b=iKK83DU1hlIZHddHP2EzwQhJRTRSiJSTMsJYhYsrojCLebSRTLH3Y//CPZPgc81avO
-         fWPlTIju2S0v+dd5EbhEepDt4EnqJW78feMN9/zKnvzrHnlW0iudjWUfTab31Eq6CjqC
-         k4McVp0O5YpYnJkZAMCDn0wHci02XXIXBI1Qu2+rFwN+Xi4xC72Ttr2kvJcwNBzWX42M
-         oTBnFMAXuRRikPfnoO3lhFfFOHkjiDB+4yT/ki9ajuAngY0PemaaZFqHj8ibHxICnpxB
-         aa+GVOiZu/hxWVSPyqTXBod968hErDLt4IheO2qz1NWg56GTdH9YyjGKHxSpnRHhI5TU
-         9FCQ==
-X-Gm-Message-State: AOJu0YxvyxMBbqwHuZNp1eti6i9IWfmUxPDlJP1kxtLJNhezls3qxYsx
-	puH6htLLKSw8XJHtqQn/3/2eUPVgJ5B7O3Qv44fPpZtncD2KFei1kApokXdQ73Jol0ab3/vZM0R
-	nv+uLbZH8v8uiKN14SYWPyh0S+RdbtRmGn9JMj/2y
-X-Gm-Gg: AfdE7cnZIHYbxXV9CpHxrYbcGdF4a1ax6G/3G7hgr0MwS56vLJLS8dc34rfXzGG7MQt
-	GkKp02KvMD3gehn9ZKge51Z0ibe7VVYfGRDJKqfG9XJAX0fvER0DvGsu2cq7duTPi2Lt4C+vce7
-	eYGJWlI6eNXZFd+OxPP1YVDwBuWy3/Sa/X+byh+21PAbftay8fneWQtEgCguPdEHpC6dmXO5dii
-	eM5c+z43XfJIgVS/bBJ/CFMMJWeY5ENQS/vcVh2Zg7jw+tYKyetqEYKoPk8Wn6zbNPnca+gsCnP
-	9aZNc1E+
-X-Received: by 2002:a05:6a00:22d1:b0:845:e08c:a4eb with SMTP id
- d2e1a72fcca58-845e08ca873mr2238300b3a.58.1782594240806; Sat, 27 Jun 2026
- 14:04:00 -0700 (PDT)
+        bh=nILz1Z5b7EzsgPgmNo563wVi3lhcA2jWBLwDMyAkbT0=;
+        b=lCqhlcKEtFa/JVYfFduT2uxyOQH7iIRRI589oUDoV8BNF1TtgaIqGiBlZo/GFKuHvi
+         MUnWmchmV9eV1EwXtZp25GplisOZhtGDElj1AhqanmTKKUHKMXF0u8bq25U9i5udi6ZJ
+         yZfGcVo8LVRwdEoUL5LlBSdzboUvzyhfmneoE/s90WvhaepA2bnphcCe+4yupnZN8Rtj
+         kfWazAIZCX005DKftAa1lqPJn0Dyh+qtoSVgW25bZpfNK4wsfuDveW3CLzxRqUKJ7BTE
+         I3PF8Yn2aSvDd1rjwD+9W63LgebXPu3sEOeBVgfKjz7Ezguow4eXtFhRAkj31Ck8LcEJ
+         Sw2Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8t6HmHiSGI7sa7kTfONPhLFnX5qo5oM/OQlxXLZ86jZy1P+dpnCnSCcHxdD3XaQ57W+zKwgvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwZnMC3RFIB6+ZU5TqWn7i+uJRsdiJjVq6dv43RMd0RVfFZIvX
+	GLDA+818saIH58g5DmLTvFc6qbdCLqjx39fhRA8VNSdMdJlH/lDuMJae
+X-Gm-Gg: AfdE7cnojwijX3lgaq8b8fXSJcGGL0C1ivka4h+vKMTRI/NxkjGC1oIFsEnwX2ze5wh
+	7bkpqB+6qoHdWkH+zaiC146egwdKKtTdRyR17lI8sffMAC0NLze2ZurWXmyptfX1wBqrSli71qF
+	6yu3DJ5RBBJ/dafJ5grTckljELvQ1NPBklImCODnZ42NvgSLlLMX9aErTrF5pgAKJEJhxP7rBnw
+	N8DZ0EwNPhvWGn1/puuDB033EyGhso6rXJmOLL9Ogn2ShZCgH4CTP+VfLtZtSl6thl76cTHHKAG
+	6ctw5h5eUvCgVRe4E0jKmBDmG82XfZyzeMfEz27rBdX8r0Fx6bFShlM4WQSBFXnKHs5DYN3RU97
+	opFqzp9emXon9y7+foUf54J0AavdMmMbRFRogChCh0+X9aUj7ImCudElMxFiOIjQfGb3/mFWEj5
+	sFlmKCTOPAwTxsOzjjV0+dWcuxyYqlTA8JaQQgBKmBl+ZcWNGO2YIfw9G4gs3Lspqv3MGeiwXfG
+	v65Bm45k5reEPgU0OnTACv6DL8juUkxDmnQrBx3/dLf3K4=
+X-Received: by 2002:a05:600c:a086:b0:492:6954:1036 with SMTP id 5b1f17b1804b1-49269541111mr135494035e9.14.1782594397270;
+        Sat, 27 Jun 2026 14:06:37 -0700 (PDT)
+Received: from localhost.localdomain (p200300fbef048400fc99b634a1c2fd05.dip0.t-ipconnect.de. [2003:fb:ef04:8400:fc99:b634:a1c2:fd05])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49268fcee16sm198439905e9.2.2026.06.27.14.06.36
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 27 Jun 2026 14:06:36 -0700 (PDT)
+From: Nils Juenemann <nils.juenemann@gmail.com>
+To: rjethwani@purestorage.com
+Cc: borisp@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	leon@kernel.org,
+	mbloch@nvidia.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	saeedm@nvidia.com,
+	sd@queasysnail.net,
+	tariqt@nvidia.com
+Subject: Re: [PATCH net-next v14 0/9] tls: Add TLS 1.3 hardware offload support
+Date: Sat, 27 Jun 2026 23:06:35 +0200
+Message-ID: <20260627210635.89769-1-nils.juenemann@gmail.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260515212715.3151307-1-rjethwani@purestorage.com>
+References: <20260515212715.3151307-1-rjethwani@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624224016.24018-1-jhs@mojatatu.com> <CAM0EoMmJZxAbOsyW7bBp0DbTTiQKZeGaaBHPEw45D5b6DKDEvg@mail.gmail.com>
- <20260626141547.GA1310988@horms.kernel.org> <CAM0EoMntFA+fqs_BgT0E_KSsQHyf0W0u7OTngHHB7icrnUiC3A@mail.gmail.com>
- <20260627163602.GG1310988@horms.kernel.org>
-In-Reply-To: <20260627163602.GG1310988@horms.kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 27 Jun 2026 17:03:48 -0400
-X-Gm-Features: AVVi8CcrCffzgUXXJ-TShlgaYV3gjj8Lvxm4KD3V_maA6P8aE4SdQzXXyB8yS8s
-Message-ID: <CAM0EoMkr=1qj6LQGsi6JHnEneiycyZ5_aLCr5DLSy2cCp9Xqdw@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] net/sched: sch_teql: Introduce slaves_lock to
- avoid race condition and UAF
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, victor@mojatatu.com, 
-	security@kernel.org, zdi-disclosures@trendmicro.com, stable@vger.kernel.org, 
-	kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jiri@resnulli.us,m:victor@mojatatu.com,m:security@kernel.org,m:zdi-disclosures@trendmicro.com,m:stable@vger.kernel.org,m:lkp@intel.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com,queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-302352-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302351-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:rjethwani@purestorage.com,m:borisp@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:leon@kernel.org,m:mbloch@nvidia.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:saeedm@nvidia.com,m:sd@queasysnail.net,m:tariqt@nvidia.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nilsjuenemann@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
+	FROM_NEQ_ENVFROM(0.00)[nilsjuenemann@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3414C6D2A71
+X-Rspamd-Queue-Id: 6BB816D2AAC
 
-On Sat, Jun 27, 2026 at 12:36=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Fri, Jun 26, 2026 at 12:11:47PM -0400, Jamal Hadi Salim wrote:
-> > Hi Simon,
-> >
-> > On Fri, Jun 26, 2026 at 10:15=E2=80=AFAM Simon Horman <horms@kernel.org=
-> wrote:
-> > >
-> > > On Fri, Jun 26, 2026 at 06:16:43AM -0400, Jamal Hadi Salim wrote:
-> > > > "
-> > > >
-> > > > On Wed, Jun 24, 2026 at 6:40=E2=80=AFPM Jamal Hadi Salim <jhs@mojat=
-atu.com> wrote:
-> > > > >
-> > > > > The teql master->slaves singly linked list is not protected again=
-st
-> > > > > multiple writes. It can be mod'ed concurently from teql_master_xm=
-it(),
-> > > > > teql_dequeue(), teql_init() and teql_destroy() without holding an=
-y list
-> > > > > lock or RCU protection.
-> > > > >
-> > > > > zdi-disclosures@trendmicro.com has demonstrated that the qdisc is=
- freed
-> > > > > after an RCU grace period, but teql_master_xmit() running on anot=
-her
-> > > > > CPU can still hold a stale pointer into the list, resulting in a
-> > > > > slab-use-after-free:
-> > > > >
-> > > > > BUG: KASAN: slab-use-after-free in teql_destroy+0x3ca/0x440 linux=
-/net/sched/sch_teql.c:142
-> > > > > Read of size 8 at addr ffff88802923aa80 by task ip/10024
-> > > > >
-> > > > > The zdi-disclosures@trendmicro.com repro created concurrent AF_PA=
-CKET
-> > > > > senders on a teql device against a thread that repeatedly adds/de=
-letes the
-> > > > > slave qdisc, together with a SLUB spray that reclaims the freed s=
-lot; the
-> > > > > resulting UAF is controllable enough to be turned into a read/wri=
-te
-> > > > > primitive against the freed qdisc object.
-> > > > >
-> > > > > The fix?
-> > > > > Add a per-master slaves_lock spinlock that serializes all mutatio=
-ns of
-> > > > > master->slaves and the NEXT_SLAVE() links in teql_destroy() and
-> > > > > teql_qdisc_init(). teql_master_xmit() also takes the same slaves_=
-lock
-> > > > > around those updates.
-> > > > > Annotate master->slaves and the per-slave ->next pointer with __r=
-cu and
-> > > > > use the appropriate RCU accessors everywhere they are touched:
-> > > > > rcu_assign_pointer() on the writer side (under slaves_lock),
-> > > > > rcu_dereference_protected() for the writer-side loads (also under
-> > > > > slaves_lock), rcu_dereference_bh() for the loads in teql_master_x=
-mit() and
-> > > > > rtnl_dereference() for the loads in teql_master_open()/teql_maste=
-r_mtu(),
-> > > > > which run under RTNL.
-> > > > > Pair this with rcu_read_lock_bh()/rcu_read_unlock_bh() around the=
- list
-> > > > > traversal in teql_master_xmit(), so that readers either observe a=
- fully
-> > > > > linked list or are deferred until the in-flight mutation complete=
-s. The two
-> > > > > early-return paths in teql_master_xmit() are updated to release t=
-he RCU-bh
-> > > > > read-side critical section before returning, since leaving it hel=
-d would
-> > > > > disable BH on that CPU for good.
-> > > > >
-> > > >
-> > > > sashiko-gemini's complaints:
-> > > > https://sashiko.dev/#/patchset/20260624224016.24018-1-jhs%40mojatat=
-u.com
-> > > > seem bogus to me (someone correct me if i am wrong). I am only goin=
-g
-> > > > to address the first claim of "TOCTOU / "resurrection" race in
-> > > > teql_master_xmit()"
-> > > > teql_master_xmit() holds rcu_read_lock_bh() across the entire
-> > > > traversal. teql_destroy() freeing can only proceed once the qdisc's
-> > > > RCU grace period has elapsed - so where is this TOCTOU? Let's say t=
-his
-> > > > were true: both calls hold the slaves_lock.
-> > > > The other issues are of similar nature.
-> > >
-> > > Hi Jamal,
-> > >
-> > > I think the central question here is about the protection offered by =
-RCU
-> > > in these code paths. And while I agree it protects the use of element=
-s
-> > > of the list, I think the problem flagged relates to the management of
-> > > the list itself.
-> > >
-> > > The example AI gave me when I asked is like this:
-> > >
-> > >     Assume a TEQL master has one slave, `q`.
-> > >     The list is circular: `q->next =3D=3D q`.
-> > >
-> > >     1. CPU A (Transmitting): Enters `teql_master_xmit()`.
-> > >        It reads `master->sla ves` and gets a local pointer to `q`.
-> > >
-> > >     2.  CPU B (Destroying): Calls `teql_destroy(q)`.
-> > >         It takes the lock, unlinks `q`, and sets `master->slaves =3D =
-NULL`.
-> > >         The list is now logically empty.
-> > >
-> > >     3.  CPU A: Finishes its work and prepares to rotate the list head
-> > >         to the next slave.
-> > >         It takes the lock.
-> > >
-> > >     4.  CPU A (The "Use" / The Resurrection):
-> > >         It executes: `rcu_assign_pointer(master->slaves, NEXT_SLAVE(q=
-));`
-> > >         Because `q` was circular, `NEXT_SLAVE(q)` is still `q`.
-> > >
-> > >     5.  CPU A: Releases the lock.
-> > >         **The global `master->slaves` is now `q` again.**
-> > >
-> > >     6.  The System: The RCU grace period expires. CPU B finishes
-> > >         `teql_destroy()` and the memory for `q` is freed.
-> > >
-> > >     The global `master->slaves` pointer is now a **dangling pointer**
-> > >     pointing to freed memory.
-> > >
-> >
-> >
-> > Yeah, thats the same earlier claim of TOCTOU (what sashiko-gemini
-> > claimed was "resurrecting the freed q")
-> > My view is rcu read lock blocks the subsequent call_rcu free - and
-> > destroy() and xmit() already serialize on slaves_lock.
->
-> The read of master->slaves is outside of the slaves_lock critical
-> section(s) in teql_master_xmit(). This is possibly the nub of this issue.
->
+Hi Rishikesh, all,
 
-Yes, i think this could cause an issue on a second run of xmit() ;->
-Let me ponder on it. I will probably have something tommorow..
+thanks for picking up the sendfile/EOF fix in tls_device_splice_eof().
 
-cheers,
-jamal
-> > I could be totaly wrong, but it's almost like sashiko-gemini thinks
-> > that the list-mutation lock _alone_ governs the object lifetime.
-> > The rcu read-side critical section prevents the UAF, not just the
-> > slaves_lock alone
-> > Only reason i added slaves_lock was to prevent corrupting the list
-> > state (whereas the RCU read lock prevents premature free).
-> >
-> > In step #4 above this thing somehow leaves out any mention of the rcu
-> > read lock entirely and places the free in step 6 as if it was
-> > independent of CPU A's critical section.
->
-> I see what you are saying regarding the free not occurring at step 4
-> because CPU A is in an RCU read-side critical section.
->
-> But once CPU A has assigned master->slaves as q (again) it exits
-> the RCU read-side critical section. Then the free of q can occur.
-> And master->slaves will point to memory that has been been freed.
->
-> So the access to q is safe when teql_master_xmit is invoked, due to RCU
-> protecting object lifetime.  But it is unsafe when teql_master_xmit is
-> invoked again because by then master->slaves is a dangling pointer.
->
-> >
-> > I am not sure how to improve it.
-> >
-> > > > OTOH, sashiko-claude
-> > > > (https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260624224016=
-.24018-1-jhs%40mojatatu.com)
-> > > > does make some valid claims which are low value, so not sure a rese=
-nd
-> > > > is worth it.
-> > > > For example in claim 1 it says "Should the changelog mention this
-> > > > teql_dequeue() site too?" Sure I can - but just because I provided
-> > > > extra information in the commit log, which I could have omitted, no=
-w I
-> > > > have to add more info? ;->
-> > >
-> > > FWIIW, I think there is a value in tightening up the commit message.
-> > > E.g. so it's accurate when we look at again in two years time.
-> > > But I also lean towards it not being necessary to post an update
-> > > only to address this.
-> > >
-> > >
-> > > > The second claim is "rcu_dereference_bh()
-> > > > should be rcu_dereference_protected() on writer side". Sparse didnt
-> > > > complain and i dont see this as breakage rather a consistency measu=
-re.
-> > >
-> > > I think it would be good to address in the long run.  But as per my c=
-omment
-> > > immediately above, I also lean towards it not being necessary to post=
- an
-> > > update only to address this.
-> >
-> > I can resend with these two taken care of - but i am skeptical of what
-> > sashiko-gemini is claiming (and i admit as a human the AI may see
-> > something i am totally missing).
-> >
-> > cheers,
-> > jamal
-> > >
-> > > > Unless I am missing something ..
-> > > >
-> > > > cheers,
-> > > > jamal
+Separate issue we hit while testing, looks pre-existing in mlx5e
+rather than v14: a NULL deref on the RX offload path. Trigger is
+ethtool -L <dev> combined 32 (down from 64) under HW-kTLS load,
+then a TLS_RX offload setup:
+
+BUG: unable to handle page fault for address: 00000000000031c0
+RIP: mlx5e_ktls_add_rx+0x268 [mlx5_core]
+Call Trace:
+mlx5e_ktls_add
+tls_device_dev_add_rx
+tls_set_device_offload_rx
+tls_setsockopt
+
+sk_rx_queue_get(sk) returns a stale rxq (62 here) after the
+reduction; mlx5e_ktls_sk_get_rxq() only guards rxq == -1, so
+mlx5e_ktls_add_rx() dereferences priv->channels.c[62], which
+appears to be NULL. The resync paths index
+priv->channels.c[priv_rx->rxq] the same way. This path is not
+TLS 1.3 specific.
+
+I do not have a proposed fix yet. Happy to share the full
+decoded oops / additional kdump details or test patches.
+
+Thanks again,
+Nils Juenemann
 
