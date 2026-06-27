@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-302317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302321-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kuuaLtyXP2pFUwkAu9opvQ
-	(envelope-from <netdev+bounces-302317-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:29:00 +0200
+	id 7oyaDQKYP2poUwkAu9opvQ
+	(envelope-from <netdev+bounces-302321-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:29:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38AE56D194E
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:29:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DE286D19A9
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:29:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=korg header.b=TsWvUQMt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302317-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302317-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=korg header.b=E6KXIxuf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302321-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302321-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 79B803025F4D
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 09:28:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 70DC13027379
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 09:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566AE3939B9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB26399018;
 	Sat, 27 Jun 2026 09:28:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1DC211466;
-	Sat, 27 Jun 2026 09:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416C83537F9;
+	Sat, 27 Jun 2026 09:28:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782552528; cv=none; b=LfI7PAG2348PSrOUwpc/lorTtvVcXsbwkc1Wv8j6Y/7hufOVOLahpMuRm21QX3K9RidblOXiYrXywOsBOjdRAkrzuaSrk6yiDPGs5c/CXgrQLAvR4Wyo9uXZV8Zt8GBPU7FHl3XKl+bxwUo1Ca8zNS3a2rUcgw+iybgQQ8eLc7E=
+	t=1782552528; cv=none; b=sDTb6w3H1t2tAKYnvF/8ITTdxPr4ymrPbedhZTBfv8keJkkopT6gxHlQn1Ns9wfD+n7LNsFxs15cnd6HizS67/VbBmq4dHg0hrIaOQvX782EGnEjMlEmXO+H5ZLvU+R0Z1GHtUhAZ/qr0qaBAFZ2y+ugu12rjsvFjnygV5CGQ24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782552528; c=relaxed/simple;
-	bh=aF47iLMPZHY8ikZj0/3fPMH5Q4mRqmYCLQexdlk5/mo=;
+	bh=f19XCtBPrdV1fkgcubKrKRKRYVaBwil44TIB/tWiXTo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gpNkYLfuBY0Qex4lGk0agh2UM+QZfUF17aNErYAofdhk77PPxS66PmwLC02V6I7OoG5EOPZc+bYo1W0zhb7itHhJf0u+5nvWELJHzXrMxDiUJWOiClbwo8dXHVNVaRxl3lqKehUPC0i23SWlmd2xxuZ84QGFaAsBFf25w0Yzn6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TsWvUQMt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BA97AC2BCF4;
+	 In-Reply-To:To:Cc; b=ONQnS9wkREwGWzmQ/Y0tl5ll8UmplJkd+PJZ1yUmt1jNXcuSjDrxk8wFU6Pk3dXid7i/teZerwWfqk7myOmT/6A2x4Z1juMx1QR7dNQEmh+38cdg+/kXzrvIrwQhTcQRBc+p6eavydVdKjXpP5Rq4kNWAKHdG6UmpGTkj8EUffA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E6KXIxuf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2A31C2BCFB;
 	Sat, 27 Jun 2026 09:28:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1782552527; bh=aF47iLMPZHY8ikZj0/3fPMH5Q4mRqmYCLQexdlk5/mo=;
+	t=1782552528; bh=f19XCtBPrdV1fkgcubKrKRKRYVaBwil44TIB/tWiXTo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TsWvUQMt62wgvD+ef+UVGOqHtKVfLbwtduFNfuSabHEs0UrZfg2NB048fs4EnTH47
-	 IyBXPPvoPmzKjxGu0DOzlihUKYk/pHITmJb2ozXO8ZmBw6mJz+/CHablDhSUftGImD
-	 ulkY+iqbXG6A0X82GkvfDMPCAV0ObG/Wicl4DkP0=
+	b=E6KXIxufvzmDwhJ3B+qiurzKVVe6gkc0mi1RSeDIve4uqyGAhBXlWxMSaP2/tFVEc
+	 lZSXf9rE2OLS/2JLFHnZY93ytItEFkZOdg2wM+bD/wvEMgDFwZjBqJhy4FrT9Rv0bG
+	 Vu4KHqR3L4CqRw1V1W2VT2uYBjpfNRaVmOaUX7eA=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA646C43602;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C13D9C43458;
 	Sat, 27 Jun 2026 09:28:47 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Sat, 27 Jun 2026 17:28:40 +0800
-Subject: [PATCH v7 02/10] rust: module: add `THIS_MODULE` const to
- `ModuleMetadata` trait
+Date: Sat, 27 Jun 2026 17:28:41 +0800
+Subject: [PATCH v7 03/10] rust: doctest: add LocalModule fallback for
+ #[vtable] ThisModule
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260627-fix-fops-owner-v7-2-33cd3990edf0@linux.dev>
+Message-Id: <20260627-fix-fops-owner-v7-3-33cd3990edf0@linux.dev>
 References: <20260627-fix-fops-owner-v7-0-33cd3990edf0@linux.dev>
 In-Reply-To: <20260627-fix-fops-owner-v7-0-33cd3990edf0@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -90,11 +90,11 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782552525; l=3594;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782552525; l=1329;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=aF47iLMPZHY8ikZj0/3fPMH5Q4mRqmYCLQexdlk5/mo=;
- b=7R/uNBFs1pvnOfA6/pe6CcnnqKBFT1zKiiahnOmqWa6q1JXz/QYMu5TA8HTmfpXdXZwymQcLc
- qYCInzcENwBC5nnEPgxrUZrDd5pO/3oLK3qm3nWWEBIShkmRXUCzaor
+ bh=f19XCtBPrdV1fkgcubKrKRKRYVaBwil44TIB/tWiXTo=;
+ b=2U+otmBxVn+NwBtMKrH7zr8lFtkmR40aSlcB22On3uei9QlGjxLiHwGSOBAfq3pZuQE9n/nj7
+ E01ggwbXEhzAkaUDs3DyRlmc5kwwz2NyZ9XEH7g72CA8YT/eMIR1sNt
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
@@ -110,7 +110,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302317-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302321-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[47];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -132,24 +132,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,garyguo.net:email,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 38AE56D194E
+X-Rspamd-Queue-Id: 8DE286D19A9
 
-Since `const_refs_to_static` has been stable as of the MSRV bump, a
-`ThisModule` pointer can now be used in const contexts.
-
-Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that modules
-can provide their `ThisModule` pointer in const contexts such as static
-`file_operations`.
-
-Add a `this_module()` helper to retrieve the `THIS_MODULE` pointer of a
-given module type, and update `__init` to use it instead of the
-`THIS_MODULE` static generated by the `module!` macro.
-
-The `static THIS_MODULE` generated by the `module!` macro is retained
-for backwards compatibility with existing users and removed in a later
-patch once all references have been migrated.
+Add a `LocalModule` struct with a null-pointer `ModuleMetadata` impl
+in the doctest harness, so that `crate::LocalModule` (auto-inserted
+by `#[vtable]`) resolves correctly when there is no `module!` macro.
 
 Assisted-by: opencode:glm-5.2
 Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
@@ -157,66 +146,36 @@ Reviewed-by: Gary Guo <gary@garyguo.net>
 Acked-by: Danilo Krummrich <dakr@kernel.org>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- rust/kernel/module.rs |  9 +++++++++
- rust/macros/module.rs | 18 +++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ scripts/rustdoc_test_gen.rs | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/rust/kernel/module.rs b/rust/kernel/module.rs
-index be242a82e86d2..d713705984477 100644
---- a/rust/kernel/module.rs
-+++ b/rust/kernel/module.rs
-@@ -42,6 +42,15 @@ fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, crate::erro
- pub trait ModuleMetadata {
-     /// The name of the module as specified in the `module!` macro.
-     const NAME: &'static crate::str::CStr;
-+
-+    /// The module's `THIS_MODULE` pointer.
-+    const THIS_MODULE: ThisModule;
-+}
-+
-+/// Returns a reference to the `THIS_MODULE` of the given module type.
-+#[inline]
-+pub const fn this_module<M: ModuleMetadata>() -> &'static ThisModule {
-+    &M::THIS_MODULE
- }
+diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
+index ee76e96b41eea..198af4e446c8c 100644
+--- a/scripts/rustdoc_test_gen.rs
++++ b/scripts/rustdoc_test_gen.rs
+@@ -239,6 +239,22 @@ macro_rules! assert_eq {{
  
- /// Equivalent to `THIS_MODULE` in the C API.
-diff --git a/rust/macros/module.rs b/rust/macros/module.rs
-index 06c18e2075083..aa9a618d5d19e 100644
---- a/rust/macros/module.rs
-+++ b/rust/macros/module.rs
-@@ -519,6 +519,22 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+ const __LOG_PREFIX: &[u8] = b"rust_doctests_kernel\0";
  
-         impl ::kernel::ModuleMetadata for #type_ {
-             const NAME: &'static ::kernel::str::CStr = #name_cstr;
++/// Dummy module type for doctest context.
++struct LocalModule;
 +
-+            #[cfg(MODULE)]
-+            const THIS_MODULE: ::kernel::ThisModule = {
-+                extern "C" {
-+                    static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
-+                }
++use kernel::{{
++    str::CStr,
++    ModuleMetadata,
++    ThisModule, //
++}};
++use core::ptr::null_mut;
 +
-+                // SAFETY: `__this_module` is constructed by the kernel at load time
-+                // and lives until the module is unloaded.
-+                unsafe { ::kernel::ThisModule::from_ptr(__this_module.get()) }
-+            };
++impl ModuleMetadata for LocalModule {{
++    const NAME: &'static CStr = c"rust_doctests_kernel";
++    // SAFETY: `try_module_get`/`module_put` handle null module pointers gracefully.
++    const THIS_MODULE: ThisModule = unsafe {{ ThisModule::from_ptr(null_mut()) }};
++}}
 +
-+            #[cfg(not(MODULE))]
-+            const THIS_MODULE: ::kernel::ThisModule = unsafe {
-+                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
-+            };
-         }
- 
-         // Double nested modules, since then nobody can access the public items inside.
-@@ -616,7 +632,7 @@ pub extern "C" fn #ident_exit() {
-                 /// This function must only be called once.
-                 unsafe fn __init() -> ::kernel::ffi::c_int {
-                     let initer = <super::super::LocalModule as ::kernel::InPlaceModule>::init(
--                        &super::super::THIS_MODULE
-+                        ::kernel::module::this_module::<super::super::LocalModule>()
-                     );
-                     // SAFETY: No data race, since `__MOD` can only be accessed by this module
-                     // and there only `__init` and `__exit` access it. These functions are only
+ {rust_tests}
+ "#
+     )
 
 -- 
 2.43.0
