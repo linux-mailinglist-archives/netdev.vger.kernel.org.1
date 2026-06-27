@@ -1,231 +1,166 @@
-Return-Path: <netdev+bounces-302345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id W4jnJ9oJQGp5bQkAu9opvQ
-	(envelope-from <netdev+bounces-302345-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 19:35:22 +0200
+	id Z37+JWQTQGpXbgkAu9opvQ
+	(envelope-from <netdev+bounces-302346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 20:16:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4D36D26A1
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 19:35:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D0D6D2787
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 20:16:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=rHMA200h;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302345-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302345-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=ixit.cz header.s=dkim header.b=RAYZJFRE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302346-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302346-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=ixit.cz;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DC213028833
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 17:35:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C34A23005170
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 18:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EEAD33F38A;
-	Sat, 27 Jun 2026 17:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1062BE7DC;
+	Sat, 27 Jun 2026 18:15:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ixit.cz (ixit.cz [185.100.197.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747AB30BB94
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 17:35:00 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782581703; cv=pass; b=MpiWoDbFErAFhQMWLG5wX7yXlAZf5Z8j3AdEf9GvzLZGStlFaDktbnzBwl51mGwEoGOba4GOftjgeE03ELPM2FJVeY0aSvJoo/imGoV6BJSN2RSIvrxpllnnz+Pbrueu7rHSZvn2RCS4hHG/0uojdKZkO15ppPpfbdhKN5lpSCE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782581703; c=relaxed/simple;
-	bh=EtSa3a4s7pUIWy8W5ASP2Hk6Xhg7fEmw0EI/tsx6ptI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cBy1OPahqpOoboC4Flo9JAjaU/bS+PrH/RJgxMn3CEWO7EV3FA25e/3JqNQxFnvDJYH/mvBuxWQkLlmNmV7/Iw1LfOBg4KE0jjbl/wTUJquIZyQXN/NR1QCyAKFTKJEBvXgCjctYdX8XEs5S8YdMmw4iAGB1Bs2RguUOyPZEKi4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rHMA200h; arc=pass smtp.client-ip=209.85.128.175
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-806449d108aso27705137b3.2
-        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 10:35:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782581699; cv=none;
-        d=google.com; s=arc-20260327;
-        b=aGuqSPPHGWaYx+ki10sP5086KI/qi4X9JuUUtOkWs66lCfgU4fSDewt5x6MPJkpsRo
-         R/OM72EyEVzMPDjdHxMgPJA1LkNv+xkBOF+iX+84WX8S3sUcMmgxW300ykq4OSNCRl+M
-         NYHmr+cw3Ehh8Q0nBQGH9Z0utPqXAQO07dZMAntpT8WHFUL/xhz3m2ncuIaBMyajiP1y
-         PRgs80p46HGN5ijbB3gcEelQCg9y6M/VZcFx048W7aABvOxEyvKB7461bhnpwvVkLEZp
-         PY5VXKuownblBOogibX1Pw4UnVrp2lv0OB8Y1jKnIjkynouqEe/KWN48cyUKIN6rc0vN
-         xxkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Dgu34QrpNJdt6cwZYfvIh4PfqfTJtLR90pHZigkhqr8=;
-        fh=JHfeGowkdcsOHDjoOAyhM/8+wnn54TtIfe/zFsd/7uQ=;
-        b=pGpnh8UtFiOEvVtP7zhCvvkVy7sAiMtle9h3U6/sbCgAbRA2q9oXu88TKmLH+u6GUf
-         PtpTGSEABzkdL7ykzDVxESyXtLkl0hMQjhtzQdhY9DMFfANf1y4Dt7jpzhGjpiAd3tfq
-         ImXMkRR9jSZ52WLwoorR9zzze2Fpvxxve3Apvrt/IQ4kQhaqI77ZeMQpbD9XKJF8aYh6
-         uG8dL2WIoijuTHKoIqSYIgQZXCifcQ3Zzknm4zWWV3PB0KZK/jG1aK4rZ7JY5b9QTR16
-         ep+sZj5oLi63dYJ2OHBwWhKcH3G+4WDGcRVGOpfVdlxBTFKc4V975QzLP2nu4OwyHZqz
-         RBlQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782581699; x=1783186499; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dgu34QrpNJdt6cwZYfvIh4PfqfTJtLR90pHZigkhqr8=;
-        b=rHMA200h85kj5cgUDkXotqTcF9w2HC9z0SaL/mGqx7SI6VLThAmZXDrzzTQPc5hlK0
-         y53Wz1YwaZT0FqhF7aVKBGu0UGUu3B8i0hQuXd6Bi5qgoSCQ6e/NawDcvdKaL9DeyV7W
-         xNCd9PE3wRPCU3q5BophlCLtea/GkhQ3Ir5/XkBn7Rx6i/raJtK/rgmoFYfXRC2M6Y85
-         JFERMRi4gagYs/2mrf71a1yYqiRdwkRul66mFIdZXJnDO65wavzoAXkG90rgp2bpaZ36
-         PK8ehOMdTZtJ+xNqT4P02gv36vQAngW5JZsXpZBThPnFMw4G4dnk5MPUPD8SOKKmsVyz
-         LpKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782581699; x=1783186499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Dgu34QrpNJdt6cwZYfvIh4PfqfTJtLR90pHZigkhqr8=;
-        b=mc6cZYVV1aKkeqh4+b9gB9zQxnpgy2Nye7JQQ4MfLgbwH3xOGbleVhEORXR99ZCPkg
-         RMH4HpCWEt2UVB17ZlBxF4/t9vb35doNvkcRdJyeRAF8SjPNE8FkiMl3B+AoXz0S9AlP
-         l4bDUdcYwgV7+qkwQC/ugercdWy0nmJd2M0dUUkdmI3Q7UAjL/Yp9R1HneBr0MbkqoI4
-         Fp20q4VYa3/nFrWYRk0xU3+Vk4GykP0tEIrhfJKmwzwjKIaCsfX5MEy0GHcOHY4zrR8+
-         hv16zwAZ9Jv/jhidzwPqhcTyEYaeAGl8Ur4AJdvjLrLSeJgaFlqbPyVDq7Y1JOMWEh4E
-         VoQg==
-X-Forwarded-Encrypted: i=1; AHgh+RpqfxxPA/qkq76UN5f4GWxespUK/GPT3UQt9c8oTYdxnBST/aCGvyrvYit20P03tipNpuQo8r0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpK0rqad6iH3qTONw7rO8NjxtdL1YE1HYTwvLqrCCxwIW5HdSm
-	mj2fMK2bBQKNwq7mOltBuOfMeSaW9LoPsaeuOYsxwhXsDoLGeGMvZ06feFSoGa5qw+fQ3m0bDsB
-	JN6k5M+ygipvrS5RdduM0o/ZjNcX4E1M=
-X-Gm-Gg: AfdE7ckf/aMEnwcszoM3pOGz7cYTgk+F5dhYih76bAi7A31z1TOMu6ssNNY12LjaM+B
-	+aMcKHJA/NhIAwT3KNzojB9KN6XaNbQecP/UYbkC3bvNXEMpCVHGe+WTvIS4xQ1gTPF/16xvEK7
-	3s+xiTKz84YCBhQ/i1bOkX8Gkdw67NvY2uuNegKbWxZQhS3op4xg2pxCIgLhfAJBVc55/X9i3w2
-	5QLTLAzCcSQlUvG4fyfvrfn24pDnXb1NQRhYlitmlFlTbRYaXw6wH2k5WY3Ph8LTVRJyh39MEDZ
-	Pq4UAEAgOTirX1kJ0goh/BKh/dE2CCRskyUcFsFAtJBegAE5
-X-Received: by 2002:a05:690c:e370:b0:7dc:1609:53ae with SMTP id
- 00721157ae682-80a6a09b112mr118115867b3.25.1782581699520; Sat, 27 Jun 2026
- 10:34:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3615F274FD0;
+	Sat, 27 Jun 2026 18:15:57 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782584158; cv=none; b=nl9+df/DH3pSFVYvmwd6peZxkktr7RCrwuI0gmtc5hFml9dsRJbGxCRwZUIukYTxzaAyf9WtxTrN2BDmmJhDDS4/gQ33tFh+8pLIDfXZ6BYath/C2gOxXHt7zV1Qp2jOtWjebXOPbD0mrBC1W4GtPxGniLqVNi7+u9AUmczFBTk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782584158; c=relaxed/simple;
+	bh=YdXT8d9HZM7ftd6dZcHIQSZOZIfHESE0LumULEoQkrg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kRRrkVAKTQRS1mVQNAonRj/O7ZQf4EDVVFrlCa4ZCwf8ndh0J/IIBSSHJcbRqrJRiFUidFF/qspgK7fG2YDVimSPmGNSAJb0a1X73K94CjDdxg+10Wx3/9V45lieI2/9Lius9O6PJM4UBQ4QPs2zuumKUhk7harihPV+tSfveeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=RAYZJFRE; arc=none smtp.client-ip=185.100.197.86
+Received: from [10.0.0.200] (unknown [10.88.125.21])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id 181F0534058D;
+	Sat, 27 Jun 2026 20:15:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1782584152;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=oEE0s9z2KUkGFMtiVRxqelZcjlSqtQUIHE3wkMUwk/g=;
+	b=RAYZJFREThD6TR5SsyDJtPe+enhZtmUriURm+AvAB5SeY0KKzQTlPgjUVx2n1B5qNtNqYk
+	zK+REKMxFCt3743JEuIqjo+G5Fg1hRziHYEfQnpxi+oVIlCMQUusuFmfl45IRwnxrLQpIJ
+	i1Hj8188bBH41EoMXdopE5M8vh51ncY=
+Message-ID: <6a1705f7-32a3-4c96-9f26-c76de72026b5@ixit.cz>
+Date: Sat, 27 Jun 2026 20:15:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co>
-In-Reply-To: <20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co>
-From: sun jian <sun.jian.kdev@gmail.com>
-Date: Sun, 28 Jun 2026 01:34:48 +0800
-X-Gm-Features: AVVi8CdMPlgvdtTlopQ1G7HcBFTuPVL00FJZpDP6g1ISEPYbsnwP6Z4y-kISnc0
-Message-ID: <CABFUUZGg1B0vaw9DFX3uTHxpRyyGtvn04Ae=Ob-VmnuVJB4KLg@mail.gmail.com>
-Subject: Re: [PATCH bpf v2 0/4] bpf, sockmap: Fix sockmap leaking UDP socks
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	Jiayuan Chen <jiayuan.chen@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Cong Wang <cong.wang@bytedance.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Emil Tsalapatis <emil@etsalapatis.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] nfc: nci: fix uninit-value in
+ nci_core_init_rsp_packet()
+To: Samuel Page <sam@bynar.io>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260624224455.999374-1-sam@bynar.io>
+Content-Language: en-US
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <20260624224455.999374-1-sam@bynar.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:mhal@rbox.co,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:ast@kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-302345-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302346-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sam@bynar.io,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ixit.cz:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,gmail.com,cloudflare.com,linux.dev,davemloft.net,kernel.org,bytedance.com,iogearbox.net,etsalapatis.com,vger.kernel.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,rbox.co:email,mail.gmail.com:mid]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ixit.cz:dkim,ixit.cz:email,ixit.cz:mid,ixit.cz:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1F4D36D26A1
+X-Rspamd-Queue-Id: 90D0D6D2787
 
-On Sat, Jun 27, 2026 at 4:37=E2=80=AFAM Michal Luczaj <mhal@rbox.co> wrote:
->
-> Fix for UDP sockets getting leaked during sockmap lookup/release.
-> Accompanied by selftests updates.
->
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
-> Changes in v2:
-> - selftest: drop the original, adapt old tests
-> - fix: change approach to rejecting unbound UDP [Kuniyuki]
-> - Link to v1: https://patch.msgid.link/20260623-sockmap-lookup-udp-leak-v=
-1-0-05804f9308e4@rbox.co
->
-> ---
-> Michal Luczaj (4):
->       bpf, sockmap: Reject unhashed UDP sockets on sockmap update
->       selftests/bpf: Ensure UDP sockets are bound
->       selftests/bpf: Adapt sockmap update error handling
->       selftests/bpf: Fail unbound UDP on sockmap update
->
->  net/core/sock_map.c                                     |  2 ++
->  tools/testing/selftests/bpf/prog_tests/sockmap_basic.c  |  6 +++---
->  tools/testing/selftests/bpf/prog_tests/sockmap_listen.c | 17 +++++++++--=
-------
->  tools/testing/selftests/bpf/test_maps.c                 |  6 +++---
->  4 files changed, 17 insertions(+), 14 deletions(-)
-> ---
-> base-commit: 26490a375cb9be9bac96b5171610fd85ca6c2305
-> change-id: 20260617-sockmap-lookup-udp-leak-bc4e5c5481d7
->
-> Best regards,
-> --
-> Michal Luczaj <mhal@rbox.co>
->
->
 
-Hi Michal,
+On Wed, 24 Jun 2026 23:44:55 +0100, Samuel Page wrote:
+ > nfc: nci: fix uninit-value in nci_core_init_rsp_packet()
 
-I tested this series on bpf.git base commit:
-  26490a375cb9be9bac96b5171610fd85ca6c2305
-The test environment was virtme-ng x86_64.
+Applied, thanks!
 
-Before, with only patches 2/4-4/4 applied:
-  sockmap_basic:  PASS
-  sockmap_listen: FAIL as expected
-    - UDP test_insert_opened failed on sockmap/sockhash,
-      both IPv4 and IPv6
-  test_maps:      FAIL as expected
-    - failed at the new unbound SOCK_DGRAM update check
+[1/1] nfc: nci: fix uninit-value in nci_core_init_rsp_packet()
+       commit: 27d431711a3a6e23e7f961ec2934de20e2ed7cac
 
-After applying the full series:
-  sockmap_basic:  PASS
-  sockmap_listen: PASS
-  test_maps:      no longer failed at the unbound
-                  SOCK_DGRAM update check
-test_maps still later reported:
-  Failed sockmap unexpected timeout
-
-However, I can reproduce the same timeout in three consecutive
-runs on the unmodified base commit, so this looks pre-existing or
-environmental in my virtme-ng setup rather than a regression from
-this series.
-
-I am not adding a Tested-by tag for now because test_maps does not
-fully pass in my setup. The targeted before/after behavior behaved as
-expected.
-
-Thanks,
-Sun Jian
+Best regards,
+-- 
+David Heidelberg <david@ixit.cz>
 
