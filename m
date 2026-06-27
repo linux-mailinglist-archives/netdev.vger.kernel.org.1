@@ -1,205 +1,357 @@
-Return-Path: <netdev+bounces-302350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Q053Jmo4QGpydgkAu9opvQ
-	(envelope-from <netdev+bounces-302350-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 22:54:02 +0200
+	id +KlFNsY6QGpIdwkAu9opvQ
+	(envelope-from <netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:04:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 055C16D2A26
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 22:54:02 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3414C6D2A71
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:04:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=DOKTrW8b;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302350-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302350-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b=v6SKBx+A;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302351-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 119573015A67
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 20:54:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 996E23008C28
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 21:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C701436F91B;
-	Sat, 27 Jun 2026 20:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4397837E2E2;
+	Sat, 27 Jun 2026 21:04:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A28369990
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 20:53:58 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782593640; cv=none; b=iGw02zzeM40T78FHzXnIcX/IzHm+c4x2ETgHnH52UhpuGfxeyiBLVDJqTMk2Ra3QF6yGMUHKKS4CV+atAzudFuDgwWPkFfAMvAEkFosrereVBeApo+cCZZrvV1pH4TWQIirIkvoLN+0TfqNeXpoKG35VTLQQRCoEFPYc1l11Y04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782593640; c=relaxed/simple;
-	bh=e7wQOCZ2RmUk/JLlzqi8q5dvkrkwEKZp/vsqcgT7OlY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T+yRXYLCnQq+Mp59nqbidGeb7o7Thl1ZxJ6P0WYnVl32GaJ7TwHbagM7TBKZU7YiBSG4WXUXgJ+Jl7Rd7jMSQGQsGA/OwxkbTiOBMKJvtzhNkeTKBtECvlOUxBds5BHIGsM0ELfp0jnMmWIqYtLgxYSx/YhPutGLFustQfmLSrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=DOKTrW8b; arc=none smtp.client-ip=209.85.210.178
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-845c38dee22so985222b3a.0
-        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 13:53:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5804315F
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 21:04:01 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782594243; cv=pass; b=FHWA97eka72DL0v/3MFVyPWcDSkpXUaAIqls/WnHZUJUQyP0WqA7YpCY0RBsJ9ytsgQ8pKXYLMKDTZIXw+rCTWeN7pg3aTIMFhkKYfu5ifcGsd592Sm6WJtd2kzBQWaE2dmOc2vbntBXr8OiRY0ujcZDJ4ZyoB8vsN5uWRbdctI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782594243; c=relaxed/simple;
+	bh=MFPTZmygDB5eIaofxE2nBy2zz3SCsiq382k9t8M2MvA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OElbWJcMzWW0oKaS8P7+R0bcGVC4ZI0ilNljB6jkcmI+SzN5vo+lDrG2P4HBrfyBRgJW2lqpKkhfFlL9KKABWjsbcpwhCsVEFDHWFnjmVK5BiLNf7RdzOXOcJGooPObWbKi7Zusz6s+mHSt39q91MZUST7hPCURYu/5VYvhquzU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=v6SKBx+A; arc=pass smtp.client-ip=209.85.210.172
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-84347ad88edso1710450b3a.1
+        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 14:04:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782594241; cv=none;
+        d=google.com; s=arc-20260327;
+        b=GNofPuRmhIdgOikwcYP8DwfHSKfoXx2H4Z/7nl3jNrROevlYESLgOC16JNpdvBbGHe
+         FjTZnvT9QSgLx01MKMN+qaI2hdz7R0VIdPj1qeeNtXEUTbMkcZ2ws/EG4AOfoknT5Plp
+         IALskkKFFEhRKNSdjQz9iw+Y8sBB/D8pvsxhT+w38ARs84eNNLk7EcXFWe1TJVJCenjs
+         ygaf82ffoVcvqSHLgl3xD+XgLu1cdlGgvBaqgv+WBtxKEbSdiGWVA83YYMsWzKTuhLiS
+         LwqiZWNJOgwz7MBJ04Hk1OiECR+mJHLaGGEYrdZWtiR6iJsrZKzrjJ26NxEDC30rOOfT
+         +5mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Aw09dR/Zs90zrBnlxdIxEMTCBzgnoxukuT5GWdKhK6w=;
+        fh=7V41OBPjdslGFggioTxKS4i14shBp0V9+JFAiFx5oQY=;
+        b=NKYMyl5WQHxleERWYCk6lh3GWRx78br6baEiViP1m+g0klpe01RcinR1w38K0Dm6mx
+         5JNx/U2q9K9mXZn+3wQrLnINkIAQV4EJZXh1fHog2KluvX83yyKpioRIdFaquOwS9uQO
+         e/mVznXrnP2WxFG/WNyQjySrrz3LnQqxU3IwNGOKrXCi4dI1VwlqlvE+a6jpNEdp4LCf
+         LC24San/07G+DqnQ9kV2oAcPu/f+LHUqxun/oI+I2NYdR781tyPEiTgbq5dnvfB3LeFR
+         EUvanhPvth3pTUbG+3uJhx4JNSU351UeA/Z9zkSaxrC4LbDTDN57ei6iLFvmhv0R1/rj
+         gEiw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1782593638; x=1783198438; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eHRjizZyH2fQDJvnCRDCcWYlVrs6WnvhUFm2dNj9VHQ=;
-        b=DOKTrW8bzAoY0Yzfb1G1m3Wqgq7mfZ8C5ctzuUMu3uRxZ37zUjJmGmR3+3bVFcRSw8
-         MdjKkP/+cH+ZJqM7mcp6dFnEzqwpn+HU56zoWEc0Wm53TCpSvxdrAYSpaxnUnS2xUNDT
-         LthQpw6RFVv6fojSRBKsmVkOMoh/ZF9lSDCxGG9ppMrACmPE3TWsuYTXk1hYRHcypFkO
-         8KgcQZh137rNvvZ7I0KOuxF4hDknZRwbsHy/SRnmjsODxwbO48JoKJodyPSiyouDN/ns
-         sp5j6CXpqE6lkdBZkOhG3G2gaF+oKFQbWUP3EHwFLJSp2VRqbFTDE5PPNehgsmjFQY4n
-         RFkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782593638; x=1783198438;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu.com; s=google; t=1782594241; x=1783199041; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eHRjizZyH2fQDJvnCRDCcWYlVrs6WnvhUFm2dNj9VHQ=;
-        b=fk61k0it2fHBXMnxQynIm3KtLciT1aIlvQji2h1f40gtYNg9Ig/Z+kyNt7SpmAW4Dz
-         86FChI3+NF9o13KjWxvlMAfzTxP57c/eh0ilujPzkN6FxqGz7mEhJOaOqPmS9yOwzdmW
-         XPGweM4Ucuya1LgOb0USkfICyuvAIVt6U7lLuK1ba1MbqihgUmodXAy2UNH4AMuzO1CU
-         rvUKb+WbexAbHjpfQtDobf8/0vRLvM/7RSb9cQ1dsUssGjhyuTMhT1KU/3cBzNvqIU7z
-         PDLlQ62EyG/ppuSnuzGUDJaPztyY2E7o10iXT3x/xHCAYdH2DQjVgPTfg4qpNho3+nt+
-         IX4Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/v9S7tTWzQDZRySW+BUiI6V/7peqHq2jkDtHmrXnpfx3xO3+0GhgibtaPmUFVMpaJYbl7jzzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2txTlgBonWPzeNwrY7G6OzbxL3nrP83/cb+cjasCQ7zHC0Xf4
-	EVGRP+ngCeyphXZDBFkx98Sic/vJurumUTnmuAQaKoKVhx4+FKY3XwxksmnKwU7hWQ==
-X-Gm-Gg: AfdE7clNy6iamF64d8WSAAkMPz5HbBbvMUALgI/oM4sg70ueJrBffXM+7UCNj2Vc8cA
-	MpXRMMZzQSxzw205K0IO/gPMR501ru/od2uz52tSLC/CUIiD5SeIRIcIBEGN48n1o+65Tdm+8g+
-	5yH26HPawttp/Vw8lOaEhYMhsoKx1VVeAj43fyYEtmcpswHS5HhbgcdI/WaWjwbkQYF+K6Oucvo
-	jNOD4XmUJnfAZh6DuCisKz8VEoLgltZDdAer+qUS6SJ7gIW0utBbqCSyJ1KgoKjsy2oZruu0X+y
-	jQGcnHjH0ZR+tbB3DJZ1jyu4w+Dz1zSXIgEKvGXs1id89dh5OMiLvBzywIvVGxfR0ksmL16fxL+
-	3trXHRcNVMS6Mm6f/ybXkNHvKvNmyfEo9/m1aMH65grtEHXmEYo2l6vJ1xwOiGW75bfGf991UvW
-	Yb76DH/kc=
-X-Received: by 2002:a05:6a00:c87:b0:845:a302:2281 with SMTP id d2e1a72fcca58-845d25fb441mr4561069b3a.35.1782593637421;
-        Sat, 27 Jun 2026 13:53:57 -0700 (PDT)
-Received: from p1.. ([2607:fb90:ec0d:cc1e:95f8:260b:6b05:f94])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-845a4127bd0sm8822715b3a.53.2026.06.27.13.53.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Jun 2026 13:53:57 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net] usbnet: gl620a: fix out-of-bounds read in genelink_rx_fixup()
-Date: Sat, 27 Jun 2026 13:53:53 -0700
-Message-ID: <20260627205353.4000788-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        bh=Aw09dR/Zs90zrBnlxdIxEMTCBzgnoxukuT5GWdKhK6w=;
+        b=v6SKBx+A1QrtP5hOa/+roT9UueRthHofkTXS3BfDJeFN3Ymq3nQohN6WjMDMuEuoCE
+         viRPaCQMgYwuysjMIuAvFx7pvzvGnI94+zYcQiXTIcLVfiWgDPSROgNfHNnj/wiwP7Oj
+         Sket+QH9klEprsv1JES9AV6iawBgQ+eyw3518=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782594241; x=1783199041;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Aw09dR/Zs90zrBnlxdIxEMTCBzgnoxukuT5GWdKhK6w=;
+        b=iKK83DU1hlIZHddHP2EzwQhJRTRSiJSTMsJYhYsrojCLebSRTLH3Y//CPZPgc81avO
+         fWPlTIju2S0v+dd5EbhEepDt4EnqJW78feMN9/zKnvzrHnlW0iudjWUfTab31Eq6CjqC
+         k4McVp0O5YpYnJkZAMCDn0wHci02XXIXBI1Qu2+rFwN+Xi4xC72Ttr2kvJcwNBzWX42M
+         oTBnFMAXuRRikPfnoO3lhFfFOHkjiDB+4yT/ki9ajuAngY0PemaaZFqHj8ibHxICnpxB
+         aa+GVOiZu/hxWVSPyqTXBod968hErDLt4IheO2qz1NWg56GTdH9YyjGKHxSpnRHhI5TU
+         9FCQ==
+X-Gm-Message-State: AOJu0YxvyxMBbqwHuZNp1eti6i9IWfmUxPDlJP1kxtLJNhezls3qxYsx
+	puH6htLLKSw8XJHtqQn/3/2eUPVgJ5B7O3Qv44fPpZtncD2KFei1kApokXdQ73Jol0ab3/vZM0R
+	nv+uLbZH8v8uiKN14SYWPyh0S+RdbtRmGn9JMj/2y
+X-Gm-Gg: AfdE7cnZIHYbxXV9CpHxrYbcGdF4a1ax6G/3G7hgr0MwS56vLJLS8dc34rfXzGG7MQt
+	GkKp02KvMD3gehn9ZKge51Z0ibe7VVYfGRDJKqfG9XJAX0fvER0DvGsu2cq7duTPi2Lt4C+vce7
+	eYGJWlI6eNXZFd+OxPP1YVDwBuWy3/Sa/X+byh+21PAbftay8fneWQtEgCguPdEHpC6dmXO5dii
+	eM5c+z43XfJIgVS/bBJ/CFMMJWeY5ENQS/vcVh2Zg7jw+tYKyetqEYKoPk8Wn6zbNPnca+gsCnP
+	9aZNc1E+
+X-Received: by 2002:a05:6a00:22d1:b0:845:e08c:a4eb with SMTP id
+ d2e1a72fcca58-845e08ca873mr2238300b3a.58.1782594240806; Sat, 27 Jun 2026
+ 14:04:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260624224016.24018-1-jhs@mojatatu.com> <CAM0EoMmJZxAbOsyW7bBp0DbTTiQKZeGaaBHPEw45D5b6DKDEvg@mail.gmail.com>
+ <20260626141547.GA1310988@horms.kernel.org> <CAM0EoMntFA+fqs_BgT0E_KSsQHyf0W0u7OTngHHB7icrnUiC3A@mail.gmail.com>
+ <20260627163602.GG1310988@horms.kernel.org>
+In-Reply-To: <20260627163602.GG1310988@horms.kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sat, 27 Jun 2026 17:03:48 -0400
+X-Gm-Features: AVVi8CcrCffzgUXXJ-TShlgaYV3gjj8Lvxm4KD3V_maA6P8aE4SdQzXXyB8yS8s
+Message-ID: <CAM0EoMkr=1qj6LQGsi6JHnEneiycyZ5_aLCr5DLSy2cCp9Xqdw@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/1] net/sched: sch_teql: Introduce slaves_lock to
+ avoid race condition and UAF
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, victor@mojatatu.com, 
+	security@kernel.org, zdi-disclosures@trendmicro.com, stable@vger.kernel.org, 
+	kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jiri@resnulli.us,m:victor@mojatatu.com,m:security@kernel.org,m:zdi-disclosures@trendmicro.com,m:stable@vger.kernel.org,m:lkp@intel.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,asu.edu];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302350-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302351-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 055C16D2A26
+X-Rspamd-Queue-Id: 3414C6D2A71
 
-genelink_rx_fixup() splits an aggregated RX frame into its individual
-packets, using a per-packet length taken from device-supplied data. That
-length is only bounded by GL_MAX_PACKET_LEN (1514); it is never compared
-against how many bytes were actually received.
+On Sat, Jun 27, 2026 at 12:36=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Fri, Jun 26, 2026 at 12:11:47PM -0400, Jamal Hadi Salim wrote:
+> > Hi Simon,
+> >
+> > On Fri, Jun 26, 2026 at 10:15=E2=80=AFAM Simon Horman <horms@kernel.org=
+> wrote:
+> > >
+> > > On Fri, Jun 26, 2026 at 06:16:43AM -0400, Jamal Hadi Salim wrote:
+> > > > "
+> > > >
+> > > > On Wed, Jun 24, 2026 at 6:40=E2=80=AFPM Jamal Hadi Salim <jhs@mojat=
+atu.com> wrote:
+> > > > >
+> > > > > The teql master->slaves singly linked list is not protected again=
+st
+> > > > > multiple writes. It can be mod'ed concurently from teql_master_xm=
+it(),
+> > > > > teql_dequeue(), teql_init() and teql_destroy() without holding an=
+y list
+> > > > > lock or RCU protection.
+> > > > >
+> > > > > zdi-disclosures@trendmicro.com has demonstrated that the qdisc is=
+ freed
+> > > > > after an RCU grace period, but teql_master_xmit() running on anot=
+her
+> > > > > CPU can still hold a stale pointer into the list, resulting in a
+> > > > > slab-use-after-free:
+> > > > >
+> > > > > BUG: KASAN: slab-use-after-free in teql_destroy+0x3ca/0x440 linux=
+/net/sched/sch_teql.c:142
+> > > > > Read of size 8 at addr ffff88802923aa80 by task ip/10024
+> > > > >
+> > > > > The zdi-disclosures@trendmicro.com repro created concurrent AF_PA=
+CKET
+> > > > > senders on a teql device against a thread that repeatedly adds/de=
+letes the
+> > > > > slave qdisc, together with a SLUB spray that reclaims the freed s=
+lot; the
+> > > > > resulting UAF is controllable enough to be turned into a read/wri=
+te
+> > > > > primitive against the freed qdisc object.
+> > > > >
+> > > > > The fix?
+> > > > > Add a per-master slaves_lock spinlock that serializes all mutatio=
+ns of
+> > > > > master->slaves and the NEXT_SLAVE() links in teql_destroy() and
+> > > > > teql_qdisc_init(). teql_master_xmit() also takes the same slaves_=
+lock
+> > > > > around those updates.
+> > > > > Annotate master->slaves and the per-slave ->next pointer with __r=
+cu and
+> > > > > use the appropriate RCU accessors everywhere they are touched:
+> > > > > rcu_assign_pointer() on the writer side (under slaves_lock),
+> > > > > rcu_dereference_protected() for the writer-side loads (also under
+> > > > > slaves_lock), rcu_dereference_bh() for the loads in teql_master_x=
+mit() and
+> > > > > rtnl_dereference() for the loads in teql_master_open()/teql_maste=
+r_mtu(),
+> > > > > which run under RTNL.
+> > > > > Pair this with rcu_read_lock_bh()/rcu_read_unlock_bh() around the=
+ list
+> > > > > traversal in teql_master_xmit(), so that readers either observe a=
+ fully
+> > > > > linked list or are deferred until the in-flight mutation complete=
+s. The two
+> > > > > early-return paths in teql_master_xmit() are updated to release t=
+he RCU-bh
+> > > > > read-side critical section before returning, since leaving it hel=
+d would
+> > > > > disable BH on that CPU for good.
+> > > > >
+> > > >
+> > > > sashiko-gemini's complaints:
+> > > > https://sashiko.dev/#/patchset/20260624224016.24018-1-jhs%40mojatat=
+u.com
+> > > > seem bogus to me (someone correct me if i am wrong). I am only goin=
+g
+> > > > to address the first claim of "TOCTOU / "resurrection" race in
+> > > > teql_master_xmit()"
+> > > > teql_master_xmit() holds rcu_read_lock_bh() across the entire
+> > > > traversal. teql_destroy() freeing can only proceed once the qdisc's
+> > > > RCU grace period has elapsed - so where is this TOCTOU? Let's say t=
+his
+> > > > were true: both calls hold the slaves_lock.
+> > > > The other issues are of similar nature.
+> > >
+> > > Hi Jamal,
+> > >
+> > > I think the central question here is about the protection offered by =
+RCU
+> > > in these code paths. And while I agree it protects the use of element=
+s
+> > > of the list, I think the problem flagged relates to the management of
+> > > the list itself.
+> > >
+> > > The example AI gave me when I asked is like this:
+> > >
+> > >     Assume a TEQL master has one slave, `q`.
+> > >     The list is circular: `q->next =3D=3D q`.
+> > >
+> > >     1. CPU A (Transmitting): Enters `teql_master_xmit()`.
+> > >        It reads `master->sla ves` and gets a local pointer to `q`.
+> > >
+> > >     2.  CPU B (Destroying): Calls `teql_destroy(q)`.
+> > >         It takes the lock, unlinks `q`, and sets `master->slaves =3D =
+NULL`.
+> > >         The list is now logically empty.
+> > >
+> > >     3.  CPU A: Finishes its work and prepares to rotate the list head
+> > >         to the next slave.
+> > >         It takes the lock.
+> > >
+> > >     4.  CPU A (The "Use" / The Resurrection):
+> > >         It executes: `rcu_assign_pointer(master->slaves, NEXT_SLAVE(q=
+));`
+> > >         Because `q` was circular, `NEXT_SLAVE(q)` is still `q`.
+> > >
+> > >     5.  CPU A: Releases the lock.
+> > >         **The global `master->slaves` is now `q` again.**
+> > >
+> > >     6.  The System: The RCU grace period expires. CPU B finishes
+> > >         `teql_destroy()` and the memory for `q` is freed.
+> > >
+> > >     The global `master->slaves` pointer is now a **dangling pointer**
+> > >     pointing to freed memory.
+> > >
+> >
+> >
+> > Yeah, thats the same earlier claim of TOCTOU (what sashiko-gemini
+> > claimed was "resurrecting the freed q")
+> > My view is rcu read lock blocks the subsequent call_rcu free - and
+> > destroy() and xmit() already serialize on slaves_lock.
+>
+> The read of master->slaves is outside of the slaves_lock critical
+> section(s) in teql_master_xmit(). This is possibly the nub of this issue.
+>
 
-A malicious GeneLink (GL620A) device can therefore send a short URB whose
-header claims packet_count > 1 and a first packet of up to 1514 bytes.
+Yes, i think this could cause an issue on a second run of xmit() ;->
+Let me ponder on it. I will probably have something tommorow..
 
-	skb_put_data(gl_skb, packet->packet_data, size);
-
-then copies past the end of the receive buffer and hands the adjacent slab
-contents up the network stack, an out-of-bounds read that leaks kernel heap.
-No privilege is required: the path runs in the usbnet RX softirq as soon as
-the interface is up.
-
-  BUG: KASAN: slab-out-of-bounds in genelink_rx_fixup (drivers/net/usb/gl620a.c:112)
-  Read of size 1514 at addr ffff888011309708 by task ksoftirqd/0/14
-  Call Trace:
-    ...
-    __asan_memcpy (mm/kasan/shadow.c:105)
-    genelink_rx_fixup (include/linux/skbuff.h:2814 drivers/net/usb/gl620a.c:112)
-    usbnet_bh (drivers/net/usb/usbnet.c:572 drivers/net/usb/usbnet.c:1589)
-    process_one_work (kernel/workqueue.c:3322)
-    bh_worker (kernel/workqueue.c:3405)
-    tasklet_action (kernel/softirq.c:965)
-    handle_softirqs (kernel/softirq.c:622)
-    run_ksoftirqd (kernel/softirq.c:1076)
-    ...
-
-skb_pull() already verifies that the requested length fits the buffer and
-returns NULL otherwise. Move it ahead of the copy and check its result, so
-a packet that overruns the received data is rejected before it is read.
-Well-formed frames, whose packets are fully present, are unaffected.
-
-Fixes: 47ee3051c856 ("[PATCH] USB: usbnet (5/9) module for genesys gl620a cables")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
----
- drivers/net/usb/gl620a.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/usb/gl620a.c b/drivers/net/usb/gl620a.c
-index 0bfa37c14059..09afd137b64e 100644
---- a/drivers/net/usb/gl620a.c
-+++ b/drivers/net/usb/gl620a.c
-@@ -104,6 +104,9 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 			return 0;
- 		}
- 
-+		if (!skb_pull(skb, size + 4))
-+			return 0;
-+
- 		// allocate the skb for the individual packet
- 		gl_skb = alloc_skb(size, GFP_ATOMIC);
- 		if (gl_skb) {
-@@ -116,9 +119,6 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 		// advance to the next packet
- 		packet = (struct gl_packet *)&packet->packet_data[size];
- 		count--;
--
--		// shift the data pointer to the next gl_packet
--		skb_pull(skb, size + 4);
- 	}
- 
- 	// skip the packet length field 4 bytes
--- 
-2.43.0
-
+cheers,
+jamal
+> > I could be totaly wrong, but it's almost like sashiko-gemini thinks
+> > that the list-mutation lock _alone_ governs the object lifetime.
+> > The rcu read-side critical section prevents the UAF, not just the
+> > slaves_lock alone
+> > Only reason i added slaves_lock was to prevent corrupting the list
+> > state (whereas the RCU read lock prevents premature free).
+> >
+> > In step #4 above this thing somehow leaves out any mention of the rcu
+> > read lock entirely and places the free in step 6 as if it was
+> > independent of CPU A's critical section.
+>
+> I see what you are saying regarding the free not occurring at step 4
+> because CPU A is in an RCU read-side critical section.
+>
+> But once CPU A has assigned master->slaves as q (again) it exits
+> the RCU read-side critical section. Then the free of q can occur.
+> And master->slaves will point to memory that has been been freed.
+>
+> So the access to q is safe when teql_master_xmit is invoked, due to RCU
+> protecting object lifetime.  But it is unsafe when teql_master_xmit is
+> invoked again because by then master->slaves is a dangling pointer.
+>
+> >
+> > I am not sure how to improve it.
+> >
+> > > > OTOH, sashiko-claude
+> > > > (https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260624224016=
+.24018-1-jhs%40mojatatu.com)
+> > > > does make some valid claims which are low value, so not sure a rese=
+nd
+> > > > is worth it.
+> > > > For example in claim 1 it says "Should the changelog mention this
+> > > > teql_dequeue() site too?" Sure I can - but just because I provided
+> > > > extra information in the commit log, which I could have omitted, no=
+w I
+> > > > have to add more info? ;->
+> > >
+> > > FWIIW, I think there is a value in tightening up the commit message.
+> > > E.g. so it's accurate when we look at again in two years time.
+> > > But I also lean towards it not being necessary to post an update
+> > > only to address this.
+> > >
+> > >
+> > > > The second claim is "rcu_dereference_bh()
+> > > > should be rcu_dereference_protected() on writer side". Sparse didnt
+> > > > complain and i dont see this as breakage rather a consistency measu=
+re.
+> > >
+> > > I think it would be good to address in the long run.  But as per my c=
+omment
+> > > immediately above, I also lean towards it not being necessary to post=
+ an
+> > > update only to address this.
+> >
+> > I can resend with these two taken care of - but i am skeptical of what
+> > sashiko-gemini is claiming (and i admit as a human the AI may see
+> > something i am totally missing).
+> >
+> > cheers,
+> > jamal
+> > >
+> > > > Unless I am missing something ..
+> > > >
+> > > > cheers,
+> > > > jamal
 
