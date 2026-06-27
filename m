@@ -1,278 +1,309 @@
-Return-Path: <netdev+bounces-302310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zlzkBmmAP2rFTwkAu9opvQ
-	(envelope-from <netdev+bounces-302310-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 09:48:57 +0200
+	id MqwiI6eIP2oFUQkAu9opvQ
+	(envelope-from <netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 10:24:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F7206D16AE
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 09:48:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED5B96D1770
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 10:24:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=Aukdy4cF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302310-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302310-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=secunet.com header.s=202301 header.b=is3Y3lf4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=secunet.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BA5C9302AE27
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 07:48:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6306930269DA
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 08:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D486E26F29B;
-	Sat, 27 Jun 2026 07:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1401F34FF62;
+	Sat, 27 Jun 2026 08:24:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010048.outbound.protection.outlook.com [52.101.46.48])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A91E555;
-	Sat, 27 Jun 2026 07:48:51 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782546532; cv=fail; b=giENZ5J6dIU1F6zKnQwLWGjbZNiwIBkGQK5r+hutDT0jXG29IjJgxHAYXr5NmDAQZ0aThElot7kHos7XMPK7DZyN/SSP3XRYdfNsHK5Uv6eNIOMqTmqXbLXYY5a65xSDZ4kbh1TYLn0ASfcb+z9b8uYtaxwa7UIgCpQzIH36oKc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782546532; c=relaxed/simple;
-	bh=MlKldxnfk6fdOj9oXzt/gjayTGmwrw6wPbudAqt+9Lk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BsJAXjjz/fp2BdoLu5WnRKdS/htp1K9vjfegp5+pBFyhLjoJTmKQexsYLIjzKCY7eJL2g1Y+Khf7frXJ9nt55vSDXSL0OIfifHkUEOhxjR/Dsuj22qln5/Nv9WogJfLkkeqxQxk9UGvqBQz0GxuBFgdTHolog+e2/mMMWkMgvfg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Aukdy4cF; arc=fail smtp.client-ip=52.101.46.48
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YTHgLE181YRuzC6x6v7WE73d1kEnX6K4Jft/ElPyVTdlroJeWdpbtMMSs76p4Lvk28DraWtEgy1oLtQHHyqndnG6ndd70WBhIaceI9pbDkCzcjnLpPl3WZNCtPYJZEOXAhuqb6C9rNmug28vCnf4D/FEhGkeYZCQKoVDjYnN8PpQNElbvKD6qlj3YPNIig2/bpvMcmC0pUs9SJiVnjO9XsuXOf40FxTCPfbf1WRGfPpZ6klUI4mHBovWCJ5NA+Jb1Uz53+D25Zl68KRIhehD0KX85Y1Xvuqn8p2WO9Pvb0jaMfyfUsXDkkHEXRzDA39T7wICrbx98E4DqIcZ8UhGbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oMysTsTvUdKvEjtppI5qVt/r2CO5NlVfb6CQYAcZNBM=;
- b=PQcCzIl8RCcWnwerYAKLWaDlbmKlB4CmXyQ+HyKg0PymfPXcnyZsFsZKFD5yloq8gLGYFxshdM9nrZ+bQPy1BE1Bvgfm3RKXT9OgGkGaZzQKNRbMm6W6nss9qbls5853A639bZi6MQm5aQBHKqtTu9xy3uZ4ThqwKP6yF8UHiKFO7H1HRY+dXousX53yO0g0fViWElME+gdYq5VU7SjqjmOFKBhmy9zsJMor9kuogbHHEW/2xEotQ43TM2fL3g4sCVR7vVdgivxy81K3/GNKgQz3MG82BscJaXa5xZRRekNuFH+cl9JkDvgWoSoFkORzZzWm846ycym//R84QDtzwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oMysTsTvUdKvEjtppI5qVt/r2CO5NlVfb6CQYAcZNBM=;
- b=Aukdy4cFJ3K6D6k26VF6il6STqM8dpYXDCh0cM4rbgBPd25I+Bb36raFvAnDSMNUcWZXASsg5zKYAUpwG/PLH0/U+YD+QKx51cqCrfQe4h9GRIGWmbUUI4z0FD/TG51NCc5ejK7+/HF2ECGkTiioyqxb3ZbyLhg7EcTWz24xZ9yJ2uYTHRqVfqhSme6KSUi39JDLss1c8TpyHEL93ovcC100xdwDBQF+d1CxpwT7AGtuvBNt9znfhVJq0YwKb13Fzh1/W4e9IrvhzS4yTou0W3e1sQmpXFG3mixx1SHXrdO6vUV9UlmRC4vIW5yRtjW993YvogLQiY54Bq2BAC4RTw==
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by LV9PR12MB9759.namprd12.prod.outlook.com (2603:10b6:408:2ea::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Sat, 27 Jun
- 2026 07:48:48 +0000
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7%6]) with mapi id 15.21.0159.018; Sat, 27 Jun 2026
- 07:48:48 +0000
-Message-ID: <6d6243a1-41d8-495a-97cf-d67022a1f4c9@nvidia.com>
-Date: Sat, 27 Jun 2026 09:48:42 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [mellanox/mlx5-next RFC 1/1] net/mlx5: RX, Fix refcount warning
- on frag page release
-To: "Nabil S. Alramli" <dev@nalramli.com>, saeedm@nvidia.com,
- tariqt@nvidia.com, mbloch@nvidia.com
-Cc: nalramli@fastly.com, leon@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260625174059.2879717-1-dev@nalramli.com>
- <20260625174059.2879717-2-dev@nalramli.com>
- <9f150145-d95c-4a90-a358-5b33ab78a8ef@nvidia.com>
- <aa190e99-2ebf-4d59-a6c9-755ca181e16d@nalramli.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <aa190e99-2ebf-4d59-a6c9-755ca181e16d@nalramli.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0057.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cc::6) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AE731AF3B
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 08:23:59 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782548643; cv=none; b=YPR7kOqDJPHmXthVdjUJ6ej9UZWZHorL0R5ecR8zX5qcsdxuj0ej560VHYcGtnZAwC4whZDtn9fJ7dJZybptoh5vgi08y0GSGDuq642A5QgQ/TfSOMfNi+EMxlLjTMcvGqpsoMXwmsvFqTkPBU+fSblmYDc5C0nW1KSYlBUaV0c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782548643; c=relaxed/simple;
+	bh=Dzi5RsnHnCrAih7RyfoUUg4y9anw3liHkR7Z+Z6lNhI=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mOGBYJjSEjYhy8icVrZfpknSsNSHNP9sudAUJW48jeK+v0g1Mye8DazRGcntOCaizsgurhIwVWKQM0OlnRJuXueMjukkfbwIjMPt+drgjnjBVQz9a+jRFxf6iqfitzvLQDna0yRIBkDTmZt8Xr+itBrCY9oyylql5wAW/VJ4hT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=is3Y3lf4; arc=none smtp.client-ip=62.96.220.36
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 5F49320719;
+	Sat, 27 Jun 2026 10:23:52 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6r8aHhXJRAJz; Sat, 27 Jun 2026 10:23:51 +0200 (CEST)
+Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 25951205CD;
+	Sat, 27 Jun 2026 10:23:51 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 25951205CD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1782548631;
+	bh=7W92P8P9sC2OAa9w/jneDCqFzVRtmvF7DhM6G0ngi4I=;
+	h=Date:From:To:CC:Subject:Reply-To:From;
+	b=is3Y3lf4uskCBjqlOfLHtuLu9hKPU0n01LCm66Jcc1CBweYWA+aUWem5YrOscNr9O
+	 dnDiRblex8GoZaqVLruJMl7QjjgtoJSOuo1lihin84qaD+S8vthBzt4Xbm2Pywb/0O
+	 A8jfhv1qL8zt7l70Opk0IWVuCJbjSvCPc8m/3tj33rg9UrG5qUZfXd3LOCcd1B8yFA
+	 YwC919w/sPJhneIIvhr49G717+qz89qtduXKSRR+UBjkdn7LfOiP593dZ/+/29yy7Z
+	 5hBYsvZpOL165zXd1517hf+dIzXLma001nfV9t+nhMb5b1RfR3Crgep1KVF3Wuz5QJ
+	 DZ4FYtTrEUfgw==
+Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
+ (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Sat, 27 Jun
+ 2026 10:23:50 +0200
+Date: Sat, 27 Jun 2026 10:23:43 +0200
+From: Antony Antony <antony.antony@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Christian Hopps
+	<chopps@labn.net>
+CC: Tobias Brunner <tobias@strongswan.org>, <netdev@vger.kernel.org>,
+	<syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com>, Antony Antony
+	<antony.antony@secunet.com>
+Subject: [PATCH ipsec v2] xfrm: reject optional IPTFS templates in outbound
+ policies
+Message-ID: <20260627-xfrm-pol-out-tmpl-iptfs-reject-fix-v2-1-45ff81741874@secunet.com>
+Reply-To: <antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|LV9PR12MB9759:EE_
-X-MS-Office365-Filtering-Correlation-Id: 534103e4-1347-4531-b0a0-08ded420859d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|7416014|22082099003|18002099003|4143699003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	f5Gk9UUpYSUxw2Mh6RjlRvWeqMEmrk+05ygZHOyWSCFZZnZkkwYgcSDyK2PgZjxKu9phuQdHwsxHQksuK8RkaReWFetJGB0jMA9Y4vFNFIjmoWbRa8IKBHDZ335qhNevfY67v0iOtVXx1RbxFYkGfPJOedHtNYqPpiA09S2gJzQkjnZ7FBnNPRezyd/72uHG3EcH9YPtVYfiQE5CNgMSg5VEF0pK5f3OR3Y7eV5aPAXbdAkz7oMOM5pPeEKYE99pNdIAAbsxt8rCurPJ6TtLuh44cGhGgKu2g19pLWlhhJZudpIBC5UlGaQykm4x52LI9aj95n/ONervaJKwB1eooh4gWsxWtc/OFA1MHtvm7fawM+b190wU0ohGkoMXIvtLdz/ftbFESc0XkRkCdM5w9pSFYtXspzpn6vVx29TUpDA0NhVXqifd7p7s97vTWCuFJEOVK3IUp+YY8gu8Lng9f0I3HZcS9/8Fk+DeaQI9DtD6bA4xclQ4HDAYSwfPpEg8+L76LFzReObwD6YFxF+RadyrWrfy/8Th8onuIMRyk0x4kHRPWLUubuMQQBuM/62a4os0RsgjWqK1rv3GaaTrqjWi6jkVkzFbbrlH5KzGLRKc7du+kQALsC+vDqiMdeW4S6D/wzD5A5UeTHEDmBBNPV+Yma/vObbL+8CJ9s9jC28=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(7416014)(22082099003)(18002099003)(4143699003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?c2EzYmtwYmVJTnF4ek5Ub2VpcHBFYWxZQXJ1ZlBrM3BWaUIzQmJVYWFUclZD?=
- =?utf-8?B?S21iMEhKaUJ2ZDRGamg0ZTFkMjR5K091WEN5SEp0ZlFlUENFVlZZYnJ0Rkh0?=
- =?utf-8?B?K3ZnTTlTYTcrSGdzRkhnQmVlaWpTSDE3clFYcHgzdkk3dVZQUzBaYXJTZ2Qx?=
- =?utf-8?B?WTFWMjBSUERLTWZGZnkxdjlHOGhKZGRIbUo0ZHB2cTViY2R3Zm1nWjhXclZW?=
- =?utf-8?B?R09IQ3ZEUDRSejh0NFlEMkVFTC9DZDdsUk5vMmNiVnFoT2ZBSlVST2tFU2tz?=
- =?utf-8?B?OU9Ib0lFWGMxanNOTHZTNzh2bFpqY0lWVHg1UXUwTWgwdDlXeHNtMUsvckxQ?=
- =?utf-8?B?RC85Sjh0UVRXZ3NLSHlQRytnWG9TdVVTbS94cmJWTHRISll1em1wcm5tMDI1?=
- =?utf-8?B?OGt2OGpoazJhUmw0WUx4RENweWJRSmVnaFNnbWJYcXhldGg5SFU0aEdDMnBI?=
- =?utf-8?B?T08zQlZTRWtLYXlYUWpSbVJUY3gweHJqTzNUN3F3aWpWakNWeEZMeThNbEtQ?=
- =?utf-8?B?aHpaTk1kOHczTDZiMzFpZ0htTjcvdUlSZlhQZjNhWFpUa09ScEc0aHNrd1hk?=
- =?utf-8?B?aW9PVWNoQmpPc3NNcFFvbWxnay9TcUtxRUE3OUZJWkFPakNFYVNxRGFqT241?=
- =?utf-8?B?dWdpSktrYVpiWnZaZXU1SnEvSnZGNzZNZnpaeTIvVVM1VCsrTW5RUHJFRGdN?=
- =?utf-8?B?bVpLV0puL3ZQSVF2Z1RYRjJKUldpZ25RZHBzL3JLVU94QnZYQndieXY2aEhr?=
- =?utf-8?B?WjFZSGpaU2hHNDJVcTRNK3pwV0tnNnBabnBON2swRjluRlpsaUt0eitMT2Vi?=
- =?utf-8?B?ajNybkk5Mml6OEFhVkQ0ZW16SnpyNVRLZ2laaVdwaDN0cnZKRVVMczRQZ3RC?=
- =?utf-8?B?a1dwL1hsUk1PQUEvTFZPakc3eXFFU3c1cWN3RWZCSTVwNFk1UDRrMFg5V0xu?=
- =?utf-8?B?UWR0bXJpMG10M1hQZGg4Y2dReXZrbnhkaG53NXEwbVZMK3hGdEt1VDFrYlQ1?=
- =?utf-8?B?OCt1M0NpWDVLT21xeXRRSm1Ec3JqTk0rL3ZuWDBYejVJOERZaXNwZTZscEgr?=
- =?utf-8?B?V2tPUVZaMWhzL3RuNi9tR3cydGwrZ0JORFZaWVBwR2w1djBJK093Q2FEdm5m?=
- =?utf-8?B?OGhpMDc4MkJyM1BMSm51d2hYekk4M3JuZTVPMDhZTmhuTWJ4OFZGb3ZLUXJo?=
- =?utf-8?B?cXNucXhkZ1FuVldQd0dydXVseVBCRkxxUGJmK1liSlZZZCtvdzliRTEwMFRn?=
- =?utf-8?B?MzB6ZkFlTEZmRFlBUUVuV0NOZnFOY0JZTUhWMUxOMURiNjMrNWczRHBZOFEv?=
- =?utf-8?B?dm5pcTRLd3N1WnFzWjR0YkpMZDBrNmNuNkNHVkRVVjF3TVZFRjlnbStjWWEx?=
- =?utf-8?B?Qjk2aVRtakZpcEJyVUFvN0FnWVpsV0l0N2c2RnJ6MEUreTYrd3lCWHhnM2VQ?=
- =?utf-8?B?VXlJenhwTVMrNXErOUJvTlRsbEZsaTlJZnNLMkpvOERzbUYrZWl1bW5hQlU4?=
- =?utf-8?B?NFdXd3M0eURISEJjc3hONTE4TXg2U0ZKOVN3MWNPUEErYXM4S2V2SUlFTFBC?=
- =?utf-8?B?Nmord1Z1aWE4RXJNZEdtRW54ZWh4TkJyOW41NTVhNzVxblQ2bElXdHFua1Aw?=
- =?utf-8?B?NGkyT0FaZEszcU5Ib2hTd0NEdWxjS3RmWlpjb3VTVm9wK0p1T3BRNnNkamta?=
- =?utf-8?B?TngzdWZuZlpuMUJpUlVSYWJ2TEtobXRzOXpmcUVJN3hJMVBYai9TZU5TeUwr?=
- =?utf-8?B?aDcrWlpRNGJwcTA1R3IrYVhHVWVLbVhkVXFaTVlTd2ExaGtVRkhTU1NwWjdY?=
- =?utf-8?B?Tk5lR0xOQ3o1R2NJazZaN2lYUGJ0WisxNmZYMHlUdjVGOWVSNkl0TEZOd2Q4?=
- =?utf-8?B?VjlhMjFvUjVxcndhRjFRMW8wR21ha3lzRzF4ZFF6dnJ4dTBhbTlPVDJOT3E4?=
- =?utf-8?B?NUtZVmJmRHdCbUlzMW54RzVYM2hwMVBCaFRVaHRQemxqQ3VWMmthYm5QUnB4?=
- =?utf-8?B?Z0x0b1dQd0pMQ09KVGt1SWhQL1RoaEp2MEJWSlJoeHhIWGpuZ3lsL1Qwa292?=
- =?utf-8?B?aVpUV3pyNi9hZzlFL2tNU0phamJEY0NLZUlwNzk5d3JxcHNHQVhLeDlSSElj?=
- =?utf-8?B?Q2R0a1o4QmlvWDUxSFF4aGlvSUwwZEc4cVkwb1NqQWVRc3Vpb1p1UzAvcmM3?=
- =?utf-8?B?YkNDV0draURhNTUwN3V5bmNrd0RwT3JIMjdQV2RCdU5rc0d6QmhrS2Z6N051?=
- =?utf-8?B?cUlMZkFibGUyTjlncExYekRqKzdSQkFKYjlJWGFqelh3S051N2lCY1ZldWpp?=
- =?utf-8?B?ZDhYVWRYeVJTaGxvQmdnUTNhbTVpL3IySnJqWlRhWnorUi9KZmV0UT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 534103e4-1347-4531-b0a0-08ded420859d
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2026 07:48:48.0802
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PWjzc4w/ofnKJ9wE+L3y+4dbPKPr9Ov37GZFvZ6RjlBisV89kcuwDm8SPf2BWR9M1lMD8jzGdjDDsYTNQgJ+wg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR12MB9759
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-B4-Tracking: v=1; b=H4sIADdeP2oC/5WPwW7DIBBEfyXi3E1ZjAH31P+ocgCy1FTBtoBYq
+ SL/e7ClfkCPM6uZN/tkhXKkwj5OT5ZpjSXOUxPi7cT8aKdvgnhtmgkuFFeih0fICZb5BvO9Qk3
+ LDeJSQ4FMP+QrhPgA5J3uOiEtIrJWtGRq9gH5YnEp5Nml2c4WAj+nFOtOMLxH0zvttUWuBpJcO
+ xW065wfDEl5ldgHaST7i7psJz/u0aPzPdlSKe/nMZY659/jqRUP7H/2rwgIBqVRiGLgRn22+vt
+ E9dzWssu2bS9xShK0NwEAAA==
+X-Change-ID: 20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-10373324a111
+X-Mailer: b4 0.16-dev
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
+ (10.32.0.172)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302310-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dev@nalramli.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:nalramli@fastly.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302311-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:chopps@labn.net,m:tobias@strongswan.org,m:netdev@vger.kernel.org,m:syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com,m:antony.antony@secunet.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	HAS_ORG_HEADER(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,secunet.com:from_mime,secunet.com:dkim,secunet.com:email,secunet.com:mid,secunet.com:replyto,msgid.link:url];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[antony.antony@secunet.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[secunet.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,0ac4d84afe1066a1f3e9];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5F7206D16AE
+X-Rspamd-Queue-Id: ED5B96D1770
 
+syzbot reported a stack-out-of-bounds read in xfrm_state_find()
+which flows from xfrm_tmpl_resolve_one().
 
+Commit 3d776e31c841 ("xfrm: Reject optional tunnel/BEET mode
+templates in outbound policies") disallowed optional tunnel and
+BEET in outbound policies to prevent this. Later when IPTFS
+added, it was not covered by that fix and can still trigger
+the out-of-bounds read;
 
-On 26.06.26 20:02, Nabil S. Alramli wrote:
-> On 6/26/26 09:12, Dragos Tatulea wrote:
->>
->>
->> [...]
->>> ```
->>> 	ret = atomic_long_sub_return(nr, pp_ref_count);
->>> 	WARN_ON(ret < 0);
->>> ```
->>>
->>> The actual stack trace looks like this:
->>>
->>> ```
->>> WARNING: CPU: 37 PID: 447795 at include/net/page_pool/helpers.h:277 mlx5e_page_release_fragmented.isra.0+0x51/0x60 [mlx5_core]
->>> Tainted: [S]=CPU_OUT_OF_SPEC, [O]=OOT_MODULE
->>> Hardware name: *
->>> RIP: 0010:mlx5e_page_release_fragmented.isra.0+0x51/0x60 [mlx5_core]
->>> RSP: 0018:ffffc90019814d98 EFLAGS: 00010293
->>> RAX: 000000000000003f RBX: ffff88c0993d0a10 RCX: ffffea02424592c0
->>> RDX: 0000000000000001 RSI: ffffea02424592c0 RDI: ffff88c090e20000
->>> RBP: 000000000000000a R08: 0000000000001409 R09: 0000000000000006
->>> R10: 0000000000000000 R11: ffff88c095fbc040 R12: 000000000000141f
->>> R13: 0000000000000009 R14: ffff88c090e20000 R15: 0000000000000001
->>> FS:  00007f34149fa6c0(0000) GS:ffff89200fa40000(0000) knlGS:0000000000000000
->>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> CR2: 00007ed0265eb000 CR3: 0000005091cbe000 CR4: 0000000000350ef0
->>> Call Trace:
->>>  <IRQ>
->>>  mlx5e_free_rx_wqes+0x7b/0xa0 [mlx5_core]
->>>  mlx5e_post_rx_wqes+0x1ac/0x5a0 [mlx5_core]
->>>  mlx5e_napi_poll+0x5e5/0x6f0 [mlx5_core]
->>>  __napi_poll+0x2b/0x1a0
->>>  net_rx_action+0x30e/0x370
->>>  ? sched_clock+0x9/0x10
->>>  ? sched_clock_cpu+0xf/0x170
->>>  handle_softirqs+0xe2/0x2a0
->>>  common_interrupt+0x85/0xa0
->>>  </IRQ>
->>>  <TASK>
->>>  asm_common_interrupt+0x26/0x40
->>> RIP: 0010:page_counter_uncharge+0x34/0x90
->>> RSP: 0018:ffffc900e728bb00 EFLAGS: 00000213
->>> RAX: ffff88aff4762000 RBX: ffff88aff4762100 RCX: 0000000000000304
->>> RDX: 0000000000000001 RSI: 00000000004e9e1a RDI: ffff88aff4762100
->>> RBP: 0000000000000001 R08: ffff891ea0560048 R09: 00007ffffffff000
->>> R10: 0000000000001000 R11: ffff891ae8061b00 R12: ffffffffffffffff
->>> R13: ffff89107fcfd4c0 R14: ffff891ae8061b00 R15: ffff892002fe1400
->>>  uncharge_batch+0x40/0xd0
->>> ```
->>>
->> Can you provide more data on how you reproduced this? This helps to
->> narrow down the bug. Reproduction steps would be ideal.
->>
-> 
-> I don't have clear steps to reproduce it, we just have seen it randomly on
-> some servers that were under memory pressure. I will try to look into it more
-> and find a way to reliably reproduce it. I agree that would be ideal to find a
-> proper fix.
-> 
-What NIC is this?
-What MTU is being used?
-Is strided rq enabled (ethtool --show-priv-flags).
-Is XDP/AF_XDP used? If yes, can you provide more details?
-Is HW-GRO on?
+Extend the check to disallow optional IPTFS in outbound policies
+as well. IPTFS should be identical to tunnel mode.
+IN and FWD policies are not affected: xfrm_tmpl_resolve_one()
+is only reachable via the outbound path.
 
-Based on those answers we can review the code path and see if there
-is a case where the accounting for the fragments is not done correctly
+Reproducer, before:
 
-Also, is buf_alloc_err growing during these memory pressure?
+ip link add dummy0 type dummy
+ip link set dummy0 up
+ip addr add 10.1.1.1/24 dev dummy0
+ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl
+  src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs
+  level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid
+  2 mode transport
+ping -W 1 -c 1 10.1.1.2
+PING 10.1.1.2 (10.1.1.2) 56(84) bytes of data.
 
->>> The fix is to use an atomic page fragment counter, so it will always match
->>> the number of references held in the page_pool.
->>>
->> This is not the right fix. The mlx5 page frag counter is not atomic
->> on purpose because all changes to it happen only within the NAPI
->> context.
->>
-> 
-> That was a question that I had, is it ever possible for frag_page->frags to be
-> incremented / set outside of NAPI context? I tried to answer that by looking
-> at code and by tracing it but could not get a clear picture. If it's not
-> possible then I agree, this is not the right fix.
-> 
-If that happens it is probably a bug.
+[   64.168420] ==================================================================
+[   64.169977] BUG: KASAN: stack-out-of-bounds in __xfrm6_addr_hash+0x11e/0x170
+[   64.169977] Read of size 4 at addr ffff88800e1ffd20 by task ping/2844
 
-Thanks,
-Dragos
+[   64.169977] CPU: 2 UID: 0 PID: 2844 Comm: ping Not tainted 7.1.0-rc7-00180-geb23b588430a #98 PREEMPT(full)
+[   64.169977] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   64.169977] Call Trace:
+[   64.169977]  <TASK>
+[   64.169977]  dump_stack_lvl+0x47/0x70
+[   64.169977]  ? __xfrm6_addr_hash+0x11e/0x170
+[   64.169977]  print_report+0x152/0x4b0
+[   64.169977]  ? ksys_mmap_pgoff+0x6d/0xa0
+[   64.169977]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   64.169977]  ? rcu_read_unlock_sched+0xa/0x20
+[   64.169977]  ? __virt_addr_valid+0x21b/0x230
+[   64.169977]  ? __xfrm6_addr_hash+0x11e/0x170
+[   64.169977]  kasan_report+0xa8/0xd0
+[   64.169977]  ? __xfrm6_addr_hash+0x11e/0x170
+[   64.169977]  __xfrm6_addr_hash+0x11e/0x170
+[   64.169977]  __xfrm_dst_hash+0x24/0xc0
+[   64.169977]  xfrm_state_find+0xa2d/0x2f90
+[   64.169977]  ? __pfx_xfrm_state_find+0x10/0x10
+[   64.169977]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
+[   64.169977]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
+[   64.169977]  xfrm_tmpl_resolve_one+0x210/0x570
+[   64.169977]  ? __pfx_xfrm_tmpl_resolve_one+0x10/0x10
+[   64.169977]  ? __pfx_stack_trace_consume_entry+0x10/0x10
+[   64.169977]  ? kernel_text_address+0x5b/0x80
+[   64.169977]  ? __kernel_text_address+0xe/0x30
+[   64.169977]  ? unwind_get_return_address+0x5e/0x90
+[   64.169977]  ? arch_stack_walk+0x8c/0xe0
+[   64.169977]  xfrm_tmpl_resolve+0x130/0x200
+[   64.169977]  ? __pfx_xfrm_tmpl_resolve+0x10/0x10
+[   64.169977]  ? __pfx_xfrm_policy_inexact_lookup_rcu+0x10/0x10
+[   64.169977]  ? __refcount_add_not_zero.constprop.0+0xb2/0x110
+[   64.169977]  ? __pfx___refcount_add_not_zero.constprop.0+0x10/0x10
+[   64.169977]  xfrm_resolve_and_create_bundle+0xd5/0x310
+[   64.169977]  ? __pfx_xfrm_resolve_and_create_bundle+0x10/0x10
+[   64.169977]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
+[   64.169977]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
+[   64.169977]  xfrm_lookup_with_ifid+0x3d8/0xb80
+[   64.169977]  ? __pfx_xfrm_lookup_with_ifid+0x10/0x10
+[   64.169977]  ? ip_route_output_key_hash+0xc6/0x110
+[   64.169977]  ? kasan_save_track+0x10/0x30
+[   64.169977]  xfrm_lookup_route+0x18/0xe0
+[   64.169977]  ip4_datagram_release_cb+0x4c9/0x530
+[   64.169977]  ? __pfx_ip4_datagram_release_cb+0x10/0x10
+[   64.169977]  ? do_raw_spin_lock+0x71/0xc0
+[   64.169977]  ? __pfx_do_raw_spin_lock+0x10/0x10
+[   64.169977]  release_sock+0xb0/0x170
+[   64.169977]  udp_connect+0x43/0x50
+[   64.169977]  __sys_connect+0xa6/0x100
+[   64.169977]  ? alloc_fd+0x2e9/0x300
+[   64.169977]  ? __pfx___sys_connect+0x10/0x10
+[   64.169977]  ? preempt_latency_start+0x1f/0x70
+[   64.169977]  ? fd_install+0x7e/0x150
+[   64.169977]  ? rcu_read_unlock_sched+0xa/0x20
+[   64.169977]  ? __sys_socket+0xdf/0x130
+[   64.169977]  ? __pfx___sys_socket+0x10/0x10
+[   64.169977]  ? vma_refcount_put+0x43/0xa0
+[   64.169977]  __x64_sys_connect+0x7e/0x90
+[   64.169977]  do_syscall_64+0x11b/0x2b0
+[   64.169977]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   64.169977] RIP: 0033:0x7f4851ecb570
+[   64.169977] Code: 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 80 3d f9 ca 0d 00 00 74 17 b8 2a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 54
+[   64.169977] RSP: 002b:00007ffc830e3498 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
+[   64.169977] RAX: ffffffffffffffda RBX: 00007ffc830e34d0 RCX: 00007f4851ecb570
+[   64.169977] RDX: 0000000000000010 RSI: 00007ffc830e34d0 RDI: 0000000000000005
+[   64.169977] RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
+[   64.169977] R10: 0000000000000006 R11: 0000000000000202 R12: 0000000000000005
+[   64.169977] R13: 0000000000000000 R14: 00005619a863f340 R15: 0000000000000000
+[   64.169977]  </TASK>
+
+[   64.169977] The buggy address belongs to stack of task ping/2844
+[   64.169977]  and is located at offset 88 in frame:
+[   64.169977]  ip4_datagram_release_cb+0x0/0x530
+
+[   64.169977] This frame has 1 object:
+[   64.169977]  [32, 88) 'fl4'
+
+[   64.169977] The buggy address belongs to the physical page:
+[   64.169977] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xe1ff
+[   64.169977] flags: 0x4000000000000000(zone=1)
+[   64.169977] raw: 4000000000000000 0000000000000000 ffffea0000387fc8 0000000000000000
+[   64.169977] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+[   64.169977] page dumped because: kasan: bad access detected
+
+[   64.169977] Memory state around the buggy address:
+[   64.169977]  ffff88800e1ffc00: f2 f2 00 00 f3 f3 00 00 00 00 00 00 00 00 00 00
+[   64.169977]  ffff88800e1ffc80: 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00
+[   64.169977] >ffff88800e1ffd00: 00 00 00 00 f3 f3 f3 f3 f3 00 00 00 00 00 00 00
+[   64.169977]                                ^
+[   64.169977]  ffff88800e1ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+[   64.169977]  ffff88800e1ffe00: f1 f1 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+[   64.169977] ==================================================================
+[   64.245153] Disabling lock debugging due to kernel taint
+
+After the fix:
+
+ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl \
+ src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs \
+ level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 \
+ mode transport
+
+Error: Mode in optional template not allowed in outbound policy.
+
+Fixes: d1716d5a44c3 ("xfrm: add generic iptfs defines and functionality")
+Reported-by: syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6a3ceb94.43b4ff68.30a095.0004.GAE@google.com/T/
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+v1->v2: Fix Signed-off-by:
+Link to v1: https://patch.msgid.link/20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-v1-1-814861129086@secunet.com
+---
+ net/xfrm/xfrm_user.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 6384795ee6b2..0f2c921b1e03 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -2104,13 +2104,12 @@ static int validate_tmpl(int nr, struct xfrm_user_tmpl *ut, u16 family,
+ 		switch (ut[i].mode) {
+ 		case XFRM_MODE_TUNNEL:
+ 		case XFRM_MODE_BEET:
++		case XFRM_MODE_IPTFS:
+ 			if (ut[i].optional && dir == XFRM_POLICY_OUT) {
+ 				NL_SET_ERR_MSG(extack, "Mode in optional template not allowed in outbound policy");
+ 				return -EINVAL;
+ 			}
+ 			break;
+-		case XFRM_MODE_IPTFS:
+-			break;
+ 		default:
+ 			if (ut[i].family != prev_family) {
+ 				NL_SET_ERR_MSG(extack, "Mode in template doesn't support a family change");
+
+---
+base-commit: 805185b7c7a1069e407b6f7b3bc98e44d415f484
+change-id: 20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-10373324a111
+
+Best regards,
+--  
+Antony
+
 
