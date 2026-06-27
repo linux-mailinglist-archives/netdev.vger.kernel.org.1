@@ -1,307 +1,236 @@
-Return-Path: <netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302335-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vEvmFxvDP2oIYAkAu9opvQ
-	(envelope-from <netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:33:31 +0200
+	id WB/HOPXNP2qWYQkAu9opvQ
+	(envelope-from <netdev+bounces-302335-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 15:19:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048C86D1EF5
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:33:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 504E76D1FBE
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 15:19:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=AgyuloEC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=I88UiKZ+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302335-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302335-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 672053017012
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 12:33:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0F56C300E15F
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 13:11:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA443AE18D;
-	Sat, 27 Jun 2026 12:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7533AFD16;
+	Sat, 27 Jun 2026 13:11:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFF939023C
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 12:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BAF3AD516
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 13:11:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782563606; cv=none; b=TXhyJP2K4Dm+Nv7NGgG7VaVXUlXVH5RPWF1ldeEokuVUQwzT0DQqHpMEYUZfTrSo3ZGlr9PSkLM78faS6ia72wcRruyvvssOhnlXrovCaLYo7UP/Eu5xjcVDglWTkeXpgXUlTqT8vsDdFpvdfKLy80yj+8TEfllH/5hYB3I3iSk=
+	t=1782565884; cv=none; b=pt2f5xILaHGtzIfJ+DZ/nrDNGrdCDqQyoZWNNVfIEQCAokxEyyvctSJlSHZfTijO6sd0PPg3AWGoMQ8u+FKkxrvBbJ5FqfUqcP4OQoawqsNH9TX4YmrqUa04xnw9+rz2q769bfmL6M86aKBBa6JAD8JhdHRg1LaNdNjqPtLXrbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782563606; c=relaxed/simple;
-	bh=xbxEDsydXJAiVLZ5Cf6Ao9KnDZgjCNf+AXTfOmlvxNE=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uzd3PCnFV0mP+Fj984zyIImLyDv1Mqpn967UJgf1m3YXWxmODOOmRpWNf1OOcxKeHkqHI69Xq04RbqSZmg1nHLoUKal1VenFnqBW3b/5R8Wx7ZL+TM1dPr/ZIdGVSef8ixFFIdbLFOjd938UvvjlREvb4lO/4bxxiEsk+jVvwrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AgyuloEC; arc=none smtp.client-ip=209.85.128.53
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4926fe5be4bso10064585e9.0
-        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 05:33:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782563603; x=1783168403; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3PtIUvxIw7trdusrNOr6fjoOoHqmRqU46S4I9pGH/As=;
-        b=AgyuloECDvljj+zNbL0P+qIrINEor1sZ9+0/a9u0sgF7Dleosnhz7g+jY7RDhcH6ti
-         gExi1fpzghcXdeNihRErkiGHyr/xSKc5pI7t03RIKm7Xf+Gyn46IPGP9q3+SW4fokK+B
-         Ufvz9/f6O2WzYnOwdpFOOiDtcuPRNJiXef3uJUbxwoY6XMRidJNuM+Pv+t/lcffz80DX
-         cr4PFnkzY0Nf0RbvzwP58Lrj05sXlXdzNyfLLFCPmtXQ+q+N/3skOSBiAdDlbGJQgCwt
-         awiTfNImWQ8DU6Q446B+CtywAf2tTl4w/F5cu/2CQoBZG/5W+Mshbv0BBMPdW0WdJrN4
-         D86A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782563603; x=1783168403;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3PtIUvxIw7trdusrNOr6fjoOoHqmRqU46S4I9pGH/As=;
-        b=lm2cc7XANafqCboUOC9EVRl5bEwTMruTV56OgSvMC9XEAIWHfYVVH47HwweDbMWFwX
-         bdJZrIVnUfr00DoxXg3WyoKd4vOhKmeV+s6FU9W1Sj+jLbrsjrqMgc0jZNun6SqxwV+4
-         YnBFVAtak4q5PiCFjZakmdwqD0XeFZieha9OqztBFUJB8EtdZpvW9oGF8/9lr7rAmCYn
-         6jujXeexC+0ZteHs/p6mlyXFwbBdCk/WE4qpF/7l3L/etfA4ynxQBx4/Q6+AfZjmJ0yM
-         8Pu4GwOUzcYa+YxmEetYE3orRGDGd51y+OfjZtUH5L2V9D/4jWaNlKDAfAvb379Arp88
-         DU/g==
-X-Forwarded-Encrypted: i=1; AFNElJ9Ow7eaNdcQ4hJhqPBAAXjWQRBeKPV0aeI21Tf3eMVnUuJZyzpPukyp1eUBdr2s58lEFPzRkks=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8uRZ+rpL8ii/oKBqxPFxi7Rg5/yiMxVK38bjKNYFhJuFCOmhL
-	Vezh2Qew3C15ZyY/au0SOSXWnc2cHdaZfhTpVafb7kWKWc1FLNNUL3Dp
-X-Gm-Gg: AfdE7cn4BRpEi3m6RdZvPMUK5qfXwXvuk6T1V/Mn2NmDeu3xsnBkk6Q+2yFbAjYaluC
-	H0544DDWkvIsOST7nmg+qa4fbt1bGhmp6/U4rUy7x1dDoYUSpjmm3ViiymUViKoFbTphZIndsA9
-	lFZ2aX7yqRc8/CtvRllxgPPTKYe7h9nsgES7Iv1D6mCaW07fak0DE37qGIx5bZ8cjrUvfb8VHAM
-	ZDd++W8F1fpsi6vKYcRI9KFcvsu4G0MOK6Kdg8FDbniEcQd2paYYHJGxX9gJx1QdXUfMWTRcgHH
-	9w9mcN95Ixj366H6t7cam/WyUXf/dnzAVsCeShCR2NubtMJCi0gudSUDn0UHDrkm7M4RTVjaNtv
-	2s75zoTGBPCZUN3IygLbjjum7iAZZL7oYyb8/Fr5TmZpazECJxzFMs9mt4CjOhnL4xce7qx56Fz
-	Nt54r/iOfKdm1zFbymmvmPThpv6G1r7sCQlrUYF0/2njdD
-X-Received: by 2002:a05:600c:81c5:b0:492:4ff5:fb9e with SMTP id 5b1f17b1804b1-4926fcade65mr62722535e9.37.1782563603146;
-        Sat, 27 Jun 2026 05:33:23 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-89-195.ip49.fastwebnet.it. [93.34.89.195])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492690a1a85sm271536875e9.15.2026.06.27.05.33.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Jun 2026 05:33:22 -0700 (PDT)
-Message-ID: <6a3fc312.6161eb1e.3441bb.c0de@mx.google.com>
-X-Google-Original-Message-ID: <aj_DD_djHkw7CLZ4@Ansuel-XPS.>
-Date: Sat, 27 Jun 2026 14:33:19 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
-Subject: Re: [RFC PATCH net-next v8 03/12] net: phylink: add
- phylink_release_pcs() to externally release a PCS
-References: <20260618125752.1223-1-ansuelsmth@gmail.com>
- <20260618125752.1223-4-ansuelsmth@gmail.com>
- <a271385e-302d-45c7-a1df-aebd380b427b@bootlin.com>
+	s=arc-20240116; t=1782565884; c=relaxed/simple;
+	bh=0D3QtVTQ9/VyZ2GHdi7eh0l4L5UHK8hpuhOW6sOiDcg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pvyWFqX46yBLbj2ARM9NFjprEWSKQ/ceSF3GWNADi8ViXYh4V8izk5KYNkTVXMTC74av+2W2OOtLx/hMRzNe4nB2PMpLDDgIjyMAbP6EJkkh25G1qDeYcCdESeSJqYU2ge52CwiGHl8YeAbdPxQUfv+jnSHuu7bNlLd/OZBeSLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I88UiKZ+; arc=none smtp.client-ip=91.218.175.184
+Message-ID: <b35c76ac-030a-4458-b85b-90ef7bcd3894@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782565869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kTfmCVZgLsQAYxOGmqgi+d9SGTwihp06nkzRCBL0e+M=;
+	b=I88UiKZ+5NSVSOCF6J4gIIRkkZToigFcGN3SeLfMhryeUfJLFw4kvfe+NuwObJ0Mm2vtFf
+	tpQ1eQi/oIHPtsZgpegcnpq7MyzNRpWpRQ5M3ApzXTndtytC16U3Rb06RVXWdNorU7alQy
+	0BGxL8bMeCgEkMhwf/yUBhSRJmUrCN4=
+Date: Sat, 27 Jun 2026 21:10:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a271385e-302d-45c7-a1df-aebd380b427b@bootlin.com>
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Subject: Re: [PATCH v6 07/10] rust: configfs: use `LocalModule` for
+ `THIS_MODULE`
+To: Gary Guo <gary@garyguo.net>, Miguel Ojeda <ojeda@kernel.org>,
+ Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+ Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
+ Aaron Tomlin <atomlin@atomlin.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Daniel Almeida <daniel.almeida@collabora.com>, Arnd Bergmann
+ <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>,
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>,
+ Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>,
+ Igor Korotin <igor.korotin@linux.dev>,
+ FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org
+References: <20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev>
+ <20260624-fix-fops-owner-v6-7-5295e333cb3e@linux.dev>
+ <DJI7IOXAD84M.2F6VSBY64BO62@garyguo.net>
+ <34a009d9-a1f3-4347-9e92-866ec05ddb60@linux.dev>
+ <DJJ25JJ3TDO9.1UFOP60U0IPX5@garyguo.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Alvin Sun <alvin.sun@linux.dev>
+In-Reply-To: <DJJ25JJ3TDO9.1UFOP60U0IPX5@garyguo.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Action: add header
+X-Spamd-Result: default: False [8.84 / 15.00];
+	URIBL_BLACK(7.50)[rust-lang.github.io:url];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302334-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:gary@garyguo.net,m:ojeda@kernel.org,m:boqun@kernel.org,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:dakr@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:leon@kernel.org,m:igor.korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@
+ googlegroups.com,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
+	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
+	TAGGED_FROM(0.00)[bounces-302335-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,body];
+	FORGED_SENDER(0.00)[alvin.sun@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[46];
+	FREEMAIL_TO(0.00)[garyguo.net,kernel.org,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,linux.dev,davidgow.net,debian.org,kernel.dk,intel.com,android.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,lkml];
-	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alvin.sun@linux.dev,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mx.google.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,rust-lang.github.io:url,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 048C86D1EF5
+X-Rspamd-Queue-Id: 504E76D1FBE
+X-Spam: Yes
 
-On Thu, Jun 25, 2026 at 04:13:14PM +0200, Maxime Chevallier wrote:
-> Hello Christian,
-> 
-> On 6/18/26 14:57, Christian Marangi wrote:
-> > Add phylink_release_pcs() to externally release a PCS from a phylink
-> > instance. This can be used to handle case when a single PCS needs to be
-> > removed and the phylink instance needs to be refreshed.
-> > 
-> > On calling phylink_release_pcs(), the PCS will be removed from the
-> > phylink internal PCS list and the phylink supported_interfaces value is
-> > reparsed with the remaining PCS interfaces.
-> > 
-> > Also a phylink resolve is triggered to handle the PCS removal.
-> > 
-> > The flag force_major_config is set to make phylink resolve reconfigure
-> > the interface (even if it didn't change).
-> > This is needed to handle the special case when the current PCS used
-> > by phylink is removed and a major_config is needed to propagae the
-> > configuration change. With this option enabled we also force mac_config
-> > even if the PHY link is not up for the in-band case.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  drivers/net/phy/phylink.c | 56 +++++++++++++++++++++++++++++++++++++++
-> >  include/linux/phylink.h   |  2 ++
-> >  2 files changed, 58 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > index c38bcd43b8c8..064d6f5a06da 100644
-> > --- a/drivers/net/phy/phylink.c
-> > +++ b/drivers/net/phy/phylink.c
-> > @@ -158,6 +158,8 @@ static const phy_interface_t phylink_sfp_interface_preference[] = {
-> >  static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
-> >  
-> >  static void phylink_run_resolve(struct phylink *pl);
-> > +static void phylink_link_down(struct phylink *pl);
-> > +static void phylink_pcs_disable(struct phylink_pcs *pcs);
-> >  
-> >  /**
-> >   * phylink_set_port_modes() - set the port type modes in the ethtool mask
-> > @@ -918,6 +920,60 @@ static void phylink_resolve_an_pause(struct phylink_link_state *state)
-> >  	}
-> >  }
-> >  
-> > +/**
-> > + * phylink_release_pcs - Removes a PCS from the phylink PCS available list
-> > + * @pcs: a pointer to the phylink_pcs struct to be released
-> > + *
-> > + * This function release a PCS from the phylink PCS available list if
-> > + * actually in use. It also refreshes the supported interfaces of the
-> > + * phylink instance by copying the supported interfaces from the phylink
-> > + * conf and merging the supported interfaces of the remaining available PCS
-> > + * in the list and trigger a resolve.
-> > + */
-> > +void phylink_release_pcs(struct phylink_pcs *pcs)
-> > +{
-> > +	struct phylink *pl;
-> > +
-> > +	ASSERT_RTNL();
-> > +
-> > +	pl = pcs->phylink;
-> > +	if (!pl)
-> > +		return;
-> > +
-> > +	mutex_lock(&pl->state_mutex);
-> > +
-> > +	list_del(&pcs->list);
-> > +	pcs->phylink = NULL;
-> > +
-> > +	/*
-> > +	 * Check if we are removing the PCS currently
-> > +	 * in use by phylink. If this is the case, tear down
-> > +	 * the link, force phylink resolve to reconfigure the
-> > +	 * interface mode, disable the current PCS and set the
-> > +	 * phylink PCS to NULL.
-> > +	 */
-> > +	if (pl->pcs == pcs) {
-> > +		phylink_link_down(pl);
-> > +		phylink_pcs_disable(pl->pcs);
-> > +
-> > +		pl->force_major_config = true;
-> > +		pl->pcs = NULL;
-> > +	}
-> > +
-> > +	mutex_unlock(&pl->state_mutex);
-> > +
-> > +	/* Refresh supported interfaces */
-> > +	phy_interface_copy(pl->supported_interfaces,
-> > +			   pl->config->supported_interfaces);
-> > +	list_for_each_entry(pcs, &pl->pcs_list, list)
-> > +		phy_interface_or(pl->supported_interfaces,
-> > +				 pl->supported_interfaces,
-> > +				 pcs->supported_interfaces);
-> 
-> I've given more thought to that 'supported_interfaces' thing. This
-> patchset redefines the meaning of
-> 
->   pl->config->supported_interfaces
-> 
-> Currently, it's filled by the MAC driver and means "Every interface
-> we can support, including the ones provided by PCSs that we can use
-> with this MAC".
-> 
-> It now becomes "Every interface we support without needing a PCS", at
-> least the way I understand that.
+
+On 6/26/26 22:41, Gary Guo wrote:
+> On Fri Jun 26, 2026 at 3:35 AM BST, Alvin Sun wrote:
+>> On 6/25/26 22:40, Gary Guo wrote:
+>>> On Wed Jun 24, 2026 at 4:00 PM BST, Alvin Sun wrote:
+>>>> Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
+>>>> macro with `this_module::<LocalModule>()`, and update
+>>>> rnull to import `LocalModule` instead of `THIS_MODULE`, consistent
+>>>> with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
+>>>>
+>>>> Assisted-by: opencode:glm-5.2
+>>>> Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+>>>> Acked-by: Danilo Krummrich <dakr@kernel.org>
+>>>> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
+>>>> ---
+>>>>    drivers/block/rnull/configfs.rs | 6 ++----
+>>>>    rust/kernel/configfs.rs         | 8 +++++---
+>>>>    2 files changed, 7 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+>>>> index c10a55fc58948..b2547ad1e5ddd 100644
+>>>> --- a/drivers/block/rnull/configfs.rs
+>>>> +++ b/drivers/block/rnull/configfs.rs
+>>>> @@ -1,9 +1,7 @@
+>>>>    // SPDX-License-Identifier: GPL-2.0
+>>>>    
+>>>> -use super::{
+>>>> -    NullBlkDevice,
+>>>> -    THIS_MODULE, //
+>>>> -};
+>>>> +use super::NullBlkDevice;
+>>>> +use crate::LocalModule;
+>>>>    use kernel::{
+>>>>        block::mq::gen_disk::{
+>>>>            GenDisk,
+>>>> diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
+>>>> index 2339c6467325d..c31d7882e216d 100644
+>>>> --- a/rust/kernel/configfs.rs
+>>>> +++ b/rust/kernel/configfs.rs
+>>>> @@ -875,7 +875,7 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
+>>>>    ///                 configfs::Subsystem<Configuration>,
+>>>>    ///                 Configuration
+>>>>    ///                 >::new_with_child_ctor::<N,Child>(
+>>>> -///             &THIS_MODULE,
+>>>> +///             ::kernel::module::this_module::<crate::LocalModule>(),
+>>>>    ///             &CONFIGURATION_ATTRS
+>>>>    ///         );
+>>>>    ///
+>>>> @@ -1021,7 +1021,8 @@ macro_rules! configfs_attrs {
+>>>>    
+>>>>                        static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
+>>>>                            $crate::configfs::ItemType::<$container, $data>::new::<N>(
+>>>> -                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
+>>>> +                            $crate::module::this_module::<LocalModule>(),
+>>> ^ You only changed one single place. This is still plain `LocalModule`.
+>> Initially I wrote it as `crate::LocalModule`, but clippy warned about it. So
+>> instead of putting the crate path in the macro body, I added `use
+>> crate::LocalModule` in the calling file.
+>>
+>> ```
+>> warning: `crate` references the macro call's crate
+>>       --> rust/kernel/configfs.rs:1024:59
+>>        |
+>> 1024 | ...  $crate::module::this_module::<crate::LocalModule>(),
+>>        |                                                     ^^^^^ help:
+>> to reference the macro definition's crate, use: `$crate`
+>>        |
+>>        = help: for further information visit
+>> https://rust-lang.github.io/rust-clippy/rust-1.94.0/index.html#crate_in_macro_def
+>>        = note: `-W clippy::crate-in-macro-def` implied by `-W clippy::all`
+>>        = help: to override `-W clippy::all` add
+>> `#[allow(clippy::crate_in_macro_def)]`
+>>
+>> warning: 1 warning emitted
+>> ```
+> Clippy has a point about `crate::` being usually wrong in macros, but it is what
+> we actually want here, so obviously you should allow the warning.
 >
+> It is the exact same case in `vtable` macro, just that Clippy is unable to check
+> proc macros!
 
-Wait but with the current code using the OR logic, it still follows
-"Every interface we can support...". The modes that needs a PCS are
-specificed with the pcs_interfaces mask in phylink_config.
+Thanks for the detailed explanation.
 
-The late add and release operates on the phylink supported_interfaces ONLY
-when the MAC didn't specify support for it (by removing it as only the PCS
-will declare support for it)
+I specifically searched for issues related to `crate_in_macro_def`, and 
+this information is very useful to me.
 
-The confusion is present because everything is validated later on
-major_config so those supported_interfaces are just an HINT that are later
-verified with get_caps and with the pcs_validate OPs.
+Best regards,
 
-Adding the supported_interfaces to phylink is really to keep an original
-reference of the value. This is to address a pattern I have notice where
-the MAC driver always OR the interfaces with the one supported by the PCS.
-(I remember it was pointed out by Russell)
+Alvin
 
-But I'm more than open to discussion as this is something marginal to the
-whole implementation, I'm also questioning if this OR is actually useful to
-anything on the nth tought on this.
-
-One thing that I notice is that parsing this early with AND might be
-problematic at phylink_create, but I still have to evaluate that.
-
-My take is that would be good to have some review also on the other logic
-as I think I reached a point where Sashiko starts to comments on more or
-less unreal problem.
-
-> It's not an error in your code, but I think this is worth documenting
-> somewhere as this changes one the things that's already fairly
-> error-prone in new drivers.
-> 
-> I don't know to what extent people use that, be we have a porting guide
-> that explains how to use phylink in a MAC driver, maybe an update in there
-> would be nice as well :
-> 
-> https://docs.kernel.org/networking/sfp-phylink.html#rough-guide-to-converting-a-network-driver-to-sfp-phylink
-> 
-> Maxime
-> 
-> 
-
--- 
-	Ansuel
+>
+> Best,
+> Gary
+>
+>> Alternatively, `#[allow(clippy::crate_in_macro_def)]` could be added on
+>> the macro
+>> definition. Would you suggest that approach?
 
