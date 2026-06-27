@@ -1,152 +1,135 @@
-Return-Path: <netdev+bounces-302295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rPMqAMouP2pRPwkAu9opvQ
-	(envelope-from <netdev+bounces-302295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 04:00:42 +0200
+	id dldcLNwuP2pXPwkAu9opvQ
+	(envelope-from <netdev+bounces-302296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 04:01:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAFE76D0C22
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 04:00:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 994286D0C30
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 04:00:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=DF4HFjeV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302295-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302295-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oLYcekoP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302296-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302296-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB469300F0F3
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 02:00:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2BD173016C19
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 02:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 573E161FCE;
-	Sat, 27 Jun 2026 02:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298C12773DE;
+	Sat, 27 Jun 2026 02:00:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A5940D560
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 02:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D22526FA4B;
+	Sat, 27 Jun 2026 02:00:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782525635; cv=none; b=iARyaELatuY1XnqFxzOeFGl46Ky7ke9lcW8kfkZW72JtpHm5n0CPqTqQS6I9UFykuMtJBOVrMCLOh85fuNLFphXvmu9nB5KvuyFDp0i1vY9ZyFMxISeN60PSmYWjKi0eeGDMxFmHU9qFVplwUQVxQOK5hU5K2QvGv3pem5+dKc4=
+	t=1782525639; cv=none; b=iwTMHQfMW1UDZPrxCoixNwbEHRfrFVmVuwqrFFzoHAXwMf+d5u+7vfFK2mbWgjn4dM3LmQ8F9n6slAU6atZFDEHLZHX7n8EBrdK5LRTGWhQZmiI4P4ogkbU/h+kKNqbRLjy5w5VnvF3IOb8aZsmuo9WO/4a9TcDjCIcKyHMMV3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782525635; c=relaxed/simple;
-	bh=tdghv4m6igqruZl3i17E1AitEhp5hBdz2aZ/ruBes/4=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=hiVjc+YJGuNc9pgZgm7ScCFsqJl8pXkOdy5KJJxdW4QnxO3Pz6e2W8EwIhAx4S3GsTWuwDV+6xeDM18omf4XFlrYVhQdLZ/Zwe8Pfz6tAZnlUadXWZIWjDcoEjmnlHsT4K1scwKmkgKSrNHVHPlZlI+OQ4xccH+bSrPNR0VfIVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DF4HFjeV; arc=none smtp.client-ip=95.215.58.171
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782525631;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qly20BwYW7Q5PttZGy/epQwb3FRzsbU+9R2X09dI0qA=;
-	b=DF4HFjeVa9S9AddhxLRQ19HjhW5lt5NV4rjTFRlrP6sFdJQ9ojWRYFqmOafq/fHCC7W0Di
-	ifVV4gN/Z5+7dnVcCtYlrnXojAXJF8aH2XgqCmCKoTZevFSdDaFTInEIHWDFq1lPqis0B4
-	6likOKKxah2WZ0kd6lYVWaGTnvTS4d0=
+	s=arc-20240116; t=1782525639; c=relaxed/simple;
+	bh=uSv7uId4Z0E891CAD78oLyzZuB0lM067i7irWiMsZiQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=f3GLNTWjHoAOIA/6r0ipQx2H1IAuhl+4Kne5uJAnKi2hKanx/p0fEJVTDACdo40Vye5epcFQ+5N0AhePkzfWxDqqop56+EVOKKtT5hapcgpfBYWVmtNzP8MjycbBH0kwARzNqD1m97a9VHHNywMXImyNWzn2IJpUPy0QE/TT6iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLYcekoP; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E3E71F00A3A;
+	Sat, 27 Jun 2026 02:00:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782525637;
+	bh=wwXltDt8hUiSby2DBmR6jK0QaWZT3W5aCkZkHrdqTNs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=oLYcekoPEGv62Gh2t/p2dys2ZbHT1bFDlMYHZKX7LCL88ZMSuAHN9sIH87pPYi561
+	 VxMJY8dmgCb8FK2FKMPykOPJnIcPuJsFYjpKpbfD0E5QnZNsT846gNTYpnSiyg+5Gl
+	 YKl/iJf4FgOxNK5mf//DFkV/7EFmmgW3fDz9N9Xps5PqcmGgx3uLoWv5a4povJ5rhf
+	 3m+gGcjrZS3e+FhOWoivZti0fpV/pnJEDTYwUepy6l16aDXS1/OD4w48+BdsjmrvIL
+	 9sLO8IoiO61BK1TRfamsC7cdWhUxjXTh9zo1ViAYvI6qJp/cVic0tOZVKcZRALZurH
+	 VWYpRMyyBMqdw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A883938C76;
+	Sat, 27 Jun 2026 02:00:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
-Subject: Re: [PATCH net-next v1] tcp/dccp: avoid parity split for socket-local
- bind range
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-In-Reply-To: <CAAVpQUCayy3o59i2vh9hHRPi-3pw1BJgEYMwZYRpZnYEUoqsGw@mail.gmail.com>
-Date: Sat, 27 Jun 2026 09:59:57 +0800
-Cc: Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>,
- netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- luoxuanqiang <luoxuanqiang@kylinos.cn>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F6AFD54C-1618-4501-80C2-88F796BA95C0@linux.dev>
-References: <20260626093856.61864-1-xuanqiang.luo@linux.dev>
- <CAAVpQUCayy3o59i2vh9hHRPi-3pw1BJgEYMwZYRpZnYEUoqsGw@mail.gmail.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] qede: fix out-of-bounds check for cqe->len_list[]
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178252562330.1167656.14912063533919224131.git-patchwork-notify@kernel.org>
+Date: Sat, 27 Jun 2026 02:00:23 +0000
+References: <20260623144602.3521-1-matvey.kovalev@ispras.ru>
+In-Reply-To: <20260623144602.3521-1-matvey.kovalev@ispras.ru>
+To: Matvey Kovalev <matvey.kovalev@ispras.ru>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Pavel.Zhigulin@kaspersky.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302296-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302295-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:matvey.kovalev@ispras.ru,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Pavel.Zhigulin@kaspersky.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:ncardwell@google.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:luoxuanqiang@kylinos.cn,m:kuniyu@google.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,kylinos.cn:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,ispras.ru:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DAFE76D0C22
+X-Rspamd-Queue-Id: 994286D0C30
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 23 Jun 2026 17:45:54 +0300 you wrote:
+> Move index check before element access.
+> 
+> Fixes: 896f1a2493b5 ("net: qlogic/qede: fix potential out-of-bounds read in qede_tpa_cont() and qede_tpa_end()")
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Matvey Kovalev <matvey.kovalev@ispras.ru>
+> 
+> [...]
+
+Here is the summary with links:
+  - qede: fix out-of-bounds check for cqe->len_list[]
+    https://git.kernel.org/netdev/net/c/f9ba47fce593
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-> 2026=E5=B9=B46=E6=9C=8827=E6=97=A5 07:40=EF=BC=8CKuniyuki Iwashima =
-<kuniyu@google.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Fri, Jun 26, 2026 at 2:40=E2=80=AFAM <xuanqiang.luo@linux.dev> =
-wrote:
->>=20
->> From: luoxuanqiang <luoxuanqiang@kylinos.cn>
->>=20
->> IP_LOCAL_PORT_RANGE lets applications override the netns ephemeral =
-port
->> range on a per-socket basis.  __inet_hash_connect() already treats =
-such a
->> range as an explicit application partition and scans it with step 1 =
-[1].
->>=20
->> Do the same in inet_csk_find_open_port():
->=20
-> What's the use case of IP_LOCAL_PORT_RANGE + bind(, 0)
-> without IP_BIND_ADDRESS_NO_PORT ?
-Hi Kuniyuki,
-
-Thanks for the question!
-
-The use case is when an application wants to restrict ephemeral port
-allocation to a socket-local IP_LOCAL_PORT_RANGE, but still needs
-bind(..., 0) to allocate and reserve a local port immediately.
-
-IP_BIND_ADDRESS_NO_PORT is useful when the application can defer port
-allocation until connect(), but it changes this behavior: bind(..., 0)
-does not reserve a port in that case. So it is not a replacement for
-applications that need the local port before connect(), for example to
-publish it to another component or set up local policy.
-
-This patch is also intended to keep the bind(..., 0) path consistent =
-with
-Eric's earlier change in __inet_hash_connect().
-
-Thanks,
-Xuanqiang=
 
