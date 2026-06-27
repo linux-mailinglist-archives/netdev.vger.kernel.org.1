@@ -1,409 +1,307 @@
-Return-Path: <netdev+bounces-302333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jHeXKbzBP2rgXwkAu9opvQ
-	(envelope-from <netdev+bounces-302333-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:27:40 +0200
+	id vEvmFxvDP2oIYAkAu9opvQ
+	(envelope-from <netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:33:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2CD6D1ED6
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:27:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 048C86D1EF5
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:33:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b=nlfRSI7t;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302333-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302333-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=163.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=AgyuloEC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302334-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 74A7F3001463
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 12:27:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 672053017012
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 12:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C068292B4B;
-	Sat, 27 Jun 2026 12:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA443AE18D;
+	Sat, 27 Jun 2026 12:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83583149DF1;
-	Sat, 27 Jun 2026 12:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFF939023C
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 12:33:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782563258; cv=none; b=pk51jAenqHDWpbmNmav6+GXb36EMDZskCTMDUz6TL8dj8+VxySVPrlbcMHxWraz7rmkMTAQJl47PuyaHEa1Xqa/XOwYGrz1uheOjNq4V/5DHP+a0RDngjAOQP+OnwhJYgXVqVgogoO+Z89FSvFAhtJLE3XZxouoErecEldVrpXA=
+	t=1782563606; cv=none; b=TXhyJP2K4Dm+Nv7NGgG7VaVXUlXVH5RPWF1ldeEokuVUQwzT0DQqHpMEYUZfTrSo3ZGlr9PSkLM78faS6ia72wcRruyvvssOhnlXrovCaLYo7UP/Eu5xjcVDglWTkeXpgXUlTqT8vsDdFpvdfKLy80yj+8TEfllH/5hYB3I3iSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782563258; c=relaxed/simple;
-	bh=jg7le5Edxdke5v2CzWmOlEz3Op61yufJV0E/9LBIfVs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SwEVns6L5BXW9a/pJQq0yv4n3KUzbNPh3xbcrsgP4Uuj/tMsZ9N22a8HMLi2LD1yOd98/lVjGrDOxlj1tZYKtlCh4juusLo3WeUMr3Sic3bZ+FcQElA6tal/hJuFoFmxgYLsR/Ek5MvcqQNjPJrJ13ob6ACcYhB4iQB+KBxJDRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nlfRSI7t; arc=none smtp.client-ip=220.197.31.3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=ob
-	+Wv9rtj1ilAQNd+VQ7h5QgRYhVXXlg29EFqwYLSKM=; b=nlfRSI7tj78YruV6Bo
-	tnp9env0ql4rGkN6TIjgStqBDakkENjxnigh4pAk3kgoVMVjCUS4p66+DfiX8CQe
-	O6gbhddGCRmBUt3ZRLKKUFRwqibzuR8PWF3z3H2AJF0H0IrU+pY/WbIesMg1Hk4i
-	oEQWUu4QkdXq0W88kXzA79yLI=
-Received: from 4CV529F122.company.local (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD39_9AwT9qK5mFGA--.3634S2;
-	Sat, 27 Jun 2026 20:25:48 +0800 (CST)
-From: Ding Hui <dinghui1111@163.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1782563606; c=relaxed/simple;
+	bh=xbxEDsydXJAiVLZ5Cf6Ao9KnDZgjCNf+AXTfOmlvxNE=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uzd3PCnFV0mP+Fj984zyIImLyDv1Mqpn967UJgf1m3YXWxmODOOmRpWNf1OOcxKeHkqHI69Xq04RbqSZmg1nHLoUKal1VenFnqBW3b/5R8Wx7ZL+TM1dPr/ZIdGVSef8ixFFIdbLFOjd938UvvjlREvb4lO/4bxxiEsk+jVvwrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AgyuloEC; arc=none smtp.client-ip=209.85.128.53
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4926fe5be4bso10064585e9.0
+        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 05:33:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782563603; x=1783168403; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3PtIUvxIw7trdusrNOr6fjoOoHqmRqU46S4I9pGH/As=;
+        b=AgyuloECDvljj+zNbL0P+qIrINEor1sZ9+0/a9u0sgF7Dleosnhz7g+jY7RDhcH6ti
+         gExi1fpzghcXdeNihRErkiGHyr/xSKc5pI7t03RIKm7Xf+Gyn46IPGP9q3+SW4fokK+B
+         Ufvz9/f6O2WzYnOwdpFOOiDtcuPRNJiXef3uJUbxwoY6XMRidJNuM+Pv+t/lcffz80DX
+         cr4PFnkzY0Nf0RbvzwP58Lrj05sXlXdzNyfLLFCPmtXQ+q+N/3skOSBiAdDlbGJQgCwt
+         awiTfNImWQ8DU6Q446B+CtywAf2tTl4w/F5cu/2CQoBZG/5W+Mshbv0BBMPdW0WdJrN4
+         D86A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782563603; x=1783168403;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3PtIUvxIw7trdusrNOr6fjoOoHqmRqU46S4I9pGH/As=;
+        b=lm2cc7XANafqCboUOC9EVRl5bEwTMruTV56OgSvMC9XEAIWHfYVVH47HwweDbMWFwX
+         bdJZrIVnUfr00DoxXg3WyoKd4vOhKmeV+s6FU9W1Sj+jLbrsjrqMgc0jZNun6SqxwV+4
+         YnBFVAtak4q5PiCFjZakmdwqD0XeFZieha9OqztBFUJB8EtdZpvW9oGF8/9lr7rAmCYn
+         6jujXeexC+0ZteHs/p6mlyXFwbBdCk/WE4qpF/7l3L/etfA4ynxQBx4/Q6+AfZjmJ0yM
+         8Pu4GwOUzcYa+YxmEetYE3orRGDGd51y+OfjZtUH5L2V9D/4jWaNlKDAfAvb379Arp88
+         DU/g==
+X-Forwarded-Encrypted: i=1; AFNElJ9Ow7eaNdcQ4hJhqPBAAXjWQRBeKPV0aeI21Tf3eMVnUuJZyzpPukyp1eUBdr2s58lEFPzRkks=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8uRZ+rpL8ii/oKBqxPFxi7Rg5/yiMxVK38bjKNYFhJuFCOmhL
+	Vezh2Qew3C15ZyY/au0SOSXWnc2cHdaZfhTpVafb7kWKWc1FLNNUL3Dp
+X-Gm-Gg: AfdE7cn4BRpEi3m6RdZvPMUK5qfXwXvuk6T1V/Mn2NmDeu3xsnBkk6Q+2yFbAjYaluC
+	H0544DDWkvIsOST7nmg+qa4fbt1bGhmp6/U4rUy7x1dDoYUSpjmm3ViiymUViKoFbTphZIndsA9
+	lFZ2aX7yqRc8/CtvRllxgPPTKYe7h9nsgES7Iv1D6mCaW07fak0DE37qGIx5bZ8cjrUvfb8VHAM
+	ZDd++W8F1fpsi6vKYcRI9KFcvsu4G0MOK6Kdg8FDbniEcQd2paYYHJGxX9gJx1QdXUfMWTRcgHH
+	9w9mcN95Ixj366H6t7cam/WyUXf/dnzAVsCeShCR2NubtMJCi0gudSUDn0UHDrkm7M4RTVjaNtv
+	2s75zoTGBPCZUN3IygLbjjum7iAZZL7oYyb8/Fr5TmZpazECJxzFMs9mt4CjOhnL4xce7qx56Fz
+	Nt54r/iOfKdm1zFbymmvmPThpv6G1r7sCQlrUYF0/2njdD
+X-Received: by 2002:a05:600c:81c5:b0:492:4ff5:fb9e with SMTP id 5b1f17b1804b1-4926fcade65mr62722535e9.37.1782563603146;
+        Sat, 27 Jun 2026 05:33:23 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-89-195.ip49.fastwebnet.it. [93.34.89.195])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492690a1a85sm271536875e9.15.2026.06.27.05.33.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Jun 2026 05:33:22 -0700 (PDT)
+Message-ID: <6a3fc312.6161eb1e.3441bb.c0de@mx.google.com>
+X-Google-Original-Message-ID: <aj_DD_djHkw7CLZ4@Ansuel-XPS.>
+Date: Sat, 27 Jun 2026 14:33:19 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ding Hui <dinghui@lixiang.com>,
-	netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER),
-	linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE),
-	linux-kernel@vger.kernel.org (open list)
-Cc: xiasanbo@lixiang.com,
-	yangchen11@lixiang.com,
-	liuxuanjun@lixiang.com
-Subject: [PATCH v4] net: stmmac: fix fatal bus error on resume by reinitializing RX buffers
-Date: Sat, 27 Jun 2026 20:25:30 +0800
-Message-Id: <20260627122533.1165324-1-dinghui1111@163.com>
-X-Mailer: git-send-email 2.34.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
+Subject: Re: [RFC PATCH net-next v8 03/12] net: phylink: add
+ phylink_release_pcs() to externally release a PCS
+References: <20260618125752.1223-1-ansuelsmth@gmail.com>
+ <20260618125752.1223-4-ansuelsmth@gmail.com>
+ <a271385e-302d-45c7-a1df-aebd380b427b@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD39_9AwT9qK5mFGA--.3634S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWfJw4DKrWxKr1kKFWfJw15twb_yoWkAF18pF
-	Wayw4qkryDJrsxGw48Jw48uFyYyay5AFW3Ww4xXwsI9w4akrnavF1SyFWYvasrCFW0vw4k
-	tF4DCa9rCF1UZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jR38nUUUUU=
-X-CM-SenderInfo: pglqwx1xlriiqr6rljoofrz/xtbC9A7tGmo-wU6OVwAA3O
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a271385e-302d-45c7-a1df-aebd380b427b@bootlin.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,lixiang.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:dinghui@lixiang.com,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:xiasanbo@lixiang.com,m:yangchen11@lixiang.com,m:liuxuanjun@lixiang.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[dinghui1111@163.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302334-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302333-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DKIM_TRACE(0.00)[163.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dinghui1111@163.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lixiang.com:email,vger.kernel.org:from_smtp]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,lkml];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mx.google.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3F2CD6D1ED6
+X-Rspamd-Queue-Id: 048C86D1EF5
 
-From: Ding Hui <dinghui@lixiang.com>
+On Thu, Jun 25, 2026 at 04:13:14PM +0200, Maxime Chevallier wrote:
+> Hello Christian,
+> 
+> On 6/18/26 14:57, Christian Marangi wrote:
+> > Add phylink_release_pcs() to externally release a PCS from a phylink
+> > instance. This can be used to handle case when a single PCS needs to be
+> > removed and the phylink instance needs to be refreshed.
+> > 
+> > On calling phylink_release_pcs(), the PCS will be removed from the
+> > phylink internal PCS list and the phylink supported_interfaces value is
+> > reparsed with the remaining PCS interfaces.
+> > 
+> > Also a phylink resolve is triggered to handle the PCS removal.
+> > 
+> > The flag force_major_config is set to make phylink resolve reconfigure
+> > the interface (even if it didn't change).
+> > This is needed to handle the special case when the current PCS used
+> > by phylink is removed and a major_config is needed to propagae the
+> > configuration change. With this option enabled we also force mac_config
+> > even if the PHY link is not up for the in-band case.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  drivers/net/phy/phylink.c | 56 +++++++++++++++++++++++++++++++++++++++
+> >  include/linux/phylink.h   |  2 ++
+> >  2 files changed, 58 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index c38bcd43b8c8..064d6f5a06da 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -158,6 +158,8 @@ static const phy_interface_t phylink_sfp_interface_preference[] = {
+> >  static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
+> >  
+> >  static void phylink_run_resolve(struct phylink *pl);
+> > +static void phylink_link_down(struct phylink *pl);
+> > +static void phylink_pcs_disable(struct phylink_pcs *pcs);
+> >  
+> >  /**
+> >   * phylink_set_port_modes() - set the port type modes in the ethtool mask
+> > @@ -918,6 +920,60 @@ static void phylink_resolve_an_pause(struct phylink_link_state *state)
+> >  	}
+> >  }
+> >  
+> > +/**
+> > + * phylink_release_pcs - Removes a PCS from the phylink PCS available list
+> > + * @pcs: a pointer to the phylink_pcs struct to be released
+> > + *
+> > + * This function release a PCS from the phylink PCS available list if
+> > + * actually in use. It also refreshes the supported interfaces of the
+> > + * phylink instance by copying the supported interfaces from the phylink
+> > + * conf and merging the supported interfaces of the remaining available PCS
+> > + * in the list and trigger a resolve.
+> > + */
+> > +void phylink_release_pcs(struct phylink_pcs *pcs)
+> > +{
+> > +	struct phylink *pl;
+> > +
+> > +	ASSERT_RTNL();
+> > +
+> > +	pl = pcs->phylink;
+> > +	if (!pl)
+> > +		return;
+> > +
+> > +	mutex_lock(&pl->state_mutex);
+> > +
+> > +	list_del(&pcs->list);
+> > +	pcs->phylink = NULL;
+> > +
+> > +	/*
+> > +	 * Check if we are removing the PCS currently
+> > +	 * in use by phylink. If this is the case, tear down
+> > +	 * the link, force phylink resolve to reconfigure the
+> > +	 * interface mode, disable the current PCS and set the
+> > +	 * phylink PCS to NULL.
+> > +	 */
+> > +	if (pl->pcs == pcs) {
+> > +		phylink_link_down(pl);
+> > +		phylink_pcs_disable(pl->pcs);
+> > +
+> > +		pl->force_major_config = true;
+> > +		pl->pcs = NULL;
+> > +	}
+> > +
+> > +	mutex_unlock(&pl->state_mutex);
+> > +
+> > +	/* Refresh supported interfaces */
+> > +	phy_interface_copy(pl->supported_interfaces,
+> > +			   pl->config->supported_interfaces);
+> > +	list_for_each_entry(pcs, &pl->pcs_list, list)
+> > +		phy_interface_or(pl->supported_interfaces,
+> > +				 pl->supported_interfaces,
+> > +				 pcs->supported_interfaces);
+> 
+> I've given more thought to that 'supported_interfaces' thing. This
+> patchset redefines the meaning of
+> 
+>   pl->config->supported_interfaces
+> 
+> Currently, it's filled by the MAC driver and means "Every interface
+> we can support, including the ones provided by PCSs that we can use
+> with this MAC".
+> 
+> It now becomes "Every interface we support without needing a PCS", at
+> least the way I understand that.
+>
 
-On suspend, stmmac_suspend() calls stmmac_disable_all_queues() which
-stops the RX NAPI, but the RX DMA engine may still be running for a
-short window before stmmac_stop_all_dma() takes effect. During that
-window the hardware can write incoming frames into the buffers pointed
-to by the RX descriptors and write back the descriptors (clearing the
-OWN bit and overwriting RDES0/1/2 with status/timestamp data). Because
-NAPI is already disabled, the driver never refills these descriptors,
-so the RX ring is left in a "consumed but not refilled" state with
-stale content in the descriptor buffer-address fields.
+Wait but with the current code using the OR logic, it still follows
+"Every interface we can support...". The modes that needs a PCS are
+specificed with the pcs_interfaces mask in phylink_config.
 
-On resume, stmmac_clear_descriptors() only re-arms the OWN bit and
-does not repopulate the RX buffer address fields. When the DMA is
-restarted it dereferences these stale addresses and triggers a fatal
-bus error (not kernel panic, just a Fatal Bus Error interrupt and
-RX DMA engine halts).
+The late add and release operates on the phylink supported_interfaces ONLY
+when the MAC didn't specify support for it (by removing it as only the PCS
+will declare support for it)
 
-Fix this by introducing stmmac_reinit_rx_descriptors(), called from
-stmmac_resume() immediately after stmmac_clear_descriptors(). The
-helper iterates every RX descriptor slot and re-programs its buffer
-address fields:
+The confusion is present because everything is validated later on
+major_config so those supported_interfaces are just an HINT that are later
+verified with get_caps and with the pcs_validate OPs.
 
- - For normal (page_pool) queues: restore RDES0/1 from buf->addr and
-   RDES2 from buf->sec_addr. The DMA mapping has remained valid across
-   suspend/resume because no pages were freed. Slots left NULL by a
-   prior GFP_ATOMIC failure in stmmac_rx_refill() before suspend
-   are re-allocated here with GFP_KERNEL;
-   -ENOMEM is returned and resume is aborted if allocation fails.
-   The slots with null buffer are unacceptable, because they will
-   cause a DMA suspend dead lock problem by the condition of
-   Current Descriptor Pointer == Descriptor Tail Pointer.
+Adding the supported_interfaces to phylink is really to keep an original
+reference of the value. This is to address a pattern I have notice where
+the MAC driver always OR the interfaces with the one supported by the PCS.
+(I remember it was pointed out by Russell)
 
- - For AF_XDP zero-copy queues: restore the DMA address from
-   xsk_buff_xdp_get_dma(buf->xdp). Slots with no xdp buffer
-   (e.g. TX-only socket, empty fill ring) attempt xsk_buff_alloc()
-   first; on failure the descriptor is zeroed so the DMA engine skips
-   the slot safely via an RBU event.
+But I'm more than open to discussion as this is something marginal to the
+whole implementation, I'm also questioning if this OR is actually useful to
+anything on the nth tought on this.
 
- - For chain mode: call stmmac_mode_init() to rebuild the des3 next-
-   descriptor pointer chain, which hardware may have overwritten with
-   a PTP timestamp value (as noted in chain_mode.c:refill_desc3()).
+One thing that I notice is that parsing this early with AND might be
+problematic at phylink_create, but I still have to evaluate that.
 
-After reprogramming all address fields, a final pass restores OWN=1
-on every valid slot. This is necessary because set_sec_addr and
-chain-mode init unconditionally overwrite des3 (clearing the OWN bit
-set by stmmac_clear_descriptors()), and must run after all address
-writes are complete.
+My take is that would be good to have some review also on the other logic
+as I think I reached a point where Sashiko starts to comments on more or
+less unreal problem.
 
-Also fix stmmac_init_rx_buffers() to actually use its gfp_t flags
-parameter instead of the hardcoded GFP_ATOMIC | __GFP_NOWARN.
+> It's not an error in your code, but I think this is worth documenting
+> somewhere as this changes one the things that's already fairly
+> error-prone in new drivers.
+> 
+> I don't know to what extent people use that, be we have a porting guide
+> that explains how to use phylink in a MAC driver, maybe an update in there
+> would be nice as well :
+> 
+> https://docs.kernel.org/networking/sfp-phylink.html#rough-guide-to-converting-a-network-driver-to-sfp-phylink
+> 
+> Maxime
+> 
+> 
 
-Signed-off-by: Ding Hui <dinghui@lixiang.com>
-
----
-Changes in v4:
-- Just add description for return value of 'stmmac_reinit_rx_descriptors'.
-- Link to v3:
-  https://lore.kernel.org/netdev/20260604144557.3175399-1-dinghui1111@163.com/
-
-Changes in v3:
-- Re-allocate page_pool NULL slots (from prior GFP_ATOMIC failures)
-  with GFP_KERNEL in stmmac_reinit_rx_descriptors(); return -ENOMEM and
-  abort resume.
-- For XSK NULL slots, attempt xsk_buff_alloc() first; fall back to
-  stmmac_clear_desc() only when allocation fails.
-- Add a re-arm loop at the end of stmmac_reinit_rx_descriptors() to
-  restore OWN=1 on all valid slots, since set_sec_addr and
-  chain-mode init both write des3 unconditionally.
-- stmmac_reinit_rx_descriptors() now returns int; stmmac_resume()
-  checks the return value and propagates -ENOMEM with mutex/rtnl cleanup.
-- Fix stmmac_init_rx_buffers() to use its flags parameter instead of
-  hardcoded GFP_ATOMIC | __GFP_NOWARN.
-  (884d2b845477 ("net: stmmac: Add GFP_DMA32 for rx buffers if no 64
-  capability"))
-- Run stmmac_reinit_rx_descriptors() after stmmac_clear_descriptors()
-  so that stmmac_clear_desc() on XSK NULL slots overrides the OWN
-  bit set by stmmac_clear_descriptors().
-- Update commit message.
-- Link to v2:
-  https://lore.kernel.org/netdev/20260526022620.501229-1-dinghui1111@163.com/
-
-Changes in v2:
-- Introducing stmmac_reinit_rx_descriptors() to reinitializing rx
-  buffers without any allocation.
-- Modify commit log.
-- Link to v1:
-  https://lore.kernel.org/netdev/20260515053856.2310369-1-dinghui1111@163.com/
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 164 +++++++++++++++++-
- 1 file changed, 163 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 3591755ea30b..c82f3d5dbd43 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1660,7 +1660,7 @@ static int stmmac_init_rx_buffers(struct stmmac_priv *priv,
- {
- 	struct stmmac_rx_queue *rx_q = &dma_conf->rx_queue[queue];
- 	struct stmmac_rx_buffer *buf = &rx_q->buf_pool[i];
--	gfp_t gfp = (GFP_ATOMIC | __GFP_NOWARN);
-+	gfp_t gfp = flags;
- 
- 	if (priv->dma_cap.host_dma_width <= 32)
- 		gfp |= GFP_DMA32;
-@@ -1693,6 +1693,148 @@ static int stmmac_init_rx_buffers(struct stmmac_priv *priv,
- 	return 0;
- }
- 
-+/**
-+ * stmmac_reinit_rx_descriptors - re-program RX descriptor buffer addresses
-+ *				   after stmmac_clear_descriptors()
-+ * @priv: driver private structure
-+ * @dma_conf: structure holding the dma data
-+ * @queue: RX queue index
-+ *
-+ * Description: Called in the resume path after stmmac_clear_descriptors()
-+ * has re-armed the OWN bit on every descriptor.  Walk buf_pool[] and
-+ * re-program the buffer-address fields of every RX descriptor from the
-+ * buffers that are already attached to the queue.  Slots whose page was
-+ * never allocated (GFP_ATOMIC failure before suspend) are re-allocated
-+ * here with GFP_KERNEL; the resume path is in process context.
-+ *
-+ * Between suspend and resume the hardware may have written back status/
-+ * length information into the descriptor address fields (RDESx are reused
-+ * for status on completion for GMAC4/XGMAC), so the address fields must be
-+ * repopulated before the DMA is restarted.
-+ *
-+ * For XSK slots that have no xdp buffer at suspend time (TX-only socket,
-+ * empty fill ring for Rx), xsk_buff_alloc() is attempted but does not
-+ * return an error on failure because we can't identify a real TX-only
-+ * socket from an alloc error (same as stmmac_alloc_rx_buffers_zc() in
-+ * __init_dma_rx_desc_rings); on failure the descriptor is zeroed so the DMA
-+ * engine skips the slot safely.
-+ *
-+ * To avoid the DMA stall after resume in non-XSK mode, this function
-+ * re-allocates pages for NULL slots using GFP_KERNEL (the resume path runs
-+ * in process context). If allocation fails, -%ENOMEM is returned immediately
-+ * and the resume is aborted; the caller should report the error.
-+ *
-+ * This helper must be called after stmmac_clear_descriptors() and before
-+ * stmmac_hw_setup() in stmmac_resume() because we need to wipe the OWN bit
-+ * set in stmmac_clear_descriptors() for NULL slots in XSK mode.
-+ *
-+ * Returns: 0 on success, or a negative errno on allocation failure in
-+ * non-XSK mode (e.g. -%ENOMEM).
-+ */
-+static int stmmac_reinit_rx_descriptors(struct stmmac_priv *priv,
-+					struct stmmac_dma_conf *dma_conf,
-+					u32 queue)
-+{
-+	struct stmmac_rx_queue *rx_q = &dma_conf->rx_queue[queue];
-+	struct stmmac_rx_buffer *buf;
-+	struct dma_desc *p;
-+	int i;
-+
-+	if (rx_q->xsk_pool) {
-+		for (i = 0; i < dma_conf->dma_rx_size; i++) {
-+			buf = &rx_q->buf_pool[i];
-+			p = stmmac_get_rx_desc(priv, rx_q, i);
-+
-+			/* The XSK pool may not be fully populated (e.g.
-+			 * xdpsock TX-only, empty fill ring).  Try to refill
-+			 * from the pool; on failure zero the descriptor so the
-+			 * DMA engine skips this slot safely.
-+			 */
-+			if (!buf->xdp) {
-+				buf->xdp = xsk_buff_alloc(rx_q->xsk_pool);
-+				if (!buf->xdp) {
-+					stmmac_clear_desc(priv, p);
-+					continue;
-+				}
-+			}
-+
-+			stmmac_set_desc_addr(priv, p,
-+					     xsk_buff_xdp_get_dma(buf->xdp));
-+			stmmac_set_desc_sec_addr(priv, p, 0, false);
-+		}
-+	} else {
-+		for (i = 0; i < dma_conf->dma_rx_size; i++) {
-+			buf = &rx_q->buf_pool[i];
-+			p = stmmac_get_rx_desc(priv, rx_q, i);
-+
-+			/* buf->page can be NULL when stmmac_rx_refill() hit a
-+			 * GFP_ATOMIC failure before suspend and left the slot
-+			 * without a buffer. The resume path runs in process
-+			 * context, so re-allocate with GFP_KERNEL. Allocation
-+			 * failure aborts the resume.
-+			 */
-+			if (!buf->page) {
-+				int err;
-+
-+				err = stmmac_init_rx_buffers(priv, dma_conf, p,
-+							     i, GFP_KERNEL,
-+							     queue);
-+				if (err)
-+					return err;
-+				/* stmmac_init_rx_buffers() already programmed
-+				 * the descriptor; skip the reprogramming below.
-+				 */
-+				continue;
-+			}
-+
-+			stmmac_set_desc_addr(priv, p, buf->addr);
-+			stmmac_set_desc_sec_addr(priv, p, buf->sec_addr,
-+						 priv->sph_active &&
-+						 buf->sec_page);
-+
-+			if (dma_conf->dma_buf_sz == BUF_SIZE_16KiB)
-+				stmmac_init_desc3(priv, p);
-+		}
-+	}
-+
-+	/* Chain mode: re-link descriptor 'next' pointers. This is
-+	 * allocation-free; it just rewrites the per-descriptor next
-+	 * field which may have been clobbered by HW writeback.
-+	 */
-+	if (priv->descriptor_mode == STMMAC_CHAIN_MODE) {
-+		void *des = priv->extend_desc ? (void *)rx_q->dma_erx
-+					      : (void *)rx_q->dma_rx;
-+
-+		stmmac_mode_init(priv, des, rx_q->dma_rx_phy,
-+				 dma_conf->dma_rx_size, priv->extend_desc);
-+	}
-+
-+	/* Re-arm OWN=1 on every valid slot.
-+	 *
-+	 * Two address-programming helpers write des3 unconditionally and
-+	 * therefore clear the OWN bit that stmmac_clear_descriptors() set:
-+	 *
-+	 *  - stmmac_desc_ops.set_sec_addr (called by stmmac_set_desc_sec_addr()):
-+	 *    writes des3 with upper_32_bits(addr).
-+	 *
-+	 *  - stmmac_mode_ops.init() (called by stmmac_mode_init() above): writes
-+	 *    des3 with the next-descriptor physical address.
-+	 *
-+	 * A single pass over valid slots restores OWN=1 after all descriptor
-+	 * fields have been written.  NULL slots are left with OWN=0 for XSK mode
-+	 * so the Rx DMA engine stalls safely.
-+	 */
-+	for (i = 0; i < dma_conf->dma_rx_size; i++) {
-+		buf = &rx_q->buf_pool[i];
-+		p = stmmac_get_rx_desc(priv, rx_q, i);
-+
-+		if (rx_q->xsk_pool ? !!buf->xdp : !!buf->page)
-+			stmmac_set_rx_owner(priv, p, false);
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * stmmac_free_rx_buffer - free RX dma buffers
-  * @priv: private structure
-@@ -8272,6 +8414,7 @@ int stmmac_resume(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-+	u32 queue;
- 	int ret;
- 
- 	if (priv->plat->resume) {
-@@ -8321,6 +8464,25 @@ int stmmac_resume(struct device *dev)
- 	stmmac_free_tx_skbufs(priv);
- 	stmmac_clear_descriptors(priv, &priv->dma_conf);
- 
-+	/* Re-program the RX descriptor buffer-address fields.  Slots that
-+	 * had no page at suspend time (GFP_ATOMIC failure) are re-allocated
-+	 * here with GFP_KERNEL; XSK slots without an xdp buffer are refilled
-+	 * from the pool if possible.  Any unrecoverable allocation failure
-+	 * is reported so the resume can be aborted cleanly.
-+	 */
-+	for (queue = 0; queue < priv->plat->rx_queues_to_use; queue++) {
-+		ret = stmmac_reinit_rx_descriptors(priv, &priv->dma_conf,
-+						   queue);
-+		if (ret) {
-+			netdev_err(priv->dev,
-+				   "%s: rx desc reinit failed on queue %u\n",
-+				   __func__, queue);
-+			mutex_unlock(&priv->lock);
-+			rtnl_unlock();
-+			return ret;
-+		}
-+	}
-+
- 	ret = stmmac_hw_setup(ndev);
- 	if (ret < 0) {
- 		netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
 -- 
-2.34.1
-
+	Ansuel
 
