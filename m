@@ -1,76 +1,63 @@
-Return-Path: <netdev+bounces-302358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2H9vBfpAQGq4eAkAu9opvQ
-	(envelope-from <netdev+bounces-302358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:30:34 +0200
+	id 52zPKmdLQGo6egkAu9opvQ
+	(envelope-from <netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 00:15:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959866D2B67
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 23:30:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE1826D2BEA
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 00:15:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mYkqtHXG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302358-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302358-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TcAzT8h9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 076743008C28
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 21:30:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DF373012C58
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 22:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82871244687;
-	Sat, 27 Jun 2026 21:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AEE36A374;
+	Sat, 27 Jun 2026 22:15:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F83081ACD;
-	Sat, 27 Jun 2026 21:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7193713A3ED
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 22:14:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782595831; cv=none; b=AYIIELYmVNmaXKnZCame/n438G2f+wrrE1/4hNKX3/Vl9FzHOrGeNBvkkIgz95jkfctorsI85O++5gMfYOykVjbsjclMd9tHgi0i90apvcG9ESNqs3utkC1yqXzeWNVITtro3dVZAr6lnbUdSbmzWdIhVN6edVPnGdrt4T3u91Q=
+	t=1782598500; cv=none; b=WgxpOquu58IhWETR8mWWKDMLhqUs3+ckN4v7DtGuNIa5dMgUOyBWoZOHQ95GXAUqkCUy/pfE8KdEGGeJkQ9vFjHCjxQh9bSaEsfbO1Hjn4lnI2jfG9gV9sAMktVxAJhK4POlfIS1zYRQQcOhwwV/Gz/eHQwXAzDOQ6HP8iJXz48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782595831; c=relaxed/simple;
-	bh=krTNiPDsPuRh5LLdM0DdlxpaPCAeoJuT2fD7ycNc3Z4=;
+	s=arc-20240116; t=1782598500; c=relaxed/simple;
+	bh=uYkIPmrFsX+U7yRwISuAYVrXjTJyZ2+3oQ+XUoGXEZM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c4dEQAwUfrBIO3GT9+DvcwGgP5E1OUPURSXg2IbBDavbkNNqeftGMHJ9S9OIl5deBRccE7MccKF03PQZbAsBYwKqK1zp0cA82dTvrLnyeww25eZfRBUErXUeWyb6mQiUtauzakkayH8G+qK0Yo4ArRjXZHpZgwAXNw+/3kBL/AQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYkqtHXG; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F6A71F000E9;
-	Sat, 27 Jun 2026 21:30:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GafICJGH/llRA8l9NSvbtiPWBwO94jF7QVpXKfDn7aPyvV4hbQqUjUEIZX5PFJDVhfVCNip6OAu3lYAqhrOY3mJz7uhl9ayBQ0ycBhT1wSzP5JMuV133mUdfFQGi+Jsw/w3hCGFy/bLfDcmpqXB8UIjSB6j7/dqApK7VKxpHcGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcAzT8h9; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D7211F000E9;
+	Sat, 27 Jun 2026 22:14:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782595830;
-	bh=7zmeTFPg9RCjxyqzDSGo/9G7XtLWMfidKxIsvz34kIo=;
+	s=k20260515; t=1782598499;
+	bh=Wk/PWikZzI8tkJFohtL1a3rjzub1aBMgnTDQjwUJUEE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=mYkqtHXGPooym5zZZo1nDJxpwIiv9Z1134InZEewnnzNXqRueS5ORaiC33uxAgOXR
-	 ZLVw+Y7T4qM+XbFwZZZzYkMPHwhPA7cJ8XEItUYxu53Lj3tuK2f7jmndPSQuiwf6if
-	 kud+E6D3YyaSZX0F3Xdd1MUbZB8QwcRvaEljHYp07gK+FYxndcMEySF4vtLD6zTFBC
-	 EVjqNd+Zx92lKFSVknwZY3YdoEEXOqfzPAzyX96kLGqjuw63BItAIrefx8P6+p5noL
-	 9srYxAWxYBy3rK44NzQ/0MNuZrBdyQ8bL896W5uvFLjLIqVK+vc7Il5rsVya7HGITL
-	 AGXrn/QWEyGXg==
-Date: Sat, 27 Jun 2026 14:30:28 -0700
+	b=TcAzT8h9WJy0Bf2CYpvRhJQnAtcIPj4V7fsS1g70PCmm5vlNb0gnS9zRbbtUCGBSL
+	 fxl8L87do5Lwj32vwJtgH5ev0JkrAo36Sl0p+cYVfkIr8pum1vhoa29R1Bevw7j/B2
+	 B4VtCNIwqBaw2xDowwhXy/vjiv2XEQMX+8yFOikJarRrbfNq8NOT7u71kQCTZeopBd
+	 uJ0x3h29l10TTMiCETQl/3cGFOECLfkDpZ47YdVABFJ4GUjGXtneQbtXEjz5dt9dko
+	 Dqo1ebM1MDuwhZ8yiLLrdbGs3WTjGvwotUplx51+XZ1EQt5ktVxICeBIn5Pc474fTg
+	 DS/8sebogk3kQ==
+Date: Sat, 27 Jun 2026 15:14:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
- <skhan@linuxfoundation.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Florian Fainelli
- <f.fainelli@gmail.com>, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] Documentation: networking: Add a test plan for
- ethtool pause validation
-Message-ID: <20260627143028.5afed23a@kernel.org>
-In-Reply-To: <12b66ea3-42df-4ecb-8eb7-44471407b83f@bootlin.com>
-References: <20260522175109.198059-1-maxime.chevallier@bootlin.com>
-	<20260526172447.10ca4b9e@kernel.org>
-	<5cb8e2b4-8eb6-4446-9b90-1cd4c7964cd9@lunn.ch>
-	<38bafe7e-d419-46f7-8fa7-87e9183e578c@bootlin.com>
-	<58f37d6e-973b-4242-be82-0561ccdb1a6f@lunn.ch>
-	<65d26fd2-fbb3-49cd-a9ac-07863d9a8909@bootlin.com>
-	<5b7dbdbc-93fd-4664-abad-0f47855fab55@lunn.ch>
-	<20260626173352.7dc8f106@kernel.org>
-	<12b66ea3-42df-4ecb-8eb7-44471407b83f@bootlin.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+ davem@davemloft.net, petrm@mellanox.com, yuantan098@gmail.com,
+ yifanwucs@gmail.com, tomapufckgml@gmail.com, zcliangcn@gmail.com,
+ bird@lzu.edu.cn, bronzed_45_vested@icloud.com
+Subject: Re: [PATCH net v2 1/1] net: sched: ets: avoid deficit wrap and
+ bound empty dequeue  rounds
+Message-ID: <20260627151458.4e5822d9@kernel.org>
+In-Reply-To: <0e17a0309061300d31036a6a4c139919192f6373.1782379460.git.bronzed_45_vested@icloud.com>
+References: <0e17a0309061300d31036a6a4c139919192f6373.1782379460.git.bronzed_45_vested@icloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,27 +67,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302358-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302359-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:o.rempel@pengutronix.de,m:vladimir.oltean@nxp.com,m:f.fainelli@gmail.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:petrm@mellanox.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,resnulli.us,davemloft.net,mellanox.com,gmail.com,lzu.edu.cn,icloud.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,gmail.com,lwn.net,linuxfoundation.org,pengutronix.de,nxp.com,bootlin.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -112,21 +98,84 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 959866D2B67
+X-Rspamd-Queue-Id: EE1826D2BEA
 
-On Sat, 27 Jun 2026 07:34:31 +0200 Maxime Chevallier wrote:
-> > This is very far from what existing python tests do in netdev.  
+On Fri, 26 Jun 2026 16:32:00 +0800 Ren Wei wrote:
+> From: Wyatt Feng <bronzed_45_vested@icloud.com>
 > 
-> We can probably drop the class, as it is with this discussion, it's merely a way
-> to regroup doc common to similar tests. The rest really is the usual set of
-> ksft funcs you can feed to the run function, with a set of ksft_ethtool_*
-> annotators for generic checks.
+> ETS keeps each DRR-style deficit in a u32 and replenishes it with
+> the configured quantum whenever the head packet is too large. Both
+> the quantum and qdisc_pkt_len() are user-controlled inputs: a large
+> quantum can wrap the deficit counter, while a tiny quantum combined
+> with an inflated qdisc_pkt_len() can force billions of iterations in
+> softirq context before any packet becomes eligible.
 
-The common way of checking prereqs in the tests is to call a function
-called require_xyz() which then raises a skip. At a quick glance - the
-rss_api and xdp_metadata are good tests to get a sense of the usual format.
+Do you mean when packet is gigabytes in size?
+Where do such packets originate?
+
+> Store the deficit in u64 so replenishment cannot wrap the counter.
+> This keeps the existing dequeue logic unchanged while fixing the
+> overflow condition.
+> 
+> Bound one dequeue attempt to at most nbands * 2 ETS rotations, as
+> suggested in review. This avoids the livelock without adding heavier
+> logic to the fast path.
+> 
+> Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Suggested-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Assisted-by: Codex:GPT-5.4
+> Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+> changes in v2:
+>   - Instead of doing a div() in the fast path, simply bound the loop per
+>     dequeue
+>   - v1 Link: https://lore.kernel.org/all/20260615103759.2404228-2-n05ec@lzu.edu.cn/
+> 
+> 
+>  net/sched/sch_ets.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
+> index cb8cf437ce87..12a156ccb0a6 100644
+> --- a/net/sched/sch_ets.c
+> +++ b/net/sched/sch_ets.c
+> @@ -40,7 +40,7 @@ struct ets_class {
+>  	struct list_head alist; /* In struct ets_sched.active. */
+>  	struct Qdisc *qdisc;
+>  	u32 quantum;
+> -	u32 deficit;
+> +	u64 deficit;
+>  	struct gnet_stats_basic_sync bstats;
+>  	struct gnet_stats_queue qstats;
+>  };
+> @@ -463,6 +463,8 @@ ets_qdisc_dequeue_skb(struct Qdisc *sch, struct sk_buff *skb)
+>  static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
+>  {
+>  	struct ets_sched *q = qdisc_priv(sch);
+> +	unsigned int max_loops = READ_ONCE(q->nbands) * 2;
+> +	unsigned int loops = 0;
+>  	struct ets_class *cl;
+>  	struct sk_buff *skb;
+>  	unsigned int band;
+> @@ -499,6 +501,8 @@ static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
+>  
+>  		cl->deficit += READ_ONCE(cl->quantum);
+>  		list_move_tail(&cl->alist, &q->active);
+> +		if (++loops > max_loops)
+> +			goto out;
+>  	}
+>  out:
+>  	return NULL;
+
 
