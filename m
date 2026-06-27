@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-302283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Bs1vEBcdP2rKOwkAu9opvQ
-	(envelope-from <netdev+bounces-302283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 02:45:11 +0200
+	id MYaqMnAdP2rSOwkAu9opvQ
+	(envelope-from <netdev+bounces-302284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 02:46:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5AF56D0A2B
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 02:45:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA946D0A38
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 02:46:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="P3IrGto/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302283-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302283-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=gPuKfqkV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302284-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302284-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 23CB0300DD7E
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 00:44:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1BCE303AAB6
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 00:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE971DE4F1;
-	Sat, 27 Jun 2026 00:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A6F81ACD;
+	Sat, 27 Jun 2026 00:46:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B1D15E8B;
-	Sat, 27 Jun 2026 00:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A6640D57D;
+	Sat, 27 Jun 2026 00:46:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782521087; cv=none; b=bvpETLJ+ZIhNM42fFvzRBLLUucRYtbcED0i4mLmnnYt78KLQIaYs7BNzkJLYLy26tj0Wse9Z1Jz7RPof5s+WEmupzn5DRSFr7qkdT7Q6thbut6TXp5BEpRD5WBIwMOvl3/a+rWgQGEdDK2sM6xNOlm7V0McawacgGeABm2+UiYQ=
+	t=1782521197; cv=none; b=VQRs16vU4dvtqVkCsYx/FhZPKV5R/BN9HZPEt6ZW70qOE00s+zVmnAz+9n5YA5Jgevl6sVKt8RCsBaK3boSWn4s/5dpQR5ApqRGmVaik1PiLz/XdhIpMduZvG1h7J4Sr999EtkhlyXv/NAwrLsVGt+sBdbcNFHeTpIWwip2RmAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782521087; c=relaxed/simple;
-	bh=kUr2yPQCOsok+8rxx1oCI1yb2iBBXfSozLF9w97A8c8=;
+	s=arc-20240116; t=1782521197; c=relaxed/simple;
+	bh=NWuSmhMmyeLgLdiGZL9kRFiRj045XoP70lSp+zhpnFY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hTX909tjFYsIERs9vp56tMYLFNZy6zBvE+q6ShXPVZHxMBMBkvAsoBQHVmNjsO8YDFvupHO7oOZqefA2h1BIA63Keka0Aqa3CvEQZq1tOLLYRCp8sdXQzf7Ekt1KDi1aK6qBQm5nyoFMvOqI/04UFR1yQtQ18wgmQRwhUc6MQWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3IrGto/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E7291F00A3A;
-	Sat, 27 Jun 2026 00:44:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=a5NzBuUWSRgPKKGYIm7mrEG9LdfuMbRfxKJbOzNCIfoTUVJiDq14jjAkylxWop8G7K8WGICeSnLbWr+24eh7wzYNb5MMS8fqu2kpSX8SvwCdjC5bMWURGjBzFGV0YU0NXWp2uh+//ZmnByK8MmbW4Kky1X0obPikMepcpmwNAAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPuKfqkV; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0BBE1F000E9;
+	Sat, 27 Jun 2026 00:46:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782521086;
-	bh=Xft+vbctEr1djAr+KskNxSck9zBs9troo/s4Ve2heuw=;
+	s=k20260515; t=1782521196;
+	bh=RpncTxnbJ7Ss8uCIuHkdvpbtV/TGKZbOx7F+JNIfP9c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=P3IrGto/ssl/6Aj0KV7T+Mcp2qpZPH2WtCGaQ498wYOm3HGEjWg/xQhVaFoYQHbl2
-	 drAJyC+/0xpmPtQV77AMKRAMxKE0xRzY6JwrobJIpo5H3oXLcfu5W0HpWVC5XYB68O
-	 DaEvnkJ4umHKsLVLlrQp6vfuQTm4XrujoWigKhf7LI561Z1EXhd/3n9YV5qLTIkail
-	 r92R0mgaeJKYLM6iwdVNam3lnHAJu0n9i7IoVl5XTFba54xQIM1ZRsQTdq2LLtzT27
-	 gqya1lJy5fQI+sGKvGfbdum8bbLUzCmQU7XKgREtqkJK1Zjra34tcddsQyXPuAvgKP
-	 fRZ0Ol0iJybRA==
-Date: Fri, 26 Jun 2026 17:44:45 -0700
+	b=gPuKfqkVq1sUTk1El35/d1fRnIADgNgxf+pwhC6C32OxcZ19+orIpfPXA4cRM0d7P
+	 agUC0Ng41AlBCKQ5CPGkq9eFLhBB2XmVzYDjkohtqWDDs6dhn/dle3NAcfNs7ZVZ9Q
+	 13/G+VQnSrb7Yhk/Dn/bTVeGLkpJSwqtIraVhmSq957WfZ/R5FVNS5tSGyNX1xJ29i
+	 N7Oys4yCOszTyY4cr/teRqivJqwDV/dnCeItJMBsMo9uDf+Xo4SfsnwFVOrl8gKGuB
+	 VxB8mOJ4+1nmsTGmUGBtWIn9rPpY+9qiDovAkoRCpGPd27xmNLs+gLYvqs2Xb09JD2
+	 M8cQSgI2uVPyw==
+Date: Fri, 26 Jun 2026 17:46:34 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>, lange_tang@163.com
-Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, jasowang@redhat.com,
- edumazet@google.com, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, tanglongjun@kylinos.cn
-Subject: Re: [PATCH v4] virtio_net: disable cb when NAPI is busy-polled
-Message-ID: <20260626174445.700df7e3@kernel.org>
-In-Reply-To: <20260626151508.1319440-1-horms@kernel.org>
-References: <20260625013733.29300-1-lange_tang@163.com>
-	<20260626151508.1319440-1-horms@kernel.org>
+To: Carlo Szelinsky <github@szelinsky.de>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Kory Maincent
+ <kory.maincent@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Corey Leavitt
+ <corey@leavitt.info>, Jonas Jelonek <jelonek.jonas@gmail.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: decouple controller lookup
+ from MDIO probe
+Message-ID: <20260626174634.1fd06473@kernel.org>
+In-Reply-To: <20260626165929.2908782-1-github@szelinsky.de>
+References: <20260626165929.2908782-1-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,58 +70,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:lange_tang@163.com,m:mst@redhat.com,m:xuanzhuo@linux.alibaba.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302283-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302284-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:github@szelinsky.de,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:corey@leavitt.info,m:jelonek.jonas@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,163.com];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[pengutronix.de,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,leavitt.info,kernel.org,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C5AF56D0A2B
+X-Rspamd-Queue-Id: 1DA946D0A38
 
-On Fri, 26 Jun 2026 16:15:08 +0100 Simon Horman wrote:
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 26afa6341d161..c1e252400c0fc 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -3011,6 +3011,8 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
-> >  	unsigned int xdp_xmit = 0;
-> >  	bool napi_complete;
-> >  
-> > +	virtqueue_disable_cb(rq->vq);
-> > +  
-> 
-> [Severity: High]
-> Can this unconditionally disable the RX callback and cause a permanent network
-> stall when polled by netpoll?
+On Fri, 26 Jun 2026 18:59:26 +0200 Carlo Szelinsky wrote:
+> Subject: [PATCH net-next v3 0/3] net: pse-pd: decouple controller lookup from MDIO probe
 
-Good catch, Longjun just add if (budget)
+## Form letter - net-next-closed
+
+We have already submitted our pull request with net-next material for v7.2,
+and therefore net-next is closed for new drivers, features, code refactoring
+and optimizations. We are currently accepting bug fixes only.
+
+Please repost when net-next reopens after June 29th.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
+pv-bot: closed
 
