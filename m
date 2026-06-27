@@ -1,174 +1,304 @@
-Return-Path: <netdev+bounces-302315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302318-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MsazIZ6XP2okUwkAu9opvQ
-	(envelope-from <netdev+bounces-302315-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:27:58 +0200
+	id 5gRXBuOXP2pOUwkAu9opvQ
+	(envelope-from <netdev+bounces-302318-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:29:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F6C6D18FD
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:27:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851096D1961
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:29:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=BlsYlC+f;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302315-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302315-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	dkim=pass header.d=linux.dev header.s=korg header.b=Cvc7BtA8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302318-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302318-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04268302AD0F
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 09:27:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F0A3930292F4
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 09:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB2E396597;
-	Sat, 27 Jun 2026 09:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D26395AEA;
+	Sat, 27 Jun 2026 09:28:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28582395AEA;
-	Sat, 27 Jun 2026 09:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C249255F28;
+	Sat, 27 Jun 2026 09:28:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782552457; cv=none; b=QwZ/FoLX7xpxoZ1s2IWins/oiWnyax2k47tAhtCOYSk6gUlstUd7/xTo7u9T97KV5bjdE2loXReJ+oDbgOYTXBK0KyNHyOftHPv10xlWGTWZGixktMttv+1/uQMS8UbrAMbOEOrx9ZK/vI4ZpT9iJ1zA88pz1HiPcK/DUhYgWdA=
+	t=1782552528; cv=none; b=EI7/zD3CWWgsq33IYqRx4YgbiOtgL712n35zrtQSvnxAeTefA2u65WEoBWTZOcyE1+vfoP58Wirf0XozbzTdrmE3OgzDfl+ogXmXqJlJKFXiXvxgQOgVvFeA6vO3GQs5LBG2bXWF0lMHvwBaR6Ni5ibwBAXuJhKWSFL0Y0dPmjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782552457; c=relaxed/simple;
-	bh=l7XM2AVZdatBvllVHmZNwMMfq0/bhHAfuiI1wJjzYwU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KHUbLGSmEBIGJu6cjFyphnQwn1i2FNPyFUW5RmFym/6ia/0vDxpnfVMKaqnfl8Fz/MyjUi2nZhBOGUNJVd87NtEPdo8pKE7tRWh5vn7B+HMJnjmTun6LlnK6ycnOV3eEu9Jv16qojU26sogIWgaSslixpMKmWovjic0rDIZ0610=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=BlsYlC+f; arc=none smtp.client-ip=45.254.49.197
-Received: from PC-202605011814.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 43fdf9cda;
-	Sat, 27 Jun 2026 17:22:21 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: sam@mendozajonas.com,
-	fercerpav@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	runyu.xiao@seu.edu.cn,
-	jianhao.xu@seu.edu.cn
-Subject: [RFC PATCH net 2/2] net/ncsi: stop device work before freeing channels
-Date: Sat, 27 Jun 2026 17:22:14 +0800
-Message-Id: <20260627092214.373480-3-runyu.xiao@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260627092214.373480-1-runyu.xiao@seu.edu.cn>
-References: <20260627092214.373480-1-runyu.xiao@seu.edu.cn>
+	s=arc-20240116; t=1782552528; c=relaxed/simple;
+	bh=q7Z8vM/lzBiYt9UP0I5D7x1b8l52GpWysHKN+soD51k=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OQ0FCn1X/utytZwjzwLVHY6ia1f9OKxWhbskkL7M9rdyLUiulTCw2FsVUmnmmPnuoQdQ8F4rTudu+WWU5JPNUhhA+Winy9qgXVZIrT3Rvth8T6f+U0LBZVD9ASH6Tb9gT8pC1E3enrE9XzGw0DYFrSyQu+pa0wza1MPePiNoYu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cvc7BtA8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9268DC2BCB8;
+	Sat, 27 Jun 2026 09:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
+	t=1782552527; bh=q7Z8vM/lzBiYt9UP0I5D7x1b8l52GpWysHKN+soD51k=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Cvc7BtA8VSp/AeALm7cPWA3DwP71YhqHP7nvrnwf8e+/vnpth9BBMppVmc7Jb2vwq
+	 xfEBQfUgfyBqMfvypHhMIXliJotWNJTcxkldMRBa83kit3xGJCRVyonRtSRH1XNBCp
+	 6uApLs0gUye9W6YBDqOkwCmTLKPVjybYxNryGtvY=
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 834EAC43458;
+	Sat, 27 Jun 2026 09:28:47 +0000 (UTC)
+From: Alvin Sun <alvin.sun@linux.dev>
+Subject: [PATCH v7 00/10] Fix missing fops.owner in Rust DRM/misc
+ abstractions
+Date: Sat, 27 Jun 2026 17:28:38 +0800
+Message-Id: <20260627-fix-fops-owner-v7-0-33cd3990edf0@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9f08631efc03a1kunmb5b491adc8bf0
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDGBhJVh1LHklOSU5NGhlCGlYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSE
-	pPSExVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=BlsYlC+fHCYoZ1tZcP2y4DFmPJrCdM+aMkmRgSVUMZujPlVmqNo4T27qy5a35oVYDpatmBnedhS88UjE0yrbglmcptQtri9Ffkw8wMfKChIQ2cPmAd5J5cuKX789u5IHzb3uaGVmZQuNyfA6CZUTjsLYbb4JJtYA9lzRkWk5yZg=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=WvNRjtPj8ElX4II/Zb/SLufSf65ErdXS12z35MPn1is=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMaXP2oC/33Py07DMBAF0F+JvMaVn3GdFf+BWPgxppZI0tppK
+ Kr67wypBFEjWI7lc+/MlVQoGSrpmispMOeaxwEH89SQcHDDG9AccSaCiZZpbmnKF5rGY6XjxwC
+ FgnTGeC9MaANBdCyAP5bAl9f7XOB0xtzp/ki8q0DD2Pd56prZ7DgtwZB1X9f8tPW5hggzPaNJY
+ +ndRK3zBvbS88B5N0vy3XLIdRrL53LFzJeavxaeOWVURIh2L1l0XD2/5+F82WHLEjWLFRd8wwX
+ yFK1lxgbt2IbLX94KseESubJR6eClYVI8crXmcsMVctw66cSMiTo8cr3masM1cud48E4okZh+5
+ O3/vEWuhdUgpcT9Yc1vt9sXD/qQmU0CAAA=
+X-Change-ID: 20260519-fix-fops-owner-e3a77bb27c6c
+To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, 
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
+ Dave Ertman <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+ Igor Korotin <igor.korotin@linux.dev>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, 
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
+ Carlos Llamas <cmllamas@google.com>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org, 
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, Alvin Sun <alvin.sun@linux.dev>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782552525; l=9237;
+ i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
+ bh=q7Z8vM/lzBiYt9UP0I5D7x1b8l52GpWysHKN+soD51k=;
+ b=NNx0atP7v8M5dynY8/qFfCtudacdQzexdzygIGug8H2TMox+3lpgj5ZPf4CVxyWWuPiDnKcv7
+ hNVh63625uCBRgT7mQvi/U9B9lMgzvkfwzZsx/BKPHXckMDbAsRUzsG
+X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
+ pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
+X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
+ auth_id=684
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302315-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[mendozajonas.com,gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sam@mendozajonas.com,m:fercerpav@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:runyu.xiao@seu.edu.cn,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302318-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,suse.com,atomlin.com,linuxfoundation.org,gmail.com,ffwll.ch,collabora.com,arndb.de,linux.dev,davidgow.net,debian.org,kernel.dk,intel.com,android.com];
+	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:dakr@kernel.org,m:mcgrof@kernel.org,m:petr.pavlu@suse.com,m:da.gomez@kernel.org,m:samitolvanen@google.com,m:atomlin@atomlin.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:daniel.almeida@collabora.com,m:arnd@arndb.de,m:brendan.higgins@linux.dev,m:david@davidgow.net,m:raemoar63@gmail.com,m:leitao@debian.org,m:axboe@kernel.dk,m:david.m.ertman@intel.com,m:leon@kernel.org,m:igor.korotin@linux.dev,m:fujita.tomonori@gmail.com,m:bhelgaas@google.com,m:kwilczynski@kernel.org,m:arve@android.com,m:tkjos@android.com,m:brauner@kernel.org,m:cmllamas@google.com,m:rust-for-linux@vger.kernel.org,m:linux-modules@vger.kernel.org,m:driver-core@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:nova-gpu@lists.linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@
+ googlegroups.com,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-pci@vger.kernel.org,m:alvin.sun@linux.dev,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[alvin.sun@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alvin.sun@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,module.rs:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D5F6C6D18FD
+X-Rspamd-Queue-Id: 851096D1961
 
-ncsi_unregister_dev() tears down packages and channels before it
-disables the NCSI device work item. Current trees already stop the work
-before freeing ndp itself, but a teardown window remains where a running
-or already scheduled ncsi_dev_work() can still reach package/channel
-readers after ncsi_remove_package() has freed the underlying objects.
+During tyr debugfs development, a kernel NULL pointer dereference was
+encountered after `rmmod tyr` while gnome-shell still held /dev/card1 open:
 
-One visible path is the configuration flow through ncsi_channel_is_tx(),
-which walks package channels and ndp->channel_queue while choosing a
-transmit channel. Channel queue entries are struct ncsi_channel objects
-owned by the package channel lists, and ncsi_remove_channel() frees
-those objects during package removal.
+```
+  [158827.868132] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+  [158827.868918] Mem abort info:
+  [158827.869177]   ESR = 0x0000000086000004
+  [158827.869519]   EC = 0x21: IABT (current EL), IL = 32 bits
+  [158827.870000]   SET = 0, FnV = 0
+  [158827.870281]   EA = 0, S1PTW = 0
+  [158827.870571]   FSC = 0x04: level 0 translation fault
+  [158827.871043] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000108dec000
+  [158827.871623] [0000000000000000] pgd=0000000000000000, p4d=0000000000000000
+  [158827.872242] Internal error: Oops: 0000000086000004 [#1]  SMP
+  [158827.872246] Modules linked in: tyr sunrpc snd_soc_simple_card rk805_pwrkey snd_soc_simple_card_utils rtw88_8822bu display_connector rtw88_usb rtw88_8822b snd_soc_rockchip_i2s_tdm snd_soc_hdmi_codec
+  rtw88_core]
+  [158827.872337] CPU: 4 UID: 1000 PID: 11276 Comm: gnome-s:disk$0 Tainted: G                 N  7.1.0-rc1+ #331 PREEMPT
+  [158827.880534] Tainted: [N]=TEST
+  [158827.880535] Hardware name: FriendlyElec NanoPi R6C/NanoPi R6C, BIOS v1.1 04/09/2025
+  [158827.880538] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  [158827.880542] pc : 0x0
+  [158827.880547] lr : _RNvNtCs257m05FHVbX_3tyr2vm8pt_unmap+0x8c/0x12c [tyr]
+  [158827.880578] sp : ffff800083c236b0
+  [158827.880579] x29: ffff800083c236d0 x28: ffff00013f8a0000 x27: 0000000000000000
+  [158827.880585] x26: 000000000000007c x25: ffff000108e6ed80 x24: 0000000000401000
+  [158827.880590] x23: 0000000000000000 x22: 0000000040000000 x21: 0000000000001000
+  [158827.880595] x20: ffff00010f778138 x19: 0000000000400000 x18: 00000000ffffffff
+  [158827.880600] x17: 000000040044ffff x16: 045000f2b5503510 x15: 0720072007200720
+  [158827.880606] x14: 0720072007200720 x13: 0000000000401000 x12: 0000000000400000
+  [158827.880611] x11: ffff800083c239d0 x10: ffff000141e4fd88 x9 : 0000000000000000
+  [158827.880615] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000400000
+  [158827.880620] x5 : ffff00013f8a0000 x4 : 0000000000000000 x3 : 0000000000000001
+  [158827.880625] x2 : 0000000000001000 x1 : 0000000000400000 x0 : ffff00010f778138
+  [158827.880630] Call trace:
+  [158827.880632]  0x0 (P)
+  [158827.880635]  _RNvXs6_NtCs257m05FHVbX_3tyr2vmNtB5_9GpuVmDataNtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm11DriverGpuVm13sm_step_unmap+0x3c/0x120 [tyr]
+  [158827.891166]  _RNvMs4_NtNtNtCsgmSOfgXi5CZ_6kernel3drm5gpuvm6sm_opsINtB7_5GpuVmNtNtCs257m05FHVbX_3tyr2vm9GpuVmDataE13sm_step_unmapB13_+0x18/0x34 [tyr]
+  [158827.891187]  op_unmap_cb+0x78/0xb0
+  [158827.891196]  __drm_gpuvm_sm_unmap+0x18c/0x1b4
+  [158827.891204]  drm_gpuvm_sm_unmap+0x38/0x4c
+  [158827.891209]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm7exec_op+0x1cc/0x254 [tyr]
+  [158827.894085]  _RNvMs5_NtCs257m05FHVbX_3tyr2vmNtB5_2Vm11unmap_range+0x124/0x188 [tyr]
+  [158827.894105]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeNtNtCs257m05FHVbX_3tyr3gem8KernelBoEBK_+0x44/0xd8 [tyr]
+  [158827.894125]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel5alloc4kvec3VecNtNtCs257m05FHVbX_3tyr2fw7SectionNtNtBL_9allocator7KmallocEEB1r_+0x3c/0x100 [tyr]
+  [158827.894147]  _RINvNtCs5hGKnPbRUFW_4core3ptr13drop_in_placeINtNtNtCsgmSOfgXi5CZ_6kernel4sync3arc3ArcNtNtCs257m05FHVbX_3tyr2fw8FirmwareEEB1p_+0x94/0x190 [tyr]
+  [158827.894167]  _RNvMs4_NtNtCsgmSOfgXi5CZ_6kernel3drm6deviceINtB5_6DeviceNtNtCs257m05FHVbX_3tyr6driver12TyrDrmDriverE7releaseBW_+0x30/0x98 [tyr]
+  [158827.899550]  drm_dev_put.part.0+0x88/0xc0
+  [158827.899557]  drm_minor_release+0x18/0x28
+  [158827.899562]  drm_release+0x144/0x170
+  [158827.899567]  __fput+0xe4/0x30c
+  [158827.899573]  ____fput+0x14/0x20
+  [158827.899579]  task_work_run+0x7c/0xe8
+  [158827.899586]  do_exit+0x2a8/0xac4
+  [158827.899590]  do_group_exit+0x34/0x90
+  [158827.899594]  get_signal+0xaac/0xabc
+  [158827.899599]  arch_do_signal_or_restart+0x90/0x3e8
+  [158827.899606]  exit_to_user_mode_loop+0x140/0x1d0
+  [158827.899613]  el0_svc+0x2f4/0x2f8
+  [158827.899620]  el0t_64_sync_handler+0xa0/0xe4
+  [158827.899627]  el0t_64_sync+0x198/0x19c
+  [158827.899632] ---[ end trace 0000000000000000 ]---
+```
 
-Disable the device work before package/channel teardown. Also clear any
-remaining channel_queue links while the channel objects are still alive,
-so no stale queue membership is carried into teardown.
+The root cause: `fops.owner` was `NULL` in Rust DRM drivers, so the kernel
+never blocked module unloading while file descriptors were open. This leads to
+use-after-free when drm_release (or other fops) is called on freed module code.
 
-This was found by our static analysis tool and then manually reviewed
-against the current tree. CONFIG_PROVE_RCU_LIST was used as
-target-matched triage evidence; the teardown change is based on the
-source-level workqueue and channel lifetime review rather than on the
-dynamic warning alone.
+The series moves `THIS_MODULE` into the `ModuleMetadata` as a const, threads it
+through `#[vtable]` to set `fops.owner` in DRM/miscdevice, and updates configfs
+and rnull to use `this_module::<LocalModule>()`.
 
-This is deliberately limited to the teardown ordering problem. It does
-not change the normal package/channel RCU-list update model.
-
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Assisted-by: opencode:glm-5.2
+Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- net/ncsi/ncsi-manage.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Changes in v7:
+- Use `crate::LocalModule` in `configfs_attrs!` and silence `clippy::crate_in_macro_def`, per Gary's review.
+- Link to v6: https://lore.kernel.org/r/20260624-fix-fops-owner-v6-0-5295e333cb3e@linux.dev
 
-diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index 5316eadd8ce4..289974dff0c1 100644
---- a/net/ncsi/ncsi-manage.c
-+++ b/net/ncsi/ncsi-manage.c
-@@ -1956,10 +1956,18 @@ void ncsi_unregister_dev(struct ncsi_dev *nd)
- {
- 	struct ncsi_dev_priv *ndp = TO_NCSI_DEV_PRIV(nd);
- 	struct ncsi_package *np, *tmp;
-+	struct ncsi_channel *nc, *ntmp;
- 	unsigned long flags;
- 
- 	dev_remove_pack(&ndp->ptype);
- 
-+	disable_work_sync(&ndp->work);
-+
-+	spin_lock_irqsave(&ndp->lock, flags);
-+	list_for_each_entry_safe(nc, ntmp, &ndp->channel_queue, link)
-+		list_del_init(&nc->link);
-+	spin_unlock_irqrestore(&ndp->lock, flags);
-+
- 	list_for_each_entry_safe(np, tmp, &ndp->packages, node)
- 		ncsi_remove_package(np);
- 
-@@ -1967,7 +1975,6 @@ void ncsi_unregister_dev(struct ncsi_dev *nd)
- 	list_del_rcu(&ndp->node);
- 	spin_unlock_irqrestore(&ncsi_dev_lock, flags);
- 
--	disable_work_sync(&ndp->work);
- 
- 	kfree(ndp);
- }
+Changes in v6:
+- Update MAINTAINERS to cover the new `rust/kernel/module.rs`.
+- Link to v5: https://lore.kernel.org/r/20260624-fix-fops-owner-v5-0-aa1cba242f05@linux.dev
+
+Changes in v5:
+- Add `#[inline]` to the `this_module()` helper.
+- Fix configfs doc comment to reference `crate::LocalModule` instead of
+  bare `LocalModule`.
+- Link to v4: https://lore.kernel.org/r/20260623-fix-fops-owner-v4-0-0daf5f077d5c@linux.dev
+
+Changes in v4:
+- Move module-related types into a new `rust/kernel/module.rs`.
+- Migrate binder from the `module!`-generated `THIS_MODULE` static to
+  `this_module::<LocalModule>()`.
+- Reorganise the series so that every commit builds independently, and
+  drop the legacy `THIS_MODULE` static once all users are migrated.
+- Link to v3: https://lore.kernel.org/r/20260622-fix-fops-owner-v3-0-49d45cb37032@linux.dev
+
+Changes in v3:
+- Renamed vtable associated type `ThisModule` to `OwnerModule`
+- Added `this_module()` helper for ergonomic `THIS_MODULE` access
+- Refined vtable macro implementation: one-liner detection and single `defined_items` set
+- Reordered commits to place doctest fallback before vtable auto-insert
+- Link to v2: https://lore.kernel.org/r/20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev
+
+Changes in v2:
+- Merged old `static THIS_MODULE` and v1's `MODULE_PTR` into a single
+  `ModuleMetadata::THIS_MODULE` const
+- `#[vtable]` macro now auto-inserts `type ThisModule`, removing all per-driver
+  manual patches from v1
+- Added configfs & rnull usage site updates and doctest `LocalModule` fallback
+- Link to v1: https://lore.kernel.org/r/20260519-fix-fops-owner-v1-0-2ded9830da14@linux.dev
+
+---
+Alvin Sun (10):
+      rust: module: move module types into `module.rs`
+      rust: module: add `THIS_MODULE` const to `ModuleMetadata` trait
+      rust: doctest: add LocalModule fallback for #[vtable] ThisModule
+      rust: macros: auto-insert OwnerModule in #[vtable]
+      rust: drm: set fops.owner from driver module pointer
+      rust: miscdevice: set fops.owner from driver module pointer
+      rust: configfs: use `LocalModule` for `THIS_MODULE`
+      rust: binder: use `LocalModule` for `THIS_MODULE`
+      rust: macros: remove `THIS_MODULE` static from `module!`
+      rust: module: update MAINTAINERS to cover module.rs
+
+ MAINTAINERS                                |  2 +-
+ drivers/android/binder/rust_binder_main.rs |  3 +-
+ drivers/block/rnull/configfs.rs            |  6 +--
+ rust/kernel/auxiliary.rs                   |  2 +-
+ rust/kernel/configfs.rs                    |  9 ++--
+ rust/kernel/drm/device.rs                  |  3 +-
+ rust/kernel/drm/gem/mod.rs                 |  4 +-
+ rust/kernel/i2c.rs                         |  2 +-
+ rust/kernel/lib.rs                         | 75 +++-------------------------
+ rust/kernel/miscdevice.rs                  |  4 +-
+ rust/kernel/module.rs                      | 80 ++++++++++++++++++++++++++++++
+ rust/kernel/net/phy.rs                     |  6 ++-
+ rust/kernel/pci.rs                         |  2 +-
+ rust/kernel/platform.rs                    |  2 +-
+ rust/kernel/usb.rs                         |  2 +-
+ rust/macros/lib.rs                         |  6 +++
+ rust/macros/module.rs                      | 34 ++++++-------
+ rust/macros/vtable.rs                      | 41 +++++++++++++--
+ scripts/rustdoc_test_gen.rs                | 16 ++++++
+ 19 files changed, 190 insertions(+), 109 deletions(-)
+---
+base-commit: b7e5ac83cb16f7ffd11dc23736f84276602100ed
+change-id: 20260519-fix-fops-owner-e3a77bb27c6c
+prerequisite-change-id: 20260519-miscdev-use-format-9ab7e83b1c11:v3
+prerequisite-patch-id: 405b334ff0d48ad350014f05a2321bdbaa025400
+prerequisite-patch-id: 604b631c81d5423f4ebb2e12ba2d22e9ce371bfc
+prerequisite-patch-id: cb550d94cefe01920e0d3ced2b2bcbecd76f3907
+prerequisite-patch-id: 3bc830839742591460cb86d9472c04f4686dc600
+prerequisite-patch-id: 571058244bc8c7088638d2e3225713011246c7e9
+prerequisite-patch-id: 347c5a3c6dbef9832bfce8419fc23e6e08ba477f
+prerequisite-patch-id: 3e202d988b56b88446f7535e90d3f00cf5f15701
+
+Best regards,
 -- 
-2.34.1
+Alvin Sun <alvin.sun@linux.dev>
+
+
 
