@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 52zPKmdLQGo6egkAu9opvQ
-	(envelope-from <netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 00:15:03 +0200
+	id d/6pBZZLQGo8egkAu9opvQ
+	(envelope-from <netdev+bounces-302360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 00:15:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1826D2BEA
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 00:15:02 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB9E6D2BEE
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 00:15:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TcAzT8h9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302359-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CtVurek5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302360-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302360-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9DF373012C58
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 22:15:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5857230055F5
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 22:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AEE36A374;
-	Sat, 27 Jun 2026 22:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245431ACED5;
+	Sat, 27 Jun 2026 22:15:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7193713A3ED
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 22:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310CE4204E
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 22:15:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782598500; cv=none; b=WgxpOquu58IhWETR8mWWKDMLhqUs3+ckN4v7DtGuNIa5dMgUOyBWoZOHQ95GXAUqkCUy/pfE8KdEGGeJkQ9vFjHCjxQh9bSaEsfbO1Hjn4lnI2jfG9gV9sAMktVxAJhK4POlfIS1zYRQQcOhwwV/Gz/eHQwXAzDOQ6HP8iJXz48=
+	t=1782598544; cv=none; b=Ahh4wCmxWUOAutbeSqCkmUQAHVtiCLojpR3IiDeFLfIMJzXFWFgtM3V4gton13C/8JdrAKn/HK0gnvG56QtHDcD84ArFyxPoYRSc2JIy178F7f7TVNZWWfCCkWKMC2zCVF9n/YvlhQkq+F13H5Z1gMah/m06uLG/vS/btZcQ6OU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782598500; c=relaxed/simple;
-	bh=uYkIPmrFsX+U7yRwISuAYVrXjTJyZ2+3oQ+XUoGXEZM=;
+	s=arc-20240116; t=1782598544; c=relaxed/simple;
+	bh=W04uXXvhgO82ttrCtlB+3EwPAZquOJrmaDJSu/S0ReM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GafICJGH/llRA8l9NSvbtiPWBwO94jF7QVpXKfDn7aPyvV4hbQqUjUEIZX5PFJDVhfVCNip6OAu3lYAqhrOY3mJz7uhl9ayBQ0ycBhT1wSzP5JMuV133mUdfFQGi+Jsw/w3hCGFy/bLfDcmpqXB8UIjSB6j7/dqApK7VKxpHcGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcAzT8h9; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D7211F000E9;
-	Sat, 27 Jun 2026 22:14:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=d1yLLf07/+mCVyTuCl23LqaMz/jggovuyNugiORovjqbRytH1/AmU1n5eUG85y8PLOc0DzAbzrV/W4tsyyjBs2qi/eEFnaoyVLp5q77IaaOL1AjChrCuXNu9lekT6FlxAJzrK1Z450rIq0gSY3DPShMHa1fvrGkrqKuEWjr5dkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CtVurek5; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 718521F000E9;
+	Sat, 27 Jun 2026 22:15:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782598499;
-	bh=Wk/PWikZzI8tkJFohtL1a3rjzub1aBMgnTDQjwUJUEE=;
+	s=k20260515; t=1782598542;
+	bh=nK+pf9PlmXmJL5a5Vd6SqrSuHAG0CCQGM/NZvgMcl6k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TcAzT8h9WJy0Bf2CYpvRhJQnAtcIPj4V7fsS1g70PCmm5vlNb0gnS9zRbbtUCGBSL
-	 fxl8L87do5Lwj32vwJtgH5ev0JkrAo36Sl0p+cYVfkIr8pum1vhoa29R1Bevw7j/B2
-	 B4VtCNIwqBaw2xDowwhXy/vjiv2XEQMX+8yFOikJarRrbfNq8NOT7u71kQCTZeopBd
-	 uJ0x3h29l10TTMiCETQl/3cGFOECLfkDpZ47YdVABFJ4GUjGXtneQbtXEjz5dt9dko
-	 Dqo1ebM1MDuwhZ8yiLLrdbGs3WTjGvwotUplx51+XZ1EQt5ktVxICeBIn5Pc474fTg
-	 DS/8sebogk3kQ==
-Date: Sat, 27 Jun 2026 15:14:58 -0700
+	b=CtVurek5TIX7Kop4RcGjdI2qQBZ180UhrL+fHjkhwfvi77wq7S4Bi2SsA42FX+Npi
+	 dA2jFaWbwF8AaRlkREsdqv5R9dbIWdYEmYwrqA4TxTlCD9pTlp8QBcg04X63cdyjCr
+	 wKUxKt9QQQr8mcKXlcFJZnRSped35E4BaAboZm+ca53WH4CkoQmns+mdRgbG6uaJ9l
+	 IZ9POkGBE4ptUnJX8QBYIZ56eTnSu/pcVlXGlmZIWhr5FhcSFjADZvOpX+mJGgwWtj
+	 1MOlyscr8Pp7gqVdO17mFJxWhs/mCRT+A6gW47+9uK5pYolgxH2LHSrHv9+6HTbf5b
+	 uujBnF+E6OjRQ==
+Date: Sat, 27 Jun 2026 15:15:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Ren Wei <n05ec@lzu.edu.cn>
 Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
@@ -55,7 +55,7 @@ Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
  bird@lzu.edu.cn, bronzed_45_vested@icloud.com
 Subject: Re: [PATCH net v2 1/1] net: sched: ets: avoid deficit wrap and
  bound empty dequeue  rounds
-Message-ID: <20260627151458.4e5822d9@kernel.org>
+Message-ID: <20260627151541.3b22bdd8@kernel.org>
 In-Reply-To: <0e17a0309061300d31036a6a4c139919192f6373.1782379460.git.bronzed_45_vested@icloud.com>
 References: <0e17a0309061300d31036a6a4c139919192f6373.1782379460.git.bronzed_45_vested@icloud.com>
 Precedence: bulk
@@ -72,13 +72,13 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302359-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302360-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:petrm@mellanox.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,s:lists@lfdr.de];
@@ -98,84 +98,21 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lzu.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EE1826D2BEA
+X-Rspamd-Queue-Id: 4AB9E6D2BEE
 
 On Fri, 26 Jun 2026 16:32:00 +0800 Ren Wei wrote:
-> From: Wyatt Feng <bronzed_45_vested@icloud.com>
-> 
-> ETS keeps each DRR-style deficit in a u32 and replenishes it with
-> the configured quantum whenever the head packet is too large. Both
-> the quantum and qdisc_pkt_len() are user-controlled inputs: a large
-> quantum can wrap the deficit counter, while a tiny quantum combined
-> with an inflated qdisc_pkt_len() can force billions of iterations in
-> softirq context before any packet becomes eligible.
-
-Do you mean when packet is gigabytes in size?
-Where do such packets originate?
-
-> Store the deficit in u64 so replenishment cannot wrap the counter.
-> This keeps the existing dequeue logic unchanged while fixing the
-> overflow condition.
-> 
-> Bound one dequeue attempt to at most nbands * 2 ETS rotations, as
-> suggested in review. This avoids the livelock without adding heavier
-> logic to the fast path.
-> 
-> Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Suggested-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Assisted-by: Codex:GPT-5.4
-> Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
-> changes in v2:
->   - Instead of doing a div() in the fast path, simply bound the loop per
->     dequeue
->   - v1 Link: https://lore.kernel.org/all/20260615103759.2404228-2-n05ec@lzu.edu.cn/
-> 
-> 
->  net/sched/sch_ets.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-> index cb8cf437ce87..12a156ccb0a6 100644
-> --- a/net/sched/sch_ets.c
-> +++ b/net/sched/sch_ets.c
-> @@ -40,7 +40,7 @@ struct ets_class {
->  	struct list_head alist; /* In struct ets_sched.active. */
->  	struct Qdisc *qdisc;
->  	u32 quantum;
-> -	u32 deficit;
-> +	u64 deficit;
->  	struct gnet_stats_basic_sync bstats;
->  	struct gnet_stats_queue qstats;
->  };
-> @@ -463,6 +463,8 @@ ets_qdisc_dequeue_skb(struct Qdisc *sch, struct sk_buff *skb)
->  static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
->  {
->  	struct ets_sched *q = qdisc_priv(sch);
-> +	unsigned int max_loops = READ_ONCE(q->nbands) * 2;
-> +	unsigned int loops = 0;
->  	struct ets_class *cl;
->  	struct sk_buff *skb;
->  	unsigned int band;
 > @@ -499,6 +501,8 @@ static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
 >  
 >  		cl->deficit += READ_ONCE(cl->quantum);
 >  		list_move_tail(&cl->alist, &q->active);
 > +		if (++loops > max_loops)
 > +			goto out;
->  	}
->  out:
->  	return NULL;
 
+BTW sashiko says that this will permanently stall the qdisc.
+-- 
+pw-bot: cr
 
