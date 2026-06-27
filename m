@@ -1,215 +1,169 @@
-Return-Path: <netdev+bounces-302331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uwydBPi4P2qXXgkAu9opvQ
-	(envelope-from <netdev+bounces-302331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 13:50:16 +0200
+	id 8Pm6Cgm8P2oaXwkAu9opvQ
+	(envelope-from <netdev+bounces-302332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:03:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB826D1DB6
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 13:50:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D45C6D1DFA
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 14:03:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302331-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302331-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=MZr0qSpd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302332-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302332-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4CE553016D05
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 11:50:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BABFF301038E
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 12:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677EA2F8E8E;
-	Sat, 27 Jun 2026 11:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65DC3559F8;
+	Sat, 27 Jun 2026 12:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F243259C82;
-	Sat, 27 Jun 2026 11:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB1F23394B
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 12:03:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782561013; cv=none; b=Tc40Ah8W4SsJmhszeSIbDuXIUmLtkv+v740sjw308UfFcwz//45YcBCk76aZ8JABPs93NibwPNpcsquTYJRQ9ZuX1A/hzQsXAqc+O+N2ONp/ZMpFkDZhmZd6ulzbfFhsKdutSv9dZcbQ4uP/+JJ0sQ18UMRtZ13AyGlzckbEZQM=
+	t=1782561797; cv=none; b=dLueMwDzvbpwVfxH9fSWNDgQgtqm3P4BWJ24lkMPyPQtujW8/W2fjrgwyS3eGhLJs2V+1AubNkxIm9/I4vbDkqZCTuVnD0IpdZopbGZzgn1PsOpjkQJRuczrCYm6OGWLHeoZ2Irpv4vhQDjp6bBt9iRKls5keJA/+N2rSPKNpzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782561013; c=relaxed/simple;
-	bh=eUcSqBHkXirCMIOjpFOJWdsWV9uFVk8ox4QAtE6jOq0=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=jq/BENorviUON7gdpMcLdQ2WlJSW8YCzusxuF26kQhMkK1sn83UUfaRZyRGcxvqB90X8AUskgqSBXQnydqIwd+2xBYN1A3omqRkJYXMXf8J4C39OyRVecwUDX9w09b+UlwrysV3dHT0pjcpKH6twdkCBU4/OjNZvnBUAe3hOvr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Received: from smtpclient.apple (unknown [117.182.75.66])
-	by APP-03 (Coremail) with SMTP id rQCowACXaZDpuD9qQjMMFg--.6005S2;
-	Sat, 27 Jun 2026 19:50:01 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1782561797; c=relaxed/simple;
+	bh=WwGFokztcs+y9n4jJTNDSzVxZhLEu2f8nljUSlA7JXg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lh2aCOihmIrPYgwDwxvVla29M46v2r1lu1EHp0Pxi4YCfosyYhm3BpVIb5QoF6lLeZ+1YvyiQojjChCYjaydw4wSLfiCIrQzjtHly7hBDusrTm6UQkSq+5CkOTowxMjJFyEBDJmtPZJeA/KbWd9MUVUS1D1H8UJKZMKN0ImUqrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MZr0qSpd; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 69F87C5CD78;
+	Sat, 27 Jun 2026 12:03:21 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 24CE760233;
+	Sat, 27 Jun 2026 12:03:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6ED60106F0447;
+	Sat, 27 Jun 2026 14:03:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782561791; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=vXHW0KlN3ToKmF2y5q+w/EnLPad1QSe+5reRgFv7LEA=;
+	b=MZr0qSpduLDgGneJuPXUW3tm3Wox0CLWrXJ1dd7bgqRTuZxb3bpcWYT2RyQGt3a0ZuvlfD
+	5XNMmDD52JQ7UkdP0eKxjDa98a83ohEUb8R19UWODqH5NvRT9z69KwB2mr4oIt05bC/Mzb
+	jrIXZmQ9vbjVm5GM1qeNWJpdI+HLcblpXXC2drJEIaZCzJrc4DVsA3VGyCAOXFmLHxXcjm
+	mCHogqiRU6zGtlp7bWNM3NAVmvb3lv0vNAYChJCZbYcccjST6thpfW+J/ORfkbQWfdQybm
+	IDTdj64W5CESXBeX5pPf3kKfZWctIAE3fiygR5IN5VhX7YlD9ne9EzLsJ3x6Ag==
+Message-ID: <24a4065d-1e37-4364-94eb-622b11bd0471@bootlin.com>
+Date: Sat, 27 Jun 2026 14:03:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
-Subject: Re: [PATCH v2] fix: net: renesas: rswitch_mii_register: fix double
- of_node_put after   of_mdiobus_register
-From: WenTao Liang <vulab@iscas.ac.cn>
-In-Reply-To: <fdb2120d-5d0e-445f-97a5-ef2307ebd4d1@lunn.ch>
-Date: Sat, 27 Jun 2026 19:49:51 +0800
-Cc: netdev@vger.kernel.org,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- stable@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1846E0CF-B785-418B-A7D9-DD58D9C3B2F0@iscas.ac.cn>
-References: <20260626152430.51835-1-vulab@iscas.ac.cn>
- <20260626152550.51911-1-vulab@iscas.ac.cn>
- <fdb2120d-5d0e-445f-97a5-ef2307ebd4d1@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3826.700.81.1.8)
-X-CM-TRANSID:rQCowACXaZDpuD9qQjMMFg--.6005S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxZw47tFy3JFWUXFyxGr1xKrg_yoW5Ww4xpa
-	95KwsIyrWDtr4xtws7ZF4UZa4v934ftayrGF1YgryIkFn8X34fKrWIg3yY9FyDW3s5ua42
-	qrn5Xw1kW3WDZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkSb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4j6F4UMc
-	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF
-	04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r
-	18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vI
-	r41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr
-	1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvE
-	x4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUgAsgUUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwELA2o-mHs9ZAABsg
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 2/2] net: phy: mdio-i2c: defer RollBall bridge
+ probe to PHY discovery
+To: Petr Wozniak <petr.wozniak@gmail.com>, olek2@wp.pl,
+ linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-phy@lists.infradead.org, bjorn@mork.no, kabel@kernel.org
+References: <20260624084814.20972-3-petr.wozniak@gmail.com>
+ <20260626163519.10678-1-petr.wozniak@gmail.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260626163519.10678-1-petr.wozniak@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302331-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:yoshihiro.shimoda.uh@renesas.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302332-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:petr.wozniak@gmail.com,m:olek2@wp.pl,m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-phy@lists.infradead.org,m:bjorn@mork.no,m:kabel@kernel.org,m:petrwozniak@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,wp.pl,armlinux.org.uk,lunn.ch];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iscas.ac.cn:mid,iscas.ac.cn:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6AB826D1DB6
+X-Rspamd-Queue-Id: 6D45C6D1DFA
 
+Hi Petr
 
+On 6/26/26 18:35, Petr Wozniak wrote:
+> Maxime Chevallier wrote:
+>> I finally got time to test this with a RollBall module, and I
+>> confirm what Aleksander says, the RollBall module's PHY doesn't
+>> get detected even with this patch. It does work on v7.0 though,
+>> so before the bridge probing was introduced.
+> 
+> Thanks a lot for taking the time to test, Maxime - and Aleksander
+> for the original report.
+> 
+> That settles it: the deferred-probe approach in patch 2/2 doesn't
+> actually restore genuine RollBall PHY detection, and as you both
+> confirm it worked before 8fe125892f40 introduced the bridge probing.
+> Sashiko's static review flagged the same thing (the probe bypasses the
+> PHY discovery retry loop for slow-initializing modules), so the static
+> analysis and the two hardware reports all point at the same flaw.
+> 
+> I only have RTL8261BE-based copper modules here, not a genuine RollBall
+> one, so I can't develop and verify a proper slow-init timing fix
+> (module_t_wait / a retry that waits for the bridge) without the
+> hardware to test against.
+> 
+> Given that, my suggestion:
+> 
+> - Please drop patch 2/2 from the series.
+> 
+> - Since 8fe125892f40 regressed genuine RollBall detection and the
+>   deferred probe doesn't restore it, I think the cleanest fix is to
+>   revert 8fe125892f40. I'm happy to send that revert if you'd prefer.
+>   The 5-minute RTL8261BE probe loop it was addressing is handled in our
+>   downstream tree, so reverting it upstream is fine on our side.
+> 
+> - Patch 1/2 (the mii_bus leak fix) is independent of all this and
+>   already has Reviewed-by from Maxime and Larysa - it would be good to
+>   take that one regardless. I can resend it standalone if that's easier.
+> 
+> A proper fix covering slow-firmware modules really needs a genuine
+> RollBall module to validate, so it's better owned by someone who has
+> that hardware - happy to help review.
+> 
 
-> 2026=E5=B9=B46=E6=9C=8827=E6=97=A5 00:10=EF=BC=8CAndrew Lunn =
-<andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Fri, Jun 26, 2026 at 11:25:50PM +0800, WenTao Liang wrote:
->> After of_mdiobus_register succeeds, the mdio_np reference ownership =
-is
->>  transferred to the mii_bus device (released via fwnode_handle_put =
-during
->>  mdiobus_release). The success path calls of_node_put(mdio_np) which,
->>  combined with the automatic release via bus teardown, results in a =
-double
->>  put and refcount underflow.
->>=20
->> Move of_node_put so it is only called in the error path where
->>  of_mdiobus_register failed. On success, the bus driver manages the
->>  reference lifecycle.
->=20
-> Please stop with these patches.
->=20
-> First please read:
->=20
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->=20
-> and
->=20
-> https://docs.kernel.org/process/submitting-patches.html
->=20
-> You are getting a lot of things wrong.=20
->=20
-> * don=E2=80=99t repost your patches within one 24h period
-> * Don't thread new versions of a patch to the old one
-> * Include version history, how is v2 different to v1
-> * When you see your own patch is broken, reply with NACK, and explain
->  what is wrong with it.
->=20
-> Until you learn how to correctly submit patches, please only submit
-> them one at a time, get it accepted, and move onto the next. Otherwise
-> you are wasting peoples time, and getting yourself a bad reputation.
->=20
->     Andrew
+I only have a single rollball module here, and none with the missing
+bridge, so I can't test the full thing either.
 
+In that case, I agree with reverting 8fe125892f40 as this is breaking
+all rollball modules right now.
 
-Hi Andrew,
+Can you send the revert ?
 
-Thank you for your careful review and for pointing out this issue. You =
-are
-absolutely correct =E2=80=94 my previous analysis was flawed, and I =
-appreciate you
-taking the time to clarify.
-
-Let me address your concerns:
-
-1. On the double of_node_put():
-   You are right. In the current error path, if mdiobus_register() =
-succeeds
-   and later macb_mii_probe() fails, the code jumps to =
-err_out_unregister_bus,
-   which calls mdiobus_unregister() and then mdiobus_free().
-   - mdiobus_free() indeed releases the reference to the device node =
-(via
-     put_device()).
-   - Adding an explicit of_node_put() in that same path would indeed =
-result
-     in a double decrement, which is incorrect and could lead to =
-use-after-free
-     or refcount underflow.
-
-2. On the risk of untested patches:
-   You are right to be cautious. I do not have access to the specific =
-hardware
-   to test this change, and I should have been more careful in reasoning =
-about
-   the reference counting semantics. I will refrain from submitting =
-further
-   patches in this area without proper testing or more thorough review =
-of the
-   existing code paths.
-
-3. Proposed way forward:
-   I will withdraw this patch for now. If I find a way to test it or =
-gain more
-   confidence through static analysis and documentation, I will resubmit =
-with
-   a clearer explanation and, ideally, test results.
-
-Again, thank you for your diligence. I apologize for the noise and any =
-extra
-work this may have caused.
-
-Please let me know if there is anything else I can clarify or help with.
-
-Best regards,
-
-WenTao Liang=
+Maxime
 
 
