@@ -1,309 +1,214 @@
-Return-Path: <netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302312-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MqwiI6eIP2oFUQkAu9opvQ
-	(envelope-from <netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 10:24:07 +0200
+	id zcQAHsqNP2rCUQkAu9opvQ
+	(envelope-from <netdev+bounces-302312-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 10:46:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED5B96D1770
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 10:24:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A58C6D17EC
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 10:46:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b=is3Y3lf4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302311-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=secunet.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=I0Km5rlj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302312-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302312-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6306930269DA
-	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 08:24:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 659D0300B522
+	for <lists+netdev@lfdr.de>; Sat, 27 Jun 2026 08:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1401F34FF62;
-	Sat, 27 Jun 2026 08:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C463016E0;
+	Sat, 27 Jun 2026 08:45:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AE731AF3B
-	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 08:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876982949E0
+	for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 08:45:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782548643; cv=none; b=YPR7kOqDJPHmXthVdjUJ6ej9UZWZHorL0R5ecR8zX5qcsdxuj0ej560VHYcGtnZAwC4whZDtn9fJ7dJZybptoh5vgi08y0GSGDuq642A5QgQ/TfSOMfNi+EMxlLjTMcvGqpsoMXwmsvFqTkPBU+fSblmYDc5C0nW1KSYlBUaV0c=
+	t=1782549956; cv=none; b=jUQ/glpLOwh4ZPE4m4DLL1XUMDkeoS7H4dfC2GFHcgbmBRr5OltGi4DyOODBFxcJ0r1I9ChUgt2OAbgMFKYNNlGaROirWy+1zu0tq3GPNzuo/h9j5+fCYO0WvdmIjEsPE+M3EQnJNvLwi07cqeDTevjUyKVBZk+BSJ85p8uihL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782548643; c=relaxed/simple;
-	bh=Dzi5RsnHnCrAih7RyfoUUg4y9anw3liHkR7Z+Z6lNhI=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mOGBYJjSEjYhy8icVrZfpknSsNSHNP9sudAUJW48jeK+v0g1Mye8DazRGcntOCaizsgurhIwVWKQM0OlnRJuXueMjukkfbwIjMPt+drgjnjBVQz9a+jRFxf6iqfitzvLQDna0yRIBkDTmZt8Xr+itBrCY9oyylql5wAW/VJ4hT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=is3Y3lf4; arc=none smtp.client-ip=62.96.220.36
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 5F49320719;
-	Sat, 27 Jun 2026 10:23:52 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6r8aHhXJRAJz; Sat, 27 Jun 2026 10:23:51 +0200 (CEST)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 25951205CD;
-	Sat, 27 Jun 2026 10:23:51 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 25951205CD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1782548631;
-	bh=7W92P8P9sC2OAa9w/jneDCqFzVRtmvF7DhM6G0ngi4I=;
-	h=Date:From:To:CC:Subject:Reply-To:From;
-	b=is3Y3lf4uskCBjqlOfLHtuLu9hKPU0n01LCm66Jcc1CBweYWA+aUWem5YrOscNr9O
-	 dnDiRblex8GoZaqVLruJMl7QjjgtoJSOuo1lihin84qaD+S8vthBzt4Xbm2Pywb/0O
-	 A8jfhv1qL8zt7l70Opk0IWVuCJbjSvCPc8m/3tj33rg9UrG5qUZfXd3LOCcd1B8yFA
-	 YwC919w/sPJhneIIvhr49G717+qz89qtduXKSRR+UBjkdn7LfOiP593dZ/+/29yy7Z
-	 5hBYsvZpOL165zXd1517hf+dIzXLma001nfV9t+nhMb5b1RfR3Crgep1KVF3Wuz5QJ
-	 DZ4FYtTrEUfgw==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Sat, 27 Jun
- 2026 10:23:50 +0200
-Date: Sat, 27 Jun 2026 10:23:43 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Christian Hopps
-	<chopps@labn.net>
-CC: Tobias Brunner <tobias@strongswan.org>, <netdev@vger.kernel.org>,
-	<syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com>, Antony Antony
-	<antony.antony@secunet.com>
-Subject: [PATCH ipsec v2] xfrm: reject optional IPTFS templates in outbound
- policies
-Message-ID: <20260627-xfrm-pol-out-tmpl-iptfs-reject-fix-v2-1-45ff81741874@secunet.com>
-Reply-To: <antony.antony@secunet.com>
+	s=arc-20240116; t=1782549956; c=relaxed/simple;
+	bh=jt0EBY+LImM/A8tZgmXPsqoQLL5bfBy2QOw0BIWnCeI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u08MomqMdu8ku3egcJlDwiT1AHqJvU/P3w0uIGSJodKA24/AIXYdIRcMPnA1XgISoUjTno40LsdjakR0YkxTgw8HEAhy04o8gG48U1Xk+ecNpyRuMLsYlAaL4n1v4YCQwDhy8H3zdWyU4ivv3iTRpmiOtzmXw+GkQ+uilUr/kY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I0Km5rlj; arc=none smtp.client-ip=209.85.128.49
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-493a287b8c1so260975e9.0
+        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 01:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782549953; x=1783154753; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aApX5Xg5U2zMCX27/6SQYv+4H7RcS2fyony6licKWuk=;
+        b=I0Km5rljpizTSznKp/varLO65/YWNRk8QBiuYepwdj1h84IxQx3N8lbnXLWAecVKbt
+         3do3UtvK6wtHYIt1QLG0kVN80UYmpIb6I2kIz8TdHncr6HWaVT056ZniQHcUirc/T9W6
+         NTwztbYH4W5pIydfYe8GhmCgTGCDikmZihZee4H/94/LYooVABjmcg5lH6d5nHfncsN9
+         zndeMDbCOis30mdsqOZdrZgTmdpyN0DSeFkuHYeZVx4HE2da4PNo6qZmJ23CsUUgqgY9
+         wlsLi7Jkn4bGGl/z5EfZLOgDtVVOPCovMl/Ng44AYAp+Nah7/AxNDoQSqo/PZTShO8Ng
+         PQjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782549953; x=1783154753;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aApX5Xg5U2zMCX27/6SQYv+4H7RcS2fyony6licKWuk=;
+        b=ZP9nr23NxIlsiD90aHptLayHBsiwkdR6wVrMrc45wQCSiF3l6lhBRoYzVzFN497pUv
+         Wqau6rIQP3FR9JoEP0x3x8lmglokNzTZMFN7n82vOMqLuVVmdATD2QyCaECqJEz+2uJz
+         NTCpAPkdGOe+1aKp0uC9p5B6gzlcsgjRd2f0KeKhxL4Xq0m8Jrjdu5yyxoTtHaP88GKh
+         mmhMZeewwVdWSYRbN/+Ezzwcp6vyT2a+7fKbwzAHyIxoPJLk0pK4Yg8thycJm7HAO7Kg
+         e4OPmUh5/XwD1ZuYJkJJ3uPb6bOONJEHpuxA3BDoPee+Rd1AM1ntm83K74I+H6T8EZGT
+         HjoA==
+X-Forwarded-Encrypted: i=1; AFNElJ+IDb2yt8XNXyWEYD4UardoPApCvVYgXOZhODcNPZdjJ5sCefzTtpyNNf+lQY1aj42l6Ic+e0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH1w/k5bq1oZvRUuQSXireTflXZB+qcMdOpC0GlpdBNC2++7T6
+	JJ8TCavLH9ZQ0HOMX2tKKm7rr8bXfRob7kOoM0XY7yz18bG6Q77zL10xqtBDlw==
+X-Gm-Gg: AfdE7cmFeo+k8rvt/J3j0ACdY9U7oG4HRiEIiEkbXdOrPHmvTNGRsJwI/4HyhQC1+0J
+	X6dSLgoowz3HeI6dzTHZOmRtZr2G/egB6CH/YL91LlHOOq4R5dWKvnCjZ6DKMp0wdVx6PR13LiW
+	+DrbIyIV50iv1rJzsKQTf4TsctHUGMUcWQp6PAz+bYgCNZsQktxK+jpnoqtLw7bjHeAoSwaah5v
+	ULTrxjF4oLhcVxlLbVIno6a8O3sk2mPEQo028LXRn8pV5wpYytKOt6qVQgLbgHRG4W6G+UkyWed
+	vDoJZAw2JDRnPDOmdLTkF72N0H2HdkHwc3N+tECS/TB7bX+z01MEYRDwRZIHS7xNab/GSYe96IR
+	dyri/klGNq5lqOV3IncD+JXL1Lq026AuwnzPTqqxxK3ej5z8n7yH2DLLMOhcIs14fSQV+tQWXSm
+	QjHYQyMDXpHzRpfI2Q7n4sTa7l+fss+cnQA9/Wa1dBWi2Mff8e5ud5yDg2MEjKPWwfBZ72eEF3k
+	TsaUEHY0pXzM+E=
+X-Received: by 2002:a05:600c:3593:b0:492:6cd0:41b2 with SMTP id 5b1f17b1804b1-4926cd04404mr71506295e9.32.1782549952575;
+        Sat, 27 Jun 2026 01:45:52 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f106:e901:6d7b:bd22:a37c:4eb1? ([2001:9e8:f106:e901:6d7b:bd22:a37c:4eb1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492690988e0sm157844555e9.14.2026.06.27.01.45.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Jun 2026 01:45:52 -0700 (PDT)
+Message-ID: <9d65d91f-f48e-4580-b32a-5b8c1126c003@gmail.com>
+Date: Sat, 27 Jun 2026 10:45:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-B4-Tracking: v=1; b=H4sIADdeP2oC/5WPwW7DIBBEfyXi3E1ZjAH31P+ocgCy1FTBtoBYq
- SL/e7ClfkCPM6uZN/tkhXKkwj5OT5ZpjSXOUxPi7cT8aKdvgnhtmgkuFFeih0fICZb5BvO9Qk3
- LDeJSQ4FMP+QrhPgA5J3uOiEtIrJWtGRq9gH5YnEp5Nml2c4WAj+nFOtOMLxH0zvttUWuBpJcO
- xW065wfDEl5ldgHaST7i7psJz/u0aPzPdlSKe/nMZY659/jqRUP7H/2rwgIBqVRiGLgRn22+vt
- E9dzWssu2bS9xShK0NwEAAA==
-X-Change-ID: 20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-10373324a111
-X-Mailer: b4 0.16-dev
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
- (10.32.0.172)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/3] net: pse-pd: decouple controller lookup
+ from MDIO probe
+Content-Language: en-US
+To: Carlo Szelinsky <github@szelinsky.de>
+Cc: Corey Leavitt <corey@leavitt.info>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Kory Maincent <kory.maincent@bootlin.com>
+References: <20260626165929.2908782-1-github@szelinsky.de>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <20260626165929.2908782-1-github@szelinsky.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-302312-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302311-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:chopps@labn.net,m:tobias@strongswan.org,m:netdev@vger.kernel.org,m:syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com,m:antony.antony@secunet.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:github@szelinsky.de,m:corey@leavitt.info,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:linux@armlinux.org.uk,m:o.rempel@pengutronix.de,m:andrew+netdev@lunn.ch,m:hkallweit1@gmail.com,m:kory.maincent@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[leavitt.info,kernel.org,vger.kernel.org,redhat.com,google.com,davemloft.net,armlinux.org.uk,pengutronix.de,lunn.ch,gmail.com,bootlin.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,secunet.com:from_mime,secunet.com:dkim,secunet.com:email,secunet.com:mid,secunet.com:replyto,msgid.link:url];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[antony.antony@secunet.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[secunet.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,0ac4d84afe1066a1f3e9];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,szelinsky.de:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ED5B96D1770
+X-Rspamd-Queue-Id: 5A58C6D17EC
 
-syzbot reported a stack-out-of-bounds read in xfrm_state_find()
-which flows from xfrm_tmpl_resolve_one().
+Hi Carlo,
 
-Commit 3d776e31c841 ("xfrm: Reject optional tunnel/BEET mode
-templates in outbound policies") disallowed optional tunnel and
-BEET in outbound policies to prevent this. Later when IPTFS
-added, it was not covered by that fix and can still trigger
-the out-of-bounds read;
+On 26.06.26 18:59, Carlo Szelinsky wrote:
+> This is v3 of Corey's series [1]. It takes the PSE controller lookup out
+> of the MDIO probe path, so a modular PSE driver no longer makes the
+> PHY/DSA probe spin on -EPROBE_DEFER until the PSE module loads.
+>
+> v2 was four patches. The first one (a regulator handle fix) is a
+> self-contained bug fix, so on Jakub's suggestion it is going to net on
+> its own [2] and is not part of this series. The three patches here are
+> the notifier rework and target net-next. net-next was closed for the
+> merge window when v2 was posted; it is open again now, so here they are.
+>
+> How it works: pse_core gets a notifier chain (REGISTERED / UNREGISTERED).
+> The phy layer subscribes, owns phydev->psec, and attaches the PSE handle
+> when the controller shows up instead of during probe. fwnode_mdio loses
+> its PSE awareness, so no -EPROBE_DEFER leaves it and the probe-retry loop
+> is gone.
+>
+> Tested on a Realtek rtl93xx PoE switch with two HS104 PSE controllers on
+> i2c:
+>
+>  - clean boot, no probe-retry loop, no watchdog reset
+>  - 10G SFP+ port: module hotplug works, no deadlock
+>  - ethtool --set-pse enable/disable cuts and restores power to a PD
+>  - i2c unbind -> rmmod -> modprobe: PSE detaches on unbind and re-attaches
+>    on reload with power restored, no reboot. No lockdep splats.
+>
+> Tested-by: Carlo Szelinsky <github@szelinsky.de>
+>
+> Changes in v3:
+>  - Drop patch 1 (regulator handle fix); it goes to net separately [2].
+>  - Rebase on current net-next. No code changes to the three patches.
+>
+> v1 was an RFC by Corey [3].
+>
+> [1] https://lore.kernel.org/netdev/20260620112440.1734404-1-github@szelinsky.de/
+> [2] https://lore.kernel.org/netdev/20260624204017.2752934-1-github@szelinsky.de/
+> [3] https://lore.kernel.org/netdev/20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info/
+>
+> Corey Leavitt (3):
+>   net: pse-pd: add notifier chain for controller lifecycle events
+>   net: pse-pd: fire lifecycle events on controller register/unregister
+>   net: phy: own phydev->psec via PSE notifier and remove fwnode_mdio
+>     hook
+>
+>  drivers/net/mdio/fwnode_mdio.c |  34 -------
+>  drivers/net/phy/phy_device.c   | 168 +++++++++++++++++++++++++++++++--
+>  drivers/net/phy/sfp.c          |   2 +-
+>  drivers/net/pse-pd/pse_core.c  |  54 +++++++++++
+>  include/linux/phy.h            |   2 +
+>  include/linux/pse-pd/pse.h     |  41 ++++++++
+>  6 files changed, 258 insertions(+), 43 deletions(-)
+>
+>
+> base-commit: 805185b7c7a1069e407b6f7b3bc98e44d415f484
 
-Extend the check to disallow optional IPTFS in outbound policies
-as well. IPTFS should be identical to tunnel mode.
-IN and FWD policies are not affected: xfrm_tmpl_resolve_one()
-is only reachable via the outbound path.
+Thanks a lot for continuing the work!
 
-Reproducer, before:
+since you need to do a v4 anyway because net-next is still closed, feel
+free to include:
 
-ip link add dummy0 type dummy
-ip link set dummy0 up
-ip addr add 10.1.1.1/24 dev dummy0
-ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl
-  src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs
-  level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid
-  2 mode transport
-ping -W 1 -c 1 10.1.1.2
-PING 10.1.1.2 (10.1.1.2) 56(84) bytes of data.
+Tested-by: Jonas Jelonek <jelonek.jonas@gmail.com>
 
-[   64.168420] ==================================================================
-[   64.169977] BUG: KASAN: stack-out-of-bounds in __xfrm6_addr_hash+0x11e/0x170
-[   64.169977] Read of size 4 at addr ffff88800e1ffd20 by task ping/2844
+The issue I reported before, specifically with RTL8241FC, is fixed now.
+No deadlock anymore.
 
-[   64.169977] CPU: 2 UID: 0 PID: 2844 Comm: ping Not tainted 7.1.0-rc7-00180-geb23b588430a #98 PREEMPT(full)
-[   64.169977] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   64.169977] Call Trace:
-[   64.169977]  <TASK>
-[   64.169977]  dump_stack_lvl+0x47/0x70
-[   64.169977]  ? __xfrm6_addr_hash+0x11e/0x170
-[   64.169977]  print_report+0x152/0x4b0
-[   64.169977]  ? ksys_mmap_pgoff+0x6d/0xa0
-[   64.169977]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   64.169977]  ? rcu_read_unlock_sched+0xa/0x20
-[   64.169977]  ? __virt_addr_valid+0x21b/0x230
-[   64.169977]  ? __xfrm6_addr_hash+0x11e/0x170
-[   64.169977]  kasan_report+0xa8/0xd0
-[   64.169977]  ? __xfrm6_addr_hash+0x11e/0x170
-[   64.169977]  __xfrm6_addr_hash+0x11e/0x170
-[   64.169977]  __xfrm_dst_hash+0x24/0xc0
-[   64.169977]  xfrm_state_find+0xa2d/0x2f90
-[   64.169977]  ? __pfx_xfrm_state_find+0x10/0x10
-[   64.169977]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
-[   64.169977]  ? __pfx_ftrace_graph_ret_addr+0x10/0x10
-[   64.169977]  xfrm_tmpl_resolve_one+0x210/0x570
-[   64.169977]  ? __pfx_xfrm_tmpl_resolve_one+0x10/0x10
-[   64.169977]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-[   64.169977]  ? kernel_text_address+0x5b/0x80
-[   64.169977]  ? __kernel_text_address+0xe/0x30
-[   64.169977]  ? unwind_get_return_address+0x5e/0x90
-[   64.169977]  ? arch_stack_walk+0x8c/0xe0
-[   64.169977]  xfrm_tmpl_resolve+0x130/0x200
-[   64.169977]  ? __pfx_xfrm_tmpl_resolve+0x10/0x10
-[   64.169977]  ? __pfx_xfrm_policy_inexact_lookup_rcu+0x10/0x10
-[   64.169977]  ? __refcount_add_not_zero.constprop.0+0xb2/0x110
-[   64.169977]  ? __pfx___refcount_add_not_zero.constprop.0+0x10/0x10
-[   64.169977]  xfrm_resolve_and_create_bundle+0xd5/0x310
-[   64.169977]  ? __pfx_xfrm_resolve_and_create_bundle+0x10/0x10
-[   64.169977]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
-[   64.169977]  ? __pfx_xfrm_policy_lookup_bytype+0x10/0x10
-[   64.169977]  xfrm_lookup_with_ifid+0x3d8/0xb80
-[   64.169977]  ? __pfx_xfrm_lookup_with_ifid+0x10/0x10
-[   64.169977]  ? ip_route_output_key_hash+0xc6/0x110
-[   64.169977]  ? kasan_save_track+0x10/0x30
-[   64.169977]  xfrm_lookup_route+0x18/0xe0
-[   64.169977]  ip4_datagram_release_cb+0x4c9/0x530
-[   64.169977]  ? __pfx_ip4_datagram_release_cb+0x10/0x10
-[   64.169977]  ? do_raw_spin_lock+0x71/0xc0
-[   64.169977]  ? __pfx_do_raw_spin_lock+0x10/0x10
-[   64.169977]  release_sock+0xb0/0x170
-[   64.169977]  udp_connect+0x43/0x50
-[   64.169977]  __sys_connect+0xa6/0x100
-[   64.169977]  ? alloc_fd+0x2e9/0x300
-[   64.169977]  ? __pfx___sys_connect+0x10/0x10
-[   64.169977]  ? preempt_latency_start+0x1f/0x70
-[   64.169977]  ? fd_install+0x7e/0x150
-[   64.169977]  ? rcu_read_unlock_sched+0xa/0x20
-[   64.169977]  ? __sys_socket+0xdf/0x130
-[   64.169977]  ? __pfx___sys_socket+0x10/0x10
-[   64.169977]  ? vma_refcount_put+0x43/0xa0
-[   64.169977]  __x64_sys_connect+0x7e/0x90
-[   64.169977]  do_syscall_64+0x11b/0x2b0
-[   64.169977]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   64.169977] RIP: 0033:0x7f4851ecb570
-[   64.169977] Code: 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 80 3d f9 ca 0d 00 00 74 17 b8 2a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 54
-[   64.169977] RSP: 002b:00007ffc830e3498 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-[   64.169977] RAX: ffffffffffffffda RBX: 00007ffc830e34d0 RCX: 00007f4851ecb570
-[   64.169977] RDX: 0000000000000010 RSI: 00007ffc830e34d0 RDI: 0000000000000005
-[   64.169977] RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
-[   64.169977] R10: 0000000000000006 R11: 0000000000000202 R12: 0000000000000005
-[   64.169977] R13: 0000000000000000 R14: 00005619a863f340 R15: 0000000000000000
-[   64.169977]  </TASK>
-
-[   64.169977] The buggy address belongs to stack of task ping/2844
-[   64.169977]  and is located at offset 88 in frame:
-[   64.169977]  ip4_datagram_release_cb+0x0/0x530
-
-[   64.169977] This frame has 1 object:
-[   64.169977]  [32, 88) 'fl4'
-
-[   64.169977] The buggy address belongs to the physical page:
-[   64.169977] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xe1ff
-[   64.169977] flags: 0x4000000000000000(zone=1)
-[   64.169977] raw: 4000000000000000 0000000000000000 ffffea0000387fc8 0000000000000000
-[   64.169977] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-[   64.169977] page dumped because: kasan: bad access detected
-
-[   64.169977] Memory state around the buggy address:
-[   64.169977]  ffff88800e1ffc00: f2 f2 00 00 f3 f3 00 00 00 00 00 00 00 00 00 00
-[   64.169977]  ffff88800e1ffc80: 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00
-[   64.169977] >ffff88800e1ffd00: 00 00 00 00 f3 f3 f3 f3 f3 00 00 00 00 00 00 00
-[   64.169977]                                ^
-[   64.169977]  ffff88800e1ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
-[   64.169977]  ffff88800e1ffe00: f1 f1 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[   64.169977] ==================================================================
-[   64.245153] Disabling lock debugging due to kernel taint
-
-After the fix:
-
-ip xfrm policy add src 10.1.1.1/32 dst 10.1.1.2/32 dir out tmpl \
- src fc00::dead:1 dst fc00::dead:2 proto esp reqid 1 mode iptfs \
- level use tmpl src fc00::dead:1 dst fc00::dead:2 proto esp reqid 2 \
- mode transport
-
-Error: Mode in optional template not allowed in outbound policy.
-
-Fixes: d1716d5a44c3 ("xfrm: add generic iptfs defines and functionality")
-Reported-by: syzbot+0ac4d84afe1066a1f3e9@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6a3ceb94.43b4ff68.30a095.0004.GAE@google.com/T/
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
-v1->v2: Fix Signed-off-by:
-Link to v1: https://patch.msgid.link/20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-v1-1-814861129086@secunet.com
----
- net/xfrm/xfrm_user.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 6384795ee6b2..0f2c921b1e03 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2104,13 +2104,12 @@ static int validate_tmpl(int nr, struct xfrm_user_tmpl *ut, u16 family,
- 		switch (ut[i].mode) {
- 		case XFRM_MODE_TUNNEL:
- 		case XFRM_MODE_BEET:
-+		case XFRM_MODE_IPTFS:
- 			if (ut[i].optional && dir == XFRM_POLICY_OUT) {
- 				NL_SET_ERR_MSG(extack, "Mode in optional template not allowed in outbound policy");
- 				return -EINVAL;
- 			}
- 			break;
--		case XFRM_MODE_IPTFS:
--			break;
- 		default:
- 			if (ut[i].family != prev_family) {
- 				NL_SET_ERR_MSG(extack, "Mode in template doesn't support a family change");
-
----
-base-commit: 805185b7c7a1069e407b6f7b3bc98e44d415f484
-change-id: 20260625-xfrm-pol-out-tmpl-iptfs-reject-fix-10373324a111
-
-Best regards,
---  
-Antony
-
+Best,
+Jonas
 
