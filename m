@@ -1,146 +1,168 @@
-Return-Path: <netdev+bounces-302375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9D7KMUqQQGr6gAkAu9opvQ
-	(envelope-from <netdev+bounces-302375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 05:08:58 +0200
+	id n3WUL2ycQGqVggkAu9opvQ
+	(envelope-from <netdev+bounces-302376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 06:00:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB2B6D3011
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 05:08:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B896D3195
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 06:00:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MOnRIRYa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302375-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302375-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302376-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302376-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 890EC3016914
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 03:08:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C21D23000FC6
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 04:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904CC2690F9;
-	Sun, 28 Jun 2026 03:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F5630FC1A;
+	Sun, 28 Jun 2026 04:00:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A4D18B0A;
-	Sun, 28 Jun 2026 03:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76E13264C8;
+	Sun, 28 Jun 2026 04:00:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782616132; cv=none; b=MTpUry8fHBxXkJ2yQPAVwon/bT7YUpjOFHUvUM/Bb5TkYhTBDuCHufY2DwCqNfboW/78CCcGpXZ4l5NjBLw6a6gpditF2TSj4125KgP6GaGiYMUAE7omRaCQRHQMNSTgSFCv2XfzHpMZd93jxjKOf30xGkdtFpZjVBB/Vuh3cY4=
+	t=1782619241; cv=none; b=TrgDLuxJX1pzHrI7+piKrl1Aj9DeFs1PzhDe0H5IbKFxoDtlFmtkSerBnaK7D71fefH2kCjRgP/nirHBQwnf8G/gBNNsqr196QK/58OaTr0k6RwUJwFc5ytgpdfQoB/ubTt/mJLsD9xtYCa1/aKkI8sqmf5r373gAsvkCIhedF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782616132; c=relaxed/simple;
-	bh=F13cvcxhy3d55n7MjK8iW6eyN6upRu2rZr5RBuse3J4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n+yq8J8XCsacC3DSr2s4I544cB8U/bulCCpoACOHTxBnDtI1gtnXlZG/puoOvb8ChfVk6pDVHdpGrV9MuKiNd9Mgg0IK4veeGsXwZok3WK28qAWebRByG5IZNKzJtDCengYsvfEwnkPC5dHqhC3o1NrqKBKypDogjp+nNdP1Vt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOnRIRYa; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA3291F000E9;
-	Sun, 28 Jun 2026 03:08:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782616131;
-	bh=mB14dzokXviAWew5o/D1323LSbv37Vmdi+prndaBPPk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MOnRIRYaRdO5vvVGeU7z0bd3sUm5jr4IF5E7H3Drrc/mhZ6J38Qgq2KfeWfZdyiZF
-	 MyPP0RbCyJey4DDEUnHd/WLuffNAb8sTTBthLHXIGJyqrQSSPkIx6uWA/liBTX+5lW
-	 MrlHQ5wgAlRACR0pP+fZlMCwm6ZXwW2hMDDiaTArIgZesUqxLqEhUgCYnpG+5qr0Hj
-	 uKSDOrLyTeD9isVpYKdNW0tZpinsYRBlVXmHhM4YAegP3rdvy1dlnWzXSqBQtEmPm3
-	 0+QfU26iTUBVvK4ZJZA1rRf5Di3ctOCXGbhevxIzBFqBQWEaeaX29sq0WMzJFx/G1K
-	 t0d4zembWGl2A==
-Date: Sat, 27 Jun 2026 22:08:46 -0500
-From: Bjorn Andersson <andersson@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: george.moussalem@outlook.com, Jens Axboe <axboe@kernel.dk>, 
-	Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
-	Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan <saravanak@kernel.org>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
-Subject: Re: [PATCH 2/6] remoteproc: qcom: Add M0 BTSS secure PIL driver
-Message-ID: <akCQA-bLpp31QVGV@baldur>
-References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
- <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
- <38aceb33-b28e-4994-b277-de070b6dae2b@oss.qualcomm.com>
+	s=arc-20240116; t=1782619241; c=relaxed/simple;
+	bh=XB5RieHfp3RbGKs43shx49zHI8ThUDFvXuVU8ivWlOk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=ozgTQH8fzIkty6zwQBRW/z4QeXKySX6MeStDEhF21GoTR6temTc1OfQPfx2qwdaqPVZknH0IGPaZT/b5+UWHVmlkhVKhAQsZ7VB9efN28agYJ3NDGHm2wXbGWbugQocoPkQ42jdiFMZfKEXAlV2yFfPPMmQbZStLWRStUIeh7cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Received: from smtpclient.apple (unknown [117.182.74.7])
+	by APP-01 (Coremail) with SMTP id qwCowAB3HNVYnEBqCluqAw--.53240S2;
+	Sun, 28 Jun 2026 12:00:25 +0800 (CST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38aceb33-b28e-4994-b277-de070b6dae2b@oss.qualcomm.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
+Subject: Re: [PATCH] fix: net: mediatek: mtk_star_mdio_init: fix double
+ of_node_put after   devm_of_mdiobus_register
+From: WenTao Liang <vulab@iscas.ac.cn>
+In-Reply-To: <20260626152009.51599-1-vulab@iscas.ac.cn>
+Date: Sun, 28 Jun 2026 12:00:14 +0800
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ stable@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <533F8AAC-3167-48E0-87B9-4F4F4B38D184@iscas.ac.cn>
+References: <20260626152009.51599-1-vulab@iscas.ac.cn>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+ netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.700.81.1.8)
+X-CM-TRANSID:qwCowAB3HNVYnEBqCluqAw--.53240S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1xKF43Cr1fur1rWrW3KFg_yoW8WrW7pr
+	WUGayavrn7Xr4Igw48uF4UuFyYga93KrWrWr1avwsa93Wqy34UJrWjgayYqr1FyrW8C3Za
+	qr48A3Zruan8ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkCb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4
+	vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
+	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJV
+	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc7CjxVAaw2AFwI0_JF0_
+	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Xr0_Ar1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxU2PEfUU
+	UUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwEMA2pAixEbZgABsF
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302376-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302375-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:george.moussalem@outlook.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.
- de];
-	FORGED_SENDER(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@iogearbox.net,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andersson@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[outlook.com,kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de,vger.kernel.org,lists.infradead.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6AB2B6D3011
+X-Rspamd-Queue-Id: 55B896D3195
 
-On Fri, Jun 26, 2026 at 01:20:25PM +0200, Konrad Dybcio wrote:
-> On 6/25/26 4:10 PM, George Moussalem via B4 Relay wrote:
-> > From: George Moussalem <george.moussalem@outlook.com>
-> > 
-> > Add support to bring up the M0 core of the bluetooth subsystem found in
-> > the IPQ5018 SoC.
-> > 
-> > The signed firmware loaded is authenticated by TrustZone. If successful,
-> > the M0 core boots the firmware and the peripheral is taken out of reset
-> > using a Secure Channel Manager call to TrustZone.
-> > 
-> > Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-> > ---
-> 
-> Can this not fit inside the existing PAS driver?
-> 
 
-While the start/stop SCM calls look the same, this doesn't follow any of
-the surrounding concepts. So I think this should follow the other
-non-remoteproc uses of mdt_loader and scm directly instead.
 
-Regards,
-Bjorn
+> 2026=E5=B9=B46=E6=9C=8826=E6=97=A5 23:20=EF=BC=8CWenTao Liang =
+<vulab@iscas.ac.cn> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> After devm_of_mdiobus_register succeeds, the mdio_node reference
+>  ownership is transferred to the mii_bus device (released via
+>  mdiobus_release on device teardown). However, the function
+>  unconditionally calls of_node_put(mdio_node) after registration, =
+causing
+>  a double put.
+>=20
+> Only call of_node_put when devm_of_mdiobus_register fails (i.e., when
+>  ownership was not transferred). On success, the bus driver manages =
+the
+>  reference lifecycle.
+>=20
+> Cc: stable@vger.kernel.org
+> Fixes: 9ed0a3fac08b ("net: ethernet: mtk-star-emac: use =
+devm_of_mdiobus_register()")
+> Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+> ---
+> drivers/net/ethernet/mediatek/mtk_star_emac.c | 3 +++
+> 1 file changed, 3 insertions(+)
+>=20
+> diff --git a/drivers/net/ethernet/mediatek/mtk_star_emac.c =
+b/drivers/net/ethernet/mediatek/mtk_star_emac.c
+> index b83886a41121..b949dd240e6b 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_star_emac.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_star_emac.c
+> @@ -1446,7 +1446,10 @@ static int mtk_star_mdio_init(struct net_device =
+*ndev)
+> 	priv->mii->priv =3D priv;
+>=20
+> 	ret =3D devm_of_mdiobus_register(dev, priv->mii, mdio_node);
+> +	if (ret)
+> +		of_node_put(mdio_node);
+>=20
+> +	return ret;
+> out_put_node:
+> 	of_node_put(mdio_node);
+> 	return ret;
+> --=20
+> 2.39.5 (Apple Git-154)
 
-> Konrad
+Please ignore this patch. I will resend a proper version after
+learning the kernel submission process.
+
+Apologies for the noise.
+
+Best regards,
+WenTao Liang=
+
 
