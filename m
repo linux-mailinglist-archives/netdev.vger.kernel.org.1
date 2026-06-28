@@ -1,213 +1,196 @@
-Return-Path: <netdev+bounces-302387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZJvLMZwGQWo9kQkAu9opvQ
-	(envelope-from <netdev+bounces-302387-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 13:33:48 +0200
+	id PHWqBr8HQWpmkQkAu9opvQ
+	(envelope-from <netdev+bounces-302388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 13:38:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E006D3AFD
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 13:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D0D16D3B0E
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 13:38:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JpKJajIp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302387-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302387-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302388-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302388-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 25DF3300CC02
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 11:33:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDD93300D854
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 11:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9459F35201C;
-	Sun, 28 Jun 2026 11:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C33352005;
+	Sun, 28 Jun 2026 11:38:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A5E15E8B
-	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 11:33:44 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782646425; cv=pass; b=r73ZUI7gNtY+trWuXnD/8JnHPmbaNB0okIuMjaAp6lQrr+eqFX1bmskYMNpgILwCIR5Qpe3Bzs6DH7shjVPFAKHmFBbRVE8JEHxUm0UZHfxIrUt6KGMXLFs/V9O4oo9hbPQBlaI1MAM7SN0+QOk0+mup6yp8aEH2RPx/zKRW7F8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782646425; c=relaxed/simple;
-	bh=bgfpN079ZTjkfGSzvnJl3HzKuIyjV75/HikjUo6F6JI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Ku2GSMhauJuuwMVxMOQCfWVKTT9SbTWxRen50A8witgL+z/LcU7J5gwCRVGaa//YfB+hWEOnuZ0mkIWBb3EBw1U0Iimsg51UywRSMDzbT/BBtdWEhhy0CVa6+9RzhmCQhkoY+nt9lQP6sAcD281zNj/6CTI0Qw/CPjTa9so/Yyo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpKJajIp; arc=pass smtp.client-ip=209.85.221.43
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-471eeac43bfso887295f8f.3
-        for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 04:33:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782646423; cv=none;
-        d=google.com; s=arc-20260327;
-        b=XX85SfQ0eBpMOJofT88n6StlH1aUAK8u7REXKK/+K0HZ5BMPIhiz5ewLn14CSskhDN
-         5dXcjNSrgSZdjusRE+n1P389e8/oLd1gcmg66vR5Pw1BquQEaMUu4iGIHgSy2nmwP/Sk
-         aF6pHXhIgdsj22j0xrt37NRwo38vB0tREkNOdYkHFWuuu4TO6UeVXF3XpNm5EcJfqMPP
-         piAY2z9a7Z+1S9OHARFRsfRUziqWRbSEyje+Wq0gLv9foL3K7EyJgXRGyJ3kyvaNYxsD
-         V68qjgfB05BJXjKqb4Uls52muBfgZas/gFEy3rkO7qm3ilg+geln834FY+GPVLeDfgBH
-         Cmmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=CBSQ7Q9WGiOFkEauFRc+1+ZNzSO1tr4SWnVeYuWVixE=;
-        fh=8MK+xCPUZSuaN4/lOJfMiXVqCtQCUbgNI2CFLqxGkcg=;
-        b=rUiR5C/mCX8zWv6/zY8ykX3lvZwAVnipGasUObUvnlESSk9Whrxf8JmfsHNIfq4nOj
-         ChQmCuq7ynHXE6vTPwYeTDDe+rSQyG22HYpxSEFDOfHImHM3Pv8LNwkaNdB8V/+C3ddH
-         bW0yhFdW+/I1lfHIBmMvNWfxxkDqePOANKi2tqaYhvx7N/Lo3bqdSfe5Me/D0vkaqShV
-         YlB01GmZJG0hqMhpgGGe9bqkOJ5cjslapjLZQ2FD15w3c1qNPxSQ9saShBgZUg/oP39i
-         wVmxV70M3ML9l7f1F3z8nAjcO81US+hJWg2NVxY7Gfvx5uycyaHizzO2PomQvBRc66G7
-         tttg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782646423; x=1783251223; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CBSQ7Q9WGiOFkEauFRc+1+ZNzSO1tr4SWnVeYuWVixE=;
-        b=JpKJajIpQ0FsXQUjKhtdpT3iBJKQSG165IVyQXjfxsUhliJGJNWIPAZTUBpR89tEn6
-         H2KbKu0pdQJMavGl9T4mRFD/AnmSdewRUk61h87UCuGx7In2VcJLio1PRkbCtBR/gmJ8
-         Jbdbd6rkYcCrmaU0jrWq2dffI6HzdULitCNKmdw71Ro4f+P7KW65jPC6eYhMsg16G9bi
-         lEPGfBk6RLrg7yrhNP/+rQTuBXYVbo1kur2+03a1gHnXiOTxPSjF+Z7PUuuhQjpmkHIY
-         j7BFIP4K70FYuyYgqCiKysNbGPq2eNwB9tY80qeecK8s+Xvd+6ZZtqDg1MfC6SRgXkQw
-         K3Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782646423; x=1783251223;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CBSQ7Q9WGiOFkEauFRc+1+ZNzSO1tr4SWnVeYuWVixE=;
-        b=QQFJMQMxTWhezIy+egNiLkfGWd6n36BWqoKIWtnVfKR0Yfp6J2chX0Ddml2iScjU/z
-         AybHsd1t7ww70lfKTx1v18fAlhrtfwap3jxOgsNAABgFpGrhvMxutq/MxIxzOZGuBci+
-         xnBVq4vWiKKDXALMoq4LWgPu0NYCu8HhGX4SV6tGfus5xm4cff4adsov6sKgFFMBJALO
-         u/Ju9259gsQne5SwwQFQfGGriBCciuSbg3/JzRTsIzn8cQXkCLo5ibv3XW6YWtOgxl88
-         s3pD9S0wvc7zNBzHiRbQgRCsYVJLIBShxq3Go5jFoXcrr4I6afg2kuLs40PzDvpMtZEw
-         JT7A==
-X-Gm-Message-State: AOJu0YwaSTzg63UaaIyh1LfkkUV5+/APw569VgCbDsMv/Tz0c4RIR6N/
-	KtyIkVBGtJZ8Nsv3txQoLFrQKsJqTWVajDh6TYa2mvRVU4vt9zX+8RY0xklnBUpG4dQwjLQwiLQ
-	BAKFfiekQ9B53nhVdn8m6RfOg2XfVZREf0eHkZJs=
-X-Gm-Gg: AfdE7cl1vIcH34xfzOeJJCc2Th72KWIVkEusvCZ0HoR0ST9hF/rYxIe7FLYgyV6ZtdK
-	5kNDUDDUMJ+EVJzsGHOu99mzsxVq45EIDebB2rPm75S1YL1rgdf+xVCq20D3SjVL/wJ8UFvlbSO
-	kASikBw0I07qQtK+5/Yj+7VEVy0ZWIfYylxkq/rOw/3n+ckik1uyqFi5+5M4Urtuq2EJnv05SLf
-	ywWv4MRh9A3xAs1yfeCd6qazGhjCyLkWQaFFzszKPC3YODtu/coMqoXa6uwCey/BTgLXw==
-X-Received: by 2002:a05:6000:3111:b0:45e:f684:7347 with SMTP id
- ffacd0b85a97d-46dbf7d1bc0mr22070830f8f.12.1782646422449; Sun, 28 Jun 2026
- 04:33:42 -0700 (PDT)
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0096433B6C4
+	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 11:38:25 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782646710; cv=none; b=rSFRWH0YZVzPzevZcKB+VtdEQ1L0BxNpKdQvyosm3PLgMZi9n5ngYxQu3cUy8rpWzsd/O25waZqkjjjon3E86ssK6rb5Y+jhv/kRb1RQ/GO4BRsGcJXk9ZM8M+fXrVUuoBdGEtE7+tXN42vB/jEfw2HZNsqs8k86//WsuRbPqGI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782646710; c=relaxed/simple;
+	bh=dT0x9zKduV0I8BZNm3gs09ipQRXhjy21+kdREAJTsFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CSHUw20WqzoWdvPh2vVatBSfPyqtp1YDnFpIPC2QKXUX/B/9yr3HEwU5x+szPtW1fam4bzVagef+q1Pd/BVknjCHdUk2NAHa1YgKOx/Q+OejJ//x1e7Jw1nROgJ7TPG+1+cVxhmgG2z7DGGe+3YlJeX/i3yEHbrt27oCq8DIfVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowAC31L6TB0FqVwG_AA--.53723S3;
+	Sun, 28 Jun 2026 19:38:03 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	chia-yu.chang@nokia-bell-labs.com,
+	ij@kernel.org,
+	idosch@nvidia.com,
+	fmancera@suse.de,
+	bronzed_45_vested@icloud.com,
+	yuuchihsu@gmail.com,
+	kuniyu@google.com,
+	yuantan098@gmail.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	bird@lzu.edu.cn,
+	roxy520tt@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] tcp: Require init_net CAP_NET_ADMIN for tcp_child_ehash_entries
+Date: Sun, 28 Jun 2026 19:37:38 +0800
+Message-ID: <012fba43272abc560acfc0fa37ae22182a60b457.1782641525.git.roxy520tt@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1782641525.git.roxy520tt@gmail.com>
+References: <cover.1782641525.git.roxy520tt@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Masashi Honma <masashi.honma@gmail.com>
-Date: Sun, 28 Jun 2026 20:33:31 +0900
-X-Gm-Features: AVVi8Ceiv0d_3j-P-e81X83o_swUGxL0tFzZtYhSLjCxBgrq_DUpuk-krqAYxbI
-Message-ID: <CAFk-A4mcCfNBWLw-rMAnC25k8LV6fF2_jGyhpKciFZv35koy8w@mail.gmail.com>
-Subject: xdp: add device context to bpf_xdp_link_attach_failed tracepoint
-To: netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Cc: leon.hwang@linux.dev, ast@kernel.org, daniel@iogearbox.net, 
-	kuba@kernel.org, hawk@kernel.org, andrii@kernel.org, rostedt@goodmis.org, 
-	mhiramat@kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowAC31L6TB0FqVwG_AA--.53723S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJF17WrW5GrW5WFW5JrWfGrg_yoW5Ar15pF
+	WFkryUKrZ8GF17KFn2vw4ftF17Ww4kXr47Cr92gwnFvwnIgr92yFsYgrySqFnFkrW2kFWY
+	vFW2yan8Gw45ZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_
+	JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUU0zuJUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsMCWpA2VUB6gAAsC
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302387-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302388-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:chia-yu.chang@nokia-bell-labs.com,m:ij@kernel.org,m:idosch@nvidia.com,m:fmancera@suse.de,m:bronzed_45_vested@icloud.com,m:yuuchihsu@gmail.com,m:kuniyu@google.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:bird@lzu.edu.cn,m:roxy520tt@gmail.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[masashihonma@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:leon.hwang@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:hawk@kernel.org,m:andrii@kernel.org,m:rostedt@goodmis.org,m:mhiramat@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,nokia-bell-labs.com,nvidia.com,suse.de,icloud.com,gmail.com,lzu.edu.cn];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[masashihonma@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_TWELVE(0.00)[18];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lzu.edu.cn:from_mime,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 14E006D3AFD
+X-Rspamd-Queue-Id: 9D0D16D3B0E
 
-Hello,
+From: Zhiling Zou <roxy520tt@gmail.com>
 
-The bpf_xdp_link_attach_failed tracepoint (added in commit bf4ea1d0b2cb
-"xdp: Add tracepoint for xdp attaching failure") exposes the netlink
-extack message produced when attaching an XDP program via BPF_LINK_CREATE
-fails. This is useful because, unlike the netlink attach path, the
-bpf_link attach path does not return the extack to userspace -- the caller
-only gets an errno (e.g. EINVAL/ERANGE).
+tcp_child_ehash_entries controls the size of the private TCP established
+hash table allocated for subsequently created child network namespaces.
+The value is consumed during child netns creation by tcp_set_hashinfo()
+and passed to inet_pernet_hashinfo_alloc(), which can allocate a large
+per-netns ehash.
 
-We would like to use this in Cilium [1][2]: when attaching the XDP
-datapath program fails, surface the kernel's reason (e.g. "single-buffer
-XDP requires MTU less than ...") in the agent logs instead of an opaque
-errno, so operators don't have to inspect dmesg on the host.
+The sysctl is writable in each network namespace, and net sysctl
+permissions allow a task with CAP_NET_ADMIN in the namespace's owning
+user namespace to write it.  An unprivileged user can therefore create a
+user and network namespace, set tcp_child_ehash_entries to its maximum
+value, and repeatedly create nested network namespaces to force large
+kernel allocations and exhaust host memory.
 
-The limitation we hit is that the tracepoint only carries the message
-string, so a consumer cannot tell which device a failure belongs to.
-This matters for two reasons:
+Require CAP_NET_ADMIN in the initial user namespace before accepting
+writes to tcp_child_ehash_entries.  This keeps the tuning knob available
+to the host administrator while preventing unprivileged user namespaces
+from using it to drive host-wide memory consumption.
 
-  1. Correlation: with only the message, a consumer cannot reliably
-      attribute a failure to a specific attach, particularly if multiple
-      XDP attaches happen concurrently.
-  2. Scoping: a consumer watching this tracepoint sees XDP attach
-      failures system-wide and cannot limit them to the devices it
-      manages.
+Fixes: d1e5e6408b30 ("tcp: Introduce optional per-netns ehash.")
+Cc: stable@vger.kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:gpt-5.4
+Signed-off-by: Zhiling Zou <roxy520tt@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ net/ipv4/sysctl_net_ipv4.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-At the call site (bpf_xdp_link_attach() in net/core/dev.c) the net_device
-is in scope, so exposing it looks straightforward:
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index ca1180dba1de..1cad1b5cb826 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -9,6 +9,7 @@
+ #include <linux/sysctl.h>
+ #include <linux/seqlock.h>
+ #include <linux/init.h>
++#include <linux/capability.h>
+ #include <linux/slab.h>
+ #include <net/icmp.h>
+ #include <net/ip.h>
+@@ -415,6 +416,16 @@ static int proc_tcp_ehash_entries(const struct ctl_table *table, int write,
+ 	return proc_dointvec(&tbl, write, buffer, lenp, ppos);
+ }
+ 
++static int proc_tcp_child_ehash_entries(const struct ctl_table *table, int write,
++					void *buffer, size_t *lenp,
++					loff_t *ppos)
++{
++	if (write && !capable(CAP_NET_ADMIN))
++		return -EPERM;
++
++	return proc_douintvec_minmax(table, write, buffer, lenp, ppos);
++}
++
+ static int proc_udp_hash_entries(const struct ctl_table *table, int write,
+ 				 void *buffer, size_t *lenp, loff_t *ppos)
+ {
+@@ -1524,7 +1535,7 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.data		= &init_net.ipv4.sysctl_tcp_child_ehash_entries,
+ 		.maxlen		= sizeof(unsigned int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_douintvec_minmax,
++		.proc_handler	= proc_tcp_child_ehash_entries,
+ 		.extra1		= SYSCTL_ZERO,
+ 		.extra2		= &tcp_child_ehash_entries_max,
+ 	},
+-- 
+2.43.0
 
-  TRACE_EVENT(bpf_xdp_link_attach_failed,
-      TP_PROTO(const char *msg, const struct net_device *dev),
-      TP_ARGS(msg, dev),
-      TP_STRUCT__entry(
-          __string(msg, msg)
-          __field(int, ifindex)
-      ),
-      TP_fast_assign(
-          __assign_str(msg);
-          __entry->ifindex = dev->ifindex;
-      ),
-      TP_printk("ifindex=%d errmsg=%s", __entry->ifindex, __get_str(msg))
-  );
-
-  - trace_bpf_xdp_link_attach_failed(extack._msg);
-  + trace_bpf_xdp_link_attach_failed(extack._msg, dev);
-
-Before sending a formal patch I'd appreciate guidance on a few points:
-
-  - Should the tracepoint take const struct net_device *dev (consistent
-    with the other tracepoints in this file, and lets TP_printk show the
-    device), or just the ifindex as an int (simpler for raw_tp BPF
-    consumers, which otherwise read dev->ifindex via CO-RE)?
-
-  - For raw_tp consumers the argument order is effectively ABI: prepending
-    dev would shift the existing msg argument. I've appended dev above to
-    keep msg at args[0]. Is preserving the existing argument position the
-    right call, or is reordering acceptable given how new and rarely
-    consumed this tracepoint is?
-
-  - Is extending the existing tracepoint preferred, or would you rather
-    keep it as-is and expose the device context some other way?
-
-This would be my first XDP/BPF tracepoint change, so any direction is
-welcome. I'm happy to send a proper patch once the shape is agreed.
-
-Regards,
-Masashi Honma
-
-[1] https://github.com/cilium/cilium/issues/40777
-[2] https://github.com/cilium/cilium/pull/46546
 
