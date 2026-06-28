@@ -1,186 +1,140 @@
-Return-Path: <netdev+bounces-302378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d+h5CHmdQGrbggkAu9opvQ
-	(envelope-from <netdev+bounces-302378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 06:05:13 +0200
+	id OBd4GsLMQGr2iAkAu9opvQ
+	(envelope-from <netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 09:26:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 904346D323C
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 06:05:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E74A26D3582
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 09:26:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302378-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302378-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=PxQ+6usg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7CEA330430F1
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 04:03:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3F5413005994
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 07:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E61C34C124;
-	Sun, 28 Jun 2026 04:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC739218845;
+	Sun, 28 Jun 2026 07:26:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-m49228.qiye.163.com (mail-m49228.qiye.163.com [45.254.49.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A882834C141;
-	Sun, 28 Jun 2026 04:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5CF2F872
+	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 07:26:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782619379; cv=none; b=XiyfV9dUANE7jJ3xgsStSI2DqzqZaDhr5zvAA+TKkA7LhJL76MwfBnS07r5NCQayYic4S6Bm2xMLHTxbDFcA+O2MNVvYloBmaqnnm6pvi3XH/QdzcDVcxV6YmD9hBywAWE4hJ1lmRdEwOCosS8fknSBj5/XjxKhwLKXNwOFw98w=
+	t=1782631613; cv=none; b=Df4mTf48pFBFdtvDZBWhajhhnrw6XZ7yCpc0spQTqIYY0lm3+Fj5MoQoBLFQLmHGoYdClkdWNQeGLi6NWt1DgZUUIA4zC2Ylqp41GTOdtbL/DB5vgik7LFRsHB+X0kl2aRZsPJ17MRL26CAHBBdcWGS5WIHuQWnH4pEU3HEJpkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782619379; c=relaxed/simple;
-	bh=W0X4REEsCMOa9N5LgJWHLJjqghfFaeXgh5qVdFJ+Xjs=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=hgo3f1a70DCdJZs+a1tPQrpME+eJi9NkrWjLwfHRcMZ5lQEZOzjGY2dsfzse8m+d8OpPNE+SJ5JzJp4yOvCUBsDiuIrrUsPJCGLz9GJyZ72fQfBaF4sObNgLipJCmKoC4N1wZsCODtuWxEHDYW+mgTN+VuR24Uk0TQ6qc+BYhxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Received: from smtpclient.apple (unknown [117.182.74.7])
-	by APP-01 (Coremail) with SMTP id qwCowAD3j8h4nEBq+V6qAw--.55335S10;
-	Sun, 28 Jun 2026 12:02:46 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1782631613; c=relaxed/simple;
+	bh=yns7EYALhF6S1Qn2UCp2deAXK5Ibk5U2WE4Q5prGCGk=;
+	h=Content-Type:Message-ID:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:From:Date; b=XT6vzE9yaojbmvocWTH158GeFwGZ78gHsuOD2pt6rk3y0JEaRrSqxD9h/bf7AcYrZ6Qes4j6uBR+0aQdNESTm8l94vAmotOVibWnk6K2Rz/yQc6AbAtDv7OrDu/Pn67E9Amq5U3WamSNa1kcEYJFe+qFS5nF1lJby23Gt/cQ+dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=PxQ+6usg; arc=none smtp.client-ip=45.254.49.228
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Message-ID: <AFEAtADoKs22QyipHhKwe4op.3.1782623057057.Hmail.220255722@seu.edu.cn>
+To: Jakub Kicinski  <kuba@kernel.org>
+Cc: davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, horms <horms@kernel.org>, 
+	leitao <leitao@debian.org>, sashal <sashal@kernel.org>, 
+	bigeasy <bigeasy@linutronix.de>, netdev <netdev@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	"jianhao.xu" <jianhao.xu@seu.edu.cn>
+Subject: =?UTF-8?B?UmU6IFtSRkMgUEFUQ0ggbmV0LW5leHRdIG5ldHBvbGw6IGhvbGQgUkNVIHdoaWxlIHdhbGtpbmcgbmFwaV9saXN0?=
+X-Priority: 3
+X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_WIN_1.64.1
+In-Reply-To: <20260627142105.29f1322c@kernel.org>
+References: <20260627101228.1191586-1-runyu.xiao@seu.edu.cn> <20260627142105.29f1322c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
-Subject: Re: [PATCH] fix: net: marvell: orion_mdio_probe: fix clock reference
- leak on extra   clock detection
-From: WenTao Liang <vulab@iscas.ac.cn>
-In-Reply-To: <20260626151926.51342-1-vulab@iscas.ac.cn>
-Date: Sun, 28 Jun 2026 12:02:36 +0800
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- stable@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A5A62826-E67D-4A29-A0A2-4FAF8D388946@iscas.ac.cn>
-References: <20260626151926.51342-1-vulab@iscas.ac.cn>
-To: Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org
-X-Mailer: Apple Mail (2.3826.700.81.1.8)
-X-CM-TRANSID:qwCowAD3j8h4nEBq+V6qAw--.55335S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr1ftFyrZF1DWry5uw45KFg_yoW8Zr4Upa
-	y8KFyYyrWfAr17G3WxXa10qFyFgw4fta48GryavwsYvwnxAF18Zr1DWry0qrW8JrWkuw47
-	tr1UAan7u3Z0vrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBEb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI
-	8067AKxVWUAVCq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28C
-	jxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI
-	8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2
-	z280aVCY1x0267AKxVWxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2
-	IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4U
-	McvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUAVWUtw
-	CF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j
-	6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64
-	vIr41lIxAIcVC0I7IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIx
-	AIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07j5zVbUUUUU
-	=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAMMA2pAioodmQABsv
+MIME-Version: 1.0
+Received: from 220255722@seu.edu.cn( [223.112.146.162] ) by ajax-webmail ( [127.0.0.1] ) ; Sun, 28 Jun 2026 13:04:17 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Date: Sun, 28 Jun 2026 13:04:17 +0800 (GMT+08:00)
+X-HM-Tid: 0a9f0c9a86ef02f2kunm8623471ff3b0
+X-HM-MType: 1
+X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMTUS6Y2fHkyPT6dc03QDwVaZPGiA09TnwhbhTj
+	hLfuFZO94YXwX6xgvkjGVFFRKj5KLe6NS1CGiyhuD0RcZHIxcyljU39+n1YnYQfUuQJf73cLjTIU
+	yq9bpWVPXKN3Z9gsEIaThAzp9eqY0COUUIz5A=
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDTh0ZVh9JGUoYGRpCTR1MS1YVFA
+	kWGhdVEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVU
+	pLSEpOT0xVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=PxQ+6usgxK/4JU6RU1m4g+jF/+WEdvEYwuupMmevs0a7vOnPsKYoxLvhGqY0D6X4NinUWzEym1cbXCibQzneeCrQjpi6+D1V7vk8lrblROwcQyslemabgl5ZOctpMmu7prHWHhftsrRQMxcFVorotFXzjFdNLS46msBHYcp4Gcg=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=yns7EYALhF6S1Qn2UCp2deAXK5Ibk5U2WE4Q5prGCGk=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302378-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302380-lists,netdev=lfdr.de];
+	HAS_X_PRIO_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:leitao@debian.org,m:sashal@kernel.org,m:bigeasy@linutronix.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,seu.edu.cn:dkim,seu.edu.cn:mid,seu.edu.cn:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 904346D323C
+X-Rspamd-Queue-Id: E74A26D3582
 
-
-
-> 2026=E5=B9=B46=E6=9C=8826=E6=97=A5 23:19=EF=BC=8CWenTao Liang =
-<vulab@iscas.ac.cn> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> The code calls of_clk_get(pdev->dev.of_node, ARRAY_SIZE(dev->clk)) to
->  detect unsupported extra clocks. If an extra clock exists, the =
-function
->  prints a warning but discards the returned clk pointer without =
-calling
->  clk_put, leaking a clock reference on every probe.
->=20
-> Store the returned clock and call clk_put after the warning to =
-properly
->  release the acquired reference.
->=20
-> Cc: stable@vger.kernel.org
-> Fixes: ea664b1bdc19 ("net: mvmdio: print warning when orion-mdio has =
-too many clocks")
-> Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
-> ---
-> drivers/net/ethernet/marvell/mvmdio.c | 17 ++++++++++++-----
-> 1 file changed, 12 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/marvell/mvmdio.c =
-b/drivers/net/ethernet/marvell/mvmdio.c
-> index 3f4447e68888..4e5b5c5f7301 100644
-> --- a/drivers/net/ethernet/marvell/mvmdio.c
-> +++ b/drivers/net/ethernet/marvell/mvmdio.c
-> @@ -339,11 +339,18 @@ static int orion_mdio_probe(struct =
-platform_device *pdev)
-> 			clk_prepare_enable(dev->clk[i]);
-> 		}
->=20
-> -		if (!IS_ERR(of_clk_get(pdev->dev.of_node,
-> -				       ARRAY_SIZE(dev->clk))))
-> -			dev_warn(&pdev->dev,
-> -				 "unsupported number of clocks, limiting =
-to the first "
-> -				 __stringify(ARRAY_SIZE(dev->clk)) =
-"\n");
-> +		{
-> +			struct clk *extra_clk;
-> +
-> +			extra_clk =3D of_clk_get(pdev->dev.of_node,
-> +					       ARRAY_SIZE(dev->clk));
-> +			if (!IS_ERR(extra_clk)) {
-> +				dev_warn(&pdev->dev,
-> +					 "unsupported number of clocks, =
-limiting to the first "
-> +					 =
-__stringify(ARRAY_SIZE(dev->clk)) "\n");
-> +				clk_put(extra_clk);
-> +			}
-> +		}
->=20
-> 		if (type =3D=3D BUS_TYPE_XSMI)
-> 			orion_mdio_xsmi_set_mdc_freq(bus);
-> --=20
-> 2.39.5 (Apple Git-154)
-
-Please ignore this patch. I will resend a proper version after
-learning the kernel submission process.
-
-Apologies for the noise.
-
-Best regards,
-WenTao Liang
-
+SGksCgpPbiBTYXQsIDI3IEp1biAyMDI2IDE0OjIxOjA1IC0wNzAwIEpha3ViIEtpY2luc2tpIHdy
+b3RlOgomZ3Q7IFBsZWFzZSBwcm92aWRlIHRoZSBzdGFjayB0cmFjZSBmcm9tIHRoZSByZXBvcnQs
+IHJhdGhlciB0aGFuIGp1c3Qgc2F5aW5nCiZndDsgdGhhdCB5b3UgY2FuIHRyaWdnZXIgaXQuCgpT
+dXJlLCBzb3JyeSBmb3Igbm90IGluY2x1ZGluZyBpdCBpbiB0aGUgUkZDLiAgVGhlIHdhcm5pbmcg
+d2FzIGZyb20gdGhlCnJldmlld2VkIHJlcHJvZHVjZXIgdXNlZCBmb3IgdGhlIENPTkZJR19QUk9W
+RV9SQ1VfTElTVCB0cmlhZ2UsIG5vdCBmcm9tCmEgcHJvZHVjdGlvbiBjcmFzaC4gIFRoZSByZWxl
+dmFudCBwYXJ0IG9mIHRoZSBkbWVzZyBpczoKCiAgV0FSTklORzogc3VzcGljaW91cyBSQ1UgdXNh
+Z2UKICA2LjEuNjYgIzMgVGFpbnRlZDogRyAgICAgICAgICAgTwogIC0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tCiAgL2hvbWUvdWJ1bnR1MjIvbXN2X3dvcmtzcGFjZS9zaGFyZWQvdnVsbl9t
+c3YuYzo0NSBSQ1UtbGlzdCB0cmF2ZXJzZWQgaW4gbm9uLXJlYWRlciBzZWN0aW9uISEKCiAgb3Ro
+ZXIgaW5mbyB0aGF0IG1pZ2h0IGhlbHAgdXMgZGVidWcgdGhpczoKCiAgcmN1X3NjaGVkdWxlcl9h
+Y3RpdmUgPSAyLCBkZWJ1Z19sb2NrcyA9IDEKICBubyBsb2NrcyBoZWxkIGJ5IGluc21vZC8xOTAu
+CgogIHN0YWNrIGJhY2t0cmFjZToKICBDUFU6IDEgUElEOiAxOTAgQ29tbTogaW5zbW9kIFRhaW50
+ZWQ6IEcgICAgICAgICAgIE8gICAgICAgNi4xLjY2ICMzCiAgSGFyZHdhcmUgbmFtZTogUUVNVSBT
+dGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgMS4xNS4wLTEgMDQvMDEvMjAx
+NAogIENhbGwgVHJhY2U6CiAgIDx0YXNrPgogICBkdW1wX3N0YWNrX2x2bCsweDQ1LzB4NWQKICAg
+bG9ja2RlcF9yY3Vfc3VzcGljaW91cy5jb2xkKzB4MmQvMHg2NAogICBwb2xsX25hcGkuY29uc3Rw
+cm9wLjArMHg0My8weDcxIFt2dWxuX21zdl0KICAgbmV0cG9sbF9wb2xsX2Rldi5jb25zdHByb3Au
+MCsweDI3LzB4MzYgW3Z1bG5fbXN2XQogICA/IDB4ZmZmZmZmZmZjMDAwNTAwMAogICByY3VfbGlz
+dF9tc3ZfaW5pdCsweGUyLzB4MTAwMCBbdnVsbl9tc3ZdCiAgIGRvX29uZV9pbml0Y2FsbCsweDU2
+LzB4MjUwCiAgIGRvX2luaXRfbW9kdWxlKzB4NDcvMHgxYzAKICAgX19kb19zeXNfZmluaXRfbW9k
+dWxlKzB4YTYvMHgxMDAKICAgZG9fc3lzY2FsbF82NCsweDNiLzB4OTAKICAgZW50cnlfU1lTQ0FM
+TF82NF9hZnRlcl9od2ZyYW1lKzB4NjQvMHhjZQogICA8L3Rhc2s+CgpUaGUgcmVwcm9kdWNlciBr
+ZWVwcyB0aGUgc2hhcGUgaW50ZW50aW9uYWxseSBzbWFsbDogbmV0cG9sbF9wb2xsX2RldigpCmlz
+IGV4ZXJjaXNlZCBkaXJlY3RseSBhbmQgY2FsbHMgcG9sbF9uYXBpKCksIHdoaWNoIHdhbGtzIGRl
+di0mZ3Q7bmFwaV9saXN0CndpdGggbGlzdF9mb3JfZWFjaF9lbnRyeV9yY3UoKSBvdXRzaWRlIGFu
+IGV4cGxpY2l0IFJDVSByZWFkLXNpZGUgc2VjdGlvbi4KSXQgZG9lcyBub3QgbW9kZWwgYSBjb25j
+dXJyZW50IE5BUEkgZnJlZS4KClRoYW5rcy4K
 
