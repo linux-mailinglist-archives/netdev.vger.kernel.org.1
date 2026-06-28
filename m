@@ -1,233 +1,223 @@
-Return-Path: <netdev+bounces-302392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iO/RBGUVQWpikwkAu9opvQ
-	(envelope-from <netdev+bounces-302392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 14:36:53 +0200
+	id nv3bMToXQWqekwkAu9opvQ
+	(envelope-from <netdev+bounces-302393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 14:44:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15826D3CFF
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 14:36:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639EB6D3D4E
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 14:44:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=WW5NNTVS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302392-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302392-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=doyensec.com header.s=google header.b=DAmu0AcP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302393-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302393-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=doyensec.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1D4DD3001471
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 12:36:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0BA9300F52D
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 12:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24ACF3A4F4B;
-	Sun, 28 Jun 2026 12:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762963A6F19;
+	Sun, 28 Jun 2026 12:44:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD6F3A3815
-	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 12:36:48 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782650211; cv=pass; b=aVGYF/ZfFAU/ZxyYxpulRCSpe5GBwi45WfRafOEkwmZh36dHRtfpkNYWRLfM+Iw3y3RFggOw8s309QaS9YQvNgxXLsn3Q23S/ZYxOrOFp6UJpz9hqxvqr8Rx2HoqO80sXaTvLk5IT/4NHfJNtP+sTd08FL8Dsa8ZmeITr11oRrw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782650211; c=relaxed/simple;
-	bh=QT3KyRx/yYFX7YJbB0Phy/hJFhtSz/3fbeRsVp3f/3o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IB21T1yIT4LEoLNG9ycsQDrVgKI98XcBuZ6y7aNEhgP8hQ01TXuaDbLSMvnr5Ab7kE5j1btmMGwxzYPQH1ZIzG7WS4BJhYpDsbGLDliiLr0f+5Vo7wo40hd3Mc/4UD8g59KHvuQFpsE0LVnCwuUgVbHZ/HSRjNoYpfIP2irLEpo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=WW5NNTVS; arc=pass smtp.client-ip=74.125.224.42
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-664bb15d05dso673464d50.3
-        for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 05:36:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782650208; cv=none;
-        d=google.com; s=arc-20260327;
-        b=UQFR1b9vugdvEHCHPJltt8zPLVe7Uu1gSUhNyNUAE+wDIwDKjVl+6T2F7iAw64QLed
-         5vZWsixGGDVVdUOc5xa+MMtnl9sQgaiFRHOHNZ6DTXnnWBliT1SfD+EwYpcoTZXc0I7q
-         FYGiztcKaYOiPd4kQTQ00JC5BuiIGeJCt8ZELcwY7T8X7O/bo+1CFOzmhNKbUBHbsSP3
-         i1zJHmbQImCxAL8iCWFXXAZDS6178tO+y27Cp11iyndQXVVoO4vMSah7OoTTYzZPtQ1X
-         8SEk4TVBRlzDEnvER4oo3OGz8ES/IY23pppe8w0GwY8fKZI2/C6yhPXhqmAc7qvn2fTZ
-         2Y7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vzP5f4zYs9UEe0wmc6361FiYfWw38ZSqAfPCOvm2SFQ=;
-        fh=ASOfhIunJDagNd2+OgI89SLv07wThRMIAbZcqiDF6s4=;
-        b=bXolY0CuLXC3zPfel18XfVi6HQBzSvhBPF/B8nt+xTuXV7uO5GlQpjBjkysl6XdK7l
-         kJ15ixCMr5VGKh8W4ee7NIRcmqaDqLYqbmMFrSEcyBCfSGcqvIBg2qgUHlJmVDImt4Tt
-         0khWhJvS47cTBcDgO4MmebgJONAkdt/N13API+LqkXk7n+ZktAXqA3QQVjQ45QOUjIaJ
-         nMAFyy8GPBEyaeGtxZ7flePJRNjU0z6Suds2eDRgKxjeCN9cXg7/f1AGW+KDfsO262OQ
-         Oncb1KUHTjehxMpyCgmiCWm47uono/eIrv2XodNZUMyif0FMXfZ2CrE5XJS6JrJ9eO2G
-         KndQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BFF3A641D
+	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 12:44:30 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782650673; cv=none; b=aTf5cfXx2u0Q8mU5AoMYl58+GinWQ1on6btTuh7NIRqEMd95osMlwLUJXE1YHNbstBwgeVrYmfrgoc0GE9hyI+LeqkdV+HdHGGi/d2rN8BsJ/o/xVEwi7EOVSpKCdjFs8wrFUQ7oUCEamF/6jUmNwN7b7FuRvkuircm59NrnAUs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782650673; c=relaxed/simple;
+	bh=IPjEHzSTdwyloWctFDPS+6k8OmXJDIPZjH823U/Xxe4=;
+	h=From:Content-Type:Mime-Version:Date:Subject:Cc:To:Message-Id; b=G/o6u17zExWh2Tzo/mq6SNkk1J5gicMe8qXtrIRiWCA36GAJpQbDvu+NdMLhSS6IYFdVmxKha5iVI8GgSaVwx6DhnJiuhCIjBaNy4rQTs1O1W0wWbye5trXMVmeC8fJJPigOioaXokhVBMGYUKqrztu8NtuqpxqB0iFasCggxrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=doyensec.com; spf=pass smtp.mailfrom=doyensec.com; dkim=pass (2048-bit key) header.d=doyensec.com header.i=@doyensec.com header.b=DAmu0AcP; arc=none smtp.client-ip=209.85.218.52
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c08922c23ebso332522866b.0
+        for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 05:44:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782650208; x=1783255008; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vzP5f4zYs9UEe0wmc6361FiYfWw38ZSqAfPCOvm2SFQ=;
-        b=WW5NNTVSch88pbEt7NnwwVgbRhQ/NVC1fq1rBHfIo261G8o2i2hzm6kaHp8lZUoOok
-         KR7K46YUX3n4t+ch0acBDbNJ7BrdKS4wuHDbnMOsa3LbgddwXJWVi3fvE0nG0bwTPUVi
-         5qVUswUKN/5YBJCvQcrI/A93ti06HC8dxgSos=
+        d=doyensec.com; s=google; t=1782650669; x=1783255469; darn=vger.kernel.org;
+        h=message-id:to:cc:subject:date:mime-version
+         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z/PKxXDyIAMOlaR096tTQhy4xjIPnfe/Wjks8AZRapc=;
+        b=DAmu0AcPWloxuKqJtRQnPW/tMGJS9i2Ncu31u2qdHf3JVsP5zNHXsjC3Et43dHgKNQ
+         0F36FVeSY7ZpWVLZSYDAgYKuKm/Fkm1Ut6pDEfuCr2okx+zsH8elBelPAT0xls5pecXF
+         6d29Q6o7n7azAiwQDsc6pS4EMHEOme37233fnGzz95GWt4p3oELxVutxYLR/EWQpNYlw
+         a1+Y1WTQhSfOaLFeJKk8BzI7wo5TDtvZz91Kh8hWm1gysJKZp4uGb7hBhnNH0Rm4bAdF
+         tqa0qsPfZytGp48nNpgayH7OzZ17XRVVIGO9gsdChID6Khnzuva4cGD2kuef6z0MytSu
+         UFLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782650208; x=1783255008;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vzP5f4zYs9UEe0wmc6361FiYfWw38ZSqAfPCOvm2SFQ=;
-        b=duf/Qvgw5b1b2mchAK0G8DyTaibGm84CiM6ePrx2Wsrv5UbrHPy9QDgwsanPfjhSGX
-         SChR8y42AUenoFPKlm1Fo+Swe2u4d/INqN32eTA3BwA4FnGE1iGFirKu5kZ8RM0PSI6g
-         Dp1zXYf1/ggR/N+0AUU98KdraFlfFhL91gJsS1itRYQnVn2UPAPHefpADlqODmrBgZZ4
-         J4+BGmJCZ7AN4Cu+vJfEl6hPgm1VvyoA6ELWMNqTO8t3RKkrbwLARAFyc7RhyrJLl1Nd
-         BzDZ894x+hP6YEXU4nLsriT9PjS8dfVkrL7ctcfnYyT5u56qdfLKzpVlefvhrqrHRsiw
-         JA1g==
-X-Forwarded-Encrypted: i=1; AHgh+RocTN+v3E7cKAR+zT88LJcIW9N19kqwLUgAMejCn7WVeZb3emSirQIV9BYAOi3GY56yOgv5XQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLmLbripI8Bxi3ju1GOimi1pcMBvqiWZEPlxKGsqy1EI9x+opU
-	vfvDbNGQQd/qByh4rERUJQ79AJSvuTWFRvK+zqKsOvqA4YJC/KsXDp71Yitnn9ctV7ymxg+McTS
-	5roOVyMsbQDEHwhcVLuwYRzgDwWrFvP7k4ZgpOfCKFtsEbWRx7iE=
-X-Gm-Gg: AfdE7cmaaUOEDMdORkoBLYxBv+jvAhffQsBar88uBHCfAazIOTpgOS2AKdON9+qFbC/
-	P1laZOuBR3668gV0eCcQOv+lTqQGl1shWokqBHUeMD1OxSyed4XzKKHzmIluwZzgzwcziXDYh0E
-	pk2OhZU/nApMZZUys0Sj3h6zt+T5IJj0FazA3OGdJ8oYyNXc20v8yAhMURMFMwY9E9TyNIMgee3
-	GKoPuO32uL0yE4HObzlIaAsQaSXCks6YPo9EYLOFHcWUWmMaDJu9incPFlTYPkmXkijQXKLIw2v
-	FEq7jRSm
-X-Received: by 2002:a05:690e:4508:10b0:660:5e32:b2a2 with SMTP id
- 956f58d0204a3-66487e08811mr8856149d50.49.1782650207987; Sun, 28 Jun 2026
- 05:36:47 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782650669; x=1783255469;
+        h=message-id:to:cc:subject:date:mime-version
+         :content-transfer-encoding:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Z/PKxXDyIAMOlaR096tTQhy4xjIPnfe/Wjks8AZRapc=;
+        b=U4b13QQHun65GhkricgslWojuf4RjAcqR+IJX1b+JVrGmv381LEg7xC5nU9+T0i3sp
+         MNJLX7BNAzToBECYLoITCKHavRURxFROzIGVV4pwIkWrd+AZk4DYJrAqX6QhiOJXiBr/
+         FpMGxUZ2jcBxvNCoQmVQIkKtHZoNm2OVVh9NzdawlEdS5DAcOtuW+HE6/1Ok1YuWMKrV
+         SEJAp554VfpJlEf52/iYdrEau3ofzStYHdXZxVomcGMo9DCtLQIGkGIrJvHIACZzWMqL
+         8QGqEDqHpk9JPNMNq2zSLlL+9lzYQ6U4BMIklCHWXPLqvJrksSJLT8yPo+Ht7AY0LGgl
+         wKHg==
+X-Gm-Message-State: AOJu0YyTh/xDi85S7WoI0d3LRS9haKkwV2kQjcQdbbaTckefg5it+o3G
+	prG5B1Kab3mXnHcJ9ey/YUl+U/VUHBr/KWbRyjZMhTURVw9GKs6sgMHzhJzI7YE7whCg3tPfIjW
+	UjS5MeN1We6bc
+X-Gm-Gg: AfdE7clYwVqr3iqBCbzpGG2Q/2ArcVu5kAaIDSEUT8cqunQS8noDG8H20niPm/NMwNB
+	MvToLsG1UgifCPstxDxgC5BrKGlqIMaEJ8sfcgmKmDis/gaAw+CBSOr+bfjiki/9FxzevjkPA9r
+	bQT0WFxdSiDhs20XGWDWCskWyTvj17R9JHDpmjNXzxCaEuTBkgtoK8ibXVB53Hhu3YAVfCO4+xi
+	4yZGE8H2EhLeCiUWc61097Yip2GcN1OcLoERH9BU1kFSuA0vVpW0KAmRS0HYXX5sy1eY/43uCp9
+	Al4RC7peGznhGtmLBUfTtnWKH/k+dyX0ntovdF3MfUcYwOqwxDtyvAknCSSWbJptIq04LM1CSIw
+	2cdnIKnFbaAFdbdm6vTq5rp3FjtcTnwZ2fRq/7rUSDuH1GuaZV54IQ3kPh01BtghBLNMt+DDZDW
+	AXE1dRn1/6+ovXJUO+IPDVm1u/YFA4ax7hILit0llJop+U224d3dAoDbOiMrTF1Zs5qrdZuAY=
+X-Received: by 2002:a17:907:720a:b0:c12:5a0e:3e0 with SMTP id a640c23a62f3a-c125a0e0aacmr87293766b.19.1782650669201;
+        Sun, 28 Jun 2026 05:44:29 -0700 (PDT)
+Received: from smtpclient.apple (83.10.35.68.ipv4.supernova.orange.pl. [83.10.35.68])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c11fbc2c6a9sm625534066b.28.2026.06.28.05.44.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 28 Jun 2026 05:44:28 -0700 (PDT)
+From: Norbert Szetei <norbert@doyensec.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260626165156.169012-1-jhs@mojatatu.com> <20260626165156.169012-4-jhs@mojatatu.com>
- <20260627165220.CA0CD1F000E9@smtp.kernel.org>
-In-Reply-To: <20260627165220.CA0CD1F000E9@smtp.kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 28 Jun 2026 08:36:36 -0400
-X-Gm-Features: AVVi8CcMk-OTbWtGzb65ms48PIO_Ru3oLcwHNHpBqSVb0aZgtGM3z9o_xVpkdK0
-Message-ID: <CAM0EoM=Sm82LdxrX-tckyxyGbNOawQ0DAXnEPowgyYVZbx=vqw@mail.gmail.com>
-Subject: Re: [PATCH net 3/3] selftests/tc-testing: Verify bpf redirect on RED
- block with preceding clsact (egress) classifier
-To: sashiko-reviews@lists.linux.dev
-Cc: bpf@vger.kernel.org, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Victor Nogueira <victor@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
+Date: Sun, 28 Jun 2026 14:44:16 +0200
+Subject: [PATCH net] ppp: fix use-after-free reads in the stats ioctls.
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ linux-ppp@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+To: netdev@vger.kernel.org
+Message-Id: <CF6F0CC7-C448-406B-8E24-2025AD585D18@doyensec.com>
+X-Mailer: Apple Mail (2.3826.700.81.1.4)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[doyensec.com,none];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[doyensec.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sashiko-reviews@lists.linux.dev,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:victor@mojatatu.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302392-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302393-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[norbert@doyensec.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-ppp@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[doyensec.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[norbert@doyensec.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:from_mime,sashiko.dev:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A15826D3CFF
+X-Rspamd-Queue-Id: 639EB6D3D4E
 
-On Sat, Jun 27, 2026 at 12:52=E2=80=AFPM <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Medium] Hardcoded BPF object path 'action-ebpf' instead of using '$EBP=
-FDIR/action-ebpf'.
-> --
->
-> commit f4ff308069725bd7a3b6c6f843ecb0fda5b73239
-> Author: Victor Nogueira <victor@mojatatu.com>
->
-> selftests/tc-testing: Verify bpf redirect on RED block with preceding cls=
-act (egress) classifier
->
-> This commit adds a test case to reproduce a NULL pointer dereference when=
- a
-> bpf filter attached to a RED block (which uses shared blocks) returns
-> TC_ACT_REDIRECT while a preceding clsact egress classifier is present. Th=
-e
-> issue stems from a stack-allocated bpf_net_context being torn down before
-> tcf_qevent_handle() calls skb_do_redirect().
->
-> > diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.j=
-son b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-> > index a1f97a4b606e8..762f86ceab1cd 100644
-> > --- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-> > +++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-> [ ... ]
-> > @@ -1540,5 +1540,37 @@
-> [ ... ]
-> > +    {
-> > +        "id": "fb8d",
-> > +        "name": "Verify bpf redirect on RED block with preceding clsac=
-t (egress) classifier",
-> > +        "category": [
-> > +            "qdisc",
-> > +            "red",
-> > +            "qevent",
-> > +            "clsact"
-> > +        ],
-> > +        "plugins": {
-> > +            "requires": "nsPlugin"
-> > +        },
-> > +        "setup": [
-> > +            "$IP addr add 10.10.10.1/24 dev $DUMMY",
-> > +            "$IP neigh add 10.10.10.2 lladdr 02:00:00:00:00:01 dev $DU=
-MMY nud permanent",
-> > +            "$TC qdisc add dev $DUMMY handle 1: root tbf rate 1Mbit bu=
-rst 10K limit 1M",
-> > +            "$TC qdisc add dev $DUMMY parent 1:1 handle 11: red limit =
-1M avpkt 1400 probability 1 burst 38 harddrop min 30000 max 30001 qevent ea=
-rly_drop block 10",
-> > +            "$TC qdisc add dev $DUMMY clsact",
-> > +            "$TC filter add dev $DUMMY egress protocol ip prio 1 match=
-all action gact pass",
-> > +            "$TC filter add block 10 protocol ip prio 1 matchall actio=
-n bpf obj action-ebpf sec action-redirect"
->
-> [Severity: Medium]
-> In the setup block for "Verify bpf redirect on RED block with preceding c=
-lsact
-> (egress) classifier", will this test fail with a file-not-found error whe=
-n
-> the tdc.py runner is executed in an out-of-tree build environment or with=
- a
-> customized $EBPFDIR?
->
-> Should this path be updated to use $EBPFDIR/action-ebpf instead of the
-> hardcoded action-ebpf so it aligns with other tests in the suite and find=
-s
-> the BPF object correctly?
+ppp_get_stats() (SIOCGPPPSTATS) and the SIOCGPPPCSTATS handler, both
+reached from ppp_net_siocdevprivate(), dereference state that other
+ioctls free under the ppp lock, without taking it:
 
-The $EBPFDIR issue seems to be legit. Victor?
+  - ppp_get_stats() reads ppp->vj; PPPIOCSMAXCID frees it with
+    slhc_free() under ppp_lock().
+  - SIOCGPPPCSTATS calls ->comp_stat()/->decomp_stat() on
+    ppp->xc_state / ppp->rc_state; PPPIOCSCOMPRESS and ppp_ccp_closed()
+    free those.
 
-cheers,
-jamal
+A concurrent stats ioctl can then read freed memory (slab-use-after-
+free), and the freed contents are copied back to userspace. This is=20
+reachable by a local user who has CAP_NET_ADMIN privileges and=20
+read/write access to /dev/ppp.
 
-> > +        ],
-> > +        "cmdUnderTest": "bash -c 'data=3D$(head -c 1400 /dev/zero | tr=
- \"\\0\" \"x\"); exec 3>/dev/udp/10.10.10.2/12345; for i in $(seq 1 8000); =
-do printf \"%s\" \"$data\" >&3; done; exit 0'",
-> [ ... ]
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260626165156.16=
-9012-1-jhs@mojatatu.com?part=3D3
+Take the lock the freeing path holds around each access: the receive
+lock in ppp_get_stats() (PPPIOCSMAXCID frees ppp->vj under ppp_lock(),
+which includes it) and ppp_lock() around the SIOCGPPPCSTATS callbacks.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Norbert Szetei <norbert@doyensec.com>
+---
+ drivers/net/ppp/ppp_generic.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ppp/ppp_generic.c =
+b/drivers/net/ppp/ppp_generic.c
+index 57c68efa5ff8..847c5e1793c8 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -1505,10 +1505,13 @@ ppp_net_siocdevprivate(struct net_device *dev, =
+struct ifreq *ifr,
+
+ 	case SIOCGPPPCSTATS:
+ 		memset(&cstats, 0, sizeof(cstats));
++		/* protect against PPPIOCSCOMPRESS/ppp_ccp_closed() =
+freeing the state */
++		ppp_lock(ppp);
+ 		if (ppp->xc_state)
+ 			ppp->xcomp->comp_stat(ppp->xc_state, &cstats.c);
+ 		if (ppp->rc_state)
+ 			ppp->rcomp->decomp_stat(ppp->rc_state, =
+&cstats.d);
++		ppp_unlock(ppp);
+ 		if (copy_to_user(addr, &cstats, sizeof(cstats)))
+ 			break;
+ 		err =3D 0;
+@@ -3303,7 +3306,7 @@ find_compressor(int type)
+ static void
+ ppp_get_stats(struct ppp *ppp, struct ppp_stats *st)
+ {
+-	struct slcompress *vj =3D ppp->vj;
++	struct slcompress *vj;
+ 	int cpu;
+
+ 	memset(st, 0, sizeof(*st));
+@@ -3323,8 +3326,14 @@ ppp_get_stats(struct ppp *ppp, struct ppp_stats =
+*st)
+ 	}
+ 	st->p.ppp_ierrors =3D ppp->dev->stats.rx_errors;
+ 	st->p.ppp_oerrors =3D ppp->dev->stats.tx_errors;
+-	if (!vj)
++
++	/* protect against PPPIOCSMAXCID freeing ppp->vj */
++	ppp_recv_lock(ppp);
++	vj =3D ppp->vj;
++	if (!vj) {
++		ppp_recv_unlock(ppp);
+ 		return;
++	}
+ 	st->vj.vjs_packets =3D vj->sls_o_compressed + =
+vj->sls_o_uncompressed;
+ 	st->vj.vjs_compressed =3D vj->sls_o_compressed;
+ 	st->vj.vjs_searches =3D vj->sls_o_searches;
+@@ -3333,6 +3342,7 @@ ppp_get_stats(struct ppp *ppp, struct ppp_stats =
+*st)
+ 	st->vj.vjs_tossed =3D vj->sls_i_tossed;
+ 	st->vj.vjs_uncompressedin =3D vj->sls_i_uncompressed;
+ 	st->vj.vjs_compressedin =3D vj->sls_i_compressed;
++	ppp_recv_unlock(ppp);
+ }
+
+ /*
+--
+2.54.0=
 
