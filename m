@@ -1,179 +1,139 @@
-Return-Path: <netdev+bounces-302402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4KP6FDpLQWrYnAkAu9opvQ
-	(envelope-from <netdev+bounces-302402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 18:26:34 +0200
+	id PpdIKahOQWqwnQkAu9opvQ
+	(envelope-from <netdev+bounces-302403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 18:41:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD0EB6D45E8
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 18:26:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87DE96D469C
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 18:41:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JKL0oaxE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302402-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302402-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=OrimP6fT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302403-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302403-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6D8830078E7
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 16:26:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1C9583003804
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 16:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285DB279DB1;
-	Sun, 28 Jun 2026 16:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FD42D8376;
+	Sun, 28 Jun 2026 16:41:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AD72459EA
-	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 16:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEAF2D592D;
+	Sun, 28 Jun 2026 16:41:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782663961; cv=none; b=Ysl8Fhc/p6tKW2TYmPpB3uac8E7Rz/6RfURy6w3jCYGFQwSgb1ITGPVYTLRyCpzY3Qa0SxGH7bUv3F/w61hZo2PSzn8n8livB4SzJ9qxJNNAprW7rj2vqwnamj5TJuBQ/RFzZG1CDbe0WQOZ2ufi3G9balbHQRUggynLnThUKe8=
+	t=1782664865; cv=none; b=mvR2MYrQm1oc3jV5MIq2qnpxdyux1JC36a9oRxgghrDyFoCrHeqk3eUXkAUeBFkMZCndMqCYV9wWyuVKYAiiuZ3B62jOk1YfkJcgYMZLfY+VB15pepONVOO/IG60ynzQm+QVu77V64wMHphGdNwSja+huzX4LzmtBT07dYsWmv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782663961; c=relaxed/simple;
-	bh=g2UA5Nh4NURnQU5YTpPXu2g0qAmphQXzC4iKtTM9Trg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YtP1OQu/jc4vIPitiJz8ei/4v9MYCVsA8FrgqgLw1MwC3J7p8rpYBVte0+oKHHhd6+ozhK5l0t/6dg9SQb0/XOzwo/GJr9d0BDoOUFo+S0KBbyMQpM96rdTUJtnHaO/3OAaUot2SVsngPbZ5O/oh7y8RWPharz1tgIGhe71glSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKL0oaxE; arc=none smtp.client-ip=209.85.128.170
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-80bb578d58bso19969277b3.0
-        for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 09:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782663958; x=1783268758; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7van/FF1WCavCF+DOAc6ZN9nL2beTOurDM/vGTwpdMI=;
-        b=JKL0oaxEiINbu1DR3+UgnHxBeii6/FkKYzrTKvU22+fk/ChTSA9jy4eXhj4jc7Gpg2
-         w8iShpVkpWTw+VJMXd0bvzw1dac5s7uJYNjwhJR+yvxqbkEyzYHPLZcoX1vIyHvL0qM5
-         Zeqz+0XIHZNyMZA/4gNAJx/ufqauTdTSGhhqWaVmEyjCoazpVp6NYmlgdlN2N7egKt12
-         Bz6kccKKyd7hXyyOiMlBPGb5hSfPRnYntMwytSBFoXanRyeFCutJJyep1DeqmHIS45St
-         MHvDrxjk5Qox3p+bJl9ydS8yzcYjbQZs7sVmlLS0vuZoiB32n6o196YZ2/3IxHWBjoQX
-         itrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782663958; x=1783268758;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7van/FF1WCavCF+DOAc6ZN9nL2beTOurDM/vGTwpdMI=;
-        b=ZDsZB+OcgsbXKc7VEhmE4YPbWM7HHfo7a2bXJWez0tHUPHqA7BwXAzg1YYZxvTDNpu
-         lTtwCSQK7yYqbQppltRYFYPUr8xmKOMF6kSl7bN2sMdWPot9h4c6Td67Z5y+irsd3INO
-         77nPnKZRUsKKbj4ZOPU9JLE44TKkKeLXPaZ8uexcXxVK1oRotgSZsyNWiGUvZoePqa92
-         ZZ4v2IXDu9OTT39MNiwjtNtvLLFUqsJhN4z7AtEhNozlzaAdLASTiDsqB3EIh1+lgMin
-         Y29ioRo/D++b9FTnpARv/43HxqLlWnGxhmbFz68UyR61scivr6RmxOLOJ8L4FjzNvWrQ
-         yQEg==
-X-Forwarded-Encrypted: i=1; AHgh+Rppa0TOfmhzjZcnqe1BTAZ3AipMNYp+cv5Z5iZa7umKh/rl6zCwXdp2Rnv7seRW1Z0z99pkAjA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx3hpqsZvG4rhy6ICOg2JKzqPFM4UQiXV8aHJiG6IW4M+TNSWR
-	xJpWHqZwuOkH4A4R8YPMH5iSCX9WEruSYc0wz9UAuCuIy6XppgXoki6F
-X-Gm-Gg: AfdE7cmku2DNqK9yCMU50h4s8Z6ezVbXJ2vrN1SO3tzDTomNdVf3mboskxIVxbyGkJ7
-	74f1BJMvMSejedVhlV97mP2jZA+dIGcNQvp0zh85ejLsiWByKOFhh9jm3diwoj59aGlFZVYSz6U
-	K6lbBHdQFvB17t7R/+jHC/8V9gwTS804oVtHPS+eHoRICz5IqDEZ+CLksspsPHqETwYSY2dWUJJ
-	NyEjHRSb+s9KjM5L0Fb4w6hVBYa79QyQE156DYEbmv90TusGFYTcPaI5ipNkp8w4EyxMcAxnfOI
-	bPJvubEkQNhjRT49zzwidmtV+15QV/jGLdtsSOmcjpDrOx/zOAPlIGVDTGvQW7DxaJ5r8WUQyqn
-	0lGL9GnOn3R0yYRIgpgoeJZklCzjw1H3p5s2QevZ0pkuW6oAztRMFxn9VkMgtv9Kn0hWP29fzAn
-	NimuVUo8E+TTsdgY0uYrMukn8skQ==
-X-Received: by 2002:a05:690c:6185:b0:80c:85b6:764a with SMTP id 00721157ae682-80c85b69188mr75232687b3.63.1782663958305;
-        Sun, 28 Jun 2026 09:25:58 -0700 (PDT)
-Received: from Dev-Null-MSI ([2a0d:3344:52ac:a808:98a4:4381:be45:536f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-80259d20d84sm106446247b3.0.2026.06.28.09.25.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jun 2026 09:25:57 -0700 (PDT)
-From: Yousef Alhouseen <alhouseenyousef@gmail.com>
-To: Petko Manolov <petkan@nucleusys.com>,
+	s=arc-20240116; t=1782664865; c=relaxed/simple;
+	bh=LSCUwICUqCuV2GVZLI+GD5iR/lyWdJWr3Z3gQRwcJQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LMwrPNleX60uWYbQQg2qerOFbalLrDOnR6BzHTqVvOwyYVOkkC0LvuWeeMB4oL8E+vs7CocKZsGFL3CblJKMscwMA9ATOhziDyseuRdkaeON5bn+KzBKdut9DhGAPg3d9v4P8AoO+h8YQ0qpxTIG4cYDQT090DtUfWc3fRFEN5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OrimP6fT; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=m/ThfnCA53xsojiK3CDkKqyB+7t20zZEYIXw4BzuvDA=; b=OrimP6fTdz343iL+WTwQ1+rjCS
+	8uCXcEObsyaEJ4tFo7UPjtXRtkVAYWq1eDAKvM8AF8AIJmJSpt4TkO+0RA2DuU9/UPsi3xqtDFmIS
+	3LdR6BjtQnk4UeM5HvJLK+tzAQzoBF1tsUg6jeFMwsPxo283gnklZmrBGmmIqv1kDWaA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wdsYo-009cMG-T7; Sun, 28 Jun 2026 18:40:46 +0200
+Date: Sun, 28 Jun 2026 18:40:46 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yousef Alhouseen <alhouseenyousef@gmail.com>
+Cc: Petko Manolov <petkan@nucleusys.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com,
-	Yousef Alhouseen <alhouseenyousef@gmail.com>
-Subject: [PATCH v2] net: usb: rtl8150: handle link status read failures
-Date: Sun, 28 Jun 2026 18:25:28 +0200
-Message-ID: <20260628162528.8273-1-alhouseenyousef@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260628151835.GC14404@carbon.k.g>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] net: usb: rtl8150: handle link status read failures
+Message-ID: <31402931-dd4f-4dda-9637-2880350101d7@lunn.ch>
 References: <20260628151835.GC14404@carbon.k.g>
+ <20260628162528.8273-1-alhouseenyousef@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260628162528.8273-1-alhouseenyousef@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302402-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,syzkaller.appspotmail.com,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:alhouseenyousef@gmail.com,m:petkan@nucleusys.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302403-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:petkan@nucleusys.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com,m:alhouseenyousef@gmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,9db6c624635564ad813c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,syzkaller.appspot.com:url,appspotmail.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CD0EB6D45E8
+X-Rspamd-Queue-Id: 87DE96D469C
 
-set_carrier() ignores the result of the USB control transfer and tests
-the stack variable supplied as its receive buffer. If the device rejects
-or aborts the request, that variable remains uninitialized and the driver
-chooses an arbitrary carrier state.
+On Sun, Jun 28, 2026 at 06:25:28PM +0200, Yousef Alhouseen wrote:
+> set_carrier() ignores the result of the USB control transfer and tests
+> the stack variable supplied as its receive buffer. If the device rejects
+> or aborts the request, that variable remains uninitialized and the driver
+> chooses an arbitrary carrier state.
+> 
+> Leave the existing carrier state unchanged when the link status cannot be
+> read. A transient USB error should not be treated as link loss.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=9db6c624635564ad813c
+> Cc: stable@vger.kernel.org
 
-Leave the existing carrier state unchanged when the link status cannot be
-read. A transient USB error should not be treated as link loss.
+https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=9db6c624635564ad813c
-Cc: stable@vger.kernel.org
-Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
+Does this issue bother people?
+
+I think it would be better to submit to net-next:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Please don't thread patch versions together.
+
+Also, a Suggested-by: might be appropriate here.
+
+    Andrew
+
 ---
- drivers/net/usb/rtl8150.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index c880c95c41a5..d51e43170e03 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -732,7 +732,9 @@ static void set_carrier(struct net_device *netdev)
- 	rtl8150_t *dev = netdev_priv(netdev);
- 	short tmp;
- 
--	get_registers(dev, CSCR, 2, &tmp);
-+	if (get_registers(dev, CSCR, 2, &tmp))
-+		return;
-+
- 	if (tmp & CSCR_LINK_STATUS)
- 		netif_carrier_on(netdev);
- 	else
--- 
-2.54.0
-
+pw-bot: cr
 
