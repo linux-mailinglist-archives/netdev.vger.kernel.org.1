@@ -1,224 +1,144 @@
-Return-Path: <netdev+bounces-302423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302424-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aDohGQ6ZQWrjsQkAu9opvQ
-	(envelope-from <netdev+bounces-302423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:58:38 +0200
+	id ORjdCz+ZQWrnsQkAu9opvQ
+	(envelope-from <netdev+bounces-302424-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:59:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37C76D50DB
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:58:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76CAD6D50E9
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:59:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b="KDBA2/oA";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302423-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302423-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
+	dkim=pass header.d=rbox.co header.s=selector2 header.b=OIP5T3+J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302424-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302424-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=rbox.co;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9507300901F
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 21:58:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ADFE1300B9E3
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 21:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875B63B95F2;
-	Sun, 28 Jun 2026 21:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C863B8BC1;
+	Sun, 28 Jun 2026 21:59:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B9739023A
-	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 21:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE65348C47;
+	Sun, 28 Jun 2026 21:59:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782683916; cv=none; b=EYKfGagf204TTOfEnnpe9dC88snGroZeGuQHSO+Y+FGnOTPmm7Y+hSqmbhdreYYuoB+GYjF5lpIPVfDDMu3Zthj9UtgEMt8ALywCE3zTm0A7smOK3Hp8cV9VKO0UmXHHa+h3AjWHxxnwDJDuXtEQ0hdaPSh13hoIiBFmNd6ELjg=
+	t=1782683961; cv=none; b=pBIJMjU63IGD9nrdfnRdinEf9Bl4/u75HvgoGhxRGyKU65hrDCmWCea1M9TTgZ+r4/Ngyxk2EUycK7r1PYwYVNGpbnfvBu0A3g8OlPuFz0FVcuI9HpybAs6uuW5INwtyi39x5YyA/Z5YS7OXTVDmrlI6wfUSAooe6D1obtn8v0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782683916; c=relaxed/simple;
-	bh=vrWnXwOBEFqvQMci/AIv280VxVOyotUsQO0ClKkqswE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GkD5G6sfxLPnKK1VREwDJBIkEsmKYMx+NBXKf1X6hTppECwMGhjwOJm5/Vuz9DvQK9X7/UFWNQm8fC8goa/GKo8ShhgcMss0shY3ZYt2ApjcSwgfQVOfTqfywhGLP41EyqxM+08vdm+CcFa9EQaAl5conh6+U7RX8QZ4NLnUJu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=KDBA2/oA; arc=none smtp.client-ip=74.125.82.41
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1397e093f90so4522108c88.1
-        for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 14:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1782683913; x=1783288713; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lP1y4sy5xHQwRNPg5YoRcLSpRVU19u5JDLJN4zIGwjg=;
-        b=KDBA2/oA7FhNjQ8c5GAKIOX1keC6d4YTloDBTOik5iUFDGyjyeK7nQVfr+JnEAndO4
-         63M1+WFDskj5snQ82fLvmEWgHsbZFeTzkGBRCX4rpWsDsu2K/GmntDi92QNLje1cRdAL
-         EJFryZYwWOWs9syyPkC9lg2Fnf+7q3p65tAbxLknD06lV23bCU25eVlHhZXq2GkX51Xz
-         NeeOMPQiLAPP8HC0M3SSw86ohtFaEWeMBZG/IBm5QZ+dNvM3wbfBdLd7mFeBNVVmrO7m
-         367IPeOYVJM/+007dRpR47R+BYBefEZ2dYT3D7iNNW2ninQM//zdtOnT8FuG9CDEaPxf
-         Nyzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782683913; x=1783288713;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lP1y4sy5xHQwRNPg5YoRcLSpRVU19u5JDLJN4zIGwjg=;
-        b=HbZHeVuw/UonoV/dZ2OPLkPYmzZLNDvWvwfCAR+EsbD4XVo7jeyOpvpPFY88GCzzxS
-         sfeUOSHyQYiIosYYL1k4PeDnEGtliuctZlA3qOatt7cuK81PysRgnvnACZYdsnN80jLi
-         FkaSrtzE9MxA3o9mdaEUpA+Ww6sWfOvMSrYRS5PKW/HMI8JRionbIMWsWrs/Hjiou4E4
-         u7km0gs8hRrKGzNHXSHtG20XuLUSTt0dimi6+B+uEOHlipGLmiheKcxBNJD0ejQwaLrX
-         RW7fQUy6j3k4jo+0zE50IA6KT3dZDgDfwCN2da1lEOY5O8/EPOWlgi8w+gLnYkRMnzbO
-         SI5A==
-X-Gm-Message-State: AOJu0YzVqpBLHWfWo1/vd3/A9AS0aBA5G9OiGRXZRQxj0Sef9EpqOyXJ
-	kqZij8MtYprlvelB4uneigWUneiOTenaaReWNyg6kX4IRaFy9KTgg3qhsIbD6Kj3PoDsnZHtHOl
-	RfXGQ
-X-Gm-Gg: AfdE7ckesAnX2mQdL6haYfchjDqphY7EsN3gaWqGl9IAHO0T5T6JEpMyt++ubFz53gh
-	YITjMna7uM/o2/nS11xif+90WitiRsMGfbhdm5sc17/OiELvaQ0DPHrU1nB4ovDpT1P1bAE/RU+
-	tN5i7TkR0gBGKRVusS5oCPZJFJVkJIftbDZsxLsNtWBepeJ/FGtmmf7Kgd1WXfAqqQZyafxl5iC
-	K+i5a2xY00vXpvRJa1+BkWzui8VkbGbj3MxUtz5RW8CrLdYgjw55PeOlmmMAsgKiFH8rDhYfzFK
-	AbU+JIsZmiEFFy+Amv2LwVAmuBJV+qt2qvSEo2idAjy03LJk8XNIbx5DXQbjcW9sqhp2TC9HifP
-	5MH1hKGr0ZykaDv51bRGM4OYDFxdCSfwrsaICCt6OfUrZHV7fQannVC7h6pzS6AKA+KUciKxhD/
-	gOE6BVg7uIcyzkDMyJJxI3YVxozQUMH2VeWx5sNwhPKWU0P7rXxEY=
-X-Received: by 2002:a05:7022:6298:b0:139:f3cd:22a2 with SMTP id a92af1059eb24-139f3cd251cmr4550650c88.44.1782683912885;
-        Sun, 28 Jun 2026 14:58:32 -0700 (PDT)
-Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139d91006bcsm40753503c88.13.2026.06.28.14.58.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jun 2026 14:58:32 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2] man: fix troff warnings and whitespace
-Date: Sun, 28 Jun 2026 14:58:02 -0700
-Message-ID: <20260628215830.379088-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1782683961; c=relaxed/simple;
+	bh=ANvYV3bj+Y4afWXCh7EYSGpmbUPz6qEbChgwaakvHt8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WwnXXSyNfu2/qB77Odk4tux0VsGhXTo1zh17gyaOm2yOb3lhT9acjXeUZg9Dm+Og6FEoZcVS//7VK7fAf859vNs6evBuuzqTn0CwJvSmGrhp0lsWpDxMoEpq3uJWU4qpDRU1EoG619+TLUj5M4zddozqO/lxE5o3rNBEvOl3iFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=OIP5T3+J; arc=none smtp.client-ip=185.226.149.38
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1wdxWq-001ZLo-Kn; Sun, 28 Jun 2026 23:59:04 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=YPw84bxPaC1tOS8Jb9NaP4dSqs1KHqksSKnTohhbvZE=; b=OIP5T3+JAnIfc9UzzXT5hJA1Bt
+	BCDcflZLTMOHo9fq2CZDMqy+CHCMYgHDEnMJZjDQigmgxhOCT1BTmsQi3DJaaFCTpcuEg7eZrmJCU
+	71ThnihZG7mp6lR//Rto5AqDFsZD5B9peOno+G326PxVrPWagWzb5qQusEydPxuXyTjybhUrHoG0Z
+	a737li/PfGAnAj3fk/Hn4k138wR2Daq9Svs+/b06aRS08eX3s2lVdONYvN9QODnswIsYlhIquzyc8
+	ErM0KedoLQik3KfpDCGlm8koaCbiVfLHM+3RtR1DxgzjdfI64/d0t8uH2VpTRYIFOqq9p5yLYg7rv
+	jw99QK+Q==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1wdxWp-0005zI-Ft; Sun, 28 Jun 2026 23:59:03 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.95)
+	id 1wdxWn-00DOhE-Cl;
+	Sun, 28 Jun 2026 23:59:01 +0200
+Message-ID: <a5615598-9740-4bda-8ace-e6704b97d17b@rbox.co>
+Date: Sun, 28 Jun 2026 23:58:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH bpf v2 2/4] selftests/bpf: Ensure UDP sockets are bound
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Jiayuan Chen
+ <jiayuan.chen@linux.dev>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Cong Wang <cong.wang@bytedance.com>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
+ Emil Tsalapatis <emil@etsalapatis.com>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co>
+ <20260626-sockmap-lookup-udp-leak-v2-2-7e7e201c951a@rbox.co>
+ <CAAVpQUCGpSWuei+cX9LL1WG=-14_FJU75G2njvvWCugsSMWDqQ@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <CAAVpQUCGpSWuei+cX9LL1WG=-14_FJU75G2njvvWCugsSMWDqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,gmail.com,cloudflare.com,linux.dev,davemloft.net,kernel.org,bytedance.com,iogearbox.net,etsalapatis.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302424-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:edumazet@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:ast@kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:stephen@networkplumber.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302423-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[rbox.co:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D37C76D50DB
+X-Rspamd-Queue-Id: 76CAD6D50E9
 
-Fix troff warnings about line breaks around URL's.
-Remove unnecessary whitespace at end of line.
+On 6/26/26 22:47, Kuniyuki Iwashima wrote:
+> On Fri, Jun 26, 2026 at 1:37 PM Michal Luczaj <mhal@rbox.co> wrote:
+>>
+>> Update sockmap_basic tests to bind sockets before they are used. This
+>> accommodates the recent change in sockmap that rejects unbound UDP sockets.
+>>
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> 
+> nit: this should be patch 1.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- man/man8/ip-link.8.in  | 5 ++++-
- man/man8/tc-flower.8   | 2 --
- man/man8/tc-fq_codel.8 | 2 +-
- man/man8/tc-netem.8    | 4 ++++
- man/man8/tc-red.8      | 6 +++++-
- 5 files changed, 14 insertions(+), 5 deletions(-)
+OK, I'll push it up.
 
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index fc7f0248..38f5a13a 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -3071,7 +3071,10 @@ are supported:
- locally terminated traffic for the given DSA switch user port. For a
- description of which network interfaces are suitable for serving as conduit
- interfaces of this user port, please see
--https://docs.kernel.org/networking/dsa/configuration.html#affinity-of-user-ports-to-cpu-ports
-+.nf
-+.UR https://docs.kernel.org/networking/dsa/configuration.html#affinity-of-user-ports-to-cpu-ports
-+.UE
-+.fi
- as well as what is supported by the driver in use.
- 
- .sp
-diff --git a/man/man8/tc-flower.8 b/man/man8/tc-flower.8
-index adde2168..3f8ba465 100644
---- a/man/man8/tc-flower.8
-+++ b/man/man8/tc-flower.8
-@@ -418,8 +418,6 @@ bits is assumed.
- .BI enc_tos " NUMBER"
- .TQ
- .BI enc_ttl " NUMBER"
--.TQ
--.BR
- .TP
- .BI ct_state " CT_STATE"
- .TQ
-diff --git a/man/man8/tc-fq_codel.8 b/man/man8/tc-fq_codel.8
-index 78590636..6ed523c7 100644
---- a/man/man8/tc-fq_codel.8
-+++ b/man/man8/tc-fq_codel.8
-@@ -66,7 +66,7 @@ the local minimum queue delay that packets experience. Default value is 5ms.
- has the same semantics as
- .B codel
- and is used to ensure that the measured minimum delay does not become too stale.
--The minimum delay must be experienced in the last epoch of length 
-+The minimum delay must be experienced in the last epoch of length
- .BR interval .
- It should be set on the order of the worst-case RTT through the bottleneck to
- give endpoints sufficient time to react. Default value is 100ms.
-diff --git a/man/man8/tc-netem.8 b/man/man8/tc-netem.8
-index a4cc0d61..8d608c77 100644
---- a/man/man8/tc-netem.8
-+++ b/man/man8/tc-netem.8
-@@ -383,15 +383,19 @@ A filter classifies all packets going to 65.172.181.4 as being priority 3.
- .IP " 1. " 4
- Hemminger S. , "Network Emulation with NetEm", Open Source Development Lab,
- April 2005
-+.nf
- .UR http://devresources.linux-foundation.org/shemminger/netem/LCA2005_paper.pdf
- .UE
-+.fi
- 
- .IP " 2. " 4
- Salsano S., Ludovici F., Ordine A., "Definition of a general and intuitive loss
- model for packet networks and its implementation in the Netem module in the
- Linux kernel", available at
-+.nf
- .UR http://netgroup.uniroma2.it/NetemCLG
- .UE
-+.fi
- 
- .SH SEE ALSO
- .BR tc (8)
-diff --git a/man/man8/tc-red.8 b/man/man8/tc-red.8
-index 662e4d8b..dd6bc6cf 100644
---- a/man/man8/tc-red.8
-+++ b/man/man8/tc-red.8
-@@ -132,7 +132,11 @@ With this parameter, traffic that should be marked, but is not ECN-capable, is
- enqueued. Without the parameter it is early-dropped.
- .TP
- adaptive
--(Added in linux-3.3) Sets RED in adaptive mode as described in http://icir.org/floyd/papers/adaptiveRed.pdf
-+(Added in linux-3.3) Sets RED in adaptive mode as described in
-+.na
-+.UR http://icir.org/floyd/papers/adaptiveRed.pdf
-+.UE
-+.ad
- .nf
- Goal of Adaptive RED is to make 'probability' dynamic value between 1% and 50% to reach the target average queue :
- .B (max - min) / 2
--- 
-2.53.0
+thanks,
+Michal
 
 
