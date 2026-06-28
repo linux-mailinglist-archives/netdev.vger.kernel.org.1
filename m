@@ -1,140 +1,189 @@
-Return-Path: <netdev+bounces-302418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302419-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GeWQIduLQWo2sAkAu9opvQ
-	(envelope-from <netdev+bounces-302418-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:02:19 +0200
+	id t89uMkGPQWqbsAkAu9opvQ
+	(envelope-from <netdev+bounces-302419-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:16:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FBAF6D4EF8
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:02:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A7E6D4F64
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:16:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=DP3DyreI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302418-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302418-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=R10uOHed;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302419-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302419-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46E92300C91D
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 21:02:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19D22301186B
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 21:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF3635A381;
-	Sun, 28 Jun 2026 21:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E29372B41;
+	Sun, 28 Jun 2026 21:16:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4167261A;
-	Sun, 28 Jun 2026 21:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942692FA0C4
+	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 21:16:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782680536; cv=none; b=bGw4fnwxuFtLGqoLChZpVHmFeaZJ8nn0qQTmBEIAnBruAS9A9kLX6ymSbbBXgoZAkDyDUtCx13ongblKHhx8UY1sFRBZ6W0af1+GfjN1cNNg7qna4z3Fpm3L4FMCcMCIU9hpordwE4i3s4EalJ11wXWrwQRly3V1GHIwgt3GLiM=
+	t=1782681400; cv=none; b=gGY8QIIhgpJU0tU4mQA4QwxTRhmlYa5pnuihssLZqsSJQtCmdRhxbPcqBHu3+jkBQokv4iF+5wSAhY/gsRDUtpHdomZREoiAQt+psp/SFG3UYgAoc52L7wnPoGkQOX9aaSk6wkYXhmFRQnexTDaFU4QnXxzDhUk2wl9x5akklio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782680536; c=relaxed/simple;
-	bh=rfpd3WbPnifSHSfMdfb2ShUhrdTA2HxDq0vn2oqQ3JE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gIIg0Dk8pmib2FULzvMbzqkDfQNwAA60v884rjB0tuVk0/OlavxATxT5CTGYbDgFjrTQFPr5Xgp3EZjc1JqPRJaCtAYMD8vRg/Pl1pZx6n/kTsMtx/ghLNCU59cJQq94Zmmex+pFRVuG9Ajdk3jWjW8QBe8EYdqC7NcnysptiE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DP3DyreI; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UdPVrGBsfiuqpekwBYy0Es3XVPiPzRaFs+oHp2F9b7E=; b=DP3DyreI+7yUlA/LxYAXw/5+Ka
-	U/DI5iIEnr2wYYd20XmdK/lgC8rSXxhEgY03rTeHC5TA1b9aq/9akJGhiXCzS86TEA6pnXsq3zyLW
-	BY9RusdBe82e1w+9VdFFh5fQRQV45zTF/TraxXInApku/4SMj9JYQtb19Hz2CZBKhY/Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wdwdh-009eJ8-6m; Sun, 28 Jun 2026 23:02:05 +0200
-Date: Sun, 28 Jun 2026 23:02:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rafael Passos <rafael@rcpassos.me>
-Cc: Jason@zx2c4.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzbot+9ca7674fa7521a3f1bc2@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Subject: Re: [PATCH] Wireguard: Fix data-race in rx/tx counter
-Message-ID: <aa423184-7465-4bc9-aff4-d3d671beb3c6@lunn.ch>
-References: <DJFTVX3FE7OD.2O8GTO84798T@rcpassos.me>
- <20260628203823.144789-1-rafael@rcpassos.me>
+	s=arc-20240116; t=1782681400; c=relaxed/simple;
+	bh=wq9vbsRd4z1aEUNzFLhJHF4nnkcAgJGHkCTxiXCvGUk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JOpq23fkLZZr6U0wiqV9FrTE0hCjBO4znNt43GcKi+p4jt4KpCS9+dfebdhVD/hPpyDb5l1b7oh34Di6ACWgPkuk9ToOHed3KQI4NiKPCMVlXkwYxRuFP5BobJT8gLmWCBKKoq5+IOEpf3aTtIDn7jhFJqBKTvIsvdde2KG33j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R10uOHed; arc=none smtp.client-ip=209.85.216.51
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-37f816d01e3so1751298a91.2
+        for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 14:16:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782681398; x=1783286198; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=52R9zl6QfbAW5HIolSvFCYHUPFuJm6lr9c2cx/FRyQM=;
+        b=R10uOHedbbWc/3cowbzQqANuxqvAgtfj+9QRkuKyRo3c7GMWy1/nidnwwTiWuad8cd
+         50fKhXFDcZApx7di6vujkazXlndw5i/x6hl50OhFcWfLG3s/yNHf+AS7xC0OFMV8/KFJ
+         5xHU0ErE8y+cEGBxr53NEOJ8IJpiTJKeRatzjKOjz9SOfMgbBux8zM801a/PnF2mghFr
+         D8ke6mZYGVTBaAq28qjME2i5GC0PS6rAw3D0amH5z3EpwyGQdh5tNlm9hl+KXcQqiOJW
+         jNEPOBE45OjlUPIcofFneYFjAOkRJPA4YjJcBSEQV2b8RuRE9et5cJptE/BPLJIGRGz3
+         Enwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782681398; x=1783286198;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=52R9zl6QfbAW5HIolSvFCYHUPFuJm6lr9c2cx/FRyQM=;
+        b=YwbaUo7J+rBs5PN4MgdlbPEToGAWoxKYBr2dPSaj1R255mpJappdZzNDeI4Wer7ZXZ
+         S7nw278/Qv2ZPoHvMe/m3+TwH1X9YPAI/z4EHockaxm/fPOd5wdojY14sZleHGUL1DHy
+         Pm4a0C7eA3wT299HEzjeYCS294Z/YWw33ObcEmU+UnbA2T8ScVljgRSoKSOnOaYCbOHD
+         Fo6d6DxdEb7FCdfSBnYnpfM2QWQtvb0zrQiemFtN91tsxc9g22OQj+v4E7sfaqP+hPS6
+         EXeCPz/IwIG5s5CCdmuhQ8rZHwPbnWGxT8lx2MQDPFcl98jKUzotytURlF+ztZvOaVH5
+         /abQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrT8dmaUHsyoezOIEkm28ctTBC8w6AO3y7lV6IAyLBDfccC/LFlaGHfM3yvZi4CVHDyLDHDghk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXygbDCA0N6FNIBt9QMlElsbNn+rZZibF+jgk/0yIWp+Cn0w/1
+	03VTtajFRZjR9EOVRPCHQJ66H6WE65cjBjBpgHbJVhQo2pj4g/M1OGCG
+X-Gm-Gg: AfdE7cltB7blh6UeTsaI+/RmzWdNcUYzd24EhX2HgA0W/QTYlLJzxuK1M9WjkeyINZ4
+	gLdg2zIO7JfHsiO92OJRUPZbgw3m7vhMj+zbO/2hGnUQa/hV8uNpswsCSPUGSzsvTsDjoNDsrAn
+	uVb/8vB/8ZZY3r1gQkEFyeqQpBe9IgqR98j/IvU4fIMdV3C2ONW8M3RSCCYrZfQqRuaG8elCd5F
+	VveprgfZxRP0KF2L2w4AWoVnklaEZ1wXJ+mqm+AUC69anDuAXrbLaq/Glpehsz9O6X5UYY9E5gD
+	UXVe0Nhki3ucuaGqbMzRXUEcM2KAE7MSxTj2tsbNohzwUfxEV8giFOxWdb78q2A5DB56mwCONjj
+	XMnLeAUAnK85sfdf3S29iBmXPSComyImpY28txt6T/LYE9/ytwGn658WzMv1hYwH3p4mewcerK3
+	czdH5JjkSIXr7pxFZFPkokx/kW7ynaLY0e4tVUdaQm4MFYjbRAB+IF5MjkCCI6oA==
+X-Received: by 2002:a17:90b:5548:b0:37f:ed7e:7e42 with SMTP id 98e67ed59e1d1-37fed7e7f5emr2136383a91.14.1782681397840;
+        Sun, 28 Jun 2026 14:16:37 -0700 (PDT)
+Received: from node ([149.40.62.34])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37fd2bd0e49sm2403592a91.0.2026.06.28.14.16.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jun 2026 14:16:36 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: David Heidelberg <david@ixit.cz>,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	oe-linux-nfc@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] nfc: nci: fix use of uninitialized memory in NFC-DEP general bytes
+Date: Mon, 29 Jun 2026 02:16:27 +0500
+Message-ID: <20260628211627.131617-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260628203823.144789-1-rafael@rcpassos.me>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302418-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302419-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:oe-linux-nfc@lists.linux.dev,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:rafael@rcpassos.me,m:Jason@zx2c4.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzbot+9ca7674fa7521a3f1bc2@syzkaller.appspotmail.com,m:syzkaller-bugs@googlegroups.com,m:wireguard@lists.zx2c4.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[meatuni001@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[meatuni001@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,9ca7674fa7521a3f1bc2];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email,rcpassos.me:email,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8FBAF6D4EF8
+X-Rspamd-Queue-Id: 27A7E6D4F64
 
-On Sun, Jun 28, 2026 at 05:38:23PM -0300, Rafael Passos wrote:
-> fixes data-race in {rx/tx}_bytes counter for wireguard connection.
-> these values were incremented inside a read_lock_bh block, but write
-> protections were missing. making them atomic was the simplest way out.
-> This was found by syzbot with kcsan.
-> 
-> Reported-by: syzbot+9ca7674fa7521a3f1bc2@syzkaller.appspotmail.com
-> Link: https://syzkaller.appspot.com/bug?extid=9ca7674fa7521a3f1bc2
-> Signed-off-by: Rafael Passos <rafael@rcpassos.me>
-> ---
-> 
-> Hi,
-> 
-> I am posting this patch to better ilustrate the discussion.
-> If this is a non-issue, its fine.
-> As I mentioned in the previous email, this issue was reported by syzbot,
-> but I was not able to reproduce it.
-> I am also aware atomic calls may introduce extra cost on older arm cpus.
+nci_store_general_bytes_nfc_dep() derives the length of the NFC-DEP
+general bytes by subtracting the fixed general-bytes offset from the ATR
+length:
 
-Atomics are expensive in general, especially on high CPU count
-systems. 
+  atr_res_len - NFC_ATR_RES_GT_OFFSET   (poll, offset 15)
+  atr_req_len - NFC_ATR_REQ_GT_OFFSET   (listen, offset 14)
 
-Statistic counters tend to be very asymmetric in usage. They are
-incremented frequently, maybe per packet, but reported very
-infrequently, maybe every minute when an SNMP agent reads them. So the
-solution to statistic counters should reflect this. Increment should
-be very cheap, reporting them can be expensive.
+It never checks that the ATR is at least that long.  When a
+RF_INTF_ACTIVATED_NTF reports an ATR shorter than the offset the
+subtraction is negative; because min_t() casts its arguments to __u8 the
+negative value becomes large and is then capped at
+NFC_ATR_RES_GB_MAXSIZE / NFC_ATR_REQ_GB_MAXSIZE.  remote_gb_len is thus
+set to up to 47/48 even though only atr_res_len/atr_req_len bytes of the
+on-stack atr_res/atr_req buffer were copied from the packet, and the
+following memcpy() reads the uninitialized remainder into
+ndev->remote_gb.
 
-There are a few different solutions. Per CPU counters is
-one. u64_stats_sync.h may help.
+Skip storing the general bytes (leaving remote_gb_len at 0) when the ATR
+is shorter than the general-bytes offset.
 
-Please take a look at other drivers doing statistics. This is a solved
-problem, you just need to copy bits of code from somewhere else.
+Fixes: a99903ec4566 ("NFC: NCI: Handle Target mode activation")
+Cc: stable@vger.kernel.org
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+---
+ net/nfc/nci/ntf.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-      Andrew
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index 63aa0a78472b1..802928ca4d51e 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -653,6 +653,9 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
+ 	switch (ntf->activation_rf_tech_and_mode) {
+ 	case NCI_NFC_A_PASSIVE_POLL_MODE:
+ 	case NCI_NFC_F_PASSIVE_POLL_MODE:
++		if (ntf->activation_params.poll_nfc_dep.atr_res_len <
++		    NFC_ATR_RES_GT_OFFSET)
++			break;
+ 		ndev->remote_gb_len = min_t(__u8,
+ 			(ntf->activation_params.poll_nfc_dep.atr_res_len
+ 						- NFC_ATR_RES_GT_OFFSET),
+@@ -665,6 +668,9 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
+ 
+ 	case NCI_NFC_A_PASSIVE_LISTEN_MODE:
+ 	case NCI_NFC_F_PASSIVE_LISTEN_MODE:
++		if (ntf->activation_params.listen_nfc_dep.atr_req_len <
++		    NFC_ATR_REQ_GT_OFFSET)
++			break;
+ 		ndev->remote_gb_len = min_t(__u8,
+ 			(ntf->activation_params.listen_nfc_dep.atr_req_len
+ 						- NFC_ATR_REQ_GT_OFFSET),
+-- 
+2.54.0
+
 
