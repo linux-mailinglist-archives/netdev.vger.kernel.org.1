@@ -1,140 +1,221 @@
-Return-Path: <netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OBd4GsLMQGr2iAkAu9opvQ
-	(envelope-from <netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 09:26:58 +0200
+	id TPJjI2mzQGqPhQkAu9opvQ
+	(envelope-from <netdev+bounces-302379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 07:38:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E74A26D3582
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 09:26:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C3E6D33B2
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 07:38:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=PxQ+6usg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302380-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=SKMB1B5j;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302379-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302379-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F5413005994
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 07:26:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 948C1300678A
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 05:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC739218845;
-	Sun, 28 Jun 2026 07:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CCF317143;
+	Sun, 28 Jun 2026 05:38:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49228.qiye.163.com (mail-m49228.qiye.163.com [45.254.49.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5CF2F872
-	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 07:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0491A26C3BD
+	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 05:38:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782631613; cv=none; b=Df4mTf48pFBFdtvDZBWhajhhnrw6XZ7yCpc0spQTqIYY0lm3+Fj5MoQoBLFQLmHGoYdClkdWNQeGLi6NWt1DgZUUIA4zC2Ylqp41GTOdtbL/DB5vgik7LFRsHB+X0kl2aRZsPJ17MRL26CAHBBdcWGS5WIHuQWnH4pEU3HEJpkg=
+	t=1782625127; cv=none; b=imYMuR8hGcvqgNcnYnKqxRIc6CK4S2AQsAhd1mMkiSKAWRtOE+4cU0eScAUwG133m3u0vfW92vwxDM4YjRdTP/eTBv+9x0FwZES2nY+AFt2/7edFkH0Y9NzJEVEM0xpATZnG1zJgySsQH/z1e0VIRJ7QlizovQ6p5Tgp6lHaUug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782631613; c=relaxed/simple;
-	bh=yns7EYALhF6S1Qn2UCp2deAXK5Ibk5U2WE4Q5prGCGk=;
-	h=Content-Type:Message-ID:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:From:Date; b=XT6vzE9yaojbmvocWTH158GeFwGZ78gHsuOD2pt6rk3y0JEaRrSqxD9h/bf7AcYrZ6Qes4j6uBR+0aQdNESTm8l94vAmotOVibWnk6K2Rz/yQc6AbAtDv7OrDu/Pn67E9Amq5U3WamSNa1kcEYJFe+qFS5nF1lJby23Gt/cQ+dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=PxQ+6usg; arc=none smtp.client-ip=45.254.49.228
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Message-ID: <AFEAtADoKs22QyipHhKwe4op.3.1782623057057.Hmail.220255722@seu.edu.cn>
-To: Jakub Kicinski  <kuba@kernel.org>
-Cc: davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	pabeni <pabeni@redhat.com>, horms <horms@kernel.org>, 
-	leitao <leitao@debian.org>, sashal <sashal@kernel.org>, 
-	bigeasy <bigeasy@linutronix.de>, netdev <netdev@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	"jianhao.xu" <jianhao.xu@seu.edu.cn>
-Subject: =?UTF-8?B?UmU6IFtSRkMgUEFUQ0ggbmV0LW5leHRdIG5ldHBvbGw6IGhvbGQgUkNVIHdoaWxlIHdhbGtpbmcgbmFwaV9saXN0?=
-X-Priority: 3
-X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_WIN_1.64.1
-In-Reply-To: <20260627142105.29f1322c@kernel.org>
-References: <20260627101228.1191586-1-runyu.xiao@seu.edu.cn> <20260627142105.29f1322c@kernel.org>
+	s=arc-20240116; t=1782625127; c=relaxed/simple;
+	bh=9X4NR4faCoAw8gAB6DE6MXzAJt7E9V1scWMVnpmHSlo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WBnHORgyG46qTV1ngKo/2lOn4AfLZH33ac3XXtYX2eAL/3H/lwSr1wPcQRB/iDA5Xr7S9Qm7+cJfNM1HF4GkqlHrcYvDuXiuVUat3xjaYf5c6Cgu9HlofMeprs6JhiL7zitawrrv4Jw/c4CVcivxNXEi74MJ0bqt6VY3Kxpe8m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SKMB1B5j; arc=none smtp.client-ip=209.85.128.41
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-493a97fad2fso1033275e9.0
+        for <netdev@vger.kernel.org>; Sat, 27 Jun 2026 22:38:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782625124; x=1783229924; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DnnBkviPIVGVSUUeDRaGIGK1tCYZppMxJfO/BcaDKK4=;
+        b=SKMB1B5jQIOPU8jwNaIqkPcFJH2XCkdwGE8jdwvvcSCv+sPRQVpHPKKSXU+mNCYsUf
+         A1sRkQgO9vAka36P9b2nxseyGW8nYSH8flgaJpo/GC0mnoOeGjy4knW8RL07odVx7TjZ
+         20Aa7HXMJYW34M5drLv1oceIPL7vCh/Ej7hTAEPP0N73FD73v5np+q6/XA7ddreYxsxq
+         jGcBAMl9Qweu1TZRMBsZHs+fHmexAE3X7Iu3ZeP7HKiy2SlsIoIOULLZesDMBZ7ZM48f
+         2gPtg/TaVYK3pln83oZwZioi2Gj78H4eyBs/H3o1ZgvJs8BpaU4pl1URlMGXjUmsMY07
+         anFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782625124; x=1783229924;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DnnBkviPIVGVSUUeDRaGIGK1tCYZppMxJfO/BcaDKK4=;
+        b=j0yXvNfAye75in8dI04eE5ttwtgmSbC0CIk8qWx89+WjjhU4/JD5t+xYcfL2nWCCzj
+         I021wYFmIRtkm9H1IPG12Bh+EJzrdHJVcFTl4aWQOEOKa/EZvKk86yG+pD9AOtfJyMBE
+         ukdZcAmiMgb2xV/inxqlOOz47nkcV9DiIBRVCZ71oDbQpHT0+7Zy/cP8GKTAL2irj84U
+         LD/k+KzePv7iBfiagFdYc3K2hsi944f3cdc+FXIXE41T3LobpxSzZQIW7OcA9QEDrXaV
+         UrR/LPnaZqOhfrAHBgx862EEvAEXSycJ+xvFnIvGVn5QNdCrFspBKGluuxqTyOyPmwge
+         ziCw==
+X-Forwarded-Encrypted: i=1; AFNElJ9gizjcVKJtLzcggTIFNPUp9k1Fip+9pqavMt1NgeGKutSkok2bpG85Nm11yYHa7cotxgfVtl4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8Fu+/h4rPZLBLlGeo6dIhilfxsK+fin7e/agOdm3zPOQwYPWd
+	+YDaX1mnNJYn3swtgZ+Gpseiy6OIi3q7SgLArO6zjEgwwgWyfEbTzlnN
+X-Gm-Gg: AfdE7cnCVnZbuyJxyAEshp+z9L41KkvSbH7fK6Xw9ETbUr4fmP3H2YeDjG1oDL6GMqW
+	rKoIYV2CcT0gvviYOsyEUuTtlR+jcyAtoVbK2cgzxBfzjO59VMxp3oTMZhB5II0NpUmOL8QsuqF
+	6goKi0HLuzHqIERRUeyic7mNBSfkq5ALHDVAzNvRENekMkTaNm5mmmn/aNZR0kRWFS053/fDknu
+	pmkKE5Zc4O1RAgFZcPZyVrBfw8nAXxUn+/ETzhfrvLqcHgIgx+gVzoD85maUoY8fsEodMIGRRhP
+	q8cROq9KK5EW51phcCD3SUL08q01w4Fcr+QwQfAJtvgqj3IAQmVTyoYPQvgvJJKwPqW5ExuwsfT
+	C90hqXs4j/jOZOFWqcKRW58fP9tzzegylcPnGOu2dL+4c3nydTy3KKp2BYK3w2ET+7pfywIi7EO
+	LV34YdgpPD6Du4CB0x9NYHyugsVVnJ+i73NDHbmdbYh83m9m4+GQ==
+X-Received: by 2002:a05:600c:3b24:b0:492:3fcb:22fe with SMTP id 5b1f17b1804b1-492668551dbmr198217305e9.1.1782625124333;
+        Sat, 27 Jun 2026 22:38:44 -0700 (PDT)
+Received: from fedora.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47327c47122sm1059843f8f.34.2026.06.27.22.38.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Jun 2026 22:38:44 -0700 (PDT)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+To: jonathan.lemon@gmail.com,
+	vadim.fedorenko@linux.dev,
+	richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sagi Maimon <maimon.sagi@gmail.com>
+Subject: [PATCH v2] ptp: ocp: add I2C ISP support for ADVA TimeCard CPLD
+Date: Sun, 28 Jun 2026 08:38:40 +0300
+Message-ID: <20260628053840.4305-1-maimon.sagi@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from 220255722@seu.edu.cn( [223.112.146.162] ) by ajax-webmail ( [127.0.0.1] ) ; Sun, 28 Jun 2026 13:04:17 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Date: Sun, 28 Jun 2026 13:04:17 +0800 (GMT+08:00)
-X-HM-Tid: 0a9f0c9a86ef02f2kunm8623471ff3b0
-X-HM-MType: 1
-X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMTUS6Y2fHkyPT6dc03QDwVaZPGiA09TnwhbhTj
-	hLfuFZO94YXwX6xgvkjGVFFRKj5KLe6NS1CGiyhuD0RcZHIxcyljU39+n1YnYQfUuQJf73cLjTIU
-	yq9bpWVPXKN3Z9gsEIaThAzp9eqY0COUUIz5A=
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDTh0ZVh9JGUoYGRpCTR1MS1YVFA
-	kWGhdVEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVU
-	pLSEpOT0xVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=PxQ+6usgxK/4JU6RU1m4g+jF/+WEdvEYwuupMmevs0a7vOnPsKYoxLvhGqY0D6X4NinUWzEym1cbXCibQzneeCrQjpi6+D1V7vk8lrblROwcQyslemabgl5ZOctpMmu7prHWHhftsrRQMxcFVorotFXzjFdNLS46msBHYcp4Gcg=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=yns7EYALhF6S1Qn2UCp2deAXK5Ibk5U2WE4Q5prGCGk=;
-	h=date:mime-version:subject:message-id:from;
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUBJ_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302380-lists,netdev=lfdr.de];
-	HAS_X_PRIO_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:leitao@debian.org,m:sashal@kernel.org,m:bigeasy@linutronix.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302379-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,linux.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[maimonsagi@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jonathan.lemon@gmail.com,m:vadim.fedorenko@linux.dev,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:maimon.sagi@gmail.com,m:jonathanlemon@gmail.com,m:andrew@lunn.ch,m:maimonsagi@gmail.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,seu.edu.cn:dkim,seu.edu.cn:mid,seu.edu.cn:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maimonsagi@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,spinics.net:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E74A26D3582
+X-Rspamd-Queue-Id: 26C3E6D33B2
 
-SGksCgpPbiBTYXQsIDI3IEp1biAyMDI2IDE0OjIxOjA1IC0wNzAwIEpha3ViIEtpY2luc2tpIHdy
-b3RlOgomZ3Q7IFBsZWFzZSBwcm92aWRlIHRoZSBzdGFjayB0cmFjZSBmcm9tIHRoZSByZXBvcnQs
-IHJhdGhlciB0aGFuIGp1c3Qgc2F5aW5nCiZndDsgdGhhdCB5b3UgY2FuIHRyaWdnZXIgaXQuCgpT
-dXJlLCBzb3JyeSBmb3Igbm90IGluY2x1ZGluZyBpdCBpbiB0aGUgUkZDLiAgVGhlIHdhcm5pbmcg
-d2FzIGZyb20gdGhlCnJldmlld2VkIHJlcHJvZHVjZXIgdXNlZCBmb3IgdGhlIENPTkZJR19QUk9W
-RV9SQ1VfTElTVCB0cmlhZ2UsIG5vdCBmcm9tCmEgcHJvZHVjdGlvbiBjcmFzaC4gIFRoZSByZWxl
-dmFudCBwYXJ0IG9mIHRoZSBkbWVzZyBpczoKCiAgV0FSTklORzogc3VzcGljaW91cyBSQ1UgdXNh
-Z2UKICA2LjEuNjYgIzMgVGFpbnRlZDogRyAgICAgICAgICAgTwogIC0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tCiAgL2hvbWUvdWJ1bnR1MjIvbXN2X3dvcmtzcGFjZS9zaGFyZWQvdnVsbl9t
-c3YuYzo0NSBSQ1UtbGlzdCB0cmF2ZXJzZWQgaW4gbm9uLXJlYWRlciBzZWN0aW9uISEKCiAgb3Ro
-ZXIgaW5mbyB0aGF0IG1pZ2h0IGhlbHAgdXMgZGVidWcgdGhpczoKCiAgcmN1X3NjaGVkdWxlcl9h
-Y3RpdmUgPSAyLCBkZWJ1Z19sb2NrcyA9IDEKICBubyBsb2NrcyBoZWxkIGJ5IGluc21vZC8xOTAu
-CgogIHN0YWNrIGJhY2t0cmFjZToKICBDUFU6IDEgUElEOiAxOTAgQ29tbTogaW5zbW9kIFRhaW50
-ZWQ6IEcgICAgICAgICAgIE8gICAgICAgNi4xLjY2ICMzCiAgSGFyZHdhcmUgbmFtZTogUUVNVSBT
-dGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgMS4xNS4wLTEgMDQvMDEvMjAx
-NAogIENhbGwgVHJhY2U6CiAgIDx0YXNrPgogICBkdW1wX3N0YWNrX2x2bCsweDQ1LzB4NWQKICAg
-bG9ja2RlcF9yY3Vfc3VzcGljaW91cy5jb2xkKzB4MmQvMHg2NAogICBwb2xsX25hcGkuY29uc3Rw
-cm9wLjArMHg0My8weDcxIFt2dWxuX21zdl0KICAgbmV0cG9sbF9wb2xsX2Rldi5jb25zdHByb3Au
-MCsweDI3LzB4MzYgW3Z1bG5fbXN2XQogICA/IDB4ZmZmZmZmZmZjMDAwNTAwMAogICByY3VfbGlz
-dF9tc3ZfaW5pdCsweGUyLzB4MTAwMCBbdnVsbl9tc3ZdCiAgIGRvX29uZV9pbml0Y2FsbCsweDU2
-LzB4MjUwCiAgIGRvX2luaXRfbW9kdWxlKzB4NDcvMHgxYzAKICAgX19kb19zeXNfZmluaXRfbW9k
-dWxlKzB4YTYvMHgxMDAKICAgZG9fc3lzY2FsbF82NCsweDNiLzB4OTAKICAgZW50cnlfU1lTQ0FM
-TF82NF9hZnRlcl9od2ZyYW1lKzB4NjQvMHhjZQogICA8L3Rhc2s+CgpUaGUgcmVwcm9kdWNlciBr
-ZWVwcyB0aGUgc2hhcGUgaW50ZW50aW9uYWxseSBzbWFsbDogbmV0cG9sbF9wb2xsX2RldigpCmlz
-IGV4ZXJjaXNlZCBkaXJlY3RseSBhbmQgY2FsbHMgcG9sbF9uYXBpKCksIHdoaWNoIHdhbGtzIGRl
-di0mZ3Q7bmFwaV9saXN0CndpdGggbGlzdF9mb3JfZWFjaF9lbnRyeV9yY3UoKSBvdXRzaWRlIGFu
-IGV4cGxpY2l0IFJDVSByZWFkLXNpZGUgc2VjdGlvbi4KSXQgZG9lcyBub3QgbW9kZWwgYSBjb25j
-dXJyZW50IE5BUEkgZnJlZS4KClRoYW5rcy4K
+The ADVA TimeCard programs its on-board CPLD (Lattice MachXO3)
+via I2C using in-system programming (ISP).
+
+The CPLD resides on a secondary I2C bus controlled by the
+embedded MicroBlaze. To allow programming, the driver must
+take ownership of this bus and expose it to userspace.
+
+Add support to:
+  - enable the i2c-dev interface to expose /dev/i2c-N
+  - provide sysfs control over the secondary I2C bus
+
+Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+---
+ Address comments from:
+  - Andrew Lunn: https://www.spinics.net/lists/netdev/msg1200997.html
+
+ Changes since v1:
+  - Add reasoning to the commit message
+ 
+ 
+ drivers/ptp/ptp_ocp.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index 35e911f1ad78..1b4ccb4feca5 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -4224,6 +4224,34 @@ static const struct ocp_attr_group art_timecard_groups[] = {
+ 	{ },
+ };
+ 
++static ssize_t
++i2c_bus_ctrl_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct ptp_ocp *bp = dev_get_drvdata(dev);
++
++	if (!bp->pps_select)
++		return -ENODEV;
++	return sysfs_emit(buf, "0x%08x\n",
++			  ioread32(&bp->pps_select->__pad1));
++}
++
++static ssize_t
++i2c_bus_ctrl_store(struct device *dev, struct device_attribute *attr,
++		   const char *buf, size_t count)
++{
++	struct ptp_ocp *bp = dev_get_drvdata(dev);
++	u32 val;
++
++	if (!bp->pps_select)
++		return -ENODEV;
++	if (kstrtou32(buf, 0, &val))
++		return -EINVAL;
++	iowrite32(val, &bp->pps_select->__pad1);
++	return count;
++}
++
++static DEVICE_ATTR_RW(i2c_bus_ctrl);
++
+ static struct attribute *adva_timecard_attrs[] = {
+ 	&dev_attr_serialnum.attr,
+ 	&dev_attr_gnss_sync.attr,
+@@ -4272,6 +4300,7 @@ static struct attribute *adva_timecard_x1_attrs[] = {
+ 	&dev_attr_ts_window_adjust.attr,
+ 	&dev_attr_utc_tai_offset.attr,
+ 	&dev_attr_tod_correction.attr,
++	&dev_attr_i2c_bus_ctrl.attr,
+ 	NULL,
+ };
+ 
+@@ -5235,6 +5264,7 @@ ptp_ocp_init(void)
+ 	const char *what;
+ 	int err;
+ 
++	request_module("i2c-dev");
+ 	ptp_ocp_debugfs_init();
+ 
+ 	what = "timecard class";
+-- 
+2.47.0
+
 
