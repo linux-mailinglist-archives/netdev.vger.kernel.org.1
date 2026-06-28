@@ -1,164 +1,197 @@
-Return-Path: <netdev+bounces-302399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aBFzAuo8QWq7mgkAu9opvQ
-	(envelope-from <netdev+bounces-302399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 17:25:30 +0200
+	id 34wZDTM9QWrOmgkAu9opvQ
+	(envelope-from <netdev+bounces-302400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 17:26:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F35B6D448B
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 17:25:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3C796D449D
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 17:26:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=temperror ("DNS error when getting key") header.d=nucleusys.com header.s=xyz header.b=PrTr3khF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302399-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302399-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=temperror reason="query timed out" header.from=nucleusys.com (policy=temperror);
+	dkim=pass header.d=linux.dev header.s=key1 header.b=EuRa5dRq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302400-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302400-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 457FE300DDC8
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 15:25:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CAB2C3002D19
+	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 15:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753C32DEA93;
-	Sun, 28 Jun 2026 15:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFC6352007;
+	Sun, 28 Jun 2026 15:26:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lan.nucleusys.com (lan.nucleusys.com [92.247.61.126])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF3B5A79B;
-	Sun, 28 Jun 2026 15:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72AA5A79B
+	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 15:26:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782660318; cv=none; b=G5vNOrgJtN+wjjwPmsacZIUQSJ6XnTH2/IumL4tpLcljmTAjG9zV8Md65hK5msiHxCyQs8sGlp0ldv65YTJRzwJeUUS7Pi7umLSoft/dd8mecr9xQmzWhethBj3XaRL6xNJVhIU7ZZrbkKrBfTtsjgmqcZKgUfwZlOHPF+JctBg=
+	t=1782660395; cv=none; b=CXf81Uea8Sr3xn1WcuDw7p+WUBKTXLDVfO1SVue2363Eo4a7QIbcpIU23hnoZgi6BIXZ0W4N2TtdFYroFe1L/pJXIerD695du7Y4Uf2a7q+x7pGly9eOQHsdZNBe7hIie3Yp/wZFtl/a6xoR7OcQKs3qZBpHlgi/mMhen8ftFvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782660318; c=relaxed/simple;
-	bh=w/epT0ahS6q94buTFyAQH/uBAn9kJQHvuxCbCRAFn7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pjh5+Iuy+YEH68gJRvcrRvdHCEfE0spBMxxk3W4hRRYriVOubILec9WJ5MJitD0D4BPA+XfoROQ5wS7UtUmk2CWa4WyX7yeuKpdISdM7RKJ6FVPa2EX7M3eKC3H95ocWDR7OuIPhRT6f3xPBZokWYKwbnM6/enXaBuWTSCD8ubc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nucleusys.com; spf=pass smtp.mailfrom=nucleusys.com; dkim=pass (2048-bit key) header.d=nucleusys.com header.i=@nucleusys.com header.b=PrTr3khF; arc=none smtp.client-ip=92.247.61.126
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nucleusys.com; s=xyz;
-	t=1782659915; bh=w/epT0ahS6q94buTFyAQH/uBAn9kJQHvuxCbCRAFn7k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PrTr3khF9brmi02LWzuiNOkw+TePq9rB+8wtA2F8urhbxgOUj2iTUm92/ffkVFE5c
-	 p3o6MOZF5VMepLu9sHzrNRbq9KCE//icMrmMAetfJUmkvXaQHIuFxuNEPVtTMus5q0
-	 zYHmcKXO8Mfheuh4Q0aUwW8h/TOABZzLMPleRYxxJJc9BVtd9VBJw4s9u5adct9XFR
-	 ek8tsyJoP6zfKq11bA/Rw1B5qfVdObXd9NZLEJPctDXhAywg6/OqbCZRuNd2dP5EAO
-	 dHzMXep4txsoWiu95LPsq/DW/ljOL/JxV25AN/ct+UnHmtEFhfmIeXNYNXzp/4wisz
-	 ya+GRC3bOuXfA==
-Received: from carbon.k.g (unknown [85.187.61.220])
-	by lan.nucleusys.com (Postfix) with ESMTPSA id DB5B53FBC8;
-	Sun, 28 Jun 2026 18:18:34 +0300 (EEST)
-Date: Sun, 28 Jun 2026 18:18:35 +0300
-From: Petko Manolov <petkan@nucleusys.com>
-To: Yousef Alhouseen <alhouseenyousef@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net: usb: rtl8150: handle link status read failures
-Message-ID: <20260628151835.GC14404@carbon.k.g>
-References: <20260628093929.44214-1-alhouseenyousef@gmail.com>
+	s=arc-20240116; t=1782660395; c=relaxed/simple;
+	bh=WBai87XxH2KfdCNpP6IHXulByZKLLRxdxBssMrSpXNo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AyZzfkXsh38FHfmqOZho1096MXLv1nmcQk824o8uSXQKudOJgVank72OCyvdreB/f+2yo36IXG5HpQx7OZOnEwPPbUFHYrsDWxUgdKXpxIDRLnrrtfpmt3PKK4DR9n/AOd6yDaHSVjZR4YTrai3w7DKvU5wUg+1lb593nojsAnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EuRa5dRq; arc=none smtp.client-ip=95.215.58.186
+Message-ID: <29129c40-4010-4862-9b4b-3bafad874568@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782660391;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TeK+Cvyg2fOloDs+N1O69MAGfndJD1u5V/csmGaI8cE=;
+	b=EuRa5dRqExJZ5UWWWpG3KNz3LC4YymuAcLyPVwXcWvk6v+WIf0+qUlzYOcpbQcRpg1o2b0
+	uoZGboFK/NySptMEb4a+oiOJmd6P6J4NAq6AS/bYavpSS9HwDAi3pMtEX/sGfM3Dq2hf6i
+	NuUNlLXayuDoGU9fV1dhH08a3DkUZjQ=
+Date: Sun, 28 Jun 2026 23:26:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260628093929.44214-1-alhouseenyousef@gmail.com>
+Subject: Re: [RFC] xdp: add device context to bpf_xdp_link_attach_failed
+ tracepoint
+To: Masashi Honma <masashi.honma@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, kuba@kernel.org, hawk@kernel.org,
+ andrii@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org
+References: <CAFk-A4mE9Jweo2hfX7y_85xbPyt0FqpMT1EvqX1OcYZ=LTLgRA@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leon Hwang <leon.hwang@linux.dev>
+In-Reply-To: <CAFk-A4mE9Jweo2hfX7y_85xbPyt0FqpMT1EvqX1OcYZ=LTLgRA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302399-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[nucleusys.com:?];
+	FORGED_RECIPIENTS(0.00)[m:masashi.honma@gmail.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:hawk@kernel.org,m:andrii@kernel.org,m:rostedt@goodmis.org,m:mhiramat@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:masashihonma@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302400-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:alhouseenyousef@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[petkan@nucleusys.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petkan@nucleusys.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DMARC_DNSFAIL(0.00)[nucleusys.com : query timed out];
+	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_TEMPFAIL(0.00)[nucleusys.com:s=xyz];
-	TAGGED_RCPT(0.00)[netdev,9db6c624635564ad813c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nucleusys.com:from_mime,carbon.k.g:mid,syzkaller.appspot.com:url]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F35B6D448B
+X-Rspamd-Queue-Id: C3C796D449D
 
-On 26-06-28 11:39:29, Yousef Alhouseen wrote:
-> set_carrier() ignores the result of the USB control transfer and tests the
-> stack variable supplied as its receive buffer. If the device rejects or aborts
-> the request, that variable remains uninitialized and the driver chooses an
-> arbitrary carrier state.
+On 2026/6/28 19:39, Masashi Honma wrote:
+> Hello, I am re-posting this mail because I forget to add [RFC].
 > 
-> Report carrier down when the link status cannot be read.
+> The bpf_xdp_link_attach_failed tracepoint (added in commit bf4ea1d0b2cb
+> "xdp: Add tracepoint for xdp attaching failure") exposes the netlink
+> extack message produced when attaching an XDP program via BPF_LINK_CREATE
+> fails. This is useful because, unlike the netlink attach path, the
+
+I really appreciate that the XDP tracepoint helped someone.
+
+> bpf_link attach path does not return the extack to userspace -- the caller
+> only gets an errno (e.g. EINVAL/ERANGE).
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=9db6c624635564ad813c
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
-> ---
->  drivers/net/usb/rtl8150.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> We would like to use this in Cilium [1][2]: when attaching the XDP
+> datapath program fails, surface the kernel's reason (e.g. "single-buffer
+> XDP requires MTU less than ...") in the agent logs instead of an opaque
+> errno, so operators don't have to inspect dmesg on the host.
 > 
-> diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-> index c880c95c41a5..5606490aaea0 100644
-> --- a/drivers/net/usb/rtl8150.c
-> +++ b/drivers/net/usb/rtl8150.c
-> @@ -732,7 +732,11 @@ static void set_carrier(struct net_device *netdev)
->  	rtl8150_t *dev = netdev_priv(netdev);
->  	short tmp;
->  
-> -	get_registers(dev, CSCR, 2, &tmp);
-> +	if (get_registers(dev, CSCR, 2, &tmp)) {
-> +		netif_carrier_off(netdev);
-> +		return;
-> +	}
-> +
->  	if (tmp & CSCR_LINK_STATUS)
->  		netif_carrier_on(netdev);
->  	else
+> The limitation we hit is that the tracepoint only carries the message
+> string, so a consumer cannot tell which device a failure belongs to.
+> This matters for two reasons:
+> 
+>   1. Correlation: with only the message, a consumer cannot reliably
+>       attribute a failure to a specific attach, particularly if multiple
+>       XDP attaches happen concurrently.
+>   2. Scoping: a consumer watching this tracepoint sees XDP attach
+>       failures system-wide and cannot limit them to the devices it
+>       manages.
+> 
+> At the call site (bpf_xdp_link_attach() in net/core/dev.c) the net_device
+> is in scope, so exposing it looks straightforward:
+> 
+>   TRACE_EVENT(bpf_xdp_link_attach_failed,
+>       TP_PROTO(const char *msg, const struct net_device *dev),
+>       TP_ARGS(msg, dev),
+>       TP_STRUCT__entry(
+>           __string(msg, msg)
+>           __field(int, ifindex)
+>       ),
+>       TP_fast_assign(
+>           __assign_str(msg);
+>           __entry->ifindex = dev->ifindex;
+>       ),
+>       TP_printk("ifindex=%d errmsg=%s", __entry->ifindex, __get_str(msg))
+>   );
+> 
+>   - trace_bpf_xdp_link_attach_failed(extack._msg);
+>   + trace_bpf_xdp_link_attach_failed(extack._msg, dev);
+> 
+> Before sending a formal patch I'd appreciate guidance on a few points:
+> 
+>   - Should the tracepoint take const struct net_device *dev (consistent
+>     with the other tracepoints in this file, and lets TP_printk show the
+>     device), or just the ifindex as an int (simpler for raw_tp BPF
+>     consumers, which otherwise read dev->ifindex via CO-RE)?
+> 
+>   - For raw_tp consumers the argument order is effectively ABI: prepending
+>     dev would shift the existing msg argument. I've appended dev above to
+>     keep msg at args[0]. Is preserving the existing argument position the
+>     right call, or is reordering acceptable given how new and rarely
+>     consumed this tracepoint is?
+> 
 
-I'd rather do something along these lines:
+Good concerns. I'm not sure about these parts.
 
-@@ -732,7 +732,9 @@ static void set_carrier(struct net_device *netdev)
- 	rtl8150_t *dev = netdev_priv(netdev);
- 	short tmp;
- 
--	get_registers(dev, CSCR, 2, &tmp);
-+	if (get_registers(dev, CSCR, 2, &tmp)
-+		return;
-+
- 	if (tmp & CSCR_LINK_STATUS)
- 		netif_carrier_on(netdev);
- 	else
+>   - Is extending the existing tracepoint preferred, or would you rather
+>     keep it as-is and expose the device context some other way?
+> 
 
-IIRC it is possible for the message get lost in bus noise while the device is
-still operating correctly.  So if my memory isn't failing me, it is better to
-not do anything if usb_control_msg_recv() is non-zero and only change the
-carrier status if 'tmp' contains meaningful value.
+I'm planning to retire this tracepoint. But I think I cannot do it, if
+there's user space application relied on the tracepoint.
 
+I'm planning to add BPF syscall common attributes support for
+BPF_LINK_CREATE, including XDP link. By that way, the kernel will be
+able to back-propagate the 'extack._msg' to user space, when fail to
+create XDP link. Thereafter, the user space library will be able to get
+the error message alongside the errno.
 
-		Petko
+Thanks,
+Leon
+
+> This would be my first XDP/BPF tracepoint change, so any direction is
+> welcome. I'm happy to send a proper patch once the shape is agreed.
+> 
+> Regards,
+> Masashi Honma
+> 
+> [1] https://github.com/cilium/cilium/issues/40777
+> [2] https://github.com/cilium/cilium/pull/46546
+
 
