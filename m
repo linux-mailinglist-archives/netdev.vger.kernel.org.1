@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-302448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302449-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vfDkB8foQWqEvwkAu9opvQ
-	(envelope-from <netdev+bounces-302448-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:38:47 +0200
+	id 7BfaBwLpQWqcvwkAu9opvQ
+	(envelope-from <netdev+bounces-302449-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:39:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F206D5AF6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:38:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A93B46D5B09
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:39:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gurudas.dev header.s=spacemail header.b=EhhFE7XY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302448-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302448-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gurudas.dev header.s=spacemail header.b=YKtNGdPN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302449-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302449-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 53055300CE64
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 03:38:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5824C302AC1B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 03:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D3E37E307;
-	Mon, 29 Jun 2026 03:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970C637F730;
+	Mon, 29 Jun 2026 03:38:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-03.smtp.spacemail.com (out-03.smtp.spacemail.com [63.250.43.88])
+Received: from out-13.smtp.spacemail.com (out-13.smtp.spacemail.com [63.250.43.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F096CBA3D;
-	Mon, 29 Jun 2026 03:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB137FF54;
+	Mon, 29 Jun 2026 03:38:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782704322; cv=none; b=rFDpvQnFikm+juuFIe2OL6wHkdn/iwsC24JKHopojw+dVVarotucQzfMOUZDCD2P825vf0FjzAjvhkXzNzzMswExnZKagaYt/suIVd/d0h7Ewn0HNPmsb4Uw3kQJSAiU+bgwJgfI2eUdF1+iYJ4i3zNSDDrHboDtYY0HQ1y50K0=
+	t=1782704324; cv=none; b=M26U9jQJlopJF+Y0fAh+TZl93BW8tTe1LSAxRiwR1xK4zV5NUVxGihXqFEAf8ze+rJ+Uzth4+ACImXyE2kHBCB34vLBtFLQvdfiDQjGLNEqfVoV1PEyzmaDSZwEiiKuz1n3r0lZw3FNRLj0ApwlmT9cvpx6oyPJIEyz9Xd787nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782704322; c=relaxed/simple;
-	bh=IFp8KIfJQFaD5SxJ03pX/G7sKzcitokGMS85gqHLheo=;
+	s=arc-20240116; t=1782704324; c=relaxed/simple;
+	bh=thiPY5S+QBxellP5Uj9DdCyEm46ESuaHvrW+lWMbg0I=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pY7d6cTiG4u1WbtgMY/+JHG31B3nBDa8MPOvgxC52IEE+/US6Jynui9dpRLkNKfthADcJVjTYtTqH07tjQIZe3wlLFDaG+dzhcXF+h8bFH4AK4p3YECmgdSqnUaxXAY3aYIMrr17zjX6/0fLNpE2FS6RYE4T+9+P3LTkB2e8Y8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=EhhFE7XY; arc=none smtp.client-ip=63.250.43.88
+	 In-Reply-To:To:Cc; b=OkGziMn3MafLjr1BYlSBZtf2V74n0bngrWbJGLoPNOLotkOT+jscl2SQVWFbmKHzW1yB+6SLuaMBrgGf5JoiMhNNKYmbBTHP3TtLIXxh6JstgTcf9HUKm3lQGNQ9U9i+cgN08cnHEv4YWhoYhIWEDE5wMzmiX9I29sbVzY3OT48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=YKtNGdPN; arc=none smtp.client-ip=63.250.43.96
 Received: from [192.168.1.96] (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX7H6gmwz8sbG;
-	Mon, 29 Jun 2026 03:38:35 +0000 (UTC)
+	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX7L3L2qz8sbh;
+	Mon, 29 Jun 2026 03:38:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1782704318;
-	bh=YIeQik7zWpB4jmw4IE+FSK27BQvQ/I/lwKnJtdpPOVk=;
+	s=spacemail; t=1782704321;
+	bh=YS27Kixvby6KSWXTt2w35oH9jMdFGUOYAotvdtSmrSU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=EhhFE7XYbRvohudmbaj4Tj/bf7TsPPwJS6wC8hq61i/uzpkfCPn9O/Sj+E6vte5mI
-	 zbnJ9PqzqqaLumWY6B+onwSBNV/N76KtKvpbx7stlcS3fDZ9oMExVWMz38iTcsSWwO
-	 w+0ygrtBSeD6V211j4eHZhNCHmNJbZX06k/SLUnRt01sFiEAWtvcBgfdXLpH8y+NxD
-	 PuODykExHbQ4D7tovt0GiZQVTfBrDuTvGtLEJhO67v9mO5L9Dk9Ot7WdHsyhsU3HGO
-	 Yu1WQEDXN2d6In0WW0QXUi7DPbd9JKlwh78KcnLoxIh/ivkPjwTJJI78IQh07n+xfJ
-	 U7tOax9rEkydw==
+	b=YKtNGdPNllSWHUf29xTf+H/qJRGsTx9ge6T579+WgPUypUW5v6y3OJtqWs9HWUTiV
+	 zbhlllaRoZxWjota9YxkLFCLGUnaZSNXbEHfDHKvUTG+CT7vASnJUFZVfv57AR/Ec4
+	 Fd5+G/+P+UUSqhj8+IT43fw3bELljdvhSncYSiDIFxwhmV9y+Otp+AcMqSGLXXXdl4
+	 1p0/vY7R4zmYhlP/s+8tmuFG4M0xvDXSzDQZQqw1SNiukkScPwDdbYFoBIAx57yRsb
+	 A4UBNbrxuI8Ovx4rFMv+ZAmaWs7neivc5ZH3vRpkCpGXtKUUb1OEKNc3Z5hcESrTNF
+	 WpS5rTL2gqnAw==
 From: Guru Das Srinagesh <linux@gurudas.dev>
-Date: Sun, 28 Jun 2026 20:38:19 -0700
-Subject: [PATCH 5/7] net: phy: ax88796b: use vertical import style
+Date: Sun, 28 Jun 2026 20:38:20 -0700
+Subject: [PATCH 6/7] net: phy: qt2025: use vertical import style
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,7 +61,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260628-b4-rust-vertical-imports-v1-5-98bc71d4810b@gurudas.dev>
+Message-Id: <20260628-b4-rust-vertical-imports-v1-6-98bc71d4810b@gurudas.dev>
 References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 In-Reply-To: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org, 
@@ -109,7 +109,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
  linux.dev,m:dri-devel@lists.freedesktop.org,m:linux@gurudas.dev,m:abdieljanulgue@gmail.com,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[linux@gurudas.dev,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302448-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302449-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[44];
 	DMARC_NA(0.00)[gurudas.dev];
 	MIME_TRACE(0.00)[0:+];
@@ -129,36 +129,42 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gurudas.dev:dkim,gurudas.dev:email,gurudas.dev:mid,gurudas.dev:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,gurudas.dev:dkim,gurudas.dev:email,gurudas.dev:mid,gurudas.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 97F206D5AF6
+X-Rspamd-Queue-Id: A93B46D5B09
 
 Convert `use` imports to vertical layout for better readability and
 maintainability.
 
 Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
 ---
- drivers/net/phy/ax88796b_rust.rs | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/net/phy/qt2025.rs | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-index 2d24628a4e58..5a21fe09bd62 100644
---- a/drivers/net/phy/ax88796b_rust.rs
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -5,7 +5,12 @@
- //!
- //! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
- use kernel::{
--    net::phy::{self, reg::C22, DeviceId, Driver},
-+    net::phy::{
-+        self,
-+        reg::C22,
-+        DeviceId,
-+        Driver, //
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 470d89a0ac00..efde3f909367 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -14,11 +14,17 @@
+ use kernel::io::poll::read_poll_timeout;
+ use kernel::net::phy::{
+     self,
+-    reg::{Mmd, C45},
++    reg::{
++        Mmd,
++        C45, //
 +    },
-     prelude::*,
-     uapi,
+     Driver,
  };
+ use kernel::prelude::*;
+-use kernel::sizes::{SZ_16K, SZ_8K};
++use kernel::sizes::{
++    SZ_16K,
++    SZ_8K, //
++};
+ use kernel::time::Delta;
+ 
+ kernel::module_phy_driver! {
 
 -- 
 2.54.0
