@@ -1,107 +1,106 @@
-Return-Path: <netdev+bounces-302511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302513-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Zk8EDSc0QmoW1wkAu9opvQ
-	(envelope-from <netdev+bounces-302511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:00:23 +0200
+	id VDgUBcozQmrq1gkAu9opvQ
+	(envelope-from <netdev+bounces-302513-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:58:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77C5A6D7CC3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:00:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2946D7C64
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:58:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=F1Fcs9z1;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=AOBEQBjK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302511-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302511-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=pX86Czb9;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=EDOFXoYA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302513-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302513-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F059305D84A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:55:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4D026300DD6C
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E1C3FA5EF;
-	Mon, 29 Jun 2026 08:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2F43FB07B;
+	Mon, 29 Jun 2026 08:55:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648363F9F49
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142983FAE01
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:55:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782723340; cv=none; b=MuHfSn/KRS0CWfP1G/JZi2v87V3fzvbRv8CO6nNumMe+t+hLddyP65Oexh4GsPi3bumJb82aoWs/Ek9YxMGlgmu04FuXnwla0jaO9j+YRpp+0/iKBze6t0W/oZFTFixqIbR7lJXLJfJxpQbvsCA+wT8eRDmxeWPTYRd5ZICevIw=
+	t=1782723352; cv=none; b=KIu3++YFk0u1SAvDeiemk4/l2ATLaTrFpD08wuyi1LT77RfQWfN4j/j0BoMjBJIdcGlQpCb133asPpNs3yx76xb89Hbmrn33sMY27PE7TtbfS4w/n9VOKQkhffBooHKEONPz8muiOucXlyNjb2RTCBheDk6dJ35HUCJcfmq4fQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782723340; c=relaxed/simple;
-	bh=xh4ucig5hPRkaGw1GggCAwEU1pqdfnGTPbj3vUFpt5A=;
+	s=arc-20240116; t=1782723352; c=relaxed/simple;
+	bh=+S+svEblCgUppZ1HOg5J8cBfo2GYNn4HEFtbMzXGGfs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X/32+ewu9d3UA3jv7yHCy7cEjF2X7WxuJ9K/tP99uT2+evVNRaJbXj7rXX/X8PCPk162q2q1pfwm/wrR/vIsDaIHeay+bgCpiWLp+DwfbyfU7WYET7xQ/nZeOVIr/i7vv2F/3g2//GemeVoeXKb5HrkWN3XLxUHAeb2QQ3EazQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=F1Fcs9z1; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=AOBEQBjK; arc=none smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65T7DnkU2188693
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:55:37 GMT
+	 In-Reply-To:To:Cc; b=tPbIYzGCPgpBR7qvgFEfG0GkCWeTAWkx3N/6n6LqyPq+E2PblU3iHa29WFzsIFY86RA7PRjdy4YdPKFhZ2ZYO5LcSqYD2/X3VFIMOXXwXtHHNgeo1rk2dsS1+u6zaHEYelE3Ah+pJqPHcSQIGm3Q2rF+W+ZNnEsdWuiHh8AQeZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pX86Czb9; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=EDOFXoYA; arc=none smtp.client-ip=205.220.168.131
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65T6rTHh2097418
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:55:40 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	OF0qK3G3GFE0oahQw0gKGPhEucSp1JH1FwJoY8Lp59M=; b=F1Fcs9z1Aw6XRZTs
-	Um7fEWGgX5KMk8DW9SYSLWVtVnGWMJoda5P8TBu5fBZ3dVMgwzv6NR9VP+2jTMO9
-	F9h+ZjaDO9PlssYceWEKHXRrKeR2KStUYV7d4vpowsopRKjKBUAzdLPtVtLtWLbY
-	fDxJri626kkWHDHjJmKmv+ksfmW5/EqibfVeuYrF/4mLCNM4Ot4/R1kY5GmT0knZ
-	E8//UYQO8q/RRHP/sc38FkSY62FIrSbjWcgouKPze7dsixwql/LsXLDVr0HdN0Fd
-	qeQ/zpD0gUl6oTpQwEdeGYE4Ew8MW6Hsq1+kAIhSwnMR5g7MaLJRA0WXT+K+2U/K
-	0tmChg==
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com [209.85.221.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f3m4trdjc-1
+	OcTiSzV5CVcWs86Y9J99L1MrJ0Tbe0CLQ7Splzu1vMM=; b=pX86Czb9chwHGe5O
+	KgsPZCxyZpBLOMDEILVpySAvlhInQ9T42c3DflRUase3EEy36NkTD6BXkcmL1BIZ
+	jhGbCJBKonjAXwJz3oFL3roWfPPrfYWQCfMaQLyxkUGjlqW3ko3gqrxFhGVgDf0/
+	FYIPFQCt7gMlXkDRuXYl3Y1SQW3me5kIBwdg/vEQx6g0LjTT342X2ylNAp5Y6xLS
+	jp1Ku1wDOMpdrv+IxNFc3ch6FH07G5vyDDnJ5yn0XLdEUeSjUdtEw2WPMrP+x1eq
+	JH0TI34ri/FXptbXl+cq78Fd1qypCpMQ+mKXrN64betuxuRXlQCbBX6PVAjX7FQz
+	bxMERw==
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com [209.85.221.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f27t7wfcf-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:55:37 +0000 (GMT)
-Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-5bd954154b1so706079e0c.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 01:55:37 -0700 (PDT)
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:55:40 +0000 (GMT)
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-5bda012e304so165279e0c.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 01:55:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782723336; x=1783328136; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1782723339; x=1783328139; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OF0qK3G3GFE0oahQw0gKGPhEucSp1JH1FwJoY8Lp59M=;
-        b=AOBEQBjKIgTnXwJxyvX7rCT6xzjLuyp80J8/Vs3oqHsJBHrG2y0KRGA2YEtOpOS8vt
-         JKrtwBT+mhW1wkE15eEQ+mAcCo1Q55vq/npwcu2Fr8qUMzkSvW4Uc1cTfVxbSwsc6pKV
-         ceVvKjgUGZjr+k4I9USXnZ8GYs0G5NJioLGrvM4apFa+4lcwFDIzSFUf1oU0sANNeIaj
-         DGDi63ucVzCqndpqirmAtu3S6tTrBFiOS/sGM+IHFz5IfWvoUty8zOuP0Qvam0MozNcY
-         4o/o8ImtsDLLcyOijuP3I+TlQ2iRO+lG2AlTvA3x758nGQWkk3t4A+sAigeXxqU0HGEA
-         5uGQ==
+        bh=OcTiSzV5CVcWs86Y9J99L1MrJ0Tbe0CLQ7Splzu1vMM=;
+        b=EDOFXoYAuhg/QAn4nxNHAtV2e/ffcsGzE0BKreq0RplX5kd/GkRGmPWwoHQKBuO/NQ
+         ZPbkCkld8XappSU6kQWM7gPar83eLFpu/4UfECchRYvQc8Eklk8Qktzr6YwBYrSCxEMO
+         lw4fBn7vz2JJf4HHnIsWsrxsAkI2ohAur0YHgVuhxHVUp0Ul0V/rfTaA9/tlQX0IAlu9
+         SJ/OqpGZAsDyBtubk8T6D4ZDWWwdFwg3ztBH0qTKKD/yCdFq7QHXGmCqJQCByKbpAiHV
+         dsGuEodfqfDIb6Y/ZVgtH+6txhoNeXBDilI52I27djkaBBtuFz8FHAEefClxMxYnLqxI
+         OXXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782723336; x=1783328136;
+        d=1e100.net; s=20251104; t=1782723339; x=1783328139;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=OF0qK3G3GFE0oahQw0gKGPhEucSp1JH1FwJoY8Lp59M=;
-        b=BbnfUB8VCWVjQ4DjMxnh6Ov8UnSeX8AZQX1iDnvrBATreeqTcNszkDYmdB/K/VelsH
-         Tj17Z/aMGv+2z8Ce6wW8/E/A/HBz13htg8qh6DdRG4bhxQ40eS9wBc/3EwdaLXVX7K6J
-         bL9cm4nUkW0ptbVxf+5VSSL+ixRjVKGvf5K+OZoqkFteH/bAJ5Uyuk57NhkNz50MZamE
-         CnauL0vJN6pOrrTqGHPIOtSuVm9JBN7Rw3UnJUoPCiLrsHpz5CVHBv1hFT2EmUpfh3zk
-         7Uckwud2EkmmQ1/gJ/4jUpS3fPZkfzbfPdki2UBj6JlyqDkqKvPTnaCVO7Th8rWUaCfp
-         tQ1w==
-X-Forwarded-Encrypted: i=1; AHgh+Rp/ZDWLPQ3ibSKcr9sWkAWZVom6A5dF5Yj+7tZcMOhZze66WdCvI0k9oPgpyII1dqKB/EhgQV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysDHptgdvvu38frVJ0AGGrYlzAs46y2f8tq8SzDlMQE3roFkWp
-	NNBCsSfmPyFmmPEAKGhP+dS2ouoTdjvpICX6aEAYgtpRHyH7o8NdYyFuMOKCwCoE/57P4sCBfwQ
-	BjsR3xS/YfqxOMBoOzNxx/BLVU+1ap4Mv5Fao3cHoAJoDwft+ptRhD+316k4=
-X-Gm-Gg: AfdE7cnxxZ3uswA3xXn4F+9ShuF9Nyile4GpqjUgHig5cCC4y58wSEjMy5zGXtR0fHD
-	qqfqAVgniW0ucEyrut70PAGmRg9QxHZFwbSxQ/MI0nnWWrSCCQz4CxiLiM2d202XzR8qRytmwkb
-	STGAFWJ1C3vkdSnbluYsSGc5ekWefcl5JD1Skk9HoAmmzkIFvhUc+vU6W8j7jq+hLlUcN7EwwWY
-	t2gVN7zmKkgR33joiENWDLRrD8Kwp0Hm7kUNily0OTlxzCSRCI3jjTAzQ9+2s5KVpZQ7OK1utVM
-	bE4VIDRkagpkFgdOs3wthnzOXF9cTffI0DTlZkDjv+LgFyPwbdSgnijoFs7SR0IuByNRYn19vI2
-	xjy1doeG6SRMTQdj4Kgog1bnsqS/DxCvZE7wj1hu/Z77UnXCbLetPY6HX7ai/caxGmeEwuwzLNC
-	BX44zq3Y1C77Mi6ORo/oPKkOPl1yYox99LOj3AS0/dt6wkNP3bIh1WrOjvEto0CaPMrhzhSFPC1
-	sJtw0GWsv8qP8pC8/8f
-X-Received: by 2002:a05:6122:3123:b0:5a4:6680:64f0 with SMTP id 71dfb90a1353d-5bd69cc1bf6mr6343010e0c.4.1782723336556;
-        Mon, 29 Jun 2026 01:55:36 -0700 (PDT)
-X-Received: by 2002:a05:6122:3123:b0:5a4:6680:64f0 with SMTP id 71dfb90a1353d-5bd69cc1bf6mr6342973e0c.4.1782723336048;
-        Mon, 29 Jun 2026 01:55:36 -0700 (PDT)
+        bh=OcTiSzV5CVcWs86Y9J99L1MrJ0Tbe0CLQ7Splzu1vMM=;
+        b=U1r9wBehv9HK67CBjNbIu0+UUwyELnS0k8fs5dh7C/x7lTJoDvXRC71n5fS8Hwj203
+         jOA1zYKG1VV6frDlVk7Lz8QOMHcYgOGJvMRnZ1Z8VJgM0ATvTSKf1t+6Njar/Uuv6P+N
+         j+E7E5317PJyDeqb+n3FyZAkruJ/H4moci7tmoca2lV1vefyrcKyoqXLdIyVyzd26I9I
+         YB5ErY1D0JjyguewZsQFildZ/FhnPNAAulXBM8eAfTzpSdmthNtlkgZuCozng/hZHvzK
+         ONWfoFjbplWXwS3TD1PJ8rrSTlXA7LlqIagvMl7xVnD7gpAZ7OcVOOxD23T0+CtixNV7
+         TtmQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrWMvEDT4wHg14ZbyyAdQKAfJv3m9N4MJLpTphtLtjfDjCT7oMN37UB0CoRJDFRR4DvbPmvZP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxfvml8yxFofD1rziBX44uz6GLiQz7HGAUZm0bHd4Bk/TCCbSWe
+	Iq5p4kWWqs0viEnNieIt3uaDN0MSrW75HpdYJCIB42BTJuN0E808ac8MOJOKrglhAI6N443zCWF
+	Hjq027kceQ4KZX6rno2GiHzJTb0E8pQptFB75RTwKDp4WN0pQs/lcjNyhgL4=
+X-Gm-Gg: AfdE7ckfjvwl0JatEJS1HtvkJbycPBGbUsxBQXkMWAgACV82WOAVx/iNnUXDMOCwd9U
+	jReAAnwV3UFezm1gxduMX7bE4NcL0kR2owGWNqy/waulyX0WurHdGuS/zA+5gokcQ6aI2IiP0FD
+	ScB3RbLKovKwo3R/CjijPFaCrCv3GcchR4VLhThPscGLpp0Uiv2s4M4s0SuDipRe4vjwjki5rPs
+	b3h0jUpYtIMC5a7lDSJMVyaj1ZK0Xec99qnQsF1UNhtHNxrqpeUXd7B4yGLcMjT1eChSIdNjqLX
+	dgsjktQLQUXx8xOIhIqDJhwc5vPcEa7QWsDKibRgyz8qUJU0bFgh92Znt8oRldbuabsWjH6+eau
+	r2Kxkkjd/Ad0rSet4i/5H6R9gTXDEFlx83nH6lP5Zh+hgZ2UAFjHKq007Tjk6DBPGs3wRyeqy1D
+	vowrir3YbGZ8Z3gTuSX9aMBpTdIJlH9+VJr3cXHPJ/RM6iyW53+tfUZlIoFxzeuIPpfTJvZ1BgT
+	4BFETNGPkg/rHGvPTUO
+X-Received: by 2002:a05:6122:4683:b0:5a0:5805:c8ba with SMTP id 71dfb90a1353d-5bd69d85542mr6116224e0c.11.1782723338931;
+        Mon, 29 Jun 2026 01:55:38 -0700 (PDT)
+X-Received: by 2002:a05:6122:4683:b0:5a0:5805:c8ba with SMTP id 71dfb90a1353d-5bd69d85542mr6116214e0c.11.1782723338384;
+        Mon, 29 Jun 2026 01:55:38 -0700 (PDT)
 Received: from QCOM-eG0v1AUPpu.na.qualcomm.com (82-64-236-198.subs.proxad.net. [82.64.236.198])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f4bc8016sm6558981a12.25.2026.06.29.01.55.33
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f4bc8016sm6558981a12.25.2026.06.29.01.55.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 01:55:35 -0700 (PDT)
+        Mon, 29 Jun 2026 01:55:37 -0700 (PDT)
 From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 29 Jun 2026 10:55:23 +0200
-Subject: [PATCH v6 4/9] dt-bindings: bluetooth: qcom: Add NVMEM BD address
- cell
+Date: Mon, 29 Jun 2026 10:55:24 +0200
+Subject: [PATCH v6 5/9] block: implement NVMEM provider
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,7 +109,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260629-block-as-nvmem-v6-4-f02513dcd46d@oss.qualcomm.com>
+Message-Id: <20260629-block-as-nvmem-v6-5-f02513dcd46d@oss.qualcomm.com>
 References: <20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com>
 In-Reply-To: <20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com>
 To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -138,34 +137,33 @@ Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
         linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
         ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
         netdev@vger.kernel.org, daniel@makrotopia.org,
-        Loic Poulain <loic.poulain@oss.qualcomm.com>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+        Loic Poulain <loic.poulain@oss.qualcomm.com>
 X-Mailer: b4 0.14.2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI5MDA3MSBTYWx0ZWRfXxSICweGGELnc
- w21szwM7xR6oGGWVKUODVMIH/CuTL2GI5IAyRpV28N5noH/nvbvGAi6KANnq6iym/1MDBzht7ox
- jMgyGObSzXYaqqaap17AX9nEM1/U8paT4vEL3iP30+3FmDeiLrQWq/8RFGEGbNVVXw8/YC3wavm
- KeolL95S/E7fLBs+DVV+xoN0O4KTnmRCyZ2r4IFPUVbaiN9h4j63jbQCNbaZlXCCy2H5M5MjAri
- EOVg0EQ+O2skx4KJFfNrp0G2tRcm4FIA9WU/tCPqWQXCGbGF/MgyJalZ0tcL/rEykQsvCQ8LUaA
- fNDuZNW31Emizn0qNvDazscbOaSAEVnZNl3IdqWQfvRcwjlCQ+RQz6EyGF3Qk9UmzcQeIXnT/Kj
- aSQzRXEYv1sac9wqLEiR5zATNHFVZs3hgWra2nt5Rvy33UoiszraQDy7MVCoHDBtV3yFUQRtaRh
- +OOEm758ztsZyiWWJKA==
-X-Authority-Analysis: v=2.4 cv=R58z39RX c=1 sm=1 tr=0 ts=6a423309 cx=c_pps
- a=wuOIiItHwq1biOnFUQQHKA==:117 a=MDeckJw97qnk8wCBExTehA==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI5MDA3MSBTYWx0ZWRfX4Q3v+5WfDuup
+ /oyUVyt1D862QicNNGX4lGrASKs2qdjbqS5WDjnoor3cDVflHpYv7LhFYEGpJqS9TtalabNLQQO
+ DxyWQydBRCnKLGGZUlMbevik3U73huWN3zbQmhNnd+/0k1TP4P2iDypgT6oKw3Hk9rLJQyd++P6
+ MZVg4gSLWD9lypyvi8YP+704Z0xH7jNtDOyawDFpHyhgkzjQJiGOVjDGdFhWPCz7VV5Ln8W7U2p
+ z41k9Yw+Jze739Xl0zv9owB8P7wT3XLitDyyysAC5GQmU1XP5FGFroe9bFywLw73Ug9kSq2M4HS
+ OtlUGDUjC2GmG+PdeMKE8mq9s0umqmBpbDA+5YAiYjoKtPAWIVka1gT7ZLSFwNdJed8tmZxfYfq
+ pw59LUohM5Z8RVt8Hvv9rOdxTtbIBLxjjd5XxoMP7hvWw5dT0dkcK7Cix8khqRt6BFEZcazArn7
+ r8jV1c82jB0VHaEeySQ==
+X-Proofpoint-GUID: goladpge9ng2igZMKK7brFN7SK9M4G__
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI5MDA3MSBTYWx0ZWRfX1kf1ICg06I1b
+ iDKuUdDClO2vyxOCiS79YJt9P90Q/G6fPd6VxUILAvdRQf8AuC7DZ+YdS/FGJce0s4olUSnV7x0
+ MVz5YhZSnJBEMpMTBP9FsbCfZY1syp4=
+X-Proofpoint-ORIG-GUID: goladpge9ng2igZMKK7brFN7SK9M4G__
+X-Authority-Analysis: v=2.4 cv=BdnoFLt2 c=1 sm=1 tr=0 ts=6a42330c cx=c_pps
+ a=1Os3MKEOqt8YzSjcPV0cFA==:117 a=MDeckJw97qnk8wCBExTehA==:17
  a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=jFERsaRKWwo8c2z-USAA:9 a=QEXdDO2ut3YA:10
- a=XD7yVLdPMpWraOa8Un9W:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI5MDA3MSBTYWx0ZWRfX02wRC5G94tfw
- qbOk1kGCX6iS8/5SYx1DVnKX4lxDsu+tRAA1vxyuQMrqhaQHxG1HfxIlbSsDxVJzsO5WnBu7NAj
- CCRZMlMO72zEjRuMHjyIvHDL3lNGSr0=
-X-Proofpoint-ORIG-GUID: GPXeHl8FKEEQBDdnvSpHFEK4-dFfyD6C
-X-Proofpoint-GUID: GPXeHl8FKEEQBDdnvSpHFEK4-dFfyD6C
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=VT4XjZGOAAAA:8 a=EUspDBNiAAAA:8 a=QS6QONgytJYYblx7mpIA:9 a=QEXdDO2ut3YA:10
+ a=hhpmQAJR8DioWGSBphRh:22 a=6CpsfURP9XNmmWg3j1mJ:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-29_02,2026-06-26_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 suspectscore=0 phishscore=0 clxscore=1015
- adultscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 clxscore=1015 suspectscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606290071
 X-Rspamd-Action: no action
@@ -174,22 +172,21 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
 	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302511-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302513-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[37];
+	RCPT_COUNT_TWELVE(0.00)[36];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk];
-	FORGED_RECIPIENTS(0.00)[m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:ansuelsmth@gmail.com,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:daniel@makrotopia.org,m:loic.poulain@oss.qualcomm.com,m:bartosz.golaszewski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:list
- s@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:ansuelsmth@gmail.com,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:daniel@makrotopia.org,m:loic.poulain@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,qualcomm.com:dkim,qualcomm.com:email];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,config.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,config.name:url,config.id:url,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,vger.kernel.org:from_smtp,qualcomm.com:dkim,qualcomm.com:email];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -204,37 +201,242 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 77C5A6D7CC3
+X-Rspamd-Queue-Id: 6D2946D7C64
 
-Add support for an NVMEM cell provider for "local-bd-address",
-allowing the Bluetooth stack to retrieve controller's BD address
-from non-volatile storage such as an EEPROM or an eMMC partition.
+From: Daniel Golle <daniel@makrotopia.org>
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+On embedded devices using an eMMC it is common that one or more partitions
+on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
+data. Allow referencing the partition in device tree for the kernel and
+Wi-Fi drivers accessing it via the NVMEM layer.
+
+For now, NVMEM is only registered for the whole disk block device, as the
+OF node is currently only associated to it.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 ---
- .../devicetree/bindings/net/bluetooth/qcom,bluetooth-common.yaml | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/Kconfig             |   9 ++++
+ block/Makefile            |   1 +
+ block/blk-nvmem.c         | 111 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk.h               |   8 ++++
+ block/genhd.c             |   4 ++
+ include/linux/blk_types.h |   3 ++
+ include/linux/blkdev.h    |   1 +
+ 7 files changed, 137 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,bluetooth-common.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,bluetooth-common.yaml
-index c8e9c55c1afb4c8e05ba2dae41ce2db4194b4a0f..7cb28f30c9af032082f23311f2fc89a32f266f17 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qcom,bluetooth-common.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,bluetooth-common.yaml
-@@ -22,4 +22,13 @@ properties:
-     description:
-       boot firmware is incorrectly passing the address in big-endian order
+diff --git a/block/Kconfig b/block/Kconfig
+index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc33473683706f75c92bdf8b648f7c 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+ 	  by falling back to the kernel crypto API when inline
+ 	  encryption hardware is not present.
  
-+  nvmem-cells:
-+    maxItems: 1
-+    description:
-+      Nvmem data cell that contains a 6 byte BD address with the most
-+      significant byte first (big-endian).
++config BLK_NVMEM
++	bool "Block device NVMEM provider"
++	depends on OF
++	depends on NVMEM
++	help
++	  Allow block devices (or partitions) to act as NVMEM providers,
++	  typically used with eMMC to store MAC addresses or Wi-Fi
++	  calibration data on embedded devices.
 +
-+  nvmem-cell-names:
-+    const: local-bd-address
+ source "block/partitions/Kconfig"
+ 
+ config BLK_PM
+diff --git a/block/Makefile b/block/Makefile
+index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a8800ea266190a43b3e63d 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
+ 					   blk-crypto-sysfs.o
+ obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
+ obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
++obj-$(CONFIG_BLK_NVMEM)                += blk-nvmem.o
+diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b35a74255059320ef0cbd3c0003f1510bae5733
+--- /dev/null
++++ b/block/blk-nvmem.c
+@@ -0,0 +1,111 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * block device NVMEM provider
++ *
++ * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
++ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ *
++ * Useful on devices using a partition on an eMMC for MAC addresses or
++ * Wi-Fi calibration EEPROM data.
++ */
 +
- additionalProperties: true
++#include <linux/file.h>
++#include <linux/nvmem-provider.h>
++#include <linux/nvmem-consumer.h>
++#include <linux/of.h>
++#include <linux/pagemap.h>
++#include <linux/property.h>
++
++#include "blk.h"
++
++static int blk_nvmem_reg_read(void *priv, unsigned int from, void *val, size_t bytes)
++{
++	dev_t devt = (dev_t)(uintptr_t)priv;
++	size_t bytes_left = bytes;
++	loff_t pos = from;
++	int ret = 0;
++
++	struct file *bdev_file __free(fput) =
++		bdev_file_open_by_dev(devt, BLK_OPEN_READ, NULL, NULL);
++	if (IS_ERR(bdev_file))
++		return PTR_ERR(bdev_file);
++
++	while (bytes_left) {
++		pgoff_t f_index = pos >> PAGE_SHIFT;
++		struct folio *folio;
++		size_t folio_off;
++		size_t to_read;
++
++		folio = read_mapping_folio(bdev_file->f_mapping, f_index, NULL);
++		if (IS_ERR(folio)) {
++			ret = PTR_ERR(folio);
++			break;
++		}
++
++		folio_off = offset_in_folio(folio, pos);
++		to_read = min(bytes_left, folio_size(folio) - folio_off);
++		memcpy_from_folio(val, folio, folio_off, to_read);
++		pos += to_read;
++		bytes_left -= to_read;
++		val += to_read;
++		folio_put(folio);
++	}
++
++	return ret;
++}
++
++int blk_nvmem_add(struct block_device *bdev)
++{
++	struct device *dev = &bdev->bd_device;
++	struct nvmem_config config = {};
++
++	/* skip devices which do not have a device tree node */
++	if (!dev_of_node(dev))
++		return 0;
++
++	/* skip devices without an nvmem layout defined */
++	struct device_node *child __free(device_node) =
++		of_get_child_by_name(dev_of_node(dev), "nvmem-layout");
++	if (!child)
++		return 0;
++
++	/*
++	 * skip block device too large to be represented as NVMEM devices,
++	 * nvmem_config.size is a signed int
++	 */
++	if (bdev_nr_bytes(bdev) > INT_MAX) {
++		dev_warn(dev, "block device too large to be an NVMEM provider\n");
++		return 0;
++	}
++
++	config.id = NVMEM_DEVID_NONE;
++	config.dev = dev;
++	config.name = dev_name(dev);
++	config.owner = THIS_MODULE;
++	config.priv = (void *)(uintptr_t)dev->devt;
++	config.reg_read = blk_nvmem_reg_read;
++	config.size = bdev_nr_bytes(bdev);
++	config.word_size = 1;
++	config.stride = 1;
++	config.read_only = true;
++	config.root_only = true;
++	config.ignore_wp = true;
++	config.of_node = to_of_node(dev->fwnode);
++
++	bdev->bd_nvmem = nvmem_register(&config);
++	if (IS_ERR(bdev->bd_nvmem)) {
++		int ret = PTR_ERR(bdev->bd_nvmem);
++
++		bdev->bd_nvmem = NULL;
++		dev_err_probe(dev, ret, "Failed to register NVMEM device\n");
++		return ret;
++	}
++
++	return 0;
++}
++
++void blk_nvmem_del(struct block_device *bdev)
++{
++	nvmem_unregister(bdev->bd_nvmem);
++	bdev->bd_nvmem = NULL;
++}
+diff --git a/block/blk.h b/block/blk.h
+index ec4674cdf2ead4fd259ff5fc42401f591e684ee9..ed0c10168ba7be10855509637f824a9cea2b9ccb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -757,4 +757,12 @@ static inline void blk_debugfs_unlock(struct request_queue *q,
+ 	memalloc_noio_restore(memflags);
+ }
+ 
++#ifdef CONFIG_BLK_NVMEM
++int blk_nvmem_add(struct block_device *bdev);
++void blk_nvmem_del(struct block_device *bdev);
++#else
++static inline int blk_nvmem_add(struct block_device *bdev) { return 0; }
++static inline void blk_nvmem_del(struct block_device *bdev) {}
++#endif
++
+ #endif /* BLK_INTERNAL_H */
+diff --git a/block/genhd.c b/block/genhd.c
+index 7d6854fd28e95ae9134309679a7c6a937f5b7db8..1b2382de6fb30c1e5f60f45c04dc03ed3bf5d5f2 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -421,6 +421,8 @@ static void add_disk_final(struct gendisk *disk)
+ 		 */
+ 		dev_set_uevent_suppress(ddev, 0);
+ 		disk_uevent(disk, KOBJ_ADD);
++
++		blk_nvmem_add(disk->part0);
+ 	}
+ 
+ 	blk_apply_bdi_limits(disk->bdi, &disk->queue->limits);
+@@ -704,6 +706,8 @@ static void __del_gendisk(struct gendisk *disk)
+ 
+ 	disk_del_events(disk);
+ 
++	blk_nvmem_del(disk->part0);
++
+ 	/*
+ 	 * Prevent new openers by unlinked the bdev inode.
+ 	 */
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 8808ee76e73c09e0ceaac41ba59e86fb0c4efc64..ace6f59b860d0813665b2f62a1c03a1f4be94059 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -73,6 +73,9 @@ struct block_device {
+ 	int			bd_writers;
+ #ifdef CONFIG_SECURITY
+ 	void			*bd_security;
++#endif
++#ifdef CONFIG_BLK_NVMEM
++	struct nvmem_device	*bd_nvmem;
+ #endif
+ 	/*
+ 	 * keep this out-of-line as it's both big and not needed in the fast
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 890128cdea1ce66863c5baa36f3b336ec4550807..f15d2b5bf9e4fd2368b8a70416a978e22c0d4333 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -30,6 +30,7 @@
+ 
+ struct module;
+ struct request_queue;
++struct nvmem_device;
+ struct elevator_queue;
+ struct blk_trace;
+ struct request;
 
 -- 
 2.34.1
