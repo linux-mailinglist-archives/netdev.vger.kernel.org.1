@@ -1,316 +1,286 @@
-Return-Path: <netdev+bounces-302628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uj1GDcxwQmo87QkAu9opvQ
-	(envelope-from <netdev+bounces-302628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:19:08 +0200
+	id bhJeDf5wQmpZ7QkAu9opvQ
+	(envelope-from <netdev+bounces-302629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:19:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C006DB0D5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 873DF6DB13E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:19:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LTV6djWo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302628-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302628-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=rcpassos.me header.s=purelymail2 header.b=WNdUmxUN;
+	dkim=pass header.d=purelymail.com header.s=purelymail2 header.b=GyEMib7G;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302629-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302629-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=rcpassos.me;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A8EE3095E8D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:57:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19EC13125B75
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF24E4028FA;
-	Mon, 29 Jun 2026 12:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59748403E87;
+	Mon, 29 Jun 2026 12:59:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5AA401A3F
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 12:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE37403AEE
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 12:59:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782737871; cv=none; b=TOFa2JV9dCOtH6xtmbbNTQIeqrHP2i/bRBQ7elIbIl+Yc2RC9++v1QChsGszRbzTuzUERRMrGvgalTQ6AJwZC7g/F1PcrWAqA60mIDUwYrOhRjZwX7WKCrvb9tRxxA/BV0RBmJ9a0DtIMhaMvigPTCH/m57sOL322Ab37gS8jDE=
+	t=1782737966; cv=none; b=ZiLhoEvEO/Keb6VsaCIJyk1BrCh1J9CmgK7U92BNctrdUDXH7uKhNLQz83+dwGjFvmkGwYnV0PmiMEs1E6JLptSjLGgzsIV/CRVWDvcey7/EqvKNen6eYPu15LURak5kLkkxNFminSOEsHYy8QfDZarP08qEoO4/YVeSNneCtzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782737871; c=relaxed/simple;
-	bh=zfksjw+XRBPxiZB4Kl4ufA4nXVLgzGFz2c+17Fn6Yn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I+I6KMAE1mq0uPQPKJE7e9hlcE4/7+V243B2VMQj90pDOGn43404aGblb5/rlT/z07Y3CUuXz4+zunHJniRltqWrOJrabkZj/q+m3UES3KR26kc3z0zGbnLVRaDMD411b/gN7ajMZ+EJzBkM3TO/W72D8IIvwn75ANM+H1gOM9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LTV6djWo; arc=none smtp.client-ip=209.85.128.49
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4939a809b24so16668865e9.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 05:57:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782737868; x=1783342668; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zS6INqnnyC03KYKAIS5NHsKTWgAmbX4KvTkfnH8Dlis=;
-        b=LTV6djWorcvP7cu6Zcqhf48TrEgrSu0/pH/34I66LZYBvNn2QtaGhC7BuJd3+EZD72
-         sYmJE8qKrNPzU8Fmq8VsDlLSiZl/Jho5ZFmqfeYg6uLlBa7Lwt8B73NLhq9Blu6XjaRs
-         k4h0viYx2bQ6hctjh83/6reD0J2lTVF2GudD194HQYP2KhoU28hsKFybd/sL5STTFylx
-         HKgy6eKtEp2q0QKTKVCLtNdWd8pzsywzSr+62myrcotcdZ75dyeNKah2+RSyn/ytZB43
-         NfVNjp8wfh7gMc4dGLQHroVkA4dXSlkHh9NOgF2s70WI/H1STAVfsRzmu3d3G96f2Kkd
-         Cu2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782737868; x=1783342668;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zS6INqnnyC03KYKAIS5NHsKTWgAmbX4KvTkfnH8Dlis=;
-        b=gIScGkVaLOWUZKdlpcBsI4iJBcxbzT9+6eUxfw7eLarXv+ii1ZOa5G3l72kTG74IIx
-         P2dolYcxILrD1d/qKz/N5AwUnUv+rayn+/donXcX0X/NZ5zglaAhx3jF0BmirCw99oyj
-         mGRuldawWdZU9rK5KuBi526W3KhyU+NfP12zSi9bxEsC+aX4dKdKn6kb0/23HTFT1B0j
-         ODyPaob3Ysc2AS4mpaozlFJjESTGmiHFTNFc7dZg6Md9fdzC4qUnQbYmvrkf3tjl8DG0
-         qf8Z6DmYrmWUEVgbhKPzPCvXUAyWybefIdnMhFjDEKH2GVf1Ur/KtTBtZwTSdClHIyaB
-         SuDA==
-X-Forwarded-Encrypted: i=1; AFNElJ/2nC31Dab7Ft7oa3YGZgI/HwXYq4neNPViG8TuTWYj6LArXYyMqnidCDCNMASCyEgyQKpdbR0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxm/DLK4wqUVfuP4xJuUGd0EVMyrZYX68tULyi+dMlIUKp941pL
-	j+4wEGfQBAvKGcfNneJkivW/baGHRB2hmL8KCiiU+Q1sU9aBOh5mHiUW
-X-Gm-Gg: AfdE7cmsqeZa4LMhahefoYFTrlUahieJ/bhSJ+i4Wf+QEtzblevZtpwJ5VaEjEZOAhS
-	1yH4k4NnqEKaxsq7BuiEYnfYXnnsJHtmGIwx2RG9/y4aJ2WltmuTROUK1N4WQxrRoRNarEmvIzX
-	cvDn0Lw8fmOamqaEiJTR6E3sMlzOqKJM7l54kHgbdl8h6dEXxLzv90fUW4Mv0+uNehTNCsndW3T
-	xzfT5lemwEqVc907MRTXSgz071fVqQhpnhfBbNLh92m7Y1kDnLcNM8VmT/+S1NsVq5rx0myxjnF
-	sEcnpUyvkHlXIgK8BdNbDcAY4Bc7AnevekXVhhRxERzwqHVRUD29rJvQ9cdJjxgdGU7FiHoodFj
-	bodNehtLYpuhS8ASvRUzpj/NFHJhTWkhflLlxPOo3zam2EVcH0aMyfjhOf1wq64ke2NTMeykd14
-	N3t+Tr30r3Ehz1DehQIqk9NA==
-X-Received: by 2002:a05:600c:3acd:b0:492:6da2:5f0e with SMTP id 5b1f17b1804b1-4926da25f4dmr177134215e9.32.1782737868462;
-        Mon, 29 Jun 2026 05:57:48 -0700 (PDT)
-Received: from uberwald.home ([2a02:a03f:635d:6701:d6a2:6d4:bf93:c1b7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492690a1a85sm546336835e9.15.2026.06.29.05.57.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 05:57:47 -0700 (PDT)
-From: "Guillaume @layus Maudoux" <layus.on@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Eduard Zingerman <eddyz87@gmail.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	bpf@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	s=arc-20240116; t=1782737966; c=relaxed/simple;
+	bh=OAabJhZJpwdljO6/DOk3RokqXfpzgC+NtYOZUkORDt0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W9MGCYfriAPM59kdtACUpv0kVUgb9MkAlbQYvRCUFzO5KPQ9UwemTDBuW0vfbooqiAXpS+y54OSWKAavpknFUs8yuNCQI4k7r5NnejM5GYHIjlyoJOmuw4bWkOOiETjRShBFSu4V5sjzoIAcq+6h3zVm7hgb3dL2OHAfFg/YrTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me; spf=pass smtp.mailfrom=rcpassos.me; dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b=WNdUmxUN; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=GyEMib7G; arc=none smtp.client-ip=34.202.193.197
+DKIM-Signature: a=rsa-sha256; b=WNdUmxUNjSIFknvfTJ0w5wTRP9R0jFn/wzrIGwbmMaukZVK3ih7w2yozFrKJj7Qkxr0DAG1sDDIpj9sWyu3u7QY47EemI0kk9AK+q2JG/Yr1wpl0Id5r3FJN6C1qlEPnprbi5dax3EWftVC3J+4Jrhgn8ln522ZEIitzfVE+D8+eHizV7dL0G95s+Lhrm8xTNpNmdv2nsJ2FfW+ssKxzemPsN/IerApwUfMa+V5P4QmUNTWaQL9YS7/aaMSdQPYuZbi3GL05Ncepk2Bq4Hhp8oONUAlx+Pp1vAMnNc50D7HACz7Ja4yl/XnhOCFd2yz+gkuanL9hLEWY4Ka92M5Nbg==; s=purelymail2; d=rcpassos.me; v=1; bh=OAabJhZJpwdljO6/DOk3RokqXfpzgC+NtYOZUkORDt0=; h=Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=GyEMib7GxlAfbmEixXiJ+7ATVUeMTInm2mJGrzGh7uS98PRodaLZ9H8Kua3hvuhn1z5Ccqd2uEVvD0FuKLY3AwVU7McoFmHenF2gNFamgvMrVgAA/EbvvH3SFUs/LE7oE/5yUmKmJ87adLhu3oHOEceBpOetVIa9gHYvcHIFq4giAg7RU3MOnGeqpUzlHqf6a/gqxpMO4+vZ3Kv3Z0BV7eMnX8TgBni3KLDqIibfQ3zWXEtVmHkvjloIiIuj+vwX942zuvMSFmwpDGJRhoWTU5Ds3JtmJ39cOdaQhWpXVt09Vi7PCtT7+bwA02M3UQenZqkux5t2ZZ4FI5EAdtFlFw==; s=purelymail2; d=purelymail.com; v=1; bh=OAabJhZJpwdljO6/DOk3RokqXfpzgC+NtYOZUkORDt0=; h=Feedback-ID:Received:From:To:Subject:Date;
+Feedback-ID: 45355:7809:null:purelymail
+X-Pm-Original-To: netdev@vger.kernel.org
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 647000529;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Mon, 29 Jun 2026 12:59:01 +0000 (UTC)
+From: Rafael Passos <rafael@rcpassos.me>
+To: andrew+netdev@lunn.ch,
+	tytso@mit.edu
+Cc: rafael@rcpassos.me,
+	Jason@zx2c4.com,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
 	linux-kernel@vger.kernel.org,
-	"Guillaume @layus Maudoux" <layus.on@gmail.com>
-Subject: [PATCH] selftests/bpf: Mask socket type flags in mptcpify prog
-Date: Mon, 29 Jun 2026 14:56:37 +0200
-Message-ID: <20260629125637.384923-1-layus.on@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+9ca7674fa7521a3f1bc2@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	wireguard@lists.zx2c4.com
+Subject: [PATCH v2] Wireguard: Fix data-race in rx/tx counter
+Date: Mon, 29 Jun 2026 09:59:13 -0300
+Message-ID: <20260629125913.2354450-1-rafael@rcpassos.me>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <DJL786MPR9HO.BWHI3U37PDVM@rcpassos.me>
+References: <DJL786MPR9HO.BWHI3U37PDVM@rcpassos.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
+Content-Type: text/plain; charset=UTF-8
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[rcpassos.me,reject];
+	R_DKIM_ALLOW(-0.20)[rcpassos.me:s=purelymail2,purelymail.com:s=purelymail2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-302628-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:shuah@kernel.org,m:bpf@vger.kernel.org,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:layus.on@gmail.com,m:layuson@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302629-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[layuson@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[rafael@rcpassos.me,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:tytso@mit.edu,m:rafael@rcpassos.me,m:Jason@zx2c4.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzbot+9ca7674fa7521a3f1bc2@syzkaller.appspotmail.com,m:syzkaller-bugs@googlegroups.com,m:wireguard@lists.zx2c4.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[layuson@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rafael@rcpassos.me,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[rcpassos.me:+,purelymail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,9ca7674fa7521a3f1bc2];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,purelymail.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 81C006DB0D5
+X-Rspamd-Queue-Id: 873DF6DB13E
 
-The mptcpify BPF prog hooks update_socket_protocol() to rewrite
-eligible TCP socket() calls to IPPROTO_MPTCP. It only does so when the
-socket type is exactly SOCK_STREAM:
+Fix data-race in {rx/tx}_bytes counter for wireguard connection.
+These values were incremented inside a read_lock_bh block, without
+exclusive write protection.
+Using per-cpu counters guarantees consistency, and move overhead only to
+the read part: the least frequent operation.
 
-	type == SOCK_STREAM
-
-The problem is that update_socket_protocol() in __sys_socket() is
-called on the raw type argument as passed from userspace, before
-__sys_socket_create() strips the flag bits with
-"type &= SOCK_TYPE_MASK". The type argument may therefore carry
-SOCK_CLOEXEC and/or SOCK_NONBLOCK in its upper bits, and the equality
-check above then fails.
-
-As a result, any socket created with e.g.
-socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0) -- which is what common
-libraries do by default -- is silently left as plain TCP instead of
-being upgraded to MPTCP. This was observed in practice with curl,
-whose connections were not upgraded to MPTCP despite the prog being
-attached.
-
-The impact reaches beyond the test, because mptcpify.c is referenced
-as example code for users who want to transparently enable MPTCP. The
-same mistake is therefore likely to be copied into real deployments,
-where it fails the same way and is hard to diagnose.
-
-The fix is to mask off the flag bits before comparing, mirroring what
-the socket core does:
-
-	(type & SOCK_TYPE_MASK) == SOCK_STREAM
-
-Since SOCK_TYPE_MASK is not exposed through vmlinux.h, define it in
-bpf_tracing_net.h.
-
-To exercise the regression directly, extend the mptcpify test to also
-create the server socket with SOCK_CLOEXEC and SOCK_NONBLOCK set.
-Routing a flagged type through start_server() then revealed a second
-instance of the same pattern: start_server_addr() compared the type
-against SOCK_STREAM for equality to decide whether to set SO_REUSEADDR
-and call listen(), and so would skip listening for a flagged type.
-Mask the type there as well. As SOCK_TYPE_MASK is not exposed by
-glibc's <sys/socket.h> either, define it in network_helpers.h,
-mirroring prog_tests/socket_helpers.h.
-
-Fixes: ddba122428a7 ("selftests/bpf: Add mptcpify test")
-Signed-off-by: Guillaume @layus Maudoux <layus.on@gmail.com>
+Signed-off-by: Rafael Passos <rafael@rcpassos.me>
 ---
- tools/testing/selftests/bpf/network_helpers.c |  4 ++--
- tools/testing/selftests/bpf/network_helpers.h |  5 +++++
- .../testing/selftests/bpf/prog_tests/mptcp.c  | 20 +++++++++++++++----
- .../selftests/bpf/progs/bpf_tracing_net.h     |  3 +++
- tools/testing/selftests/bpf/progs/mptcpify.c  |  2 +-
- 5 files changed, 27 insertions(+), 7 deletions(-)
+As we discussed in the thread, keeping this counters accurate might not
+be worth this extra memory cost of per-cpu counter.
+It was great reading and learning about it. I think this would have been
+a good patch :)
 
-diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
-index b82f572641b7..db935a9d9fc1 100644
---- a/tools/testing/selftests/bpf/network_helpers.c
-+++ b/tools/testing/selftests/bpf/network_helpers.c
-@@ -111,7 +111,7 @@ int start_server_addr(int type, const struct sockaddr_storage *addr, socklen_t a
- 	if (settimeo(fd, opts->timeout_ms))
- 		goto error_close;
- 
--	if (type == SOCK_STREAM &&
-+	if ((type & SOCK_TYPE_MASK) == SOCK_STREAM &&
- 	    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) {
- 		log_err("Failed to enable SO_REUSEADDR");
- 		goto error_close;
-@@ -128,7 +128,7 @@ int start_server_addr(int type, const struct sockaddr_storage *addr, socklen_t a
- 		goto error_close;
- 	}
- 
--	if (type == SOCK_STREAM) {
-+	if ((type & SOCK_TYPE_MASK) == SOCK_STREAM) {
- 		if (listen(fd, opts->backlog ? MAX(opts->backlog, 0) : 1) < 0) {
- 			log_err("Failed to listed on socket");
- 			goto error_close;
-diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
-index 79a010c88e11..75133119c04a 100644
---- a/tools/testing/selftests/bpf/network_helpers.h
-+++ b/tools/testing/selftests/bpf/network_helpers.h
-@@ -25,6 +25,11 @@ typedef __u16 __sum16;
- #define VIP_NUM 5
- #define MAGIC_BYTES 123
- 
-+/* include/linux/net.h */
-+#ifndef SOCK_TYPE_MASK
-+#define SOCK_TYPE_MASK 0xf
-+#endif
+When looking around drivers/net, I found a few u64_stats uses without
+per-cpu. I will do some digging to understand the reasoning behind it,
+compared to the original "bare u64 counters" in wireguard.
+
+Thanks,
+Rafael Passos
+
+ drivers/net/wireguard/netlink.c | 22 ++++++++++++++++++++--
+ drivers/net/wireguard/peer.c    |  7 ++++++-
+ drivers/net/wireguard/peer.h    |  7 ++++++-
+ drivers/net/wireguard/receive.c |  9 ++++++++-
+ drivers/net/wireguard/socket.c  |  9 +++++++--
+ 5 files changed, 47 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlin=
+k.c
+index 1da7e98d0d50..f5978a8c2ca3 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -105,13 +105,31 @@ get_peer(struct wg_peer *peer, struct sk_buff *skb, s=
+truct dump_ctx *ctx)
+ =09=09if (fail)
+ =09=09=09goto err;
+=20
++=09=09// read per-cpu counters for peer rx/tx_bytes
++=09=09u64 total_rx_bytes =3D 0, total_tx_bytes =3D 0;
++=09=09u64 rx_bytes =3D 0, tx_bytes =3D 0;
++=09=09struct wg_peer_stats *pcpu_ptr;
++=09=09unsigned int cpu, start;
 +
- struct network_helper_opts {
- 	int timeout_ms;
- 	int proto;
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index 8fade8bdc451..faa001ea84ab 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -264,7 +264,7 @@ static int verify_mptcpify(int server_fd, int client_fd)
- 	return err;
++=09=09for_each_possible_cpu(cpu) {
++=09=09=09pcpu_ptr =3D per_cpu_ptr(peer->pcpu_stats, cpu);
++=09=09=09do {
++=09=09=09=09start =3D u64_stats_fetch_begin(&pcpu_ptr->syncp);
++=09=09=09=09rx_bytes =3D u64_stats_read(&pcpu_ptr->rx_bytes);
++=09=09=09=09tx_bytes =3D u64_stats_read(&pcpu_ptr->tx_bytes);
++=09=09=09} while (u64_stats_fetch_retry(&pcpu_ptr->syncp, start));
++
++=09=09=09total_rx_bytes +=3D rx_bytes;
++=09=09=09total_tx_bytes +=3D tx_bytes;
++=09=09}
++
+ =09=09if (nla_put(skb, WGPEER_A_LAST_HANDSHAKE_TIME,
+ =09=09=09    sizeof(last_handshake), &last_handshake) ||
+ =09=09    nla_put_u16(skb, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+ =09=09=09=09peer->persistent_keepalive_interval) ||
+-=09=09    nla_put_u64_64bit(skb, WGPEER_A_TX_BYTES, peer->tx_bytes,
++=09=09    nla_put_u64_64bit(skb, WGPEER_A_TX_BYTES, total_tx_bytes,
+ =09=09=09=09      WGPEER_A_UNSPEC) ||
+-=09=09    nla_put_u64_64bit(skb, WGPEER_A_RX_BYTES, peer->rx_bytes,
++=09=09    nla_put_u64_64bit(skb, WGPEER_A_RX_BYTES, total_rx_bytes,
+ =09=09=09=09      WGPEER_A_UNSPEC) ||
+ =09=09    nla_put_u32(skb, WGPEER_A_PROTOCOL_VERSION, 1))
+ =09=09=09goto err;
+diff --git a/drivers/net/wireguard/peer.c b/drivers/net/wireguard/peer.c
+index 1cb502a932e0..a37aa31f132a 100644
+--- a/drivers/net/wireguard/peer.c
++++ b/drivers/net/wireguard/peer.c
+@@ -36,6 +36,10 @@ struct wg_peer *wg_peer_create(struct wg_device *wg,
+ =09if (unlikely(dst_cache_init(&peer->endpoint_cache, GFP_KERNEL)))
+ =09=09goto err;
+=20
++=09peer->pcpu_stats =3D alloc_percpu(struct wg_peer_stats);
++=09if (unlikely(!peer->pcpu_stats))
++=09=09goto err;
++
+ =09peer->device =3D wg;
+ =09wg_noise_handshake_init(&peer->handshake, &wg->static_identity,
+ =09=09=09=09public_key, preshared_key, peer);
+@@ -189,7 +193,8 @@ static void rcu_release(struct rcu_head *rcu)
+=20
+ =09dst_cache_destroy(&peer->endpoint_cache);
+ =09WARN_ON(wg_prev_queue_peek(&peer->tx_queue) || wg_prev_queue_peek(&peer=
+->rx_queue));
+-
++
++=09free_percpu(peer->pcpu_stats);
+ =09/* The final zeroing takes care of clearing any remaining handshake key
+ =09 * material and other potentially sensitive information.
+ =09 */
+diff --git a/drivers/net/wireguard/peer.h b/drivers/net/wireguard/peer.h
+index 718fb42bdac7..e01781724aa1 100644
+--- a/drivers/net/wireguard/peer.h
++++ b/drivers/net/wireguard/peer.h
+@@ -34,6 +34,11 @@ struct endpoint {
+ =09};
+ };
+=20
++struct wg_peer_stats {
++=09u64_stats_t rx_bytes, tx_bytes;
++=09struct u64_stats_sync syncp;
++};
++
+ struct wg_peer {
+ =09struct wg_device *device;
+ =09struct prev_queue tx_queue, rx_queue;
+@@ -49,7 +54,7 @@ struct wg_peer {
+ =09struct work_struct transmit_handshake_work, clear_peer_work, transmit_p=
+acket_work;
+ =09struct cookie latest_cookie;
+ =09struct hlist_node pubkey_hash;
+-=09u64 rx_bytes, tx_bytes;
++=09struct wg_peer_stats __percpu *pcpu_stats;
+ =09struct timer_list timer_retransmit_handshake, timer_send_keepalive;
+ =09struct timer_list timer_new_handshake, timer_zero_key_material;
+ =09struct timer_list timer_persistent_keepalive;
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receiv=
+e.c
+index eb8851113654..d799370122b5 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -19,8 +19,15 @@
+ /* Must be called with bh disabled. */
+ static void update_rx_stats(struct wg_peer *peer, size_t len)
+ {
++=09struct wg_peer_stats *pcpu_ptr;
++
+ =09dev_sw_netstats_rx_add(peer->device->dev, len);
+-=09peer->rx_bytes +=3D len;
++
++=09pcpu_ptr =3D this_cpu_ptr(peer->pcpu_stats);
++
++=09u64_stats_update_begin(&pcpu_ptr->syncp);
++=09u64_stats_add(&pcpu_ptr->rx_bytes, len);
++=09u64_stats_update_end(&pcpu_ptr->syncp);
  }
- 
--static int run_mptcpify(int cgroup_fd)
-+static int run_mptcpify(int cgroup_fd, int type)
+=20
+ #define SKB_TYPE_LE32(skb) (((struct message_header *)(skb)->data)->type)
+diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.=
+c
+index 0028ef17dc71..685ae6a0fb2c 100644
+--- a/drivers/net/wireguard/socket.c
++++ b/drivers/net/wireguard/socket.c
+@@ -166,6 +166,7 @@ static int send6(struct wg_device *wg, struct sk_buff *=
+skb,
+=20
+ int wg_socket_send_skb_to_peer(struct wg_peer *peer, struct sk_buff *skb, =
+u8 ds)
  {
- 	int server_fd, client_fd, err = 0;
- 	struct mptcpify *mptcpify_skel;
-@@ -280,7 +280,7 @@ static int run_mptcpify(int cgroup_fd)
- 		goto out;
- 
- 	/* without MPTCP */
--	server_fd = start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
-+	server_fd = start_server(AF_INET, type, NULL, 0, 0);
- 	if (!ASSERT_GE(server_fd, 0, "start_server")) {
- 		err = -EIO;
- 		goto out;
-@@ -307,7 +307,18 @@ static int run_mptcpify(int cgroup_fd)
- static void test_mptcpify(void)
- {
- 	struct netns_obj *netns = NULL;
--	int cgroup_fd;
-+	int cgroup_fd, i;
-+	int types[] = {
-+		SOCK_STREAM,
-+		/* userspace sets these flags together with the type, and the
-+		 * BPF prog must still upgrade the socket to MPTCP. See
-+		 * update_socket_protocol() in net/socket.c, which runs before
-+		 * the type is masked with SOCK_TYPE_MASK.
-+		 */
-+		SOCK_STREAM | SOCK_CLOEXEC,
-+		SOCK_STREAM | SOCK_NONBLOCK,
-+		SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK,
-+	};
- 
- 	cgroup_fd = test__join_cgroup("/mptcpify");
- 	if (!ASSERT_GE(cgroup_fd, 0, "test__join_cgroup"))
-@@ -317,7 +328,8 @@ static void test_mptcpify(void)
- 	if (!ASSERT_OK_PTR(netns, "netns_new"))
- 		goto fail;
- 
--	ASSERT_OK(run_mptcpify(cgroup_fd), "run_mptcpify");
-+	for (i = 0; i < ARRAY_SIZE(types); i++)
-+		ASSERT_OK(run_mptcpify(cgroup_fd, types[i]), "run_mptcpify");
- 
- fail:
- 	netns_free(netns);
-diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-index d8dacef37c16..c4b438854565 100644
---- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-+++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-@@ -8,6 +8,9 @@
- #define AF_INET			2
- #define AF_INET6		10
- 
-+/* include/linux/net.h */
-+#define SOCK_TYPE_MASK		0xf
-+
- #define SOL_SOCKET		1
- #define SO_REUSEADDR		2
- #define SO_SNDBUF		7
-diff --git a/tools/testing/selftests/bpf/progs/mptcpify.c b/tools/testing/selftests/bpf/progs/mptcpify.c
-index cbdc730c3a47..e3f8cb54dbe9 100644
---- a/tools/testing/selftests/bpf/progs/mptcpify.c
-+++ b/tools/testing/selftests/bpf/progs/mptcpify.c
-@@ -15,7 +15,7 @@ int BPF_PROG(mptcpify, int family, int type, int protocol)
- 		return protocol;
- 
- 	if ((family == AF_INET || family == AF_INET6) &&
--	    type == SOCK_STREAM &&
-+	    (type & SOCK_TYPE_MASK) == SOCK_STREAM &&
- 	    (!protocol || protocol == IPPROTO_TCP)) {
- 		return IPPROTO_MPTCP;
- 	}
--- 
-2.54.0
++=09struct wg_peer_stats *pcpu_ptr;
+ =09size_t skb_len =3D skb->len;
+ =09int ret =3D -EAFNOSUPPORT;
+=20
+@@ -178,8 +179,12 @@ int wg_socket_send_skb_to_peer(struct wg_peer *peer, s=
+truct sk_buff *skb, u8 ds)
+ =09=09=09    &peer->endpoint_cache);
+ =09else
+ =09=09dev_kfree_skb(skb);
+-=09if (likely(!ret))
+-=09=09peer->tx_bytes +=3D skb_len;
++=09if (likely(!ret)) {
++=09=09pcpu_ptr =3D this_cpu_ptr(peer->pcpu_stats);
++=09=09u64_stats_update_begin(&pcpu_ptr->syncp);
++=09=09u64_stats_add(&pcpu_ptr->tx_bytes, skb_len);
++=09=09u64_stats_update_end(&pcpu_ptr->syncp);
++=09}
+ =09read_unlock_bh(&peer->endpoint_lock);
+=20
+ =09return ret;
+--=20
+2.53.0
 
 
