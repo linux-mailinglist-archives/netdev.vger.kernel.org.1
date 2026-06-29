@@ -1,364 +1,237 @@
-Return-Path: <netdev+bounces-302774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Gu4PEpC2QmpMAAoAu9opvQ
-	(envelope-from <netdev+bounces-302774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:16:48 +0200
+	id d6DpLdq2QmpYAAoAu9opvQ
+	(envelope-from <netdev+bounces-302775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:18:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71C06DDF53
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:16:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF4656DDF67
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:18:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=r3ngRI7J;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302774-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302774-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=VNtHKhc9;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=VGtJps6u;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=SsLfc1Uz;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=0ewm2h2d;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302775-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302775-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C62C30330B7
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:13:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68689304544C
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395F337D13D;
-	Mon, 29 Jun 2026 18:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0155637FF47;
+	Mon, 29 Jun 2026 18:15:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FAD2C2360
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:13:08 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782756791; cv=pass; b=RGZjDSHvoo6Hytqm5Zx+4b5BMoRIcU4In0xLUf202zg1vgQEoj07qUnTqVPBVmnlRkNqIwQ8VwQ1PKTzsafp4zQrSmT3Kkj71deevolXb0EAAZdC4Gwzd2JaySrkcWY5RRRPfJ+QiPjWOahukRHeU6NKu6khc45kiVzzz2EYX1w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782756791; c=relaxed/simple;
-	bh=YsBJ5rLzCHNROrpoUXAG2+olo/jg6vCTJlr1rdi8LKo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fq/mM93Xxi8AWYPgUWbSeQus/jPo/N9nyXsD6s+C0LrNJKIbhx/ZEMjFJQJMJhVl1KO4LfEHRjwlBEftjCff2ibVsfdEWxjY1ZlQzgx+dqW04LGM7x1lwvUkMEYFwIYGMRUSb2rwcpyQoLeKijpJ+iQVSjXAiq1SEF18d0KQWP0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r3ngRI7J; arc=pass smtp.client-ip=209.85.128.174
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-80bab6cf5ebso32471267b3.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:13:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782756787; cv=none;
-        d=google.com; s=arc-20260327;
-        b=st15asnxmlAuSTIwiQNiuUcaJzR82URhmAhiTTwrQZvx4lC8qvW1UQFKhdxz7d4zsH
-         yX+BOBDA0OX75ok6XQridsoux9GCgIDaQ+OZRJWNwNiosbt3+WUFs1kg7xtfvE6xpAnm
-         UT5jEQrjU1aZ9o/0YF6rDD9om5+zXpKupkgyRfpyq3WCxv8cZUZgcdzaZPyvvsX/c7AO
-         FPXzUVFFqm4u+F4wttUeb3g2tt9AuCqM50bEn69zC4cJzYPI499HnkxRRleXPdxLXjmH
-         GjuzlnL4YFF1XMvdBrwrt1QlZFPeMboqJ2VLqmEWvjk5JuxPTb6Xn3a2dkmG7KcmLLSV
-         Tfpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=SmmYAil1f9hLMNCPLSvS+Czx4YqCWUlhWfkBPgyh9NY=;
-        fh=OgPBJaXhftMvyZttB6eJXVX1+yvHNVY7Zt4b71AcTTk=;
-        b=QF5C8apB/GFZWoPE4EfAAqH9AuBf/4U9uEa0xDLDqpdjoOgTRmSWKulfaGR1ZrfJ+m
-         OJLBW48fiZOdYGwImmpCIFwQIClPSSE0oXY4NzMkepvScyiiZi9WJrtKHH3/RevjOKBF
-         iX/qCt37/3VhqsF8iz+8C/1y0spvrxgsrwCSKB+E12u2l+AF2jmk5enxJTeOmMAQ2eKG
-         2jDEs2pV6PXK22M18qfwcfw8hwyzWR8Iv8RryfOtKshEzDbgmvXOxH0rZYoW4CVnsugc
-         0NT+S01zJcewsqxkyU+D2gElIP/o5DT/FxrmSim/yPyvUAi/Ewn0HZdKix0gCsQtjt+V
-         pSHA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782756787; x=1783361587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SmmYAil1f9hLMNCPLSvS+Czx4YqCWUlhWfkBPgyh9NY=;
-        b=r3ngRI7Jw9a9T4fPzceGvzHGZRZZq6wE0N8XjsH5UPH5hLeo0brp789qCVWuxAnoS0
-         gS3TMV/Cw6nuiR1WzZM/2N31gOX/7iUcSOu5g7v0WcTy6bmtuy5mq0DGSCWwRtreNS7X
-         TysAfKHcBqNz1ud1PETZI/DUHiAb+js5G5s7xqEjK3LjYFhDoDHzJ+BGJRFBY9CPuzsz
-         eGj6HqkRitxTwvykDsc694jyWxXtSsaHYkKS6F+X2098lujKa0HRsxnJOTfFr9g0IOoX
-         ptSWKhC+6uoAzRb3d06nLra+bLdT7lRdQnRzvqxGNOOH5dYygTcgBJZFoExKIir97Gjx
-         KS2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782756787; x=1783361587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SmmYAil1f9hLMNCPLSvS+Czx4YqCWUlhWfkBPgyh9NY=;
-        b=IbBudAs2o/PmiFV4xiIf1tLv43fwpBTQXglMzI6SErqg7E415d1doAfgDLBaAVTNIl
-         HDPpeLTy8Aha4hjorVlpSyH6P677CD9qTY6kXP3E4uy6cXzdcGYSU+x/7eoW2/FnrwG1
-         qxVplt4yhjdYontVcxtdefSpWlKsy1XuPeUsUD7JnicTYvEaUGI+CRf0ktiOHMhOHdLW
-         MJrWa+UiK/A9SG1FIJfU9RCiSu5YtO8hpu+kgOV4VRq3JcADdtaCXk2L5b1tPQWXH1GH
-         1w8VJeqboBZLJwN9BFS6++qenudNwnqtk1CATWvqXkbCwQB+7vnlc5a64W4N2dm8mkoO
-         IAVQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rrvw6tH8Mxfok5CUPZL/u+6nTsqMZ2u+vYnGMR+WWAwE6JXxq1yAtbdQWLOPwgkhRDHVy9aUQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyn4fMcFfprYuaPSUJIkq04tZFITWLSaB8XINuTHD5ok4/lpbXQ
-	w6rtKK994aw4a8AdUXydvMyCkyvmPlK+V3zzM+w2OKMxEoiOg8ZIBmLYx2z+Rjf+094LNMJ1VNf
-	hQSxtPDs0QR5U2hOupTmb9oIiai9V2pQ=
-X-Gm-Gg: AfdE7ckGSPneti3JTiJgwlJhR2+UEmj2DSiCVRsqYQfe8rYHgRKH6AY1Wp9Px/io7XK
-	K6IYSgBd8Mz0OoyVPD++re1RUftYyUTn+KSGbdFhoUOSF2GqPixR+xIlI6xB1nEj6UWFzOgydkG
-	axjkWssx6RcM4IaMuM8YuW5s1rnvgz8DwbgvDkMQPxqIIt7f4HPeg0tQ6eecmLe7N9axx2tuPMo
-	WymYBkKBX7n76SNZa6wfAHh4HuCWsa3+gPRouSxS6FCeIoaLFei3GMh3cQJngqKdpXiyCZjoVeB
-	Bg/1AGiEOczN
-X-Received: by 2002:a05:690c:dcd:b0:80b:1616:5c0e with SMTP id
- 00721157ae682-810e984a566mr3240827b3.20.1782756787534; Mon, 29 Jun 2026
- 11:13:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD1A3803F7
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:15:02 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782756904; cv=none; b=MVsk+3/vsdiJTWXOYlJhj4bR+RiUJaVRw+FWjaPaXU8+pcwageC/lthYLJyiX2ov/DkiUE97Af66EgcifFYxlET+vNO4ZGEObQSy/jwtmducs9+zKslZLxqL8Z9a9HwkOI6/9EV4yXIZ6AoG648K+3z5x3Sc8InN6sqrebP3f7Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782756904; c=relaxed/simple;
+	bh=By0n8G3sBjGLrUSrrTIHRTlZQW3MAqjP1hwQzFXUw7A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LqAsYGWpYjpVBWIVF3aZzw6EmELywmtexuF9jDkcDJDwvh7Y/D37WUux7ooC8jKt23pUTscQe+qJ0F4gngcW0HvyGi0ph/f96leIQK0aC6TeMvvYrqPKahFX2ZnLtf2N+YzYNd6mBbpZnFi7A8YmEUlqyt3oemNWWWAjrnUmwqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=VNtHKhc9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VGtJps6u; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SsLfc1Uz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0ewm2h2d; arc=none smtp.client-ip=195.135.223.130
+Received: from lion.mk-sys.cz (unknown [10.149.218.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CA524731FD;
+	Mon, 29 Jun 2026 18:14:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1782756900; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iKDO9YEPoEjEnMcJ6USeubCIXl3RKllsrDCzVLn6z9c=;
+	b=VNtHKhc9ARdD8zfheivU5BHCNZn7aW7IugGli1pdOVyPVCWvLit3KzxPwgsN0A7/GKNp4r
+	qLVBiYMqZDghr8rsoJ3s2OdbrXkDsJWvAzdFl5hCAGX96RUgCWdfOxS/ZLhrJryDBef+eG
+	hds+1srxiM8VLQc4Yls9vzVA0RNanoQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1782756900;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iKDO9YEPoEjEnMcJ6USeubCIXl3RKllsrDCzVLn6z9c=;
+	b=VGtJps6uimFJEKdlPlWS3P1gKnOlTx8J5KMA2qR2HjXxNxuEUeiDw1IvFlLojxpN9wnAfE
+	PrIwBSJcPTuhIuDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1782756898; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iKDO9YEPoEjEnMcJ6USeubCIXl3RKllsrDCzVLn6z9c=;
+	b=SsLfc1UzxwE8Xlv+ELmNDUBdsgw7gis0jjbYoLlRCNZP6CpfGmwpFPTknKAg9CYYSNTsSc
+	4zlfdVlioxomjqDK8K7LL6k/kcWh2F6s+Qpo80azWITEPacYdxUtusAEdJNh6/NIZ6ScL8
+	YFl3xTOiwVJrK7S2kdR+oW6OEAAaqbc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1782756898;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iKDO9YEPoEjEnMcJ6USeubCIXl3RKllsrDCzVLn6z9c=;
+	b=0ewm2h2d1h24j7cJcdmUcK5A1DUGwcKJ7co/X7ZP4iAWcXQl/RDWdMKqH+EU1FZ7E0UmBp
+	zmTzQfG2RWw7yOBA==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 9B4292008C; Mon, 29 Jun 2026 20:14:58 +0200 (CEST)
+Date: Mon, 29 Jun 2026 20:14:58 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: "D H, Siddaraju" <siddaraju.dh@intel.com>, 
+	Andrew Lunn <andrew@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"Das, Shubham" <shubham.das@intel.com>, "Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>, 
+	"Srinivasan, Vijay" <vijay.srinivasan@intel.com>
+Subject: Re: the confusing 10000base_CR. Shouldn't it be 10000_SFI_DA?
+Message-ID: <jwbx3t5mxv6drv56ttu3iavtbv34csqtdewdgal4jkutx4zpgs@uya4traf7und>
+References: <MW4PR11MB6912A234CAAAFD25EAC7C8909AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <2994edfc-0894-49c9-abac-6daea5e12075@lunn.ch>
+ <MW4PR11MB6912BE7FEDE5C509B6C5D5DF9AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <2baa5a77-3305-4ed9-b56d-ba27cecc1911@lunn.ch>
+ <MW4PR11MB6912BABFEED268D38B4BC2BB9AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <1b3975a8-788a-4b81-94ec-3ab5708b251b@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260629125637.384923-1-layus.on@gmail.com>
-In-Reply-To: <20260629125637.384923-1-layus.on@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Mon, 29 Jun 2026 11:12:54 -0700
-X-Gm-Features: AVVi8CdW3Ek5fAOq0hw_26M9hi49cDbrZRotwx5VJpI7hZNDTSnWdF5fckFOukc
-Message-ID: <CAMB2axM=utfi11L1e2-yMgCiSEZ=QrZAPrcFLwk44hNqyT1qJQ@mail.gmail.com>
-Subject: Re: [PATCH] selftests/bpf: Mask socket type flags in mptcpify prog
-To: "Guillaume @layus Maudoux" <layus.on@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	bpf@vger.kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2h5sszaprbwge7ah"
+Content-Disposition: inline
+In-Reply-To: <1b3975a8-788a-4b81-94ec-3ab5708b251b@bootlin.com>
+X-Spam-Flag: NO
+X-Spam-Score: -4.90
+X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:layus.on@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:shuah@kernel.org,m:bpf@vger.kernel.org,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:layuson@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:siddaraju.dh@intel.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:shubham.das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-302774-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-302775-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ameryhung@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,vger.kernel.org,lists.linux.dev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DMARC_NA(0.00)[suse.cz];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[mkubecek@suse.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.cz:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mkubecek@suse.cz,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D71C06DDF53
+X-Rspamd-Queue-Id: DF4656DDF67
 
-On Mon, Jun 29, 2026 at 6:19=E2=80=AFAM Guillaume @layus Maudoux
-<layus.on@gmail.com> wrote:
->
-> The mptcpify BPF prog hooks update_socket_protocol() to rewrite
-> eligible TCP socket() calls to IPPROTO_MPTCP. It only does so when the
-> socket type is exactly SOCK_STREAM:
->
->         type =3D=3D SOCK_STREAM
->
-> The problem is that update_socket_protocol() in __sys_socket() is
-> called on the raw type argument as passed from userspace, before
-> __sys_socket_create() strips the flag bits with
-> "type &=3D SOCK_TYPE_MASK". The type argument may therefore carry
-> SOCK_CLOEXEC and/or SOCK_NONBLOCK in its upper bits, and the equality
-> check above then fails.
->
-> As a result, any socket created with e.g.
-> socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0) -- which is what common
-> libraries do by default -- is silently left as plain TCP instead of
-> being upgraded to MPTCP. This was observed in practice with curl,
-> whose connections were not upgraded to MPTCP despite the prog being
-> attached.
->
-> The impact reaches beyond the test, because mptcpify.c is referenced
-> as example code for users who want to transparently enable MPTCP. The
-> same mistake is therefore likely to be copied into real deployments,
-> where it fails the same way and is hard to diagnose.
->
-> The fix is to mask off the flag bits before comparing, mirroring what
-> the socket core does:
->
->         (type & SOCK_TYPE_MASK) =3D=3D SOCK_STREAM
->
-> Since SOCK_TYPE_MASK is not exposed through vmlinux.h, define it in
-> bpf_tracing_net.h.
->
-> To exercise the regression directly, extend the mptcpify test to also
-> create the server socket with SOCK_CLOEXEC and SOCK_NONBLOCK set.
-> Routing a flagged type through start_server() then revealed a second
-> instance of the same pattern: start_server_addr() compared the type
-> against SOCK_STREAM for equality to decide whether to set SO_REUSEADDR
-> and call listen(), and so would skip listening for a flagged type.
-> Mask the type there as well. As SOCK_TYPE_MASK is not exposed by
-> glibc's <sys/socket.h> either, define it in network_helpers.h,
-> mirroring prog_tests/socket_helpers.h.
->
-> Fixes: ddba122428a7 ("selftests/bpf: Add mptcpify test")
-> Signed-off-by: Guillaume @layus Maudoux <layus.on@gmail.com>
 
-Hello,
+--2h5sszaprbwge7ah
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You will need to use your real name in the SOB. At least "@" caused
-some problems when I downloaded the patch.
+On Mon, Jun 29, 2026 at 11:30:43AM GMT, Maxime Chevallier wrote:
+> > What about
+> > "option-(b): create a new enum ETHTOOL_LINK_MODE_10G_SFI_DA_Full_BIT"?
+> >   Idea is just to create a new enum, with same enum value of 10000baseC=
+R.
+> >   This will NOT consume a bit position in "ethtool_link_mode_bit_indice=
+s".
+> >   It just helps those tech-savvy people, who does not accept 10000baseCR
+> >   and prefer 10000sfiDA for being explicit.
+>=20
+> The thing is that even with a new enum value, that won't bring much to
+> the table. It would likely be better to have a comment near the
+> 10000baseCR definition explaining the SFF equivalency.
+>=20
+> >=20
+> > At worst case, hope we agree for
+> > "option-(c): ethtool.8 man page help strings to indicate 10G_SFI_DA"
+> >   Something like
+> >     "10000baseCR (10G_SFI_DA    SFF-8431 SFP+ DA)
+> >   under "advertise" mask values.
+>=20
+> In that case, let's add Michal in the loop as the ethtool maintainer. Even
+> then it's not straightforward as some tooling relies on the JSON output
+> from ethtool, so _if_ we change the output for that mode, it should only
+> be in the non-json output.
 
-Please also include "bpf-next" in your subject prefix so that the CI
-can properly test it.
+The biggest problem I see here is that even if ethtool has its own link
+mode tables, those are only for backward compatibility and as long as
+reasonably new ethtool and kernel are in use, ethtool gets the link mode
+names from kernel. There are multiple aspects:
 
-> ---
->  tools/testing/selftests/bpf/network_helpers.c |  4 ++--
->  tools/testing/selftests/bpf/network_helpers.h |  5 +++++
->  .../testing/selftests/bpf/prog_tests/mptcp.c  | 20 +++++++++++++++----
->  .../selftests/bpf/progs/bpf_tracing_net.h     |  3 +++
->  tools/testing/selftests/bpf/progs/mptcpify.c  |  2 +-
->  5 files changed, 27 insertions(+), 7 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testin=
-g/selftests/bpf/network_helpers.c
-> index b82f572641b7..db935a9d9fc1 100644
-> --- a/tools/testing/selftests/bpf/network_helpers.c
-> +++ b/tools/testing/selftests/bpf/network_helpers.c
-> @@ -111,7 +111,7 @@ int start_server_addr(int type, const struct sockaddr=
-_storage *addr, socklen_t a
->         if (settimeo(fd, opts->timeout_ms))
->                 goto error_close;
->
-> -       if (type =3D=3D SOCK_STREAM &&
-> +       if ((type & SOCK_TYPE_MASK) =3D=3D SOCK_STREAM &&
->             setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) {
->                 log_err("Failed to enable SO_REUSEADDR");
->                 goto error_close;
-> @@ -128,7 +128,7 @@ int start_server_addr(int type, const struct sockaddr=
-_storage *addr, socklen_t a
->                 goto error_close;
->         }
->
-> -       if (type =3D=3D SOCK_STREAM) {
-> +       if ((type & SOCK_TYPE_MASK) =3D=3D SOCK_STREAM) {
->                 if (listen(fd, opts->backlog ? MAX(opts->backlog, 0) : 1)=
- < 0) {
->                         log_err("Failed to listed on socket");
->                         goto error_close;
-> diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testin=
-g/selftests/bpf/network_helpers.h
-> index 79a010c88e11..75133119c04a 100644
-> --- a/tools/testing/selftests/bpf/network_helpers.h
-> +++ b/tools/testing/selftests/bpf/network_helpers.h
-> @@ -25,6 +25,11 @@ typedef __u16 __sum16;
->  #define VIP_NUM 5
->  #define MAGIC_BYTES 123
->
-> +/* include/linux/net.h */
-> +#ifndef SOCK_TYPE_MASK
-> +#define SOCK_TYPE_MASK 0xf
-> +#endif
-> +
->  struct network_helper_opts {
->         int timeout_ms;
->         int proto;
-> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testi=
-ng/selftests/bpf/prog_tests/mptcp.c
-> index 8fade8bdc451..faa001ea84ab 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> @@ -264,7 +264,7 @@ static int verify_mptcpify(int server_fd, int client_=
-fd)
->         return err;
->  }
->
-> -static int run_mptcpify(int cgroup_fd)
-> +static int run_mptcpify(int cgroup_fd, int type)
->  {
->         int server_fd, client_fd, err =3D 0;
->         struct mptcpify *mptcpify_skel;
-> @@ -280,7 +280,7 @@ static int run_mptcpify(int cgroup_fd)
->                 goto out;
->
->         /* without MPTCP */
-> -       server_fd =3D start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
-> +       server_fd =3D start_server(AF_INET, type, NULL, 0, 0);
->         if (!ASSERT_GE(server_fd, 0, "start_server")) {
->                 err =3D -EIO;
->                 goto out;
-> @@ -307,7 +307,18 @@ static int run_mptcpify(int cgroup_fd)
->  static void test_mptcpify(void)
->  {
->         struct netns_obj *netns =3D NULL;
-> -       int cgroup_fd;
-> +       int cgroup_fd, i;
-> +       int types[] =3D {
-> +               SOCK_STREAM,
-> +               /* userspace sets these flags together with the type, and=
- the
-> +                * BPF prog must still upgrade the socket to MPTCP. See
-> +                * update_socket_protocol() in net/socket.c, which runs b=
-efore
-> +                * the type is masked with SOCK_TYPE_MASK.
-> +                */
-> +               SOCK_STREAM | SOCK_CLOEXEC,
-> +               SOCK_STREAM | SOCK_NONBLOCK,
-> +               SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK,
-> +       };
->
->         cgroup_fd =3D test__join_cgroup("/mptcpify");
->         if (!ASSERT_GE(cgroup_fd, 0, "test__join_cgroup"))
-> @@ -317,7 +328,8 @@ static void test_mptcpify(void)
->         if (!ASSERT_OK_PTR(netns, "netns_new"))
->                 goto fail;
->
-> -       ASSERT_OK(run_mptcpify(cgroup_fd), "run_mptcpify");
-> +       for (i =3D 0; i < ARRAY_SIZE(types); i++)
-> +               ASSERT_OK(run_mptcpify(cgroup_fd, types[i]), "run_mptcpif=
-y");
+1. The UAPI constants. These are part of kernel uAPI and ethtool just
+gets a sanitized copy of kernel file. In other words, if we want any
+change here (even adding a comment), it has to be done on kernel side
+and ethtool gets the change on next uapi sync. Adding an alias here
+would be quite simple.
 
-nit: testing all four type combinations adds little value here. I'd
-drop array+loop and keep two. For example:
+2. Link mode names as shown in "ethtool <dev>" output. These are
+normally retrieved from kernel via the ETH_SS_LINK_MODES string set.
+In other words, if any change were desired, it would have to happen on
+kernel side as well. And unless we add a specific exception to the code,
+the same name is shown in both plain text and json output. (Personally
+I don't think it would be a good idea to show different name in each.)
 
-  ASSERT_OK(run_mptcpify(cgroup_fd, SOCK_STREAM), "run_mptcpify");
-  ASSERT_OK(run_mptcpify(cgroup_fd, SOCK_STREAM | SOCK_CLOEXEC),
-"run_mptcpify_cloexec");
+3. Link mode names that can be used in "ethtool -s" command line. These
+are handled exactly the same way as names used for output. Here I could
+imagine an alias implemented on ethtool side but it would have to be
+hard coded in ethtool and it would only work in (new versions of)
+ethtool. In general, names shown by "ethtool <dev>" should match those
+expected on "ethtool -s" command line, any mismatch would be very
+confusing and impractical.
 
->
->  fail:
->         netns_free(netns);
-> diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/=
-testing/selftests/bpf/progs/bpf_tracing_net.h
-> index d8dacef37c16..c4b438854565 100644
-> --- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-> +++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-> @@ -8,6 +8,9 @@
->  #define AF_INET                        2
->  #define AF_INET6               10
->
-> +/* include/linux/net.h */
-> +#define SOCK_TYPE_MASK         0xf
-> +
->  #define SOL_SOCKET             1
->  #define SO_REUSEADDR           2
->  #define SO_SNDBUF              7
-> diff --git a/tools/testing/selftests/bpf/progs/mptcpify.c b/tools/testing=
-/selftests/bpf/progs/mptcpify.c
-> index cbdc730c3a47..e3f8cb54dbe9 100644
-> --- a/tools/testing/selftests/bpf/progs/mptcpify.c
-> +++ b/tools/testing/selftests/bpf/progs/mptcpify.c
-> @@ -15,7 +15,7 @@ int BPF_PROG(mptcpify, int family, int type, int protoc=
-ol)
->                 return protocol;
->
->         if ((family =3D=3D AF_INET || family =3D=3D AF_INET6) &&
-> -           type =3D=3D SOCK_STREAM &&
-> +           (type & SOCK_TYPE_MASK) =3D=3D SOCK_STREAM &&
->             (!protocol || protocol =3D=3D IPPROTO_TCP)) {
->                 return IPPROTO_MPTCP;
->         }
-> --
-> 2.54.0
->
->
+4. Adding a text to ethtool(8) manual page is possible. While most of
+the link mode table in the man page is (unsurprisingly) generated, it is
+then reordered manually and adding a note would definitely be possible.
+One just needs to be careful about the table formatting. (Yes, I'm aware
+that this table has been getting out of hand for some time and I'm
+thinking about ways to make it more readable and useful. Suggestions are
+welcome.)
+
+> My personal opinion would be that adding a comment in the enum definition
+> near 10000baseCR is enough :/
+
+That would certainly be the easiest solution but as I said above, it
+would be a kernel code change, ethtool would just inherit the updated
+header file.
+
+Michal
+
+--2h5sszaprbwge7ah
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmpCth0ACgkQ538sG/LR
+dpUrBAf+IN/EACNYTvrR6+Ay7cZ/WZvBfNHjN0bO1bipHGngUSS/815PTo5SFQ7M
+7r18M7nNDH4v0W2KxvkIaLYuAFpsxRTV/ykUgzdy4ZamizF/qFLAo9PjNaK1wTaQ
+wlMmotkiR87FMZgIEaMZy3r/6DBYRQ4OWDJ9CZx1bEkqS/Mvu0S7jeTGrl3WQRgP
+mtS8nhdCvPtl8T6Y0c1d45QUTPe36a13Vnssnm+xh8rOaF04ofp8Go0TXlsodtaJ
+H4ZraOGTX9WSzd6SoimxBfpliDDuhuRyylNXQ5i0tjcAJVX20nzgaZppjpMhgcJh
+iAPJSAUihIARMuS24p1erBCLktt+hA==
+=J4JH
+-----END PGP SIGNATURE-----
+
+--2h5sszaprbwge7ah--
 
