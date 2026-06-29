@@ -1,240 +1,204 @@
-Return-Path: <netdev+bounces-302563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302564-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PgxTBFRNQmqq4QkAu9opvQ
-	(envelope-from <netdev+bounces-302563-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:47:48 +0200
+	id kDbFG4ZOQmoK4gkAu9opvQ
+	(envelope-from <netdev+bounces-302564-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:52:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE446D90A8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:47:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD19C6D9120
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:52:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b="oyI/H26l";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302563-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302563-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=HHPbbuv7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302564-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302564-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4581530160C2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:47:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08F493016520
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B50346AFD;
-	Mon, 29 Jun 2026 10:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E576352C52;
+	Mon, 29 Jun 2026 10:52:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165AE34750E
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 10:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24A136215E
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 10:52:00 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782730047; cv=pass; b=Lm4QN0riAU1K0PDoSGkRKnfR2KK68Pf9BaZcljhOhYHz+Q2uEh4N+lk8BJmrts+n/Jw1glKk7aKiKxdvURllwcjwDfoFAP/jVOVLXXqhiKFKwaWPx+tsxa7B/CRGaUoDGLvNznFPWq5gS44jU9p3c0fJRilgwyevlF48V3xKw3o=
+	t=1782730322; cv=pass; b=Q+wOBmVAbp37/es3oNSgDrY/NMpTXNi1xdTCFE0W1a8OpiYDdXisqxmNCbFhauto7ZvrZ1VDe16Z2zVHWuC+qtYAXBNohNpXCsqA5Y5xBVPNNizoYcMikFylRg8AcyerdLY4IXAjw8AINM0xB5VeRdu6a4WLS94GqhQJFUV2AgQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782730047; c=relaxed/simple;
-	bh=gWfU6/OyCo2rP1ZHR0B3aygjC+wA0mTDxemW9AISS04=;
+	s=arc-20240116; t=1782730322; c=relaxed/simple;
+	bh=a+9Ci904vYVDmRk5KhmJjWn1Uo6x512DECDzE+yXLeE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VPPiHY8c5IMkOj25KT94323SjMIQhMUmf/YSXN9ZwNFO5vfPCegFS2JthYfhpgfdZtwvwzLQ28XYTO3GPQ0frnCk/v010q8N7xuUlXATjlPMetWrk/zcfM2Dvj0SX61ZQovJpWuwwca7YsSsMBcFPaxnTXpj1yZlvW9vqs4Yuuw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=oyI/H26l; arc=pass smtp.client-ip=209.85.210.172
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-8478cc93299so288066b3a.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 03:47:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782730045; cv=none;
+	 To:Cc:Content-Type; b=eJfi6yeO79iwcxUMy5zOlfqIhksvoTWfApja7bUILBBXNPSH+7zPW51g0g7lc1T4hLZ20tm+RAeGTsEcNhW9ayRkkzTNU2w7F5QaJtUWVbi8J+a/somRY2WMvvvu6fbbwoXZQ9viv4HBvmBiydlbMQd1iY9yJfpQtec+37nZ23U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHPbbuv7; arc=pass smtp.client-ip=209.85.218.66
+Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-c127813835aso47213366b.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 03:52:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782730319; cv=none;
         d=google.com; s=arc-20260327;
-        b=qpWwiGoiHD8UcIBrPjD+2kkzaa2Ul+tiKkqb2omaZg1DlISPReirY+sQaPnIM/Hjmg
-         waqAFBcBJ2+DuQh2juLVITF72hWg48O05D0477mPWzN8+rHMEj3hWbhisIh4XpkEEkyC
-         pMU1Yxkg3N6BNUOwP2Or/A/y2or2MMDZrFsCBmv0BXFnrbKYHOMdPZ044rf/TfRR4BB/
-         UF5ZHWXyASYchwOK2eK7e4GSVoJFvWRG8q/9kWjyfvEA8akAipC8p4GUNhpxDMEYCFoG
-         oxPx8lmIE5tNP+eXCVkWAgKdbRKR3+/ZbNnsQR6CuHdjszY4OO5DffkKY/HcvwgUgY+y
-         D6pg==
+        b=HkVdGHtZ/f08T7fCKpAJKZRV2s/4uSb7yW0V4SEQgFieHj9eLpJ1p0/Ys4UmAROMNi
+         hck/0oF39+cEJG5vw/0MF32DFw3kK37bOFJ44jkP1WqjO6Z/D8jCIgA3urTjEyfj8vhu
+         DlMpOBESeN/G35ks7gWJt6RBTuZompM2kqI/7jwhMeCoAanIVRxjL8hcJyuwsfh5V99e
+         OM7ITN334iwYC0xsHZem5YsfcgN9ZvVrEAOd0+ZVVltQ61rQncSAvHczbZpKclxhZCbz
+         XrHxtO/hXw0Aixz/f0gQCQg7/QPwbCWw5DDBQI7QXa/U+nOHu+l1LugbaTiAcdn1lTyG
+         yXOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=2D/+tKmqEVHdrXuSNJqyqQwhydaMlOMVeSo45A3y9ak=;
-        fh=cd02/ZbeI/l8yzLwiWB4VmtTSZH++Ap/Oa+LgBqOo6g=;
-        b=oGUyorMlPZnbVO/5Nb4etolOaDDIiWr2+SksgVN6wMdkQLgBNgHnYBEPSZjLN7ezZl
-         eVfPba8hESV9/kbdTLR3EiVurqrTa2J9eMWWsApOrcnCn23rW4CFGtvqtJdeTCMA1n4K
-         UENDjogIOt/6X8uRjXLdkdJ2JEsM2ZPd6CcgWiDNSquVKIJRPzU5g+mHQddtQY9ZWs3X
-         PdLSMtLDcqWni2Ey4k0v8+NSyu+JNCHP4GSL6Z9kI8CNAbBuApfxPN44AjkBUCGVW/EI
-         NrWM4CoSTdCSaeboPf7oWTWJ+EDt+3eroXsF+M+4RPm/WCODgP7RFzmIpnAG68XgNhkR
-         aBAA==;
+        bh=4Mg8UEegHbEdTu+VPB2awrbgQQKUf5awSgB2yQxFIug=;
+        fh=WfG9W83XX7nQKa+URLI+J9aVA+X2JnggliphQZQt7GA=;
+        b=ijuuIjljPWo4ojw7vo6nsdSur2PYU4tPDMCiYjktCkBfXXBnNqlRGASRd3yvArr6k0
+         vHnee+OcFGvpCvKd5FIMOx5T6d/kTc0To1jmeAlQgJzkH6Lv7fgMKaxE4ks96WUWOze/
+         7KmQTnm3LToiYinzFIhgEq27agUxQ7TrPVBhtuZEU5TYwJvNB4pYSZRsD21KZrzyzJtt
+         jY0gZr3vGFSTuNhXBM8O9T8/9x4vHlh1FEqmLrQcxXVRZk5giuNJ4bFhH2dOUzcjCmgJ
+         zMyFJCziWTjgnloTv/np5Zi57fJsDa74sT7XUPbwlVKoNVxLf6Y8WUwA2MrJE12saLRe
+         O/mg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782730045; x=1783334845; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782730319; x=1783335119; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2D/+tKmqEVHdrXuSNJqyqQwhydaMlOMVeSo45A3y9ak=;
-        b=oyI/H26lFj6+qhCKhcQPKAz2JKRRE2BIwmqYDhZR58GxiuPo3OYsSLPEInYwX1uAV8
-         QhMD3sd1UjSVoyyB0xCYz2gVMqbym+a6TcaYQMeklDKuQA7z5a711ABRYqA7JJFuEEFE
-         gBv/+uBfY67xhSWAv8AvDxuFlHahv1KV/z4+c=
+        bh=4Mg8UEegHbEdTu+VPB2awrbgQQKUf5awSgB2yQxFIug=;
+        b=HHPbbuv7jmzRK/Bb+pwFyjf6DnJFfk4gO8zRoK5saN21dulIJViCmGsaxjfm9k+iP7
+         6/+mDUOnrEVsrRVyHkYs+ntdpjiSyj1x/HG/+JonHO36pYfjjIOu5/lU1lif718g3hgr
+         oRakP5XJ3LM3HKlj61pfM6s4XYrof7l0daeaGf0bF+XdrLl1wmPBw14OcreBsEpBiahK
+         lEeDWLp/dEjin7lXCizh+urrzY9QRnHw+6yIAYEweFz9oqkb+MymZHRdxOcXyVnJlZSq
+         BO1XfmUaSDP2sovLPln1M58a+Nakwy52ij1iaQNiuK9yRy8YXgFY26wN4t6lKSLwgVZK
+         botA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782730045; x=1783334845;
+        d=1e100.net; s=20251104; t=1782730319; x=1783335119;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2D/+tKmqEVHdrXuSNJqyqQwhydaMlOMVeSo45A3y9ak=;
-        b=bMjoDT2uFpFRh4D23vXvI8Md712vPmDvZalMEz3GFhKXlfXeh8XFYTW3afBy6LWRZ7
-         nLKYjQoBtlBy/2z0C1SwtcVSALgqCeDCh2LDFzFbPgLa/Ps0QZlve08s7Ngfucnm6TMQ
-         WXeJQh3bJPjT/atdq6CzKEp1N6B+VdMiLQi8vZEugYX+eSFGwKXe1cf66Ap5E7SFJqYz
-         Oo2UlZCSmAXJB5lL9GMNacbtBe34QMHmWZb2/KtyFYz1WwjlkcjcNd4jtps1798g/zL3
-         Q4AbL8f8ar8FV4xep5ANlBCJN2KQ8+0QATRBUPuISvICB1t9HHmtrsnqyFvQoxQqoYS/
-         HjPQ==
-X-Gm-Message-State: AOJu0YyhHQegOQND0CAgOvJWjAtRaMaD+XaFVRvCU30GdcNfaELzRU1h
-	D0hG4QNtp2bcaBejpn0D16Kz3kBTPE6ILtdFlIUywKBVzSTslZBgS9YChNPYZwx9Jx1jtoTdVdi
-	AW1JJi1vHG/jG35KDOujRLRsuHAefbY6Vqg3ttsaC
-X-Gm-Gg: AfdE7cnCqD0T/XB7lHyfyr/HlUiVUw2qzCGRLCQERdTW2J425hXTpLMJOwt9eJP5ms/
-	jjVGHWH0gQoaHwmpMye91WdtmiIQam6Of/PUq+gsEitnq76wfgCUg2iGkq1atIrZfZJVRuMbkIX
-	99J1XJeODNmfZrtZvzk1Sglsnqj9J61hQy3au6trReVfV0GVftVcMMU6mYmApO5IWO+h4a3Cb9I
-	sbG6Yjj3pkX6IrGwQJ2L0IdAg6IJnzlcfNUGXj5+YA8EPUpE6BQxRidt31V3UkVcHn8AWts3g==
-X-Received: by 2002:a05:6a00:4b4f:b0:847:1d73:f753 with SMTP id
- d2e1a72fcca58-8471d740f0emr3744079b3a.45.1782730045309; Mon, 29 Jun 2026
- 03:47:25 -0700 (PDT)
+        bh=4Mg8UEegHbEdTu+VPB2awrbgQQKUf5awSgB2yQxFIug=;
+        b=jj3DRD26O2giHIRouWygTSZ1p2+972THI2dYcIhZE4K59XhZte5/HK9ji0l19/Yrb/
+         caQQql0RFdyHOff644NvVCDtAiPwE84e1ZZbdFMde9t+mmrk6Bi29g3XQLSs8xTbxtkq
+         V9kc8+zPfeKyFxZQZDMZUdHbJGpTgA7Dqk4SULWarvGASLGnSXWr2J+2SBz3DrnYZsQ2
+         G8HJDxoyfuY7ZV59iL25v5A5vOyJ8Mn/qq0RuN6PNrrIuAtItI7L1tnSrba/GeaGULcf
+         EH52msAsLH8EG2sFDuoZNSzd4KH6BPaKJ43SR3/EDKQqM0O/F6EQ60m0LKfGszVCGOUW
+         Wf2Q==
+X-Forwarded-Encrypted: i=1; AHgh+RpZA1S3RVuJxIMViMXbl9tns9yFiT8p076rkUDb21Pm5HF4A0aemm78/vPcZQ4n0/rmFiAEcgE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPF+e4hDCKp21/PIrj0FGE5XkjTX7PcvPjVvT4S1pG7UiZcAFk
+	VFguma6k3vQBhZo9/cf2MerAnQq54uty1+kBVnok8Khal9/A97+63UiW/ei4+EtyZJGPnuOotDx
+	mOr+KKFm+W/d/a1MDVMB8EVt5ydyGic4=
+X-Gm-Gg: AfdE7clUfJ4ILdPzAPVHN6g8437PCSXLyYhjae9y3P8Fegqm2bGZzPr/aMdbnbbsVJt
+	ZTjmuYV/Hqjw+d0gPkmtpCCNABd5pgrJmxgDczJrKG2Tu2qai0j6v1SsqXCAxzSlbtSDqnK/DF1
+	Affo1GlSR8718lXXoTmMPWbeWM4GRzpiTbl+VbichXwKykMJHhnFYvEg1+nxqWzde/ZwTTKp53/
+	hRf8Vgj5oE5VwLjkD0dSvqwp7TQnxPoI+FRWYDZbnFz6UcQtQdlhAaUe+xvvTcbxtZRCC10
+X-Received: by 2002:a17:906:4788:b0:c12:7e29:4ed0 with SMTP id
+ a640c23a62f3a-c127e295153mr32135566b.39.1782730319038; Mon, 29 Jun 2026
+ 03:51:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260626165156.169012-1-jhs@mojatatu.com> <20260626165156.169012-2-jhs@mojatatu.com>
- <20260629102917.Ag2Vd7LR@linutronix.de>
-In-Reply-To: <20260629102917.Ag2Vd7LR@linutronix.de>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 29 Jun 2026 06:47:14 -0400
-X-Gm-Features: AVVi8CdCMJDxSkLILcgjDrSjOxQDi_5ubUK40tv1YNxcJz-LIUxKvJgWZ1t15wA
-Message-ID: <CAM0EoMkh50LPeZ6sy8uA6APen1zTRBRYjcH_b521q=5YhitLKg@mail.gmail.com>
-Subject: Re: [PATCH net 1/3] net: Extend bpf_net_context lifetime to cover
- qdisc enqueue
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	toke@toke.dk, jiri@resnulli.us, clrkwllms@kernel.org, rostedt@goodmis.org, 
-	kuniyu@google.com, sdf.kernel@gmail.com, skhawaja@google.com, 
-	liuhangbin@gmail.com, krikku@gmail.com, mkarsten@uwaterloo.ca, 
-	victor@mojatatu.com, ast@kernel.org, hawk@kernel.org, 
-	john.fastabend@gmail.com, daniel@iogearbox.net, 
-	Sashiko <sashiko-bot@kernel.org>
+References: <cover.1782641525.git.roxy520tt@gmail.com> <012fba43272abc560acfc0fa37ae22182a60b457.1782641525.git.roxy520tt@gmail.com>
+ <CANn89i+sq29-PbxDrCdUJk405Bs0759wXLBNhpGqE7TNTEPraQ@mail.gmail.com>
+In-Reply-To: <CANn89i+sq29-PbxDrCdUJk405Bs0759wXLBNhpGqE7TNTEPraQ@mail.gmail.com>
+From: tt roxy <roxy520tt@gmail.com>
+Date: Mon, 29 Jun 2026 18:51:47 +0800
+X-Gm-Features: AVVi8CdNXTCShujoi4xIJpHSDgy83pJPS0h44PHymowFqFsiM_fviE6jYC4AQEY
+Message-ID: <CALMqdkTaQKMdoVP079PBsGb=Mb2RQsjKqnL9NH=qpPW1zu088w@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] tcp: Require init_net CAP_NET_ADMIN for tcp_child_ehash_entries
+To: Eric Dumazet <edumazet@google.com>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org, davem@davemloft.net, 
+	pabeni@redhat.com, horms@kernel.org, chia-yu.chang@nokia-bell-labs.com, 
+	ij@kernel.org, idosch@nvidia.com, fmancera@suse.de, 
+	bronzed_45_vested@icloud.com, yuuchihsu@gmail.com, kuniyu@google.com, 
+	yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com, 
+	bird@lzu.edu.cn
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302564-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:chia-yu.chang@nokia-bell-labs.com,m:ij@kernel.org,m:idosch@nvidia.com,m:fmancera@suse.de,m:bronzed_45_vested@icloud.com,m:yuuchihsu@gmail.com,m:kuniyu@google.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:bird@lzu.edu.cn,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:toke@toke.dk,m:jiri@resnulli.us,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:kuniyu@google.com,m:sdf.kernel@gmail.com,m:skhawaja@google.com,m:liuhangbin@gmail.com,m:krikku@gmail.com,m:mkarsten@uwaterloo.ca,m:victor@mojatatu.com,m:ast@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:daniel@iogearbox.net,m:sashiko-bot@kernel.org,m:sdfkernel@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302563-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	DMARC_NA(0.00)[mojatatu.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
+	FORGED_SENDER(0.00)[roxy520tt@gmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lzu.edu.cn,vger.kernel.org,davemloft.net,redhat.com,kernel.org,nokia-bell-labs.com,nvidia.com,suse.de,icloud.com,gmail.com,google.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,toke.dk,resnulli.us,goodmis.org,gmail.com,uwaterloo.ca,mojatatu.com,iogearbox.net];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[roxy520tt@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linutronix.de:email,mojatatu.com:dkim,mojatatu.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6BE446D90A8
+X-Rspamd-Queue-Id: BD19C6D9120
 
- -
-
-On Mon, Jun 29, 2026 at 6:29=E2=80=AFAM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
+On Mon, Jun 29, 2026 at 6:41=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> On 2026-06-26 12:51:54 [-0400], Jamal Hadi Salim wrote:
-> > The bpf_net_context used by sch_handle_egress() is stack-allocated and =
-torn
-> > down in that function returned. By the time tcf_qevent_handle() runs
-> > current->bpf_net_context is NULL.
+> On Sun, Jun 28, 2026 at 4:38=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
 > >
-> > When a filter attached to a qevent block (e.g. RED's early_drop or mark
-> > qevents, which always use shared blocks) returns TC_ACT_REDIRECT,
-> > tcf_qevent_handle() calls skb_do_redirect(), which in turn calls bpf he=
-lper
-> > bpf_net_ctx_get_ri(). That helper unconditionally dereferences
-> > current->bpf_net_context resulting in a NULL pointer dereference.
+> > From: Zhiling Zou <roxy520tt@gmail.com>
 > >
-> > Note: The same holds for actions that invoke BPF redirect helpers
-> > (e.g. act_bpf running a program that calls bpf_redirect()) during qeven=
-t
-> > classification itself. And as a matter of fact the same assumption is
-> > made in the code outside of tc.
-> >
-> > Fix:
-> > Move the bpf_net_context lifecycle out of sch_handle_egress() into
-> > __dev_queue_xmit(), so that it spans both the egress TC fast path and t=
-he
-> > qdisc enqueue. The setup is placed outside the egress_needed_key static
-> > branch because qevents are independent of clsact/NF egress hooks and
-> > that key may stay disabled when only a qevent-bearing qdisc is
-> > configured. Unfortunately this adds a small unconditional penalty to th=
-e
-> > code path _per packet_ only guarded by CONFIG_NET_XGRESS (two writes an=
+> > tcp_child_ehash_entries controls the size of the private TCP establishe=
 d
-> > one read for bpf_net_ctx_set, plus one write for bpf_net_ctx_clear).
->
-> I fail to understand this but you and sashiko have an understanding...
-> If there is TC_ACT_REDIRECT returned by tc_run(), then the skb is NULL
-> and as such uppon return from sch_handle_egress() the control flow goes
-> to the out label.
-> As a fix you move the bpf_net_ctx assigned to before CONFIG_NET_EGRESS
-> and clear it on exit. What do I miss here?
->
-
-There are 2 separate filters.
-IIUC, you are thinking of the first one which is the clsact egress
-classifier (which runs in sch_handle_egress())  - its redirect would
-indeed return NULL and skip qdisc enqueue.
-The second one is the qevent redirect whch happens in
-tcf_qevent_handle() during qdisc enqueue (block 10 in the reproducer).
-
-
-> > This keeps all bpf_net_context management in net/core/dev.c i.e the
-> > existing boundary between tc core and BPF without requiring any net/sch=
-ed/
-> > code to know about BPF plumbing.
+> > hash table allocated for subsequently created child network namespaces.
+> > The value is consumed during child netns creation by tcp_set_hashinfo()
+> > and passed to inet_pernet_hashinfo_alloc(), which can allocate a large
+> > per-netns ehash.
 > >
-> > Reproducer (see the accompanying tdc test):
+> > The sysctl is writable in each network namespace, and net sysctl
+> > permissions allow a task with CAP_NET_ADMIN in the namespace's owning
+> > user namespace to write it.  An unprivileged user can therefore create =
+a
+> > user and network namespace, set tcp_child_ehash_entries to its maximum
+> > value, and repeatedly create nested network namespaces to force large
+> > kernel allocations and exhaust host memory.
 > >
-> >   tc qdisc add dev eth0 root handle 1: red limit 1MB min 10KB max 20KB =
-\
-> >       avpkt 1000 burst 100 qevent early_drop block 10
-> >   tc qdisc add dev eth0 clsact
-> >   tc filter add block 10 pref 1 bpf obj redirect.o
+> > Require CAP_NET_ADMIN in the initial user namespace before accepting
+> > writes to tcp_child_ehash_entries.  This keeps the tuning knob availabl=
+e
+> > to the host administrator while preventing unprivileged user namespaces
+> > from using it to drive host-wide memory consumption.
 >
-> stupid question: how do I get this redirect.o? Just a simply thing to
-> reproduce this=E2=80=A6
+> I do not think this patch is desirable.
+> It breaks nested container use cases.
+> A container runtime running inside a container (with namespace-local
+> CAP_NET_ADMIN but not global)
+> would no longer be able to tune tcp_child_ehash_entries for its own
+> nested child namespaces.
 >
-
-It's just pseudo code for a bpf prog that redirects (so you can create
-probably a few liner bpf prog).
-Take a look at patch 3 which uses a prebuilt action-ebpf binary with
-the action-redirect section (added by patch 3 to action.c).
-If it's still not clear, I can craft one and send it to you.
-
-cheers,
-jamal
-
-> >   tc filter add dev eth0 egress protocol ip prio 1 matchall \
-> >       action gact pass
-> >
-> >   traffic through eth0 triggers red_enqueue() -> tcf_qevent_handle() an=
-d,
-> >   on a redirect verdict, a NULL deref in skb_do_redirect().
+> inet_pernet_hashinfo_alloc() uses GFP_KERNEL_ACCOUNT for a reason, I
+> suggest you start using memcg :)
 >
-> Sebastian
+> Keep in mind the sysctl could be set (by root) in init_net for some
+> reason, so only memcg will protect against OOM.
+
+Thanks for the review.
+
+Agreed, restricting writes to init_user_ns CAP_NET_ADMIN is too broad and
+would break nested container use cases. We will drop this approach.
+
+We will re-check the memcg accounting/fallback behavior for the per-netns
+ehash allocation and prepare a different fix if there is still a path to
+host-wide OOM outside the intended memcg limits.
 
