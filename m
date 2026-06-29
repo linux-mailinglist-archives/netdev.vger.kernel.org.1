@@ -1,560 +1,325 @@
-Return-Path: <netdev+bounces-302758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rOmCK1KsQmof/gkAu9opvQ
-	(envelope-from <netdev+bounces-302758-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:33:06 +0200
+	id IFF2FvSzQmrU/wkAu9opvQ
+	(envelope-from <netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:05:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E0CC6DDC37
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:33:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9326DDEB6
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:05:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=hE3wkRC+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302758-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302758-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=BwWI1nyC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 90E2D3054EB6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:32:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9D0B73002908
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F06374E63;
-	Mon, 29 Jun 2026 17:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06145282F3B;
+	Mon, 29 Jun 2026 18:05:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A354534A3BF
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 17:32:02 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782754324; cv=none; b=e4JRybOFcmH3BD0loe8XlTgwGkNJPigDSa9wZqyy0aQws5Ra6ksjjKThoKLrFG7ujSROI2RH1hbg5lFCnB9H977p0O1gS1zdjAEfVy+2doGLaBxY1TO14L/CDUGd2M994DDEDO7Y1NgK2i14zaz8i1BQWkpaVCOXSopuH+ranh8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782754324; c=relaxed/simple;
-	bh=BvsyFNR58sqly7rb4QImUPP7f6q1MkkJg+k7c67/rzk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AEui2iF/FQQnkR73Gw/2r/gmbU6KoEzRqHJWOGNuxEaXiq/dectYM0LgFLbHsRkL5db2jRLeMhGbfMR9C2cwd9LG/UpOPsCdkTWq1rntH1Jn9EZ7VUWX5lwzwm8LArZoPgo4RzXyAb9VKY1L5vGcZclfzhUdVXTHScpzwWYCMK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hE3wkRC+; arc=none smtp.client-ip=209.85.160.201
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-51c0408254aso16894141cf.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 10:32:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8897E2D0C7E
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:05:26 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782756327; cv=pass; b=uNN0oiR8+seG9mrkQOGsa+1lkm8Y9dGUekl0cPMA3H7irgUCxSPYj58qEsun8JhEXI6wJ1CFx6MUwZ1bRkmyxDCRy8DnQnoOyH7IF1MlKttIrDOgKOPrgV5z6FW+XYLzvLoan4bLGboKoCr7+bfp033N6gcukhPMoeUKpW+uTB0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782756327; c=relaxed/simple;
+	bh=Uhckl5gasRPy/Q9fjOQVz92tB7mZ/a0FmJRdZQt/bK0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p5eJN7urBUM+4E5ixQtx/VJ6svnp+L0Q9uHy9GV4jHb9XXrJtKdJQG6FaqpSeQy+QCg7+1o1Ge7UagdWGESoVaqglDeJM9CBEjpwbI5nZodXVA18qNOFrp0z8HzLs8Xmghg3cwSrZRICbleHrkG7lJNYHGvt1E3JomKx451u8/E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BwWI1nyC; arc=pass smtp.client-ip=74.125.82.47
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-13809223fd4so4405512c88.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:05:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782756325; cv=none;
+        d=google.com; s=arc-20260327;
+        b=a8DvpMqgCxXIn6BDppIY6nr+YBfYZMfwkKc9obJTfzvXvCkIP/wDvLA9Y4RrK3aL32
+         TYvDwauR5Zxk1EV3uDqQKMgu4LRcR395LtXZv5c1aKPVf6/vbNKUEfVAOAB7LbANOcu8
+         SGrgJ+9RQG9OOvN522EL+N2Nio7SnewAao1r1SsPrw78QSF1DinU+WNAnq4SB/yzkglB
+         QafFYZzvEGhNoDhqug438GYDsGZg6xsDzpgbFcYf6np+sVwSpAmtnQcR9llvm84xqd6K
+         TYCCjec1/KtykNUG6SUBYprN6RpaGmZ2N5SQh8hW8PbfIqKpXY8q/z/gsvsp6Bfblf6x
+         uAsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=NDw1E2/pIt6d7lE9aQGWAuiRLCVjcZhQOY5MZpoHVnM=;
+        fh=LGPirqrxwya2Xl+I+WxNpg6Ny03f/JMrcrRM1/WJeZk=;
+        b=IxuBmMw/Kn1fpQTPm7AXK2t1asZBcw3AAoYsZNWRLpSMGnqMa/VhRWmM06BAvN5ksd
+         oMVnubmOMEY70BOXcOc27Z4GB5mvfXq+Hqz41Mldaxfr6sFBTgLHQKXZ2pTOIwAd3RQY
+         XZmrxCTKhQ5nXVQwdSlp0u1LFhFHjyty5KvzAPv9QzbJghtvLq5pn3+rfwm/mqPXur9a
+         2NMYRSJmEhDro0mlUG7xhKWpRS0R2Aq8CyZ5zK9ataOkfR6ZbInOPBOFwg/cyrUyFsfy
+         aHA1RRwegAdBkNlyuOFXCxmraM4oGq7JiD6KbKfmvxyRBxtGDcIwk7Ke+rVSoupjQBfG
+         6GcQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782754322; x=1783359122; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1RMnFhQOMJTAjzT4orpWwwLHyIsXLICZbpnLS4wuwM4=;
-        b=hE3wkRC+/8fai3o////Psj11f2K9zWhwQEIwD6wcNyNACcRcPHq9tiZ50wzRiCOAA2
-         hlO08HKSw3mgz2XZgo4V1uK8/iexXs/Q8S5YcHEveiYDRk7hB9+LxSBc5Buz8Zkb+eBH
-         msYEfJL6ePLxrsXPaoxDFUMeCd/xvA0uMZRx8Sx65qSKzAUPB3yzBmPBlCEQ4tWY+aPS
-         OlAwQLuJgf+Z/WCFOiyZzf3vD89BJ/JtEpQEuriBFNyzJTLxbwFeRoEwdrphQO5rSQ3/
-         +BOi9/ULFxQpyKr7PmGunAJCcV+ZYJpRsy4qnDLpatSYvbl0A2FHjp4n5o4/6Uwmowlu
-         xk2g==
+        d=google.com; s=20251104; t=1782756325; x=1783361125; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=NDw1E2/pIt6d7lE9aQGWAuiRLCVjcZhQOY5MZpoHVnM=;
+        b=BwWI1nyCWmtHjhGNWZNB8kvBDzGHvjeQ2KKeO/PD0DPd98CD57aqVETnHt51JripG4
+         S25mDGOwz0n2a+iY6NHCh8yTAzemHz2dQ5uyHYYU83BHYqBQC3UR6tE2OWXn+pe5qqgu
+         nCrt8Q/LZZqH+M57ZW+wzsC3OA8i9+TIGC9fnBOTKyjmBe8vrbhY6KEYt3QlweA1szDz
+         h6E7wsgFR+3enkVh0k7puES2GsiMIUICT6bPMbNLNKzXfTPOUXxNtw5MRtySd1InqZiw
+         wq72i+kp1PD/1ssPGWfnKNr6hGv++4DUZuf12rcPtPl0Vzn/6+Bm1ekm73pealqCHRnA
+         nE5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782754322; x=1783359122;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1RMnFhQOMJTAjzT4orpWwwLHyIsXLICZbpnLS4wuwM4=;
-        b=fhUHMBhpMZ8b6EhCVsQLOVvJ23QEqinCITS8vYRiZz/DURRw0hiy5ITRvRez+u5sWR
-         2Eanq91cL9fRa3xw4itPW1GDx2k3087DeiSt+T9nqSKsRbd7PwbYf2TnJUvxs1Iupl7I
-         fIhUT8B7jqxZysukUkODeXAcOoZS2brlcTS/prhP4cBSLWEhsnzPeXKN6hKtPqsC/ZcF
-         fBI9/Q1y92EQd0yPfV7BZ7sXW3p+NiWd8X67aBT0PLgodUeqJzhzbqxVFlCoyFmjNhlB
-         CboOZCoxefpL1/pUmUAjZ/YhghdeLpyveMmU0XgHId8kVl48yRbfXctfz5dT9rS1KTT9
-         1ABQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9fL0cgDERJuedJhNmZrLH8p0qURcugN08uekwigTrCMAh/gQ5n+GGk1OLNPL2iW6BQgXtve4E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQd1pL7p18mSkuV5KLuLCdEtYiP6ayra9FXxbCs5nCtN+2BZWP
-	loT9zmbTR/ruJ/sGtl1bkEVeMuCds/+gMWbsKsAeiXhUWmYin10LyHwuh0Oev1Zy2s8uvsPQCZO
-	wOf0d7PwTCwm4kg==
-X-Received: from qtbjb6.prod.google.com ([2002:a05:622a:7106:b0:517:72b3:d80a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5d12:0:b0:51a:8c86:bd2a with SMTP id d75a77b69052e-51c10df10a3mr2064501cf.31.1782754321335;
- Mon, 29 Jun 2026 10:32:01 -0700 (PDT)
-Date: Mon, 29 Jun 2026 17:32:00 +0000
+        d=1e100.net; s=20251104; t=1782756325; x=1783361125;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NDw1E2/pIt6d7lE9aQGWAuiRLCVjcZhQOY5MZpoHVnM=;
+        b=rhA0wQaFideXM6pNjzTPzMSSt+R0u55wFHUrwS2qzP4VoNnXyVNqlXmoZ+kZybFXUZ
+         gSjE6Mq7tUBM1iJwIEfeI/ItVSGDkbxjkrubORl+3ILsjoFE1UJpC71oMHFWEQ0Q4bIR
+         mx7fYWaJF0/mTD415w/U7hCj4qMcYYxbnzmfvfA3dtYd5b+1ojfPNQxomS/JpQ4cxj2O
+         fzHjOH4mvgz2i4++9l+sMBoQ760Div8V9PGOJ+Vk5ezcqCPGBMkFrffK1SAnRE9L05qG
+         h8eEfaFQJQHnNLicA6vTd7jtfOzGwr288KlNNqPWqlBMzfCcJJEFfi2EpcvwH5ZCQEnc
+         8ggA==
+X-Forwarded-Encrypted: i=1; AFNElJ85H2sgCx0raxZGFS1Ib9mIzk6x6NLLwpfyZiK1AEbwecuzAHf7rTjaIflUl3Jgt8EgClS672c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSPUiLM0dP054pph6emguvDpKZub/nwpWZz3Ru0Qc/qcZuKwGY
+	/2vzKiwHpBEcaL4DftDCTJyo5kd+10I/PVi5kLUeSmfaEIBC6Y8RFbUtA3MhdcbRpK/c4wMwxVH
+	wKnRZ1wU3U4J7ubq0rJJ1KBr7ZKQ3kk1m9lEBAr/i
+X-Gm-Gg: AfdE7cn9b8aQmSpcKwUDsaXeO59aIC2WDsc9Vhu/NWP8P6RVvGE0XrfDGg0EN/sAUvt
+	ONlqOKh3MW2xgv6Ha0VR1YwKLzAZDRfVPaeYfuyjxSodOkt+2Ugs/7T+sqW/q+/3LlTxPVs/gP8
+	zAv6IbsZpxAVKe3J8uVO9GrQ3yVpf1k9TYMqOOrJcXIe0l4I0qlAi25Jg6wRyBBQ7hITKHX/OSZ
+	vfmQ4Ts7RdOUbdZraSNoHP3TyUqBamYfiF1SSRunvnpPB0opa04LfNvsKGSCAE8ys7XVzJqTK4u
+	xX32YxAhFm5slcwulHkgxdbOU4ESni07wc8mGa7PASQQIXfautw4kVgQysl+VTqbZtvzzyvr+RK
+	nwojC1hQZllPIUUPxfhYnGarrY2zvIlROE62RiYVSMw==
+X-Received: by 2002:a05:7022:2212:b0:137:5b9d:cf87 with SMTP id
+ a92af1059eb24-13b2a0a8ac0mr334633c88.0.1782756324471; Mon, 29 Jun 2026
+ 11:05:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260629173200.469953-1-edumazet@google.com>
-Subject: [PATCH v4 net-next] bonding: no longer rely on RTNL in bond_fill_info()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>
+MIME-Version: 1.0
+References: <20260625102020.92814-1-vimal.agrawal@sophos.com>
+ <20260625214659.1115819-1-kuniyu@google.com> <CALkUMdSzLQSpjpK+cnt=c+dPDZGnyB2zUD3z3KKXr=-DhM7t=Q@mail.gmail.com>
+In-Reply-To: <CALkUMdSzLQSpjpK+cnt=c+dPDZGnyB2zUD3z3KKXr=-DhM7t=Q@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 29 Jun 2026 11:05:13 -0700
+X-Gm-Features: AVVi8Cec4fh6C2dBxYFOx_MjNcL0Q14J81BUEtzA5DPiOrLQzPF73f4WfQeydUM
+Message-ID: <CAAVpQUA4dyukqihiQoGfbaPtBn1OAaRaWyQ197+hPs7gmqW7=Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: neigh: avoid calling neigh_forced_gc on
+ every alloc when table is full
+To: Vimal Agrawal <avimalin@gmail.com>
+Cc: kuba@kernel.org, edumazet@google.com, netdev@vger.kernel.org, 
+	vimal.agrawal@sophos.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:avimalin@gmail.com,m:kuba@kernel.org,m:edumazet@google.com,m:netdev@vger.kernel.org,m:vimal.agrawal@sophos.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302758-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,jvosburgh.net,lunn.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302761-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lunn.ch:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,sophos.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2E0CC6DDC37
+X-Rspamd-Queue-Id: 4B9326DDEB6
 
-Add READ_ONCE()/WRITE_ONCE() annotations on port->is_enabled.
-While this field is written under bond->mode_lock protection,
-is is read without this lock being held.
+On Mon, Jun 29, 2026 at 12:57=E2=80=AFAM Vimal Agrawal <avimalin@gmail.com>=
+ wrote:
+>
+> Hi Kuniyuki,
+> Thank you for the feedback.
+> However, the rate limiting issue exists independently of the threshold
+> values. If entries genuinely exceed gc_thresh3 =E2=80=94 regardless of wh=
+at it
+> is set to =E2=80=94 neigh_forced_gc() is called on every allocation attem=
+pt
+> with no rate limiting. In my workload, most entries are
+> active/reachable with refcnt > 1, so the GC walk traverses the entire
+> table without reclaiming anything.
 
-Change bond_fill_info() to acquire RCU and use READ_ONCE()
-to read bond->params fields that can be updated concurrently
-from sysfs/procfs/rtnetlink.
+This suggests your gc_thresh2/3 do not fit your use case.
 
-Add const qualifiers to bond_uses_primary(), __agg_active_ports(),
-bond_option_active_slave_get_rcu(), bond_3ad_get_active_agg_info(),
-__bond_3ad_get_active_agg_info() helpers.
+If GC does not help, there is no point in running it or rate-limiting
+in the first place.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
----
-v4: addressed Sashiko/Jakub feedback
 
- drivers/net/bonding/bond_3ad.c     |  24 ++++---
- drivers/net/bonding/bond_netlink.c | 109 ++++++++++++++++-------------
- drivers/net/bonding/bond_options.c |   8 +--
- include/net/bond_3ad.h             |   4 +-
- include/net/bonding.h              |   8 +--
- 5 files changed, 85 insertions(+), 68 deletions(-)
+> Increasing gc_thresh3 would make
+> this worse, not better, as GC now has a larger table to scan on each
+> call.
 
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index acbba08dbdfada00c118bd41b89a60e60f8521e7..b8e4b4d68dd65f1381ba7c0aad84609fcfbabbef 100644
---- a/drivers/net/bonding/bond_3ad.c
-+++ b/drivers/net/bonding/bond_3ad.c
-@@ -760,14 +760,14 @@ static int __agg_usable_ports(struct aggregator *agg)
- 	return valid;
- }
- 
--static int __agg_active_ports(struct aggregator *agg)
-+static int __agg_active_ports(const struct aggregator *agg)
- {
--	struct port *port;
-+	const struct port *port;
- 	int active = 0;
- 
- 	for (port = agg->lag_ports; port;
- 	     port = port->next_port_in_aggregator) {
--		if (port->is_enabled)
-+		if (READ_ONCE(port->is_enabled))
- 			active++;
- 	}
- 
-@@ -2801,11 +2801,11 @@ void bond_3ad_handle_link_change(struct slave *slave, char link)
- 	 * some of he adaptors(ce1000.lan) report.
- 	 */
- 	if (link == BOND_LINK_UP) {
--		port->is_enabled = true;
-+		WRITE_ONCE(port->is_enabled, true);
- 		ad_update_actor_keys(port, false);
- 	} else {
- 		/* link has failed */
--		port->is_enabled = false;
-+		WRITE_ONCE(port->is_enabled, false);
- 		ad_update_actor_keys(port, true);
- 	}
- 	agg = __get_first_agg(port);
-@@ -2878,16 +2878,20 @@ int bond_3ad_set_carrier(struct bonding *bond)
-  * Returns:   0 on success
-  *          < 0 on error
-  */
--int __bond_3ad_get_active_agg_info(struct bonding *bond,
-+int __bond_3ad_get_active_agg_info(const struct bonding *bond,
- 				   struct ad_info *ad_info)
- {
--	struct aggregator *aggregator = NULL, *tmp;
-+	const struct aggregator *aggregator = NULL, *tmp;
-+	struct ad_slave_info *ad_slave_info;
-+	const struct port *port;
- 	struct list_head *iter;
- 	struct slave *slave;
--	struct port *port;
- 
- 	bond_for_each_slave_rcu(bond, slave, iter) {
--		port = &(SLAVE_AD_INFO(slave)->port);
-+		ad_slave_info = SLAVE_AD_INFO(slave);
-+		if (!ad_slave_info)
-+			continue;
-+		port = &ad_slave_info->port;
- 		tmp = rcu_dereference(port->aggregator);
- 		if (tmp && tmp->is_active) {
- 			aggregator = tmp;
-@@ -2907,7 +2911,7 @@ int __bond_3ad_get_active_agg_info(struct bonding *bond,
- 	return 0;
- }
- 
--int bond_3ad_get_active_agg_info(struct bonding *bond, struct ad_info *ad_info)
-+int bond_3ad_get_active_agg_info(const struct bonding *bond, struct ad_info *ad_info)
- {
- 	int ret;
- 
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index 4a11572f663d3127fb2901468939556d34df16ed..55d2f8a539d46ad825768a0fb91ffe5648028d28 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -686,53 +686,58 @@ static size_t bond_get_size(const struct net_device *bond_dev)
- 		0;
- }
- 
--static int bond_option_active_slave_get_ifindex(struct bonding *bond)
-+static int bond_option_active_slave_get_ifindex_rcu(const struct bonding *bond)
- {
--	const struct net_device *slave;
--	int ifindex;
-+	const struct net_device *dev = NULL;
-+	const struct slave *slave;
- 
--	rcu_read_lock();
--	slave = bond_option_active_slave_get_rcu(bond);
--	ifindex = slave ? slave->ifindex : 0;
--	rcu_read_unlock();
--	return ifindex;
-+	slave = rcu_dereference(bond->curr_active_slave);
-+	if (slave)
-+		dev = slave->dev;
-+	return dev ? dev->ifindex : 0;
- }
- 
- static int bond_fill_info(struct sk_buff *skb,
- 			  const struct net_device *bond_dev)
- {
--	struct bonding *bond = netdev_priv(bond_dev);
--	unsigned int packets_per_slave;
--	int ifindex, i, targets_added;
-+	const struct bonding *bond = netdev_priv(bond_dev);
-+	int i, targets_added, miimon, mode;
-+	const struct slave *primary;
- 	struct nlattr *targets;
--	struct slave *primary;
- 
--	if (nla_put_u8(skb, IFLA_BOND_MODE, BOND_MODE(bond)))
-+	rcu_read_lock();
-+	mode = READ_ONCE(bond->params.mode);
-+	if (nla_put_u8(skb, IFLA_BOND_MODE, mode))
- 		goto nla_put_failure;
- 
--	ifindex = bond_option_active_slave_get_ifindex(bond);
--	if (ifindex && nla_put_u32(skb, IFLA_BOND_ACTIVE_SLAVE, ifindex))
--		goto nla_put_failure;
-+	if (bond_mode_uses_primary(mode)) {
-+		int ifindex = bond_option_active_slave_get_ifindex_rcu(bond);
-+
-+		if (ifindex && nla_put_u32(skb, IFLA_BOND_ACTIVE_SLAVE, ifindex))
-+			goto nla_put_failure;
-+	}
- 
--	if (nla_put_u32(skb, IFLA_BOND_MIIMON, bond->params.miimon))
-+	miimon = READ_ONCE(bond->params.miimon);
-+	if (nla_put_u32(skb, IFLA_BOND_MIIMON, miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_UPDELAY,
--			bond->params.updelay * bond->params.miimon))
-+			READ_ONCE(bond->params.updelay) * miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_DOWNDELAY,
--			bond->params.downdelay * bond->params.miimon))
-+			READ_ONCE(bond->params.downdelay) * miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_PEER_NOTIF_DELAY,
--			bond->params.peer_notif_delay * bond->params.miimon))
-+			READ_ONCE(bond->params.peer_notif_delay) * miimon))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_USE_CARRIER, 1))
- 		goto nla_put_failure;
- 
--	if (nla_put_u32(skb, IFLA_BOND_ARP_INTERVAL, bond->params.arp_interval))
-+	if (nla_put_u32(skb, IFLA_BOND_ARP_INTERVAL,
-+			READ_ONCE(bond->params.arp_interval)))
- 		goto nla_put_failure;
- 
- 	targets = nla_nest_start_noflag(skb, IFLA_BOND_ARP_IP_TARGET);
-@@ -741,8 +746,10 @@ static int bond_fill_info(struct sk_buff *skb,
- 
- 	targets_added = 0;
- 	for (i = 0; i < BOND_MAX_ARP_TARGETS; i++) {
--		if (bond->params.arp_targets[i]) {
--			if (nla_put_be32(skb, i, bond->params.arp_targets[i]))
-+		__be32 t = READ_ONCE(bond->params.arp_targets[i]);
-+
-+		if (t) {
-+			if (nla_put_be32(skb, i, t))
- 				goto nla_put_failure;
- 			targets_added = 1;
- 		}
-@@ -753,11 +760,12 @@ static int bond_fill_info(struct sk_buff *skb,
- 	else
- 		nla_nest_cancel(skb, targets);
- 
--	if (nla_put_u32(skb, IFLA_BOND_ARP_VALIDATE, bond->params.arp_validate))
-+	if (nla_put_u32(skb, IFLA_BOND_ARP_VALIDATE,
-+			READ_ONCE(bond->params.arp_validate)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_ARP_ALL_TARGETS,
--			bond->params.arp_all_targets))
-+			READ_ONCE(bond->params.arp_all_targets)))
- 		goto nla_put_failure;
- 
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -767,6 +775,9 @@ static int bond_fill_info(struct sk_buff *skb,
- 
- 	targets_added = 0;
- 	for (i = 0; i < BOND_MAX_NS_TARGETS; i++) {
-+		/* Note: IPv6 addresses can not be read in an atomic READ_ONCE() yet.
-+		 * We accept this minor race for the moment.
-+		 */
- 		if (!ipv6_addr_any(&bond->params.ns_targets[i])) {
- 			if (nla_put_in6_addr(skb, i, &bond->params.ns_targets[i]))
- 				goto nla_put_failure;
-@@ -780,97 +791,97 @@ static int bond_fill_info(struct sk_buff *skb,
- 		nla_nest_cancel(skb, targets);
- #endif
- 
--	primary = rtnl_dereference(bond->primary_slave);
-+	primary = rcu_dereference(bond->primary_slave);
- 	if (primary &&
- 	    nla_put_u32(skb, IFLA_BOND_PRIMARY, primary->dev->ifindex))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_PRIMARY_RESELECT,
--		       bond->params.primary_reselect))
-+		       READ_ONCE(bond->params.primary_reselect)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_FAIL_OVER_MAC,
--		       bond->params.fail_over_mac))
-+		       READ_ONCE(bond->params.fail_over_mac)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_XMIT_HASH_POLICY,
--		       bond->params.xmit_policy))
-+		       READ_ONCE(bond->params.xmit_policy)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_RESEND_IGMP,
--			bond->params.resend_igmp))
-+			READ_ONCE(bond->params.resend_igmp)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_NUM_PEER_NOTIF,
--		       bond->params.num_peer_notif))
-+		       READ_ONCE(bond->params.num_peer_notif)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_ALL_SLAVES_ACTIVE,
--		       bond->params.all_slaves_active))
-+		       READ_ONCE(bond->params.all_slaves_active)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_MIN_LINKS,
--			bond->params.min_links))
-+			READ_ONCE(bond->params.min_links)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u32(skb, IFLA_BOND_LP_INTERVAL,
--			bond->params.lp_interval))
-+			READ_ONCE(bond->params.lp_interval)))
- 		goto nla_put_failure;
- 
--	packets_per_slave = bond->params.packets_per_slave;
- 	if (nla_put_u32(skb, IFLA_BOND_PACKETS_PER_SLAVE,
--			packets_per_slave))
-+			READ_ONCE(bond->params.packets_per_slave)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_AD_LACP_ACTIVE,
--		       bond->params.lacp_active))
-+		       READ_ONCE(bond->params.lacp_active)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_AD_LACP_RATE,
--		       bond->params.lacp_fast))
-+		       READ_ONCE(bond->params.lacp_fast)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_AD_SELECT,
--		       bond->params.ad_select))
-+		       READ_ONCE(bond->params.ad_select)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_TLB_DYNAMIC_LB,
--		       bond->params.tlb_dynamic_lb))
-+		       READ_ONCE(bond->params.tlb_dynamic_lb)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_MISSED_MAX,
--		       bond->params.missed_max))
-+		       READ_ONCE(bond->params.missed_max)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_COUPLED_CONTROL,
--		       bond->params.coupled_control))
-+		       READ_ONCE(bond->params.coupled_control)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_BROADCAST_NEIGH,
--		       bond->params.broadcast_neighbor))
-+		       READ_ONCE(bond->params.broadcast_neighbor)))
- 		goto nla_put_failure;
- 
- 	if (nla_put_u8(skb, IFLA_BOND_LACP_STRICT,
--		       bond->params.lacp_strict))
-+		       READ_ONCE(bond->params.lacp_strict)))
- 		goto nla_put_failure;
- 
--	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
-+	if (mode == BOND_MODE_8023AD) {
- 		struct ad_info info;
- 
- 		if (capable(CAP_NET_ADMIN)) {
- 			if (nla_put_u16(skb, IFLA_BOND_AD_ACTOR_SYS_PRIO,
--					bond->params.ad_actor_sys_prio))
-+					READ_ONCE(bond->params.ad_actor_sys_prio)))
- 				goto nla_put_failure;
- 
- 			if (nla_put_u16(skb, IFLA_BOND_AD_USER_PORT_KEY,
--					bond->params.ad_user_port_key))
-+					READ_ONCE(bond->params.ad_user_port_key)))
- 				goto nla_put_failure;
- 
-+			/* Small race here, this is a minor trade off. */
- 			if (nla_put(skb, IFLA_BOND_AD_ACTOR_SYSTEM,
- 				    ETH_ALEN, &bond->params.ad_actor_system))
- 				goto nla_put_failure;
- 		}
--		if (!bond_3ad_get_active_agg_info(bond, &info)) {
-+		if (!__bond_3ad_get_active_agg_info(bond, &info)) {
- 			struct nlattr *nest;
- 
- 			nest = nla_nest_start_noflag(skb, IFLA_BOND_AD_INFO);
-@@ -898,9 +909,11 @@ static int bond_fill_info(struct sk_buff *skb,
- 		}
- 	}
- 
-+	rcu_read_unlock();
- 	return 0;
- 
- nla_put_failure:
-+	rcu_read_unlock();
- 	return -EMSGSIZE;
- }
- 
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index e590c8dee86e1e7168e400b1321fc22c8f75b87c..36b8d89387ee5d67a51087fa2c6edd0de579ab3f 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -934,14 +934,14 @@ static int bond_option_mode_set(struct bonding *bond,
- 
- 	/* don't cache arp_validate between modes */
- 	WRITE_ONCE(bond->params.arp_validate, BOND_ARP_VALIDATE_NONE);
--	bond->params.mode = newval->value;
-+	WRITE_ONCE(bond->params.mode, newval->value);
- 
- 	/* When changing mode, the bond device is down, we may reduce
- 	 * the bond_bcast_neigh_enabled in bond_close() if broadcast_neighbor
- 	 * enabled in 8023ad mode. Therefore, only clear broadcast_neighbor
- 	 * to 0.
- 	 */
--	bond->params.broadcast_neighbor = 0;
-+	WRITE_ONCE(bond->params.broadcast_neighbor, 0);
- 
- 	if (bond->dev->reg_state == NETREG_REGISTERED) {
- 		bool update = false;
-@@ -1706,7 +1706,7 @@ static int bond_option_lacp_strict_set(struct bonding *bond,
- {
- 	netdev_dbg(bond->dev, "Setting LACP fallback to %s (%llu)\n",
- 		   newval->string, newval->value);
--	bond->params.lacp_strict = newval->value;
-+	WRITE_ONCE(bond->params.lacp_strict, newval->value);
- 	bond_3ad_set_carrier(bond);
- 
- 	return 0;
-@@ -1927,7 +1927,7 @@ static int bond_option_broadcast_neigh_set(struct bonding *bond,
- 	if (bond->params.broadcast_neighbor == newval->value)
- 		return 0;
- 
--	bond->params.broadcast_neighbor = newval->value;
-+	WRITE_ONCE(bond->params.broadcast_neighbor, newval->value);
- 	if (bond->dev->flags & IFF_UP) {
- 		if (bond->params.broadcast_neighbor)
- 			static_branch_inc(&bond_bcast_neigh_enabled);
-diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-index 05572c19e14b7ae97d497cc9c5d97d4314eab295..ef667dff297294dc78d98701aae10c31ef09df3f 100644
---- a/include/net/bond_3ad.h
-+++ b/include/net/bond_3ad.h
-@@ -302,8 +302,8 @@ void bond_3ad_state_machine_handler(struct work_struct *);
- void bond_3ad_initiate_agg_selection(struct bonding *bond, int timeout);
- void bond_3ad_adapter_speed_duplex_changed(struct slave *slave);
- void bond_3ad_handle_link_change(struct slave *slave, char link);
--int  bond_3ad_get_active_agg_info(struct bonding *bond, struct ad_info *ad_info);
--int  __bond_3ad_get_active_agg_info(struct bonding *bond,
-+int  bond_3ad_get_active_agg_info(const struct bonding *bond, struct ad_info *ad_info);
-+int  __bond_3ad_get_active_agg_info(const struct bonding *bond,
- 				    struct ad_info *ad_info);
- int bond_3ad_lacpdu_recv(const struct sk_buff *skb, struct bonding *bond,
- 			 struct slave *slave);
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 2c54a36a8477b98dc7a4a1f45d27f7972efecba0..598d56b1bc97063365c88dd002ec1423850e56eb 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -345,14 +345,14 @@ static inline bool bond_mode_uses_primary(int mode)
- 	       mode == BOND_MODE_ALB;
- }
- 
--static inline bool bond_uses_primary(struct bonding *bond)
-+static inline bool bond_uses_primary(const struct bonding *bond)
- {
- 	return bond_mode_uses_primary(BOND_MODE(bond));
- }
- 
--static inline struct net_device *bond_option_active_slave_get_rcu(struct bonding *bond)
-+static inline struct net_device *bond_option_active_slave_get_rcu(const struct bonding *bond)
- {
--	struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
-+	const struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
- 
- 	return bond_uses_primary(bond) && slave ? slave->dev : NULL;
- }
-@@ -703,7 +703,7 @@ void bond_setup(struct net_device *bond_dev);
- unsigned int bond_get_num_tx_queues(void);
- int bond_netlink_init(void);
- void bond_netlink_fini(void);
--struct net_device *bond_option_active_slave_get_rcu(struct bonding *bond);
-+struct net_device *bond_option_active_slave_get_rcu(const struct bonding *bond);
- const char *bond_slave_link_status(s8 link);
- struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
- 					      struct net_device *end_dev,
--- 
-2.55.0.rc0.799.gd6f94ed593-goog
+If you just increase gc_thresh3 slightly, then yes, it won't help.
 
+
+>
+> Regarding neigh_hash_shift: in my workload, neigh_alloc() returns
+> ENOBUFS before reaching do_alloc() since GC cannot reclaim any
+> entries. kzalloc() is never called, so neigh_hash_grow() is not
+> involved in the latency I observed. The pre-lock time check in
+> neigh_forced_gc() is a low-cost safeguard that prevents repeated full
+> table scans regardless of gc_thresh3 value. It does not interfere with
+> correct GC behaviour =E2=80=94 if entries are still above the threshold, =
+GC
+> runs normally.
+>
+>
+> Hi Jakub,
+> I tested with different threshold values, filling the table completely
+> with 32k reachable entries and attempting 1000 additional allocations.
+> Exported neigh_forced_gc so that it can be profiled
+>                          no change  10ms   50ms   100ms
+> max cpu usage %          44%        11.8%  2.56%  1.42%
+> calls > 100us (of 1000)  101        31     13     7
+>
+> At 10ms, max CPU usage is still 11.8% and 31 out of 1000 calls take
+> more than 100us. Given that 50ms reduces this to 2.56% and 13 calls
+> respectively, I would prefer 50ms as the threshold. However, I am open
+> to further discussion on the right value.
+>
+> Thanks,
+> Vimal
+>
+>
+> On Fri, Jun 26, 2026 at 3:17=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.=
+com> wrote:
+> >
+> > From: Vimal Agrawal <avimalin@gmail.com>
+> > Date: Thu, 25 Jun 2026 10:20:20 +0000
+> > > Once the neighbour table exceeds gc_thresh3, neigh_forced_gc() is cal=
+led
+> > > on every allocation attempt with no rate limiting. In workloads with =
+mostly
+> > > active/reachable entries, the GC walk traverses a large portion of th=
+e
+> > > neighbour table without reclaiming entries, holding tbl->lock for an
+> > > extended period. This causes severe lock contention and allocation
+> > > latencies exceeding 16ms under sustained neighbour creation.
+> > >
+> > > Add a pre-lock check in neigh_forced_gc() to skip the GC run if one w=
+as
+> > > performed within the last second, avoiding repeated full table scans =
+and
+> > > lock acquisitions on the hot allocation path.
+> > >
+> > > Profiling of neigh_create() shows ~3 orders of magnitude latency
+> > > improvement with this change.
+> > >
+> > > Link:https://lore.kernel.org/netdev/CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx=
+7sSM=3DAEgsq0kywHxTw@mail.gmail.com/
+> >
+> > From the thread, these look misconfigured.
+> >
+> > ---8<---
+> > net.ipv6.neigh.default.gc_thresh2 =3D 32768
+> > net.ipv6.neigh.default.gc_thresh3 =3D 32768
+> > ---8<---
+> >
+> > If gc_thresh3 is larger enough, gc_thresh2 will give you 5s
+> > rate limiting.
+> >
+> > If the number of active neigh entries constantly exceeds
+> > gc_thresh3, it will be the correct gc_thresh2 for you.
+> >
+> > Also, I guess you want a new kernel param for the first
+> > neigh_hash_alloc(), which is currently fixed for 3, which
+> > is too small for some hosts.
+> >
+> > 50000 entries require neigh_hash_grow() 13 times.
+> >
+> > Can you test this on your real workload, starting from
+> > neigh_hash_shift=3D16 and appropriate gc_thresh2/3 ?
+> >
+> > ---8<---
+> > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> > index 1349c0eedb64..a75b3750eec9 100644
+> > --- a/net/core/neighbour.c
+> > +++ b/net/core/neighbour.c
+> > @@ -1817,6 +1817,22 @@ EXPORT_SYMBOL(neigh_parms_release);
+> >  static struct lock_class_key neigh_table_proxy_queue_class;
+> >
+> >  static struct neigh_table __rcu *neigh_tables[NEIGH_NR_TABLES] __read_=
+mostly;
+> > +static __initdata unsigned long neigh_hash_shift =3D 3;
+> > +
+> > +static int __init neigh_set_hash_shift(char *str)
+> > +{
+> > +       ssize_t ret;
+> > +
+> > +       if (!str)
+> > +               return 0;
+> > +
+> > +       ret =3D kstrtoul(str, 0, &neigh_hash_shift);
+> > +       if (ret)
+> > +               return 0;
+> > +
+> > +       return 1;
+> > +}
+> > +__setup("neigh_hash_shift=3D", neigh_set_hash_shift);
+> >
+> >  void neigh_table_init(int index, struct neigh_table *tbl)
+> >  {
+> > @@ -1843,7 +1859,7 @@ void neigh_table_init(int index, struct neigh_tab=
+le *tbl)
+> >                 panic("cannot create neighbour proc dir entry");
+> >  #endif
+> >
+> > -       RCU_INIT_POINTER(tbl->nht, neigh_hash_alloc(3));
+> > +       RCU_INIT_POINTER(tbl->nht, neigh_hash_alloc(neigh_hash_shift));
+> >
+> >         phsize =3D (PNEIGH_HASHMASK + 1) * sizeof(struct pneigh_entry *=
+);
+> >         tbl->phash_buckets =3D kzalloc(phsize, GFP_KERNEL);
+> > ---8<---
+> >
+> >
+> >
+> > > Signed-off-by: Vimal Agrawal <vimal.agrawal@sophos.com>
+> > > ---
+> > >  net/core/neighbour.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> > > index 1349c0eedb64..078842db3c5f 100644
+> > > --- a/net/core/neighbour.c
+> > > +++ b/net/core/neighbour.c
+> > > @@ -260,6 +260,9 @@ static int neigh_forced_gc(struct neigh_table *tb=
+l)
+> > >       int shrunk =3D 0;
+> > >       int loop =3D 0;
+> > >
+> > > +     if (!time_after(jiffies, READ_ONCE(tbl->last_flush) + HZ))
+> > > +             return 0;
+> > > +
+> > >       NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
+> > >
+> > >       spin_lock_bh(&tbl->lock);
+> > > --
+> > > 2.17.1
+> > > v
 
