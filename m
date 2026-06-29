@@ -1,79 +1,102 @@
-Return-Path: <netdev+bounces-302677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EbvGG4B/QmqM8gkAu9opvQ
-	(envelope-from <netdev+bounces-302677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:21:52 +0200
+	id 6fkDDMB/QmqY8gkAu9opvQ
+	(envelope-from <netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:22:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26666DBF78
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:21:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE646DBF9F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:22:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=ba9IDNG5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302677-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302677-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Fe0zJ3MI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=debian.org (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8978332107DF
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:14:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D43A30A4757
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D9740C5DD;
-	Mon, 29 Jun 2026 14:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED11408004;
+	Mon, 29 Jun 2026 14:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180FC379966;
-	Mon, 29 Jun 2026 14:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1310B33A6E9
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 14:13:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782742276; cv=none; b=Ny+a7rqqdXcbdy6n0X/gf8+n9ZaK3G3CNakY5u7mhbmB60fta/f+YaXkdILDi9eZqyzwatpHMYkpphtLxc9fmh3aB1rX6qmQ1ji4yvmRN4YErik3sb4UThedETE8IodOXFRZGaTbAjDTk7SaWrJZyw80UKD3y8k8JGGvsttHozE=
+	t=1782742412; cv=none; b=NE4Vc4MZ18KZxsCQRpy64SNHCV4WR+5wIGW00jAzizjR/o9X+dl5wTsmJ38r1QnrhwIpku1TDC0l+qQOBtMD2p9VVrutRQ5TuQyjsuNXV+KPPEP0x3l5iVDLjGwe267P/SGhzCMDUp6c0VwN7woDNK1va8QhxALsAE6hZqOD+bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782742276; c=relaxed/simple;
-	bh=w3Rk58VFHsHRk8+/VRDIy/78iRnDfVByA+Q+K0PFJ2Y=;
+	s=arc-20240116; t=1782742412; c=relaxed/simple;
+	bh=n2moP8sJR9BhHMurE5j8uV8hEciqqJxPDOsyZT57eT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n5qG+Y4r40CCl6UqvVRHGt1mNm7qUEty6uMzQGPQyb2HhI7FdelXAeH0FpZ1av21R9BKKL0BZgPYyUvSMkWqB+CIAePYd6qL4+ZP1TIsxhRltA2P+r+5z/Aq5eNbXrm6jIuEb4A+GomYNDaaikh4KrvMIEpdS09FiR6m5IuAkoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ba9IDNG5; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ljs7RGaTifxfFw5bn73caHjn9tTVbQSLKh5eLK8il9o=; b=ba9IDNG5qaNFbWiu8XAchmSY7m
-	H6B6cvKMhQWm/IMhepYGlwO/sminRwaTuwNC8KnxE/eQq9T2JAkYRli3bDTmSTZlGpakGnAx2jn8K
-	rpI80xwM6ZaTeTrrSNeZf5BpQdHsMauMtaeRbYFLZK+927daMOnNxGnPZlJide3yZp3g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1weChI-009las-3j; Mon, 29 Jun 2026 16:10:52 +0200
-Date: Mon, 29 Jun 2026 16:10:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Wu. JackBB (GSM)" <JackBB_Wu@compal.com>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=co8VR+9J7zpfCE1rQjkCE7GNmPgDj/Qu2aAI5zsFMw1RMTnBGJ/sGvPOGtO1epsrjWlnulg9wSqxHuav33lB2L9Cms+g7KCwprssP11hXd0FXfu684bdLdOgZbJR1InRYabQjBcMJekUQhW53TkVc/x/jFeajvmzlTeuYK1kc+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fe0zJ3MI; arc=none smtp.client-ip=209.85.221.49
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-47231f1f8f3so2487236f8f.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 07:13:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782742407; x=1783347207; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xeFfaIaYuJ4MPfGng2mUHQKnK1lD+x40upFL0+GBvfo=;
+        b=Fe0zJ3MIZdeG79AwrWUFe0XWL+XHBFIxSZYDhE+SSYicAyxUvDR7p9KtJAT3Iv3LKo
+         mfeyHP7tMNJ1iuhhtq16POCERc6tF5KSPDqqWJc7gO5gqsNymfxa9XYjTq+m3IfkNmC0
+         c4R+/kJRsyK7L4zdXGIN19DsdqSxHr2VtQUy+YjaPgauim7kuT6SKugvaQwiy4QNSzxD
+         MkA23GUiOMNSv3Ef8NNvn2mVJAMti442+FAq9K1Owhc4MuRDcH/QMkUWCwDMHPufOygd
+         BlRDrOCNAzBFuMQjgXJ5+HPOg8aWe323XQlD5fviatKe/2ANyYOyuDjn/nb4t7x1phH1
+         2hFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782742407; x=1783347207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xeFfaIaYuJ4MPfGng2mUHQKnK1lD+x40upFL0+GBvfo=;
+        b=Tv5jzDiRUgbthhA5dwF9oSAwxywjDnT2ziG/tZvLjs8HSUpOQDtZQvB4TF9aNH8PbK
+         XxrlpGFW0dv41qqnH12nkba6E2v4W8gAiv/hXLAcLAHXQf+cCkBx2gjF+KLxfv/reccL
+         OWhmvQdoh7IFWPb2Y2sr1s2l0WLdueAijLj5QEO6evstsIVSoIQ9RF0l7+t3rtgiglM/
+         Db+SjsIYlDOQsTRwRNZbTu53NSrTqn3yIdz/h29OCbZD2Gfk1029hqgm7p7dZfDhshrk
+         ueUkhyEFOqpNs+xy4rTYu2U6icqC/NLpSa51qwfdEXrjmLLUmOQbrdx3n/jnZ5wvTU7K
+         gnkA==
+X-Forwarded-Encrypted: i=1; AFNElJ85mudmoudd+THYq8uCiQbrjKh8uCAar96vVpxcN7RXIEznQfIDvlc/tLLbA0ZRHqFg8gx6jFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv1UdX0UtIFIc6y/HZBl9MVLcP2mH5cdSdAS+Brp83X+A/InVC
+	1PGMsxYILu30ml7mYBbkGscCtvI3L5wYilKuFOtkucpX1EQNchbcGvst
+X-Gm-Gg: AfdE7cmBk+DpnKaTsOTfEgC/fGTLpS0qFj4RnklZihtgCKT/pR5Uj6FIm7h3uwhX/K3
+	O4WFsO+AM2nHCJyxOmypIxfOUVKZYcKUQGsNljE79QDFaGWzwPdToq3tSUZv/LlnkaUgCGgA+7p
+	oBhBrog1GLSqmCIdWi/xqJ3SC2e46wqiWvl9KaYBGyFuJ1BeJJLITRiZe5yXAT9Rlp4I+MBjUsm
+	Q6nRxC4IkqToQ17vbZzjrpvhXrQrtEH4q3dtj3veEclnX46sWsoqThRgwTQuozmAa/qIljv3eNz
+	OIpSdeE6+zSr7Zysgunq91C3rVBdVQOItfnz5VgtmBupOR9LXrsNeH8pBlQACu4PAiruiW+deMg
+	69g3mYtFPh1ruEZ2CztDV7BQ9zvPzTh8hMHqk94mM67qr+HsV3L1zNTq4RnGBmlBRo9QYldQG9F
+	awSFiWRx5IMfAWpQhAz2pEQM3WiKlsiOAMoi6/a5W0cWOE24nU
+X-Received: by 2002:a05:600c:a086:b0:492:6954:1036 with SMTP id 5b1f17b1804b1-49269541111mr229190765e9.14.1782742406763;
+        Mon, 29 Jun 2026 07:13:26 -0700 (PDT)
+Received: from eldamar.lan (c-82-192-247-196.customer.ggaweb.ch. [82.192.247.196])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47290ed4377sm16140004f8f.37.2026.06.29.07.13.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2026 07:13:25 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 026AFBE2DE0; Mon, 29 Jun 2026 16:13:24 +0200 (CEST)
+Date: Mon, 29 Jun 2026 16:13:23 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Wongi Lee <qw3rtyp0@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wen-Zhi Huang <wen-zhi.huang@mediatek.com>,
-	Shi-Wei Yeh <shi-wei.yeh@mediatek.com>,
-	Minano Tseng <Minano.tseng@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-Subject: Re: [External Mail] Re: [PATCH v3 2/7] net: wwan: t9xx: Add control
- plane transaction layer
-Message-ID: <92b1e341-31a1-4f60-80d5-ccf8f742a38a@lunn.ch>
-References: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
- <20260624-t9xx_driver_v1-v3-2-73ff03f60c48@compal.com>
- <2a90ae6b-2b6d-4340-b557-915252cc3488@lunn.ch>
- <49939d4d682f4c1fb359973ea2cdbd00@compal.com>
+	Simon Horman <horms@kernel.org>, Jungwoo Lee <jwlee2217@gmail.com>
+Subject: Re: Please apply 736b380e28d0 and eca856950f7c down to 6.1.y
+Message-ID: <akJ9gzZrhXMUomcg@eldamar.lan>
+References: <ajuR7rZYU943EG6p@DESKTOP-19IMU7U.localdomain>
+ <2026062417-conceal-driving-0ebd@gregkh>
+ <ajujm9+82N1g/HgF@DESKTOP-19IMU7U.localdomain>
+ <2026062416-amulet-paradox-cf7c@gregkh>
+ <ajum4HXbhgdRl6Vz@DESKTOP-19IMU7U.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,63 +105,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49939d4d682f4c1fb359973ea2cdbd00@compal.com>
+In-Reply-To: <ajum4HXbhgdRl6Vz@DESKTOP-19IMU7U.localdomain>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[debian.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302677-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:qw3rtyp0@gmail.com,m:gregkh@linuxfoundation.org,m:stable@vger.kernel.org,m:sashal@kernel.org,m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jwlee2217@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:JackBB_Wu@compal.com,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,linuxfoundation.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[carnil@debian.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-302678-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[carnil@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E26666DBF78
+X-Rspamd-Queue-Id: 7CE646DBF9F
 
-> > > -	devm_kfree(dev, mdev);
-> > > +	mtk_dev_free(mdev);
-> >
-> > Why are you removing devm_ calls?
+Hi Greg,
+
+On Wed, Jun 24, 2026 at 06:44:00PM +0900, Wongi Lee wrote:
+> On Wed, Jun 24, 2026 at 11:37:29AM +0200, Greg Kroah-Hartman wrote:
+> > On Wed, Jun 24, 2026 at 06:30:03PM +0900, Wongi Lee wrote:
+> > > On Wed, Jun 24, 2026 at 11:00:45AM +0200, Greg Kroah-Hartman wrote:
+> > > > On Wed, Jun 24, 2026 at 05:14:38PM +0900, Wongi Lee wrote:
+> > > > > Hi,
+> > > > > 
+> > > > > Could the following upstream commits be queued for the active stable
+> > > > > trees?
+> > > > > 
+> > > > >   commit 736b380e28d0480c7bc3e022f1950f31fe53a7c5
+> > > > >   ("ipv6: account for fraggap on the paged allocation path")
+> > > > 
+> > > > I do not see that commit id in Linus's tree, are you sure it is correct?
+> > > > 
+> > > > >   commit eca856950f7cb1a221e02b99d758409f2c5cec42
+> > > > >   ("ipv4: account for fraggap on the paged allocation path")
+> > > > 
+> > > > Same here, no id of that one in Linus's tree that I can see.
+> > > > 
+> > > > thanks,
+> > > > 
+> > > > greg k-h
+> > > 
+> > > 
+> > > Hi Greg,
+> > > 
+> > > First, sorry for confusing you.
+> > > 
+> > > The commit IDs are from netdev/net.git:
+> > > 
+> > >   736b380e28d0480c7bc3e022f1950f31fe53a7c5
+> > >   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=736b380e28d0
+> > > 
+> > >   eca856950f7cb1a221e02b99d758409f2c5cec42
+> > >   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=eca856950f7c
+> > > 
+> > > They were applied to netdev without Cc: stable@vger.kernel.org, so I
+> > > wanted to flag them for stable handling but I send it too fast (before
+> > > merge).
+> > > 
+> > > I will resend the request with the Linus tree commit ID.
+> > 
+> > They have to be in Linus's tree, before we can take them in a stable
+> > release, right?
+> > 
+> > And why were they not originally tagged with the cc: stable?  That would
+> > save you time in the future as it would all just happen automatically.
+> > 
+> > thanks,
+> > 
+> > greg k-h
 > 
-> mtk_dev_alloc/mtk_dev_free are paired wrappers so the caller
-> doesn't need to know the underlying allocation mechanism.
-> The devm_kfree is still called inside mtk_dev_free.
+> Right, my fault.
+> 
+> Also I just forgot cc'ing stable when sending it. I'll apply it next time.
 
-Two different issues here:
+Small heads-up: Both commits are now in Linus' tree and included in
+v7.2-rc1:
 
-1) If you don't want to use devm_, don't use devm_ from the
-beginning. A patch should not change how a previous patch works, since
-you are wasting reviewer time reviewing code which you later change.
+$ git describe --contains 736b380e28d0480c7bc3e022f1950f31fe53a7c5
+v7.2-rc1~29^2~66^2
+$ git describe --contains eca856950f7cb1a221e02b99d758409f2c5cec42
+v7.2-rc1~29^2~66^2~1
 
-2) Do you understand what devm_ actually does? Since you use
-devm_free() i don't think you actually understand what devm_ is all
-about.
+Can you queue those as needed down to the 6.1.y stable series?
 
-	Andrew
+Thank you already,
+Regards,
+Salvatore
 
