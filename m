@@ -1,325 +1,141 @@
-Return-Path: <netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302762-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IFF2FvSzQmrU/wkAu9opvQ
-	(envelope-from <netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:05:40 +0200
+	id 2+BnLiS0QmrX/wkAu9opvQ
+	(envelope-from <netdev+bounces-302762-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:06:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B9326DDEB6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:05:39 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B3C6DDEBB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:06:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=BwWI1nyC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302761-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hc76mXVB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302762-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302762-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9D0B73002908
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:05:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C22DF3003363
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06145282F3B;
-	Mon, 29 Jun 2026 18:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5059E346766;
+	Mon, 29 Jun 2026 18:06:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8897E2D0C7E
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:05:26 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782756327; cv=pass; b=uNN0oiR8+seG9mrkQOGsa+1lkm8Y9dGUekl0cPMA3H7irgUCxSPYj58qEsun8JhEXI6wJ1CFx6MUwZ1bRkmyxDCRy8DnQnoOyH7IF1MlKttIrDOgKOPrgV5z6FW+XYLzvLoan4bLGboKoCr7+bfp033N6gcukhPMoeUKpW+uTB0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782756327; c=relaxed/simple;
-	bh=Uhckl5gasRPy/Q9fjOQVz92tB7mZ/a0FmJRdZQt/bK0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p5eJN7urBUM+4E5ixQtx/VJ6svnp+L0Q9uHy9GV4jHb9XXrJtKdJQG6FaqpSeQy+QCg7+1o1Ge7UagdWGESoVaqglDeJM9CBEjpwbI5nZodXVA18qNOFrp0z8HzLs8Xmghg3cwSrZRICbleHrkG7lJNYHGvt1E3JomKx451u8/E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BwWI1nyC; arc=pass smtp.client-ip=74.125.82.47
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-13809223fd4so4405512c88.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:05:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782756325; cv=none;
-        d=google.com; s=arc-20260327;
-        b=a8DvpMqgCxXIn6BDppIY6nr+YBfYZMfwkKc9obJTfzvXvCkIP/wDvLA9Y4RrK3aL32
-         TYvDwauR5Zxk1EV3uDqQKMgu4LRcR395LtXZv5c1aKPVf6/vbNKUEfVAOAB7LbANOcu8
-         SGrgJ+9RQG9OOvN522EL+N2Nio7SnewAao1r1SsPrw78QSF1DinU+WNAnq4SB/yzkglB
-         QafFYZzvEGhNoDhqug438GYDsGZg6xsDzpgbFcYf6np+sVwSpAmtnQcR9llvm84xqd6K
-         TYCCjec1/KtykNUG6SUBYprN6RpaGmZ2N5SQh8hW8PbfIqKpXY8q/z/gsvsp6Bfblf6x
-         uAsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NDw1E2/pIt6d7lE9aQGWAuiRLCVjcZhQOY5MZpoHVnM=;
-        fh=LGPirqrxwya2Xl+I+WxNpg6Ny03f/JMrcrRM1/WJeZk=;
-        b=IxuBmMw/Kn1fpQTPm7AXK2t1asZBcw3AAoYsZNWRLpSMGnqMa/VhRWmM06BAvN5ksd
-         oMVnubmOMEY70BOXcOc27Z4GB5mvfXq+Hqz41Mldaxfr6sFBTgLHQKXZ2pTOIwAd3RQY
-         XZmrxCTKhQ5nXVQwdSlp0u1LFhFHjyty5KvzAPv9QzbJghtvLq5pn3+rfwm/mqPXur9a
-         2NMYRSJmEhDro0mlUG7xhKWpRS0R2Aq8CyZ5zK9ataOkfR6ZbInOPBOFwg/cyrUyFsfy
-         aHA1RRwegAdBkNlyuOFXCxmraM4oGq7JiD6KbKfmvxyRBxtGDcIwk7Ke+rVSoupjQBfG
-         6GcQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782756325; x=1783361125; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=NDw1E2/pIt6d7lE9aQGWAuiRLCVjcZhQOY5MZpoHVnM=;
-        b=BwWI1nyCWmtHjhGNWZNB8kvBDzGHvjeQ2KKeO/PD0DPd98CD57aqVETnHt51JripG4
-         S25mDGOwz0n2a+iY6NHCh8yTAzemHz2dQ5uyHYYU83BHYqBQC3UR6tE2OWXn+pe5qqgu
-         nCrt8Q/LZZqH+M57ZW+wzsC3OA8i9+TIGC9fnBOTKyjmBe8vrbhY6KEYt3QlweA1szDz
-         h6E7wsgFR+3enkVh0k7puES2GsiMIUICT6bPMbNLNKzXfTPOUXxNtw5MRtySd1InqZiw
-         wq72i+kp1PD/1ssPGWfnKNr6hGv++4DUZuf12rcPtPl0Vzn/6+Bm1ekm73pealqCHRnA
-         nE5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782756325; x=1783361125;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NDw1E2/pIt6d7lE9aQGWAuiRLCVjcZhQOY5MZpoHVnM=;
-        b=rhA0wQaFideXM6pNjzTPzMSSt+R0u55wFHUrwS2qzP4VoNnXyVNqlXmoZ+kZybFXUZ
-         gSjE6Mq7tUBM1iJwIEfeI/ItVSGDkbxjkrubORl+3ILsjoFE1UJpC71oMHFWEQ0Q4bIR
-         mx7fYWaJF0/mTD415w/U7hCj4qMcYYxbnzmfvfA3dtYd5b+1ojfPNQxomS/JpQ4cxj2O
-         fzHjOH4mvgz2i4++9l+sMBoQ760Div8V9PGOJ+Vk5ezcqCPGBMkFrffK1SAnRE9L05qG
-         h8eEfaFQJQHnNLicA6vTd7jtfOzGwr288KlNNqPWqlBMzfCcJJEFfi2EpcvwH5ZCQEnc
-         8ggA==
-X-Forwarded-Encrypted: i=1; AFNElJ85H2sgCx0raxZGFS1Ib9mIzk6x6NLLwpfyZiK1AEbwecuzAHf7rTjaIflUl3Jgt8EgClS672c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSPUiLM0dP054pph6emguvDpKZub/nwpWZz3Ru0Qc/qcZuKwGY
-	/2vzKiwHpBEcaL4DftDCTJyo5kd+10I/PVi5kLUeSmfaEIBC6Y8RFbUtA3MhdcbRpK/c4wMwxVH
-	wKnRZ1wU3U4J7ubq0rJJ1KBr7ZKQ3kk1m9lEBAr/i
-X-Gm-Gg: AfdE7cn9b8aQmSpcKwUDsaXeO59aIC2WDsc9Vhu/NWP8P6RVvGE0XrfDGg0EN/sAUvt
-	ONlqOKh3MW2xgv6Ha0VR1YwKLzAZDRfVPaeYfuyjxSodOkt+2Ugs/7T+sqW/q+/3LlTxPVs/gP8
-	zAv6IbsZpxAVKe3J8uVO9GrQ3yVpf1k9TYMqOOrJcXIe0l4I0qlAi25Jg6wRyBBQ7hITKHX/OSZ
-	vfmQ4Ts7RdOUbdZraSNoHP3TyUqBamYfiF1SSRunvnpPB0opa04LfNvsKGSCAE8ys7XVzJqTK4u
-	xX32YxAhFm5slcwulHkgxdbOU4ESni07wc8mGa7PASQQIXfautw4kVgQysl+VTqbZtvzzyvr+RK
-	nwojC1hQZllPIUUPxfhYnGarrY2zvIlROE62RiYVSMw==
-X-Received: by 2002:a05:7022:2212:b0:137:5b9d:cf87 with SMTP id
- a92af1059eb24-13b2a0a8ac0mr334633c88.0.1782756324471; Mon, 29 Jun 2026
- 11:05:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AEC2D0C7E;
+	Mon, 29 Jun 2026 18:06:22 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782756384; cv=none; b=QotSf8HKxr3S0EwQaseZMr1Q/pL83RdYYP20GzwPG0S1tbv44AZx+cfhSYvQ3zTAnsHEHJP2eHFHiVYno3Ms0ypexzes9jWFPXzYqEntLABhW/QTqy1kgiplg4/zw0nSg4uL8pJULklSQEbxVjtGgvZ1fXrYGb2YwBdrn7SGmFU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782756384; c=relaxed/simple;
+	bh=ISc5SyCOpS0axCv9I7/0PAfvIIvOLejgS1CCA3ntoB4=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=SYP8aNoVut9iwZzlHnkTz3+1hk/LIY/ygUsiYBqbIG/u+W4ZhjKQtCyFCaJjQaWFlXYtebuW7JlYl4+nRhWT2KwoqVibhPBsYLHJTqQrsGx/HhsIB7yAta3YvcCv55Pov2N7fFO5DXmVVUCHsD/VRob6U6Nv5cYETyV+sUIGa0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hc76mXVB; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ABAE1F000E9;
+	Mon, 29 Jun 2026 18:06:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782756382;
+	bh=15dZbETBPdvycW7dlHbmw19eotEmkycpFDuovtTBY5E=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=hc76mXVBx/xAmA7fOoTVWhqc9v3QMpG7oxGdePrhTwK2EQT2W0AnO0bFLcVDKAVT/
+	 gQmj6yjP99RURYeZUj4aei4iRmS+4iK0Y3YAF8UxW5TVsQg1hnRQ7bLFkCW6JshPFI
+	 EpCQW1rdzRL6QsAlQjeKftOujACNAv/nWjkRrmZGPeJTEZgaNF5+2iukkWGWN60wPR
+	 pd1ch5ayR59W5jeO5Cb9gHoSbEP6bp7oovcPzfIJ3sifeguevPbiYrC4MadLmclnOe
+	 9GiL4UFPdLskjlprWC/iSY6u+Bkb1t31D9MSJ3aM28uH83zm8mOe059clxGY6is++g
+	 ulK2pvStV55JA==
+Content-Type: multipart/mixed; boundary="===============1636887923003465919=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260625102020.92814-1-vimal.agrawal@sophos.com>
- <20260625214659.1115819-1-kuniyu@google.com> <CALkUMdSzLQSpjpK+cnt=c+dPDZGnyB2zUD3z3KKXr=-DhM7t=Q@mail.gmail.com>
-In-Reply-To: <CALkUMdSzLQSpjpK+cnt=c+dPDZGnyB2zUD3z3KKXr=-DhM7t=Q@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 29 Jun 2026 11:05:13 -0700
-X-Gm-Features: AVVi8Cec4fh6C2dBxYFOx_MjNcL0Q14J81BUEtzA5DPiOrLQzPF73f4WfQeydUM
-Message-ID: <CAAVpQUA4dyukqihiQoGfbaPtBn1OAaRaWyQ197+hPs7gmqW7=Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: neigh: avoid calling neigh_forced_gc on
- every alloc when table is full
-To: Vimal Agrawal <avimalin@gmail.com>
-Cc: kuba@kernel.org, edumazet@google.com, netdev@vger.kernel.org, 
-	vimal.agrawal@sophos.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <ebc38cb448d37cbb143f80680a4e489e5a06bbb5106faf0c381ba97efd9a10df@mail.kernel.org>
+In-Reply-To: <20260629172704.1302218-2-rhkrqnwk98@gmail.com>
+References: <20260629172704.1302218-2-rhkrqnwk98@gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/2] bpf, sockmap: disallow update and delete from tc, xdp and flow_dissector
+From: bot+bpf-ci@kernel.org
+To: rhkrqnwk98@gmail.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,john.fastabend@gmail.com,eddyz87@gmail.com,memxor@gmail.com,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org
+Cc: martin.lau@linux.dev,song@kernel.org,yonghong.song@linux.dev,jolsa@kernel.org,sdf@fomichev.me,emil@etsalapatis.com,lmb@isovalent.com,jakub@cloudflare.com,jiayuan.chen@linux.dev,shuah@kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kselftest@vger.kernel.org,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Mon, 29 Jun 2026 18:06:22 +0000 (UTC)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:avimalin@gmail.com,m:kuba@kernel.org,m:edumazet@google.com,m:netdev@vger.kernel.org,m:vimal.agrawal@sophos.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+];
+	TAGGED_FROM(0.00)[bounces-302762-lists,netdev=lfdr.de,bpf-ci];
 	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302761-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linux.dev,kernel.org,fomichev.me,etsalapatis.com,isovalent.com,cloudflare.com,vger.kernel.org,iogearbox.net,gmail.com,meta.com];
+	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:john.fastabend@gmail.com,m:eddyz87@gmail.com,m:memxor@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:sdf@fomichev.me,m:emil@etsalapatis.com,m:lmb@isovalent.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:shuah@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net,davemloft.net];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,sophos.com:email]
+	RCPT_COUNT_TWELVE(0.00)[32];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4B9326DDEB6
+X-Rspamd-Queue-Id: 58B3C6DDEBB
 
-On Mon, Jun 29, 2026 at 12:57=E2=80=AFAM Vimal Agrawal <avimalin@gmail.com>=
- wrote:
->
-> Hi Kuniyuki,
-> Thank you for the feedback.
-> However, the rate limiting issue exists independently of the threshold
-> values. If entries genuinely exceed gc_thresh3 =E2=80=94 regardless of wh=
-at it
-> is set to =E2=80=94 neigh_forced_gc() is called on every allocation attem=
-pt
-> with no rate limiting. In my workload, most entries are
-> active/reachable with refcnt > 1, so the GC walk traverses the entire
-> table without reclaiming anything.
+--===============1636887923003465919==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This suggests your gc_thresh2/3 do not fit your use case.
+>     sock_map_update_common() and __sock_map_delete() hold stab->lock and call
+>     sock_map_unref() -> sock_map_del_link(), which takes sk_callback_lock for
+>     write. That gives the order stab->lock -> sk_callback_lock.
+>
+>     The reverse order comes from the SK_SKB stream parser.
+>     sk_psock_strp_data_ready() holds sk_callback_lock for read, and after the
+>     verdict tcp_bpf_strp_read_sock() acks the consumed data inline via
+>     __tcp_cleanup_rbuf(). The ACK goes out egress, where a sched_cls program
+>     deletes from the sockmap and takes stab->lock:
+>
+>     A tc, xdp or flow_dissector program has no reason to update or delete a
+>     sockmap, and redirect does not go through here. Drop them from
+>     may_update_sockmap() so the verifier rejects it. It also closes the
+>     matching sockhash inversion.
+>
+>     Suggested-by: John Fastabend <john.fastabend@gmail.com>
+>     Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
 
-If GC does not help, there is no point in running it or rate-limiting
-in the first place.
+This fixes the behaviour added by commit 0126240f448d ("bpf: sockmap: Allow
+update from BPF"), which introduced may_update_sockmap() and added the four
+BPF_PROG_TYPE_* cases that this change removes.  Should it carry:
+
+  Fixes: 0126240f448d ("bpf: sockmap: Allow update from BPF")
 
 
-> Increasing gc_thresh3 would make
-> this worse, not better, as GC now has a larger table to scan on each
-> call.
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-If you just increase gc_thresh3 slightly, then yes, it won't help.
-
-
->
-> Regarding neigh_hash_shift: in my workload, neigh_alloc() returns
-> ENOBUFS before reaching do_alloc() since GC cannot reclaim any
-> entries. kzalloc() is never called, so neigh_hash_grow() is not
-> involved in the latency I observed. The pre-lock time check in
-> neigh_forced_gc() is a low-cost safeguard that prevents repeated full
-> table scans regardless of gc_thresh3 value. It does not interfere with
-> correct GC behaviour =E2=80=94 if entries are still above the threshold, =
-GC
-> runs normally.
->
->
-> Hi Jakub,
-> I tested with different threshold values, filling the table completely
-> with 32k reachable entries and attempting 1000 additional allocations.
-> Exported neigh_forced_gc so that it can be profiled
->                          no change  10ms   50ms   100ms
-> max cpu usage %          44%        11.8%  2.56%  1.42%
-> calls > 100us (of 1000)  101        31     13     7
->
-> At 10ms, max CPU usage is still 11.8% and 31 out of 1000 calls take
-> more than 100us. Given that 50ms reduces this to 2.56% and 13 calls
-> respectively, I would prefer 50ms as the threshold. However, I am open
-> to further discussion on the right value.
->
-> Thanks,
-> Vimal
->
->
-> On Fri, Jun 26, 2026 at 3:17=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.=
-com> wrote:
-> >
-> > From: Vimal Agrawal <avimalin@gmail.com>
-> > Date: Thu, 25 Jun 2026 10:20:20 +0000
-> > > Once the neighbour table exceeds gc_thresh3, neigh_forced_gc() is cal=
-led
-> > > on every allocation attempt with no rate limiting. In workloads with =
-mostly
-> > > active/reachable entries, the GC walk traverses a large portion of th=
-e
-> > > neighbour table without reclaiming entries, holding tbl->lock for an
-> > > extended period. This causes severe lock contention and allocation
-> > > latencies exceeding 16ms under sustained neighbour creation.
-> > >
-> > > Add a pre-lock check in neigh_forced_gc() to skip the GC run if one w=
-as
-> > > performed within the last second, avoiding repeated full table scans =
-and
-> > > lock acquisitions on the hot allocation path.
-> > >
-> > > Profiling of neigh_create() shows ~3 orders of magnitude latency
-> > > improvement with this change.
-> > >
-> > > Link:https://lore.kernel.org/netdev/CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx=
-7sSM=3DAEgsq0kywHxTw@mail.gmail.com/
-> >
-> > From the thread, these look misconfigured.
-> >
-> > ---8<---
-> > net.ipv6.neigh.default.gc_thresh2 =3D 32768
-> > net.ipv6.neigh.default.gc_thresh3 =3D 32768
-> > ---8<---
-> >
-> > If gc_thresh3 is larger enough, gc_thresh2 will give you 5s
-> > rate limiting.
-> >
-> > If the number of active neigh entries constantly exceeds
-> > gc_thresh3, it will be the correct gc_thresh2 for you.
-> >
-> > Also, I guess you want a new kernel param for the first
-> > neigh_hash_alloc(), which is currently fixed for 3, which
-> > is too small for some hosts.
-> >
-> > 50000 entries require neigh_hash_grow() 13 times.
-> >
-> > Can you test this on your real workload, starting from
-> > neigh_hash_shift=3D16 and appropriate gc_thresh2/3 ?
-> >
-> > ---8<---
-> > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> > index 1349c0eedb64..a75b3750eec9 100644
-> > --- a/net/core/neighbour.c
-> > +++ b/net/core/neighbour.c
-> > @@ -1817,6 +1817,22 @@ EXPORT_SYMBOL(neigh_parms_release);
-> >  static struct lock_class_key neigh_table_proxy_queue_class;
-> >
-> >  static struct neigh_table __rcu *neigh_tables[NEIGH_NR_TABLES] __read_=
-mostly;
-> > +static __initdata unsigned long neigh_hash_shift =3D 3;
-> > +
-> > +static int __init neigh_set_hash_shift(char *str)
-> > +{
-> > +       ssize_t ret;
-> > +
-> > +       if (!str)
-> > +               return 0;
-> > +
-> > +       ret =3D kstrtoul(str, 0, &neigh_hash_shift);
-> > +       if (ret)
-> > +               return 0;
-> > +
-> > +       return 1;
-> > +}
-> > +__setup("neigh_hash_shift=3D", neigh_set_hash_shift);
-> >
-> >  void neigh_table_init(int index, struct neigh_table *tbl)
-> >  {
-> > @@ -1843,7 +1859,7 @@ void neigh_table_init(int index, struct neigh_tab=
-le *tbl)
-> >                 panic("cannot create neighbour proc dir entry");
-> >  #endif
-> >
-> > -       RCU_INIT_POINTER(tbl->nht, neigh_hash_alloc(3));
-> > +       RCU_INIT_POINTER(tbl->nht, neigh_hash_alloc(neigh_hash_shift));
-> >
-> >         phsize =3D (PNEIGH_HASHMASK + 1) * sizeof(struct pneigh_entry *=
-);
-> >         tbl->phash_buckets =3D kzalloc(phsize, GFP_KERNEL);
-> > ---8<---
-> >
-> >
-> >
-> > > Signed-off-by: Vimal Agrawal <vimal.agrawal@sophos.com>
-> > > ---
-> > >  net/core/neighbour.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> > > index 1349c0eedb64..078842db3c5f 100644
-> > > --- a/net/core/neighbour.c
-> > > +++ b/net/core/neighbour.c
-> > > @@ -260,6 +260,9 @@ static int neigh_forced_gc(struct neigh_table *tb=
-l)
-> > >       int shrunk =3D 0;
-> > >       int loop =3D 0;
-> > >
-> > > +     if (!time_after(jiffies, READ_ONCE(tbl->last_flush) + HZ))
-> > > +             return 0;
-> > > +
-> > >       NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
-> > >
-> > >       spin_lock_bh(&tbl->lock);
-> > > --
-> > > 2.17.1
-> > > v
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/28391303635
+--===============1636887923003465919==--
 
