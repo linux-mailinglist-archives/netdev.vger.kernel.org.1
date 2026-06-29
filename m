@@ -1,218 +1,298 @@
-Return-Path: <netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302679-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6fkDDMB/QmqY8gkAu9opvQ
-	(envelope-from <netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:22:56 +0200
+	id qeYtNT+BQmr68gkAu9opvQ
+	(envelope-from <netdev+bounces-302679-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:29:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE646DBF9F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:22:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D76A66DC0CB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:29:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Fe0zJ3MI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302678-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=debian.org (policy=none);
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dqUXewsM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302679-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302679-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D43A30A4757
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:14:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9CA63303E7D5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED11408004;
-	Mon, 29 Jun 2026 14:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38861423A94;
+	Mon, 29 Jun 2026 14:17:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1310B33A6E9
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 14:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B968C40B364
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 14:17:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782742412; cv=none; b=NE4Vc4MZ18KZxsCQRpy64SNHCV4WR+5wIGW00jAzizjR/o9X+dl5wTsmJ38r1QnrhwIpku1TDC0l+qQOBtMD2p9VVrutRQ5TuQyjsuNXV+KPPEP0x3l5iVDLjGwe267P/SGhzCMDUp6c0VwN7woDNK1va8QhxALsAE6hZqOD+bs=
+	t=1782742632; cv=none; b=dVR6XwIxVweRm3PQSMmLIA97xB+WEcQf8vzqcM/aokXKyYzMd/iLwo7QNMardIuRfkXAOQ803BKKEOVCiYUoOtqUU5d3kl9DBMVun8YspKNco3CnRNNQnZy5vNrlQq+HgepX70q+mAOYHx03dxQPtgThio2heoepWV+ap0Do9qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782742412; c=relaxed/simple;
-	bh=n2moP8sJR9BhHMurE5j8uV8hEciqqJxPDOsyZT57eT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=co8VR+9J7zpfCE1rQjkCE7GNmPgDj/Qu2aAI5zsFMw1RMTnBGJ/sGvPOGtO1epsrjWlnulg9wSqxHuav33lB2L9Cms+g7KCwprssP11hXd0FXfu684bdLdOgZbJR1InRYabQjBcMJekUQhW53TkVc/x/jFeajvmzlTeuYK1kc+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fe0zJ3MI; arc=none smtp.client-ip=209.85.221.49
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-47231f1f8f3so2487236f8f.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 07:13:28 -0700 (PDT)
+	s=arc-20240116; t=1782742632; c=relaxed/simple;
+	bh=A7dfX+vNqB8tGdyYV/BojgDBGmuRClxRMuJSfPWHnDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OpAS7ksAEiPb/qqIMpyaz1nzb4G3Hi9OdwyWQYalBqcCp27PVHKM0Dv+lK+euZuODScy5Izl1oCrPiTyW3zfpDHV688ddjukCCXruH+scFaGBOw2MXgdYfyo0RW0t6FXqiiKGfvcOnUthGvWxBHaQvh6YfkpB2VW/mroJECcTKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqUXewsM; arc=none smtp.client-ip=209.85.161.43
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-69d7aa0ac14so2335570eaf.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 07:17:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782742407; x=1783347207; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xeFfaIaYuJ4MPfGng2mUHQKnK1lD+x40upFL0+GBvfo=;
-        b=Fe0zJ3MIZdeG79AwrWUFe0XWL+XHBFIxSZYDhE+SSYicAyxUvDR7p9KtJAT3Iv3LKo
-         mfeyHP7tMNJ1iuhhtq16POCERc6tF5KSPDqqWJc7gO5gqsNymfxa9XYjTq+m3IfkNmC0
-         c4R+/kJRsyK7L4zdXGIN19DsdqSxHr2VtQUy+YjaPgauim7kuT6SKugvaQwiy4QNSzxD
-         MkA23GUiOMNSv3Ef8NNvn2mVJAMti442+FAq9K1Owhc4MuRDcH/QMkUWCwDMHPufOygd
-         BlRDrOCNAzBFuMQjgXJ5+HPOg8aWe323XQlD5fviatKe/2ANyYOyuDjn/nb4t7x1phH1
-         2hFw==
+        d=gmail.com; s=20251104; t=1782742630; x=1783347430; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RnLUCD2cfxxWhTfLsTUO4oXPegvOa3BjYaXWIEOfKbA=;
+        b=dqUXewsMTUxMeU7hcHWSZ/DI6URWljhaK6AfDa0lwdDuq40gD7OVGiwetm1ZPYBNst
+         a2Vf5nGVt8TlBhMyzaYr1L68bs2DRuXhB9l10XID5+DyB/Jd4+ZloHYCkvt+N5orrhm2
+         K8vNBSnwHPGE3c5U50MJ6CoWVIvx35f6iV8HhSMC3EYnJg8rl1wuSojPgTnqb4JAQ+U8
+         jbwoZmnp+4f5hI/wkweEiEr9L5xpgS4qeuIWmTl42Ac5xlWv1P7ECk4F/LtkpH0fQFhN
+         KBwbThkyc9aXWdt19QYoavAiV1OGVfqO8AaVUymzUJNKop3fjUPoCI9p+g0E/PWopOTa
+         Kbkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782742407; x=1783347207;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xeFfaIaYuJ4MPfGng2mUHQKnK1lD+x40upFL0+GBvfo=;
-        b=Tv5jzDiRUgbthhA5dwF9oSAwxywjDnT2ziG/tZvLjs8HSUpOQDtZQvB4TF9aNH8PbK
-         XxrlpGFW0dv41qqnH12nkba6E2v4W8gAiv/hXLAcLAHXQf+cCkBx2gjF+KLxfv/reccL
-         OWhmvQdoh7IFWPb2Y2sr1s2l0WLdueAijLj5QEO6evstsIVSoIQ9RF0l7+t3rtgiglM/
-         Db+SjsIYlDOQsTRwRNZbTu53NSrTqn3yIdz/h29OCbZD2Gfk1029hqgm7p7dZfDhshrk
-         ueUkhyEFOqpNs+xy4rTYu2U6icqC/NLpSa51qwfdEXrjmLLUmOQbrdx3n/jnZ5wvTU7K
-         gnkA==
-X-Forwarded-Encrypted: i=1; AFNElJ85mudmoudd+THYq8uCiQbrjKh8uCAar96vVpxcN7RXIEznQfIDvlc/tLLbA0ZRHqFg8gx6jFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywv1UdX0UtIFIc6y/HZBl9MVLcP2mH5cdSdAS+Brp83X+A/InVC
-	1PGMsxYILu30ml7mYBbkGscCtvI3L5wYilKuFOtkucpX1EQNchbcGvst
-X-Gm-Gg: AfdE7cmBk+DpnKaTsOTfEgC/fGTLpS0qFj4RnklZihtgCKT/pR5Uj6FIm7h3uwhX/K3
-	O4WFsO+AM2nHCJyxOmypIxfOUVKZYcKUQGsNljE79QDFaGWzwPdToq3tSUZv/LlnkaUgCGgA+7p
-	oBhBrog1GLSqmCIdWi/xqJ3SC2e46wqiWvl9KaYBGyFuJ1BeJJLITRiZe5yXAT9Rlp4I+MBjUsm
-	Q6nRxC4IkqToQ17vbZzjrpvhXrQrtEH4q3dtj3veEclnX46sWsoqThRgwTQuozmAa/qIljv3eNz
-	OIpSdeE6+zSr7Zysgunq91C3rVBdVQOItfnz5VgtmBupOR9LXrsNeH8pBlQACu4PAiruiW+deMg
-	69g3mYtFPh1ruEZ2CztDV7BQ9zvPzTh8hMHqk94mM67qr+HsV3L1zNTq4RnGBmlBRo9QYldQG9F
-	awSFiWRx5IMfAWpQhAz2pEQM3WiKlsiOAMoi6/a5W0cWOE24nU
-X-Received: by 2002:a05:600c:a086:b0:492:6954:1036 with SMTP id 5b1f17b1804b1-49269541111mr229190765e9.14.1782742406763;
-        Mon, 29 Jun 2026 07:13:26 -0700 (PDT)
-Received: from eldamar.lan (c-82-192-247-196.customer.ggaweb.ch. [82.192.247.196])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47290ed4377sm16140004f8f.37.2026.06.29.07.13.25
+        d=1e100.net; s=20251104; t=1782742630; x=1783347430;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RnLUCD2cfxxWhTfLsTUO4oXPegvOa3BjYaXWIEOfKbA=;
+        b=f1RG79WLAdffH/gf19Dx09J9fowM5i6LXX6X8mST/P/hr8Ba2I1BAdPzdINal/eIQJ
+         4bBcW9ji4xeM+fU4R3UNbxCHXEsZt6668kPaBtWmmDVFsqLAGJtu3168+QTs9+GCBe7W
+         0y1zefcOdMTpvqkTQEo/MN6zx2DLf6UZSKSBg4VibIB9BO2xSKrh28KmV3GHPz8ET/Uq
+         ijvqq2ua1XgqIW4B3klYIEFIqI9azWd565kQ9xLWTesl67l8AjAVq/eslJ9cCefSWnd3
+         ZWth0kTYdYTT5d0MpGZSAAd3PQCYlcgoxLoSzHCCN2eRAd7dSsOm8zeA5a9yRXHZK4Bz
+         rN9g==
+X-Gm-Message-State: AOJu0Yz5boABVmyGlxtIjfwPKvslyBrfFmaLgS1dXPZIp4FkyDQGfkBv
+	PLJ2aagwI/WA+LJrrceboffiuty0c0fsa/3culdX7/IL8vxmsh0NAndF
+X-Gm-Gg: AfdE7cn+johmol1Sd9Urtc+FfvCQbV2K8/TNe++LFEYdrs1P0SOf7GZ2r4ezYQhkv2d
+	QlODzrHEl/cgxaRvTsr4S24bPAyGJvaHZv0kqKz6Dnb85nwF0f2ec+gyMMMNWM6FXrmXoA/Axy3
+	L4nFQEghjqiSv7K1xcSV1Ekg0YJUgGLpnTDI+Ya1JrTBFTMhNXzVc1uGNl2dfyzwishMxxtjSPZ
+	qb/M6IMplcl8jUzbQFLbfIvWyCRgftnqJ/N+y77QcGX7fg2DCL/yswqeRfPfMHsws1bM7JhPTkO
+	8Vd6967PzEIPYTGIl1BDTl3IrTM52KefLOvQtso/oz+vEm5SgaTwLstLLJVPOKX5B7bkfCmLahg
+	reM53O5jTG1S0ehpMayvDEDFzEk1SkJ5eMMQp5HB4AJAzT/7b+/afKgZxRY6mmXeZGpaet6bn3Q
+	LizehaeCNQxjf9bmRUl/Zry362Llxz5Q==
+X-Received: by 2002:a05:6820:3389:20b0:6a1:50e9:d586 with SMTP id 006d021491bc7-6a150e9d657mr4912535eaf.67.1782742629478;
+        Mon, 29 Jun 2026 07:17:09 -0700 (PDT)
+Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ea52af6006sm91287136d6.11.2026.06.29.07.17.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 07:13:25 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 026AFBE2DE0; Mon, 29 Jun 2026 16:13:24 +0200 (CEST)
-Date: Mon, 29 Jun 2026 16:13:23 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Wongi Lee <qw3rtyp0@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
+        Mon, 29 Jun 2026 07:17:09 -0700 (PDT)
+From: Yuho Choi <dbgh9129@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jungwoo Lee <jwlee2217@gmail.com>
-Subject: Re: Please apply 736b380e28d0 and eca856950f7c down to 6.1.y
-Message-ID: <akJ9gzZrhXMUomcg@eldamar.lan>
-References: <ajuR7rZYU943EG6p@DESKTOP-19IMU7U.localdomain>
- <2026062417-conceal-driving-0ebd@gregkh>
- <ajujm9+82N1g/HgF@DESKTOP-19IMU7U.localdomain>
- <2026062416-amulet-paradox-cf7c@gregkh>
- <ajum4HXbhgdRl6Vz@DESKTOP-19IMU7U.localdomain>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Zilin Guan <zilin@seu.edu.cn>,
+	Uwe Kleine-Koenig <u.kleine-koenig@baylibre.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Marco Crivellari <marco.crivellari@suse.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yuho Choi <dbgh9129@gmail.com>
+Subject: [PATCH net v2] net/liquidio: drop cached VF pci_dev LUT and resolve VF for FLR on request
+Date: Mon, 29 Jun 2026 10:16:56 -0400
+Message-ID: <20260629141656.1769227-1-dbgh9129@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ajum4HXbhgdRl6Vz@DESKTOP-19IMU7U.localdomain>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[debian.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:qw3rtyp0@gmail.com,m:gregkh@linuxfoundation.org,m:stable@vger.kernel.org,m:sashal@kernel.org,m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jwlee2217@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,linuxfoundation.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[carnil@debian.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302679-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-302678-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kory.maincent@bootlin.com,m:zilin@seu.edu.cn,m:u.kleine-koenig@baylibre.com,m:vadim.fedorenko@linux.dev,m:marco.crivellari@suse.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dbgh9129@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[carnil@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7CE646DBF9F
+X-Rspamd-Queue-Id: D76A66DC0CB
 
-Hi Greg,
+The PF SR-IOV enable path caches VF pci_dev pointers in
+dpiring_to_vfpcidev_lut[] by iterating with pci_get_device(). Those
+entries do not own a reference, because the iterator drops the previous
+device reference on each step. The cached pointer is then dereferenced
+later when handling OCTEON_VF_FLR_REQUEST.
 
-On Wed, Jun 24, 2026 at 06:44:00PM +0900, Wongi Lee wrote:
-> On Wed, Jun 24, 2026 at 11:37:29AM +0200, Greg Kroah-Hartman wrote:
-> > On Wed, Jun 24, 2026 at 06:30:03PM +0900, Wongi Lee wrote:
-> > > On Wed, Jun 24, 2026 at 11:00:45AM +0200, Greg Kroah-Hartman wrote:
-> > > > On Wed, Jun 24, 2026 at 05:14:38PM +0900, Wongi Lee wrote:
-> > > > > Hi,
-> > > > > 
-> > > > > Could the following upstream commits be queued for the active stable
-> > > > > trees?
-> > > > > 
-> > > > >   commit 736b380e28d0480c7bc3e022f1950f31fe53a7c5
-> > > > >   ("ipv6: account for fraggap on the paged allocation path")
-> > > > 
-> > > > I do not see that commit id in Linus's tree, are you sure it is correct?
-> > > > 
-> > > > >   commit eca856950f7cb1a221e02b99d758409f2c5cec42
-> > > > >   ("ipv4: account for fraggap on the paged allocation path")
-> > > > 
-> > > > Same here, no id of that one in Linus's tree that I can see.
-> > > > 
-> > > > thanks,
-> > > > 
-> > > > greg k-h
-> > > 
-> > > 
-> > > Hi Greg,
-> > > 
-> > > First, sorry for confusing you.
-> > > 
-> > > The commit IDs are from netdev/net.git:
-> > > 
-> > >   736b380e28d0480c7bc3e022f1950f31fe53a7c5
-> > >   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=736b380e28d0
-> > > 
-> > >   eca856950f7cb1a221e02b99d758409f2c5cec42
-> > >   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=eca856950f7c
-> > > 
-> > > They were applied to netdev without Cc: stable@vger.kernel.org, so I
-> > > wanted to flag them for stable handling but I send it too fast (before
-> > > merge).
-> > > 
-> > > I will resend the request with the Linus tree commit ID.
-> > 
-> > They have to be in Linus's tree, before we can take them in a stable
-> > release, right?
-> > 
-> > And why were they not originally tagged with the cc: stable?  That would
-> > save you time in the future as it would all just happen automatically.
-> > 
-> > thanks,
-> > 
-> > greg k-h
-> 
-> Right, my fault.
-> 
-> Also I just forgot cc'ing stable when sending it. I'll apply it next time.
+Replace cached VF mapping with runtime lookup on mailbox DPI ring:
+derive VF index from q_no, resolve the VF via exported PCI IOV helpers,
+validate with PF pointer + VF ID, then pcie_flr() and pci_dev_put().
+Also, remove unused dpiring_to_vfpcidev_lut init/cleanup and simplify
+Xgene PCI probe by using port->dev->of_node directly.
 
-Small heads-up: Both commits are now in Linus' tree and included in
-v7.2-rc1:
+Fixes: ca6139ffc67ee ("liquidio CN23XX: sysfs VF config support")
+Fixes: 8c978d059224 ("liquidio CN23XX: Mailbox support")
+Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
+---
+Changes in v2:
+- Replace use of pci_iov_virtfn_bus() with runtime VF lookup using exported helpers.
+ .../net/ethernet/cavium/liquidio/lio_main.c   | 27 ---------------
+ .../ethernet/cavium/liquidio/octeon_device.h  |  3 --
+ .../ethernet/cavium/liquidio/octeon_mailbox.c | 33 ++++++++++++++++++-
+ 3 files changed, 32 insertions(+), 31 deletions(-)
 
-$ git describe --contains 736b380e28d0480c7bc3e022f1950f31fe53a7c5
-v7.2-rc1~29^2~66^2
-$ git describe --contains eca856950f7cb1a221e02b99d758409f2c5cec42
-v7.2-rc1~29^2~66^2~1
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index 0db08ac3d098..e303956b4bf1 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -3779,9 +3779,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
+ static int octeon_enable_sriov(struct octeon_device *oct)
+ {
+ 	unsigned int num_vfs_alloced = oct->sriov_info.num_vfs_alloced;
+-	struct pci_dev *vfdev;
+ 	int err;
+-	u32 u;
+ 
+ 	if (OCTEON_CN23XX_PF(oct) && num_vfs_alloced) {
+ 		err = pci_enable_sriov(oct->pci_dev,
+@@ -3794,23 +3792,6 @@ static int octeon_enable_sriov(struct octeon_device *oct)
+ 			return err;
+ 		}
+ 		oct->sriov_info.sriov_enabled = 1;
+-
+-		/* init lookup table that maps DPI ring number to VF pci_dev
+-		 * struct pointer
+-		 */
+-		u = 0;
+-		vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-				       OCTEON_CN23XX_VF_VID, NULL);
+-		while (vfdev) {
+-			if (vfdev->is_virtfn &&
+-			    (vfdev->physfn == oct->pci_dev)) {
+-				oct->sriov_info.dpiring_to_vfpcidev_lut[u] =
+-					vfdev;
+-				u += oct->sriov_info.rings_per_vf;
+-			}
+-			vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-					       OCTEON_CN23XX_VF_VID, vfdev);
+-		}
+ 	}
+ 
+ 	return num_vfs_alloced;
+@@ -3818,8 +3799,6 @@ static int octeon_enable_sriov(struct octeon_device *oct)
+ 
+ static int lio_pci_sriov_disable(struct octeon_device *oct)
+ {
+-	int u;
+-
+ 	if (pci_vfs_assigned(oct->pci_dev)) {
+ 		dev_err(&oct->pci_dev->dev, "VFs are still assigned to VMs.\n");
+ 		return -EPERM;
+@@ -3827,12 +3806,6 @@ static int lio_pci_sriov_disable(struct octeon_device *oct)
+ 
+ 	pci_disable_sriov(oct->pci_dev);
+ 
+-	u = 0;
+-	while (u < MAX_POSSIBLE_VFS) {
+-		oct->sriov_info.dpiring_to_vfpcidev_lut[u] = NULL;
+-		u += oct->sriov_info.rings_per_vf;
+-	}
+-
+ 	oct->sriov_info.num_vfs_alloced = 0;
+ 	dev_info(&oct->pci_dev->dev, "oct->pf_num:%d disabled VFs\n",
+ 		 oct->pf_num);
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_device.h b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+index 19344b21f8fb..858a0fff2cc0 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_device.h
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+@@ -390,9 +390,6 @@ struct octeon_sriov_info {
+ 
+ 	struct lio_trusted_vf	trusted_vf;
+ 
+-	/*lookup table that maps DPI ring number to VF pci_dev struct pointer*/
+-	struct pci_dev *dpiring_to_vfpcidev_lut[MAX_POSSIBLE_VFS];
+-
+ 	u64	vf_macaddr[MAX_POSSIBLE_VFS];
+ 
+ 	u16	vf_vlantci[MAX_POSSIBLE_VFS];
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
+index ad685f5d0a13..697fcdc41e3c 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
+@@ -26,6 +26,31 @@
+ #include "octeon_mailbox.h"
+ #include "cn23xx_pf_device.h"
+ 
++static struct pci_dev *lio_vf_pci_dev_by_qno(struct octeon_device *oct, u32 q_no)
++{
++	struct pci_dev *vfdev = NULL;
++	int vfidx;
++
++	if (!oct->sriov_info.rings_per_vf)
++		return NULL;
++
++	if (q_no % oct->sriov_info.rings_per_vf)
++		return NULL;
++
++	vfidx = q_no / oct->sriov_info.rings_per_vf;
++	if (vfidx >= oct->sriov_info.num_vfs_alloced)
++		return NULL;
++
++	while ((vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
++				       OCTEON_CN23XX_VF_VID, vfdev))) {
++		if (pci_physfn(vfdev) && pci_physfn(vfdev) == oct->pci_dev &&
++		    pci_iov_vf_id(vfdev) == vfidx)
++			return vfdev;
++	}
++
++	return NULL;
++}
++
+ /**
+  * octeon_mbox_read:
+  * @mbox: Pointer mailbox
+@@ -237,6 +262,7 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
+ 				   struct octeon_mbox_cmd *mbox_cmd)
+ {
+ 	struct octeon_device *oct = mbox->oct_dev;
++	struct pci_dev *vfdev;
+ 
+ 	switch (mbox_cmd->msg.s.cmd) {
+ 	case OCTEON_VF_ACTIVE:
+@@ -260,7 +286,12 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
+ 		dev_info(&oct->pci_dev->dev,
+ 			 "got a request for FLR from VF that owns DPI ring %u\n",
+ 			 mbox->q_no);
+-		pcie_flr(oct->sriov_info.dpiring_to_vfpcidev_lut[mbox->q_no]);
++		vfdev = lio_vf_pci_dev_by_qno(oct, mbox->q_no);
++		if (!vfdev)
++			break;
++
++		pcie_flr(vfdev);
++		pci_dev_put(vfdev);
+ 		break;
+ 
+ 	case OCTEON_PF_CHANGED_VF_MACADDR:
+-- 
+2.43.0
 
-Can you queue those as needed down to the 6.1.y stable series?
-
-Thank you already,
-Regards,
-Salvatore
 
