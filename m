@@ -1,297 +1,178 @@
-Return-Path: <netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302475-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id T3ZZD4cdQmrv0QkAu9opvQ
-	(envelope-from <netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:23:51 +0200
+	id rxCbIjocQmqR0QkAu9opvQ
+	(envelope-from <netdev+bounces-302475-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:18:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D2746D6F50
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:23:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F30EC6D6E3A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:18:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b="of/X3b2p";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=compal.com (policy=reject);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302475-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302475-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A3EEB30ABED0
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 07:06:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B9E69308793E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 07:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E695A3C10A7;
-	Mon, 29 Jun 2026 07:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3D43BB69E;
+	Mon, 29 Jun 2026 07:06:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from tpecef21.compal.com (exmail3.compal.com [59.120.207.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DEE3C1083;
-	Mon, 29 Jun 2026 07:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC13638F62F;
+	Mon, 29 Jun 2026 07:05:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782716708; cv=none; b=pNg8xXK8x7vzPFMZhd6Pxm6s9c+3NOtF5VbTRHvS710Tvw6u3t3nuHqcRnrODMftQ0DjcZbQ5madOouXokXraf75A7m61HfVY9HA5zT/FNy8Eb08G0oBTJHvEwuTFrU/9jsrYlDWympjsw5oU1kJkxpERIRyMRwX2RsX7D1+epw=
+	t=1782716760; cv=none; b=rb5e2cqscT0iueG42JuDjfA9z06UCu4QarsgAOdyKVnW/k8qId4T6+iJ9CL0LIbGu5RjUIe9gINxaVF2zSLl72e+fgNop0wXR2czv4c4PErB5xd4PoY+BwzRv3M3weEaIVi8pTWdNU0wB7MqULBlY6F4mQNaMAYWA48AFvHxmIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782716708; c=relaxed/simple;
-	bh=S1hzlPC8gANr8aZdGiGeYuKVTflE4DxyuYbmc5JiOPA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HPjDuOr5n0qxsSsxinBJVGkKXmwb+BhhDoGKmJnUlPJQLm0FJD67tjeTaEgcAku1hFq8Pyz7eS96oO1Ym269iDuNLtMzzojT6A95o3dxUs/sDzKaMDEO0CnTy+j3mQ8pvez4EsRdNlL0+uKfJvtSnvckZekBDevtqB+UkLgEEp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=of/X3b2p; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 25924C5145C;
-	Mon, 29 Jun 2026 07:05:13 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2419A5FF96;
-	Mon, 29 Jun 2026 07:05:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8AF9B106F14DB;
-	Mon, 29 Jun 2026 09:04:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782716701; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=1rsMIqeUo7w/8HQ084SMthYLAbPCuimMFz6Hr3QOyaE=;
-	b=of/X3b2pqHw09oeoNd1OvSXDh4fwfA+/kKLRQreFdmzEqIgfhOA1Qr/ndrgAS+GDHD1foq
-	YVUwy2UDChvK8VCKa8bl8WHPu/RGbgHx65vTU8qf5QhD+0SjO+EkaJQD+PiMQRKealgon9
-	TuDtgKRkFFgrshWTzAVAX0UEKPDekcNslGvvWEwSaHcY0QSWF9ruFjP5u+SRAQ0XeASqZc
-	cYPYWionzUmVuXiJgbsoK9MfyrKHSIylnjEV4Hxv2eg1bnCcvScdtVZk2m50nfz7Mpw8Ir
-	N/mi42ewOEIx03TM2HzKhOkVMoYeeWZgwbOT1qao8LyiML3z7WV7A+3DF6KRQw==
-Message-ID: <178defc6-8e60-4b0b-b3b0-f0f2a4003b68@bootlin.com>
-Date: Mon, 29 Jun 2026 09:04:49 +0200
+	s=arc-20240116; t=1782716760; c=relaxed/simple;
+	bh=BeTnNwE9zAl/2PeQiD7HfAWUZzInG8v71OulXD0GcmI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KD7mX53OBT0HTWUcC2KLuSGAvYfegB6H75TkcBpZbX7wYEe3s0Eid37QofldMOM3uU8j0FfrH9tRhDRkISO48lox+fLijzgMmv6yVkX9BkaJqQvlHcJZGR3QcxC0hDqC7CB5TjNafxK9wLWnb36QOCoxBb3/ht+s3afq76Xjyqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=compal.com; spf=pass smtp.mailfrom=compal.com; arc=none smtp.client-ip=59.120.207.196
+X-UUID: f28fab56738811f1b2470fb4f881575f-20260629
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.15,REQID:c9fe79e4-5e75-4812-a739-c9bf76782507,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e276073,CLOUDID:5348f88b-c1a3-4335-bf81-c4a7f9da024d,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111|836|865|888|
+	898,TC:-5,Content:-10|0|15|50|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:ni
+	l,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE
+	:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: f28fab56738811f1b2470fb4f881575f-20260629
+Received: from sdmg11.sdbg.compal.com [(10.113.168.9)] by tpecef21.compal.com
+	(envelope-from <jackbb_wu@compal.com>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 555330373; Mon, 29 Jun 2026 15:05:44 +0800
+X-UUID: f0550e30738811f1b328fd8a884f4420-20260629
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.15,REQID:9f5b2324-446e-4959-8583-243ad8fb5f36,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e276073,CLOUDID:6df59e0c-7517-44c1-aea5-8c9d3ce153dd,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111|836|865|888|
+	898,TC:-5,Content:-10|0|15|50|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:ni
+	l,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE
+	:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: f0550e30738811f1b328fd8a884f4420-20260629
+Received: from sdbmbx12.tpe.compalcomm.com [(10.113.2.136)] by sdmg11.sdbg.compal.com
+	(envelope-from <jackbb_wu@compal.com>)
+	(Compal Mail Service with TLSv1.2 ECDHE-RSA-AES256-SHA 256/256)
+	with ESMTP id 238474838; Mon, 29 Jun 2026 15:05:41 +0800
+Received: from SDBMBX13.tpe.compalcomm.com (10.113.2.137) by
+ SDBMBX12.tpe.compalcomm.com (10.113.2.136) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA) id 15.2.2562.29;
+ Mon, 29 Jun 2026 15:05:38 +0800
+Received: from SDBMBX13.tpe.compalcomm.com ([fe80::7d1b:448d:4d95:51b0]) by
+ SDBMBX13.tpe.compalcomm.com ([fe80::7d1b:448d:4d95:51b0%11]) with mapi id
+ 15.02.2562.029; Mon, 29 Jun 2026 15:05:38 +0800
+From: "Wu. JackBB (GSM)" <JackBB_Wu@compal.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Loic Poulain <loic.poulain@oss.qualcomm.com>, Sergey Ryazanov
+	<ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>, Shi-Wei Yeh
+	<shi-wei.yeh@mediatek.com>, Minano Tseng <Minano.tseng@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-mediatek@lists.infradead.org"
+	<linux-mediatek@lists.infradead.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>
+Subject: RE: [External Mail] Re: [PATCH v3 1/7] net: wwan: t9xx: Add PCIe core
+Thread-Topic: [External Mail] Re: [PATCH v3 1/7] net: wwan: t9xx: Add PCIe
+ core
+Thread-Index: AQHdA/IH10HhI6o7GUuqYj0+Wsnzp7ZVIxqw
+Date: Mon, 29 Jun 2026 07:05:38 +0000
+Message-ID: <e1345ff36a94468c83a0f82e5b2ec22d@compal.com>
+References: <20260624-t9xx_driver_v1-v3-0-73ff03f60c48@compal.com>
+ <20260624-t9xx_driver_v1-v3-1-73ff03f60c48@compal.com>,<b6ee3440-385f-4567-993d-c10db6f10b97@lunn.ch>
+In-Reply-To: <b6ee3440-385f-4567-993d-c10db6f10b97@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-tm-as-product-ver: SMEX-14.0.0.3239-9.1.2019-30036.005
+x-tm-as-result: No-10--8.890000-8.000000
+x-tmase-matchedrid: CEwNJ/T/RZQuv++HU7VXryRFbfQbCufdN0X64jGy2db7+pncqRJfy2XQ
+	7TcqkNINLfgCWmpP5eNQyXUpsiJmUqfDm5zpCGQxJw66cQh/R5edVbkPpTjx908Amukj7bVmEbr
+	AUOQkjxDQ+sS71+DOCDt5SMZ9h0apLRtwOjyP9FeiWLhmiI4dPyDilljGyWFts2R4RgZsli4Ghf
+	Rb1Tj8IFtuSLLSc0B1Rj1QPIRw621+ObWvlxRIpL6eQJjrK3FJ
+x-tm-as-user-approved-sender: No
+x-tm-as-user-blocked-sender: No
+x-tmase-result: 10--8.890000-8.000000
+x-tmase-version: SMEX-14.0.0.3239-9.1.2019-30036.005
+x-tm-snts-smtp: 1842DB57374D5C5769838A65F7F54A1E39FC6395FFF685D109E847A256343F1B2000:8
+Content-Type: text/plain; charset="big5"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v8 03/12] net: phylink: add
- phylink_release_pcs() to externally release a PCS
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Saravana Kannan <saravanak@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- llvm@lists.linux.dev
-References: <20260618125752.1223-1-ansuelsmth@gmail.com>
- <20260618125752.1223-4-ansuelsmth@gmail.com>
- <a271385e-302d-45c7-a1df-aebd380b427b@bootlin.com>
- <6a3fc312.6161eb1e.3441bb.c0de@mx.google.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <6a3fc312.6161eb1e.3441bb.c0de@mx.google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [3.14 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[compal.com : SPF not aligned (relaxed), No valid DKIM,reject];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302474-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302475-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:ryazanovsa@gmail.com,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mediatek.com,collabora.com,lwn.net,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[JackBB_Wu@compal.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,compal.com:mid,compal.com:from_mime];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[JackBB_Wu@compal.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,lkml];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
+	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2D2746D6F50
+X-Rspamd-Queue-Id: F30EC6D6E3A
 
-Hi Christian,
-
-On 6/27/26 14:33, Christian Marangi wrote:
-> On Thu, Jun 25, 2026 at 04:13:14PM +0200, Maxime Chevallier wrote:
->> Hello Christian,
->>
->> On 6/18/26 14:57, Christian Marangi wrote:
->>> Add phylink_release_pcs() to externally release a PCS from a phylink
->>> instance. This can be used to handle case when a single PCS needs to be
->>> removed and the phylink instance needs to be refreshed.
->>>
->>> On calling phylink_release_pcs(), the PCS will be removed from the
->>> phylink internal PCS list and the phylink supported_interfaces value is
->>> reparsed with the remaining PCS interfaces.
->>>
->>> Also a phylink resolve is triggered to handle the PCS removal.
->>>
->>> The flag force_major_config is set to make phylink resolve reconfigure
->>> the interface (even if it didn't change).
->>> This is needed to handle the special case when the current PCS used
->>> by phylink is removed and a major_config is needed to propagae the
->>> configuration change. With this option enabled we also force mac_config
->>> even if the PHY link is not up for the in-band case.
->>>
->>> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
->>> ---
->>>  drivers/net/phy/phylink.c | 56 +++++++++++++++++++++++++++++++++++++++
->>>  include/linux/phylink.h   |  2 ++
->>>  2 files changed, 58 insertions(+)
->>>
->>> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
->>> index c38bcd43b8c8..064d6f5a06da 100644
->>> --- a/drivers/net/phy/phylink.c
->>> +++ b/drivers/net/phy/phylink.c
->>> @@ -158,6 +158,8 @@ static const phy_interface_t phylink_sfp_interface_preference[] = {
->>>  static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
->>>  
->>>  static void phylink_run_resolve(struct phylink *pl);
->>> +static void phylink_link_down(struct phylink *pl);
->>> +static void phylink_pcs_disable(struct phylink_pcs *pcs);
->>>  
->>>  /**
->>>   * phylink_set_port_modes() - set the port type modes in the ethtool mask
->>> @@ -918,6 +920,60 @@ static void phylink_resolve_an_pause(struct phylink_link_state *state)
->>>  	}
->>>  }
->>>  
->>> +/**
->>> + * phylink_release_pcs - Removes a PCS from the phylink PCS available list
->>> + * @pcs: a pointer to the phylink_pcs struct to be released
->>> + *
->>> + * This function release a PCS from the phylink PCS available list if
->>> + * actually in use. It also refreshes the supported interfaces of the
->>> + * phylink instance by copying the supported interfaces from the phylink
->>> + * conf and merging the supported interfaces of the remaining available PCS
->>> + * in the list and trigger a resolve.
->>> + */
->>> +void phylink_release_pcs(struct phylink_pcs *pcs)
->>> +{
->>> +	struct phylink *pl;
->>> +
->>> +	ASSERT_RTNL();
->>> +
->>> +	pl = pcs->phylink;
->>> +	if (!pl)
->>> +		return;
->>> +
->>> +	mutex_lock(&pl->state_mutex);
->>> +
->>> +	list_del(&pcs->list);
->>> +	pcs->phylink = NULL;
->>> +
->>> +	/*
->>> +	 * Check if we are removing the PCS currently
->>> +	 * in use by phylink. If this is the case, tear down
->>> +	 * the link, force phylink resolve to reconfigure the
->>> +	 * interface mode, disable the current PCS and set the
->>> +	 * phylink PCS to NULL.
->>> +	 */
->>> +	if (pl->pcs == pcs) {
->>> +		phylink_link_down(pl);
->>> +		phylink_pcs_disable(pl->pcs);
->>> +
->>> +		pl->force_major_config = true;
->>> +		pl->pcs = NULL;
->>> +	}
->>> +
->>> +	mutex_unlock(&pl->state_mutex);
->>> +
->>> +	/* Refresh supported interfaces */
->>> +	phy_interface_copy(pl->supported_interfaces,
->>> +			   pl->config->supported_interfaces);
->>> +	list_for_each_entry(pcs, &pl->pcs_list, list)
->>> +		phy_interface_or(pl->supported_interfaces,
->>> +				 pl->supported_interfaces,
->>> +				 pcs->supported_interfaces);
->>
->> I've given more thought to that 'supported_interfaces' thing. This
->> patchset redefines the meaning of
->>
->>   pl->config->supported_interfaces
->>
->> Currently, it's filled by the MAC driver and means "Every interface
->> we can support, including the ones provided by PCSs that we can use
->> with this MAC".
->>
->> It now becomes "Every interface we support without needing a PCS", at
->> least the way I understand that.
->>
-> 
-> Wait but with the current code using the OR logic, it still follows
-> "Every interface we can support...". The modes that needs a PCS are
-> specificed with the pcs_interfaces mask in phylink_config.
-
-you current code is correct, I was mostly concerned about the doc
-that goes along with it :)
-
-So in the end, we'd have something like (simplified):
-
-pl->config.supported_interfaces = RGMII_xx | SGMII | 1000BaseX
-pl->config.pcs_interfaces = SGMII | 1000BaseX
-
-pcs->supported_interface = SGMII| 1000BaseX
-
-correct ?
-
-> 
-> The late add and release operates on the phylink supported_interfaces ONLY
-> when the MAC didn't specify support for it (by removing it as only the PCS
-> will declare support for it)
-> 
-> The confusion is present because everything is validated later on
-> major_config so those supported_interfaces are just an HINT that are later
-> verified with get_caps and with the pcs_validate OPs.
-> 
-> Adding the supported_interfaces to phylink is really to keep an original
-> reference of the value. This is to address a pattern I have notice where
-> the MAC driver always OR the interfaces with the one supported by the PCS.
-> (I remember it was pointed out by Russell)
-> 
-> But I'm more than open to discussion as this is something marginal to the
-> whole implementation, I'm also questioning if this OR is actually useful to
-> anything on the nth tought on this.
-> 
-> One thing that I notice is that parsing this early with AND might be
-> problematic at phylink_create, but I still have to evaluate that.
-> 
-> My take is that would be good to have some review also on the other logic
-> as I think I reached a point where Sashiko starts to comments on more or
-> less unreal problem.
-
-True, TBH all the fwnode part is something I'm a bit less familiar with though
-so maybe someone else can browse through that.
-
-FWIW, I've tested that whole series on a board that has "legacy" PCS board
-that has mvpp2 and 2 possible PCSs, and it seems to work fine so no regressions
-there :)
-
-A side note with the "legacy" naming, I'd rather have it called "built-in" or
-something like that, I don't see a clear path to porting the existing code to
-fwnode without breaking DT compat, as it's likely we'll have to remove the PCS
-register ranges out of the MAC's range. 
-
-Thanks for this work anyway, this is great !
-
-Maxime
+SGkgQW5kcmV3LA0KDQo+ID4gKyNlbHNlIC8qICFDT05GSUdfQUNQSSAqLw0KPiA+ICsJZGV2X2Vy
+cigobWRldiktPmRldiwgIlVuc3VwcG9ydGVkLCBDT05GSUcgQUNQSSBoYXNuJ3QgYmVlbiBzZXQg
+dG8gJ3knXG4iKTsNCj4NCj4gV2h5IG5vdCBqdXN0IGhhdmUgdGhlIEtjb25maWcgZGVwZW5kIG9u
+IEFDUEk/DQoNCldpbGwgYWRkICJkZXBlbmRzIG9uIEFDUEkiIGFuZCByZW1vdmUgdGhlICNpZmRl
+ZiBibG9ja3MgaW4gdjQuDQoNCj4gPiArCWlmIChyZXQpIHsNCj4gPiArCQlkZXZfZXJyKChtZGV2
+KS0+ZGV2LCAiRmFpbGVkIHRvIHJlZ2lzdGVyIG1oY2NpZl9pcnEgY2FsbGJhY2tcbiIpOw0KPg0K
+PiBXaHkgdGhlICgpIGFyb3VuZCBtZGV2Pw0KDQpXaWxsIHJlbW92ZSB0aGUgdW5uZWNlc3Nhcnkg
+cGFyZW50aGVzZXMgZnJvbSBhbGwgb2NjdXJyZW5jZXMgaW4gdjQuDQoNClRoYW5rcy4=
 
