@@ -1,179 +1,171 @@
-Return-Path: <netdev+bounces-302502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oG/nFdkqQmoA1QkAu9opvQ
-	(envelope-from <netdev+bounces-302502-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:20:41 +0200
+	id T3izDKIvQmrW1QkAu9opvQ
+	(envelope-from <netdev+bounces-302503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:41:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC12E6D770D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:20:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 728ED6D797A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:41:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=uniontech.com header.s=onoh2408 header.b=LviCPR3Z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302502-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302502-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=uniontech.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=g0jrwcN7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302503-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302503-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4CEDC302C0E2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:09:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 99C7C300B61C
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0893E9C1B;
-	Mon, 29 Jun 2026 08:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB833F65F9;
+	Mon, 29 Jun 2026 08:39:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8803DCDAD;
-	Mon, 29 Jun 2026 08:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1D33932F7;
+	Mon, 29 Jun 2026 08:39:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782720549; cv=none; b=LA+5TGFByGsdn54K7z11q0uebFUVvLzbNU0dqJL/tyEfYcu5yg0wAC1IjXX720ufkLulYUUnu6ONi8F07bIp0WYofa3vH1erqYVFz3+Yihm7kLNRqXc0rN7A/HA4sDhTI7kQjx0gdHEnk6tHOAk7RJf8f4Pn3oXPEwC1WCH3sCU=
+	t=1782722373; cv=none; b=MdLMRKqNfqnW2gzooSgvUOIg2tMftwdc+caUyQb000X9GD5uXT0Hi+RU+EaoKmICYH3RosdbnIpYJPOErG1l3TcjUZVGZaLOnxgbqXuuOL92KA3L7sQkHC7IvabkOhBHclt8qzttOkaTsP7kPzx8sifLr3RvXhuXLYBXRzNn5M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782720549; c=relaxed/simple;
-	bh=Vxoi1cmDZfQArHjfngvHJ3m+cmHDV9o3Lr0fhwyX5is=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RZY7g8g0YSwp5KJpxBuT81RdwSuv0F0iz+Noumop8jdb7IWgXI0ODZgOlNuQm5MJoITln2ia9Eryvu47+tAIldSXRr6wOkmfHd0SROZzeTcqS/s5VDUx5YzA+7GAOMkgjod+S1nkgpbj2FyBRiwjpB/TDn77zNgeTfDnBaPgSwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=LviCPR3Z; arc=none smtp.client-ip=18.132.163.193
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1782720405;
-	bh=i2DdokORhd2J9b8fMGYTamdftk3sCUnAFClIAvIlENQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=LviCPR3Z9ksI/Cgwjqaw3FIWaOyix7Pv7T5FkjvKA7IW/ZzdjUAeXLkO5c5QPH8v7
-	 Bak0qRAbrSP0prGSIyNqi62R4p6MZMlIWOClWDRgg2g4jh/r6Dlr4dnsuEqr0XxDBm
-	 uz6I443MNLFbKTUf8NAa5/UL3nbO1a/QSuFvpB5U=
-X-QQ-mid: esmtpgz14t1782720386t569d4ab0
-X-QQ-Originating-IP: 261MedjCVxDuM4UpNE1QoVSXNH3HdjfqTuqpgpoG9j0=
-Received: from PEN202512010004 ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 29 Jun 2026 16:06:24 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8126023900001592942
-EX-QQ-RecipientCnt: 11
-From: raoxu <raoxu@uniontech.com>
-To: tsbogend@alpha.franken.de
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-mips@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	raoxu@uniontech.com,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: sgi: ioc3-eth: fix split TX DMA mapping lengths
-Date: Mon, 29 Jun 2026 16:06:23 +0800
-Message-ID: <4E1486BC4536407E+20260629080623.908426-1-raoxu@uniontech.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1782722373; c=relaxed/simple;
+	bh=c4sIW5ycgpKIzndr7OBsugpKjXxHJyhKvNXgVBgHeU4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LFy8mFWRDuEQS6JACV50YjB7neu0+Zbt4F0q2ffy7yPMDLqFFtSvXdWQjB/I2i+Zk4uH8APkb8jfZoCQZOIryD+us4Yni7GAj2RyR1AdELeGZZ3Bw5mV5zXsaunY9rzBOh9Q/Q7dBgzBcX7pPDwgXhq70o4RUrclAEkkvRmuu/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0jrwcN7; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D224C1F000E9;
+	Mon, 29 Jun 2026 08:39:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782722372;
+	bh=lq5LQ9JJIDNlCaG6JOmQhcLy406DV5gppuzq/19j6u4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=g0jrwcN7FicUiZjmTdmUTBj9Jd6bDziwdyJEXWr9dwXtodAHHfT4gyhX90rCOLzMG
+	 LZ/WbKKfW/llBWAnPUID5vrxbWnIsEMzfnmmGlddoEw07yl0+kN0xTCAnYFMAM1lgw
+	 VfQZ+UddMWjc14ffDQM+l63bdsgK0VxxksGsknHAOJfI4QtBSUKewhoH7Zg50oam7D
+	 BqB5DEpDacVIFF3iKVxhOclY55m87G0cONuxRo9/FtK7dRlsqIymFhcCpQ6mQGksTH
+	 q0ZAahQkgb57Le0NwhxkQtp0csuXF43ZGmnQ3v0UfdtZvb8F5+QwwU8dDaVVxRiAnh
+	 0/tWhLjmKBD7Q==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, David Woodhouse
+ <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, John Stultz
+ <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
+ Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti
+ <giometti@enneenne.com>, Vincent Donnefort <vdonnefort@google.com>, Marc
+ Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai
+ <tiwai@suse.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Johannes Berg <johannes.berg@intel.com>, Jacob Keller
+ <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber
+ <peter.hilber@oss.qualcomm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev, linux-wireless@vger.kernel.org,
+ linux-sound@vger.kernel.org
+Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
+ ktime_get_snapshot_id()
+In-Reply-To: <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.374814973@kernel.org>
+ <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
+ <87echtk24a.ffs@fw13>
+ <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
+ <87fr29ib4v.ffs@fw13>
+ <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
+Date: Mon, 29 Jun 2026 10:39:26 +0200
+Message-ID: <87bjctsptt.ffs@fw13>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: Naz1YHCzw2jIHC7m24qCCb6HuBzpVCcNaxUWCyk2JEeHoRtla8cPwZHV
-	Rlo5N8f2MPQPpbng4adW1FV48Af4rwt/xtI0rCbEWtlIvcgY8tsTZkFHtGMtjGUVVapoCTc
-	QiVnzxod3Mekjnqv6yxkUuaTYay4UiIs036oY34n6APLG1wzOc8GManQq730KraNTU02pok
-	RNoe9kIdvyUPab39n+Kh/4SGcNmK9450AnUNOJI4CZTvVhhn5gQbbVVpAAj4NzVYqk2jfrr
-	t+Y9wt+1sdzkdpSmMeWYc2URGDvzm35CaXSi6pEagmPattZxB1Nbj8jEmG+VdzbLiWIV7ZD
-	ZBMR8cub91hA5fAJtBnSMSvfPpa6/W9M1dTlMIo8euMo5V/pzw1AwrG8FdNPkXDMEdjMfjs
-	5Da5bTcDKTuJ16XGvU3LP/tri+aDLkwyArbQNSLYThz/ChcKiRT05ifxxduZOhe74hKNzHJ
-	wv6FJCrgdzI2HDjYKf1cykX8MAnI5NxkXawpg6oZlXoEC8eKqUnNz2hB1PTu5WHDZ11kEaR
-	DU30KgxXbfb+it8NQbH2gvllmARQhif+pxJIoVjVeDjzK58nAfvDy9x2zt2HLEes637IkGL
-	mkQcp5bHS9GtA2uwOi7IH5kc9Fgi6/nm4zF3ThYoCFPDOf50GEsZxrKtIaNVaXXIuM3ONWC
-	IJQoNRKUtVkH/lCGVTv9v4xYzt6BtbXhvijUOdSseNivTCQtphy2E8xIrz+f9gK3iag29+r
-	SM//FR37LLdh6VPa0oh6nvYyQoPmpcQL6A8wTNW0eXBv+0IOG9ph1c7uDCOvg3VNHB1BJro
-	dQwknvyYBJzIH2PXZS9wc92jUOab+WStqKH0wHp8NfycbTJk+/7CzYBoZyDQhLGI0FSZW3n
-	jgTDVxQGEuAOLZ7DmSdx1qGxbdUfjrqQrzaS5UlV66sTjOSZGJf3wu3SVvINDBXOw402lDb
-	EIlITKvAM0+MDYl+mYSpEZF0uUAkYBUG1tTK2zvFr4O9pP/QhCc+wuwZs3vjrpGH2JlNOIQ
-	szpsj+43W+tOAgw7GdDpNenHr+P3iTIzYwUt6d4g==
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-4.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[raoxu@uniontech.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:thomas.weissschuh@linutronix.de,m:linux-kernel@vger.kernel.org,m:dwmw2@infradead.org,m:mlichvar@redhat.com,m:jstultz@google.com,m:sboyd@kernel.org,m:anna-maria@linutronix.de,m:frederic@kernel.org,m:akiyano@amazon.com,m:giometti@enneenne.com,m:vdonnefort@google.com,m:maz@kernel.org,m:oliver.upton@linux.dev,m:kvmarm@lists.linux.dev,m:oupton@kernel.org,m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:tiwai@suse.com,m:miriam.rachel.korenblit@intel.com,m:johannes.berg@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:saeedm@nvidia.com,m:peter.hilber@oss.qualcomm.com,m:mst@redhat.com,m:virtualization@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-sound@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302502-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:tsbogend@alpha.franken.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-mips@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:raoxu@uniontech.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[uniontech.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[raoxu@uniontech.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_SENDER(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302503-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[uniontech.com:dkim,uniontech.com:email,uniontech.com:mid,uniontech.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AC12E6D770D
+X-Rspamd-Queue-Id: 728ED6D797A
 
-From: Xu Rao <raoxu@uniontech.com>
+On Mon, Jun 29 2026 at 05:55, Thomas Wei=C3=9Fschuh wrote:
+> On Fri, Jun 26, 2026 at 05:17:52PM +0200, Thomas Gleixner wrote:
+>> On Fri, Jun 26 2026 at 13:03, Thomas Wei=C3=9Fschuh wrote:
+>> > On Fri, Jun 26, 2026 at 12:49:41PM +0200, Thomas Gleixner wrote:
+>> >> On Fri, Jun 26 2026 at 10:48, Thomas Wei=C3=9Fschuh wrote:
+>> >> > On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
+>> >> > (...)
+>> >> >
+>> >> >>  static inline void tk_update_aux_offs(struct timekeeper *tk, ktim=
+e_t offs)
+>> >> >> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
+>> >> >>  		tkd =3D &tk_core;
+>> >> >>  		offs =3D &tk_core.timekeeper.offs_boot;
+>> >> >>  		break;
+>> >> >> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
+>> >> >> +		tkd =3D aux_get_tk_data(clock_id);
+>> >> >> +		if (!tkd)
+>> >> >> +			return false;
+>> >> >> +		offs =3D &tkd->timekeeper.offs_aux;
+>> >> >> +		break;
+>> >> >
+>> >> > 'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr=
+_mono'
+>> >> > are the same for auxilary clocks, so this will compute a wrong 'mon=
+oraw'.
+>> >>=20
+>> >> AUX clocks are independent in the first place and the MONORAW part is
+>> >> the "MONORAW" related to the AUX clock itself.=20
+>> >>=20
+>> >> > Instead 'monoraw' should be computed based on 'tk_core'.
+>> >> > Which then also requires the sequence locking of 'tk_core'.
+>> >>=20
+>> >> No. From a PTP and steering point of view you want the "raw" value wh=
+ich
+>> >> is related to the AUX clock itself and not the global one.
+>> >
+>> > Ack.
+>> >
+>> > However the kdocs call it 'CLOCK_MONOTONIC_RAW'. Can we clean this up?
+>>=20
+>> Yes. Something like the below?
+>
+> Looks good, thanks.
+> The corresponding structure definitions are a also affected, though.
 
-When a linear skb crosses a 16 KiB boundary, ioc3_start_xmit()
-splits it into two buffers of lengths s1 and s2.  The descriptor
-advertises those lengths through B1CNT and B2CNT.
-
-The first buffer is mapped with s1, but the second buffer is also
-mapped with s1 even though the device is told to fetch s2 bytes from
-it.  When the lengths differ, the DMA mapping does not cover the same
-region as the second descriptor buffer, which can result in incorrect
-cache maintenance or a DMA fault on implementations that enforce the
-mapped range.
-
-There is a separate mismatch in the error path.  If mapping the second
-buffer fails, only d1 needs to be unmapped.  d1 was mapped for s1 bytes,
-but the driver unmaps it using the full packet length.  Streaming DMA
-mappings must be unmapped with the same size used for the corresponding
-map operation.
-
-Map the second buffer with s2 and unmap the first buffer with s1 when
-the second mapping fails.
-
-Fixes: ed870f6a7aa2 ("net: sgi: ioc3-eth: use dma-direct for dma allocations")
-Cc: stable@vger.kernel.org
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
----
- drivers/net/ethernet/sgi/ioc3-eth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/sgi/ioc3-eth.c b/drivers/net/ethernet/sgi/ioc3-eth.c
-index 3973106..261f2d3 100644
---- a/drivers/net/ethernet/sgi/ioc3-eth.c
-+++ b/drivers/net/ethernet/sgi/ioc3-eth.c
-@@ -1061,9 +1061,9 @@ static netdev_tx_t ioc3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		d1 = dma_map_single(ip->dma_dev, skb->data, s1, DMA_TO_DEVICE);
- 		if (dma_mapping_error(ip->dma_dev, d1))
- 			goto drop_packet;
--		d2 = dma_map_single(ip->dma_dev, (void *)b2, s1, DMA_TO_DEVICE);
-+		d2 = dma_map_single(ip->dma_dev, (void *)b2, s2, DMA_TO_DEVICE);
- 		if (dma_mapping_error(ip->dma_dev, d2)) {
--			dma_unmap_single(ip->dma_dev, d1, len, DMA_TO_DEVICE);
-+			dma_unmap_single(ip->dma_dev, d1, s1, DMA_TO_DEVICE);
- 			goto drop_packet;
- 		}
- 		desc->p1     = cpu_to_be64(ioc3_map(d1, PCI64_ATTR_PREF));
--- 
-2.47.3
-
+True.
 
