@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-302768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302769-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BF/RB+q1QmozAAoAu9opvQ
-	(envelope-from <netdev+bounces-302768-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:14:02 +0200
+	id xHV2IgC2Qmo0AAoAu9opvQ
+	(envelope-from <netdev+bounces-302769-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:14:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7740C6DDF25
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:14:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C066DDF29
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:14:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=wbfG66LN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302768-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302768-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b="Fl/J091N";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302769-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302769-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8976330479C1
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:12:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90DF73053E8B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD614380FFE;
-	Mon, 29 Jun 2026 18:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F4D380FE7;
+	Mon, 29 Jun 2026 18:12:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9C737C0E7
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87123380FDE
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:12:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782756755; cv=none; b=tutTstnfZRqDV9nkMD/rbhRmbtWGeAVMXFcucNJLSObZMD8pW0PG1GKzvqg22ikfS+EdSWYg4Uu/LG43/hdoH6aUA8FyxiCZrdWisqDq6xiBCDKQzJad5cTnlyVbkwe0HvB1Ohb14p9NEyhiqE0798+AUFQyFLL+QPDzO7iygVo=
+	t=1782756756; cv=none; b=T47j9t3J86zbmlhXMnwqDTxJ9Sq+2po0zIWG8D/NpbTmZRQap9uMPoSy3FWdXbfsH5PNUic9sOW2r4B71qBpmX7mPan2HfPHhwwb7A4lugX6c+mfAaW09lC2i/xDzPSY3+f0Zy1q05M4A+fE4YgyetXon6ymA3E+/QMOmheYIgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782756755; c=relaxed/simple;
-	bh=Y3XSBR9ty13tjR7eA9bGsDzxlHHrTKCv8ssch553Esc=;
+	s=arc-20240116; t=1782756756; c=relaxed/simple;
+	bh=dplleEyAyb72UrESvN7FcnpEgD4ge0Y7f9BoSqkRzms=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nA1JpZ8Qa7d4LUbW++AhWg604O4utOHuRo4yG4Rt+wDGBmTM/F6UhvxefQcSqXSGsAcR1M7dgDrONzvIMFa4TqgyzTtwKltZBZdfyBsNRIsptHOQi5ipUjx5QQJblK15ajPuUG2kUYiejLQ2r9FsQ1rcPRzHqYrxL/4oSiwLnV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wbfG66LN; arc=none smtp.client-ip=209.85.214.201
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2c804e38c65so39296955ad.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:12:34 -0700 (PDT)
+	 To:Cc:Content-Type; b=PvezLxZ96XBCz9TtWNJYhF/vR+IZKczH071P8i5kFnIf6fVS6+spsFWJkGyP+eSGyeYIALRNpyn9ymHAIG/3t3hWXtMDvFKjd6nJu/gGpqyAkAS7IemOqNK5VXPk0ABzR0DXKTOuIeRXU0ziNmpUaztWis6lBs+Ujk7MoyXzzpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fl/J091N; arc=none smtp.client-ip=209.85.210.202
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-845e3ede1f9so1463540b3a.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:12:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782756754; x=1783361554; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782756755; x=1783361555; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SO3BTf/18qQBrY40uuLAVTCmct5NvytYO5ofDh/MuJ0=;
-        b=wbfG66LNosaG+e60skIcdQ/r3aRz0QoPKC/3ujXkAVAtjiM7OM+mhtW1W6gVC3+FYM
-         aeiBrbWuy1hA257DyRvaWU9cHk0O6u/yTL41LaOUUky5YLgcxFqyFSove6B7m53Vi0jl
-         dUZRUQtz9bCbD7d0XcFItxs+doB6M8vAY0aM1cfua+mj2T/I5+tolmwOkHN42PmStv7k
-         GVmMniHTiYrRURm+vmWDrGMY3PqqWz72k25I1HJkEnOUwS+IeoSo1k3gHXCQPMpa0j0H
-         Z0gvcMaXXZn0C8PjsoW6TLzQ2wV2wWqnYEGLA8HyZ7pN1911ISJhyeDlJ88ej3zZbBp+
-         D7gQ==
+        bh=DLT/jvNkfWMKrPf0TbNGZ+38e0hMq+zgh9IO5EiOsaY=;
+        b=Fl/J091N75C4o5IFpUaINrNp5lfPR2nWhOnzDOHD4SZYIMDK+LX32KgrYk1oq9KvhK
+         VFPGldyJfME5Fw/ThyTP8pZ0YwxKCCzTeuVmtuiyPV5jD6VFkRGC+kyJnZoM8gwh9raN
+         0bu7my1c0/hoHOHscn0+VAt5e700tN54DLptfgdRy2ZkzPQUKk+u2JDZErZczlaEcUFO
+         lf/MY+leUHSyfxxGjDd/mXWwteCYt8go0pDMXA/jg5RwtyLvX0yG9Jjt1oTwMF3rMfgF
+         hTw7oDcqZr+CcAFVaEHAqrGuc2n2ifLGc8zhlXtJ3RKeNIakSNabLQbSG76z9hz1IYFn
+         A34g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782756754; x=1783361554;
+        d=1e100.net; s=20251104; t=1782756755; x=1783361555;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SO3BTf/18qQBrY40uuLAVTCmct5NvytYO5ofDh/MuJ0=;
-        b=edhTMfn5XYqnJNzXXmy8PvrkkcR69bQTYsYYYS+PwhAx22yxT2o2veAY8bc0IbtNLp
-         ub0AIu5NST/AAhou94SoA9HWCQrHZgch2iwToLtg53+6BDn+e/9W+ts8HCShk/3kUugF
-         lSVnKvzqGM9CkIphVqiWxmyUAP92v+Hm7LNLWaZ126FMQdy4+/TKlDNYwyxhEdOeeNYf
-         6qva+E60vdTlho1qVgD7PfgsVWWhKFk+Wa8s2EbMYK/LJ2rirMwXBt+jfL93bWW1AJML
-         Rn1kIWJQRq9by1ETf6SAmsYEny8vIqd/EfLUTsvh81/FD9PIT67+VavFuHsedV50zZk5
-         izhg==
-X-Forwarded-Encrypted: i=1; AHgh+RoNgFhOm6+D2hZzhsQZqZCwi3SI/7O5x8h6ztngWQ5AK2M9c2+K2yIyK9iznE1jEKJ2842GKgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6bdqkD+DmzTb0wC+udGmS02k/JgqUBeFh23aoB0spJAn3ZF9W
-	QVfwhZYn5NM8rToo7NHuBzF1UpvwtLkZZL9T8OuQ2YdnuEn1oWkidP5x7lHF3ec9hBzZN6K+AlT
-	Cx66yKQ==
-X-Received: from plhd15.prod.google.com ([2002:a17:903:230f:b0:2c1:220c:ccc1])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3886:b0:2c9:d892:b7df
- with SMTP id d9443c01a7336-2ca2e91091cmr3477505ad.25.1782756753613; Mon, 29
- Jun 2026 11:12:33 -0700 (PDT)
-Date: Mon, 29 Jun 2026 18:10:57 +0000
+        bh=DLT/jvNkfWMKrPf0TbNGZ+38e0hMq+zgh9IO5EiOsaY=;
+        b=Yp2huk4/pWTkLePzm3oKvc1dnYMcJVWkackhvfBd6gwtoKv2uCp/pcZjdoM7b/FJq3
+         tPDYYGJ9WhQQXTNqBLsUr0RAkm1/BE0kAZIfwPJKUst9hzDGPpYS+edAeJUKNWQzqwQP
+         E1JaIZtoy9Yz3EfX3QEX/i2zu3vYlyG1pNcEIhgHW/QjKdO23zIEFClxxR41erJ0wFbX
+         Jq1qCFG3ACAfF0KyYRsAMgetc9uTD5DpSidxxqgs7RmiBdMDbfHsL/VmJf5dzN7kqGUJ
+         yGez8gv5Jfa+Kz/f7yXmarf4tiwavN0iXy3y3Ks9qklHI7xHeNm7FfxrrZLuoKssEd+k
+         +05A==
+X-Forwarded-Encrypted: i=1; AHgh+RpQbTHip6Uc+q5vQNGTRIxSYKGGLzCavq1ZzsL/Mrvc9dYeUw55xrRLJhW3XX+qfVP99ENsSkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyc/VI9VqomjOSZlPnHNElWG+secNAuQnY3dhTay+Szsgf7/giS
+	Wch96htfSPu7VSS97Cz+9GTdMxvdoAW7U9fGdmBXTYa1Oa4g7KLKSWwKOksJClPbECz1OqH5GEv
+	4Is/xyg==
+X-Received: from pfej17.prod.google.com ([2002:aa7:8d11:0:b0:847:7a66:88f3])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1302:b0:847:823c:bdf5
+ with SMTP id d2e1a72fcca58-8479f1f5750mr444183b3a.37.1782756754424; Mon, 29
+ Jun 2026 11:12:34 -0700 (PDT)
+Date: Mon, 29 Jun 2026 18:10:58 +0000
 In-Reply-To: <20260629181226.1929658-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260629181226.1929658-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260629181226.1929658-6-kuniyu@google.com>
-Subject: [PATCH v1 net-next 05/10] net: fib_rules: Add fib_rules_ops.lock.
+Message-ID: <20260629181226.1929658-7-kuniyu@google.com>
+Subject: [PATCH v1 net-next 06/10] net: fib_rules: Remove unnecessary EXPORT_SYMBOL.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
 	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -91,12 +91,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302768-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302769-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -115,134 +115,95 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7740C6DDF25
+X-Rspamd-Queue-Id: D9C066DDF29
 
-We will no longer hold RTNL for RTM_NEWRULE and RMT_DELRULE
-except for the first IPv4 RTM_NEWRULE.
+All fib_rule users cannot be compiled as module.
 
-Let's add per-fib_rules_ops mutex inside RTNL.
+  $ grep -E "config (INET|IPV6|IP_MROUTE|IPV6_MROUTE)\b" -A1 \
+    net/{Kconfig,{ipv4,ipv6}/Kconfig}
+  net/Kconfig:config INET
+  net/Kconfig-	bool "TCP/IP networking"
+  --
+  net/ipv4/Kconfig:config IP_MROUTE
+  net/ipv4/Kconfig-	bool "IP: multicast routing"
+  --
+  net/ipv6/Kconfig:menuconfig IPV6
+  net/ipv6/Kconfig-	bool "The IPv6 protocol"
+  --
+  net/ipv6/Kconfig:config IPV6_MROUTE
+  net/ipv6/Kconfig-	bool "IPv6: multicast routing"
+
+Let's remove EXPORT_SYMBOL and friends for fib_rule.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/net/fib_rules.h |  1 +
- net/core/fib_rules.c    | 20 ++++++++++++++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ net/core/fib_rules.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/include/net/fib_rules.h b/include/net/fib_rules.h
-index f9a4bca51eda..7636ef4da5ad 100644
---- a/include/net/fib_rules.h
-+++ b/include/net/fib_rules.h
-@@ -98,6 +98,7 @@ struct fib_rules_ops {
- 	struct list_head	rules_list;
- 	struct module		*owner;
- 	struct net		*fro_net;
-+	struct mutex		lock;
- 	struct rcu_head		rcu;
- };
- 
 diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 961eb709f256..8b9dac1bd4a7 100644
+index 8b9dac1bd4a7..25a3fd997782 100644
 --- a/net/core/fib_rules.c
 +++ b/net/core/fib_rules.c
-@@ -172,6 +172,7 @@ fib_rules_register(const struct fib_rules_ops *tmpl, struct net *net)
- 		return ERR_PTR(-ENOMEM);
+@@ -51,7 +51,6 @@ bool fib_rule_matchall(const struct fib_rule *rule)
+ 		return false;
+ 	return true;
+ }
+-EXPORT_SYMBOL_GPL(fib_rule_matchall);
  
- 	INIT_LIST_HEAD(&ops->rules_list);
-+	mutex_init(&ops->lock);
- 	ops->fro_net = net;
- 
- 	err = __fib_rules_register(ops);
-@@ -392,6 +393,7 @@ static int call_fib_rule_notifiers(struct net *net,
- 	};
- 
- 	ASSERT_RTNL_NET(net);
-+	lockdep_assert_held(&ops->lock);
- 
- 	/* Paired with READ_ONCE() in fib_rules_seq() */
- 	WRITE_ONCE(ops->fib_rules_seq, ops->fib_rules_seq + 1);
-@@ -910,6 +912,7 @@ int fib_newrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 	if (!rtnl_held)
- 		rtnl_net_lock(net);
-+	mutex_lock(&ops->lock);
- 
- 	err = fib_nl2rule_rtnl(rule, ops, tb, extack);
- 	if (err)
-@@ -978,6 +981,7 @@ int fib_newrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 	fib_rule_get(rule);
- 
-+	mutex_unlock(&ops->lock);
- 	if (!rtnl_held)
- 		rtnl_net_unlock(net);
- 
-@@ -988,6 +992,7 @@ int fib_newrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
+ int fib_default_rule_add(struct fib_rules_ops *ops,
+ 			 u32 pref, u32 table)
+@@ -78,7 +77,6 @@ int fib_default_rule_add(struct fib_rules_ops *ops,
+ 	list_add_tail(&r->list, &ops->rules_list);
  	return 0;
+ }
+-EXPORT_SYMBOL(fib_default_rule_add);
  
- errout_free:
-+	mutex_unlock(&ops->lock);
- 	if (!rtnl_held)
- 		rtnl_net_unlock(net);
- 	kfree(rule);
-@@ -1039,6 +1044,7 @@ int fib_delrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
+ static u32 fib_default_rule_pref(struct fib_rules_ops *ops)
+ {
+@@ -183,7 +181,6 @@ fib_rules_register(const struct fib_rules_ops *tmpl, struct net *net)
  
- 	if (!rtnl_held)
- 		rtnl_net_lock(net);
-+	mutex_lock(&ops->lock);
+ 	return ops;
+ }
+-EXPORT_SYMBOL_GPL(fib_rules_register);
  
- 	err = fib_nl2rule_rtnl(nlrule, ops, tb, extack);
- 	if (err)
-@@ -1093,6 +1099,7 @@ int fib_delrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
+ static void fib_rules_cleanup_ops(struct fib_rules_ops *ops)
+ {
+@@ -208,7 +205,6 @@ void fib_rules_unregister(struct fib_rules_ops *ops)
+ 	fib_rules_cleanup_ops(ops);
+ 	kfree_rcu(ops, rcu);
+ }
+-EXPORT_SYMBOL_GPL(fib_rules_unregister);
  
- 	call_fib_rule_notifiers(net, FIB_EVENT_RULE_DEL, rule, ops, NULL);
+ static int uid_range_set(struct fib_kuid_range *range)
+ {
+@@ -364,7 +360,6 @@ int fib_rules_lookup(struct fib_rules_ops *ops, struct flowi *fl,
  
-+	mutex_unlock(&ops->lock);
- 	if (!rtnl_held)
- 		rtnl_net_unlock(net);
+ 	return err;
+ }
+-EXPORT_SYMBOL_GPL(fib_rules_lookup);
  
-@@ -1104,6 +1111,7 @@ int fib_delrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
- 	return 0;
+ static int call_fib_rule_notifier(struct notifier_block *nb,
+ 				  enum fib_event_type event_type,
+@@ -425,7 +420,6 @@ int fib_rules_dump(struct net *net, struct notifier_block *nb, int family,
  
- errout_free:
-+	mutex_unlock(&ops->lock);
- 	if (!rtnl_held)
- 		rtnl_net_unlock(net);
- 	kfree(nlrule);
-@@ -1403,20 +1411,28 @@ static int fib_rules_event(struct notifier_block *this, unsigned long event,
+ 	return err;
+ }
+-EXPORT_SYMBOL_GPL(fib_rules_dump);
  
- 	switch (event) {
- 	case NETDEV_REGISTER:
--		list_for_each_entry(ops, &net->rules_ops, list)
-+		list_for_each_entry(ops, &net->rules_ops, list) {
-+			mutex_lock(&ops->lock);
- 			attach_rules(&ops->rules_list, dev);
-+			mutex_unlock(&ops->lock);
-+		}
- 		break;
+ unsigned int fib_rules_seq_read(const struct net *net, int family)
+ {
+@@ -441,7 +435,6 @@ unsigned int fib_rules_seq_read(const struct net *net, int family)
  
- 	case NETDEV_CHANGENAME:
- 		list_for_each_entry(ops, &net->rules_ops, list) {
-+			mutex_lock(&ops->lock);
- 			detach_rules(&ops->rules_list, dev);
- 			attach_rules(&ops->rules_list, dev);
-+			mutex_unlock(&ops->lock);
- 		}
- 		break;
+ 	return fib_rules_seq;
+ }
+-EXPORT_SYMBOL_GPL(fib_rules_seq_read);
  
- 	case NETDEV_UNREGISTER:
--		list_for_each_entry(ops, &net->rules_ops, list)
-+		list_for_each_entry(ops, &net->rules_ops, list) {
-+			mutex_lock(&ops->lock);
- 			detach_rules(&ops->rules_list, dev);
-+			mutex_unlock(&ops->lock);
-+		}
- 		break;
- 	}
- 
+ static struct fib_rule *rule_find(struct fib_rules_ops *ops,
+ 				  struct fib_rule_hdr *frh,
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
