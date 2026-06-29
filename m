@@ -1,195 +1,133 @@
-Return-Path: <netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302642-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9CBhHKlxQmqR7QkAu9opvQ
-	(envelope-from <netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:22:49 +0200
+	id QN0pISp0QmpF7gkAu9opvQ
+	(envelope-from <netdev+bounces-302642-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:33:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9996DB21D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:22:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F26186DB41F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:33:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b=gMJDg1NA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=JJ2c5AB4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302642-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302642-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A1A7300909E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:13:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3E4A4311152C
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34535409121;
-	Mon, 29 Jun 2026 13:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BF3407CCE;
+	Mon, 29 Jun 2026 13:11:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2532B40B38C
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 13:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7197B405860
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 13:11:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782738595; cv=none; b=sE6YeaXHJSmGvdSJ+S63WOdZs3bjsKXz6Ug/EyA4kZ0yyzcDLRc4kW4Glk2BKxkTp750G9LEs0VCuo+HhRqKNxp8ofwd6KvE9yvlsArhoGKRUMj9vejlYiY76Y0GZAlj597/USVChjy+cFv1gLP0DBjtl8M7h/rygFM8qXaP7og=
+	t=1782738676; cv=none; b=ERlFPvt8mfpOuKnXY0c/wrU1HSNADBFwVc4R78QRJucNsclAfddFqCjVeUnIKQP7fQA6bNbC2H57P6rXVE3YztAcmdotf8rjwF4vU2KJNQg08h5stu0pX0deq09waUF9axmnqADRuaELEMShQ1G1G9t+KTmuHiALb2TZ29H8CNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782738595; c=relaxed/simple;
-	bh=MRnm09PMVz3zZlTQCCbSkxqgokpKHu3OelLb7bM8jtQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MK/XsyOV9Vq5RqNtH5XRBZqDUKTetlS4K5k3xYdNs3lGQAdFEWr3ZZ3VFH7fwPiE9xGZeOkQ54x6oulttO1ebm1W7rIiJsd4HJL5hAer+WqxA9lpXySCcthiIzFZHNWVStZwQi16jcMRSdo9BUsDAC5Zcv2bUIWrEEOR3EUdDNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=gMJDg1NA; arc=none smtp.client-ip=209.85.210.51
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7e93cd4e64bso2579974a34.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 06:09:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782738592; x=1783343392; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C857Q2VDyItus3syZ+DUaEL05/aUtCKQC2sIRlYJkic=;
-        b=gMJDg1NAajeSLhbu0RTZcMA51c0+/uo33amb51UJLNd1o2YVOaFkRWKjg/iPIKLDSw
-         46XUc8VZocCD5dV08LbuyFxuwpGOeMsJSbSNr+1ITT4Dw+HINjDwWkW8wPm6BZSuY7IM
-         CSQqPeDgY0QntvYjabDVFqnOPb21tnh3onwIo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782738592; x=1783343392;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C857Q2VDyItus3syZ+DUaEL05/aUtCKQC2sIRlYJkic=;
-        b=hCv5j8I58aTh8lmjDGxe5sOLZch89Vvc4eXhpBV7TISy08o70PDm5OsHPGy4FBHZzw
-         BD96d89QqXIyApY8Vbi4oI7ncToc9E+qtlDOg/0FlRON4eQSzUKN4INrjl9GgCej04I4
-         CHkco6pKuDpDYjtpswp87aRBCt+T2XIrwejVk+xVqc/2khV5fCv6VqE6kpa/pTQBIx/b
-         I8AZ7pej98nr63rMk2tL1Levwf/0PhRXqw1NSK1CH8G1gbzkQ8fi8oDFiQsV29t20M1E
-         fTIj++cwLGDGic4onvXAeQcQxz2o/QxHZuM/sAHcOottsrVaFg60KYLzb2Ton/qVaEv9
-         35Hg==
-X-Forwarded-Encrypted: i=1; AFNElJ8cLYOK/JYxBKRt0ziJUHJxJCRwvOuPmhsB3p7X7IvgEMdYp7mk25olnclVodlhAUbqAxenTys=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4fliViD0lmZITWThsYdth3H7dgpfHq6Gofxb7kCrjorAfWzw4
-	GW+QbeMTtguIoMsXPY2jKjlfDZUsCe37BmB70nMJGL+auN8iSR1keRIROwATQLrhng==
-X-Gm-Gg: AfdE7cnlTG/iRuiLIY2AP2gkVhPiN9qPDx0KuLwrXwsTgjz1cjfOWj4JEN6AX3qBFhi
-	ycG+Ya7RP/66na2AnLYMVgAEaw5c4B5tZ9loqc76rptP9tErfaKa9cwoEoSVfNzEDed6hJmtsdP
-	FWa4vSMYV3JpOU59m9kxdC76pe9FfeOPpLyuGRZlAwpBZvup3Gt09xk1uVss1mf/OXDL6mhvRkM
-	BetEi1lhof67m5sNY0AcTNkiSM268vWiUBU7yPHMVeO18nKzqJyLlswd3Emzsj/w4KYJZzBuH2k
-	ChVPHMev/dbhz+JsUsfXe4crAooxo5aQVGuklJ6nqa+t6MIu4D+e/Ie8LBHM8cbPmTDcXV/iOiU
-	+4FyoWMr8oznt3oC5R1APyWnRGIuyvMpeEZKGb5+w4g/jPPrFlP9ELyQuECIAdVF1Ip7xWe5V0D
-	TnVXj7upclmgR7ZRpmBmjqu1cP2AuzroTvRA==
-X-Received: by 2002:a05:6830:314c:b0:7e9:d3aa:e391 with SMTP id 46e09a7af769-7e9e91a5b19mr361337a34.6.1782738592071;
-        Mon, 29 Jun 2026 06:09:52 -0700 (PDT)
-Received: from ?IPV6:2804:14d:5c54:4d67::1c9d? ([2804:14d:5c54:4d67::1c9d])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e9aa800350sm8796677a34.25.2026.06.29.06.09.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jun 2026 06:09:51 -0700 (PDT)
-Message-ID: <f315dd0d-211e-4d85-a06e-da422f015f1e@mojatatu.com>
-Date: Mon, 29 Jun 2026 10:09:45 -0300
+	s=arc-20240116; t=1782738676; c=relaxed/simple;
+	bh=Uvbn2OzXJH/AEYcQQZnnByuP9FqGwNtcUMW2sa97Ik4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JEXaGryPTe3wIeHfkauX0YDPW/ADLEnKJIkIBklPLCGPlS7bjtAjvQd82HVhOi0C36TofupEddCIphi1hnAeyWODNRu1McTHI91I96zc8CG3rhspZ7xge5CtY+TWrJDk9UUfUbx8B5bNWkYigWQ1XRewrcqRpj5ikDnIpSjQxZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JJ2c5AB4; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UDQKJL7fISB5ZtnqWn72zCYjTHrHpgulsxTX7mBM+fE=; b=JJ2c5AB4WUYQ9643mGcyXLt63m
+	VNCAT7My1v2sGUBkfYXwfE09VQwhvHkb03st0hZZ3RNLzLTSramYCHbhaRDmCe1+xpupxumZwBqIx
+	/EWYjephBcvBBedCPTnc4qYcJXXxJyCoQFfR5347Snj/3TAF4JuI3lIG39Pzq0E8ELdM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1weBlM-009l2z-Js; Mon, 29 Jun 2026 15:11:00 +0200
+Date: Mon, 29 Jun 2026 15:11:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "D H, Siddaraju" <siddaraju.dh@intel.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Das, Shubham" <shubham.das@intel.com>,
+	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
+	"Srinivasan, Vijay" <vijay.srinivasan@intel.com>,
+	"Lindberg, Magnus" <magnus.k.lindberg@ericsson.com>,
+	Niklas Damberg <niklas.damberg@ericsson.com>,
+	"Wirandi, Jonas" <jonas.wirandi@ericsson.com>,
+	Siddaraju DH <siddarajudh@gmail.com>
+Subject: Re: the confusing 10000base_CR. Shouldn't it be 10000_SFI_DA?
+Message-ID: <deee3864-69dd-4eb5-bcfc-4ab771f4530c@lunn.ch>
+References: <MW4PR11MB6912A234CAAAFD25EAC7C8909AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <2994edfc-0894-49c9-abac-6daea5e12075@lunn.ch>
+ <MW4PR11MB6912BE7FEDE5C509B6C5D5DF9AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <2baa5a77-3305-4ed9-b56d-ba27cecc1911@lunn.ch>
+ <MW4PR11MB6912BABFEED268D38B4BC2BB9AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <1b3975a8-788a-4b81-94ec-3ab5708b251b@bootlin.com>
+ <SN7PR11MB6900D73E1714AA8AE05BA7BF9AE82@SN7PR11MB6900.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] netfilter: nf_nat_masquerade: recalculate TCP TS
- offset when port is randomized
-To: xietangxin <xietangxin@h-partners.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
- Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: gaoxingwang <gaoxingwang1@huawei.com>, huyizhen <huyizhen2@huawei.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260629093408.3927103-1-xietangxin@h-partners.com>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20260629093408.3927103-1-xietangxin@h-partners.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN7PR11MB6900D73E1714AA8AE05BA7BF9AE82@SN7PR11MB6900.namprd11.prod.outlook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302641-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_RECIPIENTS(0.00)[m:xietangxin@h-partners.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:gaoxingwang1@huawei.com,m:huyizhen2@huawei.com,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302642-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:siddaraju.dh@intel.com,m:maxime.chevallier@bootlin.com,m:mkubecek@suse.cz,m:netdev@vger.kernel.org,m:shubham.das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[bootlin.com,suse.cz,vger.kernel.org,intel.com,ericsson.com,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mojatatu.com:dkim,mojatatu.com:mid,mojatatu.com:from_mime,h-partners.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A9996DB21D
+X-Rspamd-Queue-Id: F26186DB41F
 
-Hi!
-
-On 29/06/2026 06:34, xietangxin wrote:
-> Problem observed in Kubernetes environments where MASQUERADE target with
-> --random-fully is configured by default. after commit
-> 165573e41f2f ("tcp: secure_seq: add back ports to TS offset") TCP short
-> connection QPS dropped from ~20000 to ~10000. This added source and
-> destination ports into TS offset calculation.
+> Will wait for @Michal Kubecek's response about the manual page update
+> and as second possibility: options to update ethtool help string.
 > 
-> However, with MASQUERADE --random-fully, when multiple internal connections
-> (e.g sport 10000,20000) are mapped to the same external port (e.g 30000),
-> their TS offsets are calculated as ts_offset(10000) and ts_offset(20000).
-> If the server reuses the TIME_WAIT slot from the first connection, there is
-> a chance that ts_offset(20000) < ts_offset(10000), breaking TSval
-> monotonicity for the same 4-tuple and causing RST packets:
->    Client -> Server 24870 -> 80 [SYN] TSval=2294041168
->    Server -> Client 80 -> 24870 [ACK] TSecr=2846236456
->    Client -> Server 24870 -> 80 [RST] Seq=855605690
-> 
-> After nf_nat_setup_info() successfully assigns a new randomized
-> source port, recalculate the TS offset using the new port and
-> update the SYN packet's TSval accordingly.
-> 
-> Test results on 4U4G VM with
-> `./wrk -t8 -c200 -H "Connection: close" -d10s --latency http://5.5.5.5:80`
-> Before:
->    random:10712 req/s, random-fully:10986 req/s
-> After:
->    random:21463 req/s, random-fully:19181 req/s
-> 
-> Fixes: 165573e41f2f ("tcp: secure_seq: add back ports to TS offset")
-> Cc: stable@vger.kernel.org
-> Closes:https://lore.kernel.org/all/92935c00-e0be-4591-ac44-5978c7804d57@yeah.net/
-> Signed-off-by: xietangxin <xietangxin@h-partners.com>
-> [...]
-> +
-> +static void masquerade_update_tcp_ts_offset(struct nf_conn *ct, struct sk_buff *skb)
-> +{
-> [...]
-> +
-> +		if (nf_ct_l3num(ct) == NFPROTO_IPV4)
-> +			st = secure_tcp_seq_and_ts_off(net, tuple->src.u3.ip, tuple->dst.u3.ip,
-> +				tuple->src.u.tcp.port, tuple->dst.u.tcp.port);
-> +		else
-> +			st = secure_tcpv6_seq_and_ts_off(net, tuple->src.u3.ip6,
-> +				tuple->dst.u3.ip6, tuple->src.u.tcp.port, tuple->dst.u.tcp.port);
+> IMHO, yes the comment in ethtool.h enum definition is good
+> as it helps developers who use ethtool.h directly but from
+> ethtool app USER point-of-view, the manual page is the
+> first impression and ethtool --help is second. The effort here is
+> to help the user with a clarification, to avoid the clear confusion
+> with the wrong naming of 10000baseCR
 
-This breaks the build when CONFIG_IPV6 is not set.
+Is there confusion? git blame suggests it has been there 10 years, and
+this is the first time somebody has questioned it.
 
-.config:4948:warning: override: reassigning to symbol NET
-.config:4949:warning: override: reassigning to symbol NET_CORE
-.config:4950:warning: override: reassigning to symbol NETDEVICES
-.config:4951:warning: override: reassigning to symbol NETWORK_FILESYSTEMS
-ERROR: modpost: "secure_tcpv6_seq_and_ts_off" [net/netfilter/nf_nat.ko] 
-undefined!
+I would limit changes to Documentation, man pages, help etc.
 
-cheers,
-Victor
+	Andrew
 
