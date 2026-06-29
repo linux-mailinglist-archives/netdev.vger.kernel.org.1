@@ -1,435 +1,297 @@
-Return-Path: <netdev+bounces-302472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NtNZL3cVQmqGzwkAu9opvQ
-	(envelope-from <netdev+bounces-302472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:49:27 +0200
+	id T3ZZD4cdQmrv0QkAu9opvQ
+	(envelope-from <netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:23:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 455596D6846
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:49:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2746D6F50
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:23:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=Bjv5on17;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302472-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302472-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b="of/X3b2p";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302474-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 41D2F3010ED7
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 06:49:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A3EEB30ABED0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 07:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A7C3ADB9A;
-	Mon, 29 Jun 2026 06:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E695A3C10A7;
+	Mon, 29 Jun 2026 07:05:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945C43A6B67;
-	Mon, 29 Jun 2026 06:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DEE3C1083;
+	Mon, 29 Jun 2026 07:05:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782715749; cv=none; b=KEK6jsty9124SwYUNobo1xw7/J5c34XywxATu/V80w8Q5j82reDP4T5y/oWkWNceWZJCBEEbQ/hawDrSPobPpDGOhLXvelZwsmC8Jj8td3NKw7NSlFdEMyheVmISmFOMyMgsKu2EshQnISrxbtICdnghPjKB2JgjgosvOvMiWGk=
+	t=1782716708; cv=none; b=pNg8xXK8x7vzPFMZhd6Pxm6s9c+3NOtF5VbTRHvS710Tvw6u3t3nuHqcRnrODMftQ0DjcZbQ5madOouXokXraf75A7m61HfVY9HA5zT/FNy8Eb08G0oBTJHvEwuTFrU/9jsrYlDWympjsw5oU1kJkxpERIRyMRwX2RsX7D1+epw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782715749; c=relaxed/simple;
-	bh=sa5jvNVafJPt6apw/2HzJC3Igb/gL8z9hN+vvZmlR30=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IHBHZr5W4/YeyyXA/Q+DLt6b3dP/PzoPPBrxkZz5M7uCs5GE1S2JXLM50VTjtY37daYb7nuGXJylr3FoHtKj8T0MzpBwr61Yb5SUZ68ceLaG27TR+Nt8H0/yeiUxlP1ZWE/EXu/2nIu/LDVGnrmV6KGBGpYnRAsqzN8yOCEOc4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=Bjv5on17; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65T6lLHl93483096, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1782715642;
-	bh=RvaBxJEVqPHiI4pLcndKc5kkSE6m2nvpyDHPI2Rjof8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=Bjv5on17j7nKUO3S9dC9DfAAVCO6grDwG7cxjNH7vBbaIh+TN5paWvTI/KM/MSiOe
-	 WMbxR7sgNeefJsAt2Ow+uVmQ9j+F8sW3ryPYNfT3NTb79/FpXM0nGJHiSb5/5ox6V5
-	 z1f2XgxUIvMuLFFxNdmf727hvq1t7EFA8VBZ6DiO1aShjLUOQSfGsU8V8vv49lbwp3
-	 ldjKckmV6kijwjwgIRAzoj3ccqaDKngB5IHy+Pi/1/sAvjNPQlBZznHF8cp+Su9Cvn
-	 ZRRM/3BDD00x09RuxylvR3xSoG+lrEUDcr25Ez9Ff+fyj5Ym440v5zh3FYetJrMVWV
-	 fYR2Ii44FWOsQ==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65T6lLHl93483096
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 29 Jun 2026 14:47:21 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 29 Jun 2026 14:47:21 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Mon, 29 Jun 2026 14:47:21 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <freddy_gu@realsil.com.cn>, <nb@tipi-net.de>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, <nic_swsd@realtek.com>,
-	Javen Xu <javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v7 4/4] net: phy: realtek: load firmware for RTL8261C_CG
-Date: Mon, 29 Jun 2026 14:47:18 +0800
-Message-ID: <20260629064718.1349-5-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260629064718.1349-1-javen_xu@realsil.com.cn>
-References: <20260629064718.1349-1-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1782716708; c=relaxed/simple;
+	bh=S1hzlPC8gANr8aZdGiGeYuKVTflE4DxyuYbmc5JiOPA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HPjDuOr5n0qxsSsxinBJVGkKXmwb+BhhDoGKmJnUlPJQLm0FJD67tjeTaEgcAku1hFq8Pyz7eS96oO1Ym269iDuNLtMzzojT6A95o3dxUs/sDzKaMDEO0CnTy+j3mQ8pvez4EsRdNlL0+uKfJvtSnvckZekBDevtqB+UkLgEEp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=of/X3b2p; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 25924C5145C;
+	Mon, 29 Jun 2026 07:05:13 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2419A5FF96;
+	Mon, 29 Jun 2026 07:05:03 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8AF9B106F14DB;
+	Mon, 29 Jun 2026 09:04:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782716701; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=1rsMIqeUo7w/8HQ084SMthYLAbPCuimMFz6Hr3QOyaE=;
+	b=of/X3b2pqHw09oeoNd1OvSXDh4fwfA+/kKLRQreFdmzEqIgfhOA1Qr/ndrgAS+GDHD1foq
+	YVUwy2UDChvK8VCKa8bl8WHPu/RGbgHx65vTU8qf5QhD+0SjO+EkaJQD+PiMQRKealgon9
+	TuDtgKRkFFgrshWTzAVAX0UEKPDekcNslGvvWEwSaHcY0QSWF9ruFjP5u+SRAQ0XeASqZc
+	cYPYWionzUmVuXiJgbsoK9MfyrKHSIylnjEV4Hxv2eg1bnCcvScdtVZk2m50nfz7Mpw8Ir
+	N/mi42ewOEIx03TM2HzKhOkVMoYeeWZgwbOT1qao8LyiML3z7WV7A+3DF6KRQw==
+Message-ID: <178defc6-8e60-4b0b-b3b0-f0f2a4003b68@bootlin.com>
+Date: Mon, 29 Jun 2026 09:04:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v8 03/12] net: phylink: add
+ phylink_release_pcs() to externally release a PCS
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Saravana Kannan <saravanak@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Nathan Chancellor
+ <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ llvm@lists.linux.dev
+References: <20260618125752.1223-1-ansuelsmth@gmail.com>
+ <20260618125752.1223-4-ansuelsmth@gmail.com>
+ <a271385e-302d-45c7-a1df-aebd380b427b@bootlin.com>
+ <6a3fc312.6161eb1e.3441bb.c0de@mx.google.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <6a3fc312.6161eb1e.3441bb.c0de@mx.google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302474-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302472-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:nic_swsd@realtek.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,lkml];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 455596D6846
+X-Rspamd-Queue-Id: 2D2746D6F50
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+Hi Christian,
 
-This patch adds support for loading firmware. Download some parameters
-for RTL8261C_CG.
+On 6/27/26 14:33, Christian Marangi wrote:
+> On Thu, Jun 25, 2026 at 04:13:14PM +0200, Maxime Chevallier wrote:
+>> Hello Christian,
+>>
+>> On 6/18/26 14:57, Christian Marangi wrote:
+>>> Add phylink_release_pcs() to externally release a PCS from a phylink
+>>> instance. This can be used to handle case when a single PCS needs to be
+>>> removed and the phylink instance needs to be refreshed.
+>>>
+>>> On calling phylink_release_pcs(), the PCS will be removed from the
+>>> phylink internal PCS list and the phylink supported_interfaces value is
+>>> reparsed with the remaining PCS interfaces.
+>>>
+>>> Also a phylink resolve is triggered to handle the PCS removal.
+>>>
+>>> The flag force_major_config is set to make phylink resolve reconfigure
+>>> the interface (even if it didn't change).
+>>> This is needed to handle the special case when the current PCS used
+>>> by phylink is removed and a major_config is needed to propagae the
+>>> configuration change. With this option enabled we also force mac_config
+>>> even if the PHY link is not up for the in-band case.
+>>>
+>>> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+>>> ---
+>>>  drivers/net/phy/phylink.c | 56 +++++++++++++++++++++++++++++++++++++++
+>>>  include/linux/phylink.h   |  2 ++
+>>>  2 files changed, 58 insertions(+)
+>>>
+>>> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+>>> index c38bcd43b8c8..064d6f5a06da 100644
+>>> --- a/drivers/net/phy/phylink.c
+>>> +++ b/drivers/net/phy/phylink.c
+>>> @@ -158,6 +158,8 @@ static const phy_interface_t phylink_sfp_interface_preference[] = {
+>>>  static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
+>>>  
+>>>  static void phylink_run_resolve(struct phylink *pl);
+>>> +static void phylink_link_down(struct phylink *pl);
+>>> +static void phylink_pcs_disable(struct phylink_pcs *pcs);
+>>>  
+>>>  /**
+>>>   * phylink_set_port_modes() - set the port type modes in the ethtool mask
+>>> @@ -918,6 +920,60 @@ static void phylink_resolve_an_pause(struct phylink_link_state *state)
+>>>  	}
+>>>  }
+>>>  
+>>> +/**
+>>> + * phylink_release_pcs - Removes a PCS from the phylink PCS available list
+>>> + * @pcs: a pointer to the phylink_pcs struct to be released
+>>> + *
+>>> + * This function release a PCS from the phylink PCS available list if
+>>> + * actually in use. It also refreshes the supported interfaces of the
+>>> + * phylink instance by copying the supported interfaces from the phylink
+>>> + * conf and merging the supported interfaces of the remaining available PCS
+>>> + * in the list and trigger a resolve.
+>>> + */
+>>> +void phylink_release_pcs(struct phylink_pcs *pcs)
+>>> +{
+>>> +	struct phylink *pl;
+>>> +
+>>> +	ASSERT_RTNL();
+>>> +
+>>> +	pl = pcs->phylink;
+>>> +	if (!pl)
+>>> +		return;
+>>> +
+>>> +	mutex_lock(&pl->state_mutex);
+>>> +
+>>> +	list_del(&pcs->list);
+>>> +	pcs->phylink = NULL;
+>>> +
+>>> +	/*
+>>> +	 * Check if we are removing the PCS currently
+>>> +	 * in use by phylink. If this is the case, tear down
+>>> +	 * the link, force phylink resolve to reconfigure the
+>>> +	 * interface mode, disable the current PCS and set the
+>>> +	 * phylink PCS to NULL.
+>>> +	 */
+>>> +	if (pl->pcs == pcs) {
+>>> +		phylink_link_down(pl);
+>>> +		phylink_pcs_disable(pl->pcs);
+>>> +
+>>> +		pl->force_major_config = true;
+>>> +		pl->pcs = NULL;
+>>> +	}
+>>> +
+>>> +	mutex_unlock(&pl->state_mutex);
+>>> +
+>>> +	/* Refresh supported interfaces */
+>>> +	phy_interface_copy(pl->supported_interfaces,
+>>> +			   pl->config->supported_interfaces);
+>>> +	list_for_each_entry(pcs, &pl->pcs_list, list)
+>>> +		phy_interface_or(pl->supported_interfaces,
+>>> +				 pl->supported_interfaces,
+>>> +				 pcs->supported_interfaces);
+>>
+>> I've given more thought to that 'supported_interfaces' thing. This
+>> patchset redefines the meaning of
+>>
+>>   pl->config->supported_interfaces
+>>
+>> Currently, it's filled by the MAC driver and means "Every interface
+>> we can support, including the ones provided by PCSs that we can use
+>> with this MAC".
+>>
+>> It now becomes "Every interface we support without needing a PCS", at
+>> least the way I understand that.
+>>
+> 
+> Wait but with the current code using the OR logic, it still follows
+> "Every interface we can support...". The modes that needs a PCS are
+> specificed with the pcs_interfaces mask in phylink_config.
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
-Changes in v2:
- - remove __pack, struct rtl8261x_fw_header and rtl8261x_fw_entry will not pad
- - reverse xmas tree for some definition
- - add explanation on rtl_phy_write_mmd_bits()
+you current code is correct, I was mostly concerned about the doc
+that goes along with it :)
 
-Changes in v3:
- - add struct rtl8261x_priv
+So in the end, we'd have something like (simplified):
 
-Changes in v4:
- - add struct device *dev
+pl->config.supported_interfaces = RGMII_xx | SGMII | 1000BaseX
+pl->config.pcs_interfaces = SGMII | 1000BaseX
 
-Changes in v5:
- - no changes
+pcs->supported_interface = SGMII| 1000BaseX
 
-Changes in v6:
- - replace rtl_phy_write_mmd_bits with phy_modify_mmd, keep mdio lock
- - check msb and lsb at the beginning of rtl8261x_fw_execute_entry()
- - add comments on rtl8261x_config_init()
+correct ?
 
-Changes in v7:
- - no changes
----
- drivers/net/phy/realtek/realtek_main.c | 220 +++++++++++++++++++++++++
- 1 file changed, 220 insertions(+)
+> 
+> The late add and release operates on the phylink supported_interfaces ONLY
+> when the MAC didn't specify support for it (by removing it as only the PCS
+> will declare support for it)
+> 
+> The confusion is present because everything is validated later on
+> major_config so those supported_interfaces are just an HINT that are later
+> verified with get_caps and with the pcs_validate OPs.
+> 
+> Adding the supported_interfaces to phylink is really to keep an original
+> reference of the value. This is to address a pattern I have notice where
+> the MAC driver always OR the interfaces with the one supported by the PCS.
+> (I remember it was pointed out by Russell)
+> 
+> But I'm more than open to discussion as this is something marginal to the
+> whole implementation, I'm also questioning if this OR is actually useful to
+> anything on the nth tought on this.
+> 
+> One thing that I notice is that parsing this early with AND might be
+> problematic at phylink_create, but I still have to evaluate that.
+> 
+> My take is that would be good to have some review also on the other logic
+> as I think I reached a point where Sashiko starts to comments on more or
+> less unreal problem.
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index ef3700894ebf..bf7bc19fb44c 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -8,7 +8,9 @@
-  * Copyright (c) 2004 Freescale Semiconductor, Inc.
-  */
- #include <linux/bitops.h>
-+#include <linux/crc32.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/firmware.h>
- #include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/pm_wakeirq.h>
-@@ -281,6 +283,42 @@
- 					 RTL8261X_INT_ALDPS_CHG | \
- 					 RTL8261X_INT_JABBER)
- 
-+#define FW_MAIN_MAGIC			0x52544C38
-+#define FW_SUB_MAGIC_8261C		0x32363143
-+#define RTL8261X_POLL_TIMEOUT_MS	100
-+
-+#define RTL8261C_CE_FW_NAME	"rtl_nic/rtl8261c.bin"
-+MODULE_FIRMWARE(RTL8261C_CE_FW_NAME);
-+
-+enum rtl8261x_fw_op {
-+	OP_WRITE = 0x00,	/* Write */
-+	OP_POLL  = 0x02,	/* Polling */
-+};
-+
-+struct rtl8261x_fw_header {
-+	__le32 main_magic;	/* Main magic number 0x52544C38 ("RTL8") */
-+	__le32 sub_magic;	/* Sub magic number */
-+	__le16 version_major;	/* Major version */
-+	__le16 version_minor;	/* Minor version */
-+	__le16 num_entries;	/* Number of entries */
-+	__le16 reserved;	/* Reserved */
-+	__le32 crc32;		/* CRC32 checksum */
-+};
-+
-+struct rtl8261x_fw_entry {
-+	__u8  type;		/* Operation type (OP_*) */
-+	__u8  dev;		/* MMD device */
-+	__le16 addr;		/* Register address */
-+	__u8  msb;		/* MSB bit position */
-+	__u8  lsb;		/* LSB bit position */
-+	__le16 value;		/* Value to write/compare */
-+	__le16 timeout_ms;	/* Poll timeout in milliseconds */
-+	__u8  poll_set;		/* Poll for set (1) or clear (0) */
-+	__u8  reserved;		/* Reserved */
-+};
-+
-+#define FW_HEADER_SIZE		sizeof(struct rtl8261x_fw_header)
-+#define FW_ENTRY_SIZE		sizeof(struct rtl8261x_fw_entry)
- 
- /* RTL8211E and RTL8211F support up to three LEDs */
- #define RTL8211x_LED_COUNT			3
-@@ -300,6 +338,11 @@ struct rtl821x_priv {
- 	u16 iner;
- };
- 
-+struct rtl8261x_priv {
-+	const char *fw_name;
-+	bool fw_loaded;
-+};
-+
- static int rtl821x_read_page(struct phy_device *phydev)
- {
- 	return __phy_read(phydev, RTL821x_PAGE_SELECT);
-@@ -342,8 +385,16 @@ static int rtl821x_modify_ext_page(struct phy_device *phydev, u16 ext_page,
- 
- static int rtl8261x_probe(struct phy_device *phydev)
- {
-+	struct device *dev = &phydev->mdio.dev;
-+	struct rtl8261x_priv *priv;
- 	int sub_phy_id, ret;
- 
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
- 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_ADDR_REG,
- 			    RTL_8261X_SUB_PHY_ID_ADDR);
- 	if (ret < 0)
-@@ -357,6 +408,7 @@ static int rtl8261x_probe(struct phy_device *phydev)
- 
- 	switch (sub_phy_id) {
- 	case RTL8261C_CE_MODEL:
-+		priv->fw_name = RTL8261C_CE_FW_NAME;
- 		phydev_info(phydev, "RTL8261C detected (sub_id 0x%02x)\n", sub_phy_id);
- 		break;
- 
-@@ -407,6 +459,153 @@ static int rtl8261x_read_status(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8261x_verify_firmware(struct phy_device *phydev, const struct firmware *fw)
-+{
-+	const struct rtl8261x_fw_header *hdr;
-+	u32 main_magic, sub_magic;
-+	u32 calc_crc, file_crc;
-+	size_t data_len;
-+	u16 num_entries;
-+
-+	if (fw->size < FW_HEADER_SIZE) {
-+		phydev_err(phydev, "Firmware too small: %zu bytes\n", fw->size);
-+		return -EINVAL;
-+	}
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	main_magic = le32_to_cpu(hdr->main_magic);
-+	if (main_magic != FW_MAIN_MAGIC) {
-+		phydev_err(phydev, "Invalid firmware magic: 0x%08x\n", main_magic);
-+		return -EINVAL;
-+	}
-+
-+	sub_magic = le32_to_cpu(hdr->sub_magic);
-+	if (sub_magic != FW_SUB_MAGIC_8261C) {
-+		phydev_err(phydev, "Invalid sub magic: 0x%08x\n", sub_magic);
-+		return -EINVAL;
-+	}
-+
-+	num_entries = le16_to_cpu(hdr->num_entries);
-+	data_len = num_entries * FW_ENTRY_SIZE;
-+
-+	if (fw->size != sizeof(*hdr) + data_len) {
-+		phydev_err(phydev, "Firmware size mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	calc_crc = crc32(~0, fw->data + FW_HEADER_SIZE, data_len) ^ ~0;
-+	file_crc = le32_to_cpu(hdr->crc32);
-+
-+	if (calc_crc != file_crc) {
-+		phydev_err(phydev, "CRC32 mismatch: calculated=0x%08x file=0x%08x\n",
-+			   calc_crc, file_crc);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8261x_fw_execute_entry(struct phy_device *phydev,
-+				     const struct rtl8261x_fw_entry *entry)
-+{
-+	u16 addr, value, timeout_ms;
-+	u8 dev, msb, lsb, poll_set;
-+	u32 bits, expect_val;
-+	int ret = 0;
-+	int val;
-+
-+	dev = entry->dev;
-+	addr = le16_to_cpu(entry->addr);
-+	msb = entry->msb;
-+	lsb = entry->lsb;
-+	value = le16_to_cpu(entry->value);
-+	timeout_ms = le16_to_cpu(entry->timeout_ms);
-+	poll_set = entry->poll_set;
-+
-+	if (timeout_ms == 0)
-+		timeout_ms = RTL8261X_POLL_TIMEOUT_MS;
-+
-+	if (msb > 15 || lsb > msb) {
-+		phydev_err(phydev, "Invalid firmware bits: msb=%d, lsb=%d\n", msb, lsb);
-+		return -EINVAL;
-+	}
-+
-+	switch (entry->type) {
-+	case OP_WRITE:
-+		ret = phy_modify_mmd(phydev, dev, addr,
-+				     GENMASK(msb, lsb), (value << lsb) & GENMASK(msb, lsb));
-+		if (ret) {
-+			phydev_err(phydev, "WRITE failed: dev=%d addr=0x%04x\n", dev, addr);
-+			return ret;
-+		}
-+		break;
-+
-+	case OP_POLL: {
-+		bits = GENMASK(msb, lsb);
-+		expect_val = (value << lsb) & bits;
-+
-+		if (poll_set)
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) == expect_val,
-+							1000, timeout_ms * 1000, false);
-+		else
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) != expect_val,
-+							1000, timeout_ms * 1000, false);
-+		if (ret)
-+			phydev_err(phydev, "POLL timeout: dev=%d addr=0x%04x\n",
-+				   dev, addr);
-+		break;
-+	}
-+	default:
-+		phydev_err(phydev, "Unknown firmware operation: %d\n", entry->type);
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static int rtl8261x_fw_load(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	const struct rtl8261x_fw_entry *entry;
-+	const struct rtl8261x_fw_header *hdr;
-+	const struct firmware *fw;
-+	int ret, i;
-+
-+	if (!priv->fw_name)
-+		return 0;
-+
-+	ret = request_firmware(&fw, priv->fw_name, &phydev->mdio.dev);
-+	if (ret) {
-+		phydev_err(phydev, "Failed to load firmware %s: %d\n", priv->fw_name, ret);
-+		return ret;
-+	}
-+
-+	ret = rtl8261x_verify_firmware(phydev, fw);
-+	if (ret)
-+		goto release_fw;
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	entry = (const struct rtl8261x_fw_entry *)(fw->data + FW_HEADER_SIZE);
-+	for (i = 0; i < le16_to_cpu(hdr->num_entries); i++, entry++) {
-+		ret = rtl8261x_fw_execute_entry(phydev, entry);
-+		if (ret) {
-+			phydev_err(phydev, "Entry %d failed: %d\n", i, ret);
-+			goto release_fw;
-+		}
-+	}
-+
-+	priv->fw_loaded = true;
-+
-+release_fw:
-+	release_firmware(fw);
-+	return ret;
-+}
-+
- static int rtl8261x_config_intr(struct phy_device *phydev)
- {
- 	int ret;
-@@ -484,6 +683,26 @@ static int rtl8261x_config_aneg(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8261x_config_init(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	int ret = 0;
-+
-+	/* The firmware parameters are preserved across IEEE soft resets and
-+	 * suspend/resume cycles. Reloading is only necessary after a power
-+	 * cycle or hard reset.
-+	 */
-+	if (priv->fw_name && !priv->fw_loaded) {
-+		ret = rtl8261x_fw_load(phydev);
-+		if (ret) {
-+			phydev_err(phydev, "Firmware loading failed: %d\n", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return ret;
-+}
-+
- static int rtl821x_probe(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-@@ -3179,6 +3398,7 @@ static struct phy_driver realtek_drvs[] = {
- 		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
- 		.name			= "Realtek RTL8261C 10Gbps PHY",
- 		.probe			= rtl8261x_probe,
-+		.config_init		= rtl8261x_config_init,
- 		.get_features		= rtl8261x_get_features,
- 		.config_aneg		= rtl8261x_config_aneg,
- 		.read_status		= rtl8261x_read_status,
--- 
-2.43.0
+True, TBH all the fwnode part is something I'm a bit less familiar with though
+so maybe someone else can browse through that.
 
+FWIW, I've tested that whole series on a board that has "legacy" PCS board
+that has mvpp2 and 2 possible PCSs, and it seems to work fine so no regressions
+there :)
+
+A side note with the "legacy" naming, I'd rather have it called "built-in" or
+something like that, I don't see a clear path to porting the existing code to
+fwnode without breaking DT compat, as it's likely we'll have to remove the PCS
+register ranges out of the MAC's range. 
+
+Thanks for this work anyway, this is great !
+
+Maxime
 
