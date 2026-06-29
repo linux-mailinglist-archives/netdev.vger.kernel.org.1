@@ -1,360 +1,210 @@
-Return-Path: <netdev+bounces-302825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zeUIKljTQmrZDgoAu9opvQ
-	(envelope-from <netdev+bounces-302825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 22:19:36 +0200
+	id 7WVYKg/fQmokGAoAu9opvQ
+	(envelope-from <netdev+bounces-302826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 23:09:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E08A6DE972
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 22:19:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 415636DECA0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 23:09:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=W9DAQSpt;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=i1bohtN0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302825-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302825-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302826-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302826-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A6F28300D34D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:19:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AD55E300CD9A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CF2388369;
-	Mon, 29 Jun 2026 20:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CC03ACA61;
+	Mon, 29 Jun 2026 21:09:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f80.google.com (mail-oa1-f80.google.com [209.85.160.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE4F38F24C
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 20:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E33133DEF9
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:09:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782764373; cv=none; b=E2stR/6LLaCvhLciIyXPkxGJZTIYPJNq9cAZrPqHzRBMmrNOLE2+7RXeZIRfeOCa2TOExRfTGjJ1tzmAVI/wXx6EZfE5zL8OMOgeW8u31YEASR5V+ns3HwNj7V7mfG6AVribR8E1cJNnnHrzaarvHXFfLYq6tkkBL8Z72bx/nRQ=
+	t=1782767369; cv=none; b=bG3DVYSCa2gLsxYd4luvNdWUIU8wA9IVdEBJv/lJSb3xcl8Ma4TznH6i+/wI+dT3ZOt4daA3lBbUNQXXuq4VAU/Nf3EQAo3Q+WSl2/h6LHOTyXv48Dsy97nFeLcADPveZewaKlUvxCQ5Iq6pFiyteI+THXxrsD++kjIZ02VjVgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782764373; c=relaxed/simple;
-	bh=J2o9siOknjUV1EIyuyIEguI/OuQyvr7osGhO/HaaCVA=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CiMN7n+z6j37FQM2z44QHDdRQC/+JHXm0Nr1XhwCcBpxHNzMbOhhLsaj32U2J7x0I3zqlElEtzMtCI5M9scr6EO6vx8Y4X+AcHOdHWBSgDMNxdHRZQ93TGq/mmOyBrOLsokDpjXE+BcMcSOEkzMulBxvORTABEICgA9b+u8gNSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=W9DAQSpt; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=i1bohtN0; arc=none smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65TJss6O3867324
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 20:19:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	YrPo/wrins9m3aOwmOa8IZ6Og4C3nSZZxKNrdPPXXPk=; b=W9DAQSpt5htlg5z1
-	mpMIs5cdn2PEQ526sAaNI+Alzz5Vg7ayQXmDC2KzMAXaO23KFOafLH2BWGmjIIeu
-	s1hm4cjl8JxdeSDDp8NMk0eYlEWi41/RkIN8v4koFQaZlx1rvA4a4CnabP8fKi89
-	tzDQcyQPj5NWlvRwfUyfLw6aiKl66b41Ad8QRBn635NB9WZnd/kWzkgBDjMHHdB7
-	WuQrp1KchLc06K3xu++1oiD1SQn0SKm9gFO48ZggeVrI+j7Gz7VuCMBVznTByUcb
-	nXto4/m7b3hZmAcp621aja1AEdnttphPGIROCTDfF9TFS+9XlE8KHH+aL8uxf+Ax
-	o/Idvg==
-Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f3y9j02mf-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 20:19:23 +0000 (GMT)
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-30ca3374c6aso10128363eec.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 13:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782764362; x=1783369162; darn=vger.kernel.org;
-        h=content-language:thread-index:content-transfer-encoding
-         :mime-version:message-id:date:subject:in-reply-to:references:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YrPo/wrins9m3aOwmOa8IZ6Og4C3nSZZxKNrdPPXXPk=;
-        b=i1bohtN0ZfaIyfFik+MhMSrLQswafLKPrsc3z3xQ53W0kFG9l9cf0tM2NYftL9ZbP/
-         rL23BzzIvWKn39wRY4hHWiTE9+5OI/xU1Y+GZgvUkjWtfQT8zzicEKViij5a1zUFh4ZV
-         KjskJwevQeSoFqTQ3k1hZb0DqyhRI25IU/e8IKXffKYDDmte0OXbIL8dMCOzMJOTYs7v
-         b175DI+w6RIa4eE5cM2TOODnckJMrA69rp/dgZDT18wTvtc5UU131swQmXD8K/P6Af/J
-         dbAEbibxjmlJMsuWv9qbn+eaW5k1s99sBW9f2GEISJQhW2NPtDmCESl2Lvk/jhep9SWA
-         4U1Q==
+	s=arc-20240116; t=1782767369; c=relaxed/simple;
+	bh=ywK+jmLIUBCAOzSFSMVIKI+bYm9mhJ6yboUEn0dK8YU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qf6fsfcPPV1VOpaVnXv+YkPmwW+y4VaFIeBmUmUOBLMwPzzX55VGiOiW0cQ9JJaiZTWWJLwmpPSgUhfOngt22nybrQ3vskJQ6XzlWXdDW/dwLisnWT9EOGkPYdlkavTxu+1e/ygDhRLDs/73B3duytYihoMLv5vTG/WP5twfCEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.80
+Received: by mail-oa1-f80.google.com with SMTP id 586e51a60fabf-448d51840c4so493320fac.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 14:09:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782764362; x=1783369162;
-        h=content-language:thread-index:content-transfer-encoding
-         :mime-version:message-id:date:subject:in-reply-to:references:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YrPo/wrins9m3aOwmOa8IZ6Og4C3nSZZxKNrdPPXXPk=;
-        b=c1UrEpn/nLJvCZhqSx/X2BSQByxXzdlTEMSrLANBmok47kH1a065CPEVQp7DG3XKjT
-         dqm/npmKajDE6NLQ9IuHnqX43lky09z7bApxWaDPgcG56mNURJZiTt6Cm524x0LeqeBf
-         GOGIA8nAjNjKTaSPkR80tcdLJDYKleMoPUge/4xov+tkYNw9Cq+HuCVG0F5sTQfiFY3z
-         Usd+7oc4DZP9pwrM5MBM2jh7KB0Rp6aIC7ewoZYWppuVXsoFttw0bfqHoz/gl0dDyAbS
-         rxD+aIS0UpdcEsJ49DRh+MeaZeyk4rps9QDDfrmCCmaDjWc3u67kPW1fInHpXtsgQc/t
-         LEYQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqJwo+vSXxhFuASAqqh6JLN4aSEwUnDXgYrQ9rpvRb/E93yZEvPfu4oQNdPLymE7ZM7+FIoj44=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzHnhGD2fdffG7QUoSfV8/txCIfYiVZI10SGC0skLA49ammpX0
-	9RK5DmxenwXioUeG4YIvbNkqNCWeaHyGYiu0T20Y73WleBHw4BeC6IFx7uWvGVbvsQaFu2nScEJ
-	gayOxRgENbjkuCbij4+9+li5l1yR/D3ewLQGH0iWhVyM6xPrwq6M46hRfCpU=
-X-Gm-Gg: AfdE7cnOIeVjUfAnULqvSsqiFxtNGcsCOuFse3q4BiSuPw1TKOvaeQCG6G5irClSna1
-	GQz/Zn8zXpFWvT5V3BqwzWL3D8pYLOPoByu0p1TuthvBvXuFZKWQoZ8Hus+LiMxtC4TqLNg69ci
-	6z8AEifMnIdeqrWX5zqKMAcZ7x6UjMrWIM2GSaKmC5lxsQfwRmtVxQ7f/kh0F7KHwUAvrqTwHeF
-	JcBLmaezZhsy1CXsi+HvvrCSnNz3rYKeIclqxr9FHuyrvt/CpZFFMegENraHoGKII4Zp+ELzbdQ
-	tI995yMZbNhOYpFihrD6tXVn+tNJrC3YaXu+bbFAuPYJ2jJCChrTE9KH9Wo6c7zzbIakDhE2YAq
-	UFMqS5+546dZXMOAJgwGWJ5vtXZ21/F4wzFx7Rg5ay8LKuwtT8QliT+dbkH3gEpVMcQfWIi4LvC
-	scCpS7FGA=
-X-Received: by 2002:a05:7300:6ca0:b0:30c:9f31:b604 with SMTP id 5a478bee46e88-30ee13852c7mr605267eec.25.1782764362198;
-        Mon, 29 Jun 2026 13:19:22 -0700 (PDT)
-X-Received: by 2002:a05:7300:6ca0:b0:30c:9f31:b604 with SMTP id 5a478bee46e88-30ee13852c7mr605238eec.25.1782764361328;
-        Mon, 29 Jun 2026 13:19:21 -0700 (PDT)
-Received: from QCOMk1gASIiYhG (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30ee2ffdbfesm651643eec.11.2026.06.29.13.19.20
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Jun 2026 13:19:21 -0700 (PDT)
-From: <subash.a.kasiviswanathan@oss.qualcomm.com>
-To: "'Xiang Mei'" <xmei5@asu.edu>, <sean.tranchetti@oss.qualcomm.com>,
-        <netdev@vger.kernel.org>
-Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <bestswngs@gmail.com>
-References: <20260628075205.62280-1-xmei5@asu.edu>
-In-Reply-To: <20260628075205.62280-1-xmei5@asu.edu>
-Subject: RE: [PATCH net] net: qualcomm: rmnet: validate MAP frame length before ingress parsing
-Date: Mon, 29 Jun 2026 14:19:19 -0600
-Message-ID: <000601dd0804$91cbd910$b5638b30$@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1782767367; x=1783372167;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gaZr34ys5Ki64CCh0X0YqV0Wo6Hd8GclX02Ssf8CR9g=;
+        b=JTnFCmvG3+NQcDjWe0zXFhdkwLUlmR/9mNwH8svlfj6aTX236LM1do/PFbbXOSSJhJ
+         msZSjDtNfROlgm4Xf5qXuLoO3UzWRex75AcChgKiGEH/zjxbtXXmehq/syfJSswjGYq3
+         lZ2SvGl4oPDW6e7+os7R9jbHExobGiuCF+okAUbftlxQtRQDfeSSX3AkzRcZXgclvBXh
+         jPloKJbAvFhXfTzx/ElLS/E2Ncm5lSSsMWaqFH2xzeDgSUGGpVYwNrMS8pH9/5JGMXcJ
+         BevQLYF3kqQ33wdYmXxzVqqNuK7w3yDUIZbk4jmLK+/0VWHDdeKa6cJiR4H7Dl6r5PfS
+         jFNA==
+X-Forwarded-Encrypted: i=1; AFNElJ8n6Z7Ieagyv6Gt9B0J4zmBmss75IeK4qc4CFUYZ61Tlf50haX/PCgutHm5Nha4tXgbX99/gZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7jMj+Ql1QCSctHcJsELE7EZjONeKQfHLrGvwRO/p4O6mdAWly
+	ieZjiRGmCMa9bCmkaiFGS+sQX7BFTSGCs0z6qiZdKrFdE7LLyYmhvXgKHOM+Ir4nk97HGTQxFeX
+	YL7ulv38KZdwLuCSDFcYtWK0sFehZt+E8QufliwGvmTTpdf9dDCqcLwOyKA8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHQ7aP9pGM6mVEWYd59aeRp0a7HYLZuKwKQ
-Content-Language: en-us
-X-Proofpoint-ORIG-GUID: g0rm_M2f35cNsvr-ZJtLBtKd2poosgzB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI5MDE3MSBTYWx0ZWRfX08mF9aG0cDGg
- dt1vEOuY5a8j2ZqvmKJ/SA/+HytTjuZq30DlJSbLKNA0AYMb2xsS5lzJ2Yf8UdSFPiOW1xyCM/k
- E1KeuJtNnekAnjfpOLmuXBLbjSVtLaZHf5suJjWDiCyaf/7KkWHvwSUzw/fxdpM8lmqUnzcgDo2
- WVmr6sPyztXTdgmRAhp//hU6jR09sYcM3XA0nMiFuZjEKsu/VQ9Gf+uqUYFYNDBcmAK5YeKRtib
- ZHn1dz5Z7bRZ7exFsQkGZ57XY5y8fSmKvsLPKbn0Q6e7K7qB4zAvUvOXhWENUyuAxDQz5hFNI1u
- 8oFZg21fBS7at5TELO9S7aSmwKEuvxwyQ22djieWQiQ54ZUOHIgNA3JnVkA5/ZSRBPkEsX1CgE2
- sFqolGCnl0PCTHvmRU77wEbdrD/wIDlgJbwWspnREfbYEahyFBsnMD+b0+A9ATs8Y9iTX1BYEAL
- ijPYT+fxRC2bqHS6GLg==
-X-Proofpoint-GUID: g0rm_M2f35cNsvr-ZJtLBtKd2poosgzB
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI5MDE3MSBTYWx0ZWRfXzA6Jfx8uWAEV
- aCnHPhuSfV7syqNqs76iGiXo6N1h5f6dH7z1cr/t4KGkFtrOTy7DcK6tm9h4ypZTyG5PbBIZk8G
- rmGsnKtxR77K6wGbu2hsw+1xXE+EG14=
-X-Authority-Analysis: v=2.4 cv=SINykuvH c=1 sm=1 tr=0 ts=6a42d34b cx=c_pps
- a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
- a=vR_vMVs8yzpaFJNcJ2gA:9 a=CjuIK1q_8ugA:10 a=bBxd6f-gb0O0v-kibOvt:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-29_04,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 malwarescore=0 priorityscore=1501 spamscore=0 phishscore=0
- clxscore=1011 bulkscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606290171
+X-Received: by 2002:a05:6808:5296:b0:491:bee4:d722 with SMTP id
+ 5614622812f47-495eaf639a5mr851332b6e.23.1782767367604; Mon, 29 Jun 2026
+ 14:09:27 -0700 (PDT)
+Date: Mon, 29 Jun 2026 14:09:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a42df07.854d4ab9.360e1d.000d.GAE@google.com>
+Subject: [syzbot] [usb?] KASAN: slab-use-after-free Read in uea_upload_pre_firmware
+From: syzbot <syzbot+3d45d763d18796f97412@syzkaller.appspotmail.com>
+To: 3chas3@gmail.com, castet.matthieu@free.fr, gregkh@linuxfoundation.org, 
+	linux-atm-general@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org, stf_xl@wp.pl, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2bb8183b2d472f18];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302825-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,asu.edu:email];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:sean.tranchetti@oss.qualcomm.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[subash.a.kasiviswanathan@oss.qualcomm.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[subash.a.kasiviswanathan@oss.qualcomm.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_FROM(0.00)[bounces-302826-lists,netdev=lfdr.de,3d45d763d18796f97412];
+	FORGED_RECIPIENTS(0.00)[m:3chas3@gmail.com,m:castet.matthieu@free.fr,m:gregkh@linuxfoundation.org,m:linux-atm-general@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:stf_xl@wp.pl,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,free.fr,linuxfoundation.org,lists.sourceforge.net,vger.kernel.org,wp.pl,googlegroups.com];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,vger.kernel.org:from_smtp,goo.gl:url,storage.googleapis.com:url,syzkaller.appspotmail.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,appspotmail.com:email];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3E08A6DE972
+X-Rspamd-Queue-Id: 415636DECA0
 
-> -----Original Message-----
-> From: Xiang Mei <xmei5@asu.edu>
-> Each guard uses pskb_may_pull() before its read. The MAPv4 check uses
-> ntohs(pkt_len) (== payload + pad) directly rather than the derived len, so
-it is
-> unaffected by the u16 underflow in len when pad > pkt_len. Well-formed
-> frames always carry the header/trailer they declare, so only malformed
-> packets are dropped; this mirrors the length check rmnet_map_deaggregate()
-> already performs on the deaggregation path.
-> 
-> @@ -61,6 +61,9 @@ __rmnet_map_ingress_handler(struct sk_buff *skb,
->  	u16 len, pad;
->  	u8 mux_id;
-> 
-> +	if (!pskb_may_pull(skb, sizeof(*map_header)))
-> +		goto free_skb;
-> +
->  	if (map_header->flags & MAP_CMD_FLAG) {
->  		/* Packet contains a MAP command (not data) */
->  		if (port->data_format &
-> RMNET_FLAGS_INGRESS_MAP_COMMANDS) @@ -84,11 +87,19 @@
-> __rmnet_map_ingress_handler(struct sk_buff *skb,
-> 
->  	if ((port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV5)
-> &&
->  	    (map_header->flags & MAP_NEXT_HEADER_FLAG)) {
-> +		if (!pskb_may_pull(skb, sizeof(*map_header) +
-> +				   sizeof(struct
-> rmnet_map_v5_csum_header)))
-> +			goto free_skb;
->  		if (rmnet_map_process_next_hdr_packet(skb, len))
->  			goto free_skb;
->  		skb_pull(skb, sizeof(*map_header));
->  		rmnet_set_skb_proto(skb);
->  	} else {
-> +		if (port->data_format &
-> RMNET_FLAGS_INGRESS_MAP_CKSUMV4 &&
-> +		    !pskb_may_pull(skb, sizeof(*map_header) +
-> +				   ntohs(map_header->pkt_len) +
-> +				   sizeof(struct
-rmnet_map_dl_csum_trailer)))
-> +			goto free_skb;
->  		/* Subtract MAP header */
->  		skb_pull(skb, sizeof(*map_header));
->  		rmnet_set_skb_proto(skb);
-> --
-> 2.43.0
+Hello,
 
-The patch seems fine at a high level. However, it ends up adding duplicate
-checks for the deagg path which is the commonly used path.
-Perhaps you can try something similar to the following which adds all the
-relevant checks of the deagg path to the no agg path as well.
+syzbot found the following issue on:
 
-diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-b/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-index 9f3479500f85..086874b673c6 100644
---- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-+++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-@@ -126,7 +126,8 @@ rmnet_map_ingress_handler(struct sk_buff *skb,
- 
-                consume_skb(skb);
-        } else {
--               __rmnet_map_ingress_handler(skb, port);
-+               if (rmnet_map_validate_packet_len(skb, port))
-+                       __rmnet_map_ingress_handler(skb, port);
-        }
- }
- 
-diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
-b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
-index b70284095568..46495b7966f3 100644
---- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
-+++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
-@@ -59,5 +59,7 @@ void rmnet_map_tx_aggregate_init(struct rmnet_port *port);
- void rmnet_map_tx_aggregate_exit(struct rmnet_port *port);
- void rmnet_map_update_ul_agg_config(struct rmnet_port *port, u32 size,
-                                    u32 count, u32 time);
-+u32 rmnet_map_validate_packet_len(struct sk_buff *skb,
-+                                 struct rmnet_port *port);
- 
- #endif /* _RMNET_MAP_H_ */
-diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-index 8b4640c5d61e..1729b73249f7 100644
---- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-+++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-@@ -333,24 +333,16 @@ struct rmnet_map_header
-*rmnet_map_add_map_header(struct sk_buff *skb,
-        return map_header;
- }
- 
--/* Deaggregates a single packet
-- * A whole new buffer is allocated for each portion of an aggregated frame.
-- * Caller should keep calling deaggregate() on the source skb until 0 is
-- * returned, indicating that there are no more packets to deaggregate.
-Caller
-- * is responsible for freeing the original skb.
-- */
--struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
--                                     struct rmnet_port *port)
--{
-+u32 rmnet_map_validate_packet_len(struct sk_buff *skb,
-+                                 struct rmnet_port *port) {
-        struct rmnet_map_v5_csum_header *next_hdr = NULL;
-        struct rmnet_map_header *maph;
-        void *data = skb->data;
--       struct sk_buff *skbn;
-        u8 nexthdr_type;
-        u32 packet_len;
- 
-        if (skb->len == 0)
--               return NULL;
-+               goto err1;
- 
-        maph = (struct rmnet_map_header *)skb->data;
-        packet_len = ntohs(maph->pkt_len) + sizeof(*maph);
-@@ -364,24 +356,48 @@ struct sk_buff *rmnet_map_deaggregate(struct sk_buff
-*skb,
-                                next_hdr = data + sizeof(*maph);
-                        else
-                                /* Mapv5 data pkt without csum hdr is
-invalid */
--                               return NULL;
-+                               goto err1;
-                }
-        }
- 
-        if (((int)skb->len - (int)packet_len) < 0)
--               return NULL;
-+               goto err1;
- 
-        /* Some hardware can send us empty frames. Catch them */
-        if (!maph->pkt_len)
--               return NULL;
-+               goto err1;
- 
-        if (next_hdr) {
-                nexthdr_type = u8_get_bits(next_hdr->header_info,
-                                           MAPV5_HDRINFO_HDR_TYPE_FMASK);
-                if (nexthdr_type != RMNET_MAP_HEADER_TYPE_CSUM_OFFLOAD)
--                       return NULL;
-+                       goto err1;
-        }
- 
-+       goto err0;
-+
-+err1:
-+       packet_len = 0;
-+err0:
-+       return packet_len;
-+}
-+
-+/* Deaggregates a single packet
-+ * A whole new buffer is allocated for each portion of an aggregated frame.
-+ * Caller should keep calling deaggregate() on the source skb until 0 is
-+ * returned, indicating that there are no more packets to deaggregate.
-Caller
-+ * is responsible for freeing the original skb.
-+ */
-+struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
-+                                     struct rmnet_port *port)
-+{
-+       struct sk_buff *skbn;
-+       u32 packet_len;
-+
-+       packet_len = rmnet_map_validate_packet_len(skb, port);
-+       if (!packet_len)
-+               return NULL;
-+
-        skbn = alloc_skb(packet_len + RMNET_MAP_DEAGGR_SPACING, GFP_ATOMIC);
-        if (!skbn)
-                return NULL;
+HEAD commit:    3d5670d672ae Add linux-next specific files for 20260626
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b76dfe580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2bb8183b2d472f18
+dashboard link: https://syzkaller.appspot.com/bug?extid=3d45d763d18796f97412
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15fa0e1c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13519391580000
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a96151aa0055/disk-3d5670d6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cdb70a1a6c6c/vmlinux-3d5670d6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3ffb9df12cc1/bzImage-3d5670d6.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3d45d763d18796f97412@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in __intf_to_usbdev include/linux/usb.h:752 [inline]
+BUG: KASAN: slab-use-after-free in uea_upload_pre_firmware+0x8d/0x640 drivers/usb/atm/ueagle-atm.c:598
+Read of size 8 at addr ffff88802b0710b8 by task kworker/0:2/1664
+
+CPU: 0 UID: 0 PID: 1664 Comm: kworker/0:2 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+Workqueue: events request_firmware_work_func
+
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ __intf_to_usbdev include/linux/usb.h:752 [inline]
+ uea_upload_pre_firmware+0x8d/0x640 drivers/usb/atm/ueagle-atm.c:598
+ request_firmware_work_func+0xf7/0x2d0 drivers/base/firmware_loader/main.c:1164
+ process_one_work+0x93a/0x12b0 kernel/workqueue.c:3326
+ process_scheduled_works kernel/workqueue.c:3409 [inline]
+ worker_thread+0xb05/0x10d0 kernel/workqueue.c:3490
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 5937:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x3d2/0x6b0 mm/slub.c:5515
+ _kmalloc_noprof include/linux/slab.h:969 [inline]
+ _kzalloc_noprof include/linux/slab.h:1290 [inline]
+ usb_set_configuration+0x3cc/0x2180 drivers/usb/core/message.c:2096
+ usb_generic_driver_probe+0x8d/0x150 drivers/usb/core/generic.c:250
+ usb_probe_device+0x1c3/0x3b0 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x254/0xae0 drivers/base/dd.c:706
+ __driver_probe_device+0x1e8/0x360 drivers/base/dd.c:868
+ driver_probe_device+0x4f/0x240 drivers/base/dd.c:898
+ __device_attach_driver+0x270/0x410 drivers/base/dd.c:1026
+ bus_for_each_drv+0x25b/0x2f0 drivers/base/bus.c:500
+ __device_attach+0x2c7/0x450 drivers/base/dd.c:1098
+ device_initial_probe+0xa1/0xd0 drivers/base/dd.c:1153
+ bus_probe_device+0x12d/0x220 drivers/base/bus.c:620
+ device_add+0x7d7/0xb80 drivers/base/core.c:3772
+ usb_new_device+0x98d/0x1610 drivers/usb/core/hub.c:2695
+ hub_port_connect drivers/usb/core/hub.c:5567 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
+ port_event drivers/usb/core/hub.c:5871 [inline]
+ hub_event+0x28cf/0x4cf0 drivers/usb/core/hub.c:5953
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
