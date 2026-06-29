@@ -1,432 +1,240 @@
-Return-Path: <netdev+bounces-302755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HMJCO3uuQmqd/gkAu9opvQ
-	(envelope-from <netdev+bounces-302755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:42:19 +0200
+	id Lw/ZGO6uQmqq/gkAu9opvQ
+	(envelope-from <netdev+bounces-302756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:44:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00FE56DDD5D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:42:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B6E06DDD7E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:44:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=HDICKZ50;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302755-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302755-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=VSxyeUn9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302756-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302756-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7ED143022C33
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:29:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5291030872E9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A9947A0B6;
-	Mon, 29 Jun 2026 17:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1745644B663;
+	Mon, 29 Jun 2026 17:29:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3753F47278B
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 17:27:31 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782754052; cv=none; b=nRVfAB+2pyD7voKx8aWC4/J1bcXlrER0drAj4t//yPmt8ZyyFBjVk9fsGbbtP8/taqmeoOPY2Ro19ymEr1n7lo2WSBRyQylgnAFrrxCXdaL9vymGHJcdDALPbnLwOASJqC4sjRSPnHXXV2B4vEZw73fZa4UqPbm8LPlzSE4RsCk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782754052; c=relaxed/simple;
-	bh=BJeyjpSrE3nFrrnXnTELicRfP0xiuDtfrJZGnuaoXQs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mnq7FQir/MecboZsNds1ctycqeGH1oUZuLqhPSkbifZ/12sl9JlIaDdPTX8yIGEVbzV3gdo0g1+4ZCIDXtPdZWIC+nrNWCwVaXnIWOg56uo2u8hNIG69Oax2ek1Fmd26Mi0SIYRNtcXMhwG74frft0BWq4Et11ui8h1DwyYjPCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HDICKZ50; arc=none smtp.client-ip=209.85.210.180
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-846970f0acaso1263796b3a.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 10:27:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782754050; x=1783358850; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SfTqAPF2z3x4FKe96v+KSKZ7cZLPBUPyaVvC2qekN80=;
-        b=HDICKZ50/BAkrs1cqwcM9agHV5LJ9XOP0MduaiNTH+CSH11Yk2YzPAjAkcv1c2zfDd
-         gTFbrClZUivkNpJIRgvxGuCWdGHhLeNrEUQNIT5atUTQd1NvXm4F8UoXmZ5ntcSGY4xI
-         YpRq3hNyy++bIwvPwJP0PzQNxmfsPXYj7h5oOMq1j8pN6lRfbz/+HVME97+wpQ0GGNVe
-         hK5QRNOYmDmjOGNOJMk/YajAbhOMmDcSRd7xXVTnbtK56nDZK+Xv05geXoWp1lRSmxcQ
-         Lw2mLMxbYARkcA5buG6+rkvVSk+YVU2JBHXj5W3w8JA+OmR9mgIsEkiK5OuBQIZM104Z
-         mydg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782754050; x=1783358850;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SfTqAPF2z3x4FKe96v+KSKZ7cZLPBUPyaVvC2qekN80=;
-        b=PBQqUymwMSPyYbHNvv6I4qbiZDkt2aq7+9taxC3w6+2WUhNIJ7V/I6kzmLWSBd6sLK
-         jWVbeUEO8P5QtJaKfZ2DPLrzy0s8CJQQfXs5K37RVtTWzZQCBwLLIKPdH+H6wzazLMSB
-         igg5eR/Ccj0+dgDU4ltot4PxyAYrtLo5yOy6RIpwvVYpgG/3cw/rhRW0wSochcYN9pS2
-         mFJP4sxGBIbzXsdEoMa8kPlAUoibOy45Y2WjBtNh2fTnuIn7rtZfm43WjV5XVGramvjW
-         bH1A9wXplj4q0oVFVSmEYuQcNboVBibWzxNC8OqtiJXzBDCRX55xYYz7CWDZEukCBSsN
-         So/A==
-X-Forwarded-Encrypted: i=1; AFNElJ9z0xCn9smWPdIA0vPOYudmB8XVJZSl4A6y3Y/qYTWUgPffos+8MMjgCE42cT3+aaPX+KlP4vQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywip7P7C/r6ghoOi5IOxOmPciiLVgpA15fAx72A3WbWidOktocs
-	CXMCI+jdMwCdtqMwhkoQMWHrYRkE9xqDNwgAMi5zUE6KSJ2TVN7f0m0v
-X-Gm-Gg: AfdE7clRNeeutTZ7fUWuvFzGrn/h2z+ndGQsqmr73IAf/tgcTqWx1pRWMA4qhvzgmwz
-	isnPgRgUJx2kFnH/2nPFIXqTRpzN8czzXykWwEsQnOiHhH/6N9X55RMYjV03MU7BTYQ6LIXZkJL
-	lJbuP+9aaQxrYeFTprE5RCmufyse3cKfM1PhTt6PO7lD3koUBGrzaQpYTXpcGLx8gwe/Ww3B4nM
-	PfRSr5G9lEMW9/4TkAFqs4Wr1XOWvsq9Op4Z5KZFDQygS94Yoc5GyckT1DNvIIy4zX/tAYYo5WV
-	SkavH4XWlXcE1sSBiqNJduY5WnrA+DVFwwQqr1Du+49Aqa/hMlx8oYHO7nx5ktF8HX/u1FhksC4
-	b8KiguBzvhNDoMia4vqb4HN0nNRoaAx6NpgvNpPxixpPlTbq1CADnGX143wpYlxFiS9tXb30KxQ
-	7VG0Jt/GoQ3W6hBzKakj3S+t3JxhByEukkehRLa0iv4y+9YiMfuZrVdatdx+8Q1Q==
-X-Received: by 2002:a05:6a00:368e:b0:845:4fec:3f8f with SMTP id d2e1a72fcca58-8479f27b7d6mr294845b3a.40.1782754050415;
-        Mon, 29 Jun 2026 10:27:30 -0700 (PDT)
-Received: from cps-manycore-1.. ([147.46.174.222])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a039f2afsm78542b3a.53.2026.06.29.10.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 10:27:30 -0700 (PDT)
-From: Sechang Lim <rhkrqnwk98@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Lorenz Bauer <lmb@isovalent.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Shuah Khan <shuah@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v3 2/2] selftests/bpf: drop tc/xdp/flow_dissector sockmap mutation tests
-Date: Mon, 29 Jun 2026 17:27:01 +0000
-Message-ID: <20260629172704.1302218-3-rhkrqnwk98@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260629172704.1302218-1-rhkrqnwk98@gmail.com>
-References: <20260629172704.1302218-1-rhkrqnwk98@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258A6419311
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 17:29:06 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782754149; cv=fail; b=LBaQQO0mUtaJT1ddAOK4Doa+2Tl08+GJCO8wyyqD8qB+UQ7s26aDTbxa3foh4QaOk6M0g3sq2OJEEIqO28qYNg3CStWre1LIrG1tB4l7QF8uTKnu0yI1HP8DEeDplg4IxE6LJcQtx84H4eFOwgypaUSNm3tZya3x8aqVMGTU5Vs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782754149; c=relaxed/simple;
+	bh=O1I55rcdQFknwxxKeHwKBq+xIjrz8HBSnSIbHGjU9G4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FRcEK9TKRHvM3OJYf1VLCISTRcZ8bt/utErkDw23f4cyT0KkTlhp5nMG/S20tVfKYg+wYx35jzhknttJ063BcBggo3ZQVf0Bfh/JUlYzotrcWxin0phrsDKN80U061QhCqn9K0W364tBU8ag1M+NdPS8nW7s0GhEqdMzqpqXAVc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VSxyeUn9; arc=fail smtp.client-ip=198.175.65.9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782754147; x=1814290147;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=O1I55rcdQFknwxxKeHwKBq+xIjrz8HBSnSIbHGjU9G4=;
+  b=VSxyeUn97SBum2frHmyEs0PZ6X9y2nCr6pfeC6ix5SCJ91zWfwpDYL45
+   0NM2Sxn/EBdsVi0gpZFPHmh6COigeYk7TJhjFqiDvAGQlQpVJKanGhCN2
+   h0kqyWENOmirc4uJGXX5azMBZi/jZiugbr3iB66YARPr2yuxVbVnlFQwy
+   vnKBc3OeCZAg8cxJjNNIvtrXAzQ4UAKkloAz/cOLt27IuTf3vyTCoX/4g
+   T14DPyw+dlW3TOW0RaZuVxuuStyI8CVfDScWCycJOV5JHjb0fUWho/D09
+   LlZ3calzhqQqvFJC7t/6P7hhJd+KivTeTzrdEdMVIV7iNq1oPDx7WgS+a
+   g==;
+X-CSE-ConnectionGUID: MJB+BUYFSQWhcK2PyXdk8g==
+X-CSE-MsgGUID: 4Xa1j6u1Q4ywCyruzk2GPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11832"; a="106249496"
+X-IronPort-AV: E=Sophos;i="6.24,232,1774335600"; 
+   d="scan'208";a="106249496"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 10:29:07 -0700
+X-CSE-ConnectionGUID: dy1obXMaQpaiU7kp24eE0A==
+X-CSE-MsgGUID: h9NczbrjSLOcELlESt7y2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,232,1774335600"; 
+   d="scan'208";a="250958933"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 10:29:07 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 29 Jun 2026 10:29:06 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Mon, 29 Jun 2026 10:29:06 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.33) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 29 Jun 2026 10:29:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YSvBzQv0ebyMfVaT5xNJgr/AbMLIk4as9mMzz5qWYzDcdFgKvFbJ5ZdWMTIgq8RWp7pKcfF3h7KzYDNGR6TLVDBUnjaxjuMJz1XOdDCX/BGppp6xI+1XLUSNdcaNtzrjUmf1SPX1w2EmvqgCwwclj/prSMbjSjv5bvrq9A4oRbVk1AdtLwAmDZS7mF1WSU6dFEkgVU8xO41T2zdtAFsFoJ2RWgr65fEqUdxG2sKSjEcydJrFk2cEtdqy37J0gKYJTfxeQ53yo49ocdGQ7YkPU4SuRwNXkqFnysl/a7aVv04LmUCx+Sbol7MWtgyc6FgqqTQAg3sKhOvEEks2dvuSoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O1I55rcdQFknwxxKeHwKBq+xIjrz8HBSnSIbHGjU9G4=;
+ b=FaGMIRHxOx3TTv6Cidq00rVAnJOGQ9DLymXGQwrgF61cgtlj9N0lr48mDsyqVJYJ2gHQPNV9dBiq8T9Rh8YvesBdeiLgzKogGoZEVdBk87eKqMtentZ8HdZkwhnvgUEPqMowNz2/+TDPBIVhYb4z32ubuvjaU5usnfo3A0VOjlwFWQZ97LHzPeKG8MFD60ZTh9md9VcxTGTXfYmq/mwpAeltHSRN+vJiTHuw5dw+eQNsA0UpiWe2IsWFQXjgLk3USgaORdEF0ZxMi+xUs0Gg6tCW9wYhFBQ71S9/QRoNNsoyverL6xYzFM/huMyrxk4Hm9i/8e/Gfti0SGhn0txrzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SN7PR11MB6900.namprd11.prod.outlook.com (2603:10b6:806:2a8::7)
+ by PH7PR11MB5765.namprd11.prod.outlook.com (2603:10b6:510:139::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.13; Mon, 29 Jun
+ 2026 17:29:03 +0000
+Received: from SN7PR11MB6900.namprd11.prod.outlook.com
+ ([fe80::65da:530d:6803:83e0]) by SN7PR11MB6900.namprd11.prod.outlook.com
+ ([fe80::65da:530d:6803:83e0%4]) with mapi id 15.21.0159.018; Mon, 29 Jun 2026
+ 17:29:03 +0000
+From: "D H, Siddaraju" <siddaraju.dh@intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, Michal Kubecek
+	<mkubecek@suse.cz>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Das,
+ Shubham" <shubham.das@intel.com>, "Chintalapalle, Balaji"
+	<balaji.chintalapalle@intel.com>, "Srinivasan, Vijay"
+	<vijay.srinivasan@intel.com>, "Lindberg, Magnus"
+	<magnus.k.lindberg@ericsson.com>, Niklas Damberg
+	<niklas.damberg@ericsson.com>, "Wirandi, Jonas" <jonas.wirandi@ericsson.com>,
+	Siddaraju DH <siddarajudh@gmail.com>
+Subject: RE: the confusing 10000base_CR. Shouldn't it be 10000_SFI_DA?
+Thread-Topic: the confusing 10000base_CR. Shouldn't it be 10000_SFI_DA?
+Thread-Index: Ad0FbzNABPoQ31JxTh+QV3XDba1IJQACWbSAAAchFbAAAMJTgAAAOH5gAIQ6zYAAAe+HAAAFwfUAAAihfaA=
+Date: Mon, 29 Jun 2026 17:29:03 +0000
+Message-ID: <SN7PR11MB69009867F1598517AC0557E29AE82@SN7PR11MB6900.namprd11.prod.outlook.com>
+References: <MW4PR11MB6912A234CAAAFD25EAC7C8909AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <2994edfc-0894-49c9-abac-6daea5e12075@lunn.ch>
+ <MW4PR11MB6912BE7FEDE5C509B6C5D5DF9AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <2baa5a77-3305-4ed9-b56d-ba27cecc1911@lunn.ch>
+ <MW4PR11MB6912BABFEED268D38B4BC2BB9AEB2@MW4PR11MB6912.namprd11.prod.outlook.com>
+ <1b3975a8-788a-4b81-94ec-3ab5708b251b@bootlin.com>
+ <SN7PR11MB6900D73E1714AA8AE05BA7BF9AE82@SN7PR11MB6900.namprd11.prod.outlook.com>
+ <deee3864-69dd-4eb5-bcfc-4ab771f4530c@lunn.ch>
+In-Reply-To: <deee3864-69dd-4eb5-bcfc-4ab771f4530c@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR11MB6900:EE_|PH7PR11MB5765:EE_
+x-ms-office365-filtering-correlation-id: bdaba0c4-920a-4f2a-e386-08ded603e9e4
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|38070700021|22082099003|11063799006|56012099006|4143699003|18002099003;
+x-microsoft-antispam-message-info: 1OpBgFyamUZJ1rAIpJAGo9bskQT+SdskDKuPHAB6MjWNAyPUYu4JpawDJ+95alR2+GMWXPiWYuggExqeOv46nTM2j53MnfIfclZyNWfGBczR/pe5eEVsy/XOZ6NxgxF4JlPbVigpFr7gm/T2ZCiKKdrpxsNwyx74XiwM4gmfbyWIWDqAbgA8AIVyM4XEAtKOCJ2AKzLEfcoHUAWf156WYlT2ZgVbOD5J2jUiT9soVjZiIN/jSs8eWL0/A+gxyFakNfS5OUqvv4m3gw0UXiz9COc+2S6SUVpssD0ZtL3PNct33AEeClXGQtyXBTXmpqG5SrH7Eu8EMSrumwUikF1DvD6C0kpOr7mhrdDq75jMHtKI9Y92HekZA7Ueq4bvPcrbFiLod2h5Nf8C9XxtIwrMi98yT7tCPJHuMqszJYqIM5JtAwk67wF87ynnYwQ2IiD8bSR3l+cfrAAgUk2M8Y7d5CJlSNDDIR59i09QKe3B1xRdMoZw8Esr1+tSQN++/AVa9z35UGMrlssrtNQe2lRkJajQvfXmVh2IkxGV0JWfX2TH/VzoVVpiG4C47VsDlf4sdUKIhLha/RNv8VuBCJXmSNAUFFNLIDamm2wUdmbvNF4dmNWjavY6+Ett2iDoqHlEyC7iEiJwoyi5rSpK2ekFljnoTnDJUnLzzzzQOelfTKAVfMkqDGHiOGqP0J26tVAy7LGEdY/E7CtXqRLXgzdqZtfB8Ua69QIxvka4iVCuqDQ=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB6900.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(38070700021)(22082099003)(11063799006)(56012099006)(4143699003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?W3hmbm3F7cE6fQ4l3qK4xn/kT4njyuLg7/gzYA63p/hBYLm0FAN+lI//49jN?=
+ =?us-ascii?Q?oxG/cusPOqVFobUUDfEnNo9flND9IRsmGprckZgnn8eLx5vC+6kjPSuFqzpN?=
+ =?us-ascii?Q?wtzgZ6d72t+0pHLDvB6KJUzX5vNdh0LqiQdnwfXud6BAX0Y0F5R2/nkCN1lj?=
+ =?us-ascii?Q?zPPFoU77KYisEZSAY6h5TeMVflNoKoBlHSOm6b7SSSHy51VH3LF7H/ccOJSr?=
+ =?us-ascii?Q?BMq+oAoQJ0a6xhmiJcQQJoIXic/s8/JOs7a9bwt8JLRKQNaKi6VdrqJukLD9?=
+ =?us-ascii?Q?acmZdRxx3nyrJ0bANPd1uAQMSiPihP+mEkeEDAlhVJsUviONO6xkov8qb1ur?=
+ =?us-ascii?Q?LrJWoxX2hee3dZ2k0iBr7ToVWY3PjfNVleLEA7zy9gIN6eFK907oaRuZ/p3D?=
+ =?us-ascii?Q?kyredHvdqlJonQyHDUFeo23UyKKK0IHmh4QZbuPFn8Lu8RYk///HEzMXSOta?=
+ =?us-ascii?Q?NvV5E56xHq+fvUbvJjKQl2362/sdQFGs/c8DsZOh1UruNIDR/ZPDonyiYL/b?=
+ =?us-ascii?Q?5qAn+vWdSRdgI7uhBNIgqA4p4SOK6uMhGO6nmYSvkot3jYmjEPjhnk66/JD0?=
+ =?us-ascii?Q?6qgL+LGidm6gNV7uxXySfB+Y38pOlMkaLL0imVskx6ypoQXxRYqCROQmUbTn?=
+ =?us-ascii?Q?2sBkzQ4QddFrTA5232fLgc0Smc5uhsVeKpvevNhAc6PYLgSLncyh0AOBGaDI?=
+ =?us-ascii?Q?wQHY84yTPpun2El3ctS8RGm3xilk1ySuguBJKiObLmeQiSRj4Z9tEOwh5ele?=
+ =?us-ascii?Q?7qCUk8ik//juM+dxNvvRLMMNuOU/KcPV/9ZlmDz7oU2iA8IqTb/AOjLhkTVz?=
+ =?us-ascii?Q?8Re3rXCXwyi4BCZOi+PjzCLJQTQKtnVUleEZUN/n057ODNonyof7Mw6fN4wP?=
+ =?us-ascii?Q?FaeViZHr4NY1stdgHM14r3qhcykGJNWUTUVTUiFqhMKk0Y5hRJYsTUehFUgN?=
+ =?us-ascii?Q?cxxaf9Lk0rJblYgjPRK+FcCZpILNae4xqvtMYF0lb+0B6J93ScweniRvg46u?=
+ =?us-ascii?Q?77LTPNu/B+sZHlUqV2QiCBdbcdxwuYFaBraiGRIsKn++P7BGXdBLY1OtgkQL?=
+ =?us-ascii?Q?F89qsN40+swfeGX0S7X1pYF/Xe60gjRchmPgATMi09Lt6Gf4uDNWXo48UwPn?=
+ =?us-ascii?Q?byf2ObFzde7cGPC2BfiK3ukFt/t9wj7ZZnRUuDOTX8+9RYpmRfHNIT/nfLXY?=
+ =?us-ascii?Q?dBlHu8+2EsVhdAhx4v5keROtBIRrqaslr2QIxYJ5oOrlAuIC9iL7wom/YdNk?=
+ =?us-ascii?Q?xj5p/bjfSOHpEbhUPbCq3dH/xS8f2RFbkhXJvyKVvhsKWGO2VP2qUbKeZyRG?=
+ =?us-ascii?Q?1VcMK5qpdgdJmrqbf3zbWMzWo/F/SzJ9AdUz4DgdiUsYNJxHaWYf89iC+ihI?=
+ =?us-ascii?Q?ANdur3f9suL8xxe6KnqQC8oYuPXk1mM48M+1BzdqxHfWkKZZ4aPohZfsA7/3?=
+ =?us-ascii?Q?HNpXTWBTNNqKBR+bYm80qcIhnklaXgvd6tuyxr0fsMZybPpPAW79Jb6SM6hb?=
+ =?us-ascii?Q?dY2AH1WGmIOlnpiJkWNXaE5AD51+ncciaUuUA1hhA7QAg1rAyxdXYrKhE4+q?=
+ =?us-ascii?Q?z6q/Frw4yc/0e62v2KGJyJY+3gHWRTG7Ffs443qwFYyJyPfpaC4HhS6vAFzF?=
+ =?us-ascii?Q?KoV4caa/nvbUxUCAMkkPyx/eoLTOFs+5KGf9abJnZyxMMsOJm13uFRCHiimD?=
+ =?us-ascii?Q?iKhdbCrjqrB80/6wj8g/byN8F4StyP1IdHyMEbrPmCnR+4S2?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: R6Acifb0tgsxlQR8zJZFIj3ZDo9P0FUbUHOhpA8eQ4yggLGeeLJAGPmPt7uCJ3OuynaGXXQeEHqw9lhXUId7Zav2/+LDksXWfd9NtZd0Ae4BpmEqwZwA9lsAKqplfSAgi+I0JwPfoZS9HiGGNBjMeJ9iuZzCSQeTJB/FRlD0gfTPh3ZRImuXCmTxqbfVruD9F/d5nXurS/9nBetNoU+/mc0v4XoFcErYXRjVFldK3guM2R6ls5I6hwlFGNnpHSfT03t/w12d9yEjGRZN31nLbU49utykaCWe51SkffXddoPxWOXxkAPQuzpP6AXG2ex5U0is2ZsQQOvb0924zF7ypQ==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB6900.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdaba0c4-920a-4f2a-e386-08ded603e9e4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2026 17:29:03.0493
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tIZAXT0WeKkccercLTefwY9c1hM+sT1CDsaJXpFckOPIrNnXbd5+Ws5atHwDW1UolWH1+54vM3M56C1d+PIMeA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5765
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302755-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:john.fastabend@gmail.com,m:eddyz87@gmail.com,m:memxor@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:sdf@fomichev.me,m:emil@etsalapatis.com,m:lmb@isovalent.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:shuah@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,davemloft.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302756-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[siddaraju.dh@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:maxime.chevallier@bootlin.com,m:mkubecek@suse.cz,m:netdev@vger.kernel.org,m:shubham.das@intel.com,m:balaji.chintalapalle@intel.com,m:vijay.srinivasan@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:siddarajudh@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,suse.cz,vger.kernel.org,intel.com,ericsson.com,gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[siddaraju.dh@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 00FE56DDD5D
+X-Rspamd-Queue-Id: 5B6E06DDD7E
 
-tc, xdp and flow_dissector programs can no longer update or delete a
-sockmap. Adjust the tests:
+On 6/29/26, Andrew Lunn wrote,
+> Is there confusion? git blame suggests it has been there 10 years,
+> and this is the first time somebody has questioned it.
+>
+> I would limit changes to Documentation, man pages, help etc.
 
- - verifier_sockmap_mutate: the tc, xdp and flow_dissector cases now
-   expect __failure with "cannot update sockmap in this context".
- - sockmap_basic: drop "sockmap update" / "sockhash update", which load
-   a SEC("tc") program that copies a sock between maps.
- - fexit_bpf2bpf: drop "func_sockmap_update", whose freplace program
-   updates a sockmap in the tc cls_redirect context.
+Yes Andrew, as summarized in the first email of this thread, there
+is no standard to explicitly support 10000baseCR and it conflicts with
+so many characteristics of a "typical IEEE *baseCR". Based on my internal
+discussion & feedback, it seems people are using 10000baseCR
+with 10G-SFI-DA cables but the question "why should I set it to 10000baseCR
+while using 10G_SFI_DACables?" keeps coming back along with the subsequent
+questions to seek clarity against the "IEEE *baseCR" definitions.
 
-Remove the now-unused test_sockmap_update.c and freplace_cls_redirect.c.
+This is an effort to settle it down for once & all. With option-(c) it is
+just to add a clarity that 10000baseCR is SFF-8431 SFP+ Direct Attach (DA)
+standard with SFI interface.
 
-Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
----
- .../selftests/bpf/prog_tests/fexit_bpf2bpf.c  | 13 -----
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 52 -------------------
- .../bpf/progs/freplace_cls_redirect.c         | 34 ------------
- .../selftests/bpf/progs/test_sockmap_update.c | 48 -----------------
- .../bpf/progs/verifier_sockmap_mutate.c       | 10 ++--
- 5 files changed, 5 insertions(+), 152 deletions(-)
- delete mode 100644 tools/testing/selftests/bpf/progs/freplace_cls_redirect.c
- delete mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_update.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/fexit_bpf2bpf.c b/tools/testing/selftests/bpf/prog_tests/fexit_bpf2bpf.c
-index 92c20803ea76..d3a954158c33 100644
---- a/tools/testing/selftests/bpf/prog_tests/fexit_bpf2bpf.c
-+++ b/tools/testing/selftests/bpf/prog_tests/fexit_bpf2bpf.c
-@@ -336,17 +336,6 @@ static void test_fmod_ret_freplace(void)
- }
- 
- 
--static void test_func_sockmap_update(void)
--{
--	const char *prog_name[] = {
--		"freplace/cls_redirect",
--	};
--	test_fexit_bpf2bpf_common("./freplace_cls_redirect.bpf.o",
--				  "./test_cls_redirect.bpf.o",
--				  ARRAY_SIZE(prog_name),
--				  prog_name, false, NULL);
--}
--
- static void test_func_replace_void(void)
- {
- 	const char *prog_name[] = {
-@@ -599,8 +588,6 @@ void serial_test_fexit_bpf2bpf(void)
- 		test_func_replace();
- 	if (test__start_subtest("func_replace_verify"))
- 		test_func_replace_verify();
--	if (test__start_subtest("func_sockmap_update"))
--		test_func_sockmap_update();
- 	if (test__start_subtest("func_replace_return_code"))
- 		test_func_replace_return_code();
- 	if (test__start_subtest("func_map_prog_compatibility"))
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index cb3229711f93..33f788e2786d 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -7,7 +7,6 @@
- 
- #include "test_progs.h"
- #include "test_skmsg_load_helpers.skel.h"
--#include "test_sockmap_update.skel.h"
- #include "test_sockmap_invalid_update.skel.h"
- #include "test_sockmap_skb_verdict_attach.skel.h"
- #include "test_sockmap_progs_query.skel.h"
-@@ -235,53 +234,6 @@ static void test_skmsg_helpers_with_link(enum bpf_map_type map_type)
- 	test_skmsg_load_helpers__destroy(skel);
- }
- 
--static void test_sockmap_update(enum bpf_map_type map_type)
--{
--	int err, prog, src;
--	struct test_sockmap_update *skel;
--	struct bpf_map *dst_map;
--	const __u32 zero = 0;
--	char dummy[14] = {0};
--	LIBBPF_OPTS(bpf_test_run_opts, topts,
--		.data_in = dummy,
--		.data_size_in = sizeof(dummy),
--		.repeat = 1,
--	);
--	__s64 sk;
--
--	sk = connected_socket_v4();
--	if (!ASSERT_NEQ(sk, -1, "connected_socket_v4"))
--		return;
--
--	skel = test_sockmap_update__open_and_load();
--	if (!ASSERT_OK_PTR(skel, "open_and_load"))
--		goto close_sk;
--
--	prog = bpf_program__fd(skel->progs.copy_sock_map);
--	src = bpf_map__fd(skel->maps.src);
--	if (map_type == BPF_MAP_TYPE_SOCKMAP)
--		dst_map = skel->maps.dst_sock_map;
--	else
--		dst_map = skel->maps.dst_sock_hash;
--
--	err = bpf_map_update_elem(src, &zero, &sk, BPF_NOEXIST);
--	if (!ASSERT_OK(err, "update_elem(src)"))
--		goto out;
--
--	err = bpf_prog_test_run_opts(prog, &topts);
--	if (!ASSERT_OK(err, "test_run"))
--		goto out;
--	if (!ASSERT_NEQ(topts.retval, 0, "test_run retval"))
--		goto out;
--
--	compare_cookies(skel->maps.src, dst_map);
--
--out:
--	test_sockmap_update__destroy(skel);
--close_sk:
--	close(sk);
--}
--
- static void test_sockmap_invalid_update(void)
- {
- 	struct test_sockmap_invalid_update *skel;
-@@ -1385,10 +1337,6 @@ void test_sockmap_basic(void)
- 		test_skmsg_helpers(BPF_MAP_TYPE_SOCKMAP);
- 	if (test__start_subtest("sockhash sk_msg load helpers"))
- 		test_skmsg_helpers(BPF_MAP_TYPE_SOCKHASH);
--	if (test__start_subtest("sockmap update"))
--		test_sockmap_update(BPF_MAP_TYPE_SOCKMAP);
--	if (test__start_subtest("sockhash update"))
--		test_sockmap_update(BPF_MAP_TYPE_SOCKHASH);
- 	if (test__start_subtest("sockmap update in unsafe context"))
- 		test_sockmap_invalid_update();
- 	if (test__start_subtest("sockmap copy"))
-diff --git a/tools/testing/selftests/bpf/progs/freplace_cls_redirect.c b/tools/testing/selftests/bpf/progs/freplace_cls_redirect.c
-deleted file mode 100644
-index 7e94412d47a5..000000000000
---- a/tools/testing/selftests/bpf/progs/freplace_cls_redirect.c
-+++ /dev/null
-@@ -1,34 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--// Copyright (c) 2020 Facebook
--
--#include <linux/stddef.h>
--#include <linux/bpf.h>
--#include <linux/pkt_cls.h>
--#include <bpf/bpf_endian.h>
--#include <bpf/bpf_helpers.h>
--
--struct {
--	__uint(type, BPF_MAP_TYPE_SOCKMAP);
--	__type(key, int);
--	__type(value, int);
--	__uint(max_entries, 2);
--} sock_map SEC(".maps");
--
--SEC("freplace/cls_redirect")
--int freplace_cls_redirect_test(struct __sk_buff *skb)
--{
--	int ret = 0;
--	const int zero = 0;
--	struct bpf_sock *sk;
--
--	sk = bpf_map_lookup_elem(&sock_map, &zero);
--	if (!sk)
--		return TC_ACT_SHOT;
--
--	ret = bpf_map_update_elem(&sock_map, &zero, sk, 0);
--	bpf_sk_release(sk);
--
--	return ret == 0 ? TC_ACT_OK : TC_ACT_SHOT;
--}
--
--char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_update.c b/tools/testing/selftests/bpf/progs/test_sockmap_update.c
-deleted file mode 100644
-index 6d64ea536e3d..000000000000
---- a/tools/testing/selftests/bpf/progs/test_sockmap_update.c
-+++ /dev/null
-@@ -1,48 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--// Copyright (c) 2020 Cloudflare
--#include "vmlinux.h"
--#include <bpf/bpf_helpers.h>
--
--struct {
--	__uint(type, BPF_MAP_TYPE_SOCKMAP);
--	__uint(max_entries, 1);
--	__type(key, __u32);
--	__type(value, __u64);
--} src SEC(".maps");
--
--struct {
--	__uint(type, BPF_MAP_TYPE_SOCKMAP);
--	__uint(max_entries, 1);
--	__type(key, __u32);
--	__type(value, __u64);
--} dst_sock_map SEC(".maps");
--
--struct {
--	__uint(type, BPF_MAP_TYPE_SOCKHASH);
--	__uint(max_entries, 1);
--	__type(key, __u32);
--	__type(value, __u64);
--} dst_sock_hash SEC(".maps");
--
--SEC("tc")
--int copy_sock_map(void *ctx)
--{
--	struct bpf_sock *sk;
--	bool failed = false;
--	__u32 key = 0;
--
--	sk = bpf_map_lookup_elem(&src, &key);
--	if (!sk)
--		return SK_DROP;
--
--	if (bpf_map_update_elem(&dst_sock_map, &key, sk, 0))
--		failed = true;
--
--	if (bpf_map_update_elem(&dst_sock_hash, &key, sk, 0))
--		failed = true;
--
--	bpf_sk_release(sk);
--	return failed ? SK_DROP : SK_PASS;
--}
--
--char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/progs/verifier_sockmap_mutate.c b/tools/testing/selftests/bpf/progs/verifier_sockmap_mutate.c
-index fe4b123187b8..b11026123690 100644
---- a/tools/testing/selftests/bpf/progs/verifier_sockmap_mutate.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_sockmap_mutate.c
-@@ -74,7 +74,7 @@ static __always_inline void test_sockmap_lookup_and_mutate(void)
- }
- 
- SEC("action")
--__success
-+__failure __msg("cannot update sockmap in this context")
- int test_sched_act(struct __sk_buff *skb)
- {
- 	test_sockmap_mutate(skb->sk);
-@@ -82,7 +82,7 @@ int test_sched_act(struct __sk_buff *skb)
- }
- 
- SEC("classifier")
--__success
-+__failure __msg("cannot update sockmap in this context")
- int test_sched_cls(struct __sk_buff *skb)
- {
- 	test_sockmap_mutate(skb->sk);
-@@ -90,7 +90,7 @@ int test_sched_cls(struct __sk_buff *skb)
- }
- 
- SEC("flow_dissector")
--__success
-+__failure __msg("cannot update sockmap in this context")
- int test_flow_dissector_delete(struct __sk_buff *skb __always_unused)
- {
- 	test_sockmap_delete();
-@@ -98,7 +98,7 @@ int test_flow_dissector_delete(struct __sk_buff *skb __always_unused)
- }
- 
- SEC("flow_dissector")
--__failure __msg("program of this type cannot use helper bpf_sk_release")
-+__failure __msg("cannot update sockmap in this context")
- int test_flow_dissector_update(struct __sk_buff *skb __always_unused)
- {
- 	test_sockmap_lookup_and_update(); /* no access to skb->sk */
-@@ -179,7 +179,7 @@ int test_sockops_update_dedicated(struct bpf_sock_ops *ctx)
- }
- 
- SEC("xdp")
--__success
-+__failure __msg("cannot update sockmap in this context")
- int test_xdp(struct xdp_md *ctx __always_unused)
- {
- 	test_sockmap_lookup_and_mutate();
--- 
-2.43.0
-
+- Thank you,
+Siddaraju D H
 
