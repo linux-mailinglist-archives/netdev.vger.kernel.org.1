@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-302465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302466-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oL7THt4MQmrhzQkAu9opvQ
-	(envelope-from <netdev+bounces-302465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:12:46 +0200
+	id a6O/MOcMQmrpzQkAu9opvQ
+	(envelope-from <netdev+bounces-302466-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:12:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C076D6361
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:12:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39ED06D636E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:12:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=k4paX2iL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302465-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302465-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=e8dgTnCg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302466-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302466-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 332D8303AF28
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9217B303C4ED
 	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 06:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4880397338;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCCC39769D;
 	Mon, 29 Jun 2026 06:10:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292F5246BC0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294FA389107;
 	Mon, 29 Jun 2026 06:10:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782713433; cv=none; b=rov2VwjITIVOs80inQyqT1ylNiBTrWGd4VRlT5qespzpoBjYJzgSTJZhh64fd1lvAw3dNRiEqoLbhZJuCc7p+Z669drQiECpk1QqeDchcYzfXsYzk1+T1/znBaxgE728A5EbMX3ba09eSHQMypqcdr+OP7htOGrcIrbZXP58cis=
+	t=1782713433; cv=none; b=JfqHGJSUOlM0naKsKk1GmDIQ++6uLYYEXCHxwwmW0ALC/Xsbput2dtZIFZAmb2ay4BcdCL1X7yOxzQo1DnbkXrm+Z1tEl/vxRE1VNJuewep1FjsG+0NmNAVXUGNxKBMKbxjoUX+afFUbp49b8YewS+y1P5ER8nUq8JglTrHr6m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782713433; c=relaxed/simple;
-	bh=dAym+ThF6vWwIa6evJK6TGnFNorfFncdjlhkLksLJ+k=;
+	bh=pD+muPy3liYQLdqeTb/Cr5bzuLAf7qVseqGm/6A0t78=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WckJSwR4HVIt/7WSOZv8WL7xXEpoiIiV9XvLGPq0JeADDCP3gENpog7g/Dzcu4aQD7wstnoWhCBHF9i91OWRuElqsqkZQiIVKdc/+nbPuAaE07ZFATozYQ6FBIhHjEfW+pOT0cCUvVde3K5RiW8BfcYp614MyXv6Le4EuhPmfhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=k4paX2iL; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65T69Y2O03467453, This message is accepted by code: ctloc85258
+	 MIME-Version:Content-Type; b=Hhuc/2sZnYGPP+wOS3STxYqEkLwApXM3haiviY/YXqXsY1rcYIsIj/snz24KXGJU4giL2zGwogx1Cz2y+0zYDeGdzoej4r4aB4KilwLsfvl//JYOUKTJq42B7nV2g5+hnx/k7fkOEPkuaYeku1pFQ1aF0i4li77BmkqWcGk9SIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=e8dgTnCg; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65T69Z2M03467453, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
 	s=dkim; t=1782713375;
-	bh=EEz2GQZ1a13cH2RWgryf+hPFNuQvRNADB6ah3aE6DWM=;
+	bh=HA1IxDgPcOQyAzQmT2vEj1ndpTfQFkeGXC6oWNuVC6w=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=k4paX2iL3dKWQeW12y91mzRT9DYDpwTsJ5a+UdU6AMDp1CSPDb9N1L8AoOZud7mt0
-	 IldE4EvFKgDhtPoDLB+mDv7ZN2KF2Tq0UkVgzB0GTBOwbWZAFtyLkZFQfjrnmaSenX
-	 IKFDrPn7RNCILjDlBdXs3/smyoLPt6nWszmVCD8qeX3RUiEhUwz5ikVkYlZ/ZXxFeX
-	 /Ke4GtbJWRJHsAGT6Sy2QUV75tSoAaF91YD77FC0x+NasoBASwJqhU3wO4Ne9iDfiO
-	 Y3qQ7LnlqBnyIAJznMuvNpvqY6fBIHPZIj2ScP9sjqHNO30wuUBQYboZapq3Bk4Bbe
-	 tGY4wcXFcmKWA==
+	b=e8dgTnCgoByLxMIY/oKl57BaQLiPZWGyXZ9iTCS8yxS1KVWbpgeXz4yJHprQ0kay7
+	 ck0CGmVG0MkzpqPb2izvNE1R8B134khltVsj1KhjQtLBRhFE7iAcBiPX5U6PqErMUV
+	 ogqPs0UEVC4q3DDWZY4L295Ih6jxNk8/rrcOEwY+qMFyMtWaijLGdzn7U+KmCa7jBO
+	 q40edFoa2oUAOYm86Oi0Sb4/XNecEyujrTkqvlQP+REGuimRWiQAGIF9b1SVI9PY2b
+	 pBivV2LIPpBvQ8arx4dCkGnfT+Sm0/KYgH2b7tKa21y4Y0S2RExlqIjvGovrB02j/3
+	 RltMt+Y3gMuZw==
 Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65T69Y2O03467453
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65T69Z2M03467453
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 29 Jun 2026 14:09:34 +0800
+	Mon, 29 Jun 2026 14:09:35 +0800
 Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
  RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -63,9 +63,9 @@ To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
 	<pabeni@redhat.com>, <maxime.chevallier@bootlin.com>, <horms@kernel.org>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v3 5/7] r8169: add ltr support for RTL8116af
-Date: Mon, 29 Jun 2026 14:09:29 +0800
-Message-ID: <20260629060931.1006-6-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v3 6/7] r8169: fix RTL8116af can not enter s0idle and c10
+Date: Mon, 29 Jun 2026 14:09:30 +0800
+Message-ID: <20260629060931.1006-7-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260629060931.1006-1-javen_xu@realsil.com.cn>
 References: <20260629060931.1006-1-javen_xu@realsil.com.cn>
@@ -85,12 +85,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302465-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302466-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
 	MIME_TRACE(0.00)[0:+];
@@ -108,16 +108,30 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:dkim,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 09C076D6361
+X-Rspamd-Queue-Id: 39ED06D636E
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-This patch adds ltr support for RTL8116af, enables RTL8116af enter l1.2
-state. This makes sense for the system to enter c10 state.
+RTL8116AF is a multi-function device. Functions 2 to 7 are hidden from
+the PCI core and return an all-ones response when their vendor ID is read,
+so they are not enumerated as normal PCI functions.
+
+However, these hidden functions can still affect platform power
+management. If they are left in D0 or keep ASPM disabled, the platform may
+fail to enter the low-power s0ix state and the CPU package may fail to
+enter Package C10.
+
+Put functions 2 to 7 into D3hot and enable ASPM on their PCIe link control
+register. Since these functions are hidden, access their configuration
+space through pci_bus_read_config_dword() / pci_bus_write_config_dword()
+using the same slot and the target function numbers.
+
+Ignore functions that return a PCI error response when reading their
+configuration space.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
@@ -127,75 +141,67 @@ Changes in v2:
 Changes in v3:
  - no changes
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 33 +++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 009095e9c706..ba5e16087e03 100644
+index ba5e16087e03..223501479d20 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -349,11 +349,13 @@ enum rtl_registers {
- 	ALDPS_LTR	= 0xe0a2,
- 	LTR_OBFF_LOCK	= 0xe032,
- 	LTR_SNOOP	= 0xe034,
-+	SEND_LTR_MSG	= 0xe038,
- 
- #define ALDPS_LTR_EN			BIT(0)
- #define LTR_OBFF_LOCK_EN		BIT(0)
+@@ -356,6 +356,9 @@ enum rtl_registers {
  #define LINK_SPEED_CHANGE_EN		BIT(14)
  #define LTR_SNOOP_EN			GENMASK(15, 14)
-+#define LTR_MSG_EN			BIT(0)
+ #define LTR_MSG_EN			BIT(0)
++#define RTL8116AF_FUNC_PM_CSR		0x80
++#define RTL8116AF_FUNC_EXP_LNKCTL	0x44
++#define RTL_PM_D3HOT			GENMASK(1, 0)
  };
  
  enum rtl8168_8101_registers {
-@@ -3205,8 +3207,22 @@ static void rtl_enable_ltr(struct rtl8169_private *tp)
- 		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
- 		r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0000, LINK_SPEED_CHANGE_EN);
- 		break;
--	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
- 	case RTL_GIGA_MAC_VER_52:
-+		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-+		r8168_mac_ocp_modify(tp, LTR_SNOOP, 0x0000, LTR_SNOOP_EN);
-+		r8168_mac_ocp_write(tp, 0xe02c, 0x1880);
-+		r8168_mac_ocp_write(tp, 0xe02e, 0x4880);
-+		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
-+		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd2, 0x883c);
-+		r8168_mac_ocp_write(tp, 0xcdd4, 0x8c12);
-+		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xe0a6, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xe0a8, 0x9003);
-+		break;
-+	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
- 		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
- 		RTL_W8(tp, COMBO_LTR_EXTEND, RTL_R8(tp, COMBO_LTR_EXTEND) | COMBO_LTR_EXTEND_EN);
- 		fallthrough;
-@@ -3226,6 +3242,7 @@ static void rtl_enable_ltr(struct rtl8169_private *tp)
- 	}
- 	/* chip can trigger LTR */
- 	r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0003, LTR_OBFF_LOCK_EN);
-+	r8168_mac_ocp_modify(tp, SEND_LTR_MSG, 0x0000, LTR_MSG_EN);
+@@ -3783,6 +3786,35 @@ static void rtl_hw_start_8168ep_3(struct rtl8169_private *tp)
+ 	r8168_mac_ocp_modify(tp, 0xe860, 0x0000, 0x0080);
  }
  
- static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
-@@ -3259,6 +3276,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 		rtl_enable_ltr(tp);
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
-+		case RTL_GIGA_MAC_VER_52:
- 		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_LAST:
- 			/* reset ephy tx/rx disable timer */
- 			r8168_mac_ocp_modify(tp, 0xe094, 0xff00, 0);
-@@ -3271,6 +3289,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 	} else {
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
-+		case RTL_GIGA_MAC_VER_52:
- 		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_LAST:
- 			r8168_mac_ocp_modify(tp, 0xe092, 0x00ff, 0);
- 			break;
++static void rtl_disable_hidden_function(struct pci_dev *pdev)
++{
++	unsigned int slot = PCI_SLOT(pdev->devfn);
++	struct pci_bus *bus = pdev->bus;
++	unsigned int devfn;
++	int func;
++	int ret;
++	u32 val;
++
++	for (func = 2; func < 8; func++) {
++		devfn = PCI_DEVFN(slot, func);
++
++		ret = pci_bus_read_config_dword(bus, devfn, RTL8116AF_FUNC_PM_CSR, &val);
++		if (!ret && !PCI_POSSIBLE_ERROR(val)) {
++			val &= ~PCI_PM_CTRL_PME_STATUS;
++			val &= ~(PCI_PM_CTRL_STATE_MASK | PCI_PM_CTRL_PME_ENABLE);
++			val |= (RTL_PM_D3HOT | PCI_PM_CTRL_PME_ENABLE);
++			pci_bus_write_config_dword(bus, devfn, RTL8116AF_FUNC_PM_CSR, val);
++		}
++
++		ret = pci_bus_read_config_dword(bus, devfn, RTL8116AF_FUNC_EXP_LNKCTL, &val);
++		if (!ret && !PCI_POSSIBLE_ERROR(val)) {
++			val &= ~((PCI_EXP_LNKSTA_LBMS | PCI_EXP_LNKSTA_LABS) << 16);
++			val |= PCI_EXP_LNKCTL_ASPMC;
++			pci_bus_write_config_dword(bus, devfn, RTL8116AF_FUNC_EXP_LNKCTL, val);
++		}
++	}
++}
++
+ static void rtl_hw_start_8117(struct rtl8169_private *tp)
+ {
+ 	static const struct ephy_info e_info_8117[] = {
+@@ -3839,6 +3871,7 @@ static void rtl_hw_start_8117(struct rtl8169_private *tp)
+ 	r8168_mac_ocp_write(tp, 0xc094, 0x0000);
+ 	r8168_mac_ocp_write(tp, 0xc09e, 0x0000);
+ 
++	rtl_disable_hidden_function(tp->pci_dev);
+ 	/* firmware is for MAC only */
+ 	r8169_apply_firmware(tp);
+ }
 -- 
 2.43.0
 
