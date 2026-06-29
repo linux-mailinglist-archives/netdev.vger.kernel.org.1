@@ -1,85 +1,64 @@
-Return-Path: <netdev+bounces-302667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZGa5HMF7Qmoz8QkAu9opvQ
-	(envelope-from <netdev+bounces-302667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:05:53 +0200
+	id oGaSH8h9QmrT8QkAu9opvQ
+	(envelope-from <netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:14:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E9E6DBBA2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:05:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E646DBD62
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:14:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=6wind.com header.s=google header.b=jsQOVvPk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302667-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302667-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=6wind.com;
+	dkim=pass header.d=iogearbox.net header.s=default2302 header.b="Cg/gmrxA";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=iogearbox.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 134DE303CEDD
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:59:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1E2F30B52AE
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E54C30F7FF;
-	Mon, 29 Jun 2026 13:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2B932B118;
+	Mon, 29 Jun 2026 14:01:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A6240D58C
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 13:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0471EB9E3;
+	Mon, 29 Jun 2026 14:01:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782741544; cv=none; b=CkKwftm11mKT3KXW2Rx+d9zCg2G42Wke6mE+7cMXY/jj7fesdkvM+GFryb3mSxxYAvz6n6Db2CoAJagNMJgBUOG347WbrERyMYnIF7B3Hj1EhWMRZevtbigmo3IpNuOJSAjZwNmgKuOutsudXJEWpge98b3AfOD+KmYj+FMP2Vg=
+	t=1782741669; cv=none; b=igapxZLSSBLM2HTinH5JJ0EDcCCPxoKwj/XSWcaN6EShyrE2TdWEYgvlIW3kNE8cWRNjvcuSD3h7Kun4nkJk8WTC6RKQUWSp70pRr+QnyuOttAfJzEIe5N0YUxfmNwxWmwSAN6rWlgQ5ksV5h5qTcQ9NAgrqiDpuAmV6Gp0Zi48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782741544; c=relaxed/simple;
-	bh=KtL4BpmupJxevVTN0BsIXstXZlrPZhBbUhbYrf9LGFU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UgAOL1I9jAAwzVIBQh4DwgUZlcyZQi0iSxXlPS8nAdeLuNWYgaKVaMzEzFzaEHAPZ78ScIy9l9ESvVDzwV8RBCHxjwR8Lf4OHc9PPMgkmHOnWBKbjFuhrKzwP9aEHUhEMWEt9eegvzHl8+GlEWxV1QzR59Sk1EGKKv+KwbhIT6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=jsQOVvPk; arc=none smtp.client-ip=209.85.221.49
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-46f92237fc1so216649f8f.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 06:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1782741541; x=1783346341; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:organization
-         :content-language:from:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=H2hMYouoBeVpY2zemXppJ2FB9RiNJKITJKx7SI0axBE=;
-        b=jsQOVvPk8CQ7Qbsgtmque+ZS+Vjp5owb47kMzliFaKgVkHt1A74+Rq3ZwQvGnB3mnp
-         Ymc5Hu9dxSE5FRs4fwJdsEOiRghF3f1eMwN3LmO5l08nDi8W0nXtetBk2GDqcVVsznDv
-         XaTuZhRj2yW4+NhqzvcGQC7oPlloaFFNxlcbOzDHQvppOiHaYM/eydvrOoe2PJRLaMlV
-         nKY2eCpsp3U0iPtcB/xopQJyVJvDFhr6SOWxAhQjLpCurng6zBq17Trba2uXQAJkOMF2
-         McDm8p1i2eKY97bu+dR7kfXdIoXEvo3DuuCSzSvNPnfSkkA6Bc2iqeYSVUul8X9IUEeK
-         4rSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782741541; x=1783346341;
-        h=content-transfer-encoding:content-type:in-reply-to:organization
-         :content-language:from:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=H2hMYouoBeVpY2zemXppJ2FB9RiNJKITJKx7SI0axBE=;
-        b=rjexEetejDhCVpcgwOFlNF82x8DEnfv0HeRyM77PUWkvQKfkMZdIaGw1v5xw7Et2f7
-         e8nIPBC9e/F9z8J27MyT92BbFtGrNmBegYh807qq9JAiNYpiL/1nm/auwy8btfudgexJ
-         YTn0Iqvbwtt4LjVzW4LzYNokxGoyUxEU6tIcvaczWMhnihnheGmSBrvMroMdieyXHfKN
-         UwgMHK9M5Gye4BJTUmd5K+vvT3Bf2GNb3FB/uJRSUqFUhhV2dnfflOosThqqK8tj1Jnx
-         PRVRhKyEcgT/aqgMwnjBJTtdBqHuh9HN1ZukPrZUasof+g7kA6Eumnztof4hzpFudgre
-         TPDg==
-X-Forwarded-Encrypted: i=1; AHgh+RrE/ALIkfU6IFsb5iypDPjY0hi7Siv6R+NMvMST6dDye8j6PbXsE7pDbMId8wSZAHym/k8Tw0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLhydgILlAtnPbScgiIz/9k37PIbptO77Lee1WqyarbCJmrLEc
-	sXrwGbdBeOjj277VUhpRSDfJi1WVi/BpSbcEqedb96fj6MT+TzQ8bO92CkrL5+PRq6w=
-X-Gm-Gg: AfdE7clgsXGH1Vsf/mO1PfG3K9ezD2UQtrzWA6J+JYG3VgrBVnGu/VQEsDkNceFBSEa
-	IBQ790029uwyWjqWlAlLP3SeBcchCT/GXB9JxgDDeWbZ303XSSG/efqckauBEKFgBSdyj3P71j7
-	quTxHcu9vpJillF4PkgymfbfwMva2mJfS51vkwtjfDMI9giTiYP7Pyn0iQFVv1o+jXznRHe+FCn
-	gPbEhFGwVwo4i7FDLbI7qlLwXjHm/zKyNMleSA5hCsLV26WuIQiFdaQBjxyOvl0LxrfjIw70fZi
-	/S6CwX3VEQzR30h1Ec0gCgh3L5GCLMvP8HFOZe8V26FbkfGJZhgsLC7YC/CdwvnQKQprZTA8v28
-	PX/wlaZgkxVVeBDUjvC2930wuD07oT1ar7IyHliE/Ap+TaYfBzKdvN++ojXgQgtUEOVlEeB/qi3
-	YkKnu2SO/WX3HOn6MacYdJziYAiJyGqjKh+dpgkjCGDlvUPu254peK6Xa737x9MDIdFQ==
-X-Received: by 2002:a05:6000:4210:b0:46a:6474:8392 with SMTP id ffacd0b85a97d-46dc235912emr15722207f8f.7.1782741541235;
-        Mon, 29 Jun 2026 06:59:01 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:ab7:2110:6a1d:efff:fe52:1959? ([2a01:e0a:ab7:2110:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-472c7bec9c2sm15231360f8f.12.2026.06.29.06.59.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jun 2026 06:59:00 -0700 (PDT)
-Message-ID: <dd26c96a-8c9b-4dc3-8eb8-a1c6a8842aab@6wind.com>
-Date: Mon, 29 Jun 2026 15:59:00 +0200
+	s=arc-20240116; t=1782741669; c=relaxed/simple;
+	bh=hSN7TvGACiX/VENRWbwYtdmD1cWJQWAUeY+mVYJi3/k=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=jXCu+Gl08s3+NJfuSaNXRhT7KtbL84mCUJ92180IRxebf7MhOaKQyjk7Hx5YhKuApPMiglKaEDLY0hqFdc/HYWQEa3eOT9WCq5Pf0tpaVr30uBvtplGsrO7UkXmGFqJbofbY7TgeHd1ZTRq8MjjVtfWVb87A9cIigkavL/EAgX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Cg/gmrxA; arc=none smtp.client-ip=213.133.104.62
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=kdEWjGMOYnlDAfLALUWtqU5J62xF5F+MXIBCeOFyv+E=; b=Cg/gmrxA1R21oc7TtzY60RfYsK
+	bBkPinVh+2ZQGpaf4kakheD9OKOCDYi4cAIml4tj0C/wVEgThjEpIIZosDSfCfKNXAmWMTTuOtlLo
+	PBDfEbHTOtew/TOKakvSoEog8OW5DeumWkqr/ShfyiF+fuG4enhECalMZdJIhienyFgk0IS2LA6z9
+	h3uR2fnYQkKAlYaB+E6y2rsIxW2HkWOA5o9E/GJsFWFKhmu7NHXf5n/dS/KWuWAVYquKeuBHX5s6I
+	dIcWAVO+d7GsmZ4hnOCjg9eI6ZKUJCddR9z05CL/yyXzR28gfvZdkPKj72N6l1HdjC2eHwma7gZ10
+	27+O4Irw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1weCXl-0007pj-2O;
+	Mon, 29 Jun 2026 16:01:01 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1weCXk-000A9O-2B;
+	Mon, 29 Jun 2026 16:01:00 +0200
+Message-ID: <067ffbd7-0ed8-47e8-9541-daae18249a9b@iogearbox.net>
+Date: Mon, 29 Jun 2026 16:00:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,108 +66,212 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next v2] ipv6: honor per-interface proxy_ndp in
- forward and NA paths
-To: Chenguang Zhao <chenguang.zhao@linux.dev>, dsahern@kernel.org,
- idosch@nvidia.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: horms@kernel.org, netdev@vger.kernel.org,
- Chenguang Zhao <zhaochenguang@kylinos.cn>
-References: <20260623085600.396401-1-zhaochenguang@kylinos.cn>
- <20260629061831.1211922-1-chenguang.zhao@linux.dev>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH net 1/3 v2] net: Extend bpf_net_context lifetime to cover
+ qdisc enqueue
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ toke@toke.dk, Steven Rostedt <rostedt@goodmis.org>,
+ Petr Machata <petrm@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, linux-rt-devel@lists.linux.dev,
+ bpf@vger.kernel.org, security@kernel.org, stable@vger.kernel.org,
+ Victor Nogueira <victor@mojatatu.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <20260629102157.737306-1-jhs@mojatatu.com>
+ <20260629102157.737306-2-jhs@mojatatu.com>
+ <a1a31c1e-b5bf-458f-a80a-bc324fc7a07c@iogearbox.net>
+ <CAM0EoM=QsOZ+mbWk7Ysv8-UNMzbmzbYiNXvF9fjEnG1-bDv6YQ@mail.gmail.com>
+ <8a462b1c-b79b-42c5-8409-a36ad727f994@iogearbox.net>
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260629061831.1211922-1-chenguang.zhao@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <8a462b1c-b79b-42c5-8409-a36ad727f994@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/28046/Mon Jun 29 08:27:20 2026)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302667-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302669-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:chenguang.zhao@linux.dev,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:zhaochenguang@kylinos.cn,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:toke@toke.dk,m:rostedt@goodmis.org,m:petrm@nvidia.com,m:ast@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:linux-rt-devel@lists.linux.dev,m:bpf@vger.kernel.org,m:security@kernel.org,m:stable@vger.kernel.org,m:victor@mojatatu.com,m:bigeasy@linutronix.de,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,toke.dk,goodmis.org,nvidia.com,gmail.com,lists.linux.dev,mojatatu.com,linutronix.de];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,kylinos.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 28E9E6DBBA2
+X-Rspamd-Queue-Id: D4E646DBD62
 
-Le 29/06/2026 à 08:18, Chenguang Zhao a écrit :
-> ndisc_recv_ns() has always checked both devconf_all and idev->cnf for
-> proxy_ndp, but ip6_forward() and ndisc_recv_na() only looked at the
-> global setting. The original commit left XXX comments in these paths
-> likely because idev was not available there at the time; ip6_forward()
-> now obtains idev from IP6CB(skb)->iif.
-> 
-> Honor per-interface proxy_ndp in both places to match the NS path and
-> allow setups that only enable proxy_ndp on specific interfaces.
-> 
-> In ip6_forward(), idev is looked up via the ingress interface (iif) while
-> pneigh_lookup() uses skb->dev. For ND packets this is correct because
-> vrf_ip6_rcv() does not modify skb->dev for neighbour discovery frames,
-> so both refer to the ingress interface.
-> 
-> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
-> ---
-> v2:
->  Per Ido's review, the following changes were made in v2:
->  - Target net-next instead of net
->  - Drop Fixes tag
->  - Expand commit message: XXX comment history, idev vs skb->dev for ND packets
->  - Fix subject prefix
-> 
-> v1:
->  - https://lore.kernel.org/all/20260623085600.396401-1-zhaochenguang@kylinos.cn/
-> 
->  net/ipv6/ip6_output.c | 4 ++--
->  net/ipv6/ndisc.c      | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index 368e4fa3b43c..c4ca4a813479 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -579,8 +579,8 @@ int ip6_forward(struct sk_buff *skb)
->  		return -ETIMEDOUT;
->  	}
->  
-> -	/* XXX: idev->cnf.proxy_ndp? */
-> -	if (READ_ONCE(net->ipv6.devconf_all->proxy_ndp) &&
-> +	if ((READ_ONCE(net->ipv6.devconf_all->proxy_ndp) ||
-> +	     (idev && READ_ONCE(idev->cnf.proxy_ndp))) &&
-As stated by Ido, this changes a 20 years old user-visible behavior. It suddenly
-may enable proxy NDP on a system.
-I was thinking that this kind of change was prohibited.
+On 6/29/26 3:48 PM, Daniel Borkmann wrote:
+> On 6/29/26 3:36 PM, Jamal Hadi Salim wrote:
+>> On Mon, Jun 29, 2026 at 9:01 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>> On 6/29/26 12:21 PM, Jamal Hadi Salim wrote:
+>>>> The bpf_net_context used by sch_handle_egress() is stack-allocated and torn
+>>>> down in that function returned. By the time tcf_qevent_handle() runs
+>>>> current->bpf_net_context is NULL.
+>>>>
+>>>> When a filter attached to a qevent block (e.g. RED's early_drop or mark
+>>>> qevents, which always use shared blocks) returns TC_ACT_REDIRECT,
+>>>> tcf_qevent_handle() calls skb_do_redirect(), which in turn calls bpf helper
+>>>> bpf_net_ctx_get_ri().  That helper unconditionally dereferences
+>>>> current->bpf_net_context resulting in a NULL pointer dereference.
+>>>>
+>>>> Note: The same holds for actions that invoke BPF redirect helpers
+>>>> (e.g. act_bpf running a program that calls bpf_redirect()) during qevent
+>>>> classification itself.
+>>>>
+>>>> Fix:
+>>>> Move the bpf_net_context lifecycle out of sch_handle_egress() into
+>>>> __dev_queue_xmit(), so that it spans both the egress TC fast path and the
+>>>> qdisc enqueue.
+>>>> Note: The call is placed outside the egress_needed_key static branch
+>>>> to cover the case where clsact static key is disabled. Unfortunately this
+>>>> adds a small unconditional penalty to the code path _per packet_ only
+>>>> guarded by CONFIG_NET_XGRESS (two writes and one read).
+>>>>
+>>>> As pointed by sashiko [1]:
+>>>> The same context must also be set up in net_tx_action()'s qdisc drain
+>>>> path, since qdisc_run() -> netem_dequeue() -> qdisc_enqueue( RED child)
+>>>> can trigger qevent classification asynchronously from softirq context.
+>>>>
+>>>> This keeps all bpf_net_context management in net/core/dev.c i.e the
+>>>> existing boundary between tc core and BPF without requiring any net/sched/
+>>>> code to know about BPF plumbing.
+>>>>
+>>>> Reproducer:
+>>>>
+>>>>     tc qdisc add dev eth0 root handle 1: red limit 1MB min 10KB max 20KB \
+>>>>         avpkt 1000 burst 100 qevent early_drop block 10
+>>>>     tc filter add block 10 pref 1 bpf obj redirect.o
+>>>>
+>>>>     traffic through eth0 triggers red_enqueue() -> tcf_qevent_handle() and,
+>>>>     on a redirect verdict, a NULL deref in skb_do_redirect().
+>>>>
+>>>> Fixes: 3625750f05ec ("net: sched: Introduce helpers for qevent blocks")
+>>>> Tested-by: Victor Nogueira <victor@mojatatu.com>
+>>>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>>> Could we simplify patch 1 & 2 by just moving the bpf_net_ctx_set() and
+>>> bpf_net_ctx_clear() into a tcf_classify_qdisc() wrapper where we don't
+>>> end up having to touch the core TX code?
+>>>
+>>> Untested diff :
+>>
+>> This is bpf plumbing which doesnt belong in tc really. You already
+>> moved most ebpf/clsact stuff into dev.c - let's just keep it there.
+>>
+>> As a side note: calling a hierachy of N qdiscs we would incur N
+>> set/clear cycles for N levels — and worse, qdiscs like HTB and HFSC
+>> iterate filters while loop calling tcf_classify_qdisc() per iteration,
+>> so each filter chain traversal does set/clear per proto.
+> I'm just saying that this is a lot simpler and taken out of the core fast
+> path. Also, I think you forgot to Cc Sebastian on the whole v2 given the
+> bpf_net_ctx_{set,clear} dance. Imho, having them via tcf_classify_qdisc or
+> something similar would be the much better choice compared to sprinkling
+> ifdefs since you want to block the TC_ACT_REDIRECT from classifiers attached
+> to qdiscs.
 
-Regards,
-Nicolas
+
+Q @ Sebastian, we could probably also do sth like this, wdyt between the
+two options :
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index b446aa8be5c3..04683569ee0c 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2554,7 +2554,7 @@ BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
+  {
+         struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+  
+-       if (unlikely(flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL)))
++       if (unlikely(!ri || (flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL))))
+                 return TC_ACT_SHOT;
+  
+         ri->flags = flags;
+@@ -2575,7 +2575,7 @@ BPF_CALL_2(bpf_redirect_peer, u32, ifindex, u64, flags)
+  {
+         struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+  
+-       if (unlikely(flags))
++       if (unlikely(!ri || flags))
+                 return TC_ACT_SHOT;
+  
+         ri->flags = BPF_F_PEER;
+@@ -2597,7 +2597,7 @@ BPF_CALL_4(bpf_redirect_neigh, u32, ifindex, struct bpf_redir_neigh *, params,
+  {
+         struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+  
+-       if (unlikely((plen && plen < sizeof(*params)) || flags))
++       if (unlikely((plen && plen < sizeof(*params)) || !ri || flags))
+                 return TC_ACT_SHOT;
+  
+         ri->flags = BPF_F_NEIGH | (plen ? BPF_F_NEXTHOP : 0);
 
