@@ -1,184 +1,199 @@
-Return-Path: <netdev+bounces-302812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FUqWBc/DQmoNBAoAu9opvQ
-	(envelope-from <netdev+bounces-302812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:13:19 +0200
+	id yX+nH4fFQmojBQoAu9opvQ
+	(envelope-from <netdev+bounces-302813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:20:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6857C6DE3AC
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:13:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0C8D6DE40E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:20:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b="Mufrl/pu";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302812-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302812-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=R9BrGp9K;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302813-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302813-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B89B30125C3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:13:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C781301349D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7862139768D;
-	Mon, 29 Jun 2026 19:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A55395AEA;
+	Mon, 29 Jun 2026 19:20:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429F9388860;
-	Mon, 29 Jun 2026 19:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56682EFD95
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 19:20:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782760396; cv=none; b=m8bBmXkMty4GSSIPQCJbrhooB9ArtbD1HIIHh00UDOsArcF0z6bvwbMwil+tAxpJSIHN4auFR9fftR1nUSXJgvIHEXAllOwKeW/k2BaS3BoGyPlMn+p6dMWZeGZI8RHlMgTzyDgO8EIKuefjJK34A3bVHMKBXRg1t1Hrxg80zeY=
+	t=1782760836; cv=none; b=LDjb47IUSk19eiX319IW8tlfChvOb8Zrj/UxDe/5oOMloMjRpPAyFa6CjcRhXJN1XfwUcaN1P7gSUzTxO+ivAsBVj+PrkGsVKST2VCjkZfHV86VH87bWYTtAMbfB10/zxQkVtmnA/pklfNjVzV2hPJ53y+Nt5nB6oi0kI9ZJ1Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782760396; c=relaxed/simple;
-	bh=c0y7Ew+PvG0Oeg+XBYMEeRsYFREdBeoCETk97Xte2V8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pVarhlLO/zKI9K8cijUfomJGcJq56/3LtKGSI0sELD3CFnNxzeAU1urvYpJVkPbKGY4rCv52hceDAxZod/zD8xixfWk9S6EZUy/VXwL6rGJ5dUxGzs0mWY49NzXITz7nVMgXQikmoRPoz8uRItlpu6E9g4KHkakCFYcf8ZgI69M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mufrl/pu; arc=none smtp.client-ip=192.198.163.9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782760394; x=1814296394;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=c0y7Ew+PvG0Oeg+XBYMEeRsYFREdBeoCETk97Xte2V8=;
-  b=Mufrl/puEgRp4f3IT1rCInTe1hq5sI87GKwyCyHKRL5+HiJo/nxxSERE
-   f0RcNmAeP84qjeW0cdinnx6Z3J7VJIvOoloXsof12lDpo87Nmf76yKE2U
-   dHDLkKJhRwxmPFdwY7310NMegGj5i5S3ezSBljc9G48UQdlUzkcBxVfCQ
-   pjFmiD+49jyMb8jyWfZYfGycK1zfeN+ssPDpSxM2nzo09wOMajQKVCohA
-   hAB5JgtQoagNgfZkxe8Es9le/LeZuG1lFFA7aeXS4u+iRewW+rVS7Tw3+
-   OI6Kcn3+NaII00mxtDdnAMKJrKtGJ4/4VnsYDzD8BmitqmfpQ61pPFHl9
-   A==;
-X-CSE-ConnectionGUID: Jllih6iASHy4CUVg1cxsGQ==
-X-CSE-MsgGUID: P/myDc7fQ9a0AGULhWtuig==
-X-IronPort-AV: E=McAfee;i="6800,10657,11832"; a="94119869"
-X-IronPort-AV: E=Sophos;i="6.24,232,1774335600"; 
-   d="scan'208";a="94119869"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 12:12:53 -0700
-X-CSE-ConnectionGUID: Kns7fM1fT+ew7qjupBSp+w==
-X-CSE-MsgGUID: ukhby1NTRN2OWgB6mpYoTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,232,1774335600"; 
-   d="scan'208";a="250986913"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa010.jf.intel.com with ESMTP; 29 Jun 2026 12:12:48 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	stfomichev@gmail.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	tushar.vyavahare@intel.com,
-	kerneljasonxing@gmail.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH v3 net-next] selftests/xsk: Preserve UMEM view in BIDIRECTIONAL test
-Date: Mon, 29 Jun 2026 21:12:21 +0200
-Message-Id: <20260629191221.2700-1-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1782760836; c=relaxed/simple;
+	bh=AksPqJm8AdB8z1GseHv2j/6UI9KT3j821AcEjIKRZf0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nXubU/ClKt8Ly9Itk2i77a/zmtru/gMgnynqTuI3Tnaccp6eEGj/xi390g20N0IEjL5bE+Q9/2geialq7/Gam04jQk3lUeFfGxxDAV0axZ2WxmCUGg8QqIoI9zV2+P9r4meaclq2xpl/9GMoYf67UjO7pN2WoktzIzO4QM9343E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tanshuhao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R9BrGp9K; arc=none smtp.client-ip=74.125.82.73
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-1384427c3efso11701980c88.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 12:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782760834; x=1783365634; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tuVF3Ubxy2bUmwCTppAH3J3uuqug40elm+qvkif8OCQ=;
+        b=R9BrGp9KZNZTcwu+pZFC/+ubQCHAL8u19fS90sISGqNFHb3GhtwlHvgA7TTs2t8IlC
+         j/cl4uIlbugJR7cKPUdyMJ0mqkihE2IwqAlkZzGTHGOXnuUGWhSCeEWoj5Dohbcp6wM3
+         l/eC/NGv7talln9Zu6JXDtMEYLnVTxDn08/uMnOt1bFstRsVgkrz+mZWp1YGTIoXTbDY
+         yQ4G0+qycmFLOYFKaQCyB3wU+QGMhqaP3/fCtlmq2kTfWAPXPdDZ5EeNUxLlCcf2ENrn
+         VxEUKCegT5dKXyWLIU9vfDPfq4EQLyj7LS0RkYj6XlEvRXT2VGn63wqh+nwWhE5YL8aP
+         Z82Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782760834; x=1783365634;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tuVF3Ubxy2bUmwCTppAH3J3uuqug40elm+qvkif8OCQ=;
+        b=Y0Gm6LckKnVO0zfPpFz+DROk9pB2vM7q4KrkfkYiKrsS7Ik/XAYrwHJ1BjnMrG5QNm
+         VajX3zwEcIJ+phVyQGbWDGxv0iQYwh3hKfYbtPN6hHEWStNApP4phqZRJ4Vs5Cv4TVQo
+         K0CR1IH4JtTzgsmX9kr0iSgtwlG6PWWbsBvRAzXVi+H73wkEukXYu57pCYk3gy8CQA8K
+         JKmSoi7yB49HwygN5a/eyV9FO+BvKAZ2rxE2+jd+F+CzJwtVGFUAawlgdV2vOOs5R3zI
+         cq+iB11ALB0AvAG/hYAfzLTvvdOgLa+cUKABWnHoWdo7Inhit2BNncMN9MGf/zS+04hu
+         fb+Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/bCq6wX/PBYvRotJyWcrCR5JRWMjU35zyg2HKlLULI1TrM7GYrsm+k8YFq1l9ap48CDL2CvSA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxs8+WYUhSHnGuDxYRu19ibjf5LIFjRDnlOv03TLBkhza48m4rq
+	nulNPl+S1N0PikfUQdve87mxceJrGCB9+vCuoxTvACXbfMF9XI/b2YDaNKZIGO75WLH/ikpOn9Z
+	MsmQ7gCykvrfekjVEbw==
+X-Received: from dldyq21-n2.prod.google.com ([2002:a05:701b:4555:20b0:139:a5e6:cf73])
+ (user=tanshuhao job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7022:923:b0:137:e532:f53f with SMTP id a92af1059eb24-13b2a1c32b0mr389067c88.34.1782760833527;
+ Mon, 29 Jun 2026 12:20:33 -0700 (PDT)
+Date: Mon, 29 Jun 2026 12:20:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260629192029.4013794-1-tanshuhao@google.com>
+Subject: [PATCH net-next v1 0/2] Reuse threaded NAPI kthread across napi_del()/napi_add().
+From: Shuhao Tan <tanshuhao@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
+Cc: Shuhao Tan <tanshuhao@google.com>, Mina Almasry <almasrymina@google.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:shuah@kernel.org,m:tanshuhao@google.com,m:almasrymina@google.com,m:skhawaja@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302812-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:magnus.karlsson@intel.com,m:stfomichev@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:tushar.vyavahare@intel.com,m:kerneljasonxing@gmail.com,m:maciej.fijalkowski@intel.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER(0.00)[tanshuhao@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302813-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tanshuhao@google.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6857C6DE3AC
+X-Rspamd-Queue-Id: D0C8D6DE40E
 
-The UMEM state refactor made __send_pkts() use xsk->umem for Tx
-address generation. At the same time, the shared-UMEM Tx setup copies the
-Rx UMEM state into a Tx-local state object and resets base_addr and
-next_buffer before configuring the Tx socket.
+Currently the lifetime of the kthread of a threaded NAPI is tied to
+the napi_struct. netif_napi_del() stops the kthread when it destroys
+the NAPI struct.
 
-Passing that Tx-local object to xsk_configure() makes xsk->umem point to
-the zero-based Tx allocator state. This breaks the BIDIRECTIONAL test once
-the roles are switched: the same socket is then used for Rx validation, but
-received descriptors from the other logical UMEM half are checked against
-base_addr == 0. With the new UMEM bounds check, a valid address such as
-base_addr + XDP_PACKET_HEADROOM is rejected as being outside the UMEM
-window.
+This patch series reuses the same kthread (thus preserving all of its
+attributes) across napi_del/napi_add. The kthread is parked between
+napi_del and napi_add. This series now ties the lifetime of the
+kthread to net_device instead of napi_struct.
 
-Keep xsk->umem as the shared/Rx UMEM view used for socket configuration
-and Rx validation. Use the ifobject-local UMEM copy only for Tx descriptor
-address generation, preserving the BIDIRECTIONAL test's intent of using
-the proper logical UMEM half after the direction switch.
+The usual workflow for threaded NAPI will be "enable threaded" ->
+"configure the kthread". Driver reset (that can be caused by a NIC
+configuration change or link flap) often destroys the configuration
+and causes a usability issue. This series aims to improve on this.
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
-Tested-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+There is a downside of this approach: If a device reduces number of
+queues while its NAPIs are threaded. The kthread associated with
+removed queues will not be stopped. Since the mapping between the
+index passed to napi_add_config() and NAPI is an implementation
+detail of individual drivers, it is not straightfoward to perform
+a garbage collection and stop kthreads that are no longer associated
+with a queue. The kthread still shows up in /proc, but should not
+consume CPU cycles since it is now parked.
+
+There was a discussion
+https://lore.kernel.org/CAAywjhR0TPKZ-xzqjSP709OVmZWUisDNv2CVc_VxgOrXRtop+g@mail.gmail.com/
+around what to do with the kthread between napi_disable/napi_enable.
+It seems that there was an intention to keep user configuration for
+the kthread across NIC configuration change. This patch series extends
+the effort to cover more NIC configuration changes. Roughly tracing
+through the call hierarchy of napi_del reveals that at least the
+following drivers will not preserve the user configurations:
+- idpf: idpf_set_channels(), idpf_set_ringparam()
+- mlx4: mlx4_en_set_ringparam(), mlx4_en_set_rxfh(),
+  mlx4_en_setchannels()
+- bnx2: bnx2_set_ringparam(), bnx2_set_channels(), bnx2_change_mtu()
+- gve: gve_set_channels(), gve_set_ringparam()
+- ena2: ena_set_ringparam(), ena_set_channels()
+- fbnic: fbnic_set_ringparam()
+- (non exhaustive)
+
+These drivers destroy and recreate queues during configuration
+changes. If a NAPI was threaded before destruction, during the
+creation, a new kthread will be spawned for the NAPI.
+
+Some drivers do not have this problem, e.g. netdevsim. But these
+drivers and the drivers mentioned above will still lose kthread
+during link flap (ndo_stop/ndo_open).
+
+Because the kthreads before and after these configuration changes are
+different, all the attributes associated with the kthread are lost.
+These include CPU mask, priority, scheduler policy, etc.. If the
+threaded state is preserved for a NAPI, it makes sense to want to
+preserve the attributes of the thread as well.
+
 ---
-v3:
-- target net-next
-- remove fixes tag
-- rebase
-- add Jason's tag
-v2:
-- fix SoB line
-- rebase
-- add tags from Tushar
----
- tools/testing/selftests/bpf/prog_tests/test_xsk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes since RFC v1: https://lore.kernel.org/netdev/20260612173644.380972-1-tanshuhao@google.com/
+  - Refactor to get rid of RCU usage
+  - Treat napi_config as a mirror during the lifetime of napi
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xsk.c b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-index 6eb9096d084c..477aedbb01ba 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xsk.c
-@@ -1164,8 +1164,8 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk,
- 		       bool test_timeout)
- {
- 	u32 i, idx = 0, valid_pkts = 0, valid_frags = 0, buffer_len;
-+	struct xsk_umem_info *umem = ifobject->xsk_arr[0].umem_real;
- 	struct pkt_stream *pkt_stream = xsk->pkt_stream;
--	struct xsk_umem_info *umem = xsk->umem;
- 	bool use_poll = ifobject->use_poll;
- 	struct pollfd fds = { };
- 	int ret;
-@@ -1514,7 +1514,7 @@ static int thread_common_ops_tx(struct test_spec *test, struct ifobject *ifobjec
- 	umem_tx->base_addr = 0;
- 	umem_tx->next_buffer = 0;
- 
--	ret = xsk_configure(test, ifobject, umem_tx, true);
-+	ret = xsk_configure(test, ifobject, umem_rx, true);
- 	if (ret)
- 		return ret;
- 	ifobject->xsk = &ifobject->xsk_arr[0];
+Link: https://lore.kernel.org/netdev/20260612173644.380972-1-tanshuhao@google.com/
+Link: https://lore.kernel.org/CAAywjhR0TPKZ-xzqjSP709OVmZWUisDNv2CVc_VxgOrXRtop+g@mail.gmail.com/
+
+Shuhao Tan (2):
+  net: Save kthread of threaded NAPI in napi_config and restore it when
+    trying to create a new kthread.
+  selftests: net: Add kthread preserving test in napi_threaded and
+    busy_poll_test
+
+ include/linux/netdevice.h                     |  12 ++
+ net/core/dev.c                                | 106 ++++++++++++++----
+ .../selftests/drivers/net/napi_threaded.py    |  41 ++++++-
+ tools/testing/selftests/net/busy_poll_test.sh |  24 ++++
+ 4 files changed, 163 insertions(+), 20 deletions(-)
+
 -- 
-2.43.0
+2.55.0.rc0.799.gd6f94ed593-goog
 
 
