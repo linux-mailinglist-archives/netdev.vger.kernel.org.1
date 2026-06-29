@@ -1,174 +1,173 @@
-Return-Path: <netdev+bounces-302445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4fmZL7bcQWrCvAkAu9opvQ
-	(envelope-from <netdev+bounces-302445-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 04:47:18 +0200
+	id VqMvNdPcQWrHvAkAu9opvQ
+	(envelope-from <netdev+bounces-302446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 04:47:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 233A06D58E5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 04:47:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF7D76D58ED
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 04:47:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302445-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302445-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=g895083d;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302446-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302446-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA04F30022B2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 02:47:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 064343007940
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 02:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C490374E63;
-	Mon, 29 Jun 2026 02:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED04379C45;
+	Mon, 29 Jun 2026 02:47:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE6C1A3029
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 02:47:03 +0000 (UTC)
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6936533343B;
+	Mon, 29 Jun 2026 02:47:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782701226; cv=none; b=tfiadPAj1Olb0qOMfbAPiB/hE4+cYa1oUSJ9K5A98rrCQWkE48t1g+b2bynSFJZf0yglW6mtO261vFiSg7aNVbLOZEzQLYrLZLrkiPouviY3E9Kg30ROOmv+c0uObJkjuCPIEMOJZCJwXuEkqTLO3kGwnJT0tTLL2ShT/6mTQJc=
+	t=1782701265; cv=none; b=cATC+4aFjn0sbc2x6OKU+pInlbkYW3X3jVaBtVhyf3r8vF6xMKjjXUsEyGF9+RNXEChUFW1EghBLc5aYkSYCcUwMHfTo8pcdtoev06P09AbAIsnHmzf+jAdZ0Y1ZN2v/eJsLufJsA1fbvqQlsNteamRcqEdPZQoVREkDmclIkLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782701226; c=relaxed/simple;
-	bh=/akT817bRHgq9XHuX/qUE5uCkdu/0KK7dS+40ojAiCo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JrPyIyF3n6muXrw0bsWmG8Y2srHsfhATQ7J/9FxV+b3AO2CidLIoYq8SXGKCGcE3+wbFmVf91F3vJsY0JApH73F8xdPgVmwxcJMRaYOg8hjGm7y+XslTLQqFTmMdHTsOCYfqWX/R5ZOANiOBH+q1IRPERaJ3EQ36rV8gSzSkygI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
-Received: from enjou-Legion-Y7000P-2019 (unknown [117.157.85.28])
-	by app1 (Coremail) with SMTP id ygmowAD3E7593EFqD3XCAA--.7547S4;
-	Mon, 29 Jun 2026 10:46:36 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	cong.wang@bytedance.com,
-	peilin.ye@bytedance.com,
-	gnault@redhat.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	bronzed_45_vested@icloud.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 2/2] net/sched: act_vlan: skip pop_eth on non-Ethernet devices
-Date: Mon, 29 Jun 2026 10:46:04 +0800
-Message-ID: <40fe2d7dfce13411bfbe9271c0f7c54fb7e88e3b.1782548651.git.bronzed_45_vested@icloud.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1782548651.git.bronzed_45_vested@icloud.com>
-References: <cover.1782548651.git.bronzed_45_vested@icloud.com>
+	s=arc-20240116; t=1782701265; c=relaxed/simple;
+	bh=IfiArASDtxlFBPheGBtZmD17AkDg02i+zYiovzmIuoo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuoaTuk4iYqi6cXgK446+4gLYjpif2Yf+NzTxnAZ85M7n6DmAnzz2dhmV6DC7vDVhFNcsLrY99OnpbebYk1pUBn1Q9tQ5Z1V0O0/y1dbvgYfegl6JVHzHEVCsEZPuRoSsJlG9OfO/kG7f96auMVmtuc0MgPOhqcN6QJ9T9IBpKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=g895083d; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65T2cwJ0740293;
+	Sun, 28 Jun 2026 19:47:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=IfiArASDtxlFBPheGBtZmD17A
+	kDg02i+zYiovzmIuoo=; b=g895083dr0vUMu5EYngr4MB3P2PVn79OvhylcVE77
+	l41zyrqAkS7QL5m9SfoO7PAdhhRsyubkuiBbw1X0OL5qgBt3J1RSIMjnXmJYiQ+6
+	u/Xtw27AmXJd+cBMaScOa8oylZdfOUyJ/FEy4oHNgrZVcqlZ0iWH8DC1+lzkGhax
+	wS9bUrMG2CoLADQj7vSw/7stNHjKK3uAv/alUb2YoZlnQe2qk7kyaL/w1bPT7gnS
+	DWpHINDJMrGXrZucxCPuXPyr9MAmtqE4Tgsd8xNqy0ky2qViUlXhn8Q7m5iK/8kJ
+	rTD4k4Zc0JiwqIOw50L3CDfjqInHJLv/No3vl0kItvZ6w==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f32s69awt-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 28 Jun 2026 19:47:16 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 28 Jun 2026 19:47:07 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 28 Jun 2026 19:47:07 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id E8DA83F7069;
+	Sun, 28 Jun 2026 19:47:01 -0700 (PDT)
+Date: Mon, 29 Jun 2026 08:17:00 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Dawei Feng <dawei.feng@seu.edu.cn>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <bbhushan2@marvell.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <jbrandeb@kernel.org>, <richardcochran@gmail.com>,
+        <amakarov@marvell.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+        <jianhao.xu@seu.edu.cn>, <zilin@seu.edu.cn>
+Subject: Re: [PATCH net] octeontx2-pf: fix SQ resource leaks on init failure
+Message-ID: <akHcpA2kRjtkDfg4@rkannoth-OptiPlex-7090>
+References: <20260627060350.2544241-1-dawei.feng@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowAD3E7593EFqD3XCAA--.7547S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF13CF45uw15Ary8ZFWxCrg_yoW8AF47pF
-	ZxurWDKFZ7Jr17Gr1kC3WUAr4jgr4DGrsxKr95K34UZw1xKrn5Kr90ganI9r1kArWYkay5
-	Ary29rn8Ga1qvrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBI1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVAFwVW8JwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7
-	Cv6cx26r4rMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
-	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42
-	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY
-	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRiCJPtUUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQENCWpA2VUKzAAAsk
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260627060350.2544241-1-dawei.feng@seu.edu.cn>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI5MDAyMiBTYWx0ZWRfX3Ynaswn5VgXL
+ 8jUpGm8MzLXzduUhQakQ26/ryhaLWdWWitoRwryZ4QhosipB/F5x30tnNb/7JumENjGGKuVMZmL
+ BMmlbf0TyMXiTLmPv0+w2VMx0OUZVR8cJnAAptFDYCtDGuvhOQcXz5Sz/QgpxCX8Jy2X8IxATX8
+ u4ByMKB/gZiq4JPTyzsqjpwzeMY8iqpFwxbx5QJ+nniXpxGDz4IpJXg+xQFEhbgUvqFHHvnXj57
+ 2sTRR7TQ1YugLxMYJo4p1u8lZ7iHnn6Aznw9DeojcfFM78z5NZLQ5qcpZffzOtapOcCJbafvO+Q
+ TD1f1FStzc12r7rwKv7fPC+KqjxATux6mb2U163WEWofKEHRLyPlYiRC7+DiG2gLmiPa80rtWfZ
+ QN61mfewMCnTzPXHQ9S+ktiFQhj2kfzcMCXhfH04CXfAXeGMEzMmOFb2HSiI1hJcZ753IvpkwQ7
+ 2LVf3bmmwYfeAbxbbhQ==
+X-Proofpoint-ORIG-GUID: e0wTKTtZQAl40xmpJ7PjsYOfj1oRVHnL
+X-Authority-Analysis: v=2.4 cv=e6Y2j6p/ c=1 sm=1 tr=0 ts=6a41dcb4 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
+ a=M5GUcnROAAAA:8 a=ceM9LITnlY0sHtZh5UYA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=4Pbm1F1Cy1QVNLGpYn_S:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI5MDAyMiBTYWx0ZWRfX8Cmg3ZxK7byq
+ Yhlq60x1rmQnY1lYuAHKRINl8mfRWP4Stk6cDmNaVWbiS6AWgb+oUbgvyx5pDL+n3BsitCXuGnQ
+ lkg+gV1Jr/iQcQpaAujxuh49/ehrlbw=
+X-Proofpoint-GUID: e0wTKTtZQAl40xmpJ7PjsYOfj1oRVHnL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-29_01,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302446-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302445-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:cong.wang@bytedance.com,m:peilin.ye@bytedance.com,m:gnault@redhat.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,google.com,redhat.com,kernel.org,bytedance.com,gmail.com,lzu.edu.cn,icloud.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:from_mime,rkannoth-OptiPlex-7090:mid];
+	FORGED_RECIPIENTS(0.00)[m:dawei.feng@seu.edu.cn,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jbrandeb@kernel.org,m:richardcochran@gmail.com,m:amakarov@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:zilin@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,seu.edu.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lzu.edu.cn:from_mime,lzu.edu.cn:email,icloud.com:mid,icloud.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 233A06D58E5
+X-Rspamd-Queue-Id: EF7D76D58ED
 
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
+On 2026-06-27 at 11:33:50, Dawei Feng (dawei.feng@seu.edu.cn) wrote:
+> otx2_init_hw_resources() initializes SQ aura and pool resources
+> before several later setup steps. On failure, err_free_sq_ptrs only
+> frees SQB pages, leaving the per-SQ sqb_ptrs arrays behind. If
+> otx2_config_nix_queues() has initialized some SQs before failing, their
+> qmem-backed resources can be left behind too.
+>
+> Use otx2_free_sq_res() for the SQ unwind path and let it free sqb_ptrs
+> even when sq->sqe has not been allocated yet. Also free the PTP
+> timestamp qmem from the same helper.
+>
+> The bug was first flagged by an experimental analysis tool we are
+> developing for kernel memory-management bugs while analyzing
+> v6.13-rc1. The tool is still under development and is not yet publicly
+> available. Manual inspection confirms that the bug is still
+> present in v7.1.1.
+>
+> An x86_64 allyesconfig build showed no new warnings. As we do not have an
+> OcteonTX2 PF device and the corresponding AF mailbox setup to test with,
+> no runtime testing was able to be performed.
+>
+> Fixes: caa2da34fd25 ("octeontx2-pf: Initialize and config queues")
+> Fixes: c9c12d339d93 ("octeontx2-pf: Add support for PTP clock")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
 
-TCA_VLAN_ACT_POP_ETH removes a base Ethernet header, but tcf_vlan_act()
-currently runs it on any device type.
+Thank you.
 
-On non-Ethernet devices such as loopback, this can strip the linear
-ETH_HLEN bytes from an skb that later reaches code paths which still
-expect an Ethernet header, leading to a BUG in __skb_pull(). This is a
-short-packet handling bug caused by applying an Ethernet-only transform
-to a non-Ethernet skb.
-
-Treat POP_ETH as an Ethernet-only action and leave non-Ethernet packets
-unchanged.
-
-Fixes: 19fbcb36a39e ("net/sched: act_vlan: Add {POP,PUSH}_ETH actions")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/sched/act_vlan.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-index 6a375fdc63dd..b77f649ae204 100644
---- a/net/sched/act_vlan.c
-+++ b/net/sched/act_vlan.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/if_arp.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/skbuff.h>
-@@ -76,6 +77,9 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
- 		__vlan_hwaccel_put_tag(skb, p->tcfv_push_proto, tci);
- 		break;
- 	case TCA_VLAN_ACT_POP_ETH:
-+		if (!skb->dev || skb->dev->type != ARPHRD_ETHER)
-+			goto out;
-+
- 		err = skb_eth_pop(skb);
- 		if (err)
- 			goto drop;
--- 
-2.47.3
-
+Reviewed-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
