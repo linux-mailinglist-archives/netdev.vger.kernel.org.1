@@ -1,336 +1,263 @@
-Return-Path: <netdev+bounces-302644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AWRhAQ90Qmo67gkAu9opvQ
-	(envelope-from <netdev+bounces-302644-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:33:03 +0200
+	id wqcNINV1Qmrv7gkAu9opvQ
+	(envelope-from <netdev+bounces-302646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:40:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C3E16DB3FD
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:33:02 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B566DB5DE
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:40:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=PwMnYTaX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302644-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302644-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LFnYTSkF;
+	dkim=pass header.d=redhat.com header.s=google header.b=nJmKcovO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302646-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302646-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A9D6B3063CF0
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:25:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 071E83036C08
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8FA40B6F6;
-	Mon, 29 Jun 2026 13:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CB340860E;
+	Mon, 29 Jun 2026 13:23:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011015.outbound.protection.outlook.com [40.107.208.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1122240B396;
-	Mon, 29 Jun 2026 13:20:12 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782739214; cv=fail; b=jszpv7PVOAG1973cUX/gE7+DbxUswKnAsGD5yTCdF+SxlyRisT8Tj5gyK5Xxb5LsijODm72Ll12Erg4E8dLBgOp58Zgr/TVXXCP7t5tthGIP5dC5m6Yie5gplHqVFSjqfvKw+jPhbJWGZI654pM5sz3uP7zvhF5LNrToBlMqKnQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782739214; c=relaxed/simple;
-	bh=DLV3JzX9UJZyiMDnpO3GELl4Q6iOpXs4Ogpath2wiig=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XOOtETaEAdyukpOUbmoWUJCsMskuFrw7TMIQXuqPGJTSDh5C/I6fr1Zj/iyRVAcQSNeYz9952A5vYAlctkaDmHkuVJasdVxrH7CcvwewUkRlwI3V9lff2OucyZiq0HumEOJrUB6bgzsScXrP+jO0tGpd9jRrddUT4sf3YGvdMnA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PwMnYTaX; arc=fail smtp.client-ip=40.107.208.15
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=anIhbUTyhH8n3HnHuFtwZzrqsgfV4TeudHOwhHe+idBYQ82fSDgjpKQkqacRpS3VAV9sndc+aOjSLrOoz6yAEYicTIMk2ir7sYJOpA++LMNbE2kZluxCFh3a0VXCkxviHXbsuSb1RV1Hfg4Vf6CkPa4eseFD8PuDTRRRSd2e2mkQK+JkqxpRd3m55VLigLnvMArmPTbqoaFBW/6JhN/5xLkOS6F3OviSl3/mEQboj1vK/7Es0ilMuIDfD0onZTesHRo07qmIdWQMK2tuiV2QiRlfpoNl5hdmqlJADms08KGpG/rGujHDPsF2Ey5RKCQ5Wy9VVo4eLCBGyfP7hIkosw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xCG3b3wdI8k1jerGSUp6nKeRq+GU5pmXN0n5e6b5e5A=;
- b=Krv0et91KqvEOJosqlH16pl2r8R2Sqrmm4XOtvdxLtU7hVcrZ6Io01kVLFeZH9PqMu/QqRSr/L2Ti/ccAEUriZSs7q0GaP/9wfq2YtL01chss1uWOWiG/ORmAY4ZLDC8goGohQAS2Ps8RR5U3Czmr6+K+6BE7+BuTgKt9p3eRv7YaVrDHhypAkKW3DDS0xfxJZVzpqNXWm0FkJSMCT+naTjH0ep3bCWLK14Qz29xaEMBFO6hD9VD7fXY0SiFzQCfw8qgDLJblYGFuyvvj2royHt9VumT/+Ep6OjMtnghJvYFRVpwlNGRplA2eBeEOItn37gzlGW4wHjdoM25Eo4ZPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xCG3b3wdI8k1jerGSUp6nKeRq+GU5pmXN0n5e6b5e5A=;
- b=PwMnYTaX/wLTf6x9gCa7U9NXulrCI//oy1MNzodUEyQaQHI5X8KTvnNOi/2U/6vDPYca45M17HfM+ojrt8OmJxwoG0DfIyu34xuWUzH3+oBDnfIMSDNb6X6E92dx1BYspM81COCE5rgsTfQ8c4DhKsXkk7yRCGo5Q3eObG0cggs=
-Received: from DM4PR12MB6254.namprd12.prod.outlook.com (2603:10b6:8:a5::17) by
- SAVPR12MB999119.namprd12.prod.outlook.com (2603:10b6:806:4e9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Mon, 29 Jun
- 2026 13:20:10 +0000
-Received: from DM4PR12MB6254.namprd12.prod.outlook.com
- ([fe80::8211:9b5a:99d2:ffa1]) by DM4PR12MB6254.namprd12.prod.outlook.com
- ([fe80::8211:9b5a:99d2:ffa1%6]) with mapi id 15.21.0159.018; Mon, 29 Jun 2026
- 13:20:09 +0000
-Message-ID: <bde77dd7-fa7b-4d28-9a7b-3f0ce6587bf4@amd.com>
-Date: Mon, 29 Jun 2026 14:20:03 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v29 4/5] sfc: obtain and map cxl range using
- devm_cxl_probe_mem
-To: Richard Cheng <icheng@nvidia.com>, alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@kernel.org, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- dave.jiang@intel.com, Edward Cree <ecree.xilinx@gmail.com>
-References: <20260622124010.2192888-1-alejandro.lucero-palau@amd.com>
- <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
- <aj32gUuoZuTUODry@MWDK4CY14F>
-Content-Language: en-US
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <aj32gUuoZuTUODry@MWDK4CY14F>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO3P123CA0010.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:ba::15) To DM4PR12MB6254.namprd12.prod.outlook.com
- (2603:10b6:8:a5::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9464D23EA97
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 13:23:24 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782739406; cv=none; b=UOR4Z8+YWzJaPi+xDn5pB1GKGSb+Y1OOgm01bmg55+leKYBuayquX/RAFBuclZvaST10WIIn8zoz4q/tqL96X4o1PHxrN58UFAQcVI67AoUABSB+lAQIxmb6SbRjAZOyXFOsMeofLh43AR+Op4cLc9r+tNKDXnn1bagp1qaGnlc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782739406; c=relaxed/simple;
+	bh=jJa1vULXdD8nTb9yCBpvx7O8qwcNgz1MtHjhkOGJQGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ovGTBUON2s6fFuhNTUaHvz+UbdG/dYqyxhBCCXyUfuZx8ClcXh6SA/tR8oxRuzhHWyDzZTJDu9wjnoKx1Yi5zVcnbTXjCbht+o3ycmCjkkllz30ze9cgrcSf7Lwtrl6Db5METQ+0c74NHEhCikD3oGIjbNEeC0HVl9OIfWgJ0YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LFnYTSkF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nJmKcovO; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782739403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OGH0r9n8LKSOXIwJNJ0nZ8wggtzDvg5vMSxTltBG1AQ=;
+	b=LFnYTSkF7JhK8SfMyUn/JApZOGB2jcmSp25Z/dzFxQwKsk+PFJQGfRvyrC7cbq23d9FIHG
+	B9n02pr9HyEdxhKdVkEgHR04LqhULp7n2wl/9CcufNs9YbCNGyJyfGGnchcucRqB08fB2L
+	5Rn+GfbgzCS23oY+sE+JADCPuOhAwJ8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-224-8Li4ucE2Pgez1hSI5uvnDg-1; Mon, 29 Jun 2026 09:23:21 -0400
+X-MC-Unique: 8Li4ucE2Pgez1hSI5uvnDg-1
+X-Mimecast-MFC-AGG-ID: 8Li4ucE2Pgez1hSI5uvnDg_1782739400
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4924583c7baso37476855e9.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 06:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1782739400; x=1783344200; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OGH0r9n8LKSOXIwJNJ0nZ8wggtzDvg5vMSxTltBG1AQ=;
+        b=nJmKcovOWRRuxN1vCoF+Zh00cg0H5C6QcapW6Pj4i7T0AKdPcwoV3ljfX0nbMRR7W9
+         CBKUrUba+0N2G0xZDKI4REEyRQAG6/Tl4bdHLPLRK/K/rvBm9Ydbxu965/WTIEIZYNXZ
+         /fTGMyWd995FvpxArHjTToWDcZiFVDFKHr3BHc38uMzRviakWT/YHx3WwYUMiB14bfGU
+         7gSM+b/YxbiEgs2lzi/GrCKpqOtXxFh1O219xLQnUhso9YmUvyHW6lCdn8Cdp4BM5IAR
+         yqZoC9J08GY5LHVd6lBYjRsM995OU8aKwt+Cq+YHuWxKskSRD5RHM0wztzLprdpk5ZAH
+         Qm2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782739400; x=1783344200;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OGH0r9n8LKSOXIwJNJ0nZ8wggtzDvg5vMSxTltBG1AQ=;
+        b=WaFZgtdeKwr1WHwLA4AD+5NpoU2R25szY+WWA5jaLj9uEVz0n3dgdG8VcYrgusOSNx
+         b7xtcoGV+pHJqf3u7OEHzTYpvm0Lk5O0uuEuA6KR33eK+eAWwOJou25yJVD6SNaXS7y1
+         8SFrd609wF3r9n8kTLmpgYG5y/j45fUXfkonQTGYc6vpj2kjY31dEzd95DnyNa5Rv+kW
+         d1n+wLVmqQZSW14NCfau69myWsSMA97OpoDWAIseOpi3ZuJPtUYjd7YRZFOWOLwhYUXp
+         PspuMbVHHGToh8q24pAkHckJlzDzexdPc+VcYPh8FD5uXOBsUW8lenhJxuz+wv/wn8Dd
+         1uQQ==
+X-Gm-Message-State: AOJu0YwZ6cY/l5MwxPBIJV4C4gr4Nh0EYqE87yltGQBUaPRV94zAPnCO
+	mu6O9sAbHsvkv/9amNECFu4LpBaBbjCC4W4e2f2I20OgfBl8doYVsm/mfD5d1VveoJC5zNGaeFP
+	3dm1ryzv/dTgFycp/jtPGu2YIgMLmD4pz7hu/x14+bQVR93tsTew0kLCHqEKixt3esA==
+X-Gm-Gg: AfdE7cmLl7w0FhiMylOoFfs9UklCTWFsxNnmGgbpm69os7By8n0x+5pKATIUD4RzAiN
+	nK510UX3mPOn9/4Y68hmeMriyIe3NuVrlhNaFA3HvzM9pdk5tGJjoAuZ6UlvzVWyMS9gi3TLjP+
+	iZRGeObNUUohufpXzBNJN+Hy+hnGWzCGe2evlnl9h+bYY7svcX7NVPQP5u75Ll7RAOtyE9IdGUI
+	ccjcQceY0LTnkMfUb/2slSSw365xA9oBj4dx0IOYxPGs+cqjlTPGuUg8H1hI9RtWYomsN36g9+Q
+	guWKg+qAEfLkm/p85ReMPA8lQ/7Ea2hx9w05E3FD+B3aeU/PeWnfJrlOJ6+DHy5KYp5XdoeJLUA
+	RdtNMoL9wSQ==
+X-Received: by 2002:a05:600c:4fc4:b0:493:a54b:7f8f with SMTP id 5b1f17b1804b1-493a54b8051mr98736535e9.24.1782739400305;
+        Mon, 29 Jun 2026 06:23:20 -0700 (PDT)
+X-Received: by 2002:a05:600c:4fc4:b0:493:a54b:7f8f with SMTP id 5b1f17b1804b1-493a54b8051mr98735865e9.24.1782739399781;
+        Mon, 29 Jun 2026 06:23:19 -0700 (PDT)
+Received: from [192.168.2.83] ([46.175.183.46])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492690168d5sm432857925e9.14.2026.06.29.06.23.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jun 2026 06:23:19 -0700 (PDT)
+Message-ID: <7d21d2db-ed18-40e1-a5c2-7fc8c235805b@redhat.com>
+Date: Mon, 29 Jun 2026 15:21:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6254:EE_|SAVPR12MB999119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8316450c-bea4-40f3-6140-08ded5e124bc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|23010399003|6133799003|18002099003|22082099003|4143699003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	YhColWN98ey4UOLOxOByOo9g8TFWol1eX/WEo0W9EVDw/fv9IjN98YFFoTs5AN0fpiVOiU5Yi4uJfINKH1WRlPZfkOJc8N5v6eklCZkYkSRSNxmF02LOtsALkRBzN69a3YXbb07TRC0tGCcZIWv0ojhXlXEI3CJuZ46xXsbDqMrQSLKscp+KXv8mc/loq+OOuXrvo1hHM+D2vs78Q66ptR46Ah0cHKffuSIooNLf90wd4ONVaUfNTkOIluIytR4kuAUqQt04n1aE1vHJk/nhRmcf/QzdeaXgcAoUK7UwAXKqrIjXMw+uMgINkpTKOZpiF89x/SFXsIHgyRYzOqqZbYSLUMqR6bE0x55AsrxIBAQ65TFt87DEBkdJUCrUnWywju1iu4tGl0FNGOTO/WipER9bSJDJSkRzp8xKwti4oZYA43SbkvOl4hnhv6mowDA60h6xQ6ImC05FlR1zAP2WHLdEXTawulMKsv4cdnQiWQ2EipIKgXD2BxFYiuCVRk+2GxxM2WZCXiGYsdR/AHpf8TirBplXEujmCoXM7hB+Yyb9FmaapooNSiMe5emhncOMK834cL07mvmXn9+M4JSCLfbZaEGkVdeoDVcDTIHsZCLrbGNZojHFOPEXfRg5zMfhIi3y9qkR4H3sTjuXeGBAbZuMWkd6hksbSO10NJ+Obek=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6254.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(23010399003)(6133799003)(18002099003)(22082099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RHZzQXdtdnBrdnlVL3FMcjVGdkt3M3JzeVQ2SmRuWCtsQTIwaUtJSTFUTEVI?=
- =?utf-8?B?L3Jmb1VLVlVPSWszTjB3VzFBd0Q2Y3NmMkY1RXhSK2ZnZStjeGlLa1lUT0Jr?=
- =?utf-8?B?b3hTQ0d5ZDdPOUtSMHUrNXozazYvcTBPYVBtS2QzSlhTbkM0N3BhZkhqRXVD?=
- =?utf-8?B?S2VwZCtvMmUwdVVCTUZFZDQxNnhUd2tqVFJkcEZ1ZjM1RFlNSUJWaGhUVHBk?=
- =?utf-8?B?dkV3TWkybS9qT3RMTFd0SHB4Mm9LL0N5cTBvVW95NEcyK051YTFKblNuYUMx?=
- =?utf-8?B?aWVKRDEraXUxOFRaa00wcjM2LzhMU1Z2SGUrRjloZi9zYnEwUHVmbElEamND?=
- =?utf-8?B?Vk40a29KOXZKSnR2QzNpTVltQlJieHo0QW13aWMrbGlIdFhJRVlHZ2pQOTFH?=
- =?utf-8?B?MHh1c3Mzd0pmL3RQU1VnQUFjYmhtd0xFYnJTZ2FJcEg4TW9nU3JsaDM0cDdB?=
- =?utf-8?B?aWNDRXBkZ1JPZXRiT0F2cmg2UU55WUZlQ3NtaUcrZkJBcWQ0Z0ZrLzNmbW5m?=
- =?utf-8?B?bnBYaW4veHNhQ1ovcEtMc3Y1Mi8rMVdIUlhCLzVYZkdGUkFySUp2R3ZPZjJL?=
- =?utf-8?B?cnlFS0VBalJIK24ySWZLZGVLVmxhY1RzRU44TDBNdjN0V3VWL2VqeisrOElO?=
- =?utf-8?B?THJyWW80ZU1vRFg5UDZSaStOaVl6dmxPMDI2RXN2Q3M2YzdoenErTkJFWVcy?=
- =?utf-8?B?U1hxelpEcm55UW9UNlVhM3hWVGZxVnFHOXkvSldQRnpnUG83WUtSWUVUamsw?=
- =?utf-8?B?enhLY0ZYQndRYmltM25XemZ4WUduWkk0YUNHeE1vSlpreUhZZ2EzUVhzemVj?=
- =?utf-8?B?U2tkakNJcjE2ZDQzSjN6cEdqWVRQQUxsalNmdjVsSy9SUy9GRVlhZkd2cGV1?=
- =?utf-8?B?bHdodXUycnBUVGR2QmVVY3hFenEvYTg4a0J6T2tzNk8rU3pCeG9vMWZVTThn?=
- =?utf-8?B?cjg2SzNzbTJzNEZ1ZzZjWkVRWHRreDJ2YWg5UitiVjFtRmNEeWQ5cEk0SHZD?=
- =?utf-8?B?NDZNNEN6T3YyL1V4dEFSS3VxcTFoSmR2R1VZdjRxV1lQQUFVLy9KeVhoYmJG?=
- =?utf-8?B?VEhJV3VrbHVJRERnOHgwWU0yM040RHgvRTVUcVZ4N3dmS0E5ZWhzQlhSb1Qz?=
- =?utf-8?B?ZGo2dThuYm9PaS95WnhldlJKdC91cmpsVE00bDYyVVZtMy94QnRKMzd1WW9C?=
- =?utf-8?B?Y2Jsd1RBU0YwODJNelYxUlBCbGQ2eUdvalBGZ0tUQkRFYVY4MG8yU3hwU1BR?=
- =?utf-8?B?dDlRaDRXaFNrWVVkc0UrbVNRamFmZEVWTnc2bE91U0ptRlVxTDhiZy9mRnJa?=
- =?utf-8?B?Rm80TEloUFlSYmpUT2FlTmdIL0l3R2N4VGx4Z2Z0bDlxZjNZL2RWbWV0L2Jl?=
- =?utf-8?B?dmZiNnVRb2tJeGZYNFpLeXkyTmRDYnpTZDczWGNqZWxoZGJYeHh2RHJhcXdJ?=
- =?utf-8?B?RG9jUVd1VzNUaDIzWjZrby8xMnNCN0pSaXNwampKNjh2MUozblM4YjBTSlFt?=
- =?utf-8?B?Nmdkdk8zblNoblIwb1I2eGwzZmF2cEFCZ2FCWnZmNHF4and4emt0dGVQeUZu?=
- =?utf-8?B?YmI5MW56aDBHTnJvRWg0RDJGOW5KUG5kNFRQMWZ3SEFQblhHVlpOT2Iwallo?=
- =?utf-8?B?Y0tZeEpiamF1ZlZ2ekorZWQxZUVOWHA2a3lnNEVrekFudHRhbDFORlVZTW9X?=
- =?utf-8?B?eXpxNVpBT0M5d24vUVFoZkdPTWxkUUYwTk5GazZPMVE4Ykd5ZklpdEs4dUZz?=
- =?utf-8?B?M2lSL3RwbE01cllCNUFzNmxtSVdEM2ZQL0R0YXkvdmpnQ3gzUWJNY2dZdzFT?=
- =?utf-8?B?OU5kbG5uZTJDNG93dUhROGhNYjJkZkFFQUF6Y0tmeUEwV1JWQjh6TGJTS3Fa?=
- =?utf-8?B?ZkI2RTEwb1N5c0R6ZWM4eE1OVU04aTFFd1dkQ0RZVGdiZkFkKzluWWtpeXNu?=
- =?utf-8?B?SjFCeGlUWVlIVGwydWlCQndXRndUWmtkaVV6cDdsT2VBSEtRbTRSZ0dVeExS?=
- =?utf-8?B?MkxwRERiaGZ1QVMycDFZWlAvYTZ3NlppOXFCSk5uTDZicUNEZlVpd1BLTG1P?=
- =?utf-8?B?OEtjY3VFcjJqRHBLdk8rYkwwOTc5SnJUOGlBQnhZS2MxREx3R002SUl5OHFT?=
- =?utf-8?B?TXdmY0t6OXBqYS9oZGtlazNUQkZiVmdsRVE5TWtQZXY1YlRqcXhlSDRGUXBh?=
- =?utf-8?B?RjJnWmxQQXVIa3NTaVk5STh2dThJY1VUZDBEdWpGYmhDMkpRY2lWRXpKSFZS?=
- =?utf-8?B?eGNhWm9ZQVpPajAwSzQzRGd0ME9LNDBOQ2UzWHNmbUJoeWo4S05GZUVuVldn?=
- =?utf-8?B?S2NQWE9aWFprRjNjRnlxV3N2SmsxYzJqTTl5RkF6R2lsUllUQnNIQT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8316450c-bea4-40f3-6140-08ded5e124bc
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6254.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2026 13:20:09.6863
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RNsBmMYC3WhKvWnNdSUFjJJtIalIy+wxcEpCDqdOLntxCNu3EfmGx9I4wNwXk6QNMHmmowd7cHAqzxDaFxjq1A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SAVPR12MB999119
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net v2 2/2] ice: preserve uplink DFLT Rx rule on
+ switchdev release
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, aleksandr.loktionov@intel.com
+References: <20260622113428.2565255-3-poros@redhat.com>
+ <20260623162556.1100516-2-horms@kernel.org>
+Content-Language: en-US
+From: Petr Oros <poros@redhat.com>
+In-Reply-To: <20260623162556.1100516-2-horms@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302644-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:icheng@nvidia.com,m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:dan.j.williams@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,amd.com,davemloft.net,redhat.com,google.com,intel.com,gmail.com];
-	DKIM_TRACE(0.00)[amd.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302646-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C3E16DB3FD
+X-Rspamd-Queue-Id: 43B566DB5DE
 
 
-On 6/26/26 04:52, Richard Cheng wrote:
-> On Mon, Jun 22, 2026 at 01:40:09PM +0800, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Use core API for safely obtain the CXL range linked to an HDM committed
->> by the BIOS. Map such a range for being used as the ctpio buffer.
->>
->> A potential user space action through sysfs unbinding or core cxl
->> modules remove will trigger sfc driver device detachment, with that case
->> not racing with this mapping as this is done during driver probe and
->> therefore protected with device lock against those user space actions.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->> ---
->>   drivers/net/ethernet/sfc/efx.c     |  2 ++
->>   drivers/net/ethernet/sfc/efx_cxl.c | 23 +++++++++++++++++++++++
->>   drivers/net/ethernet/sfc/efx_cxl.h |  3 +++
->>   3 files changed, 28 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
->> index 61cbb6cfc360..3806cd3dd7f4 100644
->> --- a/drivers/net/ethernet/sfc/efx.c
->> +++ b/drivers/net/ethernet/sfc/efx.c
->> @@ -984,6 +984,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
->>   	efx_fini_io(efx);
->>   
->>   	probe_data = container_of(efx, struct efx_probe_data, efx);
->> +	efx_cxl_exit(probe_data);
->>   
->>   	pci_dbg(efx->pci_dev, "shutdown successful\n");
->>   
->> @@ -1242,6 +1243,7 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
->>   	return 0;
->>   
->>    fail3:
->> +	efx_cxl_exit(probe_data);
->>   	efx_fini_io(efx);
->>    fail2:
->>   	efx_fini_struct(efx);
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
->> index 18b535b3ea40..3e7c950f83e9 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.c
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
->> @@ -18,6 +18,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>   {
->>   	struct efx_nic *efx = &probe_data->efx;
->>   	struct pci_dev *pci_dev = efx->pci_dev;
->> +	struct range cxl_pio_range;
->>   	struct efx_cxl *cxl;
->>   	u16 dvsec;
->>   	int rc;
->> @@ -73,9 +74,31 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->>   		return -ENODEV;
->>   	}
->>   
->> +	cxl->cxlmd = devm_cxl_probe_mem(&cxl->cxlds, &cxl_pio_range);
->> +	if (IS_ERR(cxl->cxlmd)) {
->> +		pci_err(pci_dev, "CXL accel memdev creation failed\n");
->> +		return PTR_ERR(cxl->cxlmd);
->> +	}
+On 6/23/26 18:25, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> ice: preserve uplink DFLT Rx rule on switchdev release
+>
+> This commit preserves the default Rx rule on the uplink VSI when releasing
+> the switchdev environment if the interface is in promiscuous mode. This
+> prevents the catch-all rule from being removed while the netdev flags still
+> request promiscuity.
+>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> index 2e4f0969035f7..48273ef9f69dc 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> [ ... ]
+>> @@ -278,8 +280,16 @@ static void ice_eswitch_release_env(struct ice_pf *pf)
+>>   	vlan_ops->ena_rx_filtering(uplink_vsi);
+> [Severity: High]
+> Could this lockless read of netdev->flags cause a regression due to a TOCTOU
+> race?
+Both reads key on the same live netdev->flags & IFF_PROMISC (the pruning
+read just above included); it is a single word, so no torn read, and a
+flip in the two-statement window is transient and reconciled by the next
+ice_vsi_sync_fltr() after switchdev stops. I kept the read live on purpose
+so the preserved rule and the pruning decision key on the same source.
+> The ena_rx_filtering() call eventually reaches ice_cfg_vlan_pruning(),
+> which reads uplink_vsi->netdev->flags & IFF_PROMISC locklessly to decide
+> whether to enable VLAN pruning.
+>
+>>   	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
+>>   			 ICE_FLTR_TX);
+>> -	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
+>> -			 ICE_FLTR_RX);
 >> +
->> +	cxl->ctpio_cxl = ioremap_wc(cxl_pio_range.start,
->> +				    range_len(&cxl_pio_range));
-> Hi Alejandro,
+>> +	/* Keep the Rx DFLT rule if the uplink is promiscuous; it must outlive
+>> +	 * the session. Test the live netdev->flags, the same value
+>> +	 * ena_rx_filtering() -> ice_cfg_vlan_pruning() above keys its decision
+>> +	 * on, so the preserved DFLT rule and the pruning state stay consistent.
+>> +	 */
+>> +	if (!(uplink_vsi->netdev->flags & IFF_PROMISC))
+> ... and then the exact same flags are read locklessly again right here.
 >
-> A small question here,
-> Is it possible that the FW would commit a region bigger than the range ?
-
-
-Hi Richard,
-
-
-Not really. We are using the minimum size for CXL mem, 256MB, and it is 
-not configurable. If CXL is enabled by the sfc device firmware, this is 
-the only possibility.
-
-It could be a good sanity check though, but I prefer to keep v29 as it 
-is now ... Dan Williams is happy enough with it, so I expect Dave to 
-merge it soon ...
-
-
-Maybe as a follow up path.
-
-
-Thank you,
-
-Alejandro
-
-
-> The committed CXL region length is never validated against the PIO window size.
-> The legacy patch sizes wc_mem_map_size to cover the VI-strided PIO offset, but
-> here we ioremap whatever the BIOS comitted and assume it's EFX_CTPIO_BUFFER_SIZE.
+> Because setup/teardown paths are protected by devl_lock rather than
+> rtnl_lock, could a concurrent dev_change_flags() holding rtnl_lock toggle
+> IFF_PROMISC between the two checks?
 >
-> Maybe adding
-> """
-> if (range_len(&cxl_pio_range) < EFX_CTPIO_BUFFER_SIZE)
->      return -EINVAL;
-> """
-> Would be worthy ?
+> If IFF_PROMISC changes from 0 to 1 in this window, the code would incorrectly
+> enable VLAN pruning (seeing 0) and then incorrectly retain the DFLT_RX rule
+> (seeing 1), leaving the hardware with VLAN pruning enabled during promiscuous
+> mode.
 >
-> Let me know what you think.
+> [Severity: High]
+> Does preserving the Rx DFLT rule here cause a regression by permanently
+> breaking multicast promiscuity configuration if IFF_PROMISC was set?
+Correct, the DFLT rule is unicast only. v3 will fix this in patch 1:
+ice_set_promisc(ICE_MCAST_PROMISC_BITS) will run whenever the netdev is
+promiscuous, including when ice_is_dflt_vsi_in_use() is already true.
+
 >
-> Best regards,
-> Richard Cheng
+> During the switchdev session, ice_remove_vsi_fltr() removes the
+> ICE_SW_LKUP_PROMISC rules. By manually preserving the DFLT rule here, any
+> future synchronization via ice_vsi_sync_fltr() will evaluate
+> !ice_is_dflt_vsi_in_use(vsi->port_info) as false:
 >
->> +	if (!cxl->ctpio_cxl) {
->> +		pci_err(pci_dev, "CXL ioremap region (%pra) failed\n",
->> +			&cxl_pio_range);
->> +		return -ENOMEM;
->> +	}
+> ice_main.c:ice_vsi_sync_fltr() {
+>      ...
+>      if (!ice_is_dflt_vsi_in_use(vsi->port_info)) {
+>          err = ice_set_dflt_vsi(vsi);
+>          ...
+>          err = ice_set_promisc(vsi, ICE_MCAST_PROMISC_BITS);
+>      }
+>      ...
+> }
+>
+> Because it is skipped, ICE_MCAST_PROMISC_BITS is never configured, leaving
+> the VSI in unicast promiscuous mode but silently dropping multicast traffic
+> destined for other MAC addresses.
+>
+>> +		ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx,
+>> +				 false, ICE_FLTR_RX);
 >> +
->>   	probe_data->cxl = cxl;
->>   
->>   	return 0;
->>   }
->>   
->> +void efx_cxl_exit(struct efx_probe_data *probe_data)
->> +{
->> +	if (!probe_data->cxl)
->> +		return;
->> +
->> +	iounmap(probe_data->cxl->ctpio_cxl);
->> +}
->> +
->>   MODULE_IMPORT_NS("CXL");
->> diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
->> index 04e46278464d..3e2705cb063f 100644
->> --- a/drivers/net/ethernet/sfc/efx_cxl.h
->> +++ b/drivers/net/ethernet/sfc/efx_cxl.h
->> @@ -20,10 +20,13 @@ struct efx_probe_data;
->>   struct efx_cxl {
->>   	struct cxl_dev_state cxlds;
->>   	struct cxl_memdev *cxlmd;
->> +	void __iomem *ctpio_cxl;
->>   };
->>   
->>   int efx_cxl_init(struct efx_probe_data *probe_data);
->> +void efx_cxl_exit(struct efx_probe_data *probe_data);
->>   #else
->>   static inline int efx_cxl_init(struct efx_probe_data *probe_data) { return 0; }
->> +static inline void efx_cxl_exit(struct efx_probe_data *probe_data) {}
->>   #endif
->>   #endif
->> -- 
->> 2.34.1
->>
->>
+>>   	ice_fltr_add_mac_and_broadcast(uplink_vsi,
+>>   				       uplink_vsi->port_info->mac.perm_addr,
+>>   				       ICE_FWD_TO_VSI);
+> [Severity: High]
+> This is a pre-existing issue, but does this teardown function fail to
+> synchronize hardware state for previously joined multicast groups and
+> secondary unicast addresses?
+Pre-existing (rx_mode is gated during switchdev). This patch only gates
+the DFLT Rx removal in ice_eswitch_release_env(); the multicast-promisc
+half is covered by the v3 patch 1 change above, and replaying the full
+deferred uc/mc list is a wider item left out here.
+
+Petr
+>
+> When entering switchdev mode, __dev_uc_unsync() and __dev_mc_unsync() clear
+> the synchronization state of OS-level MAC addresses, and
+> ice_remove_vsi_fltr() removes the actual hardware filters. While switchdev
+> runs, calls to ndo_set_rx_mode return early and do not update hardware.
+>
+> When returning to legacy mode, this function restores only the primary MAC
+> and broadcast addresses, but doesn't seem to invoke netif_set_rx_mode() or
+> equivalent to resynchronize the deferred Rx filters from the netdev to the
+> hardware. Could this cause the hardware to silently drop packets for
+> previously joined groups until the interface is bounced?
+>
+
 
