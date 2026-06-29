@@ -1,264 +1,172 @@
-Return-Path: <netdev+bounces-302737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302738-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id x7npGdirQmoE/gkAu9opvQ
-	(envelope-from <netdev+bounces-302737-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:31:04 +0200
+	id 7yNZLy6sQmoU/gkAu9opvQ
+	(envelope-from <netdev+bounces-302738-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:32:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B10696DDBD3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:31:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F756DDC19
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:32:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=AlqhmIho;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302737-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302737-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=trailofbits.com header.s=google header.b=iF3jrPep;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302738-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302738-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=trailofbits.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1879303A51E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:24:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5E2C930346C1
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0319447B43A;
-	Mon, 29 Jun 2026 17:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055AA46AF08;
+	Mon, 29 Jun 2026 17:25:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FE947279B;
-	Mon, 29 Jun 2026 17:23:56 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782753836; cv=none; b=SQn1W4eMmENBh2UjKNlGbIDfOHfdHjhn5gR/e0jMBWWlPWLURLM4RqiYyt/iJekv3YFTcn5KcQiu8tswhMTW+Ix3GrgScd9wTspc99On89wqS3TOlmkvsqgXG3jd+Rvq3kkEY0AR4AKD+SLMCJzRa8SRpB93D8eb+JnSTrxod3U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782753836; c=relaxed/simple;
-	bh=Ks5DiytMryhPPL4xciS+WbhqW0Vz83GIDZnVvZDTgVk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RYHYl52UaS/ch8ZkaAKjww4v581urFjFIRwMRJj1xJhat60fTU1eb4g8vxhu7xRSrIHZWEJaPDMjWX60qk4FIlojIdsdisZ/tt0/nTSheFU45OnBylSEhzeVnHFNUt1lhuyNh5D+1wRN/21MSXW3ollp5+6a4zOXCFkJxU66ujg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AlqhmIho; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 80D5EC2BCF5;
-	Mon, 29 Jun 2026 17:23:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782753836;
-	bh=Ks5DiytMryhPPL4xciS+WbhqW0Vz83GIDZnVvZDTgVk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=AlqhmIhoqgh4xqqLEgcWR+63udKLV1zr6BZ6tZUO/jt6j2CoDJNr3UlN5kq9h91eM
-	 dD/P1TgpK6xdYnFSeo52iGbA70KmvILUS1wHq7qk5yDAevd4gQTSt09gpM02zw0UdT
-	 pPE1SvRFFVJijWkylgGxaai0lghhJbQAxCQ/J2D+QbOilAKMfbJA4l9N9CReqcsX6V
-	 pj4mwNTkQdyBRpHBI/d6BEvX77tQFjLZYe4B7ri9kKQB3M58vV2OHw3ib6BLd79peR
-	 tPXYVozm/7iwsnrHwuncIM3ekDUDcTI/idjGceAFW8ur35y8Rj/fsQbxvfgSxSt/7x
-	 CR+dmoe7N2zEw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79774C43458;
-	Mon, 29 Jun 2026 17:23:56 +0000 (UTC)
-From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Mon, 29 Jun 2026 10:23:45 -0700
-Subject: [PATCH net-next v6 15/15] Documentation: networking: Add timestamp
- related APIs to OA TC6 framework
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A8146AEE0
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 17:25:09 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782753910; cv=pass; b=QOKVHkQ8GjdbxYQfM/H4wICMIY1kM9/SMWZ0De4WIlCtsUReIE4c7ju9Ro57BClooIg71fviqyHLnBTuk3xF7O9PFo9Hy3EUaIXgSE82tPx0p+m/4nHlzRyJow2NNAm2fFPYWnNHL1lQYz0+SqDatO0U4peFDDSN5ND+hKTqWUA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782753910; c=relaxed/simple;
+	bh=T4Hdp4UqpRyAiDPK4Qxc+FO1sv6/EoKsG757Qnb9PLg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QvsfKnjJLEMOHl5SjKnV2bt4NCtaroNxviwJGUNdbW9gM9B+89FeM1AxiHmWZax2zwwMk7ULpHqGk86AK7p46apVRPSmEh0iPWKdgZIp+L62s9pMk2YcdqV5is71R+o0XQkpcXql9PH97hpUW+8ZPq7Rzo+UQ3zq9qr2W15R23w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=iF3jrPep; arc=pass smtp.client-ip=209.85.167.48
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5aeb91c003eso1147259e87.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 10:25:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782753908; cv=none;
+        d=google.com; s=arc-20260327;
+        b=hywAHI2iGMuioYINZvSLqcRosHhk+vLjhyymmUx0VQmtcFjEzuF+I6O6GT3lcvyY+3
+         SAXijMRdjSJAPTrkych2NGVf+ChH6T9Pn6WrWX/yTWExbfcSBcdSwKkQONRSXr03t+DY
+         Wn+t0IHXHX6FQUzrH5Ztegkvbbt46NzuokCLzRgzgjQ+rb8EzUdU7MCh3MSsr6llhM+n
+         nfkv/BBcHQbHbf6tcEt2nRSMz5Iy2k62wCMs2jA+BPJaqEIlZoQUxspF3lEA5JteKlgR
+         BRy4FTlAJLxIIScAEvnejLCt0pavqOx6LuhklV2yZzkgRm4MhUG9fnkpFrkrNm+d+nsx
+         n/rA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=RNVxrOq7hCihwcX755hqKJJxRSsbZ+NdSq43Nnq6gMU=;
+        fh=Ly9OTtlWTVk+EXUR6kWrYx9F7nbQ2uarXczd/VddIuU=;
+        b=AQkdRrtb5z4fpNlkDJ39mkjpRyGpn33fMDlXpillpmlo7LVywbSE2kwZqeLgbIzM4i
+         iOZ24SHyiGxkyTwGRh78kN0ADM4CHgNMwyOXa9Utz3eRljOw3gyJ/G5D69BeD93i7DJ+
+         7vcYLN6XGUd6sXqVMPYOPej5EshPvDdARcitAOwoBsXYtylDb5Hm/tjybdapc6h0wLx/
+         pEpP82oD+a0hcGjXswcEaTGolzAQBsIhVBflLULg/bPJkoVxtRgqyy6yVsJJaAVp/hZU
+         iMkxaEFnU2X51JKhfNjpRm/jIY96gbCESn2aZcmXvT0ni0MQuuYmYWmV71SLBRY7MExM
+         f/5A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=trailofbits.com; s=google; t=1782753908; x=1783358708; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RNVxrOq7hCihwcX755hqKJJxRSsbZ+NdSq43Nnq6gMU=;
+        b=iF3jrPepBQ/cNTOMY3YesPMRWCT0Ha5NuA+wQwYY8SMekIM/zgA9Q6sAkbFk5D7IPJ
+         g+IGgdD//r4tzlbaRgTUR8w+ew1EzjZORq3fk3378FMtzJ6+B68H/cEALEJowp2Aj47a
+         ZFtdxcjc8iZHn8IQ/SZE4/cbm1oWtAV/KyIksNuvA5aXryhrEB4j+9eWICft0/meVh9r
+         irTekg082WXLoDKR9fLOxTFztAPxWwlBM4/7YdmWRzkcF9B/E+q8lBjFHsBc0KEnGfOg
+         pCiezMF/oQZnIGzpcA8Ghe1jKCEwcj5v0DEy24OMml1ec1JrY0bWCegaw8kT8kw1YJ5K
+         UI5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782753908; x=1783358708;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RNVxrOq7hCihwcX755hqKJJxRSsbZ+NdSq43Nnq6gMU=;
+        b=NPuM51ac5ALhyNTvNK9Tj2n7Gh6CUNc9VkOI7CzjajzQgRRsiEnOaPz/Q4SsAfVsYI
+         4ogz/M6DVDnfqc0I368gSjWOhT8pWYCRTlKYoyv0lHbmoJigbXFhFwRg7oWuz+pK10RP
+         l94SAy6vXHpxxR0TfG3yvOFp2FMEdg8diwjfBBs40jxNX3EGySdvOJ7WPOSxte/L9vLu
+         Je2vrNV5iGCNO6HnN47wQKwbk3UuVDHaNuv8CvsFO0LFecFpmxKjgEk6TkR+xuLs4B5H
+         3IxfBAXRIr5F0mJ254+JDI7/O7SbJSSGdw1G1JLstWJ5ZmQCUIFQnpFE/meIArHqLa/x
+         bCDg==
+X-Forwarded-Encrypted: i=1; AHgh+RoG3BKe3V1SfWjb7THTHHNkL7yP+ETTRsKaZHqunlmxtkMwPSLME1AWNXfy9WUHQkiAWen7UhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+EVYUJ4uSxnuOUW9xzzZX1uLia/cR9nlhW2EPevGDL/6qGIj6
+	gTUot7Dyd7yUPGsYSCJXTYIWrxqIgMzpx87K//xC4lqhnbF0SCPzqEqkZiSj76bdN/kOQHUtkc0
+	CZX/ikjbbhaggLqmSU5RMsF9daE/nkkiVGv4krlQrww==
+X-Gm-Gg: AfdE7cnNe86Wpgi3nLyhgJW01ccKkoHrcuINNmWyXLQzIjNZdPpSClSTUPJmm1wN8NI
+	xSngH8+KSwhH7CW+cntgFbG+gE8gsY0lFYtsLXUK6L2LKPe90MCW8OjjVlmnwThRh6KOGsEZMNM
+	yK05RK4K0ELsJRGgZvv0JuW2PjjfXfI6nDwbJY1B9FzsISiU5w+UJvouReIYkWhjoce1YEfOAd0
+	hkJ7NfQas1T6HZcdF1EyZDZbZaX8Fdp+J16XqxSjTo4wsM49pOQi23juu8BaWVY5u7VfC8=
+X-Received: by 2002:a05:6512:a354:b0:5ae:9d0f:19f2 with SMTP id
+ 2adb3069b0e04-5aebdb7d486mr43047e87.3.1782753907646; Mon, 29 Jun 2026
+ 10:25:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260629-s2500-mac-phy-support-v6-15-18ce79500371@onsemi.com>
-References: <20260629-s2500-mac-phy-support-v6-0-18ce79500371@onsemi.com>
-In-Reply-To: <20260629-s2500-mac-phy-support-v6-0-18ce79500371@onsemi.com>
-To: Andrew Lunn <andrew@lunn.ch>, 
- Piergiorgio Beruto <pier.beruto@onsemi.com>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Selva Rajagopal <selvamani.rajagopal@onsemi.com>, 
- Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-doc@vger.kernel.org, 
- Jerry Ray <jerry.ray@microchip.com>, 
- Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782753817; l=5404;
- i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=JW25hgT0kCWM94H070UZ8n9koUMRIcHtnQFDviGNI3M=;
- b=GefbTPQisljgUOfuJsMZBmx2eLEpt4ysoL3/sRSpFmrTL57fWSfRMa8DbKNr/fusMZaErRsHq
- mjv9qsvxBGrCJ92zQ4enYdZZNN1x06CT1KjhZBlkUZRmS2KY57Sj4J1
-X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
- pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
-X-Endpoint-Received: by B4 Relay for
- Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
-X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Reply-To: Selvamani.Rajagopal@onsemi.com
+References: <20260609232935.1602659.8545fdb04fbe.cake-overhead-underflow@trailofbits.com>
+ <20260613142626.1b2183eb@kernel.org>
+In-Reply-To: <20260613142626.1b2183eb@kernel.org>
+From: Samuel Moelius <sam.moelius@trailofbits.com>
+Date: Mon, 29 Jun 2026 13:24:56 -0400
+X-Gm-Features: AVVi8CehuZasSGDM7tdu5ZNnK7k4rkh3SCVj8V71oPROccnLp1Vsy7jEK2VpmsU
+Message-ID: <CAE+C+DZpYpJDJOaCK48KBpayXSYorFRSvTE903RBqyPyYkWcCg@mail.gmail.com>
+Subject: Re: [PATCH net v2] net/sched: cake: reject overhead values that
+ underflow length
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"moderated list:CAKE QDISC" <cake@lists.bufferbloat.net>, 
+	"open list:TC subsystem" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302737-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:pier.beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:selvamani.rajagopal@onsemi.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
+	TAGGED_FROM(0.00)[bounces-302738-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:toke@toke.dk,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:cake@lists.bufferbloat.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[onsemi.com:replyto,onsemi.com:email,onsemi.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,vger.kernel.org:from_smtp,trailofbits.com:dkim,trailofbits.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B10696DDBD3
+X-Rspamd-Queue-Id: B2F756DDC19
 
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+On Sat, Jun 13, 2026 at 5:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue,  9 Jun 2026 23:29:36 +0000 Samuel Moelius wrote:
+> > +static const struct netlink_range_validation_signed cake_overhead_rang=
+e =3D {
+> > +     .min =3D -64,
+> > +     .max =3D 256,
+>
+> Both Sashiko's complain - these values are neither safe nor sufficient.
+>
+> How was the -64 chosen? It looks suspiciously close the min ethernet
+> frame length.
 
-Added new APIs to support hardware timestamp feature as defined in
-OPEN Alliance 10BASE-T1x MAC-PHY serial interface specification.
+That's how it was chosen. But as you've shown, it was not a good choice.
 
-Expanded read/write APIs to take new mms parameter to avoid
-bit manipulation before calling regular read/write APIs
-
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-
----
-changes in v6
-  - No change
-changes in v5
-  - Fixed "no blank line" issues in four places
-changes in v4
-  - Added information for new APIs in OA TC6 framework
-changes in v3
-  - Added more information for documentation
-changes in v2
-  - Removed the changes to the existing API
-  - Updated information about newly added APIs
-changes in v1
-  - Added changes to an existing API
-  - Added documentation to new hardware timestamp related APIs
----
- Documentation/networking/oa-tc6-framework.rst | 80 +++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
-
-diff --git a/Documentation/networking/oa-tc6-framework.rst b/Documentation/networking/oa-tc6-framework.rst
-index fe2aabde923a..325d299d1a7d 100644
---- a/Documentation/networking/oa-tc6-framework.rst
-+++ b/Documentation/networking/oa-tc6-framework.rst
-@@ -153,6 +153,10 @@ OPEN Alliance TC6 Framework
- - Forwards the received Ethernet frame from 10Base-T1x MAC-PHY to n/w
-   subsystem.
- 
-+- If supported by the hardware and enabled, updates hardware timestamp
-+  in skb, when indicated by one of the three timestamp capture registers
-+  through TSC fields of the header.
-+
- Data Transaction
- ~~~~~~~~~~~~~~~~
- 
-@@ -495,3 +499,79 @@ the MAC-PHY.
- Zero align receive frame feature can be enabled to align all receive ethernet
- frames data to start at the beginning of any receive data chunk payload with a
- start word offset (SWO) of zero.
-+
-+.. c:function:: int oa_tc6_ptp_register(struct oa_tc6 *tc6, \
-+                                        struct ptp_clock_info *info);
-+
-+Registers the PTP hardware clock related functions with the kernel.
-+This API simply registers. Initialization of the fields in the
-+ptp_clock_info structure are left to the vendor as programming hardware
-+timer is expected to be vendor dependent. The fields max_adj, owner,
-+and all the functions for the clock operations, like adjfine, gettimex64,
-+settime64, adjtime are expected to be initialized in the structure before
-+calling the registering the hardware clock.
-+
-+.. c:function:: void oa_tc6_ptp_unregister(struct oa_tc6 *tc6);
-+
-+Unregisters the PTP hardware clock related callbacks.
-+
-+.. c:function:: int oa_tc6_ioctl(struct oa_tc6 *tc6, struct ifreq *rq, \
-+                                 int cmd);
-+
-+ioctl interface to handle hardware timestamp and PHY related commands.
-+
-+.. c:function:: int oa_tc6_get_ts_info(struct oa_tc6 *tc6, \
-+                                       struct kernel_ethtool_ts_info *info);
-+
-+Provides timestamp related settings that are supported to ethtool.
-+
-+.. c:function:: void oa_tc6_hwtstamp_get(struct oa_tc6 *tc6, \
-+                                         struct kernel_hwtstamp_config *cfg);
-+
-+Returns hardware timestamp configuration. Part of net_device_ops callbacks.
-+
-+.. c:function:: void oa_tc6_get_ts_stats(struct oa_tc6 *tc6, \
-+                                         struct ethtool_ts_stats *ts_stats);
-+
-+Provides hardware timestamp related traffic statistics for ethtool.
-+
-+.. c:function:: int oa_tc6_hwtstamp_set(struct oa_tc6 *tc6, \
-+                                         struct kernel_hwtstamp_config *cfg);
-+
-+Helper to set hardware timestamp configuration. Part of net_device_ops
-+callbacks.
-+
-+.. c:function:: void oa_tc6_set_vend1_mms(struct oa_tc6 *tc6, int mms);
-+
-+Helper to map MDIO_MMD_VEND1 command to vendor specific Memory Map Select
-+(MMS) value. This function offers flexibility for vendors that may have
-+used any MMS value between 10 and 15 as allowed by the specification.
-+MDIO_MMD_VEND2 is already mapped to MMS4 in the OA TC6 frame work code.
-+
-+.. c:function:: int oa_tc6_write_registers_mms(struct oa_tc6 *tc6, \
-+                                               u16 address, u16 mms, \
-+                                               u32 value[], u8 length);
-+
-+Writing multiple consecutive registers starting from @address for the
-+given @mms memory map selector in the MAC-PHY. Maximum of 128 consecutive
-+registers can be written starting at @address.
-+
-+.. c:function:: int oa_tc6_write_register_mms(struct oa_tc6 *tc6, \
-+                                              u16 address, u16 mms, \
-+                                              u32 value);
-+
-+Write a single register addressed by @address and @mms in the MAC-PHY.
-+
-+.. c:function:: int oa_tc6_read_registers_mms(struct oa_tc6 *tc6, \
-+                                              u16 address, u16 mms, \
-+                                              u32 value[], u8 length);
-+
-+Reading multiple consecutive registers starting from @address for the
-+given @mms memory map selector value, in the MAC-PHY. Maximum of 128
-+consecutive registers can be read starting at @address.
-+
-+.. c:function:: int oa_tc6_read_register_mms(struct oa_tc6 *tc6, \
-+                                             u16 address, u16 mms, \
-+                                             u32 *value);
-+
-+Read a single register addressed by @address and @mms in the MAC-PHY.
-
--- 
-2.43.0
-
-
+I would like to submit a revised patch that does the check on the
+datapath, as you suggested. Should I send that patch? Or would you
+prefer to wait for a response from Toke?
 
