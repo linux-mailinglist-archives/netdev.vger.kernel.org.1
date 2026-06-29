@@ -1,178 +1,232 @@
-Return-Path: <netdev+bounces-302792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RgpvFSC9QmqMAQoAu9opvQ
-	(envelope-from <netdev+bounces-302792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:44:48 +0200
+	id +TfuC1++Qmq5AQoAu9opvQ
+	(envelope-from <netdev+bounces-302793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:50:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23C96DE1F6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:44:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB916DE231
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:50:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=gjGSI5Q0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302792-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302792-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=broadcom.com header.s=google header.b=OeHRmF6N;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302793-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302793-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=broadcom.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3934A300D37F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:44:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A628B300E24A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B493B3D0BFB;
-	Mon, 29 Jun 2026 18:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D2C3C0A05;
+	Mon, 29 Jun 2026 18:50:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A0C3B27D9
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:44:42 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782758683; cv=pass; b=l0kgGNpEGglvxaVL9z130ySsJ6NPkKyk1SqnsND4p38j1uTZmNC9x7b8rQhobV+Swr/h1iPe15463irbtDAi5CX9WYmbq4em7jffF9ATnLi4Dk2Y79f9z462q8Ppc9o74eCA/nWuXJbBVBtzZBtQK1SX8iwrmVznvEiZqI+Lz1U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782758683; c=relaxed/simple;
-	bh=Od9JhScxwqVpLsN3Iyre6FiJ55V11ZHFsfQKfHK/TAo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E45BU1v1SBuCSKx/EI0Snj57PbgvZfiZ1QE6F4xfdkQ/7TzGQPlzcNGOZvgUIP1FmZa/OhlY0aBkJ7oCx4A6UxwQuo07h6IT9VvI/eO+uXYCzQqJW6fTTffVSmno7R0EPNK9+O08tYwxtXviwRgTSbkZEEG4ToYqDeZGCq0+MZw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=gjGSI5Q0; arc=pass smtp.client-ip=209.85.167.44
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5aeae771c49so1780833e87.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:44:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782758680; cv=none;
-        d=google.com; s=arc-20260327;
-        b=n7LWYy7MBMMwUGBBDTR/ejf9Zgo8yv4mtORN3JQDO//vI9PX/VjxpiVMQXhdziN5DR
-         Uh2nLP1wjNCl0mOp80/sTMoSGw1gsmjoSIx8Fqukmz1afOdRX/dugbQivw/g7Z/o9MkG
-         d6vXZoOncF85lFBgGes5qaTffUZN9b2zAvmtxnUVbnIXP/d1tCOl4Q+TnIoGrS+6PEqX
-         pz8I6i39FcDkFwStSoecJ0OoW8BFvoJYsHgpMEUVBm9Uqb17NLQxwr81Z8C32D81npSo
-         m1ZjJVVtM42HW+APlNnwLMtzL7PzYVfR/qlAgkikzJs7lShKVaStqeMf+d8UrOZW0NRh
-         8mOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=h8GXVWaPeCuflzpz/fudyGnPI2CJbmSQwizJP5KijfQ=;
-        fh=1CxIttprsN4knxoVxaRqdZOE1t+CdzkJ2nprAuANWK8=;
-        b=jomEAndtgMHiBK7ibo2yg+FVOUoqbAxPfwpozhRMLwehm/JarGbvTGcOWBencMQf8w
-         bTfr6hAxuPQQWZXOfoFYMBTKLOeoF2s5kU3CVpRl5w6eVtTG8Vifsi2fvL5Pp/GPY7Wd
-         IcWI4SLJslLkcgwa+qkLG5a8ucrY4uZYztkASTvZEclUwKVEO6QdzdeMpnYdPLeulfRE
-         WO4qV3wX5UPw1+U1u32XQQtCJYiOdIR9qhsJ8fuRALAGC8ZXu3rL3zMtExUH/4iuppey
-         eZp3uIjw+MEiclmsHz8WhTKYhV9rKAyVSsbJ5iDmJbjfnp0vVIm8hN/4TrauPMC7NzYy
-         R9wg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1782758680; x=1783363480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h8GXVWaPeCuflzpz/fudyGnPI2CJbmSQwizJP5KijfQ=;
-        b=gjGSI5Q0GPgvWnYlH9e4J37sQmWfr/uBVK13q2uKeEBMPnqrVZiZz4iTkfn05ldoI/
-         dEUvJBSlDjls/nVOhkM2KuUyit+ShU4FAlROy/hDXXRbkXAQ8x6wsQj4iPb+O7XPiNwl
-         L1ua/Yf+IxRozkMjWNJaIHU8vFLVAaHLwI6jQE+h1sb0MCH1blFWqpjqhBQFgm1wZfb7
-         o7zHdRsc5V/lXXYW1yx0RhNCxiLMjPtsmf4HSDuGx+mBCro/aM4+LRaJQ0GUu4j0wBRy
-         zEMtlj+34BoTsQSIPfMjV0XJ91x/bJy4rJCtX33WJnCe/uwxqT0rK3nddWzM9rlFWFhy
-         GFnA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB7F397342
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:50:01 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782759003; cv=none; b=MTggrA8I9lYA4tN5RMYa1HW/57OmED8hnmFP1v4/5xN5B/lVXz5stUs9doJhfUM6vrQnPEfAomLJhpISSViTtb6v5Q6elGtiyBHohEtnKtehvdZwAZ1+GjIGB8uR44LLPA7CPvpubS8AT0p+wLSeOlRGYESMIEZjtnps0IoP0iQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782759003; c=relaxed/simple;
+	bh=JW23acsyXscKFahhJ3uLgymtIu+8SxA0avb5WEg4/oY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iuI1gVLwbPAL5oEa8VG7X7jwBIOIOCgCLN5dXf6RLu8Svm5VDmJQn/2vGbxRWY1BqgwSadmGd2RiaMB0RirbSlmZQ+R/wkiTap3Z+6jUeKG8idOt5gfJtOFWpGJY/YqR9qqxm1n+hjHbvwbwrSKcadBhCN7oxQI9PmF6K1KpzBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OeHRmF6N; arc=none smtp.client-ip=209.85.128.227
+Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-80dd4766206so12286387b3.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:50:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782758680; x=1783363480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=h8GXVWaPeCuflzpz/fudyGnPI2CJbmSQwizJP5KijfQ=;
-        b=dqPaTGAl60KCIn6W+P1DsUOQNIuAymku3iweF9PieElmbhz689nae8MJOGWpDWpUzH
-         gCRny/0PE0/o8YWAIxZrUCPJ82MrRW+jkwQjZE6t4XoIaa9SxECAWhM0lajkwZgw49Ss
-         sBfnDIBrZK/oxhn1CJsVwc0/n+oxejqgiV1XbMmlnpqyfk8swqp+s9MB1AsEhdVoiqSi
-         sUqa7W3CNX3t/oTTbj9gJ1jjYEE1uVOxGHHeOtyS5lbM8HSaZtttkomi9Vb3BY3aVTdP
-         dzBo+QBrSbXNw4WW/gkkUZypQ174tlqE2oh/ljyjY4RrIb0QLNlJYOD1F5cnGt02gFiC
-         Kl7Q==
-X-Forwarded-Encrypted: i=1; AHgh+Rrglvd8jxTsX2/iFN2g3CFIsiWPdG8mmEbGqNJVH0IWz58DR7JQgjRBAaWjVfyznR04cioxCHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPD5mcVgXPfrjZUBTiIvRKN3ih3/z6zOX3kW/3/S6mPl4Jr+KO
-	ujpBxnulPh/KhSF/M1oVTshqB4HD5H0FW96BHU2+U8Qg/xfa9OLeaQIj35Am+YghbTJ/aP9lhD+
-	eDbqt0hrqTB72kCaJCDQH+BlrKIhhFV5UqrUp0JkaBQ==
-X-Gm-Gg: AfdE7ck6YGuAYKmZDRgXVVYX0k8cmimptzokworBMmWywFx/UkCs1Ufoxdx3UkbsWdf
-	7+X/sT9SLN8GoQx8Fw6141JxfSEvGaTQOcT02DOhxbZaJyNN5JfbHWLQyVFuMBmBssCX+ff3hCY
-	JGbK9o33W2MVjqZECC+c7Oz0/GNwvJmAYQQruKx8NpNjG0AaqNBtDzuU1vQcoulXwd0tCu154mw
-	+wPaH4p5+GAULLUaDT7S1XMXz6KorimKS8CRUGlq1iwogjFJbn0TwCvNI/mUnHSmCePJrc=
-X-Received: by 2002:ac2:454e:0:b0:5ae:b019:af66 with SMTP id
- 2adb3069b0e04-5aebdbb2550mr64975e87.39.1782758680559; Mon, 29 Jun 2026
- 11:44:40 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782759001; x=1783363801;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W2YFS+K5p0G0QqqcWmPd6NTVnxkheoF8BhYqZcRHkmA=;
+        b=ejI93FwKpv+OL0becHqvwFY/VLUBUOBbMHPzaFXOWPLhpg0gCw8KJHMgzxlJXALY0w
+         YKOzICd6Qf+BP20JYIby0kzKdOZ3Tvid5vRxL7MAzaXnhk1VEKVmJ6aHZkt/jwBFpZnr
+         O2cDjhA/nZnuCdQBdbrjavNTMNtZfpdAoHJ79cafXMfCz3KMrf1W2pZ8lWDL0xNZcUAc
+         2Td55dzQp7um6ULslfGlOIqxVVsyb3z6Nv6kBi1U1fFe1sKOqu+9x4yl11SuHd6LmUmg
+         cSwXLC6j8XdsghQenGNW8y4C79P1D+/Zddki5oXHJ687M4udi9FvkW3upx1zgxi3EG9T
+         QVNw==
+X-Gm-Message-State: AOJu0YzVjabfMlbjH4MYti1CJlZs5u6g454xGA8c8CtcgW2WzqjvYr6W
+	JYGgPLTNGfBRiVrhrp7bz9pG0TNW7HOMySetMkCeN8W3M+mSpFzz+UwuZO9gje5UC6Lau1L5wy8
+	va9Bq9T17aV07nLflXdekMux7WS18ED5/JhuNBAFL6c1DGmQq0xhe9ETme0P1nt7BtTBeg4kiB8
+	c5K2tPWvpxvWIXxs52cwpJJCh/SIYk7iTslzk+kUaLVcYqf8UbByfQvvzaJkloVYtlX9m7CKsx0
+	3V9qFz1aK8=
+X-Gm-Gg: AfdE7cmIqmGsNhHYtUPmyuElLsfkRElDITXIw+jhb4ql6pkqCq6jrpof1nvGBqR+HfT
+	fRFJ50HFLRdWwsy4FaF/FxzCZyIcZ96hIQEyB75353Ct8Z+dCB2ERHrnzROq7k0Xhs557pxqMyv
+	SCdeZPNjk7AEa8kG7Jl5Xj2l0IQ4Hcqj81sAIcTUzdvzGvLycDccLrZVioC15zCVTdZZN+s8uLi
+	+1Gv3wsZO8utKEHI5ZjAI41BroelAGtD9wFXRwCEA/JmnmhJ33UiC999slSCmGyKrXErnf9jfI2
+	/TNdhq+6pdu0GbJUoqhDH7osJqECBbSzgC2lCL90yA6Fk0em87oVleJlhFSUwGLQBmd5L7voxdH
+	EpV0aU8EybZm7xrCGctXpO3aQhrq/n7cf33fjbfeNIvxMMMeO0edFAiD8TB2paOJSokSuHzLUXm
+	F1x+MOjMH3MmUpWNlkrsEHV0qLUImVNBYA6CRW4RkYYfaeeQ==
+X-Received: by 2002:a05:690c:4446:b0:7f5:87d3:c38c with SMTP id 00721157ae682-810d7db1120mr8212067b3.21.1782759000796;
+        Mon, 29 Jun 2026 11:50:00 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-810e6e893adsm184927b3.6.2026.06.29.11.50.00
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Jun 2026 11:50:00 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51be9b2582cso37992611cf.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:50:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1782759000; x=1783363800; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=W2YFS+K5p0G0QqqcWmPd6NTVnxkheoF8BhYqZcRHkmA=;
+        b=OeHRmF6NvJ6UjhOmEMAyAdgrq61sK2JBVUIfTL6CMk9nYjAS8mwT4sFjLq03aZi832
+         HSXzPgLkfOXl3giHFPj2KnLTa3ttDtHskPsAZDa+3Cz/6oZmDe04Y/aGepD/wxnBbUsf
+         pR26ojTi449LR20r4ryWngFvWK8flJI+CKfOU=
+X-Received: by 2002:ac8:5a8a:0:b0:51c:1005:d091 with SMTP id d75a77b69052e-51c1088621dmr7458181cf.56.1782759000020;
+        Mon, 29 Jun 2026 11:50:00 -0700 (PDT)
+X-Received: by 2002:ac8:5a8a:0:b0:51c:1005:d091 with SMTP id d75a77b69052e-51c1088621dmr7457461cf.56.1782758999243;
+        Mon, 29 Jun 2026 11:49:59 -0700 (PDT)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51c109ffbb3sm2176341cf.23.2026.06.29.11.49.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2026 11:49:57 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+Subject: [PATCH net-next v4 00/15] bnxt_en: Add kTLS TX offload support
+Date: Mon, 29 Jun 2026 11:49:06 -0700
+Message-ID: <20260629184921.3496727-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260609232935.1602659.8545fdb04fbe.cake-overhead-underflow@trailofbits.com>
- <20260613142626.1b2183eb@kernel.org> <CAE+C+DZpYpJDJOaCK48KBpayXSYorFRSvTE903RBqyPyYkWcCg@mail.gmail.com>
-In-Reply-To: <CAE+C+DZpYpJDJOaCK48KBpayXSYorFRSvTE903RBqyPyYkWcCg@mail.gmail.com>
-From: Samuel Moelius <sam.moelius@trailofbits.com>
-Date: Mon, 29 Jun 2026 14:44:28 -0400
-X-Gm-Features: AVVi8CemPKN3BPaGiEa1_mcG3yW7cCKSdTjgFUbLx24prCZ6rrSJeilUHeOCVxY
-Message-ID: <CAE+C+Da2-t1t76M6T9p=s6frGgOwj8LpOtVxBnmWa6kVHx9kpw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net/sched: cake: reject overhead values that
- underflow length
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"moderated list:CAKE QDISC" <cake@lists.bufferbloat.net>, 
-	"open list:TC subsystem" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302792-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:toke@toke.dk,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:cake@lists.bufferbloat.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	TAGGED_FROM(0.00)[bounces-302793-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D23C96DE1F6
+X-Rspamd-Queue-Id: 9BB916DE231
 
-On Mon, Jun 29, 2026 at 1:24=E2=80=AFPM Samuel Moelius
-<sam.moelius@trailofbits.com> wrote:
->
-> On Sat, Jun 13, 2026 at 5:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Tue,  9 Jun 2026 23:29:36 +0000 Samuel Moelius wrote:
-> > > +static const struct netlink_range_validation_signed cake_overhead_ra=
-nge =3D {
-> > > +     .min =3D -64,
-> > > +     .max =3D 256,
-> >
-> > Both Sashiko's complain - these values are neither safe nor sufficient.
-> >
-> > How was the -64 chosen? It looks suspiciously close the min ethernet
-> > frame length.
->
-> That's how it was chosen. But as you've shown, it was not a good choice.
->
-> I would like to submit a revised patch that does the check on the
-> datapath, as you suggested. Should I send that patch? Or would you
-> prefer to wait for a response from Toke?
+This patchset adds kTLS offload support for TX direction.  A number
+of new files are added:
 
-Apologies. I just noticed Toke did reply. Should I send a patch
-consistent with what he suggested?
+bnxt_mpc.[ch] handle midpath channels (MPCs) used to offload kTLS
+connections to the chip's crypto blocks without going through FW.
+
+bnxt_crypto.[ch] handle the crypto interface and resources.
+
+bnxt_ktls.[ch] handle kTLS offload.
+
+A new CONFIG_BNXT_TLS is added to enable all of the above.  The first 6
+patches add the MPC logic including resource accounting and reservations.
+The next 5 patches add the crypto logic to handle the crypto resources
+and to send/receive control data using the MPCs.  The last 4 patches
+add kTLS offload for the TX direction.
+
+There will be a follow-on patchset to make the TX offload more complete
+and to add the RX direction offload.
+
+v4:
+Fix kerneldoc prototype warning and uninitialized variable warnings reported
+by Jakub.
+
+Fix most valid Sashiko reported issues.
+
+v3:
+https://lore.kernel.org/netdev/20260614072407.2761092-1-michael.chan@broadcom.com/
+
+Fix most AI reported issues from Jakub.
+
+v2:
+https://lore.kernel.org/netdev/20260512212105.3488258-1-michael.chan@broadcom.com/
+
+Fix unused variable compile warnings in patch 10 and 12 by reorganizing
+the patches (reported by Jakub)
+
+Fix some error recovery issues in patch 12
+
+v1:
+https://lore.kernel.org/netdev/20260504235836.3019499-1-michael.chan@broadcom.com/
+
+Michael Chan (15):
+  bnxt_en: Add Midpath channel information
+  bnxt_en: Account for the MPC TX and CP rings
+  bnxt_en: Set default MPC ring count
+  bnxt_en: Rename xdp_tx_lock to tx_lock
+  bnxt_en: Allocate and free MPC software structures
+  bnxt_en: Allocate and free MPC channels from firmware
+  bnxt_en: Allocate crypto structure and backing store
+  bnxt_en: Reserve crypto RX and TX key contexts on a PF
+  bnxt_en: Add infrastructure for crypto key context IDs
+  bnxt_en: Add MPC transmit and completion functions
+  bnxt_en: Add crypto MPC transmit/completion infrastructure
+  bnxt_en: Support kTLS TX offload by implementing .tls_dev_add/del()
+  bnxt_en: Implement kTLS TX normal path
+  bnxt_en: Add support for inline transmit BDs
+  bnxt_en: Add kTLS retransmission support
+
+ drivers/net/ethernet/broadcom/Kconfig         |   9 +
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 255 +++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  91 ++-
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  | 613 +++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  | 229 ++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  53 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c |   2 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 572 ++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ktls.h    | 175 +++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 732 ++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h | 210 +++++
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   4 +-
+ include/linux/bnxt/hsi.h                      |  37 +
+ 15 files changed, 2935 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
+
+-- 
+2.51.0
+
 
