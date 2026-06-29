@@ -1,288 +1,171 @@
-Return-Path: <netdev+bounces-302541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302544-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +A9mDAo7Qmpp2QkAu9opvQ
-	(envelope-from <netdev+bounces-302541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:29:46 +0200
+	id /xgYF2A+Qmpi2gkAu9opvQ
+	(envelope-from <netdev+bounces-302544-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:44:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BC846D838C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 765B36D8626
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:43:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=h-partners.com header.s=dkim header.b=jeUP7WDj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302541-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302541-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=h-partners.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=mjHwZcQG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302544-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302544-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE60A3039394
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:23:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85CEF30FDDA2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15C2306498;
-	Mon, 29 Jun 2026 09:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C243F9F2E;
+	Mon, 29 Jun 2026 09:36:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659593F8EDE;
-	Mon, 29 Jun 2026 09:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171C73FA5E1
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 09:36:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782725020; cv=none; b=i219GvF+LiJtE5toHZJyIsYIZJKMC4qKo3MjcYWe/+BM4Zm55VzOuTXG4zYNPAeUbPDzYcN77HA1hjlRU5u9ZRD+BE3X1Eyuk6MIM066EmlswIKJiTRH7SCG9s8AIjlBLYBLzuiZBEUa4uPYQZhNkeD8XyW5gTgacf3Oh0/oe20=
+	t=1782725813; cv=none; b=qn5jhhJohd8uQS0JUu27cBYn9anRkqXjz59WiNGzyt6xiTxnWL5+HqrLOXK7ZMh8HBDDZdf5i0lLFT2NA4XEWMxWEJ4CcwMOAPpD61xjioDeg8+YCh67eB+4FmwFT5e8FMFQelYvDUeFIUWAdgJy5o1CIuaB9RB0TofqQh24GLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782725020; c=relaxed/simple;
-	bh=NOinlIUHK1O7KsV8/Sws+CeKyYdx2R8D9bQpxtImFts=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZcMbnGtE8E8Ot+Fz2WpwJ8iouEq9odDP60tjdIOimugy8f4cU7OMGetsnNCmhTAkbhUyNb7zF+p1jwpyi56YSgu7NR+NVc80hNlfpYinkBhlmH+GJJzuwqMNnqf+qcScV9Zp0eAhSpbnFPeBLr05jrtisiGcm7tOx22magRu5cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=h-partners.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=jeUP7WDj; arc=none smtp.client-ip=113.46.200.218
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=G2M8dDHxD+jz6xgmK0NGrGGjxPFhsJR72vzpL2rXGAg=;
-	b=jeUP7WDjEepo3brfJMCRdy1wLlb/PDs6Ih+yaMuvj7+GJo/FHzp8clzSgCltX7I5GbJD6d/cz
-	t/Wl56isEll41nk/w6Gk//1zIDW2YyVs6xSlbUMwNO1W37YQYXtGhLrA+kzzvqiApWOPh0CB8S3
-	tM1tkkiIa+o4+jdSctm3Ivc=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gpgbS6gYtzpSyh;
-	Mon, 29 Jun 2026 17:15:00 +0800 (CST)
-Received: from kwepemr100001.china.huawei.com (unknown [7.202.195.168])
-	by mail.maildlp.com (Postfix) with ESMTPS id 363204057D;
-	Mon, 29 Jun 2026 17:23:25 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by kwepemr100001.china.huawei.com
- (7.202.195.168) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 29 Jun
- 2026 17:23:24 +0800
-From: xietangxin <xietangxin@h-partners.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: gaoxingwang <gaoxingwang1@huawei.com>, huyizhen <huyizhen2@huawei.com>,
-	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH net] netfilter: nf_nat_masquerade: recalculate TCP TS offset when port is randomized
-Date: Mon, 29 Jun 2026 17:34:08 +0800
-Message-ID: <20260629093408.3927103-1-xietangxin@h-partners.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782725813; c=relaxed/simple;
+	bh=EXLHRzoiR1IFkDqSBsN4tYaadcYf+sRL4YQiTh51vSI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yg4tQLodXbuJP5kFNZMys7xJoAGisFfSrmc1dJRWcIyeAokdgGL2gHTwUNAXmCiVYLeB3p7cqqjZL20YjgSamGWq8/QaMBZhkB1UAYl3jrlwidY6ryXvBPkIG3AsxS6GfKVOznaxTODjAWGED03yyIz8zdu97gESgtnSUZ+OMxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mjHwZcQG; arc=none smtp.client-ip=91.218.175.181
+Message-ID: <473a9335-495c-4cef-a63a-598deb29b140@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782725799;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IACjqBQhCF+N04IXEwCSuxG0xE27jtYRD9ORQAzwMlc=;
+	b=mjHwZcQGJ2RR9NijjxYtZ6pJvje5Kg5tDY/gUYJmdeIIo2VlhaSobc93hOrBLx8ZMZ9LVr
+	Q0EM1gsSlMPpeRmsXNGB8kn/Vgm0fPooC163UPlSHRviCz3GSHfJfOWgX/SqHXHMXf/0m6
+	LXVO2uKXxI+xiNX57dJb6lPXP5Pyzbc=
+Date: Mon, 29 Jun 2026 10:36:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Ivan Vecera <ivecera@redhat.com>,
+ "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ "Schmidt, Michal" <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ "Vaananen, Pasi" <pvaanane@redhat.com>, "Oros, Petr" <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Simon Horman <horms@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <aifTFMZtWBgLzhCS@FV6GYCPJ69>
+ <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <99cebea4-156a-4379-922e-07c50f766fbe@redhat.com>
+ <BN9PR11MB5401F6BA29CBA6F0C78FDB119B1A2@BN9PR11MB5401.namprd11.prod.outlook.com>
+ <fcaa184b-f9e9-44c4-bae8-c4a9c6c41239@redhat.com>
+ <aiqkZhNdt-WhglDg@FV6GYCPJ69>
+ <ca33b9b8-aafa-40f0-9943-a6b6736af4e4@redhat.com>
+ <CH3PR11MB8749910F17977B951A8B12CA9BE42@CH3PR11MB8749.namprd11.prod.outlook.com>
+ <23e47140-f69f-451d-9154-29071130c11c@redhat.com>
+ <0f8fe4e0-72d8-48a6-96ad-d1650919d2df@linux.dev>
+ <ajzqUTuHDtMRvd1P@FV6GYCPJ69>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <ajzqUTuHDtMRvd1P@FV6GYCPJ69>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100001.china.huawei.com (7.202.195.168)
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[h-partners.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[h-partners.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-302541-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302544-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:ivecera@redhat.com,m:arkadiusz.kubalewski@intel.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[redhat.com,intel.com,kernel.org,vger.kernel.org,nvidia.com,davemloft.net,gmail.com,google.com,microchip.com];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xietangxin@h-partners.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:gaoxingwang1@huawei.com,m:huyizhen2@huawei.com,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@h-partners.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[h-partners.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[h-partners.com:dkim,h-partners.com:email,h-partners.com:mid,h-partners.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7BC846D838C
+X-Rspamd-Queue-Id: 765B36D8626
 
-Problem observed in Kubernetes environments where MASQUERADE target with
---random-fully is configured by default. after commit
-165573e41f2f ("tcp: secure_seq: add back ports to TS offset") TCP short
-connection QPS dropped from ~20000 to ~10000. This added source and
-destination ports into TS offset calculation.
+On 25/06/2026 09:45, Jiri Pirko wrote:
+> Wed, Jun 24, 2026 at 05:57:35PM +0200, vadim.fedorenko@linux.dev wrote:
+>> On 19/06/2026 18:07, Ivan Vecera wrote:
+> 
+> [...]
+> 
+>>>
+>>> Proposal:
+>>> 1) new pin capability
+>>>      - name: state-connected-override
+>>>      - doc: pin state can be changed to connected in any DPLL mode
+>>>
+>>> 2) new NCO pin type to switch the DPLL to NCO mode when connected
+>>>
+>>> 3) automatic-only DPLL
+>>>      - should expose NCO pin with state-connected-override capability
+>>>
+>>> 4) manual-only DPLL
+>>>     - does not need to expose NCO pin with state-connected-override cap
+>>>
+>>> 5) dual-mode DPLL (supporting mode switching)
+>>>     - if it exposes NCO pin with the override cap then it has to support
+>>>       switching to NCO mode directly from AUTO mode
+>>>     - if does not expose NCO pin with the override cap then a user MUST
+>>>       switch the DPLL mode from AUTO to MANUAL to be able to make NCO
+>>>       pin connected to the DPLL
+>>
+>> I still don't see good reasoning for the pin. Even this sentence says
+>> "DPLL mode" which keeps me thinking whether we have to move it to a
+>> special DPLL mode. All these items look like overcomplication of a
+>> simple function of the device itself. DPLL can be either in the closed
+>> loop when one of the pins provides a signal to align to, or in the open
+>> loop meaning that software can control adjustments to phase/frequency.
+>> But it's definitely a property of the device, and it's not a pin in any
+>> kind...
+> 
+> Vadim, did you see this:
+> https://lore.kernel.org/all/aiftnkuT9IP31qUm@FV6GYCPJ69/ ?
+> I very thoroughly described what you are questioning. There is 0 reply
+> to that email so perhaps you missed it? IDK.
 
-However, with MASQUERADE --random-fully, when multiple internal connections
-(e.g sport 10000,20000) are mapped to the same external port (e.g 30000),
-their TS offsets are calculated as ts_offset(10000) and ts_offset(20000).
-If the server reuses the TIME_WAIT slot from the first connection, there is
-a chance that ts_offset(20000) < ts_offset(10000), breaking TSval
-monotonicity for the same 4-tuple and causing RST packets:
-  Client -> Server 24870 -> 80 [SYN] TSval=2294041168
-  Server -> Client 80 -> 24870 [ACK] TSecr=2846236456
-  Client -> Server 24870 -> 80 [RST] Seq=855605690
+Hi Jiri,
 
-After nf_nat_setup_info() successfully assigns a new randomized
-source port, recalculate the TS offset using the new port and
-update the SYN packet's TSval accordingly.
+Yeah, I was traveling a lot lately, and looks like I missed it. I'll
+reply in that thread.
 
-Test results on 4U4G VM with
-`./wrk -t8 -c200 -H "Connection: close" -d10s --latency http://5.5.5.5:80`
-Before:
-  random:10712 req/s, random-fully:10986 req/s
-After:
-  random:21463 req/s, random-fully:19181 req/s
-
-Fixes: 165573e41f2f ("tcp: secure_seq: add back ports to TS offset")
-Cc: stable@vger.kernel.org
-Closes:https://lore.kernel.org/all/92935c00-e0be-4591-ac44-5978c7804d57@yeah.net/
-Signed-off-by: xietangxin <xietangxin@h-partners.com>
----
- net/netfilter/nf_nat_masquerade.c | 91 ++++++++++++++++++++++++++++++-
- 1 file changed, 89 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/nf_nat_masquerade.c b/net/netfilter/nf_nat_masquerade.c
-index 4de6e0a51701..8c9ca5a051cc 100644
---- a/net/netfilter/nf_nat_masquerade.c
-+++ b/net/netfilter/nf_nat_masquerade.c
-@@ -6,8 +6,11 @@
- #include <linux/netfilter.h>
- #include <linux/netfilter_ipv4.h>
- #include <linux/netfilter_ipv6.h>
-+#include <linux/tcp.h>
- 
-+#include <net/tcp.h>
- #include <net/netfilter/nf_nat_masquerade.h>
-+#include <net/secure_seq.h>
- 
- struct masq_dev_work {
- 	struct work_struct work;
-@@ -24,6 +27,76 @@ static DEFINE_MUTEX(masq_mutex);
- static unsigned int masq_refcnt __read_mostly;
- static atomic_t masq_worker_count __read_mostly;
- 
-+static __be32 *tcp_ts_option_ptr(const struct sk_buff *skb)
-+{
-+	const struct tcphdr *th;
-+	unsigned char *ptr;
-+	unsigned char opsize;
-+	unsigned int optlen, offset;
-+
-+	th = tcp_hdr(skb);
-+	optlen = (th->doff - 5) * 4;
-+	ptr = (unsigned char *)(th + 1);
-+	offset = 0;
-+
-+	while (offset < optlen) {
-+		unsigned char opcode = ptr[offset];
-+
-+		if (opcode == TCPOPT_EOL)
-+			break;
-+		if (opcode == TCPOPT_NOP) {
-+			offset++;
-+			continue;
-+		}
-+
-+		if (offset + 1 >= optlen)
-+			break;
-+
-+		opsize = ptr[offset + 1];
-+		if (opsize < 2 || offset + opsize > optlen)
-+			break;
-+
-+		if (opcode == TCPOPT_TIMESTAMP && opsize == TCPOLEN_TIMESTAMP)
-+			return (__be32 *)(ptr + offset + 2);
-+
-+		offset += opsize;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void masquerade_update_tcp_ts_offset(struct nf_conn *ct, struct sk_buff *skb)
-+{
-+	__be32 *tsptr;
-+	struct net *net;
-+	struct tcphdr *th;
-+	struct tcp_sock *tp;
-+	union tcp_seq_and_ts_off st;
-+	struct nf_conntrack_tuple *tuple;
-+
-+	th = tcp_hdr(skb);
-+	net = nf_ct_net(ct);
-+	tuple = &ct->tuplehash[IP_CT_DIR_REPLY].tuple;
-+
-+	if (th && th->syn && !th->ack && skb->sk &&
-+	    READ_ONCE(net->ipv4.sysctl_tcp_timestamps) == 1) {
-+		tp = tcp_sk(skb->sk);
-+		tsptr = tcp_ts_option_ptr(skb);
-+		if (!tsptr)
-+			return;
-+
-+		if (nf_ct_l3num(ct) == NFPROTO_IPV4)
-+			st = secure_tcp_seq_and_ts_off(net, tuple->src.u3.ip, tuple->dst.u3.ip,
-+				tuple->src.u.tcp.port, tuple->dst.u.tcp.port);
-+		else
-+			st = secure_tcpv6_seq_and_ts_off(net, tuple->src.u3.ip6,
-+				tuple->dst.u3.ip6, tuple->src.u.tcp.port, tuple->dst.u.tcp.port);
-+
-+		*tsptr = htonl(tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) + st.ts_off);
-+		WRITE_ONCE(tp->tsoffset, st.ts_off);
-+	}
-+}
-+
- unsigned int
- nf_nat_masquerade_ipv4(struct sk_buff *skb, unsigned int hooknum,
- 		       const struct nf_nat_range2 *range,
-@@ -35,6 +108,7 @@ nf_nat_masquerade_ipv4(struct sk_buff *skb, unsigned int hooknum,
- 	struct nf_nat_range2 newrange;
- 	const struct rtable *rt;
- 	__be32 newsrc, nh;
-+	unsigned int ret;
- 
- 	WARN_ON(hooknum != NF_INET_POST_ROUTING);
- 
-@@ -71,7 +145,13 @@ nf_nat_masquerade_ipv4(struct sk_buff *skb, unsigned int hooknum,
- 	newrange.max_proto   = range->max_proto;
- 
- 	/* Hand modified range to generic setup. */
--	return nf_nat_setup_info(ct, &newrange, NF_NAT_MANIP_SRC);
-+	ret = nf_nat_setup_info(ct, &newrange, NF_NAT_MANIP_SRC);
-+
-+	if (ret == NF_ACCEPT && nf_ct_protonum(ct) == IPPROTO_TCP &&
-+	    (range->flags & NF_NAT_RANGE_PROTO_RANDOM_ALL))
-+		masquerade_update_tcp_ts_offset(ct, skb);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(nf_nat_masquerade_ipv4);
- 
-@@ -229,6 +309,7 @@ nf_nat_masquerade_ipv6(struct sk_buff *skb, const struct nf_nat_range2 *range,
- 	struct in6_addr src;
- 	struct nf_conn *ct;
- 	struct nf_nat_range2 newrange;
-+	unsigned int ret;
- 
- 	ct = nf_ct_get(skb, &ctinfo);
- 	WARN_ON(!(ct && (ctinfo == IP_CT_NEW || ctinfo == IP_CT_RELATED ||
-@@ -248,7 +329,13 @@ nf_nat_masquerade_ipv6(struct sk_buff *skb, const struct nf_nat_range2 *range,
- 	newrange.min_proto	= range->min_proto;
- 	newrange.max_proto	= range->max_proto;
- 
--	return nf_nat_setup_info(ct, &newrange, NF_NAT_MANIP_SRC);
-+	ret = nf_nat_setup_info(ct, &newrange, NF_NAT_MANIP_SRC);
-+
-+	if (ret == NF_ACCEPT && nf_ct_protonum(ct) == IPPROTO_TCP &&
-+	    (range->flags & NF_NAT_RANGE_PROTO_RANDOM_ALL))
-+		masquerade_update_tcp_ts_offset(ct, skb);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(nf_nat_masquerade_ipv6);
- 
--- 
-2.43.0
-
+Thanks!
 
