@@ -1,182 +1,210 @@
-Return-Path: <netdev+bounces-302451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Cci3E3nqQWr3vwkAu9opvQ
-	(envelope-from <netdev+bounces-302451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:46:01 +0200
+	id hFDIAa3sQWp7wAkAu9opvQ
+	(envelope-from <netdev+bounces-302456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:55:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB486D5B4B
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:46:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575A66D5BEF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 05:55:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gurudas.dev header.s=spacemail header.b=IK8TBh20;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302451-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302451-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=linutronix.de header.s=2020 header.b=Pft78SEo;
+	dkim=pass header.d=linutronix.de header.s=2020e header.b="mhU/07WU";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302456-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302456-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3050F3028B04
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 03:45:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C71C301CA59
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 03:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BE1380FE7;
-	Mon, 29 Jun 2026 03:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F069237BE7A;
+	Mon, 29 Jun 2026 03:55:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-12.smtp.spacemail.com (out-12.smtp.spacemail.com [198.54.127.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59617331ED8;
-	Mon, 29 Jun 2026 03:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAED2D3A7C;
+	Mon, 29 Jun 2026 03:55:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782704704; cv=none; b=NyQ+B5HZcnuawKuMzxc3KH2rovDWWtHqkUwgCYr9lZe4FgVLwB4Lh3B27C0TjXN6JdZcUYZLniy6LCxoh6Z5niu+Lx5qrgKyEoSbGCDBh3dyPRwH/gJ/kKeb0yk0CKDQ83aj1DM+qqGTTHX+CjEm0kPT0tX4Vu71c5FJB0QEGg8=
+	t=1782705317; cv=none; b=HLMR2ij9j8Ar7RWTaCKWGOZC9dYjuuDKz2IUknAbgYe8YTepwXVvF7QxmEdQdQbHF0oEpECtpYKFjQ5ElieMe2I4W/jnrNsCH+xBgQvmbDwE9G+derFrK2V7DAv0MJnX64jt30ySs0VyAw4/9eQKL7bgWkLP7FSVIA3SDwCiNxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782704704; c=relaxed/simple;
-	bh=QbkbgEcDOp8DemVXI/V0dpeBMUXkEeOhRVWsw1KUqmo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KrJ/pDl9BPgYYBcOI2GTnxsspjuzbMYWB7ECEF8WYRHdMzBI3xeUsLqQaFuJ4OlHVVHos48c4EmmgbO/zsuqnl7TCqADlwycTrWbOIUur+hpDBq49rypabnyAK/L2jGA6R0NX8clL0iUmJ8mRYtURWanxf1AVXAJALGYndFMSE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gurudas.dev; spf=pass smtp.mailfrom=gurudas.dev; dkim=pass (2048-bit key) header.d=gurudas.dev header.i=@gurudas.dev header.b=IK8TBh20; arc=none smtp.client-ip=198.54.127.83
-Received: from [192.168.1.96] (107-194-158-19.lightspeed.sntcca.sbcglobal.net [107.194.158.19])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.spacemail.com (Postfix) with ESMTPSA id 4gpX7P59qNz8sbj;
-	Mon, 29 Jun 2026 03:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gurudas.dev;
-	s=spacemail; t=1782704324;
-	bh=jKx+94n82aR0aGPCo9y8gNwhGoiI7gsWMuBc5ujvVUw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IK8TBh20FCaBU8hFE79rDS1IeLvUpmNeCrw1Xd/aj5CmfYaTmvloJz6AXTa8HAIFS
-	 kGP9eqO+IXWFu5ldt1V5SUuyTagyiqAl+5AKruDwebOg5E1gf2iFIKx8ojXCS5CmFW
-	 ABawlfgtTdXozg5f4yPPc+oF5Qmhhud6oDvUyvRbespTxwCa5/tak5hZlxH+yzoohL
-	 9hfkhZUFjHej2hQNNmjGkzHYxmnWOwEIOmwMi/Vq8rqE30d/SeQmb4dup9V1hVfRQV
-	 CQ7AEOZKORM64XTLXgFWxzHQPrXbrC9eNiDqL9u7+D0Lt0ALP0jZN84WzoTbSRzsqb
-	 XxS+9tq6GQdRw==
-From: Guru Das Srinagesh <linux@gurudas.dev>
-Date: Sun, 28 Jun 2026 20:38:21 -0700
-Subject: [PATCH 7/7] drm/nova: use vertical import style
+	s=arc-20240116; t=1782705317; c=relaxed/simple;
+	bh=+9Gt5xbV0f6uwKj3h75aKeru0YfHJBPFQCGeKZXf2cU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eufzna1K0BcqIFLBEf679ZSQk/90bZBehL6iPcQPF1aSP7ho8RkhHOw1yje50f1EuLDpUS/g013HDoQPYEgm1l0KA4mTOVnbXvYJ/zTOlBtlEdglI3dEwJvdC4S+SbIyuB8zITK0EOOfMTa863xRjkEVGalCLDmLB/0QmW0FirA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Pft78SEo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mhU/07WU; arc=none smtp.client-ip=193.142.43.55
+Date: Mon, 29 Jun 2026 05:55:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1782705313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fphPRIfC3c7/rVG8Mt/TDc8McgZz28sFey5ZU2tWKdc=;
+	b=Pft78SEoAU9N4qr3lmpoTg0M92qy3Nft6vgej121eR9dSbMe0f8peTU3UQ5ZdZp4xb32eB
+	b7WgzU76UpqfIi0KH7Nok5zMxvDv0BWBBliu/F8F1xalkGFAYdD3oGsQzbc0O5OjAwtWCF
+	mXycnLD/Wd7oQtN0SElsTscfGpUIJ3xYAESLabeu0rfoa+vtgLN19lNYJ3atZNfWAGOetu
+	XZifQFpTfhxnNu61bjULxpRwl9PAqqmE3eXNeppbBRnouZ1TD+2oTzJkKTam5Hq6Pq/Lz1
+	Zl42CcwgABCE3nJlNBy1i0YxdmOXGkBpyzioiyLcnR307F4EAjjODdDMzVT1mA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1782705313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fphPRIfC3c7/rVG8Mt/TDc8McgZz28sFey5ZU2tWKdc=;
+	b=mhU/07WU2k0PFYZQUZgClVivDlMZa7FcCpph6HWnRTGAFP5kbPcuuzB14gmyxBBGCv5W+f
+	6CGdzH8OyJeCbxDw==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Miroslav Lichvar <mlichvar@redhat.com>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, Rodolfo Giometti <giometti@enneenne.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Takashi Iwai <tiwai@suse.com>, 
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Peter Hilber <peter.hilber@oss.qualcomm.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, linux-wireless@vger.kernel.org, 
+	linux-sound@vger.kernel.org
+Subject: Re: [patch 09/24] timekeeping: Add CLOCK_AUX support for
+ ktime_get_snapshot_id()
+Message-ID: <20260629055344-b74c43de-2a2b-4608-ae4e-ed0ac8e12fd1@linutronix.de>
+References: <20260526165826.392227559@kernel.org>
+ <20260526171223.374814973@kernel.org>
+ <20260626103359-66ab2b54-d36f-416b-94a4-3f3708dccced@linutronix.de>
+ <87echtk24a.ffs@fw13>
+ <20260626125819-d8b197fc-7671-4d12-a578-9025affc52d9@linutronix.de>
+ <87fr29ib4v.ffs@fw13>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260628-b4-rust-vertical-imports-v1-7-98bc71d4810b@gurudas.dev>
-References: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
-In-Reply-To: <20260628-b4-rust-vertical-imports-v1-0-98bc71d4810b@gurudas.dev>
-To: Miguel Ojeda <ojeda@kernel.org>, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: Danilo Krummrich <dakr@kernel.org>, 
- Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Robin Murphy <robin.murphy@arm.com>, 
- Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>, 
- Fu Wei <wefu@redhat.com>, Michal Wilczynski <m.wilczynski@samsung.com>, 
- =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Viresh Kumar <viresh.kumar@linaro.org>, Jens Axboe <axboe@kernel.dk>, 
- FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- driver-core@lists.linux.dev, linux-riscv@lists.infradead.org, 
- linux-pwm@vger.kernel.org, linux-pm@vger.kernel.org, 
- linux-block@vger.kernel.org, netdev@vger.kernel.org, 
- nova-gpu@lists.linux.dev, dri-devel@lists.freedesktop.org, 
- Guru Das Srinagesh <linux@gurudas.dev>
-X-Mailer: b4 0.15.2
-X-Envelope-From: linux@gurudas.dev
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87fr29ib4v.ffs@fw13>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gurudas.dev:s=spacemail];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302456-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:rust-for-linux@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dakr@kernel.org,m:abdiel.janulgue@gmail.com,m:daniel.almeida@collabora.com,m:robin.murphy@arm.com,m:a.hindborg@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:aliceryhl@google.com,m:tmgross@umich.edu,m:tamird@kernel.org,m:acourbot@nvidia.com,m:work@onurozkan.dev,m:fustini@kernel.org,m:guoren@kernel.org,m:wefu@redhat.com,m:m.wilczynski@samsung.com,m:ukleinek@kernel.org,m:rafael@kernel.org,m:viresh.kumar@linaro.org,m:axboe@kernel.dk,m:fujita.tomonori@gmail.com,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:driver-core@lists.linux.dev,m:linux-riscv@lists.infradead.org,m:linux-pwm@vger.kernel.org,m:linux-pm@vger.kernel.org,m:linux-block@vger.kernel.org,m:netdev@vger.kernel.org,m:nova-gpu@lists.
- linux.dev,m:dri-devel@lists.freedesktop.org,m:linux@gurudas.dev,m:abdieljanulgue@gmail.com,m:fujitatomonori@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[linux@gurudas.dev,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302451-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	DMARC_NA(0.00)[gurudas.dev];
+	FORGED_RECIPIENTS(0.00)[m:tglx@kernel.org,m:linux-kernel@vger.kernel.org,m:dwmw2@infradead.org,m:mlichvar@redhat.com,m:jstultz@google.com,m:sboyd@kernel.org,m:anna-maria@linutronix.de,m:frederic@kernel.org,m:akiyano@amazon.com,m:giometti@enneenne.com,m:vdonnefort@google.com,m:maz@kernel.org,m:oliver.upton@linux.dev,m:kvmarm@lists.linux.dev,m:oupton@kernel.org,m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:tiwai@suse.com,m:miriam.rachel.korenblit@intel.com,m:johannes.berg@intel.com,m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:saeedm@nvidia.com,m:peter.hilber@oss.qualcomm.com,m:mst@redhat.com,m:virtualization@lists.linux.dev,m:linux-wireless@vger.kernel.org,m:linux-sound@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,redhat.com,google.com,kernel.org,linutronix.de,amazon.com,enneenne.com,linux.dev,lists.linux.dev,gmail.com,suse.com,intel.com,nvidia.com,oss.qualcomm.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gurudas.dev:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@gurudas.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,collabora.com,arm.com,garyguo.net,protonmail.com,google.com,umich.edu,nvidia.com,onurozkan.dev,redhat.com,samsung.com,linaro.org,kernel.dk,lunn.ch,armlinux.org.uk,davemloft.net,ffwll.ch,lists.linux.dev,lists.infradead.org,vger.kernel.org,lists.freedesktop.org,gurudas.dev];
+	FROM_NEQ_ENVFROM(0.00)[thomas.weissschuh@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gurudas.dev:dkim,gurudas.dev:email,gurudas.dev:mid,gurudas.dev:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linutronix.de:dkim,linutronix.de:mid,linutronix.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CBB486D5B4B
+X-Rspamd-Queue-Id: 575A66D5BEF
 
-Convert `use` imports to vertical layout for better readability and
-maintainability.
+On Fri, Jun 26, 2026 at 05:17:52PM +0200, Thomas Gleixner wrote:
+> On Fri, Jun 26 2026 at 13:03, Thomas Weißschuh wrote:
+> > On Fri, Jun 26, 2026 at 12:49:41PM +0200, Thomas Gleixner wrote:
+> >> On Fri, Jun 26 2026 at 10:48, Thomas Weißschuh wrote:
+> >> > On Tue, May 26, 2026 at 07:14:13PM +0200, Thomas Gleixner wrote:
+> >> > (...)
+> >> >
+> >> >>  static inline void tk_update_aux_offs(struct timekeeper *tk, ktime_t offs)
+> >> >> @@ -1218,6 +1223,12 @@ bool ktime_get_snapshot_id(struct system
+> >> >>  		tkd = &tk_core;
+> >> >>  		offs = &tk_core.timekeeper.offs_boot;
+> >> >>  		break;
+> >> >> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
+> >> >> +		tkd = aux_get_tk_data(clock_id);
+> >> >> +		if (!tkd)
+> >> >> +			return false;
+> >> >> +		offs = &tkd->timekeeper.offs_aux;
+> >> >> +		break;
+> >> >
+> >> > 'tkd' is also used to compute 'monoraw'. However 'tkr_raw' and 'tkr_mono'
+> >> > are the same for auxilary clocks, so this will compute a wrong 'monoraw'.
+> >> 
+> >> AUX clocks are independent in the first place and the MONORAW part is
+> >> the "MONORAW" related to the AUX clock itself. 
+> >> 
+> >> > Instead 'monoraw' should be computed based on 'tk_core'.
+> >> > Which then also requires the sequence locking of 'tk_core'.
+> >> 
+> >> No. From a PTP and steering point of view you want the "raw" value which
+> >> is related to the AUX clock itself and not the global one.
+> >
+> > Ack.
+> >
+> > However the kdocs call it 'CLOCK_MONOTONIC_RAW'. Can we clean this up?
+> 
+> Yes. Something like the below?
 
-Signed-off-by: Guru Das Srinagesh <linux@gurudas.dev>
----
- drivers/gpu/drm/nova/file.rs | 5 ++++-
- drivers/gpu/drm/nova/gem.rs  | 6 +++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+Looks good, thanks.
+The corresponding structure definitions are a also affected, though.
 
-diff --git a/drivers/gpu/drm/nova/file.rs b/drivers/gpu/drm/nova/file.rs
-index a3b7bd36792c..9a1404a7a687 100644
---- a/drivers/gpu/drm/nova/file.rs
-+++ b/drivers/gpu/drm/nova/file.rs
-@@ -4,7 +4,10 @@
- use crate::gem::NovaObject;
- use kernel::{
-     alloc::flags::*,
--    drm::{self, gem::BaseObject},
-+    drm::{
-+        self,
-+        gem::BaseObject, //
-+    },
-     pci,
-     prelude::*,
-     uapi,
-diff --git a/drivers/gpu/drm/nova/gem.rs b/drivers/gpu/drm/nova/gem.rs
-index 9d8ff7de2c0f..f6bc7fdee732 100644
---- a/drivers/gpu/drm/nova/gem.rs
-+++ b/drivers/gpu/drm/nova/gem.rs
-@@ -2,7 +2,11 @@
- 
- use kernel::{
-     drm,
--    drm::{gem, gem::BaseObject, DeviceContext},
-+    drm::{
-+        gem,
-+        gem::BaseObject,
-+        DeviceContext, //
-+    },
-     page,
-     prelude::*,
-     sync::aref::ARef,
-
--- 
-2.54.0
-
+> Thanks,
+> 
+>         tglx
+> ---
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -1202,10 +1202,21 @@ static inline u64 tk_clock_read_snapshot
+>  
+>  /**
+>   * ktime_get_snapshot_id -  Simultaneously snapshot a given clock ID with
+> - *			    CLOCK_MONOTONIC_RAW and the underlying
+> + *			    the corresponding monotonic raw the underlying
+>   *			    clocksource counter value.
+>   * @clock_id:		The clock ID to snapshot
+>   * @systime_snapshot:	Pointer to struct receiving the system time snapshot
+> + *
+> + * For the system time keeping clocks (REALTIME, MONOTONIC and BOOTTIME) the
+> + * monotonic raw clock is CLOCK_MONOTONIC_RAW. For AUX clocks this is the
+> + * monotonic raw clock related to the AUX clock. These AUX clock related
+> + * monotonic raw clocks have a strict linear offset to the system time
+> + * CLOCK_MONOTONIC_RAW:
+> + *
+> + *	MONOTONIC_RAW(AUX$N) = CLOCK_MONOTONIC_RAW(system) + offset(AUX$N)
+> + *
+> + * The offset is established when a AUX clock is initialized, but it is
+> + * currently not accessible.
+>   */
+>  void ktime_get_snapshot_id(clockid_t clock_id, struct system_time_snapshot *systime_snapshot)
+>  {
+> @@ -1512,6 +1523,9 @@ EXPORT_SYMBOL_GPL(ktime_real_to_base_clo
+>   * @xtstamp:		Receives simultaneously captured system and device time
+>   *
+>   * Reads a timestamp from a device and correlates it to system time
+> + *
+> + * See documentation for ktime_get_snapshot_id() for information about the raw
+> + * monotonic time stamp which is used here.
+>   */
+>  int get_device_system_crosststamp(int (*get_time_fn)
+>  				  (ktime_t *device_time,
+> 
 
