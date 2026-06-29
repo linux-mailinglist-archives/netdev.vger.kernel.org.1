@@ -1,218 +1,170 @@
-Return-Path: <netdev+bounces-302570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zHOPIitSQmoM4wkAu9opvQ
-	(envelope-from <netdev+bounces-302570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:08:27 +0200
+	id 36HuMo1UQmqY4wkAu9opvQ
+	(envelope-from <netdev+bounces-302571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:18:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 225196D931A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:08:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A0D6D94CF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:18:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KQGLJoyn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302570-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302570-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=codethink.co.uk header.s=imap5-20230908 header.b="5jj+/jM8";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302571-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302571-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=codethink.co.uk;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8FC2F300D4E0
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:08:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 07CBA303301A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EF336C588;
-	Mon, 29 Jun 2026 11:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B7A36EAA2;
+	Mon, 29 Jun 2026 11:11:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FB5367B98;
-	Mon, 29 Jun 2026 11:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C528836F91E;
+	Mon, 29 Jun 2026 11:11:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782731305; cv=none; b=DRk9vk2mnS9JT7VOtSbl8Kxz2/mDfLsREv0nXzZA3Arm1ZumDHwpU/wuHghb2BjSUoR0G7jra7BodCluJjgVZzWCE6aUk6++0g+18sZ/CJPV/62080GpNq91Q52OjqUzlaPe304a7uwV4CEI6nrkiDG0tYKEauvOUyAixpJ+YvM=
+	t=1782731489; cv=none; b=PYGz00IuXpO9hFDCAKzyrvf49plbxpwd2I9DGnOETFiKQaAikPoxUFvtpvETh4PSxXRRdUYe0XVP4U8ZhxQiLxGhlRzhvQRmUn/mw0dwvSsAeygJPi8mm1WISu0LMDsTP2HIyjA8CRLUMH5Rdq7BX+2ouo71L+s5r1b5nZu4ZiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782731305; c=relaxed/simple;
-	bh=3rynhgaqXwze0Jqud6scrZk9b7QTG4cBaIRiAHpPZl8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uTN71qhFBcohsiZpmx9EAyDSYqqBXYT+ZYmipzpYLC0lBh9vgEMzwOTm4xS7w0KkBDy6ilDAvIDbfUnwXQMWB9PSFdM1XpdgrH1qvGOjs25NSkR1jujVnX7y10xoQNjAKJI/UaHmYSwcRIflSiPGJAeF3ZbWhQwfelyFn+c/dII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQGLJoyn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA2AF1F000E9;
-	Mon, 29 Jun 2026 11:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782731303;
-	bh=8p1TXG4R7ot85xgBmG5jpGYEkGHYg3itgtMPk/OkNlE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=KQGLJoynBpKj+FjZHPakpxLK7VjiyhWgsnoTqyfDP/6kBidefxIXVKXABWcDtGUuZ
-	 iOiPkoln+uz3mtoHfczA1QGIjZDzxWfJZ8mz31V6ob0tDxYRShB0dsEv7I8e8f4DBc
-	 Gqk1Ep2rvqgB/J3tYGqY1Ci2KVq4TTPd2xNdMhkcmo/ziaqullKjk6xbQWb5PNLHQy
-	 42CIn5NUkhntmCYf6iJKVvVlkObDZtgcxYeHQ+ScpzOLz9w5lMhNT0EgSD4XQidemf
-	 P2sVo9hePTxJSZ5igHZX/LqsqBpnonkQbWpOHzxsF3nG+0WqfqnXGQEmTVpagUykWS
-	 fmw1lNthiHcew==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 107EC80A1C6; Mon, 29 Jun 2026 13:08:21 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Ralf Lici <ralf@mandelbit.com>
-Cc: netdev@vger.kernel.org, Daniel =?utf-8?Q?Gr=C3=B6ber?=
- <dxld@darkboxed.org>, Antonio
- Quartulli <antonio@mandelbit.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-kernel@vger.kernel.org, Pablo Neira Ayuso
- <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter
- <phil@nwl.cc>, Beniamino Galvani <bgalvani@redhat.com>
-Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and
- dispatch core
-In-Reply-To: <20260624161854.686569-1-ralf@mandelbit.com>
-References: <87v7b9c9jj.fsf@toke.dk>
- <20260624161854.686569-1-ralf@mandelbit.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 29 Jun 2026 13:08:21 +0200
-Message-ID: <87bjctd2oq.fsf@toke.dk>
+	s=arc-20240116; t=1782731489; c=relaxed/simple;
+	bh=VIhHBFAAk1V5ISkXSs4odDoyYxGDJPj7uRrNDbXxr8k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IiNU7oI9b/Qv7NlqgMUZkgbsVn/Qi1C3+rV5o5WynwWFPG+MYlJV/eHbvW5+wQ9ZVffruI/jORaUPPgys2hVgfXecMv8df5R7lgRjlnxQPI/H+ykIPSekkiMz5aMhZbI7rC6yTAwtqDtJnUNP7Dv4S1Wohu043oDEQMKjLoy5ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.co.uk; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=5jj+/jM8; arc=none smtp.client-ip=78.40.148.171
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
+	Reply-To; bh=jPAvt4qaBDMoIurCHx70ouodE4Ai1NaWhHP67n45SmU=; b=5jj+/jM8kzonl4B7
+	XJdz4oWYE8E8yYUtrOmNyccKZxdT86dDo5mmb/lELsNfM2q4/9lPJrbgSPCbq0l9hhS/Ic4FNhWRm
+	CQ6tIi760AvxADxXVzgVttzly7dQbzSaSYCD7FRCXlXSxXSHpT4dNMMDMaSLeJa/acNYBioYmMAlt
+	9tnhVQdD6TMQPgAj/PWazeEsVbgwCjdVNB2VcaOFtnRASUZCr9YwJ1Hicjf0p13qPTK3q65+dZ1to
+	cACsKcRR+VVeoNZpIZhKOtE4YIlvukMcAo9NQQzktprBzN+uVg9Y918AEDVoFXuIAXEE4t3paW22/
+	+fbV6rq/AHfYOFXDyw==;
+Received: from [167.98.27.226] (helo=[10.35.6.194])
+	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1we9tN-000PL2-9D; Mon, 29 Jun 2026 12:11:09 +0100
+Message-ID: <74e05f3d-39a6-4a4c-8bc3-d4f23a54ef69@codethink.co.uk>
+Date: Mon, 29 Jun 2026 12:11:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: stmmac: fix missed le32_to_cpu()
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260622143707.497198-1-ben.dooks@codethink.co.uk>
+ <b375d36c-112e-4662-b538-fd10fa927ecc@bootlin.com>
+ <20260624192205.4485cd61@kernel.org>
+ <2a92fd9d-42b3-4564-b784-ec504d4d82b8@bootlin.com>
+Content-Language: en-GB
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+Organization: Codethink Limited.
+In-Reply-To: <2a92fd9d-42b3-4564-b784-ec504d4d82b8@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Sender: ben.dooks@codethink.co.uk
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.07 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.59)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[codethink.co.uk,reject];
+	R_DKIM_ALLOW(-0.20)[codethink.co.uk:s=imap5-20230908];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-302570-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302571-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[toke@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[ben.dooks@codethink.co.uk,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:ralf@mandelbit.com,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:bgalvani@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[ben.dooks@codethink.co.uk,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[codethink.co.uk:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mandelbit.com:email]
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,marc.info:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,codethink.co.uk:url,codethink.co.uk:from_mime,codethink.co.uk:dkim,codethink.co.uk:email,codethink.co.uk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 225196D931A
+X-Rspamd-Queue-Id: C6A0D6D94CF
 
-Ralf Lici <ralf@mandelbit.com> writes:
-
-> On Tue, 23 Jun 2026 21:59:44 +0200, Toke H=C3=B8iland-J=C3=B8rgensen <tok=
-e@kernel.org> wrote:
->> Ralf Lici <ralf@mandelbit.com> writes:
->> > On the BPF point specifically: I agree a BPF program should be able to
->> > decide whether to translate. What I am less sure about is whether
->> > redirecting to a netdevice is the best way to expose that. A TC action
->> > (yet another model, I know :)) gives you the same thing in-pipeline and
->> > more directly:
->> >
->> >     tc filter add dev wwan0 egress \
->> >         bpf obj match.o action ipxlat4to6 domain clat0
->> >
->> > Let BPF make the policy decision, with the native action doing the
->> > translation work that the current BPF CLAT implementations have trouble
->> > with: fragmentation, checksum corner cases, and ICMP error inner
->> > headers (as explained by Beniamino).
->> >
->> > So TC clsact looks like the natural in-kernel replacement for today's
->> > TC-BPF CLAT programs: no extra netdev, you attach to the existing
->> > uplink, direction is explicit, and on egress you sit on the real route
->> > dst, so the synthetic-dst and double-routing problems above just don't
->> > arise. The cost is more moving parts than a single bpf_redirect since
->> > userspace has to manage clsact, filters, priorities and action
->> > lifecycle/cleanup.
+On 25/06/2026 08:07, Maxime Chevallier wrote:
+> 
+> 
+> On 6/25/26 04:22, Jakub Kicinski wrote:
+>> On Mon, 22 Jun 2026 19:51:39 +0200 Maxime Chevallier wrote:
+>>> Hi Ben,
+>>>
+>>> On 6/22/26 16:37, Ben Dooks wrote:
+>>>> The print in ndesc_display_ring() sends the des2 and des3
+>>>> to the pr_info() without passing them through the relevant
+>>>> conversion to cpu order.
+>>>>
+>>>> Fix the (prototype) sparse warnings by using le32_to_cpu():
+>>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorrect type in argument 6 (different base types)
+>>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected unsigned int
+>>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restricted __le32 [usertype] des2
+>>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17: warning: incorrect type in argument 7 (different base types)
+>>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    expected unsigned int
+>>>> drivers/net/ethernet/stmicro/stmmac/norm_desc.c:258:17:    got restricted __le32 [usertype] des3
+>>>>
+>>>> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+>>>
+>>> I agree on the principle, but this isn't a fix so this'll have to wait
+>>> until net-next re-opens :)
 >>
->> Hmm, so no one really uses the bpf filter mechanism, since you can just
->> do everything from an action anyway (and with TCX attachment, you can
->> even avoid the overhead of the TC filter/action infrastructure
->> entirely). However, point taken wrt how to integrate this with BPF. I
->> guess the most flexible thing would be to expose the functionality
->> directly (as a kfunc callable from a BPF program). Which also fits with
->> your point below:
+>> Humpf, why are we not seeing this on x86 allmodconfig ? 🤔️
 >>
->
-> Ah, I see, the cls_bpf example was dated, and I like the kfunc angle
-> better than a new TC action.
->
-> I would probably keep that as the minimal per-packet interface: BPF can
-> decide whether a packet should be translated, and the kfunc can do the
-> actual translation work for packets whose translated form still fits the
-> output MTU. The full 4->6 fragmentation case still looks like
-> output-path/harness territory to me, since it is a 1->N fan-out
-> operation.
+>> $ make C=1 W=1 drivers/net/ethernet/stmicro/stmmac/norm_desc.o
+>>    DESCEND objtool
+>>    CC [M]  drivers/net/ethernet/stmicro/stmmac/norm_desc.o
+>>    CHECK   drivers/net/ethernet/stmicro/stmmac/norm_desc.c
+>> $
+> 
+> Heh good point indeed !
+>    
+>>>> Fix the (prototype) sparse warnings by using le32_to_cpu():
+> 
+> Ben, what's this "prototype" sparse ? a custom tool of yours that
+> you used to find that ?
 
-Yeah, that would probably be fine; I would expect that in most cases
-you'd want to configure your MTU to avoid fragmentation anyway :)
+I have an RFC to add variadic and thus also printf/scanf formatting
+to sparse. This is waiting on review after the original got re-worked
+to add scanf and a few other bug-fixed and shuffles.
 
->> > For a gateway translator, though, I still think a device-bound model is
->> > less natural. There the translation point is more like a forwarding
->> > decision across routes and nexthops, so a route/LWT attachment, or
->> > possibly a netfilter attachment seems easier to reason about. Also, as
->> > you already pointed out while discussing LWT, an admin setting up NAT64
->> > is more likely to reach for an nft rule than for a clsact filter on a
->> > specific device.
->> >
->> > Taking a step back, ipxlat is really a generic translation engine plus=
- a
->> > thin harness around it. So rather than pick one attachment, it might be
->> > worth structuring the engine so different harnesses can drive it.
->> > There's interesting precedent for this shape:
->> >
->> > - ILA, again, is the closest sibling: stateless IPv6 address translati=
-on
->> >   with a shared core in ila_common.c, driven both by an LWT frontend in
->> >   ila_lwt.c and by an inline netfilter hook with a netlink-configured
->> >   mapping table in ila_xlat.c.
->> >
->> > - act_ct is the precedent for the TC side specifically: a TC action th=
-at
->> >   reuses the netfilter conntrack engine rather than reimplementing it.
->> >
->> > And act_nat is the cautionary counter-example: a standalone TC
->> > reimplementation of stateless NAT that shares no code with nf_nat, and
->> > carries a "would be nice to share code" comment :)
->> >
->> > So I am wondering whether the right direction is to factor the
->> > translation engine cleanly, land it with one harness first, and keep t=
-he
->> > other attachment points as follow-up work once the core semantics are
->> > settled.
->> >
->> > Does that direction seem reasonable to you?
->>
->> Yes, reusable functionality that can be called from multiple places
->> sounds like a good fit; let's try to structure it that way!
->>
->
-> Great, that's the direction I'll take then.
->
->> As for which hook to start with, well, let's see if we hear back from
->> the netfilter devs, but either netfilter or the routing subsystem (LWT
->> style) would be OK for me I think.
->>
->
-> Works for me. The engine factoring is common to all of them, so I'll
-> start there. Once it's in shape I can sketch a harness against it to
-> sanity-check the interface.
+Ref: https://marc.info/?l=linux-sparse&m=178185274600679&w=2
 
-Awesome, sounds good!
 
--Toke
+-- 
+Ben Dooks				http://www.codethink.co.uk/
+Senior Engineer				Codethink - Providing Genius
+
+https://www.codethink.co.uk/privacy.html
 
