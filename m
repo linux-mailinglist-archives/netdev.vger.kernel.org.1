@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-302795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302796-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zHjKKni+QmrAAQoAu9opvQ
-	(envelope-from <netdev+bounces-302795-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:50:32 +0200
+	id xdtaNWu+Qmq7AQoAu9opvQ
+	(envelope-from <netdev+bounces-302796-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298306DE23D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:50:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734566DE23A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:50:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=NcT6iNj2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302795-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302795-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=Dd33ah4t;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302796-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302796-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DFFA43045CB2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:50:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4D3F03011A75
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866D53DEAD3;
-	Mon, 29 Jun 2026 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690424219F6;
+	Mon, 29 Jun 2026 18:50:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f99.google.com (mail-dl1-f99.google.com [74.125.82.99])
+Received: from mail-qv1-f100.google.com (mail-qv1-f100.google.com [209.85.219.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95A63C0A05
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C64419311
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:50:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782759008; cv=none; b=bJqVpyOFgRwfqj3OkbLqDZ51No+AfOBBSS/cjEkRjqgtcbnT2eA/hDpiuffk1Rbry8iTGlnCDn46EBbWBxRKrYj9yXx+9UaYIjcUaxNqutiIdNvAjcAy73AcHYVHcz4IV+PGbkV9fwF5QWeEpKYEEyCOuQdveST73Jue+cQy8EE=
+	t=1782759010; cv=none; b=n5tCnPyh3lTba+ty0dWACF0ysz8diRd6qStDw5FUdKHwLKss3GsP1C5G1rDCCUBLjVPHD3OWnsn+oNwNuffi6MPr+3yezUXWpEm7kyFLJO0tncpJc+Je8YULLuKWUooClOfxSN3Yf1+6N8QRGlbI6Bvqb0MDAvH5gVcugMsETsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782759008; c=relaxed/simple;
-	bh=EyuTZZYcAxCMBT9r13X/6H908N/pIZ7G+85Tz+GLjs4=;
+	s=arc-20240116; t=1782759010; c=relaxed/simple;
+	bh=O2y2n37r1WLjd49XfmjNE0+ImA0fgsE7FUXsa49XIrM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XpepFytiV/j9Gp4H9O5hL/xcusWjGVAKT4Oduh8yt+hG77VUnbdE6tO1fU57bqS5vYirA39UUl9PtZbkoBEgx4IUhLF7H/CDjFcv/YLqtjZB9bLRY13+zJAwbqb/CHoOSFrQq4TStXfLxHbSP8ev+f0VHQFqSqcK4gY2+jYVrtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NcT6iNj2; arc=none smtp.client-ip=74.125.82.99
-Received: by mail-dl1-f99.google.com with SMTP id a92af1059eb24-139b914bab6so4996488c88.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:50:06 -0700 (PDT)
+	 MIME-Version; b=cOEVPJeoTkfZWbYsilXwfQhpInYpWFfww3EoG4rgV+HQ2uKnPSpXuiSkbgWkJ9rcq/FWkcc41aG6yKI9ahGE0hRkTlJOe0AMQqHHYQAmOyf2B9yIQvYAaZ780yh7JB6LhaofcBWVgz9ekHLVGPU6G6p4vo6kNyaZPUh1ekikJCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Dd33ah4t; arc=none smtp.client-ip=209.85.219.100
+Received: by mail-qv1-f100.google.com with SMTP id 6a1803df08f44-8ee43b3e5abso20759546d6.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:50:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782759006; x=1783363806;
+        d=1e100.net; s=20251104; t=1782759008; x=1783363808;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=opAf/UA8n9XFItoH++qU6HmIp4pQc09aYsMtLtMdtLc=;
-        b=pbbr88ytmsmVDwBnF4G+7BtKk5059B9zYOuzdx2AVIZr1JQLeAx3zGl1P483BnMSVr
-         GRTQFlOTg+98o+9/FZm6eetWvo8wiadvwU/9cdoKxQRFJvHr2HSRcTTuClBUeiYmL5J9
-         Y1oRHSEYi4CEpgOfViSCfTSb5BJgI5sKMuCwGLUk+0JcNGcxNWyy+xPkayt4rAH4Ko4O
-         BtlGhI32CLlNpGL96XUdlD8ZYvUPq2oOzzOvHR/NvKzheTh3ltqnLSJwO+iIWec0QiG7
-         +b+2Sncm4Y4xxmgHGE2PU2OsHDg+BbcX934acYFKcufufjSNt8pEdwc30DwUXwzEd78v
-         pdxQ==
-X-Gm-Message-State: AOJu0Ywc1rBgv/fPJ0Oo5m4Q9/WxHHzJ7yg1riVCkcGNDDgPAqw0go9c
-	e8vawOb7qvC3ANG//Z3p4LFY3bSzseIQ/7pxMG0z7e2y65T2hsYE9MSm9AdJCe7xwAZoT2S4ui7
-	SaZQwI/gJRZ6raPJ3b8QFO0krN37fMwW9IIQwr0ItTXIQYdwRsRwMBhwZ1VuuyZLb0/f5E4O372
-	F5El8SCHyEUHea43NrZwOk8vrNW6taqE2GiuBcBC/U933ek1kalTSD9f3n+3IR3nlCp8PJNBCKD
-	iZY3jXxnt4=
-X-Gm-Gg: AfdE7cnuO/iqeY7TyKYDqXJfL5AmA0wNIpfTSMrG+bvqWFZKRWtW7xXXSaZ0ohmQ1Cr
-	RzClTeW0DcIJ2ekR8Sk0Udlft4+dY4263yEyLK/LtDwWuceHacHssspfTBfd82VTWG1KOyuNeke
-	ZAbsqJejTZH0gBWDoPCKt599uB6iDBIOys8FfdN++sqtoc4n4uCTJX+0Fan1y/KchQNnSDB51rr
-	pG2e0zeyf28Asgz7/mg4143BcIOsFO7WyD2Fz8CLnbFoTQck4V8TbQjVfYrlzisg2Weh1di0/oT
-	+IbF087maBe+TccXAyXDP8YvfDVYrfHjqf8jEVSHcK1ByQT4gnHc/Ob/I0UoclIhvzSPxOIXshY
-	f6I5i/ldlugFn8PIxgONcpJa3iiVHQNgdI6Gs4Cyc1AvaHLT9OwaooaxPG/AcFZZK0/cMnKss8y
-	a4S2kVaBXKwLMpOd/7eg0kd9K2alPtSuhwd/O2vJe1aVB09muI
-X-Received: by 2002:a05:7022:688e:b0:128:cf80:deea with SMTP id a92af1059eb24-13b2a13f5ebmr396087c88.1.1782759005796;
-        Mon, 29 Jun 2026 11:50:05 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-13b2ab9445csm1720c88.6.2026.06.29.11.50.05
+        bh=KCutg79kWQKha2rYose4I5FgRePNxSN+W9/PUWMuYkQ=;
+        b=ltjSChsmEtirBheCiMhYeVtUBg6Gu0Yp3D9nP+I/9YaLHyqnPge23N1i+PI3fNQQ5F
+         mPJFqpzj2G/ewqJsaRnk3aIM2Y/2toEoV9kQ04QeI+LYAd+iT9nCPQ5iw39boRtvhJhT
+         pLH/dPzklekwAU6Ltwl92PodNQYvPb8Nnpqm036eTquYlmWFt2tkaRKbvcDR0csawqdL
+         PUMNBpcEfhvhkTtFiUnJzdztBWD9Hnl1M6kGWsJU5sEgsadQ0xFQGSmjOW07NfC/IoW3
+         +nURAeUBfIffpuF+Zi6PZYGo3dLhXl5oWJsWGDG5gju7YCj5CqvtUD4b0JFY1apztkg5
+         hY+Q==
+X-Gm-Message-State: AOJu0Yzs8ktH8xmW6y3XXcKKAl96JgI//4M90z+q6d7LkSqWLjewgk9L
+	emO9nfU8qS2k/D+BrWBYuRNK17iw7DygaZax7J08cH+F59tW/NPwL3jH7Kr2mJu6Ki6FxbfVbE1
+	1W6/KMJ6rQT+CQ7TzemkiCSPpkgKeUnThAs+kQrLqIvYSpWjNVF4rY7x6TAEQCH7mWLh2jP+ldB
+	aLFkEOAEb9QyYmyeMX2Mvcu4iidQqdaQFp9AeHvYK0ZdPjJG3CSwYxDvqGfVgsxPJKQuxdieFsh
+	wsbp3AIqg0=
+X-Gm-Gg: AfdE7ckSleEKgtU29wNp91daZqbMDr53D6lLkOjm++EzlBxnGnY3pDF2IVxUJ05IAdO
+	9TGZqciQDE8otMpTRr8xUoNPlooUVCnUR1CBC9ceQYGh6lLI0kYMYgUJsVtVWESMrnjN/Dr9mpH
+	NCMZbRS1Erm5DH5BltSfn/32FJ1CVRJTx0hbx0vAp4tfW8RNm44+L9ZnutEwMPxAEMqFt8JLz3x
+	pa6tjKmI9Ng680ZqHSPprulxGJ4OoxIXmEQi85wWtc/ZWCl+DTzMgTmaQDofcgm73N5WpIenxJ6
+	2ObQrrN0soI3tZVkM97zvrIdr97yhh4SvtEvb83evM7AFgCV9whXc9xCBZT2lkuKXYwO7WFMnk7
+	zIA6/7qfhZrqjPGbI5Wf5vJcqyuro8Bkp85s+ocoQ3GAIaf0UYaabz0tknnt9YRM5VyLaS7BUpO
+	rJgpsIqwfOxZmLI7jFe3Xyzq1iDTE17/ZlSxbNuxq63NGRmg==
+X-Received: by 2002:a05:6214:1fce:b0:8ea:7785:f3e6 with SMTP id 6a1803df08f44-8f1bbdcb6b5mr7183606d6.42.1782759007541;
+        Mon, 29 Jun 2026 11:50:07 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8f1a3196c9esm435156d6.9.2026.06.29.11.50.06
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Jun 2026 11:50:05 -0700 (PDT)
+        Mon, 29 Jun 2026 11:50:07 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-517e054fe07so103396291cf.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:50:04 -0700 (PDT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-51a854e8336so62872261cf.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:50:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1782759004; x=1783363804; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1782759006; x=1783363806; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=opAf/UA8n9XFItoH++qU6HmIp4pQc09aYsMtLtMdtLc=;
-        b=NcT6iNj2gv0kdETBEvd0IxHCNrSZlxDsgYAMMPNyjUBEpsTeRofsWcd3QSi5Gt9HH7
-         CLxrQzlvn6BwFqpk0DIAy0L5ttl+8H8db+cdXk/iin51A/Uaph2ja2EkmnmKa8bBYK5a
-         TPRPvTIi0eQDihxREdZq74cXhpSZccvV6G9TU=
-X-Received: by 2002:a05:622a:2c6:b0:51c:1ff:2512 with SMTP id d75a77b69052e-51c10814235mr6731691cf.33.1782759004240;
-        Mon, 29 Jun 2026 11:50:04 -0700 (PDT)
-X-Received: by 2002:a05:622a:2c6:b0:51c:1ff:2512 with SMTP id d75a77b69052e-51c10814235mr6731161cf.33.1782759003497;
-        Mon, 29 Jun 2026 11:50:03 -0700 (PDT)
+        bh=KCutg79kWQKha2rYose4I5FgRePNxSN+W9/PUWMuYkQ=;
+        b=Dd33ah4tXyoVl7Fn67LKQVKMQK5tn9zz1GsaUewYyL/sRp2iLOcOgtR9jyjdfCV3ES
+         9fmJuJVzcaP+l0DmwrDtQMVMB/bi/vB3xjg/64iDg0q66Agnwf+56fS45nb+EhB4+TIU
+         IyI5/7SYixW1fYQYuFLP3XkypMdJyMr9xwmgg=
+X-Received: by 2002:ac8:5fcd:0:b0:517:8069:8afb with SMTP id d75a77b69052e-51c1081fe4amr7796821cf.33.1782759006126;
+        Mon, 29 Jun 2026 11:50:06 -0700 (PDT)
+X-Received: by 2002:ac8:5fcd:0:b0:517:8069:8afb with SMTP id d75a77b69052e-51c1081fe4amr7796471cf.33.1782759005458;
+        Mon, 29 Jun 2026 11:50:05 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51c109ffbb3sm2176341cf.23.2026.06.29.11.50.01
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51c109ffbb3sm2176341cf.23.2026.06.29.11.50.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 11:50:02 -0700 (PDT)
+        Mon, 29 Jun 2026 11:50:04 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -97,11 +97,10 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next v4 02/15] bnxt_en: Account for the MPC TX and CP rings
-Date: Mon, 29 Jun 2026 11:49:08 -0700
-Message-ID: <20260629184921.3496727-3-michael.chan@broadcom.com>
+	Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: [PATCH net-next v4 03/15] bnxt_en: Set default MPC ring count
+Date: Mon, 29 Jun 2026 11:49:09 -0700
+Message-ID: <20260629184921.3496727-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260629184921.3496727-1-michael.chan@broadcom.com>
 References: <20260629184921.3496727-1-michael.chan@broadcom.com>
@@ -121,15 +120,15 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302795-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302796-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:ajit.khaparde@broadcom.com,m:kalesh-anakkur.purayil@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:ajit.khaparde@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
@@ -139,260 +138,236 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,broadcom.com:from_mime];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 298306DE23D
+X-Rspamd-Queue-Id: 734566DE23A
 
-Modify bnxt_cp_rings_in_use(), bnxt_get_max_func_cp_rings_for_en(),
-and _bnxt_get_max_rings() to account for any TX rings and CP rings
-used by MPCs.  Add a new helper bnxt_total_tx_rings() to include
-MPC TX rings.  Ring reservations will now include the MPC rings.
+If the firmware supports MPC channels and CONFIG_BNXT_TLS is set, set
+the default number of MPC channels.  These MPC rings will share MSIX
+with the TX rings.  The number of MPC channels for each type must not
+exceed the ethtool TX channel count.  bnxt_set_dflt_mpc_rings() will
+determine the count for each MPC channel type and it cannot be directly
+controlled by the user.
 
-Note that legacy FW using older HWRM APIs does not support MPC
-rings.
+We also add bnxt_trim_mpc_rings() to make final adjustments in case
+the number of reserved TX channels is less than expected.
 
 Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 45 ++++++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 21 +++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h | 12 +++++
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |  6 +--
- 5 files changed, 71 insertions(+), 14 deletions(-)
+v3:
+Use proper int type for min_t().
+
+v2:
+https://lore.kernel.org/netdev/20260512212105.3488258-4-michael.chan@broadcom.com/
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  7 +++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  3 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 63 +++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h | 15 +++++
+ 4 files changed, 88 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 8faab85d66d1..2a737e7d7921 100644
+index 2a737e7d7921..02c234b18a06 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7752,6 +7752,11 @@ static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
- 	}
+@@ -13196,6 +13196,7 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 		return rc;
+ 
+ 	bnxt_adj_tx_rings(bp);
++	bnxt_trim_mpc_rings(bp);
+ 	rc = bnxt_alloc_mem(bp, irq_re_init);
+ 	if (rc) {
+ 		netdev_err(bp->dev, "bnxt_alloc_mem err: %x\n", rc);
+@@ -16743,6 +16744,7 @@ static void bnxt_trim_dflt_sh_rings(struct bnxt *bp)
+ 	bp->rx_nr_rings = bp->cp_nr_rings;
+ 	bp->tx_nr_rings_per_tc = bp->cp_nr_rings;
+ 	bp->tx_nr_rings = bnxt_tx_nr_rings(bp);
++	bnxt_trim_mpc_rings(bp);
  }
  
-+int bnxt_total_tx_rings(struct bnxt *bp)
-+{
-+	return bp->tx_nr_rings + bnxt_mpc_tx_rings_in_use(bp);
-+}
+ static void bnxt_adj_dflt_rings(struct bnxt *bp, bool sh)
+@@ -16794,6 +16796,8 @@ static int bnxt_set_dflt_rings(struct bnxt *bp, bool sh)
+ 		bnxt_set_dflt_ulp_stat_ctxs(bp);
+ 	}
+ 
++	bnxt_set_dflt_mpc_rings(bp);
 +
- static int __bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
- 			     bool shared);
- static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
-@@ -7792,19 +7797,28 @@ static int bnxt_hwrm_get_rings(struct bnxt *bp)
- 		stats = le16_to_cpu(resp->alloc_stat_ctx);
- 		hw_resc->resv_irqs = cp;
- 		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
-+			int mpc_tx = bnxt_mpc_tx_rings_in_use(bp);
-+			int mpc_cp = bnxt_mpc_cp_rings_in_use(bp);
- 			int rx = hw_resc->resv_rx_rings;
- 			int tx = hw_resc->resv_tx_rings;
-+			int cp_p5;
- 
-+			if (tx <= mpc_tx || cp <= mpc_cp) {
-+				rc = -ENOMEM;
-+				goto get_rings_exit;
-+			}
-+			tx -= mpc_tx;
-+			cp_p5 = cp - mpc_cp;
- 			if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 				rx >>= 1;
--			if (cp < (rx + tx)) {
--				rc = __bnxt_trim_rings(bp, &rx, &tx, cp, false);
-+			if (cp_p5 < (rx + tx)) {
-+				rc = __bnxt_trim_rings(bp, &rx, &tx, cp_p5, false);
- 				if (rc)
- 					goto get_rings_exit;
- 				if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 					rx <<= 1;
- 				hw_resc->resv_rx_rings = rx;
--				hw_resc->resv_tx_rings = tx;
-+				hw_resc->resv_tx_rings = tx + mpc_tx;
- 			}
- 			hw_resc->resv_irqs = le16_to_cpu(resp->alloc_msix);
- 			hw_resc->resv_hw_ring_grps = rx;
-@@ -7996,7 +8010,7 @@ static int bnxt_cp_rings_in_use(struct bnxt *bp)
- 		return bnxt_nq_rings_in_use(bp);
- 
- 	cp = bp->tx_nr_rings + bp->rx_nr_rings;
--	return cp;
-+	return cp + bnxt_mpc_cp_rings_in_use(bp);
- }
- 
- static int bnxt_get_func_stat_ctxs(struct bnxt *bp)
-@@ -8054,7 +8068,7 @@ static void bnxt_get_total_resources(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- 	hwr->cp_p5 = 0;
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
- 		hwr->cp_p5 = bnxt_cp_rings_in_use(bp);
--	hwr->tx = bp->tx_nr_rings;
-+	hwr->tx = bnxt_total_tx_rings(bp);
- 	hwr->rx = bp->rx_nr_rings;
- 	hwr->grp = hwr->rx;
- 	hwr->vnic = bnxt_get_total_vnics(bp, hwr->rx);
-@@ -8160,8 +8174,10 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	hwr.rx = bp->rx_nr_rings;
- 	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
- 		sh = true;
--	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
--		hwr.cp_p5 = hwr.rx + hwr.tx;
-+	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
-+		hwr.cp_p5 = hwr.rx + hwr.tx + bnxt_mpc_cp_rings_in_use(bp);
-+		hwr.tx += bnxt_mpc_tx_rings_in_use(bp);
-+	}
- 
- 	hwr.vnic = bnxt_get_total_vnics(bp, hwr.rx);
- 
-@@ -8198,6 +8214,9 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	if (bnxt_ulp_registered(edev) && hwr.stat > bnxt_get_ulp_stat_ctxs(bp))
- 		hwr.stat -= bnxt_get_ulp_stat_ctxs(bp);
- 	hwr.cp = min_t(int, hwr.cp, hwr.stat);
-+	hwr.tx -= bnxt_mpc_tx_rings_in_use(bp);
-+	if (hwr.tx < 0)
-+		return -ENOMEM;
- 	rc = bnxt_trim_rings(bp, &rx_rings, &hwr.tx, hwr.cp, sh);
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 		hwr.rx = rx_rings << 1;
-@@ -11517,12 +11536,13 @@ unsigned int bnxt_get_max_func_cp_rings(struct bnxt *bp)
- 
- static unsigned int bnxt_get_max_func_cp_rings_for_en(struct bnxt *bp)
- {
-+	unsigned int mpc_cp = (unsigned int)bnxt_mpc_cp_rings_in_use(bp);
- 	unsigned int cp = bp->hw_resc.max_cp_rings;
- 
- 	if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
- 		cp -= bnxt_get_ulp_msix_num(bp);
- 
--	return cp;
-+	return mpc_cp >= cp ? 0 : cp - mpc_cp;
- }
- 
- static unsigned int bnxt_get_max_func_irqs(struct bnxt *bp)
-@@ -14924,8 +14944,10 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 		hwr.grp = rx;
- 		hwr.rss_ctx = bnxt_get_total_rss_ctxs(bp, &hwr);
+ 	rc = __bnxt_reserve_rings(bp);
+ 	if (rc && rc != -ENODEV)
+ 		netdev_warn(bp->dev, "Unable to reserve tx rings\n");
+@@ -16808,6 +16812,7 @@ static int bnxt_set_dflt_rings(struct bnxt *bp, bool sh)
+ 		if (rc && rc != -ENODEV)
+ 			netdev_warn(bp->dev, "2nd rings reservation failed.\n");
+ 		bnxt_adj_tx_rings(bp);
++		bnxt_trim_mpc_rings(bp);
  	}
--	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
--		hwr.cp_p5 = hwr.tx + rx;
-+	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
-+		hwr.cp_p5 = hwr.tx + rx + bnxt_mpc_cp_rings_in_use(bp);
-+		hwr.tx += bnxt_mpc_tx_rings_in_use(bp);
-+	}
- 	rc = bnxt_hwrm_check_rings(bp, &hwr);
- 	if (!rc && pci_msix_can_alloc_dyn(bp->pdev)) {
- 		if (!bnxt_ulp_registered(bp->edev[BNXT_AUXDEV_RDMA])) {
-@@ -16623,7 +16645,8 @@ static void _bnxt_get_max_rings(struct bnxt *bp, int *max_rx, int *max_tx,
- 	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
- 	int max_ring_grps = 0, max_irq;
+ 	if (BNXT_CHIP_TYPE_NITRO_A0(bp)) {
+ 		bp->rx_nr_rings++;
+@@ -16842,6 +16847,7 @@ static int bnxt_init_dflt_ring_mode(struct bnxt *bp)
+ 		goto init_dflt_ring_err;
  
--	*max_tx = hw_resc->max_tx_rings;
-+	*max_tx = max(0, (int)hw_resc->max_tx_rings -
-+			 bnxt_mpc_tx_rings_in_use(bp));
- 	*max_rx = hw_resc->max_rx_rings;
- 	*max_cp = bnxt_get_max_func_cp_rings_for_en(bp);
- 	max_irq = min_t(int, bnxt_get_max_func_irqs(bp) -
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 77b1748d12d1..ea32b8bd6600 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2992,6 +2992,7 @@ int bnxt_hwrm_vnic_cfg(struct bnxt *bp, struct bnxt_vnic_info *vnic);
- int bnxt_hwrm_vnic_alloc(struct bnxt *bp, struct bnxt_vnic_info *vnic,
- 			 unsigned int start_rx_ring_idx,
- 			 unsigned int nr_rings);
-+int bnxt_total_tx_rings(struct bnxt *bp);
- int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
- int bnxt_nq_rings_in_use(struct bnxt *bp);
- int bnxt_hwrm_set_coal(struct bnxt *);
+ 	bnxt_adj_tx_rings(bp);
++	bnxt_trim_mpc_rings(bp);
+ 
+ 	bnxt_set_dflt_rfs(bp);
+ 
+@@ -17185,6 +17191,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	 * limited MSIX, so we re-initialize the TX rings per TC.
+ 	 */
+ 	bp->tx_nr_rings_per_tc = bp->tx_nr_rings;
++	bnxt_trim_mpc_rings(bp);
+ 
+ 	if (BNXT_PF(bp)) {
+ 		if (!bnxt_pf_wq) {
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 62bc9cae613c..a498dc1fe0d4 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -37,6 +37,7 @@
+ #include "bnxt_nvm_defs.h"	/* NVRAM content constant and structure defs */
+ #include "bnxt_fw_hdr.h"	/* Firmware hdr constant and structure defs */
+ #include "bnxt_coredump.h"
++#include "bnxt_mpc.h"
+ 
+ #define BNXT_NVM_ERR_MSG(dev, extack, msg)			\
+ 	do {							\
+@@ -1051,6 +1052,8 @@ static int bnxt_set_channels(struct net_device *dev,
+ 
+ 	bnxt_set_cp_rings(bp, sh);
+ 
++	bnxt_set_dflt_mpc_rings(bp);
++
+ 	/* After changing number of rx channels, update NTUPLE feature. */
+ 	netdev_update_features(dev);
+ 	if (netif_running(dev)) {
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
-index 86087e538550..9859a5f86268 100644
+index 9859a5f86268..183f1a3726c7 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
-@@ -24,3 +24,24 @@ void bnxt_free_mpc_info(struct bnxt *bp)
- 	kfree(bp->mpc_info);
- 	bp->mpc_info = NULL;
+@@ -3,6 +3,7 @@
+ 
+ #include <linux/stddef.h>
+ #include <linux/types.h>
++#include <linux/kernel.h>
+ #include <linux/slab.h>
+ #include <linux/bnxt/hsi.h>
+ 
+@@ -45,3 +46,65 @@ int bnxt_mpc_cp_rings_in_use(struct bnxt *bp)
+ 		return 0;
+ 	return mpc->mpc_cp_rings;
  }
 +
-+int bnxt_mpc_tx_rings_in_use(struct bnxt *bp)
++void bnxt_trim_mpc_rings(struct bnxt *bp)
 +{
 +	struct bnxt_mpc_info *mpc = bp->mpc_info;
-+	int i, mpc_tx = 0;
++	int max = bp->tx_nr_rings_per_tc;
++	u8 max_cp = 0;
++	int i;
 +
 +	if (!mpc)
-+		return 0;
-+	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++)
-+		mpc_tx += mpc->mpc_ring_count[i];
-+	return mpc_tx;
++		return;
++
++	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++) {
++		mpc->mpc_ring_count[i] = min_t(int, mpc->mpc_ring_count[i],
++					       max);
++		max_cp = max(max_cp, mpc->mpc_ring_count[i]);
++	}
++	mpc->mpc_cp_rings = max_cp;
 +}
 +
-+int bnxt_mpc_cp_rings_in_use(struct bnxt *bp)
++void bnxt_set_dflt_mpc_rings(struct bnxt *bp)
 +{
++	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
 +	struct bnxt_mpc_info *mpc = bp->mpc_info;
++	int mpc_tce, mpc_rce, avail, mpc_cp, i;
 +
-+	if (!mpc)
-+		return 0;
-+	return mpc->mpc_cp_rings;
++	if (!BNXT_MPC_CRYPTO_CAPABLE(bp))
++		return;
++
++	avail = hw_resc->max_tx_rings - bp->tx_nr_rings;
++	/* don't use more than 80% */
++	avail = avail * 4 / 5;
++
++	if (avail < (BNXT_MIN_MPC_TCE + BNXT_MIN_MPC_RCE))
++		goto disable_mpc;
++
++	mpc_tce = min_t(int, avail / 2, bp->tx_nr_rings_per_tc);
++	mpc_rce = mpc_tce;
++
++	mpc_tce = min_t(int, mpc_tce, BNXT_DFLT_MPC_TCE);
++	mpc_rce = min_t(int, mpc_rce, BNXT_DFLT_MPC_RCE);
++
++	avail = hw_resc->max_cp_rings - bp->tx_nr_rings -
++		bp->rx_nr_rings;
++
++	if (avail < BNXT_MIN_MPC_TCE || avail < BNXT_MIN_MPC_RCE)
++		goto disable_mpc;
++
++	mpc_tce = min(mpc_tce, avail);
++	mpc_rce = min(mpc_rce, avail);
++
++	mpc_cp = max(mpc_tce, mpc_rce);
++
++	mpc->mpc_ring_count[BNXT_MPC_TCE_TYPE] = mpc_tce;
++	mpc->mpc_ring_count[BNXT_MPC_RCE_TYPE] = mpc_rce;
++	mpc->mpc_cp_rings = mpc_cp;
++	return;
++
++disable_mpc:
++	mpc->mpc_cp_rings = 0;
++	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++)
++		mpc->mpc_ring_count[i] = 0;
 +}
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
-index cd3f268a3a29..7a7d81197ea6 100644
+index 7a7d81197ea6..4ff8cad75a23 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
-@@ -35,6 +35,8 @@ struct bnxt_mpc_info {
- #ifdef CONFIG_BNXT_TLS
- void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap);
+@@ -17,6 +17,11 @@ enum bnxt_mpc_type {
+ 
+ #define BNXT_MAX_MPC		8
+ 
++#define BNXT_MIN_MPC_TCE	1
++#define BNXT_MIN_MPC_RCE	1
++#define BNXT_DFLT_MPC_TCE	BNXT_MAX_MPC
++#define BNXT_DFLT_MPC_RCE	BNXT_MAX_MPC
++
+ struct bnxt_mpc_info {
+ 	u8			mpc_chnls_cap;
+ 	u8			mpc_cp_rings;
+@@ -37,6 +42,8 @@ void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap);
  void bnxt_free_mpc_info(struct bnxt *bp);
-+int bnxt_mpc_tx_rings_in_use(struct bnxt *bp);
-+int bnxt_mpc_cp_rings_in_use(struct bnxt *bp);
+ int bnxt_mpc_tx_rings_in_use(struct bnxt *bp);
+ int bnxt_mpc_cp_rings_in_use(struct bnxt *bp);
++void bnxt_trim_mpc_rings(struct bnxt *bp);
++void bnxt_set_dflt_mpc_rings(struct bnxt *bp);
  #else
  static inline void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap)
  {
-@@ -43,5 +45,15 @@ static inline void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap)
- static inline void bnxt_free_mpc_info(struct bnxt *bp)
+@@ -55,5 +62,13 @@ static inline int bnxt_mpc_cp_rings_in_use(struct bnxt *bp)
  {
+ 	return 0;
  }
 +
-+static inline int bnxt_mpc_tx_rings_in_use(struct bnxt *bp)
++static inline void bnxt_trim_mpc_rings(struct bnxt *bp)
 +{
-+	return 0;
 +}
 +
-+static inline int bnxt_mpc_cp_rings_in_use(struct bnxt *bp)
++static inline void bnxt_set_dflt_mpc_rings(struct bnxt *bp)
 +{
-+	return 0;
 +}
  #endif	/* CONFIG_BNXT_TLS */
  #endif	/* BNXT_MPC_H */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index edcc002e4ca3..d57059722f5b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -640,7 +640,7 @@ static int bnxt_hwrm_func_vf_resc_cfg(struct bnxt *bp, int num_vfs, bool reset)
- 		vf_rx_rings = hw_resc->max_rx_rings - bp->rx_nr_rings * 2;
- 	else
- 		vf_rx_rings = hw_resc->max_rx_rings - bp->rx_nr_rings;
--	vf_tx_rings = hw_resc->max_tx_rings - bp->tx_nr_rings;
-+	vf_tx_rings = hw_resc->max_tx_rings - bnxt_total_tx_rings(bp);
- 	vf_vnics = hw_resc->max_vnics - bp->nr_vnics;
- 	vf_rss = hw_resc->max_rsscos_ctxs - bp->rsscos_nr_ctxs;
- 
-@@ -903,8 +903,8 @@ static int bnxt_sriov_enable(struct bnxt *bp, int *num_vfs)
- 		    avail_cp < min_rx_rings)
- 			rx_ok = 0;
- 
--		if (hw_resc->max_tx_rings - bp->tx_nr_rings >= min_tx_rings &&
--		    avail_cp >= min_tx_rings)
-+		if (hw_resc->max_tx_rings - bnxt_total_tx_rings(bp) >=
-+		    min_tx_rings && avail_cp >= min_tx_rings)
- 			tx_ok = 1;
- 
- 		if (hw_resc->max_rsscos_ctxs - bp->rsscos_nr_ctxs >=
 -- 
 2.51.0
 
