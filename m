@@ -1,277 +1,149 @@
-Return-Path: <netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oGaSH8h9QmrT8QkAu9opvQ
-	(envelope-from <netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:14:32 +0200
+	id OkbAJ2p+QmpB8gkAu9opvQ
+	(envelope-from <netdev+bounces-302675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:17:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4E646DBD62
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:14:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36B226DBEB1
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 16:17:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b="Cg/gmrxA";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302669-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=iogearbox.net;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302675-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302675-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1E2F30B52AE
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:01:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16DB6318E2E3
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2B932B118;
-	Mon, 29 Jun 2026 14:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C76A379966;
+	Mon, 29 Jun 2026 14:09:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mail-out.m-online.net (mail-out.m-online.net [212.18.0.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0471EB9E3;
-	Mon, 29 Jun 2026 14:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ED4377EA9;
+	Mon, 29 Jun 2026 14:09:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782741669; cv=none; b=igapxZLSSBLM2HTinH5JJ0EDcCCPxoKwj/XSWcaN6EShyrE2TdWEYgvlIW3kNE8cWRNjvcuSD3h7Kun4nkJk8WTC6RKQUWSp70pRr+QnyuOttAfJzEIe5N0YUxfmNwxWmwSAN6rWlgQ5ksV5h5qTcQ9NAgrqiDpuAmV6Gp0Zi48=
+	t=1782742149; cv=none; b=ZkwUyBhW5i/JO/LLbzyF73rm0KWbD8kzJ4buUfzfN+GOkuGaeH3um18l6xGBj5Eaj0YsAQPnp46lkKadF+7c3EJjR8OHr9Qm2OcOpNzQ4EkFX+EyGUP1fo7n5Qc6tf4OP4msVppJr+qoFUataiiP9Vam+/85rapgfy3CQZvhC18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782741669; c=relaxed/simple;
-	bh=hSN7TvGACiX/VENRWbwYtdmD1cWJQWAUeY+mVYJi3/k=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=jXCu+Gl08s3+NJfuSaNXRhT7KtbL84mCUJ92180IRxebf7MhOaKQyjk7Hx5YhKuApPMiglKaEDLY0hqFdc/HYWQEa3eOT9WCq5Pf0tpaVr30uBvtplGsrO7UkXmGFqJbofbY7TgeHd1ZTRq8MjjVtfWVb87A9cIigkavL/EAgX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Cg/gmrxA; arc=none smtp.client-ip=213.133.104.62
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=kdEWjGMOYnlDAfLALUWtqU5J62xF5F+MXIBCeOFyv+E=; b=Cg/gmrxA1R21oc7TtzY60RfYsK
-	bBkPinVh+2ZQGpaf4kakheD9OKOCDYi4cAIml4tj0C/wVEgThjEpIIZosDSfCfKNXAmWMTTuOtlLo
-	PBDfEbHTOtew/TOKakvSoEog8OW5DeumWkqr/ShfyiF+fuG4enhECalMZdJIhienyFgk0IS2LA6z9
-	h3uR2fnYQkKAlYaB+E6y2rsIxW2HkWOA5o9E/GJsFWFKhmu7NHXf5n/dS/KWuWAVYquKeuBHX5s6I
-	dIcWAVO+d7GsmZ4hnOCjg9eI6ZKUJCddR9z05CL/yyXzR28gfvZdkPKj72N6l1HdjC2eHwma7gZ10
-	27+O4Irw==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1weCXl-0007pj-2O;
-	Mon, 29 Jun 2026 16:01:01 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1weCXk-000A9O-2B;
-	Mon, 29 Jun 2026 16:01:00 +0200
-Message-ID: <067ffbd7-0ed8-47e8-9541-daae18249a9b@iogearbox.net>
-Date: Mon, 29 Jun 2026 16:00:59 +0200
+	s=arc-20240116; t=1782742149; c=relaxed/simple;
+	bh=g9dFPNs9RCiJ30PbQ83xQiLIkKE/aoKc7Ch+A3Ps5Fg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Ha9GhqP0Hgtd3pKbOvoi+quZWFtEDEc2ohwpM+m0EjfVM2wX/2wbZqb3aRk9ixfkuQz83jzB7WjN02Dys6TON4NGH9mqjmLokOYX5Ri/BDNesjO3v6ECXv9DvCUmZPzU44V5NIUekgTUZ6r8G7UlxYg/s+XHXueN2Pdjrq3RIME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=212.18.0.9
+Received: from mail-out.m-online.net (mail-out.m-online.net [212.18.0.9])
+	by mail-out.m-online.net (Postfix) with ESMTP id 4gpnxf56FLz1r5hc;
+	Mon, 29 Jun 2026 16:01:10 +0200 (CEST)
+Received: from frontend03.mail.m-online.net (unknown [192.168.6.182])
+	by mail-out.m-online.net (Postfix) with ESMTP id 4gpnxc5SYXz1r5hL;
+	Mon, 29 Jun 2026 16:01:08 +0200 (CEST)
+Received: from localhost (dynscan3.mnet-online.de [192.168.6.87])
+	by mail.m-online.net (Postfix) with ESMTP id 4gpnxb4V3wz1qqlS;
+	Mon, 29 Jun 2026 16:01:07 +0200 (CEST)
+X-Virus-Scanned: amavis at mnet-online.de
+Received: from mail.mnet-online.de ([192.168.6.182])
+ by localhost (dynscan3.mail.m-online.net [192.168.6.87]) (amavis, port 10024)
+ with ESMTP id 0SnzNWDJyvXI; Mon, 29 Jun 2026 16:01:01 +0200 (CEST)
+X-Auth-Info: MEDGnkGkok4HHiiAHx6Yp9YpyEe4vG/D2GYhM3WXSTA4/H/l6K4jcFYiosjPmxQG
+Received: from hawking (unknown [80.255.5.134])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.mnet-online.de (Postfix) with ESMTPSA;
+	Mon, 29 Jun 2026 16:01:01 +0200 (CEST)
+From: Andreas Schwab <schwab@linux-m68k.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-gpio@vger.kernel.org,  Arnd Bergmann <arnd@arndb.de>,  Bartosz
+ Golaszewski <brgl@kernel.org>,  Andrew Lunn <andrew@lunn.ch>,  Sebastian
+ Hesselbarth <sebastian.hesselbarth@gmail.com>,  Gregory Clement
+ <gregory.clement@bootlin.com>,  Frank Li <Frank.Li@nxp.com>,  Robert
+ Jarzmik <robert.jarzmik@free.fr>,  Krzysztof Kozlowski <krzk@kernel.org>,
+  Greg Ungerer <gerg@linux-m68k.org>,  Thomas Bogendoerfer
+ <tsbogend@alpha.franken.de>,  Hauke Mehrtens <hauke@hauke-m.de>,
+  =?utf-8?Q?Rafa=C5=82_Mi=C5=82ecki?= <zajec5@gmail.com>,  Yoshinori Sato
+ <ysato@users.sourceforge.jp>,
+  John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,  Linus Walleij
+ <linusw@kernel.org>,  Dmitry Torokhov <dmitry.torokhov@gmail.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Dominik
+ Brodowski <linux@dominikbrodowski.net>,  linux-kernel@vger.kernel.org,
+  linux-arm-kernel@lists.infradead.org,  linux-samsung-soc@vger.kernel.org,
+  patches@opensource.cirrus.com,  linux-m68k@lists.linux-m68k.org,
+  linux-mips@vger.kernel.org,  linux-sh@vger.kernel.org,
+  linux-input@vger.kernel.org,  linux-media@vger.kernel.org,
+  netdev@vger.kernel.org,  linux-sunxi@lists.linux.dev,
+  linux-phy@lists.infradead.org,  linux-rockchip@lists.infradead.org,
+  linux-sound@vger.kernel.org
+Subject: Re: [PATCH 00/13] treewide: replace linux/gpio.h
+In-Reply-To: <20260629132633.1300009-1-arnd@kernel.org> (Arnd Bergmann's
+	message of "Mon, 29 Jun 2026 15:26:20 +0200")
+References: <20260629132633.1300009-1-arnd@kernel.org>
+Date: Mon, 29 Jun 2026 16:01:00 +0200
+Message-ID: <mvmik71win7.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/3 v2] net: Extend bpf_net_context lifetime to cover
- qdisc enqueue
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- toke@toke.dk, Steven Rostedt <rostedt@goodmis.org>,
- Petr Machata <petrm@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, linux-rt-devel@lists.linux.dev,
- bpf@vger.kernel.org, security@kernel.org, stable@vger.kernel.org,
- Victor Nogueira <victor@mojatatu.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <20260629102157.737306-1-jhs@mojatatu.com>
- <20260629102157.737306-2-jhs@mojatatu.com>
- <a1a31c1e-b5bf-458f-a80a-bc324fc7a07c@iogearbox.net>
- <CAM0EoM=QsOZ+mbWk7Ysv8-UNMzbmzbYiNXvF9fjEnG1-bDv6YQ@mail.gmail.com>
- <8a462b1c-b79b-42c5-8409-a36ad727f994@iogearbox.net>
-Content-Language: en-US
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <8a462b1c-b79b-42c5-8409-a36ad727f994@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28046/Mon Jun 29 08:27:20 2026)
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302669-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:toke@toke.dk,m:rostedt@goodmis.org,m:petrm@nvidia.com,m:ast@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:linux-rt-devel@lists.linux.dev,m:bpf@vger.kernel.org,m:security@kernel.org,m:stable@vger.kernel.org,m:victor@mojatatu.com,m:bigeasy@linutronix.de,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,toke.dk,goodmis.org,nvidia.com,gmail.com,lists.linux.dev,mojatatu.com,linutronix.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302675-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[linux-m68k.org];
+	FORGED_SENDER(0.00)[schwab@linux-m68k.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FORGED_RECIPIENTS(0.00)[m:arnd@kernel.org,m:linux-gpio@vger.kernel.org,m:arnd@arndb.de,m:brgl@kernel.org,m:andrew@lunn.ch,m:sebastian.hesselbarth@gmail.com,m:gregory.clement@bootlin.com,m:Frank.Li@nxp.com,m:robert.jarzmik@free.fr,m:krzk@kernel.org,m:gerg@linux-m68k.org,m:tsbogend@alpha.franken.de,m:hauke@hauke-m.de,m:zajec5@gmail.com,m:ysato@users.sourceforge.jp,m:glaubitz@physik.fu-berlin.de,m:linusw@kernel.org,m:dmitry.torokhov@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@dominikbrodowski.net,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-samsung-soc@vger.kernel.org,m:patches@opensource.cirrus.com,m:linux-m68k@lists.linux-m68k.org,m:linux-mips@vger.kernel.org,m:linux-sh@vger.kernel.org,m:linux-input@vger.kernel.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-sunxi@lists.linux.dev,m:linux-phy@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:linux-sound@vger.kernel.org,m:sebastianhesselbarth@gmail.com,m:dmitrytor
+ okhov@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,kernel.org,lunn.ch,gmail.com,bootlin.com,nxp.com,free.fr,linux-m68k.org,alpha.franken.de,hauke-m.de,users.sourceforge.jp,physik.fu-berlin.de,redhat.com,dominikbrodowski.net,lists.infradead.org,opensource.cirrus.com,lists.linux-m68k.org,lists.linux.dev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schwab@linux-m68k.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux-m68k.org:from_mime,linux-m68k.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:mid,arndb.de:email];
+	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mojatatu.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:from_mime,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D4E646DBD62
+X-Rspamd-Queue-Id: 36B226DBEB1
 
-On 6/29/26 3:48 PM, Daniel Borkmann wrote:
-> On 6/29/26 3:36 PM, Jamal Hadi Salim wrote:
->> On Mon, Jun 29, 2026 at 9:01 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>> On 6/29/26 12:21 PM, Jamal Hadi Salim wrote:
->>>> The bpf_net_context used by sch_handle_egress() is stack-allocated and torn
->>>> down in that function returned. By the time tcf_qevent_handle() runs
->>>> current->bpf_net_context is NULL.
->>>>
->>>> When a filter attached to a qevent block (e.g. RED's early_drop or mark
->>>> qevents, which always use shared blocks) returns TC_ACT_REDIRECT,
->>>> tcf_qevent_handle() calls skb_do_redirect(), which in turn calls bpf helper
->>>> bpf_net_ctx_get_ri().  That helper unconditionally dereferences
->>>> current->bpf_net_context resulting in a NULL pointer dereference.
->>>>
->>>> Note: The same holds for actions that invoke BPF redirect helpers
->>>> (e.g. act_bpf running a program that calls bpf_redirect()) during qevent
->>>> classification itself.
->>>>
->>>> Fix:
->>>> Move the bpf_net_context lifecycle out of sch_handle_egress() into
->>>> __dev_queue_xmit(), so that it spans both the egress TC fast path and the
->>>> qdisc enqueue.
->>>> Note: The call is placed outside the egress_needed_key static branch
->>>> to cover the case where clsact static key is disabled. Unfortunately this
->>>> adds a small unconditional penalty to the code path _per packet_ only
->>>> guarded by CONFIG_NET_XGRESS (two writes and one read).
->>>>
->>>> As pointed by sashiko [1]:
->>>> The same context must also be set up in net_tx_action()'s qdisc drain
->>>> path, since qdisc_run() -> netem_dequeue() -> qdisc_enqueue( RED child)
->>>> can trigger qevent classification asynchronously from softirq context.
->>>>
->>>> This keeps all bpf_net_context management in net/core/dev.c i.e the
->>>> existing boundary between tc core and BPF without requiring any net/sched/
->>>> code to know about BPF plumbing.
->>>>
->>>> Reproducer:
->>>>
->>>>     tc qdisc add dev eth0 root handle 1: red limit 1MB min 10KB max 20KB \
->>>>         avpkt 1000 burst 100 qevent early_drop block 10
->>>>     tc filter add block 10 pref 1 bpf obj redirect.o
->>>>
->>>>     traffic through eth0 triggers red_enqueue() -> tcf_qevent_handle() and,
->>>>     on a redirect verdict, a NULL deref in skb_do_redirect().
->>>>
->>>> Fixes: 3625750f05ec ("net: sched: Introduce helpers for qevent blocks")
->>>> Tested-by: Victor Nogueira <victor@mojatatu.com>
->>>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->>> Could we simplify patch 1 & 2 by just moving the bpf_net_ctx_set() and
->>> bpf_net_ctx_clear() into a tcf_classify_qdisc() wrapper where we don't
->>> end up having to touch the core TX code?
->>>
->>> Untested diff :
->>
->> This is bpf plumbing which doesnt belong in tc really. You already
->> moved most ebpf/clsact stuff into dev.c - let's just keep it there.
->>
->> As a side note: calling a hierachy of N qdiscs we would incur N
->> set/clear cycles for N levels — and worse, qdiscs like HTB and HFSC
->> iterate filters while loop calling tcf_classify_qdisc() per iteration,
->> so each filter chain traversal does set/clear per proto.
-> I'm just saying that this is a lot simpler and taken out of the core fast
-> path. Also, I think you forgot to Cc Sebastian on the whole v2 given the
-> bpf_net_ctx_{set,clear} dance. Imho, having them via tcf_classify_qdisc or
-> something similar would be the much better choice compared to sprinkling
-> ifdefs since you want to block the TC_ACT_REDIRECT from classifiers attached
-> to qdiscs.
+On Jun 29 2026, Arnd Bergmann wrote:
 
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> The linux/gpio.h header used to be the global definition for the gpio
+> interfaces, with 1100 users back in linux-3.17. In linux-7.2, only about
+> 130 of those remain, so this series cleans out the rest.
+>
+> In each subsystem, we can replace the header either with
+> linux/gpio/consumer.h for users of the modern gpio descriptor interface,
 
-Q @ Sebastian, we could probably also do sth like this, wdyt between the
-two options :
+A few of them already used <linux/gpio/consumer.h>, and is duplicated
+now.
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index b446aa8be5c3..04683569ee0c 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2554,7 +2554,7 @@ BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
-  {
-         struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
-  
--       if (unlikely(flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL)))
-+       if (unlikely(!ri || (flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL))))
-                 return TC_ACT_SHOT;
-  
-         ri->flags = flags;
-@@ -2575,7 +2575,7 @@ BPF_CALL_2(bpf_redirect_peer, u32, ifindex, u64, flags)
-  {
-         struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
-  
--       if (unlikely(flags))
-+       if (unlikely(!ri || flags))
-                 return TC_ACT_SHOT;
-  
-         ri->flags = BPF_F_PEER;
-@@ -2597,7 +2597,7 @@ BPF_CALL_4(bpf_redirect_neigh, u32, ifindex, struct bpf_redir_neigh *, params,
-  {
-         struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
-  
--       if (unlikely((plen && plen < sizeof(*params)) || flags))
-+       if (unlikely((plen && plen < sizeof(*params)) || !ri || flags))
-                 return TC_ACT_SHOT;
-  
-         ri->flags = BPF_F_NEIGH | (plen ? BPF_F_NEXTHOP : 0);
+-- 
+Andreas Schwab, schwab@linux-m68k.org
+GPG Key fingerprint = 7578 EB47 D4E5 4D69 2510  2552 DF73 E780 A9DA AEC1
+"And now for something completely different."
 
