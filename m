@@ -1,159 +1,195 @@
-Return-Path: <netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P+PIG1xxQmp97QkAu9opvQ
-	(envelope-from <netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:21:32 +0200
+	id 9CBhHKlxQmqR7QkAu9opvQ
+	(envelope-from <netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:22:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3A046DB1CA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:21:31 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A9996DB21D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:22:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=npc-ksb.ru (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mojatatu.com header.s=google header.b=gMJDg1NA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302641-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C1E83154CBA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:13:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1A1A7300909E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D294405C4E;
-	Mon, 29 Jun 2026 13:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34535409121;
+	Mon, 29 Jun 2026 13:09:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ksb-soft.ru (mail.ksb-soft.ru [5.167.76.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCD21A0BF3;
-	Mon, 29 Jun 2026 13:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2532B40B38C
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 13:09:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782738587; cv=none; b=VdWocNogPMVBfHlGLQLrniM0REmGQwEJ3FoVlcF5DBZ/v/Hcre0wyKy3BQaaYFn8QpMk/4GFExiHg6IPm+mqMJ/3IcZPE9dcIVSG3GUiQB1WQT1KcLJqyyXbGw0+o5yfdH6fPmDEb/ZXUjnZsIzadPpfh650fbcoiYCSQiSXW9k=
+	t=1782738595; cv=none; b=sE6YeaXHJSmGvdSJ+S63WOdZs3bjsKXz6Ug/EyA4kZ0yyzcDLRc4kW4Glk2BKxkTp750G9LEs0VCuo+HhRqKNxp8ofwd6KvE9yvlsArhoGKRUMj9vejlYiY76Y0GZAlj597/USVChjy+cFv1gLP0DBjtl8M7h/rygFM8qXaP7og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782738587; c=relaxed/simple;
-	bh=3NOBeloPaW0UydJy1E6tJcn6s2vDMmmsShE4mwuUqCg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DoZOgGJ3aIt3tmtZQiiLXaM3gJUhTa+BCME7EflTn4QCrBs5iSfJqhabgNOLej7tm+VOsawWQV+Zk+PN8xyGVO+XLQjXQmiizQgvtSHtAgs3bUiPrDbphisvRpKYTk2AjuahwdRwUpOOhQvl5RXru31fEMjg8wpl5oYPw6PcvIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=npc-ksb.ru; spf=pass smtp.mailfrom=npc-ksb.ru; arc=none smtp.client-ip=5.167.76.63
-Received: from ksb-289.ksb.ksb-soft.ru (unknown [10.38.22.14])
-	by mail.ksb-soft.ru (Postfix) with ESMTPA id 4gpmpH5FvHz4LKBF;
-	Mon, 29 Jun 2026 16:09:43 +0300 (MSK)
-From: Markov Gleb <markov.gi@npc-ksb.ru>
-To: Jon Maloy <jmaloy@redhat.com>
-Cc: Gleb Markov <markov.gi@npc-ksb.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net] tipc: make sure bc_rcvlink is not dereferenced with NULL value
-Date: Mon, 29 Jun 2026 16:09:40 +0300
-Message-ID: <20260629130942.469-1-markov.gi@npc-ksb.ru>
-X-Mailer: git-send-email 2.52.0.windows.1
+	s=arc-20240116; t=1782738595; c=relaxed/simple;
+	bh=MRnm09PMVz3zZlTQCCbSkxqgokpKHu3OelLb7bM8jtQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MK/XsyOV9Vq5RqNtH5XRBZqDUKTetlS4K5k3xYdNs3lGQAdFEWr3ZZ3VFH7fwPiE9xGZeOkQ54x6oulttO1ebm1W7rIiJsd4HJL5hAer+WqxA9lpXySCcthiIzFZHNWVStZwQi16jcMRSdo9BUsDAC5Zcv2bUIWrEEOR3EUdDNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=gMJDg1NA; arc=none smtp.client-ip=209.85.210.51
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7e93cd4e64bso2579974a34.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 06:09:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1782738592; x=1783343392; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C857Q2VDyItus3syZ+DUaEL05/aUtCKQC2sIRlYJkic=;
+        b=gMJDg1NAajeSLhbu0RTZcMA51c0+/uo33amb51UJLNd1o2YVOaFkRWKjg/iPIKLDSw
+         46XUc8VZocCD5dV08LbuyFxuwpGOeMsJSbSNr+1ITT4Dw+HINjDwWkW8wPm6BZSuY7IM
+         CSQqPeDgY0QntvYjabDVFqnOPb21tnh3onwIo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782738592; x=1783343392;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C857Q2VDyItus3syZ+DUaEL05/aUtCKQC2sIRlYJkic=;
+        b=hCv5j8I58aTh8lmjDGxe5sOLZch89Vvc4eXhpBV7TISy08o70PDm5OsHPGy4FBHZzw
+         BD96d89QqXIyApY8Vbi4oI7ncToc9E+qtlDOg/0FlRON4eQSzUKN4INrjl9GgCej04I4
+         CHkco6pKuDpDYjtpswp87aRBCt+T2XIrwejVk+xVqc/2khV5fCv6VqE6kpa/pTQBIx/b
+         I8AZ7pej98nr63rMk2tL1Levwf/0PhRXqw1NSK1CH8G1gbzkQ8fi8oDFiQsV29t20M1E
+         fTIj++cwLGDGic4onvXAeQcQxz2o/QxHZuM/sAHcOottsrVaFg60KYLzb2Ton/qVaEv9
+         35Hg==
+X-Forwarded-Encrypted: i=1; AFNElJ8cLYOK/JYxBKRt0ziJUHJxJCRwvOuPmhsB3p7X7IvgEMdYp7mk25olnclVodlhAUbqAxenTys=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4fliViD0lmZITWThsYdth3H7dgpfHq6Gofxb7kCrjorAfWzw4
+	GW+QbeMTtguIoMsXPY2jKjlfDZUsCe37BmB70nMJGL+auN8iSR1keRIROwATQLrhng==
+X-Gm-Gg: AfdE7cnlTG/iRuiLIY2AP2gkVhPiN9qPDx0KuLwrXwsTgjz1cjfOWj4JEN6AX3qBFhi
+	ycG+Ya7RP/66na2AnLYMVgAEaw5c4B5tZ9loqc76rptP9tErfaKa9cwoEoSVfNzEDed6hJmtsdP
+	FWa4vSMYV3JpOU59m9kxdC76pe9FfeOPpLyuGRZlAwpBZvup3Gt09xk1uVss1mf/OXDL6mhvRkM
+	BetEi1lhof67m5sNY0AcTNkiSM268vWiUBU7yPHMVeO18nKzqJyLlswd3Emzsj/w4KYJZzBuH2k
+	ChVPHMev/dbhz+JsUsfXe4crAooxo5aQVGuklJ6nqa+t6MIu4D+e/Ie8LBHM8cbPmTDcXV/iOiU
+	+4FyoWMr8oznt3oC5R1APyWnRGIuyvMpeEZKGb5+w4g/jPPrFlP9ELyQuECIAdVF1Ip7xWe5V0D
+	TnVXj7upclmgR7ZRpmBmjqu1cP2AuzroTvRA==
+X-Received: by 2002:a05:6830:314c:b0:7e9:d3aa:e391 with SMTP id 46e09a7af769-7e9e91a5b19mr361337a34.6.1782738592071;
+        Mon, 29 Jun 2026 06:09:52 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c54:4d67::1c9d? ([2804:14d:5c54:4d67::1c9d])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e9aa800350sm8796677a34.25.2026.06.29.06.09.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jun 2026 06:09:51 -0700 (PDT)
+Message-ID: <f315dd0d-211e-4d85-a06e-da422f015f1e@mojatatu.com>
+Date: Mon, 29 Jun 2026 10:09:45 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-KLMS-Rule-ID: 1
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Lua-Profiles: 197590 [Oct 29 2025]
-X-KLMS-AntiSpam-Version: 6.1.1.11
-X-KLMS-AntiSpam-Envelope-From: markov.gi@npc-ksb.ru
-X-KLMS-AntiSpam-Rate: 0
-X-KLMS-AntiSpam-Status: not_detected
-X-KLMS-AntiSpam-Method: none
-X-KLMS-AntiSpam-Auth: dkim=none
-X-KLMS-AntiSpam-Info: LuaCore: 72 0.3.72 80ff96170b649fb7ebd1aa4cb544c36c109810bd, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KLMS-AntiSpam-Interceptor-Info: scan successful
-X-KLMS-AntiPhishing: Clean
-X-KLMS-LinksScanning: Clean
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 10.0.0.7427, bases: 2025/10/29 20:57:00 #27800623
-X-KLMS-AntiVirus-Status: Clean, skipped
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netfilter: nf_nat_masquerade: recalculate TCP TS
+ offset when port is randomized
+To: xietangxin <xietangxin@h-partners.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: gaoxingwang <gaoxingwang1@huawei.com>, huyizhen <huyizhen2@huawei.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260629093408.3927103-1-xietangxin@h-partners.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20260629093408.3927103-1-xietangxin@h-partners.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[npc-ksb.ru : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:markov.gi@npc-ksb.ru,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER(0.00)[markov.gi@npc-ksb.ru,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302640-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[markov.gi@npc-ksb.ru,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302641-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_RECIPIENTS(0.00)[m:xietangxin@h-partners.com,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:gaoxingwang1@huawei.com,m:huyizhen2@huawei.com,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,npc-ksb.ru:email,npc-ksb.ru:mid,npc-ksb.ru:from_mime,linuxtesting.org:url,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mojatatu.com:dkim,mojatatu.com:mid,mojatatu.com:from_mime,h-partners.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A3A046DB1CA
+X-Rspamd-Queue-Id: 2A9996DB21D
 
-From: Gleb Markov <markov.gi@npc-ksb.ru>
+Hi!
 
-The direct dependence of the tipc_link_is_up() value on l->bc_rcvlink is
-not explicitly specified.
+On 29/06/2026 06:34, xietangxin wrote:
+> Problem observed in Kubernetes environments where MASQUERADE target with
+> --random-fully is configured by default. after commit
+> 165573e41f2f ("tcp: secure_seq: add back ports to TS offset") TCP short
+> connection QPS dropped from ~20000 to ~10000. This added source and
+> destination ports into TS offset calculation.
+> 
+> However, with MASQUERADE --random-fully, when multiple internal connections
+> (e.g sport 10000,20000) are mapped to the same external port (e.g 30000),
+> their TS offsets are calculated as ts_offset(10000) and ts_offset(20000).
+> If the server reuses the TIME_WAIT slot from the first connection, there is
+> a chance that ts_offset(20000) < ts_offset(10000), breaking TSval
+> monotonicity for the same 4-tuple and causing RST packets:
+>    Client -> Server 24870 -> 80 [SYN] TSval=2294041168
+>    Server -> Client 80 -> 24870 [ACK] TSecr=2846236456
+>    Client -> Server 24870 -> 80 [RST] Seq=855605690
+> 
+> After nf_nat_setup_info() successfully assigns a new randomized
+> source port, recalculate the TS offset using the new port and
+> update the SYN packet's TSval accordingly.
+> 
+> Test results on 4U4G VM with
+> `./wrk -t8 -c200 -H "Connection: close" -d10s --latency http://5.5.5.5:80`
+> Before:
+>    random:10712 req/s, random-fully:10986 req/s
+> After:
+>    random:21463 req/s, random-fully:19181 req/s
+> 
+> Fixes: 165573e41f2f ("tcp: secure_seq: add back ports to TS offset")
+> Cc: stable@vger.kernel.org
+> Closes:https://lore.kernel.org/all/92935c00-e0be-4591-ac44-5978c7804d57@yeah.net/
+> Signed-off-by: xietangxin <xietangxin@h-partners.com>
+> [...]
+> +
+> +static void masquerade_update_tcp_ts_offset(struct nf_conn *ct, struct sk_buff *skb)
+> +{
+> [...]
+> +
+> +		if (nf_ct_l3num(ct) == NFPROTO_IPV4)
+> +			st = secure_tcp_seq_and_ts_off(net, tuple->src.u3.ip, tuple->dst.u3.ip,
+> +				tuple->src.u.tcp.port, tuple->dst.u.tcp.port);
+> +		else
+> +			st = secure_tcpv6_seq_and_ts_off(net, tuple->src.u3.ip6,
+> +				tuple->dst.u3.ip6, tuple->src.u.tcp.port, tuple->dst.u.tcp.port);
 
-If link is up, it is assumed that the sender and receiver have valid
-values (communication with the receiver is required for timeout
-synchronization), which is not guaranteed in this code segment.
+This breaks the build when CONFIG_IPV6 is not set.
 
-Turning independent conditions into nested conditions ensures that NULL
-cannot be dereferenced at tipc_link_build_proto_msg() and allows for the
-logical structure to be fixed at the functional interaction level.
+.config:4948:warning: override: reassigning to symbol NET
+.config:4949:warning: override: reassigning to symbol NET_CORE
+.config:4950:warning: override: reassigning to symbol NETDEVICES
+.config:4951:warning: override: reassigning to symbol NETWORK_FILESYSTEMS
+ERROR: modpost: "secure_tcpv6_seq_and_ts_off" [net/netfilter/nf_nat.ko] 
+undefined!
 
-Make tipc_link_build_proto_msg() call only if l->bc_rcvlink is not NULL.
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 047491ea334a ("tipc: set link tolerance correctly in broadcast link")
-Signed-off-by: Gleb Markov <markov.gi@npc-ksb.ru>
----
- net/tipc/link.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index 49dfc098d89b..b0a640c419c8 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -2863,10 +2863,12 @@ void tipc_link_set_tolerance(struct tipc_link *l, u32 tol,
- 			     struct sk_buff_head *xmitq)
- {
- 	l->tolerance = tol;
--	if (l->bc_rcvlink)
-+	if (l->bc_rcvlink) {
- 		l->bc_rcvlink->tolerance = tol;
--	if (tipc_link_is_up(l))
--		tipc_link_build_proto_msg(l, STATE_MSG, 0, 0, 0, tol, 0, xmitq);
-+		if (tipc_link_is_up(l))
-+			tipc_link_build_proto_msg(l, STATE_MSG,
-+						  0, 0, 0, tol, 0, xmitq);
-+	}
- }
- 
- void tipc_link_set_prio(struct tipc_link *l, u32 prio,
--- 
-2.43.0
-
+cheers,
+Victor
 
