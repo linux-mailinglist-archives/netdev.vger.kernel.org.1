@@ -1,133 +1,318 @@
-Return-Path: <netdev+bounces-302645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302647-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d+jcBDJ0QmpH7gkAu9opvQ
-	(envelope-from <netdev+bounces-302645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:33:38 +0200
+	id WjWnE450Qmps7gkAu9opvQ
+	(envelope-from <netdev+bounces-302647-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:35:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C186DB429
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:33:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F856DB493
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:35:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=QSD+OS2B;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302645-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302645-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KD4wn8FG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302647-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302647-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA5133015D0D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:26:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89E4832026B7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED814071FC;
-	Mon, 29 Jun 2026 13:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FF6405C4D;
+	Mon, 29 Jun 2026 13:26:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA70E408013;
-	Mon, 29 Jun 2026 13:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E488B403EB5;
+	Mon, 29 Jun 2026 13:26:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782739334; cv=none; b=mAH+CBBPqwRQLHg3bLp5awuLRUFn1beh5BgMkbztlwe2Ky2Pq7bdJRK//fo2EO6VwbIFuKIF/C+W+8cm2mJNVWeHhrNsN0+sWMiquwL4HqE4x9Zn4P3TyWWBVslBpFkB2KEB95V5KjT7L4GY9hL37IRtK+M5RkspUGpJ5nsffDI=
+	t=1782739609; cv=none; b=XaIh+jDeGqeIw/ZVzWGxQoDAZ5r7S7qPGtQrdIxzojjLvbWssz9eYlmMcrqECuT3XBf/rCr/QClvr3/35noqp0QLfzNPbQNbu6ukoP0RMDaSzMZzzKUQa6YHgmw3zkbt59PJ68/66Yfvp9LU9HAKI6WSDfPcC+wOgDM3GBWjqgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782739334; c=relaxed/simple;
-	bh=8esuHclQn2TmNlUkMOFiokUzrniEpSCwHmAvMa6AlGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=csGPQdHEZ6f8d74/s+qrP8q+EBKkuhE3urEhuGGV+wAfrDL8/YMjIpknenKZLUAMjkxhS3VP7yJiN24TaJAxwJA94T15itSUb0u3iIg+PEZWRZsFscoaYK/gty4DrkrB8+ip9CZp2XeTMk+jc0guv9RbJWDQdKS/ApTHirCCDHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QSD+OS2B; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=yYFpYJ+g2LXtimSsYZ5CW6pJeIZVEOYSSSKP4yuzF7Q=; b=QSD+OS2BjfQAAENwOEWJmxxbGR
-	70LV2fhofGtUx+vncvyeV5M4OmFUakmhX+gehxwr9GDCK0ewQCQPi9NR0YoMr69fmWWgLV+E4HMX9
-	RMwmili6X90m8JgvXWGLraw42/Pm/7VmRc7H59uKOhQv4lLYEYqFKS+5N8pDQ0SWAO2dBQvr/uCTB
-	bBzf54OeuYGyQfGV0NVZZJYXdZvGcnzfKCRHYBiKO4jJZE0t8awhTj1bN2jAkcuP3jtog9gNi1Aqo
-	ebiYDrgSLa/XyyA9NgUmQeMPbx0WeSzADT25Av4NVROP3jU4gKge5MsteghFBpSG2eCv3iEdZfHnx
-	BGmggXlg==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1weBw8-006JqD-2S;
-	Mon, 29 Jun 2026 13:22:08 +0000
-Date: Mon, 29 Jun 2026 06:22:04 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, razor@blackwall.org, 
-	horms@kernel.org
-Subject: Re: [PATCH net] bridge: stp: Fix a potential use-after-free when
- deleting a bridge
-Message-ID: <akJxbo5tn7_fcCdL@gmail.com>
-References: <20260629072117.497959-1-idosch@nvidia.com>
+	s=arc-20240116; t=1782739609; c=relaxed/simple;
+	bh=3I9zyzkVdbsSVB8VOhT5PsQ+7G+zS3OZld35IU7mR88=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=aXkwQ97vaYswg//aMcXXY8ektj2kdKlCzBtXw+T5wS8Y5PYct2dbACtBAYKz4Zt5UlwYJCj714pz/mkFJhw1KxzYH1JU4MGDgBYvq0IR0qAi+sDWc2QGhTCzi7I8dnLWtTRgW1arVrSFKKrU6HZoNCu3bKGaZ+Uit9+rVaNA8fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KD4wn8FG; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F74D1F000E9;
+	Mon, 29 Jun 2026 13:26:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782739607;
+	bh=fhZO9CCgyPTpV3ZQrTdwjnuLM+E9OikVfMuSHmZTx2M=;
+	h=From:To:Cc:Subject:Date;
+	b=KD4wn8FGWGE30eCOOOA+dBSAHZGgiXwZF29kfKE4F2uQuFsP5YxhKF+kJLGZQW+xN
+	 c1FQZuucS/z/TV0fUUP3z4XSiOfaV3yT+/2dhnHni5ghGczyBnpiiVQ4ssE+H6KI6m
+	 MB5KQA2l+xKim04AISyQhaPf4EpWJZCa1m2px2f9EeLMQklyKDL02qd8dJNCvthmg8
+	 6PFfsK+SnbxyFSGpVQU5s9PrLcj+ipaSFtc1VHy+j8TWTBJDs/nEBBWvwVfu9LYai2
+	 5NMag8oZZwUnP9IBEXZ+74fbYASdIvn/nsUwGvCqlg0YWSzWL9DSAQY7zE04B/0xQI
+	 Auc5QmUPHo7UQ==
+From: Arnd Bergmann <arnd@kernel.org>
+To: linux-gpio@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Frank Li <Frank.Li@nxp.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Greg Ungerer <gerg@linux-m68k.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Linus Walleij <linusw@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dominik Brodowski <linux@dominikbrodowski.net>,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org,
+	patches@opensource.cirrus.com,
+	linux-m68k@lists.linux-m68k.org,
+	linux-mips@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-sunxi@lists.linux.dev,
+	linux-phy@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH 00/13] treewide: replace linux/gpio.h
+Date: Mon, 29 Jun 2026 15:26:20 +0200
+Message-Id: <20260629132633.1300009-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260629072117.497959-1-idosch@nvidia.com>
-X-Debian-User: leitao
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302645-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:bridge@lists.linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:razor@blackwall.org,m:horms@kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302647-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:linux-gpio@vger.kernel.org,m:arnd@arndb.de,m:brgl@kernel.org,m:andrew@lunn.ch,m:sebastian.hesselbarth@gmail.com,m:gregory.clement@bootlin.com,m:Frank.Li@nxp.com,m:robert.jarzmik@free.fr,m:krzk@kernel.org,m:gerg@linux-m68k.org,m:tsbogend@alpha.franken.de,m:hauke@hauke-m.de,m:zajec5@gmail.com,m:ysato@users.sourceforge.jp,m:glaubitz@physik.fu-berlin.de,m:linusw@kernel.org,m:dmitry.torokhov@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@dominikbrodowski.net,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-samsung-soc@vger.kernel.org,m:patches@opensource.cirrus.com,m:linux-m68k@lists.linux-m68k.org,m:linux-mips@vger.kernel.org,m:linux-sh@vger.kernel.org,m:linux-input@vger.kernel.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-sunxi@lists.linux.dev,m:linux-phy@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:linux-sound@vger.kernel.org,m:sebastianhesselbarth@gmail.com,m:dmitrytorokhov@gmail.com,s:
+ lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[arndb.de,kernel.org,lunn.ch,gmail.com,bootlin.com,nxp.com,free.fr,linux-m68k.org,alpha.franken.de,hauke-m.de,users.sourceforge.jp,physik.fu-berlin.de,redhat.com,dominikbrodowski.net,vger.kernel.org,lists.infradead.org,opensource.cirrus.com,lists.linux-m68k.org,lists.linux.dev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email,vger.kernel.org:from_smtp,ssd-disclosure.com:email]
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 65C186DB429
+X-Rspamd-Queue-Id: A4F856DB493
 
-On Mon, Jun 29, 2026 at 10:21:17AM +0300, Ido Schimmel wrote:
-> The three STP timers are not supposed to be armed while the bridge is
-> administratively down. They are synchronously deactivated when the
-> bridge is put administratively down and the various call sites check for
-> 'IFF_UP' before arming them.
-> 
-> This check is missing from br_topology_change_detection() and it is
-> possible to engineer a situation in which the topology change timer is
-> armed while the bridge is administratively down, resulting in a
-> use-after-free [1] when the bridge is deleted.
-> 
-> Fix by adding the missing check and for good measures synchronously
-> shutdown the three timers when the bridge is deleted.
-> 
-> [1]
-> ODEBUG: free active (active state 0) object: ffff88811662b9b0 object type: timer_list hint: br_topology_change_timer_expired (net/bridge/br_stp_timer.c:120)
-> WARNING: lib/debugobjects.c:629 at debug_print_object+0x1bc/0x450, CPU#9: ip/359
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Noam Rathaus <noamr@ssd-disclosure.com>
-> Reported-by: Neil Young <contact@ssd-disclosure.com>
-> Acked-by: Nikolay Aleksandrov <nikolay@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+The linux/gpio.h header used to be the global definition for the gpio
+interfaces, with 1100 users back in linux-3.17. In linux-7.2, only about
+130 of those remain, so this series cleans out the rest.
+
+In each subsystem, we can replace the header either with
+linux/gpio/consumer.h for users of the modern gpio descriptor interface,
+or linux/gpio/legacy.h for the few remaining users of the old number
+based interface.
+
+All patches in this series can get applied independently, so my
+preference would be for each subsystem maintainer to apply these
+directly, with the rest going into the gpio tree at some point.
+
+The final patch here obviously needs to wait for all the others
+to get merged first.
+
+      Arnd
+
+Arnd Bergmann (13):
+  ARM: replace linux/gpio.h inclusions
+  m68k/coldfire: replace linux/gpio.h inclusions
+  mips: replace linux/gpio.h inclusions
+  sh: replace linux/gpio.h inclusions
+  mfd: replace linux/gpio.h inclusions
+  [net-next] net: replace linux/gpio.h inclusions
+  ASoC: replace linux/gpio.h inclusions
+  pcmcia: replace linux/gpio.h inclusions
+  phy: replace linux/gpio.h inclusions
+  media: replace linux/gpio.h inclusions
+  Input: matrix_keyboard - replace linux/gpio.h inclusion
+  gpib: gpio: replace linux/gpio.h inclusion
+  gpiolib: remove linux/gpio.h
+
+ MAINTAINERS                                   |  1 -
+ arch/arm/mach-davinci/da850.c                 |  2 +-
+ arch/arm/mach-dove/mpp.c                      |  2 +-
+ arch/arm/mach-mv78xx0/buffalo-wxl-setup.c     |  2 +-
+ arch/arm/mach-mv78xx0/irq.c                   |  2 +-
+ arch/arm/mach-mv78xx0/mpp.c                   |  2 +-
+ arch/arm/mach-mvebu/pm.c                      |  2 +-
+ arch/arm/mach-mxs/mach-mxs.c                  |  2 +-
+ arch/arm/mach-orion5x/board-d2net.c           |  2 +-
+ arch/arm/mach-orion5x/board-rd88f5182.c       |  2 +-
+ arch/arm/mach-orion5x/dns323-setup.c          |  2 +-
+ arch/arm/mach-orion5x/irq.c                   |  2 +-
+ arch/arm/mach-orion5x/kurobox_pro-setup.c     |  2 +-
+ arch/arm/mach-orion5x/mv2120-setup.c          |  2 +-
+ arch/arm/mach-orion5x/net2big-setup.c         |  2 +-
+ .../arm/mach-orion5x/terastation_pro2-setup.c |  2 +-
+ arch/arm/mach-orion5x/ts209-setup.c           |  2 +-
+ arch/arm/mach-orion5x/ts409-setup.c           |  2 +-
+ arch/arm/mach-pxa/am200epd.c                  |  2 +-
+ arch/arm/mach-pxa/am300epd.c                  |  2 +-
+ arch/arm/mach-pxa/generic.c                   |  2 +-
+ arch/arm/mach-pxa/gumstix.c                   |  2 +-
+ arch/arm/mach-pxa/mfp-pxa2xx.c                |  2 +-
+ arch/arm/mach-pxa/pxa25x.c                    |  2 +-
+ arch/arm/mach-pxa/pxa27x.c                    |  2 +-
+ arch/arm/mach-pxa/reset.c                     |  2 +-
+ arch/arm/mach-pxa/sharpsl_pm.c                |  2 +-
+ arch/arm/mach-pxa/spitz.c                     |  2 +-
+ arch/arm/mach-pxa/spitz_pm.c                  |  2 +-
+ arch/arm/mach-s3c/dev-audio-s3c64xx.c         |  2 +-
+ arch/arm/mach-s3c/devs.c                      |  2 +-
+ arch/arm/mach-s3c/mach-crag6410.c             |  2 +-
+ arch/arm/mach-s3c/pm-gpio.c                   |  2 +-
+ arch/arm/mach-s3c/pm-s3c64xx.c                |  2 +-
+ arch/arm/mach-s3c/setup-fb-24bpp-s3c64xx.c    |  2 +-
+ arch/arm/mach-s3c/setup-i2c0-s3c64xx.c        |  2 +-
+ arch/arm/mach-s3c/setup-i2c1-s3c64xx.c        |  2 +-
+ arch/arm/mach-s3c/setup-keypad-s3c64xx.c      |  2 +-
+ arch/arm/mach-s3c/setup-sdhci-gpio-s3c64xx.c  |  2 +-
+ arch/arm/mach-s3c/setup-spi-s3c64xx.c         |  2 +-
+ arch/arm/mach-sa1100/collie.c                 |  2 +-
+ arch/arm/mach-sa1100/generic.c                |  2 +-
+ arch/arm/mach-sa1100/h3600.c                  |  2 +-
+ arch/arm/mach-sa1100/h3xxx.c                  |  2 +-
+ arch/arm/plat-orion/mpp.c                     |  2 +-
+ arch/m68k/coldfire/device.c                   |  2 +-
+ arch/m68k/include/asm/mcfgpio.h               |  2 +-
+ arch/mips/alchemy/board-xxs1500.c             |  2 +-
+ arch/mips/alchemy/devboards/db1000.c          |  2 +-
+ arch/mips/alchemy/devboards/db1200.c          |  2 +-
+ arch/mips/alchemy/devboards/db1550.c          |  2 +-
+ arch/mips/bcm47xx/workarounds.c               |  2 +-
+ arch/mips/bcm63xx/boards/board_bcm963xx.c     |  1 +
+ .../include/asm/mach-bcm63xx/board_bcm963xx.h |  2 +-
+ arch/mips/txx9/rbtx4927/setup.c               |  2 +-
+ arch/sh/boards/board-magicpanelr2.c           |  2 +-
+ arch/sh/boards/board-sh7757lcr.c              |  2 +-
+ arch/sh/boards/board-urquell.c                |  2 +-
+ arch/sh/boards/mach-ap325rxa/setup.c          |  2 +-
+ arch/sh/boards/mach-ecovec24/setup.c          |  2 +-
+ .../boards/mach-highlander/pinmux-r7785rp.c   |  2 +-
+ arch/sh/boards/mach-kfr2r09/lcd_wqvga.c       |  2 +-
+ arch/sh/boards/mach-kfr2r09/setup.c           |  2 +-
+ arch/sh/boards/mach-migor/lcd_qvga.c          |  2 +-
+ arch/sh/boards/mach-migor/setup.c             |  2 +-
+ arch/sh/boards/mach-rsk/devices-rsk7203.c     |  2 +-
+ arch/sh/boards/mach-rsk/devices-rsk7269.c     |  1 -
+ arch/sh/boards/mach-se/7724/setup.c           |  2 +-
+ .../include/mach-common/mach/magicpanelr2.h   |  2 --
+ arch/sh/kernel/cpu/sh4a/setup-shx3.c          |  2 +-
+ drivers/gpib/gpio/gpib_bitbang.c              |  2 +-
+ drivers/gpio/TODO                             |  4 +---
+ drivers/gpio/gpiolib-cdev.c                   |  2 +-
+ drivers/gpio/gpiolib-legacy.c                 |  3 +--
+ drivers/gpio/gpiolib.c                        |  2 +-
+ drivers/input/keyboard/matrix_keypad.c        |  2 +-
+ drivers/media/pci/ddbridge/ddbridge.h         |  2 +-
+ .../platform/samsung/s3c-camif/camif-core.c   |  2 +-
+ drivers/media/usb/em28xx/em28xx-dvb.c         |  2 +-
+ drivers/mfd/aat2870-core.c                    |  2 +-
+ drivers/mfd/arizona-irq.c                     |  2 +-
+ drivers/mfd/lp3943.c                          |  2 +-
+ drivers/mfd/si476x-cmd.c                      |  2 +-
+ drivers/mfd/si476x-i2c.c                      |  2 +-
+ drivers/mfd/sm501.c                           |  2 +-
+ drivers/mfd/tps6105x.c                        |  2 +-
+ drivers/mfd/tps65911-comparator.c             |  2 +-
+ drivers/mfd/wm8994-irq.c                      |  2 +-
+ drivers/net/dsa/b53/b53_priv.h                |  3 ++-
+ drivers/net/dsa/microchip/ksz8.c              |  2 +-
+ drivers/net/ethernet/allwinner/sun4i-emac.c   |  2 +-
+ .../net/ethernet/apm/xgene/xgene_enet_main.c  |  2 +-
+ .../ethernet/oki-semi/pch_gbe/pch_gbe_main.c  |  2 +-
+ drivers/net/phy/mdio_device.c                 |  2 +-
+ drivers/pcmcia/bcm63xx_pcmcia.c               |  2 +-
+ drivers/pcmcia/db1xxx_ss.c                    |  2 +-
+ drivers/pcmcia/sa1100_h3600.c                 |  2 +-
+ drivers/pcmcia/soc_common.c                   |  2 +-
+ drivers/pcmcia/xxs1500_ss.c                   |  2 +-
+ drivers/phy/broadcom/phy-bcm-ns2-usbdrd.c     |  2 +-
+ drivers/phy/rockchip/phy-rockchip-usbdp.c     |  2 +-
+ drivers/phy/ti/phy-j721e-wiz.c                |  2 +-
+ include/linux/gpio.h                          | 22 -------------------
+ include/linux/mfd/lp3943.h                    |  2 +-
+ include/linux/mfd/ti-lmu.h                    |  2 +-
+ include/linux/mfd/tps65910.h                  |  2 +-
+ include/linux/mfd/ucb1x00.h                   |  2 +-
+ sound/soc/codecs/cs42l84.c                    |  2 +-
+ sound/soc/codecs/cx2072x.c                    |  2 +-
+ sound/soc/codecs/dmic.c                       |  2 +-
+ 110 files changed, 107 insertions(+), 134 deletions(-)
+ delete mode 100644 include/linux/gpio.h
+
+-- 
+2.39.5
+
+Cc: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
+Cc: Gregory Clement <gregory.clement@bootlin.com>
+Cc: Frank Li <Frank.Li@nxp.com>
+Cc: Robert Jarzmik <robert.jarzmik@free.fr>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Greg Ungerer <gerg@linux-m68k.org>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>
+Cc: "Rafał Miłecki" <zajec5@gmail.com>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: Linus Walleij <linusw@kernel.org>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-samsung-soc@vger.kernel.org
+Cc: patches@opensource.cirrus.com
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-sh@vger.kernel.org
+Cc: linux-gpio@vger.kernel.org
+Cc: linux-input@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-sunxi@lists.linux.dev
+Cc: linux-phy@lists.infradead.org
+Cc: linux-rockchip@lists.infradead.org
+Cc: linux-sound@vger.kernel.org
 
