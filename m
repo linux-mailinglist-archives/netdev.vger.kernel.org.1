@@ -1,169 +1,144 @@
-Return-Path: <netdev+bounces-302519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hB7QMlg2Qmqb1wkAu9opvQ
-	(envelope-from <netdev+bounces-302519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:09:44 +0200
+	id NZusLy9DQmoC3AkAu9opvQ
+	(envelope-from <netdev+bounces-302551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:04:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661A56D7E1F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 11:09:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB25B6D8A03
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:04:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=iyUhTV03;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302519-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302519-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=intel.com header.s=Intel header.b=gdNIUCoV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302551-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302551-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B62A3024C85
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:06:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 24F2B303F089
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B42E3F8EA1;
-	Mon, 29 Jun 2026 09:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878993F8EA1;
+	Mon, 29 Jun 2026 09:42:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F813F825F
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 09:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38BC360745
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 09:42:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782723973; cv=none; b=aAsVGVQygQXWN0RQdIoLbLoINpk6Ma+IrV8lsGsD+gRzgQfQdQuDk5K3k5XY3cP8k3QS49Ma9yT1z8fCXirE0NnKrHgpoKIk9x8t2CNB//fVy0H/BmNyaVsCiu7ZAFW2B0faScku4CLdtr3khCuGNueTt+CB+okWcpjv+u0l+qE=
+	t=1782726172; cv=none; b=Da8+KPXnPFhOO5Ae4e4HKF3FDfaMP7ABhJmsqa3EcNt6LPVDeYoJt12/SYN02dV1q0BCLX4jJMJqvSmKtFQOmDHlNJeMkdbysFNiVloStlVGbyrVJtZKCX3kAvAmcZ5ZWrmpksfupGcWXIQLJ216Yu2bAr9ilHuXfNKEoDlG2Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782723973; c=relaxed/simple;
-	bh=qB4tJg2aYLg8hehpYin2dptPRoadEzGzbBpoppNMyKk=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fb8CME2bVhcrtd+S5L3asRjLesa2n8XWmbcKvRHS6po3hQ+sP/e7S+Xk1lf091KLxIw3+crYs3YimWFzNlrtNxlC8k+rdZ8UeKp/oO8Zo/aiOkRFCjLz+tmfXTL7RAmWLgyFQ+0PXFUm3dHaNkYYxOCSSCI5VRjMHxh/OvvJ1IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyUhTV03; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E1D1F00ACF
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 09:06:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782723971;
-	bh=qB4tJg2aYLg8hehpYin2dptPRoadEzGzbBpoppNMyKk=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=iyUhTV03bOKBX3P50ZCu5uI5Z9GdSG5FaWYf46X7lJcOmFmX+TOB5ZSHaEGQvoVvi
-	 w7QBgX5wGnlIt9PwETkpMRIPTtL2gcrwvVGZlvQ9UEO6y0jwZX9Mmn6Zpk9DscDEuY
-	 F0AAPET4mFlLtpb3GilD+x3+Q8aLT5LUaL+qRXeepLEhJbSMjM6672Tt+0t+JTi4Ib
-	 aZbeAoeQD4GZ24bf76pYRPdkOembLX2HEF5nuge3oTrb5EA6IK7gusKHdgBYLt0wZe
-	 2UB/jbL1RUF+Rd3fa80u2w1VGLhbQLmwYrqVheU88CxYlRSZkCxTIpqImYjye4YPzK
-	 QVoyZa2wkJ4iA==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3996c9eeebeso23622541fa.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 02:06:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpXA4T6fat4GP/1cy/HRSWmI8JeoIg5VU3nAhZ6rBeMqcEb+iH2vT8YYoZ9tAYFnFSc8719gmE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpQMx6L6bWNqVYuLaJGdqtQ+6ao3y8yiUhRCibRV86j85l/RZR
-	JKddOeidfIlO93b4YL2qpj0A+rJIY99UPclN7WzpyhwgHIKdEkT5GJZHNuPtU8OmiTwjSUSRMZa
-	S06gS59kL8tGd2M4LFXUhteeIzYiHMjXyt+A81FY2nQ==
-X-Received: by 2002:a05:651c:1587:b0:39a:e3c7:6644 with SMTP id
- 38308e7fff4ca-39ae3c76ecdmr17150311fa.12.1782723969253; Mon, 29 Jun 2026
- 02:06:09 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 29 Jun 2026 09:06:07 +0000
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 29 Jun 2026 09:06:07 +0000
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <ah9QPgco9BxEix7T@ashevche-desk.local>
+	s=arc-20240116; t=1782726172; c=relaxed/simple;
+	bh=2ypBJFZejzl3U8rgI1nHi231EjUtIKg6wLLXZKyeFxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kgpe21Ip+N23Fvd6rdvmtztbsyzRzc4oh29qupnJ7eDN83s4XiPN3eilQfGsinJ7cJKENlJyGu08BTMg2Vh63m0Z6b2jX4LA5A+igiRf/M9pwa1P/2niOaGzWK1FfEM3YT2LcWaI3Hp7kknmoXgm35+UUQrP/Rsh6n7E+cNllks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gdNIUCoV; arc=none smtp.client-ip=192.198.163.13
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782726171; x=1814262171;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2ypBJFZejzl3U8rgI1nHi231EjUtIKg6wLLXZKyeFxY=;
+  b=gdNIUCoVE79LAf/zAfEvH4xcJSgvfYnpaFigntDjFMzhXNYAp+a/3b1T
+   eaeJ//JmBo3g9X6LJgW0pEXNOyeb5dAADiXi4js+JLACRh51jPhgw677E
+   bvmyu+k7LPeNocMrDCAdMEn10qvbO+rvBag00tBTZf6XMLIPZzC9pAyCV
+   VtYus+2FrMKUpxe2S/mKYsgOIkTtP1HPR/AbOGCHK3sq6vdJk9SQNpegx
+   J2hR8PGqblTWZZiRAVgp/Xsh4ZFQ+S7dkSTLk28lcpQkvblStW3B+qEBE
+   JoYOIbyQu+MSttumnxgunoaxWtmxN8ldl2L9ge7FxOYI5GumWfCpoI6HJ
+   w==;
+X-CSE-ConnectionGUID: Nmib/3VORPeRRJbUTvKKiA==
+X-CSE-MsgGUID: +mjgZRLmQBGIvnJlq9WWrw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11831"; a="85957302"
+X-IronPort-AV: E=Sophos;i="6.24,231,1774335600"; 
+   d="scan'208";a="85957302"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 02:42:50 -0700
+X-CSE-ConnectionGUID: TfzmJJ1ZQxynJIDPPCckMw==
+X-CSE-MsgGUID: NyYvSUMDTPGKIjVs5NZwkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,231,1774335600"; 
+   d="scan'208";a="253815918"
+Received: from os-delivery.igk.intel.com ([10.102.21.165])
+  by fmviesa004.fm.intel.com with ESMTP; 29 Jun 2026 02:42:49 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net v1] ice: use global queue index in TC to-queue offload
+Date: Mon, 29 Jun 2026 11:12:03 +0200
+Message-ID: <20260629091203.36482-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-21-88c324a1b8d2@oss.qualcomm.com> <ah9QPgco9BxEix7T@ashevche-desk.local>
-Date: Mon, 29 Jun 2026 09:06:07 +0000
-X-Gmail-Original-Message-ID: <CAMRc=McSDNdBMc_MAbBiOgeWusQXPEvivxniX5dJq+X6rp3UZw@mail.gmail.com>
-X-Gm-Features: AVVi8Cem7nS_T_r8P1YOw4p48wRJJJKggepy3MNLXmsKDTbaRpH5jyNSSJ0YwZw
-Message-ID: <CAMRc=McSDNdBMc_MAbBiOgeWusQXPEvivxniX5dJq+X6rp3UZw@mail.gmail.com>
-Subject: Re: [PATCH 21/23] usb: musb: use platform_device_set_of_node_from_dev()
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Lee Jones <lee@kernel.org>, Mark Brown <broonie@opensource.wolfsonmicro.com>, 
-	Thierry Reding <thierry.reding@avionic-design.de>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Srinivas Kandagatla <srini@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Vinod Koul <vkoul@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@kernel.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
-	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Doug Berger <opendmb@gmail.com>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>, 
-	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
-	Matthew Brost <matthew.brost@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>, 
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Maximilian Luz <luzmaximilian@gmail.com>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org, imx@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
-	linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com];
-	TAGGED_FROM(0.00)[bounces-302519-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid];
-	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andriy.shevchenko@linux.intel.com,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel
- @pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302551-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[michal.swiatkowski@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:michal.swiatkowski@linux.intel.com,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[michal.swiatkowski@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[66];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:email,linux.intel.com:mid,linux.intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 661A56D7E1F
+X-Rspamd-Queue-Id: AB25B6D8A03
 
-On Tue, 2 Jun 2026 23:50:54 +0200, Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> said:
-> On Thu, May 21, 2026 at 10:36:44AM +0200, Bartosz Golaszewski wrote:
->> Ahead of reworking the reference counting logic for platform devices,
->> encapsulate the assignment of the OF node from another device for
->> dynamically allocated platform devices with the provided helper.
->
-> Same Q as per chipidea. Do they provide a pin control facility at the same time?
->
-> Otherwise simple device_set_node() or whatever platform analogue should suffice.
->
+Previously index within PF was used, which caused rules to fail on any PF
+other than PF0.
 
-Hi!
+Switch to global queue index by adding first RX queue id from caps.
 
-I don't know and I can't test it so let me respin the series as is. This can
-always be amended separately later.
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Fixes: 143b86f346c7 ("ice: Enable RX queue selection using skbedit action")
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Bart
+diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+index d20357c04127..6f49ecb4165b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+@@ -1202,7 +1202,8 @@ ice_add_tc_flower_adv_fltr(struct ice_vsi *vsi,
+ 		break;
+ 	case ICE_FWD_TO_Q:
+ 		/* HW queue number in global space */
+-		rule_info.sw_act.fwd_id.q_id = tc_fltr->action.fwd.q.hw_queue;
++		rule_info.sw_act.fwd_id.q_id = tc_fltr->action.fwd.q.hw_queue +
++			hw->func_caps.common_cap.rxq_first_id;
+ 		rule_info.sw_act.vsi_handle = dest_vsi->idx;
+ 		rule_info.priority = ICE_SWITCH_FLTR_PRIO_QUEUE;
+ 		rule_info.sw_act.src = hw->pf_id;
+-- 
+2.49.0
+
 
