@@ -1,356 +1,217 @@
-Return-Path: <netdev+bounces-302499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302500-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d+BLG+snQmpA1AkAu9opvQ
-	(envelope-from <netdev+bounces-302499-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:08:11 +0200
+	id xtfwHBUlQmrJ0wkAu9opvQ
+	(envelope-from <netdev+bounces-302500-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:56:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52906D74CA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 10:08:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA086D7382
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:56:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=iv+TYoyw;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=D+ZIi9pu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302499-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302499-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=k8fOapqC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302500-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302500-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1292B31DA4D8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 07:49:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 96BF7300BCB9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 07:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E8C3E44EC;
-	Mon, 29 Jun 2026 07:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5FF3E0081;
+	Mon, 29 Jun 2026 07:55:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EDA3DE446
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 07:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17FF38D40A;
+	Mon, 29 Jun 2026 07:55:28 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782719369; cv=pass; b=jGFOQk/+CosmqlVALZcBihlqKRcpSlfWBYDnZGbhjzwQY4a0GJi55PUw0l6qoR8ACzkPOYirLnTWcc/XFS4d1FiKuTO385LzbPdvoZuB++znQJQEAhoYGvfhMDEJiOgKI1d0/dwcIWuM5Dfzn9e8nK5EfOnRgc4cXqype8jxmvk=
+	t=1782719730; cv=fail; b=g2vM4KG9sedYSGg5gRn7nmK2chB3CbSi6cd9zlcHEeK3FjzmBOepXzp09SEacmiHTeUe96zfHvowknOjB+/X5AqhyyUTKQRzi5VvSSUXR9KjpoNPyyyzZhPDflMMa17OtceIlxbxwKVmu6Yf5f/BTn8JfgwrIZyOARGLLc6oVZc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782719369; c=relaxed/simple;
-	bh=btbZWvEafKqIS+blxXbzY2y2nMrTGxHr/GSus5YYopQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oEAZ5CzIDciNg/crXiEQX05VzisZhkGVF3kptCeq+PWhPZS6+t40IY/Xfnke+AvA1qmEGus/QMWNeQuDS+yuUW1eB24vnL0mQ71WbxfNEQujJPp/azs9+YbA4TbHU8J4wXPG3BslzlSTkVHh/VfXAxDZ3DSUQ918RXhp1f4KX2U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=iv+TYoyw; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=D+ZIi9pu; arc=pass smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65T72Zof2163892
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 07:49:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	PNuv6Xet+hQ1A5x1kF4sIiJsIr7UgLVZ+1RRk8NCKM0=; b=iv+TYoyw35MqA0P6
-	ep2b7mOo7OZjgz/zY4r/iqyoEO+LLdTtlSRQgtkwPLMneRwNeDnaozkmP5tF+pya
-	8jntfULb/Slc2gKLiX4vmpicffwkFUMpCr4bGEtzASBXc1K3n1bRfsLRSIt+HG4n
-	OKm8zimIQ6xzI6VolXe0Dy0LH/DTM/7eua2nUW3GURHWQl13Ep9klGYk5TrtqfzL
-	2xxjJ4o/xY1wnjwdod7sccJp5DbLbQqLqQx5nVVa/qTMENKWYf9U/6H+ozSOPKql
-	QulRw8WYTKYeA/yAneN1dABMCvWdQ6Og9nCJyS5Q6BXMYPgSiaW50WgLX+u4aJzr
-	MMV0aQ==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f3kyjg69q-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 07:49:23 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-8f05dd0dda9so22819766d6.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 00:49:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782719363; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Zb0jCH0T0JOBpShIYTG63fiwyeRjQcQGntCfeIUEJzChw/Ry0dNfga/rV7t+Hk3iDS
-         rXB0IdIRAqWhhZTnp1ZKM6+BrqfqD7d0VhXXFZH22fO4bT8eGxVGPI0NXQgLfUS9SJry
-         kfRzCwyo15jAVRSwFW1NlEWek41lTM7MgArWx0A+FX0bKeVfrcTyrPRX7EKbhshRLShu
-         TBJYOXGkuZ+wVhIx2VBcZyE+fliOLBlszhivhxhfTQBAEW/u7yaqkVTj9vD8a3iL3tPS
-         cFZdC8CPAtEapENsFVbgZ7F8KH60zriYxLRJQVKCnEOLT0r7sKW56SUhTmIOQQIwCL1C
-         nQVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PNuv6Xet+hQ1A5x1kF4sIiJsIr7UgLVZ+1RRk8NCKM0=;
-        fh=FXKxzB0D/Ad0/RbULVJmh6NG8HfEh4bynAJwtPOFGvU=;
-        b=bHwDGIjtJo+1C+KFE88kC+6rb2MXeHYfvzC4xyFQPlwfZYz3VhFBPi4lbuZubyDacF
-         nGcEScmZxbpbYfMO/wf6TvC/B4q+oflZMIe4IeNh+9xzTwX3cKrsEroFnbN3OxqE9VAU
-         QEFh0OsMAxl2qsI7RxhggkzQnA1WKTxGBZR/Lh028hWN3NLD55VSe/iG2QkLrd9LDP7j
-         LX1x7ySIJrN9X0X4LUtRDv3Ez69rd/VUN0rd+Uc0fA1fCRe4jW7GVIjzk6Nm6FLA25Po
-         xGnx7BLVyCmJpecAYoOLPSg8Vmr6Xxu5dBnK0yA+zElZG+MFVBqtG5YKPdPEIapWLL6K
-         nu8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782719363; x=1783324163; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PNuv6Xet+hQ1A5x1kF4sIiJsIr7UgLVZ+1RRk8NCKM0=;
-        b=D+ZIi9puSNmzy4vUVS9l2ilgrAOtGx74dsiyY+011sIowzSiP0PGJVwVO8tVcqdi+w
-         qjQO5lMOqbbq1+iTeBrIYq+tA1AAKJbny0aLL/fKTFWIEnW/Y7+53NO9ZhuPbqvh+vFm
-         86l12Yxm4M4vF3ZqGo/ci//UoCuERjTonCatYAxFlZJWx2VPev1Lz7RVfDgu9d/FiSTC
-         3g1XOsNVFMOYORGD1aoc1w7WVxKFHNR/B2Ui0Hu2Ho4hzCfIegy8EueKT/IjkqGmnRl/
-         Ey3xYIX80q5ZOfahxIvkN4+sdM/gRFkrK0+MtSMPHO5TI3vVMrbnxVwT/BJltUph/nbf
-         kEwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782719363; x=1783324163;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PNuv6Xet+hQ1A5x1kF4sIiJsIr7UgLVZ+1RRk8NCKM0=;
-        b=fpEJgfWU42+rAyH/2nhUYOlDTSmzjFFDTHsQ9+HhWu9SSHchHgVlYavlFH4x7vL32e
-         e1/KIdVUU6/tSyj/lq2HrolLgrTadDVOF7pAR0TbIEUesgAHuSOU3SU50Nk4MdDCqA45
-         FHs+uaofbCGfQOOLzS44BJakehf8HrvdAp2+pQwP6L83/b8svUVzNQVtWuh7sOajQQE5
-         nntNNSv8kHYCzEnE63FXDC5RN9KCtEyptjw+F0qIOhxV2is+QER1pXDpZ6nOuuYoSaZZ
-         1ibB5WL+0R9bt6ZK6PWJfoJpk+MvhYQI/Cs2nCvcs58pNNnA+90QVHbBMtPyFW1n4QyU
-         xg0g==
-X-Forwarded-Encrypted: i=1; AHgh+RoCwNzp6yQuxVTRUzf9Rs+MEQkz1Y+s/+j76bfLadfhr/1tohJ39EPSBOcwnTzPeR89jSjnvzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc6gbqh8CapcQXLIiLEkGcGk8WuupowpEZmog9AlTtaj/etKg/
-	XlQwde2DZq1ACQ5Ii2YUDndFH5gHXVfbWhQQl8tk5zPePocrhTSsZOfG0ViX6umIsGWp73mK1Ae
-	Yg6ZGSFgYkdTnZfamNWLrZtzuHXBSun1FdDd0Peginsfq9bYCG0W2U4bYoezhg/iCX0VHHjvh2I
-	Iz+R/CljqQCODxsdHZKZcm/Uu1J1fo0NyfXwFL3LGy6Kam
-X-Gm-Gg: AfdE7clE9IBiCVV1euLLsHQSaIZHeKJjEm4ibwB+jqeYvJRCHlpWtldoQpE9ixREHV1
-	uJI5yfG3NUlBIA8U3nweEEsmmACUR/mK/YTA34IFeaRvc0YUqXTv3VlHhrnJFtJ4AMwhxIH1F7D
-	Y9HGSQZt15juaN4W4BKoQHrgjfunFzcKkbi3Bf++tNarNDO1yVC7eOAmoSQUbO3ezVwtkdXxwed
-	DoaBKbfnpLVry17bvMcx5TZeIiSgCjXI/XqSUirGgzYlZL0xrOq0Kd9QpPAKl2UEBq8XtqR7l/7
-	WdCgZp9J6Yc=
-X-Received: by 2002:a05:6214:311a:b0:8f0:796:480b with SMTP id 6a1803df08f44-8f00796493cmr38684466d6.27.1782719362685;
-        Mon, 29 Jun 2026 00:49:22 -0700 (PDT)
-X-Received: by 2002:a05:6214:311a:b0:8f0:796:480b with SMTP id
- 6a1803df08f44-8f00796493cmr38684246d6.27.1782719362149; Mon, 29 Jun 2026
- 00:49:22 -0700 (PDT)
+	s=arc-20240116; t=1782719730; c=relaxed/simple;
+	bh=GMg0eQbCTa0yuaU74s4AsT7AGWIDXY8MFFkG6f3fVPk=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=U6n2juwrTwGlhW6ltpzfFXNzn2JvDyjv8xnQWouAr4KaMK/ME38cpkvvF6PqPyeyQNTNf1wertfesnKRC1RYuCpZzNoCc0NSOquf/025nSTllghlfBItqhVGXnFVVRakzGaqSnb+1KQlPT3ePjxKG+wJxhbHyR/B+B+woAcCHSA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k8fOapqC; arc=fail smtp.client-ip=192.198.163.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782719728; x=1814255728;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=GMg0eQbCTa0yuaU74s4AsT7AGWIDXY8MFFkG6f3fVPk=;
+  b=k8fOapqCcxUfgAlz7Ml/UBOXx9N94TybO4FeBKwAsgZWTRpZhvgNBIoo
+   Ffd+X7wrQqx9Ipn1yZzrdK46DG/0Ny5Zx9Go2+0ft76HchSisOiELTZKU
+   RMD/zU9B/UiAkPzFHl6GSd6uK3rHIovC6iCApq6TWQf+UAskDSiZNQ1Hq
+   H3F9U+NNJShRt49NZ6G9HE0G3a7Ymwdl6twaCibeINLKcQmvwoFiP9t9l
+   a26pfxelKcnMmxziWYwHIbwTzcTLWCVEV1C3mpoihQJKqbD2UY1P8h1pt
+   Bf3aBOF2NhDnsCHqjmB/T8rXpkf4SqjR6wJgl4sa/QMWOgYoD91utpdYq
+   w==;
+X-CSE-ConnectionGUID: +OSQPZhySyC1/uNQ/FiTSg==
+X-CSE-MsgGUID: niVeNiDyTPeTXEePdv/96g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11831"; a="94788422"
+X-IronPort-AV: E=Sophos;i="6.24,231,1774335600"; 
+   d="scan'208";a="94788422"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 00:55:28 -0700
+X-CSE-ConnectionGUID: 0y2Q6JkvTOGjsLhb8sbXxQ==
+X-CSE-MsgGUID: yRQysBtLQ9qISp85Y27xOA==
+X-ExtLoop1: 1
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 00:55:28 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Mon, 29 Jun 2026 00:55:27 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Mon, 29 Jun 2026 00:55:27 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.37) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 29 Jun 2026 00:55:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AIquPT+k8cORJbUT1/TEmZ1D/5vGfnfXCduMTj8vYKpJpgKfiUYHnMLOXAGo/17RGFCwsGHSWlMFqCG9JW7VZYT1ai7Fb7JxfmZNLHS9KUlJl4Cl3npebwulCSEBJMT3VGTtGz+QwMZo9Lu+Eru327TRlCtM1Wpn++kZuVKXKshlv6YJ/x4cfUgBwb1sV3bhV5GCZAFn0w9PTtmg6EqxuhehIhEfKHTqMRMkyw48fmmSpyVHKcChwhl/yFEhcKXWAby2VvvjEWx3mUB7e78jfZVorboGLBizm5npdjf0MLz12Mo5EJFFO9rjffLooP24soKiVysKnyYuP9gqCBLbIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GMg0eQbCTa0yuaU74s4AsT7AGWIDXY8MFFkG6f3fVPk=;
+ b=d665Lde7zzA+LFXfSYvmZ2gWViuBHSlqWmC97IyccXw4B6OAVFi4M409WzTxvrbkuZ/e9dC51nLwHw2F0FE75A0qOMKf4li7HpWqYRpSu8mlp9GumX4TvzQ5Q9XMDsbddnBy7/5dt1IH6P6Dndy9Ef06PI6g5N7+lZz0WT5+Fh9PkHLYGnajejMg0BOVa5oSMqxLhvgvSARwLpFibp7YnGjgwbkqIdXe/R8HXVt5mRKpLREA3gCqBLMpWNn/bF8s+VjV3zJJ09L77AmTnxFcKpSEqsKdQOzwPPdz+DbmcJd7TKnv/ArwZEFCxVUkqn0wLXmwWMnegnLgqTsyeq+Bvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
+ by IA1PR11MB8150.namprd11.prod.outlook.com (2603:10b6:208:44c::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Mon, 29 Jun
+ 2026 07:55:19 +0000
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::f95a:602a:34d3:5d37%5]) with mapi id 15.21.0159.015; Mon, 29 Jun 2026
+ 07:55:19 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: Manuel Ebner <manuelebner@mailbox.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Oleksij Rempel <o.rempel@pengutronix.de>, "open
+ list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, "open list:OPEN FIRMWARE
+ AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list
+	<linux-kernel@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>
+Subject: RE: [PATCH] dt-bindings: Fix bracket
+Thread-Topic: [PATCH] dt-bindings: Fix bracket
+Thread-Index: AQHdBhY1XwAZzeUmNkC9kWWcdMc1krZVLIrw
+Date: Mon, 29 Jun 2026 07:55:19 +0000
+Message-ID: <PH0PR11MB5902009AB9C7EA1DBF191CB0F0E82@PH0PR11MB5902.namprd11.prod.outlook.com>
+References: <20260627091936.29809-1-manuelebner@mailbox.org>
+In-Reply-To: <20260627091936.29809-1-manuelebner@mailbox.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|IA1PR11MB8150:EE_
+x-ms-office365-filtering-correlation-id: f1e42ed0-b0d5-4c35-6c8c-08ded5b3c408
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|23010399003|38070700021|56012099006|11063799006|18002099003|22082099003|921020;
+x-microsoft-antispam-message-info: HRFCv9c0RUuc4poLxP3G6bSUax9vjezGTdfA8vtdlWVgk+1giIHxFu1Qji9LC32woO7S+aMwfHOVrAMCc289jDJ5+iRgxiFgZ36gKzAPmPM5dEQ4oVkOqG9rGNEnK4Jt6IdCeViK1DlwWiDJxSr9f59Wkhf+4AleS5jDRtuPVAC8i6yxLoC1Xbkb3NBj1UwcmkxW9CqSb3qyarTFuiJbcMqvc7FtaxYj4F26MLo7tPhlOSuYcCNcYmu4K8TLlLpSyPmHY8EBoLlk7H6MIEEBNGDZA0hVkJMtY9AaSfSOOer8cwNw+0HzWNjWEpS+781e9AyTzG4gn8UeG0QmktuFOJ0UgBb71X4maCm5PZbz68AmGi+YiHH6uJADKSNqEtnx7+4NJN8traROHKl197Zo9y69wGIvwf1IeZZ7q1CyyTCulLSY55zhY0cA1FWZbiOlqjjfwPYnmR19cB9ywtDnkxTq61vF+/r8Gt12jfRWlXnzaBMXl7c+bTWo5vbOgWUOBxk7DYvHA1m6vPsssCMdsHgXJz9sMdETSh0tgxSh1ka0XaKf+RUln/XM58CGjoMLqAWnZT5X5OgiPQDVQQdYMFmBDCngC6qQ3dTL+Tb8q9K5kNNz+t9rM5AaimXSctROZyaCyGxaP5gjTV5V838lGC1LzshObutnhPvponXOSYB09hWfETCpp+r5qpXr2UNAuBZkD7nyCCgIWoKwAcymAPVWNetaXor3TtY3xELIrfVdvupBWrpwdh1JGcKlX3GJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(23010399003)(38070700021)(56012099006)(11063799006)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?p9d6b8CjjZVflWwMlkG61AZwg3JBjeWLXJlGQVP7VmlZogFdWJHB5mLs7YAL?=
+ =?us-ascii?Q?O3qs14xWrS6mE6cA1juLXJXf6KMw6+OtxGAmhUhtLZeNXnpB4v6p0OZ8+mli?=
+ =?us-ascii?Q?uvqHsO5yusKuaiBe+YLB8zTwLeRTfeL7oJRzR5hbq8biKRKb4Lvys/oRo74C?=
+ =?us-ascii?Q?gEfiBEKQOblSHL7H9c7D9qGgHVPNbCWOS1GtZLrlF2angiKT2/rCHPnU1FE6?=
+ =?us-ascii?Q?xhuZfSczBk5okXQl1SYSEqQTHPImmmIPqzQps4e6wQ4BLfcdBxGrXjr+Lqxk?=
+ =?us-ascii?Q?AUMXgrMKbhAlKUpDBDqkNpvme0XPqGrfmCQg2nWkmaADiJmx00UAYEQ7IftA?=
+ =?us-ascii?Q?0+QFBcfO8HDDgFMVJzMsYK9Y4fOZKwJKqnoQlAuaL72bqmkIkTnj4oBJJ6Z9?=
+ =?us-ascii?Q?iEOlXoLjMe/HtOWfcSWp+tIJ6PgZMnz6yKfjx/kAFKaLL/CXU7RU06SQjcgn?=
+ =?us-ascii?Q?IZpVmSlSoIu3TLqpn6Qz1qbup/hCFizZR2pOu667Rg2aucOmb9ZZN7ntwhnH?=
+ =?us-ascii?Q?vK0jnFBwp/E3CvpTCK9wkbwEIYEmm97vOrBlGbxr3HMqu7QKOhLEw7qkP0Gx?=
+ =?us-ascii?Q?K7kPFzPqDL4oWyHD7QonAMkPF4I1pK0Vvb8wJpVz2B3bD2DA5yMeg5QUlJQ4?=
+ =?us-ascii?Q?4hTN5HlkU41LSg8LjbHCmtP0ZqxHALHhTMigTpSqxRtkjRmRjOLywi9MN0S2?=
+ =?us-ascii?Q?rwmjopRtBKOC9/J85dfwQgdKQ3OKXAP5BDePB8J2kTpqfhqv72OmrwiaFLnc?=
+ =?us-ascii?Q?Baf/HFw8emcORdT1Sj749yXSxAn+MtQ+6i99q1ElYUYxO7PQKUIzHs6npyCm?=
+ =?us-ascii?Q?Ie0F8C0NrgP2rl0GcMGvfmVurlp0HBWAADl/YSA32eXg++jEcfqxnHOwFaPH?=
+ =?us-ascii?Q?XlHkQr8tx/GSJ63LJbn1/1EOgZC80gVn+JysVj6it5A6xnL+ZxwUE04xR90J?=
+ =?us-ascii?Q?s5k5/Cs+tCzb82CdC6kergv+GZrAvZa99dREdjgor42fHj/3QKNkImLDAFXh?=
+ =?us-ascii?Q?S6z32Fghkhd1DmOZUi7LoM+QFzU7zAO3gxH+4UpVJU4M1vKQpc4ZELOEFGc9?=
+ =?us-ascii?Q?Uejtvrx+HBPxstkWs9ucd71LHCheYNol01W8ywgiwFAdGNDdBzCh4YvZlY1w?=
+ =?us-ascii?Q?e5BH9xuztlgUf0aFMe8aatFe0yp9rLoHJNVuuXUArtfWqX0dJAOIBsz+A7DU?=
+ =?us-ascii?Q?u6z61+X98zSKD5xaiHabC73jFCAGaPaw0NMrfeYXpYPF7SJXcXWuYZRCwQuN?=
+ =?us-ascii?Q?s91Cn72E6Eb3Nbthr1oIo/z3PKHEvz1V0NKhRLAnd9xNiE1hI4ZOvxtJEkkf?=
+ =?us-ascii?Q?e+OfvSxHSZx5utxRhSVX95RcM7w9tEbcMOvU3TT9DEZ2e7f8UEbBc6ZygELY?=
+ =?us-ascii?Q?zPiP8zvvfxCcMuS5tuTRgtkd09dTtHTTby+TXQugipc7hqF9Yc5ijHml339r?=
+ =?us-ascii?Q?H+pQSSBS3KrTOerAxifDTS3zV+G3YerXsla0y8rCvdC5T0x3ceQ8GB+85aWG?=
+ =?us-ascii?Q?ie47oax/GJZXrztyIfaJH0IK9CLPxWgyXLAeKajcniqVD8aCVqlIlX1Wf7DK?=
+ =?us-ascii?Q?k427ujZHDwvZPCGhhCiSbwPpuyjTvCmgXODyTEuZYYfPrtS6PcO/ypWOa5gD?=
+ =?us-ascii?Q?fYYambM8d7vhCQnHJF6+WX5+wWusYqTifxfkBDnixKcQdpSWIWSciNf1weLI?=
+ =?us-ascii?Q?fMjTM1vPshnpXhD2QW8xf9YCI8BKSmmzcMlo1ixe9L6VLTOMJGmePpYQqV5c?=
+ =?us-ascii?Q?BP0RrdsQXg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <178236824878.3259367.5389624724479864947@maoyixie.com>
-In-Reply-To: <178236824878.3259367.5389624724479864947@maoyixie.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 29 Jun 2026 09:49:10 +0200
-X-Gm-Features: AVVi8CeThT6HkNNgV9aJl_cZk3MWOqnK73KnDiqiYz2ZGnzHZb1yeA29gTxkAQ0
-Message-ID: <CAFEp6-1=qPdK1SQo+_ziomp=GzQP8wnc6SuRKsNtRmDspfJJ9g@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: wwan: iosm: bound device offsets in the MUX
- downlink decoder
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: VY6skZXkYnTGZU6eHvAuDpU3c3kNBYik
-X-Proofpoint-ORIG-GUID: VY6skZXkYnTGZU6eHvAuDpU3c3kNBYik
-X-Authority-Analysis: v=2.4 cv=Ftk1OWrq c=1 sm=1 tr=0 ts=6a422383 cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=ZpdpYltYx_vBUK5n70dp:22 a=VwQbUJbxAAAA:8 a=SnhycFdtAAAA:8 a=pGLkceISAAAA:8
- a=EUspDBNiAAAA:8 a=SzebcLgiP4Mo2SmTKnQA:9 a=QEXdDO2ut3YA:10
- a=OIgjcC2v60KrkQgK7BGD:22 a=IdunurJ9zWQ3aaQyNLvr:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI5MDA2MiBTYWx0ZWRfX9x2+Bi54Btvq
- h/Zz+XlCVgYrrd9z8TkzBtX9IUAViFImiTIneajyOUbTElYZS3+0EiHj22fwd5F0urY1VgSSYLt
- kVrEWn5S0un5/mgcXV2/MYzp8hQS1y4=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI5MDA2MiBTYWx0ZWRfX4stxLRi+eFkq
- 22EbwxQindNTQ9FfAgxf/NZXbHtGtkWU7SE3QX1Pna7w7VSCURvmrit1jRpVU9VSptd3yKjJaS/
- dlWH6v4B6TCC1tTAPxWS1GisVYaiXmgmzme4q7uOd4d7YjDkOPZnLOO68BZExDTiTJ/mOJypTuz
- YZ2sYH1Ymbeb/tvCMoh7wvs9yGD8+1SbiAyoOuVulS4gTbr9bL/zOHArvLj3uc97MQudpIivasC
- 9cqBafriF2HYjoqIOJphiXUyvgdqBaRVmgSARx2NbJboXhULPScuf48uwM2qXW9XxO3U5vixSGo
- MDF4VhLL40elmpm9SxRyPbd0TUy7JhwrSwafwyKwVYg3Lr2V+QYJlp5NqO66nufdGa8tnwXOaQ3
- 1el/6VNp6zuU2OCkvK6R3uslDEJEzFf/ZJgfshOLlWFAYi2IH+lJHM6L+2I1EreEmcc3yoPpYgt
- eVlpPtsD4TtDF827PPA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-29_02,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 lowpriorityscore=0 adultscore=0 suspectscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 clxscore=1015 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606290062
+X-Exchange-RoutingPolicyChecked: U+4BvnUW0cHf/wlhFKFhY5GEJRAJ3LAfp8QwEo2/zj8dJNbKyv3ubMA/zLA+AYd1C0p3nOe/cg1aKXpToJC/Q9uVThrLJxMUp15lgQg8esrk4gPqfVG0L05XUmC2ZYnawDuBowJPPkAcwXtal7xt8mR/EVW0Avwit0T2nydk7ekP/ySHquPHXyoUEuI51KmPUrzMQDMFUaUacMLU01BBSBkIndDmmlCqgVd9H/8ZAMcmAUP0jMBsZuwh09cA8c6pRVfN8g9FFLl2sxb0R8qS65Z18Mzo3GqyU9tg1FZlzAMXuAA8MxLMpPr2XD47wJvjhx6m0RyxMAPN15vvmmj9Wg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1e42ed0-b0d5-4c35-6c8c-08ded5b3c408
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2026 07:55:19.7597
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oP6y97yOf/8IHFIS0u9WfZ3FJhjYJRRYK7jqHet2mwHJJoHre5X5WZaVDpEpU/D0bBPTAv76Rw26BRZ6oPz+wjkLV+r/I0+hsASND4APH00=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8150
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:manuelebner@mailbox.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:o.rempel@pengutronix.de,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rdunlap@infradead.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302500-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302499-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mailbox.org:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:from_mime];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,oss.qualcomm.com:from_mime,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B52906D74CA
+X-Rspamd-Queue-Id: 6AA086D7382
 
-On Thu, Jun 25, 2026 at 8:17=E2=80=AFAM Maoyi Xie <maoyixie.tju@gmail.com> =
-wrote:
->
-> mux_dl_adb_decode() walks a chain of aggregated datagram tables using
-> offsets and lengths taken from the modem. first_table_index,
-> next_table_index, table_length, datagram_index and datagram_length are
-> all device supplied le values. Only first_table_index was checked, and
-> only for being non zero. The decoder then formed adth =3D block +
-> adth_index and read the table header and the datagram entries with no
-> bound against the received skb. A modem that reports an index or a
-> length past the downlink buffer makes the decoder read out of bounds.
->
-> The buffer is IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE and skb->len is at most
-> that, so skb->len is the real limit, but none of these in band offsets
-> were checked against it.
->
-> The table chain is also followed with no forward progress check. The loop
-> takes the next table from adth->next_table_index and stops only when that
-> reaches zero. A modem can stage two tables that point at each other, so
-> the loop never ends. It runs in softirq and clones the skb on every pass.
->
-> Validate every device offset and length against skb->len before use.
-> The block header must fit. Each table header, on entry and after every
-> next_table_index, must lie inside the skb. The datagram table must fit.
-> Each datagram index and length must stay inside the skb. The header
-> padding must not exceed the datagram length so the receive length does
-> not wrap. Require each next_table_index to move forward so the chain
-> cannot cycle.
->
-> This was reproduced under KASAN as a slab out of bounds read on a normal
-> downlink receive once the iosm net device is up.
->
-> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support"=
-)
-> Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+From: Manuel Ebner <manuelebner@mailbox.org>=20
+Sent: Saturday, June 27, 2026 11:20 AM
 
-Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+>Add "(Alternate" to "ID)"
+>
+>Signed-off-by: Manuel Ebner <manuelebner@mailbox.org>
 
-> ---
-> Changes in v3:
-> - Also require next_table_index to move strictly forward, so a modem
->   cannot point two tables at each other and spin the decode loop in
->   softirq. Raised in review of v2.
->
-> Link to v1: https://lore.kernel.org/all/178185979029.4044562.999361597594=
-9055530@maoyixie.com/
-> Link to v2: https://lore.kernel.org/all/178196118045.462404.1106913916044=
-8641355@maoyixie.com/
->
->  drivers/net/wwan/iosm/iosm_ipc_mux_codec.c |   40 +++++++++++++++++++++-=
-------
->  1 file changed, 30 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c b/drivers/net/wwa=
-n/iosm/iosm_ipc_mux_codec.c
-> index bff46f7ca59f..0bbd41263cc2 100644
-> --- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-> @@ -553,19 +553,21 @@ static int mux_dl_process_dg(struct iosm_mux *ipc_m=
-ux, struct mux_adbh *adbh,
->         u32 packet_offset, i, rc, dg_len;
->
->         for (i =3D 0; i < nr_of_dg; i++, dg++) {
-> -               if (le32_to_cpu(dg->datagram_index)
-> -                               < sizeof(struct mux_adbh))
-> +               u32 dg_index =3D le32_to_cpu(dg->datagram_index);
-> +
-> +               dg_len =3D le16_to_cpu(dg->datagram_length);
-> +
-> +               if (dg_index < sizeof(struct mux_adbh))
->                         goto dg_error;
->
-> -               /* Is the packet inside of the ADB */
-> -               if (le32_to_cpu(dg->datagram_index) >=3D
-> -                                       le32_to_cpu(adbh->block_length)) =
-{
-> +               /* Is the packet inside of the ADB and the received skb ?=
- */
-> +               if (dg_index >=3D le32_to_cpu(adbh->block_length) ||
-> +                   dg_index >=3D skb->len ||
-> +                   dg_len > skb->len - dg_index ||
-> +                   dl_head_pad_len >=3D dg_len) {
->                         goto dg_error;
->                 } else {
-> -                       packet_offset =3D
-> -                               le32_to_cpu(dg->datagram_index) +
-> -                               dl_head_pad_len;
-> -                       dg_len =3D le16_to_cpu(dg->datagram_length);
-> +                       packet_offset =3D dg_index + dl_head_pad_len;
->                         /* Pass the packet to the netif layer. */
->                         rc =3D ipc_mux_net_receive(ipc_mux, if_id, ipc_mu=
-x->wwan,
->                                                  packet_offset,
-> @@ -589,12 +591,16 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_=
-mux,
->         struct mux_adbh *adbh;
->         struct mux_adth *adth;
->         int nr_of_dg, if_id;
-> -       u32 adth_index;
-> +       u32 adth_index, prev_index =3D 0;
->         u8 *block;
->
->         block =3D skb->data;
->         adbh =3D (struct mux_adbh *)block;
->
-> +       /* The block header itself must fit in the received skb. */
-> +       if (skb->len < sizeof(struct mux_adbh))
-> +               goto adb_decode_err;
-> +
->         /* Process the aggregated datagram tables. */
->         adth_index =3D le32_to_cpu(adbh->first_table_index);
->
-> @@ -606,6 +612,16 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_m=
-ux,
->
->         /* Loop through mixed session tables. */
->         while (adth_index) {
-> +               /* The table header must lie within the received skb, and=
- the
-> +                * chain must move forward so a modem cannot make the loo=
-p
-> +                * cycle between two tables.
-> +                */
-> +               if (adth_index <=3D prev_index ||
-> +                   adth_index < sizeof(struct mux_adbh) ||
-> +                   adth_index > skb->len - sizeof(struct mux_adth))
-> +                       goto adb_decode_err;
-> +               prev_index =3D adth_index;
-> +
->                 /* Get the reference to the table header. */
->                 adth =3D (struct mux_adth *)(block + adth_index);
->
-> @@ -629,6 +645,10 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_m=
-ux,
->                 if (le16_to_cpu(adth->table_length) < sizeof(struct mux_a=
-dth))
->                         goto adb_decode_err;
->
-> +               /* The whole datagram table must fit in the received skb.=
- */
-> +               if (le16_to_cpu(adth->table_length) > skb->len - adth_ind=
-ex)
-> +                       goto adb_decode_err;
-> +
->                 /* Calculate the number of datagrams. */
->                 nr_of_dg =3D (le16_to_cpu(adth->table_length) -
->                                         sizeof(struct mux_adth)) /
-> --
-> 2.34.1
+Hi
+as the title states that's fix path we also need a fixes tag
+here in the commit msg pointing out which patch is being fixed
 
