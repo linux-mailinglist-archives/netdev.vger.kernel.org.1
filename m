@@ -1,183 +1,150 @@
-Return-Path: <netdev+bounces-302703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xDkEKzeWQmrK+AkAu9opvQ
-	(envelope-from <netdev+bounces-302703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:58:47 +0200
+	id 2+o6Gh6YQmpf+QkAu9opvQ
+	(envelope-from <netdev+bounces-302704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:06:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E7D6DD070
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:58:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1B26DD1F5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:06:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Serf3lh9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302703-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302703-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=m5VDrsyt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302704-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302704-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4A71630086BB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:41:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACBA931C7AD6
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA1037C108;
-	Mon, 29 Jun 2026 15:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9457143C07D;
+	Mon, 29 Jun 2026 15:49:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF603B3884
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 15:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8515035E926;
+	Mon, 29 Jun 2026 15:49:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782747686; cv=none; b=CZGTrw5Uja3Skw6/Hn91kjG7pzR6ZdSWGJt/Owhl8PC+Mbj8qcqHGIVlqaX4M0BuMFc64NbmsjmLvqotxZJrIFwdgR1pVE8QNeP3mL7KeB28HanVukn6rH6fBkOzeZQyF0BHcooa5yF3c43/uKhF7CfDkwh0NZRox4J7R6IOmIM=
+	t=1782748169; cv=none; b=gIbeBdV8Huj+HcNzoapIUT19LRgntrbRAb3/eZ/nEYwX2AZND3vF9HCD8xTBkxEDvQryiHpPd46MbR0wWPyWa9w7v8zWNFu7KHAiauO9sOB+xVSnPqFRfKWaDjD4XdLZLZMeNl/RIBk3+UHb3GiLYUMiBMcP4Qb2+la0riIho4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782747686; c=relaxed/simple;
-	bh=Dkt4xyF9DYeMcPtu8Ou/ovRcY3msWhNc1z9UbNdyt48=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ABrtOlm3dG1R8qnjIG7/SQ7yJERY5i880RQmrAYR9MiHJ622kzybQa1xA492hWxrPP/JAYip7vKX6CQAEWkzJuOhC9n+QjOdDXeeqvkyQTdummOeFaO3DpOE6GKcpPE8vwAErWMPnREGRFAaq2mkznETIUI6uXDJAXjA5P4qi0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Serf3lh9; arc=none smtp.client-ip=209.85.214.180
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2c9e8a1d256so13698955ad.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 08:41:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782747684; x=1783352484; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YIeSNB3QalYM3yBkSuJQ+f9h4G1uu1ooOSnkLkitYM=;
-        b=Serf3lh9RB79Iy7hxZmlXGxKsFKH0fnigf1JBqGEAWPfaK20UCoZP9mY5LuttX2bS4
-         R+B50Au7V32dPlTdKs8uMBAWg0nC5De2Kt2+HIKPsdPTCGhwb8zr9p8do7xtmp+XzsJ8
-         lZVu6qkEPRDpmZt+HgzP6QEbg4T4IxdyrVnGfvYcirAaU447HpC5amzqk9JvqAJ5TxlS
-         aX7/bq9AR4KG9g3wKFwiJLzPpgKp1kqpEN2fPqMksZZU7Nf1qDDBekzs6DBykfjNrhIx
-         HlpXYmiYbXx1Dv/HQnxHwSRfo8dHKmpT/8ijF+ZnDubwRY5AI5mLmYPpdnVFbqSiz5zD
-         tCLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782747684; x=1783352484;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3YIeSNB3QalYM3yBkSuJQ+f9h4G1uu1ooOSnkLkitYM=;
-        b=dMONjE2M5VB5B0FOKS/k53TlkKtNxSewDIdb1oANyoqur0l8WRQUZn5QPKbS7FmuoU
-         2aVTTOGCI2ai3zRM22vmHBnbYOEycRONBFeBbgkkONCuEJC6sbFjm2ogNsy5uZ7ZaQ3n
-         +jT0OZLoRC+liSIK5Y4tBbdnT3Gh7TaiyTVFFy1a9GvdjwYuwSJG+agLVDVgA/i+WVay
-         Dn/fOLZsqlbSl2SlxU4twQU7/lxQ+pBuhUgem/iGs0TIKl6yMgn7A/rHIqxidNASBbuM
-         JnoALNrFmIQeaM5gxMiOd61Ma0DNh6fCITi5ZXFscRLfIc7bjy7Yl/A0HJFnTzLJpAw+
-         LnTA==
-X-Forwarded-Encrypted: i=1; AHgh+RpAtPZh85UC0FNpdoeszPCaCJkvolTr/y+jHTbtmZjsLYAPQCc24CqwV4F75yuRQEO5XZC6Fwk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9fr9ScX3Ma4jjomXxXH5AR8WFTH8MJBKzLgespacjmFtC5Rfu
-	aIeZZVNy42eiq5biY0ZDukmW2wp6KvnKTQWUuwdZlJ3AUwx0Ax3KVVRM190dPw==
-X-Gm-Gg: AfdE7cm62vSGhed7tZ3/B29rfCe3asOi7wUC8NyLMs+0MNZ02FiavSuO0lLlrP/eRj+
-	5OK/RS64I/PQn8IpqEz+Yz6amdD4+U26xO92q4N6PK1ituKmtQ8TKMCkT5bDAQQFLST/rKHLfmd
-	uiFaEZmsL3wSuVJvI0/psrkZzb+Cfbz6/YHO1ze9p7L91+/2DqN15i2lxFzNLmGkHcva9lXY0AR
-	18jPLmgVCra+CsSp+UmoPvghG09qqeUL5xgb2XNH8VF8eheGSiJe79z2YT02nZZt+G2z0xySeWR
-	kfNNHfViyEn66hEhCG22Kbua4MKvYtg/wV5VQ3EDw8LVt93YhZ3Bihf/HTbdZmkSnGn2B2fb9qb
-	Ef22h1HT53obyYTsugSNqTFagCVjfosBevdeDyvOdEo4fasbhvNfVSy5+25t5jBC3KxD/wdvkml
-	cT/r8j+T9XWMvIinryhmFJuC7l43qn0DSLHOi8Pkw+sYey3bpCAau/qzFyaL5OUw==
-X-Received: by 2002:a17:902:e545:b0:2c9:f0c5:98d6 with SMTP id d9443c01a7336-2c9f0c59ccfmr38873085ad.6.1782747683960;
-        Mon, 29 Jun 2026 08:41:23 -0700 (PDT)
-Received: from cps-manycore-1.. ([147.46.174.222])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c9d886668esm37040605ad.58.2026.06.29.08.41.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 08:41:23 -0700 (PDT)
-From: Sechang Lim <rhkrqnwk98@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net/sched: act_bpf: use rcu_dereference_bh() to read the filter
-Date: Mon, 29 Jun 2026 15:41:06 +0000
-Message-ID: <20260629154112.1164986-1-rhkrqnwk98@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782748169; c=relaxed/simple;
+	bh=a7gjJjimoCo2/e9mYDjktdyqawDyzH083Zsq1hR6j+c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tHlbxeO9yT1n9WRshFxGPrXt7OGmr85aiQeH9giO7dmXWZylipIkyuvFWqxQCLdQsIox+z51bdyxXQCXNa1DkJke8rXV9M6HXVTGmjWNO+kr3TslooCngqBJukNl0K+nfkT0Ss/p4sD4c4bsYDZMYZTvQzw/YO1Kn4KcF2o9jNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5VDrsyt; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB581F000E9;
+	Mon, 29 Jun 2026 15:49:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782748168;
+	bh=hXl4dJbP3FOa6+eSSAvZZMi6VNC2jfLpdmSwqcoEoNM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=m5VDrsytbDBfEN1nGXcsOCcU+kmYtf7Ai+/MPDbMTAT0mG4iwc+/f0L0F9tS+Wu5/
+	 e+1db566e+YEuCJxdMmTArGz6ciB7Yyu/2I0lQmGmHCcwm+WToCFod1K6V9lnwudQw
+	 iodPcQJVkIw2mqAIqoBF6AiSc2tFAFPT+aoB7Br2A2LBouymE0Ns7I3wT9+0/vHcxK
+	 nBKxOD7cgKLbQUkZDGAu84qI3XuDVD7ghhaB49beoRPZ+O7zgPmoevw5artZjRr3Lo
+	 Ifx2ddFGDPYJfgJtulX70MQdmfwzE3LNMph7q5n2Of5xFQ6IF3npcNCHP8JZavflH6
+	 M9jv8OCZaTk4A==
+Message-ID: <2ffa32dd-5c88-488a-aa23-deef13465eb9@kernel.org>
+Date: Mon, 29 Jun 2026 09:49:26 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v5 1/3] bpf: Add BPF_FIB_LOOKUP_VLAN flag to
+ bpf_fib_lookup() helper
+Content-Language: en-US
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Avinash Duduskar <avinash.duduskar@gmail.com>, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org
+Cc: eddyz87@gmail.com, memxor@gmail.com, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
+ emil@etsalapatis.com, john.fastabend@gmail.com, sdf@fomichev.me,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org,
+ yatsenko@meta.com, leon.hwang@linux.dev, kpsingh@kernel.org,
+ a.s.protopopov@gmail.com, ameryhung@gmail.com, rongtao@cestc.cn,
+ eyal.birger@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260624030530.3342884-1-avinash.duduskar@gmail.com>
+ <20260624030530.3342884-2-avinash.duduskar@gmail.com>
+ <d820adf6-4a33-45e9-9cfa-17f11a37c9e8@kernel.org> <87se65bd04.fsf@toke.dk>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <87se65bd04.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302703-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:ast@kernel.org,m:andrii@kernel.org,m:martin.lau@linux.dev,m:horms@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:toke@redhat.com,m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:yatsenko@meta.com,m:leon.hwang@linux.dev,m:kpsingh@kernel.org,m:a.s.protopopov@gmail.com,m:ameryhung@gmail.com,m:rongtao@cestc.cn,m:eyal.birger@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,m:asprotopopov@gmail.com,m:eyalbirger@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[redhat.com,gmail.com,kernel.org,iogearbox.net];
+	TAGGED_FROM(0.00)[bounces-302704-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A8E7D6DD070
+X-Rspamd-Queue-Id: BE1B26DD1F5
 
-tcf_bpf_act() can run from the tc egress path, which holds only
-rcu_read_lock_bh(), but reads prog->filter with rcu_dereference() and
-trips lockdep:
+On 6/29/26 9:08 AM, Toke Høiland-Jørgensen wrote:
+> David Ahern <dsahern@kernel.org> writes:
+> 
+>> On 6/23/26 9:05 PM, Avinash Duduskar wrote:
+>>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+>>> index 89b36de5fdbb..e00f0392e728 100644
+>>> --- a/include/uapi/linux/bpf.h
+>>> +++ b/include/uapi/linux/bpf.h
+>>> @@ -3532,6 +3532,29 @@ union bpf_attr {
+>>>   *			Use the mark present in *params*->mark for the fib lookup.
+>>>   *			This option should not be used with BPF_FIB_LOOKUP_DIRECT,
+>>>   *			as it only has meaning for full lookups.
+>>> + *		**BPF_FIB_LOOKUP_VLAN**
+>>
+>> This flag should not be needed. Patches for vlan support were never
+>> submitted (I have them in some old branch). Since the vlan params are
+>> initialized to 0, no new flag should be needed. Besides, these are
+>> output parameters.
+> 
+> There's no enforcement from the kernel side of the parameters being
+> zero, though? So we do need the flag for feature detection; unless we
+> expect applications to do that out of band? But then we'd need a
+> mechanism to do that which could be... the presence of the flag in the
+> ENUM (and thus in BTF)? :)
+> 
 
-  WARNING: suspicious RCU usage
-  net/sched/act_bpf.c:47 suspicious rcu_dereference_check() usage!
-  1 lock held by syz.2.1588/12756:
-   #0: (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit net/core/dev.c:4792
-   tcf_bpf_act+0x6ae/0x940 net/sched/act_bpf.c:47
-   tcf_classify+0x6e4/0x1080 net/sched/cls_api.c:1860
-   sch_handle_egress net/core/dev.c:4545 [inline]
-   __dev_queue_xmit+0x2185/0x2c00 net/core/dev.c:4808
-   packet_sendmsg+0x3dfa/0x5120 net/packet/af_packet.c:3114
-
-The other tc actions and cls_bpf already use rcu_dereference_bh() here.
-Do the same.
-
-Fixes: 1f211a1b929c ("net, sched: add clsact qdisc")
-Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
----
- net/sched/act_bpf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
-index 58a074651176..09d46e195e33 100644
---- a/net/sched/act_bpf.c
-+++ b/net/sched/act_bpf.c
-@@ -44,7 +44,7 @@ TC_INDIRECT_SCOPE int tcf_bpf_act(struct sk_buff *skb,
- 	tcf_lastuse_update(&prog->tcf_tm);
- 	bstats_update(this_cpu_ptr(prog->common.cpu_bstats), skb);
- 
--	filter = rcu_dereference(prog->filter);
-+	filter = rcu_dereference_bh(prog->filter);
- 	if (at_ingress) {
- 		__skb_push(skb, skb->mac_len);
- 		filter_res = bpf_prog_run_data_pointers(filter, skb);
--- 
-2.43.0
+This is output direction - return from the fib lookup. It does not make
+sense to require a flag to get lookup output. vlan proto of 0 is not
+valid, so it is a clear indication that the vlan output parameters were
+not set during the lookup.
 
 
