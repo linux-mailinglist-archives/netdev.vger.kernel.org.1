@@ -1,66 +1,72 @@
-Return-Path: <netdev+bounces-302468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id a0oxLEIUQmpFzwkAu9opvQ
-	(envelope-from <netdev+bounces-302468-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:44:18 +0200
+	id 7vwzO20VQmqDzwkAu9opvQ
+	(envelope-from <netdev+bounces-302469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:49:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09AB06D6769
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:44:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28BB16D6837
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 08:49:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=cg7cOhvE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302468-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302468-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=seu.edu.cn;
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=mr6YxgPW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302469-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302469-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F0CC63022B67
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 06:41:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EFB63300DD64
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 06:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831E539A4AA;
-	Mon, 29 Jun 2026 06:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB1E3ABD9D;
+	Mon, 29 Jun 2026 06:49:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m8122.xmail.ntesmail.com (mail-m8122.xmail.ntesmail.com [156.224.81.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0ED39891E;
-	Mon, 29 Jun 2026 06:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944DB3A6B61;
+	Mon, 29 Jun 2026 06:49:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782715271; cv=none; b=m3uKbghZr6R0bH4x6FCmezMQlY0FXcXKqglAE49Fj9xbe1pgWA446e+x8VsEwqHDjNFacCY5LynzvQvLihTGeJTwzsok6EfeLsAkg714fcgAfSyql/xeyY6XCKY3hC4ife/nAuJKYzdC72K5+yg+SJEVVqKRSJdp2w6GxHODc5U=
+	t=1782715748; cv=none; b=XyfG40udDCLhnk3tbUmhUmNcelO5Rn5Dls7W0MvWBnQIsHdswCiRgVr06lx4+Q8X3iwbTXoNQXLNM/mnwha4oc+xyJqGgB3XaV8xnfkyfxmG2i93EHj9wA3fAblQmkHx4GeZD2j17JumL8LHVv4FH9HnLC6Dokcc6B1pfy87fRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782715271; c=relaxed/simple;
-	bh=yfs8+bMOUbqTUuh24TuXA2WJutNxxonltXfrlZiI5iE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kJv676usm/TyrC7pR3J1HhzZOaK5zoE2HLH/hOoysKrmZlEFKkVbJvv7HxHoqI80J9Y45fB6CMCIN8xAXihUZDvyJbNEcWdwgROOKfdiKRDB/D9J8eecxd6eVS3esaoxFhj4OLI41AmekM0hMNmPxDu9dh0TFoI0UhF/gaZ2nQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=cg7cOhvE; arc=none smtp.client-ip=156.224.81.22
-Received: from DESKTOP-SUEFNF9.taila7e912.ts.net (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 441fe7671;
-	Mon, 29 Jun 2026 14:40:52 +0800 (GMT+08:00)
-From: Dawei Feng <dawei.feng@seu.edu.cn>
-To: saeedm@nvidia.com
-Cc: leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kliteyn@nvidia.com,
-	vdogaru@nvidia.com,
-	horms@kernel.org,
-	kees@kernel.org,
-	stable@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	zilin@seu.edu.cn,
-	Dawei Feng <dawei.feng@seu.edu.cn>
-Subject: [PATCH net] net/mlx5: HWS, fix matcher leak on resize target setup failure
-Date: Mon, 29 Jun 2026 14:40:49 +0800
-Message-Id: <20260629064049.3852759-1-dawei.feng@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1782715748; c=relaxed/simple;
+	bh=l5nkpwShdfjRB7HBwsY+4t1nxYUn+pmwiQmwceB/3DU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r3xrgZFrIAXvr8JH6sjrrUq4X4Eas7SFI/rfLkhnsgau53cQv8gY528NXzF6lc1V55WRjiDYE6Nwccu8PuIsV2nN3Ljhs1DP8USrfKVtqHtl/GbTpfLl3NbbWdcjtz2bBZdwBHnUwCxiRpf6Vr7A4fPvdMI6D7OIlXfyDPTYGiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=mr6YxgPW; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65T6lKHj93483096, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1782715640;
+	bh=hN5gMjD+iDpeYsE5xD0KUIXtre9++kgFD3pZwu1E5HQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=mr6YxgPWGFVkYsnzb1YLfymiCo0GlEQe1vBOR+WLd9awFfjjyXK9UY9E10tND6jk9
+	 4e4pQDt23chcxwuCqHzllNxTEhQZ2RVMeh7vmZBYhqTQ/9l/bl4tWOtl/GqyFkT4iS
+	 Q8hkDwEyYmgoBbGeHUAwPws8o8MrhPl3DHCOM+CWZl5nh3qLB/tRHAPgh+0JWWCeZO
+	 BAim1SIDGLgD+Z3bKDskjzlEngBdlBbskBnnIesveAtzCDP908JxfGb30KuJ0YJY2R
+	 xnZPfGoNCK8Df36v9f/IHDBt6g2WNrFoK6GjXB1EKJT3OHs8IyoEnx3bDGwAP0NzZx
+	 dFxg5GEpi3xCA==
+Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65T6lKHj93483096
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 29 Jun 2026 14:47:20 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 29 Jun 2026 14:47:20 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Mon, 29 Jun 2026 14:47:20 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <freddy_gu@realsil.com.cn>, <nb@tipi-net.de>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, <nic_swsd@realtek.com>,
+	Javen Xu <javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v7 0/4] Add support for RTL8261C_CG
+Date: Mon, 29 Jun 2026 14:47:14 +0800
+Message-ID: <20260629064718.1349-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,89 +74,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9f121bff6d03a2kunm0b532ae5167829
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCHh5OVkodSktNTUtDGEwaTFYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSE
-	pPSExVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=cg7cOhvEzbulZL53noFNqlYXEefydojZqYXcwUrt4F66QBc1PC66ANOY7Z8S2/ugU1n3OJLs9wlESI9PheqS5YWlnwmNPHhNreMjzu0nbf6z7VrwUpldug3vAVVUfFxIWnzmMDiFHPDGOh4V4/rfYtPjpaHIl6y5xjyaIvEL+bo=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=yVyDbdz8sAP2Avj+M0KEYVA5YSr+NWDHHtNxtisYCrI=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-302468-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[dawei.feng@seu.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302469-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kliteyn@nvidia.com,m:vdogaru@nvidia.com,m:horms@kernel.org,m:kees@kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:zilin@seu.edu.cn,m:dawei.feng@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:nic_swsd@realtek.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dawei.feng@seu.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 09AB06D6769
+X-Rspamd-Queue-Id: 28BB16D6837
 
-hws_bwc_matcher_move() allocates a replacement matcher before setting it
-as the resize target. If mlx5hws_matcher_resize_set_target() fails, the
-replacement matcher is not attached anywhere and is leaked.
+From: Javen Xu <javen_xu@realsil.com.cn>
 
-Fix the leak by destroying the replacement matcher before returning from
-the resize-target failure path.
+Add support for RTL8261C_CG and add support for loading firmware.
 
-The bug was first flagged by an experimental analysis tool we are
-developing for kernel memory-management bugs while analyzing
-v6.13-rc1. The tool is still under development and is not yet publicly
-available. Manual inspection confirms that the bug is still
-present in v7.1.1.
+Javen Xu (4):
+  net: phy: c45: add genphy_c45_soft_reset()
+  net: phy: c45: add setup and read master/slave helpers
+  net: phy: realtek: add support for RTL8261C_CG
+  net: phy: realtek: load firmware for RTL8261C_CG
 
-An x86_64 allyesconfig build showed no new warnings. As we do not have a
-mlx5 HWS-capable device to test with, no runtime testing was able to be
-performed.
+ drivers/net/phy/phy-c45.c              | 125 ++++++++
+ drivers/net/phy/realtek/realtek_main.c | 406 +++++++++++++++++++++++++
+ include/linux/phy.h                    |   1 +
+ include/uapi/linux/mdio.h              |   5 +
+ 4 files changed, 537 insertions(+)
 
-Fixes: 2111bb970c78 ("net/mlx5: HWS, added backward-compatible API handling")
-Cc: stable@vger.kernel.org
-Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
----
- drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-index eae02bc74221..3bcf412a08c4 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-@@ -205,6 +205,7 @@ static int hws_bwc_matcher_move(struct mlx5hws_bwc_matcher *bwc_matcher)
- 	ret = mlx5hws_matcher_resize_set_target(old_matcher, new_matcher);
- 	if (ret) {
- 		mlx5hws_err(ctx, "Rehash error: failed setting resize target\n");
-+		mlx5hws_matcher_destroy(new_matcher);
- 		return ret;
- 	}
- 
 -- 
-2.34.1
+2.43.0
 
 
