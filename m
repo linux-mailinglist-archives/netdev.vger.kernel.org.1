@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-302726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302728-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k/IgNUiqQmqu/QkAu9opvQ
-	(envelope-from <netdev+bounces-302726-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:24:24 +0200
+	id +9gYKFuqQmq1/QkAu9opvQ
+	(envelope-from <netdev+bounces-302728-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:24:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54CA86DDAF1
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:24:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44886DDB00
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:24:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=ne4RPrRn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302726-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302726-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=Ee9XSZus;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302728-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302728-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E7953036423
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:23:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 276C2300A64F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 17:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FE046AF0A;
-	Mon, 29 Jun 2026 17:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEB8478841;
+	Mon, 29 Jun 2026 17:23:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC2B43D515;
-	Mon, 29 Jun 2026 17:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0697044B663;
+	Mon, 29 Jun 2026 17:23:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782753836; cv=none; b=Xb6QMWxhnJewxBwk446xi0MWP4TxgGw7/XiUxX1PMa+nm7cl5LFpSn5IHul/yFj6JezB+KrPCPmKvB6eyUEg2tHkWZSvj8soVDT6Lg9QStwnpgL1vg29/PISZcPQLYlFsdgfVxPhfyr+A9+uyLpppI515ugi/+0j+2dIBqth6/Q=
+	t=1782753836; cv=none; b=et+zXVAW8EQopn1L4uUHMK3oHe3O90x0BQ9zv7StPALrqvqFgjZYQDKcps2fcLiTbwW6TKp1F3/ajbcriJEruCP4l//7Ql8erdzlC+iDW3zlQv71kdANO94JQzIOwmgpT5iEFtsNInjJn5BVrrghGS8pQKBA1WQH9ns4pnX4ii0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782753836; c=relaxed/simple;
-	bh=aNd7TC0TT8DRtt8snf6tb2R/f0P9+0DbOVq/3EsJSws=;
+	bh=cq9/4dTY8/cms2vVRNDC6h/5bwZbCir58/d4Yiaitbg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XrkPO5AD83CrLeLalo1hdE5KT7mKcohJoLI4OllDNVRGzTIiw75QcMyTJRac1QQEu/vwiHjuS8yjWKTtNEAfzYUqQEsv6pNDBvALb0xmPS4PKcBfgRYv+yY37iMBRPGKxhrXIrC3tZkLQW+TbO0s1i9vXf4w8TwFvHnq+47qzsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ne4RPrRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B81BEC2BCB8;
+	 In-Reply-To:To:Cc; b=OlensE8FEqEanh4EeyE6M+Bvuc4NK4lwJCTvjJCqeJ5zR2XuO4H1uEnuBuLhCCJljrqfUVESsaynUIASEiSDa+aGm9EWkWLcjNV0G5okhnfEPmEEuw0NfxFeTbfcxBQFi+RxWxFwivyLktYuTFywJOS7WX2DjLiyMNt6BDmhwh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ee9XSZus; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CC79BC2BD05;
 	Mon, 29 Jun 2026 17:23:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1782753835;
-	bh=aNd7TC0TT8DRtt8snf6tb2R/f0P9+0DbOVq/3EsJSws=;
+	bh=cq9/4dTY8/cms2vVRNDC6h/5bwZbCir58/d4Yiaitbg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ne4RPrRnj8ZuGdiI3kSpSr86i2bM9gc+FPjRA8oW3yvTD8Bh+fr1YbKBQd8efWg9o
-	 JbyK5XKBioDl70+jheVGwoO3pBFw65wWGJ3vvtkbx/FhBxzV7hFsUleVCaox/LCnv3
-	 hnw5R5pKU1kYQxxicqBQ17n8Yv5rdh/SoKiYQEiQfFsQBbIGmoBreWWvmL1LvIP+AQ
-	 OSsn65UWm9NlpTQn2lNiWKVqbzDQzpLxXruX2zEua4N23DgScBOQzhjRlkasTa7YH0
-	 Phia5g9Dfac2Ym0Qz7kvCoftNWJ/oSw9YTseALRaXdkgqVQpFB43Xc8QhnPAM5AX2v
-	 5o9wal27OH29Q==
+	b=Ee9XSZusgaoBv+CFvzZcO0LH1kpSlN1AZq6cholfuVmGNp53LZIaEpDm1AnH/eZpS
+	 wFi+JxZwwMaR4xQAFqqCL37vKiaaLj6uMgpAt7xnKGhI9OJqRPqJP3O0JdFLX+xaMu
+	 gfIAu34xndRxWwoW2A/RuUqTUaQBR9UEwINzTjb2Dq2CxxgQjka70BwSkYt1wHh+wC
+	 bUW3FIw2gMWZ6SgTRv1jSEV24U+zQTZwPxynR1G6APZEIE/9wLAc9oO3S3WWCsYqgx
+	 W7ksq6cuf82lXcFHIN4BKxAvS0MXZVO8MFvol63c8RZifVHpuQ/d8xpOmTfuRZmJT7
+	 rIwyIzjwkIuGg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0253C43458;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C19C43327;
 	Mon, 29 Jun 2026 17:23:55 +0000 (UTC)
 From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Mon, 29 Jun 2026 10:23:34 -0700
-Subject: [PATCH net-next v6 04/15] net: phy: microchip_t1s: Use generic
- APIs for C45 read and write
+Date: Mon, 29 Jun 2026 10:23:35 -0700
+Subject: [PATCH net-next v6 05/15] net: ethernet: oa_tc6: Move constant
+ definitions to header file
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,8 +60,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260629-s2500-mac-phy-support-v6-4-18ce79500371@onsemi.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260629-s2500-mac-phy-support-v6-5-18ce79500371@onsemi.com>
 References: <20260629-s2500-mac-phy-support-v6-0-18ce79500371@onsemi.com>
 In-Reply-To: <20260629-s2500-mac-phy-support-v6-0-18ce79500371@onsemi.com>
 To: Andrew Lunn <andrew@lunn.ch>, 
@@ -82,11 +82,11 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Jerry Ray <jerry.ray@microchip.com>, 
  Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782753817; l=2735;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782753817; l=13149;
  i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=KGd+QvN/2qmOf7SrcvVM5VMzxk4c5gfAD5Vqiwqfx70=;
- b=WBR7J3MxZuux7B+9pdLng+VguK7jhuXgAP+zTo784uUKgJihTGxelhqwaKP3DhYiW7bV4FdTI
- DW2W1aIHbaaCNLazSARsfkPvRliUTjvS1e0GE01Pip0jWNsRvXWy7mr
+ bh=VN2YuQWoZcAzQgW/jEVrO7Xz9zPMIzvsQLnvWO3gshw=;
+ b=IiwTHcLqJiahE9Rrp9lFWqR3NemfMM3X1PFbANKpxDUFYm/jmONuZKYQpH1lPI9U3QqY36Nfj
+ 6q3SGjoZhIfBiq3nyFBIn6N8Os98PqrjYHI39DogNdSeU9Gu1aGyHcA
 X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
  pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
 X-Endpoint-Received: by B4 Relay for
@@ -100,12 +100,12 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302726-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
+	TAGGED_FROM(0.00)[bounces-302728-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:pier.beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:selvamani.rajagopal@onsemi.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
 	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
@@ -127,84 +127,392 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,vger.kernel.org:from_smtp,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 54CA86DDAF1
+X-Rspamd-Queue-Id: D44886DDB00
 
 From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
-Replace vendor implementation with generic API to read and write
-PHY registers using C45 bus protocol.
+To help other source files within the module share the
+constant definitions, they are moved to a header file.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+The memory map selector(MMS) values that are defined in
+in Table 6 of OPEN Alliance 10BASE-T1x Serial Interface
+specification and currently used are added.
+
 Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
 ---
 changes in v6
   - No change
 changes in v5
-  - no change
+  - No change
 changes in v4
-  - no change
+  - Added MMS values 1 and 12, which are used now
 changes in v3
-  - Updated vendor specific phy_read_mmd/phy_write_mmd functions to
-    use genphy read/write APIs that is introduced
+  - Moved constant definitions from the source to newly created
+    header file for other sources in the directory to share.
+  - Standard specific defines are moved to Linux common header file
   - First patch
 ---
- drivers/net/phy/microchip_t1s.c | 32 ++------------------------------
- 1 file changed, 2 insertions(+), 30 deletions(-)
+ drivers/net/ethernet/oa_tc6/oa_tc6.c         | 145 +------------------------
+ drivers/net/ethernet/oa_tc6/oa_tc6_std_def.h | 157 +++++++++++++++++++++++++++
+ include/linux/oa_tc6.h                       |  15 +++
+ 3 files changed, 173 insertions(+), 144 deletions(-)
 
-diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-index e601d56b2507..0c4dc70641d8 100644
---- a/drivers/net/phy/microchip_t1s.c
-+++ b/drivers/net/phy/microchip_t1s.c
-@@ -506,34 +506,6 @@ static int lan86xx_read_status(struct phy_device *phydev)
- 	return 0;
- }
+diff --git a/drivers/net/ethernet/oa_tc6/oa_tc6.c b/drivers/net/ethernet/oa_tc6/oa_tc6.c
+index 0727d53345a3..bf96e8d1ccb9 100644
+--- a/drivers/net/ethernet/oa_tc6/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6/oa_tc6.c
+@@ -12,150 +12,7 @@
+ #include <linux/phy.h>
+ #include <linux/oa_tc6.h>
  
--/* OPEN Alliance 10BASE-T1x compliance MAC-PHYs will have both C22 and
-- * C45 registers space. If the PHY is discovered via C22 bus protocol it assumes
-- * it uses C22 protocol and always uses C22 registers indirect access to access
-- * C45 registers. This is because, we don't have a clean separation between
-- * C22/C45 register space and C22/C45 MDIO bus protocols. Resulting, PHY C45
-- * registers direct access can't be used which can save multiple SPI bus access.
-- * To support this feature, set .read_mmd/.write_mmd in the PHY driver to call
-- * .read_c45/.write_c45 in the OPEN Alliance framework
-- * drivers/net/ethernet/oa_tc6.c
+-/* OPEN Alliance TC6 registers */
+-/* Standard Capabilities Register */
+-#define OA_TC6_REG_STDCAP			0x0002
+-#define STDCAP_DIRECT_PHY_REG_ACCESS		BIT(8)
+-
+-/* Reset Control and Status Register */
+-#define OA_TC6_REG_RESET			0x0003
+-#define RESET_SWRESET				BIT(0)	/* Software Reset */
+-
+-/* Configuration Register #0 */
+-#define OA_TC6_REG_CONFIG0			0x0004
+-#define CONFIG0_SYNC				BIT(15)
+-#define CONFIG0_ZARFE_ENABLE			BIT(12)
+-
+-/* Status Register #0 */
+-#define OA_TC6_REG_STATUS0			0x0008
+-#define STATUS0_RESETC				BIT(6)	/* Reset Complete */
+-#define STATUS0_HEADER_ERROR			BIT(5)
+-#define STATUS0_LOSS_OF_FRAME_ERROR		BIT(4)
+-#define STATUS0_RX_BUFFER_OVERFLOW_ERROR	BIT(3)
+-#define STATUS0_TX_PROTOCOL_ERROR		BIT(0)
+-
+-/* Buffer Status Register */
+-#define OA_TC6_REG_BUFFER_STATUS		0x000B
+-#define BUFFER_STATUS_TX_CREDITS_AVAILABLE	GENMASK(15, 8)
+-#define BUFFER_STATUS_RX_CHUNKS_AVAILABLE	GENMASK(7, 0)
+-
+-/* Interrupt Mask Register #0 */
+-#define OA_TC6_REG_INT_MASK0			0x000C
+-#define INT_MASK0_HEADER_ERR_MASK		BIT(5)
+-#define INT_MASK0_LOSS_OF_FRAME_ERR_MASK	BIT(4)
+-#define INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK	BIT(3)
+-#define INT_MASK0_TX_PROTOCOL_ERR_MASK		BIT(0)
+-#define INT_MASK0_ALL_INTERRUPTS                (GENMASK(5, 0) | \
+-						 GENMASK(12, 7))
+-
+-/* PHY Clause 22 registers base address and mask */
+-#define OA_TC6_PHY_STD_REG_ADDR_BASE		0xFF00
+-#define OA_TC6_PHY_STD_REG_ADDR_MASK		0x1F
+-
+-/* Control command header */
+-#define OA_TC6_CTRL_HEADER_DATA_NOT_CTRL	BIT(31)
+-#define OA_TC6_CTRL_HEADER_WRITE_NOT_READ	BIT(29)
+-#define OA_TC6_CTRL_HEADER_MEM_MAP_SELECTOR	GENMASK(27, 24)
+-#define OA_TC6_CTRL_HEADER_ADDR			GENMASK(23, 8)
+-#define OA_TC6_CTRL_HEADER_LENGTH		GENMASK(7, 1)
+-#define OA_TC6_CTRL_HEADER_PARITY		BIT(0)
+-
+-/* Data header */
+-#define OA_TC6_DATA_HEADER_DATA_NOT_CTRL	BIT(31)
+-#define OA_TC6_DATA_HEADER_DATA_VALID		BIT(21)
+-#define OA_TC6_DATA_HEADER_START_VALID		BIT(20)
+-#define OA_TC6_DATA_HEADER_START_WORD_OFFSET	GENMASK(19, 16)
+-#define OA_TC6_DATA_HEADER_END_VALID		BIT(14)
+-#define OA_TC6_DATA_HEADER_END_BYTE_OFFSET	GENMASK(13, 8)
+-#define OA_TC6_DATA_HEADER_PARITY		BIT(0)
+-
+-/* Data footer */
+-#define OA_TC6_DATA_FOOTER_EXTENDED_STS		BIT(31)
+-#define OA_TC6_DATA_FOOTER_RXD_HEADER_BAD	BIT(30)
+-#define OA_TC6_DATA_FOOTER_CONFIG_SYNC		BIT(29)
+-#define OA_TC6_DATA_FOOTER_RX_CHUNKS		GENMASK(28, 24)
+-#define OA_TC6_DATA_FOOTER_DATA_VALID		BIT(21)
+-#define OA_TC6_DATA_FOOTER_START_VALID		BIT(20)
+-#define OA_TC6_DATA_FOOTER_START_WORD_OFFSET	GENMASK(19, 16)
+-#define OA_TC6_DATA_FOOTER_END_VALID		BIT(14)
+-#define OA_TC6_DATA_FOOTER_END_BYTE_OFFSET	GENMASK(13, 8)
+-#define OA_TC6_DATA_FOOTER_TX_CREDITS		GENMASK(5, 1)
+-
+-/* PHY – Clause 45 registers memory map selector (MMS) as per table 6 in the
+- * OPEN Alliance specification.
 - */
--static int lan865x_phy_read_mmd(struct phy_device *phydev, int devnum,
--				u16 regnum)
--{
--	struct mii_bus *bus = phydev->mdio.bus;
--	int addr = phydev->mdio.addr;
+-#define OA_TC6_PHY_C45_PCS_MMS2			2	/* MMD 3 */
+-#define OA_TC6_PHY_C45_PMA_PMD_MMS3		3	/* MMD 1 */
+-#define OA_TC6_PHY_C45_VS_PLCA_MMS4		4	/* MMD 31 */
+-#define OA_TC6_PHY_C45_AUTO_NEG_MMS5		5	/* MMD 7 */
+-#define OA_TC6_PHY_C45_POWER_UNIT_MMS6		6	/* MMD 13 */
 -
--	return __mdiobus_c45_read(bus, addr, devnum, regnum);
--}
+-#define OA_TC6_CTRL_HEADER_SIZE			4
+-#define OA_TC6_CTRL_REG_VALUE_SIZE		4
+-#define OA_TC6_CTRL_IGNORED_SIZE		4
+-#define OA_TC6_CTRL_MAX_REGISTERS		128
+-#define OA_TC6_CTRL_SPI_BUF_SIZE		(OA_TC6_CTRL_HEADER_SIZE +\
+-						(OA_TC6_CTRL_MAX_REGISTERS *\
+-						OA_TC6_CTRL_REG_VALUE_SIZE) +\
+-						OA_TC6_CTRL_IGNORED_SIZE)
+-#define OA_TC6_CHUNK_PAYLOAD_SIZE		64
+-#define OA_TC6_DATA_HEADER_SIZE			4
+-#define OA_TC6_CHUNK_SIZE			(OA_TC6_DATA_HEADER_SIZE +\
+-						OA_TC6_CHUNK_PAYLOAD_SIZE)
+-#define OA_TC6_MAX_TX_CHUNKS			48
+-#define OA_TC6_SPI_DATA_BUF_SIZE		(OA_TC6_MAX_TX_CHUNKS *\
+-						OA_TC6_CHUNK_SIZE)
+-#define STATUS0_RESETC_POLL_DELAY		1000
+-#define STATUS0_RESETC_POLL_TIMEOUT		1000000
 -
--static int lan865x_phy_write_mmd(struct phy_device *phydev, int devnum,
--				 u16 regnum, u16 val)
--{
--	struct mii_bus *bus = phydev->mdio.bus;
--	int addr = phydev->mdio.addr;
+-/* Internal structure for MAC-PHY drivers */
+-struct oa_tc6 {
+-	struct net_device *netdev;
+-	struct phy_device *phydev;
+-	struct mii_bus *mdiobus;
+-	struct spi_device *spi;
+-	struct mutex spi_ctrl_lock; /* Protects spi control transfer */
+-	spinlock_t tx_skb_lock; /* Protects tx skb handling */
+-	void *spi_ctrl_tx_buf;
+-	void *spi_ctrl_rx_buf;
+-	void *spi_data_tx_buf;
+-	void *spi_data_rx_buf;
+-	struct sk_buff *ongoing_tx_skb;
+-	struct sk_buff *waiting_tx_skb;
+-	struct sk_buff *rx_skb;
+-	u16 tx_skb_offset;
+-	u16 spi_data_tx_buf_offset;
+-	u16 tx_credits;
+-	u8 rx_chunks_available;
+-	bool rx_buf_overflow;
+-	bool int_flag;
+-	bool disable_traffic;
+-};
 -
--	return __mdiobus_c45_write(bus, addr, devnum, regnum, val);
--}
+-enum oa_tc6_header_type {
+-	OA_TC6_CTRL_HEADER,
+-	OA_TC6_DATA_HEADER,
+-};
 -
- static struct phy_driver microchip_t1s_driver[] = {
- 	{
- 		PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVB1),
-@@ -584,8 +556,8 @@ static struct phy_driver microchip_t1s_driver[] = {
- 		.features           = PHY_BASIC_T1S_P2MP_FEATURES,
- 		.config_init        = lan865x_revb_config_init,
- 		.read_status        = lan86xx_read_status,
--		.read_mmd           = lan865x_phy_read_mmd,
--		.write_mmd          = lan865x_phy_write_mmd,
-+		.read_mmd           = genphy_phy_read_mmd,
-+		.write_mmd          = genphy_phy_write_mmd,
- 		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
- 		.set_plca_cfg	    = lan86xx_plca_set_cfg,
- 		.get_plca_status    = genphy_c45_plca_get_status,
+-enum oa_tc6_register_op {
+-	OA_TC6_CTRL_REG_READ = 0,
+-	OA_TC6_CTRL_REG_WRITE = 1,
+-};
+-
+-enum oa_tc6_data_valid_info {
+-	OA_TC6_DATA_INVALID,
+-	OA_TC6_DATA_VALID,
+-};
+-
+-enum oa_tc6_data_start_valid_info {
+-	OA_TC6_DATA_START_INVALID,
+-	OA_TC6_DATA_START_VALID,
+-};
+-
+-enum oa_tc6_data_end_valid_info {
+-	OA_TC6_DATA_END_INVALID,
+-	OA_TC6_DATA_END_VALID,
+-};
++#include "oa_tc6_std_def.h"
+ 
+ static int oa_tc6_spi_transfer(struct oa_tc6 *tc6,
+ 			       enum oa_tc6_header_type header_type, u16 length)
+diff --git a/drivers/net/ethernet/oa_tc6/oa_tc6_std_def.h b/drivers/net/ethernet/oa_tc6/oa_tc6_std_def.h
+new file mode 100644
+index 000000000000..bc58834a3368
+--- /dev/null
++++ b/drivers/net/ethernet/oa_tc6/oa_tc6_std_def.h
+@@ -0,0 +1,157 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Register and driver related definitions to support
++ * OPEN Alliance 10BASE‑T1x MAC‑PHY Serial Interface framework.
++ *
++ * Author: Selva Rajagopal <selvamani.rajagopal@onsemi.com>
++ */
++
++#ifndef OA_TC6_STD_DEF_H
++#define OA_TC6_STD_DEF_H
++
++#include <linux/ptp_clock_kernel.h>
++#include <linux/net_tstamp.h>
++#include <linux/netdevice.h>
++#include <linux/spi/spi.h>
++#include <linux/skbuff.h>
++#include <linux/sched.h>
++#include <linux/wait.h>
++#include <linux/phy.h>
++
++/* OPEN Alliance TC6 registers */
++/* Standard Capabilities Register */
++#define OA_TC6_REG_STDCAP			0x0002
++#define STDCAP_DIRECT_PHY_REG_ACCESS		BIT(8)
++
++/* Reset Control and Status Register */
++#define OA_TC6_REG_RESET			0x0003
++#define RESET_SWRESET				BIT(0)	/* Software Reset */
++
++/* Configuration Register #0 */
++#define OA_TC6_REG_CONFIG0			0x0004
++#define CONFIG0_SYNC				BIT(15)
++#define CONFIG0_ZARFE_ENABLE			BIT(12)
++
++/* Status Register #0 */
++#define OA_TC6_REG_STATUS0			0x0008
++#define STATUS0_RESETC				BIT(6)	/* Reset Complete */
++#define STATUS0_HEADER_ERROR			BIT(5)
++#define STATUS0_LOSS_OF_FRAME_ERROR		BIT(4)
++#define STATUS0_RX_BUFFER_OVERFLOW_ERROR	BIT(3)
++#define STATUS0_TX_PROTOCOL_ERROR		BIT(0)
++
++/* Buffer Status Register */
++#define OA_TC6_REG_BUFFER_STATUS		0x000B
++#define BUFFER_STATUS_TX_CREDITS_AVAILABLE	GENMASK(15, 8)
++#define BUFFER_STATUS_RX_CHUNKS_AVAILABLE	GENMASK(7, 0)
++
++/* Interrupt Mask Register #0 */
++#define OA_TC6_REG_INT_MASK0			0x000C
++#define INT_MASK0_HEADER_ERR_MASK		BIT(5)
++#define INT_MASK0_LOSS_OF_FRAME_ERR_MASK	BIT(4)
++#define INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK	BIT(3)
++#define INT_MASK0_TX_PROTOCOL_ERR_MASK		BIT(0)
++#define INT_MASK0_ALL_INTERRUPTS		(GENMASK(5, 0) | \
++						 GENMASK(12, 7))
++
++/* PHY Clause 22 registers base address and mask */
++#define OA_TC6_PHY_STD_REG_ADDR_BASE		0xFF00
++#define OA_TC6_PHY_STD_REG_ADDR_MASK		0x1F
++
++/* Control command header */
++#define OA_TC6_CTRL_HEADER_DATA_NOT_CTRL	BIT(31)
++#define OA_TC6_CTRL_HEADER_WRITE_NOT_READ	BIT(29)
++#define OA_TC6_CTRL_HEADER_MEM_MAP_SELECTOR	GENMASK(27, 24)
++#define OA_TC6_CTRL_HEADER_ADDR			GENMASK(23, 8)
++#define OA_TC6_CTRL_HEADER_LENGTH		GENMASK(7, 1)
++#define OA_TC6_CTRL_HEADER_PARITY		BIT(0)
++
++/* Data header */
++#define OA_TC6_DATA_HEADER_DATA_NOT_CTRL	BIT(31)
++#define OA_TC6_DATA_HEADER_DATA_VALID		BIT(21)
++#define OA_TC6_DATA_HEADER_START_VALID		BIT(20)
++#define OA_TC6_DATA_HEADER_START_WORD_OFFSET	GENMASK(19, 16)
++#define OA_TC6_DATA_HEADER_END_VALID		BIT(14)
++#define OA_TC6_DATA_HEADER_END_BYTE_OFFSET	GENMASK(13, 8)
++#define OA_TC6_DATA_HEADER_PARITY		BIT(0)
++
++/* Data footer */
++#define OA_TC6_DATA_FOOTER_EXTENDED_STS		BIT(31)
++#define OA_TC6_DATA_FOOTER_RXD_HEADER_BAD	BIT(30)
++#define OA_TC6_DATA_FOOTER_CONFIG_SYNC		BIT(29)
++#define OA_TC6_DATA_FOOTER_RX_CHUNKS		GENMASK(28, 24)
++#define OA_TC6_DATA_FOOTER_DATA_VALID		BIT(21)
++#define OA_TC6_DATA_FOOTER_START_VALID		BIT(20)
++#define OA_TC6_DATA_FOOTER_START_WORD_OFFSET	GENMASK(19, 16)
++#define OA_TC6_DATA_FOOTER_END_VALID		BIT(14)
++#define OA_TC6_DATA_FOOTER_END_BYTE_OFFSET	GENMASK(13, 8)
++#define OA_TC6_DATA_FOOTER_TX_CREDITS		GENMASK(5, 1)
++
++#define OA_TC6_CTRL_HEADER_SIZE			4
++#define OA_TC6_CTRL_REG_VALUE_SIZE		4
++#define OA_TC6_CTRL_IGNORED_SIZE		4
++#define OA_TC6_CTRL_MAX_REGISTERS		128
++#define OA_TC6_CTRL_SPI_BUF_SIZE		(OA_TC6_CTRL_HEADER_SIZE +\
++						(OA_TC6_CTRL_MAX_REGISTERS *\
++						OA_TC6_CTRL_REG_VALUE_SIZE) +\
++						OA_TC6_CTRL_IGNORED_SIZE)
++#define OA_TC6_CHUNK_PAYLOAD_SIZE		64
++#define OA_TC6_DATA_HEADER_SIZE			4
++#define OA_TC6_CHUNK_SIZE			(OA_TC6_DATA_HEADER_SIZE +\
++						OA_TC6_CHUNK_PAYLOAD_SIZE)
++#define OA_TC6_MAX_TX_CHUNKS			48
++#define OA_TC6_SPI_DATA_BUF_SIZE		(OA_TC6_MAX_TX_CHUNKS *\
++						OA_TC6_CHUNK_SIZE)
++#define STATUS0_RESETC_POLL_DELAY		1000
++#define STATUS0_RESETC_POLL_TIMEOUT		1000000
++
++/* Internal structure for MAC-PHY drivers */
++struct oa_tc6 {
++	struct net_device *netdev;
++	struct phy_device *phydev;
++	struct mii_bus *mdiobus;
++	struct spi_device *spi;
++	struct mutex spi_ctrl_lock; /* Protects spi control transfer */
++	spinlock_t tx_skb_lock; /* Protects tx skb handling */
++	void *spi_ctrl_tx_buf;
++	void *spi_ctrl_rx_buf;
++	void *spi_data_tx_buf;
++	void *spi_data_rx_buf;
++	struct sk_buff *ongoing_tx_skb;
++	struct sk_buff *waiting_tx_skb;
++	struct sk_buff *rx_skb;
++	u16 tx_skb_offset;
++	u16 spi_data_tx_buf_offset;
++	u16 tx_credits;
++	u8 rx_chunks_available;
++	bool rx_buf_overflow;
++	bool int_flag;
++	bool disable_traffic;
++};
++
++enum oa_tc6_header_type {
++	OA_TC6_CTRL_HEADER,
++	OA_TC6_DATA_HEADER,
++};
++
++enum oa_tc6_register_op {
++	OA_TC6_CTRL_REG_READ = 0,
++	OA_TC6_CTRL_REG_WRITE = 1,
++};
++
++enum oa_tc6_data_valid_info {
++	OA_TC6_DATA_INVALID,
++	OA_TC6_DATA_VALID,
++};
++
++enum oa_tc6_data_start_valid_info {
++	OA_TC6_DATA_START_INVALID,
++	OA_TC6_DATA_START_VALID,
++};
++
++enum oa_tc6_data_end_valid_info {
++	OA_TC6_DATA_END_INVALID,
++	OA_TC6_DATA_END_VALID,
++};
++#endif /* OA_TC6_STD_DEF_H */
++
+diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
+index 15f58e3c56c7..39b80033dfa9 100644
+--- a/include/linux/oa_tc6.h
++++ b/include/linux/oa_tc6.h
+@@ -7,9 +7,23 @@
+  * Author: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+  */
+ 
++#ifndef _LINUX_OA_TC6_H
++#define _LINUX_OA_TC6_H
++
+ #include <linux/etherdevice.h>
+ #include <linux/spi/spi.h>
+ 
++/* PHY – Clause 45 registers memory map selector (MMS) as per table 6 in
++ * the OPEN Alliance specification.
++ */
++#define OA_TC6_PHY_C45_MAC_MMS1			1	/* No MMD */
++#define OA_TC6_PHY_C45_PCS_MMS2			2	/* MMD 3 */
++#define OA_TC6_PHY_C45_PMA_PMD_MMS3		3	/* MMD 1 */
++#define OA_TC6_PHY_C45_VS_PLCA_MMS4		4	/* MMD 31 */
++#define OA_TC6_PHY_C45_AUTO_NEG_MMS5		5	/* MMD 7 */
++#define OA_TC6_PHY_C45_POWER_UNIT_MMS6		6	/* MMD 13 */
++#define OA_TC6_PHY_C45_VS_MMS12			12	/* for vendors */
++
+ struct oa_tc6;
+ 
+ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev);
+@@ -22,3 +36,4 @@ int oa_tc6_read_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
+ 			  u8 length);
+ netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb);
+ int oa_tc6_zero_align_receive_frame_enable(struct oa_tc6 *tc6);
++#endif /* _LINUX_OA_TC6_H */
 
 -- 
 2.43.0
