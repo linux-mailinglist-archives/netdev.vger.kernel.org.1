@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-302765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gTUwG7O1QmonAAoAu9opvQ
-	(envelope-from <netdev+bounces-302765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:13:07 +0200
+	id HOw+JMe1QmopAAoAu9opvQ
+	(envelope-from <netdev+bounces-302766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:13:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E616DDF0F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:13:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF6F6DDF18
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 20:13:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=ZXziLQtC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302765-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302765-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=bLjQTIIC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302766-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302766-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E38C13035B49
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:12:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC431304045F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 18:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907A7380FE6;
-	Mon, 29 Jun 2026 18:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8133803E8;
+	Mon, 29 Jun 2026 18:12:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A566372B4B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1DD3803D7
 	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:12:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782756753; cv=none; b=Z2/T9lEh5nRUs48t3ikGdNKqdCVNZ2zyFVM531YGyTV12wQ2rxkfvctcPszzgxMucfMn/stUSj9Vp4ZIgolOMJO1MWmTw70AfBa4zQYH0wDFnlXQq62N72x5bOMzPlT6gMJ1mGgHkRUAVH1wA8TIuxbJUyePKG09MybWGQMqIjQ=
+	t=1782756754; cv=none; b=WyzF6Jfl1CYzNrYxEFRR26mIKOy1FDb8SwV8wilEzRDhlfe49tw0AWGCxZU2hux78JgblXfaZO/nIVUgTU3Idfp+NVHJgXuB5QtwbRhwYS//qViBzmLFtBpFuVSQUc2Qm02L9d9sj+wQC9kRUEMNJY+/crla1+0H0OForU9fICw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782756753; c=relaxed/simple;
-	bh=w40yZ5MJYHS2pr2MwShzm05JTL4ss/IMwryti29kRcY=;
+	s=arc-20240116; t=1782756754; c=relaxed/simple;
+	bh=b2p74CR7pczfhrBQGObICUGP3KrtQ9sYd7Tr4V1yOu0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VkTLceXC+svQi0XlvkynFHERcjIBtNabO6+/CSwDwWcOGC/G8wInPOuoQz7VBdYAl3T7cu+eCLk0R8hp7jwMecJgu5iKYEidbHqIrZOFhrah4Ftt7GQLMMzDjW+3ZPD8sG7WqcSSFulUsdnV0jbaFNyBg8BRHVeGuykDaTBr9Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZXziLQtC; arc=none smtp.client-ip=209.85.214.201
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2c9ed5caa3bso9397245ad.1
+	 To:Cc:Content-Type; b=cfgSFOTAYnOE2j/Ryk/zFr7//YCXnEsLD7i5hmz5vbeYxdEVAfbvy5rBZgL8rtg9Y4GYyqpk+BJQpmnENAEzq9vyLz6Zrn94YX7Bl8Vo3x2Nv35CvG1oUNxLwq3oPOHDWRjL+dTHhjiObmUcDX3IleGMN4TFQUXTIffH0VTx6Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bLjQTIIC; arc=none smtp.client-ip=209.85.210.202
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-845c605617dso2895006b3a.2
         for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 11:12:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782756751; x=1783361551; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782756752; x=1783361552; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hy/hCXit96TLAlp1EnAmOeuByVTqYVPjHSYBe1p0OWo=;
-        b=ZXziLQtCGnpv+7UVBuosg8vF62xMwJf9XrqMLA+Y4uK5V7qGep8xyXnBLN2lFIpzWv
-         wBXyaKyFVoK+nx25jzw3AGlxEtS+OtMaEFSrPw1Qvi41rxouQcQGcLYJXk7at848DZKP
-         yQZi8WLP8WjAzKM3AJkEdP5DyGRGjUMJMi7mw62juud4v2YjQJ+zfGExEcz0m1F24UEg
-         pp/brX3VeMy1aBM7tuFiMqkLXDtpNnzHy4orc/tQdTbpIVjyx3dj8iRS1YpbBxje7Ee9
-         ThN/8AyJ+59GVsorA2dyFHTfZKQGNjoRG9urIDxanDNjN4BYoQfEEK3H87pP0rYosbYc
-         AN2g==
+        bh=RG6U2cYi1fsF14Gow/zEswwtuv3YZZrPJjXb+Z/vrCY=;
+        b=bLjQTIICEePgJ84XvqlnDJKoYZd9Oo49/KUm/JxE3s39EXNPSVcssUfTQ/Auw9UO9w
+         wxD4pjsNpxFNd6xL6JQTVRG+LMqMzMe/EIM7NoiB6I+K2kW3uQMO2KSE3RsvjUzzzFnZ
+         c5ssnCZUzg+/Of1isZsKw1zCwoInCeS8WQlMm+P6PKDNK7kSLI1vGhEUXAFfof8WdAFa
+         heA2BfDXfVrFCjZbO49Rhie9e1GvFbhXzInAeqO1kU66mUYq+42W88uZZMuIlr0mB+x7
+         C1YbMPF9NhwAdyP1QuWjq/2Y6PEGc582DrF3MaZLHB9d0sopADEZAa7ELKOYpylGjQZ8
+         awrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782756751; x=1783361551;
+        d=1e100.net; s=20251104; t=1782756752; x=1783361552;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hy/hCXit96TLAlp1EnAmOeuByVTqYVPjHSYBe1p0OWo=;
-        b=CRURJ/llcALwW2FUKAqhLMjYl82cCy+vEEEkYmrQz/YsQv1doCK+Cn/Got+FjuoWxQ
-         BacG9fIE/v3iUg6edJ8PgjXQhA7Jm5qpRbrQPTMCL8B3izmNmm/HPC0nIKvUASPq/nO7
-         yKWKb93+mR/lxA+F/7PvCv2J0iKt/L1kzcqfmGLAL1W4aA+DMBenSYjbS9LFZbIkWhSs
-         nT8gWzqWgWT2CGh+C2MZTM6YfIR7PgOEzUF9z90snY77ZvRcy8dAQa9ruGsTK7ZpGnMZ
-         kXdmgnpFW9eszHY0jLkwKND7luBEDmjz894sHnDzr7Mk8HyAtFaHqcbiX+gvbSA+OByT
-         BXfQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqJQMIy2mRrXiWASGpN9xTswvrZWaRG0Nxg3ohv9eHpnOFHSNqUnLWIlVsALZPH4vZqKdFYN+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfARws8/cLjNX4F33W5sPn1cKUUeTcQIuiHYr2A5SFmRiJ8oFE
-	Y4RG4KQ20kclAyYWfcmaMoq3vIRJUOWE0NiV2x0J9n8IrYHp+o0+IvxBz/bmJ+MDm8VutWFAVFl
-	xKwvpWQ==
-X-Received: from plw20.prod.google.com ([2002:a17:903:45d4:b0:2c7:ef74:dfc])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea07:b0:2c8:5de:a84e
- with SMTP id d9443c01a7336-2ca2ea335cemr2514365ad.10.1782756751285; Mon, 29
- Jun 2026 11:12:31 -0700 (PDT)
-Date: Mon, 29 Jun 2026 18:10:54 +0000
+        bh=RG6U2cYi1fsF14Gow/zEswwtuv3YZZrPJjXb+Z/vrCY=;
+        b=FssA63gA/0Z2xL1lHcHBhrUR8RKC1/uFUGaTqGYTJ+xvv6TGpaYcWuLrOjQlfb1ENT
+         PviIwglwXBvRZZ5x9Q0YbTKWOVH0xbtMlAqN9qQDtw49PnPXszwQa4sCMQEydlRHQ1oo
+         +H9uS4JYf8Bjowne01n/IkKi3s84OvKo0HnS5JutM/FRpFKSCIxEu1vO+aaiKYzc1p4S
+         rAGDdksNtWyRVWpVH6Fa8VRUORBsB1ZnSsHWR85iEPfvF1jkNDUo/z4FIvkwXQSUggHu
+         ybgmONKD09zC791C0s01+6H2QHkFrm4JMEc52oB1xPVQuEQhv+1AH3XurYzzpcNdP/QM
+         3j0A==
+X-Forwarded-Encrypted: i=1; AFNElJ+Sr7Rmyc3BzN+G3Oj6vgGxqAgp08GKKgs6Em9sdmFuiLLzqQMnTV1nFCreqlOUGEG1blEhxvM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOA/IiCiNFKfOSln7V6nAyKpwUibvlvCPe2g0YvmlAyQweIyT8
+	sxM/hVXXFxUQDCajuAkIu9YbdROOyxw8JvuOnTmeaiB0dimh895z/8LA9VJG3k10Xg9NwmYnNqR
+	DTKniPg==
+X-Received: from pgap127.prod.google.com ([2002:a63:4285:0:b0:c98:1a89:bad5])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:4c03:b0:3bf:bde7:d671
+ with SMTP id adf61e73a8af0-3bfc50a7f6amr512864637.20.1782756752125; Mon, 29
+ Jun 2026 11:12:32 -0700 (PDT)
+Date: Mon, 29 Jun 2026 18:10:55 +0000
 In-Reply-To: <20260629181226.1929658-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260629181226.1929658-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260629181226.1929658-3-kuniyu@google.com>
-Subject: [PATCH v1 net-next 02/10] ipv4: fib_rules: Make the need for
- fib_unmerge() explicit.
+Message-ID: <20260629181226.1929658-4-kuniyu@google.com>
+Subject: [PATCH v1 net-next 03/10] ipv4: fib: Protect fib_new_table() with spinlock.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
 	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -97,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302765-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302766-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -120,47 +119,98 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B7E616DDF0F
+X-Rspamd-Queue-Id: DCF6F6DDF18
 
-IPv4 local and main route tables are merged by default to avoid
-unnecessary rule lookups.
+fib_newrule() will drop RTNL except for the first IPv4 rule.
 
-When the first IPv4 rule is created, fib_unmerge() splits the
-two tables.
+Then, fib4_rule_configure() could call fib_empty_table() and create
+a new IPv4 fib_table without RTNL.
 
-However, fib4_rule_configure() currently always calls fib_unmerge(),
-and even fetching a table via fib_get_table() requires RTNL (or RCU).
+Currently, net->ipv4.fib_table_hash[] is only protected by RTNL.
 
-We will drop RTNL from fib_newrule() if not needed.
-
-Let's call fib_unmerge() only once for the first rule.
+As a prep, let's protect net->ipv4.fib_table_hash[] with a dedicated
+spinlock.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv4/fib_rules.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ include/net/netns/ipv4.h |  1 +
+ net/ipv4/fib_frontend.c  | 25 +++++++++++++++++++++----
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/fib_rules.c b/net/ipv4/fib_rules.c
-index 51d0ab423ed4..16d202246a36 100644
---- a/net/ipv4/fib_rules.c
-+++ b/net/ipv4/fib_rules.c
-@@ -301,10 +301,12 @@ static int fib4_rule_configure(struct fib_rule *rule, struct sk_buff *skb,
- 	    fib4_nl2rule_dscp_mask(tb[FRA_DSCP_MASK], rule4, extack) < 0)
- 		goto errout;
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 6e27c56514df..59506320558a 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -127,6 +127,7 @@ struct netns_ipv4 {
+ 	atomic_t		fib_num_tclassid_users;
+ #endif
+ 	struct hlist_head	*fib_table_hash;
++	spinlock_t		fib_table_hash_lock;
+ 	struct sock		*fibnl;
+ 	struct hlist_head	*fib_info_hash;
+ 	unsigned int		fib_info_hash_bits;
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index 42212970d735..336d70649eb9 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -76,7 +76,7 @@ static int __net_init fib4_rules_init(struct net *net)
  
--	/* split local/main if they are not already split */
--	err = fib_unmerge(net);
--	if (err)
--		goto errout;
-+	if (!net->ipv4.fib_has_custom_rules) {
-+		/* split local/main if they are not already split */
-+		err = fib_unmerge(net);
-+		if (err)
-+			goto errout;
+ struct fib_table *fib_new_table(struct net *net, u32 id)
+ {
+-	struct fib_table *tb, *alias = NULL;
++	struct fib_table *tb, *new_tb, *alias = NULL;
+ 	unsigned int h;
+ 
+ 	if (id == 0)
+@@ -85,14 +85,27 @@ struct fib_table *fib_new_table(struct net *net, u32 id)
+ 	if (tb)
+ 		return tb;
+ 
++	if (!check_net(net))
++		return NULL;
++
+ 	if (id == RT_TABLE_LOCAL && !net->ipv4.fib_has_custom_rules)
+ 		alias = fib_new_table(net, RT_TABLE_MAIN);
+ 
+-	if (check_net(net))
+-		tb = fib_trie_table(id, alias);
+-	if (!tb)
++	new_tb = fib_trie_table(id, alias);
++	if (!new_tb)
+ 		return NULL;
+ 
++	spin_lock(&net->ipv4.fib_table_hash_lock);
++
++	tb = fib_get_table(net, id);
++	if (tb) {
++		spin_unlock(&net->ipv4.fib_table_hash_lock);
++		fib_free_table(new_tb);
++		return tb;
 +	}
++
++	tb = new_tb;
++
+ 	switch (id) {
+ 	case RT_TABLE_MAIN:
+ 		rcu_assign_pointer(net->ipv4.fib_main, tb);
+@@ -106,6 +119,9 @@ struct fib_table *fib_new_table(struct net *net, u32 id)
  
- 	if (rule->table == RT_TABLE_UNSPEC && !rule->l3mdev) {
- 		if (rule->action == FR_ACT_TO_TBL) {
+ 	h = id & (FIB_TABLE_HASHSZ - 1);
+ 	hlist_add_head_rcu(&tb->tb_hlist, &net->ipv4.fib_table_hash[h]);
++
++	spin_unlock(&net->ipv4.fib_table_hash_lock);
++
+ 	return tb;
+ }
+ EXPORT_SYMBOL_GPL(fib_new_table);
+@@ -1565,6 +1581,7 @@ static int __net_init ip_fib_net_init(struct net *net)
+ 	net->ipv4.sysctl_fib_multipath_hash_fields =
+ 		FIB_MULTIPATH_HASH_FIELD_DEFAULT_MASK;
+ #endif
++	spin_lock_init(&net->ipv4.fib_table_hash_lock);
+ 
+ 	/* Avoid false sharing : Use at least a full cache line */
+ 	size = max_t(size_t, size, L1_CACHE_BYTES);
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
