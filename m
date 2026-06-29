@@ -1,147 +1,186 @@
-Return-Path: <netdev+bounces-302436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302437-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Gu+7F4O0QWoMtwkAu9opvQ
-	(envelope-from <netdev+bounces-302436-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 01:55:47 +0200
+	id TR3CBPbHQWpEuQkAu9opvQ
+	(envelope-from <netdev+bounces-302437-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 03:18:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B687B6D5544
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 01:55:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BA96D5647
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 03:18:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=ml0u0fnx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302436-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302436-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=uLNt3yQb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302437-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302437-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BAEC4300B87E
-	for <lists+netdev@lfdr.de>; Sun, 28 Jun 2026 23:55:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA0DD3009FBE
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 01:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DB92F7EEE;
-	Sun, 28 Jun 2026 23:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563851A3172;
+	Mon, 29 Jun 2026 01:18:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104BE374A12
-	for <netdev@vger.kernel.org>; Sun, 28 Jun 2026 23:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D807E17745
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 01:18:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782690943; cv=none; b=brnMA+XnNZJtQOeG8mMPLp7ej3y8Jm/hsGiIDIsEBkEOS7NnHuLnyQiwnW80xvG9xaRFFHfybYZvcMwL4zKgEheKgpfrbgedmyqoDAJ8kHd3qlTyYUFN6q20OA94CVpdSXPeeLW0ZjnE5cdPDMVxuhbWTJHI707NWA0MEWpq0z4=
+	t=1782695923; cv=none; b=kdhisSVxhRif1uJEeLYE2hg3kWLBbV3dceEn135UFjpdPobEdH9FGO5dDTX3Vj0wKofrgJ3rf4x5u3lxOHAdhc4yRHmQsFH8z8bKSDjqG9AhR6CVhVfhaj5McXywKYbpPdxwEPcJOayCkhVNVzBCu9wpikqP2Ieu2rYjNjGNt/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782690943; c=relaxed/simple;
-	bh=1iGzbc/ihiojGypt1O30+8mo7mH0LgpOsPvWYUZLeCE=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BD6GbpdmSyyx7NkRVqiBpUHaedbmNbneHe1fa37ClR6YTmyZjr3L6NhAryymN4u7U4wTbIp0OOQw06RSO07tNTQcQ9cK2AYUbPzkqXXcb2vlex79ejAWi++iSMVE7w5qdzIQBRlV3ctVwG1WuTasa85woOs1aD7o7yjCdECh/fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ml0u0fnx; arc=none smtp.client-ip=95.215.58.174
-Message-ID: <0892f5e8-7ca4-4efc-a002-8c1ed244b18e@linux.dev>
+	s=arc-20240116; t=1782695923; c=relaxed/simple;
+	bh=JJPvMl3C5EwiyNDQZfdSCn+pGhz8kCdu5r0Z2+2OqBs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NO3bpXL5qGFC9K2rBmIw0HdQktxV5UD5dTVGgqISBfEZth4P+qq1uMGc5+ROk0Tn5ALdQJtCM6ZF6ZuH7OiqncnMCBmsQIb0P0wjTtlFhIrgyn1A1zfelobxsMAYad2Qb47JFSVhYBjQneWEKsQCy2Y7d6EijlJNwJYKdQaD8xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uLNt3yQb; arc=none smtp.client-ip=91.218.175.184
+Message-ID: <b1ed59ef-9d00-446c-bc92-131ccb3d20e4@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782690929;
+	t=1782695918;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EWJ9m0B2lARXAerF+kQRyl3GwQ7mSztH/5H45745C7k=;
-	b=ml0u0fnxeOD3TDUQoQBKFWCstaPO5JjU8s3x+N71MCNi9B9tXSfYscQzhI2Sb1wpggERiC
-	PxpqearG1H4OKQLoskDaWvUI5fW+iWc/VyWFW3yh7Thfhvj2Ncqoz9p+OxDW3zblWY4Jq9
-	ozCEs7Jdoh4uJN+j1BVRpnCSlYs9qXM=
-Date: Mon, 29 Jun 2026 07:55:22 +0800
+	bh=92MI5kENEF5zQ2yYEaLwm6Sik2fV4GEydFbExF+S0wk=;
+	b=uLNt3yQbcl+GpCAxTenm6oZ8MecAQCxbpGIjarrFZkALrW31IXszZNsfL0VsL2RqgIp5H/
+	dIb9vunYRthU05oTL4xw+tXsJRbGogeMHnsaDs7XK+TLGdzRrW72UD62BBbr+ya5YchMko
+	U9j7DJ00T+T0OEsOmfDMPVmDdArJdYI=
+Date: Mon, 29 Jun 2026 09:18:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Cc: cui.tao@linux.dev, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Tao Cui <cuitao@kylinos.cn>
-Subject: Re: [PATCH iproute2-next v3] rdma: display resource limits in
- curr/max format
-To: David Ahern <dsahern@kernel.org>, leonro@nvidia.com
-References: <20260615005315.169582-1-cui.tao@linux.dev>
- <4d98d9a3-07e1-4333-b040-c72e5f561a63@kernel.org>
+Subject: Re: [PATCH bpf-next v2] bpf, unix: Guard sk_msg-dependent code behind
+ CONFIG_NET_SOCK_MSG
+To: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Amery Hung <ameryhung@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>,
+ Network Development <netdev@vger.kernel.org>,
+ kernel-team <kernel-team@cloudflare.com>
+References: <87v7b9ysep.fsf@cloudflare.com>
+ <CAAVpQUBARp1qCEomgzWXVe35WatdaswujVLku+RESm_LW0dE7Q@mail.gmail.com>
+ <CAADnVQL2pfQ0BoN-vWcuCpbOBBKq_rM7Bp7P4XdLMFER5LGSDg@mail.gmail.com>
+ <87mrwlyqg4.fsf@cloudflare.com>
+ <CAMB2axMVhJJpP5HZtDFyQLLbKoRxhW08rj1zGRtWtgDkfYaVNA@mail.gmail.com>
+ <878q85yoy5.fsf@cloudflare.com>
+ <CAADnVQKr1XisnigNsBw7CsXxY3Xn5KOGtX_YDdXmNMZyJy4_Cw@mail.gmail.com>
+ <a50cef70-d8fe-4f42-a89b-2c63c33a72ef@linux.dev>
+ <DJHKW8E1F6PI.P3WUIG9DZE1K@gmail.com> <87cxxey09d.fsf@cloudflare.com>
+ <aj6-Ga_sIrMixgKN@john-p8>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Cui <cui.tao@linux.dev>
-In-Reply-To: <4d98d9a3-07e1-4333-b040-c72e5f561a63@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <aj6-Ga_sIrMixgKN@john-p8>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:cui.tao@linux.dev,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:cuitao@kylinos.cn,m:dsahern@kernel.org,m:leonro@nvidia.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302437-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:alexei.starovoitov@gmail.com,m:ameryhung@gmail.com,m:kuniyu@google.com,m:bpf@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:johnfastabend@gmail.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302436-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,vger.kernel.org,kernel.org,iogearbox.net,cloudflare.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B687B6D5544
+X-Rspamd-Queue-Id: 36BA96D5647
 
-Hi David,
 
-Thanks for taking a look.
+On 6/27/26 2:04 AM, John Fastabend wrote:
+> On Thu, Jun 25, 2026 at 07:53:50PM +0200, Jakub Sitnicki wrote:
+>> On Wed, Jun 24, 2026 at 01:57 PM -07, Alexei Starovoitov wrote:
+>>> On Tue Jun 23, 2026 at 6:32 PM PDT, Jiayuan Chen wrote:
+>>>>
+>>>> Hi Alexei and Jakub,
+>>>>
+>>>> skmsg is actually still pretty useful for gateways.
+>>>> I started with bpf by integrating skmsg into nginx as a module and 
+>>>> envoy
+>>>> has something similar.
+>>>> The usual setup is cgroup/sk for L4 bypass (reject SYN), and skmsg for
+>>>> L7, redirecting
+>>>> between local apps by looking at the payload. So there are real users.
+>
+> Interesting.
+>
+>>>
+>>> ...
+>>>
+>>>> Agree, just like we remove skmsg from KTLS which is rarely used.
+>>>
+>>> ...
+>>>
+>>>> Hope not have skmsg disabled by default.
+>>>
+>>> I wasn't suggesting to delete the whole skmsg,
+>>> but to disable combinations that are causing issues.
+>>> Like what was done for skmsg and ktls.
+>>> I'd allow plain tcp and udp sockets only.
+>>> Allowing unix sockets was fishy. I think we should reject it too.
+>>
+>> For unix & vsock we know Bytedance built a proxy using it.
+>> We've been showcasing it as one of sockmap use cases [1].
+>> That said, I don't know if it's still being used or not.
+>>
+>> If we don't want to go through the config-knob-then-deprecate process,
+>> then I guess the only option is to kill it and see if anyone complains.
+>>
+>> [1] Slide 117, 
+>> https://github.com/sockmap-project/sockmap-project/blob/810d259af6e7a5793922af3991c9dc7ff502fe19/talks/2024-09%20-%20NDC%20TechTown%20-%20Splicing%20Sockets%20with%20SOCKMAP.pdf
+>
+> Most the bugs I'm seeing are combinations of push/pop/pull/tail/head
+> calls over sk_msg scatter gather list no one ever considered. Or at
+> least I never considered. Add in additional socket combinations that
+> came later and we get bugs.
 
-The kernel counterpart that introduces this uapi attribute is the
-following patch, currently under review on the rdma list and not yet in
-Linus' tree:
 
-  [PATCH rdma-next v3] RDMA/nldev: add resource summary max values for usage display
-  https://lore.kernel.org/all/20260615003646.168704-1-cui.tao@linux.dev/
+IMO, the helper has issues, but it's simple. We can test every edge case,
 
-That is the one adding RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX.
+so problems will be resolved over time.
 
-You're right that the iproute2 side should reference the kernel patch.
-I'll add a Link to it in the commit log of the next revision, e.g.:
 
-  Link: https://lore.kernel.org/all/20260615003646.168704-1-cui.tao@linux.dev/
+>
+> Do the nginx/envoy offloads manipulate the scatter gather list as
+> well?
+>
+We use a helper to insert an HTTP header to mark that the packet has 
+been processed by BPF, which helps with debugging and tracing.
 
-If you'd prefer, I can also hold this iproute2 patch until the kernel
-side has landed, so the uapi is already in tree when it goes in. Happy
-to do whichever you think is best.
 
-Thanks,
-Tao
-
-在 2026/6/29 01:22, David Ahern 写道:
-> On 6/14/26 6:53 PM, Tao Cui wrote:
->> diff --git a/rdma/include/uapi/rdma/rdma_netlink.h b/rdma/include/uapi/rdma/rdma_netlink.h
->> index 4356ec4a..e5b8b065 100644
->> --- a/rdma/include/uapi/rdma/rdma_netlink.h
->> +++ b/rdma/include/uapi/rdma/rdma_netlink.h
->> @@ -604,6 +604,11 @@ enum rdma_nldev_attr {
->>  	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
->>  	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
->>  
->> +	/*
->> +	 * Resource summary entry maximum value.
->> +	 */
->> +	RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX,		/* u64 */
-> 
-> I do not see this uapi in Linus' tree. What is the status of the kernel
-> commit? Put a reference to the kernel patches in the commit message.
-> 
-
+> Do we need all these helpers? At some point I thought I was going to
+> build a real kernel proxy with this, but never did it. Another option
+> would be better test framework.
+>
+> .John
 
