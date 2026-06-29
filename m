@@ -1,233 +1,240 @@
-Return-Path: <netdev+bounces-302553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302554-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 65VPNjtCQmqX2wkAu9opvQ
-	(envelope-from <netdev+bounces-302553-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:00:27 +0200
+	id o0TaFv1CQmrp2wkAu9opvQ
+	(envelope-from <netdev+bounces-302554-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:03:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0606D88EE
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:00:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23E96D89B9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:03:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=bCfx8ehP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302553-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302553-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302554-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302554-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 663923061D62
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:52:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8994300C022
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 09:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5679A3B8409;
-	Mon, 29 Jun 2026 09:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AE4392C2A;
+	Mon, 29 Jun 2026 09:53:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83EF3B6C1D
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 09:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6664E30FC1A
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 09:53:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782726716; cv=none; b=CXDgHilutAa/Y0dm9IXlpJOMXjOU22cvcGDU317aZA+r4xE+QmKY92fmyssTz8BHSMahPol/2jBNIVNBPELFJUVkKOOdn9Oj0xP1lyyhoqHZWltiptK2ExQ/Hpauvz28w5OIgQxt8Hqib3/RYRidJ4M+T0wOdGTWU+sPnFHtbCQ=
+	t=1782726805; cv=none; b=RAlsDGmgLitMnwhywh6h7+hC4uRdn3gVCxAy3xPe6ho4lSmj4XWNlFwbVpTfh3djj78IJvqzH3/YCA784ofusKJY39Ciyl+z6NIgUs3CuG7GTVTFTLm6UAo5Pcar6riKzitSjsGJq3fSbms7aiYKSrxUXGSnLO4UTPM7dhmiRxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782726716; c=relaxed/simple;
-	bh=jT/07ZjnEljCDkg1Sui4v5JLloAdoehB4ms4+KILrac=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CoKKXVVF8Zz7Lr04shWbm9DpyMuzQoNsbzYWqqu491Kkd65rw3NODs81voLgr0fexdSKjWZEesCAqDOFVFud0gE0dVNWT23chopSqw+gVuDxmJ2HaZ//ZHESPbsQL+zd7p7OB9gu1vG2iESoy+RNe/+WdhJXfl6Bk/HeqR7qblk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCfx8ehP; arc=none smtp.client-ip=209.85.216.42
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-37cb36ca63bso1300738a91.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 02:51:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782726714; x=1783331514; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZntHgB1VK83jSGRR6wDqH2TYAXRNVfVNGYQkueQtUtc=;
-        b=bCfx8ehPCTE0J0Qca0r+V0+q7TfDPfuak5II0H7mxn+smEAzEY+0pJvzq8I5eNkFF2
-         1IzzHgjqF9JCYXPrNS2ZtkER/jwbBZe4wN68YCckYXt5mCu7tAepva9B5xak5nErdWz9
-         cdFrAowT+PsxCf5WYoMUUMNTjlhVppRtUcqbVsqJ73b7U4Gfk8ZF8tJ/U/T6eX5uTiQn
-         wjUYrB+pDM+Dx1T0XNwvcLmNBHYMN7CEYMR1eljfAs0n+B12E3whZzjxbRr5mdOvmrdp
-         8TWzfW4X4DrsSGNgZsA3/Qta6OyNUZgp4MctoRqwLlMalP2Uyhi/gmjraCl6TLKKyd/7
-         t9RA==
+	s=arc-20240116; t=1782726805; c=relaxed/simple;
+	bh=EeAtNXFftreVObAkoFRjv6jWjUd6N8FSqqOBu4hG4BQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bk9YEWPHc3chf/1TTTKzNFWX4VIz2cCSCp0peGgpYcr6/opuh+05hWsWog74npUx0Y5LQkYzBN5Eg7Zzx0ZnOJWzRGEIFFtPoih0PHb6TlGRp8DjMEO1SSU9xFFn+f140sAEcneXVq2U8wNaVFmStwtHWZ1rknVEe8+4mXGZY0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
+Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-48f680bda84so5037217b6e.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 02:53:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782726714; x=1783331514;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZntHgB1VK83jSGRR6wDqH2TYAXRNVfVNGYQkueQtUtc=;
-        b=fOMI1K0MK5wVgtCZHZycS6mEiTdGtk/AySvUQD1HXU0HV3dEX3BJXzlgeCk9uk5B+y
-         t9KnkAAFRwwXqhec9DrRL2EHYCgiI6kVIjXF4cgK7U670EmC5Rc0NXw3h7+NQCDrE6X6
-         X5218yFqJkVMN/gDwQc0aW+ifvDRRMnti9nRTo5QRhU/8EB4kgD+PNgExcCpGoWt4b/y
-         3zpV7wzHkOINMjdYANOUk3cE8kQWxy2BPk9ONFa/rJcGGnHWaAQzmR46M2mdJVpYuup5
-         dXp+kNStRTKykKLwuQB012iW12G00qRgEG97zvoX8NLuW/B1qk/nNy5ivfL5TSwtqQYz
-         PHAg==
-X-Forwarded-Encrypted: i=1; AHgh+RoFGEdkXpUzoMDHpC8pXICrXak+aPuRkBq2iKtT8FHykJ3iAHwwihE23Ivq+hSZ6fDIbvew1bs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza/HgzT8ih3Kv9HLNu3CfTXeo6wjk/19X9nWdt9CDVnLT3JhS0
-	guCAmUqx1p26I37eRUkLC2wPqTojZ4vmmeAjepMdR2LTHbfsfqynvrKS
-X-Gm-Gg: AfdE7ckS1NbmBRjX4dzE2ESYSwdGqu1KBfjXErzPCIfXRRULwoO27owSAZ58e/dNoD7
-	xRymdhwNGd8UsBQnvtKrSysaVcNZimBGNBWAHpT4TY7wKngvJzaJP3/E/BDLm0db2zR7+5BgGR1
-	SCAdrihjrlnAXEmO73VNHxkneyWYI5zs+3YeUgne6ucHXEb++axgA/j4ltHrD3TosPGhUoqW3Uq
-	W0A3Gw7owYRJMA6PJFwIMSg1MJoXyD1kI1dPqznscLBAXwhf6plohW5y3SssimfOsHcSDMX7k4i
-	iDghaa69jHgfs6rwTRqZOLBgQEObmFuXXRWqoKWZeaxhj0IlaVxAKSGQIPuNSJOC1rSm9p68/5S
-	3hmsH5Ty48lvVJDAoWcoru/7rr5G3ShV5rnPrHdrVGILWPJ6vp+OiFI3/+G1D5FxxGWenmAgXDD
-	l/dnBGIhyCrXIGKuvWssRHJ6kwdCotHg5v2VivA0FZgapwVck59LM=
-X-Received: by 2002:a17:90b:57cc:b0:37d:85cd:1367 with SMTP id 98e67ed59e1d1-37dfa2363cbmr14496003a91.15.1782726713861;
-        Mon, 29 Jun 2026 02:51:53 -0700 (PDT)
-Received: from cps-manycore-1.. ([147.46.174.222])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37e1c93272fsm5550432a91.14.2026.06.29.02.51.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 02:51:53 -0700 (PDT)
-From: Sechang Lim <rhkrqnwk98@gmail.com>
-To: "D . Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Simon Horman <horms@kernel.org>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Guvenc Gulce <guvenc@linux.ibm.com>,
-	Ursula Braun <ubraun@linux.ibm.com>,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net v3] net/smc: fix out-of-bounds read when sk_user_data holds a sk_psock
-Date: Mon, 29 Jun 2026 09:51:33 +0000
-Message-ID: <20260629095140.679754-1-rhkrqnwk98@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1782726803; x=1783331603;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zwymUYCwEopcwvNdbgWdE3V4iVchDza5/5toUHvwG2c=;
+        b=LDGdDbeszmVKLEhv//vBpvLDS/Ck1QqeYX5mEK7pE70b+XNNr+98zrD0piPh3vrUd8
+         /wQ/4r8NMZXl9lncl6AAjgRw+i7qykZAT1Xh+GRiNJye6IEjnCGR2oMCDEzdAsM6O9ww
+         wymCa8rWnuEuatqEpDLSZDjKvbFxAb8VM1zKNO9GF3w0k9ogCjSIW9qmulVvW6Z7rpjj
+         iTCj0Oa3//ElEJKa7LQLBSYsCU8hNYwYFlLjgQ0gJP1jdRfRmlxkcf6XRW76DXom7Yer
+         2ctp0EP4QpK3WWKVf8EpxCHGS8xesVMSIxyQ6usctcCMsgJdRTYcGlqsJDRFepU4dKxZ
+         PSrw==
+X-Forwarded-Encrypted: i=1; AFNElJ/0gyvnqdRJs6oaNoAOaGabxDWpMXHJYa5EDs8F6vNoOktWc8FQHlLO0dhZMYUT7UNpdqQdDAA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCj9yBt72+z6XjMLNgFgTPnL36oXuycAmmnaF0mY5uK/vqMzRf
+	GpID360LXsfEqbGPr6GkBWnsr2mp1HugqsRULjIEpEirSyCCXjKIsyiL0lKONNcSvuQMfVLmdJa
+	DYwqIaGJ0W7vzHn+2FSPA74FOvlr1wdO47Q6O7fquAj5pF+jpKNRsviiE+F8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:ec2:b0:491:3ade:8b9e with SMTP id
+ 5614622812f47-4921801d78fmr13471084b6e.36.1782726803455; Mon, 29 Jun 2026
+ 02:53:23 -0700 (PDT)
+Date: Mon, 29 Jun 2026 02:53:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a424093.34acba0d.134e3f.00b1.GAE@google.com>
+Subject: [syzbot] [wpan?] general protection fault in ieee802154_release_queue
+From: syzbot <syzbot+36256deb69a588e9290e@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=9a9f723a32776544];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-302553-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jiayuan.chen@linux.dev,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:guvenc@linux.ibm.com,m:ubraun@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-302554-lists,netdev=lfdr.de,36256deb69a588e9290e];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,appspotmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,goo.gl:url,googlegroups.com:email,storage.googleapis.com:url,syzkaller.appspot.com:url,syzkaller.appspotmail.com:from_mime];
+	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-wpan@vger.kernel.org,m:miquel.raynal@bootlin.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:stefan@datenfreihafen.org,m:syzkaller-bugs@googlegroups.com,m:alexaring@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,bootlin.com,redhat.com,datenfreihafen.org,googlegroups.com];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B0606D88EE
+X-Rspamd-Queue-Id: A23E96D89B9
 
-A passive-open child inherits the listener's smc_clcsock_data_ready().
-sk_clone_lock() clears its sk_user_data to NULL because the listener tagged
-it SK_USER_DATA_NOCOPY. Until accept restores the callback, a BPF sock_ops
-program can add the established child to a sockmap, and sk_psock_init()
-installs a sk_psock into the NULL sk_user_data. The inherited callback then
-reads it back through smc_clcsock_user_data(), which strips only NOCOPY,
-takes the sk_psock for an smc_sock, and dereferences a clcsk_* field past
-its end:
+Hello,
 
-  BUG: KASAN: slab-out-of-bounds in smc_clcsock_data_ready+0x84/0x200 net/smc/af_smc.c:2637
-  Read of size 8 at addr ffff8880013b8674 by task syz.6.12484/67930
-   <IRQ>
-   smc_clcsock_data_ready+0x84/0x200 net/smc/af_smc.c:2637
-   tcp_urg+0x24d/0x360 net/ipv4/tcp_input.c:6264
-   tcp_rcv_state_process+0x280d/0x4940 net/ipv4/tcp_input.c:7336
-   tcp_child_process+0x371/0xa50 net/ipv4/tcp_minisocks.c:1002
-   tcp_v4_rcv+0x1eaa/0x2a00 net/ipv4/tcp_ipv4.c:2186
-   [...]
-   </IRQ>
+syzbot found the following issue on:
 
-  Allocated by task 67930:
-   sk_psock_init+0x142/0x740 net/core/skmsg.c:766
-   sock_hash_update_common+0xd3/0x990 net/core/sock_map.c:1010
-   bpf_sock_hash_update+0x114/0x170 net/core/sock_map.c:1229
-   __cgroup_bpf_run_filter_sock_ops+0x74/0xa0 kernel/bpf/cgroup.c:1727
-   tcp_init_transfer+0x1085/0x1100 net/ipv4/tcp_input.c:6693
-   [...]
+HEAD commit:    b85966adbf5d Merge tag 'net-next-7.2' of git://git.kernel...
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17ac7046580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9a9f723a32776544
+dashboard link: https://syzkaller.appspot.com/bug?extid=36256deb69a588e9290e
+compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
 
-Resolve the conflict on the write path. Reserve the child's sk_user_data
-with a NULL pointer tagged SK_USER_DATA_NOCOPY so sk_psock_init() returns
--EBUSY, and release it at accept. smc_clcsock_user_data() still strips the
-tag to NULL, so the inherited callback stays a no-op.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Fixes: a60a2b1e0af1 ("net/smc: reduce active tcp_listen workers")
-Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d65306d96573/disk-b85966ad.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ef43139aab0e/vmlinux-b85966ad.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/26d4d1ab67c3/bzImage-b85966ad.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+36256deb69a588e9290e@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xfbd59c0000000043: 0000 [#1] SMP KASAN PTI
+KASAN: maybe wild-memory-access in range [0xdead000000000218-0xdead00000000021f]
+CPU: 1 UID: 0 PID: 15064 Comm: syz.4.2289 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+RIP: 0010:ieee802154_wake_queue net/mac802154/util.c:34 [inline]
+RIP: 0010:ieee802154_release_queue+0x1b0/0x380 net/mac802154/util.c:83
+Code: 42 80 3c 30 00 74 08 4c 89 e7 e8 8b f4 d0 f6 4d 8b 2c 24 4d 39 e5 0f 84 d6 00 00 00 4d 8d bd 18 01 00 00 4c 89 f8 48 c1 e8 03 <42> 80 3c 30 00 74 08 4c 89 ff e8 61 f4 d0 f6 49 8b 2f 48 85 ed 74
+RSP: 0018:ffffc90005f3f0d0 EFLAGS: 00010802
+RAX: 1bd5a00000000043 RBX: ffff88802a41a760 RCX: 0000000000080000
+RDX: ffffc90007f8c000 RSI: 000000000001e208 RDI: 000000000001e209
+RBP: ffff88802a43c018 R08: ffffffff903116f7 R09: 1ffffffff20622de
+R10: dffffc0000000000 R11: fffffbfff20622df R12: ffff88802a41a770
+R13: dead000000000100 R14: dffffc0000000000 R15: dead000000000218
+FS:  00007f6a783b06c0(0000) GS:ffff88812537c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8924187cc0 CR3: 00000000a6c7a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ieee802154_xmit_complete+0x11d/0x290 net/mac802154/util.c:140
+ hwsim_hw_xmit+0x1571/0x1620 drivers/net/ieee802154/mac802154_hwsim.c:288
+ drv_xmit_async net/mac802154/driver-ops.h:16 [inline]
+ ieee802154_tx+0x26d/0x510 net/mac802154/tx.c:89
+ ieee802154_hot_tx net/mac802154/tx.c:207 [inline]
+ ieee802154_subif_start_xmit+0x110/0x190 net/mac802154/tx.c:239
+ __netdev_start_xmit include/linux/netdevice.h:5387 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5396 [inline]
+ xmit_one net/core/dev.c:3889 [inline]
+ dev_hard_start_xmit+0x2cd/0x830 net/core/dev.c:3905
+ sch_direct_xmit+0x257/0x4c0 net/sched/sch_generic.c:372
+ __dev_xmit_skb net/core/dev.c:4211 [inline]
+ __dev_queue_xmit+0x1754/0x37f0 net/core/dev.c:4833
+ dev_queue_xmit include/linux/netdevice.h:3436 [inline]
+ dgram_sendmsg+0x709/0xe30 net/ieee802154/socket.c:689
+ sock_sendmsg_nosec net/socket.c:775 [inline]
+ __sock_sendmsg net/socket.c:790 [inline]
+ ____sys_sendmsg+0x9b9/0xa20 net/socket.c:2684
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+ __sys_sendmmsg+0x273/0x4d0 net/socket.c:2827
+ __do_sys_sendmmsg net/socket.c:2854 [inline]
+ __se_sys_sendmmsg net/socket.c:2851 [inline]
+ __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2851
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6a7759ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6a783b0028 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f6a77815fa0 RCX: 00007f6a7759ce59
+RDX: 0000000004000050 RSI: 00002000000196c0 RDI: 000000000000000d
+RBP: 00007f6a77632e6f R08: 0000000000000000 R09: 0000000000000000
+R10: 000000000400c010 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6a77816038 R14: 00007f6a77815fa0 R15: 00007ffe3e47cbf8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:ieee802154_wake_queue net/mac802154/util.c:34 [inline]
+RIP: 0010:ieee802154_release_queue+0x1b0/0x380 net/mac802154/util.c:83
+Code: 42 80 3c 30 00 74 08 4c 89 e7 e8 8b f4 d0 f6 4d 8b 2c 24 4d 39 e5 0f 84 d6 00 00 00 4d 8d bd 18 01 00 00 4c 89 f8 48 c1 e8 03 <42> 80 3c 30 00 74 08 4c 89 ff e8 61 f4 d0 f6 49 8b 2f 48 85 ed 74
+RSP: 0018:ffffc90005f3f0d0 EFLAGS: 00010802
+RAX: 1bd5a00000000043 RBX: ffff88802a41a760 RCX: 0000000000080000
+RDX: ffffc90007f8c000 RSI: 000000000001e208 RDI: 000000000001e209
+RBP: ffff88802a43c018 R08: ffffffff903116f7 R09: 1ffffffff20622de
+R10: dffffc0000000000 R11: fffffbfff20622df R12: ffff88802a41a770
+R13: dead000000000100 R14: dffffc0000000000 R15: dead000000000218
+FS:  00007f6a783b06c0(0000) GS:ffff88812537c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8924187cc0 CR3: 00000000a6c7a000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1)
+   5:	74 08                	je     0xf
+   7:	4c 89 e7             	mov    %r12,%rdi
+   a:	e8 8b f4 d0 f6       	call   0xf6d0f49a
+   f:	4d 8b 2c 24          	mov    (%r12),%r13
+  13:	4d 39 e5             	cmp    %r12,%r13
+  16:	0f 84 d6 00 00 00    	je     0xf2
+  1c:	4d 8d bd 18 01 00 00 	lea    0x118(%r13),%r15
+  23:	4c 89 f8             	mov    %r15,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	4c 89 ff             	mov    %r15,%rdi
+  34:	e8 61 f4 d0 f6       	call   0xf6d0f49a
+  39:	49 8b 2f             	mov    (%r15),%rbp
+  3c:	48 85 ed             	test   %rbp,%rbp
+  3f:	74                   	.byte 0x74
+
+
 ---
-v3:
- - reserve sk_user_data on the write path instead of the read-side check (D. Wythe)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-v2:
- - https://lore.kernel.org/netdev/20260619150342.3626224-1-rhkrqnwk98@gmail.com/
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-v1:
- - https://lore.kernel.org/netdev/20260614120931.4041687-1-rhkrqnwk98@gmail.com/
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
- net/smc/af_smc.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index b5db69073e20..78f162344fe3 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -154,7 +154,11 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
- 					       own_req, opt_child_init);
- 	/* child must not inherit smc or its ops */
- 	if (child) {
--		rcu_assign_sk_user_data(child, NULL);
-+		/* reserve sk_user_data so sockmap cannot claim the slot */
-+		write_lock_bh(&child->sk_callback_lock);
-+		__rcu_assign_sk_user_data_with_flags(child, NULL,
-+						     SK_USER_DATA_NOCOPY);
-+		write_unlock_bh(&child->sk_callback_lock);
- 
- 		/* v4-mapped sockets don't inherit parent ops. Don't restore. */
- 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
-@@ -1773,6 +1777,7 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
- 	/* new clcsock has inherited the smc listen-specific sk_data_ready
- 	 * function; switch it back to the original sk_data_ready function
- 	 */
-+	write_lock_bh(&new_clcsock->sk->sk_callback_lock);
- 	new_clcsock->sk->sk_data_ready = lsmc->clcsk_data_ready;
- 
- 	/* if new clcsock has also inherited the fallback-specific callback
-@@ -1786,6 +1791,9 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
- 		if (lsmc->clcsk_error_report)
- 			new_clcsock->sk->sk_error_report = lsmc->clcsk_error_report;
- 	}
-+	/* release the slot reserved in smc_tcp_syn_recv_sock() */
-+	rcu_assign_sk_user_data(new_clcsock->sk, NULL);
-+	write_unlock_bh(&new_clcsock->sk->sk_callback_lock);
- 
- 	(*new_smc)->clcsock = new_clcsock;
- out:
--- 
-2.43.0
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
 
