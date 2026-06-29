@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-302818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ow93FBTLQmqCCQoAu9opvQ
-	(envelope-from <netdev+bounces-302818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:44:20 +0200
+	id 505pBbLKQmo8CQoAu9opvQ
+	(envelope-from <netdev+bounces-302816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:42:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A41276DE7AE
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:44:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E2D6DE780
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 21:42:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=xs4all.nl header.s=xs4all01 header.b=pZe7J1tu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302818-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302818-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=xs4all.nl header.s=xs4all01 header.b=WZ273hGX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302816-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302816-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=xs4all.nl;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4551A30557ED
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:42:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E09913039892
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 19:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E193C1413;
-	Mon, 29 Jun 2026 19:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7D43C10A7;
+	Mon, 29 Jun 2026 19:42:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.184])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128AE3A872E
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 19:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA633B42E9
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 19:42:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782762154; cv=none; b=rFuNNJ326rLYK9BWPSmvTazz0I/4s1PEDy2cj+1yNt6jDIumER0V8STxdzgXnmD7XxunncrfLh+35voKq86DOZeJbz4mVv1v+lwqQLbB2a+HhcPefuphADe15szZ/jh9xlbR5X+nkY47Hjg/D6s/nYhIkL422oJ1cu03fQ3m2XA=
+	t=1782762153; cv=none; b=YzK1LUaYVV9SacFqEZBLhmGiFtuZlsxE+1y7VZ7I5iX/22yosgzVO0ge+yieGqIL+4tjgRp53ZAxd26OkHwnhzBO3srpTX/2k1I6u8ZS0NadMZfB3ynKQT+4sQ2i3YjF4WzE+Kw+Wp6vmSx7enwKqYfrX9TchXNFTz1SkFWviQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782762154; c=relaxed/simple;
-	bh=Yb297ECq9ujErcZveMYJ/c8Xk1cehofejNyUSx2K2dE=;
+	s=arc-20240116; t=1782762153; c=relaxed/simple;
+	bh=iQfIYpwKRdMJy1a/rEWr97wL5aBe1iET1JEYChP+I3I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bVLc9KzMuPxl7MHxz1Z2Q3tXfeQ5HLGVbi5zlwoIo/nYNEra0Ggs1wsMC5q5JDD/ne4SysHBzItUWDu6j4B6SyNt5jSoN9U8WYOy/S6To4MTs2LOj3ULJvWdES+/s0gOxThch/uKmlFI6FWZ0aj+Wt2lAAHJFTt3Pi557lFj090=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=pZe7J1tu; arc=none smtp.client-ip=195.121.94.184
-X-KPN-MessageId: a9ef72ff-73f2-11f1-a59f-005056994fde
+	 MIME-Version; b=i5yh8mJoExAIlWqO+pu7Z++mPUiA3Q/FNxxXSsk8ECyeb7pyW+BRO0NnjHPh3gIe2HqK2b3z+IG0VNPIwrZBwpWfh8BOaMzSingp47KnbmYdl5kjrKgXG6B4VHwYp1ggnRbyCvuHjVmkW8dYdqIp0BZqL1ZV4+j7gsuvBFN5Cds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=WZ273hGX; arc=none smtp.client-ip=195.121.94.186
+X-KPN-MessageId: aa60ef0f-73f2-11f1-bfba-00505699b430
 Received: from smtp.kpnmail.nl (unknown [10.31.155.7])
 	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id a9ef72ff-73f2-11f1-a59f-005056994fde;
-	Mon, 29 Jun 2026 21:42:29 +0200 (CEST)
+	id aa60ef0f-73f2-11f1-bfba-00505699b430;
+	Mon, 29 Jun 2026 21:42:30 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=xs4all.nl; s=xs4all01;
 	h=mime-version:message-id:date:subject:to:from;
-	bh=NlllJMej/M9JD4iLBjP7yjBgEn8/DtVneQJiI50FhXk=;
-	b=pZe7J1tuyfikPKsKSdhVlJLDRWOZlV/X5O7dGUl44Jk+3e0d6d0upJ9su0bQkRheA2aG0hW2hmtvY
-	 jna1mzQ5JgiQqhN0f1dMckzQtQkx5uHNCvNsKsvhTdoT1Ck+W5Fcx2FLMYVD7yXA/3ba4g5F3olUGG
-	 XA0R1m1E7CPiVhTPvqNYOv5sQnumeHC6nPpAFqE8zdypyYX8POmcspaq0worY1Bp6StHD+hT/CAfcL
-	 XcJaL9M0CPBSrNgLacDEmbe25rRtWSEs8vGMMGih/Aob6xBWxt1Z7v+MAq0x4TzBwbpRYMu2/hRgvT
-	 KAu60aKEP+SwzLGKL13ur5/JcHnGPHQ==
-X-KPN-MID: 33|WNIPsB6Le/jLdCCOCfWspZGz/ZIqheenzbbeUWe5Kcpy7fq3KHZ85ldtlEg62J7
- PkgmWU6Vl+nkksbnChsDtdDJC494G7vtPmuWVOBqKWOQ=
+	bh=hku7+dnRaiVh1NM/qXbJI8Zf9gVv0HH2UBe/fZ82O0k=;
+	b=WZ273hGXp03+FKSSyaQAaMEdUswtfTn2b0EzukA7/l9AZDqXW2sLy+cKfMj1cVp+p82YB6tjYO9FZ
+	 bLTRQA2A50Uw43YCNGsH+4aVEpF/66SbA2U4JDOX0PJ+ANIhR/mPh7UjjomDMuhP6SCX2P+K62sWU4
+	 zDZc/rWaLVFPBWfToxcnjCJMQXdeXot6pormsUqlG9ew2sjnR9u4VEUtF/FeuLaizm5TzCZfnPt8Tj
+	 /Qy3ApxXzARDNIbmsA0Zu/kp5xQ+BKqCUyhU+WIuU8vl73KjcROTffOOjPpX2g1OAWvRQwmwMGuOc5
+	 eK7Xz+A37X088jNJ3VXKLaGDUSGdqkw==
+X-KPN-MID: 33|0C3WjuoC7fcDt4DX3tFEUDiET9bw8m0mRysKIUfg5clLNUEXDmOHmgbY1TS+W6v
+ dbn2uNFl7g3/TFs/KsQIjuS51+5MwTX8MmE6fM9bxD9E=
 X-KPN-VerifiedSender: Yes
-X-CMASSUN: 33|Ty5MopHgJvtKagMH31kx6cXCl8YkognnmX+Xk+kCcikoYjqRp3nmd14qKyTaZS4
- ewEsOPsO2Z7NohC2aQpUCUg==
+X-CMASSUN: 33|eJfPE4vLd3Z3OFLlEEN9Uxms50YEzpzckxJS0ScKqlv4r9VZ/zMCIJi6pOYKsX9
+ acUZdQw+ND8ZKG77RbVrDPg==
 Received: from daedalus.home (unknown [178.231.11.185])
 	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id a9a15b9e-73f2-11f1-8076-005056998788;
-	Mon, 29 Jun 2026 21:42:29 +0200 (CEST)
+	id aa1ff099-73f2-11f1-8076-005056998788;
+	Mon, 29 Jun 2026 21:42:30 +0200 (CEST)
 From: Jori Koolstra <jkoolstra@xs4all.nl>
 To: Christian Brauner <brauner@kernel.org>,
 	Aleksa Sarai <cyphar@cyphar.com>,
@@ -70,9 +70,9 @@ Cc: netdev@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jori Koolstra <jkoolstra@xs4all.nl>
-Subject: [PATCH net-next v3 1/5] net: scm: move scm_detach_fds() from common path to scm_recv_unix()
-Date: Mon, 29 Jun 2026 21:43:23 +0200
-Message-ID: <20260629194327.2270798-2-jkoolstra@xs4all.nl>
+Subject: [PATCH net-next v3 2/5] vfs: add function receive_fd_filtered() that makes LSM filtering explicit
+Date: Mon, 29 Jun 2026 21:43:24 +0200
+Message-ID: <20260629194327.2270798-3-jkoolstra@xs4all.nl>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260629194327.2270798-1-jkoolstra@xs4all.nl>
 References: <20260629194327.2270798-1-jkoolstra@xs4all.nl>
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,xs4all.nl];
 	FREEMAIL_FROM(0.00)[xs4all.nl];
-	TAGGED_FROM(0.00)[bounces-302818-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302816-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:brauner@kernel.org,m:cyphar@cyphar.com,m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jkoolstra@xs4all.nl,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -117,42 +117,110 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,xs4all.nl:dkim,xs4all.nl:email,xs4all.nl:mid,xs4all.nl:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[xs4all.nl:dkim,xs4all.nl:email,xs4all.nl:mid,xs4all.nl:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A41276DE7AE
+X-Rspamd-Queue-Id: 90E2D6DE780
 
-scm->fp can only be set when using UNIX sockets, therefore we should
-move it out of the common path __scm_recv_common() into
-scm_recv_unix().
+To prepare for filtering LSM blocked fds received with SCM_RIGHTS, we
+first need to know when a received fd was filtered. Currently,
+receive_fd() relays the error returned by security_file_receive(). As
+there is no strict convention about what errnos this LSM hook can
+return, the caller of receive_fd() has no robust way of knowing whether
+an error is returned because the LSM blocked the fd, or because of some
+other failure (put_user, FD_PREPARE, etc.)
+
+Fix this by adding receive_fd_filtered() which carries an out-argument
+that is set only on LSM error.
 
 Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
 ---
- net/core/scm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/file.c            | 48 +++++++++++++++++++++++++++++---------------
+ include/linux/file.h |  2 ++
+ 2 files changed, 34 insertions(+), 16 deletions(-)
 
-diff --git a/net/core/scm.c b/net/core/scm.c
-index eec13f50ecaf..a73b1eb30fd2 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -523,9 +523,6 @@ static bool __scm_recv_common(struct sock *sk, struct msghdr *msg,
- 
- 	scm_passec(sk, msg, scm);
- 
--	if (scm->fp)
--		scm_detach_fds(msg, scm);
--
- 	return true;
+diff --git a/fs/file.c b/fs/file.c
+index 628ca07dc4b1..2bc22cc69e84 100644
+--- a/fs/file.c
++++ b/fs/file.c
+@@ -1367,6 +1367,25 @@ int replace_fd(unsigned fd, struct file *file, unsigned flags)
+ 	return err;
  }
  
-@@ -545,6 +542,9 @@ void scm_recv_unix(struct socket *sock, struct msghdr *msg,
- 	if (!__scm_recv_common(sock->sk, msg, scm, flags))
- 		return;
- 
-+	if (scm->fp)
-+		scm_detach_fds(msg, scm);
++static int __receive_fd(struct file *file, int __user *ufd, unsigned int o_flags)
++{
++	int error;
 +
- 	if (sock->sk->sk_scm_pidfd)
- 		scm_pidfd_recv(msg, scm);
++	FD_PREPARE(fdf, o_flags, file);
++	if (fdf.err)
++		return fdf.err;
++	get_file(file);
++
++	if (ufd) {
++		error = put_user(fd_prepare_fd(fdf), ufd);
++		if (error)
++			return error;
++	}
++
++	__receive_sock(fd_prepare_file(fdf));
++	return fd_publish(fdf);
++}
++
+ /**
+  * receive_fd() - Install received file into file descriptor table
+  * @file: struct file that was received from another process
+@@ -1384,27 +1403,24 @@ int replace_fd(unsigned fd, struct file *file, unsigned flags)
+  */
+ int receive_fd(struct file *file, int __user *ufd, unsigned int o_flags)
+ {
+-	int error;
+-
+-	error = security_file_receive(file);
++	int error = security_file_receive(file);
+ 	if (error)
+ 		return error;
++	return __receive_fd(file, ufd, o_flags);
++}
++EXPORT_SYMBOL_GPL(receive_fd);
+ 
+-	FD_PREPARE(fdf, o_flags, file);
+-	if (fdf.err)
+-		return fdf.err;
+-	get_file(file);
+-
+-	if (ufd) {
+-		error = put_user(fd_prepare_fd(fdf), ufd);
+-		if (error)
+-			return error;
++int receive_fd_filtered(struct file *file, int __user *ufd, unsigned int o_flags,
++		bool *filtered)
++{
++	int error = security_file_receive(file);
++	if (error) {
++		*filtered = true;
++		return error;
+ 	}
+-
+-	__receive_sock(fd_prepare_file(fdf));
+-	return fd_publish(fdf);
++	*filtered = false;
++	return __receive_fd(file, ufd, o_flags);
+ }
+-EXPORT_SYMBOL_GPL(receive_fd);
+ 
+ int receive_fd_replace(int new_fd, struct file *file, unsigned int o_flags)
+ {
+diff --git a/include/linux/file.h b/include/linux/file.h
+index 27484b444d31..748f08470bb4 100644
+--- a/include/linux/file.h
++++ b/include/linux/file.h
+@@ -119,6 +119,8 @@ DEFINE_FREE(fput, struct file *, if (!IS_ERR_OR_NULL(_T)) fput(_T))
+ extern void fd_install(unsigned int fd, struct file *file);
+ 
+ int receive_fd(struct file *file, int __user *ufd, unsigned int o_flags);
++int receive_fd_filtered(struct file *file, int __user *ufd, unsigned int o_flags,
++		bool *filtered);
+ 
+ int receive_fd_replace(int new_fd, struct file *file, unsigned int o_flags);
  
 -- 
 2.54.0
