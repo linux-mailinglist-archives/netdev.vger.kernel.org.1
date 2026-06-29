@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-302639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /ER6AD5xQmpx7QkAu9opvQ
-	(envelope-from <netdev+bounces-302639-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:21:02 +0200
+	id P+PIG1xxQmp97QkAu9opvQ
+	(envelope-from <netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:21:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796B36DB19D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:21:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3A046DB1CA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 15:21:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=npc-ksb.ru (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302639-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302639-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302640-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4584630A7E6D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:12:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C1E83154CBA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 13:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA1F405844;
-	Mon, 29 Jun 2026 13:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D294405C4E;
+	Mon, 29 Jun 2026 13:09:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.ksb-soft.ru (mail.ksb-soft.ru [5.167.76.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9517D3FD946;
-	Mon, 29 Jun 2026 13:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCD21A0BF3;
+	Mon, 29 Jun 2026 13:09:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782738540; cv=none; b=gNdpFzTsrkjckvyo2ZUqc8lrpmfh4Q3F1p6XANgNox9p9AlsaGYtnGzAxyhEK+7Cfo8K3Pbz50eBk7LYzPWzDsQ/SD0lI8uKlFQsz47zmsK+YEpdElxl60B5wP7/kHa0wsuxWoBfiJS8rDuES1us5T7LiGb9hxu0zsS04aq/csA=
+	t=1782738587; cv=none; b=VdWocNogPMVBfHlGLQLrniM0REmGQwEJ3FoVlcF5DBZ/v/Hcre0wyKy3BQaaYFn8QpMk/4GFExiHg6IPm+mqMJ/3IcZPE9dcIVSG3GUiQB1WQT1KcLJqyyXbGw0+o5yfdH6fPmDEb/ZXUjnZsIzadPpfh650fbcoiYCSQiSXW9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782738540; c=relaxed/simple;
-	bh=7zxT35iZfYUloVfdIN1A2Tchq2YZbtpf3iKeNzj5wWM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UZDfj1QlbwW1qJt9TJ+Ke274N/5U1NBBAfVXpHf3bI18pNPTdei0YvrXNFdEveqvTP3TKUiCaODFrh850sw1V+g22a+lo3mOxaceeD1HIgDGH44opOUFpSKwdoWF/6L7f0S/iPWI71XHv65NS2VLNa1994EpXkWNeENuyN3BXkc=
+	s=arc-20240116; t=1782738587; c=relaxed/simple;
+	bh=3NOBeloPaW0UydJy1E6tJcn6s2vDMmmsShE4mwuUqCg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DoZOgGJ3aIt3tmtZQiiLXaM3gJUhTa+BCME7EflTn4QCrBs5iSfJqhabgNOLej7tm+VOsawWQV+Zk+PN8xyGVO+XLQjXQmiizQgvtSHtAgs3bUiPrDbphisvRpKYTk2AjuahwdRwUpOOhQvl5RXru31fEMjg8wpl5oYPw6PcvIU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=npc-ksb.ru; spf=pass smtp.mailfrom=npc-ksb.ru; arc=none smtp.client-ip=5.167.76.63
 Received: from ksb-289.ksb.ksb-soft.ru (unknown [10.38.22.14])
-	by mail.ksb-soft.ru (Postfix) with ESMTPA id 4gpmnP35PQz4LJWR;
-	Mon, 29 Jun 2026 16:08:57 +0300 (MSK)
+	by mail.ksb-soft.ru (Postfix) with ESMTPA id 4gpmpH5FvHz4LKBF;
+	Mon, 29 Jun 2026 16:09:43 +0300 (MSK)
 From: Markov Gleb <markov.gi@npc-ksb.ru>
-To: Potnuri Bharat Teja <bharat@chelsio.com>
+To: Jon Maloy <jmaloy@redhat.com>
 Cc: Gleb Markov <markov.gi@npc-ksb.ru>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org (open list),
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
 	lvc-project@linuxtesting.org
-Subject: [PATCH net] cxgb4: Fix decode strings dump for T6 adapters
-Date: Mon, 29 Jun 2026 16:08:54 +0300
-Message-ID: <20260629130856.1168-1-markov.gi@npc-ksb.ru>
+Subject: [PATCH net] tipc: make sure bc_rcvlink is not dereferenced with NULL value
+Date: Mon, 29 Jun 2026 16:09:40 +0300
+Message-ID: <20260629130942.469-1-markov.gi@npc-ksb.ru>
 X-Mailer: git-send-email 2.52.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,83 +76,83 @@ X-KLMS-LinksScanning: Clean
 X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 10.0.0.7427, bases: 2025/10/29 20:57:00 #27800623
 X-KLMS-AntiVirus-Status: Clean, skipped
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[npc-ksb.ru : SPF not aligned (relaxed), No valid DKIM,none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302639-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bharat@chelsio.com,m:markov.gi@npc-ksb.ru,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:markov.gi@npc-ksb.ru,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER(0.00)[markov.gi@npc-ksb.ru,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-302640-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[markov.gi@npc-ksb.ru,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[markov.gi@npc-ksb.ru,netdev@vger.kernel.org];
 	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,npc-ksb.ru:email,npc-ksb.ru:mid,npc-ksb.ru:from_mime,linuxtesting.org:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,npc-ksb.ru:email,npc-ksb.ru:mid,npc-ksb.ru:from_mime,linuxtesting.org:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 796B36DB19D
+X-Rspamd-Queue-Id: A3A046DB1CA
 
 From: Gleb Markov <markov.gi@npc-ksb.ru>
 
-Depending on the value of chip_version, the correct decode set is selected.
-However, the subsequent matching with the t4 encoding type in the if-else
-block results in a reassignment, which leads to the loss of support for
-t6_decode as well as reinitializing of values t4_decode and t5_decode.
+The direct dependence of the tipc_link_is_up() value on l->bc_rcvlink is
+not explicitly specified.
 
-The component history shows that the if-else block previously used for
-this purpose, as well as the execution order, was not affected by the
-change.
-Furthermore, it is suggested by the execution order that the scenario with
-overwriting and loss of support will be implemented.
+If link is up, it is assumed that the sender and receiver have valid
+values (communication with the receiver is required for timeout
+synchronization), which is not guaranteed in this code segment.
 
-Delete the if-else block.
+Turning independent conditions into nested conditions ensures that NULL
+cannot be dereferenced at tipc_link_build_proto_msg() and allows for the
+logical structure to be fixed at the functional interaction level.
+
+Make tipc_link_build_proto_msg() call only if l->bc_rcvlink is not NULL.
 
 Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Fixes: 6df397539cb0 ("cxgb4: Update correct encoding of SGE Ingress DMA States for T6 adapter")
+Fixes: 047491ea334a ("tipc: set link tolerance correctly in broadcast link")
 Signed-off-by: Gleb Markov <markov.gi@npc-ksb.ru>
 ---
- drivers/net/ethernet/chelsio/cxgb4/t4_hw.c | 8 --------
- 1 file changed, 8 deletions(-)
+ net/tipc/link.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-index 8d719f82854a..f3e8153a7a0b 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-@@ -6735,14 +6735,6 @@ void t4_sge_decode_idma_state(struct adapter *adapter, int state)
- 		return;
- 	}
+diff --git a/net/tipc/link.c b/net/tipc/link.c
+index 49dfc098d89b..b0a640c419c8 100644
+--- a/net/tipc/link.c
++++ b/net/tipc/link.c
+@@ -2863,10 +2863,12 @@ void tipc_link_set_tolerance(struct tipc_link *l, u32 tol,
+ 			     struct sk_buff_head *xmitq)
+ {
+ 	l->tolerance = tol;
+-	if (l->bc_rcvlink)
++	if (l->bc_rcvlink) {
+ 		l->bc_rcvlink->tolerance = tol;
+-	if (tipc_link_is_up(l))
+-		tipc_link_build_proto_msg(l, STATE_MSG, 0, 0, 0, tol, 0, xmitq);
++		if (tipc_link_is_up(l))
++			tipc_link_build_proto_msg(l, STATE_MSG,
++						  0, 0, 0, tol, 0, xmitq);
++	}
+ }
  
--	if (is_t4(adapter->params.chip)) {
--		sge_idma_decode = (const char **)t4_decode;
--		sge_idma_decode_nstates = ARRAY_SIZE(t4_decode);
--	} else {
--		sge_idma_decode = (const char **)t5_decode;
--		sge_idma_decode_nstates = ARRAY_SIZE(t5_decode);
--	}
--
- 	if (state < sge_idma_decode_nstates)
- 		CH_WARN(adapter, "idma state %s\n", sge_idma_decode[state]);
- 	else
+ void tipc_link_set_prio(struct tipc_link *l, u32 prio,
 -- 
 2.43.0
 
