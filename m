@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-302609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oCtCCm5rQmoI6wkAu9opvQ
-	(envelope-from <netdev+bounces-302609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:56:14 +0200
+	id i8DYOHNrQmoN6wkAu9opvQ
+	(envelope-from <netdev+bounces-302610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:56:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769F76DA9AF
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:56:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 415796DA9BE
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 14:56:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=qP82+Ly+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302609-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302609-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=RgE5djvf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302610-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36207324D47E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:36:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DE3132500FF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jun 2026 12:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398E340628A;
-	Mon, 29 Jun 2026 12:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684E640314E;
+	Mon, 29 Jun 2026 12:33:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13AA43FF8A4
-	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 12:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D769640682F
+	for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 12:33:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782736414; cv=none; b=L9cGRWUx3UMefXkamnnzlQn0BenlwMDCxwcw3BzxNBwtPPCHeBP1pxCdIRhW8eLg2QYrP0+T23RU552UKwT+Iq1XWO2ZuHueB+z45t5DAr4G/2e0tYJSQtZmdswPKPvB992spYqzW6OfQWKgsWN3Prb+3kZCMI5ZnXTTjLU/AUc=
+	t=1782736417; cv=none; b=VoB295+xRX+IR3A/fXd2rSsUSk77vNWRz2pwslwUYsNC7PJXM2SGOWH4bn2m/nIIvXltvz53DmN8GN+t23yy0QuINykccw0ueTaFEqvZ3GN5DmZd65tapOeC6cz8jY5YKxmS+iHGzyWpUbtzbPTj90Wx6ukWQN/MTYSqVU4ylAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782736414; c=relaxed/simple;
-	bh=to4R4ee8k2o5804/vpzYrLJhMjVE1Ml1XXys9wSRdes=;
+	s=arc-20240116; t=1782736417; c=relaxed/simple;
+	bh=FLmf68CizDgbkWkilfIYmqlhpJjGjSd3CzUEP2obw5s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gZn+4fKa1JCFI65cR68gOq6i8xKmOu5NDYWjQB/uUpp96j8/E21gZxIrqu1QCWV5LjPz+QEUqhxBekOPsIMSLJC8401Bcoi1qvr/eLTrzHtbRctYBWleY1KTodpnIbA4COZV47fVzDzNrdhEewbMgiehZYy3h7WZb0IKp2RnGNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qP82+Ly+; arc=none smtp.client-ip=209.85.218.48
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c126e47a82cso95924566b.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 05:33:31 -0700 (PDT)
+	 MIME-Version; b=IOmtdv6Qf9gHr8YBqDXD9e+NI6cMDRd4JN0s4K0Eq9oZ1NCMnNEpieDmcfFI4bTrz2q4LEMQQixDEO1P/1T8Pd/Lj6DqFo6P5Xdct7dwuIMmsFeqXqTVghjAQD9TBf9bYh1a9sB5XPVdG0sOlGh8R/Kq+b9bkPRTYQXtZEN5JPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RgE5djvf; arc=none smtp.client-ip=209.85.218.49
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c126eb4e228so83504266b.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 05:33:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782736410; x=1783341210; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782736414; x=1783341214; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K3SLRCeShC2U5Lb0rTb1U6hkwISYxR1k50UcKsPQ0QE=;
-        b=qP82+Ly+pTyhNmHfZVdXAkqPPxuYMLaGEYeFWzOyAq29zwQoqp+uKOlbqywHHMqu9a
-         nx0If8obfUutF05+AzCXfgdR3ZBshK5+ljNNRdXccgnQYMCQYJktM/nzHvGgo8ftDZGo
-         G1OUezFh6atAsSgf7e1RqDrYuigwFQ/n8jcMbPPNgOzihyUJvo6QwxhE6rerbga4TZTm
-         0t6+8yEPhxtxaywRKdIhUbxd5suOJqq9i1RaHkdbKGkMrC/4K9/2aweb35O5GutGGOvX
-         bihLa7SiqLIn89jC9eSAFZKTXj3pzjw0vYUZOXLQsTy3mvZ9DmrhrpYgrIeNxRpXUeE2
-         Y1FA==
+        bh=B0BtFT/DLMwlAC+IMAnaYdEaIQ9JUWZrSmMLsMhq+s0=;
+        b=RgE5djvfa2/29IlLg79qmpnBPkFA1sgr2pggoc1WxASGsGcamn6Yq5KrjVBPbnZQQD
+         FCDwa2El+OupzMMb4fvC43ACKNsvkblu0MUN/CTxW2PWZOJVtupJW6u4WCmGWLwZdNpF
+         25bS80YFWSVTnKCPsc45p9Zj12L/tv9k7WxqwESaIvT08Vs1KPF43PPqp6gyKVt1ExHK
+         O8Fv9xE+MTBfIdURRwSMnNsIwNuNI0JO/mDm5KMRPa0W2xmFTOko1vz5HepgTgqACF7A
+         r/HEFGtkDnIHMmTdxc9lteZDq5F9ZuHsOTktVajrCHBi4epFhpWV/p4Zm+qLLgUdqIR3
+         c7nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782736410; x=1783341210;
+        d=1e100.net; s=20251104; t=1782736414; x=1783341214;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=K3SLRCeShC2U5Lb0rTb1U6hkwISYxR1k50UcKsPQ0QE=;
-        b=HLQxLxtNDZE5Y1SHjdmpDtaGu7hhP5VVEjlosqXjfl55z0yRMCFDX5pxpXw6VsyL9g
-         bUpO/wINJQeQ37PRdAqb8UWP9Mk9lKQziuqI/3QnyHsErPHIbp3qFHPcRfVFymUfOg7z
-         uraAdvhL+lTgaNCULDROrZ0qoKSgfZxNHdM0HzOykQKjnqUh+g6C3gFaarsNo8XMLQCd
-         IfXzj0T6u5p+5cUv0wxCbD46QOegE1Rvfz3mW1o2g9cJRuEdOOiTFianeSJXHTRun0jS
-         0UFj607nqGX3cDnMLA8kjh2RQm+k0G/pN5147C7a0l2IleJIaYJcfMtpw0z9TZEN9xsU
-         qtjQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrsQ6tvmZvM6P4i/J1XpbWidxcX/lK08vAskVqNBa7gP9XttJzIYd/Wn53pYxCmFVxqUIucNi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrr5md815IdadDdv8xN/Te9H82rmzPt4VZ7+hI+WGdKmAgRLgS
-	QAUpmm285Yks++eCn8bIRz7RjTfBJleShpHfYc62y2UdQTPLtLL9iSYS
-X-Gm-Gg: AfdE7cl83vR57mYWWYHH3wa0GTAJcxHOYmw/Ke2mEyP+GRrk/R9LMLiEbM3W6Il+gpG
-	O2S0yTxFEfXX+26Ju4HKUgVKtRYYLu+/MRyYwq+YQQroQttTZWpJy9zjFRw++DsWo8rnj2exT0K
-	BeOyepAXTOqTODHkn+sCcBw4bkKrIlrLPCyOlWp9ECePpxCr+K8HhSO5Zhi/Y5d+xukxwB1MR18
-	6RDwODg5nDFFeyKk+8SoWZ58oac7e86jnSZc6AU6sH3PmJTndoq1KEnpwzCD2SlmrI1tj0+6NER
-	63qx17y6EEDvVzpJhKZ0khQADGiNN44opR4KcfLtdyr5zh+WYudsWLgKHRFPBf6lDJ4HHP/1I1a
-	QQDh5lf5V2BNSFD2eYsxX7w+t2ovgI44TAvtg6I/oA9/dUorE2TB8S6KhUhS8uZyv9ZS5oau29Z
-	vVoG4LaJE=
-X-Received: by 2002:a17:906:6a1b:b0:c12:6b39:2211 with SMTP id a640c23a62f3a-c126b392346mr184315266b.43.1782736410170;
-        Mon, 29 Jun 2026 05:33:30 -0700 (PDT)
+        bh=B0BtFT/DLMwlAC+IMAnaYdEaIQ9JUWZrSmMLsMhq+s0=;
+        b=HOiEnu072yqolukdBkaXfATevRmTZkpFGZBdr4fnkuluSA3bpARfxoyykOG7cgiDeP
+         ZM1MGuFaNUwDN6lzi0sV2LJ7tjAhG75Fk3WsgJbWM6CFfdw32n2qf5ap7MkRIpfJbn5w
+         LLugcVTW5il2AlDXVtAbfsjXr5hcKsxvdrfeI2EO4TeA1SB4pw70pzpKqRUrYNl2AnE8
+         0bliPRS91ASRsAD53eHIw9MpyItAEvqYC9qaJ+nfr7vH9qzVLPXUKYWFcIokm/juzG3p
+         poOijP3gfMZc4U0W2x7cU9S+ILOXd4oHWFDAhgAS1t6H3JKeTbv408ipLRiQSsJ7SxAD
+         xXIw==
+X-Forwarded-Encrypted: i=1; AHgh+RoRSmqX2JuVK8KUU7vE9ctdjFVHr7RFNbI5vk4hPG5fEwoDW3IMAzZE/DMpmrNHlZ+z1nnn+O0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwX6fHgf8YO71vUNST0m5AusqZC3Fmyu0SMEYkb24H5KcSC0/x2
+	uh+WTO9ciso2+aO3k9/k81rCV7OQ4PoZFKm3tjC/LJ2R8IMKs+TML5dG
+X-Gm-Gg: AfdE7clWDZpLCrdKcw9mH6yTyNYHAkgofMqiUiEp+qRj6VhUk4G1gkIFIHDImjoBkH2
+	23MCxLZ9iuCJuV6oDMXiVdPCj3mXfEMkF/KEFMUQSJQxIFiT4Y+fdW1kROPLEgaVI6hnKghLUvh
+	6NZVxxUFTYm0Yfqo/Hxgcxa3wDRBd2rZW6F1aHfrTUDui4SkWZPVlBow0zY+Kki/u3r16SxKNsk
+	XovvcJdsxISPZNOWn/VdqYFvcdtKtPSDZHq/FkyzgKWKWIm+pewQBc/pSXiYGHLOy2HVyXJwMQS
+	fJ70VXyvAddHMHdkijeL1dMSdnZ4otCyu4QFTcti2cHMJIhsQrArpBzdhmtXAqOBeLoLOLImkq0
+	I/afqupzZc3jTVaASFfVf93a0YcAC1tnIKIcpfY2VFkAy7FO/t5GtJQltVF+oALjheMGfWoNTZH
+	4NCvC2aDs=
+X-Received: by 2002:a17:906:f58a:b0:c12:34ec:ad25 with SMTP id a640c23a62f3a-c1234ecbf2bmr445790166b.65.1782736414123;
+        Mon, 29 Jun 2026 05:33:34 -0700 (PDT)
 Received: from fedora ([46.205.218.111])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c11fbe05c22sm773866566b.39.2026.06.29.05.33.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c11fbe05c22sm773866566b.39.2026.06.29.05.33.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 05:33:28 -0700 (PDT)
+        Mon, 29 Jun 2026 05:33:32 -0700 (PDT)
 From: Daniel Pawlik <pawlik.dan@gmail.com>
 To: netfilter-devel@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -99,9 +99,9 @@ Cc: pablo@netfilter.org,
 	rchen14b@gmail.com,
 	lorenzo@kernel.org,
 	Daniel Pawlik <pawlik.dan@gmail.com>
-Subject: [PATCH 4/5] netfilter: nf_flow_table_path: handle DEV_PATH_MTK_WDMA in path info
-Date: Mon, 29 Jun 2026 14:32:52 +0200
-Message-ID: <20260629123253.1912621-5-pawlik.dan@gmail.com>
+Subject: [PATCH 5/5] netfilter: nf_flow_table_path: add VLAN passthrough support
+Date: Mon, 29 Jun 2026 14:32:53 +0200
+Message-ID: <20260629123253.1912621-6-pawlik.dan@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260629123253.1912621-1-pawlik.dan@gmail.com>
 References: <20260629123253.1912621-1-pawlik.dan@gmail.com>
@@ -119,13 +119,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-302609-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302610-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:netdev@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:razor@blackwall.org,m:idosch@nvidia.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:bridge@lists.linux.dev,m:coreteam@netfilter.org,m:linux-mediatek@lists.infradead.org,m:linux-arm-kernel@lists.infradead.org,m:rchen14b@gmail.com,m:lorenzo@kernel.org,m:pawlik.dan@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,m:pawlikdan@gmail.com,s:lists@lfdr.de];
@@ -133,7 +133,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_SENDER(0.00)[pawlikdan@gmail.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,blackwall.org,nvidia.com,gmail.com,collabora.com,lists.linux.dev,lists.infradead.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -149,38 +149,84 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 769F76DA9AF
+X-Rspamd-Queue-Id: 415796DA9BE
 
 From: Ryan Chen <rchen14b@gmail.com>
 
-Without this change, nft_dev_path_info() hits the default -ENOENT path
-for WiFi bridge offload via WDMA on MT7996. When a bridged flow goes
-through the MT7996 WiFi device, the DEV_PATH_MTK_WDMA step does not set
-h_source, causing the PPE entry to receive a zero source MAC and packets
-to stall in both software fastpath and hardware path.
+VLAN passthrough packets can be offloaded when bridge-nf-filter-vlan-tagged
+is enabled. When a packet has a VLAN tag and the bridge does not have VLAN
+filtering enabled (passthrough mode), record the VLAN encap info so the
+hardware flow offload entry includes the correct VLAN tag.
 
-Based on a MediaTek SDK patch by Bo-Cun Chen <bc-bocun.chen@mediatek.com>.
+Without this change, VLAN-tagged bridged traffic cannot be offloaded by PPE
+because the VLAN encap information is missing from the flow entry.
+
+Enable with: echo 1 > /proc/sys/net/bridge/bridge-nf-filter-vlan-tagged
+
+Based on a MediaTek SDK patch by Chak-Kei Lam <chak-kei.lam@mediatek.com>.
 Signed-off-by: Ryan Chen <rchen14b@gmail.com>
 Signed-off-by: Daniel Pawlik <pawlik.dan@gmail.com>
 ---
- net/netfilter/nf_flow_table_path.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/netfilter/nf_flow_table_path.c | 32 ++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
-index 6c470854127f..580aa1db3cb4 100644
+index 580aa1db3cb4..d15c425c88c4 100644
 --- a/net/netfilter/nf_flow_table_path.c
 +++ b/net/netfilter/nf_flow_table_path.c
-@@ -219,6 +219,10 @@ static int nft_dev_path_info(const struct net_device_path_stack *stack,
- 			}
- 			info->xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
- 			break;
-+		case DEV_PATH_MTK_WDMA:
-+			if (is_zero_ether_addr(info->h_source))
-+				memcpy(info->h_source, path->dev->dev_addr, ETH_ALEN);
-+			break;
- 		default:
- 			return -1;
- 		}
+@@ -17,6 +17,7 @@
+ #include <net/netfilter/nf_flow_table.h>
+ #include <linux/if_bridge.h>
+ #include <linux/if_ether.h>
++#include <linux/if_vlan.h>
+ #include <net/route.h>
+ #include <net/ip6_route.h>
+ 
+@@ -136,6 +137,29 @@ struct nft_forward_info {
+ 	enum flow_offload_xmit_type xmit_type;
+ };
+ 
++static void nft_fill_vlan_passthrough_info(const struct nft_pktinfo *pkt,
++					   struct nft_forward_info *info)
++{
++	if (!skb_vlan_tag_present(pkt->skb))
++		return;
++
++	rcu_read_lock();
++	/* when bridge VLAN filtering is enabled, the bridge handles the tag */
++	if (netif_is_bridge_port(pkt->skb->dev) &&
++	    !br_vlan_is_enabled_rcu(pkt->skb->dev)) {
++		if (info->num_encaps >= NF_FLOW_TABLE_ENCAP_MAX) {
++			info->indev = NULL;
++		} else {
++			info->encap[info->num_encaps].id =
++				skb_vlan_tag_get_id(pkt->skb);
++			info->encap[info->num_encaps].proto =
++				pkt->skb->vlan_proto;
++			info->num_encaps++;
++		}
++	}
++	rcu_read_unlock();
++}
++
+ static int nft_dev_path_info(const struct net_device_path_stack *stack,
+ 			     struct nft_forward_info *info,
+ 			     unsigned char *ha, struct nf_flowtable *flowtable)
+@@ -326,8 +350,12 @@ static int nft_dev_forward_path(const struct nft_pktinfo *pkt,
+ 		nft_br_vlan_dev_fill_forward_path(pkt, &ctx);
+ 	}
+ 
+-	if (nft_dev_fill_forward_path(&ctx, route, dst, ct, dir, ha, &stack) < 0 ||
+-	    nft_dev_path_info(&stack, &info, ha, &ft->data) < 0)
++	if (nft_dev_fill_forward_path(&ctx, route, dst, ct, dir, ha, &stack) < 0)
++		return -ENOENT;
++
++	nft_fill_vlan_passthrough_info(pkt, &info);
++
++	if (nft_dev_path_info(&stack, &info, ha, &ft->data) < 0)
+ 		return -ENOENT;
+ 
+ 	if (!nft_flowtable_find_dev(info.indev, ft))
 -- 
 2.54.0
 
