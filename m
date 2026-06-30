@@ -1,211 +1,166 @@
-Return-Path: <netdev+bounces-303244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bl0gKUTXQ2rTjwoAu9opvQ
-	(envelope-from <netdev+bounces-303244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:48:36 +0200
+	id ffIiLvDXQ2r+jwoAu9opvQ
+	(envelope-from <netdev+bounces-303245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:51:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D7B6E58FB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:48:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F306E593D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:51:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="LSsPTQJ/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303244-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303244-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=n7MvSUDO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303245-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303245-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E10833057890
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:46:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3BF213007F49
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F77943637C;
-	Tue, 30 Jun 2026 14:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856E043637C;
+	Tue, 30 Jun 2026 14:48:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617A8368D46;
-	Tue, 30 Jun 2026 14:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D513E44ED
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 14:48:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782830777; cv=none; b=TOTH6cg9mo7u3RUvIKMj1uyzNPaZWT6HqrzSSQz9sn9Wv6bD7rKAjNjgclw9jVIOP+KqchLLaDE2PmqF1NIxhLrS4yKu72NcCVgEbHwDIWA6EEqSoQaXEawhAgeTVIAgvciz1vLTRmz6t2KiPHyUfa8Waf5qkbc8z+Hi4y1vGVU=
+	t=1782830918; cv=none; b=PWFCctA7XbK8WHIqo8LK48zVQGtUxrF8eEawdR1kR8y+yTtQDafoIIbDhPOGR1C3maX2MELVpKEf/pxzoLx7ZwlSFdLLxC2w7VMOuiimp6smdFcJbqo0Bya7KgKOTiV/WuaWj6orHgXrkdgThjEHn3M2oB3zdUNc2ikBLUPaxEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782830777; c=relaxed/simple;
-	bh=et6WWXnaS2+pKmOqfW2RoPxasq8OHuop6VwHgCWWPSU=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=WB5C+SOmZwWut1JD0TKchAV+jPMoltAoYeqD13ZLG9yahOLl0QOIjiwGtFo38sAJH8Bl4Sr7G/QAwe08qBF7Uq6uBDIgpfY0mR8mMdXcdOkbzFKXpvQcpN0Q7D19kZVggQVJ9EuPblttRdXR/GmOSQih9Kh6IgWovRMTcsHgmSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LSsPTQJ/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC9051F000E9;
-	Tue, 30 Jun 2026 14:46:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782830776;
-	bh=tUR1TZqZgIjf7g/qHfTnghrYzXKLgJDw1xWeRAXLWJo=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=LSsPTQJ/A+v2jDQU690DW1fqHe/pLTvNXjuDFl1rNxlNreEw651MXk4g2iYcEkoLB
-	 KROa+IraIHhnWx/b6ykEYVlhLxSwURZ9K26rgS/qXttBW2D93uWcRAWbN5dIAwlbi8
-	 X02xOAeT7hZ0ojScXO8wXPseolmhnMbMlwzYfR7RhiuZ1xZfY05wJ87frNwYoh+nrQ
-	 RO4Ul8we42r3+7z/nlPPDsK5oKwF/PsNJqIJsydcQPhx+LzlUVH7yErgroIo+P11v9
-	 LP8cPpZBrN1+fcphatL2PpF7s8pSsl8PMQveBJqOfHIP7AJJaiXkR04oMK6v1IZemB
-	 Fla9dRfgznWKw==
-Content-Type: multipart/mixed; boundary="===============4372272007352423530=="
+	s=arc-20240116; t=1782830918; c=relaxed/simple;
+	bh=90Ofd6eGPD8sQlrMDYyWRLUwtEaLELqAOWjog1Cq10s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=naGkjfDBhfEeZBbiNIbjq+9XZWTDiiwivEVJqmsq3uXmZACSO3eQTtEd4UnTsgCu57N09d6XeguzLOWpH3sVt1ongncZ4sXTd+droEB8uCFGIMsyyM1f+cqXfHMUzXSiuEl52+I3Koi1VoChT6P+OSa0X38R6RshNKh5N7ogJ10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n7MvSUDO; arc=none smtp.client-ip=209.85.210.179
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-847a483e344so496804b3a.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 07:48:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782830916; x=1783435716; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FTJrhxBEl3twqdJgMl/PY4mPnQS4A0KwvpKQuTDw05U=;
+        b=n7MvSUDOnQrFnxPaViHIow3ZwdCQvi3owuxO7kC5CXGG7lM+64uTW232QeGqRtdGmD
+         r7eVpX3KJcgJ2FCcZZzAbStVzvX+avCUYO1QRHe6YR3PedZvvvXBxaKy7EMYS2D5ppUN
+         gKD++Xb15jbyH/+QWT1KOMOQWu9A090AjjlIQnKyaZ9dswpKolMg6pGJ1y3zparaPq2P
+         yaGPFMksS6ZDR/yfsRox6y8DbmV5DmOkG11AtSbc4XcXgnpxln8JUGMCHTaguc6aqA04
+         drlcu6p46vTEf5EY8t1yNxTcvgftLp+YXgHZiDV4m6Q0E+PudcRv1fwGW7BNbrftG6jB
+         26DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782830916; x=1783435716;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FTJrhxBEl3twqdJgMl/PY4mPnQS4A0KwvpKQuTDw05U=;
+        b=bQCUzGxDrkZOGmaio7A+2fwcsDbJkqe8nDNGjid/0rE2sIZ6AHW6EOAEbR7ljq9LjW
+         VaSy3lpagc7oesqGTsikXx5jglOeuxiKSJkKftkbfGW4kshOy9my5k1zg5q0EvA9pjSW
+         vtVFnAXY51wzok+rEar+ioEPWXj498hAx/U+CiAQIvwdzvnWnCFlMGcqLq3fUeIC29xJ
+         7ye5VvuiYPDzIp3PpbtWZZYPSOM8PEdzEUbCe1u+PEMAuWEhi/njqgGN/Y/WY9sCVbgr
+         AB/vTOqqsWTHIBKAQjGw4U619URyru8crpE/fEEpn5MzMsmhnkDH0EsN8TIl3XnL6Swb
+         nJFw==
+X-Forwarded-Encrypted: i=1; AHgh+RrXnky7w4IzNIlpfqa/i/DWTqav5xoPaiSexzbiHlHL+BjvdoE8KCf9KM82ddy+MFLp2ApfV5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTbzYwgprproob/VyT3OwLvOI1RqtnGxlpRSPMn1hnMQWaVlvp
+	5wfNiEdZgzMCKBmrGwYezdxCVxiJH3LVp9Xcl29XQyr5ReLQz3Wq0aHQd0uhaddc
+X-Gm-Gg: AfdE7clxRZgyYgi2dp9zA4BRdkOYAOiG6RcfDdFjs+cXOENz5MMb4TKkoVlUtni8qE6
+	OwvcoknRX1bo4pZH2FkI+IyN7sdjC6USu3/msIueb5QlwfApf6BvH0LhbnDy8Pix91eGjk3Nj2+
+	4M0c1RE02lNopmv8XMh0MuO0kSCPIZVRdU/kUjQ5MAuT1/hD8XPEMx02y1mSbF6IeNngzkH++lu
+	rcisbc7iO+0V6HlhSDs7MxKLrfzbcRcl2igmze3Rb8cpdRwvpWZifrRQKL757nqjSdgV+AipMH7
+	yv5Cf1ynb/GG6d+absZiqXB2M3JNMTZ9wkTfJtCD5jr6DMMIuJALsJs0yl2uf1i7rTyv3Im7p6y
+	gFs+uDiWy76WIjvJN2L4BZgSWZiclKucOC8QQ4cMQyxQSXEcUvpW2lPSrwhPQYr/T8KwUUc9x94
+	B5rlg01ExOqXmO198rUHqAt7uBt9+5f1laQb05VLBBoyxU3Qv8eTmh6g==
+X-Received: by 2002:a05:6a00:85a3:b0:842:dd4:d9e2 with SMTP id d2e1a72fcca58-847a7ed202dmr1411685b3a.0.1782830916332;
+        Tue, 30 Jun 2026 07:48:36 -0700 (PDT)
+Received: from DESKTOP-VNSSJ2S.lan (59-127-145-64.hinet-ip.hinet.net. [59.127.145.64])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a03a6fcasm2220480b3a.58.2026.06.30.07.48.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 07:48:35 -0700 (PDT)
+From: Zhi-Jun You <hujy652@gmail.com>
+To: lorenzo@kernel.org
+Cc: nbd@nbd.name,
+	netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Zhi-Jun You <hujy652@gmail.com>
+Subject: [PATCH net] net:ethernet: mtk_wed: setup WDMA_RING_TX(0) for non-DBDC MT7986
+Date: Tue, 30 Jun 2026 22:48:31 +0800
+Message-ID: <20260630144831.1109-1-hujy652@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <da582eb50a1b974b40f4f4c22b0ff138e490d84e0c3ff06a6f13428f62608ded@mail.kernel.org>
-In-Reply-To: <tencent_5E4F8F8DADA5DE0DAD924ADD835DD7991707@qq.com>
-References: <tencent_5E4F8F8DADA5DE0DAD924ADD835DD7991707@qq.com>
-Subject: Re: [PATCH v4] bpf: Fix smp_processor_id() call trace for preemptible kernels
-From: bot+bpf-ci@kernel.org
-To: eadavis@qq.com,sashiko-bot@kernel.org
-Cc: eadavis@qq.com,jiayuan.chen@linux.dev,sashiko-reviews@lists.linux.dev,andrii@kernel.org,ast@kernel.org,bpf@vger.kernel.org,daniel@iogearbox.net,eddyz87@gmail.com,emil@etsalapatis.com,jolsa@kernel.org,linux-kernel@vger.kernel.org,martin.lau@linux.dev,memxor@gmail.com,netdev@vger.kernel.org,song@kernel.org,syzkaller-bugs@googlegroups.com,yonghong.song@linux.dev,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue, 30 Jun 2026 14:46:15 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	TAGGED_FROM(0.00)[bounces-303244-lists,netdev=lfdr.de,bpf-ci];
-	FORGED_RECIPIENTS(0.00)[m:eadavis@qq.com,m:sashiko-bot@kernel.org,m:jiayuan.chen@linux.dev,m:sashiko-reviews@lists.linux.dev,m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:emil@etsalapatis.com,m:jolsa@kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:netdev@vger.kernel.org,m:song@kernel.org,m:syzkaller-bugs@googlegroups.com,m:yonghong.song@linux.dev,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[qq.com,linux.dev,lists.linux.dev,kernel.org,vger.kernel.org,iogearbox.net,gmail.com,etsalapatis.com,googlegroups.com,meta.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[nbd.name,vger.kernel.org,lists.infradead.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-303245-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[qq.com,kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:nbd@nbd.name,m:netdev@vger.kernel.org,m:linux-mediatek@lists.infradead.org,m:hujy652@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[hujy652@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[hujy652@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.kernel.org:mid,appspotmail.com:email,qq.com:email,syzkaller.appspot.com:url]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D1D7B6E58FB
+X-Rspamd-Queue-Id: 11F306E593D
 
---===============4372272007352423530==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+WDMA_RING_TX(0) is required to set MTK_WED_WDMA_RING_TX for WED RX
+but on a non-DBDC MT7986 it is never setup because idx is 1.
 
-> bpf: Fix smp_processor_id() call trace for preemptible kernels
->
-> bpf_mem_cache_free_rcu() maybe called in preemptible context, this
-> will trigger the below warning message:
->
-> BUG: using smp_processor_id() in preemptible [00000000] code: syz.0.17/5820
-> caller is bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
-> Call Trace:
->  check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
->  bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
->  rhtab_delete_elem+0x185a/0x1b30 kernel/bpf/hashtab.c:2969
->  __rhtab_map_lookup_and_delete_batch+0x935/0xcb0 kernel/bpf/hashtab.c:3349
->  bpf_map_do_batch+0x445/0x630 kernel/bpf/syscall.c:-1
->  __sys_bpf+0x906/0xd90 kernel/bpf/syscall.c:-1
->
-> this_cpu_ptr() access needs to be guarded against migration.
+Setting MTK_WED_WDMA_RING_TX with WDMA_RING_TX(1) is not feasible because
+WED still tries to send through WDMA_RING_TX(0). This is verified with
+register dump.
 
-The commit message says "guarded against migration" but the fix actually
-disables preemption using get_cpu()/put_cpu(). Is this description accurate?
+Fix this by calling mtk_wed_wdma_tx_ring_setup if WDMA_RING_TX(0) is not
+setup and guard it with mtk_wed_is_v2.
 
-get_cpu() does preempt_disable() + __smp_processor_id(), not just
-migrate_disable(). The later sentence "disabling preemption rather than
-prohibiting migration" correctly describes the fix, but this earlier line
-understates the requirement.
-
-> Wrapping this batch operation in bpf_disable_instrumentation() risk
-> blinding BPF tracing globally on the CPU if preemption occurs.
->
-> bpf_disable_instrumentation() increments the per-CPU bpf_prog_active counter.
-> Because migrate_disable() and rcu_read_lock() do not disable preemption under
-> CONFIG_PREEMPT_RCU, the task can be preempted during this potentially long
-> loop.
->
-> If preempted, bpf_prog_active would remain elevated on that CPU, which could
-> cause subsequent tasks scheduled on the same CPU to silently drop BPF tracing
-> events (kprobes, tracepoints, perf).
-
-The reasoning about bpf_disable_instrumentation() is sound, but could the
-commit message clarify that rhtab_delete_elem() already calls
-bpf_disable_instrumentation() internally?
-
-Looking at rhtab_delete_elem():
-
-kernel/bpf/hashtab.c:rhtab_delete_elem() {
-    ...
-    bpf_disable_instrumentation();
-    ret = rhashtable_remove_fast(&rhtab->table, &elem->htab_node,
-                                  rhtab->rhtable_params);
-    bpf_enable_instrumentation();
-    ...
-}
-
-This means the same "blinding BPF tracing" window already exists in the
-per-element path. The argument is against a longer-held instrumentation
-disable across the entire loop, not a categorical concern.
-
-> Therefore, we fix this by disabling preemption rather than prohibiting
-> migration.
->
-> Fixes: 5af6807bdb10 ("bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().")
-
-Should the Fixes tag point to a different commit? The bug occurs when
-__rhtab_map_lookup_and_delete_batch() calls rhtab_delete_elem() which calls
-bpf_mem_cache_free_rcu() in preemptible context.
-
-Commit 5af6807bdb10 introduced bpf_mem_free_rcu() in 2023 but did not modify
-kernel/bpf/hashtab.c or introduce the rhtab code. The call chain was
-introduced by:
-
-  Fixes: 6905f8601298 ("bpf: Allow special fields in resizable hashtab")
-
-which added the rhtab implementation including __rhtab_map_lookup_and_delete_batch()
-and the call to bpf_mem_cache_free_rcu() in rhtab_delete_elem().
-
-> Reported-by: syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=fd7e415d891073b83e1f
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-
-[ ... ]
-
-> diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
-> --- a/kernel/bpf/hashtab.c
-> +++ b/kernel/bpf/hashtab.c
-> @@ -3345,8 +3345,10 @@
->  	}
->
->  	if (do_delete) {
-> +		get_cpu();
->  		for (i = 0; i < total; i++)
->  			rhtab_delete_elem(rhtab, del_elems[i], NULL, 0);
-> +		put_cpu();
->  	}
->
->  	rcu_read_unlock();
-
+Fixes: 4c5de09eb0d0 ("net: ethernet: mtk_wed: add configure wed wo support")
+Signed-off-by: Zhi-Jun You <hujy652@gmail.com>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ drivers/net/ethernet/mediatek/mtk_wed.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/28451219226
---===============4372272007352423530==--
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
+index 10d9beaae372..2420557f6c96 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+@@ -2334,6 +2334,10 @@ mtk_wed_start(struct mtk_wed_device *dev, u32 irq_mask)
+ 		if (!dev->rx_wdma[i].desc)
+ 			mtk_wed_wdma_rx_ring_setup(dev, i, 16, false);
+ 
++	if (mtk_wed_is_v2(dev->hw))
++		if (!dev->tx_wdma[0].desc)
++			mtk_wed_wdma_tx_ring_setup(dev, 0, MTK_WED_WDMA_RING_SIZE, false);
++
+ 	if (dev->wlan.hw_rro) {
+ 		for (i = 0; i < MTK_WED_RX_PAGE_QUEUES; i++) {
+ 			u32 addr = MTK_WED_RRO_MSDU_PG_CTRL0(i) +
+-- 
+2.47.3
+
 
