@@ -1,301 +1,231 @@
-Return-Path: <netdev+bounces-303151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303153-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Hp3uILK3Q2rSfgoAu9opvQ
-	(envelope-from <netdev+bounces-303151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:33:54 +0200
+	id bwH8Jwe4Q2rkfgoAu9opvQ
+	(envelope-from <netdev+bounces-303153-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:35:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2CC6E4345
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:33:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 116056E436E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:35:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=EUbDFW3h;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303151-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303151-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=iogearbox.net;
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=KKnkbgGq;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=fTkZyi08;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303153-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303153-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 942CB307CD1D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:33:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E4CCE3036CFA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CBE40BCD4;
-	Tue, 30 Jun 2026 12:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3C640B373;
+	Tue, 30 Jun 2026 12:35:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA4618871F;
-	Tue, 30 Jun 2026 12:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F723FB07E
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:35:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782822817; cv=none; b=JDpRbS0SSahIKYyqStIkA4GyP5jR8cZqT5E9MeAepobb+xapZ3Nq5TwAZ4eP2WUxdMd4kwRZn4jnUdBUEgUpRsuBEdKyUv68Ee6T5gJA84IB3NMOx/drQ80be2lF37uqIstffetO/pmA0iJXkiEjIaej9cymmVaw3+JHzPVSAms=
+	t=1782822907; cv=none; b=U8T4gXyOkwy/8QGy3QtntF+JCoK1Qq9LL38+N6DrpV4iiHJRY29rYkhBt196k5sKhcGuQosuft6C3Mn1b5dFegQmzvQWlnYJytMqUN1o7ZoUxWLC30CbkWbb3Ux8wNdlQbLNe8M+Bpdr17hwMhqQtBKjUotXwzuzpEm22EE8d/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782822817; c=relaxed/simple;
-	bh=fmcjA+8zx9ng55VbxjMg0pdkvEml9BpWwChGtvRVN9w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PuTdtRfc5AS+LxVpASPZ4+Sqv2y1pFSetrC9/cHdoPSGfRsAQcJpzeGT7zna/wtGRfscqJ8WsIMn98Vbu5v4TPOouufe4MAEM0+QOvot/hhvddL/TM0PpsRuflVZICXmI1SDjRaYiq21hKKZgq+RvOKbPIM/02ffXqPHBJ6TwiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=EUbDFW3h; arc=none smtp.client-ip=213.133.104.62
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=c2qHVEHihA5zjk8EnCG+2QyPJvH+BtbDoswXeUR0QU0=; b=EUbDFW3hiQ1JxmRF8pZBPNWKpa
-	qD7PAQQydVU4uAst6KJ2vJbe2dMx7BBjqRaSG1RLn7M1GGkITo/vdietxAvYlXYISKfzhBl/8irPO
-	eWzuw0DRRSrRcAvHu70XCWFtzSLD6jtG9/jAtncvu/d4K2eheF08eKkkGfb5plsDyN7ho0GVEKHIx
-	2RG1LfsxJYHRbp632I0nCGVpBGCFlLn2fNqlqazSIXnLwAJIdMfaMntbeiR9kQCH6BPKcd+ovpgWi
-	fPSCCS1/IEvhbR9ju2/u0xi8gH5mgA2oxDmcmu2l0zuyGWtBFTq5uQfI+7+B6N1nAdjWWzI9y7MUi
-	dR2uAK/w==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1weXeg-000Ncu-1a;
-	Tue, 30 Jun 2026 14:33:34 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: pabeni@redhat.com,
-	jhs@mojatatu.com,
-	bigeasy@linutronix.de,
-	andrii@kernel.org,
-	memxor@gmail.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net 3/3] selftests/bpf: Add test for redirect from qdisc qevent block
-Date: Tue, 30 Jun 2026 14:33:31 +0200
-Message-ID: <20260630123331.186840-4-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260630123331.186840-1-daniel@iogearbox.net>
-References: <20260630123331.186840-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1782822907; c=relaxed/simple;
+	bh=9TD884/1eNmXF43nG6KMGGmoxZbFnZmA8KC/ejMW04w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LYaVjRQq7wxQ2aYRDBxUC1BWLWiZA0ji2K1bZeabtmrFYrgG2Rb6zsGYY7944n+zgBV/toOKqKTQI5hZ+TNglWkG5CriMB6VFTA2TyAhMVcIuW24L4+u78/6F/VPqUOYUWxWY7EaOQ8N8ZOHLQjwIno2sB+Vs2aj773vGVXHtYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=KKnkbgGq; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fTkZyi08; arc=none smtp.client-ip=205.220.180.131
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U9n0ER1613519
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:35:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	XbxXKmb6m1o+wu+br6lLzlt+6G9oYy2IEucIolB22Mg=; b=KKnkbgGqOr6Axbi5
+	m8AFO+/Jphf+KutD3yzjJBOBGMRnZBe0xFfEDCpHsmiMPqrNjMgEqDLg5As+APA1
+	d8qxQEA9OWFnuHHrcNzvJN31S1kOhgBbhvh5O/v/NANPH686ogZ+A6f0Jg11XSCu
+	L6oDMxUpi66Stm8pQ73m5lflpH04VKTeKA0zFa1EGW2Iuhg6ljJv0qoye7xW45Dd
+	HGtzYmxnVhiXD4HqcQrgDjuP53UqQiUinbMagr+sEQrcnIqU0lXA3SKbPhm8FgXS
+	fJ6ZJJDxasvRRXyPxZS1CTAR6hpiohrzlxjtTBOBierePcL5Z5NKnDlfpBqAH/vm
+	wze8qg==
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f3x1cuv12-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:35:05 +0000 (GMT)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51c194d1ec0so518601cf.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 05:35:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1782822905; x=1783427705; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XbxXKmb6m1o+wu+br6lLzlt+6G9oYy2IEucIolB22Mg=;
+        b=fTkZyi08V6GwTZ86ygorNFxoRPMkH3eFEfO36sM+2I6TfgOtjmHxtMP5epbC/4kv3d
+         WWzbS+609U4AxUDJCS1uDlHxUcNMIkinGsJGUHauyf3CspEf6cXZf6x/S1bumg6qEyFd
+         SscAQVBi6aGKoLZYlxPbTH0oRojgYyTdHyd/ZkfrfpI2JCUYYZgetRqwUOd0F5EM/RL6
+         pHeZTiT8cwr/Om39mtWYA0CH6XWhQTNXZsOBDjmAZpw3PF3VN3qYcSj2Rh+KleVsz6av
+         eYl5zu3vguKNjo78QRqg48owtxhIOCLx6yFchlIDfN24rjaKSOMC79e4kqKUrWYnWoec
+         xePw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782822905; x=1783427705;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=XbxXKmb6m1o+wu+br6lLzlt+6G9oYy2IEucIolB22Mg=;
+        b=aCoSAcD22fYYz7iyfwg0I/yZolLSlJJ1hYXbZ8hgPGVFD1kabTJQKiCfe9DVOFdwF8
+         P//rURKSFHyYDdfsoBnh6yxnX53ulnYtbPTHkkKiG/JeGwm8qr3SFB+iJj5LbqKCCNnS
+         Q2LY8LilPb0JoTxvXJrrK+YFIGufEv1N9hTAB0GO2xwEeBHz1UbeC7NaglTFKpNDGFSY
+         4gpvNcM+2WITDiAjQBXFoS/E4qnLkNFAD4u6Kk9KYnETA/THbSB2HlbpcUBn2DCNZsIx
+         gSgalV7Q23dJgfzNfRVi1+QsuCskaU3hI7o+AKB+6osxHbe3+62teziB+8Uqd18t7jBm
+         1njw==
+X-Forwarded-Encrypted: i=1; AFNElJ8HjzBJuyAM1to3HwOEWlas4tT5hdzkrfTTqKbTtPOBP+uHGxISbu/QqowC+22IqXp5sdZbG+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDXVz9UR1qllBS3oJdhyGFy+ykmuS/bSiDujr2/yWBv7R8syBk
+	YNkeAlX4gXlu/7mZWcMDuXpALuXNlBZk/TWsDXAMqSWz09hAHtUC1ekhL6Mi8JJGo0hSFpM4ViX
+	rTMaGsCG/7GeLPuGCgc6WSYrB3yRxWG4Htkp7AUYc5yxinT4dqiKddf48vKg=
+X-Gm-Gg: AfdE7cm32wFcv3D9ei3EC0BYIaDXiEV9lbBJt9hdtaO+nxO75mAegctNSLhmTRlU305
+	77l+oYHQutMQUbjuSJwhOsYvsx5Pi31OCUVWeWmeKeMqCOksj0N4eMt+ILygUs4Y/TWp1jxN+N6
+	N/vYm2QEKKtl/frIYQKllkbCaQp9i/wv7d+PF5S2JbA9Rdtud/3iJC9Frta2VbnFPaOgYJYTlmQ
+	LVds+L6gHfvosW7yL4Ydu3lZmABPcUhfOPMoHEhxmHX9/FERsduRBPYW4W6zPlpjlkxaoHQbOIo
+	RitccIRstnUIJbtzAH3R6t9vC5Xxfz8Gj7dOSiWka27gMOvvtE7T2lhXoUAJ20wdHJOFbLm8hAo
+	nxZXo1CcJU7+OeNYgyfx/SpHK/LA4Fl8IjGo=
+X-Received: by 2002:a05:622a:a1a:b0:51c:1744:edf0 with SMTP id d75a77b69052e-51c1744f08cmr12929381cf.9.1782822904908;
+        Tue, 30 Jun 2026 05:35:04 -0700 (PDT)
+X-Received: by 2002:a05:622a:a1a:b0:51c:1744:edf0 with SMTP id d75a77b69052e-51c1744f08cmr12928611cf.9.1782822904391;
+        Tue, 30 Jun 2026 05:35:04 -0700 (PDT)
+Received: from [192.168.120.170] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1288f4c19esm117506266b.51.2026.06.30.05.34.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jun 2026 05:35:03 -0700 (PDT)
+Message-ID: <594cf827-819e-4262-9dff-a35c7f69f86b@oss.qualcomm.com>
+Date: Tue, 30 Jun 2026 14:34:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28046/Mon Jun 29 08:27:20 2026)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 04/14] remoteproc: qcom_q6v5_pas: Switch over to
+ generic PAS TZ APIs
+To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
+        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
+        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+        vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+        Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260626133440.692849-1-sumit.garg@kernel.org>
+ <20260626133440.692849-5-sumit.garg@kernel.org>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260626133440.692849-5-sumit.garg@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDExNiBTYWx0ZWRfX2i+HjTVO3Bbz
+ nygL+w7M47PgiaLa2BXzt3Gn5Jw11LaxWqOAcUqB+KyuGFilnDok2JmR/XYkr3JUuIuoHzl70RD
+ O2HN4jvMroeY/ZZZVVmzoCKa9zol7Bpb1qZWPE5cc3eRuJkKST+xlYItvrDqvc+iHqTdvs/DgD9
+ IDkfNu0zfIzHWTFWW6SdRD9pIpS4ldWbbjLYuRpIdpNIFWJetFXi9tqy63RBz+ljyQViA4rx6Lc
+ BOQiC6e061E78NIWDSiMsf9qvLSs4Q40b7zx2RWCeoBWgJYP9An31JxEd6MHP8ZT/ZDck5+dKiu
+ puYVxXaJGKemC8kx+p/rMcHLc7s5v3QuaaOZ9cJC96YiBPjJYQTnk5Gl+lm0iuxA0b4yOninXEs
+ FRXygWeNjH8f88HeHRBtWJAYlwzBknXmdf6SuB1ejUGcg4SWhMZ4bqXSROMQy6yyFc84ysbZqjE
+ /OcydOjO7Fq06Ame+Bw==
+X-Proofpoint-ORIG-GUID: S3jJf65SUBZr37RypKTgDEESsOzV0jo-
+X-Proofpoint-GUID: S3jJf65SUBZr37RypKTgDEESsOzV0jo-
+X-Authority-Analysis: v=2.4 cv=ftfsol4f c=1 sm=1 tr=0 ts=6a43b7f9 cx=c_pps
+ a=WeENfcodrlLV9YRTxbY/uA==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=EUspDBNiAAAA:8 a=JRhjOG_OB-XQkuSI_8oA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
+ a=kacYvNCVWA4VmyqE58fU:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDExNiBTYWx0ZWRfXztYCNjHSS9wZ
+ VzVYfODfzVSFBfVfn0+s6SYuGixWPNAaPkXXC/MieJYAhJSZb1jraCaVpPCb9aJfFpXwWCyNZEV
+ Yl3x/7ERPjl+JdYg8sjMQ1x2j9hcnrU=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-30_03,2026-06-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 adultscore=0 spamscore=0 clxscore=1015 malwarescore=0
+ phishscore=0 impostorscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606300116
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,mojatatu.com,linutronix.de,kernel.org,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303151-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:bigeasy@linutronix.de,m:andrii@kernel.org,m:memxor@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	TAGGED_FROM(0.00)[bounces-303153-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
+ comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,qualcomm.com:dkim,qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3A2CC6E4345
+X-Rspamd-Queue-Id: 116056E436E
 
-Add a regression test for the NULL current->bpf_net_context deref hit
-when a BPF classifier attached to a qdisc qevent block asks for a
-redirect. The classifier runs from tcf_qevent_handle() on the qdisc
-enqueue path, outside any bpf_net_context.
+On 6/26/26 3:34 PM, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> 
+> Switch qcom_q6v5_pas client driver over to generic PAS TZ APIs. Generic PAS
+> TZ service allows to support multiple TZ implementation backends like QTEE
+> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> backend service.
+> 
+> Since qcom_q6v5_pas depends on MDT loader for PAS firmware loading, it
+> has to be switched over to generic PAS APIs in this commit to avoid any
+> build issues.
+> 
+> Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
+> Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
+> Tested-by: Vignesh Viswanathan <vignesh.viswanathan@oss.qualcomm.com> # IPQ9650
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
 
-  # LDLIBS=-static PKG_CONFIG='pkg-config --static' ./vmtest.sh -- ./test_progs -t qevent
-  [...]
-  + /etc/rcS.d/S50-startup
-  ./test_progs -t qevent
-  #496/1   tc_qevent/redirect_verdict:OK
-  #496/2   tc_qevent/redirect_helper:OK
-  #496     tc_qevent:OK
-  Summary: 1/2 PASSED, 0 SKIPPED, 0 FAILED
+I assume that the leftover qcom_scm_assign_mem() will be handled
+in a separate effort, presumably through something like FF-A lend
+on the backend
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- tools/testing/selftests/bpf/config            |   1 +
- .../selftests/bpf/prog_tests/tc_qevent.c      | 113 ++++++++++++++++++
- .../selftests/bpf/progs/test_tc_qevent.c      |  23 ++++
- 3 files changed, 137 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_qevent.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_tc_qevent.c
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index adb25146e88c..ea7044f30adc 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -82,6 +82,7 @@ CONFIG_NET_SCH_BPF=y
- CONFIG_NET_SCH_FQ=y
- CONFIG_NET_SCH_INGRESS=y
- CONFIG_NET_SCH_HTB=y
-+CONFIG_NET_SCH_RED=y
- CONFIG_NET_SCHED=y
- CONFIG_NETDEVSIM=y
- CONFIG_NETFILTER=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_qevent.c b/tools/testing/selftests/bpf/prog_tests/tc_qevent.c
-new file mode 100644
-index 000000000000..67e1d17567ab
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_qevent.c
-@@ -0,0 +1,113 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <test_progs.h>
-+#include <network_helpers.h>
-+#include <sys/socket.h>
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
-+#include <unistd.h>
-+#include <string.h>
-+
-+#include "test_tc_qevent.skel.h"
-+
-+#define NS_TX		"tc_qevent_tx"
-+#define NS_RX		"tc_qevent_rx"
-+#define IP_TX		"10.255.0.1"
-+#define IP_RX		"10.255.0.2"
-+#define PIN_PATH	"/sys/fs/bpf/tc_qevent_redirect"
-+
-+static void blast_udp(void)
-+{
-+	struct sockaddr_in dst = {};
-+	char buf[1400] = {};
-+	int fd, i;
-+
-+	fd = socket(AF_INET, SOCK_DGRAM, 0);
-+	if (!ASSERT_GE(fd, 0, "udp socket"))
-+		return;
-+
-+	dst.sin_family = AF_INET;
-+	dst.sin_port = htons(12345);
-+	inet_pton(AF_INET, IP_RX, &dst.sin_addr);
-+
-+	/*
-+	 * Push far more than the RED queue can hold. Once qavg crosses qth_min
-+	 * every further packet hits the congestion_drop / early_drop qevent.
-+	 */
-+	for (i = 0; i < 50000; i++)
-+		sendto(fd, buf, sizeof(buf), MSG_DONTWAIT,
-+		       (struct sockaddr *)&dst, sizeof(dst));
-+
-+	close(fd);
-+}
-+
-+static void run_qevent_redirect(struct bpf_program *prog, __u64 *counter)
-+{
-+	struct nstoken *tok = NULL;
-+	int err;
-+
-+	SYS_NOFAIL("ip netns del %s", NS_TX);
-+	SYS_NOFAIL("ip netns del %s", NS_RX);
-+	unlink(PIN_PATH);
-+
-+	err = bpf_program__pin(prog, PIN_PATH);
-+	if (!ASSERT_OK(err, "pin prog"))
-+		return;
-+
-+	SYS(unpin,  "ip netns add %s", NS_TX);
-+	SYS(del_tx, "ip netns add %s", NS_RX);
-+	SYS(del_rx, "ip -n %s link add veth0 type veth peer name veth1 netns %s", NS_TX, NS_RX);
-+	SYS(del_rx, "ip -n %s addr add %s/24 dev veth0", NS_TX, IP_TX);
-+	SYS(del_rx, "ip -n %s link set veth0 up", NS_TX);
-+	SYS(del_rx, "ip -n %s addr add %s/24 dev veth1", NS_RX, IP_RX);
-+	SYS(del_rx, "ip -n %s link set veth1 up", NS_RX);
-+
-+	tok = open_netns(NS_TX);
-+	if (!ASSERT_OK_PTR(tok, "open_netns"))
-+		goto del_rx;
-+
-+	SYS(close_ns, "tc qdisc add dev veth0 root handle 1: htb default 1");
-+	SYS(close_ns, "tc class add dev veth0 parent 1: classid 1:1 htb rate 1mbit ceil 1mbit");
-+
-+	if (system("tc qdisc add dev veth0 parent 1:1 handle 11: red "
-+		   "limit 500000 avpkt 1000 probability 1 min 5000 max 6000 "
-+		   "burst 6 qevent early_drop block 10 2>/dev/null")) {
-+		test__skip();
-+		goto close_ns;
-+	}
-+
-+	if (system("tc filter add block 10 bpf da object-pinned "
-+		   PIN_PATH " 2>/dev/null")) {
-+		test__skip();
-+		goto close_ns;
-+	}
-+
-+	blast_udp();
-+	ASSERT_GT(*counter, 0, "qevent classifier ran");
-+close_ns:
-+	close_netns(tok);
-+del_rx:
-+	SYS_NOFAIL("ip netns del %s", NS_RX);
-+del_tx:
-+	SYS_NOFAIL("ip netns del %s", NS_TX);
-+unpin:
-+	bpf_program__unpin(prog, PIN_PATH);
-+}
-+
-+void test_tc_qevent(void)
-+{
-+	struct test_tc_qevent *skel;
-+
-+	skel = test_tc_qevent__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	if (test__start_subtest("redirect_verdict"))
-+		run_qevent_redirect(skel->progs.qevent_redirect_verdict,
-+				    &skel->bss->verdict_calls);
-+	if (test__start_subtest("redirect_helper"))
-+		run_qevent_redirect(skel->progs.qevent_redirect_helper,
-+				    &skel->bss->helper_calls);
-+
-+	test_tc_qevent__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_tc_qevent.c b/tools/testing/selftests/bpf/progs/test_tc_qevent.c
-new file mode 100644
-index 000000000000..1529c111f4aa
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_tc_qevent.c
-@@ -0,0 +1,23 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+
-+int redirect_ifindex = 1;
-+__u64 verdict_calls = 0;
-+__u64 helper_calls = 0;
-+
-+SEC("tc")
-+int qevent_redirect_verdict(struct __sk_buff *skb)
-+{
-+	__sync_fetch_and_add(&verdict_calls, 1);
-+	return TCX_REDIRECT;
-+}
-+
-+SEC("tc")
-+int qevent_redirect_helper(struct __sk_buff *skb)
-+{
-+	__sync_fetch_and_add(&helper_calls, 1);
-+	return bpf_redirect(redirect_ifindex, 0);
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.0
-
+Konrad
 
