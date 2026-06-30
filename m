@@ -1,78 +1,102 @@
-Return-Path: <netdev+bounces-302905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4Dl/ArIvQ2r0TwoAu9opvQ
-	(envelope-from <netdev+bounces-302905-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:53:38 +0200
+	id +e6lJiwwQ2pgUAoAu9opvQ
+	(envelope-from <netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:55:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 656CF6DFE9D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:53:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D5C26DFEE6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:55:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=ENbhnWlp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302905-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302905-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=o0CHDKJg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=hotmail.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5279630C16CE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:48:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD5A93007F72
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF9A3D9DAC;
-	Tue, 30 Jun 2026 02:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916FB3C4154;
+	Tue, 30 Jun 2026 02:55:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682DF3D16F4;
-	Tue, 30 Jun 2026 02:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E473C4168
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 02:55:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782787684; cv=none; b=PfAnrxYBLWTTWP/BLwjB0ECXIIMO8KpDCNJHVBjwpx+BtJqQghHeJAFUA6eAKXcx7zKW3gLUbP/QI6iy490jbIPGXHMOk1AZ93IaEmLjpA5dkUnI4Mqa3rWx0a2VsQbCge3kdNo/gTgEpP62wTRZxiF2aXsBwmq0VsX1q895TJc=
+	t=1782788137; cv=none; b=sfYasSXF3ao9oc0TWTfm2C5vIFkQ5mohQQMSqHZsn56CI1C1P1PHzZogQ7zaI0GuUIf/XtVOORQBMPLjKR65EghutRAu4Y6OLV4u9vMm9H83l2kwMksCUseJPDAwSMAvtow7a3USYUwPwjJ142IT3cm3FiegJHqtAiLu0J+KWBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782787684; c=relaxed/simple;
-	bh=frUtEcgtfXBxIIwHd3yFZL+kevQznHP3c3Y4Yyr6beI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sces3xedo1dNb4DbxCrf33BT5i04DiU9EJDSVYfu8wKm95KkO0Qz4cnbZ26taMkMJ87lOOa4qJLZfSe2jW0W8EPZ/XqikW4foSOZ6BzWUIgR72eYERfI18n4qrTN1YdSftBy1Jwgqe32cDYsCVTj6FZMOCaxaLGOvEWW7L0cGKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ENbhnWlp; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1IEb93248655;
-	Mon, 29 Jun 2026 19:47:54 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=K
-	kZB0jvt2xUe+aMHKmNrJemqALAWpO6UFcS7nn7wj5w=; b=ENbhnWlpbuIJvt5Xn
-	UCezPyAGLjy2xzjUwVsHvsGJuxij2NrFZnFxq5b8U8cx3Q8x+hJ7IVC9GgC6AE42
-	//uJL2+kVbRbptT5n4HomyYUAxk8y8AGsTi0QE3rP6bQYmRhqXWCbDCk2BoIcPuC
-	0HTCfLDEfFbSDTiugEHhXTiYKC8qy+M/0RXvR656TrVZ6q6tbA8J7aM13UTg3azx
-	AQgqDECdxHfTsOUWFkxE1N8wL0GV+I/DoPafK+S5uXJtkyLSphzILKX5JZe7Ayji
-	U6FmbpHi5oNLsQiLX/cOpS6UEF3p5Ml4c6VxWMDALxUdMrvVLqKbEtoAWQhmpjr8
-	4NaAg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f42dfgdtm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jun 2026 19:47:54 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 29 Jun 2026 19:47:53 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 29 Jun 2026 19:47:53 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id A645F3F7041;
-	Mon, 29 Jun 2026 19:47:50 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next 9/9] octeontx2: add TC flow offload path for switch flows
-Date: Tue, 30 Jun 2026 08:17:15 +0530
-Message-ID: <20260630024715.4124281-10-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260630024715.4124281-1-rkannoth@marvell.com>
-References: <20260630024715.4124281-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1782788137; c=relaxed/simple;
+	bh=k5S+EwGXo9wnJiy2kG7WcDaC9hH1KidHn90rcM3xm5U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O3nyYLhpPFMpxlmiZYV9NuRJ7KgCQs1D/Yef41l7d8MZJOXeUSaXnxBEPXpDvCodLBzrKtjK5EP1WTraqenDODt3gpIE8Cnya8tP2Sju89ay+p9XVf6O857MTDbVWKwQSRqjd26XREYal1TJxhds6SSoSxxy/ks0ttNmJ/FS1Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o0CHDKJg; arc=none smtp.client-ip=209.85.210.171
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8475eca3a66so1707722b3a.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 19:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782788132; x=1783392932; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=70RtwANMmvYdnz+RAS7YeHJdWbaLKfaEZdfOGz52FmU=;
+        b=o0CHDKJg2jI7XLiqXpHbyA+nTVX95g1cXIqmliMT6gpTkCc0t1JuzikK5jAraHwTiN
+         msbCxbSCwwjNXWsm06qTRCYTzmJv7WzY7pHIFDyXknCuGo22dXURWA3evnHz3mhBkqCG
+         VLXSOWJNTyQjFQsQR1D/TcjcuLod/DdGYRajh6ZRLmC7/Om5IYyJtq/U0jMIiYxIL6DZ
+         V2Clmqs6saa6e71IVOYytaGU/gosbFnSfu++oz7NHHo0vbZU5uAz1+K1dbMaHL1997qt
+         VCOQwsYCOcdEJC+uu8ydAEfqeZ/Zg+mixidnc9PLt1Ezl7eG5O53hu0aAX45Za6o2SN4
+         w+Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782788132; x=1783392932;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=70RtwANMmvYdnz+RAS7YeHJdWbaLKfaEZdfOGz52FmU=;
+        b=N/rA4XMc+IPe3Ay2UgWSSQPufvGMzz7gqWkwysbM78jPsDwEQ82UI1Wje23m34W+x6
+         3eSZffd5IQ/7yQ6/egJFaeg1RwNiAj9ua7IRtDLcIoKgFxBDZCN/Eh5T1Tbsd1yw1nwk
+         O6vbNEit080sz+LeGanv0me/Hj53IBdfC873/hBlh2fJ4w0Ahp9aWJESme+mmBZP5Qci
+         tEdnGK9kMwICRCfRfLP1cazeBPppUsY8Y7NKcdUn/h5NB6siSrK0v1pjV+CJZA3zG/IG
+         rps18YksrdlH15tpeKs/A4QQifPamzdR3KN3eHJrROmBVBkr8+MjPGd07qAPoh4JZ1DM
+         UJwQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqaPzcxpL92wfaWwU5VWj/bGCTpmGMYoRHY7PuLwbKfdZmGKMTFwxdojIxEN/M9NrjMmHCIOeM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWvQClD1XwThepLwCoznnbmne5SOOnYH4b8oq31c6PW4LGvkAI
+	aHes3pB7Wgx7e1Yn1lNVSQZqbAYCjWKTEnDDS9QiFf2iKTgSNj4gkWGw
+X-Gm-Gg: AfdE7cms2DbDgvQr3TZAoYwZbtqEaeBxf0A/iBJe2oA6C/XCN5Jw96LlOPFepB538jT
+	/zmIcZ+I/ez58Z3ILE7N2IGyL0bOuJszjVEByqtrPNMkAbWRLemUQbdPGpY1QckOJvtyRFRot18
+	cMKeaTtl9IyqcsVXmKVdwWlw4uWIuK/NazLybfUTGUX58NbL9WH/eQ5xlRJfdslfiqw9O9k5PR8
+	BQa6ZqHbi38sBIrxbnItdZYUhgfCl4rYKm6+zgNw8F74nCRgdRbGYQF+khlPceqZ1gksaJ2zRhM
+	TJ+jwwlX/4sf7HSnYOD5P6eKtZwKKODMpFFQZ+MU8lvjx8LiOdQJlWmjvpP+yiFIwo1bX5KbO5u
+	rlRa2vJ3ZEAxqdSEUJrjRYydP3XGOiJCrdCvLBfIGydQTN0/6UkEe7ZxqX4TsOOt4xAaywabA6e
+	yznbjt+8YKdNU8U1CwUuKnoWgwSHg7io00NHKz4Mpteo/EFOFFJexUJp4pkMmAMywD38PBZTodr
+	/rpuQAFi9pqSxOUUbtNM1905ml9pVN48iQX
+X-Received: by 2002:a05:6a00:94e1:b0:847:8dec:141c with SMTP id d2e1a72fcca58-8479f297813mr1546557b3a.51.1782788132162;
+        Mon, 29 Jun 2026 19:55:32 -0700 (PDT)
+Received: from kirchou-macbookpro2.roam.corp.google.com (softbank126051115229.bbtec.net. [126.51.115.229])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a033c884sm789453b3a.45.2026.06.29.19.55.29
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 29 Jun 2026 19:55:31 -0700 (PDT)
+Sender: kir <610548@gmail.com>
+From: Kir Chou <note351@hotmail.com>
+To: akpm@linux-foundation.org
+Cc: thomas.weissschuh@linutronix.de,
+	davidgow@google.com,
+	geert@linux-m68k.org,
+	visitorckw@gmail.com,
+	brendan.higgins@linux.dev,
+	linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com,
+	Kir Chou <note351@hotmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org (open list),
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
+Subject: [PATCH] lib/random32: convert selftest to KUnit
+Date: Tue, 30 Jun 2026 11:55:23 +0900
+Message-ID: <20260630025524.75747-1-note351@hotmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,1106 +104,535 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfX8hVSRSG2C6GQ
- fhHK0FbO/MT3eiVrWqjoDYsWGgQ7kJMjDw37d0AWLxMq88Shsv1wx4fFOx+FKc7oNoYA9DrCn0u
- PejJg07lgWKG8AtoxTgitCtZrM8K6gs=
-X-Proofpoint-ORIG-GUID: ukAgTQjN8EtJ_CJPvU73F9qDMwrYJ5Ex
-X-Authority-Analysis: v=2.4 cv=Zrvd7d7G c=1 sm=1 tr=0 ts=6a432e5a cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=mFLhgywAW_4Ef1yZhPcA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: ukAgTQjN8EtJ_CJPvU73F9qDMwrYJ5Ex
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfX9C95Xm3ygQ2M
- cyolLVEnUNtbDcEZ4mRgil9qqiBZOhTYpfz9EC8oIlvPi7/Mi/p2FQpPIaUwA9JofZjEKCxUCYE
- Afic4O1NGcfKwtKETE9ILDSntL4VzWDRssztBzShRHDHjWP5YLiyglGbEBrDQnTdB3VLaTfNwby
- NXveRmiEfafmiOhaI4BZZuEp8Fth6amYs7Z3pCfyUz5KEKTdiWeaJOunHjxIisBZd7R9sPK/bxX
- iqCqnT78zjejikz7sZ9ZrwWJJxaFqvlV1fHJpsGF3NlVrFoYLXXgYZEmwCSjtPhr486l6+aOf3t
- ENYsn3Q78g596ZMGh/bhiFvT+YseopjZaHvgMEf7dxapQpyQpIet3Sc3hk9JIHiAwpKRZ+hEv4B
- yGp6zrgSgQjB5YAc9h2JTbpRNvXRAR3yVudbvZLOtU6U/PnnFLEm5fEOuEUwCp7GXWR9LCpxPui
- InkErxdGca4GOmcmNbQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_01,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[hotmail.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[hotmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302905-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-302907-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[note351@hotmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:akpm@linux-foundation.org,m:thomas.weissschuh@linutronix.de,m:davidgow@google.com,m:geert@linux-m68k.org,m:visitorckw@gmail.com,m:brendan.higgins@linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@googlegroups.com,m:note351@hotmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linutronix.de,google.com,linux-m68k.org,gmail.com,linux.dev,vger.kernel.org,googlegroups.com,hotmail.com,davemloft.net,kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[note351@hotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 656CF6DFE9D
+X-Rspamd-Queue-Id: 2D5C26DFEE6
 
-Register an ingress flow-table offload callback that translates TC
-flower rules into fl_tuple state, resolves ingress and egress
-pcifunc via FIB for accelerated ports, and notifies the RVU AF over
-the PF mailbox.  The AF forwards flow updates to switchdev and
-keeps per-cookie packet counters in sync using NPC MCAM multi-stats
-when the switch requests SWDEV2AF refresh.
+This patch converts the existing prandom selftest (lib/random32.c) to use
+the KUnit framework (lib/tests/random32_kunit.c). Unlike typical KUnit
+tests, this file is directly #included into lib/random32.c.
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+The new test:
+- Removes the legacy CONFIG_RANDOM32_SELFTEST from lib/random32.c.
+- Adds CONFIG_PRANDOM_KUNIT_TEST (defaulting to KUNIT_ALL_TESTS).
+- Moves the test logic to lib/tests/random32_kunit.c.
+
+v2:
+- Removes the legacy CONFIG_RANDOM32_SELFTEST from lib/Kconfig.
+- Add const to arrays in lib/tests/random32_kunit.c.
+
+v3:
+- Changes from tristate to bool in lib/Kconfig.debug.
+
+v4:
+- Changes from bool to tristate in lib/Kconfig.debug.
+- Spins off the test into its own module under lib/tests/.
+- Adds a prototype for prandom_warmup() to avoid a warning.
+- Makes prandom_warmup() visible to the test in lib/random32.c.
+- Adds the build rule for random32_kunit.o to lib/tests/Makefile.
+
+This commit is verified by `./tools/testing/kunit/kunit.py run`
+with the .kunit/.kunitconfig:
+
+```
+CONFIG_KUNIT=y
+CONFIG_PRANDOM_KUNIT_TEST=y
+```
+
+Reviewed-by: David Gow <davidgow@google.com>
+Signed-off-by: Kir Chou <note351@hotmail.com>
 ---
- .../marvell/octeontx2/af/switch/rvu_sw.c      |   8 +-
- .../marvell/octeontx2/af/switch/rvu_sw_fl.c   | 264 +++++++++
- .../marvell/octeontx2/af/switch/rvu_sw_fl.h   |   1 +
- .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +-
- .../marvell/octeontx2/nic/switch/sw_fl.c      | 541 ++++++++++++++++++
- .../marvell/octeontx2/nic/switch/sw_fl.h      |   2 +
- .../marvell/octeontx2/nic/switch/sw_trace.c   |  13 +
- .../marvell/octeontx2/nic/switch/sw_trace.h   |  82 +++
- 8 files changed, 910 insertions(+), 3 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
+ lib/Kconfig                |   6 --
+ lib/Kconfig.debug          |   9 ++
+ lib/random32.c             | 184 ++-----------------------------------
+ lib/tests/Makefile         |   1 +
+ lib/tests/random32_kunit.c | 181 ++++++++++++++++++++++++++++++++++++
+ 5 files changed, 201 insertions(+), 180 deletions(-)
+ create mode 100644 lib/tests/random32_kunit.c
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-index fd4afddd768c..0964fc440527 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-@@ -7,13 +7,13 @@
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 2923924be..5f185e9f1 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -156,12 +156,6 @@ config AUDIT_COMPAT_GENERIC
+ 	depends on AUDIT_GENERIC && AUDIT_ARCH_COMPAT_GENERIC && COMPAT
+ 	default y
  
- #include <linux/bitfield.h>
- #include "rvu.h"
--#include "rvu_sw.h"
- #include "rvu_sw_l2.h"
- #include "rvu_sw_fl.h"
-+#include "rvu_sw.h"
+-config RANDOM32_SELFTEST
+-	bool "PRNG perform self test on init"
+-	help
+-	  This option enables the 32 bit PRNG library functions to perform a
+-	  self test on initialization.
+-
+ #
+ # compression support is select'ed if needed
+ #
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index ba36939fd..0214a5859 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -3354,6 +3354,15 @@ config PRIME_NUMBERS_KUNIT_TEST
  
- u32 rvu_sw_port_id(struct rvu *rvu, u16 pcifunc)
- {
--	u32 port_id;
-+	u16 port_id;
- 	u16 rep_id;
+ 	  If unsure, say N
  
- 	rep_id  = rvu_rep_get_vlan_id(rvu, pcifunc);
-@@ -38,6 +38,10 @@ int rvu_mbox_handler_swdev2af_notify(struct rvu *rvu,
- 	case SWDEV2AF_MSG_TYPE_REFRESH_FDB:
- 		rc = rvu_sw_l2_fdb_list_entry_add(rvu, req->pcifunc, req->mac);
- 		break;
++config PRANDOM_KUNIT_TEST
++	tristate "KUnit test for prandom" if !KUNIT_ALL_TESTS
++	depends on KUNIT
++	default KUNIT_ALL_TESTS
++	help
++	  Enable this option to test the prandom functions at runtime.
 +
-+	case SWDEV2AF_MSG_TYPE_REFRESH_FL:
-+		rc = rvu_sw_fl_stats_sync2db(rvu, req->fl, req->cnt);
-+		break;
++	  If unsure, say N
++
+ endif # RUNTIME_TESTING_MENU
+ 
+ config ARCH_USE_MEMTEST
+diff --git a/lib/random32.c b/lib/random32.c
+index 24e7acd93..dad90219c 100644
+--- a/lib/random32.c
++++ b/lib/random32.c
+@@ -41,6 +41,7 @@
+ #include <linux/bitops.h>
+ #include <linux/slab.h>
+ #include <linux/unaligned.h>
++#include <kunit/visibility.h>
+ 
+ /**
+  *	prandom_u32_state - seeded pseudo-random number generator.
+@@ -92,7 +93,14 @@ void prandom_bytes_state(struct rnd_state *state, void *buf, size_t bytes)
+ }
+ EXPORT_SYMBOL(prandom_bytes_state);
+ 
+-static void prandom_warmup(struct rnd_state *state)
++/*
++ * Only declared here so that it has a prototype when made
++ * non-static for KUnit testing (avoids -Wmissing-prototypes).
++ */
++#if IS_ENABLED(CONFIG_KUNIT)
++void prandom_warmup(struct rnd_state *state);
++#endif
++VISIBLE_IF_KUNIT void prandom_warmup(struct rnd_state *state)
+ {
+ 	/* Calling RNG ten times to satisfy recurrence condition */
+ 	prandom_u32_state(state);
+@@ -106,6 +114,7 @@ static void prandom_warmup(struct rnd_state *state)
+ 	prandom_u32_state(state);
+ 	prandom_u32_state(state);
+ }
++EXPORT_SYMBOL_IF_KUNIT(prandom_warmup);
+ 
+ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state)
+ {
+@@ -125,176 +134,3 @@ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state)
  	}
- 
- 	return rc;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c
-index 1f8b82a84a5d..e87bb4e68381 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c
-@@ -4,12 +4,249 @@
-  * Copyright (C) 2026 Marvell.
-  *
-  */
-+
-+#include <linux/bitfield.h>
- #include "rvu.h"
-+#include "rvu_sw.h"
-+#include "rvu_sw_fl.h"
-+
-+#define M(_name, _id, _fn_name, _req_type, _rsp_type)			\
-+static struct _req_type __maybe_unused					\
-+*otx2_mbox_alloc_msg_ ## _fn_name(struct rvu *rvu, int devid)		\
-+{									\
-+	struct _req_type *req;						\
-+									\
-+	req = (struct _req_type *)otx2_mbox_alloc_msg_rsp(		\
-+		&rvu->afpf_wq_info.mbox_up, devid, sizeof(struct _req_type), \
-+		sizeof(struct _rsp_type));				\
-+	if (!req)							\
-+		return NULL;						\
-+	req->hdr.sig = OTX2_MBOX_REQ_SIG;				\
-+	req->hdr.id = _id;						\
-+	return req;							\
-+}
-+
-+MBOX_UP_AF2SWDEV_MESSAGES
-+#undef M
-+
-+static struct workqueue_struct *sw_fl_offl_wq;
-+
-+struct fl_entry {
-+	struct list_head list;
-+	struct rvu *rvu;
-+	u32 port_id;
-+	unsigned long cookie;
-+	struct fl_tuple tuple;
-+	u64 flags;
-+	u64 features;
-+};
-+
-+static DEFINE_MUTEX(fl_offl_llock);
-+static LIST_HEAD(fl_offl_lh);
-+static bool fl_offl_work_running;
-+
-+static struct workqueue_struct *sw_fl_offl_wq;
-+static void sw_fl_offl_work_handler(struct work_struct *work);
-+static DECLARE_DELAYED_WORK(fl_offl_work, sw_fl_offl_work_handler);
-+
-+struct sw_fl_stats_node {
-+	struct list_head list;
-+	unsigned long cookie;
-+	u16 mcam_idx[2];
-+	u64 opkts, npkts;
-+	bool uni_di;
-+};
-+
-+static LIST_HEAD(sw_fl_stats_lh);
-+static DEFINE_MUTEX(sw_fl_stats_lock);
-+
-+static int
-+rvu_sw_fl_stats_sync2db_one_entry(unsigned long cookie, u8 disabled,
-+				  u16 mcam_idx[2], bool uni_di, u64 pkts)
-+{
-+	struct sw_fl_stats_node *snode, *tmp;
-+
-+	mutex_lock(&sw_fl_stats_lock);
-+	list_for_each_entry_safe(snode, tmp, &sw_fl_stats_lh, list) {
-+		if (snode->cookie != cookie)
-+			continue;
-+
-+		if (disabled) {
-+			list_del_init(&snode->list);
-+			mutex_unlock(&sw_fl_stats_lock);
-+			kfree(snode);
-+			return 0;
-+		}
-+
-+		if (snode->uni_di != uni_di) {
-+			snode->uni_di = uni_di;
-+			snode->mcam_idx[1] = mcam_idx[1];
-+		}
-+
-+		if (snode->opkts == pkts) {
-+			mutex_unlock(&sw_fl_stats_lock);
-+			return 0;
-+		}
-+
-+		snode->npkts = pkts;
-+		mutex_unlock(&sw_fl_stats_lock);
-+		return 0;
-+	}
-+	mutex_unlock(&sw_fl_stats_lock);
-+
-+	snode = kcalloc(1, sizeof(*snode), GFP_KERNEL);
-+	if (!snode)
-+		return -ENOMEM;
-+
-+	snode->cookie = cookie;
-+	snode->mcam_idx[0] = mcam_idx[0];
-+	if (!uni_di)
-+		snode->mcam_idx[1] = mcam_idx[1];
-+
-+	snode->npkts = pkts;
-+	snode->uni_di = uni_di;
-+	INIT_LIST_HEAD(&snode->list);
-+
-+	mutex_lock(&sw_fl_stats_lock);
-+	list_add_tail(&snode->list, &sw_fl_stats_lh);
-+	mutex_unlock(&sw_fl_stats_lock);
-+
-+	return 0;
-+}
-+
-+int rvu_sw_fl_stats_sync2db(struct rvu *rvu, struct fl_info *fl, int cnt)
-+{
-+	struct npc_mcam_get_mul_stats_req *req = NULL;
-+	struct npc_mcam_get_mul_stats_rsp *rsp = NULL;
-+	int tot = 0;
-+	u16 i2idx_map[256];
-+	int rc = 0;
-+	u64 pkts;
-+	int idx;
-+
-+	for (int i = 0; i < cnt; i++) {
-+		tot++;
-+		if (fl[i].uni_di)
-+			continue;
-+
-+		tot++;
-+	}
-+
-+	req = kcalloc(1, sizeof(*req), GFP_KERNEL);
-+	if (!req) {
-+		rc = -ENOMEM;
-+		goto fail;
-+	}
-+
-+	rsp = kcalloc(1, sizeof(*rsp), GFP_KERNEL);
-+	if (!rsp) {
-+		rc = -ENOMEM;
-+		goto fail;
-+	}
-+
-+	req->cnt = tot;
-+	idx = 0;
-+	for (int i = 0; i < tot; idx++) {
-+		i2idx_map[i] = idx;
-+		req->entry[i++] = fl[idx].mcam_idx[0];
-+		if (fl[idx].uni_di)
-+			continue;
-+
-+		i2idx_map[i] = idx;
-+		req->entry[i++] = fl[idx].mcam_idx[1];
-+	}
-+
-+	if (rvu_mbox_handler_npc_mcam_mul_stats(rvu, req, rsp)) {
-+		dev_err(rvu->dev, "Error to get multiple stats\n");
-+		rc = -EFAULT;
-+		goto fail;
-+	}
-+
-+	for (int i = 0; i < tot;) {
-+		idx = i2idx_map[i];
-+		pkts =  rsp->stat[i++];
-+
-+		if (!fl[idx].uni_di)
-+			pkts += rsp->stat[i++];
-+
-+		rc |= rvu_sw_fl_stats_sync2db_one_entry(fl[idx].cookie, fl[idx].dis,
-+							fl[idx].mcam_idx,
-+							fl[idx].uni_di, pkts);
-+	}
-+
-+fail:
-+	kfree(req);
-+	kfree(rsp);
-+	return rc;
-+}
-+
-+static int rvu_sw_fl_offl_rule_push(struct fl_entry *fl_entry)
-+{
-+	struct af2swdev_notify_req *req;
-+	struct rvu *rvu;
-+	int swdev_pf;
-+
-+	rvu = fl_entry->rvu;
-+	swdev_pf = rvu_get_pf(rvu->pdev, rvu->rswitch.pcifunc);
-+
-+	mutex_lock(&rvu->mbox_lock);
-+	req = otx2_mbox_alloc_msg_af2swdev_notify(rvu, swdev_pf);
-+	if (!req) {
-+		mutex_unlock(&rvu->mbox_lock);
-+		return -ENOMEM;
-+	}
-+
-+	req->tuple = fl_entry->tuple;
-+	req->flags = fl_entry->flags;
-+	req->cookie = fl_entry->cookie;
-+	req->features = fl_entry->features;
-+
-+	otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, swdev_pf);
-+	otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, swdev_pf);
-+
-+	mutex_unlock(&rvu->mbox_lock);
-+	return 0;
-+}
-+
-+static void sw_fl_offl_work_handler(struct work_struct *work)
-+{
-+	struct fl_entry *fl_entry;
-+
-+	mutex_lock(&fl_offl_llock);
-+	fl_entry = list_first_entry_or_null(&fl_offl_lh, struct fl_entry, list);
-+	if (!fl_entry) {
-+		mutex_unlock(&fl_offl_llock);
-+		return;
-+	}
-+
-+	list_del_init(&fl_entry->list);
-+	mutex_unlock(&fl_offl_llock);
-+
-+	rvu_sw_fl_offl_rule_push(fl_entry);
-+	kfree(fl_entry);
-+
-+	mutex_lock(&fl_offl_llock);
-+	if (!list_empty(&fl_offl_lh))
-+		queue_delayed_work(sw_fl_offl_wq, &fl_offl_work, msecs_to_jiffies(10));
-+	mutex_unlock(&fl_offl_llock);
-+}
- 
- int rvu_mbox_handler_fl_get_stats(struct rvu *rvu,
- 				  struct fl_get_stats_req *req,
- 				  struct fl_get_stats_rsp *rsp)
- {
-+	struct sw_fl_stats_node *snode, *tmp;
-+
-+	mutex_lock(&sw_fl_stats_lock);
-+	list_for_each_entry_safe(snode, tmp, &sw_fl_stats_lh, list) {
-+		if (snode->cookie != req->cookie)
-+			continue;
-+
-+		rsp->pkts_diff = snode->npkts - snode->opkts;
-+		snode->opkts = snode->npkts;
-+		break;
-+	}
-+	mutex_unlock(&sw_fl_stats_lock);
- 	return 0;
  }
+ EXPORT_SYMBOL(prandom_seed_full_state);
+-
+-#ifdef CONFIG_RANDOM32_SELFTEST
+-static struct prandom_test1 {
+-	u32 seed;
+-	u32 result;
+-} test1[] = {
+-	{ 1U, 3484351685U },
+-	{ 2U, 2623130059U },
+-	{ 3U, 3125133893U },
+-	{ 4U,  984847254U },
+-};
+-
+-static struct prandom_test2 {
+-	u32 seed;
+-	u32 iteration;
+-	u32 result;
+-} test2[] = {
+-	/* Test cases against taus113 from GSL library. */
+-	{  931557656U, 959U, 2975593782U },
+-	{ 1339693295U, 876U, 3887776532U },
+-	{ 1545556285U, 961U, 1615538833U },
+-	{  601730776U, 723U, 1776162651U },
+-	{ 1027516047U, 687U,  511983079U },
+-	{  416526298U, 700U,  916156552U },
+-	{ 1395522032U, 652U, 2222063676U },
+-	{  366221443U, 617U, 2992857763U },
+-	{ 1539836965U, 714U, 3783265725U },
+-	{  556206671U, 994U,  799626459U },
+-	{  684907218U, 799U,  367789491U },
+-	{ 2121230701U, 931U, 2115467001U },
+-	{ 1668516451U, 644U, 3620590685U },
+-	{  768046066U, 883U, 2034077390U },
+-	{ 1989159136U, 833U, 1195767305U },
+-	{  536585145U, 996U, 3577259204U },
+-	{ 1008129373U, 642U, 1478080776U },
+-	{ 1740775604U, 939U, 1264980372U },
+-	{ 1967883163U, 508U,   10734624U },
+-	{ 1923019697U, 730U, 3821419629U },
+-	{  442079932U, 560U, 3440032343U },
+-	{ 1961302714U, 845U,  841962572U },
+-	{ 2030205964U, 962U, 1325144227U },
+-	{ 1160407529U, 507U,  240940858U },
+-	{  635482502U, 779U, 4200489746U },
+-	{ 1252788931U, 699U,  867195434U },
+-	{ 1961817131U, 719U,  668237657U },
+-	{ 1071468216U, 983U,  917876630U },
+-	{ 1281848367U, 932U, 1003100039U },
+-	{  582537119U, 780U, 1127273778U },
+-	{ 1973672777U, 853U, 1071368872U },
+-	{ 1896756996U, 762U, 1127851055U },
+-	{  847917054U, 500U, 1717499075U },
+-	{ 1240520510U, 951U, 2849576657U },
+-	{ 1685071682U, 567U, 1961810396U },
+-	{ 1516232129U, 557U,    3173877U },
+-	{ 1208118903U, 612U, 1613145022U },
+-	{ 1817269927U, 693U, 4279122573U },
+-	{ 1510091701U, 717U,  638191229U },
+-	{  365916850U, 807U,  600424314U },
+-	{  399324359U, 702U, 1803598116U },
+-	{ 1318480274U, 779U, 2074237022U },
+-	{  697758115U, 840U, 1483639402U },
+-	{ 1696507773U, 840U,  577415447U },
+-	{ 2081979121U, 981U, 3041486449U },
+-	{  955646687U, 742U, 3846494357U },
+-	{ 1250683506U, 749U,  836419859U },
+-	{  595003102U, 534U,  366794109U },
+-	{   47485338U, 558U, 3521120834U },
+-	{  619433479U, 610U, 3991783875U },
+-	{  704096520U, 518U, 4139493852U },
+-	{ 1712224984U, 606U, 2393312003U },
+-	{ 1318233152U, 922U, 3880361134U },
+-	{  855572992U, 761U, 1472974787U },
+-	{   64721421U, 703U,  683860550U },
+-	{  678931758U, 840U,  380616043U },
+-	{  692711973U, 778U, 1382361947U },
+-	{  677703619U, 530U, 2826914161U },
+-	{   92393223U, 586U, 1522128471U },
+-	{ 1222592920U, 743U, 3466726667U },
+-	{  358288986U, 695U, 1091956998U },
+-	{ 1935056945U, 958U,  514864477U },
+-	{  735675993U, 990U, 1294239989U },
+-	{ 1560089402U, 897U, 2238551287U },
+-	{   70616361U, 829U,   22483098U },
+-	{  368234700U, 731U, 2913875084U },
+-	{   20221190U, 879U, 1564152970U },
+-	{  539444654U, 682U, 1835141259U },
+-	{ 1314987297U, 840U, 1801114136U },
+-	{ 2019295544U, 645U, 3286438930U },
+-	{  469023838U, 716U, 1637918202U },
+-	{ 1843754496U, 653U, 2562092152U },
+-	{  400672036U, 809U, 4264212785U },
+-	{  404722249U, 965U, 2704116999U },
+-	{  600702209U, 758U,  584979986U },
+-	{  519953954U, 667U, 2574436237U },
+-	{ 1658071126U, 694U, 2214569490U },
+-	{  420480037U, 749U, 3430010866U },
+-	{  690103647U, 969U, 3700758083U },
+-	{ 1029424799U, 937U, 3787746841U },
+-	{ 2012608669U, 506U, 3362628973U },
+-	{ 1535432887U, 998U,   42610943U },
+-	{ 1330635533U, 857U, 3040806504U },
+-	{ 1223800550U, 539U, 3954229517U },
+-	{ 1322411537U, 680U, 3223250324U },
+-	{ 1877847898U, 945U, 2915147143U },
+-	{ 1646356099U, 874U,  965988280U },
+-	{  805687536U, 744U, 4032277920U },
+-	{ 1948093210U, 633U, 1346597684U },
+-	{  392609744U, 783U, 1636083295U },
+-	{  690241304U, 770U, 1201031298U },
+-	{ 1360302965U, 696U, 1665394461U },
+-	{ 1220090946U, 780U, 1316922812U },
+-	{  447092251U, 500U, 3438743375U },
+-	{ 1613868791U, 592U,  828546883U },
+-	{  523430951U, 548U, 2552392304U },
+-	{  726692899U, 810U, 1656872867U },
+-	{ 1364340021U, 836U, 3710513486U },
+-	{ 1986257729U, 931U,  935013962U },
+-	{  407983964U, 921U,  728767059U },
+-};
+-
+-static void prandom_state_selftest_seed(struct rnd_state *state, u32 seed)
+-{
+-#define LCG(x)	 ((x) * 69069U)	/* super-duper LCG */
+-	state->s1 = __seed(LCG(seed),        2U);
+-	state->s2 = __seed(LCG(state->s1),   8U);
+-	state->s3 = __seed(LCG(state->s2),  16U);
+-	state->s4 = __seed(LCG(state->s3), 128U);
+-}
+-
+-static int __init prandom_state_selftest(void)
+-{
+-	int i, j, errors = 0, runs = 0;
+-	bool error = false;
+-
+-	for (i = 0; i < ARRAY_SIZE(test1); i++) {
+-		struct rnd_state state;
+-
+-		prandom_state_selftest_seed(&state, test1[i].seed);
+-		prandom_warmup(&state);
+-
+-		if (test1[i].result != prandom_u32_state(&state))
+-			error = true;
+-	}
+-
+-	if (error)
+-		pr_warn("prandom: seed boundary self test failed\n");
+-	else
+-		pr_info("prandom: seed boundary self test passed\n");
+-
+-	for (i = 0; i < ARRAY_SIZE(test2); i++) {
+-		struct rnd_state state;
+-
+-		prandom_state_selftest_seed(&state, test2[i].seed);
+-		prandom_warmup(&state);
+-
+-		for (j = 0; j < test2[i].iteration - 1; j++)
+-			prandom_u32_state(&state);
+-
+-		if (test2[i].result != prandom_u32_state(&state))
+-			errors++;
+-
+-		runs++;
+-		cond_resched();
+-	}
+-
+-	if (errors)
+-		pr_warn("prandom: %d/%d self tests failed\n", errors, runs);
+-	else
+-		pr_info("prandom: %d self tests passed\n", runs);
+-	return 0;
+-}
+-core_initcall(prandom_state_selftest);
+-#endif
+diff --git a/lib/tests/Makefile b/lib/tests/Makefile
+index 601dba4b7..39d283b26 100644
+--- a/lib/tests/Makefile
++++ b/lib/tests/Makefile
+@@ -49,5 +49,6 @@ obj-$(CONFIG_STRING_HELPERS_KUNIT_TEST) += string_helpers_kunit.o
+ obj-$(CONFIG_USERCOPY_KUNIT_TEST) += usercopy_kunit.o
+ obj-$(CONFIG_UTIL_MACROS_KUNIT) += util_macros_kunit.o
+ obj-$(CONFIG_RATELIMIT_KUNIT_TEST) += test_ratelimit.o
++obj-$(CONFIG_PRANDOM_KUNIT_TEST) += random32_kunit.o
  
-@@ -17,5 +254,32 @@ int rvu_mbox_handler_fl_notify(struct rvu *rvu,
- 			       struct fl_notify_req *req,
- 			       struct msg_rsp *rsp)
- {
-+	struct fl_entry *fl_entry;
-+
-+	if (!(rvu->rswitch.flags & RVU_SWITCH_FLAG_FW_READY))
-+		return 0;
-+
-+	fl_entry = kcalloc(1, sizeof(*fl_entry), GFP_KERNEL);
-+	if (!fl_entry)
-+		return -ENOMEM;
-+
-+	fl_entry->port_id = rvu_sw_port_id(rvu, req->hdr.pcifunc);
-+	fl_entry->rvu = rvu;
-+	INIT_LIST_HEAD(&fl_entry->list);
-+	fl_entry->tuple = req->tuple;
-+	fl_entry->cookie = req->cookie;
-+	fl_entry->flags = req->flags;
-+	fl_entry->features = req->features;
-+
-+	mutex_lock(&fl_offl_llock);
-+	list_add_tail(&fl_entry->list, &fl_offl_lh);
-+	mutex_unlock(&fl_offl_llock);
-+
-+	if (!fl_offl_work_running) {
-+		sw_fl_offl_wq = alloc_workqueue("sw_af_fl_wq", 0, 0);
-+		fl_offl_work_running = true;
-+	}
-+	queue_delayed_work(sw_fl_offl_wq, &fl_offl_work, msecs_to_jiffies(10));
-+
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h
-index cf3e5b884f77..2ad6b3152c53 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h
-@@ -7,5 +7,6 @@
- 
- #ifndef RVU_SW_FL_H
- #define RVU_SW_FL_H
-+int rvu_sw_fl_stats_sync2db(struct rvu *rvu, struct fl_info *fl, int cnt);
- 
- #endif
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-index 0e12659876e0..871a55ee3798 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-@@ -10,7 +10,7 @@ obj-$(CONFIG_RVU_ESWITCH) += rvu_rep.o
- rvu_nicpf-y := otx2_pf.o otx2_common.o otx2_txrx.o otx2_ethtool.o \
-                otx2_flows.o otx2_tc.o cn10k.o cn20k.o otx2_dmac_flt.o \
-                otx2_devlink.o qos_sq.o qos.o otx2_xsk.o \
--	       switch/sw_fdb.o switch/sw_fl.o
-+	       switch/sw_fdb.o switch/sw_fl.o switch/sw_trace.o
- 
- ifdef CONFIG_OCTEONTX_SWITCH
- rvu_nicpf-y += switch/sw_nb.o switch/sw_fib.o \
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
-index 36a2359a0a48..3ea48dcbbe23 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
-@@ -4,13 +4,554 @@
-  * Copyright (C) 2026 Marvell.
-  *
-  */
-+#include <linux/kernel.h>
-+#include <linux/netdevice.h>
-+#include <linux/etherdevice.h>
-+#include <net/switchdev.h>
-+#include <net/netevent.h>
-+#include <net/arp.h>
-+#include <net/nexthop.h>
-+#include <net/netfilter/nf_flow_table.h>
-+
-+#include "../otx2_reg.h"
-+#include "../otx2_common.h"
-+#include "../otx2_struct.h"
-+#include "../cn10k.h"
-+#include "sw_nb.h"
-+#include "sw_trace.h"
- #include "sw_fl.h"
- 
-+#if !IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
-+int sw_fl_setup_ft_block_ingress_cb(enum tc_setup_type type,
-+				    void *type_data, void *cb_priv)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+#else
-+
-+static DEFINE_SPINLOCK(sw_fl_lock);
-+static LIST_HEAD(sw_fl_lh);
-+
-+struct sw_fl_list_entry {
-+	struct list_head list;
-+	u64 flags;
-+	unsigned long cookie;
-+	struct otx2_nic *pf;
-+	struct fl_tuple tuple;
-+};
-+
-+static struct workqueue_struct *sw_fl_wq;
-+static struct work_struct sw_fl_work;
-+
-+static int sw_fl_msg_send(struct otx2_nic *pf,
-+			  struct fl_tuple *tuple,
-+			  u64 flags,
-+			  unsigned long cookie)
-+{
-+	struct fl_notify_req *req;
-+	int rc;
-+
-+	mutex_lock(&pf->mbox.lock);
-+	req = otx2_mbox_alloc_msg_fl_notify(&pf->mbox);
-+	if (!req) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	req->tuple = *tuple;
-+	req->flags = flags;
-+	req->cookie = cookie;
-+
-+	rc = otx2_sync_mbox_msg(&pf->mbox);
-+out:
-+	mutex_unlock(&pf->mbox.lock);
-+	return rc;
-+}
-+
-+static void sw_fl_wq_handler(struct work_struct *work)
-+{
-+	struct sw_fl_list_entry *entry;
-+	LIST_HEAD(tlist);
-+
-+	spin_lock(&sw_fl_lock);
-+	list_splice_init(&sw_fl_lh, &tlist);
-+	spin_unlock(&sw_fl_lock);
-+
-+	while ((entry =
-+		list_first_entry_or_null(&tlist,
-+					 struct sw_fl_list_entry,
-+					 list)) != NULL) {
-+		list_del_init(&entry->list);
-+		sw_fl_msg_send(entry->pf, &entry->tuple,
-+			       entry->flags, entry->cookie);
-+		kfree(entry);
-+	}
-+
-+	spin_lock(&sw_fl_lock);
-+	if (!list_empty(&sw_fl_lh))
-+		queue_work(sw_fl_wq, &sw_fl_work);
-+	spin_unlock(&sw_fl_lock);
-+}
-+
-+static int
-+sw_fl_add_to_list(struct otx2_nic *pf, struct fl_tuple *tuple,
-+		  unsigned long cookie, bool add_fl)
-+{
-+	struct sw_fl_list_entry *entry;
-+
-+	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	entry->pf = pf;
-+	entry->flags = add_fl ? FL_ADD : FL_DEL;
-+	if (add_fl)
-+		entry->tuple = *tuple;
-+	entry->cookie = cookie;
-+	entry->tuple.uni_di = netif_is_ovs_port(pf->netdev);
-+
-+	spin_lock(&sw_fl_lock);
-+	list_add_tail(&entry->list, &sw_fl_lh);
-+	queue_work(sw_fl_wq, &sw_fl_work);
-+	spin_unlock(&sw_fl_lock);
-+
-+	return 0;
-+}
-+
-+static int sw_fl_parse_actions(struct otx2_nic *nic,
-+			       struct flow_action *flow_action,
-+			       struct flow_cls_offload *f,
-+			       struct fl_tuple *tuple, u64 *op)
-+{
-+	struct flow_action_entry *act;
-+	struct otx2_nic *out_nic;
-+	int err;
-+	int used = 0;
-+	int i;
-+
-+	if (!flow_action_has_entries(flow_action))
-+		return -EINVAL;
-+
-+	flow_action_for_each(i, act, flow_action) {
-+		WARN_ON(used >= MANGLE_ARR_SZ);
-+
-+		switch (act->id) {
-+		case FLOW_ACTION_REDIRECT:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
-+			tuple->in_pf = nic->pcifunc;
-+			out_nic = netdev_priv(act->dev);
-+			tuple->xmit_pf = out_nic->pcifunc;
-+			*op |= BIT_ULL(FLOW_ACTION_REDIRECT);
-+			break;
-+
-+		case FLOW_ACTION_CT:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
-+			err = nf_flow_table_offload_add_cb(act->ct.flow_table,
-+							   sw_fl_setup_ft_block_ingress_cb,
-+							   nic);
-+			if (err != -EEXIST && err) {
-+				netdev_err(nic->netdev,
-+					   "%s:%d Error to offload flow, err=%d\n",
-+					   __func__, __LINE__, err);
-+				break;
-+			}
-+
-+			*op |= BIT_ULL(FLOW_ACTION_CT);
-+			break;
-+
-+		case FLOW_ACTION_MANGLE:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
-+			tuple->mangle[used].type = act->mangle.htype;
-+			tuple->mangle[used].val = act->mangle.val;
-+			tuple->mangle[used].mask = act->mangle.mask;
-+			tuple->mangle[used].offset = act->mangle.offset;
-+			tuple->mangle_map[act->mangle.htype] |= BIT(used);
-+			used++;
-+			break;
-+
-+		default:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
-+			break;
-+		}
-+	}
-+
-+	tuple->mangle_cnt = used;
-+
-+	if (!*op) {
-+		netdev_dbg(nic->netdev, "%s:%d Op is not valid\n", __func__, __LINE__);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int sw_fl_get_route(struct fib_result *res, __be32 addr)
-+{
-+	struct flowi4 fl4;
-+
-+	memset(&fl4, 0, sizeof(fl4));
-+	fl4.daddr = addr;
-+	return fib_lookup(&init_net, &fl4, res, 0);
-+}
-+
-+static int sw_fl_get_pcifunc(struct otx2_nic *pf, __be32 dst, u16 *pcifunc,
-+			     struct fl_tuple *ftuple, bool is_in_dev)
-+{
-+	struct fib_nh_common *fib_nhc;
-+	struct net_device *dev, *br;
-+	struct fib_result res;
-+	struct list_head *lh;
-+	struct otx2_nic *nic;
-+	int err;
-+
-+	rcu_read_lock();
-+
-+	err = sw_fl_get_route(&res, dst);
-+	if (err) {
-+		netdev_err(pf->netdev,
-+			   "%s:%d Failed to find route to dst %pI4\n",
-+			   __func__, __LINE__, &dst);
-+		goto done;
-+	}
-+
-+	if (res.fi->fib_type != RTN_UNICAST) {
-+		netdev_err(pf->netdev,
-+			   "%s:%d Not unicast  route to dst %pi4\n",
-+			   __func__, __LINE__, &dst);
-+		err = -EFAULT;
-+		goto done;
-+	}
-+
-+	fib_nhc = fib_info_nhc(res.fi, 0);
-+	if (!fib_nhc) {
-+		err = -EINVAL;
-+		netdev_err(pf->netdev,
-+			   "%s:%d Could not get fib_nhc for %pI4\n",
-+			   __func__, __LINE__, &dst);
-+		goto done;
-+	}
-+
-+	if (unlikely(netif_is_bridge_master(fib_nhc->nhc_dev))) {
-+		br = fib_nhc->nhc_dev;
-+
-+		if (is_in_dev)
-+			ftuple->is_indev_br = 1;
-+		else
-+			ftuple->is_xdev_br = 1;
-+
-+		lh = &br->adj_list.lower;
-+		if (list_empty(lh)) {
-+			netdev_err(pf->netdev,
-+				   "%s:%d Unable to find any slave device\n",
-+				   __func__, __LINE__);
-+			err = -EINVAL;
-+			goto done;
-+		}
-+		dev = netdev_next_lower_dev_rcu(br, &lh);
-+
-+	} else {
-+		dev = fib_nhc->nhc_dev;
-+	}
-+
-+	if (!sw_nb_is_valid_dev(dev)) {
-+		netdev_err(pf->netdev,
-+			   "%s:%d flow acceleration support is only for cavium devices\n",
-+			   __func__, __LINE__);
-+		err = -EOPNOTSUPP;
-+		goto done;
-+	}
-+
-+	nic = netdev_priv(dev);
-+	*pcifunc = nic->pcifunc;
-+
-+done:
-+	rcu_read_unlock();
-+	return err;
-+}
-+
-+static int sw_fl_parse_flow(struct otx2_nic *nic, struct flow_cls_offload *f,
-+			    struct fl_tuple *tuple, u64 *features)
-+{
-+	struct flow_rule *rule;
-+	u8 ip_proto = 0;
-+
-+	*features = 0;
-+
-+	rule = flow_cls_offload_flow_rule(f);
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
-+		struct flow_match_basic match;
-+
-+		flow_rule_match_basic(rule, &match);
-+
-+		/* All EtherTypes can be matched, no hw limitation */
-+
-+		if (match.mask->n_proto) {
-+			tuple->eth_type = match.key->n_proto;
-+			tuple->m_eth_type = match.mask->n_proto;
-+			*features |= BIT_ULL(NPC_ETYPE);
-+		}
-+
-+		if (match.mask->ip_proto &&
-+		    (match.key->ip_proto != IPPROTO_TCP &&
-+		     match.key->ip_proto != IPPROTO_UDP)) {
-+			netdev_dbg(nic->netdev,
-+				   "ip_proto=%u not supported\n",
-+				   match.key->ip_proto);
-+		}
-+
-+		if (match.mask->ip_proto)
-+			ip_proto = match.key->ip_proto;
-+
-+		if (ip_proto == IPPROTO_UDP) {
-+			*features |= BIT_ULL(NPC_IPPROTO_UDP);
-+		} else if (ip_proto == IPPROTO_TCP) {
-+			*features |= BIT_ULL(NPC_IPPROTO_TCP);
-+		} else {
-+			netdev_dbg(nic->netdev,
-+				   "ip_proto=%u not supported\n",
-+				   match.key->ip_proto);
-+		}
-+
-+		tuple->proto = ip_proto;
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
-+		struct flow_match_eth_addrs match;
-+
-+		flow_rule_match_eth_addrs(rule, &match);
-+
-+		if (!is_zero_ether_addr(match.key->dst) &&
-+		    is_unicast_ether_addr(match.key->dst)) {
-+			ether_addr_copy(tuple->dmac,
-+					match.key->dst);
-+
-+			ether_addr_copy(tuple->m_dmac,
-+					match.mask->dst);
-+
-+			*features |= BIT_ULL(NPC_DMAC);
-+		}
-+
-+		if (!is_zero_ether_addr(match.key->src) &&
-+		    is_unicast_ether_addr(match.key->src)) {
-+			ether_addr_copy(tuple->smac,
-+					match.key->src);
-+			ether_addr_copy(tuple->m_smac,
-+					match.mask->src);
-+			*features |= BIT_ULL(NPC_SMAC);
-+		}
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
-+		struct flow_match_ipv4_addrs match;
-+
-+		flow_rule_match_ipv4_addrs(rule, &match);
-+
-+		if (match.key->dst) {
-+			tuple->ip4dst = match.key->dst;
-+			tuple->m_ip4dst = match.mask->dst;
-+			*features |= BIT_ULL(NPC_DIP_IPV4);
-+		}
-+
-+		if (match.key->src) {
-+			tuple->ip4src = match.key->src;
-+			tuple->m_ip4src = match.mask->src;
-+			*features |= BIT_ULL(NPC_SIP_IPV4);
-+		}
-+	}
-+
-+	if (!(*features & BIT_ULL(NPC_DMAC))) {
-+		if (!tuple->ip4src || !tuple->ip4dst) {
-+			netdev_err(nic->netdev,
-+				   "%s:%d Invalid src=%pI4 and dst=%pI4 addresses\n",
-+				   __func__, __LINE__, &tuple->ip4src, &tuple->ip4dst);
-+			return -EINVAL;
-+		}
-+
-+		if ((tuple->ip4src & tuple->m_ip4src) == (tuple->ip4dst & tuple->m_ip4dst)) {
-+			netdev_err(nic->netdev,
-+				   "%s:%d Masked values are same; Invalid src=%pI4 and dst=%pI4 addresses\n",
-+				   __func__, __LINE__, &tuple->ip4src, &tuple->ip4dst);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS)) {
-+		struct flow_match_ports match;
-+
-+		flow_rule_match_ports(rule, &match);
-+
-+		if (ip_proto == IPPROTO_UDP) {
-+			if (match.key->dst)
-+				*features |= BIT_ULL(NPC_DPORT_UDP);
-+
-+			if (match.key->src)
-+				*features |= BIT_ULL(NPC_SPORT_UDP);
-+		} else if (ip_proto == IPPROTO_TCP) {
-+			if (match.key->dst)
-+				*features |= BIT_ULL(NPC_DPORT_TCP);
-+
-+			if (match.key->src)
-+				*features |= BIT_ULL(NPC_SPORT_TCP);
-+		}
-+
-+		if (match.mask->src) {
-+			tuple->sport = match.key->src;
-+			tuple->m_sport = match.mask->src;
-+		}
-+
-+		if (match.mask->dst) {
-+			tuple->dport = match.key->dst;
-+			tuple->m_dport = match.mask->dst;
-+		}
-+	}
-+
-+	if (!(*features & (BIT_ULL(NPC_DMAC) |
-+			   BIT_ULL(NPC_SMAC) |
-+			   BIT_ULL(NPC_DIP_IPV4) |
-+			   BIT_ULL(NPC_SIP_IPV4) |
-+			   BIT_ULL(NPC_DIP_IPV6) |
-+			   BIT_ULL(NPC_SIP_IPV6) |
-+			   BIT_ULL(NPC_DPORT_UDP) |
-+			   BIT_ULL(NPC_SPORT_UDP) |
-+			   BIT_ULL(NPC_DPORT_TCP) |
-+			   BIT_ULL(NPC_SPORT_TCP)))) {
-+		return -EINVAL;
-+	}
-+
-+	tuple->features = *features;
-+
-+	return 0;
-+}
-+
-+static int sw_fl_add(struct otx2_nic *nic, struct flow_cls_offload *f)
-+{
-+	struct fl_tuple tuple = { 0 };
-+	struct flow_rule *rule;
-+	u64 features = 0;
-+	u64 op = 0;
-+	int rc;
-+
-+	rule = flow_cls_offload_flow_rule(f);
-+
-+	rc = sw_fl_parse_actions(nic, &rule->action, f, &tuple, &op);
-+	if (rc)
-+		return rc;
-+
-+	if (op & BIT_ULL(FLOW_ACTION_CT))
-+		return 0;
-+
-+	rc  = sw_fl_parse_flow(nic, f, &tuple, &features);
-+	if (rc) {
-+		trace_sw_fl_dump(__func__, __LINE__, &tuple);
-+		return -EFAULT;
-+	}
-+
-+	if (!netif_is_ovs_port(nic->netdev)) {
-+		rc = sw_fl_get_pcifunc(nic, tuple.ip4src, &tuple.in_pf,
-+				       &tuple, true);
-+		if (rc) {
-+			trace_sw_fl_dump(__func__, __LINE__, &tuple);
-+			return rc;
-+		}
-+
-+		rc = sw_fl_get_pcifunc(nic, tuple.ip4dst,
-+				       &tuple.xmit_pf, &tuple, false);
-+		if (rc) {
-+			trace_sw_fl_dump(__func__, __LINE__, &tuple);
-+			return rc;
-+		}
-+	}
-+
-+	trace_sw_fl_dump(__func__, __LINE__, &tuple);
-+	sw_fl_add_to_list(nic, &tuple, f->cookie, true);
-+	return 0;
-+}
-+
-+static int sw_fl_del(struct otx2_nic *nic, struct flow_cls_offload *f)
-+{
-+	sw_fl_add_to_list(nic, NULL, f->cookie, false);
-+	return 0;
-+}
-+
-+static int sw_fl_stats(struct otx2_nic *nic, struct flow_cls_offload *f)
-+{
-+	struct fl_get_stats_req *req;
-+	struct fl_get_stats_rsp *rsp;
-+	u64 pkts_diff;
-+	int rc = 0;
-+
-+	mutex_lock(&nic->mbox.lock);
-+
-+	req = otx2_mbox_alloc_msg_fl_get_stats(&nic->mbox);
-+	if (!req) {
-+		netdev_err(nic->netdev,
-+			   "%s:%d Error happened while mcam alloc req\n",
-+			   __func__, __LINE__);
-+		rc = -ENOMEM;
-+		goto fail;
-+	}
-+	req->cookie = f->cookie;
-+
-+	if (otx2_sync_mbox_msg(&nic->mbox))
-+		goto fail;
-+
-+	rsp = (struct fl_get_stats_rsp *)otx2_mbox_get_rsp
-+		(&nic->mbox.mbox, 0, &req->hdr);
-+	pkts_diff = rsp->pkts_diff;
-+	mutex_unlock(&nic->mbox.lock);
-+
-+	if (pkts_diff) {
-+		flow_stats_update(&f->stats, 0x0, pkts_diff,
-+				  0x0, jiffies,
-+				  FLOW_ACTION_HW_STATS_IMMEDIATE);
-+	}
-+	return 0;
-+fail:
-+	mutex_unlock(&nic->mbox.lock);
-+	return rc;
-+}
-+
-+static bool init_done;
-+
-+int sw_fl_setup_ft_block_ingress_cb(enum tc_setup_type type,
-+				    void *type_data, void *cb_priv)
-+{
-+	struct flow_cls_offload *cls = type_data;
-+	struct otx2_nic *nic = cb_priv;
-+
-+	if (!init_done)
-+		return 0;
-+
-+	switch (cls->command) {
-+	case FLOW_CLS_REPLACE:
-+		return sw_fl_add(nic, cls);
-+	case FLOW_CLS_DESTROY:
-+		return sw_fl_del(nic, cls);
-+	case FLOW_CLS_STATS:
-+		return sw_fl_stats(nic, cls);
-+	default:
-+		break;
-+	}
-+
-+	return -EOPNOTSUPP;
-+}
-+
- int sw_fl_init(void)
- {
-+	INIT_WORK(&sw_fl_work, sw_fl_wq_handler);
-+	sw_fl_wq = alloc_workqueue("sw_fl_wq", 0, 0);
-+	if (!sw_fl_wq)
-+		return -ENOMEM;
-+
-+	init_done = true;
- 	return 0;
- }
- 
- void sw_fl_deinit(void)
- {
-+	cancel_work_sync(&sw_fl_work);
-+	destroy_workqueue(sw_fl_wq);
- }
-+#endif
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h
-index cd018d770a8a..8dd816eb17d2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h
-@@ -9,5 +9,7 @@
- 
- void sw_fl_deinit(void);
- int sw_fl_init(void);
-+int sw_fl_setup_ft_block_ingress_cb(enum tc_setup_type type,
-+				    void *type_data, void *cb_priv);
- 
- #endif // SW_FL_H
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
+ obj-$(CONFIG_TEST_RUNTIME_MODULE)		+= module/
+diff --git a/lib/tests/random32_kunit.c b/lib/tests/random32_kunit.c
 new file mode 100644
-index 000000000000..b01e7780ef12
+index 000000000..436435026
 --- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
-@@ -0,0 +1,13 @@
++++ b/lib/tests/random32_kunit.c
+@@ -0,0 +1,181 @@
 +// SPDX-License-Identifier: GPL-2.0
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2026 Marvell.
-+ *
++/*
++ * Test cases for random32 functions.
 + */
 +
-+#define CREATE_TRACE_POINTS
-+#if IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
-+#include "sw_trace.h"
-+EXPORT_TRACEPOINT_SYMBOL(sw_fl_dump);
-+EXPORT_TRACEPOINT_SYMBOL(sw_act_dump);
-+#endif
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
-new file mode 100644
-index 000000000000..5949e3dafaed
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
-@@ -0,0 +1,82 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2026 Marvell.
-+ *
-+ */
++#include <linux/prandom.h>
++#include <kunit/test.h>
 +
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM rvu
++/* prandom_warmup() is static in lib/random32.c; exposed for testing only. */
++void prandom_warmup(struct rnd_state *state);
 +
-+#if !defined(SW_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define SW_TRACE_H
++static const struct prandom_test1 {
++	u32 seed;
++	u32 result;
++} test1[] = {
++	{ 1U, 3484351685U },
++	{ 2U, 2623130059U },
++	{ 3U, 3125133893U },
++	{ 4U,  984847254U },
++};
 +
-+#include <linux/types.h>
-+#include <linux/tracepoint.h>
++static const struct prandom_test2 {
++	u32 seed;
++	u32 iteration;
++	u32 result;
++} test2[] = {
++	/* Test cases against taus113 from GSL library. */
++	{  931557656U, 959U, 2975593782U },
++	{ 1339693295U, 876U, 3887776532U },
++	{ 1545556285U, 961U, 1615538833U },
++	{  601730776U, 723U, 1776162651U },
++	{ 1027516047U, 687U,  511983079U },
++	{  416526298U, 700U,  916156552U },
++	{ 1395522032U, 652U, 2222063676U },
++	{  366221443U, 617U, 2992857763U },
++	{ 1539836965U, 714U, 3783265725U },
++	{  556206671U, 994U,  799626459U },
++	{  684907218U, 799U,  367789491U },
++	{ 2121230701U, 931U, 2115467001U },
++	{ 1668516451U, 644U, 3620590685U },
++	{  768046066U, 883U, 2034077390U },
++	{ 1989159136U, 833U, 1195767305U },
++	{  536585145U, 996U, 3577259204U },
++	{ 1008129373U, 642U, 1478080776U },
++	{ 1740775604U, 939U, 1264980372U },
++	{ 1967883163U, 508U,   10734624U },
++	{ 1923019697U, 730U, 3821419629U },
++	{  442079932U, 560U, 3440032343U },
++	{ 1961302714U, 845U,  841962572U },
++	{ 2030205964U, 962U, 1325144227U },
++	{ 1160407529U, 507U,  240940858U },
++	{  635482502U, 779U, 4200489746U },
++	{ 1252788931U, 699U,  867195434U },
++	{ 1961817131U, 719U,  668237657U },
++	{ 1071468216U, 983U,  917876630U },
++	{ 1281848367U, 932U, 1003100039U },
++	{  582537119U, 780U, 1127273778U },
++	{ 1973672777U, 853U, 1071368872U },
++	{ 1896756996U, 762U, 1127851055U },
++	{  847917054U, 500U, 1717499075U },
++	{ 1240520510U, 951U, 2849576657U },
++	{ 1685071682U, 567U, 1961810396U },
++	{ 1516232129U, 557U,    3173877U },
++	{ 1208118903U, 612U, 1613145022U },
++	{ 1817269927U, 693U, 4279122573U },
++	{ 1510091701U, 717U,  638191229U },
++	{  365916850U, 807U,  600424314U },
++	{  399324359U, 702U, 1803598116U },
++	{ 1318480274U, 779U, 2074237022U },
++	{  697758115U, 840U, 1483639402U },
++	{ 1696507773U, 840U,  577415447U },
++	{ 2081979121U, 981U, 3041486449U },
++	{  955646687U, 742U, 3846494357U },
++	{ 1250683506U, 749U,  836419859U },
++	{  595003102U, 534U,  366794109U },
++	{   47485338U, 558U, 3521120834U },
++	{  619433479U, 610U, 3991783875U },
++	{  704096520U, 518U, 4139493852U },
++	{ 1712224984U, 606U, 2393312003U },
++	{ 1318233152U, 922U, 3880361134U },
++	{  855572992U, 761U, 1472974787U },
++	{   64721421U, 703U,  683860550U },
++	{  678931758U, 840U,  380616043U },
++	{  692711973U, 778U, 1382361947U },
++	{  677703619U, 530U, 2826914161U },
++	{   92393223U, 586U, 1522128471U },
++	{ 1222592920U, 743U, 3466726667U },
++	{  358288986U, 695U, 1091956998U },
++	{ 1935056945U, 958U,  514864477U },
++	{  735675993U, 990U, 1294239989U },
++	{ 1560089402U, 897U, 2238551287U },
++	{   70616361U, 829U,   22483098U },
++	{  368234700U, 731U, 2913875084U },
++	{   20221190U, 879U, 1564152970U },
++	{  539444654U, 682U, 1835141259U },
++	{ 1314987297U, 840U, 1801114136U },
++	{ 2019295544U, 645U, 3286438930U },
++	{  469023838U, 716U, 1637918202U },
++	{ 1843754496U, 653U, 2562092152U },
++	{  400672036U, 809U, 4264212785U },
++	{  404722249U, 965U, 2704116999U },
++	{  600702209U, 758U,  584979986U },
++	{  519953954U, 667U, 2574436237U },
++	{ 1658071126U, 694U, 2214569490U },
++	{  420480037U, 749U, 3430010866U },
++	{  690103647U, 969U, 3700758083U },
++	{ 1029424799U, 937U, 3787746841U },
++	{ 2012608669U, 506U, 3362628973U },
++	{ 1535432887U, 998U,   42610943U },
++	{ 1330635533U, 857U, 3040806504U },
++	{ 1223800550U, 539U, 3954229517U },
++	{ 1322411537U, 680U, 3223250324U },
++	{ 1877847898U, 945U, 2915147143U },
++	{ 1646356099U, 874U,  965988280U },
++	{  805687536U, 744U, 4032277920U },
++	{ 1948093210U, 633U, 1346597684U },
++	{  392609744U, 783U, 1636083295U },
++	{  690241304U, 770U, 1201031298U },
++	{ 1360302965U, 696U, 1665394461U },
++	{ 1220090946U, 780U, 1316922812U },
++	{  447092251U, 500U, 3438743375U },
++	{ 1613868791U, 592U,  828546883U },
++	{  523430951U, 548U, 2552392304U },
++	{  726692899U, 810U, 1656872867U },
++	{ 1364340021U, 836U, 3710513486U },
++	{ 1986257729U, 931U,  935013962U },
++	{  407983964U, 921U,  728767059U },
++};
 +
-+#include "mbox.h"
++static void prandom_state_test_seed(struct rnd_state *state, u32 seed)
++{
++#define LCG(x)	 ((x) * 69069U)	/* super-duper LCG */
++	state->s1 = __seed(LCG(seed),        2U);
++	state->s2 = __seed(LCG(state->s1),   8U);
++	state->s3 = __seed(LCG(state->s2),  16U);
++	state->s4 = __seed(LCG(state->s3), 128U);
++}
 +
-+TRACE_EVENT(sw_fl_dump,
-+	    TP_PROTO(const char *fname, int line, struct fl_tuple *ftuple),
-+	    TP_ARGS(fname, line, ftuple),
-+	    TP_STRUCT__entry(__string(f, fname)
-+			     __field(int, l)
-+			     __array(u8, smac, ETH_ALEN)
-+			     __array(u8, dmac, ETH_ALEN)
-+			     __field(u16, eth_type)
-+			     __field(u32, sip)
-+			     __field(u32, dip)
-+			     __field(u8, ip_proto)
-+			     __field(u16, sport)
-+			     __field(u16, dport)
-+			     __field(u8, uni_di)
-+			     __field(u16, in_pf)
-+			     __field(u16, out_pf)
-+	    ),
-+	    TP_fast_assign(__assign_str(f);
-+			   __entry->l = line;
-+			   memcpy(__entry->smac, ftuple->smac, ETH_ALEN);
-+			   memcpy(__entry->dmac, ftuple->dmac, ETH_ALEN);
-+			   __entry->sip = (__force u32)(ftuple->ip4src);
-+			   __entry->dip = (__force u32)(ftuple->ip4dst);
-+			   __entry->eth_type = (__force u16)ftuple->eth_type;
-+			   __entry->ip_proto = ftuple->proto;
-+			   __entry->sport = (__force u16)(ftuple->sport);
-+			   __entry->dport = (__force u16)(ftuple->dport);
-+			   __entry->uni_di = ftuple->uni_di;
-+			   __entry->in_pf = ftuple->in_pf;
-+			   __entry->out_pf = ftuple->xmit_pf;
-+	    ),
-+	    TP_printk("[%s:%d] %pM %pI4:%u to %pM %pI4:%u eth_type=%#x proto=%u uni=%u in=%#x out=%#x",
-+		      __get_str(f), __entry->l, __entry->smac, &__entry->sip, __entry->sport,
-+		      __entry->dmac, &__entry->dip, __entry->dport,
-+		      ntohs((__force __be16)__entry->eth_type), __entry->ip_proto, __entry->uni_di,
-+		      __entry->in_pf, __entry->out_pf)
-+);
++static void test_prandom_seed_boundary(struct kunit *test)
++{
++	int i;
++	struct rnd_state state;
 +
-+TRACE_EVENT(sw_act_dump,
-+	    TP_PROTO(const char *fname, int line, u32 act),
-+	    TP_ARGS(fname, line, act),
-+	    TP_STRUCT__entry(__string(fname, fname)
-+			     __field(int, line)
-+			     __field(u32, act)
-+	    ),
++	for (i = 0; i < ARRAY_SIZE(test1); i++) {
++		prandom_state_test_seed(&state, test1[i].seed);
++		prandom_warmup(&state);
++		KUNIT_EXPECT_EQ(test, test1[i].result, prandom_u32_state(&state));
++	}
++}
 +
-+	    TP_fast_assign(__assign_str(fname);
-+			   __entry->line = line;
-+			   __entry->act = act;
-+	    ),
++static void test_prandom_taus113(struct kunit *test)
++{
++	int i, j;
++	struct rnd_state state;
 +
-+	    TP_printk("[%s:%d] %u",
-+		      __get_str(fname), __entry->line, __entry->act)
-+);
++	for (i = 0; i < ARRAY_SIZE(test2); i++) {
++		prandom_state_test_seed(&state, test2[i].seed);
++		prandom_warmup(&state);
 +
-+#endif
++		for (j = 0; j < test2[i].iteration - 1; j++)
++			prandom_u32_state(&state);
 +
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../drivers/net/ethernet/marvell/octeontx2/nic/switch/
++		KUNIT_EXPECT_EQ(test, test2[i].result, prandom_u32_state(&state));
++	}
++}
 +
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE sw_trace
++static struct kunit_case prandom_test_cases[] = {
++	KUNIT_CASE(test_prandom_seed_boundary),
++	KUNIT_CASE(test_prandom_taus113),
++	{}
++};
 +
-+#include <trace/define_trace.h>
++static struct kunit_suite prandom_test_suite = {
++	.name = "prandom",
++	.test_cases = prandom_test_cases,
++};
++
++kunit_test_suite(prandom_test_suite);
++
++MODULE_DESCRIPTION("KUnit test for prandom");
++MODULE_LICENSE("GPL");
 -- 
-2.43.0
+2.52.0
 
 
