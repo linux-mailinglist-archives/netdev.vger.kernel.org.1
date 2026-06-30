@@ -1,121 +1,117 @@
-Return-Path: <netdev+bounces-303312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kfg+Cpr/Q2punAoAu9opvQ
-	(envelope-from <netdev+bounces-303312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:40:42 +0200
+	id cniYNxj/Q2ohnAoAu9opvQ
+	(envelope-from <netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:38:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78CB16E6F9A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:40:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528EA6E6F6F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:38:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=ttUGDkqk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303312-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303312-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=ULVIdvBq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FB5F307FC2D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:38:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 569963039A12
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927AA3DDDAE;
-	Tue, 30 Jun 2026 17:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C663DDDD9;
+	Tue, 30 Jun 2026 17:38:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CB43DD537
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120803DE429
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:38:24 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782841097; cv=pass; b=d1KghuLwZIdA4Gocv8auDnNipzvsMtPJbK4uuK5kwFi7RahS3zXDFpGX+9fxsXNOpIU4hpzsnXKNMBSpMnXNFsZP9bruDetLHBUiNd3otYr3a87XyVgJ20kt0HIdQBfwEL7/0jEo4pKe9dTE1TxJ6CEv7EaqVhv5n0xGS/VD5U0=
+	t=1782841107; cv=pass; b=cQFlNynO0Yjvrlg/0/MVNnTuQ4X4ofI7hEdKBeiv3CJbtGnVTGstOIiAwpK0Vrcgvy5ccEZ+izCl9siuwCYpU8L0DRLQK7cbclqrWvSroS6F6hjJ+kgV9j2zLyfWbfXteBX7Ah1QBAbzjDmuTXKhydysOocw0jsIINNEuSNrgQk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782841097; c=relaxed/simple;
-	bh=5/krHcBHI1JSub7aw/+IBY1ssuiydpPt3+zadRH9bUg=;
+	s=arc-20240116; t=1782841107; c=relaxed/simple;
+	bh=eIHErhMYQFL0B7YbkMxX5g2Vzr8d25EAgGgSdmM/U7k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SQn5ACvrv6tu3afXy9HcKz5lJaZ5/OT3zpnlBYDpDGxEE/yJk2y1DMWguSTQ3ncVQ8Hp3y122KOSxex4WAJ0I5GeNqN2dy4zABlggrp4QUf7c5v+lAqok08gy/g1Cn5P/UAj+fhdONB3n566BLaP2ACWh14S3N/zp0FD259kc9M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ttUGDkqk; arc=pass smtp.client-ip=74.125.82.53
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-133362c30cfso701c88.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 10:38:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782841095; cv=none;
+	 To:Cc:Content-Type; b=JmwfkJLBSvDPBIVnxkqw73N0rofy0p1rqTZiE8K3bxj2Od/EvM30rlBJii1wy285HQlktceMp/o8SNAOxcBkoaBHnb0VTKpI+pbQt63gSnZZYVreoRl5BApqjU+wH5jUug8Iw7U1tsZqRPIgfjNihcWXxtSBFDnG/JQWd8MZRRc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ULVIdvBq; arc=pass smtp.client-ip=209.85.214.171
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2c9b2ac97cdso3235ad.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 10:38:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782841104; cv=none;
         d=google.com; s=arc-20260327;
-        b=hCYTyTBFRPMSG6WRXj6/xu2yEZ3zemn2YBd/NgrMHkgSOGrI64oj1FccAWav2r9crO
-         PRt2qxvR5b5gCEU2v7emi+JhWL2T1HOehpVnjiEPtKpoG+w+BTKmeFph3R6wRzt6qrf7
-         Sf5IrKhvPlMw305AO4Pp61APamUIPT8nVf2GWG3nw9mmJYpz6wB3EcOGOy2Ib9vmh8Ja
-         2i57cuDYdF0uSg+OQhHkUc7ZwzvhwngHOxoYSSsiulZFYmT5FTt9nqi1naXb60h/5Yay
-         SjgnWxTdGKEZ1lAevuzir6dpL/rq0tmZA6+mYtLBnkWPER0aH/JfOV27y84iPr7ebTEN
-         tPWg==
+        b=q4QFBo1L0wnWDYP5Z8afrxuKPrp9DTk6gk6h76XmxnegVBBaGTTD1WwlIHDvTsUcdS
+         vcp6a6ozXFLDJwjqpeSCvyHHHt4fgmAVXiWsf0XU3xOjzgbG7BTgsk6Xe8GuyPlytHWI
+         rJUSfX0fe1N/YeZYw76Oe9Rb2KMvvn5rdezKwnJLrHF0ZUzMU3CMNTzJrRL2a8vR1B+q
+         cUS07S0qpEtQqvxkOOHxcLouWOO8W5p5Uo5d9KkHIxY5/d5UOrfzNHi14S+JmLILBr+B
+         ASHnQKbSDxTaxiMY1x3bDAU9yT/8dGqVEtywUg3Kzo05BH9jHHKBZWEs6NNV2HXZGd3e
+         urtQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=PhNh1O8KJd77HVRv00phfDVEbbQW7UcJOtJ0dSSwrLo=;
-        fh=lyrIpVqQiWGRnXV0NtNTT0Qv03+2L+T97qaxMLMeJzc=;
-        b=sfWc2z3kf8YbVS1OcTNvGdFjrNv2ZlQF0jYxQy17N3yXFjY8m4XDzCFUb2xikDRL7D
-         1Oc1KQbDoaA2hEvtWV+C/Xj0SOhu9mG+Cbip1jmHcp1wWq5URhRQPUp7fpCCdxQbn3Qv
-         M9+a9mb9ZXIQrqAaYolDLeRFB8pvA/KIhwaLDOhkHafeCHMzEJ6mL4U1xW0gSjuY210F
-         Ng3wu3+O2b6EAuXxH0YX43AipOjL7QMJgamJlSg/uS/54S3vsnYRJh7hpfmpaOedypot
-         3zjXZO5X//Gif/zurmqSUCUJhcwb8r20rAYfIIDiy7x/1uGyF1dqfh9jR587PauFaa/n
-         Sxrg==;
+        bh=6xvhn4dXUWxUVWf7UvjrsOYZ0ZQQrdCYE7C0z/HL34c=;
+        fh=C38NiLBmKty8N8HcaYkoW6+y3PMS2R9/aELC+jg/9lw=;
+        b=WftJXnGEmcvmN9dqpvMIdW/bUGojMeeBTnmzcztmDSd7CUMAx2l0hKToomgIiKT55m
+         ZN48SOzOCmOy0q1VJVcaXAwagqIO9jh4DnQyvzXW1wKKoXpdgX5eywDGklZ1EfANovVi
+         vLH9Khr+qbRZWi1DiMCXqdu/lof6gTiwIemwGJZZ8BNeybgc8uCSsvVz7+4um8JGm92S
+         2ods1+qMQ0rFVbBsQabS2FKp9dRl39p0eadyaRTtq4H0kQv0gH2QLsCgo5mwjcvvqo+8
+         URoEzT5MbNwsjnGhy/zNqBnRaF6ShqZ4RDrph5gubIurlapRpRO31ExzlOJLEJtuBX43
+         JuLw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782841095; x=1783445895; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782841104; x=1783445904; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=PhNh1O8KJd77HVRv00phfDVEbbQW7UcJOtJ0dSSwrLo=;
-        b=ttUGDkqkp91LfVvWBcqkb9cgcxwOJlHBKScZcl5r94kpA3V3atVGFyFt7Itdab0C3Z
-         /XtGiNSsfec5Ofk3JPJ4iIhs4/Byzt0SDGMCgFnRd9PXhQzfctFo5ynF8kEpz/v/qEuh
-         QDXYvZ2vAwDXkKg+xgwm5315lr5hLoaswz9CyoM8ZSGOFz/eye86NEdNFrNHkm0kJtbZ
-         /EEkBBEZrq/K7voUqznwPkM2x/aQIsL8Obvf8ruK1YS52W/5fk2I9pdiW3+7i9+lT2Q7
-         7Aw3MXt2GY3gKhFTOJoMdMcZXmAiK/YC/8DYBxjZjBiYd+CHcaxqF2vv4gQYi83pN24b
-         dTxg==
+        bh=6xvhn4dXUWxUVWf7UvjrsOYZ0ZQQrdCYE7C0z/HL34c=;
+        b=ULVIdvBqx8lG0U/wPvVzEvBy/N5wOCcMHcKHAWJTG2gLnB/gOKUnRYcNIn8XDD0LxB
+         ku7+GZYlGQDb/LIjy60YhCAoyKP6IkljGbYDAUxcVegxdQsvOezDKcljBNyq+6wHgb8L
+         tamhQrPGOAaX7S9PO5jA/pwEWUZxE6qikB+eiL2eEOujg/M6RoDVOg33KK/12/XX+H8K
+         MyAJR+89RIV56yjV8PnClr0m1JuSPu7F9iNrAAoCoGly/Eb+gRHXB4d1uuhMVGIBVfxY
+         SB/0CS7JkJ97QVbpOTh1XLVg+o0dGZq3O5g8FXwUBKTsHvQfPI11AubGo15+2MnHTo3U
+         rJdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782841095; x=1783445895;
+        d=1e100.net; s=20251104; t=1782841104; x=1783445904;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=PhNh1O8KJd77HVRv00phfDVEbbQW7UcJOtJ0dSSwrLo=;
-        b=MMi3DreYrkvEM1Gox1nmc7NvmN3PH3tT4r8t3V0RlHpEWVArRkG2V3wGJyPwR9jaxy
-         0KZthn8uWuSOm7tWA6N4mfI8G+j5Kputtfb7IHMjLL60M03fOawgNoEOMV8rr6lua3Ke
-         KepeXIrDss91Fc1ajknDHjjQVp1mkgxntKWee3NkednyKYLnr0tkVzPmRCB7yt33/AHB
-         IBpWGvzzCBnVbRILSp4x71kmzwFM68OFCIaGbCjFBd0PrwWrKMhb5jbguu6pFxXbpDHo
-         TNr1C+Q7FxhToeTtVqrmREOzKag1GBCklS83Gc3jiXMhb3JbzmuJ6ij2GbCRhlYCIyG7
-         QBXQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/jpk5kZdl/SLCPVfPpzEJxEP7zP9nypNkP5mpfZWSdiyppEyM4lcUoAFP/YIoJAwo9buj+TY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6P7VkMRLchNYPMTV66nucji4KbgG5ZzgY3XEU1A6kYCDtG/fU
-	nITJRmhdRQneiWwbJVq7b++E5FXVHV4zzejVll3uEzmncaalj1k2zTkwjL/LzR60fcp1gnp74mR
-	wPMNNcyePJgSAX1/eOwQxcSjaSW+KrwMeI/39aoIp
-X-Gm-Gg: AfdE7ckIRMNJWhisZs8s5pf6RekKPLZB2GDqwOwPBlz8qpnnwBvdeBNfitrpUNymQ/O
-	XjO8IRcjpQANAvINdnBGpFDEawPeYEozfR6BnwlCz9YrkqnN/Ypy3jLsroCAYnJ571NL70GMIUb
-	eWQjDLyYw/k6eZtcS5H/wFvNmTLhvrKBAT/RjXwILYFVhVKPSCo6VQln3RVmdeFEubfIefGIhQL
-	HuE8MqNxz1/V4YgcFcmwySsS0RXgLbedmow30PA0E3WehV5UTq83F1k6BNw/8sei2Mq1Cu4IPzH
-	VgarQS52IZrWe7//gA21s3cRKiqQt9c3IFeV
-X-Received: by 2002:a05:7022:689c:b0:133:52da:cb5f with SMTP id
- a92af1059eb24-13b33aefda3mr11573c88.21.1782841094527; Tue, 30 Jun 2026
- 10:38:14 -0700 (PDT)
+        bh=6xvhn4dXUWxUVWf7UvjrsOYZ0ZQQrdCYE7C0z/HL34c=;
+        b=oMp2CWKO2rW2B2f2pRZ5BEKn/kE0Z6RwkyonOI9P+imMPumWWK2i7eW7YBjRojp7AX
+         1JBhs1leZTSlWwmXjJ8eyBkc7+rkyIDqw/YrzyT9JH/iPoW9iKnFtH+y2+t13FypcWMJ
+         w7gbHzi7p70ZnW/NlLvm+g26xjPwFyz9QFT9WIThYxLy6HopJeIwusSxTyE41He4yVF9
+         wZuRoeFEu44G7PmNCPJMbmjjIF1Nt2bUpNNWvNZojTofpZYMO8Xfi50Zo9KgO/EyTA4b
+         ebJGWmFm+UHW/DOdRA5fLDNCw3yl6eZfGnqpLJQQB/hdDUmGWhodUj8XbqRzE5ozwdyZ
+         526g==
+X-Gm-Message-State: AOJu0Ywt4+uqnOKI7dSgThgN1TlHuB4evFnpbql2PYDpjSewI7QlyfyP
+	UD3VPwyGF9cCEDndt2jrkffmP2Y1snEyqg+G7Y/fPQbrsdS0BfhkilWB7ej9nmi75infG0xT5ih
+	UDs4HlKA/OVaOzE0JCeP62PBnqZ4ne5tQkpVBdseC
+X-Gm-Gg: AfdE7cl+6VuB+IMXHZHw2fan9njHxkZGFXjAOtjD0VeryO+VL5smosH7h6+sZ0OjwXU
+	af1M1gjt9gsyqmpsAN37VQovwmjFeeknoXtz5ox3x/t90jWxC8VkXg2KwNN4vCpBEf4whvmMBEp
+	Hwkncc5i0mES09Y7OhfQ8e8+c9sqPbBWDYvKBn+sX8PfJwdFlIdySd1lrFBSvWM59YRnbCGdfO/
+	aWV13CjytUUSbavdbQEP8dNxYhhnPGCg7aXKDHKEW274WWCQqjmkMZS+eX8hyOwzy5uPWu40fxc
+	5MZmSGHXMeNllKmhxyy1fe2PlYMFZ/Kti7+fNFogzG10eDYlcI1vJsHwZMM8ItqQQZEQKu4=
+X-Received: by 2002:a17:902:e5d2:b0:2bf:3579:cdaa with SMTP id
+ d9443c01a7336-2ca68a101d9mr188615ad.10.1782841103452; Tue, 30 Jun 2026
+ 10:38:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260629192029.4013794-1-tanshuhao@google.com>
- <20260629162619.55297244@kernel.org> <CAABY+HEcNnh+ATyA_JMg4LnVpP=egprTTi4UXxV9CfW2+71z+g@mail.gmail.com>
- <20260629181955.00e63b61@kernel.org>
-In-Reply-To: <20260629181955.00e63b61@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 30 Jun 2026 10:38:01 -0700
-X-Gm-Features: AVVi8CfIDRCEEftMp-9OYUT7tFXjHknuuH7nu2ohdOSy-r7PQmXeshFnOquXIA0
-Message-ID: <CAHS8izNeoJiLyoyiPgzmX5CGcyivYqBpVxOcFnoxeOX_zzFd4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 0/2] Reuse threaded NAPI kthread across napi_del()/napi_add().
-To: Jakub Kicinski <kuba@kernel.org>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Jordan Rhee <jordanrhee@google.com>
-Cc: Shuhao Tan <tanshuhao@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, 
-	Samiullah Khawaja <skhawaja@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260630162622.2667086-1-nshettyj@marvell.com>
+In-Reply-To: <20260630162622.2667086-1-nshettyj@marvell.com>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Tue, 30 Jun 2026 10:38:11 -0700
+X-Gm-Features: AVVi8CcAs9srRcQWupEsdwoSR1XEs7xbWr7DnyNaGulL_KAiBtIRAQH7ppp4IqQ
+Message-ID: <CAEAWyHdiHuSq-49YjtB2YUxageMYnTacVKY0Ye-km-07YMh19A@mail.gmail.com>
+Subject: Re: [PATCH net v3] octeontx2-pf: check DMAC extraction support before filtering
+To: nshettyj@marvell.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sgoutham@marvell.com, 
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com, 
+	bbhushan2@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, naveenm@marvell.com, 
+	tduszynski@marvell.com, sumang@marvell.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
@@ -124,104 +120,149 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:hramamurthy@google.com,m:jordanrhee@google.com,m:tanshuhao@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:shuah@kernel.org,m:skhawaja@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303312-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-303313-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:nshettyj@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:naveenm@marvell.com,m:tduszynski@marvell.com,m:sumang@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[almasrymina@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,marvell.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 78CB16E6F9A
+X-Rspamd-Queue-Id: 528EA6E6F6F
 
-On Mon, Jun 29, 2026 at 6:19=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Tue, Jun 30, 2026 at 9:26=E2=80=AFAM <nshettyj@marvell.com> wrote:
 >
-> On Mon, 29 Jun 2026 17:47:03 -0700 Shuhao Tan wrote:
-> > > Send a netdev Netlink notification when NAPI is re-created and
-> > > let the userspace re-apply the settings?
-> >
-> > It feels surprising that the userspace needs to reconfigure thread
-> > properties when changing NIC configurations unrelated to threading.
-> > Another downside is that when userspace configures NIC configurations
-> > in quick succession, re-application becomes messy because a previous
-> > re-application might still be in progress when the thread is gone.
+> From: Suman Ghosh <sumang@marvell.com>
 >
-> Can you explain more about your deployment and system configuration
-> flow? We may be adding micro optimizations when the problem is that
-> we recreate the NAPIs in the first place.
+> Currently, configuring a VF MAC address via the PF (e.g., 'ip link
+> set <pf> vf 0 mac <mac>') blindly attempts to install a DMAC-based
+> hardware filter. However, the hardware parser profile might not
+> support DMAC extraction.
+>
+> Check if the hardware parsing profile supports DMAC extraction
+> before adding the filter. Additionally, emit a warning message
+> to inform the operator if the MAC filter installation fails due
+> to missing DMAC extraction support.
+>
+> Fixes: f0c2982aaf98 ("octeontx2-pf: Add support for SR-IOV management fun=
+ctions")
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
+>
+> ---
+> v3:
+>  - Update config->mac only after hardware programming succeeds in
+>    otx2_set_vf_mac().
+> v2:
+>  - Move the DMAC extraction check from otx2_set_vf_mac() into
+>    otx2_do_set_vf_mac() which already holds pf->mbox.lock, so all
+>    mbox operations are under a single lock/unlock pair. All error
+>    paths now use the existing goto-out pattern, eliminating the
+>    scattered mutex_unlock() + return calls from v1.
+>  - Return -EOPNOTSUPP instead of 0 when DMAC extraction is not
+>    supported, so the caller gets an explicit error rather than a
+>    silent success.
+> ---
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 44 ++++++++++++++++---
+>  1 file changed, 38 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drive=
+rs/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> index b63df5737ff2..697570765957 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> @@ -2517,10 +2517,43 @@ EXPORT_SYMBOL(otx2_config_hwtstamp_set);
+>
+>  static int otx2_do_set_vf_mac(struct otx2_nic *pf, int vf, const u8 *mac=
+)
+>  {
+> +       struct npc_get_field_status_req *freq;
+> +       struct npc_get_field_status_rsp *frsp;
+>         struct npc_install_flow_req *req;
+>         int err;
+>
+>         mutex_lock(&pf->mbox.lock);
+> +
+> +       /* Skip installing the DMAC filter if the hardware parser profile
+> +        * does not support DMAC extraction.
+> +        */
+> +       freq =3D otx2_mbox_alloc_msg_npc_get_field_status(&pf->mbox);
+> +       if (!freq) {
+> +               err =3D -ENOMEM;
+> +               goto out;
+> +       }
+> +
+> +       freq->field =3D NPC_DMAC;
+> +       if (otx2_sync_mbox_msg(&pf->mbox)) {
+> +               err =3D -EINVAL;
+> +               goto out;
+> +       }
+> +
+> +       frsp =3D (struct npc_get_field_status_rsp *)otx2_mbox_get_rsp
+> +              (&pf->mbox.mbox, 0, &freq->hdr);
+> +       if (IS_ERR(frsp)) {
+> +               err =3D PTR_ERR(frsp);
+> +               goto out;
+> +       }
+> +
+> +       if (!frsp->enable) {
+> +               netdev_warn(pf->netdev,
+> +                           "VF %d MAC filter not installed: DMAC extract=
+ion not supported by parser profile\n",
+> +                           vf);
+> +               err =3D -EOPNOTSUPP;
+> +               goto out;
+> +       }
+> +
+>         req =3D otx2_mbox_alloc_msg_npc_install_flow(&pf->mbox);
+>         if (!req) {
+>                 err =3D -ENOMEM;
+> @@ -2559,13 +2592,12 @@ static int otx2_set_vf_mac(struct net_device *net=
+dev, int vf, u8 *mac)
+>         if (!is_valid_ether_addr(mac))
+>                 return -EINVAL;
+>
+> -       config =3D &pf->vf_configs[vf];
+> -       ether_addr_copy(config->mac, mac);
+> -
+>         ret =3D otx2_do_set_vf_mac(pf, vf, mac);
+> -       if (ret =3D=3D 0)
+> -               dev_info(&pdev->dev,
+> -                        "Load/Reload VF driver\n");
+> +       if (ret =3D=3D 0) {
+> +               config =3D &pf->vf_configs[vf];
+> +               ether_addr_copy(config->mac, mac);
+> +               dev_info(&pdev->dev, "Load/Reload VF driver\n");
+> +       }
 
-We have an AF_XDP application with extremely low latency and jitter
-requirements running on our servers. Sami developed busypolling
-threaded napi for them. Since it's an AF_XDP application, they attach
-their umem to specific RX queues, and then configure threaded NAPI
-busypolling to achieve low latency. That involves using the Netlink
-API to set the threaded/busypolling property, grabbing the kthread
-PID, and setting some properties on the kthread. Concretely, something
-like:
+This is a valid change and would have been nice to mention it in the
+commit message. Either way:
 
-```
-  local napi_id
-  napi_id=3D$(call_ynl --output-json --do queue-get \
-    --json "{\"ifindex\": ${ifindex}, \"id\": ${q_id}, \"type\": \"rx\"}" |=
- \
-    jq -r '."napi-id"')
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-  echo "Enabling busypolling for queue ${q_id} (NAPI ${napi_id}) on CPU ${c=
-pu}"
-  call_ynl --do napi-set --json "{\"id\": \"${napi_id}\",
-\"threaded\": \"busy-poll\"}" >/dev/null
-
-  local napi_kthread_pid
-  napi_kthread_pid=3D$(call_ynl --do napi-get --output-json \
-    --json "{\"id\": \"${napi_id}\"}" | jq -r '."pid" // empty')
-
-  taskset -pc "${cpu}" "${napi_kthread_pid}" >/dev/null
-```
-
-The bug is that the taskset configurations disappear when the user
-runs an unrelated ethtool command. Yes, the root cause is that an
-unrelated ethtool driver config on GVE, gve_adjust_config() will
-recreate the NAPIs. My understanding is that NAPIs are recreated on
-ethtool commands as WAI and standard upstream driver behavior; is that
-not correct? If we held onto the same NAPIs during driver reconfigs,
-this issue would indeed be fixed. Is holding onto the same NAPI during
-driver reconfigurations an appropriate/feasible fix here?
-
-Other ideas, FWIW:
-
-1. We could add an optional netlink argument, "remember_napi_kthread,"
-that customizes this behavior for users who want to remember thread
-config.
-
-2. We add an optional netlink argument: "bind_napi_kthread_to_cpu"
-that not only sets threaded but also binds the created thread to a
-specific cpu set, and then include that cpu set as part of the
-napi_config so that's it's remembered on reconfigs.
-
-But I think the best options are (a) not recreating napis during
-driver configs or (b) this patch to park/unpark the thread, TBH.
-
---=20
-Thanks,
-Mina
+>
+>         return ret;
+>  }
+> --
+> 2.48.1
+>
 
