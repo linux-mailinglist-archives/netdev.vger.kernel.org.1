@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-303114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yfSsCkOoQ2qYeQoAu9opvQ
-	(envelope-from <netdev+bounces-303114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:28:03 +0200
+	id M+EIEUKpQ2rqeQoAu9opvQ
+	(envelope-from <netdev+bounces-303115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:32:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869666E395A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:28:02 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37EE76E3A1C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:32:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KEyR6CQu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303114-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303114-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="CKY49s/g";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303115-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303115-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D1E1B30583CC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:20:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4778E304774E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F4E3FC5B9;
-	Tue, 30 Jun 2026 11:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43433E3C5A;
+	Tue, 30 Jun 2026 11:19:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7313EA962
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881B93EA962
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:19:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782818390; cv=none; b=EiyXTl2yBzTk6DDJJLZjlwy4F69Nh0x2kwE+mCqWFKpS+MNiV55PDSaSBi0RAZCobBOuEpe65GgoK/qsZE2maTFmygQ0lKonkzuGxSsJgfwDlXMqCeM1axsDkkwxuwPtkld2UbdDh/Rtpp596YP194naqaiaTyHMzqM/KBGui18=
+	t=1782818393; cv=none; b=IS7Dg54Sn9rYTwueFTKpmREzr0tED9ADVf3bst/6Qu7hjJxsoGAauYs+iK37dAv5SN052qxCqZVhXEJhCUeolLmww9HP/rdAQuxTHvtMWUoLIQkas7VNHYb0yRMOUzEJutsbOX5Hz1Ovr79FtSkswOKpJKP7MSG4ZXnfzSkRhQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782818390; c=relaxed/simple;
-	bh=ijrQtH/J/+QU/Q7uhbxgKn/lrQe0GR1Pj7ac0J8UYbg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EYcMEYmydml8KQKKfsycnwn49GxM0eKhFn4MS/AyYECygG+Bi6AbJzAIg3ZlsQejvNUQyAQvtzebBU59e1PI4qjJuz4gA+KxMdOPsM4FtDUvDP92VLi77J3wEw6o+EExtW8+sxc5m4VJgcbKiHSgk8SvzdUOSYi1qZ9tIicZ66o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KEyR6CQu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 606581F000E9;
-	Tue, 30 Jun 2026 11:19:47 +0000 (UTC)
+	s=arc-20240116; t=1782818393; c=relaxed/simple;
+	bh=9SQSa2lndL91crLT50aovAsfxh0Gj2zHfRJAMccp9ao=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=dV5g7Zbt4eCv7z/zEZISlyfdkx1K9cmxw6CgDhlCj1ZminoYwbZtWHPWxxINW8U3eciGA39MfU4lYciTJmJkfjqtuvUFM4B1xIubG4ys4ff9zEC2UigT+ciK9zK06FHvDiaoFHKZUXHbkZ0Qyq4A/TCMjzfwOGPOIPuSAsASGxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CKY49s/g; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 259E01F00A3A;
+	Tue, 30 Jun 2026 11:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782818389;
-	bh=SiW+8LV11SJo42nmFzjtEE72TMoUV2Ahtx3cTWNie7w=;
-	h=From:Subject:Date:To:Cc;
-	b=KEyR6CQuRjN7HsXVk4pygSB03kM6wLcNixl6c70lCfgc0QrQ8AbgarkYokGpTvJtV
-	 KVjuwEBViA2aRbjeCl+r/bgMvv7wkP9GAhf4foDZWx+Dn6hPV3X1ynZ0KXj39xOGEU
-	 NEziyoPRPeDf4XW8WXU0zvxgJmXl9fGUzLV/tzs8gbukBge+4C9iCKS1bnpQPJ3atR
-	 wt2p4a+GKj11NLnGA8egyITSygnrBAISgJfO8zmrpBnB86KQwQUB+EmE4QXUNmdTJj
-	 O235mVjBFx/uDZ77xc2VgBFGnUcVG8MMk+LyOe9KSd5xEqaPvZhwZGoVbK9vJJhsml
-	 /tOHQ4DRf2oig==
+	s=k20260515; t=1782818392;
+	bh=WXMm0GByJ8ckgmNhY27Iw1au8xjrtbDfFsApmsKjXWU=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=CKY49s/gJpkGE2KiUoDx9XjwZbrnYMxoFfchm/AWEUfQWPPB8fyi9m0K600e7FFe1
+	 xzzXGc5rbPx1DiVWhfVqoPIHipiJivgvp8SFUQdsxpP6ZKRq8Fbu7xtO10O/UGeOfW
+	 Ydpl1dPLQ2c4xOqA17LFmHNbwnWHx7C1FbFoiXpQiHmfCWzbeSmgWVwxKgSRUU7dCT
+	 Z52NdzEEKIutqeXt/T7X4GVYXW3qPAWWhoqyAxgCE9v+bSxSIXMVE3t9LExPDn3i7i
+	 Ri9oSLQtJa5TCGtZwec5zc5D4TL0K1SVtINHFY0zGZmuXlcK1qE5USikLlwLtW+0XC
+	 kS4GMd2WNdYVA==
 From: Linus Walleij <linusw@kernel.org>
-Subject: [PATCH net-next v2 0/5] net: dsa: realtek: rtl8366rb: Use generic
- RTL83xx code
-Date: Tue, 30 Jun 2026 13:19:40 +0200
-Message-Id: <20260630-rtl8366rb-improvements-v2-0-05eb9d6a37f5@kernel.org>
+Date: Tue, 30 Jun 2026 13:19:41 +0200
+Subject: [PATCH net-next v2 1/5] net: dsa: realtek: rtl83xx: Make learning
+ optional in join/leave
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,11 +58,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WOwQ6CMBBEf4Xs2Zp20QY8+R+Gg8ACVWjJtjYYw
- r8L6NXjZObNzAye2JCHSzIDUzTeOLsKPCRQdXfbkjD1qgElaqmVEhz6LNWaS2GGkV2kgWzwotZ
- 5g+p0RpXXsMIjU2OmvfgGloKwNAUovo5/lQ+qwta7ZTvjg+P3/iGqnfjN4b+5qIQUOaaImW4ql
- NX1SWypPzpuoViW5QM1kMaY2QAAAA==
-X-Change-ID: 20260611-rtl8366rb-improvements-d69f2145219d
+Message-Id: <20260630-rtl8366rb-improvements-v2-1-05eb9d6a37f5@kernel.org>
+References: <20260630-rtl8366rb-improvements-v2-0-05eb9d6a37f5@kernel.org>
+In-Reply-To: <20260630-rtl8366rb-improvements-v2-0-05eb9d6a37f5@kernel.org>
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
  =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -75,20 +73,20 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:luizluca@gmail.com,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com,bang-olufsen.dk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-303114-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303115-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -101,56 +99,81 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,msgid.link:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 869666E395A
+X-Rspamd-Queue-Id: 37EE76E3A1C
 
-As a follow-up to Luiz's and Alvin's series improvining the
-generic handling of the Realtek DSA switches, this small
-series brings the RTL8366RB closer to the way things are done
-in the RTL8365MB driver.
-
-This patch series switches over to using the generic helpers
-for:
-
-- Bridge joining and leaving (isolation)
-- STP handling
-- Learning enable/disable
-
-It would be appreciated if this doesn't lead to AI-automated
-request to fix the entire universe (hi Sashiko, I'm looking
-at you but I bet you will do you compulsive C3P0-style review
-anyway) since I'm just moving code around so some helper
-functions come before their new users. The code itself is
-pretty straight-forward.
+Mostly to make it possible to add rtl83xx support piece by piece,
+make the port learning callback optional in rtl83xx_port_bridge_join()
+and rtl83xx_port_bridge_leave().
 
 Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
-Changes in v2:
-- Rebase on v7.2-rc1
-- Prepend a patch making the learning callbacks optional so we can add
-  functionality one patch at a time.
-- Link to v1: https://patch.msgid.link/20260612-rtl8366rb-improvements-v1-0-9232286fc20c@kernel.org
+ drivers/net/dsa/realtek/rtl83xx.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
----
-Linus Walleij (5):
-      net: dsa: realtek: rtl83xx: Make learning optional in join/leave
-      net: dsa: realtek: rtl8366rb: Switch to generic port_bridge* handlers
-      net: dsa: realtek: rtl8366rb: Use DSA port iterators
-      net: dsa: realtek: rtl8366rb: Disable STP learning on all ports in setup
-      net: dsa: realtek: rtl8366rb: Switch to generic learning enablement
+diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
+index 71124ecca92f..90843d52c5a8 100644
+--- a/drivers/net/dsa/realtek/rtl83xx.c
++++ b/drivers/net/dsa/realtek/rtl83xx.c
+@@ -356,9 +356,6 @@ int rtl83xx_port_bridge_join(struct dsa_switch *ds, int port,
+ 	if (!priv->ops->port_add_isolation)
+ 		return -EOPNOTSUPP;
+ 
+-	if (!priv->ops->port_set_learning)
+-		return -EOPNOTSUPP;
+-
+ 	dev_dbg(priv->dev, "bridge %d join port %d\n", bridge.num, port);
+ 
+ 	/* Add this port to the isolation group of every other port
+@@ -396,9 +393,11 @@ int rtl83xx_port_bridge_join(struct dsa_switch *ds, int port,
+ 			goto undo_self_isolation;
+ 	}
+ 
+-	ret = priv->ops->port_set_learning(priv, port, true);
+-	if (ret)
+-		goto undo_efid;
++	if (priv->ops->port_set_learning) {
++		ret = priv->ops->port_set_learning(priv, port, true);
++		if (ret)
++			goto undo_efid;
++	}
+ 
+ 	return 0;
+ 
+@@ -443,9 +442,6 @@ void rtl83xx_port_bridge_leave(struct dsa_switch *ds, int port,
+ 	if (!priv->ops->port_remove_isolation)
+ 		return;
+ 
+-	if (!priv->ops->port_set_learning)
+-		return;
+-
+ 	dev_dbg(priv->dev, "bridge %d leave port %d\n", bridge.num, port);
+ 
+ 	/* Remove this port from the isolation group of every other
+@@ -474,11 +470,13 @@ void rtl83xx_port_bridge_leave(struct dsa_switch *ds, int port,
+ 	 * downstream DSA ports from the isolation group.
+ 	 */
+ 
+-	ret = priv->ops->port_set_learning(priv, port, false);
+-	if (ret)
+-		dev_err(priv->dev,
+-			"failed to disable learning on port %d: %pe\n",
+-			port, ERR_PTR(ret));
++	if (priv->ops->port_set_learning) {
++		ret = priv->ops->port_set_learning(priv, port, false);
++		if (ret)
++			dev_err(priv->dev,
++				"failed to disable learning on port %d: %pe\n",
++				port, ERR_PTR(ret));
++	}
+ 
+ 	/* Remove those ports from the isolation group of this port */
+ 	ret = priv->ops->port_remove_isolation(priv, port, mask);
 
- drivers/net/dsa/realtek/rtl8366rb.c | 268 ++++++++++++++++++------------------
- drivers/net/dsa/realtek/rtl83xx.c   |  26 ++--
- 2 files changed, 143 insertions(+), 151 deletions(-)
----
-base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
-change-id: 20260611-rtl8366rb-improvements-d69f2145219d
-
-Best regards,
---  
-Linus Walleij <linusw@kernel.org>
+-- 
+2.54.0
 
 
