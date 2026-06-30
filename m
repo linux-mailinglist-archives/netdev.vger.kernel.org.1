@@ -1,173 +1,155 @@
-Return-Path: <netdev+bounces-303049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303050-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0xM2HL2JQ2qqagoAu9opvQ
-	(envelope-from <netdev+bounces-303049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:17:49 +0200
+	id S62ADFqKQ2oiawoAu9opvQ
+	(envelope-from <netdev+bounces-303050-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:20:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED496E2060
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:17:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 947506E2119
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:20:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qq.com header.s=s201512 header.b=eLMLjOw9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303049-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303049-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=qq.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=MQOn4K22;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303050-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303050-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6D5BE302B854
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:13:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AF0E23018C17
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB533EBF18;
-	Tue, 30 Jun 2026 09:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9121D389460;
+	Tue, 30 Jun 2026 09:20:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-236.mail.qq.com (out203-205-221-236.mail.qq.com [203.205.221.236])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F213EB0F6
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E57D383318;
+	Tue, 30 Jun 2026 09:20:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782810781; cv=none; b=HJd86dB0JymI23xOJKoFWvJhzGzlrJYvS0ndisoB+Kkp2lreJ6T1Le7S2eOy2JyZ6G854E+9reiUFA4s6f/fZFa5pgIIieCGLYDytFLLqg4XkwpOdub9ffIQFwdGwtnGomJPyAZvHhhUzMSp5pl+O+oTqo5cyT7/WVr7/Isvp+A=
+	t=1782811208; cv=none; b=SST1Sxu7Y6Ve0r4GRgnQaQXkKiSoMXJ5XpfDTXmOfpUTznS0iwud3fxaOEH/JBsIZ2wyLkV5VRY3HgaUpTez1oWqleXAUHi6JN+ElnNK7KGBsdczbKjilX1CYkIeMYY6wCvR0PGrhbAaTIJ605TnP9JVf1AcUrgTPvwUUGixgew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782810781; c=relaxed/simple;
-	bh=kySt2e1rfj7LptBox57g7w5ICPrmxbvLWzxRFUNeSIk=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=Td6L7VZVRDYKgyndECbAcDKc7FbP2lB77j8Ua+MCg8ArkxMIsFKNzf4stKpRV3PQtj3yvxl7IWTIMCJsbV1DAHEo9vddksMlPEjlAfyW2L/yEAlEQ780gv3qBdwkwOY2uHIQL0CYBqqaumlVh4yBN1x1oDvi3V1lmpsutiYzfK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eLMLjOw9; arc=none smtp.client-ip=203.205.221.236
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1782810771; bh=1dfi7biA1sGA59UN+588jwNbvleUJ44ok6h9LBwNWnQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eLMLjOw9BtVwLzyGRzJArQOxUH90D3ZB6VLA/p0qQUsC/Bo27oXGruxKXYANx83Or
-	 iY3MmDx5P8RTFpJlqvsP0ZQ07y+IBb3o6KbN+5dHqtPuGOw2ur8R3xGRQW33iv1h8b
-	 4RqBQ01uBe/GyxRZ5iK3yCSNn/wSo9zwUPrAqh1s=
-Received: from lxu-ped-host.. ([111.198.231.89])
-	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
-	id 2E201616; Tue, 30 Jun 2026 17:11:34 +0800
-X-QQ-mid: xmsmtpt1782810694t6vhyvnda
-Message-ID: <tencent_45066D89AD6EF9AED34CA567FA46CA52C606@qq.com>
-X-QQ-XMAILINFO: OZZSS56D9fAjxnsilrLdrNDiNIRRjgkkepro8vxPt12NBctPvNYFwCeu81DM9Z
-	 OfV9p6l/T41Jd7iuk/0sCvJQp27jU2a8CqX+dbCRmFWqGdxu+EEQZ7Gk/Cy44shP0EY5lPVZoZsg
-	 RFQ811puuNOmncYOKpncYqU/JwF8Ue9RIV26QJZCXvJywPog5kzprRTKcagiwtitp9GFnMFF8z9t
-	 h7w4NWkt/POpJZylA3b9sfRSlDUHR/vuJxrYENwD1yJ5AiYi+XJ4L75UJLZYBgyqGusmN7ajLlCW
-	 9NFj9zHo/XHVAM9ifgBGbcV+ccU/E0N7ihtM4+Lp5GbqqWtjViujRPi5Y63R11szcpGvCTJRiwkD
-	 6AUBajf7g16xLSnWyOpIYM2EAr0S7RQhIKK6ATOA9s5UgU3jv5PDZmdE7gsTDZNiOlnxYQjtkCj2
-	 97Xa/k+UfZvtFLLZLZMjtOaNFW5QzqYlS5mPpvg02rbpvtuCtb+tEF1zD2qi3dP+lVL5Cbe9zEhE
-	 wveQsB403beKq0POyjCojG3k/BOsFbX1UdWKePkSYqRtp4CmpU1zJWgVh7qfVOwMYGWAbLxs8FD5
-	 Q/+pN7MdZtvkqN8Uo9DZrBZorS2st0JEArCr93+un1raqkMAm3h7CTxVGWfAjfKSWN8Z5ZdMe1tc
-	 MbWkNbDrDk8+1/8Ym78hvkm3h3Jia8BRDj5docEiLxwl61qZdvPUfm4zQuvfWwN0Q46HsRwxyNpn
-	 HZQMCKTHaE7zXWO/1ph8+/79fu0Gc0CtlND9QzPNE9lzuBWiqjN3bkCujGPE0sOSr/8fIobtQuaA
-	 rL/c8paAMIVVptF02XVSEr1oY81Ab/PC3Jun55jNC9DZkuifWxRv58UbfLJ+cejVWYOqD+5UCtvy
-	 f1ImAa15F0cNqwm8GMuYv7lNkDWxto5R3zvXi3cCPLXp4zkx7DOPsIdOxtqDKSmPAjB2ej69Edvc
-	 5N17TF5nSxzg9M4FDGwmgneHMHLOX+5BQhU6u4xfybG/+9FsHip+ukJJWZz+Y8/hkmu08AFTVUXv
-	 95VN6HYt64DzETfL1I7GdlAbO0DQDMcShe97JLS31So/nlglm89spHRfvsH62SFGqnMlDUZ+ulWY
-	 9yVaYr
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
-From: Edward Adam Davis <eadavis@qq.com>
-To: sashiko-bot@kernel.org
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	emil@etsalapatis.com,
-	jolsa@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	memxor@gmail.com,
-	netdev@vger.kernel.org,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: [PATCH v2] bpf: Fix smp_processor_id() call trace for preemptible kernels
-Date: Tue, 30 Jun 2026 17:11:33 +0800
-X-OQ-MSGID: <20260630091132.941145-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260630084910.D5C3A1F000E9@smtp.kernel.org>
-References: <20260630084910.D5C3A1F000E9@smtp.kernel.org>
+	s=arc-20240116; t=1782811208; c=relaxed/simple;
+	bh=Rz9u1wL+cfAoqAlVFh7Bm1MXtHcdFkD5ED4Y8Ra58IU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
+	 References:In-Reply-To; b=kFv10wfvbO6NdDe47072ouxZIbg0LzjfCKDVX6xS4TEtaulK4IJaJctDNlYwV+fMGgQsN91S5h/6iaQHoaEwQjvHjYazmDTwvgxRIXFCzqs0tYIuiNcviHdVvCDbMS7BpaLFlDtvDlf2jIFbccPuBECkRTmusQR7zJmKKgFIZvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MQOn4K22; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 7C06D1A0D4F;
+	Tue, 30 Jun 2026 09:19:58 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4CB6060233;
+	Tue, 30 Jun 2026 09:19:58 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6F5EC106F1D29;
+	Tue, 30 Jun 2026 11:19:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782811197; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Rz9u1wL+cfAoqAlVFh7Bm1MXtHcdFkD5ED4Y8Ra58IU=;
+	b=MQOn4K22FB+ZSukXRORS4ivpsz2hVhO0/wA9SMAODocZazKzX/q4DeWw232cyAXUltY7Ka
+	QowY2GcacH16AvrJyWJaYU/PHqgxHAblRdIaHy6J9GKzYQROGQDvvZYmuHPX5DL2Jogg39
+	Z+9NjcB8llBOzvodZpJfYNxnvIUwFnssGgn2MAw5JQrcJDK1PA8IZxlqTrv17xilh7FthK
+	GdW9ntLZtVateNC8nE1AvJj6Zb/vvyqc/WEifUGkEA/cY9avP//uclSNPtpC2bxz3KaRkw
+	BnhAT1vRne7EhOe7iIlKSJVk2d5UEv+I8Cto4veLhTBDIMh1JnmXvft/XM7ZEA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 30 Jun 2026 11:19:43 +0200
+Message-Id: <DJM9TJAOURO5.1QAA84FHLOMEF@bootlin.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net v3 1/2] net: macb: give reasons for Tx SKB kfree
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Haavard Skinnemoen"
+ <hskinnemoen@atmel.com>, "Jeff Garzik" <jeff@garzik.org>, "Conor Dooley"
+ <conor.dooley@microchip.com>, "Paolo Valerio" <pvalerio@redhat.com>,
+ "Nicolai Buchwitz" <nb@tipi-net.de>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Vladimir Kondratiev"
+ <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
+ <maxime.chevallier@bootlin.com>, <stable@vger.kernel.org>
+To: "Jakub Kicinski" <kuba@kernel.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260617-macb-drop-tx-v3-0-d4c7e57d890b@bootlin.com>
+ <20260617-macb-drop-tx-v3-1-d4c7e57d890b@bootlin.com>
+ <20260621144047.3db74e2b@kernel.org>
+In-Reply-To: <20260621144047.3db74e2b@kernel.org>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303049-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,gmail.com,etsalapatis.com,linux.dev,googlegroups.com];
+	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-303050-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:hskinnemoen@atmel.com,m:jeff@garzik.org,m:conor.dooley@microchip.com,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:stable@vger.kernel.org,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:sashiko-bot@kernel.org,m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:emil@etsalapatis.com,m:jolsa@kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:netdev@vger.kernel.org,m:song@kernel.org,m:syzkaller-bugs@googlegroups.com,m:yonghong.song@linux.dev,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[qq.com];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,qq.com:dkim,qq.com:email,qq.com:mid,qq.com:from_mime,vger.kernel.org:from_smtp,syzkaller.appspot.com:url,appspotmail.com:email]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:url,bootlin.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0ED496E2060
+X-Rspamd-Queue-Id: 947506E2119
 
-bpf_mem_cache_free_rcu() maybe called in preemptible context, this
-will trigger the below warning message:
+Hello Jakub,
 
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.0.17/5820
-caller is bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
-Call Trace:
- check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
- bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
- rhtab_delete_elem+0x185a/0x1b30 kernel/bpf/hashtab.c:2969
- __rhtab_map_lookup_and_delete_batch+0x935/0xcb0 kernel/bpf/hashtab.c:3349
- bpf_map_do_batch+0x445/0x630 kernel/bpf/syscall.c:-1
- __sys_bpf+0x906/0xd90 kernel/bpf/syscall.c:-1
+On Sun Jun 21, 2026 at 11:40 PM CEST, Jakub Kicinski wrote:
+> On Wed, 17 Jun 2026 11:17:29 +0200 Th=C3=A9o Lebrun wrote:
+>> Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
+>> Cc: stable@vger.kernel.org
+>
+> Interesting, did AI suggest this? It's fairly uncommon for drivers
+> to care about drop reasons, packet loss on egress ports is pretty
+> clearly attributed by tx_drops.
+>
+> I don't think this belongs in net, net-next would be fine, if you think
+> it's necessary. Sashiko seems to point out a few more clear cut bugs.
 
-this_cpu_ptr() access needs to be guarded against preemption.
+I don't use AI for kernel code generation, only code exploration and
+reviews.
 
-Fixes: 5af6807bdb10 ("bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().")
-Reported-by: syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=fd7e415d891073b83e1f
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-v1 -> v2: using guard against preemption
+In MACB we know our stats are pretty broken (including tx_drops) but
+fixing stats is a full refactor that will come later and is too large
+for this bugfix. So I used the drop reason mechanism to have a way to
+notice dropped packets, otherwise we have nothing.
 
- kernel/bpf/memalloc.c | 2 ++
- 1 file changed, 2 insertions(+)
+My commit message should have covered this in more details!
 
-diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
-index bd45dda9dc35..1d7ddfc1c9d1 100644
---- a/kernel/bpf/memalloc.c
-+++ b/kernel/bpf/memalloc.c
-@@ -957,7 +957,9 @@ void notrace bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
- 	if (!ptr)
- 		return;
- 
-+	get_cpu();
- 	unit_free_rcu(this_cpu_ptr(ma->cache), ptr);
-+	put_cpu();
- }
- 
- /* Directly does a kfree() without putting 'ptr' back to the free_llist
--- 
-2.43.0
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
