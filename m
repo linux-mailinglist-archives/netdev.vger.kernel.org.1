@@ -1,186 +1,178 @@
-Return-Path: <netdev+bounces-302980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302981-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qICdMjNgQ2paXgoAu9opvQ
-	(envelope-from <netdev+bounces-302980-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:20:35 +0200
+	id thjlJ5ZgQ2pyXgoAu9opvQ
+	(envelope-from <netdev+bounces-302981-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:22:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD43C6E0B09
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:20:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 107116E0B44
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:22:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302980-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302980-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="NU/5nzWc";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302981-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302981-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D200E3006927
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:20:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D6993016002
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487C63E00B9;
-	Tue, 30 Jun 2026 06:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18B73E44E0;
+	Tue, 30 Jun 2026 06:22:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23533E2AD6
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 06:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47393336EE9;
+	Tue, 30 Jun 2026 06:22:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782800422; cv=none; b=pGmTccuPqKEWxMIO2b8zJ2GRtKcM7MRRlJ5r+EQkB85dq7iJpDPNxRFWEKW8xalbcNbRkU+G8ro4cCozvcoMcFEKDcAJF3IIJ9cP4TeS6tnhfxXwiTwqBHjvR9LfVzgIyJiXBemjaJ4AEOlhc1T2D3siIMeMFjdQJYH8fnYJip4=
+	t=1782800531; cv=none; b=KLsFY5d1atwR8hINvwUv1Ss6Mcs39mIkI34j57f7TBcePkaK9BIhJmQ4S4s5knN/FeaUH/UzIEasjg52O/QR4uNr8E12syifvtp9m/lrRK3J8nv0hm4LXCil1aZSpjt547YPVKzN7D9q8RDZyU2ddhvKok6VLpRrsB4FB6uo8CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782800422; c=relaxed/simple;
-	bh=cEsCrGj+9F9IQFWnuctbba8n0jEKZ3TqDH7l5Qt7IFY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IqpGYg3clykkk4loOsy1D+2pTxin3lupHIw1aDcQXFGAWg8eDog9e1rTed6SAuPpmk3v7z9D7DoeX7Oni8VDo/dvEfvqyTCNSARz3V9d/JuyjrZrMz2ZzPVURcY90cQ/y1gwVXBhzyCZ/XsytHfEl2qsuysi6KUdMYkTTaILII8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
-Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-495f6da4e22so137577b6e.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 23:20:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782800420; x=1783405220;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DnbMFUM7qZ+D+NV7cL8jZmwUgpg+omKmeavLOl+0ZQ8=;
-        b=i2pTmcoBvnvsuXnRBuBG7jiDNUyM9mAaxl3gfnuPsobHROLxEjTGhqSIZxts/34af4
-         97V2kg29nwqtccFO+CAG7R8a4VqdEJqH4AlseJyJ9orMNG5wE1fMHa7/nP/GtG8oxDgT
-         n0BBg5DDfl5WPE/GSSl/W7JG08mCg26H5LpDB52ZFkqqWFdU4nTewwMSZJ4pE2oMqAlU
-         5HNuXDrNAXVae19UKrn6mK/v0oy4n+xTcl8bleIPCMLo3ZBeu6OTHZNe29bh+fttuWNR
-         yE/It7qs9MK0hh+K7B9ZRPsBjPPS1nnvfHKSlIXSjVdemgszQdnThi+AHXQqLh2AZ14x
-         0jqA==
-X-Forwarded-Encrypted: i=1; AFNElJ9ogc3WqyU6sP2P4eiBfNqQGsnJ4J4qQX6y6uYQBhZR0592YkrKoNMIfacabQj20AnKza9LUI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIsyDxhKkUajqssXYU26C7oAWNTqJZ7PT8hNFTx9JV26oEp7rs
-	9CBX/xpdv8YXAt//g5zKrZV3oD0eH676itppFYUWnk7b8mmHcNh8J5VjCAUzwfh+smpguq52/Is
-	qnIVSjkQmLp600zrvzEZw8Q7iPELno/oWji/AkmKap6NMwCxePiT2+iqGz9o=
+	s=arc-20240116; t=1782800531; c=relaxed/simple;
+	bh=m2O89VPI6JEXJFqa/aL9ZWvlMZJ7oWrYznfu5QiSfNg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qga2Qm2b41KGfokweWfzucJ6GrRWjHWDIp944gh+Ru8R75v2+zta1UddLdg4wFWBI3FZ5rjcizPjex28Yf4UGIICG4W8ArKYZVIo8G6Z7GSISjlpG6La11ROMJ52XHRH5ZlhikUMRvreW/RwSTPMvsWRA78TB092WbWDr2dlTvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=NU/5nzWc; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U5d8Kx3954375;
+	Mon, 29 Jun 2026 23:22:00 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=0Ci3YaisIhEr4wgLMHcO67X
+	tvB074lKFvewkGmLcHB4=; b=NU/5nzWczIMMQJETmsJJFKLqYfb3Bsij2pyXeCR
+	sM4ZFCpzaYPF0pbwnEMIc9v0u/I/M9KtzkBk5Y9proIL8goys08jvjLktKY+CdwJ
+	HbE2HWgRm1VBJ3Qb1olKiCcbRLjQox9JevbGdO2qYf/ZZQhUG/7mfb1Clyj12Z+M
+	568Qt8zw1eOobcUmS7LfA8orSL2Zf6ZYQ/qTl4ghZRlRiw92/1J60BMnyI6v1Vjx
+	MeoHqxw62RDqA3fe74bRri1a6lO/V7KB9x9y3wYFJNDNzfALlFVgP7/tGpTNuM+G
+	KFpXsXdNuDqNrQhYnNkajTWLOn4RZlLB2IMm5eGkdBDrOow==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f3uwfajkw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jun 2026 23:21:59 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 29 Jun 2026 23:21:58 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 29 Jun 2026 23:21:58 -0700
+Received: from kernel-ep2.caveonetworks.com (unknown [10.29.36.53])
+	by maili.marvell.com (Postfix) with ESMTP id 289BA3F7080;
+	Mon, 29 Jun 2026 23:21:53 -0700 (PDT)
+From: <nshettyj@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sbhatta@marvell.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, Kiran Kumar K <kirankumark@marvell.com>
+Subject: [PATCH net-next 0/2] octeontx2-af: NPC parser and RSS improvements
+Date: Tue, 30 Jun 2026 11:51:43 +0530
+Message-ID: <20260630062145.2533816-1-nshettyj@marvell.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:4c84:b0:495:f25f:f333 with SMTP id
- 5614622812f47-495f2600e1emr670746b6e.22.1782800419888; Mon, 29 Jun 2026
- 23:20:19 -0700 (PDT)
-Date: Mon, 29 Jun 2026 23:20:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a436023.b42ede87.8e801.0003.GAE@google.com>
-Subject: [syzbot] [bpf?] BUG: using smp_processor_id() in preemptible code in bpf_mem_cache_free_rcu
-From: syzbot <syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, emil@etsalapatis.com, 
-	jolsa@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	memxor@gmail.com, netdev@vger.kernel.org, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: PFwlYgTSE9VEA1V3mbrElzDCWuD0Lsxz
+X-Authority-Analysis: v=2.4 cv=WNJPmHsR c=1 sm=1 tr=0 ts=6a436087 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8 a=mlPuASG-G_L-QCVXceYA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: PFwlYgTSE9VEA1V3mbrElzDCWuD0Lsxz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDA1MiBTYWx0ZWRfX7ZKi5eVmWJJN
+ Ps4N6q9Mvx9HL3U5qwWs0bgHHR+bM7Df/q2LssEMXe95E/EGD7jzepb6YGX2gwKVa7iBCQg7nSi
+ eP2JWkMaUknNcWManizYoE4+WK6IDSLMbYC3nOQwpCvOVtwC3G+kM6yEv5W6t1Rlum9Y1Q0fdeh
+ vWfsrDoFk/xPXAhGx105ODD4oTAi8OuerJcfI059+bBi7SV+q73isOZRGHvHoY8m9wNgi2drCe4
+ 5jc9zh2E+k4TC7iV86v2UOfySDLF0Q3lSZPzXWK0RU5zz/kl7GjJqQoh3+ZQA7Mk2ZObah2GhLe
+ 9IR3ynEBQJkgHe6eZHE++jXcayIGItsczdwcXO2Ie30XoXRmRCbpFIAA0Z36U5rxEtNnrEL/Vr3
+ jpX5jC2Q41TmgckKMjOsBXUrdUPrGhUQStbUAlBiEo1S+towp27nYvs/3yVs90MB4vpjAZLw9yA
+ D3muv4N2dR+uvggOtOQ==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDA1MiBTYWx0ZWRfX+I0a69X7XFNU
+ g/6sEk7Ueg/U0TiD6M/eXDwxoxj5680U0bftdzKTjJ0a43cAKJUhqsPz29t1NgNX1yVaPY6Nvro
+ aYWv7GCEuzfRs28H1m3RyNakjTpljdQ=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-30_02,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=1ce9592ed82f8125];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-302981-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302980-lists,netdev=lfdr.de,fd7e415d891073b83e1f];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,goo.gl:url,googlegroups.com:email,syzkaller.appspot.com:url,storage.googleapis.com:url,syzkaller.appspotmail.com:from_mime];
-	FORGED_RECIPIENTS(0.00)[m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:emil@etsalapatis.com,m:jolsa@kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:netdev@vger.kernel.org,m:song@kernel.org,m:syzkaller-bugs@googlegroups.com,m:yonghong.song@linux.dev,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,iogearbox.net,gmail.com,etsalapatis.com,linux.dev,googlegroups.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kirankumark@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CD43C6E0B09
+X-Rspamd-Queue-Id: 107116E0B44
 
-Hello,
+From: Kiran Kumar K <kirankumark@marvell.com>
 
-syzbot found the following issue on:
+This series extends the Marvell OcteonTX2 admin-function driver with two
+improvements to the NPC (Network Parser CAM) block. The NPC parses packets
+received by or transmitted from the NIX, and its matching CAM (MCAM)
+selects which VFs, queues, or output ports handle each packet.
 
-HEAD commit:    e771677c937d Merge tag 'for-linus-iommufd' of git://git.ke..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=144f8aae580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1ce9592ed82f8125
-dashboard link: https://syzkaller.appspot.com/bug?extid=fd7e415d891073b83e1f
-compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=124c12ae580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13b89986580000
+Patch 1 reserves a new range of PKINDs (46-53) to support configurable
+L2 skip-size parsing. Packets arriving with variable length L2 headers
+or a CPT (Cryptographic Accelerator Unit) pre-header can be steered
+to one of four skip-size PKINDs so the NPC advances past the right number
+of bytes before starting protocol classification. The mbox interface is
+extended with a skip_size field so PF/VF drivers can program the desired
+L2 offset at run time without rebuilding firmware.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5c69b301ec25/disk-e771677c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8267811b5065/vmlinux-e771677c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bcc54586e6c4/bzImage-e771677c.xz
+Patch 2 adds a NIX_FLOW_KEY_TYPE_ROCEV2 flow-key type so the RSS engine
+can distribute RoCEv2 traffic across receive queues using the destination
+Queue Pair (QP) field. Without this, all RoCEv2 flows hash the same
+way and land on a single queue.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com
+Both changes target the admin-function driver to improve overall hardware
+parsing infrastructure.
 
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.0.17/5820
-caller is bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
-CPU: 1 UID: 0 PID: 5820 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
- bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
- rhtab_delete_elem+0x185a/0x1b30 kernel/bpf/hashtab.c:2969
- __rhtab_map_lookup_and_delete_batch+0x935/0xcb0 kernel/bpf/hashtab.c:3349
- bpf_map_do_batch+0x445/0x630 kernel/bpf/syscall.c:-1
- __sys_bpf+0x906/0xd90 kernel/bpf/syscall.c:-1
- __do_sys_bpf kernel/bpf/syscall.c:6537 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6534 [inline]
- __x64_sys_bpf+0xba/0xd0 kernel/bpf/syscall.c:6534
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fce2819ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcea2ad4b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007fce28415fa0 RCX: 00007fce2819ce59
-RDX: 0000000000000038 RSI: 00002000000018c0 RDI: 0000000000000019
-RBP: 00007fce28232d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fce28415fac R14: 00007fce28415fa0 R15: 00007fce28415fa0
- </TASK>
+Changelog:
+v2:
+- Fixed coding style in patch 1 and patch 2.
 
+Kiran Kumar K (2):
+  octeontx2-af: reserve 4 PKINDs for skip-size custom use
+  octeontx2-af: Add RSS hashing support based on RoCEv2 header
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  2 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  4 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  2 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  9 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 43 +++++++++++++++++--
+ 5 files changed, 54 insertions(+), 6 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+-- 
+2.48.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
