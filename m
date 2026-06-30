@@ -1,88 +1,107 @@
-Return-Path: <netdev+bounces-303267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kIuSEfHZQ2rekAoAu9opvQ
-	(envelope-from <netdev+bounces-303267-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:00:01 +0200
+	id uBY8DTHaQ2rzkAoAu9opvQ
+	(envelope-from <netdev+bounces-303262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:01:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98BD36E5AAB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:00:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE676E5AC7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:01:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=d5+YhJhu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303267-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303267-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Zo5H2nrT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303262-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303262-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D16D1305B4A3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:55:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84C1E3041AA8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A3E44D011;
-	Tue, 30 Jun 2026 14:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D0D44A71C;
+	Tue, 30 Jun 2026 14:54:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE02944102E
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 14:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BD543D4E3
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 14:54:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782831273; cv=none; b=lD9QE0XQe6wSMAb/yNOH0dVEF5OEo0wBrO3m39lMAM1NgOLapKsFD7GPrC9EvkycdzPKh2fiQiKMJ5BByAKtQaF7vYWX4+9LIhL+BxiI0gW3Yvpn+aAfN/CKOpy2Dj2osjQnhbQQYg8PkETNz/80aHCvhjdtdunIeBd5erpiOEI=
+	t=1782831266; cv=none; b=fUWxdxn5vbzd2rTB7I7v9oH0s4RSZVoA6Jh7L8ukZOc68FuibEH6mUtQko+Qq69Diba6YwHmUMAoqeWqb30onX12eenA7D8yCwT8gdFeey78N4q+x+YrOXcB5p4qNW84iTr6JSTa9Dpvy/WdJxNqgacpUU9DRDt1me3Mx/Xt3aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782831273; c=relaxed/simple;
-	bh=lfY1BPxGWhADpJp9Ko6tp8pAnOvHrLtkOS1G/4nji+c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZS87XtyIKgZOc7QBbeJ8vjWRfok8GgGVzMcA5elwB0SqddFgPfqwUcFRJVyZ7eVMA4EFa2CANZUL6fCRYF+1zXjfdUe6HYlsdnpZDveSAdvi9xtgd/kRF8sodyVhjmjl1uV2heZRM1X2iJnS8ptvR/Ii8vjkm9217lHUD0YKk+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=d5+YhJhu; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65UEIWO82289073;
-	Tue, 30 Jun 2026 14:54:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=5WFgnhjFb3ujhWuLu
-	5dC/j92ByllA3Et568vLAlecps=; b=d5+YhJhuZWHmzxXUvUXEtlZlUsC+yzAW2
-	IKknIJXy80xuW28cqCx8kp/Lfwo1tTgHJId+snSioIv7dzUd00Z5QfvVAquQWIHj
-	S/D6fVUuqeodxrQ8eFVLPWphguv75RbWUZH9KOth7NmCH18XzZZTBede86eXB80f
-	D/FSuTInl/qV3cCm2BEu1HAfLCmVzHjntxEKE/fdZvZ9Y8bN6WnlYTTudePGeljs
-	S1J7atrUBgQFRFGjjrt6ux1qxk7qNRIxnH94m5oyjI6CihBauYZX2hN/pd2rK6bA
-	ZAWeZDF9cMpGE+9dmVqquLANYJa6alHsC6ky6vjERL5Ccw0jUZ53g==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26pdye9b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Jun 2026 14:54:20 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65UEndGd024608;
-	Tue, 30 Jun 2026 14:54:19 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f2u2gakv0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Jun 2026 14:54:19 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65UEsIag31261328
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Jun 2026 14:54:18 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 263D65805C;
-	Tue, 30 Jun 2026 14:54:18 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C10C15805D;
-	Tue, 30 Jun 2026 14:54:16 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.61.117.151])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 30 Jun 2026 14:54:16 +0000 (GMT)
-From: Mingming Cao <mmc@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
-        ricklind@linux.ibm.com, mmc@linux.ibm.com, kuba@kernel.org,
-        edumazet@google.com, pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
-        maddy@linux.ibm.com, mpe@ellerman.id.au,
-        Dave Marquardt <davemarq@linux.ibm.com>
-Subject: [PATCH v1 18/18] ibmveth: Fix MQ RX poll and shutdown hangs after queue resize
-Date: Tue, 30 Jun 2026 07:53:25 -0700
-Message-Id: <3cc4bebd422a70e883be8a515bfe6b0b2a9b9788.1782758799.git.mmc@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <cover.1782758799.git.mmc@linux.ibm.com>
-References: <cover.1782758799.git.mmc@linux.ibm.com>
+	s=arc-20240116; t=1782831266; c=relaxed/simple;
+	bh=mvMluMulz8TsazPI0k8zL2aMZtsqN5Gi7GN9fqtNkKE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DrIomC7hnagJxNa28ffwFT9kMVAuIfuv4gSiQ4YW0Z54miJfXkCfpa4kZ+T5xWCE2FwOx6yNHqISSAi23hEB3K7XNc/XhLZAlTNTziodmkNvgB4iE873DnxNZzrIeJnyfg/2u2xFEetFAEPX2QW/mhQP70Wdbfq30oGlGDN3z30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zo5H2nrT; arc=none smtp.client-ip=209.85.216.52
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-37fcae0ecb3so1622803a91.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 07:54:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782831264; x=1783436064; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=px0Wcp6VhD6xZWRvmlTtSAYT6tdeg+tqH+zTVPz9ZEg=;
+        b=Zo5H2nrTXqjMYGMdJPP50uZUExrQFXD75XRkt7ocVE6oac4J4tN2zkkf9h8s5ty3oK
+         xcKO3yH5g6VpqT92aZgPdQ81KxtbW4Mc86s9h75HzFqRZkmIgX7HZLdyqWf9kaDI+QRy
+         kslQlRdZIQY3AKaPbViHeYasYakmEJEpXzy+LAFPMXfLVgDphgMbu53cncAWEbPLiV6p
+         3zBglHAqZA9vq2XSUBos1c+YGOixmSDBe6USxnDxmsq99x4wOSbjTrCXvBdMxnUF4zyg
+         B8W8uXwQN+YJoMIW65UdV8fZQ39SMHU16WOSJW8apPnUwg1YxFLg0ePJLOOZBYNjUsMp
+         CzNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782831264; x=1783436064;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=px0Wcp6VhD6xZWRvmlTtSAYT6tdeg+tqH+zTVPz9ZEg=;
+        b=PoI4BS0bDgaFKxSksReLCcahdHNcc5+SmN3a98KwOsT1JKlhu8qTn7/i8bg6ZgOZct
+         Cm6KUsAVfBBaYDEA+U3rPRP5yx471CegbZZ9FP9e+3Am8Y0tuQqGtsFjjKEaZtlVSMns
+         +TojzDt706CNTBvkViYBOA3p55HEdnpmhvBCv6bTouKZzX3eXAHU1CZethZYSNF/HU3o
+         ufEsLuGC4MBDg8dkfGwcG9SgvNtEolQb5U+b2IHGyucMwiSXCSgfNPbgPReU6Z8kY081
+         XkzFfupoyVPyUcCbr/5ZF/fXp3mTioLQzllAijJmM/3vUrtxEp1YK1ygI3Bb8l+ijq6I
+         7GxQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoeDpdNIKkQQ3vGUT3wNFuYgivbTuHBgHhXwZG1sPgJwlSU7vTHvCxGQjkeUYS46O97ToIgUDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/J1MP9is7n9gGj6Wc05K+2hrvx7V69drbuTyUAMPIj78D/BfP
+	o11b9Qoq+pTj4rCdytzET9bF7ZKKXoaffrJ3fCjHrtRoMTHeM+XryFJp
+X-Gm-Gg: AfdE7cnb41CtVZUNppHmLkGBWSMsOJRs7l6GtCGZcOIX3cs3t6zJVkAUYpDQO+6qmac
+	9ogqSwiCtFHFEyJy+G9piLi3L47/FaQsH11q0bwg5OmAfR5tVnwKT56KJ+DAa+sH+lDYA+INqFl
+	S9LFgTtVfooCHyQ1u7J0M7AL8qD/T+NFrVcUWsDDYBwrY2pFSnQfK88IeC2kC5h/5V/i08sH+h+
+	FW902JJNbpEcGkv6NMunAIQtWpuajRJgzQMdKbSYkUlaLJ/+5r1BiBFGiJv1oCkbSNFyxB8LN8B
+	XuYTEyuZai9qjdMQIG5Kz3eIc4jOKutveutwFNTmfzt8t6JwKAPPZ7w2MCN0x4qrHwoxqFhBmOd
+	c0F/ISYxHEJ/e0+tak59EJJm4t2Bmf8TAJz7T+Sk29tgmyOQSf8oy2xVzOD8y4x6lF+97JNbRVd
+	n7pe5EXJwGRPxsGsQwNt0Mxf+JxjFO/7ixYBDKXDg5fphsIs15fi7V6StdfdI5IA==
+X-Received: by 2002:a17:90b:3c08:b0:368:78da:803 with SMTP id 98e67ed59e1d1-38052583a4emr2912925a91.12.1782831264127;
+        Tue, 30 Jun 2026 07:54:24 -0700 (PDT)
+Received: from cps-manycore-1.. ([147.46.174.222])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38095b684basm20122a91.1.2026.06.30.07.54.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 07:54:23 -0700 (PDT)
+From: Sechang Lim <rhkrqnwk98@gmail.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Varun R Mallya <varunrmallya@gmail.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v4 0/2] bpf, sockmap: disallow sockmap mutation from tc, xdp, socket_filter and flow_dissector
+Date: Tue, 30 Jun 2026 14:54:04 +0000
+Message-ID: <20260630145410.3648099-1-rhkrqnwk98@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,240 +109,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: p7XXJdd_fiVs1EnTYCaQ6maM2NeCxjcn
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDEzOSBTYWx0ZWRfXw8ErIUeJtcSD
- ODotwDJ2pjlF/iveKntySHh8/9ncXcR9aYGpo9xVHEhGm3XDv4wr3Ub20YWUGX4lxF9/dDZQVYW
- vHD4RbwOieKJZK+YiQ3a8BKKzexcPLI=
-X-Authority-Analysis: v=2.4 cv=edsNubEH c=1 sm=1 tr=0 ts=6a43d89c cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8 a=H2PsU0_gVjd1cLIlZ3YA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDEzOSBTYWx0ZWRfX2hzoUkVF1A1+
- lqENG/AIIL4z10BaqJdCCqjKi/Zlo3nnyF+3ChLzvleyLYr3hAJwlY8UFpWwLhk2luSkabuVNA9
- DhmOr+pKJvhKJ1QJo3eLgQ4S0WsDLSez7JCsvTQ3oYxbmC9/WoChGs+T844GBetUgKCCDJ75Hev
- 5f9h8mLkymln6hShdp3I3FDOf+6KrU5pmY/l0PT6vD0ah9qKeI3FF0oiVimoF6f/7UtEx5O4RGj
- 6sWltz95mZfKukboHHrYun2vNw4ZdAIRNyO+h2DoUYBDNm4BS9OkvRptMwZ/IUYRamsw8wZFwus
- di0+923e860qapF1bE1Hc2gz8slJaX+XKO8jIuI2LkgIPLVPp9yDUHwNer1C3DafDpzv5XaE078
- tjnV9i/gN5EoucJw0wSI+iOp/V4OkJysUU/0A23vM+t1IvcpRtuSwxIgATfrTGHfIEC7EHBijiX
- W4u3vFPT0KWGPKQ6Ucg==
-X-Proofpoint-ORIG-GUID: fPThb1TAoP7H2095qITOBcKbMo9kPp_e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_04,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0
- spamscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606300139
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-303267-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303262-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,davemloft.net];
+	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:john.fastabend@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:shuah@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:sdf@fomichev.me,m:jiayuan.chen@linux.dev,m:varunrmallya@gmail.com,m:ihor.solodrai@linux.dev,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:mmc@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[linux.dev,kernel.org,etsalapatis.com,fomichev.me,gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,linux.ibm.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 98BD36E5AAB
+X-Rspamd-Queue-Id: 3FE676E5AC7
 
-After aggressive ethtool -L cycling, PHYP can leave a VALID RX descriptor
-with a correlator that no longer matches the per-queue buffer pools. Poll
-treated this as fatal: ibmveth_rxq_get_buffer() WARNed and returned NULL
-without advancing the ring, then restart_poll retried the same slot forever.
+A tc, xdp, socket_filter or flow_dissector program updating or deleting
+a sockmap deadlocks on stab->lock vs sk_callback_lock and has no reason
+to. Patch 1 disallows it in may_update_sockmap(); patch 2 drops the
+selftests that exercised it.
 
-Advance past bad correlators instead of spinning: validate correlators
-without WARN_ON, skip invalid slots in poll (count as invalid_buffers),
-and advance the RX ring when remove_buffer_from_pool cannot map the
-correlator. Rate-limit the bad correlator message.
+v4:
+ - also drop BPF_PROG_TYPE_SOCKET_FILTER (John Fastabend)
 
-Complete NAPI when the interface is down or napi_disable is pending so
-ibmveth_cleanup_rx_interrupts() can finish. Do not restart_poll in that
-window. Close keeps hypervisor IRQ disable before napi_disable (via
-cleanup_rx_interrupts()).
+v3:
+ - https://lore.kernel.org/all/20260629172704.1302218-1-rhkrqnwk98@gmail.com/
 
-Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
----
- drivers/net/ethernet/ibm/ibmveth.c | 76 ++++++++++++++++++++++--------
- 1 file changed, 57 insertions(+), 19 deletions(-)
+v2:
+ - https://lore.kernel.org/all/20260620034632.2308-1-rhkrqnwk98@gmail.com/
 
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 50a332ab83fd..d7bf01271161 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -158,6 +158,25 @@ static inline int ibmveth_rxq_frame_length(struct ibmveth_adapter *adapter,
- 	return be32_to_cpu(rxq->queue_addr[rxq->index].length);
- }
- 
-+static inline bool
-+ibmveth_rxq_correlator_valid(struct ibmveth_adapter *adapter, int queue_index,
-+			     u64 correlator)
-+{
-+	unsigned int pool = correlator >> 32;
-+	unsigned int index = correlator & 0xffffffffUL;
-+
-+	return pool < IBMVETH_NUM_BUFF_POOLS &&
-+	       index < adapter->rx_buff_pool[queue_index][pool].size;
-+}
-+
-+static inline void ibmveth_rxq_advance(struct ibmveth_rx_q *rxq)
-+{
-+	if (++rxq->index == rxq->num_slots) {
-+		rxq->index = 0;
-+		rxq->toggle = !rxq->toggle;
-+	}
-+}
-+
- static inline int ibmveth_rxq_csum_good(struct ibmveth_adapter *adapter,
- 					int queue_index)
- {
-@@ -1284,17 +1303,12 @@ static int ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
- 	unsigned int free_index;
- 	struct sk_buff *skb;
- 
--	if (WARN_ON(pool >= IBMVETH_NUM_BUFF_POOLS) ||
--	    WARN_ON(index >= adapter->rx_buff_pool[queue_index][pool].size)) {
--		schedule_work(&adapter->work);
-+	if (!ibmveth_rxq_correlator_valid(adapter, queue_index, correlator))
- 		return -EINVAL;
--	}
- 
- 	skb = adapter->rx_buff_pool[queue_index][pool].skbuff[index];
--	if (WARN_ON(!skb)) {
--		schedule_work(&adapter->work);
-+	if (!skb)
- 		return -EFAULT;
--	}
- 
- 	/* if we are going to reuse the buffer then keep the pointers around
- 	 * but mark index as available. replenish will see the skb pointer and
-@@ -1335,11 +1349,8 @@ static inline struct sk_buff *ibmveth_rxq_get_buffer(struct ibmveth_adapter *ada
- 	unsigned int pool = correlator >> 32;
- 	unsigned int index = correlator & 0xffffffffUL;
- 
--	if (WARN_ON(pool >= IBMVETH_NUM_BUFF_POOLS) ||
--	    WARN_ON(index >= adapter->rx_buff_pool[queue_index][pool].size)) {
--		schedule_work(&adapter->work);
-+	if (!ibmveth_rxq_correlator_valid(adapter, queue_index, correlator))
- 		return NULL;
--	}
- 
- 	return adapter->rx_buff_pool[queue_index][pool].skbuff[index];
- }
-@@ -1365,14 +1376,15 @@ static int ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
- 
- 	cor = rxq->queue_addr[rxq->index].correlator;
- 	rc = ibmveth_remove_buffer_from_pool(adapter, cor, queue_index, reuse);
--	if (unlikely(rc))
-+	if (unlikely(rc)) {
-+		if (rc == -EINVAL || rc == -EFAULT)
-+			goto advance;
- 		return rc;
--
--	if (++rxq->index == rxq->num_slots) {
--		rxq->index = 0;
--		rxq->toggle = !rxq->toggle;
- 	}
- 
-+advance:
-+	ibmveth_rxq_advance(rxq);
-+
- 	return 0;
- }
- 
-@@ -2931,11 +2943,19 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 	if (WARN_ON(queue_index < 0 || queue_index >= adapter->num_rx_queues))
- 		return 0;
- 
-+	if (!netif_running(netdev) || napi_disable_pending(napi)) {
-+		napi_complete_done(napi, 0);
-+		return 0;
-+	}
-+
- 	if (adapter->rx_qstats)
- 		adapter->rx_qstats[queue_index].polls++;
- 
- restart_poll:
- 	while (frames_processed < budget) {
-+		if (!netif_running(netdev) || napi_disable_pending(napi))
-+			break;
-+
- 		if (!ibmveth_rxq_pending_buffer(adapter, queue_index))
- 			break;
- 
-@@ -2959,8 +2979,21 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 			__sum16 iph_check = 0;
- 
- 			skb = ibmveth_rxq_get_buffer(adapter, queue_index);
--			if (unlikely(!skb))
--				break;
-+			if (unlikely(!skb)) {
-+				if (net_ratelimit())
-+					netdev_err(netdev,
-+						   "bad correlator on queue %d, skipping slot\n",
-+						   queue_index);
-+				if (adapter->rx_qstats)
-+					adapter->rx_qstats[queue_index].invalid_buffers++;
-+				else
-+					adapter->rx_invalid_buffer++;
-+				rc = ibmveth_rxq_harvest_buffer(adapter, queue_index,
-+								true);
-+				if (unlikely(rc))
-+					break;
-+				continue;
-+			}
- 
- 			/* if the large packet bit is set in the rx queue
- 			 * descriptor, the mss will be written by PHYP eight
-@@ -3034,8 +3067,11 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 
- 	ibmveth_replenish_task(adapter, queue_index);
- 
--	if (frames_processed == budget)
-+	if (frames_processed == budget) {
-+		if (!netif_running(netdev) || napi_disable_pending(napi))
-+			napi_complete_done(napi, frames_processed);
- 		goto out;
-+	}
- 
- 	if (!napi_complete_done(napi, frames_processed))
- 		goto out;
-@@ -3053,6 +3089,8 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (ibmveth_rxq_pending_buffer(adapter, queue_index) &&
-+	    netif_running(netdev) &&
-+	    !napi_disable_pending(napi) &&
- 	    napi_schedule(napi)) {
- 		lpar_rc = ibmveth_disable_irq(adapter, queue_index);
- 		WARN_ON(lpar_rc != H_SUCCESS);
+v1:
+ - https://lore.kernel.org/all/20260616091153.2966617-1-rhkrqnwk98@gmail.com/
+
+Sechang Lim (2):
+  bpf, sockmap: disallow update and delete from tc, xdp, socket_filter
+    and flow_dissector
+  selftests/bpf: drop tc/xdp/flow_dissector/socket_filter sockmap
+    mutation tests
+
+ kernel/bpf/verifier.c                         |  5 --
+ .../selftests/bpf/prog_tests/fexit_bpf2bpf.c  | 13 -----
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 52 -------------------
+ .../bpf/progs/freplace_cls_redirect.c         | 34 ------------
+ .../selftests/bpf/progs/test_sockmap_update.c | 48 -----------------
+ .../bpf/progs/verifier_sockmap_mutate.c       | 12 ++---
+ 6 files changed, 6 insertions(+), 158 deletions(-)
+ delete mode 100644 tools/testing/selftests/bpf/progs/freplace_cls_redirect.c
+ delete mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_update.c
+
 -- 
-2.39.3 (Apple Git-146)
+2.43.0
 
 
