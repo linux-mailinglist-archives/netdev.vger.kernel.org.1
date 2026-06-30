@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-302940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302941-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P+VpDzFDQ2rnWAoAu9opvQ
-	(envelope-from <netdev+bounces-302940-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:16:49 +0200
+	id BOVcN0tDQ2ryWAoAu9opvQ
+	(envelope-from <netdev+bounces-302941-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:17:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CDE6E034E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:16:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B6846E035B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:17:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RDq+540S;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302940-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302940-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dP8h6fzt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302941-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302941-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3EB553013461
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:16:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7846330086B6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8EB93DE429;
-	Tue, 30 Jun 2026 04:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B85E3E074E;
+	Tue, 30 Jun 2026 04:16:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE443815D6
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADBA3D6CB0
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:16:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782793000; cv=none; b=Re52WyVcfL8fQYUuGyKbqssqeNT1YHZL2dFxNecUI+cMpvrMoJ5MYNCNGEZYDLva3DHYKX3BSuXHerfAqEYOvrOAGZsEi1jKtDNf8XnRDNLxsdPYjT4Mes4XT70nq/EWAJxwCmXlqU5hL4a0wvJPOSEdt+joIGRJRarKvFm+IyY=
+	t=1782793002; cv=none; b=k5jpHW+jChwgO1k/TkP7TS9gVkjhNPAXR2r9fwoph8zWkKzuduOpKQ6z8YxSWjpvRkSzVin+5qfLZFATPGrPsyA6zRNf4KcNSgx4iGoAu9WZQG2md/JfC7VYDwiH7L7ZV9M2nAByC0HzZXM3VsLYjgKL4kxugzQh66850CAU4FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782793000; c=relaxed/simple;
-	bh=1bq/W0yF9PeD+ycJds7LgcI05OxO22szqDYp6wvvEtQ=;
+	s=arc-20240116; t=1782793002; c=relaxed/simple;
+	bh=xt21QE1VqYy9bI9Px03bY6lvMC/3LTqF7x6ygM9mT10=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X+ldeoxUHnXVJAodOBbS7oVTV1MXjdv3g5go0SwtNi06eTqhC15XYKTaoS/lqmBbbnbVRCB+m4dEm0LLfd2jzetsus6F80hXcQItj6Q/lvNwFbzmH33Cx7iCyVi/S29cqCN+bed9mbqcYzpjq7hfmGP/dR+9ug5RYLDNp4S2JEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDq+540S; arc=none smtp.client-ip=209.85.215.182
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c964d52321bso864923a12.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:16:38 -0700 (PDT)
+	 MIME-Version; b=GZwfCDqiISyUkck3OXQQKEKq9aO7+QmUSTvBaF4kmkoXyMRxi4iu1zjKKgJCLopike73B+7hoQ32bJiIZzEzTy4z1wyMZHKRN+8ufEj1erj5O6XSgtsbQT5J2IB3NO2mFlvzEc3VzZB5HejxQSyHnmxq0+lIBEISMQDoP38xzzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dP8h6fzt; arc=none smtp.client-ip=209.85.216.54
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-37fdee9276fso1806937a91.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782792998; x=1783397798; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782792999; x=1783397799; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EG2fAhbSvmD2UnsNh2J+7cClBAWJwMlTSzzcRhRVGMg=;
-        b=RDq+540SRzU3PCG+xgXkIqgziBktbzl8Oo6vSpttyTeCE/fMgKcC6MrsQdRd4bAjX+
-         XehLUQLL9YnTclMrBSBwssXqnoSrT+f7pMb7kEvzoduy+u3Nyb2qffIwezQfYoZ4ZfuP
-         X8Y15ntfY5U/v62SHayLjxfnPc4wVlguDxyQIbtrEl2BlT8YzktYxblZxL52xnl+1Nn8
-         QcduJfaC1DNRA8SCfoqw8wcaIE51pJ/O3+kVsfqhqp0Ky6bZZtS8+l4yZOm0Jn6Ch5v5
-         siEWguZvAmfj+ab2sHk0yz3qn/bqMptL1gExQQaC3ebFvLta0cuH9362csVOvU3gd5ub
-         9YtA==
+        bh=h3+TlLu1veQ7gQkbd8iz1W8RBT2z64POb37tY0+Wf7A=;
+        b=dP8h6fztfXenrR0+daQ8VSZqCROJWipmjjqsqGm8cGGuLUNBJy0bRI7uIgEdINT/eH
+         HEWGY+VMJQbO6EqBM4KuXtKqcEENeqXlhSkcvEEgVUzCsPcNeEQ+7D7XiNX5mXv9n2z3
+         MUI6NTbQmYr8CVo3+b9LLJDm+OpPuWCRka74bs13cJJp7XYqcCEscqVl3dNU8a+hOcgQ
+         bihuELmC3AvpcjmUc/Cx4mWBA93Vn/x1T1nBzw2lLsjWJAwcn+TJxmvSu7Ay4ZwbMvvc
+         I/JtAJvymzUDO1WcZP1b9mhB+NNLnK9SMQZaHqiO3JLnPx2sq2mgp4M7Jdd/ovkx2R+7
+         ww7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782792998; x=1783397798;
+        d=1e100.net; s=20251104; t=1782792999; x=1783397799;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=EG2fAhbSvmD2UnsNh2J+7cClBAWJwMlTSzzcRhRVGMg=;
-        b=BE5oNdmwam4UfOLPVTQUBzd340jbJoeihsRJpIBjAiypJjtctmQWFQ9GX6veSeo7KM
-         3Pj8Kt8nN3BZhe+xF+sHEYZCMdSft6rEH+rf6ug+KyOiTIdKkwRVQHs8izPCg1G25jz3
-         VpCHUZMQZusBGPmVlzQUiLxx0vS5QmbuVDFj1ft6haWdS+XTXSmcO3VCqQ70vZWxIHVc
-         Y6e0f+GzGuO4i93NkD4ZuReClOVcFIw1iK+iMnRcTGsgOI5kZ/JCvMt6evHF+pK9Vipg
-         QYvvw+DEr7n3sj4+Vg1PoPMOqkXjK+BSitFBLR0I8+JDW6ncjN9kOws3gTJWW2/CK+ve
-         5SaA==
-X-Gm-Message-State: AOJu0YxUPsoRGFN666cuGD9iuc/CBijjEnOOxaRYY6IWBiuUJaC2AviT
-	VMFGbzUkSE7Vz79ODd7Nhly5qPjI9fK7FHahO2TmljpnIkUnXFiLA5ZDmdo62VUz
-X-Gm-Gg: AfdE7cmwib08azXegq+NCwZNJrtp+BKslzm6MWoZFT0V0HeZJZwik0ZGpGkEQv7n255
-	KEsPX370jJzkjG7F99HxRc3dZUIWqVwFs+gVNCtdxx9fvMnfEvAi3+q/jBQH5vI0oFjTBL5btxO
-	+8i6rxYq3RHn+nZeE/hS9UWROFCx5oEXJPvb8xyep0xVU5CU9IUez4CiQEPKt70vNfe1JVkIiah
-	drgrYV8WxCrGPx0ezvV+k5WxJsqFUvn1RMOeY422NZH1OAJV06u/rEy6CelSHy4tgUkH3Rm27/a
-	j+ArGK3aNKSsLya7O/Mq3naO7tXKY8IMfwUnrP/Nf09pRA0DkKyt9EIA+p1Ef2//gdBH2WJtAYk
-	DzeCBUetrbPsYbNcbaqyc5G00oKxtTSBbU/yLN0gvF29Y9z5FFajXBIJnjdc/Gq0lK/y51M8EdO
-	U0ajJH3wGt+n4mnNNerQ0nkVKux0RfahJ7MKL7FgrSn8eBIr3CAydwDNVvlee7WVTQflRx4iB68
-	vNd4SEzWA==
-X-Received: by 2002:a05:6a21:68e:b0:3a3:a9c4:3d60 with SMTP id adf61e73a8af0-3bfc5126035mr1651623637.27.1782792998145;
-        Mon, 29 Jun 2026 21:16:38 -0700 (PDT)
+        bh=h3+TlLu1veQ7gQkbd8iz1W8RBT2z64POb37tY0+Wf7A=;
+        b=YJnpewaQ8zJIma9tus2yRZdF+3B+of02EVOwT1lyg4XSZMNYlUAcQs/h/A9e01dI1w
+         alAuCWi5bdXm8lpQUZMy97m6BHI4S2EpRqJ4ngf2ixXbKF1Qzy6FTDYLG88hnO/7rYz+
+         3FRHJWuZHGSQDCohqpIJdu2Pz3LKPAynbowftGS98/WiZdviBk+ALezVOlNRh+zamnYg
+         4/dxdEIuyqsF1/n3siQKqymrr6QlhIj5QsqZkD0sltcg1o8yxECz0vlBl0LaanO/7dt6
+         O6YfcBAilpWNSlpaie4Kj+3ml1e4BwmrXbQc0CGTW+cUVe6beLpEcm0JXF4u8iukyBrH
+         bZ5w==
+X-Gm-Message-State: AOJu0YxWwcESoM3Be51VSA6y5YqUlnTDJpnsl/VFh7xliWEbhwfOx05s
+	y0SUKwbZcD13CiF7HMuayhN6uo/IcOJVjRoYqMOcS2FPCnAIaDDbeZ3SoVj6DLPy
+X-Gm-Gg: AfdE7cmisGbx4W1D1lcY7B0IzxgzVjeSedn1pnHiZmLHBq8DMIkBoQuImeeONHA7u4z
+	qDFXUnnJOBfYKFv+EqOQFSregvNBl9jj2HZM6JY73Z1uXhNUt4/MznG6CipBsAck73e/7Qj7K92
+	eD0jdYkRe78WnJE7q94mXYPKwCLpIPlHsE1xO3OTPQRjSGOSXKiN9itKp1T68NsBtSqpSM+Qdvu
+	UyGkYxrx5rQ6lP3iAKQzHBTqt9Xp0HdecSo1PMDBUMm7il2/ryhQ6ZYDOb3XYQNAP7Qwv72guf8
+	E6XaXjGy8jYVf3Oju+wXqesoNZzULFYEbyaJAAjpLMLdtkB/Mj3HxKqY6q1vdeVUgmsSK7Tr8Ei
+	zeZimUT3X7zyJ2AMRwPxVw8OnM5ucTiZWcsOwwQ5fBv9brXh9MLbn71LKoS74jYX0ODijtUhRMh
+	K4WAYaE0Qrvpn2Em+swY+RbUBOo0bxhs9Ovn7CVCKg9K3qwLF8BkfeMxgTvqYUELB7bwZKFSnK1
+	oUCGBPRtA==
+X-Received: by 2002:a05:6a20:db0c:b0:3b4:8f57:3205 with SMTP id adf61e73a8af0-3bfc5272280mr1899199637.36.1782792999415;
+        Mon, 29 Jun 2026 21:16:39 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbf95a3e7sm702659a12.19.2026.06.29.21.16.37
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbf95a3e7sm702659a12.19.2026.06.29.21.16.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 21:16:37 -0700 (PDT)
+        Mon, 29 Jun 2026 21:16:38 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -84,9 +84,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 01/10] net: emac: remove emac_xaht_base()
-Date: Mon, 29 Jun 2026 21:16:25 -0700
-Message-ID: <20260630041634.284127-2-rosenp@gmail.com>
+Subject: [PATCH 02/10] net: emac: fix sparse __iomem warnings in IAHT register access
+Date: Mon, 29 Jun 2026 21:16:26 -0700
+Message-ID: <20260630041634.284127-3-rosenp@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260630041634.284127-1-rosenp@gmail.com>
 References: <20260630041634.284127-1-rosenp@gmail.com>
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -115,10 +115,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302940-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302941-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -131,36 +131,45 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 17CDE6E034E
+X-Rspamd-Queue-Id: 0B6846E035B
 
-Unused function. It's also missing __iomem.
+Annotate iaht1/iaht2 in the EMAC4 register union with __iomem so
+sparse does not warn about address-space mismatches, and simplify
+emac_xaht_base() to return &p->u1.emac4sync.iaht1 (or the EMAC4
+variant) directly instead of computing the offset by hand.
 
+Assisted-by: opencode:big-pickle
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/core.h | 8 --------
- 1 file changed, 8 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.h | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/core.h b/drivers/net/ethernet/ibm/emac/core.h
-index 89fa1683ec3c..46c5512c8e00 100644
+index 46c5512c8e00..296da4bf3781 100644
 --- a/drivers/net/ethernet/ibm/emac/core.h
 +++ b/drivers/net/ethernet/ibm/emac/core.h
-@@ -420,14 +420,6 @@ static inline u32 __iomem *emac_gaht_base(struct emac_instance *dev)
- 	return emac_xaht_base(dev) + EMAC_XAHT_REGS(dev);
+@@ -399,17 +399,13 @@ static inline int emac_has_feature(struct emac_instance *dev,
+ static inline u32 __iomem *emac_xaht_base(struct emac_instance *dev)
+ {
+ 	struct emac_regs __iomem *p = dev->emacp;
+-	int offset;
+ 
+ 	/* The first IAHT entry always is the base of the block of
+ 	 * IAHT and GAHT registers.
+ 	 */
+ 	if (emac_has_feature(dev, EMAC_FTR_EMAC4SYNC))
+-		offset = offsetof(struct emac_regs, u1.emac4sync.iaht1);
+-	else
+-		offset = offsetof(struct emac_regs, u0.emac4.iaht1);
+-
+-	return (u32 __iomem *)((__force ptrdiff_t)p + offset);
++		return &p->u1.emac4sync.iaht1;
++	return &p->u0.emac4.iaht1;
  }
  
--static inline u32 *emac_iaht_base(struct emac_instance *dev)
--{
--	/* IAHT registers always come before an identical number of
--	 * GAHT registers.
--	 */
--	return emac_xaht_base(dev);
--}
--
- /* Ethtool get_regs complex data.
-  * We want to get not just EMAC registers, but also MAL, ZMII, RGMII, TAH
-  * when available.
+ static inline u32 __iomem *emac_gaht_base(struct emac_instance *dev)
 -- 
 2.54.0
 
