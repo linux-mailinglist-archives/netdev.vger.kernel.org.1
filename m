@@ -1,369 +1,205 @@
-Return-Path: <netdev+bounces-303301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id erxoOTXzQ2oUmAoAu9opvQ
-	(envelope-from <netdev+bounces-303301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:47:49 +0200
+	id 4hmrOIH0Q2pimAoAu9opvQ
+	(envelope-from <netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:53:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4011A6E6988
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:47:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E4706E6A3C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:53:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=NypgtcyR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303301-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303301-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=VpFZN77J;
+	dkim=pass header.d=redhat.com header.s=google header.b=VsZjcXlq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCD16302207E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:44:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 09AB030BF34E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0E03D6CC7;
-	Tue, 30 Jun 2026 16:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9F33D75B5;
+	Tue, 30 Jun 2026 16:47:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8F63C2BBA
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 16:44:03 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782837845; cv=pass; b=FXYZ0VNlynVEFosbtFWhlOVtXR3tvrZoncfRBYIgC59InQ2W5yvLUTtvxij8IootyeiJbPe9sL+rq5MFUljUXo0fcX4Jf4HY9+yIl8OycaZ1x0UNue6q9ll7X7eXJiF3zO7+c+KVw4Ryj6tzplbmTHQcmNK/GHi1gl65pb1zts0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782837845; c=relaxed/simple;
-	bh=v/OcWx3LYLBx0KlspHhgb4R6jpCaa2+fiCx8LKjOQhQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S/2M67MWL3aDRWXXISztR5GUC0CoCr91V2ayCM7N7hfRgYmmVVrLG6BcamVFlQHhVrO4KmMRlcg0zGCl5xVctEloSKrF1cl0m65YFS5q1/URWP1o6CzdsvhgLMRTKGO4z407PwS9emWfUD5Yq7AfgGgFyVkPms8sTv1XJ3mLPpA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NypgtcyR; arc=pass smtp.client-ip=74.125.82.50
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1390f75d8bbso9486331c88.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:44:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782837843; cv=none;
-        d=google.com; s=arc-20260327;
-        b=hQ+yLqhlDlauuUOpuuSnf65X42zuwkiFjocSHFaCobkpc4yVDCTs5UtkmlSXwFHUVq
-         Jj7L1Ov9LlCwfaZNQWb0uMreyk7nMb/fVW+GxljaWDuSR7G16Ztywy1EPDDb3OMMUaa4
-         brVkixDY5p2gtB66+lE0fmjOBIPzqRoU3oHhsZRtsvBJY4RuI2OY5f8DlIkNXHtkrL5E
-         YVNL7dauJ+JwLg94CF+RJWQTvFBMflfcBlKPi3jg5mAYD8UTBEKXcr+1yTrLr3GdOJrF
-         034XiF1WzwX762EasltAHk0f7M65vIjWdoWz7N4SWt7A+42yHeFhsiG8yy1XT7aJluVM
-         +hSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=603x+vbEytdZ550OAdNYJC+Z9vxOv/z6ypcG3r0EpNE=;
-        fh=rMNnoFUUbyzCIBXAD9Wy+qal+R/iy05TcDSr89Sv0Lc=;
-        b=Aq7sSmi1XBqGBae4EGZML3R3Hg0GyKs2gpkOAwAa92wTBO6lDlVQB5iMLHE5V8bd0t
-         tD677zC/j5vhF5wAUTM+5RAGnUlkdXZHmRhndXcKJiPwD4WPC0BeQq5Vsqqym8kYtlkH
-         ZuoiUB083zsTQ6sGspBjHhct0DQ0Fcg5BrrqOemplCcfuTB3Ntom5u/PSaf6faeizdfX
-         6BU/ztE54tdv2oQWtUeGgF04AVHynfZAx1gvsJ9n4XkqMfk9MS9xl7kpXqaHfb69Mmmd
-         cmNRhBu+Wgxg1Zc/tjQaKBdxQtCaZ7I6P/7O/RYuAr3zAZC+kGZUwUH2HZuzQSA9nOZg
-         2Z5Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAB63C8724
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 16:47:06 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782838028; cv=none; b=keAKqH+au2vMfZw7AqlxSEmv83sts9Pd1uQA2BepvguWKdup0G3TqoFawnZUjI7sv2JS/NnkLWRi9t14atvVI+c9HsVR/eqV9pliSXFMdkPLC2bGjHgPjKuqopfITMDL/6feFbo2996s5NOS5FpFCjR9lz90p6pHaHydkfyJs7E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782838028; c=relaxed/simple;
+	bh=rmXCZFpKxJzazxmjn8bzq96ps74DVqbvt62SKSYliVE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LbCxy0w1dgspyesGzII7VoFhNyt7Tk/nc8xOU+1mPIz+UIdeAduvQqFd4JDbeF4S5JjcZGWIz69oP9UZtuIOg8UzLBDa2hrhHWFNkW52Fsm3LY1rndP1e+d7SPNQqDYsISu62Dc+MYWxA1eWQ1PYqt+6ofpng6AnbgeNDIo4M48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpFZN77J; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VsZjcXlq; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782838025;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xiOPZVlIWXYiaqpOQmyOxWG5vDCdJG1lOjq1LsrNa5o=;
+	b=VpFZN77JDZRPgZtWHOgwD2AJXkEPaqlAYkqmIAhBlwBLVpKTHSibRUY8Z60p2jjAnW5qRg
+	lMMEKtshu+C48sAxKemtBYuo5ICyIr1Y9aFH1bPja3p6UIF+ryi5kby1+yypTi+K5GV+IX
+	6gHylxwKFF+d0Rw7Zhgvz79WwLDPaXU=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-98-StrHZVLiNNW00esmhhJilQ-1; Tue, 30 Jun 2026 12:47:04 -0400
+X-MC-Unique: StrHZVLiNNW00esmhhJilQ-1
+X-Mimecast-MFC-AGG-ID: StrHZVLiNNW00esmhhJilQ_1782838023
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-84622d6102dso2819937b3a.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782837843; x=1783442643; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=603x+vbEytdZ550OAdNYJC+Z9vxOv/z6ypcG3r0EpNE=;
-        b=NypgtcyRac1p+m/Q+Rzoe9y2EBHtO02VxKrCpbLnh7jrpbVCLR+nWqrrjXQJp8Rwxy
-         GZT7XqtJ5KgzVVmExnJYW9xCwm2q76sKXMJ02OI/msDuiI6B6y0H+/KhQNWRVA/iJgW2
-         Ovo0BF+hs16iKmcebuphhYntq7qoMGDEEocmMlYz+59LljkKnARA//FqKDvUk1ijhygN
-         Plz/sqAj2lkhxtdGwMe9T/4FlxV7jnJIbOexykr++UCv69CesvLslaZ7IHOV+JEIoJQj
-         aTGCoNeTQCkD2CMqhOOMem5uM2DJyJPpTsbvA9ioVhzgsgg6srzA/qQRsBKV9+mtmuFl
-         0XVA==
+        d=redhat.com; s=google; t=1782838023; x=1783442823; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xiOPZVlIWXYiaqpOQmyOxWG5vDCdJG1lOjq1LsrNa5o=;
+        b=VsZjcXlqCcjXoIe10ZpdDfp6Yui8Fhw6oTXgUZapYMULjzdl5CJ3E7povb2zv5ZscP
+         k0uT+EztKLZLE/Du4UtXRN0dJS/m3ASwny3u2xzkT2Bq5vAc6hjtHz8mDn3iVtbyacfD
+         +G+JrMfpleTKRFrkPfelK0Mx+GGoocwlZsY8O1AXwK+EgKDnn2yzuGoiogwSxFS/LQFL
+         746qgmsd8upwRraSoMg6GCNrCLVcvzcHz6qMkVO+AiHomiQY+YMTzva+w7ym4LO2O+PC
+         SyVQpz4PPVcmMoFHvktU7V07tHhPiCkJFbjvtjjyPjOcdoH1lZMk9K9zm3Xe5gplzLdP
+         rdOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782837843; x=1783442643;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=603x+vbEytdZ550OAdNYJC+Z9vxOv/z6ypcG3r0EpNE=;
-        b=lEbgRzcxZyf3QMmg1/okiPH7LFsevRy2wcgFA4o1hzDBQbKNGXKli9AiNEFAFmcniT
-         LBB6tm1w8QPvBTp606NZrLbkXkhPCnruBUA29DRTKQGWmkE/VZqxrwBGBu9SC07cC854
-         84opy+0CimI+AofXYVI6CHIFqGGqYT79xiYTIHx4bhfcNlcyGCsF6sKvWoTv/uCnAdd7
-         zqvChMhwO0h+zQuIQWa0M2J0Xa1TNBBuziAEPk4vr+kf0T7V+ifKq3ZOu1VcFHgxAB8b
-         h+D2a9ZSIyaa73yAdXs5EvZEnoLWf5gs+lMVYTh9YNlUYzWc7L7BXdqV91Fr69qwnb2j
-         9LoA==
-X-Forwarded-Encrypted: i=1; AFNElJ8rXXAvgdeCw7evCEY0qqVH0F784qBSW3uWkpFnRSFfx4dDnAJm8EeL7sJ/wX09q+KYGmcyEuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYhbrsUwIXj9STXzMil9O9za5D9jLqdBeg1Q7/kaA6/9ZkIDj/
-	pdZBV0ImTsEIYmDPoA3hVZ3TL2U4/9O50s2K6w8KmXIzeSipDUqAO00Pzzya0GLeZf2uWm61XPe
-	D90tQbnHl3NVxFONq6Q8ZplJGR7032fldtm8ijOAR
-X-Gm-Gg: AfdE7cn5w4YFTyBS8XK7dzKPjN1fV9vl895dTIYfV0/YbEvJOLfNznPpwUmCdA2ujFq
-	p+EMcQiM7IBP5XQsKL85qIb1GnmfTuGcq9DpzFB9C2OzNwaxmyJasyoYElJlRlx1Ecx7tuPfIQY
-	ZQAx4TuN60hrIuSMHNWgDu4zBoIOmsNEyEggkaF4FGBaq6o4RCja3USimh0WU4cB3VZsl8MaeC7
-	1N1165uPxh2mCnwTEV9VxapMCAtsfvO64mmK0hRqOz/f8tuqgBS9h8BPGm5DOR6DaLQjYvyb3DP
-	TNjtuZ6vP9SDKcYFEQSNF2UWav1RJSLH6CVyxG33K0LAnZ5GAAg4m0EsgpS0YRapfOwZwAmGp7Y
-	UBxwbEzkTkw/uE1grjmO1GTe9JcK8XZ7Fi/oJFw==
-X-Received: by 2002:a05:7022:fa5:b0:139:ed5d:3b3 with SMTP id
- a92af1059eb24-13b2a1d25d6mr3161157c88.44.1782837842011; Tue, 30 Jun 2026
- 09:44:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782838023; x=1783442823;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xiOPZVlIWXYiaqpOQmyOxWG5vDCdJG1lOjq1LsrNa5o=;
+        b=VwQWAIeB8HsBvxjLTCscED9pieAy7IYMO6tpPohcUTcNfryyduHEjukc5Y/5gK8KEJ
+         vXpfmIyLpZiUQw5vm0npjSu3LGRZULl182+QxdKsZVx+H6Kyi/FIcCJzOsmyuur5qWV8
+         DK1FZWSnEsFQTkPMOMWc+5uzTeY3Di4K9p2WpZd7gHi6XCXvaPvaOcyIZt7abe116dNr
+         2wkLAoBXKmiwLymkua+7xVFIKLITET3lQ3CgoXofP91f90blGprJGNM1xOcNT3Euv7lu
+         y2OVlMWi6ZMCDU+/P26pDM96bkxvv6NxNNxhwX8rcBJiOvnEdbXJW12WFI3YDHG2lDQk
+         lujg==
+X-Gm-Message-State: AOJu0YxUhpftiRb6hfqkOKFlGdnEUZDlIOdiZtdJ9xfwQR8FXlA1Y0LG
+	2f695+aotgFbXdYTYwsGfWalNd3WmQK1yQOpVTjOKO97TGZInqNb3RuliHtkLkaw0tLCOc/CuQr
+	SfutihrVfMdfu+sM49JLMgqqNzoHY1w49bK7REyncDt+12n/657zi8HxBcQ==
+X-Gm-Gg: AfdE7cm+g/SWLpQe4EyiP9a/CuyXDKfnHACwWFQHPcW5MTPaGFLPyi1JXfteLcVguHX
+	sQuTP9kXIriaG7pNlLE96EgHKDAqkpvfkXhRNCxsyrnT91fTPpalVGbZ5hGUOHsrPyI3z7lxqxL
+	pMmEtceJDDjHKbqTnDURps7oVF3QY8+sZ/R67DtRJFX9aVnSwxPlmdsWBGp2SZHVVOIQ6KWV3Dc
+	o4EZUZjyeyTk+bk0naHGejkkUbqJ4n+DW6hFyWj6KXNy4bMJSmGUsx7cE6rBLg32yXRoQTpyglO
+	PV5sHcbAJSBbgaGMYRSPN3L+aa0pGqIRZMahV7W1FjW6AhWQb9VOjq+dhNAu/BOAsoP68+3m56S
+	EuRyRW9+gC1dDKVTVWKnUreeRxpETnp3gzls=
+X-Received: by 2002:a05:6a00:92a5:b0:847:8337:64e4 with SMTP id d2e1a72fcca58-8479f1f553amr3419022b3a.30.1782838023343;
+        Tue, 30 Jun 2026 09:47:03 -0700 (PDT)
+X-Received: by 2002:a05:6a00:92a5:b0:847:8337:64e4 with SMTP id d2e1a72fcca58-8479f1f553amr3418980b3a.30.1782838022460;
+        Tue, 30 Jun 2026 09:47:02 -0700 (PDT)
+Received: from kernel-devel.tail62cea.ts.net ([240d:1a:c0d:9f00:be24:11ff:fe35:71b3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a03b9ffasm2378390b3a.59.2026.06.30.09.47.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 09:47:01 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matvey Kovalev <matvey.kovalev@ispras.ru>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>,
+	Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] qede: fix off-by-one in BD ring consumption on build_skb failure
+Date: Wed,  1 Jul 2026 01:46:20 +0900
+Message-ID: <20260630164623.3152625-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260629194327.2270798-1-jkoolstra@xs4all.nl> <20260629194327.2270798-4-jkoolstra@xs4all.nl>
-In-Reply-To: <20260629194327.2270798-4-jkoolstra@xs4all.nl>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 30 Jun 2026 09:43:50 -0700
-X-Gm-Features: AVVi8Cfg-jGOSmM0AyC_veTlwOcXtiFvZmVGHLWJZaxOaynBoRDq8uW1BKdMGmA
-Message-ID: <CAAVpQUBFJXv2FK=7DmKgWms7JROJGWp=S+AOBS__hxmgbLbUkA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/5] net: af_unix: useful handling of LSM
- denials on SCM_RIGHTS
-To: Jori Koolstra <jkoolstra@xs4all.nl>
-Cc: Christian Brauner <brauner@kernel.org>, Aleksa Sarai <cyphar@cyphar.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303301-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[xs4all.nl];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:jkoolstra@xs4all.nl,m:brauner@kernel.org,m:cyphar@cyphar.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matvey.kovalev@ispras.ru,m:syoshida@redhat.com,m:Pavel.Zhigulin@kaspersky.com,m:jamie.bainbridge@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:jamiebainbridge@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syoshida@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303302-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ispras.ru,kaspersky.com,gmail.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syoshida@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4011A6E6988
+X-Rspamd-Queue-Id: 9E4706E6A3C
 
-On Mon, Jun 29, 2026 at 12:42=E2=80=AFPM Jori Koolstra <jkoolstra@xs4all.nl=
-> wrote:
->
-> Right now if some LSM such as Smack denies an AF_UNIX socket peer to
-> receive an SCM_RIGHTS fd, the SCM_RIGHTS fd array will be cut short at
-> that point, and MSG_CTRUNC is set on return of recvmsg(). This is
-> highly problematic behaviour, because it leaves the receiver
-> wondering what happened. As per man page MSG_CTRUNC is supposed to
-> indicate that the control buffer was sized too short, but suddenly
-> a permission error might result in the exact same flag being set.
-> Moreover, the receiver has no chance to determine how many fds got
-> originally sent and how many were suppressed.[1]
->
-> Add a SO_RIGHTS_NOTRUNC option to UNIX sockets to enable more useful
-> handling of LSM denials when receiving SCM_RIGHTS messages: instead of
-> truncating the message at the first blocked fd, keep every fd slot
-> and store the LSM errno in the blocked slot.
->
-> [1]: https://github.com/uapi-group/kernel-features#useful-handling-of-lsm=
--denials-on-scm_rights
->
-> Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
-> ---
->  include/net/af_unix.h             |  1 +
->  include/net/scm.h                 | 15 +++++++++++----
->  include/uapi/asm-generic/socket.h |  3 +++
->  net/compat.c                      |  4 ++--
->  net/core/scm.c                    | 16 +++++++++++-----
->  net/unix/af_unix.c                |  9 +++++++++
->  6 files changed, 37 insertions(+), 11 deletions(-)
->
-> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-> index 34f53dde65ce..bb1b3dee02e8 100644
-> --- a/include/net/af_unix.h
-> +++ b/include/net/af_unix.h
-> @@ -49,6 +49,7 @@ struct unix_sock {
->         struct scm_stat         scm_stat;
->         int                     inq_len;
->         bool                    recvmsg_inq;
-> +       bool                    scm_rights_notrunc;
->  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
->         struct sk_buff          *oob_skb;
->  #endif
-> diff --git a/include/net/scm.h b/include/net/scm.h
-> index c52519669349..761cda0803fb 100644
-> --- a/include/net/scm.h
-> +++ b/include/net/scm.h
-> @@ -50,8 +50,8 @@ struct scm_cookie {
->  #endif
->  };
->
-> -void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm);
-> -void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm);
-> +void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm, bool not=
-runc);
-> +void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm, b=
-ool notrunc);
->  int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cooki=
-e *scm);
->  void __scm_destroy(struct scm_cookie *scm);
->  struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl);
-> @@ -108,11 +108,18 @@ void scm_recv_unix(struct socket *sock, struct msgh=
-dr *msg,
->                    struct scm_cookie *scm, int flags);
->
->  static inline int scm_recv_one_fd(struct file *f, int __user *ufd,
-> -                                 unsigned int flags)
-> +                                 unsigned int flags, bool notrunc)
->  {
-> +       bool filtered;
-> +       int error;
-> +
->         if (!ufd)
->                 return -EFAULT;
-> -       return receive_fd(f, ufd, flags);
-> +
-> +       error =3D receive_fd_filtered(f, ufd, flags, &filtered);
-> +       if (filtered && notrunc)
-> +               return put_user(error, ufd);
-> +       return error;
->  }
->
->  #endif /* __LINUX_NET_SCM_H */
-> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic=
-/socket.h
-> index 53b5a8c002b1..c5fb2ee96830 100644
-> --- a/include/uapi/asm-generic/socket.h
-> +++ b/include/uapi/asm-generic/socket.h
-> @@ -150,6 +150,9 @@
->  #define SO_INQ                 84
->  #define SCM_INQ                        SO_INQ
->
-> +#define SO_RIGHTS_NOTRUNC      85
-> +#define SCM_RIGHTS_NOTRUNC     SO_RIGHTS_NOTRUNC
+qede_rx_build_skb() and qede_tpa_rx_build_skb() do not check for a
+NULL return from qede_build_skb(). When it returns NULL under memory
+pressure, the functions still consume a BD from the ring before
+returning NULL. The callers then recycle additional BDs, resulting in
+one extra BD being consumed (off-by-one). This desynchronizes the BD
+ring, which can corrupt DMA page reference counts and lead to SLUB
+freelist corruption.
 
-SCM_RIGHTS_NOTRUNC is not needed as it's not used.
+Commit 4e910dbe3650 ("qede: confirm skb is allocated before using")
+added a NULL check inside qede_build_skb() to prevent a NULL pointer
+dereference, but did not address the missing NULL checks in the
+callers, making this off-by-one reachable.
 
+Fix this by adding NULL checks for the return value of
+qede_build_skb() in both qede_rx_build_skb() and
+qede_tpa_rx_build_skb(), returning NULL immediately before any BD ring
+manipulation.
 
-> +
->  #if !defined(__KERNEL__)
->
->  #if __BITS_PER_LONG =3D=3D 64 || (defined(__x86_64__) && defined(__ILP32=
-__))
-> diff --git a/net/compat.c b/net/compat.c
-> index d68cf9c3aad5..6bdf4a2c9077 100644
-> --- a/net/compat.c
-> +++ b/net/compat.c
-> @@ -286,7 +286,7 @@ static int scm_max_fds_compat(struct msghdr *msg)
->         return (msg->msg_controllen - sizeof(struct compat_cmsghdr)) / si=
-zeof(int);
->  }
->
-> -void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm)
-> +void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm, b=
-ool notrunc)
->  {
->         struct compat_cmsghdr __user *cm =3D
->                 (struct compat_cmsghdr __user *)msg->msg_control_user;
-> @@ -296,7 +296,7 @@ void scm_detach_fds_compat(struct msghdr *msg, struct=
- scm_cookie *scm)
->         int err =3D 0, i;
->
->         for (i =3D 0; i < fdmax; i++) {
-> -               err =3D scm_recv_one_fd(scm->fp->fp[i], cmsg_data + i, o_=
-flags);
-> +               err =3D scm_recv_one_fd(scm->fp->fp[i], cmsg_data + i, o_=
-flags, notrunc);
->                 if (err < 0)
->                         break;
->         }
-> diff --git a/net/core/scm.c b/net/core/scm.c
-> index a73b1eb30fd2..55bab203281a 100644
-> --- a/net/core/scm.c
-> +++ b/net/core/scm.c
-> @@ -351,7 +351,7 @@ static int scm_max_fds(struct msghdr *msg)
->         return (msg->msg_controllen - sizeof(struct cmsghdr)) / sizeof(in=
-t);
->  }
->
-> -void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm)
-> +void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm, bool not=
-runc)
->  {
->         struct cmsghdr __user *cm =3D
->                 (__force struct cmsghdr __user *)msg->msg_control_user;
-> @@ -365,12 +365,12 @@ void scm_detach_fds(struct msghdr *msg, struct scm_=
-cookie *scm)
->                 return;
->
->         if (msg->msg_flags & MSG_CMSG_COMPAT) {
-> -               scm_detach_fds_compat(msg, scm);
-> +               scm_detach_fds_compat(msg, scm, notrunc);
->                 return;
->         }
->
->         for (i =3D 0; i < fdmax; i++) {
-> -               err =3D scm_recv_one_fd(scm->fp->fp[i], cmsg_data + i, o_=
-flags);
-> +               err =3D scm_recv_one_fd(scm->fp->fp[i], cmsg_data + i, o_=
-flags, notrunc);
->                 if (err < 0)
->                         break;
->         }
-> @@ -542,8 +542,14 @@ void scm_recv_unix(struct socket *sock, struct msghd=
-r *msg,
->         if (!__scm_recv_common(sock->sk, msg, scm, flags))
->                 return;
->
-> -       if (scm->fp)
-> -               scm_detach_fds(msg, scm);
-> +       if (scm->fp) {
-> +               struct unix_sock *u;
-> +               bool notrunc;
-> +
-> +               u =3D unix_sk(sock->sk);
-> +               notrunc =3D READ_ONCE(u->scm_rights_notrunc);
+Fixes: 4e910dbe3650 ("qede: confirm skb is allocated before using")
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+ drivers/net/ethernet/qlogic/qede/qede_fp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Does this build with CONFIG_UNIX=3Dn ?
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_fp.c b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+index 33e18bb69774..c11e0d8f98aa 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_fp.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+@@ -765,6 +765,9 @@ qede_tpa_rx_build_skb(struct qede_dev *edev,
+ 	struct sk_buff *skb;
+ 
+ 	skb = qede_build_skb(rxq, bd, len, pad);
++	if (unlikely(!skb))
++		return NULL;
++
+ 	bd->page_offset += rxq->rx_buf_seg_size;
+ 
+ 	if (bd->page_offset == PAGE_SIZE) {
+@@ -812,6 +815,8 @@ qede_rx_build_skb(struct qede_dev *edev,
+ 	}
+ 
+ 	skb = qede_build_skb(rxq, bd, len, pad);
++	if (unlikely(!skb))
++		return NULL;
+ 
+ 	if (unlikely(qede_realloc_rx_buffer(rxq, bd))) {
+ 		/* Incr page ref count to reuse on allocation failure so
+-- 
+2.54.0
 
-
-> +               scm_detach_fds(msg, scm, notrunc);
-> +       }
->
->         if (sock->sk->sk_scm_pidfd)
->                 scm_pidfd_recv(msg, scm);
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index f7a9d55eee8a..83274ce18e06 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -921,6 +921,7 @@ static bool unix_custom_sockopt(int optname)
->  {
->         switch (optname) {
->         case SO_INQ:
-> +       case SO_RIGHTS_NOTRUNC:
->                 return true;
->         default:
->                 return false;
-> @@ -956,6 +957,14 @@ static int unix_setsockopt(struct socket *sock, int =
-level, int optname,
->
->                 WRITE_ONCE(u->recvmsg_inq, val);
->                 break;
-> +
-> +       case SO_RIGHTS_NOTRUNC:
-> +               if (val > 1 || val < 0)
-> +                       return -EINVAL;
-> +
-> +               WRITE_ONCE(u->scm_rights_notrunc, val);
-> +               break;
-> +
->         default:
->                 return -ENOPROTOOPT;
->         }
-> --
-> 2.54.0
->
 
