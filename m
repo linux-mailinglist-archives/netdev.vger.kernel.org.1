@@ -1,532 +1,235 @@
-Return-Path: <netdev+bounces-302921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jaOZFTQ2Q2pSVAoAu9opvQ
-	(envelope-from <netdev+bounces-302921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 05:21:24 +0200
+	id KPzuEtk0Q2qEUwoAu9opvQ
+	(envelope-from <netdev+bounces-302917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 05:15:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C46A6E0058
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 05:21:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D65096DFFF1
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 05:15:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=zte.com.cn (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302921-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302921-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=Uy0OPvjc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302917-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302917-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12AB930036CD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:21:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5087C3009F74
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF8637B3FE;
-	Tue, 30 Jun 2026 03:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689402E5B29;
+	Tue, 30 Jun 2026 03:15:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46460331EBA;
-	Tue, 30 Jun 2026 03:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5902690D5;
+	Tue, 30 Jun 2026 03:15:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782789676; cv=none; b=J1yslaKK547UsxDjg2w+Wo3wZCJzWN32c/BCz442qi3qzaQmjlBwOahxTbpzuCO0Le/x86oEApTTF6qUD6aWJdUFEm6r8ZqH6SGbA3UmUWwHAlwmL5sBAl0+mGQLiNBPr1nseSUvr/ZfWtDWTwAwWkYzlaxOPGqFJ3vJLjtxdWc=
+	t=1782789335; cv=none; b=VlzmhgSo+kf2TC9xYi+vj8UaYtXYtxKc99+4AqrEfYIWxvIb09Kc/MqXPMTQk7BFFvkyt8cczau7rxHygBZqK/v83QBxFiF0WsVs3ayRkw0G2MNbrbLB4iWfchAxASL9a7Iho0srvhrzR1QGnMcaX9Cb/BRAOjU+0DWXKFEFlsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782789676; c=relaxed/simple;
-	bh=i3WuPjQqcDNPG1quR5Tju0ATm3dilFFMLKkjQSvcM0g=;
-	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=u9qanEnjuatjvijcvOw0hzRWSkY0HnGxnxKxrXFkEuYRpn2NANqgLrnqGQUL3eBnDfuA09XOH14/D6SWyUOqexjq+H0GjnIE1R9kquws1MGcdHesqvenrs/1nqUBSnyznDAXhhXsFumB5VyiwAAhLukWGZs7UzvolLj9Z8Am92Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4gq7hm259kz5BNS0;
-	Tue, 30 Jun 2026 11:21:12 +0800 (CST)
-Received: from njb2app07.zte.com.cn ([10.55.22.95])
-	by mse-fl2.zte.com.cn with SMTP id 65U3CxHr046707;
-	Tue, 30 Jun 2026 11:12:59 +0800 (+08)
-	(envelope-from han.junyang@zte.com.cn)
-Received: from mapi (njb2app05[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Tue, 30 Jun 2026 11:13:00 +0800 (CST)
-X-Zmail-TransId: 2afd6a43343cfb0-061b8
-X-Mailer: Zmail v1.0
-Message-ID: <20260630111300830lukBczfNSgWE5wt6qR95k@zte.com.cn>
-In-Reply-To: <20260630110938458LNr_yEOENGtjGuNRow3RL@zte.com.cn>
-References: 20260630110938458LNr_yEOENGtjGuNRow3RL@zte.com.cn
-Date: Tue, 30 Jun 2026 11:13:00 +0800 (CST)
+	s=arc-20240116; t=1782789335; c=relaxed/simple;
+	bh=rlPcbuDju8eHLm7pwmya3VnZKoG1GXFDKuiyvAZppxw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rmVq0GGxoCaCH/Ge7YSlJAsjTtjpVcZvcRfrhdxTBXjMBHkHYuB3k0RkWoK/ZzGTo0X5ILPjtDvJBPSQ7tZghkGkVe91L2p+VFgB9MwrlQxLh7ANVn3d5TC5WfkGBaIawurl8vx6s28mO5fZmdJgv8QOF8g80PE7l4XArnH/23A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Uy0OPvjc; arc=none smtp.client-ip=115.124.30.97
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1782789330; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=1vNycxCuhzcuJXMoTNLp2cYo3/8A9ikPwob8Yjq0Vq0=;
+	b=Uy0OPvjc/0HNeJz669SBQGOEbwhQeZqxEXjOyzxVvCG+UR824Dv8aTC6wYLbmkUG0wxm2tQAK6veu+96iqgS03pNuPHfLma6dvtN7rogBKToNMyLUpvLu0H/1gXruKsxEq6rkZ8aFLStKR6JmP8na81O97CV1jP/d11SZlyDi8k=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0X5zdNCi_1782789320;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X5zdNCi_1782789320 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 30 Jun 2026 11:15:29 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: richardcochran@gmail.com,
+	dwmw2@infradead.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: svens@linux.ibm.com,
+	nick.shi@broadcom.com,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	linux-s390@vger.kernel.org,
+	xuanzhuo@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	mani@kernel.org,
+	imran.shaik@oss.qualcomm.com
+Subject: [PATCH v3 0/2] ptp: split non-host-disciplined PHC drivers into a dedicated subdirectory
+Date: Tue, 30 Jun 2026 11:15:17 +0800
+Message-Id: <20260630031519.23072-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <han.junyang@zte.com.cn>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <han.junyang@zte.com.cn>, <ran.ming@zte.com.cn>,
-        <han.chengfei@zte.com.cn>, <zhang.yanze@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY3IDEvMl0gZGluZ2hhaTogYWRkIFpURSBuZXR3b3JrIGRyaXZlciBzdXBwb3J0?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 65U3CxHr046707
-X-TLS: YES
-X-ENVELOPE-SENDER: han.junyang@zte.com.cn
-X-SOURCE-IP: 10.5.228.133 unknown Tue, 30 Jun 2026 11:21:12 +0800
-X-CLEAN: YES
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6A433628.000/4gq7hm259kz5BNS0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.14 / 15.00];
-	SUBJ_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302921-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302917-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:richardcochran@gmail.com,m:dwmw2@infradead.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:svens@linux.ibm.com,m:nick.shi@broadcom.com,m:ajay.kaher@broadcom.com,m:alexey.makhalov@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:linux-s390@vger.kernel.org,m:xuanzhuo@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:mani@kernel.org,m:imran.shaik@oss.qualcomm.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:han.junyang@zte.com.cn,m:ran.ming@zte.com.cn,m:han.chengfei@zte.com.cn,m:zhang.yanze@zte.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,infradead.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zte.com.cn:email,zte.com.cn:mid,zte.com.cn:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.alibaba.com:dkim,linux.alibaba.com:mid,linux.alibaba.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9C46A6E0058
+X-Rspamd-Queue-Id: D65096DFFF1
 
-From: Junyang Han <han.junyang@zte.com.cn>
+Hi all,
 
-Add basic framework for ZTE DingHai ethernet PF driver, including
-Kconfig/Makefile build support and PCIe device probe/remove skeleton.
+This series follows the discussion in RFC [1-2], v1 [3] and v2 [4].
 
-Signed-off-by: Junyang Han <han.junyang@zte.com.cn>
----
- MAINTAINERS                               |   6 +
- drivers/net/ethernet/Kconfig              |   1 +
- drivers/net/ethernet/Makefile             |   1 +
- drivers/net/ethernet/zte/Kconfig          |  20 +++
- drivers/net/ethernet/zte/Makefile         |   6 +
- drivers/net/ethernet/zte/dinghai/Kconfig  |  34 ++++
- drivers/net/ethernet/zte/dinghai/Makefile |  10 ++
- drivers/net/ethernet/zte/dinghai/en_pf.c  | 197 ++++++++++++++++++++++
- drivers/net/ethernet/zte/dinghai/en_pf.h  |  52 ++++++
- 9 files changed, 327 insertions(+)
- create mode 100644 drivers/net/ethernet/zte/Kconfig
- create mode 100644 drivers/net/ethernet/zte/Makefile
- create mode 100644 drivers/net/ethernet/zte/dinghai/Kconfig
- create mode 100644 drivers/net/ethernet/zte/dinghai/Makefile
- create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.c
- create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2fb1c75afd16..73692b09bf7b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -29440,6 +29440,12 @@ S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound.git
- F:	sound/hda/codecs/senarytech.c
+# Background
 
-+ZTE DINGHAI ETHERNET DRIVER
-+M:	Junyang Han <han.junyang@zte.com.cn>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/zte/
-+
- THE REST
- M:	Linus Torvalds <torvalds@linux-foundation.org>
- L:	linux-kernel@vger.kernel.org
-diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-index b8f70e2a1763..c2b6996b0cfe 100644
---- a/drivers/net/ethernet/Kconfig
-+++ b/drivers/net/ethernet/Kconfig
-@@ -188,5 +188,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
- source "drivers/net/ethernet/wiznet/Kconfig"
- source "drivers/net/ethernet/xilinx/Kconfig"
- source "drivers/net/ethernet/xircom/Kconfig"
-+source "drivers/net/ethernet/zte/Kconfig"
+The PTP Hardware Clock (PHC) interface (/dev/ptpX and the standard PTP_*
+ioctls) is used by two distinct classes of drivers in drivers/ptp/:
+host-disciplined PHC drivers whose frequency and phase are adjusted by
+the host's time synchronization stack, and non-host-disciplined PHC
+drivers that expose an external precision time reference and are
+read-only. Several non-host-disciplined PHC drivers already exist in
+the kernel [5-9], and more are expected to appear [10-11].
 
- endif # ETHERNET
-diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
-index 57344fec6ce0..a34bcbd4df4e 100644
---- a/drivers/net/ethernet/Makefile
-+++ b/drivers/net/ethernet/Makefile
-@@ -104,3 +104,4 @@ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
- obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
- obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
- obj-$(CONFIG_OA_TC6) += oa_tc6.o
-+obj-$(CONFIG_NET_VENDOR_ZTE) += zte/
-diff --git a/drivers/net/ethernet/zte/Kconfig b/drivers/net/ethernet/zte/Kconfig
-new file mode 100644
-index 000000000000..b95c2fc7db77
---- /dev/null
-+++ b/drivers/net/ethernet/zte/Kconfig
-@@ -0,0 +1,20 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# ZTE driver configuration
-+#
-+
-+config NET_VENDOR_ZTE
-+    bool "ZTE devices"
-+    default y
-+    help
-+      If you have a network (Ethernet) card belonging to this class, say Y.
-+      Note that the answer to this question doesn't directly affect the
-+      kernel: saying N will just cause the configurator to skip all
-+      the questions about Zte cards. If you say Y, you will be asked
-+      for your specific card in the following questions.
-+
-+if NET_VENDOR_ZTE
-+
-+source "drivers/net/ethernet/zte/dinghai/Kconfig"
-+
-+endif # NET_VENDOR_ZTE
-diff --git a/drivers/net/ethernet/zte/Makefile b/drivers/net/ethernet/zte/Makefile
-new file mode 100644
-index 000000000000..cd9929b61559
---- /dev/null
-+++ b/drivers/net/ethernet/zte/Makefile
-@@ -0,0 +1,6 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Makefile for the ZTE device drivers
-+#
-+
-+obj-$(CONFIG_DINGHAI) += dinghai/
-diff --git a/drivers/net/ethernet/zte/dinghai/Kconfig b/drivers/net/ethernet/zte/dinghai/Kconfig
-new file mode 100644
-index 000000000000..94b5bd9b3c50
---- /dev/null
-+++ b/drivers/net/ethernet/zte/dinghai/Kconfig
-@@ -0,0 +1,34 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# ZTE DingHai Ethernet driver configuration
-+#
-+
-+config DINGHAI
-+    bool "ZTE DingHai Ethernet driver"
-+    depends on NET_VENDOR_ZTE && PCI
-+    select NET_DEVLINK
-+    help
-+      This driver supports ZTE DingHai Ethernet devices.
-+
-+      DingHai is a high-performance Ethernet controller that supports
-+      multiple features including hardware offloading, SR-IOV, and
-+      advanced virtualization capabilities.
-+
-+      If you say Y here, you can select specific driver variants below.
-+
-+      If unsure, say N.
-+
-+if DINGHAI
-+
-+config DINGHAI_PF
-+    tristate "ZTE DingHai PF (Physical Function) driver"
-+    help
-+      This driver supports ZTE DingHai PCI Express Ethernet
-+      adapters (PF).
-+
-+      To compile this driver as a module, choose M here. The module
-+      will be named dinghai10e.
-+
-+      If unsure, say N.
-+
-+endif # DINGHAI
-diff --git a/drivers/net/ethernet/zte/dinghai/Makefile b/drivers/net/ethernet/zte/dinghai/Makefile
-new file mode 100644
-index 000000000000..f55a8de518be
---- /dev/null
-+++ b/drivers/net/ethernet/zte/dinghai/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Makefile for ZTE DingHai Ethernet driver
-+#
-+
-+ccflags-y += -I$(src)
-+
-+obj-$(CONFIG_DINGHAI_PF) += dinghai10e.o
-+dinghai10e-y := en_pf.o
-+
-diff --git a/drivers/net/ethernet/zte/dinghai/en_pf.c b/drivers/net/ethernet/zte/dinghai/en_pf.c
-new file mode 100644
-index 000000000000..b492fd2c261b
---- /dev/null
-+++ b/drivers/net/ethernet/zte/dinghai/en_pf.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * ZTE DingHai Ethernet driver
-+ * Copyright (c) 2022-2026, ZTE Corporation.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/pci.h>
-+#include <net/devlink.h>
-+#include <linux/dma-mapping.h>
-+#include "en_pf.h"
-+
-+MODULE_AUTHOR("Junyang Han <han.junyang@zte.com.cn>");
-+MODULE_DESCRIPTION("ZTE DingHai series Ethernet driver");
-+MODULE_LICENSE("GPL");
-+
-+static const struct devlink_ops dh_pf_devlink_ops = {};
-+
-+static const struct pci_device_id dh_pf_pci_table[] = {
-+	{ PCI_DEVICE(ZXDH_PF_VENDOR_ID, ZXDH_PF_DEVICE_ID) },
-+	{ PCI_DEVICE(ZXDH_PF_VENDOR_ID, ZXDH_VF_DEVICE_ID) },
-+	{ }
-+};
-+
-+MODULE_DEVICE_TABLE(pci, dh_pf_pci_table);
-+
-+void *dh_core_alloc_priv(struct dh_core_dev *dh_dev, size_t size)
-+{
-+	void *priv = kzalloc(size, GFP_KERNEL);
-+
-+	if (priv)
-+		dh_dev->priv = priv;
-+	return priv;
-+}
-+
-+void dh_core_free_priv(struct dh_core_dev *dh_dev)
-+{
-+	kfree(dh_dev->priv);
-+}
-+
-+static int dh_pf_pci_init(struct dh_core_dev *dev)
-+{
-+	struct zxdh_pf_device *pf_dev = dev->priv;
-+	int ret;
-+
-+	pci_set_drvdata(dev->pdev, dev);
-+
-+	ret = pci_enable_device(dev->pdev);
-+	if (ret) {
-+		dev_err(dev->device, "pci_enable_device failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(64));
-+	if (ret) {
-+		ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(32));
-+		if (ret) {
-+			dev_err(dev->device, "dma_set_mask_and_coherent failed: %d\n", ret);
-+			goto err_pci;
-+		}
-+	}
-+
-+	ret = pci_request_selected_regions(dev->pdev,
-+					   pci_select_bars(dev->pdev, IORESOURCE_MEM),
-+					   "dh-pf");
-+	if (ret) {
-+		dev_err(dev->device, "pci_request_selected_regions failed: %d\n", ret);
-+		goto err_pci;
-+	}
-+
-+	pci_set_master(dev->pdev);
-+	ret = pci_save_state(dev->pdev);
-+	if (ret) {
-+		dev_err(dev->device, "pci_save_state failed: %d\n", ret);
-+		goto err_pci_save_state;
-+	}
-+
-+	pf_dev->pci_ioremap_addr[0] =
-+		ioremap(pci_resource_start(dev->pdev, 0),
-+			pci_resource_len(dev->pdev, 0));
-+	if (!pf_dev->pci_ioremap_addr[0]) {
-+		ret = -ENOMEM;
-+		dev_err(dev->device, "dh pf pci ioremap failed\n");
-+		goto err_pci_save_state;
-+	}
-+
-+	return 0;
-+
-+err_pci_save_state:
-+	pci_release_selected_regions(dev->pdev,
-+				     pci_select_bars(dev->pdev, IORESOURCE_MEM));
-+err_pci:
-+	pci_disable_device(dev->pdev);
-+	return ret;
-+}
-+
-+void dh_pf_pci_close(struct dh_core_dev *dev)
-+{
-+	struct zxdh_pf_device *pf_dev = dev->priv;
-+
-+	iounmap(pf_dev->pci_ioremap_addr[0]);
-+	pci_release_selected_regions(dev->pdev,
-+				     pci_select_bars(dev->pdev, IORESOURCE_MEM));
-+	pci_disable_device(dev->pdev);
-+}
-+
-+static int dh_pf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct zxdh_pf_device *pf_dev;
-+	struct dh_core_dev *dh_dev;
-+	struct devlink *devlink;
-+	int ret;
-+
-+	devlink = devlink_alloc(&dh_pf_devlink_ops, sizeof(struct dh_core_dev),
-+				&pdev->dev);
-+	if (!devlink) {
-+		dev_err(&pdev->dev, "dh_pf devlink alloc failed\n");
-+		return -ENOMEM;
-+	}
-+
-+	dh_dev = devlink_priv(devlink);
-+	dh_dev->device = &pdev->dev;
-+	dh_dev->pdev = pdev;
-+	dh_dev->devlink = devlink;
-+
-+	pf_dev = dh_core_alloc_priv(dh_dev, sizeof(*pf_dev));
-+	if (!pf_dev) {
-+		dev_err(&pdev->dev, "dh_pf_dev alloc failed\n");
-+		ret = -ENOMEM;
-+		goto err_pf_dev;
-+	}
-+
-+	pf_dev->bar_chan_valid = false;
-+	pf_dev->vepa = false;
-+	mutex_init(&dh_dev->lock);
-+	mutex_init(&pf_dev->irq_lock);
-+
-+	dh_dev->coredev_type = GET_COREDEV_TYPE(pdev);
-+
-+	ret = dh_pf_pci_init(dh_dev);
-+	if (ret) {
-+		dev_err(&pdev->dev, "dh_pf_pci_init failed: %d\n", ret);
-+		goto err_cfg_init;
-+	}
-+
-+	devlink_register(devlink);
-+
-+	return 0;
-+
-+err_cfg_init:
-+	mutex_destroy(&pf_dev->irq_lock);
-+	mutex_destroy(&dh_dev->lock);
-+	dh_core_free_priv(dh_dev);
-+err_pf_dev:
-+	devlink_free(devlink);
-+	return ret;
-+}
-+
-+static void dh_pf_remove(struct pci_dev *pdev)
-+{
-+	struct dh_core_dev *dh_dev = pci_get_drvdata(pdev);
-+	struct devlink *devlink = priv_to_devlink(dh_dev);
-+	struct zxdh_pf_device *pf_dev = dh_dev->priv;
-+
-+	devlink_unregister(devlink);
-+	dh_pf_pci_close(dh_dev);
-+	mutex_destroy(&pf_dev->irq_lock);
-+	mutex_destroy(&dh_dev->lock);
-+	dh_core_free_priv(dh_dev);
-+	devlink_free(devlink);
-+	pci_set_drvdata(pdev, NULL);
-+}
-+
-+static void dh_pf_shutdown(struct pci_dev *pdev)
-+{
-+	struct dh_core_dev *dh_dev = pci_get_drvdata(pdev);
-+	struct devlink *devlink = priv_to_devlink(dh_dev);
-+	struct zxdh_pf_device *pf_dev = dh_dev->priv;
-+
-+	devlink_unregister(devlink);
-+	dh_pf_pci_close(dh_dev);
-+	mutex_destroy(&pf_dev->irq_lock);
-+	mutex_destroy(&dh_dev->lock);
-+	dh_core_free_priv(dh_dev);
-+	devlink_free(devlink);
-+	pci_set_drvdata(pdev, NULL);
-+}
-+
-+static struct pci_driver dh_pf_driver = {
-+	.name = "dinghai10e",
-+	.id_table = dh_pf_pci_table,
-+	.probe = dh_pf_probe,
-+	.remove = dh_pf_remove,
-+	.shutdown = dh_pf_shutdown,
-+};
-+
-+module_pci_driver(dh_pf_driver);
-diff --git a/drivers/net/ethernet/zte/dinghai/en_pf.h b/drivers/net/ethernet/zte/dinghai/en_pf.h
-new file mode 100644
-index 000000000000..87fa29b2d13d
---- /dev/null
-+++ b/drivers/net/ethernet/zte/dinghai/en_pf.h
-@@ -0,0 +1,52 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * ZTE DingHai Ethernet driver - PF header
-+ * Copyright (c) 2022-2026, ZTE Corporation.
-+ */
-+
-+#ifndef __ZXDH_EN_PF_H__
-+#define __ZXDH_EN_PF_H__
-+
-+#include <linux/types.h>
-+#include <linux/pci.h>
-+#include <linux/mutex.h>
-+#include <linux/device.h>
-+#include <linux/slab.h>
-+
-+#define ZXDH_PF_VENDOR_ID	0x1cf2
-+#define ZXDH_PF_DEVICE_ID	0x8040
-+#define ZXDH_VF_DEVICE_ID	0x8041
-+
-+enum dh_coredev_type {
-+	DH_COREDEV_PF,
-+	DH_COREDEV_VF,
-+	DH_COREDEV_SF,
-+	DH_COREDEV_MPF
-+};
-+
-+struct devlink;
-+
-+struct dh_core_dev {
-+	struct device *device;
-+	enum dh_coredev_type coredev_type;
-+	struct pci_dev *pdev;
-+	struct devlink *devlink;
-+	struct mutex lock; /* Protects device configuration */
-+	void *priv;
-+};
-+
-+struct zxdh_pf_device {
-+	void __iomem *pci_ioremap_addr[6];
-+	bool bar_chan_valid;
-+	bool vepa;
-+	struct mutex irq_lock; /* Protects IRQ operations */
-+};
-+
-+#define GET_COREDEV_TYPE(pdev) \
-+	((pdev)->device == ZXDH_VF_DEVICE_ID ? DH_COREDEV_VF : DH_COREDEV_PF)
-+
-+void *dh_core_alloc_priv(struct dh_core_dev *dh_dev, size_t size);
-+void dh_core_free_priv(struct dh_core_dev *dh_dev);
-+void dh_pf_pci_close(struct dh_core_dev *dev);
-+
-+#endif /* __ZXDH_EN_PF_H__ */
+During review of incoming non-host-disciplined PHC drivers, concerns
+were raised that they may not be a good fit for the netdev maintainership
+model [12], where all PTP/PHC drivers are currently maintained. This
+leaves an unclear upstream home and maintainership model for this class
+of drivers.
+
+
+# Proposal
+
+This series makes the separation explicit by reorganizing the drivers/ptp/
+layout into the following groups:
+
+  - drivers/ptp/          : PTP core infrastructure and host-disciplined
+                            PHC drivers.
+
+  - drivers/ptp/emulated/ : non-host-disciplined PHC drivers that expose
+                            precision time from hypervisors, platforms,
+                            or firmware. These clocks are read-only and
+                            not adjusted by the host.
+
+Patch 1 performs the directory reorganization: move drivers and split
+Kconfig/Makefiles accordingly, without intended functional changes.
+
+Patch 2 updates MAINTAINERS to match the new layout and adds a
+dedicated entry for drivers/ptp/emulated/.
+
+No userspace ABI changes are intended; this is a refactor and maintenance
+metadata update only.
+
+
+# Changes since v2:
+
+- List David Woodhouse as the sole maintainer (M:) of emulated PTP
+  drivers as suggested by Jakub. Wen Gu and Xuan Zhuo are listed as
+  reviewers (R:).
+
+- Updated the T: field to use David's tree:
+  git://git.infradead.org/linux-ptp.git
+
+- Reworded commit messages to clarify the distinction between the two
+  groups as host-disciplined vs. read-only (devices that purport to know
+  real time better than the host).
+
+
+# Changes since v1:
+
+- List David Woodhouse as the maintainer of emulated PTP drivers.
+
+- Adjust the directory layout: instead of creating both ieee1588/ and
+  emulated/ subdirectories, keep the network-oriented drivers in the
+  main drivers/ptp/ directory and only split out the emulated drivers.
+
+
+# Changes since RFC v2:
+
+- Keep ptp_ocp under the network-oriented PTP drivers as suggested
+  by Jakub.
+
+
+Thanks for any input.
+
+Regards.
+
+[1] https://lore.kernel.org/all/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com/
+[2] https://lore.kernel.org/all/20260227081934.96865-1-guwen@linux.alibaba.com/
+[3] https://lore.kernel.org/all/20260318073330.115808-1-guwen@linux.alibaba.com/
+[4] https://lore.kernel.org/all/20260407104802.34429-1-guwen@linux.alibaba.com/
+[5] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a0e136d436ded817c0aade72efdefa56a00b4e5e
+[6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7d10001e20e46ad6ad95622164686bc2cbfc9802
+[7] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2d7de7a3010d713fb89b7ba99e6fdc14475ad106
+[8] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3716a49a81ba19dda7202633a68b28564ba95eb5
+[9] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9a17125a18f9ae1e1233a8e2d919059445b9d6fd
+[10] https://lore.kernel.org/netdev/20251030121314.56729-1-guwen@linux.alibaba.com/
+[11] https://lore.kernel.org/mhi/20250818-tsc_time_sync-v1-0-2747710693ba@oss.qualcomm.com/
+[12] https://lore.kernel.org/netdev/20251127083610.6b66a728@kernel.org/
+
+Wen Gu (2):
+  ptp: move non-host-disciplined clock drivers into a dedicated
+    subdirectory
+  MAINTAINERS: update PTP maintainer entries after directory split
+
+ MAINTAINERS                                 | 21 +++++--
+ drivers/ptp/Kconfig                         | 55 +------------------
+ drivers/ptp/Makefile                        | 11 ++--
+ drivers/ptp/emulated/Kconfig                | 61 +++++++++++++++++++++
+ drivers/ptp/emulated/Makefile               | 11 ++++
+ drivers/ptp/{ => emulated}/ptp_kvm_arm.c    |  0
+ drivers/ptp/{ => emulated}/ptp_kvm_common.c |  0
+ drivers/ptp/{ => emulated}/ptp_kvm_x86.c    |  0
+ drivers/ptp/{ => emulated}/ptp_s390.c       |  0
+ drivers/ptp/{ => emulated}/ptp_vmclock.c    |  0
+ drivers/ptp/{ => emulated}/ptp_vmw.c        |  0
+ 11 files changed, 94 insertions(+), 65 deletions(-)
+ create mode 100644 drivers/ptp/emulated/Kconfig
+ create mode 100644 drivers/ptp/emulated/Makefile
+ rename drivers/ptp/{ => emulated}/ptp_kvm_arm.c (100%)
+ rename drivers/ptp/{ => emulated}/ptp_kvm_common.c (100%)
+ rename drivers/ptp/{ => emulated}/ptp_kvm_x86.c (100%)
+ rename drivers/ptp/{ => emulated}/ptp_s390.c (100%)
+ rename drivers/ptp/{ => emulated}/ptp_vmclock.c (100%)
+ rename drivers/ptp/{ => emulated}/ptp_vmw.c (100%)
+
 -- 
-2.27.0
+2.43.5
+
 
