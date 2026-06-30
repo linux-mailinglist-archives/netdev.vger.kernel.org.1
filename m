@@ -1,225 +1,248 @@
-Return-Path: <netdev+bounces-303143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O1KIHzKzQ2qbfQoAu9opvQ
-	(envelope-from <netdev+bounces-303143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:14:42 +0200
+	id b5jGMNOzQ2rSfQoAu9opvQ
+	(envelope-from <netdev+bounces-303144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:17:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8966E40E4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:14:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E5F6E414A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:17:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=Y1Rrhq5y;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=gJSA3mSq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303143-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303143-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=xs4all.nl header.s=xs4all01 header.b=CX2oM8FO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303144-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303144-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=xs4all.nl;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8CD4730039B7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:14:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 12145301C6D4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD2A409DF0;
-	Tue, 30 Jun 2026 12:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3BF31E82A;
+	Tue, 30 Jun 2026 12:17:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6526E3EDE70
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4250408633
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:17:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782821680; cv=none; b=CSXL1wTBjjz425XX87vu/whRvnypQ/N8nGZbR+FriCc9fQr3PUGO0aEygELYLZUyd5U0ab1y5o+l4LRnliUlxiHlUJmhpY5XiBi79CV1dX7Cy3Ip44RtNhEFBaw65FtN5kXGRcE85SllST5j1If57lrnbnGfi1b2QuOZJyWWek0=
+	t=1782821840; cv=none; b=NtNks6KilCFdWVOKHL/ydZkOhLPuz1oZ2lRV7OZJW2QI2My/DUfquLsBej1sngyBec8GA8tF7VooDvuNGT9F+l2D6vVCeOR0QrJLU4leC/6LeTIwtd1fU/kqlVlGHx4S7jjYGifDZV+soLbWc2MEweDjq4CPNbXGrT/WV9lkJCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782821680; c=relaxed/simple;
-	bh=Vfq7tifQqkrQcDZiRviC31PSIJy8viYJL1W1oSt9PHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hPqyuSNJv0+0a0yoZdVoxgbwlz6jTXEYouQagN4R+EPQeHKNGT39Fk5DZp70BmUeE6VmD3m2QFowRpeW3l0hWV+feyLN0ywkdP2d14wlljGxuz/vh/KucBqHwKCj0Jwqs+l6zhLTw+QlthjDPtxAUVKaaQTLXj7yZrphi2E6UGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Y1Rrhq5y; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gJSA3mSq; arc=none smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U9mvQj1605003
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:14:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	oBbce1WRUs3G2E0RY0k9esyoB3WwxEZLpDwnuzZhw+E=; b=Y1Rrhq5yt8TfNDWs
-	EgLGPzpahCcr/ZfG0Sl64RZ5vc1iAyxEEkLH1gVw6YQ3d+itWHbU9H9bJAzAcXKR
-	2/A+vh1LtOvqK7yf5qXmxGPN5wP6RNqQTW6KCTswuEgDz0nX8TYHu5pfcZpPeHup
-	CbHdMu7jpW3GsAnLW8YjKvbzZDJ1rn867EzrtM4f7+vPrirw/3bfTvvPIzPMLQz8
-	xSE6O3iF/rkQQq8UazZS2apXhMw9Q8sqNUmdOBUiGf3kKrUUD9ga2qbaEJb86ud1
-	c/nDhl2v+J03zcyY/JVJF3+Hl7IPjvXeS0+icmcN1p/XJTSwqj/BuM4vw0fbh1fd
-	W+wZiw==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f43vfjk7d-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:14:38 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-92e6415f279so16979985a.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 05:14:38 -0700 (PDT)
+	s=arc-20240116; t=1782821840; c=relaxed/simple;
+	bh=pVFWRdmduSXd0EI7LOQGs6oToijJeU2YlwTDktUqB6Y=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=NIsu7eJ3YTHSaSBTHptkcNw6RiaIJZrwehaQxOJYtlbXD17og/XTdYWxkQjonfslYaf8Zafi6QoAkqyAyqsX1Td7n1Rw2gmyrGU1QXDIvOAesUj4cczG2J8iRoXqW59u4OSLP0Zze/UXkPwsGcsxm2/4NYt40EaoS/4EN9x4Eyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=CX2oM8FO; arc=none smtp.client-ip=195.121.94.184
+X-KPN-MessageId: a0bcb971-747d-11f1-a59f-005056994fde
+Received: from mta.kpnmail.nl (unknown [10.31.161.188])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id a0bcb971-747d-11f1-a59f-005056994fde;
+	Tue, 30 Jun 2026 14:17:14 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id a0bb8d43-747d-11f1-9b04-00505699693e;
+	Tue, 30 Jun 2026 14:17:14 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782821678; x=1783426478; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=oBbce1WRUs3G2E0RY0k9esyoB3WwxEZLpDwnuzZhw+E=;
-        b=gJSA3mSqhOxYzhwVyFJNYHow6FwFnKi+pJoqsL6XfYL8QfaQZX03o1IuF7nIpipc8r
-         ILmP8vkg6b2agZeCYHfKfHTTt33yyC1RxoD9ZwSVK3Ve+rd+ABaE4KR/bYTEMGRnPsJN
-         FPGZiE6gWiFMedZcPBVXKFsXNlp1fABVcsH23jFunIkutrmLj6C4svRMcgKsSXI73t6D
-         2F8WmhzKxpbQfX3rGe8OCafQKYBwinvcVq+cQfvHsk6tie6yfzz5fW4ycRI8nlASOfiw
-         CHav6QhNoTkm4raNSzGCtZWVUXO1gW7EzzcKnjW3UaQmfpYQA23fVaz5Mrt5tmY2gabf
-         PRfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782821678; x=1783426478;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=oBbce1WRUs3G2E0RY0k9esyoB3WwxEZLpDwnuzZhw+E=;
-        b=qVIGslbB+05sT64+J53NjxSgmsvgTc4zmgjEEqBCCi89vwtf5h/fnQrNXCjlUa4yWl
-         OxYpEj8GsA2ycY/YlPZV/WpeEznfeSml1Z7XBJ6+yCQ0PfknTPawBpIAdc08wYlwKfP8
-         2jegy4INmD5u/rCPOmfMtLkG89ZhSuAJIfdfuSn5Gh28FQlg/75XTHlVK/JX8rcJVBGS
-         djpZjALuSlZS7U08D+iDOo0XL9H2r9Kv/oxtU9fPBVnaUXk6yH1oHMcytFSWtt1F8QRT
-         6RwA4/0QW+Uk5JhPcGrtRQ/NOXrIGZVuNfSrzdmk6sYXcKdfdjzWAuyuYbKXcwQP2lcR
-         N6jA==
-X-Forwarded-Encrypted: i=1; AFNElJ9tpy06pJQ4pQsjjnIIiGVpeNBGWyyp6fYpb0RcB7fydgvZbPH8c5x0F9ulp1SEPSmp5Gv3YPU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTcN1V+Tl33LORECeAffAMscldw05DD33KAHg10dR3iXH6/X0y
-	J6tD77apDg1+ZrRW/EC/OeBoajH1ze4Aq9odhxrGOdLfBjKHMemJ7JG96XZIOYx2fSuJxDl+KZf
-	mXbhenEE7AUsf2CMU0Pqy+1M3Yi9/yMM+S9p4nzP2XN1wlfVRskH/RPD7gyQ=
-X-Gm-Gg: AfdE7ckDnrkPa75qiMGaC4H00hs7HqOcpkRN5nIvjUZdiZiIWTiW1eZF/Xg2vYnNYxH
-	5M4D+zTQSA1wQ1o2yconjT8bWPj2Y92QFFJNIXm5oDFEkbs41UjHj+Zcj7iny+/hSSGFlVB+lQh
-	1/T0DNxzC9SGEiQbbAmdrpUuy4bLAtsjDE6r4qp5ihzVj9vGPslA5qi/B4c2mBT+CijmG5bWrKR
-	QliKqHOP7hjRbxdxYLv5T2Q9NHa0Cqck8d05FlEtBvMzvblVcWwV8CIq2A0Lfyl9o7rxT1nMRzg
-	BTTDl9GnRFOAAN7IAsH5KgF8SmcqDfryV2xmATxEXeQpwQ/nECK2XTUlh0pXUlKXTZQkwKwqxIg
-	+ZJ89rPfoexc5TruZI0oWPauhW6v2xWs3qME=
-X-Received: by 2002:a05:620a:2589:b0:915:7c1a:1388 with SMTP id af79cd13be357-92e627e197cmr355400785a.5.1782821677740;
-        Tue, 30 Jun 2026 05:14:37 -0700 (PDT)
-X-Received: by 2002:a05:620a:2589:b0:915:7c1a:1388 with SMTP id af79cd13be357-92e627e197cmr355395085a.5.1782821677127;
-        Tue, 30 Jun 2026 05:14:37 -0700 (PDT)
-Received: from [192.168.120.170] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1296b1f9cesm21325366b.16.2026.06.30.05.14.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jun 2026 05:14:36 -0700 (PDT)
-Message-ID: <dc7e58d3-4383-4d93-a38e-699888bff903@oss.qualcomm.com>
-Date: Tue, 30 Jun 2026 14:14:30 +0200
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=HoaUdutcVjzwLlkWs3t1/fLAplllrYSdfUovTEYFf/Y=;
+	b=CX2oM8FOasD0LfV3NG0GB1BEtOiD5etbHQ102TrTCs2sdn1v5oZjpYfgXP2K+8/RNa0KZSkqeiS7Z
+	 C7cALcGK9hTBDTsedhZF8GJ1koenP1tpFwxr7Bw31ELas6lyKmycYiXwWKo0OHN7WbX3bVQoAYyTLJ
+	 IlYGxzT5baFjdqPy8pewhUXe3twRzF4zWyT1mkxvI2B7BtKSjjarp0a3ABeDsHhq1d5sXvgeY0GUIv
+	 5aS+kp1VdCZ5qTE0fLCQhY4DSmiOXSIlOzZR8qo4x/qAU0SOTd8HIe8VXW3Sf39BURsoleV0OYPZG8
+	 T1vDwajXGn7LRj187TIRlJ1pVk3JNRQ==
+X-KPN-MID: 33|OFYpm1P/Nt8SYcBlYsmaTYPF0qERzll8sV44nr1wrEwv67WCimJpjCHdRix9Bgq
+ eFOVIbIJJTMgaVKU/aaBroU+a/AOj08YJYFo9cdM8Ec4=
+X-CMASSUN: 33|OrooBAzrv2xmU0EZVbA0G0ujgPElX0jqUXaNl7wbv+rPuDBb+5DvFwarGO7uX0S
+ M5qNHL3Z8Itq/9C6FeSXZog==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh06 (cpxoxapps-mh06.personalcloud.so.kpn.org [10.128.135.212])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id a0abbb1e-747d-11f1-8edb-00505699eff2;
+	Tue, 30 Jun 2026 14:17:14 +0200 (CEST)
+Date: Tue, 30 Jun 2026 14:17:14 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Aleksa Sarai <cyphar@cyphar.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Message-ID: <158151977.3525022.1782821834050@kpc.webmail.kpnmail.nl>
+In-Reply-To: <20260630-getoppt-granit-gekrochen-78244e8979d9@brauner>
+References: <20260629194327.2270798-1-jkoolstra@xs4all.nl>
+ <20260629194327.2270798-4-jkoolstra@xs4all.nl>
+ <20260630-getoppt-granit-gekrochen-78244e8979d9@brauner>
+Subject: Re: [PATCH net-next v3 3/5] net: af_unix: useful handling of LSM
+ denials on SCM_RIGHTS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 01/14] firmware: qcom: Add a generic PAS service
-To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org
-Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-        vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-        Sumit Garg <sumit.garg@oss.qualcomm.com>,
-        Harshal Dev <harshal.dev@oss.qualcomm.com>
-References: <20260626133440.692849-1-sumit.garg@kernel.org>
- <20260626133440.692849-2-sumit.garg@kernel.org>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260626133440.692849-2-sumit.garg@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: Wq5vuGTVDWy-7_0APT9hFfIw1CxDGwdl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDExMyBTYWx0ZWRfX8Nkev3MQKHT8
- ACkDcnuLzkJMCyHAAInGYLULDkserZdLxQ+DROKcesNyCLnkMQ5Ucd5QbH2/zMPI3WEUyNbYMI/
- 6eR+KuqrSPJuNqsh2Swv5MQ6s/sR5K0DiSGCfcJLjKjmA+DU45VexNtb5Xa2nO+cK44tYCZ1uKe
- slVzciILcWJWgDOPg+Gh+6ZgZycErrZJjT+M9rp2xQSwkWf6BEYx/Y2FflrZIK29hW1TAVUPUlH
- kxVmsPaA8qVW909TV8f7eHt+8eban4hTmdZTMDKc8QtIFrJKsow7UsYV5CBdUdJjKcJ7gGn3jUA
- SYPMB2kI35zMfLH4yVPpPji2uIZASqUbaMaaa4rC4cf8+lYCupGBkKtYYDEJAmpkpRpQ4DUOiAX
- 6ynYGCYdjR0psdR1W+jl/6DJDeG1YcoQVdjRK7s2XQAlP9IT7+maWyLAJap9UQGr/P+pwOBk8nU
- 7qhD8RR492MpqJ53k4g==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDExMyBTYWx0ZWRfX4pztf8FZpXtd
- iOKORiOz9RDrVhFcg6gbOxrEEBZh3AgKPG2jGsakTFDf3az4viHQT9TK6jkqKza+rvVi0QvgOm/
- SNL2VczJeUvqFdtZUg871Rm2fwVSCwU=
-X-Proofpoint-GUID: Wq5vuGTVDWy-7_0APT9hFfIw1CxDGwdl
-X-Authority-Analysis: v=2.4 cv=PcXPQChd c=1 sm=1 tr=0 ts=6a43b32e cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=EUspDBNiAAAA:8 a=Ltt3hjjT39zhUWiMmRAA:9 a=QEXdDO2ut3YA:10
- a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_03,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 clxscore=1015 impostorscore=0 bulkscore=0
- adultscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2606300113
+X-Priority: 3
+Importance: Normal
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
+	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	TAGGED_FROM(0.00)[bounces-303143-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-303144-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
- comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:harshal.dev@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,qualcomm.com:dkim,qualcomm.com:email,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,vger.kernel.org:from_smtp];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	HAS_X_PRIO_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	FORGED_SENDER(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:brauner@kernel.org,m:cyphar@cyphar.com,m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[xs4all.nl:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[xs4all.nl];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1E8966E40E4
+X-Rspamd-Queue-Id: 51E5F6E414A
 
-On 6/26/26 3:34 PM, Sumit Garg wrote:
-> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+
+> Op 30-06-2026 11:58 CEST schreef Christian Brauner <brauner@kernel.org>:
 > 
-> Qcom platforms has the legacy of using non-standard SCM calls
-> splintered over the various kernel drivers. These SCM calls aren't
-> compliant with the standard SMC calling conventions which is a
-> prerequisite to enable migration to the FF-A specifications from Arm.
+>  
+> > Right now if some LSM such as Smack denies an AF_UNIX socket peer to
+> > receive an SCM_RIGHTS fd, the SCM_RIGHTS fd array will be cut short at
+> > that point, and MSG_CTRUNC is set on return of recvmsg(). This is
+> > highly problematic behaviour, because it leaves the receiver
+> > wondering what happened. As per man page MSG_CTRUNC is supposed to
+> > indicate that the control buffer was sized too short, but suddenly
+> > a permission error might result in the exact same flag being set.
+> > Moreover, the receiver has no chance to determine how many fds got
+> > originally sent and how many were suppressed.[1]
+> > 
+> > Add a SO_RIGHTS_NOTRUNC option to UNIX sockets to enable more useful
+> > handling of LSM denials when receiving SCM_RIGHTS messages: instead of
+> > truncating the message at the first blocked fd, keep every fd slot
+> > and store the LSM errno in the blocked slot.
+> > 
+> > [1]: https://github.com/uapi-group/kernel-features#useful-handling-of-lsm-denials-on-scm_rights
+> > 
+> > Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
+> >
+> > diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> > index 34f53dde65ce..bb1b3dee02e8 100644
+> > --- a/include/net/af_unix.h
+> > +++ b/include/net/af_unix.h
+> > @@ -49,6 +49,7 @@ struct unix_sock {
+> >  	struct scm_stat		scm_stat;
+> >  	int			inq_len;
+> >  	bool			recvmsg_inq;
+> > +	bool			scm_rights_notrunc;
+> >  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> >  	struct sk_buff		*oob_skb;
+> >  #endif
+> > diff --git a/include/net/scm.h b/include/net/scm.h
+> > index c52519669349..761cda0803fb 100644
+> > --- a/include/net/scm.h
+> > +++ b/include/net/scm.h
+> > @@ -50,8 +50,8 @@ struct scm_cookie {
+> >  #endif
+> >  };
+> >  
+> > -void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm);
+> > -void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm);
+> > +void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm, bool notrunc);
+> > +void scm_detach_fds_compat(struct msghdr *msg, struct scm_cookie *scm, bool notrunc);
+> >  int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm);
+> >  void __scm_destroy(struct scm_cookie *scm);
+> >  struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl);
+> > @@ -108,11 +108,18 @@ void scm_recv_unix(struct socket *sock, struct msghdr *msg,
+> >  		   struct scm_cookie *scm, int flags);
+> >  
+> >  static inline int scm_recv_one_fd(struct file *f, int __user *ufd,
+> > -				  unsigned int flags)
+> > +				  unsigned int flags, bool notrunc)
+> >  {
+> > +	bool filtered;
+> > +	int error;
+> > +
+> >  	if (!ufd)
+> >  		return -EFAULT;
+> > -	return receive_fd(f, ufd, flags);
+> > +
+> > +	error = receive_fd_filtered(f, ufd, flags, &filtered);
+> > +	if (filtered && notrunc)
+> > +		return put_user(error, ufd);
+> 
+> This helper makes no sense to me. The boolean return argument is just
+> really nasty and you need an additional put_user() as well. At this
+> point, just drop receive_fd() and open-code it instead of using another
+> custom helper. Something like the completely untested:
+> 
 
-[...]
+It's not very pretty no. I thought about several different options but they
+all kinda suck.
 
-> +bool qcom_pas_is_available(void)
+You could override the error returned from the LSM to -EACCES. Since nothing
+else in receive_fd() produces this, if you get it you can be sure that you had
+an LSM fd block. However, this masks the real returned error and is also a bit
+fragile if receive_fd() does ever return -EACCES in another path (unlikely but still).
+You can also signal blocking by setting the ufd to the security_file_receive() error
+no matter the socket option. But this does change userspace.
 
-This is the most important function, for which I would expect
-kerneldoc be present. I think it also wouldn't hurt to add a
-footnote in every other function's kerneldoc saying that this must
-be called first
+But open-coding might be a better idea.
 
-Konrad
+I also choose to not put -EPERM as sentinel as suggested first, but use the
+actual LSM error. Agreed?
+
+
+> diff --git a/include/net/scm.h b/include/net/scm.h
+> index 761cda0803fb..171b5ccd0b77 100644
+> --- a/include/net/scm.h
+> +++ b/include/net/scm.h
+> @@ -116,10 +116,22 @@ static inline int scm_recv_one_fd(struct file *f, int __user *ufd,
+>         if (!ufd)
+>                 return -EFAULT;
+> 
+> -       error = receive_fd_filtered(f, ufd, flags, &filtered);
+> -       if (filtered && notrunc)
+> -               return put_user(error, ufd);
+> -       return error;
+> +       error = security_file_receive(file);
+> +       if (error)
+> +               return notrunc ? put_user(error, ufd) : error;
+> +
+> +       FD_PREPARE(fdf, flags, f);
+> +       if (fdf.err)
+> +               return fdf.err;
+> +       get_file(f);
+> +
+> +       error = put_user(fd_prepare_fd(fdf), ufd);
+> +       if (error)
+> +               return error;
+> +
+> +       __receive_sock(f);
+> +       return fd_publish(fdf);
+>  }
+> 
+> -- 
+> Christian Brauner <brauner@kernel.org>
 
