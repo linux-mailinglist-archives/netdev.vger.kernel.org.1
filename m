@@ -1,115 +1,185 @@
-Return-Path: <netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FLLRDcofQ2pvRQoAu9opvQ
-	(envelope-from <netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:45:46 +0200
+	id vdWwHCsiQ2rVRgoAu9opvQ
+	(envelope-from <netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:55:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1316DFA22
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:45:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02A256DFAC8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:55:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JqtuBAKF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="CCMkVen/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73399302BBAC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:45:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 638893006446
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0823B2C029D;
-	Tue, 30 Jun 2026 01:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD712F8EB3;
+	Tue, 30 Jun 2026 01:55:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980EC25332E;
-	Tue, 30 Jun 2026 01:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A162FD1C2;
+	Tue, 30 Jun 2026 01:55:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782783942; cv=none; b=c13isEgbu7NDYh2qDz83v86m5IDQOoxepJvw2EW4ftAHOudzGvo8o6C6TyolvezkdIrWAP52h1QMEqncW0Ph8DVA3RUKqKlXtSYWOTeM958Ty044mHkM1tnxfQx4q1b/VbyeRwbAtrpNlRhNYi2pw4gRE6R4OMIemPtE36SVLAw=
+	t=1782784553; cv=none; b=QyLsnKMzKHZCM2dkhGXfVuKkHQoR9P1hSy+DemxTQYBHZ1xp4cgcCbfSTdmeLvw6SVbWgLNAq12nOAOOUEVz2NX8ZuBvU8ow3WbQJoJdzPB0kkAV6BtyyHXNFeqFuYwL5vLu+x0aiwbjMPpTqBkuHBp4fFyuCm+p79232YpCjzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782783942; c=relaxed/simple;
-	bh=D94q21odBhNf5SmUDYFZ7h+7mfurDN0SNw/pbDxsQNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vGIgnMla0jcRUhKX51TOW2bWSFyngUHSfbAerBsW3Zk2LcdElYJ5ZVIWTZPtUtiit7XoL0zbV31zorVJs135hMPXBPLQI5ImktSuuemYd3uhq6QGK56AAi3OUvhnLbdjUhyejAu2tW9cSDZWonlm+1iytc49RG632wrLpLGpj3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JqtuBAKF; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49D021F000E9;
-	Tue, 30 Jun 2026 01:45:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782783940;
-	bh=kgpqgyIQx2BD+vAJtEmQ4KIj0mfEfZD8qoHQYPrvpj0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=JqtuBAKF4iG5BAwrNz+A6oRJJzs7RMs+uY/Pn/Ibmo0J5xgyV3eQxUyZehcb9x2Wc
-	 Wh4Kyjyg91w6iDLAxtoZaF24Oob8Qgi1aaNsOHzo/E8vLHW2FoAy19DhfRGwETX5t/
-	 anzl+PxjmuRoUoaVRNm2ujbmkIPhQc+1+MFORvVEjh4QflJWAETBVlQ4lmntovIAST
-	 9OQjTSQXeralF4LuFUXItVuPHVuiIuLnGnItS14E4KBeC5kuovyE2NcbCk6jBqpctK
-	 zDs/ikqHzo0y0ZQMjykAn2Yagm9jFHwq3CKF3XhLJx0w6bJhi7izCuFwZhfwnexZ2n
-	 L62KmsLijcg2Q==
-Date: Mon, 29 Jun 2026 18:45:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dawei Feng <dawei.feng@seu.edu.cn>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, bbhushan2@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- jbrandeb@kernel.org, richardcochran@gmail.com, amakarov@marvell.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, jianhao.xu@seu.edu.cn, zilin@seu.edu.cn
-Subject: Re: [PATCH net] octeontx2-pf: fix SQ resource leaks on init failure
-Message-ID: <20260629184538.353a477d@kernel.org>
-In-Reply-To: <20260627060350.2544241-1-dawei.feng@seu.edu.cn>
-References: <20260627060350.2544241-1-dawei.feng@seu.edu.cn>
+	s=arc-20240116; t=1782784553; c=relaxed/simple;
+	bh=cr2oETy4C1aQiD6NtNwbLq68Rta2WF7XtRZHtojddaY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r6zdqfGYd14GzaPAIs1qVQOaziV0KKkbkZikMcVZIpvnQtoQbpdqlOyTAjE9w4xFES8+lTJykY57aMPSH0aIOTx/XUYpTs8V+qWZc99ykgkygMWiSmZcA73NrLXizLniJD7/PP/rts3i/9+vuT0arDkgGRF3NQ6tg2B1BuP9hgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CCMkVen/; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1IPFK3489301;
+	Mon, 29 Jun 2026 18:50:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=5TzSs7aaBzNuPllRbmCm11r
+	K9IIpM/ddCYuDRCPwL0g=; b=CCMkVen/BPM485QQvUX2sgsl0+bGOl8pI9Ach3b
+	DTdeor0cGJ3k5gUCW8iqXKPk7ALU+FLDE+XZJXSjEvlaFqEApWtfyB1dSNk6Jzb4
+	Az+YQ8eUMHmcTSNUg/o7/mMoXqT1JS2p7bPnwcv1QoRXTWKcyAsIFiZky7rjgQsj
+	hUbr7mbaY7ZvAQb+1itjLh/HCPL9sVDKUaDbt0c5kxYWCSkxR669qwwy7iOULANS
+	yEX2ObcrAgr/z/icmD8ARzZky9EJBNYSvoirnovU5Dovxf2vFkIOKITf/J6U6zk9
+	6i1dls1Hs380EQaSUSYhOiInB49Nni+AbYWJN1e6SsOR7IA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f2e1h7uhh-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jun 2026 18:50:29 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 29 Jun 2026 18:50:28 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 29 Jun 2026 18:50:28 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 29E6F3F7068;
+	Mon, 29 Jun 2026 18:50:24 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <stephen@networkplumber.org>, <dsahern@kernel.org>, <kuba@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <rkannoth@marvell.com>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
+        <pabeni@redhat.com>, <jiri@resnulli.us>
+Subject: [PATCH iproute2-next v2 0/2] devlink: support u64-array devlink parameters
+Date: Tue, 30 Jun 2026 07:20:10 +0530
+Message-ID: <20260630015012.3728870-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 6Da8rfOmvUiSy0tvIReb_TeDebtsn55P
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAxNCBTYWx0ZWRfX5axZRe/99mKg
+ joWZUp7BLwEm2n26mMdFISGhrB+FkrOIhJkmVN6KFAhvmBDlEi4ezPuAd3iT1+nfAikRTYHMjKH
+ sVrjy8li9omgzqh6jAN5ANQB1U2UDzg=
+X-Authority-Analysis: v=2.4 cv=e802j6p/ c=1 sm=1 tr=0 ts=6a4320e5 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=QXcCYyLzdtTjyudCfB6f:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=snJZ9v3O13RfP-hfMHkA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 6Da8rfOmvUiSy0tvIReb_TeDebtsn55P
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAxNCBTYWx0ZWRfXxY152QxJIBXC
+ 81fOB1mdLjx5kLUTgKj9GPt2aUdBHvH1qCnI246lBw9dGREr2aAXOp5UKvA6FKIAqM2J+k8iFLD
+ Ugt/YOws5kFssI973HAOTbBSKOOqf26EnL55lCXqrtiTlUtqUlIYJI79y5IXJNblRRAcw7SVKtP
+ z61CehPTUjDw4cojQTRNGciJzV0RVGAlvFMliQyMEe002z3KbvKZ4p+zhLO2GghOaP00VFcpJRO
+ qnPsP/dZRqS62i+MvXmACiLgb+vYJ6ip4A4+gtIr89QYuvJ0YXQY1GHt0THBxrupe1WstAVtotA
+ WQbtE7k+Ez/NvIqxcwftfCFx77v+I2QOLug+D4rqO5wKXCLc2oD9vbd1te8NdTx0TvAuqgp1ZKT
+ xgzbTWHkhMtTWKf+CmjmsPSou6U5tWf6qJJerqVDaoe8B/nrULs3LNYIIaFn81e+X3+VnB4WtF3
+ mEol/zt0Ja1V/kPnC5w==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-30_01,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302883-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302888-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_RECIPIENTS(0.00)[m:dawei.feng@seu.edu.cn,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jbrandeb@kernel.org,m:richardcochran@gmail.com,m:amakarov@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:zilin@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:dsahern@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:rkannoth@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,vger.kernel.org,seu.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ALIAS_RESOLVED(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:mid,marvell.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA1316DFA22
+X-Rspamd-Queue-Id: 02A256DFAC8
 
-On Sat, 27 Jun 2026 14:03:50 +0800 Dawei Feng wrote:
-> Subject: [PATCH net] octeontx2-pf: fix SQ resource leaks on init failure
+The kernel gained support for devlink parameters of type
+DEVLINK_VAR_ATTR_TYPE_U64_ARRAY.  These parameters carry a variable-length
+list of u64 values encoded as multiple DEVLINK_ATTR_PARAM_VALUE_DATA
+attributes.  This is used by drivers that need to expose ordered lists of
+configuration values, such as the Marvell CN20K npc_srch_order parameter.
 
-patches does not apply, please rebase and repost.
--- 
-pw-bot: cr
+This series updates the devlink tool to handle the new UAPI and adds
+show/set support for u64-array parameters on both device and port params.
+
+Patch 1 switches devlink param show/set to use DEVLINK_VAR_ATTR_TYPE_*
+constants instead of generic MNL_TYPE_* values when interpreting
+DEVLINK_ATTR_PARAM_TYPE.  The kernel now reports param types using
+devlink_var_attr_type, so userspace must use the matching symbols.
+
+Patch 2 adds parsing, display, and configuration support for
+DEVLINK_VAR_ATTR_TYPE_U64_ARRAY.  Values are shown as a space-separated
+list of u64 elements.  Setting accepts a space- or comma-separated list
+and emits one DEVLINK_ATTR_PARAM_VALUE_DATA attribute per element.
+
+Tested on CN20K hardware with npc_srch_order:
+
+  # show search order
+  devlink dev param show pci/0002:01:00.0 name npc_srch_order
+  pci/0002:01:00.0:
+    name npc_srch_order type driver-specific
+      values:
+        cmode runtime value  value  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+
+  # set search order
+  devlink dev param set pci/0002:01:00.0 name npc_srch_order \
+    value 31,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 \
+    cmode runtime
+
+Depends on the corresponding kernel UAPI addition of
+DEVLINK_VAR_ATTR_TYPE_U64_ARRAY.
+
+Ratheesh Kannoth (2):
+  devlink: use DEVLINK_VAR_ATTR_TYPE_* in param show/set
+  devlink: support u64-array values in devlink param show/set
+
+ devlink/devlink.c            | 178 ++++++++++++++++++++++++++++++++---
+ include/uapi/linux/devlink.h |   1 +
+ 2 files changed, 164 insertions(+), 15 deletions(-)
+
+--
+v1 -> v2: Addressed David comments
+	https://lore.kernel.org/netdev/20260615041042.549715-1-rkannoth@marvell.com/
+
+2.43.0
 
