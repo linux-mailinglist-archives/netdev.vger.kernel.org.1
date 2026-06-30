@@ -1,330 +1,323 @@
-Return-Path: <netdev+bounces-303060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HGl0AQuRQ2r2cAoAu9opvQ
-	(envelope-from <netdev+bounces-303060-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:48:59 +0200
+	id s54KADuRQ2oMcQoAu9opvQ
+	(envelope-from <netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:49:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 113586E2706
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:48:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 400EF6E2728
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:49:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=TzBthXtw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303060-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303060-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=b9eIZwzD;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 01402304AFD1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:35:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 337EC3059E1F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15513AC0F2;
-	Tue, 30 Jun 2026 09:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CB238C407;
+	Tue, 30 Jun 2026 09:40:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012017.outbound.protection.outlook.com [40.107.209.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E605231842;
-	Tue, 30 Jun 2026 09:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA92B3955EE
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:40:42 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782811875; cv=fail; b=Oq0qsy8FfakfnW5Wg0J9jIz7Ok5TZCfifPTLQ6D1vaC15fB1cz1QRArvYIkbZUl3fzf9oA6V7NtOpNXfMrBsCwL90HgiFYtTdAPvWuw5dQ0+jay/3QjaX4GPejOz34Pui0Hi98CGmGci2OhjpXa0z6ApSYtBhnd1vC7suWDJUQI=
+	t=1782812445; cv=fail; b=iP9Wx5L5gqviL89NQKA1kBdWvFjaUhI+HHyH86oRPdKHnIme+Khw9HzsnbN0TWKBhWNJK9D64lNPQKjvWJFat0ZHzpnTqkP45LjU8rLyjUuMqz6xLVzfHCDDpRvctpO9HqOYjUrA2kXKbfxiLOCG/QDTpLa2YlOHtTE/alYsEaw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782811875; c=relaxed/simple;
-	bh=1TTwfQvoGiPGJz458j1LKmagvc93nFj8jWNiwfHZAi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=P1z2rbCFpIpqlOy94c765WCKUN4UDlIhaUTa66GOiipaJo9SGrj7rGndjGLZWHG3zffOS6Xt1jMmbxCDRpIEhP8RoDSknXkfiPOti0qRWaXghzfnyxLJWIvFkSkq46kv4cwYPql3ziyNVdGDdxU2fyTqo3kKD0W/VCHTU9zBgKA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TzBthXtw; arc=fail smtp.client-ip=40.107.209.17
+	s=arc-20240116; t=1782812445; c=relaxed/simple;
+	bh=M+xYt1k+37DJm+5NITo90J3cW8FsPcLzGnQhUiGDhHo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=G8JvZNxSYJmX9jmuUqIUQO45KO3dgtSkkaA53A6kyvzQBYcczxjzkspnzXBCqpy0M/MoZh5nWxlYw9xJLQVwxELb+1MgKVI7btKhCtm+OjSvEBxlN/0gIQVdKd7jDqv+bvxVsiEsd5OeRf1VG9qLWnB7cXgbqQdAsKGyHkZdKYE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b9eIZwzD; arc=fail smtp.client-ip=198.175.65.18
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782812443; x=1814348443;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=M+xYt1k+37DJm+5NITo90J3cW8FsPcLzGnQhUiGDhHo=;
+  b=b9eIZwzDaJrrA3ioUwCdZ448f18CH0gtt9hpxkdKmVYPhetgpUNzCWDh
+   RnysD2Z0sJe6fbEXoBOHiEpHApXqKp3tCFLoe2GgZCOUAnYPRwB3RyHWF
+   sZXwoCy70YsfrrrL2tEiDzna3iNwzsTbcfLVQpMKA2UvUUxynMyqj8UeX
+   9a2QYz9LEcxA9fUPpSSPPTvk5nTO0BJKlmqSfqAs2CzcfoMmaP375MMJm
+   wMMW7qThA4GClio7D7HAkfDZSSfan37RkgrochV3A6lkzeMcmimZH07q7
+   IYwOgvjFDn9xB2itHd6Srx7NWTGot+bQ331vWypFz5ZMCaiREFMDwGeYf
+   A==;
+X-CSE-ConnectionGUID: KeAt3bQXROiZoCSrHeSELA==
+X-CSE-MsgGUID: a1MtuKYmS3qYotTgCHKv8A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11832"; a="83604690"
+X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
+   d="scan'208";a="83604690"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 02:40:42 -0700
+X-CSE-ConnectionGUID: wLOCwxQvS3am2HnSOYJdMQ==
+X-CSE-MsgGUID: eAxSOl1STBeYxBzwY75ReQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
+   d="scan'208";a="252355218"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 02:40:42 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Tue, 30 Jun 2026 02:40:41 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Tue, 30 Jun 2026 02:40:41 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.64) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Tue, 30 Jun 2026 02:40:41 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kQU7PL8206Ykc+Gs92VTdm5jGhiI9VRN3uSXOiledgsBfVeOBViCUzOcTISuOBOOGOC14TWDncYC1gLNaSPrA/Mk1sd11GcBXRpqNCvFiopgCWTdsnu8HgJL5MGqu4GCNDVwFrqmsDyfYh2W2rie9Ra2OC83TZyMvSrDk+g5iaLzjCXyNAC4wDcEMeaXaPH/W1SI58vCxf1jwFbizrUtF+vJQb5eOL5VSkXe1WWQa1XxhEL+rnX6gZBUfKTgslFl74EwPqtdxE0Uoc046lBh8S7D+2yhEaGI9g56CzbW6T/eataXWM8gTf7LJy/H5itmzrUZnaELEvdvVZuWYqKBXQ==
+ b=mGUJ88bWrHU2nYv102tlmwoJaNcb4uLCAj313NUN0SeHPcJFu7SXWKLQ+z1O4wS1IVA48SAIy4ALTjOilI1bATszLVbFYdYiQAM6dMpRYN4wKSSHSP5KYyrYSyYUJRb0lcrLB8ylD+jxYzlVESKE1SgVh4MXK9QOIGRB05cZ94tkFkahkszhMA3ZSA6tqt116+NXTjcOTvMo11CIN7DpHra705iYtU/dq0cxSsdiPRyDQcehw2tybNvaYsu1Sf+/EFKD8L6sYLuCALx/VjHcMTk/rXZmpyatkHGhOt8NVJ1BlGSQgW/0/kQvMZvfI9ixFe4E3ZgwH3HWeXrxpjmSkQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ARWaE9abOEwX56BQJjSbqJEP+pTLmZ6pjC770Pjs89Q=;
- b=BXT/LB+9Aha0csfAxgkA1bf6hI/Pg8SeSLkPtjQo+umsfpJivEJ8W0t7QYBsgFAbYJu7cRZB0ldRL/YTQtkhk9m5PIpucE6bgy5jsqwOjfQPiC12AFZhep/xRD2toXTgEzaXo6WDGPdZq1+BQyrUCQWeXfrkJe+3hf8D8MzXn94dJs6pELUFQLHhvfCI/Csu1LhzlgXIBDDvh2Ft6tS8RQaGlW5123Azk6gUQIE///scTfMJ3HTNQBpUngLNRWe1NWVJ0BkaR3lZjRjYDLAQF0DaTTuRHXNK89dnf7FbfUVu5XYKORtKUVErGB/UDh5JB35IlyNP+KrY5ZlkRw41ZQ==
+ bh=N6rlO9FMN2JN/cStjPgZdy4wKJAaC3LPIGHp7x0nets=;
+ b=KCBQUqssYaK6AlsN2shrlj2O5cNSaYgVa+Mzbp2Lz+zo9GwgNolUB5V2TN1HJvUGTlDZyzfNAGlWHpyHAZHwiB/U4xKfah2rPTZmApPS7ifGCvUHRu54dhNbI6mhCQcT9bm780wMAfjOOf0GZfkmPUU8Bk2mz4dKjz3/inqwEscWmoiaOLHtL4qNtFFiH3lDW7uSdilmNRMvh63km9PBnNh7tj+eluD2xu4RH2cGx2Fb0ywAmoQYNp+h4nvSsm/OpKcFTlBGrGstdjUC4n0SbcnKgDjnB7Ar7HYdoWcrOoB3aGTnGKImoGhBM8jdwwdbA7NmFIF6mAsLJEZ87vc0mQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ARWaE9abOEwX56BQJjSbqJEP+pTLmZ6pjC770Pjs89Q=;
- b=TzBthXtwYGZjolGJ2hhE+YiXVLDgYIMT87IEDKAnplG+MtdGMkcZGC+sPxJsjCGZeqc0UuE8jUE1hO7XBe6AXrfqY13JW7carpBF1Q682J5qKrBE4TtHeOKrhFGa3Fxmj9NQ2f7ovp+vuYpUGLe6DiaHJNpVq4XD3qZKWAu5UNL/I5xF4sntNSEmVjLILNDgh2tKJmlpBuGaLpIfrYeaU29VXPGmbaLQPLx/pJbAQ3Usxgvzlj6rx+FPKvnvUzdtnDugnqzMHiGoil9vZxSBmAMbxLyEJk0Jgm0jNudi4gBavN67eHbzDy4aT41/iTGlhtZuuhSItmkJzx0AUa5EtQ==
-Received: from BL0PR12MB2370.namprd12.prod.outlook.com (2603:10b6:207:47::27)
- by BL3PR12MB6450.namprd12.prod.outlook.com (2603:10b6:208:3b9::22) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by CYYPR11MB8408.namprd11.prod.outlook.com (2603:10b6:930:b9::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 30 Jun
- 2026 09:31:10 +0000
-Received: from BL0PR12MB2370.namprd12.prod.outlook.com
- ([fe80::86cf:c3ec:2cf5:74c8]) by BL0PR12MB2370.namprd12.prod.outlook.com
- ([fe80::86cf:c3ec:2cf5:74c8%5]) with mapi id 15.21.0181.008; Tue, 30 Jun 2026
- 09:31:10 +0000
-Date: Tue, 30 Jun 2026 17:31:05 +0800
-From: Richard Cheng <icheng@nvidia.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-Cc: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org, 
-	netdev@vger.kernel.org, dan.j.williams@kernel.org, edward.cree@amd.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, 
-	dave.jiang@intel.com, Edward Cree <ecree.xilinx@gmail.com>
-Subject: Re: [PATCH v29 4/5] sfc: obtain and map cxl range using
- devm_cxl_probe_mem
-Message-ID: <akOMnchDu6Y_Nr_L@MWDK4CY14F>
-References: <20260622124010.2192888-1-alejandro.lucero-palau@amd.com>
- <20260622124010.2192888-5-alejandro.lucero-palau@amd.com>
- <aj32gUuoZuTUODry@MWDK4CY14F>
- <bde77dd7-fa7b-4d28-9a7b-3f0ce6587bf4@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bde77dd7-fa7b-4d28-9a7b-3f0ce6587bf4@amd.com>
-X-ClientProxiedBy: TP0P295CA0043.TWNP295.PROD.OUTLOOK.COM
- (2603:1096:910:4::18) To BL0PR12MB2370.namprd12.prod.outlook.com
- (2603:10b6:207:47::27)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Tue, 30 Jun
+ 2026 09:40:39 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
+ 09:40:39 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Rongguang Wei <clementwei90@163.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, Rongguang Wei <weirongguang@kylinos.cn>
+Subject: RE: [Intel-wired-lan] [PATCH net-next v1] ice: use dev_err_probe in
+ all appropriate places in ice_probe()
+Thread-Topic: [Intel-wired-lan] [PATCH net-next v1] ice: use dev_err_probe in
+ all appropriate places in ice_probe()
+Thread-Index: AQHdCEA93eAcDoz6q06sJ88TbdEQeLZW17ig
+Date: Tue, 30 Jun 2026 09:40:38 +0000
+Message-ID: <IA3PR11MB8986EA15383743B16BB7B130E5F72@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260630032537.42605-1-clementwei90@163.com>
+In-Reply-To: <20260630032537.42605-1-clementwei90@163.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CYYPR11MB8408:EE_
+x-ms-office365-filtering-correlation-id: ef369afe-1a26-428c-beb6-08ded68ba507
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|23010399003|1800799024|38070700021|6133799003|56012099006|11063799006|22082099003|18002099003;
+x-microsoft-antispam-message-info: NOC6NvOnkeQM8WGMCDFmT8DSAmLkjSIxL/Eefn5cHaz6vL361p+zNgMBwzgmfXSNC/Rz4DE9+rGi52S45CN5ZfFy4J0yYBet56IQVEipxmZtcKs4H3LZ0PUnkqYxbAATrK1FcevpMMoGldpCn6F46ws8ZWenLqyDMcuuP27Wqn5+KNGCzHhNQv+kocCdJ5uuwo58xyFmLxe55kcP3bb6oA06KIPUpFZ/UhOxWEkQ8QB+u/n9aVcigPfAKCATD3u/1XXfeEPif5xbc5Ft6tUwVRTFORCpvf0UoUP2tqW64FGgEPV7WZMABN8dLMCZKFoKIMRQ2VHW8GngOVtyAUziByR7NCwomG7Tqg2rw2JLmyQKkaQebW22mv0+KKxBzy8WC46KN8u/km5lMNH/hQZmebQsfV7u0EMZjELV184FE2PrCNxdOsuCB2Ug4W5o/C52FqBlsXOK1nicUGoraKc/JBsBE2mlRWvQLLGtmZhrdYdODFbwOcMrRi2udhPOTNUtCn482xevLfIh8gx/P2qSFZ869orzg3kB619m6cLo0gDieNDFFNxNA+qNMTM6LM/f/dqDkb6IWz/WSfwfuCF5Xs+j8L8XU9a7rJkEj0e1koUlqiENo2A+BkpMdizssSlbfqKn8gzZ0V1eFh+vcfwA8UymoLs8fOGuYyv3r406RjJQWzjClvapyxZy0mUe1It9sKNhzuigPbgH6gOCHIWQXeRuCnMyGDhhV2LQq38ZPIA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(1800799024)(38070700021)(6133799003)(56012099006)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/eygtU2ohS4yb5Olau17OO/d6ItQBlbE+nbCcGAx/ph2IOCRZTel3eBDggv9?=
+ =?us-ascii?Q?BJzG428eRSruI2b5Vw+WyUS4n6T0UQqilW3bZpxzS6kafsjWeM2X+rEGb3Hn?=
+ =?us-ascii?Q?+ZIoVJbQZUIjAEOVboG+wp1PzjZ0JgtDBEuEaqCPwFxmzSpq+YIqOavHzCJ1?=
+ =?us-ascii?Q?jMkKWvTMY1KBLMBot+LcS7F5gF++ysJqTbY/Fwlxpr+dxbrCu06EHRkf6MyO?=
+ =?us-ascii?Q?l9QYXy9GTp2zTYK1KhFS7iUDXzvx21ez6UyeviAdUyhZ6g9jxerwCHimEwUg?=
+ =?us-ascii?Q?0ZYcjGnaCCTEXw80CdUkzIDWZmw5vxyGGbzWc4yz5dDOqgDxkbtBdUSRTOF7?=
+ =?us-ascii?Q?SabY2Q5lJVy9vVYsfAqCpD5Ew3cbXYeIKOxdkqx3H0IcX742N0+o8R5sY9vi?=
+ =?us-ascii?Q?D2u69lnLprzxTNbZRM5ktfbWaNWmXZ/sYFtYTJ3YXnG+xOxi3J5ADHvplQ7u?=
+ =?us-ascii?Q?npVOq/+o3Vks1vZ44gxpC9BdtO2tplXYgqt2JNkhQFfZeyeGJxzbGAD1g8Vw?=
+ =?us-ascii?Q?g4uqZ6Ye+uVHUpMy+5UeOiDRtBJU04CQWvTivjj9Q4/xBGdO8KSBmTEwQOks?=
+ =?us-ascii?Q?DcYPxiiVhImwXBCAqr5Kezl7Zz8naxJZKCQLiPC7z/VwoS/lUrAN4tfnukwi?=
+ =?us-ascii?Q?NzQXlaW+68FimWmTIIxxvHER7mXFiRoHRKhSKc4LGysPjCIVSzrPbjwHkf7V?=
+ =?us-ascii?Q?WlCdNsD+HfvNTorH8L3zmG/LqbvDEwq5L3C7lNz6zrlBcllwhyH6HbSHe2rm?=
+ =?us-ascii?Q?fKUSg8zbbgIPfoE6zWnXIIeFp7UHcNNQ6iSsP4Zdz3I4PAAzkdXtnACAvqHC?=
+ =?us-ascii?Q?H1MXOGwNdxU84LK9ioD/n3Zo9e9LBApbuu/LKu0HDobRWS8DSrG+Ij6x0kUl?=
+ =?us-ascii?Q?Ex53+stipYUzWCHeH1JmTmjNMtdpy4c43soRE2sLZ8lPETf8silvsxK3NY/O?=
+ =?us-ascii?Q?ZUZTySngXjaSb9DHzGwN/cJsW0nFkdZUDDp6ZVezbAG2aG1s/1TuQi0U2t8m?=
+ =?us-ascii?Q?CruENyOPSbSnBu5g8jdlLXoe/Jj0FnJV/6fdlBUXaQb9KnCZcpKhMptxyLVP?=
+ =?us-ascii?Q?fqtvPebQPd8jIGvJQVdb9n0TGH0QJh6tRTi5b135KykfnIjH+UICx5h7jswO?=
+ =?us-ascii?Q?JFp7hdOSz4uYOX7LYFmrW3SITSPuSjHhfWlTi1kHVgcnoQtZ4Db6upr9dfbo?=
+ =?us-ascii?Q?YXFU0mK1ymRSgoDTy5+C4WcTeMloNZibcInVuVhFc6d61lqFrdxGOppdMjFn?=
+ =?us-ascii?Q?7UepveiYby4N6PpT58dra3pt0Yrfl4fwAh/JFtAelHSCkMhefE+TCG7iRCuP?=
+ =?us-ascii?Q?Qlpo24gpU9iJ73M2qGsjwfvrxuVpCUlwzASbunLMu2sHE/WqfE6asirzXcnj?=
+ =?us-ascii?Q?54HoXgAol3j6zQpyvBblUVDXI1G/mtpbPUhKWKg6WUqk0ufkKAQgFZQCeKwI?=
+ =?us-ascii?Q?J2YaJnC1FtIz32AMILD0F4dlqPrDTWBqexL1VEZcKoH/u0yxFgQHTKwlF+sq?=
+ =?us-ascii?Q?Je2QghlAd5imFFQOk/RoQB2WPGCW3SLlqcSHtoMiqZ9W5ziTZ6eReSm/eQKC?=
+ =?us-ascii?Q?x0fCthWxw7+UlgjUp8yu6vdFV097KUPk5urfCG10IWXG2UojFhIwhxUwzB0h?=
+ =?us-ascii?Q?WRaUfyHBVEqZHjKPPB8/8KCylDiwxVVGlTYFQm7lg0mfhUk2nEF3lxJbGGPN?=
+ =?us-ascii?Q?5maywzrW/7+QRIUhrEwcQZ8B/ZsN9audczPnDMlLZWIlfIaIUaZOsZfeVGZB?=
+ =?us-ascii?Q?bNGnQIZMPyidIAAdPXMe7+FlHqjnRJU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2370:EE_|BL3PR12MB6450:EE_
-X-MS-Office365-Filtering-Correlation-Id: 351d98e5-3aad-45f0-30eb-08ded68a51bb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|23010399003|56012099006|11063799006|4143699003|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	6lOt+RtQdAAvK3tbE9qYZMFPxXxxiMTj1dPoMvUIQ0eaIkvbT8aaTmXVhq9X3H42xTaKLHZgzdNV9jEGLRE6jTQV2mzF2toXI3XnDo8WGClck+iV0lj+SzCMmGuZRpo5KeDyNtZmifv7pNtFVXq6OvQ/ouQtLfoM6ZuzH8FmNfjugR0z9rwCzipSBrjSlhAiGYoRrNIMpl84GMrU4I0tzu0qg++NYuKn5k2vjlZqfzm1Hq5RtlvGS1WGM+JzuUo0W4zzKPvudrd+iZRK5Em9924zwv61lgbxPeiipypFX0z1gekYwiZa2gNRXQjhs6Ca2+HGaAsj/ZU0h7Mkoa1/wmZXUgP8V7YrvpEJntOHDtkfCjBiGxgeQz2z51BNHqscwcXJnwLID5z6ZH/rlEkidHFizEWd/wNrRoug/GbZuaNqoSAcImU7Pato4QMeC7CDt1H3pUtPKkcrweqq6qrDUHb1JiK1InE9ukWhCxgxupBFbQYYOHp8UMaNj3Ja95WS6ngu3W7sRcGlL6qOisPoSDv1HZVvj/I9MTW0XKJbARHpmBRjk347I0VKVGpfmwmc+4mLAhg8I6ksrom0yfPeol3I3sfl111SK5cjc9dYisNgupvvp5B84Wv1AO4qkVofXVsmNB+H8/nHj/vLg3oppABmAjWwbPsdLt0VT+8IPg8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB2370.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(23010399003)(56012099006)(11063799006)(4143699003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?riVVRcY4DhNfqDv0n/LmWdJKWBY5WdLMJYSUJfFbnz3kzn4+ffPMay034hzP?=
- =?us-ascii?Q?nukOTu88c4GIhF9HeTAipohxRFo0OAYiEVlcuZXCWKZ1o0z4wtumw5+DOVKj?=
- =?us-ascii?Q?BO8x9dbtt5yU6VGPYBQGwlVTAUmMWoyXkB4LxvhjMePu3KscgCHWqeUS0m89?=
- =?us-ascii?Q?naJU5uphHs4hzhLfrcInOW4G6dt/KhhxtAIjDFXKemwNPcgvKLrqBRuqrTqH?=
- =?us-ascii?Q?UrMztFsj5vtL50f/YUM/AaG8Zyt24lYPHObYqMzEygJU8T4/0ZSFgQVMqkYk?=
- =?us-ascii?Q?3KSdX2J3J5x6CjK1Vw5bujPOcMnG00fYapVaIlu0UkSpUCIhTLdJr0duEt4c?=
- =?us-ascii?Q?xVn5RkFvf3zmIalq6egPPZvQxV8k40Z7sObgfO0Fna+xmQdMyYLnyWr2knJ6?=
- =?us-ascii?Q?qG/PWIGhmg3mVQEVRscgSRovuDy+tlgxk1ZJv6LojIMnVBTopZTR+uw4T/qH?=
- =?us-ascii?Q?7MPDOj66QQHueDNDEhSKN6tSO6h1tbK1quOzlfp+WQyDYn6LqGlf6SduM0Yx?=
- =?us-ascii?Q?DiHWi78+U9HJxFG62eS5AQsqRnfOIezzmDLxb4zqR4sa9Pf7ayoubT+3Mabh?=
- =?us-ascii?Q?UlXbUMleuns3GvtHpTVSB6fm5lQTBedzraep5T6uLmHXstHDfZw+BcS5WeB7?=
- =?us-ascii?Q?34JpiUi2K0HEDZdDeH9H6zFsRkr5GwzgkXV52BgmFq7UY4lFIykmWDHMQGwJ?=
- =?us-ascii?Q?AXGoj0K5XkT93CvPNomsn4FToU7uFHRiGFgHyRVDpihbiH1ACPWr1Dqg9WZ4?=
- =?us-ascii?Q?deIc+mnOTG230fHH2NyuBRN3lKi/0QuOBhJ6Hdj9rVD9rncQijcRC8PrJQSt?=
- =?us-ascii?Q?BjvNmyJGLo3CpAw/bweuXAx+HXjg/JLVOr4UKOKE7ZekgFcnZt8qo3cioZDS?=
- =?us-ascii?Q?O7ZzSSr5/KJC9Q+mj1Tby3atm04uo6tdp26Q5xHiwrrWN+cXl1RK8Hb+COb1?=
- =?us-ascii?Q?9DMnQLFXD7FSZMcxDZ+HGME7N0p2mPN+rcVGk7+zJjP4mD8XqZK5IBbKo0OX?=
- =?us-ascii?Q?Xudm64EwdnYo3rQo16I7hSCYvlZxJpcTLVwuwxOHhLPk93IOuwSXjFsFzftl?=
- =?us-ascii?Q?OhgP+QuIers4Z3iVqqAy9VxaC6zDwH70M10VvLlIXyCJAjnRWSRItfkoNyAn?=
- =?us-ascii?Q?lhfLOUmRK11oEJKEeGH/zYxrD7v6AIyEJHlhYPQ87rsi9P2EIDW//zfhTTp3?=
- =?us-ascii?Q?LDWXd0lEvcSuhUOoC5aqS5h22uLQYM1imtJuJNHFKu/67zQvOWkSIo6aLezv?=
- =?us-ascii?Q?v4JI/WtrbqCzKIJFsXScBZb0zOkrQy86/0cBnAGBqA18+3rqGrrznp2QW0dH?=
- =?us-ascii?Q?HsMuSx2eh8nrqhB9UOtmnTtzznpAYdYERKd4OKxfGAglL49zD6l6EfP6T0gl?=
- =?us-ascii?Q?jnFGDzp+GEk4z8G/a8v0ZLb0RZiSMn3NjOnlhVljptBC+TQPUDmyt/9K8fog?=
- =?us-ascii?Q?cq3Y728vHgSHz3Qpo9W5NXgdUipJfUiZrcrEr3kQ5+Ho2dPBcw/BmLgy25pv?=
- =?us-ascii?Q?fR/fyGpGmBUEV3QRP6BrN2Hk4pyTXUtNQt4WT1vBDwKonX313YgVVhipeJ/9?=
- =?us-ascii?Q?RqO5sFnfJ4/iWTBRtTsUKsaWeBvkUi/dhwI4HNT7h2K0HxEvPpG/1Pj7+8Cf?=
- =?us-ascii?Q?EPTVfnbQ5miFwiEZU47o4C5UXxZglvXFca41yjvWM5Ov6lfY1GF7gHTms7bt?=
- =?us-ascii?Q?9234MUxPT5/W7J6CwjhlPo4TyIWmw2H9D12/Cgh04USIKtIBNwnIF6osWp98?=
- =?us-ascii?Q?/2oVlCXD0w=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 351d98e5-3aad-45f0-30eb-08ded68a51bb
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB2370.namprd12.prod.outlook.com
+X-Exchange-RoutingPolicyChecked: h0TxBopxzXd9pPzBTmyUNmX/zTnEtbTzcNNPvUch3l/3hKPvkbQH14xWeNG6bX60vGibwp/5DgmHTIgxS/iB9FlAFbwABrF/OdcEIku0QuQvUyHFCFhz2o7gmVjqr6+wyeEQUy78eQvkWb9u0tTK6HyIAZnaYTEkyy2+AVd/wGxbi7PguI3KtgkNsbalnSlFYU9+pUM/hv0e8j6t5zFyZfe/16WjWn5PFeIEYoN0XDMpFqXXFQhEiygCkPH6RWef2u8L8v9Y10alaklBGVyijz0iFeSeJrxwiHQQLbpOCMDCsIR+8T1MsqqPGsB/E/MQV1qfH7VNGztx644vwO3rJA==
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 09:31:10.1228
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef369afe-1a26-428c-beb6-08ded68ba507
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2026 09:40:39.0104
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B5roCaQCop5iiQaoDOoIwIWbvNRFZQEf9xSrUHkCFtM8UyJrvoDhWRUD4G2p68UdL/E1zY3rqsMCsES230fe7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6450
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ADI63tXyBL/dGjFmip8Ag+UMuDzIeWHzLLxtgG3kQXqCRkspCwy0zIqkkMR+671nC4tZ/zwdZ0R9G7PqZMMQGWg0XS2lJNUN07kYJzsu8Ag=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8408
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303060-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[icheng@nvidia.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:alucerop@amd.com,m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:dan.j.williams@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:ecree.xilinx@gmail.com,m:ecreexilinx@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[amd.com,vger.kernel.org,kernel.org,davemloft.net,redhat.com,google.com,intel.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-303061-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:clementwei90@163.com,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:weirongguang@kylinos.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[163.com,vger.kernel.org,lists.osuosl.org];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[icheng@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 113586E2706
+X-Rspamd-Queue-Id: 400EF6E2728
 
-On Mon, Jun 29, 2026 at 02:20:03PM +0800, Alejandro Lucero Palau wrote:
-> 
-> On 6/26/26 04:52, Richard Cheng wrote:
-> > On Mon, Jun 22, 2026 at 01:40:09PM +0800, alejandro.lucero-palau@amd.com wrote:
-> > > From: Alejandro Lucero <alucerop@amd.com>
-> > > 
-> > > Use core API for safely obtain the CXL range linked to an HDM committed
-> > > by the BIOS. Map such a range for being used as the ctpio buffer.
-> > > 
-> > > A potential user space action through sysfs unbinding or core cxl
-> > > modules remove will trigger sfc driver device detachment, with that case
-> > > not racing with this mapping as this is done during driver probe and
-> > > therefore protected with device lock against those user space actions.
-> > > 
-> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> > > Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> > > Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-> > > ---
-> > >   drivers/net/ethernet/sfc/efx.c     |  2 ++
-> > >   drivers/net/ethernet/sfc/efx_cxl.c | 23 +++++++++++++++++++++++
-> > >   drivers/net/ethernet/sfc/efx_cxl.h |  3 +++
-> > >   3 files changed, 28 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-> > > index 61cbb6cfc360..3806cd3dd7f4 100644
-> > > --- a/drivers/net/ethernet/sfc/efx.c
-> > > +++ b/drivers/net/ethernet/sfc/efx.c
-> > > @@ -984,6 +984,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
-> > >   	efx_fini_io(efx);
-> > >   	probe_data = container_of(efx, struct efx_probe_data, efx);
-> > > +	efx_cxl_exit(probe_data);
-> > >   	pci_dbg(efx->pci_dev, "shutdown successful\n");
-> > > @@ -1242,6 +1243,7 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
-> > >   	return 0;
-> > >    fail3:
-> > > +	efx_cxl_exit(probe_data);
-> > >   	efx_fini_io(efx);
-> > >    fail2:
-> > >   	efx_fini_struct(efx);
-> > > diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> > > index 18b535b3ea40..3e7c950f83e9 100644
-> > > --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> > > +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> > > @@ -18,6 +18,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
-> > >   {
-> > >   	struct efx_nic *efx = &probe_data->efx;
-> > >   	struct pci_dev *pci_dev = efx->pci_dev;
-> > > +	struct range cxl_pio_range;
-> > >   	struct efx_cxl *cxl;
-> > >   	u16 dvsec;
-> > >   	int rc;
-> > > @@ -73,9 +74,31 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
-> > >   		return -ENODEV;
-> > >   	}
-> > > +	cxl->cxlmd = devm_cxl_probe_mem(&cxl->cxlds, &cxl_pio_range);
-> > > +	if (IS_ERR(cxl->cxlmd)) {
-> > > +		pci_err(pci_dev, "CXL accel memdev creation failed\n");
-> > > +		return PTR_ERR(cxl->cxlmd);
-> > > +	}
-> > > +
-> > > +	cxl->ctpio_cxl = ioremap_wc(cxl_pio_range.start,
-> > > +				    range_len(&cxl_pio_range));
-> > Hi Alejandro,
-> > 
-> > A small question here,
-> > Is it possible that the FW would commit a region bigger than the range ?
-> 
-> 
-> Hi Richard,
-> 
-> 
-> Not really. We are using the minimum size for CXL mem, 256MB, and it is not
-> configurable. If CXL is enabled by the sfc device firmware, this is the only
-> possibility.
-> 
-> It could be a good sanity check though, but I prefer to keep v29 as it is
-> now ... Dan Williams is happy enough with it, so I expect Dave to merge it
-> soon ...
-> 
-> 
-> Maybe as a follow up path.
-> 
-> 
-> Thank you,
-> 
-> Alejandro
-> 
->
 
-Hi Alejandro,
 
-I see, thanks for the head up .
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Rongguang Wei
+> Sent: Tuesday, June 30, 2026 5:26 AM
+> To: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
+> Rongguang Wei <weirongguang@kylinos.cn>
+> Subject: [Intel-wired-lan] [PATCH net-next v1] ice: use dev_err_probe
+> in all appropriate places in ice_probe()
+>=20
+> From: Rongguang Wei <weirongguang@kylinos.cn>
+>=20
+> Use dev_err_probe() can conveniently combines printing an error
+> message with returning the errno and also simplify the code.
+>=20
+I'd recommend to fix the commit message, like:=20
 
-Np for me then, thanks.
+ice: use dev_err_probe() in ice_probe()
 
---Richard
- 
-> > The committed CXL region length is never validated against the PIO window size.
-> > The legacy patch sizes wc_mem_map_size to cover the VI-strided PIO offset, but
-> > here we ioremap whatever the BIOS comitted and assume it's EFX_CTPIO_BUFFER_SIZE.
-> > 
-> > Maybe adding
-> > """
-> > if (range_len(&cxl_pio_range) < EFX_CTPIO_BUFFER_SIZE)
-> >      return -EINVAL;
-> > """
-> > Would be worthy ?
-> > 
-> > Let me know what you think.
-> > 
-> > Best regards,
-> > Richard Cheng
-> > 
-> > > +	if (!cxl->ctpio_cxl) {
-> > > +		pci_err(pci_dev, "CXL ioremap region (%pra) failed\n",
-> > > +			&cxl_pio_range);
-> > > +		return -ENOMEM;
-> > > +	}
-> > > +
-> > >   	probe_data->cxl = cxl;
-> > >   	return 0;
-> > >   }
-> > > +void efx_cxl_exit(struct efx_probe_data *probe_data)
-> > > +{
-> > > +	if (!probe_data->cxl)
-> > > +		return;
-> > > +
-> > > +	iounmap(probe_data->cxl->ctpio_cxl);
-> > > +}
-> > > +
-> > >   MODULE_IMPORT_NS("CXL");
-> > > diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
-> > > index 04e46278464d..3e2705cb063f 100644
-> > > --- a/drivers/net/ethernet/sfc/efx_cxl.h
-> > > +++ b/drivers/net/ethernet/sfc/efx_cxl.h
-> > > @@ -20,10 +20,13 @@ struct efx_probe_data;
-> > >   struct efx_cxl {
-> > >   	struct cxl_dev_state cxlds;
-> > >   	struct cxl_memdev *cxlmd;
-> > > +	void __iomem *ctpio_cxl;
-> > >   };
-> > >   int efx_cxl_init(struct efx_probe_data *probe_data);
-> > > +void efx_cxl_exit(struct efx_probe_data *probe_data);
-> > >   #else
-> > >   static inline int efx_cxl_init(struct efx_probe_data *probe_data) { return 0; }
-> > > +static inline void efx_cxl_exit(struct efx_probe_data *probe_data) {}
-> > >   #endif
-> > >   #endif
-> > > -- 
-> > > 2.34.1
-> > > 
-> > > 
+dev_err_probe() logs the error and returns the supplied error code, which
+allows probe error paths to be written more compactly.
+
+Use dev_err_probe() in ice_probe() for error paths that currently print an
+error message and immediately return the same error code. This keeps the
+existing error handling semantics while reducing open-coded logging and
+return sequences.
+
+
+With the best regards
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+
+> Signed-off-by: Rongguang Wei <weirongguang@kylinos.cn>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 24 ++++++++--------------
+> -
+>  1 file changed, 8 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
+> b/drivers/net/ethernet/intel/ice/ice_main.c
+> index e2fbe111f849..81959eaec708 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -5167,10 +5167,8 @@ ice_probe(struct pci_dev *pdev, const struct
+> pci_device_id __always_unused *ent)
+>  	struct ice_hw *hw;
+>  	int err;
+>=20
+> -	if (pdev->is_virtfn) {
+> -		dev_err(dev, "can't probe a virtual function\n");
+> -		return -EINVAL;
+> -	}
+> +	if (pdev->is_virtfn)
+> +		return dev_err_probe(dev, -EINVAL, "can't probe a
+> virtual
+> +function\n");
+>=20
+>  	/* when under a kdump kernel initiate a reset before enabling
+> the
+>  	 * device in order to clear out any pending DMA transactions.
+> These @@ -5194,10 +5192,8 @@ ice_probe(struct pci_dev *pdev, const
+> struct pci_device_id __always_unused *ent)
+>  		return err;
+>=20
+>  	err =3D pcim_iomap_regions(pdev, BIT(ICE_BAR0),
+> dev_driver_string(dev));
+> -	if (err) {
+> -		dev_err(dev, "BAR0 I/O map error %d\n", err);
+> -		return err;
+> -	}
+> +	if (err)
+> +		return dev_err_probe(dev, err, "BAR0 I/O map error
+> %d\n", err);
+>=20
+>  	pf =3D ice_allocate_pf(dev);
+>  	if (!pf)
+> @@ -5208,10 +5204,8 @@ ice_probe(struct pci_dev *pdev, const struct
+> pci_device_id __always_unused *ent)
+>=20
+>  	/* set up for high or low DMA */
+>  	err =3D dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+> -	if (err) {
+> -		dev_err(dev, "DMA configuration failed: 0x%x\n", err);
+> -		return err;
+> -	}
+> +	if (err)
+> +		return dev_err_probe(dev, err, "DMA configuration
+> failed: 0x%x\n",
+> +err);
+>=20
+>  	pci_set_master(pdev);
+>  	pf->pdev =3D pdev;
+> @@ -5246,10 +5240,8 @@ ice_probe(struct pci_dev *pdev, const struct
+> pci_device_id __always_unused *ent)
+>  		return ice_probe_recovery_mode(pf);
+>=20
+>  	err =3D ice_init_hw(hw);
+> -	if (err) {
+> -		dev_err(dev, "ice_init_hw failed: %d\n", err);
+> -		return err;
+> -	}
+> +	if (err)
+> +		return dev_err_probe(dev, err, "ice_init_hw failed:
+> %d\n", err);
+>=20
+>  	ice_init_dev_hw(pf);
+>=20
+> --
+> 2.25.1
+
 
