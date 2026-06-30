@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-302903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302904-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kySkB3wvQ2rETwoAu9opvQ
-	(envelope-from <netdev+bounces-302903-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:52:44 +0200
+	id crxhB5EvQ2riTwoAu9opvQ
+	(envelope-from <netdev+bounces-302904-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:53:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8316DFE6E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:52:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A77B96DFE97
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:53:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=HVY13NMS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302903-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302903-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=Lrh4Mjg7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302904-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302904-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBE0D30A9B3D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:48:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B021302EAA8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8822D3CAE93;
-	Tue, 30 Jun 2026 02:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D863CFF6B;
+	Tue, 30 Jun 2026 02:48:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5403C4B73;
-	Tue, 30 Jun 2026 02:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4490C3CF95E;
+	Tue, 30 Jun 2026 02:47:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782787678; cv=none; b=jlp+PezrJ9vLvnSE98L28MX0PnE5w/vKrwhLGFInSswadGV6iNt7x8m4QZc13PhGU/CEXnLcwidWvMnbO3mOxBZ5Kbt5iPXHN1adBTnCD/t+LcSzK08Z5bmhKxihAR7CUU/+9wTAlJEZWthpsi2Io4UZVSEA9uqCsZm8he7xUgU=
+	t=1782787681; cv=none; b=JlbVdeWg05jpK04LhAunK7wTTug+rtjx1iOyVLvixbfo23Z2YNEkxOAXVMKhNcpqKApZy0xxmx1o5r8GqquchlMkOPlis9D3khrv2bvPfJIaTJ4bxjjQ37BjB54x+vtnbZvpRPQ2/ijqjD2ccn7juaFmYPsmjvZ+XDXlI384SgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782787678; c=relaxed/simple;
-	bh=RfLttdq2dNfVCnmHp0VwDNGWL/Oewwpx4SvVFCB0Uu4=;
+	s=arc-20240116; t=1782787681; c=relaxed/simple;
+	bh=CFeK8uJqEt1U+VkuoIIzEaRCxQPj6UvT+TB47hqjXuE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AUrnWuTcpa5k9MOeZBmrCFkWqF3ZWUWGvRH5Ci2TYSIqS8fElye8U0XNbN6wMVvNldr8VADuSmVK0BODRYg7ASFpIF1jzN2aToWhJN+NKNY8HHeCKuQ1VNhAvP6PTHwHQE3II7DRQfk4YbZPUu1YZVfbh4t//C7CHyjr2yckDUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=HVY13NMS; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1IQBK3489319;
-	Mon, 29 Jun 2026 19:47:49 -0700
+	 MIME-Version:Content-Type; b=TSuFRYW1ZhGIAxhl5kseIOLZFkYONvB6d4cBe3Cxn4di9OWcFTiF5DzsvNMQQ3iBi5cIJhNIqYL+do844ddf0KZuqiQTEyoF2z4jXUDIaqaTV9F7Pw2LzDLmW551eXbaSHX2tQEs+LvE/SMPqK4XQz/bkt3yg7ocPe2DX5tNkpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Lrh4Mjg7; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1IFF93243929;
+	Mon, 29 Jun 2026 19:47:51 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=c
-	opCFQ9TRPhXf4cG542QN30T5ejly0rafEuIteenYko=; b=HVY13NMSkpwmeJ7az
-	ecWod9Rjunu7TzM2oh23njJo6Vexhgmuft/QBVctwJ5rG+Y0bc9Of88B3dwta3ku
-	Wzqg3E2wA//QlSs0aUn+H4Ddq5LDzB8mq6jj7sC/NlZU37VkzbZ1eWjk7wihbnvV
-	1E89s/yJzSNttrTY4XlJKC3eZG01gl7/1fj2zsCKyST71x028VUf1sSxOQNxSDDy
-	P+bhFDPqcC05qyR7l+8duPQ+Xr/uv7lrckMph+mrepO+uBUNHO9eSk1M9mdcYNq3
-	lKMyIFLTWTsK5Wjawj4akWDd9xYUNewr7k3C3eojrEzBkyEAKCSHhgThB6NVWMss
-	kBKgw==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=s
+	d9K5EflVl/9aQhj5ymlni65HAiJyulVxbeamTMHOPQ=; b=Lrh4Mjg7rU0Om8TL6
+	UQAP51DlM3TlRXXqmxp/JpB8jZoDJePY7oTuMlUct9XG+tIlGpULoflgm81B52Mn
+	tcbW0sFuZqfnB9ifUkcyi6KNgcgYtNU1lQSuI4nUD+C2jga8GvKDdszdW7Pfu3IV
+	J+zjr0LGfvkOL6bgJ5iLtOF+0pAiYiwtxUjIyMlGJWZg+livxIXGlphFb9qkyBCx
+	e10/VNtzxSPhOSkyrNwVKEmIHrMmkFi4vcB1K2kryx+MY87mq3Na+97sNxYWt4z3
+	Wo9ETQWcnKOGcXmjtK33ITZBu5K1AASjRo1KdBAcjexhwBA9RV5eGXgXrLEZsRWJ
+	5NyIQ==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f2e1h7ypm-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f32s6djk9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jun 2026 19:47:48 -0700 (PDT)
+	Mon, 29 Jun 2026 19:47:50 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 29 Jun 2026 19:47:47 -0700
+ 15.2.1544.25; Mon, 29 Jun 2026 19:47:50 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 29 Jun 2026 19:47:47 -0700
+ Transport; Mon, 29 Jun 2026 19:47:50 -0700
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id DD45E3F704E;
-	Mon, 29 Jun 2026 19:47:44 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id C0F063F7041;
+	Mon, 29 Jun 2026 19:47:47 -0700 (PDT)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
 CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
         "Ratheesh
  Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next 7/9] octeontx2: plumb bridge FDB updates through AF and switchdev
-Date: Tue, 30 Jun 2026 08:17:13 +0530
-Message-ID: <20260630024715.4124281-8-rkannoth@marvell.com>
+Subject: [PATCH net-next 8/9] octeontx2: offload host FIB updates to switch via AF mailbox
+Date: Tue, 30 Jun 2026 08:17:14 +0530
+Message-ID: <20260630024715.4124281-9-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260630024715.4124281-1-rkannoth@marvell.com>
 References: <20260630024715.4124281-1-rkannoth@marvell.com>
@@ -81,24 +81,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: sJFim4YwQ7vXI_0QF8J2QKdT60YUNu_l
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfX17AUsD4ET8Ko
- mCQLU+ULsQMZoQ8IHLRGAPUlWfKHFTSLOQIdVBpqPNvTNq/AMnCerpUOK/uvhChyl0O0EsM6Q4x
- dSVY8xjKyIE7X3kDwucLVlR26TvD+9M=
-X-Authority-Analysis: v=2.4 cv=e802j6p/ c=1 sm=1 tr=0 ts=6a432e54 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfXyAgJ1HUaQ/b9
+ 9rM9TfEAPzdkSt+nwEHEy14p4g//yQAwMId8BvR5MV1eTYCUuIvku2rPCy4IpAlSdStqbT+QOCn
+ FS2CmNe7LAUDu2TWSApHM1tJfFqCYFinT8KXyEtGBlqT3fAO0FH87RN7AgXpT5l1dqH1oZMpIZv
+ I2XZ63+oH0jtjc1eLdLV/ADppqMb44q0ZZvytUx4cvUVLvAtmD6gAA81XJH8GHleZ+T93sPCmxE
+ CtvD8HxQPku48ZICSdPNGYjY7nZUV5ZIbMzeuJIP4D+bPJTovlpyHLaTShQO+YrdMMw0FpKdN3f
+ V33xnpUKmnvfLc5+fDzauWjcp0+YlS+PqEeyrV0PjMAQCaYBtMDVOUFu7BcPhHDHXSVFT98jZ4v
+ 6tEO5cSj3bJRWnMrw8eIQihO2Fy8jCwwJcu/+ZnjaC/8Fn6LcqQVv2DhZNlvG16ZyOvtK9olEqO
+ x0A604JedXyckXJWNng==
+X-Proofpoint-ORIG-GUID: 68-E-WazsNGNZGcF252BBSxT7wG6aGgF
+X-Authority-Analysis: v=2.4 cv=e6Y2j6p/ c=1 sm=1 tr=0 ts=6a432e56 cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=zjSZ3cS-AAAA:8
- a=cAmSjuAziB4ZO2rpmfEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=ZdzWmiyDu4ucoLeQK2uw:22
-X-Proofpoint-GUID: sJFim4YwQ7vXI_0QF8J2QKdT60YUNu_l
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfXzfSfnM/aFMM8
- dLnXvptwYXl4l0v7DdLAu7rC0qRk4Gfe8+GEsFbj6XLdstFC11s0M/kKyOcOADzJ1tq15W4RvAo
- 0T0zzrTFXJRqjy3WbresR4H+DNoDtkWtk/rf++9XtI36BdTt0gYj8q7keNgX1VYmQyf9wrxs0aI
- ihJ69X0sCxHtDSz6wdZSL8I0SfKXJwdt0MJaW3JA48OdgRvDBjlHJkXPMHjUk/t8bifMFES58zO
- irgH/4bKfKD662opvSTFJaaixuPCu51pWxMwyk+0mi0sJtNYQKy5WKLFrfo70z+UtpvdU3FijIZ
- 39eX7QJNFIsp30NDtiSq+hvJJ6eKWnsJaSDwykeK1aPnZV52y2zxDJfkVpf7iIhz6neiZq4XD/3
- GpeV9hlyy29s6oUVKPnEtcQTGpzmztQhZLMtV/Z9IiB2XR8qsp6s1Hp5Qfuhptoef0nunNrNByr
- OmujNxCAEr/9mDGisww==
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=eIH3sYHsz6rwSDy_Z6cA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfX9VYCn4N7/NsB
+ EoOrfQi1U3zHwU5dkWrKc128xL2zLRBz31woueKuYu0g1Q1nutaubauJ/W0s1w8aCweSUfoUTKN
+ Ky2wrr6bKBQAdX86ueNWbdPfB8iWPnY=
+X-Proofpoint-GUID: 68-E-WazsNGNZGcF252BBSxT7wG6aGgF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-30_01,2026-06-26_01,2025-10-01_01
@@ -119,7 +119,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302903-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302904-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	DKIM_TRACE(0.00)[marvell.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
@@ -129,88 +129,50 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,info.dev:url];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7E8316DFE6E
+X-Rspamd-Queue-Id: A77B96DFE97
 
-Handle switchdev FDB add and delete notifications on the PF by queuing
-work that sends fdb_notify mailbox messages to the AF. The AF queues
-those updates and pushes L2 rules toward the switchdev image with
-af2swdev notify messages when firmware is ready.
-Teach the AF swdev2af path to initialize L2 offload workqueues on
-firmware up/down and to accept refresh requests that enqueue FDB
-entries for AF to PF mailbox delivery. Add an AF to PF (and VF) upstream
-message for FDB refresh, handle it in the VF driver, and treat it like
-the CGX link event when acknowledging mailbox completion in the AF.
-On refresh, invoke the switchdev notifier so the host bridge can learn
-the updated FDB entry.
+Queue IPv4/IPv6 FIB-derived updates from the switch notifier path
+and handle fib_notify in the RVU AF by batching fib_entry
+structures and sending them to the switch PF through the
+AF-to-switchdev FIB_CMD).  Require the switch firmware to
+be ready before accepting offload work.
 
 Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- .../net/ethernet/marvell/octeontx2/af/rvu.c   |   1 +
- .../marvell/octeontx2/af/switch/rvu_sw.c      |  16 +-
- .../marvell/octeontx2/af/switch/rvu_sw_l2.c   | 269 ++++++++++++++++++
- .../marvell/octeontx2/af/switch/rvu_sw_l2.h   |   2 +
- .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  17 ++
- .../marvell/octeontx2/nic/switch/sw_fdb.c     | 128 +++++++++
- .../marvell/octeontx2/nic/switch/sw_fdb.h     |   1 +
- .../marvell/octeontx2/nic/switch/sw_nb.c      |   2 +
- 8 files changed, 435 insertions(+), 1 deletion(-)
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   2 +-
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.c   | 187 ++++++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_fib.c     | 103 ++++++++++
+ .../marvell/octeontx2/nic/switch/sw_fib.h     |   3 +
+ .../marvell/octeontx2/nic/switch/sw_nb.c      |  10 +-
+ .../marvell/octeontx2/nic/switch/sw_nb_v4.c   |  26 ++-
+ .../marvell/octeontx2/nic/switch/sw_nb_v6.c   |  10 +-
+ 7 files changed, 324 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-index ee0751cc202e..2a7cd15ae8e8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-@@ -2572,6 +2572,7 @@ static void __rvu_mbox_up_handler(struct rvu_work *mwork, int type)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index 835fe2528f03..d3ee1f1904af 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -1968,7 +1968,7 @@ struct af2swdev_notify_req {
+ 		};
+ 		struct {
+ 			u8 cnt;
+-			struct fib_entry entry[16];
++			struct fib_entry entry[12];
+ 		};
  
- 		switch (msg->id) {
- 		case MBOX_MSG_CGX_LINK_EVENT:
-+		case MBOX_MSG_AF2PF_FDB_REFRESH:
- 			break;
- 		default:
- 			if (msg->rc)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-index 28f8281e9219..fd4afddd768c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
-@@ -8,6 +8,8 @@
- #include <linux/bitfield.h>
- #include "rvu.h"
- #include "rvu_sw.h"
-+#include "rvu_sw_l2.h"
-+#include "rvu_sw_fl.h"
- 
- u32 rvu_sw_port_id(struct rvu *rvu, u16 pcifunc)
- {
-@@ -26,5 +28,17 @@ int rvu_mbox_handler_swdev2af_notify(struct rvu *rvu,
- 				     struct swdev2af_notify_req *req,
- 				     struct msg_rsp *rsp)
- {
--	return 0;
-+	int rc = 0;
-+
-+	switch (req->msg_type) {
-+	case SWDEV2AF_MSG_TYPE_FW_STATUS:
-+		rc = rvu_sw_l2_init_offl_wq(rvu, req->pcifunc, req->fw_up);
-+		break;
-+
-+	case SWDEV2AF_MSG_TYPE_REFRESH_FDB:
-+		rc = rvu_sw_l2_fdb_list_entry_add(rvu, req->pcifunc, req->mac);
-+		break;
-+	}
-+
-+	return rc;
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
-index 5f805bfa81ed..dfe21eeba0e2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
-@@ -4,11 +4,280 @@
+ 		struct {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+index 2b798d5f0644..bd021e7258a1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+@@ -4,11 +4,198 @@
   * Copyright (C) 2026 Marvell.
   *
   */
@@ -218,7 +180,6 @@ index 5f805bfa81ed..dfe21eeba0e2 100644
 +#include <linux/bitfield.h>
  #include "rvu.h"
 +#include "rvu_sw.h"
-+#include "rvu_sw_l2.h"
 +
 +#define M(_name, _id, _fn_name, _req_type, _rsp_type)			\
 +static struct _req_type __maybe_unused					\
@@ -236,57 +197,43 @@ index 5f805bfa81ed..dfe21eeba0e2 100644
 +	return req;							\
 +}
 +MBOX_UP_AF2SWDEV_MESSAGES
-+MBOX_UP_AF2PF_FDB_REFRESH_MESSAGES
 +#undef M
 +
-+struct l2_entry {
++static struct workqueue_struct *sw_l3_offl_wq;
++
++struct l3_entry {
 +	struct list_head list;
-+	u64 flags;
-+	u32 port_id;
-+	u8  mac[ETH_ALEN];
-+};
-+
-+static DEFINE_MUTEX(l2_offl_list_lock);
-+static LIST_HEAD(l2_offl_lh);
-+
-+static DEFINE_MUTEX(fdb_refresh_list_lock);
-+static LIST_HEAD(fdb_refresh_lh);
-+
-+struct rvu_sw_l2_work {
 +	struct rvu *rvu;
-+	struct work_struct work;
++	u32 port_id;
++	int cnt;
++	struct fib_entry entry[];
 +};
 +
-+static struct rvu_sw_l2_work l2_offl_work;
-+static struct workqueue_struct *rvu_sw_l2_offl_wq;
++static DEFINE_MUTEX(l3_offl_llock);
++static LIST_HEAD(l3_offl_lh);
++static bool l3_offl_work_running;
 +
-+static struct rvu_sw_l2_work fdb_refresh_work;
-+static struct workqueue_struct *fdb_refresh_wq;
++static struct workqueue_struct *sw_l3_offl_wq;
++static void sw_l3_offl_work_handler(struct work_struct *work);
++static DECLARE_DELAYED_WORK(l3_offl_work, sw_l3_offl_work_handler);
 +
-+static void rvu_sw_l2_offl_cancel_add_if_del_reqs_exist(u8 *mac)
-+{
-+	struct l2_entry *entry, *tmp;
-+
-+	mutex_lock(&l2_offl_list_lock);
-+	list_for_each_entry_safe(entry, tmp, &l2_offl_lh, list) {
-+		if (!ether_addr_equal(mac, entry->mac))
-+			continue;
-+
-+		if (!(entry->flags & FDB_DEL))
-+			continue;
-+
-+		list_del_init(&entry->list);
-+		kfree(entry);
-+		break;
-+	}
-+	mutex_unlock(&l2_offl_list_lock);
-+}
-+
-+static int rvu_sw_l2_offl_rule_push(struct rvu *rvu, struct l2_entry *l2_entry)
++static int rvu_sw_l3_offl_rule_push(struct list_head *lh)
 +{
 +	struct af2swdev_notify_req *req;
++	struct fib_entry *entry, *dst;
++	struct l3_entry *l3_entry;
++	struct rvu *rvu;
 +	int swdev_pf;
++	int sz, cnt;
++	int tot_cnt = 0;
 +
++	BUILD_BUG_ON(sizeof(*req) > 1024);
++
++	l3_entry = list_first_entry_or_null(lh, struct l3_entry, list);
++	if (!l3_entry)
++		return 0;
++
++	rvu = l3_entry->rvu;
 +	swdev_pf = rvu_get_pf(rvu->pdev, rvu->rswitch.pcifunc);
 +
 +	mutex_lock(&rvu->mbox_lock);
@@ -296,9 +243,23 @@ index 5f805bfa81ed..dfe21eeba0e2 100644
 +		return -ENOMEM;
 +	}
 +
-+	ether_addr_copy(req->mac, l2_entry->mac);
-+	req->flags = l2_entry->flags;
-+	req->port_id = l2_entry->port_id;
++	dst = &req->entry[0];
++	while ((l3_entry =
++		list_first_entry_or_null(lh,
++					 struct l3_entry, list)) != NULL) {
++		entry = l3_entry->entry;
++		cnt = l3_entry->cnt;
++		sz = sizeof(*entry) * cnt;
++
++		memcpy(dst, entry, sz);
++		tot_cnt += cnt;
++		dst += cnt;
++
++		list_del_init(&l3_entry->list);
++		kfree(l3_entry);
++	}
++	req->flags = FIB_CMD;
++	req->cnt = tot_cnt;
 +
 +	otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, swdev_pf);
 +	otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, swdev_pf);
@@ -307,241 +268,114 @@ index 5f805bfa81ed..dfe21eeba0e2 100644
 +	return 0;
 +}
 +
-+static int rvu_sw_l2_fdb_refresh(struct rvu *rvu, u16 pcifunc, u8 *mac)
++static atomic64_t req_cnt;
++static atomic64_t ack_cnt;
++static atomic64_t req_processed;
++static LIST_HEAD(l3_local_lh);
++static int lcnt;
++
++static void sw_l3_offl_work_handler(struct work_struct *work)
 +{
-+	struct af2pf_fdb_refresh_req *req;
-+	int pf, vidx;
++	struct l3_entry *l3_entry;
++	struct list_head l3lh;
++	u64 req, ack, proc;
 +
-+	pf = rvu_get_pf(rvu->pdev, pcifunc);
++	INIT_LIST_HEAD(&l3lh);
 +
-+	mutex_lock(&rvu->mbox_lock);
-+
-+	if (pf) {
-+		req = otx2_mbox_alloc_msg_af2pf_fdb_refresh(rvu, pf);
-+		if (!req) {
-+			mutex_unlock(&rvu->mbox_lock);
-+			return -ENOMEM;
-+		}
-+
-+		req->hdr.pcifunc = pcifunc;
-+		ether_addr_copy(req->mac, mac);
-+		req->pcifunc = pcifunc;
-+
-+		otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, pf);
-+		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pf);
-+	} else {
-+		vidx = pcifunc - 1;
-+
-+		req = (struct af2pf_fdb_refresh_req *)
-+			otx2_mbox_alloc_msg_rsp(&rvu->afvf_wq_info.mbox_up, vidx,
-+						sizeof(*req), sizeof(struct msg_rsp));
-+		if (!req) {
-+			mutex_unlock(&rvu->mbox_lock);
-+			return -ENOMEM;
-+		}
-+		req->hdr.sig = OTX2_MBOX_REQ_SIG;
-+		req->hdr.id = MBOX_MSG_AF2PF_FDB_REFRESH;
-+
-+		req->hdr.pcifunc = pcifunc;
-+		ether_addr_copy(req->mac, mac);
-+		req->pcifunc = pcifunc;
-+
-+		otx2_mbox_wait_for_zero(&rvu->afvf_wq_info.mbox_up, vidx);
-+		otx2_mbox_msg_send_up(&rvu->afvf_wq_info.mbox_up, vidx);
-+	}
-+
-+	mutex_unlock(&rvu->mbox_lock);
-+
-+	return 0;
-+}
-+
-+static void rvu_sw_l2_fdb_refresh_wq_handler(struct work_struct *work)
-+{
-+	struct rvu_sw_l2_work *fdb_work;
-+	struct l2_entry *l2_entry;
-+
-+	fdb_work = container_of(work, struct rvu_sw_l2_work, work);
-+
++	mutex_lock(&l3_offl_llock);
 +	while (1) {
-+		mutex_lock(&fdb_refresh_list_lock);
-+		l2_entry = list_first_entry_or_null(&fdb_refresh_lh,
-+						    struct l2_entry, list);
-+		if (!l2_entry) {
-+			mutex_unlock(&fdb_refresh_list_lock);
-+			return;
++		l3_entry = list_first_entry_or_null(&l3_offl_lh, struct l3_entry, list);
++
++		if (!l3_entry)
++			break;
++
++		if (lcnt + l3_entry->cnt > 8) {
++			req = atomic64_read(&req_cnt);
++			atomic64_set(&ack_cnt, req);
++			atomic64_set(&req_processed, req);
++			mutex_unlock(&l3_offl_llock);
++			goto process;
 +		}
 +
-+		list_del_init(&l2_entry->list);
-+		mutex_unlock(&fdb_refresh_list_lock);
++		lcnt += l3_entry->cnt;
 +
-+		rvu_sw_l2_fdb_refresh(fdb_work->rvu, l2_entry->port_id, l2_entry->mac);
-+		kfree(l2_entry);
++		atomic64_inc(&req_cnt);
++		list_del_init(&l3_entry->list);
++		list_add_tail(&l3_entry->list, &l3_local_lh);
 +	}
-+}
++	mutex_unlock(&l3_offl_llock);
 +
-+static void rvu_sw_l2_offl_rule_wq_handler(struct work_struct *work)
-+{
-+	struct rvu_sw_l2_work *offl_work;
-+	struct l2_entry *l2_entry;
-+	int budget = 16;
-+	bool add_fdb;
++	req = atomic64_read(&req_cnt);
++	ack = atomic64_read(&ack_cnt);
 +
-+	offl_work = container_of(work, struct rvu_sw_l2_work, work);
-+
-+	while (budget--) {
-+		mutex_lock(&l2_offl_list_lock);
-+		l2_entry = list_first_entry_or_null(&l2_offl_lh, struct l2_entry, list);
-+		if (!l2_entry) {
-+			mutex_unlock(&l2_offl_list_lock);
-+			return;
-+		}
-+
-+		list_del_init(&l2_entry->list);
-+		mutex_unlock(&l2_offl_list_lock);
-+
-+		add_fdb = !!(l2_entry->flags & FDB_ADD);
-+
-+		if (add_fdb)
-+			rvu_sw_l2_offl_cancel_add_if_del_reqs_exist(l2_entry->mac);
-+
-+		rvu_sw_l2_offl_rule_push(offl_work->rvu, l2_entry);
-+		kfree(l2_entry);
++	if (req > ack) {
++		atomic64_set(&ack_cnt, req);
++		queue_delayed_work(sw_l3_offl_wq, &l3_offl_work,
++				   msecs_to_jiffies(100));
++		return;
 +	}
 +
-+	if (!list_empty(&l2_offl_lh))
-+		queue_work(rvu_sw_l2_offl_wq, &l2_offl_work.work);
-+}
-+
-+int rvu_sw_l2_init_offl_wq(struct rvu *rvu, u16 pcifunc, bool fw_up)
-+{
-+	struct rvu_switch *rswitch;
-+
-+	rswitch = &rvu->rswitch;
-+
-+	if (fw_up) {
-+		rswitch->flags |= RVU_SWITCH_FLAG_FW_READY;
-+		rswitch->pcifunc = pcifunc;
-+
-+		l2_offl_work.rvu = rvu;
-+		INIT_WORK(&l2_offl_work.work, rvu_sw_l2_offl_rule_wq_handler);
-+		rvu_sw_l2_offl_wq = alloc_workqueue("swdev_rvu_sw_l2_offl_wq", 0, 0);
-+		if (!rvu_sw_l2_offl_wq) {
-+			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
-+			return -ENOMEM;
-+		}
-+
-+		fdb_refresh_work.rvu = rvu;
-+		INIT_WORK(&fdb_refresh_work.work, rvu_sw_l2_fdb_refresh_wq_handler);
-+		fdb_refresh_wq = alloc_workqueue("swdev_fdb_refresg_wq", 0, 0);
-+		if (!fdb_refresh_wq) {
-+			dev_err(rvu->dev, "fdb refresh workqueue allocation failed\n");
-+			return -ENOMEM;
-+		}
-+
-+		return 0;
++	proc = atomic64_read(&req_processed);
++	if (req == proc) {
++		queue_delayed_work(sw_l3_offl_wq, &l3_offl_work,
++				   msecs_to_jiffies(1000));
++		return;
 +	}
 +
-+	rswitch->flags &= ~RVU_SWITCH_FLAG_FW_READY;
-+	rswitch->pcifunc = -1;
-+	flush_work(&l2_offl_work.work);
-+	return 0;
-+}
++	atomic64_set(&req_processed, req);
 +
-+int rvu_sw_l2_fdb_list_entry_add(struct rvu *rvu, u16 pcifunc, u8 *mac)
-+{
-+	struct l2_entry *l2_entry;
++process:
++	lcnt = 0;
 +
-+	l2_entry = kcalloc(1, sizeof(*l2_entry), GFP_KERNEL);
-+	if (!l2_entry)
-+		return -ENOMEM;
++	mutex_lock(&l3_offl_llock);
++	list_splice_init(&l3_local_lh, &l3lh);
++	mutex_unlock(&l3_offl_llock);
 +
-+	l2_entry->port_id = pcifunc;
-+	ether_addr_copy(l2_entry->mac, mac);
++	rvu_sw_l3_offl_rule_push(&l3lh);
 +
-+	mutex_lock(&fdb_refresh_list_lock);
-+	list_add_tail(&l2_entry->list, &fdb_refresh_lh);
-+	mutex_unlock(&fdb_refresh_list_lock);
-+
-+	queue_work(fdb_refresh_wq, &fdb_refresh_work.work);
-+	return 0;
++	queue_delayed_work(sw_l3_offl_wq, &l3_offl_work, msecs_to_jiffies(100));
 +}
  
- int rvu_mbox_handler_fdb_notify(struct rvu *rvu,
- 				struct fdb_notify_req *req,
+ int rvu_mbox_handler_fib_notify(struct rvu *rvu,
+ 				struct fib_notify_req *req,
  				struct msg_rsp *rsp)
  {
-+	struct l2_entry *l2_entry;
++	struct l3_entry *l3_entry;
++	int sz;
 +
 +	if (!(rvu->rswitch.flags & RVU_SWITCH_FLAG_FW_READY))
 +		return 0;
 +
-+	l2_entry = kcalloc(1, sizeof(*l2_entry), GFP_KERNEL);
-+	if (!l2_entry)
++	sz = req->cnt * sizeof(struct fib_entry);
++
++	l3_entry = kcalloc(1, sizeof(*l3_entry) + sz, GFP_KERNEL);
++	if (!l3_entry)
 +		return -ENOMEM;
 +
-+	l2_entry->port_id = rvu_sw_port_id(rvu, req->hdr.pcifunc);
-+	ether_addr_copy(l2_entry->mac, req->mac);
-+	l2_entry->flags = req->flags;
++	l3_entry->port_id = rvu_sw_port_id(rvu, req->hdr.pcifunc);
++	l3_entry->rvu = rvu;
++	l3_entry->cnt = req->cnt;
++	INIT_LIST_HEAD(&l3_entry->list);
++	memcpy(l3_entry->entry, req->entry, sz);
 +
-+	mutex_lock(&l2_offl_list_lock);
-+	list_add_tail(&l2_entry->list, &l2_offl_lh);
-+	mutex_unlock(&l2_offl_list_lock);
++	mutex_lock(&l3_offl_llock);
++	list_add_tail(&l3_entry->list, &l3_offl_lh);
++	mutex_unlock(&l3_offl_llock);
 +
-+	queue_work(rvu_sw_l2_offl_wq, &l2_offl_work.work);
++	if (!l3_offl_work_running) {
++		sw_l3_offl_wq = alloc_workqueue("sw_af_fib_wq", 0, 0);
++		l3_offl_work_running = true;
++		queue_delayed_work(sw_l3_offl_wq, &l3_offl_work,
++				   msecs_to_jiffies(1000));
++	}
 +
  	return 0;
  }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
-index ff28612150c9..56786768880e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
-@@ -8,4 +8,6 @@
- #ifndef RVU_SW_L2_H
- #define RVU_SW_L2_H
- 
-+int rvu_sw_l2_init_offl_wq(struct rvu *rvu, u16 pcifunc, bool fw_up);
-+int rvu_sw_l2_fdb_list_entry_add(struct rvu *rvu, u16 pcifunc, u8 *mac);
- #endif
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index b022f52c6845..4540ffacdddc 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -15,6 +15,7 @@
- #include "otx2_ptp.h"
- #include "cn10k.h"
- #include "cn10k_ipsec.h"
-+#include "switch/sw_nb.h"
- 
- #define DRV_NAME	"rvu_nicvf"
- #define DRV_STRING	"Marvell RVU NIC Virtual Function Driver"
-@@ -141,6 +142,22 @@ static int otx2vf_process_mbox_msg_up(struct otx2_nic *vf,
- 		err = otx2_mbox_up_handler_cgx_link_event(
- 				vf, (struct cgx_link_info_msg *)req, rsp);
- 		return err;
-+
-+	case MBOX_MSG_AF2PF_FDB_REFRESH:
-+		rsp = (struct msg_rsp *)otx2_mbox_alloc_msg(&vf->mbox.mbox_up, 0,
-+							    sizeof(struct msg_rsp));
-+		if (!rsp)
-+			return -ENOMEM;
-+
-+		rsp->hdr.id = MBOX_MSG_AF2PF_FDB_REFRESH;
-+		rsp->hdr.sig = OTX2_MBOX_RSP_SIG;
-+		rsp->hdr.pcifunc = req->pcifunc;
-+		rsp->hdr.rc = 0;
-+		err = otx2_mbox_up_handler_af2pf_fdb_refresh(vf,
-+							     (struct af2pf_fdb_refresh_req *)req,
-+							     rsp);
-+		return err;
-+
- 	default:
- 		otx2_reply_invalid_msg(&vf->mbox.mbox_up, 0, 0, req->id);
- 		return -ENODEV;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
-index 6842c8d91ffc..e7bf57ef8d14 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
-@@ -4,13 +4,141 @@
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+index 12ddf8119372..384f11961b9d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+@@ -4,13 +4,116 @@
   * Copyright (C) 2026 Marvell.
   *
   */
@@ -551,55 +385,45 @@ index 6842c8d91ffc..e7bf57ef8d14 100644
 +#include <net/switchdev.h>
 +#include <net/netevent.h>
 +#include <net/arp.h>
++#include <net/route.h>
 +
 +#include "../otx2_reg.h"
 +#include "../otx2_common.h"
 +#include "../otx2_struct.h"
 +#include "../cn10k.h"
 +#include "sw_nb.h"
- #include "sw_fdb.h"
+ #include "sw_fib.h"
  
-+#if !IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
++static DEFINE_SPINLOCK(sw_fib_llock);
++static LIST_HEAD(sw_fib_lh);
 +
-+int otx2_mbox_up_handler_af2pf_fdb_refresh(struct otx2_nic *pf,
-+					   struct af2pf_fdb_refresh_req *req,
-+					   struct msg_rsp *rsp)
-+{
-+	return 0;
-+}
++static struct workqueue_struct *sw_fib_wq;
++static void sw_fib_work_handler(struct work_struct *work);
++static DECLARE_DELAYED_WORK(sw_fib_work, sw_fib_work_handler);
 +
-+#else
-+
-+static DEFINE_SPINLOCK(sw_fdb_llock);
-+static LIST_HEAD(sw_fdb_lh);
-+
-+struct sw_fdb_list_entry {
-+	struct list_head list;
-+	u64 flags;
++struct sw_fib_list_entry {
++	struct list_head lh;
 +	struct otx2_nic *pf;
-+	u8  mac[ETH_ALEN];
-+	bool add_fdb;
++	int cnt;
++	struct fib_entry *entry;
 +};
 +
-+static struct workqueue_struct *sw_fdb_wq;
-+static struct work_struct sw_fdb_work;
-+
-+static int sw_fdb_add_or_del(struct otx2_nic *pf,
-+			     const unsigned char *addr,
-+			     bool add_fdb)
++static int sw_fib_notify(struct otx2_nic *pf,
++			 int cnt,
++			 struct fib_entry *entry)
 +{
-+	struct fdb_notify_req *req;
++	struct fib_notify_req *req;
 +	int rc;
 +
 +	mutex_lock(&pf->mbox.lock);
-+	req = otx2_mbox_alloc_msg_fdb_notify(&pf->mbox);
++	req = otx2_mbox_alloc_msg_fib_notify(&pf->mbox);
 +	if (!req) {
 +		rc = -ENOMEM;
 +		goto out;
 +	}
 +
-+	ether_addr_copy(req->mac, addr);
-+	req->flags = add_fdb ? FDB_ADD : FDB_DEL;
++	req->cnt = cnt;
++	memcpy(req->entry, entry, sizeof(*entry) * cnt);
 +
 +	rc = otx2_sync_mbox_msg(&pf->mbox);
 +out:
@@ -607,112 +431,255 @@ index 6842c8d91ffc..e7bf57ef8d14 100644
 +	return rc;
 +}
 +
-+static void sw_fdb_wq_handler(struct work_struct *work)
++static void sw_fib_work_handler(struct work_struct *work)
 +{
-+	struct sw_fdb_list_entry *entry;
++	struct sw_fib_list_entry *lentry;
 +	LIST_HEAD(tlist);
 +
-+	spin_lock(&sw_fdb_llock);
-+	list_splice_init(&sw_fdb_lh, &tlist);
-+	spin_unlock(&sw_fdb_llock);
++	spin_lock(&sw_fib_llock);
++	list_splice_init(&sw_fib_lh, &tlist);
++	spin_unlock(&sw_fib_llock);
 +
-+	while ((entry =
++	while ((lentry =
 +		list_first_entry_or_null(&tlist,
-+					 struct sw_fdb_list_entry,
-+					 list)) != NULL) {
-+		list_del_init(&entry->list);
-+		sw_fdb_add_or_del(entry->pf, entry->mac, entry->add_fdb);
-+		kfree(entry);
++					 struct sw_fib_list_entry, lh)) != NULL) {
++		list_del_init(&lentry->lh);
++		sw_fib_notify(lentry->pf, lentry->cnt, lentry->entry);
++		kfree(lentry->entry);
++		kfree(lentry);
 +	}
 +
-+	spin_lock(&sw_fdb_llock);
-+	if (!list_empty(&sw_fdb_lh))
-+		queue_work(sw_fdb_wq, &sw_fdb_work);
-+	spin_unlock(&sw_fdb_llock);
++	spin_lock(&sw_fib_llock);
++	if (!list_empty(&sw_fib_lh))
++		queue_delayed_work(sw_fib_wq, &sw_fib_work,
++				   msecs_to_jiffies(10));
++	spin_unlock(&sw_fib_llock);
 +}
 +
-+int sw_fdb_add_to_list(struct net_device *dev, u8 *mac, bool add_fdb)
++int sw_fib_add_to_list(struct net_device *dev,
++		       struct fib_entry *entry, int cnt)
 +{
 +	struct otx2_nic *pf = netdev_priv(dev);
-+	struct sw_fdb_list_entry *entry;
++	struct sw_fib_list_entry *lentry;
 +
-+	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
-+	if (!entry)
-+		return -ENOMEM;
++	lentry = kcalloc(1, sizeof(*lentry), GFP_ATOMIC);
 +
-+	ether_addr_copy(entry->mac, mac);
-+	entry->add_fdb = add_fdb;
-+	entry->pf = pf;
++	lentry->pf = pf;
++	lentry->cnt = cnt;
++	lentry->entry = entry;
++	INIT_LIST_HEAD(&lentry->lh);
 +
-+	spin_lock(&sw_fdb_llock);
-+	list_add_tail(&entry->list, &sw_fdb_lh);
-+	queue_work(sw_fdb_wq, &sw_fdb_work);
-+	spin_unlock(&sw_fdb_llock);
++	spin_lock(&sw_fib_llock);
++	list_add_tail(&lentry->lh, &sw_fib_lh);
++	queue_delayed_work(sw_fib_wq, &sw_fib_work,
++			   msecs_to_jiffies(10));
++	spin_unlock(&sw_fib_llock);
 +
 +	return 0;
 +}
 +
- int sw_fdb_init(void)
+ int sw_fib_init(void)
  {
-+	INIT_WORK(&sw_fdb_work, sw_fdb_wq_handler);
-+	sw_fdb_wq = alloc_workqueue("sw_fdb_wq", 0, 0);
-+	if (!sw_fdb_wq)
++	sw_fib_wq = alloc_workqueue("sw_pf_fib_wq", 0, 0);
++	if (!sw_fib_wq)
 +		return -ENOMEM;
 +
  	return 0;
  }
  
- void sw_fdb_deinit(void)
+ void sw_fib_deinit(void)
  {
-+	cancel_work_sync(&sw_fdb_work);
-+	destroy_workqueue(sw_fdb_wq);
-+}
-+
-+int otx2_mbox_up_handler_af2pf_fdb_refresh(struct otx2_nic *pf,
-+					   struct af2pf_fdb_refresh_req *req,
-+					   struct msg_rsp *rsp)
-+{
-+	struct switchdev_notifier_fdb_info item = {0};
-+
-+	item.addr = req->mac;
-+	item.info.dev = pf->netdev;
-+	call_switchdev_notifiers(SWITCHDEV_FDB_ADD_TO_BRIDGE,
-+				 item.info.dev, &item.info, NULL);
-+
-+	return 0;
++	cancel_delayed_work_sync(&sw_fib_work);
++	destroy_workqueue(sw_fib_wq);
  }
-+#endif
-+EXPORT_SYMBOL(otx2_mbox_up_handler_af2pf_fdb_refresh);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
-index d4314d6d3ee4..3b06a77e6b56 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
-@@ -7,6 +7,7 @@
- #ifndef SW_FDB_H_
- #define SW_FDB_H_
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h
+index a51d15c2b80e..50c4fbca81e8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h
+@@ -7,6 +7,9 @@
+ #ifndef SW_FIB_H_
+ #define SW_FIB_H_
  
-+int sw_fdb_add_to_list(struct net_device *dev, u8 *mac, bool add_fdb);
- void sw_fdb_deinit(void);
- int sw_fdb_init(void);
++int sw_fib_add_to_list(struct net_device *dev,
++		       struct fib_entry *entry, int cnt);
++
+ void sw_fib_deinit(void);
+ int sw_fib_init(void);
  
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
-index 5d69961f516b..62d8ff4e5085 100644
+index 62d8ff4e5085..2f88d2c2fbf3 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
-@@ -117,11 +117,13 @@ static int sw_nb_fdb_event(struct notifier_block *unused,
+@@ -109,6 +109,7 @@ static int sw_nb_fdb_event(struct notifier_block *unused,
+ {
+ 	struct net_device *dev = switchdev_notifier_info_to_dev(ptr);
+ 	struct switchdev_notifier_fdb_info *fdb_info = ptr;
++	int rc = 0;
+ 
+ 	if (!sw_nb_is_valid_dev(dev))
+ 		return NOTIFY_DONE;
+@@ -117,19 +118,22 @@ static int sw_nb_fdb_event(struct notifier_block *unused,
  	case SWITCHDEV_FDB_ADD_TO_DEVICE:
  		if (fdb_info->is_local)
  			break;
-+		sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, true);
+-		sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, true);
++		rc = sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, true);
  		break;
  
  	case SWITCHDEV_FDB_DEL_TO_DEVICE:
  		if (fdb_info->is_local)
  			break;
-+		sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, false);
+-		sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, false);
++		rc = sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, false);
  		break;
  
  	default:
+ 		return NOTIFY_DONE;
+ 	}
+ 
++	if (rc)
++		netdev_err(dev, "%s: Error to add to list\n", __func__);
++
+ 	return NOTIFY_DONE;
+ }
+ 
+@@ -298,11 +302,9 @@ static int sw_nb_netdev_event(struct notifier_block *unused,
+ 	if (idev)
+ 		sw_nb_v4_netdev_event(unused, event, ptr);
+ 
+-#if IS_ENABLED(CONFIG_IPV6)
+ 	i6dev = __in6_dev_get(dev);
+ 	if (i6dev)
+ 		sw_nb_v6_netdev_event(unused, event, ptr);
+-#endif
+ 
+ 	return NOTIFY_DONE;
+ }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+index 14db824ddc06..1502e404d1e7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+@@ -71,9 +71,10 @@ int sw_nb_v4_netdev_event(struct notifier_block *unused,
+ 		break;
+ 	}
+ 
++	sw_fib_add_to_list(pf_dev, entry, 1);
++
+ 	netdev_dbg(dev, "%s: pushing netdev event from HOST interface address %#x, %pM, dev=%s\n",
+ 		   __func__, entry->dst, entry->mac, dev->name);
+-	kfree(entry);
+ 
+ 	return NOTIFY_DONE;
+ }
+@@ -131,7 +132,7 @@ int sw_nb_v4_inetaddr_event(struct notifier_block *nb,
+ 	netdev_dbg(dev, "%s: pushing inetaddr event from HOST interface address %#x, %pM, %s\n",
+ 		   __func__, entry->dst, entry->mac, dev->name);
+ 
+-	kfree(entry);
++	sw_fib_add_to_list(pf_dev, entry, 1);
+ 	return NOTIFY_DONE;
+ }
+ 
+@@ -243,18 +244,26 @@ int sw_nb_v4_fib_event(struct notifier_block *nb,
+ 	}
+ 
+ 	cnt = iter - entries;
+-	if (!cnt)
++	if (!cnt) {
++		kfree(entries);
++		kfree(haddr);
+ 		return NOTIFY_DONE;
++	}
+ 
+ 	netdev_dbg(pf_dev, "pf_dev is %s cnt=%d\n", pf_dev->name, cnt);
+-	kfree(entries);
+ 
+-	if (!hcnt)
++	sw_fib_add_to_list(pf_dev, entries, cnt);
++
++	if (!hcnt) {
++		kfree(haddr);
+ 		return NOTIFY_DONE;
++	}
+ 
+ 	entries = kcalloc(hcnt, sizeof(*entries), GFP_ATOMIC);
+-	if (!entries)
++	if (!entries) {
++		kfree(haddr);
+ 		return NOTIFY_DONE;
++	}
+ 
+ 	iter = entries;
+ 
+@@ -274,7 +283,7 @@ int sw_nb_v4_fib_event(struct notifier_block *nb,
+ 		netdev_dbg(pf_dev, "%s: FIB host  Rule cmd=%lld dst=%#x dst_len=%d gw=%#x %s\n",
+ 			   __func__, iter->cmd, iter->dst, iter->dst_len, iter->gw, pf_dev->name);
+ 	}
+-	kfree(entries);
++	sw_fib_add_to_list(pf_dev, entries, hcnt);
+ 	kfree(haddr);
+ 	return NOTIFY_DONE;
+ }
+@@ -315,7 +324,8 @@ int sw_nb_net_v4_neigh_update(struct notifier_block *nb,
+ 	pf = netdev_priv(pf_dev);
+ 	entry->port_id = pf->pcifunc;
+ 
+-	kfree(entry);
++	sw_fib_add_to_list(pf_dev, entry, 1);
++
+ 	return NOTIFY_DONE;
+ err:
+ 	kfree(entry);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c
+index e43c28d4f15c..80c386a4245d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c
+@@ -63,10 +63,10 @@ int sw_nb_v6_netdev_event(struct notifier_block *unused,
+ 		ether_addr_copy(entry->mac, dev_addr->addr);
+ 		break;
+ 	}
++	sw_fib_add_to_list(dev, entry, 1);
+ 
+ 	netdev_dbg(dev, "netdev event %pM plen=%u mac=%pM\n",
+ 		   &ifp->addr, ifp->prefix_len, entry->mac);
+-	kfree(entry);
+ 	return NOTIFY_DONE;
+ }
+ 
+@@ -145,8 +145,8 @@ int sw_nb_v6_fib_event(struct notifier_block *nb,
+ 		netdev_dbg(fib_dev, "fib found MAC=%pM\n", entry->mac);
+ 	}
+ 
++	sw_fib_add_to_list(fib_dev, entry, 1);
+ 	rcu_read_unlock();
+-	kfree(entry);
+ 
+ 	return NOTIFY_DONE;
+ }
+@@ -180,9 +180,10 @@ int sw_nb_net_v6_neigh_update(struct notifier_block *nb,
+ 	entry->mac_valid = 1;
+ 	entry->port_id = pf->pcifunc;
+ 
++	sw_fib_add_to_list(pf_dev, entry, 1);
++
+ 	netdev_dbg(n->dev, "v6 neigh update %pI6 mac=%pM plen=%u\n",
+ 		   n->primary_key, n->ha, n->tbl->key_len * 8);
+-	kfree(entry);
+ 
+ 	return NOTIFY_DONE;
+ }
+@@ -228,9 +229,10 @@ int sw_nb_v6_inetaddr_event(struct notifier_block *nb,
+ 		break;
+ 	}
+ 
++	sw_fib_add_to_list(dev, entry, 1);
++
+ 	netdev_dbg(dev, "inetaddr addr=%pI6c len=%u %pM\n",
+ 		   &ifa6->addr, ifa6->prefix_len, entry->mac);
+-	kfree(entry);
+ 
+ 	return NOTIFY_DONE;
+ }
 -- 
 2.43.0
 
