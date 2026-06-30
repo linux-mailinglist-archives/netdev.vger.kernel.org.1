@@ -1,284 +1,252 @@
-Return-Path: <netdev+bounces-303002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303003-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id l7piB8VrQ2rBYAoAu9opvQ
-	(envelope-from <netdev+bounces-303002-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:09:57 +0200
+	id QnkuEPFrQ2rJYAoAu9opvQ
+	(envelope-from <netdev+bounces-303003-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:10:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64ED96E0FD1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:09:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85E596E0FE0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:10:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=Tb5CWwQV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303002-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303002-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=mailbox.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=microchip.com header.s=selector1 header.b=WEvHxmlJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303003-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303003-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microchip.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1F54A3013692
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:09:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DCD83015709
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA5B395AC3;
-	Tue, 30 Jun 2026 07:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4463B3C10AB;
+	Tue, 30 Jun 2026 07:10:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011034.outbound.protection.outlook.com [52.101.52.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D8E381AEA;
-	Tue, 30 Jun 2026 07:09:50 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782803393; cv=none; b=F8FHolzq44y+nRcoh8eOFRXnvloJYPbTfXb6ifhyMMuu0wcs6QF4OhpmSKpne3LDVex9fpPGVljvd7/kEtlixXB7KKv+F+EmNOLhIIjwYnoWgM4FpmE3/HOMtlLomrp5lLOg1EQCdRIx5lRX/cwHVfpt3P/8DgOOMFlv/XN35MA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782803393; c=relaxed/simple;
-	bh=HSNV9k7GdpwNxUpmLTuu36JNu5wZ8x7nU1zf/Qcc/m0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cz0yCNpFUJb8ndbHCPY/VZMm71RIVkYLZ1WmOgGi2ZWtGSUqFV1WWcxBELgp9haPU958HQLDQ88/SSTRc2Tf6w/En7cPxQWw9NpSUsbuSgU5pWjnB0Q6q8qcPFdtUDLlCHSXPuLRax0MAS8fKHj3nuKSjvnqqK8Bl1lLTOaUVtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=Tb5CWwQV; arc=none smtp.client-ip=80.241.56.151
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4gqDmW2GKlz8tvP;
-	Tue, 30 Jun 2026 09:09:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1782803387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b0zjs9iwqtrc2J/ztqSJU4UXG4YZ0TfZmlMj54ld8hs=;
-	b=Tb5CWwQVBN8ShO5Nyks160IuESTvOkdDXRJAbLORDvP3ovNPzwgeBUyPR06opUyC3V3qHF
-	l7qwHpyWwV6CdxbqKN/l/xjz2YSy38iS74uT2CJ/wZwrEHxHaR24g04mlOQJZ76E7sUUPw
-	0xsBi0I960LsPjRzFyM/3TIIsrH2all43z661x6wwH9wMK2m/cwTKTOss8qnFyhKna3hzi
-	tbzSRsQBbTlzqyVjl93NimG8H3MqyGs9Jf4Bf4xRqpCjoHek+C1OA22/LN+eSg0CSQOdDX
-	aR/hsV/NiypxvxJssLHT6+GQxMxMFzesYISmcLkvdADvH3VWNN4/qo0W+bdv7A==
-Date: Tue, 30 Jun 2026 09:09:39 +0200
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, richardcochran@gmail.com, lgirdwood@gmail.com,
- nathan@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- krzk+dt@kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, robh@kernel.org, Andrew Lunn 
- <andrew@lunn.ch>
-Subject: Re: [net-next v24 3/7] net: mtip: Add buffers management functions
- to the L2 switch driver
-Message-ID: <20260630090939.078b7d6c@wsk>
-In-Reply-To: <20260609103704.443c0b57@wsk>
-References: <20260601112437.2216043-4-lukasz.majewski@mailbox.org>
-	<20260605021853.3594553-1-kuba@kernel.org>
-	<20260609103704.443c0b57@wsk>
-Organization: mailbox.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A923955C1;
+	Tue, 30 Jun 2026 07:10:03 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782803405; cv=fail; b=cojGozIlQGu/Iw0fIQQNOnMTEBk+kMqoPq5BPDwv1kbjlNdYKaS96/9Z/bACwzRVA48/vhk5xJWVaf/WzEAghm9srE28iLAUnCqNgHsL0rhmO/F+mwhC9ydO9LwIBZFmXQulFmTENei8wnXxTk2YqYYRJEjP14iwLDiObhNLvnY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782803405; c=relaxed/simple;
+	bh=jCtm6sWBSh41wi/vtGxIzbXaBlcEIQnjq2DN2o8lVS0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Qoi1R3I6NCR8b7sckgQuxRI+JK4hOcnafevdt2msP26r1+94qc+S5UPU7rsuqhyVArxYS/ugEx8sqLUQMMIdUZA4IpprOyzBorC5SVteousHryouji8jbShvtYHLEpu462plVKTQJJAwxkWyoblpddU8bxsFCXbtFz5RalgTLS0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=WEvHxmlJ; arc=fail smtp.client-ip=52.101.52.34
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ONDRa6QJWU4avpBLntE9M3SebwtSSqV9hHTVBqnz+3I7cYmtH2FDBtpU3okqtCSMyKp0+g6rXG6Ob70zOXldwlZqDMreN8QHbhY6Txqy9BLTI++iBcqrU1soEcZFc7GAqunSiMQnj5nVvij9eFqFZWFli4r9IqRWM8M+EfQMiLdwws5n0AO41/e8Ei4FFxIfXU4xxHeuaSh8+stlUW+lFVHpjNjn4uSRi9jTQdwWjUMPnDFfK6ld1kdRVDPn5BZRkmg68z91uOUt5M+/hHHohT1VVycaHAO5/ipx9UT7lz4tuNZz+72FO+8nnJJbdeJDxz1BI7BGSiXqQyD+umBLOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XT0BfVJ/JEcVt9HO4/mH49Ms7rJMim9ksIoq62KQLSc=;
+ b=sOlvbjQ6ya2RJidOt+zXpOR7gJCSYqQTuRWh0SIumVhErvinoLdLPuvl/dH5M1hN60nvtkex9LOxOUjZPU3bNigS7z/Wdb2oQlvmbTvkIPYD7zAYuVcUtbp0OBgY9UC4NpaTrgU6R110KrtSfA+dr4aXvvtOHJ9HQQrGn1V/0QSzKy1lqcUdAQSaRYX7vLNI8e7L4V573wAupq0iFMZFG1gsithK1CqugHL3mFwCtedlg2tC6idubvpuKI5pOomY/gsVOVolH+8ijVaK0q5YVnLEkHZFAU7Z+0XOnVC+WtFO+Kj1gJmaFbEk+JJ9gMISHttcgt0+d4vWvczXh2oR9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XT0BfVJ/JEcVt9HO4/mH49Ms7rJMim9ksIoq62KQLSc=;
+ b=WEvHxmlJyifVHV4WnFeAeGj8nQxDw1OebkFVTR060e+OQKpKDdK89L3wVTKG+4dH+0P2AxpB2XtiiNRzYxztTfv+yDLbgacBQjb7+Knq2DHQV2ZtLzAZA0VTKtWeVsrC/Vm476C+blM5hJ6O0gTHFtvQNdD2M2C9jCLtwImC+uQR1ahL2+VDvYJlTxUfS3T8t0tbQMUwkVAoqS4MagejaA2bE79C114y3OPT4DU2c72zadeZKz7CbhmuXai7ZlQBWFsoktSSucb19xLujaXp6/57rx3wzmjesSl0YsyATZa8DB3zX+l+QJvd/qfq/AvLoBZF1OVEibtdjasWyTBmDg==
+Received: from DSWPR11MB9715.namprd11.prod.outlook.com (2603:10b6:8:355::17)
+ by DS0PR11MB7768.namprd11.prod.outlook.com (2603:10b6:8:138::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Tue, 30 Jun
+ 2026 07:10:00 +0000
+Received: from DSWPR11MB9715.namprd11.prod.outlook.com
+ ([fe80::25ec:56c9:f864:9139]) by DSWPR11MB9715.namprd11.prod.outlook.com
+ ([fe80::25ec:56c9:f864:9139%6]) with mapi id 15.21.0181.008; Tue, 30 Jun 2026
+ 07:10:00 +0000
+From: <Thangaraj.S@microchip.com>
+To: <davthompson@nvidia.com>, <arighi@nvidia.com>,
+	<Bryan.Whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <Raju.Lakkaraju@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] net: lan743x: Initialize eth_syslock spinlock before use
+Thread-Topic: [PATCH] net: lan743x: Initialize eth_syslock spinlock before use
+Thread-Index: AQHdBYl03u0T22nJ70uDYXPu8iu5I7ZRPxKAgAV0i2A=
+Date: Tue, 30 Jun 2026 07:09:59 +0000
+Message-ID:
+ <DSWPR11MB9715C6EAB1F96D4E71A17D73ECF72@DSWPR11MB9715.namprd11.prod.outlook.com>
+References: <20260626163218.3591486-1-arighi@nvidia.com>
+ <SJ0PR12MB8113F67510A03A9486C8EB26C7EB2@SJ0PR12MB8113.namprd12.prod.outlook.com>
+In-Reply-To:
+ <SJ0PR12MB8113F67510A03A9486C8EB26C7EB2@SJ0PR12MB8113.namprd12.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DSWPR11MB9715:EE_|DS0PR11MB7768:EE_
+x-ms-office365-filtering-correlation-id: c8f37926-c59e-4ce6-80bf-08ded6769954
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|366016|23010399003|4143699003|22082099003|18002099003|11063799006|56012099006|38070700021;
+x-microsoft-antispam-message-info:
+ yuM5l6mcDMSfrbnsdantg2ksBoaGPK2a1+Ido6GU7KO+5U0FbZ/NUNmQ8DGsziDunReml44n2K/SEuo0sC4qIzlq5Co7gW75RXNwZ2kPuup0pX6nciNmSnyKZbOpel3hFTdmSw3p8smx0Ot2+fDwIXMbK7ySUVWzkmlBZfvxDbKQVofaOQCEKNKKi+5gqPu6mUfZ82sHV3M9cflpMX8nA2hKuobx0XoR+P5mjfFnXy0Ag8wvGkJkFXd59/NGl+VW4LfVTcPObtVXutNZkCZD2Zmcpe2Llag6tHcGpJ3wY4rM4yxfu3lW0x/QE09Ca/JNrggLDeOu5Jm7ruDBc86IQN6aqiyBKi4p9QFqwJgFYbpADO3JUKKvDTZERTt4P11kvfwLUg5aIBwFKZUEMQ1Qty4bNEJDd4rBVzyNCsslHDDsoEzGfI15maTaVkqYOl20Yu35zI7CQxnVuWjA+wbJiXfSEKNKoHiyLpOr7gWbKyl1RhwesI9UzwWK7jAl+uNfMfawA3ZjRXQep8SznjI98mrf1FBuRKH3IsH7KrWoXRxl5fH3PxriFoqC3+Ub3ibT08FBDhKTsQt3bAoI4Nk1d3/Ht5gY2V0KDZAAbqoE/lnFWVIAPTY2ZefmmT1PZ5O3DXsLSE7O7Xki+Iep1VvCzEQUoNMP1026NmlO3L+xN+AEtXHoRJsySY6Cl+nVqKXzJGBOmBXP7e6v8jrOOizbbAXeLcMvB0dhBtcTZyaBieg=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR11MB9715.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(23010399003)(4143699003)(22082099003)(18002099003)(11063799006)(56012099006)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?x21oTGfA/jCfNMNmbBRgQsIVXodBP4tihVXFR1usWVblLyM/vcDBm2jGsZB2?=
+ =?us-ascii?Q?Z1dnAzNlbEtyoQd5DMtpe/5u3bXKpK8u6DJj2UjxkBf5TZD5GW/07HXOGq6a?=
+ =?us-ascii?Q?D55wMHBxhoN7GlG0aC6okCjczZnnS0us9RktVk4O7hYlE6b8yACk+9dyRVkB?=
+ =?us-ascii?Q?1FqJZagRZJlj9PGKPtXgrcJhy+SR0ONzSDkpbrbNVtcE1AJ06m14bgCyeqr0?=
+ =?us-ascii?Q?ob3q8rSLQTYx0RDLNOalB1D1f7UhLxGZxIokuJEcrKNwoWj9hlIEoEPVgBzO?=
+ =?us-ascii?Q?EE+kKkGMVXw3jHEKaG8Hln+nKFYzQ6DGtOMPoKayr4Alfp+xU2VOg2Nitq9d?=
+ =?us-ascii?Q?+6QWFYQ/W4BtUQ+BbQZ7+AkB8rYx35ekv68ys1LKUeV4K5uNtM+meLaOeHbh?=
+ =?us-ascii?Q?ZEHSbSLzneBp0lEG2z5dYQfYjOos0rBBz6vO56yM6KS35zfqICwbsSR/xREE?=
+ =?us-ascii?Q?aqGeQ2sr3SmZ2TRyxYdx9byFwuWqCg8PfeE/kQcnjm/DgCKP/npV/J45/I3c?=
+ =?us-ascii?Q?VPIkTtr6dqavOL6LKiQQWVSSldFDV0+2BcAnCj4pDrJpe0506j4xCdyk+tS0?=
+ =?us-ascii?Q?TuvzcLBFI9T8eS/YioOQL6eoIcf44aKzWDEAanssWZzs8ZUXxi02GIX7XYzA?=
+ =?us-ascii?Q?sNc/Pikurupy/kL0U5co+IHxPTUSCv7BKiP3oHBnbh5vtHkO5mNzIpFbPDLj?=
+ =?us-ascii?Q?UqHHppdmatMkS2Lxhv7z3yXtHmZ+FuKbhKOuDb0yr2Vghys4rSaOw607GEZz?=
+ =?us-ascii?Q?VzZVgs6T2kvlCz5Yk+8+5XToMeUh1NZzumX6JY3uR1AQxGRqv8myMbOCsbfC?=
+ =?us-ascii?Q?FL6c1lKgLqXA9uP19gtJg+aYQnDUWhnMF+JeNkBeWZz2YPI3vG8N8VfEK+Cf?=
+ =?us-ascii?Q?2hbasJUTPTfk01eC6cQkoQXvftgKVC/npdDRWeag+YwK/vvFgJpchCbeRyNF?=
+ =?us-ascii?Q?LYXOh+JgE8lSGFxc6rMG1ugrhpaxmKtZr/Ta5dmm6wF0S0QSyl/asrKJpSYT?=
+ =?us-ascii?Q?0szNJ1rwYZe5jn1eTskKdIPVatJU6C4U6r8drExBjy4r3NRK+dfuWlZmY0DT?=
+ =?us-ascii?Q?sjjb9+HYGuoC29VSymROrzwhgP1iAJh5U9NgqVrRa9CA7jsacxvetr5Tm4q9?=
+ =?us-ascii?Q?g0LCtZrMZ1uy1Qk37EWSTJCXCKO+JHWGdx1iPxfy7ZWuznypErdQxS8dfnRF?=
+ =?us-ascii?Q?NaSEdLZHMXIQUdB72fOJmwkFoCsH9WUtMkwwIm01GAouASMnR+vhoms8Mmb2?=
+ =?us-ascii?Q?mnrmk8BO24RVAVohv83dJ6Lf8O04t0bWF4tt4wW70d9wF80cZM4an28pC4xG?=
+ =?us-ascii?Q?lhHiRk1O8Z5wgcf1UY4hM6wpeWqmIp+Bv0rvAWp2IBBQvKM643gIAtGy+sfh?=
+ =?us-ascii?Q?GWAd/z4ULo+uHhOneppoPIX9XAj9qUV0EvMhgoYCG536cRl7MB7kEEL4YX+Z?=
+ =?us-ascii?Q?0YVOlwqsSxYVTuHSZaj3YpUBtyai+oRc2MxR/A7EeY81BhgR+0ThtAPxgUZ8?=
+ =?us-ascii?Q?xngtX4fXrAAPv1DFwCVeWX0EQFnxuXoI6zxvfsudBKMFk6ZAsGe6/cUYLTlv?=
+ =?us-ascii?Q?vhXExD2gad5KIDk3ZEIjtUHQ5SUtbNmuP/+ntpf07/db8eotlb2+gxureyEC?=
+ =?us-ascii?Q?PfthuBfgev23VSPk5hIf27FGOkx83PLt5GOK/h9grsi+A68UZjx1xXJQvtPu?=
+ =?us-ascii?Q?KNaTT+fMsLQqYvTqEZnxaGgpJtNJB7MsWR0ZM4NR3PnptPp2GpjfKE/ZXMDY?=
+ =?us-ascii?Q?9xhrBrCZ8w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: f9fe1692ed39a6225db
-X-MBO-RS-META: 6xr347yciixekcd1193dniyh79nd461i
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DSWPR11MB9715.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c8f37926-c59e-4ce6-80bf-08ded6769954
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2026 07:09:59.9579
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UlxDiqrfXHv2zxHnhWjtgE4gzJ+6WDklZNjrjYTNj+g1/cg07gKb7/supnnjyRzAakCvQUxlDJQy4y49sF2HQvg8vKpARX7mTFJG4b5ZzvI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7768
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303002-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303003-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:lgirdwood@gmail.com,m:nathan@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk+dt@kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:robh@kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,s:lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[Thangaraj.S@microchip.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davthompson@nvidia.com,m:arighi@nvidia.com,m:Bryan.Whitehead@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Raju.Lakkaraju@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,lists.infradead.org];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mailbox.org:dkim,mailbox.org:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,nvidia.com:email,vger.kernel.org:from_smtp,lunn.ch:email,DSWPR11MB9715.namprd11.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64ED96E0FD1
+X-Rspamd-Queue-Id: 85E596E0FE0
 
-Hi Jakub,
+Reviewed-by: Thangaraj Samynathan<Thangaraj.s@microchip.com>
 
-> Hi Jakub,
+> -----Original Message-----
+> From: David Thompson <davthompson@nvidia.com>
+> Sent: Saturday, June 27, 2026 1:21 AM
+> To: Andrea Righi <arighi@nvidia.com>; Bryan Whitehead - C21958
+> <Bryan.Whitehead@microchip.com>; UNGLinuxDriver
+> <UNGLinuxDriver@microchip.com>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S . Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Raju
+> Lakkaraju <Raju.Lakkaraju@microchip.com>; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: RE: [PATCH] net: lan743x: Initialize eth_syslock spinlock before=
+ use
 >=20
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know
+> the content is safe
+>=20
+> > -----Original Message-----
+> > From: Andrea Righi <arighi@nvidia.com>
+> > Sent: Friday, June 26, 2026 12:32 PM
+> > To: Bryan Whitehead <bryan.whitehead@microchip.com>;
+> > UNGLinuxDriver@microchip.com
+> > Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S . Miller
+> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Raju
+> > Lakkaraju <Raju.Lakkaraju@microchip.com>; David Thompson
+> > <davthompson@nvidia.com>; netdev@vger.kernel.org; linux-
+> > kernel@vger.kernel.org
+> > Subject: [PATCH] net: lan743x: Initialize eth_syslock spinlock before
+> > use
+> >
+> > lan743x_hardware_init() calls pci11x1x_strap_get_status() during the
+> > PCI11x1x probe sequence. That helper acquires the Ethernet subsystem
+> > hardware lock via lan743x_hs_syslock_acquire(), which relies on
+> > adapter->eth_syslock_spinlock to serialize access.
+> >
+> > The spinlock is currently initialized only after the strap status is
+> > read. With CONFIG_DEBUG_SPINLOCK enabled, taking the zeroed
+> > initialized spinlock can trip the spinlock debug check.
+> >
+> > Fix by initializing adapter->eth_syslock_spinlock before reading the
+> > strap status so the probe path never attempts to lock an uninitialized
+> spinlock.
+> >
+> > Fixes: 46b777ad9a8c ("net: lan743x: Add support to SGMII 1G and 2.5G")
+> > Cc: stable@vger.kernel.org # v6.0+
+> > Signed-off-by: Andrea Righi <arighi@nvidia.com>
 > > ---
-> > net: mtip: Add buffers management functions to the L2 switch driver
-> >=20
-> > This patch fills in mtip_alloc_buffers() and mtip_free_buffers() for
-> > the MTIP L2 switch driver, replacing the previously empty stubs with
-> > real page_pool setup/teardown and tx_bounce buffer allocation/free.
-> >  =20
-> > > diff --git a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
-> > > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c index
-> > > 1d1005a42306..5b5229ee411d 100644 ---
-> > > a/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c +++
-> > > b/drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c @@ -892,11
-> > > +892,101 @@ static void mtip_get_drvinfo(struct net_device *dev,=20
-> > >  static void mtip_free_buffers(struct net_device *dev)
-> > >  {
-> > > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > > +	struct switch_enet_private *fep =3D priv->fep;
-> > > +	int i;
-> > > +
-> > > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
-> > > +		if (!fep->page[i])
-> > > +			continue;
-> > > +
-> > > +		page_pool_put_full_page(fep->page_pool,
-> > > +					fep->page[i], false);
-> > > +		fep->page[i] =3D NULL;
-> > > +	}
-> > > +
-> > > +	page_pool_destroy(fep->page_pool);
-> > > +	fep->page_pool =3D NULL;
-> > > +
-> > > +	for (i =3D 0; i < TX_RING_SIZE; i++) {
-> > > +		kfree(fep->tx_bounce[i]);
-> > > +		fep->tx_bounce[i] =3D NULL;
-> > > +	}
-> > > +}   =20
-> >=20
-> > [High]
-> > Now that mtip_free_buffers() is no longer an empty stub, can the
-> > mtip_open() error path tear down buffers that another active port is
-> > still using?
-> >=20
-> > Looking at mtip_open():
-> >=20
-> > 	if (fep->usage_count =3D=3D 0) {
-> > 		...
-> > 		ret =3D mtip_alloc_buffers(dev);
-> > 		if (ret)
-> > 			goto mtip_alloc_buffers_err;
-> > 	}
-> > 	...
-> > 	ret =3D mtip_mii_probe(dev);
-> > 	if (ret)
-> > 		goto mtip_mii_probe_err;
-> > 	...
-> >  mtip_mii_probe_err:
-> > 	mtip_free_buffers(dev);
-> >  mtip_alloc_buffers_err:
-> > 	if (fep->usage_count =3D=3D 0) {
-> > 		netif_napi_del(&fep->napi);
-> > 		clk_disable(fep->clk_ipg);
-> > 	}
-> > 	return ret;
-> >=20
-> > mtip_alloc_buffers() only runs when fep->usage_count =3D=3D 0, so the
-> > page_pool, fep->page[] and fep->tx_bounce[] are shared across switch
-> > ports and only allocated on first open. mtip_close() reflects this
-> > and only calls mtip_free_buffers() when fep->usage_count =3D=3D 1.
-> >=20
-> > When a second port is opened (fep->usage_count > 0) and
-> > mtip_mii_probe() fails, the mtip_mii_probe_err label still calls
-> > mtip_free_buffers() unconditionally, which destroys the page_pool
-> > and frees the tx_bounce buffers that the first, still-active port is
-> > using.
-> >=20
-> > Should the mtip_mii_probe_err teardown also be guarded by
-> > fep->usage_count =3D=3D 0 (or the labels reordered) so buffers are only
-> > freed for the last user, similar to mtip_close()?
-> >=20
-> > After this change the previously harmless call becomes a real
-> > teardown, so the surviving port's NAPI path (mtip_switch_rx() and
-> > the later mtip_update_cbd() refill) would dereference a freed
-> > fep->page_pool and NULL fep->page[] / fep->tx_bounce[] entries
-> > whenever the second port's PHY probe fails while the first port is
-> > up.=20
-> > > =20
-> > > +static int mtip_create_page_pool(struct switch_enet_private *fep,
-> > > int size) +{   =20
-> > [ ... ] =20
-> > > +}
-> > > =20
-> > >  static int mtip_alloc_buffers(struct net_device *dev)
-> > >  {   =20
-> > [ ... ] =20
-> > >  	return 0;
-> > > +
-> > > + err:
-> > > +	mtip_free_buffers(dev);
-> > > +	return -ENOMEM;
-> > >  }
-> > >   =20
+> >  drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/microchip/lan743x_main.c
+> > b/drivers/net/ethernet/microchip/lan743x_main.c
+> > index 1cdce35e14239..e759171bfd766 100644
+> > --- a/drivers/net/ethernet/microchip/lan743x_main.c
+> > +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+> > @@ -3541,8 +3541,8 @@ static int lan743x_hardware_init(struct
+> > lan743x_adapter *adapter,
+> >               adapter->max_tx_channels =3D PCI11X1X_MAX_TX_CHANNELS;
+> >               adapter->used_tx_channels =3D PCI11X1X_USED_TX_CHANNELS;
+> >               adapter->max_vector_count =3D PCI11X1X_MAX_VECTOR_COUNT;
+> > -             pci11x1x_strap_get_status(adapter);
+> >               spin_lock_init(&adapter->eth_syslock_spinlock);
+> > +             pci11x1x_strap_get_status(adapter);
+> >               mutex_init(&adapter->sgmii_rw_lock);
+> >               pci11x1x_set_rfe_rd_fifo_threshold(adapter);
+> >               sgmii_ctl =3D lan743x_csr_read(adapter, SGMII_CTL);
+> > --
+> > 2.54.0
 >=20
-> Thank you for sending the AI review.
->=20
-> Please find my comments:
->=20
-> - I've gone through them and yes, there are a few issues found.
->   However, those are IMHO not critical ones.
->=20
-> - Some issues are not valid at all - like concern what happens when
-> the switch is run on multi processor chip - both imx287 and vf610 are
->   single core chips.
->=20
-> - It seems like the AI review is "progressing" - i.e. there were no
->   issues found with v23 for this particular patch. I do guess that the
->   new Orc Mode from [1] has found it.
->=20
-> - I do guess that different AI agent would generate different review
->=20
-> - The aforementioned issues could be addressed with a fix patches -
->   dragging along (and preparing for upstream) patch set with ~3400
->   LOC (which is rejected by non-deterministic AI review) takes too
-> much resources now.
->=20
+> Reviewed-by: David Thompson <davthompson@nvidia.com>
 
-Could you provide some guidelines about how to proceed?
-
-The series was sent shortly before the net-next being open (and then it
-was closed because of the new merge window).
-
-Now it is open again, so maybe you would find some more time for this
-patch set discussion?
-
-Thanks in advance.
-
->=20
-> To sum up:
-> ----------
->=20
-> The MTIP driver for v6.6 kernel (YPRR Scarthgap) with and without
-> PREEMPT_RT for vf610 and imx287 as well as the v24 for net-next can be
-> found at [2].
->=20
->=20
-> Links:
->=20
-> [1] - https://netdev-ai.bots.linux.dev/ai-local.html
-> [2] - https://github.com/lmajewski/linux-imx28-l2switch/branches
->=20
->=20
->=20
-
-
-
---=20
-Best regards,
-
-=C5=81ukasz Majewski
 
