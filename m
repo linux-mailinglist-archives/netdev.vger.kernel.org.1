@@ -1,253 +1,220 @@
-Return-Path: <netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303063-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EFteFNKQQ2rHcAoAu9opvQ
-	(envelope-from <netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:48:02 +0200
+	id s0o1CoiRQ2o8cQoAu9opvQ
+	(envelope-from <netdev+bounces-303063-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:51:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B176E26B7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:48:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737D86E2743
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:51:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=N5jUq8qt;
-	dkim=pass header.d=redhat.com header.s=google header.b=dQ7dT7oF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=FIr5FheH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303063-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303063-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 73DD2301FF8B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:41:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9BC9F3044134
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90AD938C407;
-	Tue, 30 Jun 2026 09:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B76137F01B;
+	Tue, 30 Jun 2026 09:44:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D3D38657D
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF481DE894
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:44:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782812478; cv=none; b=ZabNGXuAhODpxyc1aGCgGlHXgS8wWr6KekdiiL3G/0FPFHxAtd0O7xajU0omR9vSoh5X/+MxLkOGX+d4P/XrWGHBc/CBBwAesY23naCC3mzhJyb3ysvhuSmPQYjRqjtlFG+Cry9Ba9cHavDZqHrVb+LGW55BBidvk+8JDjn22dw=
+	t=1782812655; cv=none; b=c2TA4rmx9wdMwqQXmXik2nTAI1vvViW9JoSz6OoX6NS/Ts1TuqWnk5qmuNwirqEJIPctPSq2P4CuYZqBtSDUPHdWOw1cbDuzo+bcWlgq8NfWsYKHLTMxc1ia829V0vjDcLdVEEt1bsd+ywYw59+DW5tu0Nhoqtcxd7kC/8foxjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782812478; c=relaxed/simple;
-	bh=YqmB8gQ2CSWotm3YyLmOYcMApzVTX/fpUiUxd3r4ALA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nCoZRDEnyIdilol7CJkI1JBU8qWGjXb4VDh5QV3xZz3id9MUgMxd90jT1thEquLVJus0MX5rCWfMkDrnjGpt0BaEqctlRLOpU9plNNj36d9oGi5nagz7twOqDHysc01xSJNc1YhBU4TdJ9g2CF4fqGYM9l/tUnwc6qs4bewUVlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N5jUq8qt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQ7dT7oF; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782812476;
+	s=arc-20240116; t=1782812655; c=relaxed/simple;
+	bh=oupUiEMDcMnAyLGsPxx8QGnBoeuQ2C/o4Nwwq57KXns=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MpiJaPnVT7Bw3Fpl4i2Vur82e9ZA5yT0mR2/4tuwRjkFcDKFLFWCdlarOet5uzwDSpPK+KI+xXimLzHws9jNofNLe7e5bPE9puJEVgC4J/8GX3Mj88OxoUE+5RZJydAXj5zz6ndYx0lXqPfkl8YCXwSBCjXd+oIIRfWdkBwHhOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FIr5FheH; arc=none smtp.client-ip=91.218.175.174
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782812651;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sT7VxdFpL+bwbQAtpOmSJ4nkpUzUgPkf4e0PHfftdcI=;
-	b=N5jUq8qteDoM2HBNvyK73qszNNqKgxoj9PCsuFRJxktYMpuj3xaYNgBI+BlxA353im8Im2
-	JH/aDt3RvCg7h7+fOHhTuyFdKZR82WRO3GvOmK+t8mmcYA15WZ8vcjz5EtJeqXN7QlL5y+
-	OVBbQVFnPeSqyE+4bRBaWB8eEzZVILM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-248-myAJImPjMZCSGOJbWNIrRA-1; Tue, 30 Jun 2026 05:41:14 -0400
-X-MC-Unique: myAJImPjMZCSGOJbWNIrRA-1
-X-Mimecast-MFC-AGG-ID: myAJImPjMZCSGOJbWNIrRA_1782812473
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4926d371224so26269005e9.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 02:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782812473; x=1783417273; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sT7VxdFpL+bwbQAtpOmSJ4nkpUzUgPkf4e0PHfftdcI=;
-        b=dQ7dT7oF2RDGNQd5S4pmUOsVKHR/kc7gZlJYMGC4Nxjwbk0zSIfJrBdZYwxrCZ1rix
-         yBe+WffP77YzzIE0VNJo2xn8vbXSkuQoVmXOa4TpodHOH2WtXkS8AmnTt+eDez4oRkh9
-         O3IjrzcCQH9k6mfpd+GZGP4XDv4u+2wGLdiEtNRt66YyWH2rxw3BwEPMIf8N/Ne6dGVm
-         3Z/d2QDeicKnX9AAs6V53CM3XpPhsadBguevzSYJqIK8I39fTp6paJKV9JugCBn8QL5s
-         /M3gshpdqlqX60DGQxbqfOJIkGtDCxM5R2/yXoWMxZTXvN4faKNIDOQAW2hrnyJh2jIx
-         l5Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782812473; x=1783417273;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sT7VxdFpL+bwbQAtpOmSJ4nkpUzUgPkf4e0PHfftdcI=;
-        b=ilbJm5BS4lcqKchY9qWmLDl/4K14eJb/WYcleijjd9bmKOlEEVi/WtPZLjVI8Gt+vt
-         WW4E/yc8ff6bXvDA9tKUdZcjiwaj7Y4+uRxtAD6ghu3OvJwGRAJc9sp348SZRvRzVbYt
-         udGouho1kx8PTXZbJ9mw70E6qeCeIxzi31SjAtB24/rhZRTjeC4I6TJ5AJasIrdVQ1Q1
-         THjBz87kIP3r+R6PcbKJ8CJpy9rIr26GGTCINA0VxIO/F1nRf8bJY70Qs6ys/lpSLy4R
-         Wki+GJ71OLftatZfTO+6HwJyKvdE8GauDv99uOIaFnRrL8afaiWJb/JMnVdfcXY3blwb
-         H+qA==
-X-Forwarded-Encrypted: i=1; AFNElJ+px5FgoD53yCDQ4Hjp8XQCz3QXVJwGNqHnPfBoPELy+Ix+J4/vC0fTh2QqKrOsqZIN9GIU7Kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYvmwMrL0baWYGhIbeHglm/TDfddluXpGSlqrhikIb0xrao2to
-	pPxEuZF1W8vTcInTg2jVNW09GiFXC+oLpj+ct2azaLtLwYDQ37ZI7F0NDEnwjMoKtcqNp01yN5g
-	UO2gqj7cJQ1WPHl3t8GthOTIhLojcn/xQBG/uA4Y/mxc0R6jYc0T7LkTSuQ==
-X-Gm-Gg: AfdE7cmzgB6YEb8JL60CrK6PE2ODbWbxH1HmD7Dt8V1YaIGoSzXh4eZEWVjr8w91YrP
-	4wycNU8449Al0z9j2i/BNwRvLhKrNonnbAOXCAVr3nbA2vOgtS5R6b9W46xEyZ0viAunwCABMLa
-	w/STDgG7KxH2zxii6F58kheM37ts7twq502yUdYtpA3SVcipy1t7fJqVoOERM4t3S5WojlF3MmU
-	kTYjjdTDWYJjsG/B5u/Y860TfRcTT8W0kkCykTV0h4tWIFdNNyAwZO23SCjZ7zklfPS41wiIYke
-	cfxRY8qeBWf65mHS1AyC8LqfMwRRW5wXKXT7TuXFb+5sHEeuk0cCKMKl/Cy3ZyRapfh7WQ/dVnU
-	v/DiIOjSk8PMVClLq2txMiIJ1iZnMc2SDguURiteRD/kauVLNT7V1qXhPGKBh
-X-Received: by 2002:a05:600c:a403:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493b82bc279mr38092645e9.31.1782812473067;
-        Tue, 30 Jun 2026 02:41:13 -0700 (PDT)
-X-Received: by 2002:a05:600c:a403:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493b82bc279mr38092065e9.31.1782812472479;
-        Tue, 30 Jun 2026 02:41:12 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-34-22-35.business.telecomitalia.it. [79.34.22.35])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493b8d0bbbcsm64869355e9.13.2026.06.30.02.41.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 02:41:11 -0700 (PDT)
-Date: Tue, 30 Jun 2026 11:41:07 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@rulkc.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Simon Horman <horms@kernel.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	oxffffaa@gmail.com, rulkc@linuxtesting.org
-Subject: Re: [PATCH net-next v4] vsock/virtio: rewrite MSG_ZEROCOPY flag
- handling
-Message-ID: <akOOf7ShQS4OBJrd@sgarzare-redhat>
-References: <20260628182052.951760-1-avkrasnov@rulkc.org>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RlXVy39WxevdJg+dRELNULcdQzpTU2wu1rmjs9ovpQo=;
+	b=FIr5FheHeUJwKx+VNDCtNiYxgCUIb5qkpM26Lykc5toqeOlu3RtKiWhQ38UvjwdkDulmzG
+	EMAO3S6r9sXcRNNXOOcGkM2kVyK9Xt3OGKRPjN2cOnzX1buoz/1pKvNQVZFfQnRtZ8a8jv
+	oVzdB5deyq+qJHzl4XHTWwKflmewVYg=
+From: xuanqiang.luo@linux.dev
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Subject: [PATCH net-next v1] ipv4: hold a consistent view of rt->dst.dev under RCU
+Date: Tue, 30 Jun 2026 17:42:50 +0800
+Message-ID: <20260630094250.29386-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260628182052.951760-1-avkrasnov@rulkc.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303062-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,meta.com,linux.alibaba.com,vger.kernel.org,lists.linux-foundation.org,gmail.com,linuxtesting.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:avkrasnov@rulkc.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:jasowang@redhat.com,m:bobbyeshleman@meta.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:horms@kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux-foundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oxffffaa@gmail.com,m:rulkc@linuxtesting.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303063-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:luoxuanqiang@kylinos.cn,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[xuanqiang.luo@linux.dev,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 06B176E26B7
+X-Rspamd-Queue-Id: 737D86E2743
 
-On Sun, Jun 28, 2026 at 09:20:52PM +0300, Arseniy Krasnov wrote:
->Logically it was based on TCP implementation, so to make further support
->easier, rewrite it in the TCP way (like in 'tcp_sendmsg_locked()'). By
->this way, patch also adds handling case when 'msg_ubuf' is already set.
+From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Thanks for this!
+rt_flush_dev() walks the per-CPU uncached route list and rewrites
+rt->dst.dev in-place to blackhole_netdev under spin_lock_bh().
+This lock does not exclude RCU readers, which may load rt->dst.dev
+multiple times within a single rcu_read_lock() region.
 
-IIUC the result will be similar of commit eb315a7d1396 ("tcp: support 
-externally provided ubufs") for tcp. Maybe I would have added it to the 
-commit description, anyway the patch LGTM:
+ip_rt_send_redirect() is a typical example: it reads rt->dst.dev
+three times to obtain in_dev, the L3 master ifindex, and net.
+A concurrent device unregistration can repoint rt->dst.dev to
+blackhole_netdev between those reads, making the reader combine
+state from two different net_devices — for instance, an in_dev
+from the real device but a netns and peer lookup from the blackhole
+device, causing ICMP redirects to be issued against the wrong
+namespace.  ip_rt_get_source() has the same problem: it reads
+rt->dst.dev four times to obtain the output ifindex, the netns,
+and the source address, so a concurrent flush can cause the source
+selection to mix state from different devices.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Take a single READ_ONCE() snapshot of rt->dst.dev at the start of
+each affected RCU reader and use that snapshot throughout, so
+concurrent flushes cannot cause mid-function inconsistency.
+Publish the in-place write in rt_flush_dev() with WRITE_ONCE() to
+pair with the readers.
 
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@rulkc.org>
->---
-> Changelog v1->v2:
-> * Rebase on last 'net-next'. Don't need 'skb_zcopy_set()' now - it was
->   already added.
-> Changelog v2->v3:
-> * Update commit message.
-> * Remove one empty line.
-> Changelog v3->v4:
-> * Update commit message.
->
-> net/vmw_vsock/virtio_transport_common.c | 47 ++++++++++++-------------
-> 1 file changed, 22 insertions(+), 25 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 09475007165b..41c2a0b82a8e 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -328,38 +328,35 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
-> 		return pkt_len;
->
->-	if (info->msg) {
->-		/* If zerocopy is not enabled by 'setsockopt()', we behave as
->-		 * there is no MSG_ZEROCOPY flag set.
->+	if (info->msg && (info->msg->msg_flags & MSG_ZEROCOPY)) {
->+		/* If 'info->msg' is not NULL, this is only VIRTIO_VSOCK_OP_RW.
->+		 * 'MSG_ZEROCOPY' flag handling here is based on the same flag
->+		 * handling from 'tcp_sendmsg_locked()'.
-> 		 */
->-		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
->-			info->msg->msg_flags &= ~MSG_ZEROCOPY;
->+		if (info->msg->msg_ubuf) {
->+			uarg = info->msg->msg_ubuf;
->+			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
->+		} else if (sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY)) {
->+			uarg = msg_zerocopy_realloc(sk_vsock(vsk), pkt_len,
->+						    NULL, false);
->+			if (!uarg) {
->+				virtio_transport_put_credit(vvs, pkt_len);
->+				return -ENOMEM;
->+			}
->
->-		if (info->msg->msg_flags & MSG_ZEROCOPY)
-> 			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
->+			if (!can_zcopy)
->+				uarg_to_msgzc(uarg)->zerocopy = 0;
->
->+			have_uref = true;
->+		}
->+
->+		/* 'can_zcopy' means that this transmission will be
->+		 * in zerocopy way (e.g. using 'frags' array).
->+		 */
-> 		if (can_zcopy)
-> 			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
-> 					    (MAX_SKB_FRAGS * PAGE_SIZE));
->-
->-		if (info->msg->msg_flags & MSG_ZEROCOPY &&
->-		    info->op == VIRTIO_VSOCK_OP_RW) {
->-			uarg = info->msg->msg_ubuf;
->-
->-			if (!uarg) {
->-				uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->-							    pkt_len, NULL, false);
->-				if (!uarg) {
->-					virtio_transport_put_credit(vvs, pkt_len);
->-					return -ENOMEM;
->-				}
->-
->-				if (!can_zcopy)
->-					uarg_to_msgzc(uarg)->zerocopy = 0;
->-
->-				have_uref = true;
->-			}
->-		}
-> 	}
->
-> 	rest_len = pkt_len;
->-- 
->2.25.1
->
+Fixes: caacf05e5ad1a ("ipv4: Properly purge netdev references on uncached routes.")
+Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+---
+ net/ipv4/route.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 3f3de5164d6e5..e14325c4929ab 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -873,6 +873,7 @@ static void ipv4_negative_advice(struct sock *sk,
+ void ip_rt_send_redirect(struct sk_buff *skb)
+ {
+ 	struct rtable *rt = skb_rtable(skb);
++	struct net_device *dev;
+ 	struct in_device *in_dev;
+ 	struct inet_peer *peer;
+ 	struct net *net;
+@@ -880,15 +881,16 @@ void ip_rt_send_redirect(struct sk_buff *skb)
+ 	int vif;
+ 
+ 	rcu_read_lock();
+-	in_dev = __in_dev_get_rcu(rt->dst.dev);
++	dev = READ_ONCE(rt->dst.dev);
++	in_dev = __in_dev_get_rcu(dev);
+ 	if (!in_dev || !IN_DEV_TX_REDIRECTS(in_dev)) {
+ 		rcu_read_unlock();
+ 		return;
+ 	}
+ 	log_martians = IN_DEV_LOG_MARTIANS(in_dev);
+-	vif = l3mdev_master_ifindex_rcu(rt->dst.dev);
++	vif = l3mdev_master_ifindex_rcu(dev);
+ 
+-	net = dev_net(rt->dst.dev);
++	net = dev_net(dev);
+ 	peer = inet_getpeer_v4(net->ipv4.peers, ip_hdr(skb)->saddr, vif);
+ 	if (!peer) {
+ 		rcu_read_unlock();
+@@ -1287,29 +1289,32 @@ void ip_rt_get_source(u8 *addr, struct sk_buff *skb, struct rtable *rt)
+ {
+ 	__be32 src;
+ 
+-	if (rt_is_output_route(rt))
++	rcu_read_lock();
++	if (rt_is_output_route(rt)) {
+ 		src = ip_hdr(skb)->saddr;
+-	else {
++	} else {
+ 		struct fib_result res;
+ 		struct iphdr *iph = ip_hdr(skb);
++		struct net_device *dev = READ_ONCE(rt->dst.dev);
++		struct net *net = dev_net(dev);
+ 		struct flowi4 fl4 = {
+ 			.daddr = iph->daddr,
+ 			.saddr = iph->saddr,
+ 			.flowi4_dscp = ip4h_dscp(iph),
+-			.flowi4_oif = rt->dst.dev->ifindex,
++			.flowi4_oif = dev->ifindex,
+ 			.flowi4_iif = skb->dev->ifindex,
+ 			.flowi4_mark = skb->mark,
+ 		};
+ 
+-		rcu_read_lock();
+-		if (fib_lookup(dev_net(rt->dst.dev), &fl4, &res, 0) == 0)
+-			src = fib_result_prefsrc(dev_net(rt->dst.dev), &res);
++		if (fib_lookup(net, &fl4, &res, 0) == 0)
++			src = fib_result_prefsrc(net, &res);
+ 		else
+-			src = inet_select_addr(rt->dst.dev,
++			src = inet_select_addr(dev,
+ 					       rt_nexthop(rt, iph->daddr),
+ 					       RT_SCOPE_UNIVERSE);
+-		rcu_read_unlock();
+ 	}
++	rcu_read_unlock();
++
+ 	memcpy(addr, &src, 4);
+ }
+ 
+@@ -1565,7 +1570,7 @@ void rt_flush_dev(struct net_device *dev)
+ 		list_for_each_entry_safe(rt, safe, &ul->head, dst.rt_uncached) {
+ 			if (rt->dst.dev != dev)
+ 				continue;
+-			rt->dst.dev = blackhole_netdev;
++			WRITE_ONCE(rt->dst.dev, blackhole_netdev);
+ 			netdev_ref_replace(dev, blackhole_netdev,
+ 					   &rt->dst.dev_tracker, GFP_ATOMIC);
+ 			list_del_init(&rt->dst.rt_uncached);
+-- 
+2.43.0
 
 
