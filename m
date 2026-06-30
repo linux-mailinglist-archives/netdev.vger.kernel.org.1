@@ -1,220 +1,236 @@
-Return-Path: <netdev+bounces-303329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id buKZG9cJRGpSngoAu9opvQ
-	(envelope-from <netdev+bounces-303329-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:24:23 +0200
+	id aRtQOjkMRGq9ngoAu9opvQ
+	(envelope-from <netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:34:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6EFB6E72D4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:24:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575A16E7349
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:34:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=HXiGs7Q5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303329-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303329-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=asu.edu header.s=google header.b=tFbh9655;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2DA8E30398A0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:24:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E9E3F309840A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969FA3DE422;
-	Tue, 30 Jun 2026 18:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C56357739;
+	Tue, 30 Jun 2026 18:32:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011056.outbound.protection.outlook.com [52.101.52.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4718621CC51
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 18:24:19 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782843860; cv=fail; b=d2732fTKSFC40Q4cjpoWrFmne27ayUYuVzLu7j0a1eqlMP9gXXPNAaERZjdXsYXJ6ZeiQuJJraq1zw+ky8r2KqR63BlFQ61LnFQ7EnBMANColTtGRPsbRdZqnl5SrIjkb5l/kvY18c1DZhk2ZTu7ZIQ0Op4ux/i0yZWZ4mLtoo4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782843860; c=relaxed/simple;
-	bh=4GIZB9SpOFcPHi+NXFVW2xoGSRl03svtSFLdIQTyHFU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VIjVGWzadUVFggoBGp2by1vZJ7EDxAHOGFN44cXYmtaPv1Y6JohpV0ts4TxIZU5eTszH5ZSNrDmATAqmI8cbfRBi7J6mzsAif0fJgJVBxRqVgeigXj5T+PQCQgVUgrBuDwncRb+sSovZba35vvcXI/498PIuklEMw4oW4qOV5IA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HXiGs7Q5; arc=fail smtp.client-ip=52.101.52.56
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FmQkoqTmKyenMxmA6haZyeT5AeGiKXf8YKjozPBFV0DQeUTqkNoMumcuMhvB9X+eUDoUIJUA+SaVKq/OZsmf51yPdx4xjtRuiQC1GhqRMaCuIXrTI8dXjztNSlD1vT5tuVHvP+dApm4ph/YM25+lXdweMhbhmcnMcQMYD6Azr11h78dJfN6nQ6R6cBqONMSuR+bJY2nmBwCsmrXHPYT57cxosxH/uXmC/mOTEYgm67DgizMNfQ556QdRt08pDFI9Qrx8PPQQ7KpqQZYkNEBJAkoHLMcKLdCDIKkxxrCOkG8zV0MlEL1NVe20sDWOfD0je/4t/tmyTLXS78N0p50K6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9LuGlbtas+0mgY9KIT2I8ZtiJ7laxwERtkk5ilG3Z9U=;
- b=OCHc4rG9UkrYmYI3k30ZEfclRqA4UQVcrV2ikHbQ6yi9eATkaDKiVR1EMqfAINi8zo05JD+enssu9opnmhhXNGTH+yfVIkILE6ILor2c6X8Z/IVou+8RNzJzcGqXTpALl5PddZAJxVAbbzz7dyME7/t13AXb1wquLNDrRbeR4T4oDQkdaWw257kpWQxrrNLMUg1q6nRgGTvBLeaxE8YYSmsqRbCh1mgEWceX6EAR1fUfT2wbPhQsZ9OUMKDjmG+opQmusmuHGdpetbxEcHGfql2I3ZtZrx//aa0yelZe/HpLHetYSmA7M1FyJNMuUlaauLj4q9vzhcmi/vPQTKYnNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9LuGlbtas+0mgY9KIT2I8ZtiJ7laxwERtkk5ilG3Z9U=;
- b=HXiGs7Q55lTjy84RvrRH3dNfIXj9qlDDI2bsh+crZVNpJi0Jrclm4YuBZqMhkeaXOXlLlzM6ZHcqgfVLJxWnKQiPom4SApouLYNyHj4VvKOZloKyBaiOZbDlyAObYm5x8Y45x5Z6a/Bd2spYO4FRZbDSnbW4Fv9fLjIrxPVKzP0=
-Received: from DS4PR12MB9708.namprd12.prod.outlook.com (2603:10b6:8:278::7) by
- CH3PR12MB9218.namprd12.prod.outlook.com (2603:10b6:610:19f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 30 Jun
- 2026 18:24:15 +0000
-Received: from DS4PR12MB9708.namprd12.prod.outlook.com
- ([fe80::8570:d817:2f81:c62a]) by DS4PR12MB9708.namprd12.prod.outlook.com
- ([fe80::8570:d817:2f81:c62a%6]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
- 18:24:14 +0000
-Message-ID: <a71c52a9-44c2-4dc3-b9fd-c9a95267a086@amd.com>
-Date: Tue, 30 Jun 2026 11:24:11 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 5/5] ionic: Add .get_fec_stats ethtool handler
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Brett Creeley <brett.creeley@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, "Nikhil P . Rao" <nikhil.rao@amd.com>,
- Simon Horman <horms@kernel.org>
-References: <20260614205303.48088-1-eric.joyner@amd.com>
- <20260614205303.48088-6-eric.joyner@amd.com>
- <20260615182732.7d28e31a@kernel.org>
-From: Eric Joyner <eric.joyner@amd.com>
-Content-Language: en-US
-In-Reply-To: <20260615182732.7d28e31a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH5PR02CA0006.namprd02.prod.outlook.com
- (2603:10b6:610:1ed::16) To DS4PR12MB9708.namprd12.prod.outlook.com
- (2603:10b6:8:278::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F5F41B355
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 18:32:39 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782844361; cv=none; b=L6Aqyozei2ERqj1EV1sJjGLZ4OTqyRPIGcBmeOIUpJZle1iaQLf3zqGJXlf09zdA2ZDQqzraens3zCWrbThVEziO0/ivtK3/OkYbXWgfHS/o06jZ8bU9my6LA1wXKkiMQcZVfkEpdYdXmJAdh73gw/5kKO0W6P4KZvCVkSwhd1o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782844361; c=relaxed/simple;
+	bh=5Od4tPA34zuwjf1KGQ2k1v3lZ1T6yJzidW15RO8rEM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P0CJOJFiZzR/5iUldu/9O5qc3YUK4FZwdgiqRhk7ndXL1+WkCj2zD9kzYznAHYHQIT7QEeRrNtbfuEMB4am0ZG3BW25+MSUJm3pbAKoagwFNa3iVw8aMbpC8qqZsypTH59XSN6UJAy3D7ufmQlqke0x22QPdfqeyfcKrn6gvhsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=tFbh9655; arc=none smtp.client-ip=209.85.216.46
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-37ffdc718f8so1423453a91.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:32:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1782844359; x=1783449159; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MYn0JIP6L7e0faYWM+K1qf/n2ARh502nuelJ3kEZbss=;
+        b=tFbh9655AW3jes2NpJpymBIUAFZVKq0zghP1xe/6eA1hkeolGFyND8fugRV85CQG96
+         pWQGmvc0CMzMVmVkM8zhmLZkaAy+HzczTVagbI0k/d3m5okCMARDne9VznxGmcLP5m6M
+         Kzp9uT4pgPg8uKZOd8hMpOK34pux8+A55PGujVhwya3SuD3ZRrN+pS3jpEy1oqoVkszT
+         ntjPJOhiWWOa7qb321PA5clYUHxTT+rU38hdNGFQJYH32yNndNBqM6pa5OPTTtI8bvDe
+         scrVM23I4XU8DPgY9YLbuEAbcgisDeYSv/aTvZg8FlD23efSMqm0tGL2R+VKtGHLT+Ly
+         ckTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782844359; x=1783449159;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MYn0JIP6L7e0faYWM+K1qf/n2ARh502nuelJ3kEZbss=;
+        b=hyRdWDkVbAaY8HqWXTf/hjsw9Bb+BkWSxfomWPdpzRl1m0B0q9hqOpYbwLwPGXj4Lj
+         YjWJve55Z/62IJjqU9Z3fKjAAOqWZc4ads4EMescpBHSViDDsNRP5UWUQ2YsZU9ddID4
+         yucyLw9VVwClyQ+dHJ1FElz0aFqIpxdbyCrpK2wvgIxHEFOtcHaiuvnYumP4Fy/QsjWm
+         6VAaKIyUDBsWYiY5DMM15X4zyyZCoChKwMx16qQp5xc00Sj8ktPIy+dE/2NNqVAO250V
+         NvCGel2PIxdBgGXVie/Yavv6IyRQsx0UdqDa0XM0xYqKvRMlfF4tGwVj9unXIY13c5KS
+         ro2A==
+X-Forwarded-Encrypted: i=1; AHgh+RpeTAOBH0BssaLZdRGBYUYWB1WI/cMpg6/B5BBEmGbg6QFtbP8lGZjf0FdRsUEq54OXxUHEdPs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKiuKlsznQV4DBEClxZPsGPYuVAB5Z96iLZWuoXh8qTN/lF+K/
+	IzHeMNhkCEiNRThGlJP9BUXaiNPasVRp7tf0DCzir/DmKEcZ0NhsDQlbNNAzBaeXHA==
+X-Gm-Gg: AfdE7cnucMixZZErLAUFNuYlonqxrhMRjoRzpWKJ4xWOlC5Y50UuD+vGObGIHfzWQmm
+	4g4N6TlmhYJqb7M/54Cq8uro1bZUaKHWnP39OepOtuRpa6dK8juBs1or6i+8rywspE3krpYB2ZY
+	mb10lUSmDOUi6YJ2K0DaDalo9+j5aR+/5kvLAUdLkjUpAkMQw1pwspPw7IHsi0yNRcwzGnPKewd
+	T9WqyINDH3WZMies3dv3INGmmAxBBJ9XVNm3CV1KnvoVXVROzPANBDet43n13hivlZ3YHE9UWPF
+	sfcqxN6zzTxKHb06orLGULX5iksBoIOqcc4UV77OvpLXaHDNJjdhDZ/EXGHl6SOHYYHEaiNclAo
+	ORqBgbW9b2rlFBa0Klyx/zfEJR+EK/SMcUtUCO2p0e7PNCFNZv9cT3J6DzhZfQx9o68P72FtqnQ
+	==
+X-Received: by 2002:a17:90b:4985:b0:37f:fdc8:71b4 with SMTP id 98e67ed59e1d1-3805252ef0emr3199432a91.2.1782844358846;
+        Tue, 30 Jun 2026 11:32:38 -0700 (PDT)
+Received: from p1.. ([2607:fb90:ec8c:9d53:ddf7:b69f:b5ae:d529])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38095d4c263sm387317a91.3.2026.06.30.11.32.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 11:32:38 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: Sidraya Jayagond <sidraya@linux.ibm.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hans Wippel <hwippel@linux.ibm.com>,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v2] net/smc: fix UAF in smc_cdc_rx_handler() by pinning the socket
+Date: Tue, 30 Jun 2026 11:32:27 -0700
+Message-ID: <20260630183227.2044998-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS4PR12MB9708:EE_|CH3PR12MB9218:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0dc7f841-1753-4a52-274d-08ded6d4c9d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|23010399003|376014|22082099003|18002099003|4143699003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	43UYerhfGX3uh/9D3cmYfEvCys/RldpEvuX8UihITBIQnFOcjDP13oiSP1cGuECIYmb9nFkHBFpMQ2PC9w8iTq7RIh0n3m497BBCETWawbf7gHUcUmBCjw7eKH5xt+5wKz/LkqavaUerXoXz2Bv28ScDezQ0JyB0hXp1Obj+8oWCSr5sOOfjk/5TU4KoWf+o0ykFmbJ63Y900NsiOIkCOkx/iq4AFpGXB5I0rzIupUIhxVE4GtEuJcdlpzUHfDbu20JHTFDn40/0vxhM4FYkqXHjriCYVEo3AKhuOuKWC4w+8vdt7vUtHsCooOhshHqklSsTp9O/JuNAMcBRyD354lxd1NMFOMfsyoWm/K7p91tu2rCljBQBFOVZwnTcz6R9jCdqW4qn9VsJ/JPD+LDf54fP++dM/tNQQJEr1cq7RL+zZh4/q1bRgNeiJ12MXIeyUKRizkR1DxD+VU1bNr2WhZ4ooL6n/+JJ5xUpPCeAOvDJ3hBiq6Zea559P3LP7JgblbiBgeDTgvPN6TU+iBun9iiFVO0svN1N6wjh8MqkAnymLkHPx/VzvX7DDcv+OXpexsffJ3UnI3H2FD3kwwrFRGUL6Syf3rQal8ni51qnL4csSSgdY6g40vfpNCOJAyV2rof3yGwblZZTM7JqOznwGIDhRaefcBfgSKX8atBcULY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PR12MB9708.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(376014)(22082099003)(18002099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RVNFdmVNUmN5ZjhiMG9sd3JMaDVLSUo3UDg3TkVEV25kR3VON2F3aXozR0ty?=
- =?utf-8?B?UlQvSjFSWUFPYUVwWmxuRE1veXoyMUZQZnRWQWRiZzZocVBtMnZVaUtCNnB2?=
- =?utf-8?B?anMyN0pZMlUvcHc3akd2eEZ6RVM5QmUvc08xeHo2Vkp6RTZ6cmZjT2ZEVW50?=
- =?utf-8?B?bmJTckxSNlpxSDlydFZQK1A5M0l5UmpIYUlMTTMvMzVJWkhNZjR3MGNYSWZ0?=
- =?utf-8?B?eU5SUDRkOExmVXBPcW4wR2hGTnNoVG1jc2xpbWVJVDVnZlovNEg1VW4rQld6?=
- =?utf-8?B?TitkM2xSUWdNc3V6ZXFvc21YekIxU3lWVXVXQWo5R0FPOVhvTTRIcG5ONW5R?=
- =?utf-8?B?RjRXaDdPNHlodDhSbXBoUC9ZUzRvL3UzcUpDQWlzVllSNU5jc1IwSklIaVdL?=
- =?utf-8?B?VUtyOFc4cWR1a3BDc0tQS3Z4OHNNRGRHbVo2VFVFdWNlNExmMndZYzVWUVFp?=
- =?utf-8?B?M2g5dG9DQldGM0dIemVibXlWMng2cHJXZWpGOG1ETEtKd090aGRaaHJmUjdo?=
- =?utf-8?B?Zmt2QWdQU1FyL3BpK0RnelhvWUljSEFIWk1UMzM5QVl0dy9yL29vaXhKMGdn?=
- =?utf-8?B?Vm1wNzVJVFhlYkRYeUdCcEt5V2JYMWZGWkMydzVScWV3RzBOOUM2cUxLQ08x?=
- =?utf-8?B?RG9CYUNaZUNkbTM2cmR6Tys0Q3dUc3M3N2pzZUQvd09pZlRSWmFuQ3MzUW9V?=
- =?utf-8?B?eDBrSEZDeGw2T1NyaW1OazZVQ1VoQlVtK240NnBlQm1INDRpaHpMbk4zbTgz?=
- =?utf-8?B?Mkgwdm9uWHZHejc2NzVrVzZWNUJNNmJaNFZIcWZ3OUJ4WG96NDA1cjhFdFI0?=
- =?utf-8?B?T3ZQWExRTU12cjNsNlp2NktlcVA2MzhVdzcwWkdueHJDLzBZb3RZNkIxT2M2?=
- =?utf-8?B?VUhtMld3eU5lc2RJVjI2d0JmejdwZ2hMQzlUemhCamJIQlRZRi9sVkdIVGZL?=
- =?utf-8?B?SENzYVdaRkN3c09PZHlQVFNpNFROMVpvaysrL0ZMcUVBTC81YmxKY2Y4WEdv?=
- =?utf-8?B?QlcvWVNPQ2NUaVNTY21UZTUvZWsyRXVRS3RiY1ZabXVTRlhIUndKa2xHeGRR?=
- =?utf-8?B?b2szVCtiSkZqV2hkTFk2Snl6c0hvTG9rY29Dbjc0OFMvVEhmRmMydjhoOWZy?=
- =?utf-8?B?Q3l4aE56VXhZNDdUdVlieUhlWUtHejRRajlMN0dzM0txN2ttNEM1L2N2VnUz?=
- =?utf-8?B?MzRpdGpHT2NieUkyU1AwbEVmc1BRVkF3WTZzdkdvMjZKajJBMXFka0ZiVlpO?=
- =?utf-8?B?cGQ2Um1vUnhnTG5hb3ROVFJreG80dUl0aVJJNmZhR05sQzVMNVRiVzQ3QS82?=
- =?utf-8?B?RXUybUhNNW1CNmUvSUhPK1pyUFdMeHExY3cvU3ozeUpURGRNalowa00wa0JY?=
- =?utf-8?B?MEJyS24yQXZIaEsybFI5bXF6UEdtcUNsM0JkVHRnY0xWY2RhNlh2dTljekJT?=
- =?utf-8?B?K2lFZWtPZEhsRDFEU2hteE9MME00eEFWdnc5dEdaRUw2c3dVNnAralFaLzlZ?=
- =?utf-8?B?cUpIeXdTRjVtYVVKM3ZJK2JuNFpQeE0rZFZRQkY5QXpzQklxMzZ3WGlueFNl?=
- =?utf-8?B?SVZ6Ri9lWlB5dzl3VGI1STJ1TDJodVR0SG94NThwRHdyaTM0TnpobXR2NkZK?=
- =?utf-8?B?YXhEdE5xS21SNEwyV0hscGF2YnBQRlY0NDAxUllNTEp3UDBuZ3FwdDJSckpa?=
- =?utf-8?B?NFA3T1hxVjNCS1dHa3NOSXdsc0tUc0VzODVTV0FoYzVKTk02UGdtalhSVTNX?=
- =?utf-8?B?NFNwbkY1UmMyMlhROHBZQkZQWmhHeG5LbE9XdCtpR3l3dC9jaXNPQ0lEZTlZ?=
- =?utf-8?B?aC96V2tnTVdzYlg4SklYb2dLcWpLTXYvSWVxK29QZXM3QVZ3aW5WSXFFWXVq?=
- =?utf-8?B?b3BSaG1JRko5c3ZBODl1UWxnVXFzRXJjL2hvcWlFLy9TRW1QdWdaKytrTGd1?=
- =?utf-8?B?cHA3RFVHbjJBZEgxRCt3MUdOdVBUZmlCUWpWcy95c0Vjbjl5b0hpL0tKZWFU?=
- =?utf-8?B?RHcvRzJDL0JaZ2hWamVDSVhPY3B5eFBBMDBKRUNxRzJBUFIyMW9zSnR6SVIv?=
- =?utf-8?B?NEFyUGpIWCtoV3ZTT0FPTERiaWNKcGdEaXRQLzd5R0F0dEptYmthK2xVUkkv?=
- =?utf-8?B?MjlpL1g3V0tvUnhhRmtvU053VC9LR29PMk85OUt3V0lyQURVSHJ2WEpKRnps?=
- =?utf-8?B?b2R3Z2tBOVpIT0MyUUc2OTFlTFpjVDM2V2g1SXU5OXE3RlFPdE9hb1RVZ1RZ?=
- =?utf-8?B?TXJuWVJEQXhCTTArdHZKV0xXajNGOUhWV2g0clFGQWV4eUVUTktMMU1VWEVN?=
- =?utf-8?Q?5uNceSudiG3YbAe+da?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0dc7f841-1753-4a52-274d-08ded6d4c9d7
-X-MS-Exchange-CrossTenant-AuthSource: DS4PR12MB9708.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 18:24:14.2335
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uxDsrKntgvr5avl47GUuW6x3K/bWdbiG0++QkCaiQgKEvSik0sJvSrddiqbchVED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9218
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303329-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:nikhil.rao@amd.com,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303330-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,gmail.com,asu.edu];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:sidraya@linux.ibm.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hwippel@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,amd.com:dkim,amd.com:mid,amd.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:dkim,asu.edu:email,asu.edu:mid,asu.edu:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B6EFB6E72D4
+X-Rspamd-Queue-Id: 575A16E7349
 
-On 6/15/2026 6:27 PM, Jakub Kicinski wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> On Sun, 14 Jun 2026 13:53:03 -0700 Eric Joyner wrote:
->> +             if (fec_cw_err_bin != IONIC_STAT_INVALID)
->> +                     hist->values[i].sum = le64_to_cpu(fec_cw_err_bin);
->> +             else
->> +                     hist->values[i].sum = 0;
-> 
-> Setting the sum to zero is very much against the API contract with
-> ethtool, no? Since we are just digging ourselves out of a whole with
-> the link down events maybe let's be more strict going forward. :S
-> 
-> I think mlx5 had a similar problem of not knowing bucket count.
-> You can put the bucket table in some driver struct and populate it
-> at runtime.
-> 
-> Looking at this scheme, tho, I think the ethtool core is buggy for
-> mlx5 :/ We should make a copy of the hist table, because we write
-> the Netlink attrs after releasing the locks. Another call may start
-> already and make the driver write its table in parallel.
-> 
-> Please send a fix for that if you can, or LMK if not, I'll chase
-> one of the people involved in adding the fec stats.
-> 
-> I'll apply the first 4 patches here in the meantime.
+smc_cdc_rx_handler() looks up the connection by token under the link
+group's conns_lock, drops the lock, and then dereferences conn and the
+smc_sock derived from it, ending in sock_hold(&smc->sk) inside
+smc_cdc_msg_recv(). No reference is held across the lock release.
 
-Yeah, I'll work on a fix.
+The only reference pinning the socket while the connection is
+discoverable in the link group is taken in smc_lgr_register_conn()
+(sock_hold) and dropped in __smc_lgr_unregister_conn() (sock_put), both
+under conns_lock. Once the handler drops conns_lock, a concurrent
+close() -> smc_release() -> smc_conn_free() -> smc_lgr_unregister_conn()
+can drop that reference and free the smc_sock, so the handler's later
+sock_hold() runs on freed memory:
 
-(Just to say that I didn't forget about this!)
+  WARNING: lib/refcount.c:25 at refcount_warn_saturate
+  Workqueue: rxe_wq do_work
+   refcount_warn_saturate (lib/refcount.c:25)
+   smc_cdc_msg_recv (net/smc/smc_cdc.c:430)
+   smc_cdc_rx_handler (net/smc/smc_cdc.c:502)
+   smc_wr_rx_tasklet_fn (net/smc/smc_wr.c:445)
+   tasklet_action_common (kernel/softirq.c:938)
+   handle_softirqs (kernel/softirq.c:622)
+  Kernel panic - not syncing: panic_on_warn set
 
-- Eric
+Only SMC-R is affected. The SMC-D receive tasklet is stopped by
+tasklet_kill(&conn->rx_tsklet) in smc_conn_free() before the connection
+is unregistered, so it cannot run concurrently with the free.
 
+Take the socket reference while still holding conns_lock, so the
+registration reference can no longer be the last one, and drop it once
+the handler is done.
+
+Fixes: d7b0e37c1ac1 ("net/smc: restructure CDC message reception")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+v2:
+- Take the reference under conns_lock, and compute smc once
+- Initialize smc = NULL at declaration
+
+ net/smc/smc_cdc.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+index 619b3bab3824..32d6d03df321 100644
+--- a/net/smc/smc_cdc.c
++++ b/net/smc/smc_cdc.c
+@@ -470,9 +470,9 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
+ {
+ 	struct smc_link *link = (struct smc_link *)wc->qp->qp_context;
+ 	struct smc_cdc_msg *cdc = buf;
++	struct smc_sock *smc = NULL;
+ 	struct smc_connection *conn;
+ 	struct smc_link_group *lgr;
+-	struct smc_sock *smc;
+ 
+ 	if (wc->byte_len < offsetof(struct smc_cdc_msg, reserved))
+ 		return; /* short message */
+@@ -483,21 +483,26 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
+ 	lgr = smc_get_lgr(link);
+ 	read_lock_bh(&lgr->conns_lock);
+ 	conn = smc_lgr_find_conn(ntohl(cdc->token), lgr);
+-	read_unlock_bh(&lgr->conns_lock);
+-	if (!conn || conn->out_of_sync)
++	if (!conn || conn->out_of_sync) {
++		read_unlock_bh(&lgr->conns_lock);
+ 		return;
++	}
+ 	smc = container_of(conn, struct smc_sock, conn);
++	sock_hold(&smc->sk);
++	read_unlock_bh(&lgr->conns_lock);
+ 
+ 	if (cdc->prod_flags.failover_validation) {
+ 		smc_cdc_msg_validate(smc, cdc, link);
+-		return;
++		goto out;
+ 	}
+ 	if (smc_cdc_before(ntohs(cdc->seqno),
+ 			   conn->local_rx_ctrl.seqno))
+ 		/* received seqno is old */
+-		return;
++		goto out;
+ 
+ 	smc_cdc_msg_recv(smc, cdc);
++out:
++	sock_put(&smc->sk);
+ }
+ 
+ static struct smc_wr_rx_handler smc_cdc_rx_handlers[] = {
+-- 
+2.43.0
 
 
