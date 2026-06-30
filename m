@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-302945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OqewJ5dDQ2r+WAoAu9opvQ
-	(envelope-from <netdev+bounces-302945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:18:31 +0200
+	id 45p+A31DQ2r4WAoAu9opvQ
+	(envelope-from <netdev+bounces-302946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:18:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363F86E0386
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:18:31 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E1386E0370
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:18:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ddWppg6u;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302945-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302945-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=dCxFALE+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302946-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302946-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A065B302D324
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:17:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A1802300AB11
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EBA3E1D13;
-	Tue, 30 Jun 2026 04:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BAE3E316E;
+	Tue, 30 Jun 2026 04:16:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E2D32B127
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDD33E274C
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:16:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782793005; cv=none; b=N41/9MpfPe2S8ZKKvzB/FnPnQSTELmnnJkkpgrXnvuo5ZxhbKBgmrSDNiJF/I0fHhqe9jeS8mLTvGN4M64Rr+2KK29uKCGOT8CEG7O3L6IX75DuR9F7GVepOC5jpkg6yTYUM1SiYudhRznltAVNAo4S5mAykC+YSX11m+OHGCJA=
+	t=1782793007; cv=none; b=XnOfN3raR3NPrB/erYYRTRJQLjYVC4NRpLyX6OyK41Q8Rqu3p0MXHTTGBZ+Lv76a/jd+/0fssIPNYVIOBo7abf3ZQCBTkdlwO3Ksf6d93AnT/gSx1V4NtCymgxKALbLDCmLWFdWF40xnVp1s/ceQS/WGAlLlKz8YZHxi1wpDKiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782793005; c=relaxed/simple;
-	bh=fAE/Yewa3SEx/YXCLqWkzo3ukPRxfK2v9eAkdxfVFss=;
+	s=arc-20240116; t=1782793007; c=relaxed/simple;
+	bh=ZbnG49kMtnonjZd1Bl6WZb9BoqWESC66Yb/s2HrfTKs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q+mGdHszyNFN9QNwHu9CYlllGAwR2xaNhNgqUIZW+yY/UsKESzu5xhF+maaxHKXID+0gqRJn4aF8mfMwPB35t1LVc8FRLzvLG2D5cINzDyGgyPyDUDw1aENds6F93Uhol4vbdx6yz2+04QI6PYRoFmilR8n8Hj0oFHBXGDXTE14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ddWppg6u; arc=none smtp.client-ip=209.85.215.171
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c8ff15af279so2244328a12.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:16:43 -0700 (PDT)
+	 MIME-Version; b=aHH9yd5UEWBa4Hoih3ZlCSbeubfj4zzFdpriUIjbQ96Dq/euztGfAJMZj1iyXKdHqj0R8W8+OT0lpN/szXtUZrJ0KWMZjsffSXBcv/TdKU0F6aLMXdjvuSqn9tP/I/UOKTDUmCO1svwcZ3IwGq3yhOOzscUA145xuLMvcZ9W/po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dCxFALE+; arc=none smtp.client-ip=209.85.215.170
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c9672e02e05so730030a12.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:16:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782793003; x=1783397803; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782793005; x=1783397805; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9nTeOTK7sT3w/yJG7JB2mC3o0CF3LaN7DeafntRCirY=;
-        b=ddWppg6utQnm7p2iS/LHQ39U1NtWIaO4VCk5tCKK4fJyD8DU6mS56uzCSQKI9H2NG6
-         iQcJaLkSVuT3eSTGHtgQvbYEpdsjl39LlwU8kPG+tXXhQTfTk1wbL+BZ5CdsAwuFugO+
-         oRk6Fuz0QLD5ydOCKpmXTXXjNmC0WoIeYPZXGBOil4jPxGK6mEt1k5suZQ5iDmZRZpO/
-         +g6mQsZul3qRgRSdPIbgsTFamOxUYFNrPfcrOwAAYXFMnueEqAmG04I5Il480l2o/RL4
-         gfP9mnRH7d2ruLyljEfpYRIumTCRwAJIvm1vBD+QZGG6F5vxDfgLi8g9l6JpRMGIF0sE
-         Au7w==
+        bh=4Z4ic3/d06KRCdVhV625ALQxc1LARsSY9ERoc+3rd7w=;
+        b=dCxFALE+m8Vq+KiG7qT2iv39VCERr3GfdNP+Xe3pDey2pUt0+M2xzLm+Kw1HHU2O+N
+         aZ9JqrGIMcs6VN/rIERIVAoPdjFijtMK1fG/AlneVax6ZG/dD31VGw74TyCc3hSK3Lya
+         QEM+R0SIbuIbotMLe61t/omdjx9YnGAHsyQhaHkIuSLLYnDbc8EyoazQfmVMoJMPofRW
+         7M2pzZVSpZQ1nvKo7SxYWRnSTTtwFf5TTvu3LRI2fsci9lhgfnZdMHNyXjsQBH1iSwMR
+         eVJ3M4Fz0tdbe/TuDXk7ktNNnJYA96IRwWOSZz4D+cpbYmxw/REf4D7xuEkFwYX82FA0
+         F2og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782793003; x=1783397803;
+        d=1e100.net; s=20251104; t=1782793005; x=1783397805;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9nTeOTK7sT3w/yJG7JB2mC3o0CF3LaN7DeafntRCirY=;
-        b=QI03m2xrTWt1XG+fZ4NQ3gG8ZNrE7j/awZwpnFbd4F8ueFx2IimZODVlxTSmUL9uwB
-         AGQPmKMIbQIU80ISmFGE+lGWBTVM7gn0q+Ez/EiEx6UmKwpepvT7nyOqagJxyGGwlm3O
-         dMQE29NL7XR7F18Kz7nllQEkkbWu/gStuWI1uR1OogUDe548qKRNxH+5bZGjNHV/6EFs
-         JET8H2L51r3k/gC5H7CyEToY5Mmlm2Pd734jbNRaz4jpWUNRBEXEKCPNFNNIzhFm0Epa
-         PudNE0zohzLRQI08qhq7txQXzSCoZKH7JaJFO6L7ied+1STmIoIQdEMuFf6zt2ChYmCc
-         u4iA==
-X-Gm-Message-State: AOJu0Yz8jkztAqhC/YrNKq4x4BANWEe7MV37Hn+POIpCvaCwnyhA4flZ
-	vylEsOc49Y37NWqeqxksb3lAgM1qGXw4NNPVOcbfiv7gTALYYRf6n/XnZxi+38NU
-X-Gm-Gg: AfdE7cn3dqryYuaXgXZhcPdxQpGr7lyA+YPBXNMS0zzi03C+nDDrqL3kUSJykQ9YFdt
-	CwjsDfIwbaWUoUiBADxrH/5FNN0LsFWAu3P66lGcWi3IjC6v6iDzStXRtH9q1czd1gIGiFQDQn0
-	jExHMYDK/SHi4TkTGaD7wQNyxa/4e8BfuKcCM50EB0laRS5BgyliIK6OG7yv6uu5kPcneZrkVZ+
-	vpCvJWbl2SobrOPQ722Qv3kBNjLK7IH6a+NAa5yWS9yZ6NWq1Z3ejSheBZ7jv0i/ERaWi68iP5P
-	qz3uWXo+BpO8IVix01C1fFV9HCmJBlYllEynW4riqy4T8rkLMBtv8KgaUbszFy8uv4K2L31CxGx
-	aYtzNwZ4VceBZ3cWpPv5GAXzkj8sc4+5FxG830XMq1b0szOoMhtTnmjivBseYQ/Xmcm1SmhEWFq
-	ydEq60uOy8sYPNPwSVCDDuPp8HAGj+wDeYFZ6WvpJS6Sv3AfU5J0ebUF4E+pxSNFJ+l3C41YD9/
-	se1C4ZbgQ==
-X-Received: by 2002:a05:6a21:4584:b0:3bf:6c08:fb9a with SMTP id adf61e73a8af0-3bfc547ed4emr2110881637.60.1782793003241;
-        Mon, 29 Jun 2026 21:16:43 -0700 (PDT)
+        bh=4Z4ic3/d06KRCdVhV625ALQxc1LARsSY9ERoc+3rd7w=;
+        b=ocf0JY6QG1vI8vPtQ3iTgJivXzhS0Ug+by+xDZOxQkgVL6dRPiVed3X3MpXq0iQe8V
+         TkbjI6OpjTPqBi4teWF1d20bQSDbrc2ewWY4yIliTQCl/3/RdfyKH+g+S8XLmS6T1Buj
+         D5S9k/BIIFusxGlnpFRj/kC+e0PH36lFgBJqULpKawA8w5Iyw5NNBxS1WWxXqquNj9x0
+         8TTiM2XF0AxOA1NU6fE0csejY7A7SAtexlATFKtY+Zk18pYlz03ajaf2DQFVJ4mXpSOb
+         IKx0qMXJe5EL3a24JsVKEco1mGaxN6lJ/CuR378ffwZyW6bYNfUm+CzMH8ZK7JL6ZVXR
+         BxUA==
+X-Gm-Message-State: AOJu0Yz/kuPjsIvo/6F9XJmnGv0tEfo463NqcYqEIxKqjGJfTX0kHVcU
+	HOStcG8uGeBH6rGsXqD+JuKYVfk0Vh0q9Ww+bvU5wkPL4j3LxQEssepvT6+w2W6d
+X-Gm-Gg: AfdE7ckIzPymW5dJv0HFRkh2SuLCkK7/8/R7jKSE+JnzHbhhn5F02ShnAahYrUDVXnb
+	KqznU6vgi0KV3SVUoB5Axo6+6IjOqCDB6gU1lM2nrwr7QvwqxhgaaxluLkkP4D1QukfiGP5nGP3
+	CYLXv6DUqYdaMUjVoxm6zGdRXm63IlwXEJk9f5H1woMtyMDIk/4LxjsXo1AAfVfJrw+MWMv/mMS
+	PBUftF450r8rv0KRdCTiR1bBI7TgGAVXqBI+TdRx/AWnz0xWni5mpg3aOy+dMgYA6i0ZCiWr1zl
+	M7etiAEhUXQ91ZkeCva3WDZsHbEkWPq67ywF9tASuXjKZpxqPueVnmtS2JmSLIp51YTnJxyipwi
+	UFStnxmKKYul8AOt1QX1CKLNm6Le2HKXoRgfsUqaViwuqDZBs+Mn0OWkclBR1dEHjoNcWYcDSpy
+	9C5i0TrmzT+8XMXMT+uV1G9aCfqBmopw8YTfzn+R6otFL/C33U0b3/MtP4jXxfVjw00uDMQk2ka
+	H2O8CnoEA==
+X-Received: by 2002:a05:6a21:a49:b0:3bf:bfe6:ab6e with SMTP id adf61e73a8af0-3bfc50680f1mr1949323637.6.1782793004858;
+        Mon, 29 Jun 2026 21:16:44 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbf95a3e7sm702659a12.19.2026.06.29.21.16.42
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbf95a3e7sm702659a12.19.2026.06.29.21.16.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 21:16:42 -0700 (PDT)
+        Mon, 29 Jun 2026 21:16:44 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -84,9 +84,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 05/10] net: emac: mal: replace busy-wait in mal_poll_disable with wait_event
-Date: Mon, 29 Jun 2026 21:16:29 -0700
-Message-ID: <20260630041634.284127-6-rosenp@gmail.com>
+Subject: [PATCH 06/10] net: emac: batch stats, eliminate modulo, tighten barrier in RX poll
+Date: Mon, 29 Jun 2026 21:16:30 -0700
+Message-ID: <20260630041634.284127-7-rosenp@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260630041634.284127-1-rosenp@gmail.com>
 References: <20260630041634.284127-1-rosenp@gmail.com>
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -115,10 +115,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302945-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302946-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -131,75 +131,69 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 363F86E0386
+X-Rspamd-Queue-Id: 8E1386E0370
 
-Replace the msleep(1) busy-wait loop in mal_poll_disable() with
-a proper wait_event/wake_up mechanism. Add wait_queue_head_t to
-struct mal_commac, initialize it in mal_poll_add(), and wake
-waiters in mal_poll_enable().
+Three small hot-path changes in emac_poll_rx():
+
+- Batch per-packet 64-bit stat updates into local accumulators and
+  write dev->stats once after the poll loop, avoiding expensive
+  load-linked/store-conditional sequences on 32-bit PPC for every
+  received packet.
+
+- Replace slot = (slot + 1) % NUM_RX_BUFF with a simple
+  if (++slot == NUM_RX_BUFF) branch, avoiding a div/mul by a
+  non-power-of-2 constant.
+
+- Use dma_rmb() instead of mb() when ordering the ctrl vs. data_len
+  read of the coherent RX descriptor.  The device writes the
+  descriptor fields in-order and clears MAL_RX_CTRL_EMPTY last;
+  a read barrier is sufficient.
 
 Assisted-by: opencode:big-pickle
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/mal.c | 7 +++++--
- drivers/net/ethernet/ibm/emac/mal.h | 3 +++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index 82d502d576ee..d12a376f69fd 100644
---- a/drivers/net/ethernet/ibm/emac/mal.c
-+++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -176,6 +176,8 @@ void mal_poll_add(struct mal_instance *mal, struct mal_commac *commac)
- 
- 	MAL_DBG(mal, "poll_add(%p)" NL, commac);
- 
-+	init_waitqueue_head(&commac->poll_wait);
-+
- 	/* starts disabled */
- 	set_bit(MAL_COMMAC_POLL_DISABLED, &commac->flags);
- 
-@@ -371,8 +373,8 @@ static irqreturn_t mal_int(int irq, void *dev_instance)
- void mal_poll_disable(struct mal_instance *mal, struct mal_commac *commac)
+diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
+index 5e7b85d28bde..ced9690cddc3 100644
+--- a/drivers/net/ethernet/ibm/emac/core.c
++++ b/drivers/net/ethernet/ibm/emac/core.c
+@@ -1741,6 +1741,7 @@ static int emac_poll_rx(void *param, int budget)
  {
- 	/* Spinlock-type semantics: only one caller disable poll at a time */
--	while (test_and_set_bit(MAL_COMMAC_POLL_DISABLED, &commac->flags))
--		msleep(1);
-+	wait_event(commac->poll_wait,
-+		   !test_and_set_bit(MAL_COMMAC_POLL_DISABLED, &commac->flags));
+ 	struct emac_instance *dev = param;
+ 	int slot = dev->rx_slot, received = 0;
++	u64 packets = 0, bytes = 0;
  
- 	/* Synchronize with the MAL NAPI poller */
- 	napi_synchronize(&mal->napi);
-@@ -382,6 +384,7 @@ void mal_poll_enable(struct mal_instance *mal, struct mal_commac *commac)
- {
- 	smp_wmb();
- 	clear_bit(MAL_COMMAC_POLL_DISABLED, &commac->flags);
-+	wake_up(&commac->poll_wait);
+ 	DBG2(dev, "poll_rx(%d)" NL, budget);
  
- 	/* Feels better to trigger a poll here to catch up with events that
- 	 * may have happened on this channel while disabled. It will most
-diff --git a/drivers/net/ethernet/ibm/emac/mal.h b/drivers/net/ethernet/ibm/emac/mal.h
-index e0ddc41186a2..bd52bb41adee 100644
---- a/drivers/net/ethernet/ibm/emac/mal.h
-+++ b/drivers/net/ethernet/ibm/emac/mal.h
-@@ -19,6 +19,8 @@
- #ifndef __IBM_NEWEMAC_MAL_H
- #define __IBM_NEWEMAC_MAL_H
+@@ -1797,10 +1798,11 @@ static int emac_poll_rx(void *param, int budget)
  
-+#include <linux/wait.h>
+ 		napi_gro_receive(&dev->mal->napi, skb);
+ 	next:
+-		++dev->stats.rx_packets;
++		++packets;
+ 	skip:
+-		dev->stats.rx_bytes += len;
+-		slot = (slot + 1) % NUM_RX_BUFF;
++		bytes += len;
++		if (++slot == NUM_RX_BUFF)
++			slot = 0;
+ 		--budget;
+ 		++received;
+ 		continue;
+@@ -1864,6 +1866,9 @@ static int emac_poll_rx(void *param, int budget)
+ 		emac_rx_enable(dev);
+ 		dev->rx_slot = 0;
+ 	}
 +
- /*
-  * There are some variations on the MAL, we express them in this driver as
-  * MAL Version 1 and 2 though that doesn't match any IBM terminology.
-@@ -172,6 +174,7 @@ struct mal_commac {
- 	void			*dev;
- 	struct list_head	poll_list;
- 	long       		flags;
-+	wait_queue_head_t	poll_wait;
- #define MAL_COMMAC_RX_STOPPED		0
- #define MAL_COMMAC_POLL_DISABLED	1
- 	u32			tx_chan_mask;
++	dev->stats.rx_packets += packets;
++	dev->stats.rx_bytes += bytes;
+ 	return received;
+ }
+ 
 -- 
 2.54.0
 
