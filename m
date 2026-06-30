@@ -1,122 +1,129 @@
-Return-Path: <netdev+bounces-302887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DshwGwsiQ2q+RgoAu9opvQ
-	(envelope-from <netdev+bounces-302887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:55:23 +0200
+	id xJO/N+4iQ2pRRwoAu9opvQ
+	(envelope-from <netdev+bounces-302890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:59:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E342B6DFABA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:55:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C456DFAFE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:59:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hHqkpGaJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302887-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302887-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=proton.me header.s=protonmail header.b=NevV1SaL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302890-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302890-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=proton.me;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 14B14304890A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:54:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 30076300D310
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DE12FF669;
-	Tue, 30 Jun 2026 01:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E6D303A04;
+	Tue, 30 Jun 2026 01:57:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-43101.protonmail.ch (mail-43101.protonmail.ch [185.70.43.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4D82F8E98;
-	Tue, 30 Jun 2026 01:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0BE2F8E98
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 01:57:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782784457; cv=none; b=i34CVKqS+xQ/IbpBAzcG49if9ZCi0aGyIvqhvx4P4ZRodvIiI1s7sGL8ybtZ1UWmZ2bGVJ7LvNMra9I7sDwMQRf4F5rHpAxuS2Iq9srUjC8AMgqav9dcparIUbIrwyPLJu88ZZZbIspQo2EJp/VcqmfJdfQgeF8Ymtt0BHfNXiY=
+	t=1782784646; cv=none; b=X6GSMyFGhpUt5hTnQaU/JrG5/EXSChcNSVuQ9/x9HT0aWdLjSS/TsqEXzTCZBwEndrtDvdk9pMhW8R26kNO3bmG6M/ygwSoeUObBWBMM57MtRuS7nIsW1WFdUfc3KrgcHHVoy/YGo5utt3SxQNFCX6Vdd49MN69kVQEfsSvdr/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782784457; c=relaxed/simple;
-	bh=G+Zxlz53+flqDsWEQBE4Q9MC0i67W8TGf2XxpOHs4fw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z+IKu6AOjhtaL4hSfgmwdGA/iw9WnjbaPBl5u25Y51qTZRXhZKaxB/U/NtO1rOvvFCDgbG04BTdHob1ABm+PbAx7ILp7UFcG82C4OmzWM2Y5FOMuAcwMPJmr6L5upyN6LmlR6MJKpx3MNSxLk6zmBCu1JqdORwNGzH/ufywgjRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHqkpGaJ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F7C1F000E9;
-	Tue, 30 Jun 2026 01:54:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782784456;
-	bh=B3/1fWurN9ZwfutD/RVbG86aLwljhCDdo+Xa5xf/1v8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=hHqkpGaJQZ/0SR/fc48c4cBIj+mWdrFDO8UKytKdciTg23c7xx3EbFJF66JifiDrg
-	 rN8i2sIPMYAp49C7iMCNBEq2P1mVHxc3DmlVS+V4z1KoHmMjYcKirapJZL13JddMs9
-	 UHFLP8H3OJd3Z51J4x/xuLoqkUqiREcvDYvUppq3uEqBrwZ0F/hH2u01VSmkqiwDJR
-	 Ev/Qiex7FXRFW/EK62Ch3jsbBLLHAux7/RuBP/gd+/iwMGxiE/hVgrqkAykIv5yTvx
-	 Xt31Xt/oX2vQasQnBqmCtCBKZ2B8ulVr4QXtn589EjPsf7tSjlGykWV+FVV7jsRPac
-	 SiMpIUi1ZYwsQ==
-Date: Mon, 29 Jun 2026 18:54:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, Weiming Shi <bestswngs@gmail.com>
-Subject: Re: [PATCH net] net: usb: net1080: validate packet_len before
- pad-byte access in rx_fixup
-Message-ID: <20260629185415.56ec8b67@kernel.org>
-In-Reply-To: <20260627212854.4025016-1-xmei5@asu.edu>
-References: <20260627212854.4025016-1-xmei5@asu.edu>
+	s=arc-20240116; t=1782784646; c=relaxed/simple;
+	bh=ZfoG/+QKnrfYCirFVYlyh+Zu0G4dZxrFIRndgI2AFW8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jwCOjZxfKQtrdx0b0koSM8eo5X11+A4QnWjMeTxOxckVp6y5IoK+OxrKB7aqMke2VoJwU16jDoje8AmSkw4rM0UqEUvPhKhRynF2RRsBw9NNy7Cpm8lsPuYaMMGNx80K35R3uJLNHe8vIeAeYRv8JaU/kGvBitDKfKbWTVz3wYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=NevV1SaL; arc=none smtp.client-ip=185.70.43.101
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1782784633; x=1783043833;
+	bh=abt1Km3rhqF/kozSRmSM/863AzbKoF9WEhHJyA3rzFI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=NevV1SaLMK9EaM/8nsFnFZqmVS2NBh1OjbbzFxFVfaaOGt2TJyiSfTafSqCRb/1kC
+	 ZfP4lVW08oP0eo3RQInrKxi3uafn98+8QY+w6IdzssFXST+uWCJ7nWbRxX+Z9lyF3u
+	 BvFeUc/CIqTVBY9/10ejOnclnllSYGV/py6k2bAoKU9c0/tx23FewiEiGJqACI+PCg
+	 dubck7cR7AtA09b6b6XbOzBvlc3qfcsgNWZNTzanOjdHEVaOFxWccD4YX/SFo9SIuz
+	 GxsUHbeCav/RZ81bTCyhL2+bWopMEaQGzig6aZpcMFy30JBXkJJ8wUP/v7+pYvbrCM
+	 rwjn9Swv8rdtQ==
+Date: Tue, 30 Jun 2026 01:57:10 +0000
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>
+From: Esteban Urrutia <esteuwu@proton.me>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/3] arm64: dts: qcom: sm8450: Add IPA support
+Message-ID: <1e151b08-5d3b-4b75-8d71-635617868285@proton.me>
+In-Reply-To: <66330ed6-826a-431e-9e8e-f2998af55168@oss.qualcomm.com>
+References: <20260622-sm8450-ipa-v1-0-532f0299f96e@proton.me> <20260622-sm8450-ipa-v1-1-532f0299f96e@proton.me> <806046b2-20ed-437e-a7e6-b3c0699f5a2d@oss.qualcomm.com> <b1f872f5-66cc-45fc-ad42-c308f8970691@proton.me> <66330ed6-826a-431e-9e8e-f2998af55168@oss.qualcomm.com>
+Feedback-ID: 147889766:user:proton
+X-Pm-Message-ID: ef11aeb475485be296f237c5a719643ca92d8730
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
+	R_DKIM_ALLOW(-0.20)[proton.me:s=protonmail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-302887-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302890-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:elder@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[esteuwu@proton.me,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[esteuwu@proton.me,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[proton.me:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,proton.me:dkim,proton.me:mid,proton.me:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E342B6DFABA
+X-Rspamd-Queue-Id: 77C456DFAFE
 
-On Sat, 27 Jun 2026 14:28:54 -0700 Xiang Mei wrote:
->  	if ((packet_len & 0x01) == 0) {
+On 6/29/26 10:18 AM, Konrad Dybcio wrote:
+> Please alter the size of the register range that I mentioned this under,
+> as the range is wider than what you specified - the driver takes a big
+> offset from this base and accesses far outside the bounds of that range
+Just to make sure:
 
-just add "skb->len &&" to this condition?
+diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qco=
+m/sm8450.dtsi
+index dd151a2c48ec..100daf8120ce 100644
+--- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
+@@ -2643,7 +2643,7 @@ ipa: ipa@3f40000 {
+                        compatible =3D "qcom,sm8450-ipa";
+=20
+                        reg =3D <0 0x3f40000 0 0x10000>,
+-                             <0 0x3f50000 0 0x5000>,
++                             <0 0x3f50000 0 0xb0000>,
+                              <0 0x3e04000 0 0xfc000>;
+                        reg-names =3D "ipa-reg",
+                                    "ipa-shared",
 
-> +		if (packet_len >= skb->len) {
-> +			dev->net->stats.rx_frame_errors++;
-> +			netdev_dbg(dev->net, "bad packet len %d (expected %d)\n",
-> +				   skb->len, packet_len);
-> +			nc_ensure_sync(dev);
-> +			return 0;
-> +		}
--- 
-pw-bot: cr
+Is this what you're referring to?
+
+Regards,
+Esteban
+
 
