@@ -1,206 +1,300 @@
-Return-Path: <netdev+bounces-302866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302868-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ztsvE7ISQ2qSPAoAu9opvQ
-	(envelope-from <netdev+bounces-302866-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:49:54 +0200
+	id 1CK8OdwWQ2o2PwoAu9opvQ
+	(envelope-from <netdev+bounces-302868-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:07:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2AD66DF737
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:49:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82E076DF7FB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:07:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VnLh+17y;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302866-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302866-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302868-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302868-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F39A302B3BE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 00:49:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 594D4301A7CE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2A11FF7C8;
-	Tue, 30 Jun 2026 00:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5E6227BB5;
+	Tue, 30 Jun 2026 01:07:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out28-196.mail.aliyun.com (out28-196.mail.aliyun.com [115.124.28.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815871A0712;
-	Tue, 30 Jun 2026 00:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5D81A680B;
+	Tue, 30 Jun 2026 01:07:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782780579; cv=none; b=dGiitqoFEFNkUnBQqhCnoB7nqt/Me8/DUaLyPjqCftU1D3jYV87NopFeog6YJCmKPQYA7SYKlCI/M/ybrTiyGOfdIqrVOX/JQRE3BF1/JYaf5dMSA49lFfNvIak6nAENTR2YeFI2GzluYxW8y4khJZ1z+xVW1u1hl16T1FPjBSM=
+	t=1782781654; cv=none; b=TKwpp695/Z4Dyyr0PgiOY+4gFQ5ZIw0uG0eYweZSFB2BMbYkLWrPlassCq1wPW1QtsBStTUYnQ7YGo0q6SQgL5/Z4LaerXMZyr3MOjM0Z+lx11c/C2eAIMTol/aH/qLrtTsxxp61wt/B0Ovim07keYI7DoSHfWStRLJyrTTesrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782780579; c=relaxed/simple;
-	bh=VMOUGsQgwQaA6cIYlgVOPIuJcEs6lZJAx9KSb6ElPtc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TTYf3HyDvvE1KErl1iss/3adVa9oQs9SytoZzMk0yqNSKzeDEdqL0nnWVsc0uQWBeQhO6NifQ9U/8rb7dRHhnP6w3jABH2/YCN0sP7xglDqS9NrHCUb3nBJeXWf3m8n5fkcYLSyd40GEEGQG62s+60bYhgXdVb/SbSsRX8C6kSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VnLh+17y; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF7171F000E9;
-	Tue, 30 Jun 2026 00:49:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782780578;
-	bh=Zof0jopAn7x+s0cuQEES7bZ2HEtdi52fhlQDCm29N2Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VnLh+17yELpPOLHLoJwfatYSfg2lbeaP5YMmmwsL9CfdWLGEs67tIwuSYVXhEQS5Q
-	 Hpq+bFKE8NPcZYqwaDD3ldqj4pOLbEogA8KKdZVrOl/08tNBsVushEyP9VEM28KPt1
-	 B1fwIAJALowXfxZfIFOQho5Fh+Im+5n8J6yMBi1J36m8AaDnVnxQ/umqxk+duIdSd4
-	 J+rpWhstmRpTLZw4nAh2ilhfdI2Wd0Ht/R0RL/Fe+9mvwqp5JEzml3WBrWlwbtU2hr
-	 p7UckCpDeoXew3DB6cgVGsxgwftZidH9w5HCsdLRiCrkmM7X5yCytkBvHwuQFrOtSt
-	 mKdljkBA/u8rQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: yun.zhou@windriver.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	marcin.s.wojtas@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
+	s=arc-20240116; t=1782781654; c=relaxed/simple;
+	bh=8DoqfnWWQmTyJVvYFUfKWphlzccuhD94QfIeg5/Zu5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F99nV06SLBlh5YsY0dPKMZn4pGuygCKl9WoRjkPo7C9kkbK13ASObmbppWdfpTqYqOqNmbtOsCV5gSI1n/DNcRsmtzdD5RJDcyUmcYBuI63AiM+oORadaDteEr+wqk5iI1zH4TD2227m5byuctUpP4tXCtzomMvyKpEScv46ukk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.196
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.06965154|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.121804-0.00949711-0.868699;FP=2770271054365984402|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033023018039;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=18;RT=18;SR=0;TI=SMTPD_---.i91QMr4_1782781641;
+Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.i91QMr4_1782781641 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 30 Jun 2026 09:07:22 +0800
+From: "illusion.wang" <illusion.wang@nebula-matrix.com>
+To: dimon.zhao@nebula-matrix.com,
+	illusion.wang@nebula-matrix.com,
+	alvin.wang@nebula-matrix.com,
+	sam.chen@nebula-matrix.com,
+	netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	corbet@lwn.net,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-doc@vger.kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5] net: mvneta_bm: add suspend/resume support to prevent crash after resume
-Date: Mon, 29 Jun 2026 17:49:28 -0700
-Message-ID: <20260630004927.2247546-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260625030925.956765-1-yun.zhou@windriver.com>
-References: <20260625030925.956765-1-yun.zhou@windriver.com>
+	vadim.fedorenko@linux.dev,
+	lukas.bulwahn@redhat.com,
+	edumazet@google.com,
+	enelsonmoore@gmail.com,
+	skhan@linuxfoundation.org,
+	hkallweit1@gmail.com,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v20 net-next 00/10] nbl driver for Nebulamatrix NICs
+Date: Tue, 30 Jun 2026 09:07:02 +0800
+Message-ID: <20260630010718.4346-1-illusion.wang@nebula-matrix.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302868-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[nebula-matrix.com];
+	FORGED_RECIPIENTS(0.00)[m:dimon.zhao@nebula-matrix.com,m:illusion.wang@nebula-matrix.com,m:alvin.wang@nebula-matrix.com,m:sam.chen@nebula-matrix.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:kuba@kernel.org,m:horms@kernel.org,m:linux-doc@vger.kernel.org,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:lukas.bulwahn@redhat.com,m:edumazet@google.com,m:enelsonmoore@gmail.com,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-302866-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:yun.zhou@windriver.com,m:kuba@kernel.org,m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,lwn.net,kernel.org,vger.kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,2.ai:url,nebula-matrix.com:email,nebula-matrix.com:mid,nebula-matrix.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A2AD66DF737
+X-Rspamd-Queue-Id: 82E076DF7FB
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: mvneta_bm: add suspend/resume support to prevent crash after resume
-    
-This commit adds suspend and resume callbacks to the mvneta Buffer Manager
-driver to safely drain and reinitialize buffers across power cycles. It also
-adds a device link to guarantee correct PM ordering between mvneta and the BM
-hardware.
+From: illusion wang <illusion.wang@nebula-matrix.com>
 
-> diff --git a/drivers/net/ethernet/marvell/mvneta_bm.c b/drivers/net/ethernet/marvell/mvneta_bm.c
-> index 6bb3804949190..c23982bfc20b8 100644
-> --- a/drivers/net/ethernet/marvell/mvneta_bm.c
-> +++ b/drivers/net/ethernet/marvell/mvneta_bm.c
+This patch series represents the first phase. We plan to integrate it in
+two phases: the first phase covers mailbox and chip configuration,
+while the second phase involves net dev configuration.
+Together, they will provide basic PF-based Ethernet port transmission and
+reception capabilities.
 
-[ ... ]
+After that, we will consider other features, such as ethtool support,
+flow management, adminq messaging, VF support, debugfs support, etc.
 
-> @@ -477,6 +477,68 @@ static void mvneta_bm_remove(struct platform_device *pdev)
->  	clk_disable_unprepare(priv->clk);
->  }
->  
-> +static int mvneta_bm_suspend(struct device *dev)
-> +{
-> +	struct mvneta_bm *priv = dev_get_drvdata(dev);
-> +	int i;
-> +
-> +	/* Drain buffers and free pool resources while BM is still clocked */
-> +	for (i = 0; i < MVNETA_BM_POOLS_NUM; i++) {
-> +		struct mvneta_bm_pool *bm_pool = &priv->bm_pools[i];
-> +		int size_bytes;
-> +
-> +		if (bm_pool->type == MVNETA_BM_FREE)
-> +			continue;
-> +
-> +		mvneta_bm_bufs_free(priv, bm_pool, bm_pool->port_map);
-> +		if (bm_pool->hwbm_pool.buf_num)
-> +			dev_warn(&priv->pdev->dev,
-> +				 "pool %d: %d buffers not freed\n",
-> +				 bm_pool->id, bm_pool->hwbm_pool.buf_num);
-> +
-> +		mvneta_bm_pool_disable(priv, bm_pool->id);
-> +
-> +		if (bm_pool->virt_addr) {
-> +			size_bytes = sizeof(u32) * bm_pool->hwbm_pool.size;
-> +			dma_free_coherent(&priv->pdev->dev, size_bytes,
-> +					  bm_pool->virt_addr,
-> +					  bm_pool->phys_addr);
-> +			bm_pool->virt_addr = NULL;
-> +		}
+Starting from V20, I have dropped the old Patch 3 titled "P4
+configuration invoked during chip initialization". This functionality
+will be reimplemented in next phase using the request_firmware() API
+with an external firmware blob.
 
-[Severity: High]
-This is a pre-existing issue, but does this introduce a double free during
-suspend if mvneta_bm_pool_create() partially failed?
+changes v19->v20
+Link to v19:https://lore.kernel.org/netdev/20260617044702.2439-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v18->v19
+Link to v18:https://lore.kernel.org/netdev/20260611044916.2383-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v17->v18
+Link to v17:https://lore.kernel.org/netdev/20260601093149.25905-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v16->v17
+Link to v16:https://lore.kernel.org/netdev/20260526035453.2359-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v15->v16
+Link to v15:https://lore.kernel.org/netdev/20260520032950.4874-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v14->v15
+Link to v14:https://lore.kernel.org/netdev/20260513011649.4404-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v13->v14
+Link to v13:https://lore.kernel.org/netdev/20260428114910.2616-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v12->v13
+Link to v12:https://lore.kernel.org/netdev/20260415033608.2438-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v11->v12
+Link to v11:https://lore.kernel.org/netdev/20260408093739.56001-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v10->v11
+Link to v10:https://lore.kernel.org/netdev/20260401022318.28550-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Mohsin
+2.AI review issues
+changes v9->v10
+Link to v9:https://lore.kernel.org/netdev/20260325040048.2313-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Jakub
+2.AI review issue
+changes v8->v9
+Link to v8:https://lore.kernel.org/netdev/20260317034533.5600-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Jakub
+2.AI review issue
+Changes v7→v8
+Link to v7:https://lore.kernel.org/netdev/20260310120959.22015-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Paolo
+Changes v6->v7
+Link to v6:https://lore.kernel.org/netdev/20260306033451.5196-1-illusion.wang@nebula-matrix.com/
+1.Issue found by Jakub
+2.AI review issue
+Changes v5->v6
+Link to V5:https://lore.kernel.org/netdev/20260226073840.3222-1-illusion.wang@nebula-matrix.com/
+1.put all standard linux includes files the .c file which needs it & others
+--Andrew
+2.AI review issue
+Changes v4->v5
+Link to V4:https://lore.kernel.org/netdev/20260206021608.85381-1-illusion.wang@nebula-matrix.com/
+1.change nbl_core to nbl & change ** pointers to *pointers & others
+--Andrew
+2.AI review issue
+Changes v3->v4
+Link to v3: https://lore.kernel.org/netdev/20260123011804.31263-1-illusion.wang@nebula-matrix.com
+1.cut down to part of a mini driver(mailbox and chip init)
+--Jakub Kicinski Simon Horman(some sort of staged approached)
+2.modify issues found by ai.
+3. Reverse Christmas tree/nbl_err/devm_kfree/remove some macros/
+void type to real type/others
+--Andrew Lunn
+4.change deprecated pci_enable_msix_range to pci_alloc_irq_vectors
+5.delete service layer
+6.the style of kconfig---Randy Dunlap
+7.add to Documentation/networking/device_drivers/ethernet/index.rst
+--Simon Horman
+Changes v2 →v3
+Link to v2: https://lore.kernel.org/netdev/20260109100146.63569-1-illusion.wang@nebula-matrix.com/
+1.cut down to a mini driver:
+    delete vf support
+    use promisc mode to cut down flow management
+    drop patch15 in v2
+    delete adminq msg
+    delete abnormal handling
+    delete some unimportant interfaces
+2.modify issues found by ai review
+Changes v1->v2
+Link to v1: https://lore.kernel.org/netdev/20251223035113.31122-1-illusion.wang@nebula-matrix.com/
+1.Format Issues and Compilation Issues
+- Paolo Abeni
+2.add sysfs patch and drop coexisting patch
+- Andrew Lunn
+3.delete some unimportant ndo operations
+4.add machine generated headers patch
+5.Modify the issues found in patch1-2 and apply the same fixes to other
+patches
+6.modify issues found by nipa
 
-If mvneta_bm_pool_create() succeeds at dma_alloc_coherent() but fails a
-subsequent check, the error path calls dma_free_coherent() but leaves
-bm_pool->virt_addr as a dangling pointer:
+illusion wang (10):
+  net/nebula-matrix: add minimum nbl build framework
+  net/nebula-matrix: add our driver architecture
+  net/nebula-matrix: channel msg value and msg struct
+  net/nebula-matrix: add channel layer
+  net/nebula-matrix: add common resource implementation
+  net/nebula-matrix: add intr resource implementation
+  net/nebula-matrix: add vsi resource implementation
+  net/nebula-matrix: add Dispatch layer implementation
+  net/nebula-matrix: add common/ctrl dev init/remove operation
+  net/nebula-matrix: add common dev start/stop operation
 
-drivers/net/ethernet/marvell/mvneta_bm.c:mvneta_bm_pool_create() {
-    ...
-    dma_free_coherent(&pdev->dev, size_bytes, bm_pool->virt_addr,
-                      bm_pool->phys_addr);
-    return err;
-}
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/nebula-matrix/nbl.rst            |   28 +
+ MAINTAINERS                                   |   10 +
+ drivers/net/ethernet/Kconfig                  |    1 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/nebula-matrix/Kconfig    |   34 +
+ drivers/net/ethernet/nebula-matrix/Makefile   |    6 +
+ .../net/ethernet/nebula-matrix/nbl/Makefile   |   15 +
+ .../nbl/nbl_channel/nbl_channel.c             | 1099 +++++++++++++++++
+ .../nbl/nbl_channel/nbl_channel.h             |  167 +++
+ .../nebula-matrix/nbl/nbl_common/nbl_common.c |  217 ++++
+ .../nebula-matrix/nbl/nbl_common/nbl_common.h |   33 +
+ .../net/ethernet/nebula-matrix/nbl/nbl_core.h |   58 +
+ .../nebula-matrix/nbl/nbl_core/nbl_dev.c      |  478 +++++++
+ .../nebula-matrix/nbl/nbl_core/nbl_dev.h      |   58 +
+ .../nebula-matrix/nbl/nbl_core/nbl_dispatch.c |  525 ++++++++
+ .../nebula-matrix/nbl/nbl_core/nbl_dispatch.h |   43 +
+ .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c  |  913 ++++++++++++++
+ .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h  |  368 ++++++
+ .../nbl_hw_leonis/nbl_resource_leonis.c       |  287 +++++
+ .../nbl_hw_leonis/nbl_resource_leonis.h       |   12 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h     |   74 ++
+ .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.c  |  267 ++++
+ .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.h  |   21 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_resource.c   |  143 +++
+ .../nebula-matrix/nbl/nbl_hw/nbl_resource.h   |  111 ++
+ .../nebula-matrix/nbl/nbl_hw/nbl_vsi.c        |   26 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_vsi.h        |   12 +
+ .../nbl/nbl_include/nbl_def_channel.h         |  360 ++++++
+ .../nbl/nbl_include/nbl_def_common.h          |   81 ++
+ .../nbl/nbl_include/nbl_def_dev.h             |   16 +
+ .../nbl/nbl_include/nbl_def_dispatch.h        |   42 +
+ .../nbl/nbl_include/nbl_def_hw.h              |   54 +
+ .../nbl/nbl_include/nbl_def_resource.h        |   38 +
+ .../nbl/nbl_include/nbl_include.h             |   79 ++
+ .../nbl/nbl_include/nbl_product_base.h        |   19 +
+ .../net/ethernet/nebula-matrix/nbl/nbl_main.c |  302 +++++
+ 37 files changed, 5999 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/nebula-matrix/nbl.rst
+ create mode 100644 drivers/net/ethernet/nebula-matrix/Kconfig
+ create mode 100644 drivers/net/ethernet/nebula-matrix/Makefile
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/Makefile
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dev.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dispatch.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_resource.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_product_base.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
 
-Since the caller mvneta_bm_pool_use() already set the pool type to something
-other than MVNETA_BM_FREE, won't this new suspend handler see the non-NULL
-virt_addr and call dma_free_coherent() on it a second time?
-
-> +		bm_pool->type = MVNETA_BM_FREE;
-
-[Severity: Medium]
-Will this cause a lockdep warning by re-initializing an active lock class?
-
-By setting the type to MVNETA_BM_FREE here, the resume path (which calls
-mvneta_resume() -> mvneta_bm_port_init() -> mvneta_bm_pool_use()) will treat
-this as a completely uninitialized pool.
-
-This causes mvneta_bm_pool_use() to unconditionally call:
-
-    mutex_init(&hwbm_pool->buf_lock);
-
-Because the priv->bm_pools array is preserved across suspend, the mutex
-was already fully initialized during probe. Doesn't re-initializing the
-mutex across suspend/resume cycles reset its internal lockdep state and
-wait queue?
-
-> +	}
-> +
-> +	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_STOP_MASK);
-> +	clk_disable_unprepare(priv->clk);
-> +	return 0;
-> +}
 -- 
-pw-bot: cr
+2.47.3
+
 
