@@ -1,147 +1,288 @@
-Return-Path: <netdev+bounces-303104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303110-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DHqIN02kQ2qHeAoAu9opvQ
-	(envelope-from <netdev+bounces-303104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:11:09 +0200
+	id aVe6FtamQ2o+eQoAu9opvQ
+	(envelope-from <netdev+bounces-303110-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:21:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBDC96E3654
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:11:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E976E3870
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:21:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TJb3XyLl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303104-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303104-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=dDWfEa30;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303110-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303110-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 477E830135FC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:10:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AEC7329E7DF
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868D73F86FE;
-	Tue, 30 Jun 2026 11:09:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED95409616;
+	Tue, 30 Jun 2026 11:11:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2457E3FBB72;
-	Tue, 30 Jun 2026 11:09:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782817775; cv=none; b=KUdSA4r6zp/tWfk5ed1SCKm0GgfqwPEGykwQBiknJQ96ozTVaWWWQUMeDHDcvQ9EOfEeGpEDwldIhfDk1+jaYsd3bVAKRkUp4zaD/JO+1C8LZ7OTzql+W83WM9iOVMj2BqO9SGHeb/DBsFe0fl/mvxkL2sR2iaBV/q2OnM+ZR30=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782817775; c=relaxed/simple;
-	bh=LDtINCcCDbAQN/lDJwIzHf34H7YwfSI1iyKLb8sI5Ac=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=mpOJTirwZp/nZgrsOeN42+Jkk1H2+XWD6b0LfYZxfMvCprs2Y9GTraVrLWY4YGXisI3yhEjp8yi7yILHWuqQRLrsbXkbjMDnfFo2Q7auPZWszWG1n9ARaS/JTwkqHH1l78kuBYLxmBQnq6XpDoSgv+iHia7q5bhe/3SEzCH3MIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJb3XyLl; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C0691F000E9;
-	Tue, 30 Jun 2026 11:09:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782817773;
-	bh=3KMj5bAXV72/vr7i0iWBQZicBPu9LajLdf1dnb0ON3o=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=TJb3XyLlV69QofssxSQ6LDnIqB9DgMuYHF2J+gykUHK+WcbxktgXa8N260MmTValQ
-	 dLgHkDs/vbXl6qrTn6559/gkWvt7gmK/zqvAeJfz93dndhWCX+yXpYwNHlZdGkluN+
-	 oH8LmrzMh4u84voT8ohJ2rCaOKzCvgJaoLNosUePGuchunDF0XbH8C7MO+ZxaLogWr
-	 4aAf5Eadof5NzP1A7Xq/yQxNVJIEiLJE6PCcYsgX2TxQJEiOIkNg6xI35xWjjOjkmL
-	 yKnSM15co6nI0S8bo9r7sPnWNtY2wL1wvCOIFZunJ+X7gVe8fAJuhvxnLclM9Ogsbt
-	 FRFIuSXnYEnzQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603D8409610
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:11:39 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782817900; cv=fail; b=iZbZQzzd+0Mz76j1cwOBjkuQRSQj/DKOUf1GXJiJvv/oEZfaoDKE813ErvOmnRGnRyzfSuVxI1Ggsr/L9GeJOdhubPNC/vo5mc/QJxM5lguhr9dDJZBGMWv/edCyWmm3XsFBbKsd/pEGgCWLyiCkjbe0lSY/iWGGHb+50x+e5wc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782817900; c=relaxed/simple;
+	bh=h3fJL+zlXJ4ehITEH5ctqNzra8UeBbtFZiNDWwsSSbQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Q0VH0vq4RrdhIzfkdgotKsnWA2rld2z9kYfDPuuptEmKvGSu+C6y2t5Lyy6nTlpf9zE4G8AWFXq62t/MgoLsuHE9rv9q/ZZ0nRntbzNzgrvWby0p6esqZJbLLhwae84nT18UcXA+OIgCvW/sDQH9DwtfsRIvgmvLI5aKb+JT0vk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dDWfEa30; arc=fail smtp.client-ip=192.198.163.9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782817899; x=1814353899;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=h3fJL+zlXJ4ehITEH5ctqNzra8UeBbtFZiNDWwsSSbQ=;
+  b=dDWfEa30DZbIupIUEB5DZBsIrakdWGPxFashaFns8z7bKtlRcnZ8sCiJ
+   F6LD+D1DncfCI/vm7fFYNp7upabynbCM8llplVOr4VfsBGghv0nn1df3D
+   fFZyKX5MZQMLhQy5RNta750pwJOVo19GggbiRYMrmcuvSn705ntFBoDDx
+   nsR+2qdJnz1EgEPAoNNzp4v4MbRSWhSCSqcz9AXxKdBLFdj+rU70J/rHa
+   jz57tJS3uKFfvntURYPBNNlOkftBpXLodGwVcB3IeIk7lX6l+WMHJRkVV
+   tlI/EvrtQg/Ee1OLZHCzUz6+kHuUI7xKXMyeZ6r9TNP5nnkytRCWnYuQg
+   w==;
+X-CSE-ConnectionGUID: Ymou/x0GSzW6kkD1D7cydw==
+X-CSE-MsgGUID: 4MIQxYNWSc+fRdhd7zYDjQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11832"; a="94181244"
+X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
+   d="scan'208";a="94181244"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 04:11:37 -0700
+X-CSE-ConnectionGUID: qAW6Nh2qTeCitroUrzEWnQ==
+X-CSE-MsgGUID: TTNuRvDKQ3KHO+MMr7uA6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
+   d="scan'208";a="254149659"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 04:11:37 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Tue, 30 Jun 2026 04:11:37 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Tue, 30 Jun 2026 04:11:37 -0700
+Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.41) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Tue, 30 Jun 2026 04:11:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NGt8/U+BvDZUO9srNV3nKR7ddJ/TBjfHL6lgR3O6/L1hTOL8vTz2vMnJLdqRdq23tbrEXbAGIWnFwcc9xiTAXxY0pYEmecRVz4NFMeLjpJCz/SojhSk37Wk8Vvx+u2bppeLdyJRsYCjE4zui8aNk63lffOkgyG3yHMy/hyc5zPe9eJML5oG9bmmLXzk4eH2hk3xmaJGX1gO4lnRbOj3tlhckHZvcf1jC4QZtptbM2y7mE6iyMfSLwUL2+zco8XKhP6UtGLxqZrrfmHDuiibDFaL8vMtUSJGHGGEARFWIZBuAQVKXCzl2elITyve0QooHFawRk7JF2FgXP8/JmaqeDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w3jR9MWMpHsJPzgge6Xdf+jjA5mKvESqZ3ixlJeHXEc=;
+ b=l/bgDacUtPv+pseCqaANlqecdQ64sOCtyrBLCnf34zWqDpdxs0Egv+12bSr8BwsX8pmBHJb3l5DO3r3ZqdsFsOjrgf2z8pxz4jWy7kjz8jPsmD64O7cMdeOt1fmltE5JETRMA9VQc8w0y2OBx+7V9DWXYHBzBHM4yqHoqAA39ofJ671V1386RzE7dx5El4uLUt9WJbpSZ38gg72V7okngKNRvuBgyzG4jSZRfdOtErhsI7pT7NJtNdpYaO7oBfKeeOM12Yt5WeODuKt1YYLbdRUtMXxHm3MbyVCnmOPS0UE6AVS2xWiejoi0z7ZAmoEGyMxd0dNpvHCUwlWBML8PGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com (2603:10b6:8:6e::21) by
+ CY2PR11MB637721.namprd11.prod.outlook.com (2603:10b6:930:110::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Tue, 30 Jun
+ 2026 11:11:34 +0000
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485]) by DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485%6]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
+ 11:11:33 +0000
+Date: Tue, 30 Jun 2026 13:11:22 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: <intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <przemyslaw.kitszel@intel.com>,
+	<jacob.e.keller@intel.com>
+Subject: Re: [PATCH v4 net 1/3] i40e: unregister netdev before clearing VSI
+ on reinit failure
+Message-ID: <akOkWl/5iI0oO2vr@boxer>
+References: <20260625151431.1102838-1-maciej.fijalkowski@intel.com>
+ <20260625151431.1102838-2-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260625151431.1102838-2-maciej.fijalkowski@intel.com>
+X-ClientProxiedBy: VI1PR04CA0067.eurprd04.prod.outlook.com
+ (2603:10a6:802:2::38) To DM4SPRMB0045.namprd11.prod.outlook.com
+ (2603:10b6:8:6e::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: Mask socket type flags in
- mptcpify prog
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Guillaume Maudoux <layus.on@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Matthieu Baerts <matttbe@kernel.org>, 
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org, mptcp@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260630095723.564392-1-layus.on@gmail.com>
-References: <20260630095723.564392-1-layus.on@gmail.com>
-Date: Tue, 30 Jun 2026 13:09:22 +0200
-Message-Id: <178281776277.2535326.16467031353021194373.b4-review@b4>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1067; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=LDtINCcCDbAQN/lDJwIzHf34H7YwfSI1iyKLb8sI5Ac=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGLKcF7+aGNfXv+Rfxg/NHud1t2xzJBzkuYxqjhmnZr8rn
- 394z7KmjlIWBjEuBlkxRRbptsj8mc+reEu8/Cxg5rAygQxh4OIUgIm4ZzH8L75basBx51rk3cTZ
- R5u+77M6pXH4I88Xv7lJ8+KeVFiYGDL8D7B5Kfbv5LnC5/WLVCWfVD7v520oW9bBVvbsqP6Z4KQ
- fbAA=
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4SPRMB0045:EE_|CY2PR11MB637721:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b0ccf0e-fd9c-4d58-fb96-08ded6985835
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|22082099003|18002099003|4143699003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info: +dDzJzMz1S8+jJILzSEiY65lMohJ1Qj8n1GDgW+C89K7XD3BD/zQpw6h14xTtrdBlWSGWC35/QhXupnVT6kjH31SSjTI/eREZPoJJVBbDQE9pPIg0gzxc+kl2Ol2uUcY1q2VtGsspoX0yRJh+Vk/5PpMROv0m9Ytg/ZDcQtfZI9TNz7HiarZyLfJh6lBb4OG/GW8xtxec4FyFL6iVbMpk0HfsrAzoaTfPVVQf6iFbqCMHdmPAz8+l9UJ8dtskQqklPa7eaIVuTN6LmU8BXox/fM5KoLZSN8FQBpg54MzbVRKIreoMMOWZ54JWL5mEVm+T7o38AE74u147+FBPLH32USAu8ENdo08ZS54EXBQcwDJ3mvNpFbilqVYXkyCdP/OIT0+7jRQE9JB7H2XC1JEQfa4TvrTHCO2CJW78p1P67vM5Fq5wTowbBHUQIzotxA2ztxcS2khutW1Bl55zP3jkY9DsCGz3WRt2LDakFQuZuCFsON6RmXpC7OeVnw5xPdsbE+0Foab/qODWvJIiyTwINeIzma7qOp7B1yrONtkASfh6X+QOJNT8MjWmT6mnp7MaUltGD5V1QNO7aCIPR5r73BE8zowHdfP4mNv2KWHqoKHwx+XhG/o7O9/mIRFOOcALWWCxS2EJbZai0TiShi6apAm3mI8w/QD3wwZM+i9gRI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4SPRMB0045.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(22082099003)(18002099003)(4143699003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BmXBbxUEf7BwNXXkqx1JX7fwejXjdDoetfkplRwmFhb/KTdHentud1y5vZEZ?=
+ =?us-ascii?Q?0PxG5mZVk/Psuh2vr5a5v/En3oT1AnJ2W8EnBHoSw3kilFHNUpsJhUGhDmFO?=
+ =?us-ascii?Q?qbNU6/RmU4LBAYQXSxXlAL1ITGfrlyuk6MwvOWZ27GZfTG2pB78lXLeL+jLA?=
+ =?us-ascii?Q?xkdqGqGXQz7hfsCOs0TqhXrl16DBNGonjq6Ivyqo5Lhqk7IghQUsgJ6L7tFV?=
+ =?us-ascii?Q?bNcM6m+8Or+fU2dps8O+RRHWnuqqTbYN2rLfyQM/41Z0VkiJUjf4Yq0LK1p5?=
+ =?us-ascii?Q?7tUWC5nqOAWAXMaQwIhFQI4Z6VAXuOBNpt1COun72HvQ8CkwcSxifG69Azyp?=
+ =?us-ascii?Q?6VTwxMckH858tSQXTGJAKVF/hbRYmiR53Mu7tvQ2jnkzm7bKNhelJFQTchP7?=
+ =?us-ascii?Q?T03gFqMSo3brUXaj7JlR5wC7M2RBAp4RNRcz7vUQ99a1J6110ek+5mGHUFf+?=
+ =?us-ascii?Q?GakxkLtImFC29/Nr75nZgCCGj0OT8oeyUQeGLGzvnyCreNxAYb0iaGPQeGPo?=
+ =?us-ascii?Q?gK8jo/YytkTLJK+mw9hTEGZSQLTPmisYugCL6UFY/NU7WknRSizNQ9r7+qzg?=
+ =?us-ascii?Q?/1z+/8lZp92OUzF1ap8LVOgB7Q+gUgxajYkTtuSpjYvYert5LgXcQM7N5W85?=
+ =?us-ascii?Q?v7nPTjKYB2ssBXw7jc76l+UZ/7DaiygXDegDGmCQdZI9iTo9K+jgRKroG+xf?=
+ =?us-ascii?Q?381DlDfs5I0gUem3a6mY6XY4TxXuNmKQT+uR9Lc6iT6gCvc54d+U0iKJ6mnB?=
+ =?us-ascii?Q?a3djIRL14Uvamalb5WrdEMlUt3zLFm7Tksa+Ff0D0NZ3gfThQbENB5Jo8iLQ?=
+ =?us-ascii?Q?DPzapL1/0cQpAV9oSNHIt9+dmS4AD/OIItxecEetGZNysxOPozO9NA9OlUkT?=
+ =?us-ascii?Q?6msxrIQJjqWcYryB14dQxoN3DMgpLfknzF9zfq26wUEqF8R/w5iXbMVmt4UM?=
+ =?us-ascii?Q?SxSGrRCKMaG55tjht2PXi4FHSprFNgG9YvRdFnZ3LO6c+nOpF0e4hKdxTQCr?=
+ =?us-ascii?Q?GNNgzzA+Vgb112IxRMMYFlgV7e4qxXRgf84MZgTMG8lfnQ5aU5e92T9Sr7JW?=
+ =?us-ascii?Q?gFUXzuD+zRQ5rj0GyBgqHDAfBwcC8hjqZuJl2WbdGIKR1Pi/J01JQUAqqmQr?=
+ =?us-ascii?Q?r3j3FGFKcE1hRM2gusoc1pFarrVT2/wbpmXXMd0NlDIU0ZBZsfrXE32vFK7v?=
+ =?us-ascii?Q?3ygRxdt4y7MP5pEnI7errxGxAHw2ZEGGHqkd9egYCf1SBE/pb2gP2+mBgJYp?=
+ =?us-ascii?Q?p5VYraJo83YNvBaY++Zgt2199rdvSrMzumQmhXV3RQq1CwQ5/G16jf6+/OfW?=
+ =?us-ascii?Q?Isaln/M38fssfSJ/YGAhsZfixEL5tOAVTdq9sbs37w7bVgXR6EUQFjzfJKyK?=
+ =?us-ascii?Q?DbPLwXLI3zEIa8r2/8+hNdy3SxNEk5Op+IotkNY2lZgnbbZTMML/ZGm1njC3?=
+ =?us-ascii?Q?8kk5oYS0kX0zUGEjYIS671DxZDD/5S/91dOPt1f4Pwm/u8ZK038TbTmROlpU?=
+ =?us-ascii?Q?w3pXvyR2IaOQG+oh1FyEN/OIr0ma9oLLt7m7U9iO+QDUsaOznoChea7iSoue?=
+ =?us-ascii?Q?qJrZs27AtBkJeraU5fjthB693TL9z2kGZgu6yBpok1nr6B4bWlQ7Wbcu1rv2?=
+ =?us-ascii?Q?N4mdI569I7vEs+4Jak9XFDVjezYGrQDXa4vpbxo2W9Ha+yOCsBtr9fHwzUS6?=
+ =?us-ascii?Q?Uz/JxX4eQpiSUDDnPkmEVs8CpZPPDee4+MaswYY00al/a2OjtLcQ7Quw4nZv?=
+ =?us-ascii?Q?Ruh1+ocBTWo2HHNZt7203BvrpLriF1g=3D?=
+X-Exchange-RoutingPolicyChecked: L1NWtTL/1XJ3NGKyc+yY8KaSDoqRKmmeTALex/vn+sxZrSonTw8ZAyqgbiXJNILB2dqAGULQLvyk2nHI1LIXb3Oj8XMhoz7Vj9pr4isC9BhKEplVXAQuOZS7BYWno0Bk+jd8t/84YW6r5LJn6zzTVkBPuyLgJxgJJgftKeGUWAL9/ljYgcLo5/fTPe9jI0NO/ffB/qQrpEGy79fLhBCg6foHg/ufvfg+qWATI3M2VCQGLvFP22cESRaPSecCkhDl9IIADxIZrhl2d6hI3PIJkEui8XyTFOCFX24vAmsfIcUE2gFTm3whkB8ePKAmcljKDsLJ8wIdJrga5MtYhlJnRg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b0ccf0e-fd9c-4d58-fb96-08ded6985835
+X-MS-Exchange-CrossTenant-AuthSource: DM4SPRMB0045.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 11:11:33.7930
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W7z8Z9gVVDMJZyc+u9uyObmHUC1bJKwyRnRL0LXWmISFuCAFw2ej5XMvBF0DOc8g0p2dktfKpABs5MnS76Qj04uyXpiK8PaSgOX3xg6M7As=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY2PR11MB637721
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-303110-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:layus.on@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:shuah@kernel.org,m:bpf@vger.kernel.org,m:mptcp@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:layuson@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:from_mime,boxer:mid];
+	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:magnus.karlsson@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:przemyslaw.kitszel@intel.com,m:jacob.e.keller@intel.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-303104-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,vger.kernel.org,lists.linux.dev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CBDC96E3654
+X-Rspamd-Queue-Id: C4E976E3870
 
-Hi Guillaume,
+On Thu, Jun 25, 2026 at 05:14:29PM +0200, Maciej Fijalkowski wrote:
+> i40e_vsi_reinit_setup() tears down the existing VSI queue/ring backing
+> state before allocating replacement arrays and queue tracking. If one of
+> these early allocations fails, the function jumps directly to err_vsi
+> and calls i40e_vsi_clear().
+> 
+> For a registered netdev, this frees the VSI while
+> netdev_priv(netdev)->vsi can still point at it, leaving the registered
+> netdev with dangling private driver state.
+> 
+> Split the error path so failures after destructive reinit teardown first
+> unregister and free the netdev before clearing the VSI.
+> 
+> Fixes: d2a69fefd756 ("i40e: Fix changing previously set num_queue_pairs for PFs")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index a04683004a56..471fa7f7b643 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -14274,7 +14274,7 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
+>  	i40e_set_num_rings_in_vsi(vsi);
+>  	ret = i40e_vsi_alloc_arrays(vsi, false);
+>  	if (ret)
+> -		goto err_vsi;
+> +		goto err_netdev;
+>  
+>  	alloc_queue_pairs = vsi->alloc_queue_pairs *
+>  			    (i40e_enabled_xdp_vsi(vsi) ? 2 : 1);
+> @@ -14284,7 +14284,7 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
+>  		dev_info(&pf->pdev->dev,
+>  			 "failed to get tracking for %d queues for VSI %d err %d\n",
+>  			 alloc_queue_pairs, vsi->seid, ret);
+> -		goto err_vsi;
+> +		goto err_netdev;
+>  	}
+>  	vsi->base_queue = ret;
+>  
+> @@ -14309,6 +14309,7 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
+>  
+>  err_rings:
+>  	i40e_vsi_free_q_vectors(vsi);
+> +err_netdev:
+>  	if (vsi->netdev_registered) {
+>  		vsi->netdev_registered = false;
+>  		unregister_netdev(vsi->netdev);
 
-Thank you for sharing this fix!
+Sashiko says:
+---
+Could this result in a deadlock when called during a device rebuild?
+Looking at i40e_rebuild(), it explicitly acquires the RTNL lock before
+proceeding:
+drivers/net/ethernet/intel/i40e/i40e_main.c:i40e_rebuild() {
+    ...
+	if (!lock_acquired)
+		rtnl_lock();
+	ret = i40e_setup_pf_switch(pf, reinit, true);
+    ...
+}
+If i40e_setup_pf_switch() calls i40e_vsi_reinit_setup() and takes this new
+err_netdev path, unregister_netdev() will unconditionally attempt to acquire
+rtnl_lock(), leading to a deadlock on the non-recursive mutex.
+---
 
-> The mptcpify BPF prog upgrades eligible TCP sockets to MPTCP, but only
-> when the socket type is exactly SOCK_STREAM. Its update_socket_protocol()
-> hook runs on the raw type from userspace, before the socket core masks
-> it with SOCK_TYPE_MASK, so the type may still carry SOCK_CLOEXEC or
-> SOCK_NONBLOCK in its upper bits and the equality check fails.
->
-> As a result, a socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0) -- what
-> common libraries do by default -- is silently left as plain TCP. This
-> was hit in practice with curl. Since mptcpify.c is referenced as example
-> code for enabling MPTCP transparently, the same mistake is likely to be
-> copied into real deployments where it fails the same way and is hard to
-> diagnose.
+which is another valid concern. I'll take a stab at addressing this, but
+looking at a bigger picture, we don't propagate errors from rebuild path,
+so I wouldn't be surprised that in the next iteration Sashiko would point
+it out. I'd say that would be a too big refactor for this series.
 
-Good idea to fix this code in mptcpify.c, which is indeed used as a
-reference, and ends up in real deployments.
-
-The modifications look good to me:
-
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
--- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> @@ -14318,7 +14319,6 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
+>  	if (vsi->type == I40E_VSI_MAIN)
+>  		i40e_devlink_destroy_port(pf);
+>  	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
+> -err_vsi:
+>  	i40e_vsi_clear(vsi);
+>  	return NULL;
+>  }
+> -- 
+> 2.43.0
+> 
 
