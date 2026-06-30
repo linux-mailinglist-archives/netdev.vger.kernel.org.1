@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-303203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303204-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id K+pvJ13NQ2pXigoAu9opvQ
-	(envelope-from <netdev+bounces-303203-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:06:21 +0200
+	id Dn++EaDNQ2qEigoAu9opvQ
+	(envelope-from <netdev+bounces-303204-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:07:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 113E76E5372
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:06:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24A86E53A1
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:07:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=EjYSGsNN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303203-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303203-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=DxBw5Qg4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303204-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303204-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=debian.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 227CE310D5A3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:02:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8CD6331266ED
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A7A38B7A2;
-	Tue, 30 Jun 2026 14:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9364F2F0680;
+	Tue, 30 Jun 2026 14:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03762F0680;
-	Tue, 30 Jun 2026 14:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C6224A06A;
+	Tue, 30 Jun 2026 14:01:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782828113; cv=none; b=gsTV1V3O8ReLGiks72RbfjvbHFYbaRHV5uXv+/q0w3p8tQB4k/meKXrjKzucRY3HzQyzoSt68iNLaYbeH39vl5TwL2sYARKZKd810n21yx8z3/1Mb/EQxiubmW+jMQmDzd2oQBNifEgzD77n4BtYqiJ1bK2dVxeYRUYxQqNtUhs=
+	t=1782828117; cv=none; b=WE8i0sc8t1RwfoeegVeOqTuiJlY/iDroSpznt4k1cJ5HM6A6mzJh63WQITTiL+W3Y0VIeiWyG1gXssQO8CtDq/b84hOYutP33fMxhNIutUyk5BobEHASpcB6eRJKEoXr+xQBJTT+dSYCTBzGQHVJ18FDQmUw6bb5FFifdLaZrNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782828113; c=relaxed/simple;
-	bh=+dzHlgoH3oIIDwgU+KphGG+YpbzDZnvHjofTkh5NSr0=;
+	s=arc-20240116; t=1782828117; c=relaxed/simple;
+	bh=HZc2BEXf+ysLeiL07xUt7XZS86DwsXs6gxJQ3lAPFDY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CMrx3S2La9MXbjvhF+iOK4mAWOOtBX4J8OEqAz/u65ExvglfD8QKJV3yWpzTu7+jIAYOiQaIH+5usQ2Nqr8BCYSaIVZamWx5t+/So4Ii4TgYdmd+lT9iUjnmfIInvN9pdND5j8kM0lM3OzVdWERV5DZuQV3gq1Q8QGuL+6F38+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=EjYSGsNN; arc=none smtp.client-ip=82.195.75.108
+	 In-Reply-To:To:Cc; b=KtlqRMKKCM9TM6ejNbUwHgdZ/UNARxhrsQ7NOBhUfu7npRKBXae3I9OG17SQM+1KjcevKDq0IFMGD9zff6koOfptFFNc7NOohzSYGSOUeOiZvDfmavmUqRoQcQDg6Bz/qIZGFq962hnCwZrbr6PXBZP3Rjm8ir7GWgP1LiyV2GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=DxBw5Qg4; arc=none smtp.client-ip=82.195.75.108
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
 	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
 	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
 	From:Reply-To:Content-ID:Content-Description;
-	bh=TTidiEq0Vy4JFSPra/Y1UMyI5Ambh3Gr+QoU3i+Ks3E=; b=EjYSGsNNz0EAHxRR7C1jtq3Ecw
-	OTgAO25Bi+Pg2e7YnTeLZ2UG+fTdZWRpP3XTleq+4uJ5jZsXIiBtwwJvr1u7O/qPtyukL8m0o6+a1
-	+hGdGKKFooUTz5HqHmKX0eqkA2ER6lWHiJBR29nAqkLRAXIEwYkqYdejHAaIVvoLJF+b+bfRYHOOT
-	FxAGg5bD68SngPCJMQKwmKcez2IKoM9Refrs+ihQCqjWh9cKSpgKAx+l7RA2lN35LM3YQYgz8VWa9
-	J2I8m2G2XuEjof4PkMSopOQ5Cp//E9vq80Qg1VLNWdurZdmPzihhSRg2lY+eLz80UCiWc0Y6YhRoy
-	iacbcwUw==;
+	bh=MEep7DEWjEwkHOcChn0k8KjEMKULC97jHYv3rGPYkvI=; b=DxBw5Qg4WLA2/B+1j409MjINCj
+	BTpcmfu3ilojQI5brzEYIz2zajcLuRSgadlvJd09y8ESiWHvIiSWx0Xc3ecfq0wUrtSqSM2MvluX7
+	omT70jOpXfN8uYBGoXEEqS7NIwak/Ajf25/og6DpP8i0x57g/fo5yll2/Auy8t+OC5SdxdqrMucQJ
+	ImInYouDr2HObX5S32KfulIJHyl/+BldOydL84N6w9pXnzQi4jll0REnP1pDlEIv+lcVZGwpCRXnl
+	c60DBIqxXd8nRbYq+dSwa+cpT4NfXk3DfWzKg6ZgIZ0z0gUJB2o6a9k1UItO0kI6f8U1ulVfOZbVd
+	Yt4wdskw==;
 Received: from authenticated-user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1weZ25-0077I1-2Q;
-	Tue, 30 Jun 2026 14:01:50 +0000
+	id 1weZ29-0077I7-2W;
+	Tue, 30 Jun 2026 14:01:54 +0000
 From: Breno Leitao <leitao@debian.org>
-Date: Tue, 30 Jun 2026 07:01:26 -0700
-Subject: [PATCH net-next v2 1/4] net: add sockopt_init_user() for
- getsockopt conversion
+Date: Tue, 30 Jun 2026 07:01:27 -0700
+Subject: [PATCH net-next v2 2/4] udp: convert udp_lib_getsockopt to
+ sockopt_t
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,8 +61,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260630-getsockopt_phase2-v2-1-193335f3d4d1@debian.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260630-getsockopt_phase2-v2-2-193335f3d4d1@debian.org>
 References: <20260630-getsockopt_phase2-v2-0-193335f3d4d1@debian.org>
 In-Reply-To: <20260630-getsockopt_phase2-v2-0-193335f3d4d1@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -74,20 +74,20 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
  kernel-team@meta.com
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1762; i=leitao@debian.org;
- h=from:subject:message-id; bh=+dzHlgoH3oIIDwgU+KphGG+YpbzDZnvHjofTkh5NSr0=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqQ8xElKaOzxkhaUGzoJ/9yrf1T3W2UpN7iip1L
- prUATet7jeJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCakPMRAAKCRA1o5Of/Hh3
- bSAYD/9PA07LrEnr52DTF/K1Yh7zHNLfL+Su6jcHfkOAP/OkGimYi7Vnidbhelv0OC47sRseOPU
- nVQLQ9HWcEoGixlsloeyKgta35R7DpynsI8ihyn6PY7b7LfJrcj33/yaXvAF1oqYDR1r3mOOw10
- n92dyoHSgLHIetq/i1FEU2DObZhXpS6V9LTWa+7mdgx999pUrEhZAmG+mj5NHyMAn0yWhS/bljL
- YGK8mIRhM7ZM6Qf9W3TAYm11dNGEikZCGVv8d7Ei30HJtYDLqFg5gqxMgvR46Qf5cPkBt/D9EGN
- xanvGY9bdiIbbcKKES3H8Mmdj9zX41VL1fFGJZiv/LdhS5tmhtcTxjDD8cp0XAlQAbBxqzTKE3y
- C6PeL1RRl8SoGbraZKU1Gc9foZECj8HU+3dOoBMaCBu7pPVAqiDOZuCVlklBiUfId8bIIY3+UCR
- gZA6q8MdDk+s/O+k6M++a4gEyl57pTCGwCVIvlLoeTvYnG/BD0fJkLAaWafMkWj9EeOhORI33M7
- 4pQRenlYp9dly4XA7rWe39KxPMuXCnl1AM/VOeiuE43iyOrBDU7OFY+ww8u4/QTkmiNR0mxtJz5
- D0TBYkEenJwtXFJtjjouQwGlI960KIAC708Ql3pce4p5gpXj7KSNwC87J3e2BeMgRvflj1DOhmg
- q8X/ch7ZHElY0DQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4258; i=leitao@debian.org;
+ h=from:subject:message-id; bh=HZc2BEXf+ysLeiL07xUt7XZS86DwsXs6gxJQ3lAPFDY=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqQ8xEZeEmUwRp75w0MgGIbYrhWb9OCf/CAAa8G
+ 5jr5KzlnW+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCakPMRAAKCRA1o5Of/Hh3
+ bcw8D/9gVr3/5sRDkqLbnKO7VnY506xcmF+xEX+XjB5ihucoX628WQUE2ft6jpZvB+ek+QDGNl7
+ QnpCr13rjth/A3ToJdUzFbsj2Ea0oyO6KOKKwOuXIaomRuDQlS0IE8bz2hEUAD2HQ1JtCk3a0tQ
+ 8MUYsMh2Aje79B0pZgY3vTKtUKLKb0kucKSzYlt3azYIbmi5CjvkF/8Dlrd4L4jfaZiyJbpGK5w
+ TB0TLjjRzl2gGNFOW/PIKRzbomWftXumXB/u5tTXI5a1XpyHj6Q/QwJZQKyqtSI9hhfLpXdhzU6
+ SUy3yWD2vg3WoAx9wi6w3BSsKmdCnZjfKkpwKFTWOtpp+6Hgzrg2x27hrdesAJUbHeWRYLZDWRT
+ RO0GSqLvvSTeOeXn+Tp9Wqp1vHZHj7TUKblTE0nZwype2++xEjksE3hgJq68SgScRBZy91CbAyk
+ 5vRVPHRESCoUCUsAAOzyGBYiDPHB0vMI2Kq1nd+sByGXAM8T6hDbxnJCgpjqmmNwSjOsDGP4Fs7
+ 186Qqx2IESuX3z17r+OQtUHsNxp+77p5ow3neJnGfffOwlVrbhWwFk3V5vu96XODsvMK+Kb/BtP
+ whH6q4qO/btm5+Wv7wfTXHwQlXShLKBPdZRnpZWyqxu0liQBKCzYkJXjIB8moT0fvtu2CjaLkcw
+ s6mvMSwevdYIsiQ==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
@@ -97,11 +97,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
 	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303203-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303204-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:shuah@kernel.org,m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:leitao@debian.org,m:kernel-team@meta.com,m:willemdebruijnkernel@gmail.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
@@ -122,64 +122,146 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 113E76E5372
+X-Rspamd-Queue-Id: B24A86E53A1
 
-Add a helper that initializes a user-backed sockopt_t from the (optval,
-optlen) __user pair passed to a getsockopt() callback.
+In preparation for converting the proto-layer getsockopt callbacks to the
+sockopt_t interface, switch udp_lib_getsockopt() to take a sockopt_t.
 
-It is used by transitional __user getsockopt wrappers while the
-proto-layer getsockopt callbacks are converted to take a sockopt_t, and
-is removed once the conversion is complete.
-
-The goal is to help to convert leafs. Example:
-
- sock_common_getsockopt(... char __user *optval, int __user *optlen)
-      → udp_getsockopt(sk, level, optname, optval__user, optlen__user)
-               → udp_lib_getsockopt(sk, level, optname, &opt)   /* needs a sockopt_t */
+The thin udp_getsockopt()/udpv6_getsockopt() wrappers keep their __user
+signature for now: they build a user-backed sockopt_t with
+sockopt_init_user(), call the helper, and write the returned length back
+to optlen. The helper uses copy_to_iter() instead of copy_to_user().
+No functional change.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- include/linux/net.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ include/net/udp.h |  2 +-
+ net/ipv4/udp.c    | 39 +++++++++++++++++++++++++++++----------
+ net/ipv6/udp.c    | 19 ++++++++++++++++---
+ 3 files changed, 46 insertions(+), 14 deletions(-)
 
-diff --git a/include/linux/net.h b/include/linux/net.h
-index f268f395ce473..277188a40c72e 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -47,6 +47,29 @@ typedef struct sockopt {
- 	int optlen;
- } sockopt_t;
+diff --git a/include/net/udp.h b/include/net/udp.h
+index 8262e2b215b4e..1fee17274745f 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -430,7 +430,7 @@ struct sk_buff *skb_udp_tunnel_segment(struct sk_buff *skb,
+ 				       netdev_features_t features,
+ 				       bool is_ipv6);
+ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+-		       char __user *optval, int __user *optlen);
++		       sockopt_t *opt);
+ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+ 		       sockptr_t optval, unsigned int optlen,
+ 		       int (*push_pending_frames)(struct sock *));
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 70f6cbd4ef73b..59248a59358ca 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -76,6 +76,7 @@
  
-+/*
-+ * Initialize a user-backed sockopt_t from the (optval, optlen) __user pair of
-+ * a getsockopt() callback. Used by transitional __user getsockopt wrappers
-+ * while the proto-layer callbacks are converted to take a sockopt_t; the
-+ * caller writes opt->optlen back to the user optlen after the callback.
-+ */
-+static inline int sockopt_init_user(sockopt_t *opt, char __user *optval,
-+				    int __user *optlen)
-+{
-+	int len;
-+
-+	if (get_user(len, optlen))
-+		return -EFAULT;
-+	if (len < 0)
-+		return -EINVAL;
-+
-+	iov_iter_ubuf(&opt->iter_out, ITER_DEST, optval, len);
-+	iov_iter_ubuf(&opt->iter_in, ITER_SOURCE, optval, len);
+ #include <linux/bpf-cgroup.h>
+ #include <linux/uaccess.h>
++#include <linux/uio.h>
+ #include <asm/ioctls.h>
+ #include <linux/memblock.h>
+ #include <linux/highmem.h>
+@@ -2995,14 +2996,13 @@ static int udp_setsockopt(struct sock *sk, int level, int optname, sockptr_t opt
+ }
+ 
+ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+-		       char __user *optval, int __user *optlen)
++		       sockopt_t *opt)
+ {
+ 	struct udp_sock *up = udp_sk(sk);
+ 	int val, len;
+ 
+-	if (get_user(len, optlen))
+-		return -EFAULT;
+-
++	len = opt->optlen;
++	/* keep the check so direct sockopt_t callers stay covered. */
+ 	if (len < 0)
+ 		return -EINVAL;
+ 
+@@ -3037,9 +3037,8 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+ 		return -ENOPROTOOPT;
+ 	}
+ 
+-	if (put_user(len, optlen))
+-		return -EFAULT;
+-	if (copy_to_user(optval, &val, len))
 +	opt->optlen = len;
++	if (copy_to_iter(&val, len, &opt->iter_out) != len)
+ 		return -EFAULT;
+ 	return 0;
+ }
+@@ -3047,9 +3046,29 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+ static int udp_getsockopt(struct sock *sk, int level, int optname,
+ 			  char __user *optval, int __user *optlen)
+ {
+-	if (level == SOL_UDP)
+-		return udp_lib_getsockopt(sk, level, optname, optval, optlen);
+-	return ip_getsockopt(sk, level, optname, optval, optlen);
++	sockopt_t opt;
++	int err;
++
++	/*
++	 * keep the old __user pointers, until ip_getsockopt() moves
++	 * to sockopt_t
++	 */
++	if (level != SOL_UDP)
++		return ip_getsockopt(sk, level, optname, optval, optlen);
++
++	err = sockopt_init_user(&opt, optval, optlen);
++	if (err)
++		return err;
++
++	err = udp_lib_getsockopt(sk, level, optname, &opt);
++	if (err)
++		return err;
++
++	/* optval was written by copy_to_iter() in udp_lib_getsockopt() */
++	if (put_user(opt.optlen, optlen))
++		return -EFAULT;
 +
 +	return 0;
-+}
+ }
+ 
+ /**
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 15e032194eccc..392e18b970454 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1826,9 +1826,22 @@ static int udpv6_setsockopt(struct sock *sk, int level, int optname,
+ static int udpv6_getsockopt(struct sock *sk, int level, int optname,
+ 			    char __user *optval, int __user *optlen)
+ {
+-	if (level == SOL_UDP)
+-		return udp_lib_getsockopt(sk, level, optname, optval, optlen);
+-	return ipv6_getsockopt(sk, level, optname, optval, optlen);
++	sockopt_t opt;
++	int err;
 +
- struct poll_table_struct;
- struct pipe_inode_info;
- struct inode;
++	if (level != SOL_UDP)
++		return ipv6_getsockopt(sk, level, optname, optval, optlen);
++
++	err = sockopt_init_user(&opt, optval, optlen);
++	if (err)
++		return err;
++
++	err = udp_lib_getsockopt(sk, level, optname, &opt);
++	if (err)
++		return err;
++	if (put_user(opt.optlen, optlen))
++		return -EFAULT;
++	return 0;
+ }
+ 
+ 
 
 -- 
 2.53.0-Meta
