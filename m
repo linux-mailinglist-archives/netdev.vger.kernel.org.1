@@ -1,90 +1,87 @@
-Return-Path: <netdev+bounces-303271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id B94RMyjdQ2pnkgoAu9opvQ
-	(envelope-from <netdev+bounces-303271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:13:44 +0200
+	id efP3BEDdQ2p6kgoAu9opvQ
+	(envelope-from <netdev+bounces-303272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:14:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24C96E5CD2
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6319B6E5CDE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:14:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b="QeiIf2/e";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303271-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303271-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="K/hOiKDf";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303272-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303272-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4DAF230A030F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:09:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 743AB3007896
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EAA34389D;
-	Tue, 30 Jun 2026 15:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35F72F5A12;
+	Tue, 30 Jun 2026 15:09:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0190E315D53
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 15:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77932319852
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 15:09:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782832180; cv=none; b=KLjjwYUbYD3wf3xEbknVtdAcGPAibi1F5nsHUCYj7iJdFAWrccLOnHaMDgnkdRuaa9XCmg/d3rfgeLsHvSrKRabafOkxoh4W1zOJWioCOMbARetQ/mtumVafbcn8EXJ4WoJlUsNe/znGe0KKboXx8N8mJq8DXwQNYqPmwOPF0t4=
+	t=1782832184; cv=none; b=F/UYHNSF4rWh4EoS4BkGQhVMNOuuL7WPCLWanrOSYKu+otcZp3r2GkmPQyhbQFkKO8IgfIhSaBgeBOvfr4gfjNAXvOQXfV3P0jcijGFhrDeGs984AW2n9383/u2dPyi5+6k1YUGaWsfuL+4pVPCgR5XINs7He2scVuShBBYmdjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782832180; c=relaxed/simple;
-	bh=YhRQsgrY9BW6dV2KAGeOm/WNB/fNfFPuGRQn/UxoMvg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XNst6WUCx8bYYTdnavJgynpvB4Us6dXcWPcTOqtpXV7vtJVHay3OeP2yE2KC4wGJ+gQWM3qZI+NHkBYY4CFNku1ld2mE1V+KJShkz3SH/HOxGqKB57W2rZbs2dToJt/k4rjAkWGL14GL8xp/Z1G17iRw/4AqZDlK9aGLfmywls4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=QeiIf2/e; arc=none smtp.client-ip=209.85.222.176
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-92e602d2c0fso71483685a.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 08:09:38 -0700 (PDT)
+	s=arc-20240116; t=1782832184; c=relaxed/simple;
+	bh=4SB7xtE7LLNsmMby+vVxbe3lzN/XHMxMCDPsRtqIgyA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=netaieAkqzyZcpcVHo25VnuTYPvPBQzCnGkt1dXV0+45H8MyiZXEAQ1kFQnAUOJtXWepUseqw2yCSzd1izTDqs+8shFt7uU2a29mkKrtepPZg0VP01Ng/1qnM5jgY2J1b1MZ3ZHSkECAM9s1ak8V1eVsvRRo37gZNhhoJv6mlPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/hOiKDf; arc=none smtp.client-ip=74.125.82.45
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-139b5e604b9so5349682c88.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 08:09:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1782832178; x=1783436978; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782832182; x=1783436982; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/AveCtf1R8zYDdvUZGMGx9qvpwpByoCyBF2y0phdxoE=;
-        b=QeiIf2/eLhNHYc6tFrgqqSn/tTMgC7dzj51kEtoAnQ6O5ZAbsVNW8iNcK3pol/Hc6T
-         n29RozP+3gln2GtYmhcl8fdVFm7dKYQtduYkjNYeZVtlnxcp6QGAEN70Am/6fZPzSIsA
-         VKu5DmMc4f43rSHcqPlviArHZHYJQQ5G5YwM4=
+        bh=iy90YGAiyQKrVGwXUqBi9GraSvwkuFALJaJT7TVoK6Y=;
+        b=K/hOiKDf9W3nlTQWw50wIgXstxnlMNVo8vVo/ZVPKOMVAwO0/xktJKCoPn79OTTEt+
+         FmTPm3iHHr1RNHWJLBArYhgyuRYXAS5E3vDHYshO0BcfVxlYUQ0A8YylXhvKMbqBp7Sc
+         eHHRMM1OVhTaVOVQNcru/4/iEFop+PsnEl2LOfL4QuTqS+YgyEyahaIAJjesfYO/juN/
+         FYsPipEY62knYh3iGmDVHBMzhKNSJXPHPNmgIjlTvxZgErzhdOtpieMKHs5a1mEBwHWy
+         GLp8iSrbV6/Dbxx28dQXrpoKfL3u3HhJMyCwCz7dgX+VfiP+3sBDNWuP8t6qLfTuL8DI
+         /nLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782832178; x=1783436978;
+        d=1e100.net; s=20251104; t=1782832182; x=1783436982;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/AveCtf1R8zYDdvUZGMGx9qvpwpByoCyBF2y0phdxoE=;
-        b=rC/iB7IIpVRlgyGdWrZKCb7YU/utZLTUVuEOAEhU/k/fWfBi/5UYWwBc+QnOu24yCF
-         DH4ZDPaqNXBihMalswLVLVO31/iNAWlVwN43ZPc079nyE2SnhvkkJ9weHhn8tpxya15/
-         qFXVN1nc8CEmDkONzoJ3HO9ua8tjCus8aclbwgMtZUqyQcipxgW3Snr/g/8eB2HzhtgS
-         BxApn2qzHnTojLDKtKCl4CVTBKZpANOrju2AHONW0U30roRAGQR9oBiQ1/5EiyGZfCMO
-         s/3pdPraBc8F3Z2Smjcs+ADTITIDZlbhlsB7pqt4CeyVOCLClpaZmTFs+5qaZgsmOKpr
-         xxow==
-X-Gm-Message-State: AOJu0YzlM2UaeVXye+4yGLD92d6por85nAGD/1S+u++d7uuzzeGGNrkL
-	Bq3QpoP2ma/v7f2W8JfpA/jEZwIa6rAXbExpDoHrmG5v1Lu1WgHJJh0+aUtsn6hljd8AGehQ8Sf
-	IDsw=
-X-Gm-Gg: AfdE7cnAYfNBdz2IJp3/DHkvbDTliXQqJ+pauM8LvTLGQa6uyoNpx21YpfRYnzkObHY
-	uF05oLNzC2I2VxDV64Wnkh0kl83JR0tey35WaJdXJlHZbjbpPdtJrAf7XzllKKdnyxqp9UOoy/d
-	XsNqDnYKUh+sg3eqESdBDE8SmjPTigxKM3xPE6tx96CPuLUZilFUM108vDdAEB+ou3a40LWs9cI
-	8JROQ3zCJL4VxZo6GLlqul+QRIZVQUz9ikrOF2ap/I020DURSztp+leBUFkYeTam7P773WR2yZl
-	yGBMvQCBGJgDsxtz6Tr+2nfxiqp8kakjnqI0ZEhkApazez7pkH+3xN9xb1JrDMII17iPfdRLcfG
-	WWRGgcbKhB4qR/6lao67NpOwUggixt+/3JJDG7SxLAPrsP2JTZX1cG4kUqQX6OmPF91jrOpctDg
-	m5ud9pww==
-X-Received: by 2002:a05:620a:2982:b0:927:efb0:3ad1 with SMTP id af79cd13be357-92e69792d18mr275626485a.26.1782832176080;
-        Tue, 30 Jun 2026 08:09:36 -0700 (PDT)
-Received: from majuu.waya ([184.144.29.222])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e622e8d9fsm261330385a.22.2026.06.30.08.09.34
+        bh=iy90YGAiyQKrVGwXUqBi9GraSvwkuFALJaJT7TVoK6Y=;
+        b=cr1PGlw+Upu8l4O5uyhdQajOMzewZ6dgqT1lePYDVNlog5y/kPOs6v/s5oPNqL9qDY
+         TYaMxv1o1g3GXlecfP3fvWdtr8FTI4c28CRcN5pf2bIV41AkGcjV/exgPD9uDezfzMNy
+         xpOrAIM7rzX3hWhqv2GlSgqKYNM5RyUteI2BmbF6jgJh8vAtn6KAxvva9DsE9bO6AEcK
+         Glm53I63nLjj+6wiQNjuqULT8BEjaESrynl3NmM+zMZ+qTnfI7Ro+z2IyU7F/PEx2TdK
+         TFnzPyeQhCUiHF3T6FO3ukqkOmjsd8bORU67aiSokKzdfjAkEbSKmNmf+9hJAsOz1l9k
+         XJOg==
+X-Gm-Message-State: AOJu0YwJOxZ9jqOrIPEYLlMsr5Kee4rhifB2Oh0kBUznH2rowyYbij34
+	gG2o5YW4SJMiutxNMV0RY5O4zZBANnPLFtldALlg9+Od3JwVXPgpP8HhKkk9yyOY
+X-Gm-Gg: AfdE7cm1p8TZQTjPrihQpTuOwDHTA6LQuwpQia3CED5BiUr9tkQ8cr58rM1jj5VlpyU
+	B1j4HSG/D6U1xVl9hhG4QiX9ycTao/pTze43NVDUTzI4yEmijVI9KR5wHsv20bW/lLrOH/2TsbN
+	b+wdOIbZM265Eaq2gB79eTZwkAiR54CCqvrIEqbAMQa6UDwQgr5Xf/SKcd3KXqe+fIhNnmgt2SD
+	XMfPkhcI+bFXPUksGzC/3osoiInJkIio4bply8rK10YofpKKijPuIg5HK9ImmHhVwCfQFDN8n6o
+	NIVwJU8ptDJFHwy+nBX/4bBgDRtKC8wUCp+VhUtWHFEtElrEqqVIVq/8VcdVTYkcZPJlGDjngYN
+	0R7dP33uGn+JLEflXxfEDiHUJZE/+z5ZpYCieiV64xtpBya74nArqV7rAakwHiTHz2u/nuuE1jg
+	UQZe0cosdKPafIn9us
+X-Received: by 2002:a05:7022:1e11:b0:136:c565:e847 with SMTP id a92af1059eb24-13b2a1c05f7mr2517782c88.32.1782832182454;
+        Tue, 30 Jun 2026 08:09:42 -0700 (PDT)
+Received: from amd.com ([165.204.156.251])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b2a9b425asm11369849c88.0.2026.06.30.08.09.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 08:09:35 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
+        Tue, 30 Jun 2026 08:09:41 -0700 (PDT)
+From: Paritosh Potukuchi <paritoshpotukuchi@gmail.com>
+X-Google-Original-From: Paritosh Potukuchi <paritosh.potukuchi@amd.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	jiri@resnulli.us,
-	victor@mojatatu.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net] net/sched: sch_teql: move rcu_read_lock()/spin_lock() from _bh variants
-Date: Tue, 30 Jun 2026 11:09:22 -0400
-Message-Id: <20260630150922.238714-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+Cc: linux-kernel@vger.kernel.org,
+	paritosh.potukuchi@amd.com
+Subject: [RFC net-next] bonding: Retry updating slave MAC after a failure
+Date: Tue, 30 Jun 2026 15:09:37 +0000
+Message-ID: <20260630150937.3508222-1-paritosh.potukuchi@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,149 +90,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303271-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303272-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jiri@resnulli.us,m:victor@mojatatu.com,m:jhs@mojatatu.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:paritosh.potukuchi@amd.com,s:lists@lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER(0.00)[paritoshpotukuchi@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[mojatatu.com];
+	FROM_HAS_DN(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paritoshpotukuchi@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_THREE(0.00)[3];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:mid,mojatatu.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F24C96E5CD2
+X-Rspamd-Queue-Id: 6319B6E5CDE
 
-This is a followup based on sashiko comments [1] on commit e5b811fe7931
-("net/sched: sch_teql: Introduce slaves_lock to avoid race condition and UAF")
 
-Use plain rcu_read_lock()/spin_lock() in teql_master_xmit() instead of the
-_bh variants, since ndo_start_xmit is already invoked with BH disabled
-by the core stack and the _bh primitives can warn in_hardirq() when xmit
-is reached through netpoll or a softirq xmit path with hard IRQs disabled.
+Hi all,
 
-Moves rcu_read_lock() after restart: label + adds rcu_read_unlock() before
-goto restart (fixes the unbounded RCU hold across retries)
+I came across this TODO in bond_set_mac_address() :
 
-[1] https://sashiko.dev/#/patchset/20260628111229.669751-1-jhs%40mojatatu.com
+        /* TODO: consider downing the slave
+         * and retry ?
+         * User should expect communications
+         * breakage anyway until ARP finish
+         * updating, so...
+         */
 
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/sch_teql.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+Currently, if the dev_set_mac_address() fails on a slave, we go
+ahead and unwind the bond and its slaves.
 
-diff --git a/net/sched/sch_teql.c b/net/sched/sch_teql.c
-index 24ba31f8c828..5c42a29a981c 100644
---- a/net/sched/sch_teql.c
-+++ b/net/sched/sch_teql.c
-@@ -311,14 +311,14 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
- 	int subq = skb_get_queue_mapping(skb);
- 	struct sk_buff *skb_res = NULL;
- 
--	rcu_read_lock_bh();
--
--	start = rcu_dereference_bh(master->slaves);
--
- restart:
- 	nores = 0;
- 	busy = 0;
- 
-+	rcu_read_lock();
-+
-+	start = rcu_dereference(master->slaves);
-+
- 	q = start;
- 	if (!q)
- 		goto drop;
-@@ -345,17 +345,17 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
- 				    netdev_start_xmit(skb, slave, slave_txq, false) ==
- 				    NETDEV_TX_OK) {
- 					__netif_tx_unlock(slave_txq);
--					spin_lock_bh(&master->slaves_lock);
-+					spin_lock(&master->slaves_lock);
- 					if (rcu_dereference_protected(master->slaves,
- 								      lockdep_is_held(&master->slaves_lock)) == q)
- 						rcu_assign_pointer(master->slaves,
- 								   rcu_dereference_protected(NEXT_SLAVE(q),
- 											     lockdep_is_held(&master->slaves_lock)));
--					spin_unlock_bh(&master->slaves_lock);
-+					spin_unlock(&master->slaves_lock);
- 					netif_wake_queue(dev);
- 					master->tx_packets++;
- 					master->tx_bytes += length;
--					rcu_read_unlock_bh();
-+					rcu_read_unlock();
- 					return NETDEV_TX_OK;
- 				}
- 				__netif_tx_unlock(slave_txq);
-@@ -364,37 +364,38 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
- 				busy = 1;
- 			break;
- 		case 1:
--			spin_lock_bh(&master->slaves_lock);
-+			spin_lock(&master->slaves_lock);
- 			if (rcu_dereference_protected(master->slaves,
- 						      lockdep_is_held(&master->slaves_lock)) == q)
- 				rcu_assign_pointer(master->slaves,
- 						   rcu_dereference_protected(NEXT_SLAVE(q),
- 									     lockdep_is_held(&master->slaves_lock)));
--			spin_unlock_bh(&master->slaves_lock);
--			rcu_read_unlock_bh();
-+			spin_unlock(&master->slaves_lock);
-+			rcu_read_unlock();
- 			return NETDEV_TX_OK;
- 		default:
- 			nores = 1;
- 			break;
- 		}
- 		__skb_pull(skb, skb_network_offset(skb));
--	} while ((q = rcu_dereference_bh(NEXT_SLAVE(q))) != start);
-+	} while ((q = rcu_dereference(NEXT_SLAVE(q))) != start);
- 
- 	if (nores && skb_res == NULL) {
- 		skb_res = skb;
-+		rcu_read_unlock();
- 		goto restart;
- 	}
- 
- 	if (busy) {
- 		netif_stop_queue(dev);
--		rcu_read_unlock_bh();
-+		rcu_read_unlock();
- 		return NETDEV_TX_BUSY;
- 	}
- 	master->tx_errors++;
- 
- drop:
- 	master->tx_dropped++;
--	rcu_read_unlock_bh();
-+	rcu_read_unlock();
- 	dev_kfree_skb(skb);
- 	return NETDEV_TX_OK;
- }
--- 
-2.34.1
+As the TODO suggests, one possible solution is to try setting
+the MAC again, after putting down the interface. This is because some 
+drivers may reject changing the MAC when the device is UP.
 
+The solution I am proposing is as follows:
+
+dev_set_mac_address on the slave
+        - If this fails, temporarily stop the slave - ndo_stop
+                - If stop fails, unwind
+        - call dev_set_mac_address() on the slave
+                - If this fails, unwind
+        - Bring up the slave by calling ndo_open
+                - If this fails, unwind
+If dev_set_mac_address on slave passes, we go to the next slave
+
+
+Before working on a patch, I wanted to get feedback on whether
+this interpretation of the TODO makes sense and whether there
+are concerns with temporarily stopping and restarting a slave
+during bond_set_mac_address().
+
+Thanks,
+Paritosh
 
