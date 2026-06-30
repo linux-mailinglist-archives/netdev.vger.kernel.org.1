@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-303348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kBH4ETYdRGqjogoAu9opvQ
-	(envelope-from <netdev+bounces-303348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:47:02 +0200
+	id ZcUZGF4dRGqyogoAu9opvQ
+	(envelope-from <netdev+bounces-303349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:47:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3FA46E7A38
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:47:01 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9D936E7A4F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:47:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=IzAp5xBE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303348-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303348-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="oYNu/9C6";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303349-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303349-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 318D8302BFE5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:46:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 64149303DCBF
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9653DFC8F;
-	Tue, 30 Jun 2026 19:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151113DE436;
+	Tue, 30 Jun 2026 19:47:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7BD3C4154;
-	Tue, 30 Jun 2026 19:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190883C4154;
+	Tue, 30 Jun 2026 19:47:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782848815; cv=none; b=kpeOLDaYecyO3HTTJ29dYJ+w4RDOSVXa5Imzn4Zdhpwm2QFFMPPCMo9cmT+gNt2R7igcfkcFuw43N1pYJ/o57D7lORQPjSDpw/XusugeQqRyRCVCPceyIkFOk7KVAadyGU8Vfh1AkAuhBaQS7LbwMn9MDMDpHrzj4x2PXqIikDU=
+	t=1782848858; cv=none; b=Rb6fTfUd0Q4j3T6pFus3+8arwLceMBwsWfnyKgKRQtrJJmb7TaPKivPKVwZWMkE3ZEACNihtjCmmSNW+2sF05Z4RsdfRtJaV9lxqopIoBaMCOLQfW2PFbWovkO2AlcbKn8/nrXrtTHhHOFvb2oXSmAU+3MGcuRdQMmbSHil3bGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782848815; c=relaxed/simple;
-	bh=dPWWumFbEV5yA3udEfWNt+0vEpK1URSqyUAkaq+3HAQ=;
+	s=arc-20240116; t=1782848858; c=relaxed/simple;
+	bh=Ghvoyx/ghMo5weDZ/lF347xW9I9fRNVaRjlvBCBRFBc=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=Hw5uDpFXnZ2mW+q89P/IFrc0vuuEClL4RIH/lGxzXB1HNghKlvaZafKLj4kNxM21n9iag5P7PZ7fcqQTIZSMEEOl3ZK3ONDgxQrc70DfdF+j/eGo9ovXBigHTkdhdMR1NPvdPHayeq8wNWej6bbB1d3vWYIJsOdw2auWNt/mChk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IzAp5xBE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A68A1F000E9;
-	Tue, 30 Jun 2026 19:46:48 +0000 (UTC)
+	 References:In-Reply-To; b=F5Pp9dQU4z/FsuhoPBuLb3aT5lTK6Hst3Fh+d7imRxsns3DBPMR9ns8vfGExZ0nxax4M2H8bbmA+BLetwbHAmilOcTqHHzVdCy43oGSgXii7JuVrXFiztULSWFGtptFP5ShMmK/LCDOz5gSvHiFZCZtQCabZnSi/Cy5L3bAnNI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYNu/9C6; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA62E1F000E9;
+	Tue, 30 Jun 2026 19:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782848814;
-	bh=dPWWumFbEV5yA3udEfWNt+0vEpK1URSqyUAkaq+3HAQ=;
+	s=k20260515; t=1782848856;
+	bh=Ghvoyx/ghMo5weDZ/lF347xW9I9fRNVaRjlvBCBRFBc=;
 	h=Date:Subject:Cc:To:From:References:In-Reply-To;
-	b=IzAp5xBEJGJQptQ5UMwMw4MhsshLrt31YLvU57xcLhOn39OcNMheAlXXFayLySHIj
-	 cnclQ6JZ15+RRDC+StrWDioDaPn+4fp6ArrE8G0Z423E3XEXTREAiq2UvRB5vRk0Ov
-	 /hv5yW/hjmcAou+oC2YsaraneRj8TL/lEr//ghoLNMNOlzSJZi9uRfv+CWiozavXJ4
-	 SOcclaeWHBLmH5PK508WcV2Sx9mJhYch0ODD6QyGli/BLSNLQP+a81ZGsRqdAxlob4
-	 ryfWFa6hFoSn1TJ+xwTuDeCLkqQ3ZFhNM2IOQNZmQNH4VLapU14vnXFmUjBdiBYnf/
-	 JPAuYf7XkPQkg==
+	b=oYNu/9C6YgT1wSjvtnQ/B08uyOwKYo3CE/N1BKh4qwvcudhJOssK482qYNY0oSU68
+	 fn2hIU3Mm6BvlFqKbWskQVB06WfOMlaQbpxCYsUzJy8hvn6i4k/ttNXhBMq7yQr08B
+	 Fjltzl7xcAFhN7+0cK7H/zl+JD2sSxjATLoBgUO06BomieUrcnhs6p5Gk9wekrOBCG
+	 PdTdrFOrM9lY7PpdK8awWxXfa+gYEp7IfutcTSWN1w8oVSsxVbYHGgGcN8Purl/9CS
+	 SvqMi0bWZWfIvfB2uQeTea5Ico45/7agV2pjTQuhzpje4aV5/gtGl+IRHT2sN1rNvC
+	 s6AsTbGxQisOA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,9 +54,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 30 Jun 2026 21:46:47 +0200
-Message-Id: <DJMN5NFA766Y.1LSK7LF1Q7SL0@kernel.org>
-Subject: Re: [PATCH v2 2/7] nsp32: don't keep pci_device_id
+Date: Tue, 30 Jun 2026 21:47:30 +0200
+Message-Id: <DJMN66ZPO2D8.22NZEBHTQH9QW@kernel.org>
+Subject: Re: [PATCH v2 3/7] ipack: tpci200: don't keep pci_device_id
 Cc: "Bjorn Helgaas" <bhelgaas@google.com>, "Zhenzhong Duan"
  <zhenzhong.duan@gmail.com>, "Greg Kroah-Hartman"
  <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
@@ -76,8 +76,8 @@ Cc: "Bjorn Helgaas" <bhelgaas@google.com>, "Zhenzhong Duan"
 To: "Gary Guo" <gary@garyguo.net>
 From: "Danilo Krummrich" <dakr@kernel.org>
 References: <20260630-pci_id_fix-v2-0-b834a98c0af2@garyguo.net>
- <20260630-pci_id_fix-v2-2-b834a98c0af2@garyguo.net>
-In-Reply-To: <20260630-pci_id_fix-v2-2-b834a98c0af2@garyguo.net>
+ <20260630-pci_id_fix-v2-3-b834a98c0af2@garyguo.net>
+In-Reply-To: <20260630-pci_id_fix-v2-3-b834a98c0af2@garyguo.net>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -86,11 +86,11 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303348-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303349-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
@@ -112,16 +112,15 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[garyguo.net:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[garyguo.net:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A3FA46E7A38
+X-Rspamd-Queue-Id: E9D936E7A4F
 
 On Tue Jun 30, 2026 at 1:09 PM CEST, Gary Guo wrote:
 > pci_device_id is not guaranteed to live longer than probe due to presence
-> of dynamic ID. All information apart from driver_data can be easily
-> retrieved from pci_dev, so just store driver_data.
+> of dynamic ID. This stored ID is unused so remove it.
 >
 > Signed-off-by: Gary Guo <gary@garyguo.net>
 
