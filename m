@@ -1,112 +1,92 @@
-Return-Path: <netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303303-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4hmrOIH0Q2pimAoAu9opvQ
-	(envelope-from <netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:53:21 +0200
+	id lv71A6n1Q2qamAoAu9opvQ
+	(envelope-from <netdev+bounces-303303-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:58:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4706E6A3C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:53:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF7F6E6AE5
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:58:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=VpFZN77J;
-	dkim=pass header.d=redhat.com header.s=google header.b=VsZjcXlq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303302-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=Q7KptqYC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303303-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303303-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 09AB030BF34E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:47:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A88F5301C121
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9F33D75B5;
-	Tue, 30 Jun 2026 16:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55DF37EFE5;
+	Tue, 30 Jun 2026 16:52:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012004.outbound.protection.outlook.com [52.101.48.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAB63C8724
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 16:47:06 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782838028; cv=none; b=keAKqH+au2vMfZw7AqlxSEmv83sts9Pd1uQA2BepvguWKdup0G3TqoFawnZUjI7sv2JS/NnkLWRi9t14atvVI+c9HsVR/eqV9pliSXFMdkPLC2bGjHgPjKuqopfITMDL/6feFbo2996s5NOS5FpFCjR9lz90p6pHaHydkfyJs7E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782838028; c=relaxed/simple;
-	bh=rmXCZFpKxJzazxmjn8bzq96ps74DVqbvt62SKSYliVE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LbCxy0w1dgspyesGzII7VoFhNyt7Tk/nc8xOU+1mPIz+UIdeAduvQqFd4JDbeF4S5JjcZGWIz69oP9UZtuIOg8UzLBDa2hrhHWFNkW52Fsm3LY1rndP1e+d7SPNQqDYsISu62Dc+MYWxA1eWQ1PYqt+6ofpng6AnbgeNDIo4M48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpFZN77J; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VsZjcXlq; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782838025;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xiOPZVlIWXYiaqpOQmyOxWG5vDCdJG1lOjq1LsrNa5o=;
-	b=VpFZN77JDZRPgZtWHOgwD2AJXkEPaqlAYkqmIAhBlwBLVpKTHSibRUY8Z60p2jjAnW5qRg
-	lMMEKtshu+C48sAxKemtBYuo5ICyIr1Y9aFH1bPja3p6UIF+ryi5kby1+yypTi+K5GV+IX
-	6gHylxwKFF+d0Rw7Zhgvz79WwLDPaXU=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-98-StrHZVLiNNW00esmhhJilQ-1; Tue, 30 Jun 2026 12:47:04 -0400
-X-MC-Unique: StrHZVLiNNW00esmhhJilQ-1
-X-Mimecast-MFC-AGG-ID: StrHZVLiNNW00esmhhJilQ_1782838023
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-84622d6102dso2819937b3a.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:47:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782838023; x=1783442823; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xiOPZVlIWXYiaqpOQmyOxWG5vDCdJG1lOjq1LsrNa5o=;
-        b=VsZjcXlqCcjXoIe10ZpdDfp6Yui8Fhw6oTXgUZapYMULjzdl5CJ3E7povb2zv5ZscP
-         k0uT+EztKLZLE/Du4UtXRN0dJS/m3ASwny3u2xzkT2Bq5vAc6hjtHz8mDn3iVtbyacfD
-         +G+JrMfpleTKRFrkPfelK0Mx+GGoocwlZsY8O1AXwK+EgKDnn2yzuGoiogwSxFS/LQFL
-         746qgmsd8upwRraSoMg6GCNrCLVcvzcHz6qMkVO+AiHomiQY+YMTzva+w7ym4LO2O+PC
-         SyVQpz4PPVcmMoFHvktU7V07tHhPiCkJFbjvtjjyPjOcdoH1lZMk9K9zm3Xe5gplzLdP
-         rdOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782838023; x=1783442823;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xiOPZVlIWXYiaqpOQmyOxWG5vDCdJG1lOjq1LsrNa5o=;
-        b=VwQWAIeB8HsBvxjLTCscED9pieAy7IYMO6tpPohcUTcNfryyduHEjukc5Y/5gK8KEJ
-         vXpfmIyLpZiUQw5vm0npjSu3LGRZULl182+QxdKsZVx+H6Kyi/FIcCJzOsmyuur5qWV8
-         DK1FZWSnEsFQTkPMOMWc+5uzTeY3Di4K9p2WpZd7gHi6XCXvaPvaOcyIZt7abe116dNr
-         2wkLAoBXKmiwLymkua+7xVFIKLITET3lQ3CgoXofP91f90blGprJGNM1xOcNT3Euv7lu
-         y2OVlMWi6ZMCDU+/P26pDM96bkxvv6NxNNxhwX8rcBJiOvnEdbXJW12WFI3YDHG2lDQk
-         lujg==
-X-Gm-Message-State: AOJu0YxUhpftiRb6hfqkOKFlGdnEUZDlIOdiZtdJ9xfwQR8FXlA1Y0LG
-	2f695+aotgFbXdYTYwsGfWalNd3WmQK1yQOpVTjOKO97TGZInqNb3RuliHtkLkaw0tLCOc/CuQr
-	SfutihrVfMdfu+sM49JLMgqqNzoHY1w49bK7REyncDt+12n/657zi8HxBcQ==
-X-Gm-Gg: AfdE7cm+g/SWLpQe4EyiP9a/CuyXDKfnHACwWFQHPcW5MTPaGFLPyi1JXfteLcVguHX
-	sQuTP9kXIriaG7pNlLE96EgHKDAqkpvfkXhRNCxsyrnT91fTPpalVGbZ5hGUOHsrPyI3z7lxqxL
-	pMmEtceJDDjHKbqTnDURps7oVF3QY8+sZ/R67DtRJFX9aVnSwxPlmdsWBGp2SZHVVOIQ6KWV3Dc
-	o4EZUZjyeyTk+bk0naHGejkkUbqJ4n+DW6hFyWj6KXNy4bMJSmGUsx7cE6rBLg32yXRoQTpyglO
-	PV5sHcbAJSBbgaGMYRSPN3L+aa0pGqIRZMahV7W1FjW6AhWQb9VOjq+dhNAu/BOAsoP68+3m56S
-	EuRyRW9+gC1dDKVTVWKnUreeRxpETnp3gzls=
-X-Received: by 2002:a05:6a00:92a5:b0:847:8337:64e4 with SMTP id d2e1a72fcca58-8479f1f553amr3419022b3a.30.1782838023343;
-        Tue, 30 Jun 2026 09:47:03 -0700 (PDT)
-X-Received: by 2002:a05:6a00:92a5:b0:847:8337:64e4 with SMTP id d2e1a72fcca58-8479f1f553amr3418980b3a.30.1782838022460;
-        Tue, 30 Jun 2026 09:47:02 -0700 (PDT)
-Received: from kernel-devel.tail62cea.ts.net ([240d:1a:c0d:9f00:be24:11ff:fe35:71b3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a03b9ffasm2378390b3a.59.2026.06.30.09.47.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 09:47:01 -0700 (PDT)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matvey Kovalev <matvey.kovalev@ispras.ru>,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>,
-	Jamie Bainbridge <jamie.bainbridge@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] qede: fix off-by-one in BD ring consumption on build_skb failure
-Date: Wed,  1 Jul 2026 01:46:20 +0900
-Message-ID: <20260630164623.3152625-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802263C2BBA;
+	Tue, 30 Jun 2026 16:52:38 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782838359; cv=fail; b=AfX8RCB+VqNjbdl//B82NuX3yjzyqg7w0J2DN3lKMB31oXrkzbu7O4AtfjkaPSpEbncWLfXCEau0vp3sUXZx5Z5gXq7KH5+7V70eTgqUNF3zz4FQiYauny8sH85zrhO8tb9OiHEFiL9c0rFQoMfVaGZ2jS3mENxJcnX3Uu/R8YE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782838359; c=relaxed/simple;
+	bh=aeBjYjgexK2yComLyW0nrMYBOyFIy0h2XsGpT2OyNJ0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Uw/HSiPpuAw2MTjEDKd9AchGMI+jHcG/CYL5MBPan7gJR8gn08Usx+MZ019nz2bF+EuPb1cwRPetAzpJFX7zN9uYsAIkDO/pKYMrC/PTxp7Tc1XnQq+hr3WVM2Iaf8Kl5Paw5Dm0jJMa43XCO8fYFXlOKY5DqRvUJfEzSXk7/hI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Q7KptqYC; arc=fail smtp.client-ip=52.101.48.4
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PPrRWvCOoggsU3BResvZatTXw2rVb2r13ybxikhwIT35Jb76JSqi4XPCo5aoVC9o4iuMYL/yqysfLsBmYj3zxyfIwz5Kt6JqzE9/sOUpfGJfWU3zKEHzlquJ/GEOa0Zn7frZYVhR2mAxBf+dk8N3Ow0NDlvZW/c1Kzxnk6do0MAoAM0JrXx5d+qAgBcKaXcCrHjkOW5cExH8LVYyMWY3bX9NTdSLRq5ZQqtnUBNJ1UI3swxNM0sYnVTCq6ONHJrrZD3mI8048HDoZTi3ca7WPUCq+T3lyQYhplkkyF2krZwLvHF669rSg5TXbOkg85OROiZWhFYkkKxeBwMpf77FZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xp93eoBT/3mWkYReg1XvEGMLcuCAYD4Wn47k/18IfL4=;
+ b=x6vDt6ku5h+roiPjfZ+FsmGYqBJXbdLyKWNXglbIFugngMVoFvRHIyIaniTjtdW4Y27NfHHItDAyVg5zKiE/1L9ZxmidvRoVb3DMXZFzRHEgkdt6C8wH1rwUEiRT+gupZK2dQiQCLhweu3vCgHoTiqHFGK1/uZmUezcPWtx0aq9CFcxFX72Dei8ruj1q6cRZEiZ6uNG24/uXwdKM4LCuzrMKfYcyGjNyk7Y3bjlTcQHFW6EG+fogc+pJE/Rb+4/b0lndBlnqQnknoCIBaGQ2lkDn0fU1fYD3d3QbNc167Er9A2CromtvFoLwrlsZPKIc4KWJlrnL04q53OJJ7ONEQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xp93eoBT/3mWkYReg1XvEGMLcuCAYD4Wn47k/18IfL4=;
+ b=Q7KptqYC2T9XHkVs1iYLkGkyYDO9m7ILxS3OEVPPuTePhvSji6d4LPLAzWLGYX0PdzSlhkmuv5qp65nV4ynz7fIC4/LL6OXXFo14RrRfcsa0FXU+RTCsF4XvBJA8Awq7yD5rIvcCpmVN7UpIVnR2euMnIZyEq8po7y30jbe6U3Xbi77lF2V4g1v7j5Sa9//T84Q26ivtNxzwttWzHHk//s7geA2YLu8CtAzNsPQK6Mx7B98jFhpg9JB+XGSAhht+jQ27QfXWPmwIM7lO7JB5mqWRbzygE+DxUOh36XfoOSkWNlvE3n8UuoAg4EWHi8IXYnuEngHc7WkslPbIt52srQ==
+Received: from CH0PR13CA0033.namprd13.prod.outlook.com (2603:10b6:610:b2::8)
+ by DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Tue, 30 Jun
+ 2026 16:52:33 +0000
+Received: from CH1PEPF0000AD75.namprd04.prod.outlook.com
+ (2603:10b6:610:b2:cafe::36) by CH0PR13CA0033.outlook.office365.com
+ (2603:10b6:610:b2::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.8 via Frontend Transport; Tue, 30
+ Jun 2026 16:52:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH1PEPF0000AD75.mail.protection.outlook.com (10.167.244.54) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.6 via Frontend Transport; Tue, 30 Jun 2026 16:52:32 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 30 Jun
+ 2026 09:52:10 -0700
+Received: from 82875d6-lcedt.nvidia.com (10.126.231.37) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Tue, 30 Jun 2026 09:52:10 -0700
+From: Nirmoy Das <nirmoyd@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<stable@vger.kernel.org>, Nirmoy Das <nirmoyd@nvidia.com>
+Subject: [PATCH net v2] selftests: net: make busywait timeout clock portable
+Date: Tue, 30 Jun 2026 09:51:57 -0700
+Message-ID: <20260630165157.3814871-1-nirmoyd@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -114,92 +94,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD75:EE_|DS0PR12MB7900:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2e5a17f5-1e88-472c-0961-08ded6c7fac4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700016|1800799024|23010399003|13003099007|18002099003|56012099006|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	rZFcg43MljeevmyxriATaxTCXYgBTDXObAe7spu9z8NJ890MOaPWdnKSiiZ2DB+qogi+qUirjstYGoV7NxzjePhdsj+pWOAB67V7dmlwJBGEEfHB1MKJVdKa8ocKLMe5mt36s2aF4cBJQSspKBD3D8Mj3QfVuPNIP5OPWSr/src8byqtD9LZdM3WTbBvQS+9+djehzPHVnn5w2pYA1W6k/3aDXVppsuNJqXb2D0mjSK30Q5oy93NJhZEoIfDzVrZ7h19Ec1T2PIWS7t+iG+oeqkgGax9+/g1wKZvPS5SoNR6HfI26J+RBLM1awJoISsuvo0vFwAj2MvnlsaNxad9Q9RIny1t0YMLiVMDbhko22Avt9RfryFqpgRvWGx4yLqWQD78taw585HLp7Q6JE9nNGIp3FAYSj582FHHdZAHCAwMwLCWRx6fzoSKU51yWjEkrcNeZDpa/eB4vl6z1pdhRFOnDO0jz4VRZB2x2r/IkFVZ6CUf0q3+JUav8gANVWhR1bfCTI5d56+T58Re9Beb7rXzs3tjN3nI+oD8eAQQM54U0zO8A+vsdapAvLzBTVwlEa+QfxeShBpEQGuQRtp32JYxWoFsKG8BIBUeSjTCKI27ainIdEABhyvkduGn+hat5V6olMQb87zu6+y8DGx+pSYhxqsDj/RXUmJi/MmNb4CjFzl1HA0Hf6WRbEguuBCmh5/85h+42HTlZI05mklIfw==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700016)(1800799024)(23010399003)(13003099007)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Yfd5rvebk2dDLobXH53MMCNK9zwuoH5lx3SucW6oB4g+qUrMok+ptZ6Cs+YKc1SQ0lS2Bm5CQoYLEbkR1TwD36J5giHky0T7Y6mFmFqQ18QYk/rhU8U/eTtTsdAPd8+1Jt3/HGPL+dboUB0avaAP2URRNkAOS0sfL9+BCLT/5oDZ4cjms5yaSMHMosmjHAEjsi0If3Lf8ywrFvXCDACSfcXlFl6gL79mg8qP+2OSKnQ5qduw68d+I2e23pEqot+xCxTtuV1OCynTCYFIXOTQmFHo+duy6HrnDRWRcvzHOfGd8AtairJOTz4LNxyH1FUFtJKgxYaUVpj4d1eIYeh55YL/KirBEa10j2K1Na0X4h0N8+m4n+p7oeCL7jTstH5Ef3eWZ9b7BIzLpeYr+DE7XDFM1nQ74U253nR2BuL7hpVWL5mRjM9sdb5vytpY9Qvj
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 16:52:32.5523
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e5a17f5-1e88-472c-0961-08ded6c7fac4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD75.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7900
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matvey.kovalev@ispras.ru,m:syoshida@redhat.com,m:Pavel.Zhigulin@kaspersky.com,m:jamie.bainbridge@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:jamiebainbridge@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[syoshida@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[nirmoyd@nvidia.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303302-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ispras.ru,kaspersky.com,gmail.com];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-303303-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:stable@vger.kernel.org,m:nirmoyd@nvidia.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syoshida@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[nirmoyd@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,Nvidia.com:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vlan_bridge_binding.sh:url];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9E4706E6A3C
+X-Rspamd-Queue-Id: 7DF7F6E6AE5
 
-qede_rx_build_skb() and qede_tpa_rx_build_skb() do not check for a
-NULL return from qede_build_skb(). When it returns NULL under memory
-pressure, the functions still consume a BD from the ring before
-returning NULL. The callers then recycle additional BDs, resulting in
-one extra BD being consumed (off-by-one). This desynchronizes the BD
-ring, which can corrupt DMA page reference counts and lead to SLUB
-freelist corruption.
+loopy_wait() expects millisecond timestamps. However, Ubuntu Resolute
+can use uutils date, where `date -u +%s%3N` returns seconds plus full
+nanoseconds instead of a 3-digit millisecond field. This makes
+busywait expire too early and can make vlan_bridge_binding.sh read a
+stale operstate.
 
-Commit 4e910dbe3650 ("qede: confirm skb is allocated before using")
-added a NULL check inside qede_build_skb() to prevent a NULL pointer
-dereference, but did not address the missing NULL checks in the
-callers, making this off-by-one reachable.
-
-Fix this by adding NULL checks for the return value of
-qede_build_skb() in both qede_rx_build_skb() and
-qede_tpa_rx_build_skb(), returning NULL immediately before any BD ring
-manipulation.
-
-Fixes: 4e910dbe3650 ("qede: confirm skb is allocated before using")
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
+Cc: stable@vger.kernel.org # 6.8+
+Link: https://github.com/uutils/coreutils/issues/11658
+Signed-off-by: Nirmoy Das <nirmoyd@nvidia.com>
 ---
- drivers/net/ethernet/qlogic/qede/qede_fp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Changes in v2:
+- Declare variables separately from command substitutions and propagate
+  timestamp failures, addressing ShellCheck SC2155.
 
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_fp.c b/drivers/net/ethernet/qlogic/qede/qede_fp.c
-index 33e18bb69774..c11e0d8f98aa 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_fp.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_fp.c
-@@ -765,6 +765,9 @@ qede_tpa_rx_build_skb(struct qede_dev *edev,
- 	struct sk_buff *skb;
+ tools/testing/selftests/net/lib.sh | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index b40694573f4c7..d030d45c0e603 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -70,12 +70,33 @@ ksft_exit_status_merge()
+ 		$ksft_xfail $ksft_pass $ksft_skip $ksft_fail
+ }
  
- 	skb = qede_build_skb(rxq, bd, len, pad);
-+	if (unlikely(!skb))
-+		return NULL;
++timestamp_ms()
++{
++	local now
++	local seconds
++	local nanoseconds
 +
- 	bd->page_offset += rxq->rx_buf_seg_size;
++	now=$(date -u +%s:%N) || return
++	seconds=${now%:*}
++	nanoseconds=${now#*:}
++
++	if [[ $nanoseconds =~ ^[0-9]+$ ]]; then
++		nanoseconds=${nanoseconds:0:9}
++	else
++		nanoseconds=0
++	fi
++
++	echo $((seconds * 1000 + 10#$nanoseconds / 1000000))
++}
++
+ loopy_wait()
+ {
+ 	local sleep_cmd=$1; shift
+ 	local timeout_ms=$1; shift
++	local start_time
++	local current_time
  
- 	if (bd->page_offset == PAGE_SIZE) {
-@@ -812,6 +815,8 @@ qede_rx_build_skb(struct qede_dev *edev,
- 	}
+-	local start_time="$(date -u +%s%3N)"
++	start_time=$(timestamp_ms) || return
+ 	while true
+ 	do
+ 		local out
+@@ -84,7 +105,7 @@ loopy_wait()
+ 			return 0
+ 		fi
  
- 	skb = qede_build_skb(rxq, bd, len, pad);
-+	if (unlikely(!skb))
-+		return NULL;
- 
- 	if (unlikely(qede_realloc_rx_buffer(rxq, bd))) {
- 		/* Incr page ref count to reuse on allocation failure so
--- 
-2.54.0
+-		local current_time="$(date -u +%s%3N)"
++		current_time=$(timestamp_ms) || return
+ 		if ((current_time - start_time > timeout_ms)); then
+ 			echo -n "$out"
+ 			return 1
 
+base-commit: e7cffd183c128af12683aba28ba163017ea2b192
+-- 
+2.43.0
 
