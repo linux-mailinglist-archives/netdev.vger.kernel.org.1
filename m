@@ -1,468 +1,217 @@
-Return-Path: <netdev+bounces-303209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303202-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6viFKsvMQ2oAigoAu9opvQ
-	(envelope-from <netdev+bounces-303209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:03:55 +0200
+	id gEocEybNQ2o4igoAu9opvQ
+	(envelope-from <netdev+bounces-303202-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:05:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27DFD6E5315
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:03:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B53966E534F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:05:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-berlin.de header.s=dkim-tub26 header.b=b1kPmCOG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303209-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303209-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=tu-berlin.de;
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=tcnMLnZo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303202-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303202-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=debian.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A93A30407F0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:03:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF6F230E9DB4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7E2358378;
-	Tue, 30 Jun 2026 14:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B6F32C957;
+	Tue, 30 Jun 2026 14:01:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5921624C5;
-	Tue, 30 Jun 2026 14:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E98317A2E8;
+	Tue, 30 Jun 2026 14:01:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782828223; cv=none; b=d0+XfWGlwUQ1uLyGnU/6sYxbSGN/AHyg2ipBv/9yL6LjbMg7Q2c2t/jV+PubGq5nZy2ak3BFi/q3yZErzCVBB3NH9pTps6RwjWkmNdCRiImjXOESO4eanLjCm99zESEZUj7nH0uO82Ph2jq27Lf6mnaT47/SU+fdphcZLAKGKUY=
+	t=1782828111; cv=none; b=gqBwkSBAajWM8SSZsnpJ4nqBTX6Nfcf76+YgoQeEtH+oOI/4wsn2l6KQzQICkrhMdpoWfbl2+HvJby+xqnNErcBLAUP63YOiGd7sXsH7mx20NMxbWv7Q2aF2jt0M0Umv/kLZncck6i5d8SWaoSpSaBXvzAduXySslAdsdwW84vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782828223; c=relaxed/simple;
-	bh=GVsIm8XoaVLhgPxn9LpSdYuWPr1gq2+vT3rc+BKo9d0=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=ISXHclXYoM6KATLLicRronHIAXFQjNVCXamuyLrkfCGbUpaVAIFzRbWaL09I0ahVgnDhDmFYGthEMNeK1lpNw5Mjvv9rP5CR9aPY3nsgu4M11b9wszoy6bDgIAMekGTbMJrnrfFzheMIUwTLz4QiNr6CJLaYVJV7OTsrkEhrDz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=b1kPmCOG; arc=none smtp.client-ip=130.149.7.70
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
-  d=tu-berlin.de; s=dkim-tub26; t=1782828219;
-  h=message-id:date:mime-version:from:subject:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=3AKd9KH+LJONtIvwXuLkpB31iVtF42WTeiF1oI8ZMD4=;
-  b=b1kPmCOGxxQla9mHgLGOi7USRPH83vbHGCqI/QNbSmDfwlZUapi2FwZT
-   XFxLK9RHvM6e+566V0BQlP2MWRuxyWbTuSjbgUFxH/gWUehUGZQruKhBU
-   4+nrYXKOUkDBRDs8D2OU5LhAlrAKQoJ3b7OShgAlE/EO1NLKP/wqHrfBX
-   +QEaNbNtgl6AyUg3j1nWB2B+LEdOFdckGZgt2Ns3kM8Xir51SHcdmCOe3
-   IBQba4Y/6Xs6ohPisuUHZWe43rFD40fwSwBlPWwPCyKgS1wPIlp9baB99
-   CaH0SwNBPSd7eyi7sLoWYuoIz9fQT6TUE1rx30yaAr8/cAqZrLR/f44yc
-   g==;
-X-CSE-ConnectionGUID: DAr4VdiLQzSLA7zgrlAAGw==
-X-CSE-MsgGUID: PxFxgtuITM2zVxuJS2m2MQ==
-X-IronPort-AV: E=Sophos;i="6.24,234,1774306800"; 
-   d="scan'208";a="63585045"
-Received: from bulkmail.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.143])
-  by mailrelay.tu-berlin.de with ESMTP; 30 Jun 2026 16:02:27 +0200
-Message-ID: <c4154d9c-8930-436d-b8b8-01951e8bd9f4@tu-berlin.de>
-Date: Tue, 30 Jun 2026 16:00:57 +0200
+	s=arc-20240116; t=1782828111; c=relaxed/simple;
+	bh=pqnDmfpozQdLF8X8/+ihJJg8y6+oqORe18JZB+lF7Sk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CkFh0x8t22wjd3jk8BZIMCMxiKxplfShd3KlFalNByYHvTAVqPuMrEOLO3ej87leis0AN/nYatqposs36FXPDUzEDwuP2WrcxOFGiEuiBr52GBeNsKupOVNplDXTs4ZU2CUWz86EFvKzUsvcMgNeCGdzwmNDU8DZ2FDKfIQwA5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=tcnMLnZo; arc=none smtp.client-ip=82.195.75.108
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=Ca/FumOWBkJcXOWzWEakZyxu696nHwSgTRatAghd7bM=; b=tcnMLnZo1zT2w98/2Lv+/WI0sm
+	g2HxXI+ZnW4lw/6rVjS9TJIP5QOaREBZk0cQuV6+2fespMblZ71N4tIMcR7yFnZ25gjPB5B1rllAI
+	ByQWyYDbyTR8EnOiakV82H6Q+0se5fbxaF2lngaOqJpwK6X3ehAATjvhfk5H39q+Hb9vAemPSkC3P
+	1wgKp4cn4NPK7OsDa8AzvvzV96gTtyin8Rp17uKkdLNVYGyXTr4/5DbPLD8wAHuj5KBVJ7Fs6dqrj
+	i9f/KQORUclRzxjb2sZwZhxqf7y7rQA0SmLj+mJCuZhnUMKEWmWrmTB8+tgTCN+o/C5s0JMmvAJb2
+	FTFlgYoQ==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1weZ20-0077Hy-1z;
+	Tue, 30 Jun 2026 14:01:45 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 0/4] net: convert UDP getsockopt to sockopt_t
+Date: Tue, 30 Jun 2026 07:01:25 -0700
+Message-Id: <20260630-getsockopt_phase2-v2-0-193335f3d4d1@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
-Subject: Re: [PATCH net-next v7 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: Simon Schippers <simon.schippers@tu-dortmund.de>, <hawk@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: <kernel-team@cloudflare.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20260612083530.1650245-1-hawk@kernel.org>
- <20260612083530.1650245-6-hawk@kernel.org>
- <f120fd22-1ee5-4d5b-9cdd-71804353e6a7@tu-dortmund.de>
-Content-Language: en-US
-Autocrypt: addr=j.koeppeler@tu-berlin.de; keydata=
- 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
-In-Reply-To: <f120fd22-1ee5-4d5b-9cdd-71804353e6a7@tu-dortmund.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADXMQ2oC/23NQQrDIBBA0avIrGNxpLE0q96jhGJ0kgwFDSqSE
+ nL3gnTZ9Yf3D8iUmDIM4oBElTPHAIPQnQC32rCQZA+DAK20UQZRLlRydO+4lde22kxaOn+991Y
+ h9s5CJ2BLNPPezCcEKjLQXmDsBKycS0yfNqvY+s/Vf9yKUsnbpHDGufeozMPTxDZcYlpgPM/zC
+ +00dPK9AAAA
+X-Change-ID: 20260611-getsockopt_phase2-cd495a0115ca
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Shuah Khan <shuah@kernel.org>, sdf.kernel@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3168; i=leitao@debian.org;
+ h=from:subject:message-id; bh=pqnDmfpozQdLF8X8/+ihJJg8y6+oqORe18JZB+lF7Sk=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqQ8xERMBLGdeZMILVm3ay3dia6rPwvBwoBMDLk
+ w2GOpG7MT2JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCakPMRAAKCRA1o5Of/Hh3
+ beIiD/wKZ/JZU554uvDXqBEL/LW39HuLgqfAlvGd4S/ktwXjLN3GCNBWfxpIAd8a3kyk2KRVODF
+ 7TKA+12x5XOkzmjzfBMY/Fs4LHTQTIrXAtnq5VTv50VnYXY9hqVYsqR3/ggbKwHrLQaYS752uAo
+ wmlMjaeXowPvZuz/ZGrUfJy2xdP80EkaQ7wcJtjuF40R38RKsS22R4QxX9iZuHsJbIKWVi8Qk15
+ j2Qk7MC6t3AL3/4Fcy2/Owyunnul6+RcPHlRaoOrmHqqiGWaGi13mbcfI9A9cVmCU8GpZdAJVNa
+ GyeggOq+OSbwCKOtQXeDmjNupzBFuJ0f8POn8kn2auQb5Z54RT3DNQ0htsBRlwWPMGGK/exGIp/
+ YraS6caKEJ5VekRSNuMxGkMvig3f972dzQBffP08L8MjlPj+vBOxwTilRLK1eKvWzBNdHvHr6Vw
+ /quarvSoatGA+hHQoV7aNtkp78wZDQsK2MEK/h/Vh/uz3j4dQHkHGOD1tRxN7WrQNI/V3nkNWQ1
+ vn+VjtJQHwEICuSvHNA5Du6ned2Qtpjg+vUm8WY8bMIK7VjL5SObpvD13rLFhndpsyeSa90X3Mk
+ kJJKwVdW6FGfp805MJ/WK9GXWe4JaY/BDSx6h8c2mXl1LAtDFlObIrI0fy/aJo/t2OzmjIL1zbD
+ AEZX+PIrySSFY/g==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303202-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:shuah@kernel.org,m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:leitao@debian.org,m:kernel-team@meta.com,m:willemdebruijnkernel@gmail.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303209-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:hawk@kernel.org,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tu-berlin.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[cloudflare.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,tu-berlin.de:dkim,tu-berlin.de:email,tu-berlin.de:mid,tu-berlin.de:from_mime,dql.limit:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 27DFD6E5315
+X-Rspamd-Queue-Id: B53966E534F
 
-On 6/13/26 4:14 PM, Simon Schippers wrote:
-> On 6/12/26 10:35, hawk@kernel.org wrote:
->> From: Simon Schippers <simon.schippers@tu-dortmund.de>
->>
->> Per-packet BQL completion forces DQL to converge on limit=2, causing
->> excessive NAPI scheduling overhead and qdisc requeues.
->>
->> Accumulate BQL completions and flush them when a configurable time
->> threshold (tx-usecs) is exceeded, letting DQL discover a limit that
->> bounds actual queuing delay to the configured interval. Coalescing
->> state persists across NAPI polls in struct veth_rq so completions can
->> accumulate beyond a single budget=64 cycle.
->>
->> The flush condition is:
->>
->> state->time + bql_flush_ns <= current_time || state->n_bql > dql.limit
->>
->> Flushing when n_bql exceeds dql.limit handles BQL starvation.
->>
->> The comparison is strictly greater-than because netdev_tx_sent_queue()
->> always lets the producer exceed the limit by one before it stops, so
->> n_bql == dql.limit is a normal in-flight state. dql.limit lives in
->> the same cacheline as the completion path, so the check is cheap.
->>
->> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
->> setting tx-usecs to 0 disables coalescing and falls back to per-packet
->> completion.
->>
->>    ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->>    ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->>
->> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Co-developed-by: Jonas Köppeler <j.koeppeler@tu-berlin.de>
->> Signed-off-by: Jonas Köppeler <j.koeppeler@tu-berlin.de>
->> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->> ---
->>   drivers/net/veth.c | 123 ++++++++++++++++++++++++++++++++++++++++++---
->>   1 file changed, 117 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index 2473f730734b..c62d87a8402c 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
->> @@ -28,6 +28,7 @@
->>   #include <linux/bpf_trace.h>
->>   #include <linux/net_tstamp.h>
->>   #include <linux/skbuff_ref.h>
->> +#include <linux/sched/clock.h>
->>   #include <net/page_pool/helpers.h>
->>   
->>   #define DRV_NAME	"veth"
->> @@ -50,6 +51,7 @@
->>    * delay => 64 * 250 ms = 16 s.
->>    */
->>   #define VETH_WATCHDOG_TIMEOUT_MS	(64 * 250)
->> +#define VETH_BQL_COAL_TX_USECS	100 /* default tx-usecs for BQL batching*/
->>   
->>   struct veth_stats {
->>   	u64	rx_drops;
->> @@ -69,6 +71,11 @@ struct veth_rq_stats {
->>   	struct u64_stats_sync	syncp;
->>   };
->>   
->> +struct veth_bql_state {
->> +	u64	time;	/* sched_clock() when current coalescing window started */
->> +	uint	n_bql;	/* BQL completions batched in the current window */
->> +};
->> +
->>   struct veth_rq {
->>   	struct napi_struct	xdp_napi;
->>   	struct napi_struct __rcu *napi; /* points to xdp_napi when the latteris initialized */
->> @@ -76,6 +83,7 @@ struct veth_rq {
->>   	struct bpf_prog __rcu	*xdp_prog;
->>   	struct xdp_mem_info	xdp_mem;
->>   	struct veth_rq_stats	stats;
->> +	struct veth_bql_state	bql_state;
->>   	bool			rx_notify_masked;
->>   	struct ptr_ring		xdp_ring;
->>   	struct xdp_rxq_info	xdp_rxq;
->> @@ -88,6 +96,7 @@ struct veth_priv {
->>   	struct bpf_prog		*_xdp_prog;
->>   	struct veth_rq		*rq;
->>   	unsigned int		requested_headroom;
->> +	unsigned int		tx_coal_usecs;	/* BQL completion coalescing */
->>   };
->>   
->>   struct veth_xdp_tx_bq {
->> @@ -272,7 +281,56 @@ static void veth_get_channels(struct net_device *dev,
->>   static int veth_set_channels(struct net_device *dev,
->>   			     struct ethtool_channels *ch);
->>   
->> +static int veth_get_coalesce(struct net_device *dev,
->> +			     struct ethtool_coalesce *ec,
->> +			     struct kernel_ethtool_coalesce *kernel_coal,
->> +			     struct netlink_ext_ack *extack)
->> +{
->> +	struct veth_priv *priv = netdev_priv(dev);
->> +
->> +	ec->tx_coalesce_usecs = priv->tx_coal_usecs;
->> +	return 0;
->> +}
->> +
->> +static int veth_set_coalesce(struct net_device *dev,
->> +			     struct ethtool_coalesce *ec,
->> +			     struct kernel_ethtool_coalesce *kernel_coal,
->> +			     struct netlink_ext_ack *extack)
->> +{
->> +	struct veth_priv *priv = netdev_priv(dev);
->> +	struct net_device *peer;
->> +
->> +	/* The coalescing window delays BQL completions, so keep tx-usecs well
->> +	 * below the tx_timeout watchdog; otherwise a large value could stall a
->> +	 * stopped queue long enough to trip a false watchdog timeout. Cap at
->> +	 * half the watchdog to leave a generous safety margin. tx-usecs is
->> +	 * microseconds, the watchdog is milliseconds.
->> +	 */
->> +	if (ec->tx_coalesce_usecs > VETH_WATCHDOG_TIMEOUT_MS / 2 * USEC_PER_MSEC) {
->> +		NL_SET_ERR_MSG_MOD(extack,
->> +				   "tx-usecs must stay below half the tx_timeout watchdog");
->> +		return -ERANGE;
->> +	}
->> +
->> +	/* Paired with READ_ONCE in veth_xdp_rcv(). */
->> +	WRITE_ONCE(priv->tx_coal_usecs, ec->tx_coalesce_usecs);
->> +
->> +	/* veth_xdp_rcv() reads each device's own value, so mirror it onto
->> +	 * the peer to keep the pair symmetric: both directions coalesce
->> +	 * with the same tx-usecs. Called under RTNL, rtnl_dereference() is safe.
->> +	 */
->> +	peer = rtnl_dereference(priv->peer);
->> +	if (peer) {
->> +		struct veth_priv *peer_priv = netdev_priv(peer);
->> +
->> +		WRITE_ONCE(peer_priv->tx_coal_usecs, ec->tx_coalesce_usecs);
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>   static const struct ethtool_ops veth_ethtool_ops = {
->> +	.supported_coalesce_params = ETHTOOL_COALESCE_TX_USECS,
->>   	.get_drvinfo		= veth_get_drvinfo,
->>   	.get_link		= ethtool_op_get_link,
->>   	.get_strings		= veth_get_strings,
->> @@ -282,6 +340,8 @@ static const struct ethtool_ops veth_ethtool_ops ={
->>   	.get_ts_info		= ethtool_op_get_ts_info,
->>   	.get_channels		= veth_get_channels,
->>   	.set_channels		= veth_set_channels,
->> +	.get_coalesce		= veth_get_coalesce,
->> +	.set_coalesce		= veth_set_coalesce,
->>   };
->>   
->>   /* general routines */
->> @@ -969,13 +1029,54 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
->>   	return NULL;
->>   }
->>   
->> +static void veth_bql_maybe_complete(struct veth_bql_state *state,
->> +				    struct netdev_queue *peer_txq,
->> +				    u64 bql_flush_ns)
->> +{
->> +	u64 current_time;
->> +
->> +	/* There is no reason to complete with 0 and
->> +	 * peer_txq could go away.
->> +	 */
->> +	if (!state->n_bql || !peer_txq)
->> +		return;
->> +
->> +	current_time = sched_clock();
->> +
->> +	/* We complete if:
->> +	 * 1. We reach bql_flush_ns.
->> +	 * 2. We potentially have BQL starvation.
->> +	 */
->> +	if (state->time + bql_flush_ns <= current_time ||
->> +	    state->n_bql > peer_txq->dql.limit) {
-> 
-Indeed, this does not compile when CONFIG_BQL is not set. I think we 
-should just bring back the 'queue is empty + queue is stopped' check 
-from v6 back at the end of the poll and remove the n_bql > dql.limit 
-check. It also feels not obvious why this is handling the starvation 
-case. This only works, because the producer has went overlimit 
-previously and was stopped. So more than 'limit' packets have been 
-enqueued to the ring, and they are eventually drained when this check is 
-true. By removing this we can also avoid accessing dql internal members, 
-but if you don't think that's a problem we can leave as is.
+The leaf proto_ops getsockopt callbacks have been moving to the new
+getsockopt_iter()/sockopt_t interface.
 
-Further, this is only works if VETH_BQL_UNIT stays 1, otherwise it will 
-never fire. Anyway, still its necessary to check for CONFIG_BQL. But we 
-could solve this by adding VETH_BQL_UNIT to n_bql instead of 1. This is 
-also safe from any overflows, since limit is bound to limit_max, 
-inflight is always less than limit + 1*VETH_BQL_UNIT and n_bql <= inflight.
+I was trying to get SMC into getsockop and retire .getsockopt, but,
+I found the best approach is to keep converting other protocols.
 
-In a version of bringing back the 'queue-empty' check and keeping most 
-of the current logic (so a mixture of v6 and v7) resulted in the same 
-performance on an x86_64 architecture.
+This series starts the same conversion one layer down, at the struct proto
+getsockopt path, beginning with UDP.
 
-> Both Sashiko-Nipa and Sashiko-Gemini are right, this is missing a
-> #ifdef CONFIG_BQL. Not sure what is the best way to add them.
-> And for the struct we could maybe do:
-> 
-> #ifdef CONFIG_BQL
-> struct veth_bql_state {
->      u64	time;	/* sched_clock() when current coalescing window started */
->      uint	n_bql;	/* BQL completions batched in the current window */
-> };
-> #else
-> struct veth_bql_state {};
-> #endif
-Regarding the configs: we can just do something along those lines.
-struct veth_rq {
-...
-#ifdef CONFIG_BQL
-	struct veth_bql_state		dql;
-#endif
-...
-}
+Example of the current code.
 
-and we put the rest of the code that accesses or performs an action 
-regarding bql in some functions and do it like in netdev_* functions with
+	static int udp_getsockopt(struct sock *sk, int level, int optname,
+				char __user *optval, int __user *optlen)
+	{
+		if (level == SOL_UDP)
+			return udp_lib_getsockopt(sk, level, optname, optval, optlen);
+		return ip_getsockopt(sk, level, optname, optval, optlen);
+	}
 
-Function-Signature()
+We want udp_getsockopt to go to .getsockopt_iter, and there are two
+approaches in this case:
+
+1) Create a patchset that moves both of them to getsockopt_iter, which
+   is will be a huge change (ip_getsockopt() is used in many places)
+
+2) Break this down, and transform from bottoms up. First
+   udp_lib_getsockopt() up to the point we can easily convert
+   others, such as ip_getsockopt().
+
+I am taking the approach 2), so, the intermediate code will be something
+like:
+
+static int udp_getsockopt(struct sock *sk, int level, int optname,
+                          char __user *optval, int __user *optlen)
 {
-#ifdef CONFIG_BQL
-// Code
-#endif
+        sockopt_t opt;
+        int err;
+
+        if (level != SOL_UDP)
+                return ip_getsockopt(sk, level, optname, optval, optlen);
+
+	// Convert optlen/optval in sockopt // (first patch)
+
+        err = udp_lib_getsockopt(sk, level, optname, &opt);
 }
 
-Wdyt?
-- Jonas
-> 
->> +		netdev_tx_completed_queue(peer_txq, state->n_bql,
->> +					  state->n_bql * VETH_BQL_UNIT);
->> +		state->time = current_time;
->> +		state->n_bql = 0;
->> +	}
->> +}
->> +
->>   static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->>   			struct veth_xdp_tx_bq *bq,
->>   			struct veth_stats *stats,
->>   			struct netdev_queue *peer_txq)
->>   {
->> +	struct veth_priv *priv = netdev_priv(rq->dev);
->> +	struct veth_bql_state *state = &rq->bql_state;
->>   	int i, done = 0, n_xdpf = 0;
->>   	void *xdpf[VETH_XDP_BATCH];
->> +	u64 bql_flush_ns;
->> +
->> +	/* Mirrored to both peers; paired with WRITE_ONCE() in veth_set_coalesce */
->> +	bql_flush_ns = (u64)READ_ONCE(priv->tx_coal_usecs) * 1000;
->> +
->> +	/* Clamp stored timestamp in case we migrated to a CPU with a behind
->> +	 * sched_clock(); tries to reduce late BQL flushes.
->> +	 */
->> +	state->time = min(state->time, sched_clock());
->> +
->> +	/* Flush completions that timed out since the previous NAPI poll. */
->> +	veth_bql_maybe_complete(state, peer_txq, bql_flush_ns);>>
->>   	for (i = 0; i < budget; i++) {
->>   		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
->> @@ -1000,12 +1101,11 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->>   			}
->>   		} else {
->>   			/* ndo_start_xmit */
->> -			bool bql_charged = veth_ptr_is_bql(ptr);
->>   			struct sk_buff *skb = veth_ptr_to_skb(ptr);
->>   
->> +			if (veth_ptr_is_bql(ptr))
->> +				state->n_bql++;
->>   			stats->xdp_bytes += skb->len;
->> -			if (peer_txq && bql_charged)
->> -				netdev_tx_completed_queue(peer_txq, 1, VETH_BQL_UNIT);
->>   
->>   			skb = veth_xdp_rcv_skb(rq, skb, bq, stats);
->>   			if (skb) {
->> @@ -1015,6 +1115,7 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->>   					napi_gro_receive(&rq->xdp_napi, skb);
->>   			}
->>   		}
->> +		veth_bql_maybe_complete(state, peer_txq, bql_flush_ns);
->>   		done++;
-> 
-> Sashiko-Nipa reports:
-> 
-> "If veth_xdp_rcv() finishes and returns a done count less than the budget,
-> NAPI will go to sleep in veth_poll(). Do we need to unconditionally flush
-> any stranded BQL completions in veth_poll() before sleeping?
-> If completions are left in rq->bql_state indefinitely across NAPI idle
-> periods, it might present an artificially massive delay to DQL. This could
-> cause DQL to mistakenly conclude the hardware is extremely slow and
-> aggressively shrink dql.limit to its minimum, crippling throughput on
-> subsequent bursts."
-> 
-> Again the issue that I found to be non-problematic in [1] and can be
-> seen by an BQL inflight > 0 when for example pktgen suddenly stops.
-> 
-> If we would "unconditionally flush any stranded BQL completions in
-> veth_poll() before sleeping" we would *not* accumulate BQL completions
-> across NAPI polls but we want to do that.
-> 
-> Do you agree?
-> 
-> [1] https://lore.kernel.org/netdev/c8650d3a-e488-4279-b28f-549d766c23a1@tu-dortmund.de/
+The work is bottom-up and mergeable in small steps: a protocol's inner
+getsockopt helper is switched to sockopt_t behind its existing thin
+__user wrapper, one patch at a time.
+
+Once every inner helper speaks sockopt_t, a later series flips the shared
+struct proto.getsockopt and inet_connection_sock_af_ops.getsockopt signatures
+and drops the transitional wrappers.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v2:
+- Check for invalid `len` at call site (Stanlislav)
+- Do not rewrite `optlen` on error path (Sashiko)
+- Converted ipv4 raw
+- Expanded the selftest to test this new helper.
+- Link to v1: https://lore.kernel.org/r/20260612-getsockopt_phase2-v1-0-7b01f1f5d106@debian.org
+
+---
+Breno Leitao (4):
+      net: add sockopt_init_user() for getsockopt conversion
+      udp: convert udp_lib_getsockopt to sockopt_t
+      ipv4: raw: convert do_raw_getsockopt to sockopt_t
+      selftests: net: getsockopt_iter: add raw ICMP_FILTER coverage
+
+ include/linux/net.h                           | 23 +++++++
+ include/net/udp.h                             |  2 +-
+ net/ipv4/raw.c                                | 41 ++++++-----
+ net/ipv4/udp.c                                | 39 ++++++++---
+ net/ipv6/udp.c                                | 19 +++++-
+ tools/testing/selftests/net/getsockopt_iter.c | 97 +++++++++++++++++++++++++++
+ 6 files changed, 191 insertions(+), 30 deletions(-)
+---
+base-commit: c8459ee2fef502d6ef6c063751c33d9ac7943eab
+change-id: 20260611-getsockopt_phase2-cd495a0115ca
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
 
