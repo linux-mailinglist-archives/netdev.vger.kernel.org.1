@@ -1,124 +1,164 @@
-Return-Path: <netdev+bounces-303232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EFxXD5PRQ2pRjQoAu9opvQ
-	(envelope-from <netdev+bounces-303232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:24:19 +0200
+	id pNVKNA3SQ2q0jQoAu9opvQ
+	(envelope-from <netdev+bounces-303233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:26:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA7F6E5648
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:24:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FABC6E5690
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:26:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nNoNpynb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303232-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303232-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=czOvN6MP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303233-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303233-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B329317246D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:17:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 521FE31BC1B4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8DA346E4E;
-	Tue, 30 Jun 2026 14:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E48426693;
+	Tue, 30 Jun 2026 14:18:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B238B1A0BF3;
-	Tue, 30 Jun 2026 14:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159F81A0BF3;
+	Tue, 30 Jun 2026 14:18:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782829023; cv=none; b=YyVR8nt67wPU3HztEpFg04Zdnbq9IjNTe0kJOBqFjJ/m2xJR5dmId1TweTarIS7GFEPt24N7ZhJm7WHViRw2KhS0/g+RNAPS1+PqUCpxkdkrPhd3UNDvA2EIIwZcVcT/2okbj2B5rtmYZt0RT+Vyk4L/PmmQMRX40LY7ULoMAtE=
+	t=1782829091; cv=none; b=tpIPWjp/O7M8fG5rbrJPOmfmd1bAB6n98Acjn3l8mYkoZuS/93XHNUoBqrRXFaz0bUoWXVqL1xSJj8CfG2vhZCh/T/FevJcPZqO8cUiK7+EgYiCropqMPVIFYoPISYgrVT298ffj5r+a9hqnQdMw940iAd1vV2J4H/TizpA1tvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782829023; c=relaxed/simple;
-	bh=ZGQfzpYt2YhIwe7v+7wfMdBXIFcnDDnaDTtgO6fkcmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bNF8TmcIyhIogUYmCMVcYpTQp0lp4Wuoh4RSmERX1CwBFRIgUrFaA94wZLM30HpRdX+5k3wqLkC1V1cPP+qsoD8BMLEsbvhopNya0ubz2uWGw1f48WXzoq2p4wxZ7xw4blahS1ciDZXl00CPvVtPw18ubF4j3dP37P7uEYw70F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNoNpynb; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DB831F000E9;
-	Tue, 30 Jun 2026 14:17:02 +0000 (UTC)
+	s=arc-20240116; t=1782829091; c=relaxed/simple;
+	bh=B8Y0dTMlB+oB9s7duvm7DhqDyHlJZoxRIu7q/l43pzc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L8imXBJh/C01TMsDpNM4o4NQ4i7l+DjSf+tigGqyDa5LfrHrM3QExEVfo/vwJPYJbFJQNwBLRsg2Lzb58DHcCG1WW242wShg4+q5Z4XCOm1bl7lvZ3sBLWZrAFbjAYx8WqyJ8tjl3ca6WoRW5dCuF6dOBd01NDMXbhal54B/eco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czOvN6MP; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6491F00A3A;
+	Tue, 30 Jun 2026 14:18:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782829022;
-	bh=OrryefzzWlDGUbQu3WPT9xvectgqeQ8dLjRQaVeZG94=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=nNoNpynbXbYCgClLn48fWff7gcLhhu4NgGd08gG1gxpoT7mtlBWwgSD/8falcRKVq
-	 fnUjDMJHb+VHZQspo1bklW1k9h+ETN5UfPc1iGWIsvh/NSAnUO38WxXVIU0wk+q0EY
-	 nc/koSKYyTts1CKem8i3cOhxmtMElrE47iH6S40n4nlBHxM4Nh1RNqAaC2URRaBZQO
-	 0BhD/VwhxAiWVDGKWYvA5qrnBE1Zakha8mAaJREHRh+oIOtAELMoCcQIZhVvgKi/xG
-	 PR881jCiAlQbepNHwDt9SF9zXM8ThqUCtfAy7WmLQUMzuCEz++3+/Arvtdr/t5FIiL
-	 Z1dmvCbP7OH0A==
-Date: Tue, 30 Jun 2026 07:17:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jori Koolstra <jkoolstra@xs4all.nl>
-Cc: Christian Brauner <brauner@kernel.org>, Aleksa Sarai
- <cyphar@cyphar.com>, Kuniyuki Iwashima <kuniyu@google.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/5] selftest: Add tests for useful handling
- of LSM denials on SCM_RIGHTS
-Message-ID: <20260630071701.6b583d1e@kernel.org>
-In-Reply-To: <20260629194327.2270798-6-jkoolstra@xs4all.nl>
-References: <20260629194327.2270798-1-jkoolstra@xs4all.nl>
-	<20260629194327.2270798-6-jkoolstra@xs4all.nl>
+	s=k20260515; t=1782829090;
+	bh=nJE7z6y+b0729BtKGMZ7zs0Yot0Hv1XhxgGW0/v1JZc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=czOvN6MPHetgLKJr5rLG6WWWF2AgkQQu5eBvJsJ5Yt9XG/CkpJu012K4kYCMEmjhI
+	 4y+VvaQY1M81JIrE9e0akdnw63N8atIg83+q2d23SSmfhcjoi4giHM+aMJMRvPWyaT
+	 y0dgHzWvwh9pCQIsK2MTRRFAxmlYSIbSJ542/LL5+05w6s5clcKLi82csRNiMgBUPx
+	 fim/GrOlNnCOZaDrf6+O5NPI3DJgw2owkORlK77Y0c4sPGgJ722AuYSOVxedB+973h
+	 4RdfQWcQBo8KurgCe1FP+gvQeAlCDe2eFNB/VAYbdvvmHQVXEu2cXuQpucrg+aTtbT
+	 EMSWmRA6izxyw==
+Message-ID: <cf25f667-1095-4f84-98ff-bf4662d3faa8@kernel.org>
+Date: Tue, 30 Jun 2026 08:18:07 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v5 1/3] bpf: Add BPF_FIB_LOOKUP_VLAN flag to
+ bpf_fib_lookup() helper
+Content-Language: en-US
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Avinash Duduskar <avinash.duduskar@gmail.com>, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org
+Cc: eddyz87@gmail.com, memxor@gmail.com, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
+ emil@etsalapatis.com, john.fastabend@gmail.com, sdf@fomichev.me,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org,
+ yatsenko@meta.com, leon.hwang@linux.dev, kpsingh@kernel.org,
+ a.s.protopopov@gmail.com, ameryhung@gmail.com, rongtao@cestc.cn,
+ eyal.birger@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260624030530.3342884-1-avinash.duduskar@gmail.com>
+ <20260624030530.3342884-2-avinash.duduskar@gmail.com>
+ <d820adf6-4a33-45e9-9cfa-17f11a37c9e8@kernel.org> <87se65bd04.fsf@toke.dk>
+ <2ffa32dd-5c88-488a-aa23-deef13465eb9@kernel.org> <87echobb5h.fsf@toke.dk>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <87echobb5h.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303232-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:jkoolstra@xs4all.nl,m:brauner@kernel.org,m:cyphar@cyphar.com,m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c0a:e001:db::12fc:5321:from];
+	FORGED_RECIPIENTS(0.00)[m:toke@redhat.com,m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:yatsenko@meta.com,m:leon.hwang@linux.dev,m:kpsingh@kernel.org,m:a.s.protopopov@gmail.com,m:ameryhung@gmail.com,m:rongtao@cestc.cn,m:eyal.birger@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,m:asprotopopov@gmail.com,m:eyalbirger@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[xs4all.nl];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[redhat.com,gmail.com,kernel.org,iogearbox.net];
+	TAGGED_FROM(0.00)[bounces-303233-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,100.103.45.18:received];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7EA7F6E5648
+X-Rspamd-Queue-Id: 2FABC6E5690
 
-On Mon, 29 Jun 2026 21:43:27 +0200 Jori Koolstra wrote:
-> The test uses the following Smack labels:
+On 6/30/26 4:00 AM, Toke Høiland-Jørgensen wrote:
+>> It does not make sense to require a flag to get lookup output. vlan
+>> proto of 0 is not valid, so it is a clear indication that the vlan
+>> output parameters were not set during the lookup.
 > 
->    "Sender"   - label for the sending process
->    "Receiver" - label for the receiving process
->    "SecretX"   - labels for the files being passed
+> Okay, so we could just unconditionally set the VLAN fields, but if we
+> start rewriting the ifindex that would be a change of the existing
+> behaviour that could break existing applications, no?
 
-Not sure this test belongs in net/
-99.9% of people running this test do not use Smack.
-At the very least you need to use XFAIL instead of SKIP
-we use skip for problems with the env which are fixable,
-like a command missing.
+Consistently dealing with upper devices is one of the reasons I never
+sent patches for vlan support.
+
+xdp support is at the driver layer for real (physical) devices. The fib
+lookup is going to return the vlan device index - a virtual device.
+Support for xdp should not be propagated to virtual devices; it goes
+against the intent of xdp. Any trip down this path will have to decide
+how to handle vlan-in-vlan use cases. Where is the line drawn for fast
+networking?
+
+> 
+> Specifically, if an XDP application has a table of the interfaces it
+> forwards between, today they'd get a VLAN interface ifindex, which would
+> not be in that table, and the application would return XDP_PASS. Whereas
+> if we change the ifindex and populate the VLAN tag, suddenly the
+> interface would be in the table, but because the application doesn't
+> read the returned VLAN tag, it will end up sending packets out without
+> tagging them, leading to broken forwarding.
+
+I have not followed developments over the past few years. Does XDP have
+support for vlan acceleration in the Tx path now? You really want that
+to deal with vlans and not replicating s/w processing in ebpf.
+
+> 
+> So if we don't want the flag, we'd need some other mechanism to resolve
+> the parent ifindex, AFAICT? Maybe a xdp_get_parent_ifindex() kfunc, say?
+> That could also be made generic for other stacked interface types, I
+> suppose.
+> 
+> WDYT?
+
+dealing with stacked devices is hard :-)
+
+What is the return is a bond device or a vlan on a bond device?
+
 
