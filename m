@@ -1,323 +1,253 @@
-Return-Path: <netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id s54KADuRQ2oMcQoAu9opvQ
-	(envelope-from <netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:49:47 +0200
+	id EFteFNKQQ2rHcAoAu9opvQ
+	(envelope-from <netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:48:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400EF6E2728
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:49:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06B176E26B7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:48:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=b9eIZwzD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303061-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=N5jUq8qt;
+	dkim=pass header.d=redhat.com header.s=google header.b=dQ7dT7oF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303062-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 337EC3059E1F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:40:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 73DD2301FF8B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CB238C407;
-	Tue, 30 Jun 2026 09:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90AD938C407;
+	Tue, 30 Jun 2026 09:41:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA92B3955EE
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:40:42 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782812445; cv=fail; b=iP9Wx5L5gqviL89NQKA1kBdWvFjaUhI+HHyH86oRPdKHnIme+Khw9HzsnbN0TWKBhWNJK9D64lNPQKjvWJFat0ZHzpnTqkP45LjU8rLyjUuMqz6xLVzfHCDDpRvctpO9HqOYjUrA2kXKbfxiLOCG/QDTpLa2YlOHtTE/alYsEaw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782812445; c=relaxed/simple;
-	bh=M+xYt1k+37DJm+5NITo90J3cW8FsPcLzGnQhUiGDhHo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=G8JvZNxSYJmX9jmuUqIUQO45KO3dgtSkkaA53A6kyvzQBYcczxjzkspnzXBCqpy0M/MoZh5nWxlYw9xJLQVwxELb+1MgKVI7btKhCtm+OjSvEBxlN/0gIQVdKd7jDqv+bvxVsiEsd5OeRf1VG9qLWnB7cXgbqQdAsKGyHkZdKYE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b9eIZwzD; arc=fail smtp.client-ip=198.175.65.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782812443; x=1814348443;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=M+xYt1k+37DJm+5NITo90J3cW8FsPcLzGnQhUiGDhHo=;
-  b=b9eIZwzDaJrrA3ioUwCdZ448f18CH0gtt9hpxkdKmVYPhetgpUNzCWDh
-   RnysD2Z0sJe6fbEXoBOHiEpHApXqKp3tCFLoe2GgZCOUAnYPRwB3RyHWF
-   sZXwoCy70YsfrrrL2tEiDzna3iNwzsTbcfLVQpMKA2UvUUxynMyqj8UeX
-   9a2QYz9LEcxA9fUPpSSPPTvk5nTO0BJKlmqSfqAs2CzcfoMmaP375MMJm
-   wMMW7qThA4GClio7D7HAkfDZSSfan37RkgrochV3A6lkzeMcmimZH07q7
-   IYwOgvjFDn9xB2itHd6Srx7NWTGot+bQ331vWypFz5ZMCaiREFMDwGeYf
-   A==;
-X-CSE-ConnectionGUID: KeAt3bQXROiZoCSrHeSELA==
-X-CSE-MsgGUID: a1MtuKYmS3qYotTgCHKv8A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11832"; a="83604690"
-X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
-   d="scan'208";a="83604690"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 02:40:42 -0700
-X-CSE-ConnectionGUID: wLOCwxQvS3am2HnSOYJdMQ==
-X-CSE-MsgGUID: eAxSOl1STBeYxBzwY75ReQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
-   d="scan'208";a="252355218"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 02:40:42 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 30 Jun 2026 02:40:41 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Tue, 30 Jun 2026 02:40:41 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.64) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 30 Jun 2026 02:40:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mGUJ88bWrHU2nYv102tlmwoJaNcb4uLCAj313NUN0SeHPcJFu7SXWKLQ+z1O4wS1IVA48SAIy4ALTjOilI1bATszLVbFYdYiQAM6dMpRYN4wKSSHSP5KYyrYSyYUJRb0lcrLB8ylD+jxYzlVESKE1SgVh4MXK9QOIGRB05cZ94tkFkahkszhMA3ZSA6tqt116+NXTjcOTvMo11CIN7DpHra705iYtU/dq0cxSsdiPRyDQcehw2tybNvaYsu1Sf+/EFKD8L6sYLuCALx/VjHcMTk/rXZmpyatkHGhOt8NVJ1BlGSQgW/0/kQvMZvfI9ixFe4E3ZgwH3HWeXrxpjmSkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N6rlO9FMN2JN/cStjPgZdy4wKJAaC3LPIGHp7x0nets=;
- b=KCBQUqssYaK6AlsN2shrlj2O5cNSaYgVa+Mzbp2Lz+zo9GwgNolUB5V2TN1HJvUGTlDZyzfNAGlWHpyHAZHwiB/U4xKfah2rPTZmApPS7ifGCvUHRu54dhNbI6mhCQcT9bm780wMAfjOOf0GZfkmPUU8Bk2mz4dKjz3/inqwEscWmoiaOLHtL4qNtFFiH3lDW7uSdilmNRMvh63km9PBnNh7tj+eluD2xu4RH2cGx2Fb0ywAmoQYNp+h4nvSsm/OpKcFTlBGrGstdjUC4n0SbcnKgDjnB7Ar7HYdoWcrOoB3aGTnGKImoGhBM8jdwwdbA7NmFIF6mAsLJEZ87vc0mQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by CYYPR11MB8408.namprd11.prod.outlook.com (2603:10b6:930:b9::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Tue, 30 Jun
- 2026 09:40:39 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
- 09:40:39 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Rongguang Wei <clementwei90@163.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, Rongguang Wei <weirongguang@kylinos.cn>
-Subject: RE: [Intel-wired-lan] [PATCH net-next v1] ice: use dev_err_probe in
- all appropriate places in ice_probe()
-Thread-Topic: [Intel-wired-lan] [PATCH net-next v1] ice: use dev_err_probe in
- all appropriate places in ice_probe()
-Thread-Index: AQHdCEA93eAcDoz6q06sJ88TbdEQeLZW17ig
-Date: Tue, 30 Jun 2026 09:40:38 +0000
-Message-ID: <IA3PR11MB8986EA15383743B16BB7B130E5F72@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260630032537.42605-1-clementwei90@163.com>
-In-Reply-To: <20260630032537.42605-1-clementwei90@163.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CYYPR11MB8408:EE_
-x-ms-office365-filtering-correlation-id: ef369afe-1a26-428c-beb6-08ded68ba507
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|23010399003|1800799024|38070700021|6133799003|56012099006|11063799006|22082099003|18002099003;
-x-microsoft-antispam-message-info: NOC6NvOnkeQM8WGMCDFmT8DSAmLkjSIxL/Eefn5cHaz6vL361p+zNgMBwzgmfXSNC/Rz4DE9+rGi52S45CN5ZfFy4J0yYBet56IQVEipxmZtcKs4H3LZ0PUnkqYxbAATrK1FcevpMMoGldpCn6F46ws8ZWenLqyDMcuuP27Wqn5+KNGCzHhNQv+kocCdJ5uuwo58xyFmLxe55kcP3bb6oA06KIPUpFZ/UhOxWEkQ8QB+u/n9aVcigPfAKCATD3u/1XXfeEPif5xbc5Ft6tUwVRTFORCpvf0UoUP2tqW64FGgEPV7WZMABN8dLMCZKFoKIMRQ2VHW8GngOVtyAUziByR7NCwomG7Tqg2rw2JLmyQKkaQebW22mv0+KKxBzy8WC46KN8u/km5lMNH/hQZmebQsfV7u0EMZjELV184FE2PrCNxdOsuCB2Ug4W5o/C52FqBlsXOK1nicUGoraKc/JBsBE2mlRWvQLLGtmZhrdYdODFbwOcMrRi2udhPOTNUtCn482xevLfIh8gx/P2qSFZ869orzg3kB619m6cLo0gDieNDFFNxNA+qNMTM6LM/f/dqDkb6IWz/WSfwfuCF5Xs+j8L8XU9a7rJkEj0e1koUlqiENo2A+BkpMdizssSlbfqKn8gzZ0V1eFh+vcfwA8UymoLs8fOGuYyv3r406RjJQWzjClvapyxZy0mUe1It9sKNhzuigPbgH6gOCHIWQXeRuCnMyGDhhV2LQq38ZPIA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(1800799024)(38070700021)(6133799003)(56012099006)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/eygtU2ohS4yb5Olau17OO/d6ItQBlbE+nbCcGAx/ph2IOCRZTel3eBDggv9?=
- =?us-ascii?Q?BJzG428eRSruI2b5Vw+WyUS4n6T0UQqilW3bZpxzS6kafsjWeM2X+rEGb3Hn?=
- =?us-ascii?Q?+ZIoVJbQZUIjAEOVboG+wp1PzjZ0JgtDBEuEaqCPwFxmzSpq+YIqOavHzCJ1?=
- =?us-ascii?Q?jMkKWvTMY1KBLMBot+LcS7F5gF++ysJqTbY/Fwlxpr+dxbrCu06EHRkf6MyO?=
- =?us-ascii?Q?l9QYXy9GTp2zTYK1KhFS7iUDXzvx21ez6UyeviAdUyhZ6g9jxerwCHimEwUg?=
- =?us-ascii?Q?0ZYcjGnaCCTEXw80CdUkzIDWZmw5vxyGGbzWc4yz5dDOqgDxkbtBdUSRTOF7?=
- =?us-ascii?Q?SabY2Q5lJVy9vVYsfAqCpD5Ew3cbXYeIKOxdkqx3H0IcX742N0+o8R5sY9vi?=
- =?us-ascii?Q?D2u69lnLprzxTNbZRM5ktfbWaNWmXZ/sYFtYTJ3YXnG+xOxi3J5ADHvplQ7u?=
- =?us-ascii?Q?npVOq/+o3Vks1vZ44gxpC9BdtO2tplXYgqt2JNkhQFfZeyeGJxzbGAD1g8Vw?=
- =?us-ascii?Q?g4uqZ6Ye+uVHUpMy+5UeOiDRtBJU04CQWvTivjj9Q4/xBGdO8KSBmTEwQOks?=
- =?us-ascii?Q?DcYPxiiVhImwXBCAqr5Kezl7Zz8naxJZKCQLiPC7z/VwoS/lUrAN4tfnukwi?=
- =?us-ascii?Q?NzQXlaW+68FimWmTIIxxvHER7mXFiRoHRKhSKc4LGysPjCIVSzrPbjwHkf7V?=
- =?us-ascii?Q?WlCdNsD+HfvNTorH8L3zmG/LqbvDEwq5L3C7lNz6zrlBcllwhyH6HbSHe2rm?=
- =?us-ascii?Q?fKUSg8zbbgIPfoE6zWnXIIeFp7UHcNNQ6iSsP4Zdz3I4PAAzkdXtnACAvqHC?=
- =?us-ascii?Q?H1MXOGwNdxU84LK9ioD/n3Zo9e9LBApbuu/LKu0HDobRWS8DSrG+Ij6x0kUl?=
- =?us-ascii?Q?Ex53+stipYUzWCHeH1JmTmjNMtdpy4c43soRE2sLZ8lPETf8silvsxK3NY/O?=
- =?us-ascii?Q?ZUZTySngXjaSb9DHzGwN/cJsW0nFkdZUDDp6ZVezbAG2aG1s/1TuQi0U2t8m?=
- =?us-ascii?Q?CruENyOPSbSnBu5g8jdlLXoe/Jj0FnJV/6fdlBUXaQb9KnCZcpKhMptxyLVP?=
- =?us-ascii?Q?fqtvPebQPd8jIGvJQVdb9n0TGH0QJh6tRTi5b135KykfnIjH+UICx5h7jswO?=
- =?us-ascii?Q?JFp7hdOSz4uYOX7LYFmrW3SITSPuSjHhfWlTi1kHVgcnoQtZ4Db6upr9dfbo?=
- =?us-ascii?Q?YXFU0mK1ymRSgoDTy5+C4WcTeMloNZibcInVuVhFc6d61lqFrdxGOppdMjFn?=
- =?us-ascii?Q?7UepveiYby4N6PpT58dra3pt0Yrfl4fwAh/JFtAelHSCkMhefE+TCG7iRCuP?=
- =?us-ascii?Q?Qlpo24gpU9iJ73M2qGsjwfvrxuVpCUlwzASbunLMu2sHE/WqfE6asirzXcnj?=
- =?us-ascii?Q?54HoXgAol3j6zQpyvBblUVDXI1G/mtpbPUhKWKg6WUqk0ufkKAQgFZQCeKwI?=
- =?us-ascii?Q?J2YaJnC1FtIz32AMILD0F4dlqPrDTWBqexL1VEZcKoH/u0yxFgQHTKwlF+sq?=
- =?us-ascii?Q?Je2QghlAd5imFFQOk/RoQB2WPGCW3SLlqcSHtoMiqZ9W5ziTZ6eReSm/eQKC?=
- =?us-ascii?Q?x0fCthWxw7+UlgjUp8yu6vdFV097KUPk5urfCG10IWXG2UojFhIwhxUwzB0h?=
- =?us-ascii?Q?WRaUfyHBVEqZHjKPPB8/8KCylDiwxVVGlTYFQm7lg0mfhUk2nEF3lxJbGGPN?=
- =?us-ascii?Q?5maywzrW/7+QRIUhrEwcQZ8B/ZsN9audczPnDMlLZWIlfIaIUaZOsZfeVGZB?=
- =?us-ascii?Q?bNGnQIZMPyidIAAdPXMe7+FlHqjnRJU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D3D38657D
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 09:41:16 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782812478; cv=none; b=ZabNGXuAhODpxyc1aGCgGlHXgS8wWr6KekdiiL3G/0FPFHxAtd0O7xajU0omR9vSoh5X/+MxLkOGX+d4P/XrWGHBc/CBBwAesY23naCC3mzhJyb3ysvhuSmPQYjRqjtlFG+Cry9Ba9cHavDZqHrVb+LGW55BBidvk+8JDjn22dw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782812478; c=relaxed/simple;
+	bh=YqmB8gQ2CSWotm3YyLmOYcMApzVTX/fpUiUxd3r4ALA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nCoZRDEnyIdilol7CJkI1JBU8qWGjXb4VDh5QV3xZz3id9MUgMxd90jT1thEquLVJus0MX5rCWfMkDrnjGpt0BaEqctlRLOpU9plNNj36d9oGi5nagz7twOqDHysc01xSJNc1YhBU4TdJ9g2CF4fqGYM9l/tUnwc6qs4bewUVlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N5jUq8qt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQ7dT7oF; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782812476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sT7VxdFpL+bwbQAtpOmSJ4nkpUzUgPkf4e0PHfftdcI=;
+	b=N5jUq8qteDoM2HBNvyK73qszNNqKgxoj9PCsuFRJxktYMpuj3xaYNgBI+BlxA353im8Im2
+	JH/aDt3RvCg7h7+fOHhTuyFdKZR82WRO3GvOmK+t8mmcYA15WZ8vcjz5EtJeqXN7QlL5y+
+	OVBbQVFnPeSqyE+4bRBaWB8eEzZVILM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-248-myAJImPjMZCSGOJbWNIrRA-1; Tue, 30 Jun 2026 05:41:14 -0400
+X-MC-Unique: myAJImPjMZCSGOJbWNIrRA-1
+X-Mimecast-MFC-AGG-ID: myAJImPjMZCSGOJbWNIrRA_1782812473
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4926d371224so26269005e9.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 02:41:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1782812473; x=1783417273; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sT7VxdFpL+bwbQAtpOmSJ4nkpUzUgPkf4e0PHfftdcI=;
+        b=dQ7dT7oF2RDGNQd5S4pmUOsVKHR/kc7gZlJYMGC4Nxjwbk0zSIfJrBdZYwxrCZ1rix
+         yBe+WffP77YzzIE0VNJo2xn8vbXSkuQoVmXOa4TpodHOH2WtXkS8AmnTt+eDez4oRkh9
+         O3IjrzcCQH9k6mfpd+GZGP4XDv4u+2wGLdiEtNRt66YyWH2rxw3BwEPMIf8N/Ne6dGVm
+         3Z/d2QDeicKnX9AAs6V53CM3XpPhsadBguevzSYJqIK8I39fTp6paJKV9JugCBn8QL5s
+         /M3gshpdqlqX60DGQxbqfOJIkGtDCxM5R2/yXoWMxZTXvN4faKNIDOQAW2hrnyJh2jIx
+         l5Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782812473; x=1783417273;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sT7VxdFpL+bwbQAtpOmSJ4nkpUzUgPkf4e0PHfftdcI=;
+        b=ilbJm5BS4lcqKchY9qWmLDl/4K14eJb/WYcleijjd9bmKOlEEVi/WtPZLjVI8Gt+vt
+         WW4E/yc8ff6bXvDA9tKUdZcjiwaj7Y4+uRxtAD6ghu3OvJwGRAJc9sp348SZRvRzVbYt
+         udGouho1kx8PTXZbJ9mw70E6qeCeIxzi31SjAtB24/rhZRTjeC4I6TJ5AJasIrdVQ1Q1
+         THjBz87kIP3r+R6PcbKJ8CJpy9rIr26GGTCINA0VxIO/F1nRf8bJY70Qs6ys/lpSLy4R
+         Wki+GJ71OLftatZfTO+6HwJyKvdE8GauDv99uOIaFnRrL8afaiWJb/JMnVdfcXY3blwb
+         H+qA==
+X-Forwarded-Encrypted: i=1; AFNElJ+px5FgoD53yCDQ4Hjp8XQCz3QXVJwGNqHnPfBoPELy+Ix+J4/vC0fTh2QqKrOsqZIN9GIU7Kw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYvmwMrL0baWYGhIbeHglm/TDfddluXpGSlqrhikIb0xrao2to
+	pPxEuZF1W8vTcInTg2jVNW09GiFXC+oLpj+ct2azaLtLwYDQ37ZI7F0NDEnwjMoKtcqNp01yN5g
+	UO2gqj7cJQ1WPHl3t8GthOTIhLojcn/xQBG/uA4Y/mxc0R6jYc0T7LkTSuQ==
+X-Gm-Gg: AfdE7cmzgB6YEb8JL60CrK6PE2ODbWbxH1HmD7Dt8V1YaIGoSzXh4eZEWVjr8w91YrP
+	4wycNU8449Al0z9j2i/BNwRvLhKrNonnbAOXCAVr3nbA2vOgtS5R6b9W46xEyZ0viAunwCABMLa
+	w/STDgG7KxH2zxii6F58kheM37ts7twq502yUdYtpA3SVcipy1t7fJqVoOERM4t3S5WojlF3MmU
+	kTYjjdTDWYJjsG/B5u/Y860TfRcTT8W0kkCykTV0h4tWIFdNNyAwZO23SCjZ7zklfPS41wiIYke
+	cfxRY8qeBWf65mHS1AyC8LqfMwRRW5wXKXT7TuXFb+5sHEeuk0cCKMKl/Cy3ZyRapfh7WQ/dVnU
+	v/DiIOjSk8PMVClLq2txMiIJ1iZnMc2SDguURiteRD/kauVLNT7V1qXhPGKBh
+X-Received: by 2002:a05:600c:a403:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493b82bc279mr38092645e9.31.1782812473067;
+        Tue, 30 Jun 2026 02:41:13 -0700 (PDT)
+X-Received: by 2002:a05:600c:a403:b0:493:a5d0:d1a1 with SMTP id 5b1f17b1804b1-493b82bc279mr38092065e9.31.1782812472479;
+        Tue, 30 Jun 2026 02:41:12 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-34-22-35.business.telecomitalia.it. [79.34.22.35])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493b8d0bbbcsm64869355e9.13.2026.06.30.02.41.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 02:41:11 -0700 (PDT)
+Date: Tue, 30 Jun 2026 11:41:07 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@rulkc.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Simon Horman <horms@kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	oxffffaa@gmail.com, rulkc@linuxtesting.org
+Subject: Re: [PATCH net-next v4] vsock/virtio: rewrite MSG_ZEROCOPY flag
+ handling
+Message-ID: <akOOf7ShQS4OBJrd@sgarzare-redhat>
+References: <20260628182052.951760-1-avkrasnov@rulkc.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: h0TxBopxzXd9pPzBTmyUNmX/zTnEtbTzcNNPvUch3l/3hKPvkbQH14xWeNG6bX60vGibwp/5DgmHTIgxS/iB9FlAFbwABrF/OdcEIku0QuQvUyHFCFhz2o7gmVjqr6+wyeEQUy78eQvkWb9u0tTK6HyIAZnaYTEkyy2+AVd/wGxbi7PguI3KtgkNsbalnSlFYU9+pUM/hv0e8j6t5zFyZfe/16WjWn5PFeIEYoN0XDMpFqXXFQhEiygCkPH6RWef2u8L8v9Y10alaklBGVyijz0iFeSeJrxwiHQQLbpOCMDCsIR+8T1MsqqPGsB/E/MQV1qfH7VNGztx644vwO3rJA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef369afe-1a26-428c-beb6-08ded68ba507
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2026 09:40:39.0104
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ADI63tXyBL/dGjFmip8Ag+UMuDzIeWHzLLxtgG3kQXqCRkspCwy0zIqkkMR+671nC4tZ/zwdZ0R9G7PqZMMQGWg0XS2lJNUN07kYJzsu8Ag=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8408
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260628182052.951760-1-avkrasnov@rulkc.org>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303061-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:clementwei90@163.com,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:weirongguang@kylinos.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[163.com,vger.kernel.org,lists.osuosl.org];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303062-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,meta.com,linux.alibaba.com,vger.kernel.org,lists.linux-foundation.org,gmail.com,linuxtesting.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:avkrasnov@rulkc.org,m:stefanha@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mst@redhat.com,m:jasowang@redhat.com,m:bobbyeshleman@meta.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:horms@kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux-foundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oxffffaa@gmail.com,m:rulkc@linuxtesting.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 400EF6E2728
+X-Rspamd-Queue-Id: 06B176E26B7
 
+On Sun, Jun 28, 2026 at 09:20:52PM +0300, Arseniy Krasnov wrote:
+>Logically it was based on TCP implementation, so to make further support
+>easier, rewrite it in the TCP way (like in 'tcp_sendmsg_locked()'). By
+>this way, patch also adds handling case when 'msg_ubuf' is already set.
 
+Thanks for this!
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Rongguang Wei
-> Sent: Tuesday, June 30, 2026 5:26 AM
-> To: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
-> Rongguang Wei <weirongguang@kylinos.cn>
-> Subject: [Intel-wired-lan] [PATCH net-next v1] ice: use dev_err_probe
-> in all appropriate places in ice_probe()
->=20
-> From: Rongguang Wei <weirongguang@kylinos.cn>
->=20
-> Use dev_err_probe() can conveniently combines printing an error
-> message with returning the errno and also simplify the code.
->=20
-I'd recommend to fix the commit message, like:=20
+IIUC the result will be similar of commit eb315a7d1396 ("tcp: support 
+externally provided ubufs") for tcp. Maybe I would have added it to the 
+commit description, anyway the patch LGTM:
 
-ice: use dev_err_probe() in ice_probe()
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-dev_err_probe() logs the error and returns the supplied error code, which
-allows probe error paths to be written more compactly.
-
-Use dev_err_probe() in ice_probe() for error paths that currently print an
-error message and immediately return the same error code. This keeps the
-existing error handling semantics while reducing open-coded logging and
-return sequences.
-
-
-With the best regards
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-
-> Signed-off-by: Rongguang Wei <weirongguang@kylinos.cn>
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 24 ++++++++--------------
-> -
->  1 file changed, 8 insertions(+), 16 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
-> b/drivers/net/ethernet/intel/ice/ice_main.c
-> index e2fbe111f849..81959eaec708 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -5167,10 +5167,8 @@ ice_probe(struct pci_dev *pdev, const struct
-> pci_device_id __always_unused *ent)
->  	struct ice_hw *hw;
->  	int err;
->=20
-> -	if (pdev->is_virtfn) {
-> -		dev_err(dev, "can't probe a virtual function\n");
-> -		return -EINVAL;
-> -	}
-> +	if (pdev->is_virtfn)
-> +		return dev_err_probe(dev, -EINVAL, "can't probe a
-> virtual
-> +function\n");
->=20
->  	/* when under a kdump kernel initiate a reset before enabling
-> the
->  	 * device in order to clear out any pending DMA transactions.
-> These @@ -5194,10 +5192,8 @@ ice_probe(struct pci_dev *pdev, const
-> struct pci_device_id __always_unused *ent)
->  		return err;
->=20
->  	err =3D pcim_iomap_regions(pdev, BIT(ICE_BAR0),
-> dev_driver_string(dev));
-> -	if (err) {
-> -		dev_err(dev, "BAR0 I/O map error %d\n", err);
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(dev, err, "BAR0 I/O map error
-> %d\n", err);
->=20
->  	pf =3D ice_allocate_pf(dev);
->  	if (!pf)
-> @@ -5208,10 +5204,8 @@ ice_probe(struct pci_dev *pdev, const struct
-> pci_device_id __always_unused *ent)
->=20
->  	/* set up for high or low DMA */
->  	err =3D dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-> -	if (err) {
-> -		dev_err(dev, "DMA configuration failed: 0x%x\n", err);
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(dev, err, "DMA configuration
-> failed: 0x%x\n",
-> +err);
->=20
->  	pci_set_master(pdev);
->  	pf->pdev =3D pdev;
-> @@ -5246,10 +5240,8 @@ ice_probe(struct pci_dev *pdev, const struct
-> pci_device_id __always_unused *ent)
->  		return ice_probe_recovery_mode(pf);
->=20
->  	err =3D ice_init_hw(hw);
-> -	if (err) {
-> -		dev_err(dev, "ice_init_hw failed: %d\n", err);
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(dev, err, "ice_init_hw failed:
-> %d\n", err);
->=20
->  	ice_init_dev_hw(pf);
->=20
-> --
-> 2.25.1
+>
+>Signed-off-by: Arseniy Krasnov <avkrasnov@rulkc.org>
+>---
+> Changelog v1->v2:
+> * Rebase on last 'net-next'. Don't need 'skb_zcopy_set()' now - it was
+>   already added.
+> Changelog v2->v3:
+> * Update commit message.
+> * Remove one empty line.
+> Changelog v3->v4:
+> * Update commit message.
+>
+> net/vmw_vsock/virtio_transport_common.c | 47 ++++++++++++-------------
+> 1 file changed, 22 insertions(+), 25 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 09475007165b..41c2a0b82a8e 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -328,38 +328,35 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+> 		return pkt_len;
+>
+>-	if (info->msg) {
+>-		/* If zerocopy is not enabled by 'setsockopt()', we behave as
+>-		 * there is no MSG_ZEROCOPY flag set.
+>+	if (info->msg && (info->msg->msg_flags & MSG_ZEROCOPY)) {
+>+		/* If 'info->msg' is not NULL, this is only VIRTIO_VSOCK_OP_RW.
+>+		 * 'MSG_ZEROCOPY' flag handling here is based on the same flag
+>+		 * handling from 'tcp_sendmsg_locked()'.
+> 		 */
+>-		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
+>-			info->msg->msg_flags &= ~MSG_ZEROCOPY;
+>+		if (info->msg->msg_ubuf) {
+>+			uarg = info->msg->msg_ubuf;
+>+			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
+>+		} else if (sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY)) {
+>+			uarg = msg_zerocopy_realloc(sk_vsock(vsk), pkt_len,
+>+						    NULL, false);
+>+			if (!uarg) {
+>+				virtio_transport_put_credit(vvs, pkt_len);
+>+				return -ENOMEM;
+>+			}
+>
+>-		if (info->msg->msg_flags & MSG_ZEROCOPY)
+> 			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
+>+			if (!can_zcopy)
+>+				uarg_to_msgzc(uarg)->zerocopy = 0;
+>
+>+			have_uref = true;
+>+		}
+>+
+>+		/* 'can_zcopy' means that this transmission will be
+>+		 * in zerocopy way (e.g. using 'frags' array).
+>+		 */
+> 		if (can_zcopy)
+> 			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
+> 					    (MAX_SKB_FRAGS * PAGE_SIZE));
+>-
+>-		if (info->msg->msg_flags & MSG_ZEROCOPY &&
+>-		    info->op == VIRTIO_VSOCK_OP_RW) {
+>-			uarg = info->msg->msg_ubuf;
+>-
+>-			if (!uarg) {
+>-				uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>-							    pkt_len, NULL, false);
+>-				if (!uarg) {
+>-					virtio_transport_put_credit(vvs, pkt_len);
+>-					return -ENOMEM;
+>-				}
+>-
+>-				if (!can_zcopy)
+>-					uarg_to_msgzc(uarg)->zerocopy = 0;
+>-
+>-				have_uref = true;
+>-			}
+>-		}
+> 	}
+>
+> 	rest_len = pkt_len;
+>-- 
+>2.25.1
+>
 
 
