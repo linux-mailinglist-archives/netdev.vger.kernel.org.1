@@ -1,244 +1,238 @@
-Return-Path: <netdev+bounces-303298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4OjJC1zvQ2oblwoAu9opvQ
-	(envelope-from <netdev+bounces-303298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:31:24 +0200
+	id tWzOKevvQ2pKlwoAu9opvQ
+	(envelope-from <netdev+bounces-303299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:33:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8AB6E6762
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:31:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 019C56E67CC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:33:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=i6qnUW8t;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303298-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303298-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=ThLbdQqG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303299-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303299-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 53DD13045388
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:26:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8E5D030E449E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36E81F03D9;
-	Tue, 30 Jun 2026 16:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D1347AF42;
+	Tue, 30 Jun 2026 16:27:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011015.outbound.protection.outlook.com [40.93.194.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360A61A7264;
-	Tue, 30 Jun 2026 16:26:52 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782836814; cv=none; b=dJ5d9mMCYJ2+2ofXXpT0ZewgIbfV1mDEu6OvRDIjwElG60uwLYjBj1uMRFOL9dKhvRIpEea9aKImJh+aWheD2+IYcKZIQYoOa60Hnk4xRPiyqtMyQvZBmhbZDGfLqlGCm/TH9G0ABw+b0mtj1zJMUbRHk4ukfVa/EKgn9ZdKGZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782836814; c=relaxed/simple;
-	bh=evlSDYy6Ygp+ukrloEMuQ3tjfA3TwvKzk7xCnaU6qpA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XexzDqubvYaPzFLd6Ere4ZjYjcQFInIeSx/9nkC+41+viU+XulvX07eeC4OjALDy7hs0b1XSZ5ZgXT0TUjU0JHmip15CjXU6ELE1BR7LwggoFFEto8+9urnsIT7e42yVEJbrK+HxKNOsakm+r8ZYAjQp1W4SuH+vDLcI6TvUVIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=i6qnUW8t; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65UEIgCJ499666;
-	Tue, 30 Jun 2026 09:26:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=jkdCbgZYH2S06QeuGHlHz68
-	OzUvoZ/bSIa5DVIJfQtE=; b=i6qnUW8tIPr3yCo+55+pk7VbL2GMo7FvRuu1iRQ
-	Xy5iKA5ZQr9FqUmugDnLT7ffmxXFNbo8VydTz1UXfuPv49f6zzvF1Kp7mvHLq48+
-	nXFzPnQ2DDsdVm/IpSe/iPS6q5zMNmJI9kynD1V9OjOY7oLaEyI6r9yoRD97V8I3
-	qLCvtqWyl1K828sI+dPgHJPsPaZmbPJe88dvw/44Bo2XTH5qBzRCroGxCI+Sq2vr
-	3NMsYCyV9T+piTQ/d3MtnUmjjMiwGgMquVru3OxNh0MWFgLutHk5P7x6uurTI52H
-	PYccP16zMhQ8sgFz1uhum3SUyoBzR2nrqpzSgswyaEU8GEQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f42dfjtwd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Jun 2026 09:26:37 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 30 Jun 2026 09:26:36 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 30 Jun 2026 09:26:36 -0700
-Received: from kernel-ep2.caveonetworks.com (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with ESMTP id 2AF453F707A;
-	Tue, 30 Jun 2026 09:26:30 -0700 (PDT)
-From: <nshettyj@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <bbhushan2@marvell.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <naveenm@marvell.com>, <tduszynski@marvell.com>,
-        <sumang@marvell.com>, <hramamurthy@google.com>,
-        Nitin Shetty J
-	<nshettyj@marvell.com>
-Subject: [PATCH net v3] octeontx2-pf: check DMAC extraction support before filtering
-Date: Tue, 30 Jun 2026 21:56:22 +0530
-Message-ID: <20260630162622.2667086-1-nshettyj@marvell.com>
-X-Mailer: git-send-email 2.48.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE6247AF6C
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 16:27:54 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782836878; cv=fail; b=UUBzejt7pgDUSatYXCAehTB2O+Ucmmt6yXOEukkwYjqtPo8kTUSWeSUE3B7VeLr9d1MypeAQg+RaQl1GeM8umCqhjJDuFqZdIaNRgcXIPmDMknuQvPb822yqIk0EGk/MUpfir9DLWKu106SP8gP6SRhU64uBaUd98PWdIEC6+t4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782836878; c=relaxed/simple;
+	bh=yP7ZDPdxCWxKSxLEBUyWJH1JyTzGdjtPu6gdmNYRTrE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EcwV+j6qgZu2RiBskmsDr4Bi/j5zXO1v7VcKZvgB9IQZUo/5n84DUswKM8P3V5Y8riArBkzfeqAM+OAmyyVceyldR/73Tu6lWl84r/N8l+uRPEfz4dOOkz80aVCYuPJL+8Ibf8ESgp6+lVf3ynfjK9WVrykId+srYj+mnIcld9A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ThLbdQqG; arc=fail smtp.client-ip=40.93.194.15
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V9GytEMQuqCMyZ2EXhW058N3xz76ytgg9XEQL4J9E6ffGqS33SBnK2jFTdWCGuMyEVCT9h8ihS26l5loCiNUh8rQedl1oZiKCcOJ29oh7F59ZNA9OOjnqqB6jq+BVhN9/q5JKDKaR/g6OfAvFDdBoAnzaaK4ulpTqXDATdLfrrafVJwTQSpcoSm3qCp1WDPqRrvgJKrnFAaKTYYnmgO1Wh4GZoeIvDhdII4ydkOynbsdYD4DqFxxX5V1+4SjB+NKjccJWMbKQ6elhshaQins0zH1StbF0wUZpBM3DqwfWw4EJynAtVWu5/IVul+S/+6bJvXdbNXf5qMihrr5me4jEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XSGe+s64L9ofDvCtiBa9upQ3c9QHnO/3h8sUm8rOuNo=;
+ b=aPyzEIZdps69aQc3JgW0ItgtAd2pZleqSTqksVRGrD7VNsyAeoG3I5sMO88seJv4c3W9ZMgMmC5mnVfO57iBQosyCwilc/tcu2kObdsFbp0+0vGVn7y/LFZ9DSgXDDGxCfOfZN4du+n7XG527D8PFOe8a93we0XaireBRNzAtk4WO/B3mgb08yVbbyTRskoW7IfhT6wLUOtKa81zNQUn2s5adk/xtaczHdhqe58dXMnGiBj9KZ3421arnwE+HzTFX/HO/rTi8ZzEhwgESjNBNEbYEzAlSE32TqHNn1aF25/dbhqLqrrznEvoVUmAoP+5NgB1uYOEPkkKKkqTv0h7Aw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XSGe+s64L9ofDvCtiBa9upQ3c9QHnO/3h8sUm8rOuNo=;
+ b=ThLbdQqGJZgSoQRfoyAuXUQdDpZbMEGAT+Kgl6+7jDocoHHQBQ93Fiyyd+4exXsgLxsbyVABN9hTj2GCtxnmLfg2swY8lCh+fj+xuhO21ot1sfs64+pNZQVYd/M7VRew//Ty0jsvt3Q38q5va5UDBjhMpr2x2VP3VuL5SkMjlSc=
+Received: from DM4PR12MB5389.namprd12.prod.outlook.com (2603:10b6:5:39e::8) by
+ PH0PR12MB8798.namprd12.prod.outlook.com (2603:10b6:510:28d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 30 Jun
+ 2026 16:26:38 +0000
+Received: from DM4PR12MB5389.namprd12.prod.outlook.com
+ ([fe80::1f4e:98f9:2c94:8e4e]) by DM4PR12MB5389.namprd12.prod.outlook.com
+ ([fe80::1f4e:98f9:2c94:8e4e%4]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
+ 16:26:38 +0000
+Message-ID: <bc26cd1a-ea70-4219-8ef2-a4a46d9669d5@amd.com>
+Date: Tue, 30 Jun 2026 09:26:35 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] ionic: Change list definition method
+To: Lei Zhu <zhulei_szu@163.com>, brett.creeley@amd.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org
+References: <20260630065457.160081-1-zhulei_szu@163.com>
+Content-Language: en-US
+From: "Creeley, Brett" <bcreeley@amd.com>
+In-Reply-To: <20260630065457.160081-1-zhulei_szu@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR03CA0428.namprd03.prod.outlook.com
+ (2603:10b6:610:10e::23) To DM4PR12MB5389.namprd12.prod.outlook.com
+ (2603:10b6:5:39e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDE1NiBTYWx0ZWRfX0XfeNzWOKO3k
- aEdL6ztifWGfbz3Ne8bY2WC5ekpXCqjIESaxmIFd9YxiK+f0ceS2ADQi8N2DSVTv9Ca/SCmCfXS
- yQpTMmZ5apUyuxnXGL7MHxD4riZeUMM=
-X-Proofpoint-ORIG-GUID: hMz_NLu-fPhy3c_v5M0WYBfKyBzJFpKq
-X-Authority-Analysis: v=2.4 cv=Zrvd7d7G c=1 sm=1 tr=0 ts=6a43ee3d cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=E9o4sS0pqQQeLg7t-9wA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: wCQm1AUN0J7uhnmj5iyvnrFvY1gE_siz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDE1NiBTYWx0ZWRfX0Z+kKv77l68b
- ndhFMucpKEyT72AHZTopCHQlMB9hXx34LSeg68YtqdJfLIUxMP0OkybqxVtG7uirmdWH7PCmT4h
- y4RL8coKe0nDSv8Y6fHJGEvgUWm+BkTxfiUiWCrES8tMJMJWuIn241rWr899KgpcCGVFhLhE7H9
- mB647S7L7AsZndzBHfwTbQM9D73WJFtgyspFUhwawMx8TZa9ahWVbRCHQgrZEyoYh5huFedhhMF
- bvB8CNDnGomHbOkm56V7uyx5zlIFeMO5PqZiqhofvYQIH6fGB3hQOTqQHFbysI1MHnP010ZuFP2
- w2AtjZ9A9WyQZ1nbqqoeJIsm7kCR60Chi6xH3mRlTBSQw3SPkTuTH6Uq1eQK3lslqlhpVcF/yvN
- 4TdA0rB+fDZqJ6Js7eNFUwY0PGyczeJj+MYZ6/keW2rcYqIRxHhulmHZ8uXFzzipwhQuXIWBL9H
- S8p+B0ryTYsWKrJI6Sw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_04,2026-06-26_01,2025-10-01_01
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5389:EE_|PH0PR12MB8798:EE_
+X-MS-Office365-Filtering-Correlation-Id: f9904ce9-8d7d-4527-1148-08ded6c45c51
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|22082099003|18002099003|11063799006|56012099006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	/M83IIa57PvvTAbvLCoO4GRtlM8KUN52XNs9inNj3fDi+KuDhqkH3aPyZU+IajM1PBgzSL5fxRM4k2J2M2NhaeoDT1MdMeB0ZkQaKHYoX+AYZJHtdCYzw0yUJ6XNN4SqeswQroPWzUIBgV5uTow2Fba24y7Pz9AqnRi0hRWAuVNwkX6ILwFclUr3PfT+1emBP+UgSUhYWzmCkaA/RBw7/551VcfMumyeK0r3keR7eg6Uw/XNATU7WADLwCSWBaDKg3DRX6JguGCEOdTCPDYZs7yqMVLbyW+xQ8M/GZjrqzxksCe52620DmR4Jc8EBnN66AyqqhsEigbrWgo7XwV76qfeMteePjXbfnffby8RC7lpuiefw+xlSupoJrwyrL968G3IAPBJJahyut3tW0hVlCTOyj3ab+e4LMDmBrSk05cirTKg0RQZO8pC2l5WwG5wBDdjdgxWWpZ7brUWm/JlpzQZ3W82hmmtUMCYXMWzr766PmdecYsW50IInxNZImGLopf4q7mjA+HBk5deO7c8A+2LQFU1uPEex6i3X8ltiAcea0+nwXvullNevXC6ugFytSEveC/qCQ9EEoqj9Q1Gd2gi2L79yNlbOcz3/KPRFiMsYXMhLBHDPAABSO1yCvwFqQBhMi9BTE89TcWQiUSJcO3KFlqcZtNluxDKnGPM9WY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5389.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(22082099003)(18002099003)(11063799006)(56012099006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bG5NclhmUnNzbFVuZGlSK3U3aUdaNWM1MHlaRm1obGJvZHNja1l3U2tob3hJ?=
+ =?utf-8?B?bWV2V0NxR2FuaTVTMVJRVWtXd3JkL3ViSkhkdzFqRkFQQXk5Wk1FOXVRU2du?=
+ =?utf-8?B?QzZER2YxUEhzUnA1TnZWMDdmTGVLeGFsWG02SjZFTjgxZU45MDU0V0dyK3ZR?=
+ =?utf-8?B?OHltWkl0SGY0MllUTjA1bVF4ZjZIUFUxTWlqM05vb2JmbDR6dVpSK2hsRzNn?=
+ =?utf-8?B?SUVselhmY29SdW41VWJTTXZYTFltWmU2aURwQ2VlTWNraDBCZG5VY3VpWmJ3?=
+ =?utf-8?B?RktNSDQ5dHpIL09qaS9iaDBOVHY5QTEzbzQ0ZEVlMGE0SlYyNzR5dm1ndlY0?=
+ =?utf-8?B?M2J0MDBsWGQvQW02a0ZJWEZQcU1yRWtsOGFQQktrVVRoQzdBY2NuK1FQVXRS?=
+ =?utf-8?B?Vzg3MThSZkZwWjN3RllyRzdKTjE3cC81aGNKREhNZGQwQmdGNnJjenRvREp0?=
+ =?utf-8?B?N0RYTWhFYk5KVGVFYjlYRllvZTZ1OUxRd21UK0h0ajF5TlpIczMyRkRtS3Fn?=
+ =?utf-8?B?SEJSTVJtUVZqcEdxVysrUC9xK2NzWDFRNHlSdzhEV2NSTkJZa3NmUHY3d3dT?=
+ =?utf-8?B?bUI5WFZqTG9MZk9GSjl3c1dRZnFZWmo2OUFDaVE0ZTRJSVZ5R3JocGhJVlVQ?=
+ =?utf-8?B?aWRMbUNLMUZFSkcvdXFpZm13R0ViRklVRFZVd3htcEl1S3FSa3J1d2EzRWJZ?=
+ =?utf-8?B?c3RKNDN6eGVTSzV4Z3JWK1hET2VNQ3ZBYlRLR3NlL29DUFQ1S3hTWFVTekhw?=
+ =?utf-8?B?RUZBSFc0Y1Jsbk4zK3NlR3VXZmZ6Z1hVNHpuM21LcGMyb3F4dlpIdWRtUzR2?=
+ =?utf-8?B?OWdCWW9SNHhXeDBEbVNLZDJkNkQ4MVBWVVlETk5pazU4Vm1xbXI3Y0t1Qllr?=
+ =?utf-8?B?bStlVVJFb3ZOVEVWNjlxVjBDSzJEZFJucmQrNG01bzM3Z1hDZ3Z1WHMycmp6?=
+ =?utf-8?B?NHdlOUZTMmg2R0pXaFpXVnNXRmJTYjRFVjZ1SkxqbHZQZC8zOStWSEhqSDdy?=
+ =?utf-8?B?UG1valhQMmVacVBPSkhocVRaSE1jY3VCajg4ZTlhaHVjajE2MkcyNUhoTFQy?=
+ =?utf-8?B?YUphamhXT3kyWUVZYVNTVGJEbmh0eGttQjNYVVNWTXNnSWd5d2pkV0xweHFI?=
+ =?utf-8?B?R2liKy95VXVrdkxwWXBGRGkyaE11aEpiNTZ2YzRMS3FrZTYwa3FJZWhPUGZj?=
+ =?utf-8?B?VFBlTUNUbURBL1BVVTBtQmRVem54cVhMVkhzZzFDSy9IUXFMamlKVEVOaFd4?=
+ =?utf-8?B?OVNQcVp6bExWQTFHVWtkd2FBZlROaUVHMVdmZ1E4SVN1cnYwRHFuemgvUU1y?=
+ =?utf-8?B?WExlQUNHcGNOV2JNWFVMWEFjWDdoNXNsRjRoWTdkem5Ca2dIZ05xRUxyOGMr?=
+ =?utf-8?B?TjBRZjVoa0lTY3N4TUdVNlRUWTNTMnJyejFBYys5ckhlc1F3OWhXMkkzL1B4?=
+ =?utf-8?B?SmUvbXl4cWdlS3lDVU1SMDdVS3BzVkRpTGtONXFTNXcra2NpZ2JHNVQxVUw5?=
+ =?utf-8?B?bUJxUkN5djhzNi9COVpnc0YwZXd5VTg2ekZlY0ZYQis3cWJ0MFBJU2hRZXNR?=
+ =?utf-8?B?b2JZWHhEYzhNL0dtZllrMVVFWWhCQkxaWmxQV3JsMHFKem1aeVJFZDM1T3JD?=
+ =?utf-8?B?TENuelF4VHBOeE0rMkd3bzQ5ZFV5TXM0VGcyVTJLT1NkRDRQeW5Mc0pUMlBp?=
+ =?utf-8?B?d0JDUW4yNFRramFxT3E3Tnh3YkRZYnBRQVVsb3JHM2Q4dEZ2Y3o1VkozQjZl?=
+ =?utf-8?B?QVZFd2ZLZFZuOTdYdTh0U0hvT1F5SVdweUkwQXhiWXFveTAwMW5TeHJzQnNW?=
+ =?utf-8?B?OHNTUFRwZno1UW1tQktoUE9CTXBEN0tKTFpSTzV6a05vZ2puZUhoUmNPWWVk?=
+ =?utf-8?B?ZUg5bkJuK2x0SkVpMXBwTnhLWEVGUzhsZE8wdkhWcUk3TWhMSDlqSm9QaE1w?=
+ =?utf-8?B?VW4rc3NLUmNoTjBiTXVxYmoyWERQZWdwOWxOWTR5U25qUm5neHBHTFlkOWp4?=
+ =?utf-8?B?ZklLRXd1a1JJSU40WS91c0x1MERuNVZDa0F6V2pOa0pLd0JxRzRFOFY0M2Jh?=
+ =?utf-8?B?c01DT2JZWEUxMkNtekljTHMzU0FyQnZYT3VEK3FZN1ROTjJnTHA1ZWdtMW5s?=
+ =?utf-8?B?bzF6Nk43dGhTZmlnQVp1NEU4ZnpIZ1NMWjNuZUFjLzc3VTBjWjFaWkwwZG9q?=
+ =?utf-8?B?WExVSGppNmhxWGlXMS9RVkl2dTY2dFl2Qkt2TDVSMWlIS24zWXVGUEVFUmRw?=
+ =?utf-8?B?QU54dDFLM2FleVdEMERsYUQzZU9VZnhyUmZqYnNraDZxMklKTmhTRUhSQWtH?=
+ =?utf-8?B?R3F0Mnk1MVJHQ0d2a0pYMnZHdm1HUElVa2lpY21hRmdhaVZ4NUtyQT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9904ce9-8d7d-4527-1148-08ded6c45c51
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5389.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 16:26:38.5281
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UFOPBok3vrOVJgaz7+8ufvn+OJYdaMsBPOw9F3rTCd3qT4mzU51kfBjk+mcknOtQUiKQEWqnbWpclyq4r3UE7w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8798
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303298-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303299-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[163.com,amd.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:naveenm@marvell.com,m:tduszynski@marvell.com,m:sumang@marvell.com,m:hramamurthy@google.com,m:nshettyj@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:zhulei_szu@163.com,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[bcreeley@amd.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	FROM_NEQ_ENVFROM(0.00)[bcreeley@amd.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	REDIRECTOR_URL(0.00)[aka.ms];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,aka.ms:url,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7F8AB6E6762
+X-Rspamd-Queue-Id: 019C56E67CC
 
-From: Suman Ghosh <sumang@marvell.com>
 
-Currently, configuring a VF MAC address via the PF (e.g., 'ip link
-set <pf> vf 0 mac <mac>') blindly attempts to install a DMAC-based
-hardware filter. However, the hardware parser profile might not
-support DMAC extraction.
 
-Check if the hardware parsing profile supports DMAC extraction
-before adding the filter. Additionally, emit a warning message
-to inform the operator if the MAC filter installation fails due
-to missing DMAC extraction support.
+On 6/29/2026 11:54 PM, Lei Zhu wrote:
+> [You don't often get email from zhulei_szu@163.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+>
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+>
+>
+> From: Lei Zhu <zhulei@kylinos.cn>
+>
+> The LIST_HEAD macro can both define a linked list and initialize
+> it in one step. To simplify code, we replace the separate operations
+> of linked list definition and manual initialization with the LIST_HEAD
+> macro.
+>
+> Signed-off-by: Lei Zhu <zhulei@kylinos.cn>
+> ---
+> Changes in v2:
+>    - Order the variable declaration lines longest to shortest
+>
+>   drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c | 7 ++-----
+>   1 file changed, 2 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
+> index 528114877677..c999754afb5f 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
+> @@ -558,18 +558,15 @@ struct sync_item {
+>   void ionic_rx_filter_sync(struct ionic_lif *lif)
+>   {
+>          struct device *dev = lif->ionic->dev;
+> -       struct list_head sync_add_list;
+> -       struct list_head sync_del_list;
+>          struct sync_item *sync_item;
+>          struct ionic_rx_filter *f;
+> +       LIST_HEAD(sync_add_list);
+> +       LIST_HEAD(sync_del_list);
+>          struct hlist_head *head;
+>          struct hlist_node *tmp;
+>          struct sync_item *spos;
+>          unsigned int i;
+>
+> -       INIT_LIST_HEAD(&sync_add_list);
+> -       INIT_LIST_HEAD(&sync_del_list);
+> -
+LGTM. Thanks for the patch.
 
-Fixes: f0c2982aaf98 ("octeontx2-pf: Add support for SR-IOV management functions")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
-Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
-
----
-v3:
- - Update config->mac only after hardware programming succeeds in
-   otx2_set_vf_mac().
-v2:
- - Move the DMAC extraction check from otx2_set_vf_mac() into
-   otx2_do_set_vf_mac() which already holds pf->mbox.lock, so all
-   mbox operations are under a single lock/unlock pair. All error
-   paths now use the existing goto-out pattern, eliminating the
-   scattered mutex_unlock() + return calls from v1.
- - Return -EOPNOTSUPP instead of 0 when DMAC extraction is not
-   supported, so the caller gets an explicit error rather than a
-   silent success.
----
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 44 ++++++++++++++++---
- 1 file changed, 38 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index b63df5737ff2..697570765957 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -2517,10 +2517,43 @@ EXPORT_SYMBOL(otx2_config_hwtstamp_set);
- 
- static int otx2_do_set_vf_mac(struct otx2_nic *pf, int vf, const u8 *mac)
- {
-+	struct npc_get_field_status_req *freq;
-+	struct npc_get_field_status_rsp *frsp;
- 	struct npc_install_flow_req *req;
- 	int err;
- 
- 	mutex_lock(&pf->mbox.lock);
-+
-+	/* Skip installing the DMAC filter if the hardware parser profile
-+	 * does not support DMAC extraction.
-+	 */
-+	freq = otx2_mbox_alloc_msg_npc_get_field_status(&pf->mbox);
-+	if (!freq) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	freq->field = NPC_DMAC;
-+	if (otx2_sync_mbox_msg(&pf->mbox)) {
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	frsp = (struct npc_get_field_status_rsp *)otx2_mbox_get_rsp
-+	       (&pf->mbox.mbox, 0, &freq->hdr);
-+	if (IS_ERR(frsp)) {
-+		err = PTR_ERR(frsp);
-+		goto out;
-+	}
-+
-+	if (!frsp->enable) {
-+		netdev_warn(pf->netdev,
-+			    "VF %d MAC filter not installed: DMAC extraction not supported by parser profile\n",
-+			    vf);
-+		err = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
- 	req = otx2_mbox_alloc_msg_npc_install_flow(&pf->mbox);
- 	if (!req) {
- 		err = -ENOMEM;
-@@ -2559,13 +2592,12 @@ static int otx2_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
- 	if (!is_valid_ether_addr(mac))
- 		return -EINVAL;
- 
--	config = &pf->vf_configs[vf];
--	ether_addr_copy(config->mac, mac);
--
- 	ret = otx2_do_set_vf_mac(pf, vf, mac);
--	if (ret == 0)
--		dev_info(&pdev->dev,
--			 "Load/Reload VF driver\n");
-+	if (ret == 0) {
-+		config = &pf->vf_configs[vf];
-+		ether_addr_copy(config->mac, mac);
-+		dev_info(&pdev->dev, "Load/Reload VF driver\n");
-+	}
- 
- 	return ret;
- }
--- 
-2.48.1
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+>          clear_bit(IONIC_LIF_F_FILTER_SYNC_NEEDED, lif->state);
+>
+>          /* Copy the filters to be added and deleted
+> --
+> 2.25.1
+>
 
 
