@@ -1,81 +1,74 @@
-Return-Path: <netdev+bounces-302896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4x+cKpUrQ2rpTAoAu9opvQ
-	(envelope-from <netdev+bounces-302896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:36:05 +0200
+	id BRVJNpouQ2oLTwoAu9opvQ
+	(envelope-from <netdev+bounces-302897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:48:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2258A6DFCF9
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:36:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B486DFDF8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:48:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mediatek.com header.s=dk header.b=UTxYgOo8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302896-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302896-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mediatek.com;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=ELf7Npk4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302897-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302897-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 390B73008770
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:35:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60977304E41A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB48327FB0E;
-	Tue, 30 Jun 2026 02:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0813CD8DE;
+	Tue, 30 Jun 2026 02:47:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AEC1E5B88;
-	Tue, 30 Jun 2026 02:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668523C6606;
+	Tue, 30 Jun 2026 02:47:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782786951; cv=none; b=nAGU9UVwO8SqWAkBQCKRNA7afhksx+f96OBYyhsSSQlnQ9kjRxIzpmZzU6VvOsHxsWFp3KQAoYrVySO4iP0hmgptJPeFFdZq/6LURLhuUhfO7VU+aVIQ60+HqE4mbPDrqiBAQq7ji7eHZ9m9K2aAszRyYr/5EU3Pm705rzeokko=
+	t=1782787659; cv=none; b=LnhHfb9JFyH+djHkI21c1kbl+ppIdA1pPoguptTg88KyCrTqCF43px17rA5E8xF3nvG0oX6JQBylNLFh/nHR/y3GSIKvVW6M+RzGGeeZcTD1yGdYnJvblLP97J7/vLw2hCnYB8jvaXgsPz6ULHIXrftAJyHCoFQrMgvPeGk+EJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782786951; c=relaxed/simple;
-	bh=4zXRYB+fkG9JLPCj3JM/53AYPEKpg3SY0dCqPkLx5mU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HB791bLXfapLHSndlig10PN/AdsOky2tTEi5O0UM2+iCHXO8zQxmOk8JEPgFoCfGozkEUeO/3FwJSP+9HrTMpWyfDMJpPIgcGtxg0noIf/grWtPG6EV6PoGafbQtAdYg7HGoX3D1qaT2rl/aD00dZxqocmJB/DC6mbMQIbnslaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=UTxYgOo8; arc=none smtp.client-ip=210.61.82.184
-X-UUID: 5fb8fa18742c11f18dc8c9802ae25ab1-20260630
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=roUf/zuvB6EYzKdWEjz0GHQvKg6pHRTjmrvxGeJquGQ=;
-	b=UTxYgOo8+DKdBRGUkC3/T+MFxh6zOnDiQlpfKCFkQYAsONkqlfoPj8k+DWUZSGVWrLAr0sF4FMrazm7Bp0OVi0LfNeDCapGwrsz6iYOGGidQhWnokL+ZziCCQTWvpLE7AuZAi0sQBzlujzyZVSh1B1Y/k0I+PMF86iWoWbYsXS8=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.17,REQID:40b4e8a5-a00a-4d1c-a7ec-708d17f55a75,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:d497b38,CLOUDID:a4f51b04-3795-4a90-800e-68e9393a343e,B
-	ulkID:nil,BulkQuantity:0,SF:102|836|865|888|898,TC:-5,Content:0|15|50|99,E
-	DM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,
-	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 5fb8fa18742c11f18dc8c9802ae25ab1-20260630
-Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw02.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1004192259; Tue, 30 Jun 2026 10:35:35 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
+	s=arc-20240116; t=1782787659; c=relaxed/simple;
+	bh=xvoYFtB+SS3Z3AfxxeI2uqZ+SQXkmWgI6wXqf/D6i6k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=minXPiKoL2q/3iwXMK8o8QbexkjZLgqBrBnpMsF1yDnGEHqccNvdKk+uZ8YMgbZjtT6bKEbe6zCvf2amwaKdW0svc80Qp6jox4UvKawqe7QuIvky7X9yO8KX904SF7AmToJV+Mz7FyJAdWGEBKWpS0HnzvECJvEqz2W0J8YhR40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ELf7Npk4; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1J8UL3490377;
+	Mon, 29 Jun 2026 19:47:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=JKc8bNJQ4AXz6BRVoSdAw7H
+	qlrzzuQGaHJfMifmWrjY=; b=ELf7Npk4Ze3XokyN8VwfYCBfNnS2aaKTplxDmFm
+	5sJhwHhYUsJGokzDTW6MFnXPxzRyu5Oy7A6mzCr1Wc2zcb21gQ1lC4xFrY+aoCcH
+	Ycp1WIxfLPwR5I7LAa8Xj8xxwkQ1SFM2ANJwHRXSqmalVk6Npha75DckOIgxIIsX
+	Oo3I9scHTGAy2uqTwU1ULNKYCQASMv6m2EOLv1I3tzoO4enLFjvfpE8EEbvTP/bQ
+	CSYs9eWRFBeM+XfSsLBsRHDbhLnt4iTxiwjJN54ScStgMRK7a1y+PkDmC3A/Xbuv
+	yqXTVu1ThBzibn00tQkfxlczgyoIS1xCu1/2mBOz2Gss/QA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f2e1h7ynw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jun 2026 19:47:28 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 30 Jun 2026 10:35:34 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Tue, 30 Jun 2026 10:35:33 +0800
-From: Shiming Cheng <shiming.cheng@mediatek.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <matthias.bgg@gmail.com>,
-	<angelogioacchino.delregno@collabora.com>, <willemb@google.com>,
-	<daniel.zahka@gmail.com>, <alice@isovalent.com>, <sd@queasysnail.net>,
-	<eilaimemedsnaimel@gmail.com>, <imv4bel@gmail.com>, <nbd@nbd.name>,
-	<dsahern@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>
-CC: <stable@vger.kernel.org>, <lena.wang@mediatek.com>,
-	<shiming.cheng@mediatek.com>
-Subject: [PATCH v3] Subject: [PATCH] net: gro: fix double aggregation of flush-marked skbs
-Date: Tue, 30 Jun 2026 10:35:02 +0800
-Message-ID: <20260630023512.26927-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+ 15.2.1544.25; Mon, 29 Jun 2026 19:47:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 29 Jun 2026 19:47:26 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 71F053F705B;
+	Mon, 29 Jun 2026 19:47:24 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net-next 0/9] Switch support
+Date: Tue, 30 Jun 2026 08:17:06 +0530
+Message-ID: <20260630024715.4124281-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,113 +77,231 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-MTK: N
+X-Proofpoint-ORIG-GUID: GHcOG7pQsPc0qA5W2HY5jXPtonXvP-oX
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfX41VF7GRN9eGY
+ +wBSEj2RR8uRUJX1LSGenXCOQyh5ZpUbbaQZNk4N4RxgU+Y3zTG6JYwl27tEMHNcTj0lQCGTmr2
+ B1cCQnK3z4kTWq8X3Z+FR+ZkhioVosw=
+X-Authority-Analysis: v=2.4 cv=e802j6p/ c=1 sm=1 tr=0 ts=6a432e40 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=QXcCYyLzdtTjyudCfB6f:22 a=Edpnf-iy1bkNsFY8i2QA:9
+X-Proofpoint-GUID: GHcOG7pQsPc0qA5W2HY5jXPtonXvP-oX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAyNCBTYWx0ZWRfX34VKsUfVNoY4
+ XyJTYKRB7+B9eh6T62IH6Qe4ZnlVHuew5NJ/fcYjTdXZVvfKQjiF/jUmloVLJoD508sFd9M6C2X
+ I0grfXjHAW+4UnQxDW2OiO+QGOe9sfi24/ItltoqGOY/4lGLNADaPY6PshcnVpEcn4IU83HsY0a
+ 9IzU0RJbxMSeX9p2saCGBwM0l3krl84zxIogVV7CcYvJ5LT72S42C+KBlASZbYZq83OrBcwvyH0
+ Be77cKeMBme2n3tqDUA/fByJh1NdUT8D2dU0HZPPE5W6Hc/Br2lPBw29Fp3s+lMdmOuY7Nq9JNq
+ EKC611kYKThkoQmzMX0QcByTJmymNTDGx0kMv5mEsJvA8WD7KGb2GBeAfEH0TYCzI71ValovRK6
+ 9bYGUTTkMcNFTjGh877Wkie4ceRrBZxkEz4iPFq8sa12jYEBJNKGuaoP0wbTt5sVvZdznUDt5GR
+ fVd4jg86t8hQ+lFikQA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-30_01,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302896-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:willemb@google.com,m:daniel.zahka@gmail.com,m:alice@isovalent.com,m:sd@queasysnail.net,m:eilaimemedsnaimel@gmail.com,m:imv4bel@gmail.com,m:nbd@nbd.name,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:stable@vger.kernel.org,m:lena.wang@mediatek.com,m:shiming.cheng@mediatek.com,m:matthiasbgg@gmail.com,m:danielzahka@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,isovalent.com,queasysnail.net,nbd.name,vger.kernel.org,lists.infradead.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-302897-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:rkannoth@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mediatek.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,marvell.com:dkim,marvell.com:mid,marvell.com:from_mime];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2258A6DFCF9
+X-Rspamd-Queue-Id: 56B486DFDF8
 
-The new skb_gro_receive_list() function is missing a critical safety check
-present in the legacy skb_gro_receive() path. Specifically, it does not
-validate NAPI_GRO_CB(skb)->flush before allowing packet aggregation.
+Marvell OcteonTX2 switch hardware is capable of accelerating L2, L3, and
+flow. When representors are enabled through devlink, a logical port is
+created in switch hardware for each representor device.
 
-This allows already-GRO'd packets with existing frag_list to be
-re-aggregated into a new GRO session, corrupting the frag_list chain
-structure. When skb_segment() attempts to unpack these malformed packets,
-it encounters invalid state and triggers a kernel panic.
+This patch series implements communication from the host OS to the switch
+hardware and vice versa.
 
-Scenario (Tethering/Device forwarding):
-  1. Driver: Generated aggregated packet P1 via LRO with frag_list
-  2. Dev A: Receives aggregated fraglist packet and flush flag set
-  3. Dev A: Re-enters GRO, skb_gro_receive_list() is called
-  4. Missing flush check allows re-aggregation despite flush flag
-  5. Frag_list chain becomes corrupted (loops or dangling refs)
-  6. Dev B: TX path calls skb_segment(), crashes on corrupted frag_list
+                 control plane (FDB / FIB / flow over mailbox)
+    +---------------------------------------------------------------------+
+    |                               HOST OS                               |
+    |                                                                     |
+    | +------------+  +---------------------+  +---------------+          |
+    | | bridge /   |  | PF + notifiers      |  | TC / flower   |          |
+    | | routing    |  | (FDB, FIB, flow)    |  | offload       |          |
+    | +------+-----+  +-----------+---------+  +-------+-------+          |
+    |        ^                     |                      |               |
+    |        | slow path           |                      |               |
+    |        | (unmatched pkts)    v                      v               |
+    | +------+------+       +------+------+        +------+------+        |
+    | | rep-eth0    |       | PF / VF     | <----> | RVU AF      |        |
+    | +------+------+       +-------------+        +------+------+        |
+    |        |                                                |           |
+    | +------+------+                                         |           |
+    | | rep-eth1    |                                         |           |
+    | +-------------+                                         |           |
+    |        | slow path (miss / control to host stack)       |           |
+    +---------------------------------------------------------------------+
+    |      |                                         |                    |
+    |      |              mailbox / PCIe             |                    |
+    |      v                                         v                    |
+    +---------------------------------------------------------------------+
+    |                           SWITCH HARDWARE                           |
+    |                                                                     |
+    |      +---------------------------------------------------+          |
+    |      | L2 tables   | L3 tables   | flow TCAM (HW)        |          |
+    |      +-------+-------------+---------------+-------------+          |
+    |              |       fast path (HW)           |                     |
+    |              v                                v                     |
+    |           lport0  <========================>  lport1                |
+    |             HW forwarding between ports                             |
+    |                                                                     |
+    | slow path (miss): packets raised to host via representors           |
+    +---------------------------------------------------------------------+
 
-Root cause in skb_segment():
-  The check at line ~4891:
-    if (hsize <= 0 && i >= nfrags && skb_headlen(list_skb) &&
-        (skb_headlen(list_skb) == len || sg)) {
+When representors are created, corresponding logical ports are created in
+switchdev. Matching traffic is accelerated in switch hardware using
+installed L2, L3, and flow rules. Packets that do not match offloaded
+state, or that require software handling, take the slow path through
+representors and the host networking stack. Control updates from the host
+(FDB, FIB, TC flower) are sent to the AF over mailbox and programmed into
+switch hardware tables.
 
-  When frag_list is corrupted by double aggregation, when list_skb is
-  a NULL pointer from skb->next, skb_headlen(list_skb) dereference
-  NULL/corrupted pointers occurs.
+Notifier callbacks are registered to receive system events such as FDB
+add/delete and FIB add/delete. Flow add/delete operations are handled
+through the ingress flow-table offload path. These events are captured and
+processed by the NIC driver and forwarded to the switch device through the
+AF driver. All message exchanges use the mailbox interface.
 
-Call Trace:
- skb_headlen(NULL skb)
- skb_segment
- tcp_gso_segment
- tcp4_gso_segment
- inet_gso_segment
- skb_mac_gso_segment
- __skb_gso_segment
- skb_gso_segment
- validate_xmit_skb
- validate_xmit_skb_list
- sch_direct_xmit
- qdisc_restart
- __qdisc_run
- qdisc_run
- net_tx_action
+Bridge acceleration:
+FDB add/delete notifications are processed, and learned SMAC information is
+sent to the switch hardware. The switch inserts a hardware rule to
+accelerate packets destined to the MAC address. Switch-initiated FDB
+refresh is propagated back to the host bridge through an AF to PF/VF
+mailbox and switchdev notifier.
 
-Fix: Add NAPI_GRO_CB(skb)->flush validation to the early-return check in
-skb_gro_receive_list(), matching the defensive programming pattern of
-skb_gro_receive().
+L3 acceleration:
+IPv4 and IPv6 FIB updates observed through netdev and FIB notifiers are
+queued on the PF and sent to the AF. The AF batches fib_entry structures
+and forwards them to switchdev when firmware is ready.
 
-Fixes: 8928756d53d5 ("net: add fraglist GRO/GSO support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
----
- net/core/gro.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Flow acceleration:
+TC flower rules accepted by the ingress flow-table offload callback are
+translated into fl_tuple state, ingress and egress pcifunc are resolved
+through FIB lookup, and flow updates are sent to the switch hardware
+through the mailbox interface. Per-cookie packet counters are kept in sync
+using NPC MCAM multi-stats when the switch requests a flow refresh.
 
-diff --git a/net/core/gro.c b/net/core/gro.c
-index 35f2f708f010..076247c1e662 100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -229,7 +229,8 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
- 
- int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
- {
--	if (unlikely(p->len + skb->len >= 65536))
-+	if (unlikely(p->len + skb->len >= 65536 ||
-+		     NAPI_GRO_CB(skb)->flush))
- 		return -E2BIG;
- 
- 	if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
--- 
-2.45.2
+Ratheesh Kannoth (9):
+  octeontx2-af: switch: Add AF to switch mbox and skeleton files
+  Host to switch mailbox definitions for FDB, FIB, flow, and flow stats;
+  AF-side L2/L3/flow skeleton objects.
 
+  octeontx2-af: switch: Add switch dev to AF mboxes
+  Switch to AF and AF to switchdev mailbox messages; interface query
+  handler and NPC helpers for flow delete/stats/features.
+
+  octeontx2-pf: switch: Add pf files hierarchy
+  CONFIG_OCTEONTX_SWITCH and stub PF switch objects for FDB, FIB, flow, and
+  notifier plumbing.
+
+  octeontx2-af: switch: Representor for switch port
+  Copy devlink switch_id to the AF and map representor pcifunc to a switch
+  port id when eswitch mode is enabled.
+
+  octeontx2-af: PAN switch TL1 scheduling and NPC channel control
+  Allocate multiple TL1 scheduler queues in PAN mode and honor caller
+  supplied NPC channel masks for multi-link steering.
+
+  octeontx2-pf: register switch notifiers for eswitch offload
+  Register PF notifier blocks for FIB, neighbour, address, netdev, and
+  switchdev FDB events; split IPv4/IPv6 handling.
+
+  octeontx2: plumb bridge FDB updates through AF and switchdev
+  End-to-end L2 offload from switchdev FDB notifications to AF to
+  switchdev, including firmware gating and FDB refresh to host.
+
+  octeontx2: offload host FIB updates to switch via AF mailbox
+  Queue IPv4/IPv6 FIB updates from notifiers and batch fib_entry delivery
+  from AF to switchdev.
+
+  octeontx2: add TC flow offload path for switch flows
+  Ingress flow-table offload for TC flower rules, AF forwarding to
+  switchdev, and flow counter refresh from switch to host.
+
+ .../net/ethernet/marvell/octeontx2/Kconfig    |  13 +
+ .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  | 227 ++++++++
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   | 110 ++++
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   6 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  53 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  76 +++
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  11 +
+ .../ethernet/marvell/octeontx2/af/rvu_rep.c   |   3 +-
+ .../marvell/octeontx2/af/switch/rvu_sw.c      |  48 ++
+ .../marvell/octeontx2/af/switch/rvu_sw.h      |  14 +
+ .../marvell/octeontx2/af/switch/rvu_sw_fl.c   | 294 ++++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_fl.h   |  12 +
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.c   | 283 +++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.h   |  13 +
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.c   | 215 +++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.h   |  11 +
+ .../ethernet/marvell/octeontx2/nic/Makefile   |  13 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   2 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c   |  17 +
+ .../net/ethernet/marvell/octeontx2/nic/rep.c  |  11 +
+ .../marvell/octeontx2/nic/switch/sw_fdb.c     | 144 +++++
+ .../marvell/octeontx2/nic/switch/sw_fdb.h     |  14 +
+ .../marvell/octeontx2/nic/switch/sw_fib.c     | 132 +++++
+ .../marvell/octeontx2/nic/switch/sw_fib.h     |  16 +
+ .../marvell/octeontx2/nic/switch/sw_fl.c      | 546 ++++++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_fl.h      |  15 +
+ .../marvell/octeontx2/nic/switch/sw_nb.c      | 422 ++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_nb.h      |  35 ++
+ .../marvell/octeontx2/nic/switch/sw_nb_v4.c   | 335 +++++++++++
+ .../marvell/octeontx2/nic/switch/sw_nb_v4.h   |  21 +
+ .../marvell/octeontx2/nic/switch/sw_nb_v6.c   | 236 ++++++++
+ .../marvell/octeontx2/nic/switch/sw_nb_v6.h   |  21 +
+ 33 files changed, 3361 insertions(+), 11 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v4.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb_v6.h
+
+--
+2.43.0
 
