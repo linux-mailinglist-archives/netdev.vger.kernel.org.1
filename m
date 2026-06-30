@@ -1,220 +1,448 @@
-Return-Path: <netdev+bounces-303165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JQ3lLym7Q2oLgAoAu9opvQ
-	(envelope-from <netdev+bounces-303165-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:48:41 +0200
+	id NUYBDKvBQ2ojgwoAu9opvQ
+	(envelope-from <netdev+bounces-303179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:16:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC696E4689
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:48:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3296E4BAA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:16:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=UT9LN4wv;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=OMntgcYH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303165-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303165-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=fail ("headers rsa verify failed") header.d=couthit.com header.s=default header.b=hlX4Xwm+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303179-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303179-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed)" header.from=couthit.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 599F13034AF1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:46:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09AC03031101
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD1040E8EC;
-	Tue, 30 Jun 2026 12:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6854192F7;
+	Tue, 30 Jun 2026 13:15:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E54F40E8DD
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FF24192EF;
+	Tue, 30 Jun 2026 13:15:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782823563; cv=none; b=kDIReeLx5a/HrQmy36rZgKONVi6cJb6PH1S1CkQ0BQHFHBJdj8PeU6lfWOKlvsZsrVGGvWNVSEVvt1ei9kuyk86mepoJYUJcs2wFd4vEwl5hjoZpC6Z01R5rnZ5e+Oo6f0DfyGm64f3DyROxL6OXElL6XydUg+BZ0N3EGo8Xuqk=
+	t=1782825303; cv=none; b=HCw2vFhpywVjcKZ8cu+BaFo1nLH9i4yB1Tlrl75MlIJ36oAu7039AsjEEORl2pWrRDf04xjXNX0TEB/HU9E8bMspHPMSvFy8vUYkdcem3649HCekiRPQXfB8boRvAkinF5DJKruljItsGq2RjhHORRUmQR3+PZaw2Ew9fVpvsZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782823563; c=relaxed/simple;
-	bh=chBZiGh7yrHmSBv8RUwYVeMHSTVTeDhaR08RhaJsvHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T6F8KAtm6zZ53JeKxKH2UR+RUrGCM2kE96S/ecr/70jbynjXHwcn2pwnstY2YPyO6KVv9mTQqI7+29h4ae0DOtlh9w19ol+CCxv9V4q2f5oVZmmgNTmGtGfbTJBoYOlKfZ5JGZZWL36lUR3BZIhhghqKT5xnsPdndipSZRLuDkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=UT9LN4wv; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=OMntgcYH; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U9nCRK1590600
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:46:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	pY1T4mB/1x/HK2e6EPQsvZx0ZxpL5KScVB8u3NbiQqk=; b=UT9LN4wvBVpM64j3
-	F2jAsfAILiZjYRi/KlD2eQ0MOKeqL67WC5X0+CrsUEriaIWFUiaGoLlo+n3Pwl9J
-	uHDa0/8eFWFat/YWYLfcEJwEd5QF6bX9Z4OwXSJPbGg0GoMUjJkAUkQYMeCuapko
-	T5OrkD9h97gJvlQSqmdsZWKCDQzeVfYFjItUkRfQjt7L4093O0XaIj8fw+CsdQzC
-	6IzFQuULY5XFAu2s+/EvblbwfMuHoMlkrDqXKEflaNf/oL5S1uzyQqnYyoqrWkwx
-	yTqAI/l1hiSsDIEpN5kwtUvgfTLuPIyzfTdhrgxG+nHg7+1/Cl2Pv2f0ACbtuBXG
-	VvR2uQ==
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com [209.85.217.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f3y9k3k52-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:46:01 +0000 (GMT)
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-734f7d8bb37so431254137.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 05:46:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782823561; x=1783428361; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=pY1T4mB/1x/HK2e6EPQsvZx0ZxpL5KScVB8u3NbiQqk=;
-        b=OMntgcYH257QLHSh/HIJ+MQFm9qsxmm+XmK+Y1Iq6ecUdmdRl4MZ3YIczrzS3PjRAl
-         nuPA4mDk7ypqSrDazuV9ooVrxfe000mGjsrLzycfo+mB3RY+HB4q9nQij/+7MdUj9EYi
-         DLrtStZzR9y4Os0O2O743yF/Co305KNLT1ISNQkhatnLYHe9M5DE0ANeGd7l0KeYf9CL
-         3fnCmc2ceLz411iWiVhw35irUmLGswTpGXWTAsYJouw8yevd/ew9gPhCZ6u+b14/vgd8
-         mUxUmxLFpL/+4RPffLMX2grQQ5dgTt/3hniJzM4L+pCD3AZHhBhcXN7bt+SoSQy8A6nx
-         aPPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782823561; x=1783428361;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=pY1T4mB/1x/HK2e6EPQsvZx0ZxpL5KScVB8u3NbiQqk=;
-        b=cqJlc3OHaF2O4Lk//yA8WgXlxAsehpLMkoDsbzzg91SlTDrRo4vTU53dJcCPfd7V8n
-         qU3WzXuSHsYHC7H4yV3KOK5uXDPWxHUlCuj5ZAf5OMh+ZQaG6gMk0ZI50Vt9VayfBn1R
-         AwXY1hxM7rwpiCqeV5FJgYyewG3zBIdvfN0PNena/EDUUlVQijUmSqUe0McktPwYpbxt
-         w4dHXGY+9o7PDp39QqvoOrk1YC/+W7J7EYV3daLZt0gGlAoWLteClvxja1wpk+pCMMC1
-         EWEVHPIzJd2k7PW17GcPCjpJf9AC6pioG4N3cShA5uIrj/Z2BXQA8xVsnlZDfUJFj4+z
-         XE+Q==
-X-Forwarded-Encrypted: i=1; AHgh+RoGz+BicncwnH8OPbHRijTpBLkKZI5+l7xUaaj92LQbWi0UGj/ifwSZ01aVoDwyaJsPldMiJY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw06Eh7/O/75OnM8RuZlEdobUVzClJRLrW4pVk0CK76bSMG45W8
-	brGNPGYURLZQwUawXRwcaSQmI2wgEdlSwA05wiwgUgAAeQsK9G/S2hFXcrVgtc06GwFfVZhvhME
-	ESRHSuQ2TrZPNPMeRJi9iCsmveVjy6k5k2rgbIuA9CIPP2W3tUDAmTh+9TIs=
-X-Gm-Gg: AfdE7ckfNOyTJH4DTVy56taX76GUz/9BLo8YFLquwRj0qHFZqvG6x88tKg2mSn2HAeH
-	eGbd7+KDeNUDTXyoy/+Xd72ysTFGa+Z+QDw3gDcxcEnQMvjCi9VBP9Pc8C/D9J9YftM3TUnxVdY
-	ckqwzmxP/YY4RG+WCWK81cKpsl5urFU0nRUiJd7hq+aXmgu6vgCqL/bYG8HgsV2R3RUZJznoy+m
-	ZJEmZGFqTGMeLcf1Mtz8jdVqB75Th1ts8RIOLBqJa+JMd6wSBNTlact5n0XHNWJs9Gt1H/Uz26q
-	gv3l0BhlusD5siC3nEay/hJJ7hcAoIBej26KiXS/iFAs3AnZBixz1v1LCKOxxWUIIIkzjBoFE2M
-	aNx4yeZmoabapgvBhJE4Fw7uxC5c0ehuFeDc=
-X-Received: by 2002:a05:6102:5802:b0:729:5cd5:8cc4 with SMTP id ada2fe7eead31-73a38839d2emr587875137.4.1782823560938;
-        Tue, 30 Jun 2026 05:46:00 -0700 (PDT)
-X-Received: by 2002:a05:6102:5802:b0:729:5cd5:8cc4 with SMTP id ada2fe7eead31-73a38839d2emr587855137.4.1782823560577;
-        Tue, 30 Jun 2026 05:46:00 -0700 (PDT)
-Received: from [192.168.120.170] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6987c968400sm1131274a12.25.2026.06.30.05.45.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jun 2026 05:45:59 -0700 (PDT)
-Message-ID: <b14466a5-a064-4723-8ea0-98239cd50437@oss.qualcomm.com>
-Date: Tue, 30 Jun 2026 14:45:54 +0200
+	s=arc-20240116; t=1782825303; c=relaxed/simple;
+	bh=105h6p8OnaMT2Lm3hQXOsVyGpGqGidRk87RSlt+HK+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uta8tf234z76NH8D4o01SX9NCNTjTtiyY1yRcBPsvNjwgFZ/lhdqIyfulXFsdJuitwomp8X9el1DlCrxuQWUyFLX+MrobPa4elBv7xuJE87UaCisK7Bak20qtzQuErgn/ekn6B9dPBtR368dd6q9k5VP6RSys5ksatJLfVz0DDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=hlX4Xwm+; arc=none smtp.client-ip=162.240.164.96
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Gqx06CAYLEB8rHXrCtO44BhZRf0Xxn31Jsv5lIP8hF0=; b=hlX4Xwm+QUp2+Ns8PgxCrAZuxV
+	RZ/Bipo9rXHHL5pGfQRmRHcr0Xj825vclkmKjLbAaS3sg55JOynqC3yUu/boCJFpMaCZuNrK7GWou
+	sy8MPtx21Viugso00raxsGqTH/FGF/hm8dEBGEStuRsz9Osx+7TPSlDvHpm6pZNYEmmw2ruICR7jp
+	Yc0gSoDisL8VUrolvWK1dqD05KMMQc1hYYKNFlETUBhIF3A1bYZH7ajXkzusWNgQnH0hI+go0kXBL
+	nmXcEpzBvUzD/CcFRWooWRfMSfGQHTEwwRO6fKAIg7SY7C9JpOO0UHIfp8EovGnf3AwZ0ED1XRo3/
+	mtXVaUCw==;
+Received: from [115.246.246.98] (port=58869 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.99.4)
+	(envelope-from <parvathi@couthit.com>)
+	id 1weXv6-00000006qlQ-2QRU;
+	Tue, 30 Jun 2026 08:50:33 -0400
+From: Parvathi Pudi <parvathi@couthit.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	danishanwar@ti.com,
+	parvathi@couthit.com,
+	rogerq@kernel.org,
+	pmohan@couthit.com,
+	afd@ti.com,
+	basharath@couthit.com,
+	arnd@arndb.de
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	m-malladi@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com
+Subject: [PATCH net-next v2 0/3] Introduce HSR/PRP HW offload support for PRU-ICSSM Ethernet driver
+Date: Tue, 30 Jun 2026 18:16:13 +0530
+Message-ID: <20260630124958.894360-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 13/14] firmware: qcom_scm: Remove SCM PAS wrappers
-To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org
-Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-        vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-        Sumit Garg <sumit.garg@oss.qualcomm.com>
-References: <20260626133440.692849-1-sumit.garg@kernel.org>
- <20260626133440.692849-14-sumit.garg@kernel.org>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260626133440.692849-14-sumit.garg@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDExOCBTYWx0ZWRfX/1U8mJNYOY4s
- yVt/lsebDjujbpALAp02KIGrTCens/CoU+V1EXCaEZ+LeVGR6ubIrfEMNwj0oEQ3mZEYBj1PaY3
- FpORJDKdQi7C64xSfvEPvmYDRokVShY=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDExOCBTYWx0ZWRfXz05tOsRPuPlz
- hO3tsfXXRZCEoMqzmfkMaQRovj3wnKE4e3XSk2P0PEsT6N96a9ni/q1aEOsvVD6nBHstjahYdbz
- t3M+2diq/DLrZvQRFWszBLbah59jQsPRRpWbKy5TMMhuzFFYqoy+CYCdRI4RdupHNyDDg8acwJt
- F7fcy5UJw6Zo/kow1QPOrzocnLqCsDtO6ZizuUQCzHcgkiDN6JJVXD60RcvNGX04Vh8A8UOgIF/
- rjPjpMkDmjKp9emxvMTMfsj2tAVo50jQP+phBa/IiXfMD4UGnIFIviiJ5LpS3GSLBH7iDmV43t2
- crNaQ/RiB1VyA4XRJtTF2DttZJt45U7dgxA2VbTupO3LylKx+POsWMhBLpLUDw4LlpYG4ZYFscD
- 3wn5nOxyGQeN3NSTI9a7uE0K4ufwQLqBnGRGLutcVjyFE9RwPs6oBCc88WybcMO7L/ywDAkn3g1
- MbV8mX+1T2WAmNpBaIg==
-X-Proofpoint-ORIG-GUID: Ru4dRLGwnbcwXRhj_EVlSuJWnIioxa-x
-X-Authority-Analysis: v=2.4 cv=TeqmcxQh c=1 sm=1 tr=0 ts=6a43ba89 cx=c_pps
- a=DUEm7b3gzWu7BqY5nP7+9g==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=EUspDBNiAAAA:8 a=n1VOVlC_Xzu4QXtT9DgA:9 a=QEXdDO2ut3YA:10
- a=-aSRE8QhW-JAV6biHavz:22
-X-Proofpoint-GUID: Ru4dRLGwnbcwXRhj_EVlSuJWnIioxa-x
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_03,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 phishscore=0 priorityscore=1501 malwarescore=0
- spamscore=0 adultscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606300118
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.64 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[couthit.com:s=default];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	TAGGED_FROM(0.00)[bounces-303165-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
- comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303179-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	HAS_X_GMSV(0.00)[parvathi@couthit.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	HAS_X_AS(0.00)[parvathi@couthit.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:danishanwar@ti.com,m:parvathi@couthit.com,m:rogerq@kernel.org,m:pmohan@couthit.com,m:afd@ti.com,m:basharath@couthit.com,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:pratheesh@ti.com,m:j-rameshbabu@ti.com,m:vigneshr@ti.com,m:praneeth@ti.com,m:srk@ti.com,m:rogerq@ti.com,m:m-malladi@ti.com,m:krishna@couthit.com,m:mohan@couthit.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[couthit.com:-];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	HAS_X_SOURCE(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	HAS_X_ANTIABUSE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp,couthit.com:mid,couthit.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5CC696E4689
+X-Rspamd-Queue-Id: 7A3296E4BAA
 
-On 6/26/26 3:34 PM, Sumit Garg wrote:
-> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> 
-> Now since all the Qcom SCM client drivers have been migrated over to
-> generic PAS TZ service, let's drop the exported SCM PAS wrappers.
-> 
-> Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
-> Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
-> Tested-by: Vignesh Viswanathan <vignesh.viswanathan@oss.qualcomm.com> # IPQ9650
-> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> ---
+Hi,
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+This series introduces HSR and PRP protocol HW offload support for ICSSM-Prueth driver.
+HW offload support for HSR/PRP is implemented using dedicated HSR/PRP firmware running
+on 2 PRU cores(PRU-ICSS) as a "DAN" available in AM57xx, AM437x and AM335x.
 
-Konrad
+The following features are offloaded to HW in case of HSR and PRP:
+1. L2 forwarding of a HSR frame via traditional store and forward or via cut-through (only for HSR)
+2. Transmit frame duplication is offloaded to HW
+3. Tag removal on the receive is offloaded to HW
+4. Redundant duplicate packet discard on the receive is also offloaded to HW
+
+In HW offload mode, redundant tag insertion in the transmit path will be still done by HSR driver
+and firmware updates the LAN information available in the tag on the fly when PRU is transmitting
+frame in that respective LAN.
+
+HSR Test Setup:
+--------------
+
+     ___________           ______________           ___________
+    |           | Link AB |              | Link BC |           |
+  __|   AM57*   |_________|AM57/AM43/AM33|_________|   AM57*   |___
+ |  | Station A |         |   Station B  |         | Station C |   |
+ |  |___________|         |______________|         |___________|   |
+ |                                                                 |
+ |_________________________________________________________________|
+                            Link CA
+
+Steps to switch to HSR forward offload mode:
+-------------------------------------------------
+Example assuming eth1, eth2 ports of ICSSM on AM57x, AM437x and AM335x EVM's
+
+  1) Bring down both slave interfaces
+      ip link set eth1 down
+      ip link set eth2 down
+
+  2) Set matching MAC addresses on both slave interfaces
+      ip link set eth1 address <mac-addr>
+      ip link set eth2 address <mac-addr>
+
+  3) Enable HSR offload for both interfaces
+      ethtool -K eth1 hsr-fwd-offload on
+      ethtool -K eth1 hsr-dup-offload on
+      ethtool -K eth1 hsr-tag-rm-offload on
+
+      ethtool -K eth2 hsr-fwd-offload on
+      ethtool -K eth2 hsr-dup-offload on
+      ethtool -K eth2 hsr-tag-rm-offload on
+
+  4) Create HSR interface and add slave interfaces to it
+      ip link add name hsr0 type hsr slave1 eth1 slave2 eth2 \
+    supervision 45 version 1
+
+  5) Add IP address to the HSR interface
+      ip addr add <IP_ADDR>/24 dev hsr0
+
+  6) Bring up the HSR interface
+      ip link set hsr0 up
+
+  7) Bring up the both slave ports
+      ip link set eth1 up
+      ip link set eth2 up
+
+Switching back to default mode:
+--------------------------------
+  1) Bring down both slave interfaces
+      ip link set eth1 down
+      ip link set eth2 down
+
+  2) Delete HSR interface
+      ip link delete hsr0
+
+  3) Disable HSR port-to-port offloading mode, packet duplication
+      ethtool -K eth1 hsr-fwd-offload off
+      ethtool -K eth1 hsr-dup-offload off
+      ethtool -K eth1 hsr-tag-rm-offload off
+
+      ethtool -K eth2 hsr-fwd-offload off
+      ethtool -K eth2 hsr-dup-offload off
+      ethtool -K eth2 hsr-tag-rm-offload off
+
+Testing the port-to-port frame forward offload feature:
+-------------------------------------------------------
+  1) Connect the LAN cables as shown in the test setup.
+  2) Configure Station A and Station C in HSR non-offload mode.
+  3) Configure Station B is HSR offload mode.
+  4) Since HSR is a redundancy protocol, disconnect cable "Link CA",
+     to ensure frames from Station A reach Station C only through
+     Station B.
+  5) Run iperf3 Server on Station C and client on station A.
+  7) Check the CPU usage on Station B.
+
+CPU usage report on Station B using mpstat when running UDP iperf3:
+-------------------------------------------------------------------
+
+AM57xx
+------
+
+  1) Non-Offload case
+  -------------------
+  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+  all    0.00    0.00    0.00    0.00    0.00   10.41    0.00    0.00   89.59
+    0    0.00    0.00    0.00    0.00    0.00   20.88    0.00    0.00   79.12
+    1    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+
+  2) Offload case
+  ---------------
+  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+  all    0.00    0.00    0.10    0.00    0.00    0.73    0.00    0.00   99.17
+    0    0.00    0.00    0.20    0.00    0.00    1.46    0.00    0.00   98.34
+    1    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+
+AM437x
+------
+
+  1) Non-Offload case
+  -------------------
+  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+  all    0.30    0.00    0.80    0.00    0.00   35.19    0.00    0.00   63.72
+    0    0.30    0.00    0.80    0.00    0.00   35.19    0.00    0.00   63.72
+
+  2) Offload case
+  ---------------
+  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+  all    0.10    0.00    0.31    0.10    0.00    1.74    0.00    0.00   97.75
+    0    0.10    0.00    0.31    0.10    0.00    1.74    0.00    0.00   97.75
+
+AM335x
+------
+
+  1) Non Offload case
+  -------------------
+  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+  all    0.30    0.00    1.10    0.00    0.00   90.32    0.00    0.00    8.28
+    0    0.30    0.00    1.10    0.00    0.00   90.32    0.00    0.00    8.28
+
+  2) Offload case
+  ---------------
+  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+  all    0.43    0.00    3.61    0.00    0.00   13.28    0.00    0.00   82.68
+    0    0.43    0.00    3.61    0.00    0.00   13.28    0.00    0.00   82.68
+
+PRP Test Setup:
+---------------
+
+     _________________        LAN-A        __________________
+    |                 |eth1-----------eth1|                  |
+    | AM57/AM437/AM335|                   | AM57/AM437/AM335 |
+    |    station A    |eth2-----------eth2|    station B     |
+    |_________________|       LAN-B       |__________________|
+
+Steps to switch to PRP offload mode:
+------------------------------------
+Example assuming eth1, eth2 ports of ICSSM on AM57x, AM437x and AM335x EVM's
+
+  1) Bring down both slave interfaces
+      ip link set eth1 down
+      ip link set eth2 down
+
+  2) Set matching MAC addresses on both slave interfaces
+      ip link set eth1 address <mac-addr>
+      ip link set eth2 address <mac-addr>
+
+  3) Enable PRP offload for both interfaces
+      ethtool -K eth1 hsr-dup-offload on
+      ethtool -K eth1 hsr-tag-rm-offload on
+
+      ethtool -K eth2 hsr-dup-offload on
+      ethtool -K eth2 hsr-tag-rm-offload on
+
+  4) Create PRP interface and add slave interfaces to it
+      ip link add name prp0 type hsr slave1 eth1 slave2 eth2 \
+    supervision 45 proto 1
+
+  5) Add IP address to the PRP interface
+      ip addr add <IP_ADDR>/24 dev prp0
+
+  6) Bring up the PRP interface
+      ip link set prp0 up
+
+  7) Bring up the both slave ports
+      ip link set eth1 up
+      ip link set eth2 up
+
+Switching back to default mode:
+--------------------------------
+  1) Bring down both slave interfaces
+      ip link set eth1 down
+      ip link set eth2 down
+
+  2) Delete PRP interface
+      ip link delete prp0
+
+  3) Disable PRP offloading mode
+      ethtool -K eth1 hsr-dup-offload off
+      ethtool -K eth1 hsr-tag-rm-offload off
+
+      ethtool -K eth2 hsr-dup-offload off
+      ethtool -K eth2 hsr-tag-rm-offload off
+
+Testing the PRP offload feature:
+--------------------------------
+  1) Connect eth1 of Station A to eth1 of Station B (LAN-A).
+     Connect eth2 of Station A to eth2 of Station B (LAN-B).
+  2) Configure Station A in PRP non-offload mode.
+  3) Configure Station B in PRP offload mode.
+  4) Run iperf3 Server on Station B and client on Station A.
+  5) Check the CPU usage on Station B.
+  6) Disconnect LAN-B cable to verify Station A frames still reach
+     Station B over LAN-A with no traffic interruption.
+  7) Reconnect LAN-B and disconnect LAN-A, verify the same.
+
+CPU usage report on Station B using mpstat when running UDP iperf3:
+-------------------------------------------------------------------
+
+AM57x
+-----
+
+  1) Non Offload case
+  -------------------
+  CPU    %usr   %nice    %sys  %iowait    %irq   %soft  %steal  %guest   %idle
+  all    2.04    0.00   18.85    0.00     0.00   27.83    0.00    0.00   51.27
+    0    1.80    0.00   21.56    0.00     0.00   54.89    0.00    0.00   21.76
+    1    2.29    0.00   16.14    0.00     0.00    0.80    0.00    0.00   80.78
+
+  2) Offload case
+  ---------------
+  CPU    %usr   %nice    %sys  %iowait    %irq   %soft  %steal  %guest   %idle
+  all    2.79    0.00   18.36    0.00     0.00   18.16    0.00    0.00   60.68
+    0    3.89    0.00   22.16    0.00     0.00   36.13    0.00    0.00   37.82
+    1    1.69    0.00   14.56    0.00     0.00    0.20    0.00    0.00   83.55
+
+AM437x
+------
+
+  1) Non Offload case
+  -------------------
+  CPU    %usr   %nice    %sys   %iowait  %irq   %soft    %steal  %guest   %idle
+  all    5.68    0.00    43.27   0.00    0.00    43.57    0.00     0.00    7.48
+    0    5.68    0.00    43.27   0.00    0.00    43.57    0.00     0.00    7.48
+
+  2) Offload case
+  ---------------
+  CPU    %usr   %nice    %sys   %iowait  %irq   %soft    %steal  %guest   %idle
+  all    6.39    0.00    42.86   0.00    0.00   32.57    0.00      0.00   18.18
+    0    6.39    0.00    42.86   0.00    0.00   32.57    0.00      0.00   18.18
+
+AM335x
+------
+
+  1) Non Offload case
+  -------------------
+  CPU    %usr   %nice    %sys    %iowait  %irq   %soft    %steal  %guest   %idle
+  all    2.29    0.00    14.04    0.00    0.00    75.50    0.00    0.00    8.17
+    0    2.29    0.00    14.04    0.00    0.00    75.50    0.00    0.00    8.17
+
+  2) Offload case
+  ---------------
+  CPU    %usr   %nice    %sys    %iowait  %irq   %soft    %steal  %guest   %idle
+  all    5.70    0.00    48.50    0.00    0.00    29.00    0.00    0.00    16.80
+    0    5.70    0.00    48.50    0.00    0.00    29.00    0.00    0.00    16.80
+
+Note:
+  hsr-tag-rm-offload and hsr-dup-offload are tightly coupled in the firmware implementation.
+  They both need to be enabled / disabled together and hsr-tag-ins-offload is unsupported.
+
+This is the v2 of the patch series [v1]. This version of the patchset addresses the
+comments made on [v1] of the series.
+
+Changes from v1 to v2 :
+
+*) Fixed all applicable issues, except for the false positives flagged by the AI review
+on sashiko.dev.
+*) Addressed Jakub Kicinski comments on patch 3 of the series.
+*) Rebased the series on latest net-next.
+
+[v1] https://lore.kernel.org/all/20260611123636.376577-1-parvathi@couthit.com/
+
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (3):
+  net: ti: icssm-prueth: Add HSR and PRP HW offload mode support for
+    AM57xx, AM437x and AM335x
+  net: ti: icssm-prueth: Add priority based RX IRQ handlers
+  net: ti: icssm-prueth: Support duplicate HW offload feature for HSR
+    and PRP
+
+ drivers/net/ethernet/ti/Makefile              |   2 +-
+ .../ethernet/ti/icssm/icssm_lre_firmware.h    | 141 ++++
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 728 ++++++++++++++++--
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |  73 +-
+ .../ethernet/ti/icssm/icssm_prueth_common.c   | 283 +++++++
+ .../net/ethernet/ti/icssm/icssm_prueth_lre.c  | 224 ++++++
+ .../net/ethernet/ti/icssm/icssm_prueth_lre.h  |  19 +
+ .../ethernet/ti/icssm/icssm_prueth_switch.c   | 310 +++++++-
+ .../ethernet/ti/icssm/icssm_prueth_switch.h   |   1 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  35 +-
+ 10 files changed, 1749 insertions(+), 67 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_lre_firmware.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_common.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_lre.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_lre.h
+
+-- 
+2.43.0
+
 
