@@ -1,246 +1,127 @@
-Return-Path: <netdev+bounces-303239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wBBfOOrUQ2onjwoAu9opvQ
-	(envelope-from <netdev+bounces-303239-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:38:34 +0200
+	id x2suOLDVQ2phjwoAu9opvQ
+	(envelope-from <netdev+bounces-303240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:41:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43E706E5804
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:38:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7196E5846
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:41:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JkSdYDgo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303239-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303239-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linutronix.de header.s=2020 header.b=CgemoEDA;
+	dkim=pass header.d=linutronix.de header.s=2020e header.b=D5H2UWkM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303240-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303240-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF0A4302BB9B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:36:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16AFE3151AD8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8F043C043;
-	Tue, 30 Jun 2026 14:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F67743CED7;
+	Tue, 30 Jun 2026 14:37:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384E543C05C;
-	Tue, 30 Jun 2026 14:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8D243900E;
+	Tue, 30 Jun 2026 14:37:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782830180; cv=none; b=otoq3xlr9xrWU+c6PBD9tH4jXf8eHc4Is3VugTiy4KpAWgJfkmcVFZzeAWkVV7P+oSo6lNBXQlNCTrt8MYNtca14HeoW9yqupkaA6UGm4WNq5Bi08bfH5IgdHnxXW7qwywVqXZ/XbmwbsNMURYf9lHZZTVrsx6t8Q5/tOOmoNgA=
+	t=1782830254; cv=none; b=HKAakKxJj0CNAwcGngvLZwYl20QrbNDKa8CRxUjLXV4YTr/dxGEG5kUVOX3cjxlDklY0jWHuFytWgzke2oQqwXI75FsgBG3k2FArGvrfZzUXePj1oPv4HPud/DQKeseaCZTF5e5bV9yHqtbr1keTrHuceSscyBwHdElFdUKbHGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782830180; c=relaxed/simple;
-	bh=ilw4YVXEHWBPpGkFO4p7FYlUqGFBgKsMtwAiHrGJUxY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rpziiSWg2MVk+bkAlsoJ1IwRHBUgbEqEK9X67ZW+G5l6XeF5tUJBNRY5FAoGnJUErKhEiEgJ/aoUCFhwO4+P5vjRDSyHfXmpIb1a37ttFVsHIjpYjA9K+nYDcP7ExC9/ywNDWHufzoJ4Vqj0hOf0gSBbW7wo+vHq4R3a/A+Bg4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JkSdYDgo; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C3B11F000E9;
-	Tue, 30 Jun 2026 14:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782830178;
-	bh=czYxuO/tfR9xu7bQEpayuXT8vTh36LiK41BVvSPbPvg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=JkSdYDgo0uITQsfMoy1Z9pxd0cSyoSZM9ET7vGObSBuI4ydBiQ9OPB67vz5l+qY2G
-	 cXRHblWdkbthGgtfNnwAqPNKSjEely0UMKSDCE16YDUx8pryaSXgu9QGM1h1WZWp0m
-	 b4HrBjeBSB8ENSD+qqjVPTasv06xzZyPHRuKep3LvAi0zvVBRvR88whx2bzOXn2OpR
-	 wx2+6DDhantJ0PLX+BZf3Aj4n6zhf4Bp+WAUTb1op1B5a+Xx6IqzhLHTSpvrGrjJ/O
-	 xVjj9W0ufFP9iuo2Fo97vYO2XMCd+p5cha+hSbHMf4F+wL9FhExQEd/vI0/LRR6rfe
-	 FKyIgtnEOIURg==
-Message-ID: <9d9cceae-3934-4dd6-ae8e-af995ae6b0ab@kernel.org>
-Date: Tue, 30 Jun 2026 08:36:17 -0600
+	s=arc-20240116; t=1782830254; c=relaxed/simple;
+	bh=qYkGTJXbPXZcHnt20w8gJCZ37O5G4G3Mba+cie49R0M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iWteplM4Qs0U7xBke+uylZrER02fHXC5Tb6Mu9Ymg8FDFOHP5pvXhSgTT6Anwe/mjrzPU/wuOt7QekPXqZvS20eUJGBgTBrNF4zJYwQiWR+RaLAJZdE4dKCkKX0yC1TrN4luXMPs2/vySA0jazLJX3XFx075rryq+DmIORJIddE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CgemoEDA; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=D5H2UWkM; arc=none smtp.client-ip=193.142.43.55
+Date: Tue, 30 Jun 2026 16:37:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1782830251;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ezLN1M9JlwArYj7BBJygaHQ3CcZPQGglpyFqaQ1V4EU=;
+	b=CgemoEDAhBhli2MXnGblrEhYV4/HcyVG4Xjp+/Gd2phD6kvZ1O2qSs1SIjc0nbTGDvSe1t
+	SUJgsFTMOKgoypA7l9oYtkoLES9+TVoa4dzx1NmzQlSTu0UbjXTPPVl7queu7A0B036oOl
+	+mTf78Onz3uOxHkVFhcZhJXi4AQT3wzFKLh7ZDLlloV7JEPFhRHH+VfT+XErIq3g2UR85A
+	STi/ttIDIN1dryJa3rHioQ6LwN6vECe0c+OC2C5wMP+AVoLXLOPYe2/WkueA8QNKog3IFk
+	hs3ENulEsxDhWGQEaiwGDa4zWbL8cCFIic4c/wm3xEpvKXuMR+tzrug7dBSBYQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1782830251;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ezLN1M9JlwArYj7BBJygaHQ3CcZPQGglpyFqaQ1V4EU=;
+	b=D5H2UWkM9IozabpBUu6oLVONiIjo5RguuKx2l7+CVKip0gjzunesfuYXepr0BBWbXW1QU0
+	33ipBUNDFvJMU6DQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com, andrii@kernel.org,
+	memxor@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net 0/3] Fix broken TC_ACT_REDIRECT from qdiscs
+Message-ID: <20260630143730.ZhXWjEIh@linutronix.de>
+References: <20260630123331.186840-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2 2/2] devlink: support u64-array values in
- devlink param show/set
-Content-Language: en-US
-To: Ratheesh Kannoth <rkannoth@marvell.com>, stephen@networkplumber.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- jiri@resnulli.us
-References: <20260630015012.3728870-1-rkannoth@marvell.com>
- <20260630015012.3728870-3-rkannoth@marvell.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260630015012.3728870-3-rkannoth@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260630123331.186840-1-daniel@iogearbox.net>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	URIBL_MULTI_FAIL(0.00)[vger.kernel.org:server fail,sea.lore.kernel.org:server fail];
-	TAGGED_FROM(0.00)[bounces-303239-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:stephen@networkplumber.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,mojatatu.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303240-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:andrii@kernel.org,m:memxor@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linutronix.de:dkim,linutronix.de:email,linutronix.de:mid,linutronix.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 43E706E5804
+X-Rspamd-Queue-Id: 4A7196E5846
 
-On 6/29/26 7:50 PM, Ratheesh Kannoth wrote:
-> diff --git a/devlink/devlink.c b/devlink/devlink.c
-> index 9372e92f..3c29601d 100644
-> --- a/devlink/devlink.c
-> +++ b/devlink/devlink.c
-> @@ -3496,13 +3496,115 @@ static const struct param_val_conv param_val_conv[] = {
->  };
->  
->  #define PARAM_VAL_CONV_LEN ARRAY_SIZE(param_val_conv)
-> +#define DEVLINK_PARAM_MAX_ARRAY_SIZE 32
+On 2026-06-30 14:33:28 [+0200], Daniel Borkmann wrote:
+> This is an alternative fix to [0] in order to not uglify
+> __dev_queue_xmit() with sprinkled ifdefs given this can be
+> simplified and isolated through a simple test into the BPF
+> redirect helper itself.
+> 
+> I've also added a proper BPF selftest, so there is no need
+> to check-in a binary BPF object into selftests given we do
+> have BPF infra for all of this.
 
-Why 32? Is that based on current code? How does the kernel side handle
-the number of parameters? What happens if the kernel sends more than 32
-parameters - from a user's perspective, not this code and processing the
-output?
+1/3 makes sense. Assuming we wouldn't have this per-task memory
+assignment, wouldn't then the state from one redirect leak into another?
 
-> +
-> +struct devlink_param_u64_array {
-> +	uint64_t size;
-> +	uint64_t val[DEVLINK_PARAM_MAX_ARRAY_SIZE];
-> +};
-> +
-> +static int param_value_nested_u64_attr_cb(const struct nlattr *attr, void *data)
-> +{
-> +	struct devlink_param_u64_array *arr = data;
-> +	unsigned int len;
-> +
-> +	if (mnl_attr_get_type(attr) != DEVLINK_ATTR_PARAM_VALUE_DATA)
-> +		return MNL_CB_OK;
-> +
-> +	if (arr->size >= DEVLINK_PARAM_MAX_ARRAY_SIZE)
-> +		return MNL_CB_ERROR;
-> +
-> +	len = mnl_attr_get_payload_len(attr);
-> +	if (len == sizeof(uint32_t))
-> +		arr->val[arr->size++] = mnl_attr_get_u32(attr);
-> +	else if (len == sizeof(uint64_t))
-> +		arr->val[arr->size++] = mnl_attr_get_u64(attr);
-> +	else
-> +		return MNL_CB_ERROR;
-> +
-> +	return MNL_CB_OK;
-> +}
-> +
-> +static int param_value_u64_array_fill(struct nlattr *nl,
-> +				      struct devlink_param_u64_array *arr)
-> +{
-> +	int err;
-> +
-> +	arr->size = 0;
-> +	err = mnl_attr_parse_nested(nl, param_value_nested_u64_attr_cb, arr);
-> +	if (err != MNL_CB_OK)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +static bool param_value_u64_array_equal(const struct devlink_param_u64_array *a,
-> +					const struct devlink_param_u64_array *b)
-> +{
-> +	uint64_t i;
-> +
-> +	if (a->size != b->size)
-> +		return false;
-> +
-> +	for (i = 0; i < a->size; i++) {
-> +		if (a->val[i] != b->val[i])
-> +			return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int param_value_u64_array_put_from_str(struct nlmsghdr *nlh,
-> +					      const char *param_value,
-> +					      const struct devlink_param_u64_array *cur)
-> +{
-> +	struct devlink_param_u64_array new_arr = {};
-> +	char *copy, *token, *saveptr = NULL;
-> +	char delim[] = " ,";
-> +	uint64_t val;
-> +	int err;
-> +
-> +	copy = strdup(param_value);
-> +	if (!copy)
-> +		return -ENOMEM;
-> +
-> +	token = strtok_r(copy, delim, &saveptr);
-> +	while (token) {
-> +		if (new_arr.size >= DEVLINK_PARAM_MAX_ARRAY_SIZE) {
-> +			free(copy);
-> +			pr_err("Too many array elements (max %d)\n",
-> +			       DEVLINK_PARAM_MAX_ARRAY_SIZE);
-> +			return -EINVAL;
-> +		}
-> +		err = get_u64((__u64 *)&val, token, 10);
-> +		if (err) {
-> +			free(copy);
-> +			pr_err("Value \"%s\" is not a number or not within range\n",
-> +			       token);
-> +			return err;
-> +		}
-> +		new_arr.val[new_arr.size++] = val;
-> +		token = strtok_r(NULL, delim, &saveptr);
-> +	}
-> +	free(copy);
-> +
-> +	if (cur && param_value_u64_array_equal(&new_arr, cur))
-> +		return 1;
-> +
-> +	for (uint64_t i = 0; i < new_arr.size; i++)
+For what it's worth:
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-put the declaration at the top of the function with the rest of them.
-global comment; fix all of them.
-
-> +		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, new_arr.val[i]);
-
-Why can't this put be done in the loop above as the string is processed?
-
-> +
-> +	return 0;
-> +}
->  
->  static int pr_out_param_value_print(const char *nla_name, int nla_type,
->  				     struct nlattr *val_attr, bool conv_exists,
-> -				     const char *label, bool flag_as_u8)
-> +				     const char *label, bool flag_as_u8, struct nlattr *nl)
->  {
-> +	struct devlink_param_u64_array u64_arr = { };
->  	const char *vstr;
-> -	int err;
-> +	char buffer[1024];
-> +	int err, cnt = 0;
->  
->  	print_string(PRINT_FP, NULL, " %s ", label);
->  
-
+Sebastian
 
