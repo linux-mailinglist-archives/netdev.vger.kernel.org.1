@@ -1,185 +1,456 @@
-Return-Path: <netdev+bounces-303034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CI9bOpF8Q2rgZAoAu9opvQ
-	(envelope-from <netdev+bounces-303034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:21:37 +0200
+	id MY6gAAh+Q2omZQoAu9opvQ
+	(envelope-from <netdev+bounces-303035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:27:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418B26E19BD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:21:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA506E1A61
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:27:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VkesCwpF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303034-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303034-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=atmark-techno.com header.s=gw2_bookworm header.b=OhMH3War;
+	dkim=pass header.d=atmark-techno.com header.s=google header.b="jlmMCW/l";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303035-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303035-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=atmark-techno.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5283301369E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:21:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D6A0304347F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324A43815E1;
-	Tue, 30 Jun 2026 08:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D20394793;
+	Tue, 30 Jun 2026 08:27:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from gw2.atmark-techno.com (gw2.atmark-techno.com [35.74.137.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C74B1A682A;
-	Tue, 30 Jun 2026 08:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2224E392C56
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 08:27:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782807662; cv=none; b=OI8/JCuSTs7QxtAicl9vQgteFEgSk25wUOoEkpXkrZY7P8RzRUU3LKMJiaBhHnyKSxGqfEwUhlJAGIqsXZYZbB7xbjpsz+L98KjDEH/91a04kpun+1gesYvnRa4h7Idnmp247l1DedNi0yWfbeNBLodDpZjxStiRTS1nw1B9UE0=
+	t=1782808052; cv=none; b=qhrlA4ypUI9hAbnUZq0PIO5pU4hYGiLqDJIMVmlaLddxMfwgEOyv66nk0nI1ux5edpnJ9NQp4FEwPznEbSS5+sKElmnBIDv49dlWCuZAIon8bauFIbHtJl1Fy47Vm46vUe4dlSJOySBHYKaDiw7sOB0FCOoLgEF+muV55QahRPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782807662; c=relaxed/simple;
-	bh=L+gy09Hud4GkyuL9PXbBLIAhVghD8FfubKxhKBFY5d0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lQXf4N/yLEMUJQXO4iczcMkhy4oz93d5QJytlUO8ADw4ZS8DTGnwe7XZ40294GOrKyHOMowD1iKuvGThv7j/U1bUH5fEm3opNwhOwbkSAuh8/vKlkxjxpkfY45L15NJOqdAYm7lCVOUUvnk/1q0Vnyx42fspT0HRFB6MJ4EIw7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkesCwpF; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 852861F00A3A;
-	Tue, 30 Jun 2026 08:20:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782807660;
-	bh=4JAFAW6FVXYS68CLkdKFQkBbKQZpE3Z9s68aUV9tocg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=VkesCwpFq/7KARxTGOrej0oXJaMRiKASL0h/7MkNwm4hS6BZx24uoQVITcMJzBVku
-	 326zcwrykX4zDoEIXOOlBx34enlXJ6jGBM71rAwPPWGmp/VScAGjjDtZ6yr4Fh1mej
-	 kyaRr+GbF2waXZZWyjNKFR1+B3++ZNdrwaIwmNkhpKDV74bEMjnFjGohFqbTtmpr+D
-	 N7wg3I3aQ+YUXxkRJ5hFWUgydSJ2ez/2asGIa7L63aL9YMezZuYFK1n3K6EYh6b1T9
-	 h3utQBXasD9CoHJ351YxIhidiU3M3t8cMfDijIBuAzW+VjtQywFwav/RZns6hk7IhR
-	 i8VBumX92JjKQ==
-Message-ID: <70661f45-4116-4ec1-8e6f-a2e8caf66dda@kernel.org>
-Date: Tue, 30 Jun 2026 10:20:45 +0200
+	s=arc-20240116; t=1782808052; c=relaxed/simple;
+	bh=0AqV/YDHGn19EMEu1E1okmOUiWZzYKdDuUHqmTFfw3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nzUbAsoA0PEp9QoTfhQLi+JKWbcX9ZW20oAYniKqm4Cqll1yu5iPvPBqi6ZoiMvajAHt3wuR4fsXW9EiIodz3TEScqWAM7W0IPZbMBVPFdrPpPEC04xO6SSslrDLzc1l34yA0k5k26F6yPmIGUZengB0YvT+91t/OhLdLL6lPBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=atmark-techno.com; spf=pass smtp.mailfrom=atmark-techno.com; dkim=pass (2048-bit key) header.d=atmark-techno.com header.i=@atmark-techno.com header.b=OhMH3War; dkim=pass (2048-bit key) header.d=atmark-techno.com header.i=@atmark-techno.com header.b=jlmMCW/l; arc=none smtp.client-ip=35.74.137.57
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=atmark-techno.com;
+	s=gw2_bookworm; t=1782808050;
+	bh=0AqV/YDHGn19EMEu1E1okmOUiWZzYKdDuUHqmTFfw3A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OhMH3WarNc4+1DHPQVYNJabTzFK792Sh/uTC4VUlNZwsce91W7p5PxxMId2ph/qqN
+	 i5vVGtiLWsqEDaWsI/0Q9pDuFLv57qWpc9mZlQVKm+/brTYWv1grHySN8UOtQJLeBj
+	 z13Qph6Mrfdo2xpl7j9dOTZvwrdGFD/8CWIA7KOVhgLLYU26oVwUFDWsWN9BdpF1z/
+	 5vJScSvXekNQPKTXBK9qNCvwUDGc1MSPwjOY7DhvRI3lNhTR4z2pqYFreRlG8XbqIs
+	 kbjMh59HGXq78V7gAaVoxBPL5vvADcmhNN1jBoWUrSXb4cpIqOhzAI6Fwf4x/maF4w
+	 tQPSzZIXDO+ow==
+Received: from gw2.atmark-techno.com (localhost [127.0.0.1])
+	by gw2.atmark-techno.com (Postfix) with ESMTP id 2AB0618C
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:27:30 +0900 (JST)
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	by gw2.atmark-techno.com (Postfix) with ESMTPS id 2D4F918C
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:27:28 +0900 (JST)
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-84777e9b51bso2744898b3a.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 01:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atmark-techno.com; s=google; t=1782808047; x=1783412847; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ElN0E0Vc646AHHC1/cI4G5asPGbZj5VC1KY8MtG3QEI=;
+        b=jlmMCW/lM4FJ61iWKO1/pLO+ZJngdd2cQ3wu4+/iutFnbobPKekYiy/ytfM3nfhSk9
+         NpxGnYzO4XvwsRl2E5fDg72OA0LLlQrYqDR+qvbJADlaWeA0rj07cPvKces9T++/pVzL
+         4jYZHtITnXHdo1FMPGqe5kDQ+8Ufu5NsZb4NXr42lY0vkqa3TLRxhEUbZDUbSrmLEvgZ
+         SJLXQxJJ11y4sNHyvbDJ3MQXF20r+JbgbTg2NOL4fyct849cyl+8AHjULiVUNsSZkBg+
+         oaoEifIcY6Yfq+NgOnt0fNpO3GRQJjntImfydP1p8i1jjfvGjSqMP3MHbEZ0rivZVLDY
+         mJhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782808047; x=1783412847;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ElN0E0Vc646AHHC1/cI4G5asPGbZj5VC1KY8MtG3QEI=;
+        b=loTopuDmg+J+Kr6VHhiGBRBxB5t+nlGyREw2CbID78oLQOH0LKtKAAWEQKz58VdiMs
+         j5Va7hOHHkPlNuWjq6SXbZqU+RF+NTdBitkHnytk1SCh7ybRY1I8HqMckBPdWZAQuMJj
+         /v2MHIBL+NL6wAjfSW8vPs5ZwH4tHrQ0/8ZfY43ZmS/F+kkSnQlDMGKHFQUh1WmQ8U/8
+         c/INYTduHfElWO+HRvGPhD/oqhpwZS1bTgDhUZVRDFmnnF/rHJxGVkUETm4QD1xAPLXZ
+         4UNghRdmECJWpkBK2f5Uhk9jfO+20k8sfBUdlIPpqUgBSKGO8V1+6DHX0L/CGSzlir26
+         sf6g==
+X-Forwarded-Encrypted: i=1; AFNElJ+SxFZ1jv5NoQ+xF+G7sZZiwY/YPiXXiG1Mw6XaqR6iWvyX1YqexCBMA0sPWbszwQEqXR970/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFFhyOJdw1tQ9Wz+qpADzPLuTc8DuGcZeHQIGd0ITrc7quWroR
+	VbrMTlaFIUBF+ojwcbjlNFAbXbUuwW121Jke6Ru3adse4S9ELhKTxVM8+2+RUkBGyR/IcYAtlQc
+	bISiSJrd1LoGLvOZY0FwXeVE6SpZg1sXiTwdiKbQPrjrVFBTChUR66Xn645o=
+X-Gm-Gg: AfdE7clKz+34mcr0maVa5kF9drUpxBGDKlFurg3+mJDcVuCVgfPvsSgx3+mjBq8pk47
+	HJ1s4Y9VqIcxsBF1ORFOD0fIUKvRYK5xwlCnDYXOMsBXDQbsLIQ5co3MAAoFDp2SpixEjjORmvt
+	CAUEI660/l4JIv36oj2T5Otid6RnEuckn+3jpx0iJX+7gp/r90srSPhmXpd5/LDEdvatqCz9BTq
+	YLyQ+emK48Nxed71eixVVzpZeINLwH592q56J3bkFUdpFziij41gaFXF2FmJZVtNZDyEpEzPtnj
+	da97gxpZK6qo2fG+3un7MQHatp+6Wy/C2RTlabNftWCsycghCCvep+PooblsGvYZjKdypdlhFE9
+	KLOb3akwQCDPTzyhLVx6d8H6iSJRrI0AeU1kLwIHyas+9p4MBmRtUtXtghRk=
+X-Received: by 2002:a05:6a00:94c9:b0:847:927d:47a8 with SMTP id d2e1a72fcca58-8479eef1e06mr2334511b3a.18.1782808047156;
+        Tue, 30 Jun 2026 01:27:27 -0700 (PDT)
+X-Received: by 2002:a05:6a00:94c9:b0:847:927d:47a8 with SMTP id d2e1a72fcca58-8479eef1e06mr2334489b3a.18.1782808046677;
+        Tue, 30 Jun 2026 01:27:26 -0700 (PDT)
+Received: from localhost (sodcd-04p2-40.ppp11.odn.ad.jp. [203.139.65.40])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-847a0007464sm1371506b3a.23.2026.06.30.01.27.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 01:27:26 -0700 (PDT)
+From: Dominique Martinet <dominique.martinet@atmark-techno.com>
+To: dominique.martinet@atmark-techno.com,
+	stable@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Rajat Gupta <rajat.gupta@oss.qualcomm.com>,
+	Yiming Qian <yimingqian591@gmail.com>,
+	Keenan Dong <keenanat2000@gmail.com>,
+	Han Guidong <2045gemini@gmail.com>,
+	Zhang Cen <rollkingzzc@gmail.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	=?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Victor Nogueira <victor@mojatatu.com>
+Subject: [PATCH 5.10.y] net/sched: fix pedit partial COW leading to page cache corruption
+Date: Tue, 30 Jun 2026 17:27:08 +0900
+Message-ID: <20260630-cve-2026-46331-v1-2-c1986f356f26@atmark-techno.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260630-cve-2026-46331-v1-1-c1986f356f26@atmark-techno.com>
+References: <20260630-cve-2026-46331-v1-1-c1986f356f26@atmark-techno.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/6] dt-bindings: net: bluetooth: Document Qualcomm
- IPQ5018 Bluetooth controller
-To: george.moussalem@outlook.com, Jens Axboe <axboe@kernel.dk>,
- Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan
- <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
-References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
- <20260629-ipq5018-bluetooth-v2-1-02770f03b6bb@outlook.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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
-In-Reply-To: <20260629-ipq5018-bluetooth-v2-1-02770f03b6bb@outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20260630-cve-2026-46331-4f851ccf8244
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8877; i=dominique.martinet@atmark-techno.com;
+ h=from:subject:message-id; bh=oqcZ/f4/98migEijhvNaC5FLNfmO9L/opKQ1jbIHVBc=;
+ b=owEBbQKS/ZANAwAKAfKKYH/WjHEHAcsmYgBqQ3f7YjUi3XnzjgCFJQqCGn8HEiwjWqbnoJh3M
+ zcb0dWRnEKJAjMEAAEKAB0WIQQoFSiLMD+txr0veJbyimB/1oxxBwUCakN3+wAKCRDyimB/1oxx
+ B563D/9M43LiusPq/K+A89lE25NeUV+YZF2e7L6IpUbQVFAaL5RZtY+BufA4YYTavenpmG8ULTl
+ yU75Jb95mk0oGc8wdmxcZBbinh24dkxV164Ri1meSeWNfSetPzC+WlbtMb/kEZaQRxNTLdCmmb2
+ gR5/0q92SsQQ2iSJ7m3OwiHmOOUAW7S892mXei5ApkC5sJYLqwpZo9euzWFqH4APwNG0/yx3MAN
+ 16DkhYXSTtDrripzoNEkMN+2hP3H46g3s77Ho8a+j6tBOfWZ0msqgYMA40qvG/WNcpcX8t3MPgY
+ Ss4rEauiwbw1aNWz164s6U7+rY87nXY+7CtUhk7nYmCDKe9uGTGW4LeO+f+OyjTrwpF3vgdqU0n
+ MqFRNpKbNk7NIGadMTWhCf0YS7qijz7zjMuTYWfgosZIs9CtgBcEN6upfon+B6oe6gWOR1bTxmg
+ l3A6dfU2hSN9jEqt2K2jJ7ukkAwrqe+DAYzmcmUjau65Wm0sMzdEITIRVYeJN2ld1vmvLNzuGpE
+ LUB8gc9Is1T/vnpWTEdEgH5vgl7A/aAdUSHyoTxzuFIezKG42jc74YtVWzCLyWqY5i3+ncM9b95
+ b7TGZYWYaBLI1lLWb1D6DkXBvKyX3adIHEKT6WdziyAuH+ery0nTcIXI0bdlXr2y0gB+B6fZ/Zc 8wumq8nZdU91lqA==
+X-Developer-Key: i=dominique.martinet@atmark-techno.com; a=openpgp; fpr=2815288B303FADC6BD2F7896F28A607FD68C7107
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[atmark-techno.com,none];
+	R_DKIM_ALLOW(-0.20)[atmark-techno.com:s=gw2_bookworm,atmark-techno.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303035-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	FREEMAIL_TO(0.00)[outlook.com,kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,msgid.link:url];
+	FORGED_RECIPIENTS(0.00)[m:dominique.martinet@atmark-techno.com,m:stable@vger.kernel.org,m:jhs@mojatatu.com,m:xiyou.wangcong@gmail.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:kuba@kernel.org,m:mathew.j.martineau@linux.intel.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rajat.gupta@oss.qualcomm.com,m:yimingqian591@gmail.com,m:keenanat2000@gmail.com,m:2045gemini@gmail.com,m:rollkingzzc@gmail.com,m:dcaratti@redhat.com,m:toke@redhat.com,m:victor@mojatatu.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[dominique.martinet@atmark-techno.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303034-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,kernel.org,linux.intel.com,redhat.com,vger.kernel.org,oss.qualcomm.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dominique.martinet@atmark-techno.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[atmark-techno.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,qualcomm.com:email,outlook.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 418B26E19BD
+X-Rspamd-Queue-Id: 3EA506E1A61
 
-On 29/06/2026 15:01, George Moussalem via B4 Relay wrote:
-> From: George Moussalem <george.moussalem@outlook.com>
-> 
-> Document the Qualcomm IPQ5018 Bluetooth controller.
-> 
-> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-> ---
->  .../bindings/net/bluetooth/qcom,ipq5018-bt.yaml    | 86 ++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
+From: Rajat Gupta <rajat.gupta@oss.qualcomm.com>=0D
+=0D
+[ Upstream commit 899ee91156e57784090c5565e4f31bd7dbffbc5a ]=0D
+=0D
+tcf_pedit_act() computes the COW range for skb_ensure_writable()=0D
+once before the key loop using tcfp_off_max_hint, but the hint does=0D
+not account for the runtime header offset added by typed keys. This=0D
+can leave part of the write region un-COW'd.=0D
+=0D
+Fix by moving skb_ensure_writable() inside the per-key loop where=0D
+the actual write offset is known, and add overflow checking on the=0D
+offset arithmetic. For negative offsets (e.g. Ethernet header edits=0D
+at ingress), use skb_cow() to COW the headroom instead. Guard=0D
+offset_valid() against INT_MIN, where negation is undefined.=0D
+=0D
+Fixes: 8b796475fd78 ("net/sched: act_pedit: really ensure the skb is writab=
+le")=0D
+Reported-by: Yiming Qian <yimingqian591@gmail.com>=0D
+Reported-by: Keenan Dong <keenanat2000@gmail.com>=0D
+Reported-by: Han Guidong <2045gemini@gmail.com>=0D
+Reported-by: Zhang Cen <rollkingzzc@gmail.com>=0D
+Reviewed-by: Han Guidong <2045gemini@gmail.com>=0D
+Tested-by: Han Guidong <2045gemini@gmail.com>=0D
+Reviewed-by: Davide Caratti <dcaratti@redhat.com>=0D
+Tested-by: Davide Caratti <dcaratti@redhat.com>=0D
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>=0D
+Tested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>=0D
+Reviewed-by: Victor Nogueira <victor@mojatatu.com>=0D
+Tested-by: Victor Nogueira <victor@mojatatu.com>=0D
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>=0D
+Signed-off-by: Rajat Gupta <rajat.gupta@oss.qualcomm.com>=0D
+Link: https://patch.msgid.link/20260531123221.48732-1-jhs@mojatatu.com=0D
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>=0D
+[Dominique: plenty of context conflict but the code itself could still=0D
+mostly be used]=0D
+Signed-off-by: Dominique Martinet <dominique.martinet@atmark-techno.com>=0D
+---=0D
+(Sorry for double-send to stable@vger, I hadn't intended to send the=0D
+Cc-free version...)=0D
+=0D
+CVE-2026-46331 got attention and I've had to backport this to 5.10, so=0D
+here we are, this should fix it.=0D
+=0D
+Unfortunately there are more conflicts with 5.15 so I didn't do this=0D
+one (but if anyone cares older 5.4/4.19 cherry-picks cleanly from this,=0D
+they're no longer stable kernels so I won't bother sending)=0D
+=0D
+I've tested in egress with a trivial rule redirecting port inspired from=0D
+the man page (and checking on target with tcpdump because return path is=0D
+broken), so I hopefully didn't botch this too badly:=0D
+=0D
+tc qdisc replace dev eth0 root handle 1: htb=0D
+tc filter add dev eth0 parent 1: u32 match ip dport 23 0xffff action pedit =
+pedit munge ip dport set 22=0D
+---=0D
+ include/net/tc_act/tc_pedit.h |  1 -=0D
+ net/sched/act_pedit.c         | 84 ++++++++++++++++++++++-----------------=
+----=0D
+ 2 files changed, 43 insertions(+), 42 deletions(-)=0D
+=0D
+diff --git a/include/net/tc_act/tc_pedit.h b/include/net/tc_act/tc_pedit.h=
+=0D
+index 3e02709a1df656931942be4851a115dd6bef8b4c..748cf87a4d7ea5c92b4fd48dd33=
+02b8ad64944fe 100644=0D
+--- a/include/net/tc_act/tc_pedit.h=0D
++++ b/include/net/tc_act/tc_pedit.h=0D
+@@ -14,7 +14,6 @@ struct tcf_pedit {=0D
+ 	struct tc_action	common;=0D
+ 	unsigned char		tcfp_nkeys;=0D
+ 	unsigned char		tcfp_flags;=0D
+-	u32			tcfp_off_max_hint;=0D
+ 	struct tc_pedit_key	*tcfp_keys;=0D
+ 	struct tcf_pedit_key_ex	*tcfp_keys_ex;=0D
+ };=0D
+diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c=0D
+index a44101b2f441919b7d4b0be177aa735a3c547350..cebeed6214558b1e1dd717b411c=
+9ffa108a2293d 100644=0D
+--- a/net/sched/act_pedit.c=0D
++++ b/net/sched/act_pedit.c=0D
+@@ -14,6 +14,8 @@=0D
+ #include <linux/module.h>=0D
+ #include <linux/init.h>=0D
+ #include <linux/slab.h>=0D
++#include <linux/overflow.h>=0D
++#include <asm/unaligned.h>=0D
+ #include <net/netlink.h>=0D
+ #include <net/pkt_sched.h>=0D
+ #include <linux/tc_act/tc_pedit.h>=0D
+@@ -229,21 +231,11 @@ static int tcf_pedit_init(struct net *net, struct nla=
+ttr *nla,=0D
+ 		p->tcfp_nkeys =3D parm->nkeys;=0D
+ 	}=0D
+ 	memcpy(p->tcfp_keys, parm->keys, ksize);=0D
+-	p->tcfp_off_max_hint =3D 0;=0D
+ 	for (i =3D 0; i < p->tcfp_nkeys; ++i) {=0D
+-		u32 cur =3D p->tcfp_keys[i].off;=0D
+-=0D
+ 		/* sanitize the shift value for any later use */=0D
+ 		p->tcfp_keys[i].shift =3D min_t(size_t, BITS_PER_TYPE(int) - 1,=0D
+ 					      p->tcfp_keys[i].shift);=0D
+ =0D
+-		/* The AT option can read a single byte, we can bound the actual=0D
+-		 * value with uchar max.=0D
+-		 */=0D
+-		cur +=3D (0xff & p->tcfp_keys[i].offmask) >> p->tcfp_keys[i].shift;=0D
+-=0D
+-		/* Each key touches 4 bytes starting from the computed offset */=0D
+-		p->tcfp_off_max_hint =3D max(p->tcfp_off_max_hint, cur + 4);=0D
+ 	}=0D
+ =0D
+ 	p->tcfp_flags =3D parm->flags;=0D
+@@ -277,15 +269,12 @@ static void tcf_pedit_cleanup(struct tc_action *a)=0D
+ 	kfree(p->tcfp_keys_ex);=0D
+ }=0D
+ =0D
+-static bool offset_valid(struct sk_buff *skb, int offset)=0D
++static bool offset_valid(struct sk_buff *skb, int offset, int len)=0D
+ {=0D
+-	if (offset > 0 && offset > skb->len)=0D
++	if (offset < -(int)skb_headroom(skb))=0D
+ 		return false;=0D
+ =0D
+-	if  (offset < 0 && -offset > skb_headroom(skb))=0D
+-		return false;=0D
+-=0D
+-	return true;=0D
++	return offset <=3D (int)skb->len - len;=0D
+ }=0D
+ =0D
+ static int pedit_skb_hdr_offset(struct sk_buff *skb,=0D
+@@ -325,18 +314,10 @@ static int tcf_pedit_act(struct sk_buff *skb, const s=
+truct tc_action *a,=0D
+ 			 struct tcf_result *res)=0D
+ {=0D
+ 	struct tcf_pedit *p =3D to_pedit(a);=0D
+-	u32 max_offset;=0D
+ 	int i;=0D
+ =0D
+ 	spin_lock(&p->tcf_lock);=0D
+ =0D
+-	max_offset =3D (skb_transport_header_was_set(skb) ?=0D
+-		      skb_transport_offset(skb) :=0D
+-		      skb_network_offset(skb)) +=0D
+-		     p->tcfp_off_max_hint;=0D
+-	if (skb_ensure_writable(skb, min(skb->len, max_offset)))=0D
+-		goto unlock;=0D
+-=0D
+ 	tcf_lastuse_update(&p->tcf_tm);=0D
+ =0D
+ 	if (p->tcfp_nkeys > 0) {=0D
+@@ -347,10 +328,11 @@ static int tcf_pedit_act(struct sk_buff *skb, const s=
+truct tc_action *a,=0D
+ 		enum pedit_cmd cmd =3D TCA_PEDIT_KEY_EX_CMD_SET;=0D
+ =0D
+ 		for (i =3D p->tcfp_nkeys; i > 0; i--, tkey++) {=0D
+-			u32 *ptr, hdata;=0D
++			int write_offset, write_len;=0D
+ 			int offset =3D tkey->off;=0D
+ 			int hoffset;=0D
+-			u32 val;=0D
++			u32 cur_val, val;=0D
++			u32 *ptr;=0D
+ 			int rc;=0D
+ =0D
+ 			if (tkey_ex) {=0D
+@@ -369,13 +351,15 @@ static int tcf_pedit_act(struct sk_buff *skb, const s=
+truct tc_action *a,=0D
+ =0D
+ 			if (tkey->offmask) {=0D
+ 				u8 *d, _d;=0D
++				int at_offset;=0D
+ =0D
+-				if (!offset_valid(skb, hoffset + tkey->at)) {=0D
+-					pr_info("tc action pedit 'at' offset %d out of bounds\n",=0D
+-						hoffset + tkey->at);=0D
++				if (check_add_overflow(hoffset, (int)tkey->at, &at_offset) ||=0D
++				    !offset_valid(skb, at_offset, sizeof(_d))) {=0D
++					pr_info_ratelimited("tc action pedit 'at' offset %d out of bounds\n",=
+=0D
++							    hoffset + tkey->at);=0D
+ 					goto bad;=0D
+ 				}=0D
+-				d =3D skb_header_pointer(skb, hoffset + tkey->at,=0D
++				d =3D skb_header_pointer(skb, at_offset,=0D
+ 						       sizeof(_d), &_d);=0D
+ 				if (!d)=0D
+ 					goto bad;=0D
+@@ -387,23 +371,44 @@ static int tcf_pedit_act(struct sk_buff *skb, const s=
+truct tc_action *a,=0D
+ 				goto bad;=0D
+ 			}=0D
+ =0D
+-			if (!offset_valid(skb, hoffset + offset)) {=0D
+-				pr_info("tc action pedit offset %d out of bounds\n",=0D
+-					hoffset + offset);=0D
++			if (check_add_overflow(hoffset, offset, &write_offset)) {=0D
++				pr_info_ratelimited("tc action pedit offset overflow\n");=0D
+ 				goto bad;=0D
+ 			}=0D
+ =0D
+-			ptr =3D skb_header_pointer(skb, hoffset + offset,=0D
+-						 sizeof(hdata), &hdata);=0D
+-			if (!ptr)=0D
++			if (!offset_valid(skb, write_offset, sizeof(*ptr))) {=0D
++				pr_info_ratelimited("tc action pedit offset %d out of bounds\n",=0D
++						    write_offset);=0D
+ 				goto bad;=0D
++			}=0D
++=0D
++			if (write_offset < 0) {=0D
++				if (skb_cow(skb, -write_offset))=0D
++					goto bad;=0D
++				if (write_offset + (int)sizeof(*ptr) > 0) {=0D
++					if (skb_ensure_writable(skb,=0D
++								min_t(int, skb->len,=0D
++								      write_offset + (int)sizeof(*ptr))))=0D
++						goto bad;=0D
++				}=0D
++			} else {=0D
++				if (check_add_overflow(write_offset, (int)sizeof(*ptr),=0D
++						       &write_len))=0D
++					goto bad;=0D
++				if (skb_ensure_writable(skb, min_t(int, skb->len,=0D
++								   write_len)))=0D
++					goto bad;=0D
++			}=0D
++=0D
++			ptr =3D (u32 *)(skb->data + write_offset);=0D
++			cur_val =3D get_unaligned(ptr);=0D
+ 			/* just do it, baby */=0D
+ 			switch (cmd) {=0D
+ 			case TCA_PEDIT_KEY_EX_CMD_SET:=0D
+ 				val =3D tkey->val;=0D
+ 				break;=0D
+ 			case TCA_PEDIT_KEY_EX_CMD_ADD:=0D
+-				val =3D (*ptr + tkey->val) & ~tkey->mask;=0D
++				val =3D (cur_val + tkey->val) & ~tkey->mask;=0D
+ 				break;=0D
+ 			default:=0D
+ 				pr_info("tc action pedit bad command (%d)\n",=0D
+@@ -411,9 +416,7 @@ static int tcf_pedit_act(struct sk_buff *skb, const str=
+uct tc_action *a,=0D
+ 				goto bad;=0D
+ 			}=0D
+ =0D
+-			*ptr =3D ((*ptr & tkey->mask) ^ val);=0D
+-			if (ptr =3D=3D &hdata)=0D
+-				skb_store_bits(skb, hoffset + offset, ptr, 4);=0D
++			put_unaligned((cur_val & tkey->mask) ^ val, ptr);=0D
+ 		}=0D
+ =0D
+ 		goto done;=0D
+@@ -425,7 +428,6 @@ static int tcf_pedit_act(struct sk_buff *skb, const str=
+uct tc_action *a,=0D
+ 	p->tcf_qstats.overlimits++;=0D
+ done:=0D
+ 	bstats_update(&p->tcf_bstats, skb);=0D
+-unlock:=0D
+ 	spin_unlock(&p->tcf_lock);=0D
+ 	return p->tcf_action;=0D
+ }=0D
+=0D
+---=0D
+base-commit: d9666dca97c01de1c7395ac53041634eb75120e2=0D
+change-id: 20260630-cve-2026-46331-4f851ccf8244=0D
+=0D
+Best regards,=0D
+-- =0D
+Dominique Martinet <dominique.martinet@atmark-techno.com>=0D
+=0D
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Best regards,
-Krzysztof
 
