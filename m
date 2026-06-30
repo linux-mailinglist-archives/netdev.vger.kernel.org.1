@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-303045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VJzpDOuKQ2qAawoAu9opvQ
-	(envelope-from <netdev+bounces-303045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:22:51 +0200
+	id aT53CFCLQ2rEawoAu9opvQ
+	(envelope-from <netdev+bounces-303047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:24:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294176E2172
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:22:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACF26E21B9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:24:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=szelinsky.de header.s=mail header.b=SlFE1YsX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303045-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303045-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=szelinsky.de header.s=mail header.b=EZEKg7Ee;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303047-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303047-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=szelinsky.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C549F300E312
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:12:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4EC433062DEC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250613E9C26;
-	Tue, 30 Jun 2026 09:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D944A3EB7E8;
+	Tue, 30 Jun 2026 09:11:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F3A3403F7;
-	Tue, 30 Jun 2026 09:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F6F3EBF2F;
+	Tue, 30 Jun 2026 09:11:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782810706; cv=none; b=A4FmvpkfQKgssYLR7E9xXFZR3udSganybs2TmaEadHQs2TpFyjY9mK85weAaTMbxBFiIcxZtRJBiw6FWcAOu/7415kdzOISx2GMYUzNSzGuPvpPqol8Zdlx1063BBM6H14hOhNm+JNyr5UlvUXg4zZ+QCEPTqNrdPJ+FF3FC8P4=
+	t=1782810709; cv=none; b=nCvGDeAfOxg7SLGpLMCx3KoYJRJqBewUzIIbvQmHpY0sY635kUroBkp1Pe3xWhixa/I1ihnCpgmBxyAr4dq8/f9vf25bBn13nocR8yZ1GEv7JmCq8d1wF/3E7t1KPv+7s9K7x6RYvobLdR8nIs6kx7wyuWDZ7rRMOw+otoM7+9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782810706; c=relaxed/simple;
-	bh=m2I3ui9jl+h7T+ME2SuFRMWmxKXznnAzoSXKovEI4mI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mq8LGOiw/zUoIJth+b5GPY3qVXYSiEbEGh3+nSoBsmPmebRPcFgcNYTNBJzXHG+k8mvy7eHyRFWnKLFXBAvZuReJpbZ7Ohwx/EHP+ZGpdIKtJWmzru/vFTpVcgxrJxfI51rIZT+c9Ci+qmNfpqY7PJCXR77wO+oOPmNN8wENK7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=SlFE1YsX; arc=none smtp.client-ip=85.214.127.56
+	s=arc-20240116; t=1782810709; c=relaxed/simple;
+	bh=4fHxGeXjo/4OXBi8jhnGGqUU/Ygon4FWYtEd4idbkWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=H+/h7zKH5C+L1ZyFH5i5U5GuU+hBz5ESBoA0C9sYJ9Gkh0obWCmW/b60xZv11JXCdkqMhw+y5s/qab+VUt95d6oyXxRzD0AVGFFeRYaTRw4RzQTb5i/fuzr+M9kYG+48N67LLUQ6VzWLZWmjCJLMXzyPZLO3hrJPuVgF496dECY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=EZEKg7Ee; arc=none smtp.client-ip=85.214.127.56
 Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id 392A2E838DD;
-	Tue, 30 Jun 2026 11:11:36 +0200 (CEST)
+	by szelinsky.de (Postfix) with ESMTP id 3959DE838DF;
+	Tue, 30 Jun 2026 11:11:40 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1782810696;
+	s=mail; t=1782810700;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YYj3pWWnYbewokT99bSe2eqc2JhkrYcI7d3TPbYWIAE=;
-	b=SlFE1YsXgntIBJu8j106o2Zig9FL1ns67KXHoSqX20fNqYdtAtpBzmE0f64mLEIaf5pwrp
-	Zp3Sj9tF4lNuZQPg1Em/JZjWVLVcQoMgl8yUtwyo+DwrFRxtKCFcMVI1LGYWkwYZ0moSW/
-	HazeBHddJdYIPGsUW7Xjz/vhD7KJh6LWVlylshBIdJ3xvjD914b5jWbQKGcrG/fw4WFDOl
-	93KKY1QAXSzeY/bFZDc5GkAb4FaFFDeGES3G+IBNWG1UNtQNl0tqxHw9jU+TQklNHT/8MG
-	T35IMfAE8fgKZokmlFwsl0XEDpXh6kftgJsIw4XRZbUEHHMp/MVH52A1P/ZBAw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bec0yhM2e6J0DHWUR9ij9INSwz0Ba/y7Pys3eGuwrro=;
+	b=EZEKg7EeRaU6BOq5ferNqwVCbRO/hJ1H+/ijLsA0bceLiPWhlEdculfV/ACZmnsQ0VWT5C
+	9PH9lOLwJr/yJZLiKaELR5VR+Y6bMim/AqYg7RZdAkiZFg0b521XdLLD5nAFqvlah1LWob
+	iF1BxKzgoxsFrK7XscyNUZDvDI2Paxj0l9In0Qn8arY4ZquwfyR9SoWDqix+EccT40U+m7
+	g+JpO/n63DET32rfiRbeLQeWwQlUEQxsqG8U5KoBjyLejLskojMpX3cOSMO9EA6saTr3Ld
+	uqtcE71vlo+HjC46MBg85a8eKu+JjsUls7FfeclL44EOE3Vinanw40JeamcpDA==
 X-Virus-Scanned: Debian amavis at szelinsky.de
 Received: from szelinsky.de ([127.0.0.1])
  by localhost (szelinsky.de [127.0.0.1]) (amavis, port 10025) with ESMTP
- id QaUZ56U31s8T; Tue, 30 Jun 2026 11:11:36 +0200 (CEST)
+ id xgt2kO-ZJBvI; Tue, 30 Jun 2026 11:11:40 +0200 (CEST)
 Received: from p14sgen5.. (unknown [91.25.97.186])
 	by szelinsky.de (Postfix) with ESMTPSA;
-	Tue, 30 Jun 2026 11:11:35 +0200 (CEST)
+	Tue, 30 Jun 2026 11:11:39 +0200 (CEST)
 From: Carlo Szelinsky <github@szelinsky.de>
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Kory Maincent <kory.maincent@bootlin.com>,
@@ -70,10 +72,12 @@ Cc: Corey Leavitt <corey@leavitt.info>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Carlo Szelinsky <github@szelinsky.de>
-Subject: [PATCH net-next v4 0/3] net: pse-pd: decouple controller lookup from MDIO probe
-Date: Tue, 30 Jun 2026 11:11:22 +0200
-Message-ID: <20260630091125.3162481-1-github@szelinsky.de>
+Subject: [PATCH net-next v4 1/3] net: pse-pd: add notifier chain for controller lifecycle events
+Date: Tue, 30 Jun 2026 11:11:23 +0200
+Message-ID: <20260630091125.3162481-2-github@szelinsky.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260630091125.3162481-1-github@szelinsky.de>
+References: <20260630091125.3162481-1-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,13 +92,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303045-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303047-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -113,75 +117,162 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid,szelinsky.de:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid,szelinsky.de:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,leavitt.info:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 294176E2172
+X-Rspamd-Queue-Id: 1ACF26E21B9
 
-This is v4 of Corey's series [1]. It takes the PSE controller lookup out
-of the MDIO probe path, so a modular PSE driver no longer makes the
-PHY/DSA probe spin on -EPROBE_DEFER until the PSE module loads.
+From: Corey Leavitt <corey@leavitt.info>
 
-The old patch 1 (a regulator handle fix) went to net on its own [2], so
-this series is just the three notifier patches for net-next.
+Introduce a blocking notifier chain that allows other subsystems to be
+informed when a PSE controller is registered or unregistered, and
+provide pse_register_notifier() / pse_unregister_notifier() as the
+subscriber interface.
 
-v3 [4] was posted during the merge window and deferred; net-next has
-reopened, so here it is again, now with Jonas's Tested-by.
+Subsequent patches will use this to let the phy subsystem own the
+phydev->psec lifecycle directly, decoupling PSE lookup from
+fwnode_mdiobus_register_phy() and removing the probe-time
+-EPROBE_DEFER coupling that currently exists between mdio, phy and
+pse-pd when the PSE controller driver is modular.
 
-How it works: pse_core gets a notifier chain (REGISTERED / UNREGISTERED).
-The phy layer subscribes, owns phydev->psec, and attaches the PSE handle
-when the controller shows up instead of during probe. fwnode_mdio loses
-its PSE awareness, so no -EPROBE_DEFER leaves it and the probe-retry loop
-is gone.
+A blocking chain (rather than atomic) is used because callbacks will
+take rtnl_lock and call back into pse_core via of_pse_control_get().
 
-Tested on a Realtek rtl93xx PoE switch with two HS104 PSE controllers on
-i2c:
+The enum pse_controller_event is placed outside the
+IS_ENABLED(CONFIG_PSE_CONTROLLER) guard so that subscribers compiled
+into a kernel without PSE support can still reference the event
+values in dead-code paths without breaking the build.
 
- - clean boot, no probe-retry loop, no watchdog reset
- - 10G SFP+ port: module hotplug works, no deadlock
- - ethtool --set-pse enable/disable cuts and restores power to a PD
- - i2c unbind -> rmmod -> modprobe: PSE detaches on unbind and re-attaches
-   on reload with power restored, no reboot. No lockdep splats.
+This patch is pure infrastructure: nothing fires events yet, and
+nothing subscribes. No observable behavior change.
 
-Jonas confirmed the RTL8214FC deadlock he reported is gone.
+Signed-off-by: Corey Leavitt <corey@leavitt.info>
+Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
+Tested-by: Jonas Jelonek <jelonek.jonas@gmail.com>
+---
+ drivers/net/pse-pd/pse_core.c | 34 ++++++++++++++++++++++++++++++++++
+ include/linux/pse-pd/pse.h    | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+)
 
-Tested-by: Carlo Szelinsky <github@szelinsky.de>
-
-Changes in v4:
- - Add Tested-by from Jonas Jelonek. No code changes.
- - Repost now that net-next has reopened (v3 was deferred during the
-   merge window).
-
-Changes in v3:
- - Drop patch 1 (regulator handle fix); it goes to net separately [2].
- - Rebase on net-next. No code changes to the three patches.
-
-v1 was an RFC by Corey [3].
-
-[1] https://lore.kernel.org/netdev/20260620112440.1734404-1-github@szelinsky.de/
-[2] https://lore.kernel.org/netdev/20260624204017.2752934-1-github@szelinsky.de/
-[3] https://lore.kernel.org/netdev/20260423-pse-notifier-decouple-v1-0-86ed750a9d62@leavitt.info/
-[4] https://lore.kernel.org/netdev/20260626165929.2908782-1-github@szelinsky.de/
-
-Corey Leavitt (3):
-  net: pse-pd: add notifier chain for controller lifecycle events
-  net: pse-pd: fire lifecycle events on controller register/unregister
-  net: phy: own phydev->psec via PSE notifier and remove fwnode_mdio
-    hook
-
- drivers/net/mdio/fwnode_mdio.c |  34 -------
- drivers/net/phy/phy_device.c   | 168 +++++++++++++++++++++++++++++++--
- drivers/net/phy/sfp.c          |   2 +-
- drivers/net/pse-pd/pse_core.c  |  54 +++++++++++
- include/linux/phy.h            |   2 +
- include/linux/pse-pd/pse.h     |  41 ++++++++
- 6 files changed, 258 insertions(+), 43 deletions(-)
-
-
-base-commit: cef9d6804030793cf8b8796fd6936197d065dd3e
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 69dbdbde9d71..3c4d09f1d6e4 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -8,6 +8,7 @@
+ #include <linux/device.h>
+ #include <linux/ethtool.h>
+ #include <linux/ethtool_netlink.h>
++#include <linux/notifier.h>
+ #include <linux/of.h>
+ #include <linux/phy.h>
+ #include <linux/pse-pd/pse.h>
+@@ -23,6 +24,39 @@ static LIST_HEAD(pse_controller_list);
+ static DEFINE_XARRAY_ALLOC(pse_pw_d_map);
+ static DEFINE_MUTEX(pse_pw_d_mutex);
+ 
++static BLOCKING_NOTIFIER_HEAD(pse_controller_notifier);
++
++/**
++ * pse_register_notifier - register a callback for PSE controller events
++ * @nb: notifier block to register
++ *
++ * See enum pse_controller_event for events fired and their subscriber
++ * contract. Callbacks run in process context; they may sleep, take
++ * rtnl, and call of_pse_control_get(). The chain fires synchronously,
++ * so a PSE controller driver's probe/unbind path must not hold any
++ * such lock when calling pse_controller_register() or
++ * pse_controller_unregister().
++ *
++ * Return: 0 on success, negative error code otherwise.
++ */
++int pse_register_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_register(&pse_controller_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(pse_register_notifier);
++
++/**
++ * pse_unregister_notifier - unregister a previously registered callback
++ * @nb: notifier block previously passed to pse_register_notifier()
++ *
++ * Return: 0 on success, negative error code otherwise.
++ */
++int pse_unregister_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_unregister(&pse_controller_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(pse_unregister_notifier);
++
+ /**
+  * struct pse_control - a PSE control
+  * @pcdev: a pointer to the PSE controller device
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 4e5696cfade7..78fe3a2b1ea8 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -21,6 +21,7 @@ struct net_device;
+ struct phy_device;
+ struct pse_controller_dev;
+ struct netlink_ext_ack;
++struct notifier_block;
+ 
+ /* C33 PSE extended state and substate. */
+ struct ethtool_c33_pse_ext_state_info {
+@@ -337,6 +338,24 @@ enum pse_budget_eval_strategies {
+ 	PSE_BUDGET_EVAL_STRAT_DYNAMIC	= 1 << 2,
+ };
+ 
++/**
++ * enum pse_controller_event - PSE controller lifecycle events
++ *
++ * Event data in callbacks is always a pointer to the struct
++ * pse_controller_dev firing the event.
++ *
++ * @PSE_REGISTERED: controller added to pse_controller_list and
++ *	resolvable by of_pse_control_get().
++ * @PSE_UNREGISTERED: controller about to be removed from
++ *	pse_controller_list. Subscribers holding pse_control references
++ *	targeting it must drop them before returning and must not
++ *	acquire new references for it.
++ */
++enum pse_controller_event {
++	PSE_REGISTERED,
++	PSE_UNREGISTERED,
++};
++
+ #if IS_ENABLED(CONFIG_PSE_CONTROLLER)
+ int pse_controller_register(struct pse_controller_dev *pcdev);
+ void pse_controller_unregister(struct pse_controller_dev *pcdev);
+@@ -366,6 +385,9 @@ int pse_ethtool_set_prio(struct pse_control *psec,
+ bool pse_has_podl(struct pse_control *psec);
+ bool pse_has_c33(struct pse_control *psec);
+ 
++int pse_register_notifier(struct notifier_block *nb);
++int pse_unregister_notifier(struct notifier_block *nb);
++
+ #else
+ 
+ static inline struct pse_control *of_pse_control_get(struct device_node *node,
+@@ -416,6 +438,16 @@ static inline bool pse_has_c33(struct pse_control *psec)
+ 	return false;
+ }
+ 
++static inline int pse_register_notifier(struct notifier_block *nb)
++{
++	return 0;
++}
++
++static inline int pse_unregister_notifier(struct notifier_block *nb)
++{
++	return 0;
++}
++
+ #endif
+ 
+ #endif
 -- 
 2.43.0
 
