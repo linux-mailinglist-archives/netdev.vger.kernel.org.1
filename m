@@ -1,359 +1,208 @@
-Return-Path: <netdev+bounces-303401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303402-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3nvmBJhNRGpxsQoAu9opvQ
-	(envelope-from <netdev+bounces-303401-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:13:28 +0200
+	id ZW7JI+JORGrEsQoAu9opvQ
+	(envelope-from <netdev+bounces-303402-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:18:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7266E89CF
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:13:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A55E6E8A01
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:18:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=OrkVn0s2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303401-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303401-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=ZQCAWZ+J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303402-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303402-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0F9BD3039A58
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:13:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A47743009F34
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D157B3264D0;
-	Tue, 30 Jun 2026 23:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4270231985C;
+	Tue, 30 Jun 2026 23:18:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410A02DA749
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 23:13:23 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782861204; cv=pass; b=d1Yg/2pfwraydvtZMbg5GVNFme6iSX1q9IfSb1+iVNMSWxyUGYKzv5rTOTKLm6+06EkoD7W8HpWFYNxpapSKsecns2yCd6A+Y75KQP6CXzRiOfUupwX9jICW0uK6y6NPdRDkNYbnVmbeAF4PfQoTrxb4Quyc6bcW9I9BbAQbHfU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782861204; c=relaxed/simple;
-	bh=7GnumVWjcgLJ1YLkkXRvzhPbzF1weVJjREUeBEZEFCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MJWpatyBAaPL1Gz4eute1SYtZqTphB853+J4uH+EIxlNtExD7bK7rg4nehMHuZmEp2ad6A1GTaAeqf+gpSl9bmI2hTvR0nOu6faODkdvybL/JZK/l9Yj0iPmTKlm8Cu3VUWNX2ZbynvVEDDiJCCxbYfaDu/IHY3b7HFCFET5PD0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OrkVn0s2; arc=pass smtp.client-ip=74.125.82.42
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-13b2b92b0bfso20963c88.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 16:13:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782861202; cv=none;
-        d=google.com; s=arc-20260327;
-        b=lAn9EiZysTsm6ZccIvUxWp3I59drO3Zi+bf9WKnt3tKtPh9f0j8ZvDaGrma3qZCP+X
-         ydu68XgAdYTf3vh3OQtgpri3KafoH/yCs4mo8XkMpPu1SEvT/3BBDNENcy1MEZ5Z2NCu
-         ZjzmL55845y6AREUmgi7wvjEsXskWmumvDv1sYIYjgwUjm1ll3tzXjp4GPTTu3b3irsF
-         XHeq/D6ZY2CUrILgH4pMeMzAB1edKjY8yDibrC1unbr1sP1qDQWpEd1nZso11A5TxOgq
-         P+6uwijDOA/lZV8Kn5w5sAkNiUAuQuX2mS36kzgBNDbxKLts4Z+TvTeMXlBIVfWqGTeD
-         YPIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qIwy3Ud/CLLPFGb47ouhwt98bKtOnACrBH237I4eD0o=;
-        fh=0Mt7ys5fhCaGjdNkTVQP9wwMa4Zfp1G3J60Fn6miG6Q=;
-        b=VvXgQ5Y/PwJioi81cnxJ9jIjfAQMHDmSLT350T3uT0oBKwV7AglZq1EkCcfqDHiSdi
-         CvlLKLaa8JqLNXDdPGn9/gcNwkoM3voyKBfUsTReW8Fl5m8QuOqXSQPeyGiTfI5CY1Ts
-         v2dxGoACg3ZmkQoZtSdWuz4+M5k5N5GTdupgsNVkWm4DStP61sEC5xU6jmdvkpzG8Wkj
-         wqzpQPwvACWfsIJecXNgegTNmDtC+/BD6iqxNFWKDc5jCDo97s9rV8njPgXBm0eTgPgI
-         vWOBmviVw8ZMSr3cKRr+b1XFhJU/0yFyWMlhw1bs34leuLEyiKE3Azk5yOZTzf9cscQ/
-         wVYQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782861202; x=1783466002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qIwy3Ud/CLLPFGb47ouhwt98bKtOnACrBH237I4eD0o=;
-        b=OrkVn0s2OH3b6VGVAR2IG//clXW64J/0si4BoDqt1S1yW/1xRDCmIayt1fhkHjzLPC
-         nsT/+PdsXCIq+9Ro6deVzU7HViqCepcfpmEymsZ3/Cj+jFqNiRa4enNwE43r/LaOgds4
-         m77ZUOi8HsXG/OzvmEhqJrVRz/N34X+IBwbVkdkG5csanHSJYr3XZrkd2468pRvUvivl
-         h2k5/EGAT4Ad14oe1UE77bKZEQAf4CucMUcFZNc646GvM9ccqXP7YvdtEHQR5elPTu6T
-         dns4fV2TkIRe8lk9pV1XgjdItR5ehhbTy/IpBlb5FE3V3cZECJBoxt94f+hUPcNYm6mG
-         qGvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782861202; x=1783466002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qIwy3Ud/CLLPFGb47ouhwt98bKtOnACrBH237I4eD0o=;
-        b=Fb9RfTmhcyT6ZuVSWWVrciwDV6ZKMyrfXbv65cvtke+6W3xmFkxrxfi4/UFz9+RAuB
-         TgujCQDhNvG3sWLF1zM5WtHYaudfYwFwfx6FZTnnYGQ54KA6mj8JIJWSvUDPjYBUDE9e
-         VF7IR8Q4NTLmg4G1zCGkpgPRZZ8UvXcqHNwQM2/kWumEGPSDhY4A8vjeeo1dkeyCQaRd
-         GET7S3MIJvQHBdp8cthUQu+n1+o/yO+qdDdOMl6uzjITk2FztCwgCQ2EL2lWpp89XwqY
-         LfMXOXUf2mpfc1IOR9LQqtFp1OSRSqq0ai67hv7fdPjWOpuqU78wJ6ul+o5Seao5iLXI
-         vsVg==
-X-Forwarded-Encrypted: i=1; AFNElJ8HzMBdEFZ9z5REFWFoHXqZARYMBSB8GbjFNnznfUvqI4xEoxt4eOuNM4Ke/7KRx7y9hH8EBj0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM9MXLXHxn5jtw2QT7oGmVosD/nUkyQ5bHazzc1ltek4bIVsrw
-	zXMczKJ19W7bprswamKiCT1yDzRUf2IUm8xjNV7R049MWiYchMlGomZZwEVEK4s2mZGGBF7d3pZ
-	gHagpe9nPZ3dC6Kylw4Tbf3qzLLV46WtShuxFT7s1
-X-Gm-Gg: AfdE7cmnyKIjVrb2fg2Xt7XHNLzazodtuqO78+gpT95a1RZAd1b1EQYS9HMRhO0Qelj
-	K6bbqkJCUhT+iGs9kX4GA1Xzj/272aq3y2gmpnUpWpOfa0rl2Xpas2eMQltj/B3NGo9MM+b0Ua/
-	pOruO+8PBIOeVyIWYk2otHwpoielAyhVEUDC0r7Uxg6Q9FplPt943IAxyn7eLHugDW3QbSFT9lu
-	XRf6C3Kqwr3jnNufi+NPYtBzA9+R41iCrynklykkQruYRG6MHiGq/19dGwDH87S5qfO4pvhZVVU
-	O9b7M4ydYyBKxdUCZy4K8GcvYVwot3OqgisTbd+fTfIuqtUohc70TknQb+YCT3DVymcxc79JUum
-	E+zK0rZUkpj8ePaPgH4/NYMSBgPevkxQ6uVy+eTFRttxkUW00
-X-Received: by 2002:a05:7022:fd0c:b0:139:7a48:fcb5 with SMTP id
- a92af1059eb24-13b2a1db6a1mr3367859c88.34.1782861201392; Tue, 30 Jun 2026
- 16:13:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBCA226D05;
+	Tue, 30 Jun 2026 23:18:48 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782861531; cv=none; b=G99yeJoD34Aj1XSZ2AkQRX0Ry9GNSsWZcYYi7hYuP8oGd1fz9HGoVm+79ak8NsWySD0YsIF+g3N+6pvKBUTBUzX/Dx25bdhlM6f+KewPvyfHxHiLOBCi7tbVshDXhQBDZyTJ0vheCxBZgt51gYS4x75Qkv+KWyjDzmCbwKJlgjY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782861531; c=relaxed/simple;
+	bh=+eQ6M0K+eMeEG4XsANC9glVnlOlhJrlgi8sTZLZhzh4=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=bRwIOSPuDolGhCAGF3orJyWgko5EbEGgveG1/rRB9w3ljmWlwdgKfapQ3c6PX2zLw/YE8WgQIWNBpiLIsuNYtjbvwxAuJKlOLpTiJb73CKN6ogx/bwNdzmoSQ3nWCZ3Hn0/K1W0K1pMrsf4CLUDzRBzwTqBC38/pi2kyPTBgTJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZQCAWZ+J; arc=none smtp.client-ip=192.198.163.13
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782861529; x=1814397529;
+  h=from:to:cc:subject:date:message-id;
+  bh=+eQ6M0K+eMeEG4XsANC9glVnlOlhJrlgi8sTZLZhzh4=;
+  b=ZQCAWZ+JFqHY7XuXfliRQJ3soYuvLPpgWNSE0aVzV0wS8WGZvLH4TWuO
+   vyeYGwJ5DWMDoNI4Vip49Ji+KbNwLMI1f+4wFUv2TcWx7f3lr/C5Me/fx
+   tznzUPzHm5M7VxWvLkX05CpgXDiToEiuEqBPSdROTvPbKh82+HldX+DBj
+   jYdyGBeCXpm5n4bOQFJ3Vsp9NKDiW7Ch/zPYeZ0tFsTNKQwyN1OaI631J
+   kKTMajZZIVGt+0g3QKqvCY355HPJrq/HPWoDrDZifYYWkTBfoir/0m50e
+   Lz/VmcMnm+fU5bkkO0ZrqjkB0RYJMh4tn0aU1UVGwY0Dn6NS2CUhX185f
+   Q==;
+X-CSE-ConnectionGUID: UxBO63F3R6q2QFmJsWYsmA==
+X-CSE-MsgGUID: qGfINolsTROb8KDGsaDwkg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="86135256"
+X-IronPort-AV: E=Sophos;i="6.24,234,1774335600"; 
+   d="scan'208";a="86135256"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 16:18:47 -0700
+X-CSE-ConnectionGUID: 64BaQv3RRWCocNHekXedBw==
+X-CSE-MsgGUID: 8wDUs1oHQ5+ASvCYfZXpJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,234,1774335600"; 
+   d="scan'208";a="251972105"
+Received: from estantil-desk.jf.intel.com ([10.166.241.24])
+  by orviesa008.jf.intel.com with ESMTP; 30 Jun 2026 16:18:48 -0700
+From: Emil Tantilov <emil.s.tantilov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	jay.bhat@intel.com,
+	ivan.d.barrera@intel.com,
+	aleksandr.loktionov@intel.com,
+	larysa.zaremba@intel.com,
+	anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	aleksander.lobakin@intel.com,
+	linux-pci@vger.kernel.org,
+	madhu.chittim@intel.com,
+	decot@google.com,
+	willemb@google.com,
+	sheenamo@google.com,
+	lukas@wunner.de
+Subject: [PATCH iwl-next v3 0/2] Introduce IDPF PCI callbacks
+Date: Tue, 30 Jun 2026 16:18:52 -0700
+Message-Id: <20260630231854.11536-1-emil.s.tantilov@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260630114121.26430-1-laoar.shao@gmail.com>
-In-Reply-To: <20260630114121.26430-1-laoar.shao@gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 30 Jun 2026 16:13:10 -0700
-X-Gm-Features: AVVi8CcsvaLS-6YkOytjc16Hnsuo4gnublwI4toVD8cSTSADwW9IdpCH-dOo4a8
-Message-ID: <CAAVpQUAwrWkXxjErj8QvXg0DCdPc4zkphB4OSLgDDRmGuSrfxg@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next] ss: stop displaying dccp sockets
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:laoar.shao@gmail.com,m:stephen@networkplumber.org,m:netdev@vger.kernel.org,m:laoarshao@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303401-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[emil.s.tantilov@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303402-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:przemyslaw.kitszel@intel.com,m:jay.bhat@intel.com,m:ivan.d.barrera@intel.com,m:aleksandr.loktionov@intel.com,m:larysa.zaremba@intel.com,m:anthony.l.nguyen@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:aleksander.lobakin@intel.com,m:linux-pci@vger.kernel.org,m:madhu.chittim@intel.com,m:decot@google.com,m:willemb@google.com,m:sheenamo@google.com,m:lukas@wunner.de,m:andrew@lunn.ch,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil.s.tantilov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:mid,intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9A7266E89CF
+X-Rspamd-Queue-Id: 8A55E6E8A01
 
-On Tue, Jun 30, 2026 at 4:41=E2=80=AFAM Yafang Shao <laoar.shao@gmail.com> =
-wrote:
->
-> DCCP support was retired in kernel commit 2a63dd0edf38 ("net: Retire
-> DCCP socket."). However, ss still attempts to query DCCP sockets via
-> netlink, which triggers repeated SELinux warnings in dmesg:
->
->   SELinux: unrecognized netlink message: protocol=3D4 nlmsg_type=3D19 \
->     sclass=3Dnetlink_tcpdiag_socket pid=3D188945 comm=3Dss
->
-> Stop sending DCCPDIAG_GETSOCK netlink messages to suppress these
-> warnings and align ss with the kernel change.
->
-> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->  man/man8/ss.8 |  5 +++--
->  misc/ss.c     | 40 ++++++++--------------------------------
->  2 files changed, 11 insertions(+), 34 deletions(-)
->
-> diff --git a/man/man8/ss.8 b/man/man8/ss.8
-> index 70e0a566..37dd75a0 100644
-> --- a/man/man8/ss.8
-> +++ b/man/man8/ss.8
-> @@ -378,7 +378,8 @@ Display TCP sockets.
->  Display UDP sockets.
->  .TP
->  .B \-d, \-\-dccp
-> -Display DCCP sockets.
-> +[Deprecated] DCCP is no longer supported since kernel 6.16.
-> +This option is ignored.
->  .TP
->  .B \-w, \-\-raw
->  Display RAW sockets.
-> @@ -411,7 +412,7 @@ supported: unix, inet, inet6, link, netlink, vsock, t=
-ipc, xdp.
->  .B \-A QUERY, \-\-query=3DQUERY, \-\-socket=3DQUERY
->  List of socket tables to dump, separated by commas. The following identi=
-fiers
->  are understood: all, inet, tcp, udp, raw, unix, packet, netlink, unix_dg=
-ram,
-> -unix_stream, unix_seqpacket, packet_raw, packet_dgram, dccp, sctp, tipc,
-> +unix_stream, unix_seqpacket, packet_raw, packet_dgram, sctp, tipc,
->  vsock_stream, vsock_dgram, xdp, mptcp. Any item in the list may optional=
-ly be
->  prefixed by an exclamation mark
->  .RB ( ! )
-> diff --git a/misc/ss.c b/misc/ss.c
-> index 14e9f27a..dae5f282 100644
-> --- a/misc/ss.c
-> +++ b/misc/ss.c
-> @@ -195,7 +195,6 @@ static const char *dg_proto;
->  enum {
->         TCP_DB,
->         MPTCP_DB,
-> -       DCCP_DB,
->         UDP_DB,
->         RAW_DB,
->         UNIX_DG_DB,
-> @@ -215,7 +214,7 @@ enum {
->  #define PACKET_DBM ((1<<PACKET_DG_DB)|(1<<PACKET_R_DB))
->  #define UNIX_DBM ((1<<UNIX_DG_DB)|(1<<UNIX_ST_DB)|(1<<UNIX_SQ_DB))
->  #define ALL_DB ((1<<MAX_DB)-1)
-> -#define INET_L4_DBM ((1<<TCP_DB)|(1<<MPTCP_DB)|(1<<UDP_DB)|(1<<DCCP_DB)|=
-(1<<SCTP_DB))
-> +#define INET_L4_DBM ((1<<TCP_DB)|(1<<MPTCP_DB)|(1<<UDP_DB)|(1<<SCTP_DB))
->  #define INET_DBM (INET_L4_DBM | (1<<RAW_DB))
->  #define VSOCK_DBM ((1<<VSOCK_ST_DB)|(1<<VSOCK_DG_DB))
->
-> @@ -274,10 +273,6 @@ static const struct filter default_dbs[MAX_DB] =3D {
->                 .states   =3D SS_CONN,
->                 .families =3D FAMILY_MASK(AF_INET) | FAMILY_MASK(AF_INET6=
-),
->         },
-> -       [DCCP_DB] =3D {
-> -               .states   =3D SS_CONN,
-> -               .families =3D FAMILY_MASK(AF_INET) | FAMILY_MASK(AF_INET6=
-),
-> -       },
->         [UDP_DB] =3D {
->                 .states   =3D (1 << SS_ESTABLISHED),
->                 .families =3D FAMILY_MASK(AF_INET) | FAMILY_MASK(AF_INET6=
-),
-> @@ -388,13 +383,12 @@ static int filter_db_parse(struct filter *f, const =
-char *s)
->                 int dbs[MAX_DB + 1];
->         } db_name_tbl[] =3D {
->  #define ENTRY(name, ...) { #name, { __VA_ARGS__, MAX_DB } }
-> -               ENTRY(all, UDP_DB, DCCP_DB, TCP_DB, MPTCP_DB, RAW_DB,
-> +               ENTRY(all, UDP_DB, TCP_DB, MPTCP_DB, RAW_DB,
->                            UNIX_ST_DB, UNIX_DG_DB, UNIX_SQ_DB,
->                            PACKET_R_DB, PACKET_DG_DB, NETLINK_DB,
->                            SCTP_DB, VSOCK_ST_DB, VSOCK_DG_DB, XDP_DB),
-> -               ENTRY(inet, UDP_DB, DCCP_DB, TCP_DB, MPTCP_DB, SCTP_DB, R=
-AW_DB),
-> +               ENTRY(inet, UDP_DB, TCP_DB, MPTCP_DB, SCTP_DB, RAW_DB),
->                 ENTRY(udp, UDP_DB),
-> -               ENTRY(dccp, DCCP_DB),
->                 ENTRY(tcp, TCP_DB),
->                 ENTRY(mptcp, MPTCP_DB),
->                 ENTRY(sctp, SCTP_DB),
-> @@ -935,8 +929,6 @@ static const char *proto_name(int protocol)
->                 return "mptcp";
->         case IPPROTO_SCTP:
->                 return "sctp";
-> -       case IPPROTO_DCCP:
-> -               return "dccp";
->         case IPPROTO_ICMPV6:
->                 return "icmp6";
->         }
-> @@ -3897,8 +3889,6 @@ static int tcpdiag_send(int fd, int protocol, struc=
-t filter *f)
->
->         if (protocol =3D=3D IPPROTO_TCP)
->                 req.nlh.nlmsg_type =3D TCPDIAG_GETSOCK;
-> -       else if (protocol =3D=3D IPPROTO_DCCP)
-> -               req.nlh.nlmsg_type =3D DCCPDIAG_GETSOCK;
->         else
->                 return -1;
->
-> @@ -4134,7 +4124,7 @@ static int inet_show_netlink(struct filter *f, FILE=
- *dump_fp, int protocol)
->
->         /* Suppress netlink errors. Older kernels do not support extended
->          * protocol requests using INET_DIAG_REQ_PROTOCOL, and some proto=
-cols
-> -        * may not be available in the running kernel (e.g. SCTP, DCCP).
-> +        * may not be available in the running kernel (e.g. SCTP).
->          * In both cases the kernel returns EINVAL which would cause
->          * rtnl_dump_error() to print a confusing "RTNETLINK answers" err=
-or.
->          */
-> @@ -4309,18 +4299,6 @@ static int mptcp_show(struct filter *f)
->         return 0;
->  }
->
-> -static int dccp_show(struct filter *f)
-> -{
-> -       if (!filter_af_get(f, AF_INET) && !filter_af_get(f, AF_INET6))
-> -               return 0;
-> -
-> -       if (!getenv("PROC_NET_DCCP") && !getenv("PROC_ROOT")
-> -           && inet_show_netlink(f, NULL, IPPROTO_DCCP) =3D=3D 0)
-> -               return 0;
-> -
-> -       return 0;
-> -}
-> -
->  static int sctp_show(struct filter *f)
->  {
->         if (!filter_af_get(f, AF_INET) && !filter_af_get(f, AF_INET6))
-> @@ -5779,7 +5757,7 @@ static void _usage(FILE *dest)
->  "   -M, --mptcp         display only MPTCP sockets\n"
->  "   -S, --sctp          display only SCTP sockets\n"
->  "   -u, --udp           display only UDP sockets\n"
-> -"   -d, --dccp          display only DCCP sockets\n"
-> +"   -d, --dccp          DCCP is no longer supported, option ignored\n"
->  "   -w, --raw           display only RAW sockets\n"
->  "   -x, --unix          display only Unix domain sockets\n"
->  "       --tipc          display only TIPC sockets\n"
-> @@ -5795,7 +5773,7 @@ static void _usage(FILE *dest)
->  "       --inet-sockopt  show various inet socket options\n"
->  "\n"
->  "   -A, --query=3DQUERY, --socket=3DQUERY\n"
-> -"       QUERY :=3D {all|inet|tcp|mptcp|udp|raw|unix|unix_dgram|unix_stre=
-am|unix_seqpacket|packet|packet_raw|packet_dgram|netlink|dccp|sctp|vsock_st=
-ream|vsock_dgram|tipc|xdp}[,QUERY]\n"
-> +"       QUERY :=3D {all|inet|tcp|mptcp|udp|raw|unix|unix_dgram|unix_stre=
-am|unix_seqpacket|packet|packet_raw|packet_dgram|netlink|sctp|vsock_stream|=
-vsock_dgram|tipc|xdp}[,QUERY]\n"
->  "\n"
->  "   -D, --diag=3DFILE     Dump raw information about TCP sockets to FILE=
-\n"
->  "   -F, --filter=3DFILE   read filter information from FILE\n"
-> @@ -5907,7 +5885,7 @@ static const struct option long_opts[] =3D {
->         { "threads", 0, 0, 'T' },
->         { "bpf", 0, 0, 'b' },
->         { "events", 0, 0, 'E' },
-> -       { "dccp", 0, 0, 'd' },
-> +       { "dccp", 0, 0, 'd' }, /* DCCP retired, kept for compatibility */
->         { "tcp", 0, 0, 't' },
->         { "sctp", 0, 0, 'S' },
->         { "udp", 0, 0, 'u' },
-> @@ -5997,7 +5975,7 @@ int main(int argc, char *argv[])
->                         follow_events =3D 1;
->                         break;
->                 case 'd':
-> -                       filter_db_set(&current_filter, DCCP_DB, true);
-> +                       /* DCCP retired in kernel 6.16, kept for compatib=
-ility */
+This series implements PCI callbacks for the purpose of handling FLR and
+PCI errors in the IDPF driver.
 
-I think it more user-friendly to remove the case and show usage(),
-instead of just ignoring the option.
+The first patch removes the conditional deinitialization of the mailbox in
+the idpf_vc_core_deinit() function. Aside from being redundant, due to the
+shutdown of the mailbox after a reset is detected, the check was also
+preventing the driver from sending messages to stop and disable the vports
+and queues on FW side, which is needed for the prepare phase of the FLR
+handling.
 
+The second patch implements the PCI callbacks. The logic here follows
+the reset handling done in idpf_init_hard_reset(), but is split in
+prepare and resume phases, where idpf_reset_prepare() stops all driver
+operations and the resume callback attempt to recover following the
+reset or the PCI error event.
 
->                         break;
->                 case 't':
->                         filter_db_set(&current_filter, TCP_DB, true);
-> @@ -6290,8 +6268,6 @@ int main(int argc, char *argv[])
->                 udp_show(&current_filter);
->         if (current_filter.dbs & (1<<TCP_DB))
->                 tcp_show(&current_filter);
-> -       if (current_filter.dbs & (1<<DCCP_DB))
-> -               dccp_show(&current_filter);
->         if (current_filter.dbs & (1<<SCTP_DB))
->                 sctp_show(&current_filter);
->         if (current_filter.dbs & VSOCK_DBM)
-> --
-> 2.50.1 (Apple Git-155)
->
+NOTE: These changes depend on, and apply on top of the IXD series:
+https://lore.kernel.org/netdev/20260608144127.2751230-1-larysa.zaremba@intel.com/
+
+Testing hints:
+1. FLR via sysfs:
+echo 1 > /sys/class/net/<ifname>/device/reset
+
+Previously this would have been handled by idpf_init_hard_reset() as the
+driver detects the reset. Now it will be done by the PCI err callbacks,
+so this is the easiest way to test the reset_prepare/resume path.
+
+2. PCI errors can be tested with aer-inject:
+./aer-inject -s 83:00.0 examples/<error_type>
+
+3. Stress testing can be done by combining various callbacks with the
+reset from step 1:
+echo 1 > /sys/class/net/<if>/device/reset& ethtool -L <if> combined 8
+ethtool -L <if> combined 16& echo 1 > /sys/class/net/<if>/device/reset
+
+Changelog:
+v2->v3:
+1/2:
+- Added call to libie_ctlq_xn_shutdown() in idpf_shutdown() to avoid
+possible regression when shutting down while FW is not responsive,
+causing long delays.
+- Fixed typo in the title s/conditonal/conditional/
+
+2/2:
+- Improved the logic in idpf_reset_prepare() to make sure the
+  RESET_IN_PROG bit is set after the init task.
+- Renamed the err parameter in idpf_pci_err_detected() with state
+  and updated the description to match.
+- Added check for adapter->xnm before calling libie_ctlq_xn_shutdown()
+  in idpf_pci_err_detected().
+- Corrected a comment to add some context on the reasoning behind
+  the reset triggered on resume, following a PCI error.
+- Corrected the description for slot_reset callback by removing
+  the mention of AER as it is not the only trigger for the reset.
+- Use PCI_POSSIBLE_ERROR() macro when checking RSTAT value.
+- Add vport_ctrl_lock when calling idpf_vc_core_deinit() in 
+  idpf_reset_prepare().
+
+v1->v2:
+- Removed the call to pci_save_state() from idpf_pci_err_slot_reset(),
+  as it is no longer needed after pci_restore_state(). Suggested by
+  Lukas Wunner.
+
+v1:
+https://lore.kernel.org/netdev/20260411003959.30959-1-emil.s.tantilov@intel.com/
+
+Emil Tantilov (2):
+  idpf: remove conditional MBX deinit from idpf_vc_core_deinit()
+  idpf: implement pci error handlers
+
+ drivers/net/ethernet/intel/idpf/idpf.h        |   3 +
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  13 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   | 124 ++++++++++++++++++
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  10 +-
+ 4 files changed, 139 insertions(+), 11 deletions(-)
+
+-- 
+2.37.3
+
 
