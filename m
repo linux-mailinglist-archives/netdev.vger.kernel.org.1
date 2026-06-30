@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-303170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3nBxBIrBQ2oEgwoAu9opvQ
-	(envelope-from <netdev+bounces-303170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:15:54 +0200
+	id TfGGO+a/Q2r7gQoAu9opvQ
+	(envelope-from <netdev+bounces-303171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:08:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07CFF6E4B7B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:15:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FEAC6E4A26
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:08:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=CtIkXd37;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303170-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303170-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LNDO7wy1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303171-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303171-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CFCFF30E5047
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:58:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E8CC3223F80
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11955404BF3;
-	Tue, 30 Jun 2026 12:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2108421886;
+	Tue, 30 Jun 2026 12:55:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B200741B351
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B1F41B356
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:55:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782824149; cv=none; b=gDAMZm8UVCfmvIlIRAlnUpXFfTkzaxQDy7DmCq+L04XNXP4EX233BEVuqmPWirnKcq/4EWMxiDIUM1l6w3qzhHJQymA8/njXGYWy31oD3wU/DCjuF5lY+fw6cAhJUmln2VAo6P4IG6J1Cm/6Ezx+IBk66sK3vPyhqgPZq5Ajf/o=
+	t=1782824153; cv=none; b=immnsO94SNdm1hGHiUWqLCs9p+4MVAiqRhmFS1CAB78gx7m0WYaM6WFTHL9Gepz7m0EhjuPSneF9FnFdsnTqspX2CW5KD2GJC0ul6BgoN8uLqrQxvqpzDmCRXKPQC5k1vPmf9InqLxXQ6FAtwdiLxRoIwVhLTE0/DZ+0puPyvBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782824149; c=relaxed/simple;
-	bh=8faOPPpxjFF2On6KXCEP+FzvS6v/7efQ4ZLp/78JcKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O6JGyiNUwlinfPrrbPZ6yvxEP5l0xluk/KbfH9D0gjT1GQe05jTZCJEuv8791N9LJb7DAhKajsU4dhMyLJekwnPxsJvouv+c+Y9Xld9Fi97sayKylsSkZoOWiiduUK4EEhzGnv9bZXQ/NZE7DGSQ7B/FnXO30fpZsVga5c8SV/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CtIkXd37; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1782824153; c=relaxed/simple;
+	bh=Q4MhErYfjaaIW5V/rgZEKqI4g5c+XId6wlyZPOvRywk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nqD7NkpSu0e4Ewm0hPBryL51dQzRkMz0GXVQxw7cEZJlX8kRfR/hUuncq7pE0rJn5LjHz0cIYLjZYQOHmJM6OgMUUgGUQc3VM+iIiSX8xhbNLG3YpQdQUwlxUnYyfOC2NtWI1OJxvi0RfgNlXu83TmwOh6SMCvAHpGxlO0U+L6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNDO7wy1; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782824145;
+	s=mimecast20190719; t=1782824151;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yzElmUdjyljEt5e++NVUuqZ6wnCczv4jqGflrMq30u4=;
-	b=CtIkXd37nmAy5GRCpmbAi83ch7QMKmN6AdDFVx8Olqu0HDu7RhHifsgBsBNtgZUF9SdWvN
-	IpUeDHDuxne0Pjn3VrKJ/e5ICse8P53LtOVRB7qomVxt7UZQqzoH461HRLVBwTaEbvshK6
-	k9JN25ghe5W9NkOOO8WGgfF8d87Ko/U=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PgH1mUIeYALTFNvAFhcwg/JsaLWLxQZD6EFfc+CAtWI=;
+	b=LNDO7wy1zZq3J6EwonwvMJMa9yWfdfpvQTpzXZB5zVKbgNPej/NLh80N353gX2lHJeDyEO
+	sMf6GTMurGgs9IxumO5MyW8na5l5cwqsYtAB9sxy3s+UMEvy0xN4Yyp/MJr+WzMpv1QYPJ
+	3Kud3YkesLeMX9nCKuaFjIcIXxEAe0Q=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-675-15wHhNaMN9ezYrlYZfRXmg-1; Tue,
- 30 Jun 2026 08:55:44 -0400
-X-MC-Unique: 15wHhNaMN9ezYrlYZfRXmg-1
-X-Mimecast-MFC-AGG-ID: 15wHhNaMN9ezYrlYZfRXmg_1782824142
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-xGCPZmakNC2_6WuibAxP2w-1; Tue,
+ 30 Jun 2026 08:55:47 -0400
+X-MC-Unique: xGCPZmakNC2_6WuibAxP2w-1
+X-Mimecast-MFC-AGG-ID: xGCPZmakNC2_6WuibAxP2w_1782824146
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7977C1955F14;
-	Tue, 30 Jun 2026 12:55:41 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D524A1955D7A;
+	Tue, 30 Jun 2026 12:55:45 +0000 (UTC)
 Received: from p16v.bos2.lab (unknown [10.43.2.199])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 77A9D180057F;
-	Tue, 30 Jun 2026 12:55:37 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DA7C818005AD;
+	Tue, 30 Jun 2026 12:55:41 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
@@ -74,9 +76,11 @@ Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 0/5] dpll: add NCO pin type and zl3073x support
-Date: Tue, 30 Jun 2026 14:55:31 +0200
-Message-ID: <20260630125536.720717-1-ivecera@redhat.com>
+Subject: [PATCH net-next v6 1/5] dpll: add STATE_CONNECTED_OVERRIDE pin capability
+Date: Tue, 30 Jun 2026 14:55:32 +0200
+Message-ID: <20260630125536.720717-2-ivecera@redhat.com>
+In-Reply-To: <20260630125536.720717-1-ivecera@redhat.com>
+References: <20260630125536.720717-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,11 +97,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303170-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303171-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
@@ -117,90 +121,105 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 07CFF6E4B7B
+X-Rspamd-Queue-Id: 6FEAC6E4A26
 
-Add a new DPLL_PIN_TYPE_INT_NCO pin type for virtual pins representing
-the NCO mode of a DPLL and implement support for it in the zl3073x driver.
+Add DPLL_PIN_CAPABILITIES_STATE_CONNECTED_OVERRIDE capability flag
+that indicates a pin can be set to connected regardless of the
+current DPLL device mode, overriding the active input selection.
+This is useful for automatic-only DPLL devices where mode cannot
+be switched to manual, allowing userspace to directly connect
+such pin from automatic mode.
 
-Patch 1 adds a STATE_CONNECTED_OVERRIDE pin capability for pins that
-can override input selection in any DPLL mode, with a WARN_ON check
-in dpll_pin_register() that STATE_CAN_CHANGE is also set.
+The capability requires STATE_CAN_CHANGE to be set as well;
+dpll_pin_register() warns if a driver violates this.
 
-Patch 2 adds the new INT_NCO pin type to the DPLL netlink spec and
-UAPI header.
+Document the new capability in the Pin selection section of
+Documentation/driver-api/dpll.rst.
 
-Patch 3 replaces the single 2s poll timeout with per-operation timeouts
-based on Microchip proprietary source code and own measurement.
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ Documentation/driver-api/dpll.rst     | 7 +++++++
+ Documentation/netlink/specs/dpll.yaml | 6 ++++++
+ drivers/dpll/dpll_core.c              | 6 +++++-
+ include/uapi/linux/dpll.h             | 4 ++++
+ 4 files changed, 22 insertions(+), 1 deletion(-)
 
-Patch 4 adds a per-DPLL serialization mutex taken by all DPLL callbacks
-and the periodic worker, establishing a single lock that protects all
-per-channel state. The chan_state_update() call is moved under this lock.
-
-Patch 5 adds a virtual NCO input pin to the zl3073x driver that allows
-userspace to switch a DPLL channel into NCO mode. The pin reports
-connected/active state when the channel is in NCO mode and handles
-the hardware-specific details of mode transitions including automatic
-df_offset capture and 1PPS phase preservation.
-
-Link: https://lore.kernel.org/netdev/20260531194423.383366-1-ivecera@redhat.com/
-
-Changes:
-v6:
-  - New patch 1: STATE_CONNECTED_OVERRIDE pin capability with
-    WARN_ON validation in dpll_pin_register() and documentation
-    in dpll.rst Pin selection section.
-  - Use READ_ONCE/WRITE_ONCE for per-device freq_monitor and
-    phase_avg_factor accessed from periodic worker without lock.
-    Remove unnecessary zldpll->lock from phase_offset_avg_factor
-    get/set callbacks (patch 4).
-  - Configure dpll_df_read register (ref_ofst=0, cmd=ACC_I) before
-    NCO mode switch with 25ms delays for internal register update
-    (reported by Chris du Quesnay, Microchip) (patch 5).
-  - Mark df_offset as unknown at probe when firmware left channel
-    in NCO mode (patch 5).
-  - See individual patches for detailed changelogs.
-v5:
-  - Rebased on net-next after the freq_monitor per-device fix
-    landed via net.
-  - Move phase_offset_avg_factor_set notification loop outside lock
-    to avoid lockdep false positive on multi-channel devices (patch 4).
-  - See individual patches for detailed changelogs.
-v4:
-  - New patch 3: per-operation poll timeouts
-  - New patch 4: per-DPLL serialization lock
-  - See individual patches for detailed changelogs.
-v3:
-  - fixed SoB position
-v2:
-  - See individual patches for detailed changelogs.
-
-Ivan Vecera (5):
-  dpll: add STATE_CONNECTED_OVERRIDE pin capability
-  dpll: add DPLL_PIN_TYPE_INT_NCO pin type
-  dpll: zl3073x: use per-operation poll timeouts
-  dpll: zl3073x: add per-DPLL serialization lock
-  dpll: zl3073x: add NCO virtual input pin
-
- Documentation/driver-api/dpll.rst     |   7 +
- Documentation/netlink/specs/dpll.yaml |  19 +
- drivers/dpll/dpll_core.c              |   6 +-
- drivers/dpll/dpll_nl.c                |   2 +-
- drivers/dpll/zl3073x/chan.c           | 128 ++++++-
- drivers/dpll/zl3073x/chan.h           |  48 +++
- drivers/dpll/zl3073x/core.c           |  48 +--
- drivers/dpll/zl3073x/core.h           |  12 +-
- drivers/dpll/zl3073x/dpll.c           | 489 ++++++++++++++++++++++----
- drivers/dpll/zl3073x/dpll.h           |   4 +
- drivers/dpll/zl3073x/regs.h           |  11 +
- include/uapi/linux/dpll.h             |   8 +
- 12 files changed, 677 insertions(+), 105 deletions(-)
-
-
-base-commit: cef9d6804030793cf8b8796fd6936197d065dd3e
+diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-api/dpll.rst
+index bae14766d4f7b..f83150917814e 100644
+--- a/Documentation/driver-api/dpll.rst
++++ b/Documentation/driver-api/dpll.rst
+@@ -91,6 +91,13 @@ following pin states:
+ - ``DPLL_PIN_STATE_DISCONNECTED`` - the pin shall be not considered as
+   a valid input for automatic selection algorithm
+ 
++Pins that have the ``DPLL_PIN_CAPABILITIES_STATE_CONNECTED_OVERRIDE``
++capability can additionally be set to ``DPLL_PIN_STATE_CONNECTED`` in
++automatic mode, overriding the active input selection. This is useful
++for automatic-only DPLL devices where mode cannot be switched to manual.
++When such a pin is disconnected, the device returns to automatic input
++selection.
++
+ The actual hardware status of a pin is reported via the operational
+ state (``DPLL_A_PIN_OPERSTATE``) attribute nested under the parent
+ device:
+diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+index 2bf83f6732ab0..526a5b2df2bd2 100644
+--- a/Documentation/netlink/specs/dpll.yaml
++++ b/Documentation/netlink/specs/dpll.yaml
+@@ -252,6 +252,12 @@ definitions:
+       -
+         name: state-can-change
+         doc: pin state can be changed
++      -
++        name: state-connected-override
++        doc: |
++          pin state can be set to connected regardless of current
++          DPLL device mode, overriding the active input selection.
++          Requires state-can-change to be set as well.
+   -
+     type: const
+     name: phase-offset-divider
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 2e8690cb3c16e..bb1e8650c9d59 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -884,7 +884,11 @@ dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
+ 	    WARN_ON(ops->measured_freq_get &&
+ 		    (!dpll_device_ops(dpll)->freq_monitor_get ||
+ 		     !dpll_device_ops(dpll)->freq_monitor_set)) ||
+-	    WARN_ON(ops->supported_ffo && !ops->ffo_get))
++	    WARN_ON(ops->supported_ffo && !ops->ffo_get) ||
++	    WARN_ON((pin->prop.capabilities &
++		     DPLL_PIN_CAPABILITIES_STATE_CONNECTED_OVERRIDE) &&
++		    !(pin->prop.capabilities &
++		      DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE)))
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&dpll_lock);
+diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
+index 55eaa82f5f986..5d7ca6a413cdd 100644
+--- a/include/uapi/linux/dpll.h
++++ b/include/uapi/linux/dpll.h
+@@ -208,11 +208,15 @@ enum dpll_pin_operstate {
+  * @DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE: pin direction can be changed
+  * @DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE: pin priority can be changed
+  * @DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE: pin state can be changed
++ * @DPLL_PIN_CAPABILITIES_STATE_CONNECTED_OVERRIDE: pin state can be set to
++ *   connected regardless of current DPLL device mode, overriding the active
++ *   input selection. Requires state-can-change to be set as well.
+  */
+ enum dpll_pin_capabilities {
+ 	DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE = 1,
+ 	DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE = 2,
+ 	DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE = 4,
++	DPLL_PIN_CAPABILITIES_STATE_CONNECTED_OVERRIDE = 8,
+ };
+ 
+ #define DPLL_PHASE_OFFSET_DIVIDER		1000
 -- 
 2.53.0
 
