@@ -1,207 +1,262 @@
-Return-Path: <netdev+bounces-303112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4uIAI3GnQ2pweQoAu9opvQ
-	(envelope-from <netdev+bounces-303112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:24:33 +0200
+	id ypetD+ipQ2ogegoAu9opvQ
+	(envelope-from <netdev+bounces-303124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:35:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC7596E38EB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:24:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A9E6E3A9F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:35:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=MWnAJo3y;
-	dkim=pass header.d=redhat.com header.s=google header.b=J6RITRFM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303112-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303112-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=siemens.com header.s=fm2 header.b=au27Z8Yj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303124-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303124-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=siemens.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 88E84330328D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:15:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B312430391E9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADBF4014B8;
-	Tue, 30 Jun 2026 11:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624DA3FA5CB;
+	Tue, 30 Jun 2026 11:32:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5459A3FF1B1
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3704B3F1AA8
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:32:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782818112; cv=none; b=rpNCUUGv9dCtqwQEGsFQ+r24rmDG4DvQ4OhQBjhM/RmD7ARpM7PNJHtR/mcGHVp1EWNQ1S4gwi+IuJc+srkZLYyyexjHFM4UbLecA7u9jBMOyhj3VktY1p0ZJBdbEXsChjQujExbWY21Wq2n6N0vVeq597YBYmrnprMGQ8V6YKI=
+	t=1782819144; cv=none; b=czViax+FSud+ZCaDNPD9gXbjasAI+KUIXpiZ2F5qiYNUIXeTgHLgWYb60qZ7BdcQvAwpW9vgvRynC0Zd90qrcCw7z2Jszhx0JE5EzzAvpZK94JCTI5gybw6BLtfp56ut0nGhB8HQLrbC2vxwAY5hEnHgyILH9I6uxSE5FDj615g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782818112; c=relaxed/simple;
-	bh=KN1FRu4cuOz4IFhgPj+yn2ZmKQqb+oVckZ03m5pXlAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cJUXRQrrSn0SbXiEowNFAD1QFyBAtPIr5aPIsUukw5K9PQJJg9bjfbqAUWp+qaWhWH27sXZVxwNk/oLIpwCHUIM3+3lA2aK/PcqDC5OWS0xLPMHsXa35RQ8wO1dDVW+fyyWUEWMNlNQKCyecxIhnlmeDtIkOL6o+0VwRolG+oJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MWnAJo3y; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=J6RITRFM; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782818110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j15V7ngwE/VoSisyb4jPtPP2vsFCnu4q3l7tU5FLXAA=;
-	b=MWnAJo3y9inWm0EXpBxzlVH5wanKleijOEMt4R4hG6NKcr5ZLvKmhdftO2kOvLL4WcphPb
-	577fELL6/9GInAZzjK59AwmmTR8ZjFUBjcfKu4ldBkPwonjTX9fLl/Z7MJxLqBRYp4rPwN
-	ANNn+2O2WM7qyuQzXb4Vab9ndTrg+18=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-Das4qW0aO7aDkTuiBiXPXA-1; Tue, 30 Jun 2026 07:15:07 -0400
-X-MC-Unique: Das4qW0aO7aDkTuiBiXPXA-1
-X-Mimecast-MFC-AGG-ID: Das4qW0aO7aDkTuiBiXPXA_1782818107
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-7f582244e9eso86488047b3.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782818107; x=1783422907; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j15V7ngwE/VoSisyb4jPtPP2vsFCnu4q3l7tU5FLXAA=;
-        b=J6RITRFMkP6oI/1ka8mRsZbGkrToqP7+lLijURua8dBCTr2oOedemijEI2JU2sVAQO
-         1m0NhFHYXyUQ9dNqrqQedUO3OEvJgUgX8JfqioUdpkcHJM8TYyMQwSMbBTd+3D9mELp0
-         yrbXGbKAvpSV24Jqs+5EUGHE27CNHFYPHZXc0pCV4kO+lSsNmHabHPnZc3cPWLQQNrQP
-         OL6kAXi7oeupqo2THNLd+Wo07nvKvie/2Z5dPjTbGJqAsbk37gkc5YGxukcZ9qbZsm00
-         zEZXUncro8JHpmiCScO88gX0OKb8onyb3VSKU7oaTbHNgjm0ENC/V1p+xCPnU/L9Ygnq
-         lLNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782818107; x=1783422907;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j15V7ngwE/VoSisyb4jPtPP2vsFCnu4q3l7tU5FLXAA=;
-        b=LLL80mn5PwdrrFkkULbiRmaerLefpVyb1IeKSr0hBwh68r/kJaK7G0cpx9j0IUksC/
-         oAPoqAfbDdk66amO43olYsMCldkKqjVurkDdaa3fjHIxVzB/NFdfQBoHJ8aafDmSTpeY
-         nxFZ79mg9L9qlftDd3hPGuajpAu1Ay7nk2fL/riIyR+hXC24tMlQpiiucSnWuj4QJgu5
-         M8V5GfHwg4v6CxwmV+oj8IChxEsBVcf2JRFr9kAQyNtHpHJwWEN/5Q1R3GJplI8lBQUY
-         hYrdK+HaHkPBJZYQ7Bu0EXVaY88QU0remDFmg4shvPSUwZ/DCvPD45mktpBnZ3jarmOR
-         6g7g==
-X-Forwarded-Encrypted: i=1; AHgh+RpwIYOl/8wALJwt3Wy7FaYNNlJLANNeLloJBpG8zVx4Yf4Rcvh42/uUbLBtoYYEGGkk6aui5VY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz07Cc5lYadRuXCj2Cp4AnNloo9JxnLS3XHZNaBDP7u5A4JJyi/
-	4YRc+xSUs5zKuuOO5N5unMBao6Od2nNOG4pmHScMOKcV9uHFksc+ofSxHhwNXzadWeCJOyD3S0n
-	vld7L4zi4rhjE0mdTLsu8WxrIc+1mhRDvAfcgxJnHoqgXOxzHqD7cd8vG99jc+h6KJg==
-X-Gm-Gg: AfdE7cnu5v76CHhKBWyXuOFJ/BA4sfNRjsSGRksTwBtoWcnaLYCFI6u5KMIipWqtscN
-	fliMcPenpQKWCFtcwJS/oUreUw9B7YtwumiKsZi/QEmEpjxWgv1a3a/LGNzYIL/6oheVhFYBI7y
-	6NJRJHDCRrq5kUGxhCUigGsPOsDru7Mb1Ih0f1r2aOVCawFvtEDqBX6c3LAsTiSIC9WoV3kB5wm
-	lc8clGeZCxYEWxf+vWJwMp8+/pzegu1rx8oxrt9WE8PwpXFH4O3k2ewjOFjoxwAO4rRBM9cv6I8
-	/YWkcTZPAFf8nGVonnBgonNHI6KiTtPK0wnUFULzZF8220PLxHGPAG7bKt1J5gZVn9iRUkc0yvS
-	fSToRIeVQBE2Ym+7ukS+DBHec8SmfRYVcEe9jAc/HWixBZs73KX3y1UBkeoiiQBvojIfzRpdvJy
-	fleFqSAog8fw==
-X-Received: by 2002:a05:690e:428c:20b0:664:e5c5:5b3f with SMTP id 956f58d0204a3-664f98d1883mr2606815d50.44.1782818106801;
-        Tue, 30 Jun 2026 04:15:06 -0700 (PDT)
-X-Received: by 2002:a05:690e:428c:20b0:664:e5c5:5b3f with SMTP id 956f58d0204a3-664f98d1883mr2606780d50.44.1782818106280;
-        Tue, 30 Jun 2026 04:15:06 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:2eb7:f61a:75:4534? ([2a0d:3344:5521:6b10:2eb7:f61a:75:4534])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-665006a8c03sm770116d50.9.2026.06.30.04.15.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jun 2026 04:15:05 -0700 (PDT)
-Message-ID: <de40b1a5-663e-43ab-9fb7-5a49f029cc4b@redhat.com>
-Date: Tue, 30 Jun 2026 13:15:03 +0200
+	s=arc-20240116; t=1782819144; c=relaxed/simple;
+	bh=4ZSwZymhBMoMS7e9yAqoDjInucyag5+dMxp9MPkaiY0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gJiURkega/NKYT1JkdHi5ZP6s7/yww+XR8pztbo0RcYZ6R57/Chdx4hIpL1nwVODfK6VWfIGc9lk7wk4iBIFCZ1SM3SAhWTgIKnn5UtisxTN8cNVsQkpGGz4U/0hanhB4JsAALkNJ2kLRejehAU4jky5Sw484bDMSgnq2EATGLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=meng.ding@siemens.com header.b=au27Z8Yj; arc=none smtp.client-ip=185.136.64.227
+Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 2026063011220064f1e555ed000207cf
+        for <netdev@vger.kernel.org>;
+        Tue, 30 Jun 2026 13:22:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=meng.ding@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=FGWjX5Iw+idjzBCUjhnqRS4MmD5hoBNLO0VdMjNcb0g=;
+ b=au27Z8YjSO7lrdMiXMKZKX04axUjx3tCBcFn/n1iVduzZQwpYpn1MMDv3JXmUT35/VG1nZ
+ muiVJZ9oa28547LGKhhcioH4cLarvCqcVCeULc1MIYDKoMg/tsspDJYrLs5agqoM3Wd6nmzV
+ uWt5dJ3z9uyDhixiGcY6khTLwWraKKUYJNf5wicZaEBMfi8C75m8rC+w/9qM6cHt+vBV7j6z
+ i7Sz1wK9qXAFdZQf3+Vq02+VIRgvywuG/EjTl+riq+DSvgLzQvwumxPQ6wJjAjI8qO2PKlji
+ ZKijyupNhmCSt8qaljxIxGPu9lD+MvbnaanfmIHM4eOqjUWuq6NEYtqQ==;
+From: Ding Meng <meng.ding@siemens.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jan.kiszka@siemens.com,
+	florian.bezdeka@siemens.com
+Cc: intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	meng.ding@siemens.com,
+	wq.wang@siemens.com,
+	pmenzel@molgen.mpg.de,
+	stable@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Subject: [Intel-wired-lan] [PATCH net v2] igc: Fix RX HW timestamp reporting when NET_RX_BUSY_POLL is disabled
+Date: Tue, 30 Jun 2026 19:15:23 +0800
+Message-ID: <20260630112056.885071-1-meng.ding@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 1/1] net/sched: sch_teql: Introduce slaves_lock to
- avoid race condition and UAF
-To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- horms@kernel.org, victor@mojatatu.com, jiri@resnulli.us,
- security@kernel.org, zdi-disclosures@trendmicro.com, stable@vger.kernel.org
-References: <20260628111229.669751-1-jhs@mojatatu.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260628111229.669751-1-jhs@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1335312:519-21489:flowmailer
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[siemens.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-303124-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303112-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[meng.ding@siemens.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:victor@mojatatu.com,m:jiri@resnulli.us,m:security@kernel.org,m:zdi-disclosures@trendmicro.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jan.kiszka@siemens.com,m:florian.bezdeka@siemens.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:meng.ding@siemens.com,m:wq.wang@siemens.com,m:pmenzel@molgen.mpg.de,m:stable@vger.kernel.org,m:aleksandr.loktionov@intel.com,m:piotr.kwapulinski@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[meng.ding@siemens.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[siemens.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mojatatu.com:email,trendmicro.com:email]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[siemens.com:dkim,siemens.com:email,siemens.com:mid,siemens.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DC7596E38EB
+X-Rspamd-Queue-Id: 96A9E6E3A9F
 
-On 6/28/26 1:12 PM, Jamal Hadi Salim wrote:
-> The teql master->slaves singly linked list is not protected against
-> multiple writes. It can be mod'ed concurently from teql_master_xmit(),
-> teql_dequeue(), teql_init() and teql_destroy() without holding any list
-> lock or RCU protection.
-> 
-> zdi-disclosures@trendmicro.com has demonstrated that the qdisc is freed
-> after an RCU grace period, but teql_master_xmit() running on another
-> CPU can still hold a stale pointer into the list, resulting in a
-> slab-use-after-free:
-> 
-> BUG: KASAN: slab-use-after-free in teql_master_xmit+0xf0f/0x16b0
-> Read of size 8 at addr ffff888013fb0440 by task poc/332
-> Freed 512-byte region [ffff888013fb0400, ffff888013fb0600) (kmalloc-512)
-> 
-> The fix?
-> Add a per-master slaves_lock spinlock that serializes all mutations of
-> master->slaves and the NEXT_SLAVE() links in teql_destroy() and
-> teql_qdisc_init(). teql_master_xmit() also takes the same slaves_lock
-> around those updates.
-> Annotate master->slaves and the per-slave ->next pointer with __rcu and
-> use the appropriate RCU accessors everywhere they are touched:
-> rcu_assign_pointer() on the writer side (under slaves_lock),
-> rcu_dereference_protected() for the writer-side loads (also under
-> slaves_lock), rcu_dereference_bh() for the loads in teql_master_xmit() and
-> rtnl_dereference() for the loads in teql_master_open()/teql_master_mtu(),
-> which run under RTNL.
-> Pair this with rcu_read_lock_bh()/rcu_read_unlock_bh() around the list
-> traversal in teql_master_xmit(), so that readers either observe a fully
-> linked list or are deferred until the in-flight mutation completes. The two
-> early-return paths in teql_master_xmit() are updated to release the RCU-bh
-> read-side critical section before returning, since leaving it held would
-> disable BH on that CPU for good.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: zdi-disclosures@trendmicro.com
-> Tested-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+When CONFIG_NET_RX_BUSY_POLL is deactivated, fetching RX HW timestamps
+from the NIC no longer works as expected, often resulting in incorrect
+or negative values such as "HW raw -121948.050407424".
 
-Looks good, thanks!
+This occurs because disabling CONFIG_NET_RX_BUSY_POLL disables the
+SKB NAPI mapping in __skb_mark_napi_id(). Consequently, get_timestamp()
+fails to perform its driver lookup, and the igc driver's struct
+net_device_ops::ndo_get_tstamp is never invoked.
 
-Please note that sashiko/gemini found a pre-existing issues which may
-require a follow-up/separate fix:
+Instead, get_timestamp() falls back to use shhwtstamps(skb)->hwtstamp,
+a field that the driver has not populated. This results in incorrect
+timestamps.
 
-https://sashiko.dev/#/patchset/20260628111229.669751-1-jhs%40mojatatu.com
+Fix this by populating the hwtstamp field with the correct timestamp
+in the default timer when CONFIG_NET_RX_BUSY_POLL is disabled.
+The "igc_adapter" is passed to igc_construct_skb() to enable
+igc_ptp_rx_pktstamp() to access the necessary adapter details for
+adjusting the timestamp.
 
-(the 2nd one in the above link, IDK how to generate a direct link to a
-specific comment)
+Test case:
+ Disable CONFIG_NET_RX_BUSY_POLL.
+ Sender:
+ # tools/testing/selftests/net/timestamping en0 \
+        SOF_TIMESTAMPING_TX_HARDWARE PTPV2 IP_MULTICAST_LOOP
+ Receiver:
+ # tools/testing/selftests/net/timestamping en0 \
+        SOF_TIMESTAMPING_RX_HARDWARE SOF_TIMESTAMPING_RAW_HARDWARE PTPV2
 
-/P
+Before patch, receiver prints
+ HW raw -121948.050407424
+After patch, receiver prints
+ HW raw 1760648763.746974064
+
+Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
+Cc: stable@vger.kernel.org
+Co-developed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
+Signed-off-by: Florian Bezdeka <florian.bezdeka@siemens.com>
+Signed-off-by: Ding Meng <meng.ding@siemens.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+---
+V2:
+  - update commit message(suggested by Paul Menzel):
+      add error log
+      explain why need to pass igc_adapter
+      add test case
+  - move variable declarations on top of the function
+  - Cc stable@vger.kernel.org
+V1: https://lore.kernel.org/intel-wired-lan/20260622041718.6106-1-meng.ding@siemens.com/
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 41 ++++++++++++++++-------
+ 1 file changed, 29 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 8ac16808023..5c4beb8b5d4 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -1992,7 +1992,29 @@ static struct sk_buff *igc_build_skb(struct igc_ring *rx_ring,
+ 	return skb;
+ }
+ 
+-static struct sk_buff *igc_construct_skb(struct igc_ring *rx_ring,
++static void igc_construct_skb_timestamps(struct igc_adapter *adapter,
++					 struct sk_buff *skb,
++					 struct igc_xdp_buff *ctx)
++{
++#ifndef CONFIG_NET_RX_BUSY_POLL
++	struct igc_inline_rx_tstamps *tstamps;
++#endif
++
++	if (!ctx->rx_ts)
++		return;
++
++#ifndef CONFIG_NET_RX_BUSY_POLL
++	tstamps = ctx->rx_ts;
++	skb_hwtstamps(skb)->hwtstamp = igc_ptp_rx_pktstamp(adapter,
++							   tstamps->timer0);
++#else
++	skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
++	skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
++#endif
++}
++
++static struct sk_buff *igc_construct_skb(struct igc_adapter *adapter,
++					 struct igc_ring *rx_ring,
+ 					 struct igc_rx_buffer *rx_buffer,
+ 					 struct igc_xdp_buff *ctx)
+ {
+@@ -2013,10 +2035,7 @@ static struct sk_buff *igc_construct_skb(struct igc_ring *rx_ring,
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+-	if (ctx->rx_ts) {
+-		skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
+-		skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
+-	}
++	igc_construct_skb_timestamps(adapter, skb, ctx);
+ 
+ 	/* Determine available headroom for copy */
+ 	headlen = size;
+@@ -2686,7 +2705,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
+ 		else if (ring_uses_build_skb(rx_ring))
+ 			skb = igc_build_skb(rx_ring, rx_buffer, &ctx.xdp);
+ 		else
+-			skb = igc_construct_skb(rx_ring, rx_buffer, &ctx);
++			skb = igc_construct_skb(adapter, rx_ring, rx_buffer, &ctx);
+ 
+ 		/* exit if we failed to retrieve a buffer */
+ 		if (!xdp_res && !skb) {
+@@ -2738,7 +2757,8 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
+ 	return total_packets;
+ }
+ 
+-static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
++static struct sk_buff *igc_construct_skb_zc(struct igc_adapter *adapter,
++					    struct igc_ring *ring,
+ 					    struct igc_xdp_buff *ctx)
+ {
+ 	struct xdp_buff *xdp = &ctx->xdp;
+@@ -2760,10 +2780,7 @@ static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
+ 		__skb_pull(skb, metasize);
+ 	}
+ 
+-	if (ctx->rx_ts) {
+-		skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
+-		skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
+-	}
++	igc_construct_skb_timestamps(adapter, skb, ctx);
+ 
+ 	return skb;
+ }
+@@ -2775,7 +2792,7 @@ static void igc_dispatch_skb_zc(struct igc_q_vector *q_vector,
+ 	struct igc_ring *ring = q_vector->rx.ring;
+ 	struct sk_buff *skb;
+ 
+-	skb = igc_construct_skb_zc(ring, ctx);
++	skb = igc_construct_skb_zc(q_vector->adapter, ring, ctx);
+ 	if (!skb) {
+ 		ring->rx_stats.alloc_failed++;
+ 		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &ring->flags);
+
+base-commit: 4549871118cf616eecdd2d939f78e3b9e1dddc48
+-- 
+2.47.3
 
 
