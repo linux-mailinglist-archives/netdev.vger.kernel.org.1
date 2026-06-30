@@ -1,172 +1,169 @@
-Return-Path: <netdev+bounces-303004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bQAvK5JsQ2roYAoAu9opvQ
-	(envelope-from <netdev+bounces-303004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:13:22 +0200
+	id G1rsJ2xtQ2oIYQoAu9opvQ
+	(envelope-from <netdev+bounces-303005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:17:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F9D86E1020
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:13:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0786E106F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:17:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=ukauNkjo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303004-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303004-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=fgN5FXQE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303005-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303005-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2865C30607F0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:10:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0BCDF30276B8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB66F3D6CC3;
-	Tue, 30 Jun 2026 07:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F6A3D6CD3;
+	Tue, 30 Jun 2026 07:14:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9E23D1CCF;
-	Tue, 30 Jun 2026 07:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300273D331A
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 07:14:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782803453; cv=none; b=OEww4ttPJZgu54qNjJproBYCxU3QTCa0LBXqDN0ReP7JU4dfqXT/minLehJjr8PK61bItsjZkFss1i1tHws6/V5Ptl63wPrEDdbX7j8tzsboRtedi8NZiQSz+zmq4lZwGVTpUJVZ5ecypbTvgzBh7D0thQPg7BR54VefUmaAfIQ=
+	t=1782803684; cv=none; b=CmCn+VcYwrdx+WR3ioL/j066Qs5ZYyhLxFGVT/9MvE1tlKsoT1UQCbH1zkHQxp8f5ESJkxnpIawhlnvg861sKATmUHZRzS4EXn21Sk6xJoN5S39DC3QiEOB/zTs+MymHksdSmkqL3yG1/141xqujOiGusJAvBWfJqOyhpVE0j0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782803453; c=relaxed/simple;
-	bh=coe15ogFPnrnNLGsSFkOoXrK9juFWi8tMyZD8xBfr7E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xtp5TeBQ0KGL8ip2nbiZ8DZOGPdt9iJozFjEEQtdxip5nP2J2Azj7K4wb1/Uw2TbKj8nE6vS/xQ4IO5qBm7kRQNdUHasomy6KQILaZG+smaFldA/CeBOgQhmqIcxNGFXAS7n6/ZrXGYwdUiEpvka7egn5KHUFjP0Th522TbDpmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ukauNkjo; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id EFF13C5CD4C;
-	Tue, 30 Jun 2026 07:10:59 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6543F60233;
-	Tue, 30 Jun 2026 07:10:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E7836106F1C3F;
-	Tue, 30 Jun 2026 09:10:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782803447; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=2WEvFOUe3RFPl/fYwecdyACzR7RbrE8OMXLcd2G9smQ=;
-	b=ukauNkjoFa+Izzi7oPn2g0tA9q7whk8DxJSbSLP4SFqYdfTnlnKGZ1S4XqYxEEwP8ROc9E
-	HBc0hiAPp7t+IiAp+olwJx+tnk551HcHvSjWCDN0CAqAC9n0GWw0PdeayEatvn0B87x+i2
-	UtCQ70rLf2WOGxPOPxiLprWMeC8InZK5XbLOStrcUyN9FT/CSPIE8djSzaSgoUsGbVtrxe
-	ZHuWI77VuVPssz2DRPOR0uitBZkzZoNSB2PL41BJvUg7Ik0Og/41Mijhl8L8HyfqFLpmni
-	K2yR3zqh15Dqv+kBkWLY7EwbaAqDcVbg9hQlF4vujxerOUvHat58mr27FL4SvQ==
-Message-ID: <0083a957-7afb-489b-b2db-de3acd71b445@bootlin.com>
-Date: Tue, 30 Jun 2026 09:10:34 +0200
+	s=arc-20240116; t=1782803684; c=relaxed/simple;
+	bh=XL23FZIFV8lgtowgc1D3LIn4aqMyxN0Pts3G4jOCcZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnhOdt3S2J4BUkCdfi07977B2uUL0Iw/alwfiXa8YCswgl/hdYiT4xcV4Rt9r2LHsAIj+YyTXGCfR+z7wB4C0JopknA+X7uhVxKQM/Yo2NvOKVPNw1e6zOn7JV4hsrruxHyCzbt5JK4abv46toZiGBxd0YvfaBU4POLdbfyTS60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgN5FXQE; arc=none smtp.client-ip=209.85.216.50
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-37d82f3a244so1794310a91.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 00:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782803682; x=1783408482; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bDQGREITe91mNJKLkfaBft7iY0zy1ezAMTmaONILis=;
+        b=fgN5FXQEFp7ODVTlb5EKin3jjBuoNcnuY813a8+INqGJD5QCMSObTCqWfspj6cY8ma
+         e+CSpiBPZz5LxN6QtnVJBNgCE3gFD2r/CTnSo3N0Ib7M7oLJVpt10Krm+HIwJb5SclPg
+         4rj8Anq4Lg4dSYXs9bVx4bdr1xQ43iPyYmTNjb+32ccty2ZGU+tfIdHDVxc/8zSxh1Y8
+         KyfXqQQYpgaznKXfD6L8u5YDVX44XB7uj4AI+O4+EhBWlqDzFKCRRhgH2m70ZZEVLg3t
+         ATC8nct5RdNwm1Uz13EGl+tyzlsLdSgiIfPJLJ1Ngx76lH7MQrzx6y94lX6unE9i7CR+
+         9APQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782803682; x=1783408482;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2bDQGREITe91mNJKLkfaBft7iY0zy1ezAMTmaONILis=;
+        b=C6NqKa4TI4zE/h0fcYy6RgRBvf3Q+jk/EBUvtulgODHW9WoK3580opHuKQDkxhifGg
+         xGIM86FmV3LwRFon9UbhsRJA1JNKJRTkSb4XeBwJO5UXyWj2nNMmpM6K/5Pi2XdjcZuN
+         KfadPa/ziBI7uBJ/6e5woSu6sj/eJow90NJL2nRD/uDHdH205saRPHQIFuz4jbpluGW0
+         skojfWWmNF5Gl6QAX3Sdodk3jgUZ/juesFE0i+9fGtTtsPAa4fUnhaZItZwVTfzV4DQl
+         Gx7XRysk1JDVXEGjI/TginD1ymkwAFr96TSB7miYC/DDHj9N+/SbfSqga6fSXuARm/be
+         iONQ==
+X-Forwarded-Encrypted: i=1; AHgh+Roa1TO1kbKdsfFnXM+AL5G3esQGqVspNhB6zxGddXWGu9GG/VKkM3Jbcvbau78iwPFFZUSZvDk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh6gsOh2WLcpgOStAzLkLobynzPzTQh042E5G8lurNoZ8GwQyL
+	KvTwz+jA1L927o0BmjA1by/CQBZx/6npR7oBsawKcTlGIT7jTeBsskZs
+X-Gm-Gg: AfdE7cntGY+owfLt+rZQgYABaPPqQcUjoNmSKy3sG7G3my3R3zH9ywCpbuUFcC6KPID
+	0RzbVXXqpcOZI72ckrfmI3XfYizkgs9chB7yH7LSc+p2lrmuAA6mIQuquJBNEvKnQgi6/TUlpIi
+	JxDJwb+0tPPcqGmxtstIjueUmlVIzRZlLS7UyU9d1/CkwlIChJ3bybfjvCwZCBpKQa5F/JJ24A4
+	Bk5tCq0kL/nvXYBW3hPYBKmKhPCnzXMGMeCIK+CmkYnyjqlhGHV4s99Gus8VYTFn/8LnZvjKzXG
+	r9A4DvGYfF/R3yZdc5gF+heiEw86esrU9OLcKF0XhK3PF6fYDeu3Lh8ax4bty3QpUvtD7WlK9vz
+	BhumoPBRMpU7VGWlxINCxO/XAUlfqle5Z4jyORxR2ql/72xkLOKdggKI9rh1zzHekxu/WAgSaUO
+	2uLdp/QdRXJ0VQsQTlB+M+vXhFEj0RrsXiKgHpXNY51Y0+alrKHcFZDuSoiy0=
+X-Received: by 2002:a17:90b:2e48:b0:37f:9cdf:f0ad with SMTP id 98e67ed59e1d1-3805281b8d0mr1773163a91.28.1782803682352;
+        Tue, 30 Jun 2026 00:14:42 -0700 (PDT)
+Received: from cps-manycore-1 ([147.46.174.222])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3805bf2c5absm285378a91.2.2026.06.30.00.14.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 00:14:41 -0700 (PDT)
+Date: Tue, 30 Jun 2026 07:14:32 +0000
+From: Sechang Lim <rhkrqnwk98@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Emil Tsalapatis <emil@etsalapatis.com>, 
+	Lorenz Bauer <lmb@isovalent.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	Jiayuan Chen <jiayuan.chen@linux.dev>, Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/2] bpf, sockmap: disallow update and delete
+ from tc, xdp and flow_dissector
+Message-ID: <3speqrvxsx25cbyronbm4jatlhkawkjiki7j2b7clrtkbwgpn6@x2gx7rwvpho7>
+References: <20260629172704.1302218-1-rhkrqnwk98@gmail.com>
+ <20260629172704.1302218-2-rhkrqnwk98@gmail.com>
+ <DJLQSC87KCSV.314DTZAWRNA8C@gmail.com>
+ <akNXhg5K7aV7Opdr@john-p8>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/6] dt-bindings: ethernet: eswin: add EIC7700
- eth1 RX clock inversion variant
-To: lizhi2@eswincomputing.com, devicetree@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, pjw@kernel.org,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
- linux-riscv@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com,
- pinkesh.vaghela@einfochips.com, pritesh.patel@einfochips.com,
- weishangjuan@eswincomputing.com, horms@kernel.org, lee@kernel.org,
- wens@kernel.org
-References: <20260630063123.1118-1-lizhi2@eswincomputing.com>
- <20260630063239.1158-1-lizhi2@eswincomputing.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260630063239.1158-1-lizhi2@eswincomputing.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <akNXhg5K7aV7Opdr@john-p8>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303004-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,dabbelt.com,eecs.berkeley.edu,ghiti.fr,lists.infradead.org,st-md-mailman.stormreply.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lizhi2@eswincomputing.com,m:devicetree@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:pjw@kernel.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:alex@ghiti.fr,m:linux-riscv@lists.infradead.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:ningyu@eswincomputing.com,m:linmin@eswincomputing.com,m:pinkesh.vaghela@einfochips.com,m:pritesh.patel@einfochips.com,m:weishangjuan@eswincomputing.com,m:horms@kernel.org,m:lee@kernel.org,m:wens@kernel.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303005-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:alexei.starovoitov@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:sdf@fomichev.me,m:emil@etsalapatis.com,m:lmb@isovalent.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:shuah@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,m:alexeistarovoitov@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,davemloft.net,linux.dev,fomichev.me,etsalapatis.com,isovalent.com,cloudflare.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,eswincomputing.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,x2gx7rwvpho7:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F9D86E1020
+X-Rspamd-Queue-Id: 3C0786E106F
 
-Hi,
+On Mon, Jun 29, 2026 at 10:47:41PM -0700, John Fastabend wrote:
+>I think we additionally need to also block 
+>BPF_PROG_TYPE_SOCKET_FILTER? Did you check this case I guess the same 
+>case is possible there?
+>
 
-On 6/30/26 08:32, lizhi2@eswincomputing.com wrote:
-> From: Zhi Li <lizhi2@eswincomputing.com>
-> 
-> The EIC7700 SoC integrates two GMAC instances. The eth1 MAC exhibits
-> different RX clock sampling characteristics due to silicon-inherent
-> timing behavior.
-> 
-> The eth1 MAC has a fixed, non-configurable RX clock-to-data skew at the
-> MAC input in the order of 4-5 ns. This cannot be compensated solely by
-> the standard MAC internal delay configuration and PHY delay, and RX clock
-> inversion is required at 1000Mbps for correct sampling.
-> 
-> The eth1 TX path also includes a fixed silicon-inherent delay of
-> approximately 2 ns. This delay is always present and cannot be disabled.
-> It is therefore part of the effective transmit timing observed on the
-> wire.
-> 
-> For the eth1 variant, the valid tx-internal-delay-ps values include
-> this fixed delay component. Consequently, the effective range becomes
-> 2000-4540 ps (approximately 2000 ps fixed delay plus 0-2540 ps
-> programmable delay).
-> 
-> Introduce a dedicated compatible string
-> "eswin,eic7700-qos-eth-clk-inversion" to represent the eth1 variant,
-> allowing the driver to apply RX clock inversion only when required by
-> hardware variant selection.
-> 
-> This keeps SoC-level differentiation without exposing silicon-fixed skew
-> as configurable device tree parameters.
-> 
-> To reflect this, model the TX internal delay as a base 0-4540 ps range,
-> and constrain valid values per compatible using conditional schema rules.
-> 
-> Update the binding schema as follows:
-> 
->   - Define tx-internal-delay-ps as a base range: 0-4540 ps
->   - Add compatible-specific constraints using if/then rules:
->     * eswin,eic7700-qos-eth:
->         max 2540 ps
->     * eswin,eic7700-qos-eth-clk-inversion:
->         minimum 2000 ps (effective range 2000-4540 ps)
-> 
-Maybe Andrew can help answering that one, but does it ever make sense to insert
-a delay beyond 2540 ps ?
+Yes, same inversion. I'll block BPF_PROG_TYPE_SOCKET_FILTER in v4.
 
-Maxime
+>Then another patch needs to restrict BPF_SOCK_OPS users. For that
+>we need to block BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_*.
+>Let me know if you want to do those as well. Let me know if you want
+>to do both patches or just the prog blocking above with the possible
+>addition of SOCKET_FILTER. I didn't search very hard so probably need
+>to check all the BPF_SOCK_OPS_* to find the valid cases.
+>
 
+Just the prog blocking with BPF_PROG_TYPE_SOCKET_FILTER added. I'll
+leave SOCK_OPS out of this series.
+
+Bests,
+Sechang
 
