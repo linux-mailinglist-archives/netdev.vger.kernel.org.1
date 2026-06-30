@@ -1,222 +1,216 @@
-Return-Path: <netdev+bounces-303028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303009-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zG8DAH93Q2rNYwoAu9opvQ
-	(envelope-from <netdev+bounces-303028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:59:59 +0200
+	id HpVdMIZwQ2rLYQoAu9opvQ
+	(envelope-from <netdev+bounces-303009-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:30:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542096E17B3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:59:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD756E1293
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:30:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=EBySJ7DE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303028-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303028-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=KLT4WTD0;
+	dkim=pass header.d=redhat.com header.s=google header.b=MuKy0YhC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303009-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303009-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A2E63111127
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:51:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8AD473065F3B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68B23EE1F6;
-	Tue, 30 Jun 2026 07:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713C739D6FA;
+	Tue, 30 Jun 2026 07:28:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010064.outbound.protection.outlook.com [52.101.69.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872553EB813;
-	Tue, 30 Jun 2026 07:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABD939A04C
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 07:28:35 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782805804; cv=fail; b=gahXjiEA++eeSOzk3gn+skzPh4UxrH6y88H1yWPztIU7GrjXvYOmHaIwbnWFyf6GoTgi5YvGVAb3Mx1ur+5md3pgaJo1/pot7kZPJUTe5qVgBYwudEpjJODBhAAcvfrMgnzgYyilkNZgatkOyfD1KfdbivhG2EL3aEhxEP7Ftv4=
+	t=1782804517; cv=pass; b=EwAXaXjz7cwEgUa4sFOYTQ8pUFyYDuxLqwbRnWCUvM7NEKfo+qFYsdsD7F5E4SSBmhHeemluxogBVWkhDhzeZm7nF9+cly8JUjlb4u8Be2UnsZ3MUERLKEWBzFXiJp9ZQLlkzx+nipg3cam95V2amMouiEBsscBJFB4sWVXc79w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782805804; c=relaxed/simple;
-	bh=xs5XQR4GCTJgSYpvY0nM42qJl1+P3JkQUA1R73tXpik=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aV0cYeX15QIY2dkkBXcsZZbN/JlQZc3EfAgT64K58cPgVdWQBRYhotcmYKMb683p90nSynqtcJAtaqqzxXbgaKme9mbwCLtCubUv6zouZ0eJEzCtijNp7tZ/YlndevmpWvxjQFA4InWu8R87d9+S+tJFREZBEhp7zEBZWG4hnoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=EBySJ7DE; arc=fail smtp.client-ip=52.101.69.64
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=x8egj2QRV4tNoiKVLCV8+CvqGRt1QEofIiy0kiFdSaxS8+ocXRBHPhikCZxJho0n1uOl4IJ9th+6o/yULw7MowzKFi+umpthNSXKaxI5khDOxIvH7kSYJW4ZKKP9lJHQA2L3jCqA6KeaT/eSKHnvHZ99jXd/Wllm/ny3O507Kx7eVMPVGv/b0FKipL086fulbEmFs5J7Ir7wQ4ka8Rme1ShpIyvDP9w7Z8k9L3oVIApQ7qekmfQkm2VGAgtDMBuoELZx+Aus60uRu1GOUTCwrl9/2TBEFyT3UcZ5ZSLWwEGeIpDUZbRB9eUrSovu8/jCSDA4VPKBRFYo9S0RMzy5aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fV8Ikb13ip2x5qNT/bfhYmUDt+DWXX5h4YDEVsNj9z8=;
- b=FtE5jStyu3BgBj1LkqVOrhe6HYRavq3g/jJE6d5ay3zlJ/YMUobO8yYFEF9yxg/UxgqIKOi0yNU47FcGqCQeZGNnWcO/VX9KtJ2KJsI32rr0KjPbs0Rh3HVnoryeKy7r6YfYtSV35D6/J/ySEii9tVTEK9TMIan6SdTq6/O2A6Jw9LUmq3FeDtI1ZakeDLd/p2lR2AVYXWsWYE4X2bWd1XiSTaNvAfEj5HJrEtmsl/nHiU6EdVDt9rY5QdoryaROMqXw0j7oh+9vZPmPcDpmimdQe3LQnby8takhtN1U5vo9w4+IH3kkbUdStVSS4sWHqqJUnU3ZE84HylE6n5dWcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fV8Ikb13ip2x5qNT/bfhYmUDt+DWXX5h4YDEVsNj9z8=;
- b=EBySJ7DEc5jntHOj2twJGZf5gYFvQal2zlO1z6xyU2Sw1Ma4wBKEpji5rq13y4dhikcIMXd+lvEA2EMRDMSvVpo9Olxir9N3dPmzpYQVux89wSIXfOYYgU2RfLvvWcL1XM67y5hjjvQU/PyDhyYAWXDNEH750OtwlSo2Z2bF2fXeTsG6+7ykZjHGw7lKDd1DtXMjDO/pX2ZlccJkHrPt6JASGYEU9fOFLLZw9ASI/O4KewiKPl4gYMW72CB09ij0qWz8wpu6xL09t+ctBF65zRhh0K/yf4dLEXJBS+sAF4ZMQYRTXYBq2OfV9SDQOSf8JwVX01G+cyhsOdLALlb+sg==
-Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
- by DUZPR04MB9918.eurprd04.prod.outlook.com (2603:10a6:10:4db::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Tue, 30 Jun
- 2026 07:50:00 +0000
-Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
- ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
- ([fe80::a9a5:cf83:dbe8:1f74%3]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
- 07:50:00 +0000
-From: wei.fang@oss.nxp.com
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	wei.fang@nxp.com,
-	chleroy@kernel.org
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next 14/14] net: enetc: use kzalloc_flex() for enetc_psfp_gate allocation
-Date: Tue, 30 Jun 2026 15:20:36 +0800
-Message-Id: <20260630072036.382761-15-wei.fang@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260630072036.382761-1-wei.fang@oss.nxp.com>
-References: <20260630072036.382761-1-wei.fang@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR02CA0053.apcprd02.prod.outlook.com
- (2603:1096:4:196::16) To VE1PR04MB7216.eurprd04.prod.outlook.com
- (2603:10a6:800:1b0::22)
+	s=arc-20240116; t=1782804517; c=relaxed/simple;
+	bh=QpiJXUd/TdRC88Zy5JYnnExcUMasQKSq5TYcaHFChJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XRE0cRQrZvgHQO04sUiRTZ4D24Pr3AQCW3KSK4Pf8gQcJVsQ9/FKArAqA5hjuEtShtxxNtlx7DtuWWU1CY3Gp0Q/8DZdqScVCQzRKoSYNsRxV/qiZp7R3YjAqgDGV9rba/w4YNWe6gZg//wIDeV82LLiLwhyoceo/cELIXAMZ3c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KLT4WTD0; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MuKy0YhC; arc=pass smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782804515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1hTUJ3hTjCt2yXulZuZv+e76jNuquuhLumAKkPqjpPY=;
+	b=KLT4WTD0K6sioNHAsjZQDVerxtrp6So33sjga6HdAj4e5mal2KuINNfV+Z6VSwmCQ6UYnk
+	+lrF45FdXhlaro015Pax0Smni4go+ukFP+wTeXqon28xP0I5qmzv6JDL2NScjPME8JD4sY
+	8XI82B2ssjgYPhZaTQdqQS3MaSidZm0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-AiXfctltP3a4CCISLeclFw-1; Tue, 30 Jun 2026 03:28:33 -0400
+X-MC-Unique: AiXfctltP3a4CCISLeclFw-1
+X-Mimecast-MFC-AGG-ID: AiXfctltP3a4CCISLeclFw_1782804512
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-473bc66c837so1395385f8f.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 00:28:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782804512; cv=none;
+        d=google.com; s=arc-20260327;
+        b=qHqsO+wOmpqs0swVQlSxxV78Iu/bL10tY6a+BPLJ9y8NPsrQtXhxI+QdstjZMcWHQz
+         7rOk7Ukgt7nY6KjANWpHeCCBUSHeFXG67xwjdvt8+1JUmzleKKYUUxJyLWll27Y/uO0d
+         wtLqj/JvjCuO9mHotEZDYcWKNQwx/ugNvcdcQlf5P5cfqSdjUTazVYJnCWMXNlFwx3Pq
+         JUB3WRJt5S7lPt1AaK+Ea7uYiqpZpwlhrxCyz3BZn6+11kgBPXTeaeIBbg1FoFPrl5Yi
+         Yf2AYmjXG0SBBgh9yHWs+tQu7b2rTMLCcfxWKA9yieHVV+tN1arj2ZpR751PylsZiM7N
+         TCIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=1hTUJ3hTjCt2yXulZuZv+e76jNuquuhLumAKkPqjpPY=;
+        fh=mh/9pi+RVlXxT5wIYgEzEXjhwpsuYOsKtHYfXIh81fA=;
+        b=UAyqcHSXHokTedKlh5eXkP7y8EhTStvRvIzTNm+ZS9+BbYZtApN+yE1NIfqLIYNoGh
+         5/jKBEbYUAS3YCBFhuHzZ8eC6ntfFaj6zvlAONQvCinJt+A/T8uZcPV3kNG4IcjxNMcr
+         l3jBLP7yeu8aU2braeQaYZxZVfoZ+rnLnZmSUgL+ypsB4+6vZ5Q8LEWrmi066lKLYE0v
+         OlzubIEzv4sLexkTXmNlXW+SETgBr9n3VBQLSDaZC0tWF5DPjreMUCIDfT2a0xyE4RsG
+         ocPWF6ujEohKCwpqG4BvROpqtYw+qv0s+6CV5Ioho/Qqf08rTXkQDPqNq+22wwWIgzXR
+         Zk6A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1782804512; x=1783409312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1hTUJ3hTjCt2yXulZuZv+e76jNuquuhLumAKkPqjpPY=;
+        b=MuKy0YhCCFb8cSNnTjZ8V3Kgo3nl6s9tbEUhoZjb/UYRhWQCuqvbYN624xN9DdNTBr
+         2OufUModUUMXv67fLbj8gU9iRXOLN0uEZdgVLVHlO29vpvakbu7RaQ5tWCs/mvB22K2E
+         pIqewZVmI4Rmuygd3O2nn8byOEZfs72uo5E2lAX6D0tXj8nuKfBYITLpXdmy8UWTF4AY
+         bFMpYBFk+0Z67575U9/M+VZopyGB86PSYVna5qG2Mc45Ll1asF8TZhNJEPxCnWV5f1m/
+         +4XrOqOLArRXEDOHmh8KEYHJH253Uol2G8K++IX5rzBOye+Sh/2D2tD29cyYsOJ2fmae
+         to3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782804512; x=1783409312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1hTUJ3hTjCt2yXulZuZv+e76jNuquuhLumAKkPqjpPY=;
+        b=ULsKztMRBlyMAsnSfrAK8irVKy6cEfnT6GX3ofMOJYL3gZJnbePJC2wtgTZGabMdVt
+         PLvtWHLn244hp73H81r6lH7/6JOOvS1Vazt9ygQTqPwflQ9tFlZIEwHBuoHIBPMqhWv5
+         PGTOhwXZry7Qze8LfOHke6+f0VJcOxiHJ/83XGFHexMICkDxAiA84oUhmaDdEu8DIyuw
+         N50gxhw221G/0THzAU8XfmiyYtH2HmKZS+KVIfj4PhDovjLFSsjElZQtXWJGm1eJ4YSJ
+         7rJMVLV+A6AtxqI7umuOaDlsVgImwLSnVGH6X95vwjAmbOx/wPmNhaB14fkV5Yb33Fbd
+         vLgQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqDwxu8aFuuTt6DIhenf8RLyKVaZwbRIkPgBNkWy8I+EfpjKIx5Zpsy1QHBFYy1OsWYeA0jlKw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4UYGemb+L/wAS6mJI/OBFeWUd/dz9DrajBZvxV7e287O7Gy2F
+	G6VFHdlGnVDVh6e6me5WZaZwmkjGXUCV7K+FRy0XY4CSshmuejXNho21UzdbFrFbzZtSy1iLdHA
+	bS9YrXXbG2OVwgjzhhf0aTiOsIulQlxFfFZRCx1YuUiK5hHjTN5ecdlWo0B7sF3RHGbHPhKVS17
+	GNOhMttLsYP9HCQVOMQPKQB7mnWWhHPL0l
+X-Gm-Gg: AfdE7cmJQIhE9HILG1kToQJEoHzM/+qHSZkpPCbh82WjwaCL9vRRrVNxZTlzZ/nKlDQ
+	TR3DquI+nDjXevbWmbgXNnB2MoyQWGPKud/hA1miaS9ASfIeYnJirsCUkYhLhpa4RfLjNOzck96
+	cjiiLQtaQMXslfsoW1VrWUf0vlA3o80x+GWOX68PkbqEFAv8PqjT+9L3ROIOUB06fWXVg=
+X-Received: by 2002:a05:6000:40da:b0:46d:d6e0:9cc4 with SMTP id ffacd0b85a97d-47553d96e98mr3142197f8f.46.1782804512188;
+        Tue, 30 Jun 2026 00:28:32 -0700 (PDT)
+X-Received: by 2002:a05:6000:40da:b0:46d:d6e0:9cc4 with SMTP id
+ ffacd0b85a97d-47553d96e98mr3142160f8f.46.1782804511792; Tue, 30 Jun 2026
+ 00:28:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|DUZPR04MB9918:EE_
-X-MS-Office365-Filtering-Correlation-Id: 003567c8-053d-4759-4cf2-08ded67c2fe1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|23010399003|376014|19092799006|1800799024|366016|921020|22082099003|18002099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	nGN/ZmFzd8noCPaRjRP0ngr5fHdGttfEcRLktAzddnS3QTBkcrx78+pag509qfJTi1CQRaxmhEpkaXA5xfZBVvMf6ZrVdgcEuzw8jL4Glq4aNz7kBdXjgGxoOSDOiZ9IPt55gMf3DCzXH4EN5+JYEygNDjoh4eDkZApNgQSxwgarJP7zzaU4DAODQWwGBIlOU0WezL9zc3EUjYohTNzYNASORxi0JgIJyWwy0+aEY66pIXHr9wqdBuvub/CsE/YlBtkwXxj1X5gSO7XXEjlpKn8ib9LDk7u1blSJl7aWTq5x/xu+vEb7U63+jFA6X7i54kp3cmWHmYjaO/If9kHZqnSoAIvTbdRkBAP+7+r/lr4wDaFNXun+2pcLhG8gSPKHjnpbAdsSFpMqqvW4N4dMBAIu4pqz40NDjVNvLyHjVSX0esSD+rKAnYT1Jp3q32sJJpcFbGTulhbr9MVMvUZJRmKJPeMRgzBUs320/EIvAXr/1/vVZ60ESHyJz2RTVq6BSmgueEMCq1kw8+p2u7lcsPVPxZeRxpCct1OhtgpgLvwhG+rinrGA3wW5oG+pJERT/9llbHfEO07peZlbqPqDhxJ7yd71GcZrN6NuzAxtQ+Jn8sr+Z+u1iSImPOAfYVN45fnSWopwAuKAZiyBU2wYNE2ZbTYJ+93hYy0KL874S2DFf8Gg+3ijxHSt+7/ZTO/4Vo8L+JhTuOZvVehn6LXqGQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(376014)(19092799006)(1800799024)(366016)(921020)(22082099003)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?yahuWumKpUJSe2TY/Fp914e1k49u6AGktApLBR8yo82HKDFECJq5HXnNxpxi?=
- =?us-ascii?Q?GX5Z4ciZPCoZ6+HBNfnJCRRRkUfs1nuqX2D1IafNknHa4OxgJZ5YI7/DwIbh?=
- =?us-ascii?Q?eSJ9bYdyBHkKtnbg6P0gXPNMKvl1kvJ3Vr7uWZ77PwOddxZFR9sXb2oTO9AB?=
- =?us-ascii?Q?8fP6K2CoQ9996nW28Hu/xE84g+KVwP4WjKoX+U+ZfiKXu/eRJQiL9G771Rac?=
- =?us-ascii?Q?Qi28SE7YrqzUemP6uCK929m8dxF2CjFi0Vh6BjcAmDvXNXPCKqIngZmMNsR6?=
- =?us-ascii?Q?tS4/WVnlRRrOZxePkCMolwxiBA6nHYrOBWbn3WG7naKRx+bVWziLsKDicezN?=
- =?us-ascii?Q?iLi6kKzaXUY/1gOHiw4WLD5Clv2dHIPF+XDdQCLgXpdJVo8YmMKHigaczCd0?=
- =?us-ascii?Q?l9K5l61tTaUv1KQmu8T6rsUMXpTPYwmtWeMjxC2rAws+j2VOAzUGaV3U2t1h?=
- =?us-ascii?Q?be4FN8zVEj+9IPASvDdOihz9sRgSRJ1dkVxxgu5Pvem1OVX426oZJEcv9Knu?=
- =?us-ascii?Q?wZYPFl1eo9VQ9Bw4xfUqJTSCYRocjYUaPhPPGJO0TzSvDJWlNGhIhX7Su+i2?=
- =?us-ascii?Q?H+4wLoxvb764PzPbCuyml3xlC8UHylEqcjJ4yGb9rTHH2dK2GYgfpPvQrF6h?=
- =?us-ascii?Q?6s6ZRs/lgyBjr8Hgag/dr77YgcG7pkQTwei13ohO66fcy67llTuLzuMnN9RJ?=
- =?us-ascii?Q?lGqEW7Zqshk33B3NfxlL/Ah4NaL9y7Qh9ePST2A/B++TaVXUfgQvEIwetygj?=
- =?us-ascii?Q?wOnDhGPo45m4HP35L6BcOzRthdnbiDCKw9k+Th6T947QLyNQ+hNjnMupkdoX?=
- =?us-ascii?Q?+4YljG5bzkNf0qqoxqaGpxzHIfrvGFdhNrBJGE+SRin4icrV0+p1jcCsashB?=
- =?us-ascii?Q?iGKBmtl43up8s/hUB5TqsVT/lfFiQmxz+nzzN27CfdyXyuOde9N32cJr+06d?=
- =?us-ascii?Q?4kGQh9Q511PJMK5yRJyVaP5mgqCtJaRrh7OawRwjFelVUom63vDVaZNdYdIS?=
- =?us-ascii?Q?SFeKt1qd/g8bv6DtP1WBFC3Ugr+muj8JiaDtinjqh+MHl6RnnYGEq0QFbOCX?=
- =?us-ascii?Q?+rkKI+5iByRShD41DyGw1VwLotB9mnMdiauXep3xAxmKLQi0WJGtIvjyMeTQ?=
- =?us-ascii?Q?ML4M641HVYIIlQYLDBjV3KBc5jLhz81MlSCurL4X2mJG0CNs8EE7jTnySP17?=
- =?us-ascii?Q?sFTlGornZU7kPbkFU8xE7NG/GY2mDrKrFqBhAaS+SpweQcqCCtfj1uhvRTQV?=
- =?us-ascii?Q?aaTyC9gloasBjrZe53KjQnl5DtRYb8AxXPRUK7O2uWexMrL+OccQ8XiEZAxd?=
- =?us-ascii?Q?KH7TKuWLuQycZ9JfL3YYfzUJ661oWsc5hzbmwZZeuHgYHJBL9Sfi0hO9Mr9o?=
- =?us-ascii?Q?oUecXvUSRRRsKNg3NFPjqNAprsKcDqM+m1XrCyc0M+zPuRmaiWA4VhCKljM6?=
- =?us-ascii?Q?CmxMixsGS+1DZMfu4p4Reci4onCsXz0yIneaujm/xN9BzCfNy49hS8Lv6oeK?=
- =?us-ascii?Q?DMg7mRciZdjCizS/ioaatwXS4yJk1nUy4A9MPD8mjSclcozwJRyWSnzWLRPI?=
- =?us-ascii?Q?z8m6jGI5M/9WghMjFzjD1m+mZMKKjTHz1Bd5XKbEZ+XAvdhm4TRvWpqy+1R9?=
- =?us-ascii?Q?/fGucIW1WEItpjJiMATrHIZvPHeCfVP8uHCWnPBKc54hgG+MDoO1dosjJ6SI?=
- =?us-ascii?Q?D1tPmpL+2Ndf3lFUeWx3wDuplL673nBgHViJn7mTYo1sUeMIIYiwUug/HF5p?=
- =?us-ascii?Q?5LKSBMCPtOVAHjfnJs6HZLRdL/z6TIN8+yFp4bodlHQaTFIvx1Jg?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 003567c8-053d-4759-4cf2-08ded67c2fe1
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 07:50:00.2568
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r4L4cq04jC4uZy9hFCPPlkP3QYIntqAylZ6CVUW/k8KNHVFql3GZrdI5MWIWSMgjtgsGjdsks7Wiu4tCBxwCl5ElKIQNykJ2nJuhUcfbeELlzuZZLjXnH8ZCCubglVLt
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9918
+References: <20260630001432.2204298-1-kuba@kernel.org> <20260630001432.2204298-2-kuba@kernel.org>
+In-Reply-To: <20260630001432.2204298-2-kuba@kernel.org>
+From: Jan Stancek <jstancek@redhat.com>
+Date: Tue, 30 Jun 2026 09:28:15 +0200
+X-Gm-Features: AVVi8CezvGUJJ6tK2r8Ed3axYsHeG8WJZoxmVVLjU0XdqUzoRNnMhue2yMZrwkM
+Message-ID: <CAASaF6yKwyfDRzXoi8pXk=976kC3zxfNVuh7MwOFJQOHv866fQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tools: ynl: pyynl: re-export the library API
+ from the package root
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	donald.hunter@gmail.com, sdf@fomichev.me, gal@nvidia.com, ast@fiberby.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [3.44 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303028-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,fomichev.me,nvidia.com,fiberby.net];
+	TAGGED_FROM(0.00)[bounces-303009-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[jstancek@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:donald.hunter@gmail.com,m:sdf@fomichev.me,m:gal@nvidia.com,m:ast@fiberby.net,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:claudiu.manoil@nxp.com,m:vladimir.oltean@nxp.com,m:xiaoning.wang@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:wei.fang@nxp.com,m:chleroy@kernel.org,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jstancek@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,NXP1.onmicrosoft.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oss.nxp.com:mid,oss.nxp.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 542096E17B3
+X-Rspamd-Queue-Id: 3BD756E1293
 
-From: Wei Fang <wei.fang@nxp.com>
+On Tue, Jun 30, 2026 at 2:20=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> The public classes live in pyynl.lib, so users had to spell out
+>
+>   from pyynl.lib import YnlFamily
+>
+> which I forget at least once a month. Re-export lib's API from
+> the package __init__ so that
+>
+>   from pyynl import YnlFamily
+>
+> works as well. I don't think there was a real reason not to do
+> this?
 
-Replace the open-coded struct_size() + kzalloc() pattern with the
-kzalloc_flex() helper when allocating struct enetc_psfp_gate. This
-removes the intermediate entries_size local variable and makes the
-allocation site more concise.
+I think it was more uncertainty on my part whether in future we get
+more subdirectories.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc_qos.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Acked-by: Jan Stancek <jstancek@redhat.com>
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_qos.c b/drivers/net/ethernet/freescale/enetc/enetc_qos.c
-index 7b17bca24f26..2aa0fcaafcd2 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_qos.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_qos.c
-@@ -1135,7 +1135,6 @@ static int enetc_psfp_parse_clsflower(struct enetc_ndev_priv *priv,
- 	struct flow_action_entry *entry;
- 	struct action_gate_entry *e;
- 	u8 sfi_overwrite = 0;
--	int entries_size;
- 	int i, err;
- 
- 	if (f->common.chain_index >= priv->psfp_cap.max_streamid) {
-@@ -1242,8 +1241,7 @@ static int enetc_psfp_parse_clsflower(struct enetc_ndev_priv *priv,
- 		goto free_filter;
- 	}
- 
--	entries_size = struct_size(sgi, entries, entryg->gate.num_entries);
--	sgi = kzalloc(entries_size, GFP_KERNEL);
-+	sgi = kzalloc_flex(*sgi, entries, entryg->gate.num_entries);
- 	if (!sgi) {
- 		err = -ENOMEM;
- 		goto free_filter;
--- 
-2.34.1
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/net/ynl/pyynl/__init__.py | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/tools/net/ynl/pyynl/__init__.py b/tools/net/ynl/pyynl/__init=
+__.py
+> index e69de29bb2d1..d8f59c132ab7 100644
+> --- a/tools/net/ynl/pyynl/__init__.py
+> +++ b/tools/net/ynl/pyynl/__init__.py
+> @@ -0,0 +1,9 @@
+> +# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+> +
+> +""" Python YNL (YAML Netlink) library. """
+> +
+> +# Re-export the public library API so it can be imported straight from t=
+he
+> +# package, e.g. `from pyynl import YnlFamily`.
+> +# pylint: disable=3Dwildcard-import,unused-wildcard-import
+> +from .lib import *
+> +from .lib import __all__
+> --
+> 2.54.0
+>
 
 
