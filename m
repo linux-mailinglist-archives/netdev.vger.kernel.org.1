@@ -1,49 +1,51 @@
-Return-Path: <netdev+bounces-303194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303193-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KVTLDv/JQ2oEiAoAu9opvQ
-	(envelope-from <netdev+bounces-303194-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:51:59 +0200
+	id nxgZKvrJQ2oBiAoAu9opvQ
+	(envelope-from <netdev+bounces-303193-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:51:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975216E50FA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:51:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D81E96E50F7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:51:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=wYd2D1cD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303194-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303194-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=simonwunderlich.de header.s=09092022 header.b=gSGup5cP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303193-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303193-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=simonwunderlich.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEF4730D6527
+	by sea.lore.kernel.org (Postfix) with ESMTP id C9FE4309F07A
 	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F42E368D5F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABE5296BD2;
 	Tue, 30 Jun 2026 13:50:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E323736655D
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 13:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3090366052;
+	Tue, 30 Jun 2026 13:50:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782827414; cv=none; b=e6j8U/2aQFR1FMbQ47HJMpguHIanzc3GaYD6LiqnKoG9qtM5CHxFX8YkFxZxUMMvC+DNbccJ3wn1SF3vay1cdbrpb/66l1IP+hx2QZscAvh0gak7+mz9T+mWVj9Qizjw2M1P5JVAIBA8s5wrUy/c1+XDCa48TAhdgpx9iBeluHo=
+	t=1782827414; cv=none; b=AM7Lg9MftamFpsvOiDHrqImlrSBsTt8m4UW0ocWzR0BDmhUyC4BzTqvCjW3yc2LtK9DQOWAURbrkgfxZBs0xp9Y9WSigICLs8X5ftR0EjllYspYB4XIM97st/higI3nHDtiy+PiPKd6mHwldh8H98+9pcYMNl7P/39olm5ofgnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782827414; c=relaxed/simple;
-	bh=OY/WLvSMj3uNnrwh7DqXkFCXLCQIr8dCX1FF87BNPvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NiVwsDT5yHpPkzy8xpblMMjVxXf32PWDcVSnstbbKQUeEvDRuLo8M7cgkOIZIuqWPGJqzHfgDwcnVK2aYmO0ymKHzVl3meuQMkNHS+vEI0RHflVFK5Sim+jD7dL1rFtlG1hkWmEqnP1BSGq7q6Wk9YWirJCk8EKXfbzyMvo1VCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=wYd2D1cD; arc=none smtp.client-ip=23.88.38.48
+	bh=0waat0bcc64myjOjt1ucKwriB7oQE5aosJTDY2Mu3n4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WV0xjiFR4JAW1q2o+zewMIpVzbGhR9HfCNroLhIxSmyiW81pQNOl7HCK/Y6lxXIoBDTx5CwBRZlEHmyU/FsrDvWEUOHCNIPLDpoyPJA91yT6ALxq3d+vaoQFZTJJfjFD5h6c8boCL+hzfpAf6XCpJ9rIieptZpTHSg4YivePQZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; dkim=pass (2048-bit key) header.d=simonwunderlich.de header.i=@simonwunderlich.de header.b=gSGup5cP; arc=none smtp.client-ip=23.88.38.48
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
-	s=09092022; t=1782827071;
+	s=09092022; t=1782827072;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=chPXv7++l38ngSLvkWCokAnOz0yB1awOLYQnYMHr4js=;
-	b=wYd2D1cDDBHMXhRtV125IjhreNgzEkma9b8QF9y8aERTZX18kz/zd99boU6xPGFX5VjHFX
-	J2kBaipvq1qLTOtXh7ch2IuHp8yBKlAhpKOE1L2F3C59vCiSSrC6+CnhmuEjwi0lpubU9Y
-	uCNbOAzh6ciOGVR3SQY1Suam1jN4Xban/kExSjtjz/l03vvuj6iysv5SV+7ClNPdgmVxdk
-	Z0fVPP8pJpdC3GE2IiBy0MIJ2s3ZwQVzZwfeE/CKkysViE2evhxyB0cNwWQ+RcnglBS9wU
-	/RARVCvmu9RtgpmPw8AgpPG4r83ZH7Hav1ny8pOBAq/d2l3qX3cNjX6ngllsRw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SOjchQvhacxvYrMble3BHRhvtECYrwp0WDh1TmLB26c=;
+	b=gSGup5cPIGZra0Xv5mvac2TW7IAkfBMTTDmKokVrMFVTdIcQX4RTZQB4da1DRBJk69tbNw
+	OmXD0uvyEiF3ZcmlgHScJd8qtLwGlnTk+R4JgIrJ3GNybfVJKxBVedtauHfaMAA+aXFcGC
+	iF+MzJyAZm4oq9VyYtAcv/PgWiUhnCUdZhlNN86N6c9ZLH/QBMUicyeRpqa+GxMlTPdIV4
+	Bo9fc1Fp3QYFkUKi8WpRu522oW3xrXHb2TrHreFhdcwwzVqcmwEj4TrTpfyaU4xKX+9WqV
+	XGj59EcKqkbDY/b3aZxRO2q19+2j7DTTD869zlUBGfj2NI9Kl49bcBvF3mNxhw==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -52,11 +54,16 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	b.a.t.m.a.n@lists.open-mesh.org,
+	Sven Eckelmann <sven@narfation.org>,
+	stable@vger.kernel.org,
+	Sashiko <sashiko-bot@kernel.org>,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 0/6] pull request: batman-adv 2026-06-30
-Date: Tue, 30 Jun 2026 15:44:24 +0200
-Message-ID: <20260630134430.85786-1-sw@simonwunderlich.de>
+Subject: [PATCH net 1/6] batman-adv: retrieve ethhdr after potential skb realloc on RX
+Date: Tue, 30 Jun 2026 15:44:25 +0200
+Message-ID: <20260630134430.85786-2-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260630134430.85786-1-sw@simonwunderlich.de>
+References: <20260630134430.85786-1-sw@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,10 +83,10 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303194-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-303193-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sven@narfation.org,m:stable@vger.kernel.org,m:sashiko-bot@kernel.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:b.a.t.m.a.n@lists.open-mesh.org,m:sw@simonwunderlich.de,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[sw@simonwunderlich.de,netdev@vger.kernel.org];
@@ -92,54 +99,45 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[simonwunderlich.de:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,simonwunderlich.de:dkim,simonwunderlich.de:mid,simonwunderlich.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,open-mesh.org:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,simonwunderlich.de:dkim,simonwunderlich.de:email,simonwunderlich.de:mid,simonwunderlich.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,narfation.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 975216E50FA
+X-Rspamd-Queue-Id: D81E96E50F7
 
-Dear net maintainers,
+From: Sven Eckelmann <sven@narfation.org>
 
-here are a couple of bugfixes for batman-adv which we would like to have integrated into net.
+pskb_may_pull() in batadv_interface_rx() could reallocate the buffer behind
+the skb. Variables which were pointing to the old buffer need to be
+reassigned to avoid an use-after-free.
 
-Please pull or let me know of any problem!
+This was done correctly for the VLAN header but missed for the ethernet
+header which is later used for the TT and AP isolation handling.
 
-Thank you,
-      Simon
+Cc: stable@vger.kernel.org
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
+Fixes: c78296665c3d ("batman-adv: Check skb size before using encapsulated ETH+VLAN header")
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+---
+ net/batman-adv/mesh-interface.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The following changes since commit 805185b7c7a1069e407b6f7b3bc98e44d415f484:
+diff --git a/net/batman-adv/mesh-interface.c b/net/batman-adv/mesh-interface.c
+index 44026810b99ce..511f70e0706a7 100644
+--- a/net/batman-adv/mesh-interface.c
++++ b/net/batman-adv/mesh-interface.c
+@@ -434,6 +434,7 @@ void batadv_interface_rx(struct net_device *mesh_iface,
+ 		if (!pskb_may_pull(skb, VLAN_ETH_HLEN))
+ 			goto dropped;
+ 
++		ethhdr = eth_hdr(skb);
+ 		vhdr = skb_vlan_eth_hdr(skb);
+ 
+ 		/* drop batman-in-batman packets to prevent loops */
+-- 
+2.47.3
 
-  Merge tag 'net-7.2-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-06-25 12:25:36 -0700)
-
-are available in the Git repository at:
-
-  https://git.open-mesh.org/batadv.git tags/batadv-net-pullrequest-20260630
-
-for you to fetch changes up to 26560c4a03dc4d607331600c187f59ab2df5f341:
-
-  batman-adv: dat: ensure accessible eth_hdr proto field (2026-06-28 11:49:04 +0200)
-
-----------------------------------------------------------------
-Here are some batman-adv bugfix, all by Sven Eckelmann:
-
- - fix pointers after potential skb reallocs (5 patches)
-
- - dat: ensure accessible eth_hdr proto field
-
-----------------------------------------------------------------
-Sven Eckelmann (6):
-      batman-adv: retrieve ethhdr after potential skb realloc on RX
-      batman-adv: access unicast_ttvn skb->data only after skb realloc
-      batman-adv: gw: acquire ethernet header only after skb realloc
-      batman-adv: dat: acquire ARP hw source only after skb realloc
-      batman-adv: bla: reacquire gw address after skb realloc
-      batman-adv: dat: ensure accessible eth_hdr proto field
-
- net/batman-adv/distributed-arp-table.c | 28 +++++++++++++++++++++++++++-
- net/batman-adv/gateway_client.c        |  3 ++-
- net/batman-adv/main.c                  |  3 +++
- net/batman-adv/mesh-interface.c        |  1 +
- net/batman-adv/routing.c               |  3 ++-
- 5 files changed, 35 insertions(+), 3 deletions(-)
 
