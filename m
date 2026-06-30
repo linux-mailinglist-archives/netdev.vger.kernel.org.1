@@ -1,366 +1,225 @@
-Return-Path: <netdev+bounces-302978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RnXzKlpcQ2oXXQoAu9opvQ
-	(envelope-from <netdev+bounces-302978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:04:10 +0200
+	id +Oe5GGhgQ2pkXgoAu9opvQ
+	(envelope-from <netdev+bounces-302979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:21:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A26676E0913
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:04:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFFAE6E0B32
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:21:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=windriver.com header.s=PPS06212021 header.b=ToljrfLg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302978-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-302978-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=windriver.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Vw6R5LKp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302979-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302979-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A5556300B538
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:03:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C2E93029AED
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEAF29A9FE;
-	Tue, 30 Jun 2026 06:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793EB3E2ACC;
+	Tue, 30 Jun 2026 06:19:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87002325491;
-	Tue, 30 Jun 2026 06:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1AC396588;
+	Tue, 30 Jun 2026 06:19:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782799431; cv=none; b=Qqt6q2SX63HBri4UARisqOp/5mmMHMEAQIcFLosKazBq52Je0RB/rqg0ojGoXxc3cjrJCC3OZPCfDWWM/wIe1q90l/pVfBpwTpKVHhNuH6UbvTfeh0rv7ArI6Y1h5Ib27f446LcIBAm+pBbwC34xwccF6LA8QIKj8aiz72VV57U=
+	t=1782800353; cv=none; b=aEA9DR5ex+AHsnNNyCoYAcuRjq5iD+ILjq1kOMwg4PTp5K64LMmL8Lhg19Qs6AciQ+b+usBkuuXTB/2L52zfNUiv2OLKM1Htj+RitiNA83nGT4LLphAArXCtdKvim4lrAOjJMyUPtObtiUVU5tGjpDjAC3m2Wy977fJYnodfwC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782799431; c=relaxed/simple;
-	bh=Qimp2i4uAqaTa85hotHc2wuYOBeOfP1LoES2EjGOHzE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CO+orVEkcDEQP5Bl75DpkjbEmT6Qb/yg++DyP7b/XXcJEupiXOIsGnWUu1VR7cEmZ4aQ9Ir1fbB0DNz+KTNy9DfTNDJxSEBs8nBNBycsfzQyyDgr4vaGAC1s3Znc42aP573ciAzW0OD+VLVrhnCd0LfNN+HKonsHjuZCEUOEnS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=ToljrfLg; arc=none smtp.client-ip=205.220.166.238
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U5ghHE338419;
-	Mon, 29 Jun 2026 23:03:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:message-id:mime-version:subject:to; s=PPS06212021; bh=oEJHvixGy
-	3TiSGx8/Vgl6aY/23h640aaxfycDEpLw3Y=; b=ToljrfLgiOlIPMwhUy6di3qXD
-	EuUraBdqVMCEE5wqCYlST3cF/wHJUI8brwfZEfnQTeJ5GRKfiZPM9D2OMu9MoFJY
-	BrZyXAA8XWk7Z43hV1v+/n0fBEDgheG5cuAzyc7ukRqnBxpKLHXpJljYacv3pCgf
-	U3egRytQmMrPjDu9HLyDiMZWpdq6fH9hoiIx1qDqtHoxHfUH13Ut4YidBEeIwhWN
-	gSS6vJePdA/hESR290w4hMDDZDqzTiGnLq8QXxJhjMSC3Pt2M6FUqkp48vn3+KdX
-	mplvGDnnI6GzDlPQg3tm2rpeqyIL/CjrnbOaACljVWz7qBOVpMczOlcxiP5ow==
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [128.224.246.37])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4f2e1gu72t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 29 Jun 2026 23:03:15 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Mon, 29 Jun 2026 23:03:14 -0700
-Received: from pek-yzhou-d3.wrs.com (10.11.232.110) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
- 15.1.2507.61 via Frontend Transport; Mon, 29 Jun 2026 23:03:12 -0700
-From: Yun Zhou <yun.zhou@windriver.com>
-To: <marcin.s.wojtas@gmail.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yun.zhou@windriver.com>
-Subject: [PATCH v6] net: mvneta_bm: add suspend/resume support to prevent crash after resume
-Date: Tue, 30 Jun 2026 14:03:11 +0800
-Message-ID: <20260630060311.4072140-1-yun.zhou@windriver.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782800353; c=relaxed/simple;
+	bh=AqDsct3vg4EkmYvjIthGbbEt5EqA+5w5suFL1b5gJpY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b8A2/TtxHAH7dsdDl1Ns1S3YqDapFeNaceuToVvGpf60Olq/fWY877wUj5UUHbTkXl9RXyTQmEsHEQ6qTzdgq7+9L06mkOtI3XpjTxExWQtLLiyYJ73RoUczMCDVOyZtkpjYMeZ5gkC/WCRPfXVCXmHwWYkJZAxJlQuAESHsxC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vw6R5LKp; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA4571F000E9;
+	Tue, 30 Jun 2026 06:19:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782800352;
+	bh=qMiG0Alun6q3tS0Lfxy2DZB8LH3E6RU8IaYzZ98kJPE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Vw6R5LKpATzPgLliEKZ19Q0EtU7HZ8sYgi1WTs+y/db48PlO5fs4EtFmRoRoxbFVm
+	 XYZi81/r7Ii13cvqVFEfXFWSpC3mCeCSpOsYsnr5+NX+7Gt8+ncMroeu85FUkVjfs6
+	 tq/bejYQIVxnmrQQvn9nPp8OBObmN3as+2VQ7desYE3KQEqyyGYPCnHxhFu5Ed3dDk
+	 L98PTPEtODX/IIBBxTmniLus/0z6YSCd1lXegOi0UBabLOa1Q1TE4ucLX7eYrME11a
+	 +E9t1LvZsKXCWVFvKnSgnhyZIPj69IOM49bxhxpqVopnnl6tP97fSjgijBTLWuVCB+
+	 pE8pbibs5Yr4w==
+Message-ID: <976ad3b4-ada5-4fc0-8fba-97eb172ede91@kernel.org>
+Date: Tue, 30 Jun 2026 08:18:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: WnJXZ1vj9tZy3lEV2LHq0k2eG9ZOTco6
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDA0OCBTYWx0ZWRfX81Yn1MfpzoYe
- IQeoOpmO9PTWFcQ9UTnSmJ/NXUHHkOLLrlJtwK968TDD2LAklplaZha5p7YuAZOxlwkxWElBK2+
- JxibWULxW04hYYj1PEFwj5iXABfs/YGxuWcTyIVazlkXf4qut61f
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDA0OCBTYWx0ZWRfXxwNnzd/Zb0nu
- 35miitvpwkLbbKax4Glp2sO/n+pAT2cW/KzflgyMMWCznMfQT76eUtQQv0tMnYYP23CSU62RNDp
- pQ2R07ju7H9bgR4jt+vDBol40qENJxEL61drHGCvcXkY/iYdibpKmdYA/HsX2bQJNYeVTGbhOMf
- 4DY9H47vtMMl/p6feiE2mxFA2LN64lMBpU9Lk27Y4CPpbbYnmk3FWh1WKymLjR+S7MBoEBA98K5
- xYL8TblHMJyZKXijwWYOOwCdIDzPMfym0eguP4tvVEZJF8Bo0zCdKKl00wNsSyiRG03tmekWFk1
- SCsBWhZ3Z5406s+b1n2RkdsLdRgrdWV9aPuESbNcvEPuKw5eHq1HQ0op7H7CPccs+KQn5tpK3e5
- F/HTdsxxNLzj8sZTwnjTGt3ZvuLEAaBXV26b6ZVIMoc0F9Fg605C7hgEHZ4TfCyDYvJMq4sfhcb
- J6rMfxUdcAr/5h6g7FA==
-X-Proofpoint-GUID: WnJXZ1vj9tZy3lEV2LHq0k2eG9ZOTco6
-X-Authority-Analysis: v=2.4 cv=GsByPE1C c=1 sm=1 tr=0 ts=6a435c23 cx=c_pps
- a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=bi6dqmuHe4P4UrxVR6um:22
- a=iKiJcTA2PjBS6x5JeXcw:22 a=t7CeM3EgAAAA:8 a=llSl7IMiYTbgZXsqiVMA:9
- a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_02,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0
- spamscore=0 malwarescore=0 priorityscore=1501 impostorscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606300048
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/6] dt-bindings: net: bluetooth: Document Qualcomm
+ IPQ5018 Bluetooth controller
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ George Moussalem <george.moussalem@outlook.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Johannes Berg
+ <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>,
+ Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan
+ <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath10k@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org
+References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
+ <20260625-ipq5018-bluetooth-v1-4-d999be0e04f7@outlook.com>
+ <20260626-discerning-light-swan-6b599c@quoll>
+ <SN7PR19MB673692EBED649CF6DC9833A89DEB2@SN7PR19MB6736.namprd19.prod.outlook.com>
+ <0e0fb3af-968f-46d2-be6c-18b76c7d2a1a@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <0e0fb3af-968f-46d2-be6c-18b76c7d2a1a@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[windriver.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[windriver.com:s=PPS06212021];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302978-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yun.zhou@windriver.com,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[windriver.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,windriver.com:dkim,windriver.com:email,windriver.com:mid,windriver.com:from_mime];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:george.moussalem@outlook.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@
+ gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,outlook.com];
+	TAGGED_FROM(0.00)[bounces-302979-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de,vger.kernel.org,lists.infradead.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,outlook.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A26676E0913
+X-Rspamd-Queue-Id: EFFAE6E0B32
 
-The mvneta driver uses the hardware Buffer Manager (BM) for RX buffer
-allocation. During suspend, mvneta disables its clock, causing BM to
-lose all buffer address state. On resume, mvneta_bm_port_init() re-
-attaches the BM pool to the NIC, but BM hardware returns stale/garbage
-buffer addresses. When NAPI poll processes these buffers, DMA cache
-sync hits an invalid virtual address causing a kernel panic:
+On 26/06/2026 13:30, Konrad Dybcio wrote:
+> On 6/26/26 1:20 PM, George Moussalem wrote:
+>> On 6/26/26 14:53, Krzysztof Kozlowski wrote:
+>>> On Thu, Jun 25, 2026 at 06:10:08PM +0400, George Moussalem wrote:
+>>>> Document the Qualcomm IPQ5018 Bluetooth controller.
+>>>>
+>>>> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+>>>> ---
+> 
+> [...]
+> 
+>>>> +      compatible = "qcom,ipq5018-bt";
+>>>> +
+>>>> +      qcom,ipc = <&apcs_glb 8 23>;
+>>>> +      interrupts = <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>;
+>>>
+>>> No firmware to load?
+>>
+>> firmware is loaded by the remoteproc in patch 1
+>>
+>>>
+>>> It feels like remoteproc node split is fake. The property qcom,rproc is
+>>> even more supporting that case. Shouldn't this be simply one device -
+>>> bluetooth? What sort of two devices do you have exactly? How can I
+>>> identify them in the hardware?
+>>
+>> I wasn't sure how to represent the HW. Should I make this bluetooth node
+>> a childnode of the rproc? Essentially, this is the transport layer
+>> (using shared memory space and IPC/interrupt).
+>>
+>> Most QCA BT controllers are also childnodes of a serdev/uart node as
+>> they use serdev for transport.
+>>
+>> From what I understand, it's simply BT firmware running on this
+>> dedicated M0 core in the SoC itself connected to an RF.
+> 
+> Seems like this rhymes with the WPSS remoteproc +ATH1xK_AHB situation
+> - the Q6 core power sequences and manages the wireless controller,
+> while Linux gets to drive the device as it would if it were connected
+> over PCIe/ UART respectively, just with MMIO writes instead.
 
- Unable to handle kernel paging request at virtual address b0000080
- PC is at v7_dma_inv_range
- Call trace:
-  v7_dma_inv_range from arch_sync_dma_for_cpu+0x94/0x158
-  arch_sync_dma_for_cpu from __dma_sync_single_for_cpu+0xc4/0x15c
-  __dma_sync_single_for_cpu from mvneta_rx_swbm+0x6c8/0xf48
-  mvneta_rx_swbm from mvneta_poll+0x6fc/0x70c
-  mvneta_poll from __napi_poll.constprop.0+0x2c/0x1e0
-  __napi_poll.constprop.0 from net_rx_action+0x160/0x2c4
-  net_rx_action from handle_softirqs+0xd8/0x2b8
-  handle_softirqs from run_ksoftirqd+0x30/0x94
-  run_ksoftirqd from smpboot_thread_fn+0x100/0x204
-  smpboot_thread_fn from kthread+0xf4/0x110
-  kthread from ret_from_fork+0x14/0x28
+But the ATH (except the MMIO for remoteproc bringup) are physically
+connected over other bus, like PCIe and UART.
 
-Fix by adding suspend/resume callbacks to the BM driver:
+What is here?
 
-- suspend: drain all buffers (with DMA unmapping), free the BPPE
-  regions, and reset pool state to FREE before stopping BM and gating
-  the clock.
-
-- resume: enable the clock, reinitialize BM defaults, and restore pool
-  read/write pointers and size registers. Pool allocation and buffer
-  refill are handled by mvneta_resume() through the normal
-  mvneta_bm_port_init() path, which sees pools as FREE and performs
-  full initialization identical to probe.
-
-Add a device_link (DL_FLAG_AUTOREMOVE_CONSUMER) in mvneta_probe to
-guarantee BM resumes before mvneta and suspends after mvneta. If the
-link cannot be created, fall back to SW buffer management to avoid a
-potential crash on resume due to unordered PM transitions.
-
-Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
----
-v6:
-  - Add mutex_destroy() before setting type = FREE in suspend, pairing
-    with mutex_init() in mvneta_bm_pool_use() on resume. This avoids
-    re-initializing an active lockdep class.
-  - NULL-out bm_pool->virt_addr in mvneta_bm_pool_create() error paths
-    to fix a pre-existing dangling pointer that could cause double-free
-    in suspend.
-
-v5:
-  - Call mvneta_bm_pool_disable() per pool before dma_free_coherent()
-    in suspend, matching mvneta_bm_pool_destroy() ordering. This also
-    ensures ENABLE_MASK is cleared before BM START on resume.
-  - Guard dma_free_coherent() with if (bm_pool->virt_addr) to defend
-    against a partially-failed mvneta_bm_pool_create() leaving a stale
-    pointer.
-
-v4:
-  - On device_link_add() failure, fall back to SW buffer management
-    (destroy pools, put BM reference, clear bm_priv) instead of merely
-    emitting a warning. Without the link, suspend/resume ordering is
-    not guaranteed and the original crash can still occur.
-
-v3:
-  - Restore per-pool POOL_SIZE_REG, POOL_READ_PTR_REG, and
-    POOL_WRITE_PTR_REG in resume, since clock gating loses all BM
-    register state.
-  - Check device_link_add() return value and emit dev_warn on failure.
-  - Replace SIMPLE_DEV_PM_OPS (deprecated) with
-    DEFINE_SIMPLE_DEV_PM_OPS and pm_sleep_ptr(), removing the
-    #ifdef CONFIG_PM_SLEEP guard.
-  - Add dev_warn in suspend if not all buffers could be freed.
-
-v2:
-  - Drain buffers via mvneta_bm_bufs_free() in suspend instead of only
-    stopping BM and gating the clock. This ensures proper DMA unmapping
-    and avoids buffer leaks.
-  - Free the BPPE DMA-coherent region in suspend so that resume takes
-    the full probe-time initialization path (alloc + fill), eliminating
-    the need to modify mvneta_bm_pool_create().
-  - Reset pool type to MVNETA_BM_FREE in suspend so mvneta_bm_pool_use()
-    correctly re-creates and refills pools on resume.
-  - Check clk_prepare_enable() return value in resume.
-  - Add device_link between mvneta (consumer) and mvneta_bm (supplier)
-    to guarantee correct suspend/resume ordering.
-
- drivers/net/ethernet/marvell/mvneta.c    | 18 ++++++
- drivers/net/ethernet/marvell/mvneta_bm.c | 72 ++++++++++++++++++++++++
- 2 files changed, 90 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 744d6585a949..543e566425c1 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -5678,6 +5678,24 @@ static int mvneta_probe(struct platform_device *pdev)
- 					 "use SW buffer management\n");
- 				mvneta_bm_put(pp->bm_priv);
- 				pp->bm_priv = NULL;
-+			} else if (!device_link_add(&pdev->dev,
-+						    &pp->bm_priv->pdev->dev,
-+						    DL_FLAG_AUTOREMOVE_CONSUMER)) {
-+				/*
-+				 * Link guarantees BM resumes before mvneta.
-+				 * Without it, BM may not be ready when
-+				 * mvneta_bm_port_init() runs on resume,
-+				 * causing stale buffer addresses and a crash.
-+				 * Fall back to SW management to be safe.
-+				 */
-+				dev_warn(&pdev->dev,
-+					 "failed to link to BM, use SW buffer management\n");
-+				mvneta_bm_pool_destroy(pp->bm_priv,
-+						       pp->pool_long, 1 << pp->id);
-+				mvneta_bm_pool_destroy(pp->bm_priv,
-+						       pp->pool_short, 1 << pp->id);
-+				mvneta_bm_put(pp->bm_priv);
-+				pp->bm_priv = NULL;
- 			}
- 		}
- 		/* Set RX packet offset correction for platforms, whose
-diff --git a/drivers/net/ethernet/marvell/mvneta_bm.c b/drivers/net/ethernet/marvell/mvneta_bm.c
-index 6bb380494919..e0c693c0a910 100644
---- a/drivers/net/ethernet/marvell/mvneta_bm.c
-+++ b/drivers/net/ethernet/marvell/mvneta_bm.c
-@@ -129,6 +129,7 @@ static int mvneta_bm_pool_create(struct mvneta_bm *priv,
- 	if (!IS_ALIGNED((u32)bm_pool->virt_addr, MVNETA_BM_POOL_PTR_ALIGN)) {
- 		dma_free_coherent(&pdev->dev, size_bytes, bm_pool->virt_addr,
- 				  bm_pool->phys_addr);
-+		bm_pool->virt_addr = NULL;
- 		dev_err(&pdev->dev, "BM pool %d is not %d bytes aligned\n",
- 			bm_pool->id, MVNETA_BM_POOL_PTR_ALIGN);
- 		return -ENOMEM;
-@@ -139,6 +140,7 @@ static int mvneta_bm_pool_create(struct mvneta_bm *priv,
- 	if (err < 0) {
- 		dma_free_coherent(&pdev->dev, size_bytes, bm_pool->virt_addr,
- 				  bm_pool->phys_addr);
-+		bm_pool->virt_addr = NULL;
- 		return err;
- 	}
- 
-@@ -477,6 +479,75 @@ static void mvneta_bm_remove(struct platform_device *pdev)
- 	clk_disable_unprepare(priv->clk);
- }
- 
-+static int mvneta_bm_suspend(struct device *dev)
-+{
-+	struct mvneta_bm *priv = dev_get_drvdata(dev);
-+	int i;
-+
-+	/* Drain buffers and free pool resources while BM is still clocked */
-+	for (i = 0; i < MVNETA_BM_POOLS_NUM; i++) {
-+		struct mvneta_bm_pool *bm_pool = &priv->bm_pools[i];
-+		int size_bytes;
-+
-+		if (bm_pool->type == MVNETA_BM_FREE)
-+			continue;
-+
-+		mvneta_bm_bufs_free(priv, bm_pool, bm_pool->port_map);
-+		if (bm_pool->hwbm_pool.buf_num)
-+			dev_warn(&priv->pdev->dev,
-+				 "pool %d: %d buffers not freed\n",
-+				 bm_pool->id, bm_pool->hwbm_pool.buf_num);
-+
-+		mvneta_bm_pool_disable(priv, bm_pool->id);
-+
-+		if (bm_pool->virt_addr) {
-+			size_bytes = sizeof(u32) * bm_pool->hwbm_pool.size;
-+			dma_free_coherent(&priv->pdev->dev, size_bytes,
-+					  bm_pool->virt_addr,
-+					  bm_pool->phys_addr);
-+			bm_pool->virt_addr = NULL;
-+		}
-+		/*
-+		 * Safe to destroy: device_link guarantees all mvneta ports
-+		 * have already suspended, so no hwbm_pool_add() can be in
-+		 * progress holding buf_lock.  Pairs with mutex_init() in
-+		 * mvneta_bm_pool_use() on resume.
-+		 */
-+		mutex_destroy(&bm_pool->hwbm_pool.buf_lock);
-+		bm_pool->type = MVNETA_BM_FREE;
-+	}
-+
-+	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_STOP_MASK);
-+	clk_disable_unprepare(priv->clk);
-+	return 0;
-+}
-+
-+static int mvneta_bm_resume(struct device *dev)
-+{
-+	struct mvneta_bm *priv = dev_get_drvdata(dev);
-+	int i, err;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return err;
-+
-+	/* Reinitialize BM hardware; pools are refilled by mvneta_resume() */
-+	mvneta_bm_default_set(priv);
-+
-+	/* Restore pool registers lost during clock gating */
-+	for (i = 0; i < MVNETA_BM_POOLS_NUM; i++) {
-+		mvneta_bm_write(priv, MVNETA_BM_POOL_READ_PTR_REG(i), 0);
-+		mvneta_bm_write(priv, MVNETA_BM_POOL_WRITE_PTR_REG(i), 0);
-+		mvneta_bm_write(priv, MVNETA_BM_POOL_SIZE_REG(i),
-+				priv->bm_pools[i].hwbm_pool.size);
-+	}
-+
-+	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_START_MASK);
-+	return 0;
-+}
-+
-+static DEFINE_SIMPLE_DEV_PM_OPS(mvneta_bm_pm_ops, mvneta_bm_suspend, mvneta_bm_resume);
-+
- static const struct of_device_id mvneta_bm_match[] = {
- 	{ .compatible = "marvell,armada-380-neta-bm" },
- 	{ }
-@@ -489,6 +560,7 @@ static struct platform_driver mvneta_bm_driver = {
- 	.driver = {
- 		.name = MVNETA_BM_DRIVER_NAME,
- 		.of_match_table = mvneta_bm_match,
-+		.pm = pm_sleep_ptr(&mvneta_bm_pm_ops),
- 	},
- };
- 
--- 
-2.43.0
-
+Best regards,
+Krzysztof
 
