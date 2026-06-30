@@ -1,40 +1,42 @@
-Return-Path: <netdev+bounces-302989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302990-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5rTdBV5jQ2rxXgoAu9opvQ
-	(envelope-from <netdev+bounces-302989-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:34:06 +0200
+	id lyMlN51jQ2r+XgoAu9opvQ
+	(envelope-from <netdev+bounces-302990-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:35:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776A46E0C64
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:34:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657FE6E0C89
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:35:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302989-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302989-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302990-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302990-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B1EDD3027111
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:33:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD9ED3035D54
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF6036A363;
-	Tue, 30 Jun 2026 06:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61693C4B85;
+	Tue, 30 Jun 2026 06:34:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085A02222D9;
-	Tue, 30 Jun 2026 06:33:16 +0000 (UTC)
+Received: from mail.eswincomputing.com (mail.eswincomputing.com [123.124.195.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511EB2222D9;
+	Tue, 30 Jun 2026 06:34:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782801199; cv=none; b=PdCOmhJXeFZhFplIBO63rFkCbkLy8+FYhxLwbyj9HR4tzDOmNHGRVjAHewQlK5zZ+4rV4q/t/3r7LCgjn4s6i21mKJP8W792ittSOg4U3WT6CSZggIilzT3nMeCkuBBUccYVh/ojjVKy9r7UmT1Xvto9vprejdzJj0LGBV3cCbY=
+	t=1782801277; cv=none; b=JTcBZe7M0jtZFHDhgX8qqB2UnNYwETB28gYreyYP+FSLAFheQ5KiAiev2AdAo0Ixk1yxA+LeaE09j5QhpJLAjgUttDBVdklF++PoBBE/3ox6/wDE98KDQmdVyxyLHU6rin+huWdhNWkUT12YhYNypOXj9HNs2kUwqSTK5LvnyRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782801199; c=relaxed/simple;
-	bh=0cdOsRjjWkvnWG5ya1nBN615An1iMqVOo7w0MiaJISI=;
+	s=arc-20240116; t=1782801277; c=relaxed/simple;
+	bh=M8DcNB1oRP1N+K/EhND2ua3BUW7ikd7HXngLRl8spPg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a1LNeZmT/FDylGUlYLBkPKh51sdDiKNstY+y/FkJYmhXnJYlxJaZ/ph3HvBtcNU6bJnGJm8fOkxycRQMkRmpWnJY25NUax1ikfXEZcaHDA+P6kvXp0jL6J4RItEyuSqi9NCB1Uf1t4g6Mvq0j///AaLTol/DoGGi4v3zMHTShGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=162.243.161.220
+	 MIME-Version; b=ijln6Ik8yfBOZ8VIP9vsvprbSQ92x5XPT5XAB7lbGVzHCQ5sagXTBZvgXUFrEc0ykYjV0tLpfFZag2kcbJp972KuFrQPCexlqH1HiJTVz/KrqmgxBp/38iyG3a/2OlnuV60+6ZT7oqWaHB3chgoRNzpSEaQtRPY1YicpnAbv4e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=123.124.195.78
 Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
-	by app2 (Coremail) with SMTP id TQJkCgBne54LY0NqWRwwAA--.52745S2;
-	Tue, 30 Jun 2026 14:32:44 +0800 (CST)
+	by app1 (Coremail) with SMTP id TAJkCgCXLHEcY0Nq7ikwAA--.24077S2;
+	Tue, 30 Jun 2026 14:33:01 +0800 (CST)
 From: lizhi2@eswincomputing.com
 To: devicetree@vger.kernel.org,
 	andrew+netdev@lunn.ch,
@@ -67,9 +69,9 @@ Cc: ningyu@eswincomputing.com,
 	lee@kernel.org,
 	wens@kernel.org,
 	Zhi Li <lizhi2@eswincomputing.com>
-Subject: [PATCH net-next v9 2/6] dt-bindings: ethernet: eswin: add EIC7700 eth1 RX clock inversion variant
-Date: Tue, 30 Jun 2026 14:32:39 +0800
-Message-ID: <20260630063239.1158-1-lizhi2@eswincomputing.com>
+Subject: [PATCH net-next v9 3/6] net: stmmac: eic7700: make RGMII delay properties optional
+Date: Tue, 30 Jun 2026 14:32:57 +0800
+Message-ID: <20260630063257.1175-1-lizhi2@eswincomputing.com>
 X-Mailer: git-send-email 2.52.0.windows.1
 In-Reply-To: <20260630063123.1118-1-lizhi2@eswincomputing.com>
 References: <20260630063123.1118-1-lizhi2@eswincomputing.com>
@@ -80,11 +82,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgBne54LY0NqWRwwAA--.52745S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF43Ww1DuF4rJryxJF18Krg_yoWrXFW5pF
-	WDury8Gr18Xr4xJw4xJF10k3W3t397ury3Kr4kAF17X3Z8t3Z8XrWI9a45Ga4xur4UZFy3
-	WayYqF1Fyayqy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBm14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:TAJkCgCXLHEcY0Nq7ikwAA--.24077S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zr1DCrWfXw1UZry8tFyfCrg_yoW8ZrWrpF
+	W5JF1Yv3srtr1xK3Z8Aa1v9a4rta1jgF1xKryrtwn3Za90kF9Yqa43Ka4YkF1jgrWkZF1a
+	y3yDJFWxu3WjkrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBG14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
 	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
@@ -94,9 +96,9 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxuF43Ww1DuF4rJryxJF18Krg_yoWrXFW5pF
 	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
 	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
 	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1U
-	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMrWrDUUUU
+	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4U
+	JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcV
+	C2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRdWrXUUUUU=
 X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.54 / 15.00];
@@ -104,7 +106,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -118,7 +120,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	FORGED_SENDER(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-302989-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302990-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -129,141 +131,58 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	R_DKIM_NA(0.00)[];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[eswincomputing.com:email,eswincomputing.com:mid,eswincomputing.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 776A46E0C64
+X-Rspamd-Queue-Id: 657FE6E0C89
 
 From: Zhi Li <lizhi2@eswincomputing.com>
 
-The EIC7700 SoC integrates two GMAC instances. The eth1 MAC exhibits
-different RX clock sampling characteristics due to silicon-inherent
-timing behavior.
+Make rx-internal-delay-ps and tx-internal-delay-ps optional in the
+EIC7700 DWMAC driver.
 
-The eth1 MAC has a fixed, non-configurable RX clock-to-data skew at the
-MAC input in the order of 4-5 ns. This cannot be compensated solely by
-the standard MAC internal delay configuration and PHY delay, and RX clock
-inversion is required at 1000Mbps for correct sampling.
+The driver previously required both properties to be present and would
+fail probe when they were missing. This restricts valid hardware
+configurations where RGMII timing is instead provided by the PHY or
+board design.
 
-The eth1 TX path also includes a fixed silicon-inherent delay of
-approximately 2 ns. This delay is always present and cannot be disabled.
-It is therefore part of the effective transmit timing observed on the
-wire.
+Update the driver to treat missing delay properties as zero delay,
+allowing systems without explicit MAC-side delay tuning to operate
+correctly.
 
-For the eth1 variant, the valid tx-internal-delay-ps values include
-this fixed delay component. Consequently, the effective range becomes
-2000-4540 ps (approximately 2000 ps fixed delay plus 0-2540 ps
-programmable delay).
-
-Introduce a dedicated compatible string
-"eswin,eic7700-qos-eth-clk-inversion" to represent the eth1 variant,
-allowing the driver to apply RX clock inversion only when required by
-hardware variant selection.
-
-This keeps SoC-level differentiation without exposing silicon-fixed skew
-as configurable device tree parameters.
-
-To reflect this, model the TX internal delay as a base 0-4540 ps range,
-and constrain valid values per compatible using conditional schema rules.
-
-Update the binding schema as follows:
-
-  - Define tx-internal-delay-ps as a base range: 0-4540 ps
-  - Add compatible-specific constraints using if/then rules:
-    * eswin,eic7700-qos-eth:
-        max 2540 ps
-    * eswin,eic7700-qos-eth-clk-inversion:
-        minimum 2000 ps (effective range 2000-4540 ps)
-
-No functional change for existing "eswin,eic7700-qos-eth" users.
+This aligns the driver behavior with the updated device tree binding
+and provides a safe default configuration when MAC-side delay
+programming is not required.
 
 Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
 ---
- .../bindings/net/eswin,eic7700-eth.yaml       | 51 ++++++++++++++++++-
- 1 file changed, 49 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-index 4e02fedae5c6..ba49fd6a086c 100644
---- a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-+++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-@@ -20,16 +20,37 @@ select:
-       contains:
-         enum:
-           - eswin,eic7700-qos-eth
-+          - eswin,eic7700-qos-eth-clk-inversion
-   required:
-     - compatible
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+index 4ac979d874d6..ec99b597aeaf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+@@ -165,9 +165,6 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
+ 		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
+ 		dwc_priv->eth_clk_dly_param |=
+ 				 FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
+-	} else {
+-		return dev_err_probe(&pdev->dev, -EINVAL,
+-			"missing required property rx-internal-delay-ps\n");
+ 	}
  
- allOf:
-   - $ref: snps,dwmac.yaml#
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: eswin,eic7700-qos-eth
-+    then:
-+      properties:
-+        tx-internal-delay-ps:
-+          maximum: 2540
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: eswin,eic7700-qos-eth-clk-inversion
-+    then:
-+      properties:
-+        tx-internal-delay-ps:
-+          minimum: 2000
+ 	/* Read tx-internal-delay-ps and update tx_clk delay */
+@@ -187,9 +184,6 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
+ 		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
+ 		dwc_priv->eth_clk_dly_param |=
+ 				 FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
+-	} else {
+-		return dev_err_probe(&pdev->dev, -EINVAL,
+-			"missing required property tx-internal-delay-ps\n");
+ 	}
  
- properties:
-   compatible:
-     items:
--      - const: eswin,eic7700-qos-eth
-+      - enum:
-+          - eswin,eic7700-qos-eth
-+          - eswin,eic7700-qos-eth-clk-inversion
-       - const: snps,dwmac-5.20
- 
-   reg:
-@@ -69,7 +90,7 @@ properties:
- 
-   tx-internal-delay-ps:
-     minimum: 0
--    maximum: 2540
-+    maximum: 4540
-     multipleOf: 20
- 
-   eswin,hsp-sp-csr:
-@@ -140,3 +161,29 @@ examples:
-             snps,wr_osr_lmt = <2>;
-         };
-     };
-+
-+    ethernet@50410000 {
-+        compatible = "eswin,eic7700-qos-eth-clk-inversion", "snps,dwmac-5.20";
-+        reg = <0x50410000 0x10000>;
-+        interrupt-parent = <&plic>;
-+        interrupts = <70>;
-+        interrupt-names = "macirq";
-+        clocks = <&d0_clock 186>, <&d0_clock 171>, <&d0_clock 40>,
-+                <&d0_clock 194>;
-+        clock-names = "axi", "cfg", "stmmaceth", "tx";
-+        resets = <&reset 94>;
-+        reset-names = "stmmaceth";
-+        eswin,hsp-sp-csr = <&hsp_sp_csr 0x200 0x208 0x218 0x214 0x21c>;
-+        phy-handle = <&gmac1_phy0>;
-+        phy-mode = "rgmii-id";
-+        snps,aal;
-+        snps,fixed-burst;
-+        snps,tso;
-+        snps,axi-config = <&stmmac_axi_setup_gmac1>;
-+
-+        stmmac_axi_setup_gmac1: stmmac-axi-config {
-+            snps,blen = <0 0 0 0 16 8 4>;
-+            snps,rd_osr_lmt = <2>;
-+            snps,wr_osr_lmt = <2>;
-+        };
-+    };
+ 	dwc_priv->eic7700_hsp_regmap =
 -- 
 2.25.1
 
