@@ -1,207 +1,261 @@
-Return-Path: <netdev+bounces-303246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303247-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TkrhOhfYQ2oUkAoAu9opvQ
-	(envelope-from <netdev+bounces-303246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:52:07 +0200
+	id 5mDLH8zYQ2pdkAoAu9opvQ
+	(envelope-from <netdev+bounces-303247-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:55:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949AE6E5952
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:52:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E834B6E59E6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:55:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=eguBgHH2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303246-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303246-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=bbku3p7s;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303247-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303247-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ibm.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 205E9306BAB1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:49:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEFE73063624
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EA743CED7;
-	Tue, 30 Jun 2026 14:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A13343E9C4;
+	Tue, 30 Jun 2026 14:53:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1355F43C05D
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 14:49:39 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782830981; cv=pass; b=YxzEeUzh0AmCVPFTI4Uc4xO6Vr5h6EH7yt6D/eDziaOKg2CvGy7CUFK+wIk58ombnDRRT8cU+YrvFVSKJSO0XYZKfyE4FYRb6Cy+5cJ1yKBcfoPjMvJYIU5I78uaHqbD7VFyHQ4fcoIaeg5GC2S5DOuygFqN25+26HRXtbdWoQ4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782830981; c=relaxed/simple;
-	bh=R2RLlWKV31uw1vmm0eE8g4HAQBST/y2tQNtzmoB595w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IDIxP2O9WTSuKRC6lvhBA6HBUUUPTNwFjDo6S5y5sBknZtPFy4c2GIHdKWpS5pW3Gf655Tr80BjUZW9wZs6U9ZuAk1UTHBdXF54EprFGMtCExdfHl+UGVEBbRU6Y6wH/h3qd4JI5ahQBVOrS9HX8BfqiT+31aP3r05h/KVLXhK0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eguBgHH2; arc=pass smtp.client-ip=209.85.167.49
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5aeb89359a3so2132342e87.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 07:49:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782830978; cv=none;
-        d=google.com; s=arc-20260327;
-        b=F7lU5OSC/z+9yKEjGU+arrB0vcHjvEwIYFLOhc8SDYFQoeJ0r19M4qWKycQHdJ6JP9
-         GhCAYG6T1GATtYKibKJT4qpAD18U+U4h+qU485FC/T6bfWLUcr0ycPNORKezKtp1hg+r
-         fN6U9op9KHGRsUlVu97nHcjPWevn+q9XWHz9rZsHrZN5CBOk9UemXjq0IFTfyYslPH5o
-         AbqCpQFKY8F5DVeA0gEGgp0xv6ZBpUou2GFg1my+vc2jAMKDqm9vo3/z/Zz3FhLdG1nC
-         jE+yMb7UwzlscwoNpJm5gfKnNhGwD9p9vULY1kQWlUNLwE3TsFrZ8D/ORwxQ86ZsvTWN
-         JR1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=BAHFXtMiFS3SQCPXfcc6nAkzBIK1JQ7gQg2BRXU7Bfc=;
-        fh=b9o9xs7mxZEzFiU9iX/E9tVoZ56wmfpCcNe9kIcRFNY=;
-        b=UwwKSlS7uUEmNo2xqOiJop13EORl1jTR9x4sUQvKzFbTu5S4qgV1RriKey96jQQ2L+
-         EgMaMMI9y8yd0UZ7rUyvvb61WJZjLq6trRaNtFq9bSVW7D64cNWINVNrMaWExO0UXngy
-         v0XE+OprkDsfGA0tjfZIYtJHG7q/1wz7etOhGR2k3B8RJu2ZqrYfUMyqBAlkf3Cpzs/d
-         idsWwQcqbPwdINmyvlrqTv753YvKL9nEaGrLlT0iJg7GKo9Naj+sTkWVPr0A/9KHMFCi
-         oyINa2Mitun8vfVpSt6HocrgTrM9D4QAg1f0YvjkyrPvW0f4rUZPuju6S7JYwAb2Y7AQ
-         pe0w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782830978; x=1783435778; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=BAHFXtMiFS3SQCPXfcc6nAkzBIK1JQ7gQg2BRXU7Bfc=;
-        b=eguBgHH2CoPRAyRaOi3uiaGSli4ODNgt+uvPY+h/SIbi3UUzw5fgIYyM6JQzztjeNV
-         3JlZ/ToxMazHgtcSpYy6Wanx8ZqhDUqqumustyQxJN+22k7vxLd4LMYm7+P0yLfn8pQ9
-         JmK4CXxkJxFZX5JST3Z2ucXmDLXruN8OwppFZNOl6Ue/Rze31PgrmjMVcdVChqaVzkn3
-         9z6twiYp4Zo1H82GIHWlqKbcTI38vd2yEWEiZYcXIzue3/HMx3mwR50ZIJUVf2D/Y4gU
-         v2SGLfGE48Xhlw6IlpE/3my5ZFDfLd1udwdgHT/iCfuo1uBXsQroYQOJpyClQUxBsTNu
-         CwgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782830978; x=1783435778;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=BAHFXtMiFS3SQCPXfcc6nAkzBIK1JQ7gQg2BRXU7Bfc=;
-        b=DjYIVlWHJDQ/XExBtVnDW1Su7QMbbInluwIXll7ATM4GWtsNfBHIrUEfnzjGapxx+A
-         sno9ICC7+IxZNFgLkatllSoHzFwMcPTcrsw4MEgljPcpLrWAx7bwa+ectBE6L+pkmzr+
-         stuH5F5kRy5sacpJkCx8yitL44YMuZu+xwdy0QTHx7KN/gTXjJk4ohJY8awyk6wf0Jq4
-         tFalXbkXP7VAsS7ASG3niQxep5q8WEUUr1zBjr8ngnKfM4oJA7da2MyEF979v5N1g/Nk
-         uqFFe/arHnsS1EeYf8MWL+riJbw1tKCf3B4L2NL1QwBgaKBEHw5N8H6RUHwP7rfayBBO
-         8BCQ==
-X-Forwarded-Encrypted: i=1; AHgh+RolP/qHkUzZuCMrebLT2R/0eig3mtMY5sQD9AloxlWFIXDvzS85RDzMljzbSdD6OJpG9xi6G4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXVFnwNJpZp2ncsa9Su2hDqyA4j/4CvOzOIvLZKPzsnLymhci+
-	sPrAjMcQiTTEdlZmAR2txaX0s/LvHQLKYWAq8nW4HVSO6Yt4eltBLkkDCusjxjRDdal+A0QYIZ5
-	yuUfIrZtHzl+y5SBmTr2hp3nq28uRxZA=
-X-Gm-Gg: AfdE7cnf/KyKXOZ2QoW+evROif8/mhQ85NDACoGRALUpsKy8wYX3jI+8mGZPgVetK3e
-	CcWUV8zdy+uWqlt+HuL3p4e2nysU3JgQtol9VnlT4t8e2/2mi3tPYPNfNaWwR+/sCis0lDeBdaQ
-	14DUBuw5cxVryPGaCdQdNPIQKsfXsn7haoFvIAJlkIk+gKjyRYWHNW8CK2WBdvqM9pSfuIyg8zL
-	/HJof/IcnwU0sxZPQPe1bN6EQek9IntxmHP6DPt4UU/rJ2oUCSyl3VpnmOxJxl9jN+Yk8s0yLRZ
-	hq0N/Yhb0Dds1sCwb2TJI+oEAGzNLSdy4737/Ib0AcgB8caKmVYP8IMNtxJyr90Gen5zC0/cq8z
-	3rvVeYta+6B2mJpOBJguW
-X-Received: by 2002:a05:6512:640e:b0:5ae:b6cf:2869 with SMTP id
- 2adb3069b0e04-5aebdb9485emr981524e87.23.1782830977995; Tue, 30 Jun 2026
- 07:49:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A3243DA49
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 14:53:48 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782831233; cv=none; b=G+mLpf5onIJpyzEB1KIYnvWgo5+7oZh9KAhx8qcgJrkVtkXIXTQCxn9Q3RT7zd09/0+ZbZziRJvqzOdS0jvLhonHWNcaoDIZWNnPxu28ARi/k9+HJ19AXRwalPCaFIJtkLTAICWNdVSdRLahc3zhM7mR29m3hKX0bwbqQNnZkEs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782831233; c=relaxed/simple;
+	bh=vJIeP4A7gFvAaFjRlwjnxeYf9YFIIAfxfw2G90t9k9Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=LPbC5Kxhj2+Nix+HPOu4duqNxOu0tvMz5j8ZoN0KUmnU6wf+ZXz759PocORUmBrTwcapb0ZDGR3JGDowp9v/p/mgeLkQPHK51UUFz+r2n4rP8OybkWmk/KMeOBojh5ge5D6fIEetPnk0dNBZ7vs3wMPOaPdGof+gMDcWm1bfiBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bbku3p7s; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65UEIFRN2288445;
+	Tue, 30 Jun 2026 14:53:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=ePbu4lf0CxuGrUrD+boUl0AdVYvq
+	CqZlcSfMiXrD/yY=; b=bbku3p7sv/xCrnCEKcTfg+B2BkwEh8wcyiXmcgy4P+Kv
+	Qs/YfYp4DexqZVruWXxJW+B9XyWzX8thb1kjf1NNSrH7a8RX/nIWMgP7DNKmK9Je
+	oIwplnPMOJr/3k0kpoc6i1ZRtoSE7N+ei+lwAU9Fc+CP2Mjg5SDHVunB6L3GBFpC
+	iNnU8CA9EiMY2OGjM7J3A7n8xqs+L18lIujuDMi13qm/cHl8yQ//mZoLUbMOprYH
+	H9gLIEFVJbdssRUZnsEfi4nIFc1XkP6CtNfsEUsQhuhYppFsIUewjTGsjl1hyolZ
+	TukUQCOehH8FF14/+7ieoWHv15pF63nt6nGzOExmGQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26pdye17-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jun 2026 14:53:34 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65UEnapa024567;
+	Tue, 30 Jun 2026 14:53:33 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f2u2gakk1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jun 2026 14:53:33 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65UErV4B8716870
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Jun 2026 14:53:31 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9AB1F5805D;
+	Tue, 30 Jun 2026 14:53:31 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 59E265805C;
+	Tue, 30 Jun 2026 14:53:30 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.117.151])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 30 Jun 2026 14:53:30 +0000 (GMT)
+From: Mingming Cao <mmc@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+        ricklind@linux.ibm.com, mmc@linux.ibm.com, kuba@kernel.org,
+        edumazet@google.com, pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
+        maddy@linux.ibm.com, mpe@ellerman.id.au
+Subject: [PATCH v1 00/18] ibmveth: Add multi-queue RX Support
+Date: Tue, 30 Jun 2026 07:53:07 -0700
+Message-Id: <cover.1782758799.git.mmc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aj5KJEIsTl6IK0nX@gmail.com>
-In-Reply-To: <aj5KJEIsTl6IK0nX@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 30 Jun 2026 22:49:00 +0800
-X-Gm-Features: AVVi8CeNolHc0bWFWi94se6V_El3cArCALeJfgf0e7sVp8JXgJSa3XDzBUrtcNM
-Message-ID: <CAL+tcoA6=_paEdqWaY7-VHdBeAxEFeMCfTECAEGv3C6ZqFUNSw@mail.gmail.com>
-Subject: Re: [ANNOUNCEMENT] LPC 2026: System Monitoring and Observability Microconference
-To: Breno Leitao <leitao@debian.org>
-Cc: linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kernel-team@meta.com, 
-	linux-mm@kvack.org, iipeace5@gmail.com, gavinguo@igalia.com, 
-	linux@jordanrome.com, amscanne@meta.com, sj@kernel.org, gpiccoli@igalia.com, 
-	Daniel Gomez <da.gomez@kernel.org>, mfo@igalia.com, platform-driver-x86@vger.kernel.org, 
-	acpica-devel@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: tim87rfbqAQ3dHMaUoQQRc69xa8shfEM
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDEzOSBTYWx0ZWRfX7q2Ty/nOkSis
+ tgMkceaDuxuV0oBjMm7/+FNlkxjQdNm14GYc3wlObtlAtud4HF9Z89zwqJ5w3dcs4jyFggiT8aY
+ P1kXeUm6wsdLotWDeJIgu2lShNRRJeY=
+X-Authority-Analysis: v=2.4 cv=edsNubEH c=1 sm=1 tr=0 ts=6a43d86e cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
+ a=1C0YqRXPaoIq7nfLI6kA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDEzOSBTYWx0ZWRfXxamQRi10Wj2T
+ /B0s9usaJ6HZ13VTPCXj7uVbDlOc8pPAhH7/kpud/1FvV/zeFyVnMioHlO+83me0mroXQ28CbRm
+ nDSy/kmVVw5X4Nh4r+IwR2wmdUnZaSc0GRai+YUgbr9+gi1kHWdamsHfimFjo91QDZhNFeBbsWi
+ u6EBQBRgTQPWscYPSAp3z/LgT3Tc5yu+vKo/KELS5iankF5AT7oK1CG9I1TIunVUe0FcQwWqGnl
+ G3KWkKzwEtbRIIx2O3Cnkdu2qgoKIqMwC9Rj1UXcEXo3C9C42VuhpV1h7nOkSBFxsO3xntSDoWZ
+ 6thZHijRPzjKOMmcyT5/m/4FCF0ZUD7SxjybX8rojaS1UkOl/opivKr1AEQX/x/CaX2gq7cueds
+ LDZH8Cej+9JOF/3U70bWt6dcAZ258N9NNXtmZ48ysuSkMhBc4X8rjKA4Vc7iWSqKZRhE6nLAY5M
+ RIYNBxGILLAjUpW2kkg==
+X-Proofpoint-ORIG-GUID: 5dQ6Xz5_7S5wOagLl7dJ8k1ymD95PTY_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-30_04,2026-06-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0
+ spamscore=0 suspectscore=0 clxscore=1011 lowpriorityscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606300139
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303246-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:linux-acpi@vger.kernel.org,m:linux-hwmon@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:kernel-team@meta.com,m:linux-mm@kvack.org,m:iipeace5@gmail.com,m:gavinguo@igalia.com,m:linux@jordanrome.com,m:amscanne@meta.com,m:sj@kernel.org,m:gpiccoli@igalia.com,m:da.gomez@kernel.org,m:mfo@igalia.com,m:platform-driver-x86@vger.kernel.org,m:acpica-devel@lists.linux.dev,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-303247-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,linux.ibm.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	FORGED_SENDER(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,meta.com,kvack.org,gmail.com,igalia.com,jordanrome.com,kernel.org,lists.linux.dev];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:mmc@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,vger.kernel.org:from_smtp,lpc.events:url]
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 949AE6E5952
+X-Rspamd-Queue-Id: E834B6E59E6
 
-On Fri, Jun 26, 2026 at 5:56=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> We are pleased to announce the Call for Proposals (CFP) for another
-> edition of  System Monitoring and Observability Microconference, this
-> time at the 2026 Linux Plumbers Conference (LPC), taking place in
-> Prague, Czechia, from Oct 5-7, 2026.
->
->   https://lpc.events/event/20/sessions/262/
->
-> This microconference provides a valuable forum for key engineering areas
-> such as:
->
->    - Kernel Health and Runtime Monitoring
->    - Hardware Integration and Error Detection
->    - Correlation of Issues (crashes, stalls, bugs)
->    - Virtualization Stack Monitoring
->    - Memory Management Monitoring and Observability
->    - Anomaly Detection Algorithms for System Behavior
->    - Automated Analysis, Remediation and post mortem analyzes
->
-> The purpose of each talk is to share challenges and discuss potential
-> improvements. Sessions will last 20 to 30 minutes and aim to encourage
-> brainstorming and open dialogue about ongoing issues rather than
-> delivering immediate solutions.
->
-> The conference acts as both a knowledge-sharing platform and a strategic
-> venue for guiding the future of kernel technologies to better meet the
-> demands of large-scale infrastructure.
->
-> We invite you to submit your proposals here:
->         https://lpc.events/event/20/abstracts/
->
-> Please select track "Linux System Monitoring and Observability MC"
+Power11 PHYP firmware adds Virtual Ethernet multi-queue (MQ) RX for
+the ibmveth device: multiple logical-LAN RX queues, per-queue buffer
+posting, and completion delivery. Guest Linux did not use that
+platform support; ibmveth still registered one RX queue even when
+PHYP was MQ-capable.
 
-A kind reminder: at the bottom of the page [1], please click the
-'Submit new abstract' button so that you will be able to quickly
-submit a new proposal. (Admittedly, it's a bit easy to miss the entry
-especially for the newcomers)
+This series adds the ibmveth MQ client. When PHYP advertises the
+capability through H_ILLAN_ATTRIBUTES, the driver registers
+multiple RX queues, receives on per-queue NAPI, and exposes queue
+count through ethtool. Older firmware without the bit is unchanged.
 
-If you have any questions/suggestions/problems, please do not hesitate
-to contact Breno or me.
 
-Again, proposals are greatly appreciated :)
+ibmveth today registers one logical LAN, one set of buffer pools, and
+one NAPI context. PHYP MQ mode gives each RX queue its own handle:
+buffers are posted with H_ADD_LOGICAL_LAN_BUFFERS_QUEUE, subordinate
+queues register through H_REG_LOGICAL_LAN_QUEUE, and traffic can
+land on any active queue. Queue selection is firmware-defined; v1
+does not program RSS or hash tables. The driver needs per-queue
+pools, IRQs, and poll state to match.
 
-[1]: https://lpc.events/event/20/abstracts/
+Queue-aware hcalls are selected only when probe sets multi_queue
+from H_ILLAN_ATTRIBUTES; legacy firmware keeps the original hcall
+path unchanged through the entire series.
 
-Thanks,
-Jason
+This splits the work so review follows the actual bring-up sequence:
+
+ 1. Hypercall definitions and MQ data structures (patches 1-3)
+ 2. Refactor open/close into helpers - RX, per-queue pools,
+    IRQ, TX, PHYP (4-10)
+ 3. Turn on the MQ datapath at probe/open (11)
+ 4. Per-queue RX/TX stats, get_stats64, and sysfs pool readout
+    (12-14)
+ 5. Runtime RX queue resize via ethtool -L (15-17)
+ 6. Runtime stability fixes from LPAR testing (18)
+
+
+ - Helper patches (4-10) reshape ibmveth_open()/close() into
+queue-aware helpers. Runtime behaviour is unchanged through that
+block: num_rx_queues stays 1 and multi_queue is false until patch 11.
+
+- Patch 11 is the switch: probe sets multi_queue from firmware, raises
+num_rx_queues, registers subordinates, and replenishes every active
+queue.
+
+- Patch 18 fixes poll hangs after aggressive ethtool -L cycling,
+NAPI/close deadlocks on ip link down, and preserves probe-time
+pool->active across close/open so RX works after link down/up.
+
+
+Design notes
+* Per-queue buffer pools (rx_buff_pool[queue][pool]) - PHYP ties
+ posted buffers to a queue handle; a shared pool set does not work.
+ Patch 5 also disables the 64 KiB pool at standard MTU to save
+ per-queue memory in MQ.
+* Legacy mode keeps queue 0 on h_register_logical_lan(); MQ uses
+ handles for all queues (subordinates via H_REG_LOGICAL_LAN_QUEUE).
+ Close uses H_FREE_LOGICAL_LAN for the whole adapter.
+* ethtool -L resizes incrementally while the netdev stays up so
+ surviving queues keep PHYP handles, pools, and IRQ state. A
+ close/open cycle would drop traffic and force full LAN
+ re-registration for every queue.
+
+
+Tested on ppc64le PowerVM LPAR with MQ-capable firmware:
+* MQ path: ethtool -L under iperf3 load, link down/up during traffic
+* Legacy firmware (no MQ bit): full open/close/stress on the
+ refactored helper path to confirm single-queue behaviour is
+ unchanged
+* ethtool -L resize while all RX queues are receiving traffic, not
+ only a single-flow iperf session
+* ip link down/up and ping after reopen (patch 18)
+
+
+Future work
+* IRQ affinity hints for subordinate queue IRQs returned by PHYP
+* Summed global no_buffer drop counter across all RX queues in MQ mode
+Comments and suggestions on patch split, design, and testing are
+welcome.
+
+Mingming Cao <mmc@linux.ibm.com>
+
+Mingming Cao (18):
+  ibmveth: Add MQ RX hypercall wrappers and call definitions
+  ibmveth: Prepare adapter data structures for MQ RX
+  ibmveth: Add MQ-ready RX statistics structures
+  ibmveth: Refactor RX resource allocation for MQ RX bring-up
+  ibmveth: Refactor buffer pool management for per-queue MQ RX
+  ibmveth: Refactor RX interrupt control for MQ RX queues
+  ibmveth: Refactor TX resource allocation in open/close paths
+  ibmveth: Add RX queue register/deregister helpers for MQ
+  ibmveth: Refactor open/close into MQ-ready resource pipeline
+  ibmveth: Add queue-aware RX buffer submit helper for MQ
+  ibmveth: Enable multi-queue RX receive path
+  ibmveth: Add per-queue RX statistics collection and reporting
+  ibmveth: Add per-queue TX statistics reporting
+  ibmveth: Expose per-queue buffer pool details via sysfs
+  ibmveth: Add helpers for incremental MQ RX queue resize
+  ibmveth: Implement incremental MQ RX queue resize
+  ibmveth: Wire ethtool set_channels to MQ RX queue resize
+  ibmveth: Fix MQ RX poll and shutdown hangs after queue resize
+
+ arch/powerpc/include/asm/hvcall.h  |    6 +-
+ drivers/net/ethernet/ibm/ibmveth.c | 2451 +++++++++++++++++++++++-----
+ drivers/net/ethernet/ibm/ibmveth.h |  226 ++-
+ 3 files changed, 2284 insertions(+), 399 deletions(-)
+
+-- 
+2.39.3 (Apple Git-146)
+
 
