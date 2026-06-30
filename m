@@ -1,73 +1,77 @@
-Return-Path: <netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vdWwHCsiQ2rVRgoAu9opvQ
-	(envelope-from <netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:55:55 +0200
+	id PSZGCNciQ2o/RwoAu9opvQ
+	(envelope-from <netdev+bounces-302889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:58:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A256DFAC8
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:55:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 649EE6DFAF4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:58:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="CCMkVen/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-302888-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=P1GcS8rt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302889-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302889-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 638893006446
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:55:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7ED6730037C7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD712F8EB3;
-	Tue, 30 Jun 2026 01:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234F830148B;
+	Tue, 30 Jun 2026 01:57:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A162FD1C2;
-	Tue, 30 Jun 2026 01:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B188C280A20;
+	Tue, 30 Jun 2026 01:57:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782784553; cv=none; b=QyLsnKMzKHZCM2dkhGXfVuKkHQoR9P1hSy+DemxTQYBHZ1xp4cgcCbfSTdmeLvw6SVbWgLNAq12nOAOOUEVz2NX8ZuBvU8ow3WbQJoJdzPB0kkAV6BtyyHXNFeqFuYwL5vLu+x0aiwbjMPpTqBkuHBp4fFyuCm+p79232YpCjzk=
+	t=1782784634; cv=none; b=lMG3Ez6nQj9Vxsexf8o/FoGJAMYW2R1BFbJOF1ABYHW119ijUR+N0dR/WQB1+UFSPVaVe4dGAVHvLetNrbALpvFUGyxwksqLKQzPJZjUPcrMrh92OOmk1547YduOVWI1X5r2r2zPM+hpJYaAThSDugYQBlSDrp3s9rSHa2iN66M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782784553; c=relaxed/simple;
-	bh=cr2oETy4C1aQiD6NtNwbLq68Rta2WF7XtRZHtojddaY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r6zdqfGYd14GzaPAIs1qVQOaziV0KKkbkZikMcVZIpvnQtoQbpdqlOyTAjE9w4xFES8+lTJykY57aMPSH0aIOTx/XUYpTs8V+qWZc99ykgkygMWiSmZcA73NrLXizLniJD7/PP/rts3i/9+vuT0arDkgGRF3NQ6tg2B1BuP9hgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CCMkVen/; arc=none smtp.client-ip=67.231.156.173
+	s=arc-20240116; t=1782784634; c=relaxed/simple;
+	bh=Vs3Zqucg9bgJAyhvH4HtFpE559QAadACxaWeXOLY/10=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Su4WcACzJZ45BXB5DBSMPhVkzC9A7BE3NaeMAENrOGxdsuQwYSkbCMerx03TD7Fdy6TEsMGwXpZy7rfGWlgtQYZSmbGyGLaZmbtkNtKvQN1qqt3SlkVM/Y7ZSa36PWmahcX0e4B68PiPHTdP/nWG7nmnmEnB+p3w6Tcu2RKGIjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=P1GcS8rt; arc=none smtp.client-ip=67.231.156.173
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1IPFK3489301;
-	Mon, 29 Jun 2026 18:50:29 -0700
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U1IPqj3489287;
+	Mon, 29 Jun 2026 18:50:35 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=5TzSs7aaBzNuPllRbmCm11r
-	K9IIpM/ddCYuDRCPwL0g=; b=CCMkVen/BPM485QQvUX2sgsl0+bGOl8pI9Ach3b
-	DTdeor0cGJ3k5gUCW8iqXKPk7ALU+FLDE+XZJXSjEvlaFqEApWtfyB1dSNk6Jzb4
-	Az+YQ8eUMHmcTSNUg/o7/mMoXqT1JS2p7bPnwcv1QoRXTWKcyAsIFiZky7rjgQsj
-	hUbr7mbaY7ZvAQb+1itjLh/HCPL9sVDKUaDbt0c5kxYWCSkxR669qwwy7iOULANS
-	yEX2ObcrAgr/z/icmD8ARzZky9EJBNYSvoirnovU5Dovxf2vFkIOKITf/J6U6zk9
-	6i1dls1Hs380EQaSUSYhOiInB49Nni+AbYWJN1e6SsOR7IA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f2e1h7uhh-3
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=7
+	rCQ5rFehI+c6eagJi54xkn+Opzozq7vEl8C9HFYePk=; b=P1GcS8rt1ahdnB+kS
+	rKxlRnxtABfMXrDvPOnLUs2KqwtwV5nkCVJnAYoDsjdGmsXCKakQmfcpf2nlXh6+
+	BGQlCIaIQxDUmwRyhDLJaHo5566QE1uumlY4tywA3XvuDl0iyugLQyhY+RylsS3y
+	nAwbzKX42hsNKXxe0PPgPInWb5GiZGm40oyscteal6C39Utujwq30oQ+tLRQAVT6
+	pAF43iLsgjN9AQSlWuwRsCrX2Revza/Dl7WpQhqIzcllakNN/M1MH2fdGthUJNqM
+	J6tkhFqkX7jVF5lxbduarCtLpHxDtFwMyZ5g5UMrArBEQXHj1gTdTrDP6QO5ywkn
+	xumOA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f2e1h7uhk-2
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jun 2026 18:50:29 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	Mon, 29 Jun 2026 18:50:34 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 29 Jun 2026 18:50:28 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 29 Jun 2026 18:50:28 -0700
+ 15.2.1544.25; Mon, 29 Jun 2026 18:50:32 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 29 Jun 2026 18:50:32 -0700
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 29E6F3F7068;
-	Mon, 29 Jun 2026 18:50:24 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id E34CD3F7081;
+	Mon, 29 Jun 2026 18:50:28 -0700 (PDT)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <stephen@networkplumber.org>, <dsahern@kernel.org>, <kuba@kernel.org>,
         <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
 CC: <rkannoth@marvell.com>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
         <pabeni@redhat.com>, <jiri@resnulli.us>
-Subject: [PATCH iproute2-next v2 0/2] devlink: support u64-array devlink parameters
-Date: Tue, 30 Jun 2026 07:20:10 +0530
-Message-ID: <20260630015012.3728870-1-rkannoth@marvell.com>
+Subject: [PATCH iproute2-next v2 1/2] devlink: use DEVLINK_VAR_ATTR_TYPE_* in param show/set
+Date: Tue, 30 Jun 2026 07:20:11 +0530
+Message-ID: <20260630015012.3728870-2-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260630015012.3728870-1-rkannoth@marvell.com>
+References: <20260630015012.3728870-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,24 +80,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 6Da8rfOmvUiSy0tvIReb_TeDebtsn55P
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAxNCBTYWx0ZWRfX5axZRe/99mKg
- joWZUp7BLwEm2n26mMdFISGhrB+FkrOIhJkmVN6KFAhvmBDlEi4ezPuAd3iT1+nfAikRTYHMjKH
- sVrjy8li9omgzqh6jAN5ANQB1U2UDzg=
-X-Authority-Analysis: v=2.4 cv=e802j6p/ c=1 sm=1 tr=0 ts=6a4320e5 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+X-Proofpoint-ORIG-GUID: g_yr6KPyOChuZk8K09eW7FCSp6jJHkWx
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDAxNCBTYWx0ZWRfX+k6tZd0Y4dU2
+ 4qVW01wYadKsHRaFSBpu6mKud9ZATHLMYFgMsO9psF70JfueaiRDfr3TjSWaAUnRlBVbacKSjmm
+ b27KqId6svzgEOvLfm9QqYgdtfSBQfw=
+X-Authority-Analysis: v=2.4 cv=e802j6p/ c=1 sm=1 tr=0 ts=6a4320ea cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
- a=snJZ9v3O13RfP-hfMHkA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: 6Da8rfOmvUiSy0tvIReb_TeDebtsn55P
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAxNCBTYWx0ZWRfXxY152QxJIBXC
- 81fOB1mdLjx5kLUTgKj9GPt2aUdBHvH1qCnI246lBw9dGREr2aAXOp5UKvA6FKIAqM2J+k8iFLD
- Ugt/YOws5kFssI973HAOTbBSKOOqf26EnL55lCXqrtiTlUtqUlIYJI79y5IXJNblRRAcw7SVKtP
- z61CehPTUjDw4cojQTRNGciJzV0RVGAlvFMliQyMEe002z3KbvKZ4p+zhLO2GghOaP00VFcpJRO
- qnPsP/dZRqS62i+MvXmACiLgb+vYJ6ip4A4+gtIr89QYuvJ0YXQY1GHt0THBxrupe1WstAVtotA
- WQbtE7k+Ez/NvIqxcwftfCFx77v+I2QOLug+D4rqO5wKXCLc2oD9vbd1te8NdTx0TvAuqgp1ZKT
- xgzbTWHkhMtTWKf+CmjmsPSou6U5tWf6qJJerqVDaoe8B/nrULs3LNYIIaFn81e+X3+VnB4WtF3
- mEol/zt0Ja1V/kPnC5w==
+ a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=voOhfFORqQuKaeI7gG4A:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: g_yr6KPyOChuZk8K09eW7FCSp6jJHkWx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDAxNCBTYWx0ZWRfX4b4sTDERSRyX
+ q//q06XYGyx3QO5b5bmgDchLjvKwrvs5WodFQkt4ALORgWc/jWoxQ0UwDhNPSgnh+h0LkXb48PG
+ 2orD08XOKArFLG7u1FGtETjxt5pmkqyFZn6Cizllcl3WBR2Q4JMIc5fabSgFZ6n0jiOaDiKQcXA
+ KvyK3YYTQ6Cr2k7RZpeQ19zijVElFhxLnbW5NqW4gRyT2R6ebmMkZAWDh2+v/vycjigh3HXcgT+
+ LO5/xP1I0pBJteLlg9e9kn9gngW6eUVzeEGJ20HLe9+fGpeW/QcrlEixqCYKK5M0cjEyw1VmeMb
+ y42Vr6hYZheqWG+PYwyxOqcIFZwRncD3Y92fsOpH1ZpgpLmi/N/fr9Zh4ksFM2IHeYYNEbTv/1o
+ I641qxH5krx7NdxZIBR8TZs/zAgLzvzvpaR+29c1WIeCGKu79VBkmK+/RcHRube62lo+xuVmdk1
+ 7c1dFLKpZiEjmX5NkTw==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-30_01,2026-06-26_01,2025-10-01_01
@@ -105,12 +109,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302888-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302889-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:dsahern@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:rkannoth@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
@@ -123,63 +127,126 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:mid,marvell.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,vger.kernel.org:from_smtp];
 	DKIM_TRACE(0.00)[marvell.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 02A256DFAC8
+X-Rspamd-Queue-Id: 649EE6DFAF4
 
-The kernel gained support for devlink parameters of type
-DEVLINK_VAR_ATTR_TYPE_U64_ARRAY.  These parameters carry a variable-length
-list of u64 values encoded as multiple DEVLINK_ATTR_PARAM_VALUE_DATA
-attributes.  This is used by drivers that need to expose ordered lists of
-configuration values, such as the Marvell CN20K npc_srch_order parameter.
+Replace MNL_TYPE_* constants with DEVLINK_VAR_ATTR_TYPE_* when
+handling DEVLINK_ATTR_PARAM_TYPE in param value display and set
+paths. The kernel uAPI now exposes these values directly via
+devlink_var_attr_type.
 
-This series updates the devlink tool to handle the new UAPI and adds
-show/set support for u64-array parameters on both device and port params.
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ devlink/devlink.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-Patch 1 switches devlink param show/set to use DEVLINK_VAR_ATTR_TYPE_*
-constants instead of generic MNL_TYPE_* values when interpreting
-DEVLINK_ATTR_PARAM_TYPE.  The kernel now reports param types using
-devlink_var_attr_type, so userspace must use the matching symbols.
-
-Patch 2 adds parsing, display, and configuration support for
-DEVLINK_VAR_ATTR_TYPE_U64_ARRAY.  Values are shown as a space-separated
-list of u64 elements.  Setting accepts a space- or comma-separated list
-and emits one DEVLINK_ATTR_PARAM_VALUE_DATA attribute per element.
-
-Tested on CN20K hardware with npc_srch_order:
-
-  # show search order
-  devlink dev param show pci/0002:01:00.0 name npc_srch_order
-  pci/0002:01:00.0:
-    name npc_srch_order type driver-specific
-      values:
-        cmode runtime value  value  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-
-  # set search order
-  devlink dev param set pci/0002:01:00.0 name npc_srch_order \
-    value 31,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 \
-    cmode runtime
-
-Depends on the corresponding kernel UAPI addition of
-DEVLINK_VAR_ATTR_TYPE_U64_ARRAY.
-
-Ratheesh Kannoth (2):
-  devlink: use DEVLINK_VAR_ATTR_TYPE_* in param show/set
-  devlink: support u64-array values in devlink param show/set
-
- devlink/devlink.c            | 178 ++++++++++++++++++++++++++++++++---
- include/uapi/linux/devlink.h |   1 +
- 2 files changed, 164 insertions(+), 15 deletions(-)
-
---
-v1 -> v2: Addressed David comments
-	https://lore.kernel.org/netdev/20260615041042.549715-1-rkannoth@marvell.com/
-
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index b4deba30..9372e92f 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -3507,7 +3507,7 @@ static int pr_out_param_value_print(const char *nla_name, int nla_type,
+ 	print_string(PRINT_FP, NULL, " %s ", label);
+ 
+ 	switch (nla_type) {
+-	case MNL_TYPE_U8:
++	case DEVLINK_VAR_ATTR_TYPE_U8:
+ 		if (conv_exists) {
+ 			err = param_val_conv_str_get(param_val_conv,
+ 						     PARAM_VAL_CONV_LEN,
+@@ -3522,7 +3522,7 @@ static int pr_out_param_value_print(const char *nla_name, int nla_type,
+ 				   mnl_attr_get_u8(val_attr));
+ 		}
+ 		break;
+-	case MNL_TYPE_U16:
++	case DEVLINK_VAR_ATTR_TYPE_U16:
+ 		if (conv_exists) {
+ 			err = param_val_conv_str_get(param_val_conv,
+ 						     PARAM_VAL_CONV_LEN,
+@@ -3537,7 +3537,7 @@ static int pr_out_param_value_print(const char *nla_name, int nla_type,
+ 				   mnl_attr_get_u16(val_attr));
+ 		}
+ 		break;
+-	case MNL_TYPE_U32:
++	case DEVLINK_VAR_ATTR_TYPE_U32:
+ 		if (conv_exists) {
+ 			err = param_val_conv_str_get(param_val_conv,
+ 						     PARAM_VAL_CONV_LEN,
+@@ -3552,11 +3552,11 @@ static int pr_out_param_value_print(const char *nla_name, int nla_type,
+ 				   mnl_attr_get_u32(val_attr));
+ 		}
+ 		break;
+-	case MNL_TYPE_STRING:
++	case DEVLINK_VAR_ATTR_TYPE_STRING:
+ 		print_string(PRINT_ANY, label, "%s",
+ 			     mnl_attr_get_str(val_attr));
+ 		break;
+-	case MNL_TYPE_FLAG:
++	case DEVLINK_VAR_ATTR_TYPE_FLAG:
+ 		if (flag_as_u8)
+ 			print_bool(PRINT_ANY, label, "%s",
+ 				   mnl_attr_get_u8(val_attr));
+@@ -3822,7 +3822,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 
+ 	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, ctx.nla_type);
+ 	switch (ctx.nla_type) {
+-	case MNL_TYPE_U8:
++	case DEVLINK_VAR_ATTR_TYPE_U8:
+ 		if (conv_exists) {
+ 			err = param_val_conv_uint_get(param_val_conv,
+ 						      PARAM_VAL_CONV_LEN,
+@@ -3839,7 +3839,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 			return 0;
+ 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
+ 		break;
+-	case MNL_TYPE_U16:
++	case DEVLINK_VAR_ATTR_TYPE_U16:
+ 		if (conv_exists) {
+ 			err = param_val_conv_uint_get(param_val_conv,
+ 						      PARAM_VAL_CONV_LEN,
+@@ -3856,7 +3856,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 			return 0;
+ 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
+ 		break;
+-	case MNL_TYPE_U32:
++	case DEVLINK_VAR_ATTR_TYPE_U32:
+ 		if (conv_exists) {
+ 			err = param_val_conv_uint_get(param_val_conv,
+ 						      PARAM_VAL_CONV_LEN,
+@@ -3873,7 +3873,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 			return 0;
+ 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
+ 		break;
+-	case MNL_TYPE_U64:
++	case DEVLINK_VAR_ATTR_TYPE_U64:
+ 		if (conv_exists)
+ 			err = param_val_conv_uint_get(param_val_conv,
+ 						      PARAM_VAL_CONV_LEN,
+@@ -3888,7 +3888,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 			return 0;
+ 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u64);
+ 		break;
+-	case MNL_TYPE_FLAG:
++	case DEVLINK_VAR_ATTR_TYPE_FLAG:
+ 		err = str_to_bool(dl->opts.param_value, &val_bool);
+ 		if (err)
+ 			goto err_param_value_parse;
+@@ -3898,7 +3898,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 			mnl_attr_put(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
+ 				     0, NULL);
+ 		break;
+-	case MNL_TYPE_STRING:
++	case DEVLINK_VAR_ATTR_TYPE_STRING:
+ 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
+ 				  dl->opts.param_value);
+ 		if (!strcmp(dl->opts.param_value, ctx.value.vstr))
+-- 
 2.43.0
+
 
