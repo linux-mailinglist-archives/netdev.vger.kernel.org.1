@@ -1,95 +1,94 @@
-Return-Path: <netdev+bounces-302950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302951-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HtoLHyhEQ2oUWQoAu9opvQ
-	(envelope-from <netdev+bounces-302950-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:20:56 +0200
+	id 0V++CFpEQ2oYWQoAu9opvQ
+	(envelope-from <netdev+bounces-302951-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:21:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA1276E03BA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:20:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F296E03C9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 06:21:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=WepGYRF2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302950-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302950-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=O323CP3q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302951-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302951-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4859130889BF
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:17:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1DCFB309E4EA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948873E6DDD;
-	Tue, 30 Jun 2026 04:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D4A33BBCF;
+	Tue, 30 Jun 2026 04:17:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1453E5A31
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E9D3B71D7
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:17:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782793012; cv=none; b=EP5B0nSfBvdjFMlv+1mwxakFRqicFENJ/MgcX5lJGZH2pFlVHF31H0PDbLf5JPwcd/I0YUXxwZXr+GUcyVi0NUqGsOpIi9elViF2c5/kgplT81MH/Ar0XQrgUdsvnuyHsyMwLIj7bTrYfXRJ/lK5AYn2rWdAWJ2no6Y4fP8LxnI=
+	t=1782793049; cv=none; b=Uy3+OQy1jY2h5hRF+XkknrDOhc3nyI1q239RGfH1639qPYEVK1Nlt190XW/s8UIgc9SooNq5ti4uxvMF0lFg/M1d205T95puejJx8Bjtprb8cYOYZ7jn9lvZVyKP0yryCk0dR1KNrB+wymYtENuunTvVdsKLOsiE8Rc6L8TJDzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782793012; c=relaxed/simple;
-	bh=64aL75OIgqDclMA6C8tWWwaoVnGiBmBtYT/k0X5tWGo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G5tPXKHhESpIHQJw3LjVNbzRZR1HPY8A4Var2zLVjVoghaMknp5hc1I9unSXjuuNfmB6Co2PXa9GOeXSz+dbhCoHD1lDHAEzlCkFYEi/tC/uIyxAwAC15T8a3ySBhC8QsqzzFU1Z0qpJxZXj2WPGjFC7cFAb7y3t0T06PFpCOiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WepGYRF2; arc=none smtp.client-ip=209.85.215.169
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c8fee9f63d5so1616635a12.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:16:50 -0700 (PDT)
+	s=arc-20240116; t=1782793049; c=relaxed/simple;
+	bh=8u5uZUMqhrL/gnN85tqtWF3US52t+rBo+R6AWDwO5ck=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NUW+S8E52Z/t3fdT6ZbUiPFZIK9B10uR8oWNazPhct81cPRYWo07BYiuuItWzQlRpzDwNSwL4FapMEr0UvMshVhWPPvHd5TD2vrWCeKbDgLXdoiLO5Gsj6IeX4BEYK/wUtG6SC7PN0xtNQQ2f5xWxuFjW20I95P5WGpbWS5KZa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O323CP3q; arc=none smtp.client-ip=74.125.82.42
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-139edc6bfc0so7642621c88.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 21:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782793010; x=1783397810; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=9NXRc86Umg+xwqOwvqqu82cgLkqOtrrtEqy6z9NCU5o=;
-        b=WepGYRF2oX2AX4FpdPtkA5tflrv//lcqhbnhmZ2Vbgcl+vzeQYPEIKJmnmocEz+5MJ
-         jM3XqsfRPVkmco4nt2SAVT+D4gVHohp5bJgCLx9ssHDbbWiNt3k27s8gEWcM0c4QskqK
-         If1cjOudN/Gl374qjvQPVTjw2oSoCe7M8rXxm0yprWzCevL11yLbEe8Y3RDJjDfWsHJ6
-         W6/Aq1rnbLree//n7Lx2nEEghDzY7v5NpAGXr9unA3UFu70bOl4LtE3YCtVRgcw+NAOx
-         qQfY7w4ksFglMIaW8WnVugXUntkS0ZMue+oKayjnBPAUj0xwrxLJ2jq+I7SXAy6GcFUU
-         XJ6A==
+        d=gmail.com; s=20251104; t=1782793045; x=1783397845; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OjgHD+veL6Mrs93d7R3aSe1UX0mQg1cLxReyF2YhYPw=;
+        b=O323CP3qFts6eay/77P5Bgbp0JoTIDQIXpTbAo5xG4OQTLtykzxJcwieKuJM0e1n/J
+         4JHRHXVin4N8vfSQgj73907E9c/HawBqTLJg4mC0c571T7L6J5j/c+DJQEK1wdErE8IH
+         Ahu+GHiD/KbCy2CLZFAszbcdQ29yWRq5nj+csx5CPpWcjWtxr3/UhpY/Nwz27FaisPgt
+         2RaVmtSvHZQbDBZLPq/PrzIjlnVaj1aneagwCJSCLIsI8MuMtsUOBv81kAy1rZYAngIF
+         axj2u3IfLqnQt7MmnKbjuCC3JLd35YjvptO7+XTYwKrmmgRMa/0cv074haxzdd8MNW5x
+         GA8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782793010; x=1783397810;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9NXRc86Umg+xwqOwvqqu82cgLkqOtrrtEqy6z9NCU5o=;
-        b=Y162K8w/QECCyPVwB/4FrWkYd9qP+lGuoWVFgjs+DEyEdp/IoOdBL8yXGScnfTBN/d
-         6sCoj55kIqXqo3XYalrUwW4t9taTVOkCLn4uJckOtHI7/LHSfBdcexCCsGhYe7wC+h7C
-         C7rnUANoVV3V/v1ZgwDJzvobtczK/i1skCUJunRP/gyYQBeuWgTxf5ugB/zmBb8qgA6/
-         wXlZL/QlVhaBnJc5c7unShD1CfAYmMlY5s+6ZfsPfsVUd4nkA7nf0RcIEZZRfahxzDkw
-         AGOnqhqpKwIvL8i7voVRf9bXAaufiCfHJ6ryvR5SVIa0anmleLDKNGySlBlB+0DtqGfq
-         Qu0g==
-X-Gm-Message-State: AOJu0YwSqWc2w4kXddIJsUA9LXOeuubVvq/hCNpUhlJo/qzIyC2xL73M
-	Wg5TNJesytWbhVxXVCuaKpND/PyPD2kQw9nNIRBZClfcPH9GStffFOvMTPEUOCkN
-X-Gm-Gg: AfdE7cnNU6Wyh8luslApAPr3i6qbhjtAzdDu5SbPy0SRJiMWyjRe+XEzCrlZfMo3dl8
-	dnHsWw536uBHRDwpSJOccAgosXKPKZADSWatvSy+WOUEpgthbV0CCHNpRxtughMENvypVgppPxf
-	DYhQ4zzoqihPv1T6d3Zqq8Vp0Zg/SiUHxZAkwCwha9/u7NZvzqSKo4rrm50R9hc5u2k8RLQqZOo
-	QuGRJ+dNJCGh17ecmBHBzwCKBkL+g5c61I3oGVwCqxQE+qD9iiYS42G2zHpD04IHVo3IWlnYyJ6
-	M9mSa0PA2i4wuAJ8kocvTZsUn8y9fqDCCAsndEhQ3XQP1PahEOsKtdJRRD0cmV8GlDh5j2tXkFP
-	mkAWsKKryGw5vJ7rved+O9G8NDcX1F7h6oHozQhZxCFVrZ7BLHaBFqzB1xwawuqDJF6+cWyRw4I
-	T6T/Jy9aXM9DNvj7TR+DzCTDO5ZLydTr14KSvgGQHfqUm1NXHC798e6UyIVihvwL8arWzidNaPR
-	m0NVaoPfQ==
-X-Received: by 2002:a05:6a21:6013:b0:3bf:7ab7:98a4 with SMTP id adf61e73a8af0-3bfc5101243mr1788990637.27.1782793009975;
-        Mon, 29 Jun 2026 21:16:49 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbf95a3e7sm702659a12.19.2026.06.29.21.16.48
+        d=1e100.net; s=20251104; t=1782793045; x=1783397845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OjgHD+veL6Mrs93d7R3aSe1UX0mQg1cLxReyF2YhYPw=;
+        b=Bx8kXPiqtCsTYnIgxvX4+Ok8fmVDlBdWcE16gYj+HiN5KlDHE1Rxd3NwqtViDp5Fys
+         ToZAljrJHH1mtgJPeQ0KT/4fAWJ0+qXC/X63E5jZFwzI/3+VWRlDdN2y6tRYHcLaTEI8
+         bxWsEGMqdko/qCcaM0L5l4/Zj304zSI+g7DZOD4LK+/23VN5B3MuXiYTxIvJ9XxwHbRO
+         5NIYcR69nTMJwptXMc01u4doAGTEgKBiWM6vW8Ob6v8hK+5YCw7JkxZSJ2+QAqYB91cW
+         IYXuvI+JpLERJHMHFCSBCbVIoNQW1PyCZSKNyDPacr5EN5obLB2jCjdbDViSdw+W2jaK
+         sP4A==
+X-Forwarded-Encrypted: i=1; AFNElJ8wMaP5zEeSqkfDVsjzDZ0w8DrM65Il9QiFGvophZtpQV/ezblhQRNRXy8RjmzzMm41rmt6ymM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNJY0tqkWpzk+vT3mE91byRl9JAZow5mZvOwWzBL6VOwtF3GXE
+	q89bhP/tpwtA0sYvD9iGm9P4eOQnt90mpr9QIim+AB34juXE1TnbbK6j
+X-Gm-Gg: AfdE7clDhA6lolU4Z6bwD25nQPYVvZCwEloKLhWbqkfEDsvLXG5pdI4FrW91vb2mCRZ
+	dw3/llgbuVhrGcbb/x1YflTUf0xVTPU0Hg7eEYbLYQ0MWjZw8LOd99e25t9wA+bCvvJdjDiWT2p
+	MyAW9n5NmAs4dl+rbhEGautpHjEgEK1cUJPnimGZ0aLFwp4PQeGk3I1ecyzmjTFK2YTUenJIFzT
+	AWLmJj8YhJp6IU+UvWf7YJicN+C1VEA+tVoCwVXJQGeJDuHU2+M3Hos0yThgIP1gMelSN+IYhl4
+	YgosptEfT+/Z0p1gPJFuD33gJzZE1rdKrkMpYXJCidctxNCdXRb77t5jvIoUCqgiOZsUdddC0S4
+	FT3Zk7xDVvPLpWfW6BxbtQZ+WNzz3fqLTE4X7Soc2ylmwLuUIwuol5QaKmiIRtx9CANPklsmwnZ
+	vQqImbkAMw1VeyJsH2dfgMEMPAhtpzBDmdWaEpjIM/xzBya0oHGQE1735vcpsdLPGlokmr
+X-Received: by 2002:a05:7022:fa0:b0:13b:20ad:b96a with SMTP id a92af1059eb24-13b2a1dd575mr1300904c88.50.1782793045226;
+        Mon, 29 Jun 2026 21:17:25 -0700 (PDT)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:bf30:8dca:9d63:c0de])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b2a9b425asm3891062c88.0.2026.06.29.21.17.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 21:16:49 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 10/10] net: emac: use ndo_get_stats64 instead of ndo_get_stats
-Date: Mon, 29 Jun 2026 21:16:34 -0700
-Message-ID: <20260630041634.284127-11-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260630041634.284127-1-rosenp@gmail.com>
-References: <20260630041634.284127-1-rosenp@gmail.com>
+        Mon, 29 Jun 2026 21:17:24 -0700 (PDT)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: castet.matthieu@free.fr,
+	stf_xl@wp.pl,
+	3chas3@gmail.com,
+	gregkh@linuxfoundation.org
+Cc: linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+3d45d763d18796f97412@syzkaller.appspotmail.com
+Subject: [PATCH] usb: atm: ueagle: fix use-after-free in uea_upload_pre_firmware()
+Date: Tue, 30 Jun 2026 09:47:16 +0530
+Message-ID: <20260630041716.97102-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,172 +99,103 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lists.sourceforge.net,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-302951-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302950-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:castet.matthieu@free.fr,m:stf_xl@wp.pl,m:3chas3@gmail.com,m:gregkh@linuxfoundation.org,m:linux-atm-general@lists.sourceforge.net,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:kartikey406@gmail.com,m:syzbot+3d45d763d18796f97412@syzkaller.appspotmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[free.fr,wp.pl,gmail.com,linuxfoundation.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,3d45d763d18796f97412];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,appspotmail.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,syzkaller.appspot.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EA1276E03BA
+X-Rspamd-Queue-Id: 76F296E03C9
 
-Replace the legacy emac_stats() callback with emac_get_stats64()
-that fills struct rtnl_link_stats64 directly from the driver's
-u64 counters, avoiding truncation of 64-bit values on 32-bit
-architectures.
+uea_load_firmware() calls request_firmware_nowait() passing a raw
+struct usb_device pointer as context, without holding a reference
+to it.
 
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+If the USB device is disconnected before the firmware workqueue
+fires, the usb_device and its usb_interface objects are freed while
+uea_upload_pre_firmware() is still pending on the workqueue. When
+the callback eventually runs, it accesses the freed memory causing
+a slab-use-after-free:
+
+  BUG: KASAN: slab-use-after-free in __intf_to_usbdev
+  include/linux/usb.h:752 [inline]
+  BUG: KASAN: slab-use-after-free in uea_upload_pre_firmware+0x8d/0x640
+  drivers/usb/atm/ueagle-atm.c:598
+  Read of size 8 at addr ffff88802b0710b8 by task kworker/0:2/1664
+
+Fix by calling usb_get_dev() before queuing the firmware request to
+pin the usb_device in memory for the lifetime of the async operation,
+and usb_put_dev() in the callback once it is finished with the
+pointer. On the error path where request_firmware_nowait() itself
+fails, drop the reference immediately since the callback will never
+fire.
+
+Reported-by: syzbot+3d45d763d18796f97412@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3d45d763d18796f97412
+Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/core.c | 84 ++++++++++++++--------------
- 1 file changed, 41 insertions(+), 43 deletions(-)
+ drivers/usb/atm/ueagle-atm.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index da5f3d436aa3..c62abc8aa471 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -2026,57 +2026,55 @@ static irqreturn_t emac_irq(int irq, void *dev_instance)
- 	return IRQ_HANDLED;
+diff --git a/drivers/usb/atm/ueagle-atm.c b/drivers/usb/atm/ueagle-atm.c
+index d610cdcef7d0..686cc58fb89f 100644
+--- a/drivers/usb/atm/ueagle-atm.c
++++ b/drivers/usb/atm/ueagle-atm.c
+@@ -663,6 +663,7 @@ static void uea_upload_pre_firmware(const struct firmware *fw_entry,
+ 	uea_err(usb, "firmware is corrupted\n");
+ err:
+ 	release_firmware(fw_entry);
++	usb_put_dev(usb);
  }
  
--static struct net_device_stats *emac_stats(struct net_device *ndev)
-+static void emac_get_stats64(struct net_device *ndev,
-+			     struct rtnl_link_stats64 *stats)
- {
- 	struct emac_instance *dev = netdev_priv(ndev);
- 	struct emac_stats *st = &dev->stats;
- 	struct emac_error_stats *est = &dev->estats;
--	struct net_device_stats *nst = &ndev->stats;
- 	unsigned long flags;
+ /*
+@@ -693,12 +694,14 @@ static int uea_load_firmware(struct usb_device *usb, unsigned int ver)
+ 		break;
+ 	}
  
- 	DBG2(dev, "stats" NL);
++	usb_get_dev(usb);
+ 	ret = request_firmware_nowait(THIS_MODULE, 1, fw_name, &usb->dev,
+ 					GFP_KERNEL, usb,
+ 					uea_upload_pre_firmware);
+-	if (ret)
++	if (ret) {
+ 		uea_err(usb, "firmware %s is not available\n", fw_name);
+-	else
++		usb_put_dev(usb);
++	} else
+ 		uea_info(usb, "loading firmware %s\n", fw_name);
  
--	/* Compute "legacy" statistics */
- 	spin_lock_irqsave(&dev->lock, flags);
--	nst->rx_packets = (unsigned long)st->rx_packets;
--	nst->rx_bytes = (unsigned long)st->rx_bytes;
--	nst->tx_packets = (unsigned long)st->tx_packets;
--	nst->tx_bytes = (unsigned long)st->tx_bytes;
--	nst->rx_dropped = (unsigned long)(est->rx_dropped_oom +
--					  est->rx_dropped_error +
--					  est->rx_dropped_resize +
--					  est->rx_dropped_mtu);
--	nst->tx_dropped = (unsigned long)est->tx_dropped;
--
--	nst->rx_errors = (unsigned long)est->rx_bd_errors;
--	nst->rx_fifo_errors = (unsigned long)(est->rx_bd_overrun +
--					      est->rx_fifo_overrun +
--					      est->rx_overrun);
--	nst->rx_frame_errors = (unsigned long)(est->rx_bd_alignment_error +
--					       est->rx_alignment_error);
--	nst->rx_crc_errors = (unsigned long)(est->rx_bd_bad_fcs +
--					     est->rx_bad_fcs);
--	nst->rx_length_errors = (unsigned long)(est->rx_bd_runt_packet +
--						est->rx_bd_short_event +
--						est->rx_bd_packet_too_long +
--						est->rx_bd_out_of_range +
--						est->rx_bd_in_range +
--						est->rx_runt_packet +
--						est->rx_short_event +
--						est->rx_packet_too_long +
--						est->rx_out_of_range +
--						est->rx_in_range);
--
--	nst->tx_errors = (unsigned long)(est->tx_bd_errors + est->tx_errors);
--	nst->tx_fifo_errors = (unsigned long)(est->tx_bd_underrun +
--					      est->tx_underrun);
--	nst->tx_carrier_errors = (unsigned long)est->tx_bd_carrier_loss;
--	nst->collisions = (unsigned long)(est->tx_bd_excessive_deferral +
--					  est->tx_bd_excessive_collisions +
--					  est->tx_bd_late_collision +
--					  est->tx_bd_multple_collisions);
-+	stats->rx_packets = st->rx_packets;
-+	stats->rx_bytes = st->rx_bytes;
-+	stats->tx_packets = st->tx_packets;
-+	stats->tx_bytes = st->tx_bytes;
-+	stats->rx_dropped = est->rx_dropped_oom +
-+			    est->rx_dropped_error +
-+			    est->rx_dropped_resize +
-+			    est->rx_dropped_mtu;
-+	stats->tx_dropped = est->tx_dropped;
-+
-+	stats->rx_errors = est->rx_bd_errors;
-+	stats->rx_fifo_errors = est->rx_bd_overrun +
-+				est->rx_fifo_overrun +
-+				est->rx_overrun;
-+	stats->rx_frame_errors = est->rx_bd_alignment_error +
-+				 est->rx_alignment_error;
-+	stats->rx_crc_errors = est->rx_bd_bad_fcs +
-+			       est->rx_bad_fcs;
-+	stats->rx_length_errors = est->rx_bd_runt_packet +
-+				  est->rx_bd_short_event +
-+				  est->rx_bd_packet_too_long +
-+				  est->rx_bd_out_of_range +
-+				  est->rx_bd_in_range +
-+				  est->rx_runt_packet +
-+				  est->rx_short_event +
-+				  est->rx_packet_too_long +
-+				  est->rx_out_of_range +
-+				  est->rx_in_range;
-+
-+	stats->tx_errors = est->tx_bd_errors + est->tx_errors;
-+	stats->tx_fifo_errors = est->tx_bd_underrun +
-+				est->tx_underrun;
-+	stats->tx_carrier_errors = est->tx_bd_carrier_loss;
-+	stats->collisions = est->tx_bd_excessive_deferral +
-+			    est->tx_bd_excessive_collisions +
-+			    est->tx_bd_late_collision +
-+			    est->tx_bd_multple_collisions;
- 	spin_unlock_irqrestore(&dev->lock, flags);
--	return nst;
- }
- 
- static struct mal_commac_ops emac_commac_ops = {
-@@ -3040,7 +3038,7 @@ static int emac_init_config(struct emac_instance *dev)
- static const struct net_device_ops emac_netdev_ops = {
- 	.ndo_open		= emac_open,
- 	.ndo_stop		= emac_close,
--	.ndo_get_stats		= emac_stats,
-+	.ndo_get_stats64	= emac_get_stats64,
- 	.ndo_set_rx_mode	= emac_set_multicast_list,
- 	.ndo_eth_ioctl		= emac_ioctl,
- 	.ndo_tx_timeout		= emac_tx_timeout,
-@@ -3052,7 +3050,7 @@ static const struct net_device_ops emac_netdev_ops = {
- static const struct net_device_ops emac_gige_netdev_ops = {
- 	.ndo_open		= emac_open,
- 	.ndo_stop		= emac_close,
--	.ndo_get_stats		= emac_stats,
-+	.ndo_get_stats64	= emac_get_stats64,
- 	.ndo_set_rx_mode	= emac_set_multicast_list,
- 	.ndo_eth_ioctl		= emac_ioctl,
- 	.ndo_tx_timeout		= emac_tx_timeout,
+ 	return ret;
 -- 
-2.54.0
+2.43.0
 
 
