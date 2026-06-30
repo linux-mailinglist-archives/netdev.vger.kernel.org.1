@@ -1,638 +1,244 @@
-Return-Path: <netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302908-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +e6lJiwwQ2pgUAoAu9opvQ
-	(envelope-from <netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:55:40 +0200
+	id /4HiH0oxQ2onUQoAu9opvQ
+	(envelope-from <netdev+bounces-302908-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 05:00:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5C26DFEE6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 04:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA486DFF0E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 05:00:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=o0CHDKJg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302907-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=hotmail.com (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=hotmail.com header.s=selector1 header.b=Iz0MpEGX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302908-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-302908-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=hotmail.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD5A93007F72
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 02:55:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79E443007CA4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916FB3C4154;
-	Tue, 30 Jun 2026 02:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A2F3D0932;
+	Tue, 30 Jun 2026 03:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazolkn19012055.outbound.protection.outlook.com [52.103.66.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E473C4168
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 02:55:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782788137; cv=none; b=sfYasSXF3ao9oc0TWTfm2C5vIFkQ5mohQQMSqHZsn56CI1C1P1PHzZogQ7zaI0GuUIf/XtVOORQBMPLjKR65EghutRAu4Y6OLV4u9vMm9H83l2kwMksCUseJPDAwSMAvtow7a3USYUwPwjJ142IT3cm3FiegJHqtAiLu0J+KWBQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782788137; c=relaxed/simple;
-	bh=k5S+EwGXo9wnJiy2kG7WcDaC9hH1KidHn90rcM3xm5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O3nyYLhpPFMpxlmiZYV9NuRJ7KgCQs1D/Yef41l7d8MZJOXeUSaXnxBEPXpDvCodLBzrKtjK5EP1WTraqenDODt3gpIE8Cnya8tP2Sju89ay+p9XVf6O857MTDbVWKwQSRqjd26XREYal1TJxhds6SSoSxxy/ks0ttNmJ/FS1Nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o0CHDKJg; arc=none smtp.client-ip=209.85.210.171
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8475eca3a66so1707722b3a.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 19:55:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782788132; x=1783392932; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=70RtwANMmvYdnz+RAS7YeHJdWbaLKfaEZdfOGz52FmU=;
-        b=o0CHDKJg2jI7XLiqXpHbyA+nTVX95g1cXIqmliMT6gpTkCc0t1JuzikK5jAraHwTiN
-         msbCxbSCwwjNXWsm06qTRCYTzmJv7WzY7pHIFDyXknCuGo22dXURWA3evnHz3mhBkqCG
-         VLXSOWJNTyQjFQsQR1D/TcjcuLod/DdGYRajh6ZRLmC7/Om5IYyJtq/U0jMIiYxIL6DZ
-         V2Clmqs6saa6e71IVOYytaGU/gosbFnSfu++oz7NHHo0vbZU5uAz1+K1dbMaHL1997qt
-         VCOQwsYCOcdEJC+uu8ydAEfqeZ/Zg+mixidnc9PLt1Ezl7eG5O53hu0aAX45Za6o2SN4
-         w+Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782788132; x=1783392932;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=70RtwANMmvYdnz+RAS7YeHJdWbaLKfaEZdfOGz52FmU=;
-        b=N/rA4XMc+IPe3Ay2UgWSSQPufvGMzz7gqWkwysbM78jPsDwEQ82UI1Wje23m34W+x6
-         3eSZffd5IQ/7yQ6/egJFaeg1RwNiAj9ua7IRtDLcIoKgFxBDZCN/Eh5T1Tbsd1yw1nwk
-         O6vbNEit080sz+LeGanv0me/Hj53IBdfC873/hBlh2fJ4w0Ahp9aWJESme+mmBZP5Qci
-         tEdnGK9kMwICRCfRfLP1cazeBPppUsY8Y7NKcdUn/h5NB6siSrK0v1pjV+CJZA3zG/IG
-         rps18YksrdlH15tpeKs/A4QQifPamzdR3KN3eHJrROmBVBkr8+MjPGd07qAPoh4JZ1DM
-         UJwQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqaPzcxpL92wfaWwU5VWj/bGCTpmGMYoRHY7PuLwbKfdZmGKMTFwxdojIxEN/M9NrjMmHCIOeM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWvQClD1XwThepLwCoznnbmne5SOOnYH4b8oq31c6PW4LGvkAI
-	aHes3pB7Wgx7e1Yn1lNVSQZqbAYCjWKTEnDDS9QiFf2iKTgSNj4gkWGw
-X-Gm-Gg: AfdE7cms2DbDgvQr3TZAoYwZbtqEaeBxf0A/iBJe2oA6C/XCN5Jw96LlOPFepB538jT
-	/zmIcZ+I/ez58Z3ILE7N2IGyL0bOuJszjVEByqtrPNMkAbWRLemUQbdPGpY1QckOJvtyRFRot18
-	cMKeaTtl9IyqcsVXmKVdwWlw4uWIuK/NazLybfUTGUX58NbL9WH/eQ5xlRJfdslfiqw9O9k5PR8
-	BQa6ZqHbi38sBIrxbnItdZYUhgfCl4rYKm6+zgNw8F74nCRgdRbGYQF+khlPceqZ1gksaJ2zRhM
-	TJ+jwwlX/4sf7HSnYOD5P6eKtZwKKODMpFFQZ+MU8lvjx8LiOdQJlWmjvpP+yiFIwo1bX5KbO5u
-	rlRa2vJ3ZEAxqdSEUJrjRYydP3XGOiJCrdCvLBfIGydQTN0/6UkEe7ZxqX4TsOOt4xAaywabA6e
-	yznbjt+8YKdNU8U1CwUuKnoWgwSHg7io00NHKz4Mpteo/EFOFFJexUJp4pkMmAMywD38PBZTodr
-	/rpuQAFi9pqSxOUUbtNM1905ml9pVN48iQX
-X-Received: by 2002:a05:6a00:94e1:b0:847:8dec:141c with SMTP id d2e1a72fcca58-8479f297813mr1546557b3a.51.1782788132162;
-        Mon, 29 Jun 2026 19:55:32 -0700 (PDT)
-Received: from kirchou-macbookpro2.roam.corp.google.com (softbank126051115229.bbtec.net. [126.51.115.229])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a033c884sm789453b3a.45.2026.06.29.19.55.29
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 29 Jun 2026 19:55:31 -0700 (PDT)
-Sender: kir <610548@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EF432D0E3;
+	Tue, 30 Jun 2026 03:00:22 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782788423; cv=fail; b=UtP28113kzmAaP2DESFuuQN8a0JcNxXMKRvy/cuCkR9BUafPY2K5Wbo+MYWgV9Tsvs92feYgiamzLQCvcsWphYJLQ3x8K1VvnLyHtxtPT94ksLR0GOJy0Br7dFTY+TEOOSfKCZIKhZCm08ykvQhN86yZaBbzrpB5ZukfwCOy4JM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782788423; c=relaxed/simple;
+	bh=YyXwwttf++UbQ/t0ElwXy7kcUI3/YtrMkMf6+umkhQk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hrW1YtmgLvK5v0ISyJYaa1K2tkZy8xqWyKziPqPkivyE6hoar9GqHNX8b8WCNtflg3X0ijc2WIkXCcsLfak1eASVMo8NCzk/kHWp0c7LGVJivWmXOcgP/m6FYZLslV3mSC0YVbMgi5xaHy17xSZEu1NVx7qrlAsUFsZ9uflElto=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=Iz0MpEGX; arc=fail smtp.client-ip=52.103.66.55
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Gv1H9kML4vArygL8vdvPvktoJI0JIMDwJVY5uf/3Bs/a8lKg1hvYYKJ+pYCwk3XtA7a3OqDT0MZsD6F9zVoK96SmjhYw15+rLHqGkgbtXLo8NRAk34qcg1yKhhqhQ3GfwSpsT1FzZb9klbKeUfO2v+m96uGn+n2HY24Ah3+npkgxofLD+QIjR5BBcZU7/IJ3vU5Xocg/OnshuDs4JHCxqfWa+21uM9bUx0N5uHEObsP28ytKycX0HKxYoyQOYwPElzSgDLUEL0YkXQde+UIrwIkce6oxGzBOkeMVA1DR1qQSxmN8eoK4Togc4yH6umM+OwmGhfKZyCEJbysAxO0w2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YyXwwttf++UbQ/t0ElwXy7kcUI3/YtrMkMf6+umkhQk=;
+ b=mqbXzVXbyaOrU8/iIUp5fZjoQwo9I46xXw3TzlCY9KZuQLToa9UO/mWFvDkfPFcodnQJi6ewXiz/wxuECejD0U9t95+G2g18DvpYAnIcohAkwx+fcBD4+myUwLl6vLUprJ+UJB2sU4oBlqLjt51P1CkyYZe9t+8BOBLCTq0xKHwoIRLQEnWhVX6+Yo6d4S4Jy430XFARZ8pQM13MtiRhwEY5c89mLlRFAlAYqqZgAB57GTZRSafNa7ECKSofrdFiJ/5NariEPDciTtAkKi0pmVAWcdVvAWQRm4gEXlxTgjGykNxtq5TS6U/l0SK6yD/QpxAKbncHcBIB9NXdiJi9Hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YyXwwttf++UbQ/t0ElwXy7kcUI3/YtrMkMf6+umkhQk=;
+ b=Iz0MpEGXITVhv8YFFb3Hm+8d9VAALXhKLyxiVc7qOW9Fs0VuQiI2wj7fTGcpJe0ndPtfoeak/CrikzTzQPk8lp8dVGiMepRogxoiNaByYM3tNF8T9T+IoFuaX/QA5eRsSvLt7I09mKHTf1jh7+vs9YGddQ7e+ZXXGSxDYarrSxesTTrqlZmK3mv9vSrsm0UI94GoOjI6quWq0HEmOohdGlM+NZTT6ma6Um90FLGyYXvKGXnOLd+9klesQroNq2zVS1vSNsqmCuj+QEOvuLc/REMXnaUVyaVgq2nlIKEkP5QdwptmqIYMjadr2vU0W7aqeHhhiFKFzzdVM+Wp8CabXw==
+Received: from TYZPR06MB6916.apcprd06.prod.outlook.com (2603:1096:405:42::10)
+ by OSNPR06MB8592.apcprd06.prod.outlook.com (2603:1096:604:492::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.16; Tue, 30 Jun
+ 2026 03:00:18 +0000
+Received: from TYZPR06MB6916.apcprd06.prod.outlook.com
+ ([fe80::e814:9b12:c9a7:5f4f]) by TYZPR06MB6916.apcprd06.prod.outlook.com
+ ([fe80::e814:9b12:c9a7:5f4f%3]) with mapi id 15.21.0159.012; Tue, 30 Jun 2026
+ 03:00:17 +0000
 From: Kir Chou <note351@hotmail.com>
-To: akpm@linux-foundation.org
-Cc: thomas.weissschuh@linutronix.de,
-	davidgow@google.com,
-	geert@linux-m68k.org,
-	visitorckw@gmail.com,
-	brendan.higgins@linux.dev,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	Kir Chou <note351@hotmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
-Subject: [PATCH] lib/random32: convert selftest to KUnit
-Date: Tue, 30 Jun 2026 11:55:23 +0900
-Message-ID: <20260630025524.75747-1-note351@hotmail.com>
-X-Mailer: git-send-email 2.52.0
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+CC: "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"thomas.weissschuh@linutronix.de" <thomas.weissschuh@linutronix.de>,
+	"davidgow@google.com" <davidgow@google.com>, "visitorckw@gmail.com"
+	<visitorckw@gmail.com>, "brendan.higgins@linux.dev"
+	<brendan.higgins@linux.dev>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "kunit-dev@googlegroups.com"
+	<kunit-dev@googlegroups.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Abeni Paolo
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, open list
+	<linux-kernel@vger.kernel.org>, "open list:NETWORKING"
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v3] lib/random32: convert selftest to KUnit
+Thread-Topic: [PATCH v3] lib/random32: convert selftest to KUnit
+Thread-Index: AQHdB4oCRDvxz59XqEyNwDocm0uKwLZVPLuAgAEtWYA=
+Date: Tue, 30 Jun 2026 03:00:17 +0000
+Message-ID:
+ <TYZPR06MB691672076025A5A6F476D90BE8F72@TYZPR06MB6916.apcprd06.prod.outlook.com>
+References: <20260629054143.7737-1-note351@hotmail.com>
+ <CAMuHMdWMx1zAgnzkoYqDB8TOu7s93L4f1PoeXVpYm1n4=dESnA@mail.gmail.com>
+In-Reply-To:
+ <CAMuHMdWMx1zAgnzkoYqDB8TOu7s93L4f1PoeXVpYm1n4=dESnA@mail.gmail.com>
+Accept-Language: en-US, zh-TW
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYZPR06MB6916:EE_|OSNPR06MB8592:EE_
+x-ms-office365-filtering-correlation-id: b83ce693-cd99-44d3-810b-08ded653b729
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|15080799012|25031999004|6072599003|14091999006|24021099003|19110799012|8060799015|8062599012|41001999006|39105399006|4140399003|31061999003|25010399006|22141099003|40105399003|41105399003|102099032|26104999009|3412199025|440099028;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?S2xLOUVSdjN6N2UwSzRMcVVzT1pzS0x1UGp0ZXV1ODNFT1hRelVLMkNURURN?=
+ =?utf-8?B?azhxd3NNZG1ZOUZ2T0o1UXliWTZYVEMrZE1iMkRqLzVHbW5jSW9UdWNzV09k?=
+ =?utf-8?B?bi8rWFQ1RXltdnAxQ2hGVlI5d3ZCMU9mVVlVSG9uK3JLaTRseGFZV2tQRVFW?=
+ =?utf-8?B?VlVLcHpJVzkzZ0JuT3o3cDZRMDFncFg4ZlFKUmFpWU1rNzBGU1JSSDhXdEFm?=
+ =?utf-8?B?WmthODJ6WVc5bDJLSitZR09JdjduTUJDNFRjZ0sxYXFLcCtvQkZ0bnVYb1RQ?=
+ =?utf-8?B?RXpVN2xodnROTmJsb3A4T1ZlQ09JRlZWZlhCUkxRS2dLQ2RmR2JlVlllazhO?=
+ =?utf-8?B?d21nVmlJK2dSRWt0SjdCRDNybDBKSHRCZWRwelVSVGdnNk1kRFdQaFlsQmx0?=
+ =?utf-8?B?Q3JOY1lnTEpOWVlCWVNiNzUrc25sYlMyYmRKajBvUWZ1SDdoTTJYbVdLTjY2?=
+ =?utf-8?B?bEt4bTNMNExwWXRtcnBYOEFQaHc1ZllXU1h4Mi9kc0dDWHVVN2VpNjB1aFR4?=
+ =?utf-8?B?OWF0VjNLUzBEMzJNOXJFU1hmTUpsdUd6REJZQzF4MVZwelZHWXdzYUVpdzdH?=
+ =?utf-8?B?YWExKzFGK1B4UklnbEZ4VzJIci8wV2J2dHc3eTNsdzV1ODlQRWpXRDMxaFMr?=
+ =?utf-8?B?S0E1anJXbDBWak8rbVBhaU5SZkRGbTRCUUhPVDVPVXFZd01lTjNRbW9TME4z?=
+ =?utf-8?B?NFFNY21GT080ZG5QQ0pJVk1TMEVCNE42SWh4YllkRHR6QVd3OU5PdUdFVkUz?=
+ =?utf-8?B?TnRZSFRUUmZmeWFySjYzSlQvWldUbkJHb1I5UkxZQkMwb0xkSU1BQlBOS3dQ?=
+ =?utf-8?B?aUc1RVVIZnQ4U0RaYUFSU0R1VjU1eXJXanRuZTNqMUttWEJSQmYyalVQQmdn?=
+ =?utf-8?B?SkQrSFo1OTZsT0gvSm1WLytERHQwb29qdWkyVjJkUWtVZ1pqWW9BbWt5QW9n?=
+ =?utf-8?B?S0QydWNJN2M5RXF4Wk5LWEhCRzlZc2h3VTM2ZnNZRjlmdnR2b1YyK2MybU9l?=
+ =?utf-8?B?SUpZdnVvbGN5MFRvWFplbklUZVF4YzNNU0cyUGl3L3RTcmpqSTRiM1NaUzVT?=
+ =?utf-8?B?aXBKdEpUbnczdmVlMGpIajY1NnRpT2ZmcmhKajlLYkZBK1prOExoYXJXbjE4?=
+ =?utf-8?B?QmdRaEFkVnRndmlxekYxcm1Xd3ZXZ1E5VStwdUw3TlNqdFMyQVNOZmF2Qmoy?=
+ =?utf-8?B?K3paM1p6MWE3RXIzU0VjZ1dWRVpKY0ZpMWM4WHU3U2lZZWRmeTQ2bWtKaVV5?=
+ =?utf-8?B?SzdvVUZ0d3hTeHl2c09hYmRnSlBRcW1jUDIzMEROandkWWx6Q240R251UzI1?=
+ =?utf-8?B?Y0NjSnBYYlUzMWk5VkszTkUrREhnOUdXY0doNjU4QnNyTVAxZ01sb0pqRllJ?=
+ =?utf-8?B?cENuVkRHQkI4RFVDY0NncHZxWHhBZytTa0tybVdyaGhiSUt4MHMySU5YVE9y?=
+ =?utf-8?B?c05HWGQwTXR2RXgvQlp2YXBGQjVlUnRyUzVNRzFSdTRDcGo5MDR6NThyRWNF?=
+ =?utf-8?Q?59bz7Q8Dr5yfwKJFumy03nNRrYj?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?RzF3ZzQ3bENqY3RTMzJ3aTZKRUJPZVRyWUVRMmZEenpOWkUySHhoN0JkeVQ0?=
+ =?utf-8?B?TE9tK0ZOTzdoWi9mMVhsVGlBK09Kb0Y0S3M0QmxESXk1YTJ3SXFGWGZzTzZG?=
+ =?utf-8?B?MjBETGZMTzVZaVRkRFljKy82a3hsZEYxaXdOSmRqN0lJY3g1ZGtGSWcxVG0z?=
+ =?utf-8?B?bUtRNk1aZEhUblBOdWlsWGV1SU5kaGYvNTZDMG1GSEYwRFFCcmhlV2paNEFX?=
+ =?utf-8?B?RHU4N2RHNkdzWnJ6OXVkeEV0T3Vudjc2dzJtb0IyQUFiTldHOE50RVhwNlVC?=
+ =?utf-8?B?U3F2NzRxZWFPRTlGT3cwS0JIa2dtZUVtT1hTVHZkdWg4eWZHd2NRcDVqdVoz?=
+ =?utf-8?B?ejVwbk9GSkFWWG4rUjgwMmdJQllXVVN6Mi9Denh1bzN6ZGs4eUpKOXVDSW1q?=
+ =?utf-8?B?ekFnU2FoTmMxQXlISmwxR2Ntd2ZPcjkzQkFTVW5RRGhFeHBEOTU5c2N0Y2M0?=
+ =?utf-8?B?U01wdlhCSjlUMThwYXlNZFVHRE9EN002SFpXcTNuRjJoUG51L0ZNUGNlNnkx?=
+ =?utf-8?B?L3c0LzhDUGhldHA5MDNNTnY1eDNTOW9NUDl0NW42aTEwR1I5Y1ZaZWF0NDly?=
+ =?utf-8?B?QVpRa2xwdDZIblJlMklxNGNZeXhrNlhJeVRkWlVHL3o2Q3hBcHVXb1dIamZH?=
+ =?utf-8?B?VVdvMldUZTRWQU5haU1zU0k5SHBlZW5VaysyYmFTcUpyOFBJM2RTN0IwT01M?=
+ =?utf-8?B?eXpBTFVKVFJwd2JxZ0VaRGpBUjdrdUpIVXF5Z09wSitOclBDdTU5WnhtRnhZ?=
+ =?utf-8?B?NzF3UkRyblJScFRVeWJqK3grRHRiai9OeXRHMFkwNU03SkFOUlJFbm4yeExm?=
+ =?utf-8?B?ak9BTExXTnRxMFZoblU5Z2phdk9JQngweHNUakhjYkNPMHczV2dhNytPZzd4?=
+ =?utf-8?B?VjE3WDhDY2JJMkR4dG95blhSaE8rQUJ3T1BuN24xTGpUNjZITzdUdS9rMXRV?=
+ =?utf-8?B?eEVaL253NHhlR1I2UXB6a3N6OHhtckJwOGl2dk02T2tNbVpLZXVEZDhQSWtP?=
+ =?utf-8?B?U2FOdGFvcTdnTkxERnNpZEs5WWVzYmNzc3RXT3BKVjBxdG01bHdmakprZkY2?=
+ =?utf-8?B?K0hyK1MzMnppSjJDMWFVZU9GbWtMSzBLVTVISGhXWU9FQXduNzdNc2ZKNE5y?=
+ =?utf-8?B?bW0rMUF3Vng3d2E5d2hBSzdNcnhGbDF4YlA2ZUg1YmMyWHdCNk0xclJYNjdy?=
+ =?utf-8?B?K2ZPVE52ZFdVbHJKN1pCTFZjUXllNmY1cWZJNi9Od1FEUlB4Z1QyVXZYYjJ6?=
+ =?utf-8?B?TjgwQ3lJR1BucWZQRTk4b0JBL1NxZnRNZFN4UjVmdURhV1IzTURHeXZ4aFcr?=
+ =?utf-8?B?bUU4ZlExT252WldoTW9lRFlYWTQ0dWUyekEyc0ptSWJxbTRwMEMzWWpMWWdm?=
+ =?utf-8?B?QkowcC8yRm1oeG1PWWlXbFFBWG8rRGRYQng4VTFtOCtMdVM0UTFLdzJCNENQ?=
+ =?utf-8?B?aFZ6MnFtamRWVUhSbXNpNEZwTmlUMitvZlRLVTltQ1hhSVVuV1NZODBxRmFa?=
+ =?utf-8?B?aXgxOExkbkdOQWxFOCtYMm1LUHJPbGpZR3lnNnNMQ2pUSDQ5dU55d1hhMWFp?=
+ =?utf-8?B?ZnFRWkt1akUvaDJ4U3lNa01PSTl1N2JzYWpGbkk5d0JacTdsVlpBQ3FzL215?=
+ =?utf-8?B?ZnpGc2tMTnFHRVRDUUxGSEZETHg3cVhRZ1o2VzV0cldtcndoNTc0VjU2aS82?=
+ =?utf-8?B?b1hsb2kvWnJSMEVBU0ZWSzVibnN2emhzMG9TMTZLRG1VQTM0L214aVc3dTlQ?=
+ =?utf-8?B?c2NoeEl4Qmd4SjJmV3VHRWdQV21pV3hhSVJrQWN0QXY2ZnFjYUsyVFQzNjhn?=
+ =?utf-8?B?YnJSWm0rVUZrNjBhUmRHelViYTdwcVcwNEdwSkNxVHd0Qk9yOXZHVmVEMmNw?=
+ =?utf-8?Q?NEWTkHw+pSW2V?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: sct-15-20-9412-4-msonline-outlook-25b72.templateTenant
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB6916.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: b83ce693-cd99-44d3-810b-08ded653b729
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2026 03:00:17.5782
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSNPR06MB8592
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.06 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hotmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[hotmail.com:s=selector1];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[hotmail.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[hotmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302907-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[note351@hotmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:akpm@linux-foundation.org,m:thomas.weissschuh@linutronix.de,m:davidgow@google.com,m:geert@linux-m68k.org,m:visitorckw@gmail.com,m:brendan.higgins@linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@googlegroups.com,m:note351@hotmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:geert@linux-m68k.org,m:akpm@linux-foundation.org,m:thomas.weissschuh@linutronix.de,m:davidgow@google.com,m:visitorckw@gmail.com,m:brendan.higgins@linux.dev,m:linux-kselftest@vger.kernel.org,m:kunit-dev@googlegroups.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-302908-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[linutronix.de,google.com,linux-m68k.org,gmail.com,linux.dev,vger.kernel.org,googlegroups.com,hotmail.com,davemloft.net,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER(0.00)[note351@hotmail.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[hotmail.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linux-foundation.org,linutronix.de,google.com,gmail.com,linux.dev,vger.kernel.org,googlegroups.com,davemloft.net,kernel.org,redhat.com];
+	DKIM_TRACE(0.00)[hotmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[note351@hotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,TYZPR06MB6916.apcprd06.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2D5C26DFEE6
+X-Rspamd-Queue-Id: CDA486DFF0E
 
-This patch converts the existing prandom selftest (lib/random32.c) to use
-the KUnit framework (lib/tests/random32_kunit.c). Unlike typical KUnit
-tests, this file is directly #included into lib/random32.c.
-
-The new test:
-- Removes the legacy CONFIG_RANDOM32_SELFTEST from lib/random32.c.
-- Adds CONFIG_PRANDOM_KUNIT_TEST (defaulting to KUNIT_ALL_TESTS).
-- Moves the test logic to lib/tests/random32_kunit.c.
-
-v2:
-- Removes the legacy CONFIG_RANDOM32_SELFTEST from lib/Kconfig.
-- Add const to arrays in lib/tests/random32_kunit.c.
-
-v3:
-- Changes from tristate to bool in lib/Kconfig.debug.
-
-v4:
-- Changes from bool to tristate in lib/Kconfig.debug.
-- Spins off the test into its own module under lib/tests/.
-- Adds a prototype for prandom_warmup() to avoid a warning.
-- Makes prandom_warmup() visible to the test in lib/random32.c.
-- Adds the build rule for random32_kunit.o to lib/tests/Makefile.
-
-This commit is verified by `./tools/testing/kunit/kunit.py run`
-with the .kunit/.kunitconfig:
-
-```
-CONFIG_KUNIT=y
-CONFIG_PRANDOM_KUNIT_TEST=y
-```
-
-Reviewed-by: David Gow <davidgow@google.com>
-Signed-off-by: Kir Chou <note351@hotmail.com>
----
- lib/Kconfig                |   6 --
- lib/Kconfig.debug          |   9 ++
- lib/random32.c             | 184 ++-----------------------------------
- lib/tests/Makefile         |   1 +
- lib/tests/random32_kunit.c | 181 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 201 insertions(+), 180 deletions(-)
- create mode 100644 lib/tests/random32_kunit.c
-
-diff --git a/lib/Kconfig b/lib/Kconfig
-index 2923924be..5f185e9f1 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -156,12 +156,6 @@ config AUDIT_COMPAT_GENERIC
- 	depends on AUDIT_GENERIC && AUDIT_ARCH_COMPAT_GENERIC && COMPAT
- 	default y
- 
--config RANDOM32_SELFTEST
--	bool "PRNG perform self test on init"
--	help
--	  This option enables the 32 bit PRNG library functions to perform a
--	  self test on initialization.
--
- #
- # compression support is select'ed if needed
- #
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index ba36939fd..0214a5859 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -3354,6 +3354,15 @@ config PRIME_NUMBERS_KUNIT_TEST
- 
- 	  If unsure, say N
- 
-+config PRANDOM_KUNIT_TEST
-+	tristate "KUnit test for prandom" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Enable this option to test the prandom functions at runtime.
-+
-+	  If unsure, say N
-+
- endif # RUNTIME_TESTING_MENU
- 
- config ARCH_USE_MEMTEST
-diff --git a/lib/random32.c b/lib/random32.c
-index 24e7acd93..dad90219c 100644
---- a/lib/random32.c
-+++ b/lib/random32.c
-@@ -41,6 +41,7 @@
- #include <linux/bitops.h>
- #include <linux/slab.h>
- #include <linux/unaligned.h>
-+#include <kunit/visibility.h>
- 
- /**
-  *	prandom_u32_state - seeded pseudo-random number generator.
-@@ -92,7 +93,14 @@ void prandom_bytes_state(struct rnd_state *state, void *buf, size_t bytes)
- }
- EXPORT_SYMBOL(prandom_bytes_state);
- 
--static void prandom_warmup(struct rnd_state *state)
-+/*
-+ * Only declared here so that it has a prototype when made
-+ * non-static for KUnit testing (avoids -Wmissing-prototypes).
-+ */
-+#if IS_ENABLED(CONFIG_KUNIT)
-+void prandom_warmup(struct rnd_state *state);
-+#endif
-+VISIBLE_IF_KUNIT void prandom_warmup(struct rnd_state *state)
- {
- 	/* Calling RNG ten times to satisfy recurrence condition */
- 	prandom_u32_state(state);
-@@ -106,6 +114,7 @@ static void prandom_warmup(struct rnd_state *state)
- 	prandom_u32_state(state);
- 	prandom_u32_state(state);
- }
-+EXPORT_SYMBOL_IF_KUNIT(prandom_warmup);
- 
- void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state)
- {
-@@ -125,176 +134,3 @@ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state)
- 	}
- }
- EXPORT_SYMBOL(prandom_seed_full_state);
--
--#ifdef CONFIG_RANDOM32_SELFTEST
--static struct prandom_test1 {
--	u32 seed;
--	u32 result;
--} test1[] = {
--	{ 1U, 3484351685U },
--	{ 2U, 2623130059U },
--	{ 3U, 3125133893U },
--	{ 4U,  984847254U },
--};
--
--static struct prandom_test2 {
--	u32 seed;
--	u32 iteration;
--	u32 result;
--} test2[] = {
--	/* Test cases against taus113 from GSL library. */
--	{  931557656U, 959U, 2975593782U },
--	{ 1339693295U, 876U, 3887776532U },
--	{ 1545556285U, 961U, 1615538833U },
--	{  601730776U, 723U, 1776162651U },
--	{ 1027516047U, 687U,  511983079U },
--	{  416526298U, 700U,  916156552U },
--	{ 1395522032U, 652U, 2222063676U },
--	{  366221443U, 617U, 2992857763U },
--	{ 1539836965U, 714U, 3783265725U },
--	{  556206671U, 994U,  799626459U },
--	{  684907218U, 799U,  367789491U },
--	{ 2121230701U, 931U, 2115467001U },
--	{ 1668516451U, 644U, 3620590685U },
--	{  768046066U, 883U, 2034077390U },
--	{ 1989159136U, 833U, 1195767305U },
--	{  536585145U, 996U, 3577259204U },
--	{ 1008129373U, 642U, 1478080776U },
--	{ 1740775604U, 939U, 1264980372U },
--	{ 1967883163U, 508U,   10734624U },
--	{ 1923019697U, 730U, 3821419629U },
--	{  442079932U, 560U, 3440032343U },
--	{ 1961302714U, 845U,  841962572U },
--	{ 2030205964U, 962U, 1325144227U },
--	{ 1160407529U, 507U,  240940858U },
--	{  635482502U, 779U, 4200489746U },
--	{ 1252788931U, 699U,  867195434U },
--	{ 1961817131U, 719U,  668237657U },
--	{ 1071468216U, 983U,  917876630U },
--	{ 1281848367U, 932U, 1003100039U },
--	{  582537119U, 780U, 1127273778U },
--	{ 1973672777U, 853U, 1071368872U },
--	{ 1896756996U, 762U, 1127851055U },
--	{  847917054U, 500U, 1717499075U },
--	{ 1240520510U, 951U, 2849576657U },
--	{ 1685071682U, 567U, 1961810396U },
--	{ 1516232129U, 557U,    3173877U },
--	{ 1208118903U, 612U, 1613145022U },
--	{ 1817269927U, 693U, 4279122573U },
--	{ 1510091701U, 717U,  638191229U },
--	{  365916850U, 807U,  600424314U },
--	{  399324359U, 702U, 1803598116U },
--	{ 1318480274U, 779U, 2074237022U },
--	{  697758115U, 840U, 1483639402U },
--	{ 1696507773U, 840U,  577415447U },
--	{ 2081979121U, 981U, 3041486449U },
--	{  955646687U, 742U, 3846494357U },
--	{ 1250683506U, 749U,  836419859U },
--	{  595003102U, 534U,  366794109U },
--	{   47485338U, 558U, 3521120834U },
--	{  619433479U, 610U, 3991783875U },
--	{  704096520U, 518U, 4139493852U },
--	{ 1712224984U, 606U, 2393312003U },
--	{ 1318233152U, 922U, 3880361134U },
--	{  855572992U, 761U, 1472974787U },
--	{   64721421U, 703U,  683860550U },
--	{  678931758U, 840U,  380616043U },
--	{  692711973U, 778U, 1382361947U },
--	{  677703619U, 530U, 2826914161U },
--	{   92393223U, 586U, 1522128471U },
--	{ 1222592920U, 743U, 3466726667U },
--	{  358288986U, 695U, 1091956998U },
--	{ 1935056945U, 958U,  514864477U },
--	{  735675993U, 990U, 1294239989U },
--	{ 1560089402U, 897U, 2238551287U },
--	{   70616361U, 829U,   22483098U },
--	{  368234700U, 731U, 2913875084U },
--	{   20221190U, 879U, 1564152970U },
--	{  539444654U, 682U, 1835141259U },
--	{ 1314987297U, 840U, 1801114136U },
--	{ 2019295544U, 645U, 3286438930U },
--	{  469023838U, 716U, 1637918202U },
--	{ 1843754496U, 653U, 2562092152U },
--	{  400672036U, 809U, 4264212785U },
--	{  404722249U, 965U, 2704116999U },
--	{  600702209U, 758U,  584979986U },
--	{  519953954U, 667U, 2574436237U },
--	{ 1658071126U, 694U, 2214569490U },
--	{  420480037U, 749U, 3430010866U },
--	{  690103647U, 969U, 3700758083U },
--	{ 1029424799U, 937U, 3787746841U },
--	{ 2012608669U, 506U, 3362628973U },
--	{ 1535432887U, 998U,   42610943U },
--	{ 1330635533U, 857U, 3040806504U },
--	{ 1223800550U, 539U, 3954229517U },
--	{ 1322411537U, 680U, 3223250324U },
--	{ 1877847898U, 945U, 2915147143U },
--	{ 1646356099U, 874U,  965988280U },
--	{  805687536U, 744U, 4032277920U },
--	{ 1948093210U, 633U, 1346597684U },
--	{  392609744U, 783U, 1636083295U },
--	{  690241304U, 770U, 1201031298U },
--	{ 1360302965U, 696U, 1665394461U },
--	{ 1220090946U, 780U, 1316922812U },
--	{  447092251U, 500U, 3438743375U },
--	{ 1613868791U, 592U,  828546883U },
--	{  523430951U, 548U, 2552392304U },
--	{  726692899U, 810U, 1656872867U },
--	{ 1364340021U, 836U, 3710513486U },
--	{ 1986257729U, 931U,  935013962U },
--	{  407983964U, 921U,  728767059U },
--};
--
--static void prandom_state_selftest_seed(struct rnd_state *state, u32 seed)
--{
--#define LCG(x)	 ((x) * 69069U)	/* super-duper LCG */
--	state->s1 = __seed(LCG(seed),        2U);
--	state->s2 = __seed(LCG(state->s1),   8U);
--	state->s3 = __seed(LCG(state->s2),  16U);
--	state->s4 = __seed(LCG(state->s3), 128U);
--}
--
--static int __init prandom_state_selftest(void)
--{
--	int i, j, errors = 0, runs = 0;
--	bool error = false;
--
--	for (i = 0; i < ARRAY_SIZE(test1); i++) {
--		struct rnd_state state;
--
--		prandom_state_selftest_seed(&state, test1[i].seed);
--		prandom_warmup(&state);
--
--		if (test1[i].result != prandom_u32_state(&state))
--			error = true;
--	}
--
--	if (error)
--		pr_warn("prandom: seed boundary self test failed\n");
--	else
--		pr_info("prandom: seed boundary self test passed\n");
--
--	for (i = 0; i < ARRAY_SIZE(test2); i++) {
--		struct rnd_state state;
--
--		prandom_state_selftest_seed(&state, test2[i].seed);
--		prandom_warmup(&state);
--
--		for (j = 0; j < test2[i].iteration - 1; j++)
--			prandom_u32_state(&state);
--
--		if (test2[i].result != prandom_u32_state(&state))
--			errors++;
--
--		runs++;
--		cond_resched();
--	}
--
--	if (errors)
--		pr_warn("prandom: %d/%d self tests failed\n", errors, runs);
--	else
--		pr_info("prandom: %d self tests passed\n", runs);
--	return 0;
--}
--core_initcall(prandom_state_selftest);
--#endif
-diff --git a/lib/tests/Makefile b/lib/tests/Makefile
-index 601dba4b7..39d283b26 100644
---- a/lib/tests/Makefile
-+++ b/lib/tests/Makefile
-@@ -49,5 +49,6 @@ obj-$(CONFIG_STRING_HELPERS_KUNIT_TEST) += string_helpers_kunit.o
- obj-$(CONFIG_USERCOPY_KUNIT_TEST) += usercopy_kunit.o
- obj-$(CONFIG_UTIL_MACROS_KUNIT) += util_macros_kunit.o
- obj-$(CONFIG_RATELIMIT_KUNIT_TEST) += test_ratelimit.o
-+obj-$(CONFIG_PRANDOM_KUNIT_TEST) += random32_kunit.o
- 
- obj-$(CONFIG_TEST_RUNTIME_MODULE)		+= module/
-diff --git a/lib/tests/random32_kunit.c b/lib/tests/random32_kunit.c
-new file mode 100644
-index 000000000..436435026
---- /dev/null
-+++ b/lib/tests/random32_kunit.c
-@@ -0,0 +1,181 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Test cases for random32 functions.
-+ */
-+
-+#include <linux/prandom.h>
-+#include <kunit/test.h>
-+
-+/* prandom_warmup() is static in lib/random32.c; exposed for testing only. */
-+void prandom_warmup(struct rnd_state *state);
-+
-+static const struct prandom_test1 {
-+	u32 seed;
-+	u32 result;
-+} test1[] = {
-+	{ 1U, 3484351685U },
-+	{ 2U, 2623130059U },
-+	{ 3U, 3125133893U },
-+	{ 4U,  984847254U },
-+};
-+
-+static const struct prandom_test2 {
-+	u32 seed;
-+	u32 iteration;
-+	u32 result;
-+} test2[] = {
-+	/* Test cases against taus113 from GSL library. */
-+	{  931557656U, 959U, 2975593782U },
-+	{ 1339693295U, 876U, 3887776532U },
-+	{ 1545556285U, 961U, 1615538833U },
-+	{  601730776U, 723U, 1776162651U },
-+	{ 1027516047U, 687U,  511983079U },
-+	{  416526298U, 700U,  916156552U },
-+	{ 1395522032U, 652U, 2222063676U },
-+	{  366221443U, 617U, 2992857763U },
-+	{ 1539836965U, 714U, 3783265725U },
-+	{  556206671U, 994U,  799626459U },
-+	{  684907218U, 799U,  367789491U },
-+	{ 2121230701U, 931U, 2115467001U },
-+	{ 1668516451U, 644U, 3620590685U },
-+	{  768046066U, 883U, 2034077390U },
-+	{ 1989159136U, 833U, 1195767305U },
-+	{  536585145U, 996U, 3577259204U },
-+	{ 1008129373U, 642U, 1478080776U },
-+	{ 1740775604U, 939U, 1264980372U },
-+	{ 1967883163U, 508U,   10734624U },
-+	{ 1923019697U, 730U, 3821419629U },
-+	{  442079932U, 560U, 3440032343U },
-+	{ 1961302714U, 845U,  841962572U },
-+	{ 2030205964U, 962U, 1325144227U },
-+	{ 1160407529U, 507U,  240940858U },
-+	{  635482502U, 779U, 4200489746U },
-+	{ 1252788931U, 699U,  867195434U },
-+	{ 1961817131U, 719U,  668237657U },
-+	{ 1071468216U, 983U,  917876630U },
-+	{ 1281848367U, 932U, 1003100039U },
-+	{  582537119U, 780U, 1127273778U },
-+	{ 1973672777U, 853U, 1071368872U },
-+	{ 1896756996U, 762U, 1127851055U },
-+	{  847917054U, 500U, 1717499075U },
-+	{ 1240520510U, 951U, 2849576657U },
-+	{ 1685071682U, 567U, 1961810396U },
-+	{ 1516232129U, 557U,    3173877U },
-+	{ 1208118903U, 612U, 1613145022U },
-+	{ 1817269927U, 693U, 4279122573U },
-+	{ 1510091701U, 717U,  638191229U },
-+	{  365916850U, 807U,  600424314U },
-+	{  399324359U, 702U, 1803598116U },
-+	{ 1318480274U, 779U, 2074237022U },
-+	{  697758115U, 840U, 1483639402U },
-+	{ 1696507773U, 840U,  577415447U },
-+	{ 2081979121U, 981U, 3041486449U },
-+	{  955646687U, 742U, 3846494357U },
-+	{ 1250683506U, 749U,  836419859U },
-+	{  595003102U, 534U,  366794109U },
-+	{   47485338U, 558U, 3521120834U },
-+	{  619433479U, 610U, 3991783875U },
-+	{  704096520U, 518U, 4139493852U },
-+	{ 1712224984U, 606U, 2393312003U },
-+	{ 1318233152U, 922U, 3880361134U },
-+	{  855572992U, 761U, 1472974787U },
-+	{   64721421U, 703U,  683860550U },
-+	{  678931758U, 840U,  380616043U },
-+	{  692711973U, 778U, 1382361947U },
-+	{  677703619U, 530U, 2826914161U },
-+	{   92393223U, 586U, 1522128471U },
-+	{ 1222592920U, 743U, 3466726667U },
-+	{  358288986U, 695U, 1091956998U },
-+	{ 1935056945U, 958U,  514864477U },
-+	{  735675993U, 990U, 1294239989U },
-+	{ 1560089402U, 897U, 2238551287U },
-+	{   70616361U, 829U,   22483098U },
-+	{  368234700U, 731U, 2913875084U },
-+	{   20221190U, 879U, 1564152970U },
-+	{  539444654U, 682U, 1835141259U },
-+	{ 1314987297U, 840U, 1801114136U },
-+	{ 2019295544U, 645U, 3286438930U },
-+	{  469023838U, 716U, 1637918202U },
-+	{ 1843754496U, 653U, 2562092152U },
-+	{  400672036U, 809U, 4264212785U },
-+	{  404722249U, 965U, 2704116999U },
-+	{  600702209U, 758U,  584979986U },
-+	{  519953954U, 667U, 2574436237U },
-+	{ 1658071126U, 694U, 2214569490U },
-+	{  420480037U, 749U, 3430010866U },
-+	{  690103647U, 969U, 3700758083U },
-+	{ 1029424799U, 937U, 3787746841U },
-+	{ 2012608669U, 506U, 3362628973U },
-+	{ 1535432887U, 998U,   42610943U },
-+	{ 1330635533U, 857U, 3040806504U },
-+	{ 1223800550U, 539U, 3954229517U },
-+	{ 1322411537U, 680U, 3223250324U },
-+	{ 1877847898U, 945U, 2915147143U },
-+	{ 1646356099U, 874U,  965988280U },
-+	{  805687536U, 744U, 4032277920U },
-+	{ 1948093210U, 633U, 1346597684U },
-+	{  392609744U, 783U, 1636083295U },
-+	{  690241304U, 770U, 1201031298U },
-+	{ 1360302965U, 696U, 1665394461U },
-+	{ 1220090946U, 780U, 1316922812U },
-+	{  447092251U, 500U, 3438743375U },
-+	{ 1613868791U, 592U,  828546883U },
-+	{  523430951U, 548U, 2552392304U },
-+	{  726692899U, 810U, 1656872867U },
-+	{ 1364340021U, 836U, 3710513486U },
-+	{ 1986257729U, 931U,  935013962U },
-+	{  407983964U, 921U,  728767059U },
-+};
-+
-+static void prandom_state_test_seed(struct rnd_state *state, u32 seed)
-+{
-+#define LCG(x)	 ((x) * 69069U)	/* super-duper LCG */
-+	state->s1 = __seed(LCG(seed),        2U);
-+	state->s2 = __seed(LCG(state->s1),   8U);
-+	state->s3 = __seed(LCG(state->s2),  16U);
-+	state->s4 = __seed(LCG(state->s3), 128U);
-+}
-+
-+static void test_prandom_seed_boundary(struct kunit *test)
-+{
-+	int i;
-+	struct rnd_state state;
-+
-+	for (i = 0; i < ARRAY_SIZE(test1); i++) {
-+		prandom_state_test_seed(&state, test1[i].seed);
-+		prandom_warmup(&state);
-+		KUNIT_EXPECT_EQ(test, test1[i].result, prandom_u32_state(&state));
-+	}
-+}
-+
-+static void test_prandom_taus113(struct kunit *test)
-+{
-+	int i, j;
-+	struct rnd_state state;
-+
-+	for (i = 0; i < ARRAY_SIZE(test2); i++) {
-+		prandom_state_test_seed(&state, test2[i].seed);
-+		prandom_warmup(&state);
-+
-+		for (j = 0; j < test2[i].iteration - 1; j++)
-+			prandom_u32_state(&state);
-+
-+		KUNIT_EXPECT_EQ(test, test2[i].result, prandom_u32_state(&state));
-+	}
-+}
-+
-+static struct kunit_case prandom_test_cases[] = {
-+	KUNIT_CASE(test_prandom_seed_boundary),
-+	KUNIT_CASE(test_prandom_taus113),
-+	{}
-+};
-+
-+static struct kunit_suite prandom_test_suite = {
-+	.name = "prandom",
-+	.test_cases = prandom_test_cases,
-+};
-+
-+kunit_test_suite(prandom_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit test for prandom");
-+MODULE_LICENSE("GPL");
--- 
-2.52.0
-
+WWVzIGl04oCZcyBwcm9iYWJseSBkb2FibGUgKGRvbmUgaW4gdjQpLCBJIGRpZG7igJl0IGRvIHRo
+aXMgdG8gZm9sbG93IHRoZSBleGlzdGluZyBkZXNpZ24uDQoNClNvcnJ5IEkgZm9yZ290IGFkZHJl
+c3MgdGhlIFNvQiBmb3JtYXQsIEnigJlsbCBoYW5kbGUgaWYgaGF2aW5nIHY14oCmDQoNCj4gT24g
+SnVuIDI5LCAyMDI2LCBhdCAxODowMiwgR2VlcnQgVXl0dGVyaG9ldmVuIDxnZWVydEBsaW51eC1t
+NjhrLm9yZz4gd3JvdGU6DQo+IA0KPiDvu79IaSBLaXIsDQo+IA0KPiBUaGFua3MgZm9yIHRoZSB1
+cGRhdGUhDQo+IA0KPj4gT24gTW9uLCAyOSBKdW4gMjAyNiBhdCAwNzo0MiwgS2lyIENob3UgPG5v
+dGUzNTFAaG90bWFpbC5jb20+IHdyb3RlOg0KPj4gVGhpcyBwYXRjaCBjb252ZXJ0cyB0aGUgZXhp
+c3RpbmcgcHJhbmRvbSBzZWxmdGVzdCAobGliL3JhbmRvbTMyLmMpIHRvIHVzZQ0KPj4gdGhlIEtV
+bml0IGZyYW1ld29yayAobGliL3Rlc3RzL3JhbmRvbTMyX2t1bml0LmMpLiBVbmxpa2UgdHlwaWNh
+bCBLVW5pdA0KPj4gdGVzdHMsIHRoaXMgZmlsZSBpcyBkaXJlY3RseSAjaW5jbHVkZWQgaW50byBs
+aWIvcmFuZG9tMzIuYy4NCj4+IA0KPj4gVGhlIG5ldyB0ZXN0Og0KPj4gLSBSZW1vdmVzIHRoZSBs
+ZWdhY3kgQ09ORklHX1JBTkRPTTMyX1NFTEZURVNUIGZyb20gbGliL3JhbmRvbTMyLmMuDQo+PiAt
+IEFkZHMgQ09ORklHX1BSQU5ET01fS1VOSVRfVEVTVCAoZGVmYXVsdGluZyB0byBLVU5JVF9BTExf
+VEVTVFMpLg0KPj4gLSBNb3ZlcyB0aGUgdGVzdCBsb2dpYyB0byBsaWIvdGVzdHMvcmFuZG9tMzJf
+a3VuaXQuYy4NCj4+IA0KPj4gdjI6DQo+IA0KPiBUaGUgY2hhbmdlbG9nIGJlbG9uZ3MgdW5kZXIg
+dGhlICItLS0iIHVuZGVyIHlvdXIgU29CLg0KPiANCj4+IC0gUmVtb3ZlcyB0aGUgbGVnYWN5IENP
+TkZJR19SQU5ET00zMl9TRUxGVEVTVCBmcm9tIGxpYi9LY29uZmlnLg0KPj4gLSBBZGQgY29uc3Qg
+dG8gYXJyYXlzIGluIGxpYi90ZXN0cy9yYW5kb20zMl9rdW5pdC5jLg0KPj4gDQo+PiB2MzoNCj4+
+IC0gQ2hhbmdlcyBmcm9tIHRyaXN0YXRlIHRvIGJvb2wgaW4gbGliL0tjb25maWcuZGVidWcuDQo+
+IA0KPiBUaGF0J3MgKElNSE8gdmVyeSkgdW5mb3J0dW5hdGUuLi4NCj4gDQo+PiAtLS0gYS9saWIv
+cmFuZG9tMzIuYw0KPj4gKysrIGIvbGliL3JhbmRvbTMyLmMNCj4gDQo+PiAtY29yZV9pbml0Y2Fs
+bChwcmFuZG9tX3N0YXRlX3NlbGZ0ZXN0KTsNCj4+ICsjaWZkZWYgQ09ORklHX1BSQU5ET01fS1VO
+SVRfVEVTVA0KPj4gKyNpbmNsdWRlICJ0ZXN0cy9yYW5kb20zMl9rdW5pdC5jIg0KPj4gI2VuZGlm
+DQo+IA0KPiBJIGd1ZXNzIHRoYXQgaXMgdGhlIHJlYXNvbj8NCj4gDQo+IEFueSByZWFzb24gd2h5
+IHRoZSBhY3R1YWwgdGVzdCBjb2RlIGNhbm5vdCBiZSBzcHVuLW9mZiBpbnRvIGEgc2VwYXJhdGUN
+Cj4gbW9kdWxlLCBzbyBpdCBjYW4gYmVjb21lIG1vZHVsYXI/DQo+IA0KPiBHcntvZXRqZSxlZXRp
+bmd9cywNCj4gDQo+ICAgICAgICAgICAgICAgICAgICAgICAgR2VlcnQNCj4gDQo+IC0tDQo+IEdl
+ZXJ0IFV5dHRlcmhvZXZlbiAtLSBUaGVyZSdzIGxvdHMgb2YgTGludXggYmV5b25kIGlhMzIgLS0g
+Z2VlcnRAbGludXgtbTY4ay5vcmcNCj4gDQo+IEluIHBlcnNvbmFsIGNvbnZlcnNhdGlvbnMgd2l0
+aCB0ZWNobmljYWwgcGVvcGxlLCBJIGNhbGwgbXlzZWxmIGEgaGFja2VyLiBCdXQNCj4gd2hlbiBJ
+J20gdGFsa2luZyB0byBqb3VybmFsaXN0cyBJIGp1c3Qgc2F5ICJwcm9ncmFtbWVyIiBvciBzb21l
+dGhpbmcgbGlrZSB0aGF0Lg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLS0gTGlu
+dXMgVG9ydmFsZHMNCg==
 
