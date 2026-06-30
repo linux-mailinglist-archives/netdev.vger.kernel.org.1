@@ -1,102 +1,97 @@
-Return-Path: <netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aRtQOjkMRGq9ngoAu9opvQ
-	(envelope-from <netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:34:33 +0200
+	id YjwsERANRGrYngoAu9opvQ
+	(envelope-from <netdev+bounces-303331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:38:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575A16E7349
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:34:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4806E738B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:38:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=tFbh9655;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303330-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bRvwnvvi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303331-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303331-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9E3F309840A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:32:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A26430470E6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C56357739;
-	Tue, 30 Jun 2026 18:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A090F3DE451;
+	Tue, 30 Jun 2026 18:37:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F5F41B355
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 18:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7309F3DD537
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 18:37:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782844361; cv=none; b=L6Aqyozei2ERqj1EV1sJjGLZ4OTqyRPIGcBmeOIUpJZle1iaQLf3zqGJXlf09zdA2ZDQqzraens3zCWrbThVEziO0/ivtK3/OkYbXWgfHS/o06jZ8bU9my6LA1wXKkiMQcZVfkEpdYdXmJAdh73gw/5kKO0W6P4KZvCVkSwhd1o=
+	t=1782844642; cv=none; b=N0yZA3dBnLSUGTOU2EwkJOzHYC5ItpbMJVap+hQplfy4xMT4OHdOSO3V31DIhxjrvLgOjEEql8U02WUuAC4+4itGrCVgn8Fj1uq81l6Y+a5X1TlsyFjlwX+d90tQ0KqDCP0vihPAcEtHhLoNTROQ2fd4cQ4cZJteFv6Oem3nsZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782844361; c=relaxed/simple;
-	bh=5Od4tPA34zuwjf1KGQ2k1v3lZ1T6yJzidW15RO8rEM4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P0CJOJFiZzR/5iUldu/9O5qc3YUK4FZwdgiqRhk7ndXL1+WkCj2zD9kzYznAHYHQIT7QEeRrNtbfuEMB4am0ZG3BW25+MSUJm3pbAKoagwFNa3iVw8aMbpC8qqZsypTH59XSN6UJAy3D7ufmQlqke0x22QPdfqeyfcKrn6gvhsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=tFbh9655; arc=none smtp.client-ip=209.85.216.46
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-37ffdc718f8so1423453a91.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:32:39 -0700 (PDT)
+	s=arc-20240116; t=1782844642; c=relaxed/simple;
+	bh=DYD1JUeHIQBn+tSBBpX4SXFw4uV7JZpeKR5pyZgwgpE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lLQI7nVi4GK9Dh6uTGTZEw6AYg/OgBeIzdPG8iMrpeAr/lEyCHhPF1rwZgLbAWiocqhA02xS8P3wTu/nF8wG2DuSJfaRn08gbpISccAC3ivXePw4la5dwcWVwsLnlEh+ZMHz9KG09xtzP5uYgM2NKJbwcA6UKXslD2BYRZy+dLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bRvwnvvi; arc=none smtp.client-ip=74.125.82.170
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-30e9eefa268so1321172eec.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1782844359; x=1783449159; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782844641; x=1783449441; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MYn0JIP6L7e0faYWM+K1qf/n2ARh502nuelJ3kEZbss=;
-        b=tFbh9655AW3jes2NpJpymBIUAFZVKq0zghP1xe/6eA1hkeolGFyND8fugRV85CQG96
-         pWQGmvc0CMzMVmVkM8zhmLZkaAy+HzczTVagbI0k/d3m5okCMARDne9VznxGmcLP5m6M
-         Kzp9uT4pgPg8uKZOd8hMpOK34pux8+A55PGujVhwya3SuD3ZRrN+pS3jpEy1oqoVkszT
-         ntjPJOhiWWOa7qb321PA5clYUHxTT+rU38hdNGFQJYH32yNndNBqM6pa5OPTTtI8bvDe
-         scrVM23I4XU8DPgY9YLbuEAbcgisDeYSv/aTvZg8FlD23efSMqm0tGL2R+VKtGHLT+Ly
-         ckTw==
+        bh=Ih45vlyCqTdxWz3Y+8yYeJgcebBFtFeu2WVvm7KcQZ8=;
+        b=bRvwnvvifNqRu+ekKhHbQ0XuskXSyiiQTubAZV3rcDjHWY06eMMMAIglEbTCnTo1Ab
+         uQcogMaXac6/ORw1lpsfPg2Vg4h7MxEzwmU8Nrow9F00v+GCPbpBG+9+QQgTcen2T0sc
+         ve8BadPXiZERTSTjzbnuMeNQiFCwQDNjXKPPaTYQ2TxEDa50DPQ3dsK9EfOX+tqtATjT
+         R9qqbWtkngpL9wYdImTh23HR+ZMMfv917VZ49NIGVv/Ldt8Xtu1KsFc+6j6OKfDbLDaC
+         5OeFOr5Hd6PY1NUBs+e3iJZLdzb7Lrs7dCxZinlj5/L46ZUkwWaf/+ZES/EiwpBaAGPy
+         kq/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782844359; x=1783449159;
+        d=1e100.net; s=20251104; t=1782844641; x=1783449441;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MYn0JIP6L7e0faYWM+K1qf/n2ARh502nuelJ3kEZbss=;
-        b=hyRdWDkVbAaY8HqWXTf/hjsw9Bb+BkWSxfomWPdpzRl1m0B0q9hqOpYbwLwPGXj4Lj
-         YjWJve55Z/62IJjqU9Z3fKjAAOqWZc4ads4EMescpBHSViDDsNRP5UWUQ2YsZU9ddID4
-         yucyLw9VVwClyQ+dHJ1FElz0aFqIpxdbyCrpK2wvgIxHEFOtcHaiuvnYumP4Fy/QsjWm
-         6VAaKIyUDBsWYiY5DMM15X4zyyZCoChKwMx16qQp5xc00Sj8ktPIy+dE/2NNqVAO250V
-         NvCGel2PIxdBgGXVie/Yavv6IyRQsx0UdqDa0XM0xYqKvRMlfF4tGwVj9unXIY13c5KS
-         ro2A==
-X-Forwarded-Encrypted: i=1; AHgh+RpeTAOBH0BssaLZdRGBYUYWB1WI/cMpg6/B5BBEmGbg6QFtbP8lGZjf0FdRsUEq54OXxUHEdPs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKiuKlsznQV4DBEClxZPsGPYuVAB5Z96iLZWuoXh8qTN/lF+K/
-	IzHeMNhkCEiNRThGlJP9BUXaiNPasVRp7tf0DCzir/DmKEcZ0NhsDQlbNNAzBaeXHA==
-X-Gm-Gg: AfdE7cnucMixZZErLAUFNuYlonqxrhMRjoRzpWKJ4xWOlC5Y50UuD+vGObGIHfzWQmm
-	4g4N6TlmhYJqb7M/54Cq8uro1bZUaKHWnP39OepOtuRpa6dK8juBs1or6i+8rywspE3krpYB2ZY
-	mb10lUSmDOUi6YJ2K0DaDalo9+j5aR+/5kvLAUdLkjUpAkMQw1pwspPw7IHsi0yNRcwzGnPKewd
-	T9WqyINDH3WZMies3dv3INGmmAxBBJ9XVNm3CV1KnvoVXVROzPANBDet43n13hivlZ3YHE9UWPF
-	sfcqxN6zzTxKHb06orLGULX5iksBoIOqcc4UV77OvpLXaHDNJjdhDZ/EXGHl6SOHYYHEaiNclAo
-	ORqBgbW9b2rlFBa0Klyx/zfEJR+EK/SMcUtUCO2p0e7PNCFNZv9cT3J6DzhZfQx9o68P72FtqnQ
-	==
-X-Received: by 2002:a17:90b:4985:b0:37f:fdc8:71b4 with SMTP id 98e67ed59e1d1-3805252ef0emr3199432a91.2.1782844358846;
-        Tue, 30 Jun 2026 11:32:38 -0700 (PDT)
-Received: from p1.. ([2607:fb90:ec8c:9d53:ddf7:b69f:b5ae:d529])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38095d4c263sm387317a91.3.2026.06.30.11.32.36
+        bh=Ih45vlyCqTdxWz3Y+8yYeJgcebBFtFeu2WVvm7KcQZ8=;
+        b=SwkWP37YeBX6+V0TMHmy+x+otKq1KAR0TkSErnnK1RH62mPyfivVCM3lYUJgkBWOMk
+         0+OJo5be1goNVRxnWnYXOh81ijqcCFt79yPHc2Cn6Q+vcLN+kqcg5XWc/OHbUTiSDnmB
+         6Bw4IPSAgxT9UiWwYnRLrGD/I378l/bABBP5u7EKN3Ldu5xlHAhVgGsTP2O0DGN3r9en
+         9228BK7QUA6ym17lRwiHZbEFpCU5ueQuEnf1YrBIiCFHrJW745fzNjxC4f+2XyhuP2VY
+         tYQRYQtSMeUX9PhjrSh0j72RUZX8Il8IEgexJ77zrBpisEMRbqSL41F5wQ1vuhfmhxDp
+         0yNw==
+X-Gm-Message-State: AOJu0YxNHMWcyCiZXW+u9rY9JnrIAMowhYIv/4tjTu3kpkhyZUr18coj
+	sxF9OZ6tk34yPG3Hr7oUNHEp79o3clMJymgy780jA+ChDsRy88pcnzPZJJNi+Fl+
+X-Gm-Gg: AfdE7ckH9HO1Z0NxChL7fN5uey8BridnHegDlJD33pXXSpNgwovDgmftnElBcFOqEjV
+	dRewoTtPCF0kipdGM0x5fdVz5+4nTZUE2uH8UMLsKEQSTrtwRtG/PAKe/H7W09YcewBBbIY/nov
+	Y5B5qlcBd5z4LXlHatMgdzQnqoiZRZqDjmTjpfrmdG3hvnNAx6IiOAN2Uuy/ya0t2YJ3KNwmpek
+	Yagj6c+T8UQKn5uxPFPMESShtvkikgJg1wMc2ZOl1Ax0VM3NOHj1np1dNYTdzDuXWRBBk07atBM
+	G8a3xcq+MsIvEBZV64xNangPi1fLovxBHYlu+7+Ozfa0QFuB/lyGUuGAAChTIKfKBGzQBl7U2am
+	rHJYfmbfj18f+zDGgKs7J+ubS/wdfjXo/pX2uJBOY3ygDmvel54/9kap0ppIlZ7RMla/CU4loSi
+	BCb9kzilCZ2R6OpPol/tleS46rC1E=
+X-Received: by 2002:a05:7300:6144:b0:30e:c24e:2f01 with SMTP id 5a478bee46e88-30ee1404a70mr3317602eec.35.1782844640668;
+        Tue, 30 Jun 2026 11:37:20 -0700 (PDT)
+Received: from Inspiron-14-5420.. ([2402:e280:21c6:671:b5a1:965b:86fd:756])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30ee3205993sm10888191eec.24.2026.06.30.11.37.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 11:32:38 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: Sidraya Jayagond <sidraya@linux.ibm.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Hans Wippel <hwippel@linux.ibm.com>,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net v2] net/smc: fix UAF in smc_cdc_rx_handler() by pinning the socket
-Date: Tue, 30 Jun 2026 11:32:27 -0700
-Message-ID: <20260630183227.2044998-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        Tue, 30 Jun 2026 11:37:20 -0700 (PDT)
+From: "Hemendra M. Naik" <hemendranaik@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jiri@resnulli.us,
+	jhs@mojatatu.com,
+	shuah@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	vishy0777@gmail.com,
+	tahiliani@nitk.edu.in,
+	"Hemendra M. Naik" <hemendranaik@gmail.com>
+Subject: [PATCH net-next v3 0/2] net/sched: sch_fq_pie: add per-flow class statistics
+Date: Wed,  1 Jul 2026 00:07:00 +0530
+Message-Id: <20260630183702.170798-1-hemendranaik@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,128 +104,68 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303330-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,gmail.com,asu.edu];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,resnulli.us,mojatatu.com,vger.kernel.org,gmail.com,nitk.edu.in];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-303331-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jiri@resnulli.us,m:jhs@mojatatu.com,m:shuah@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:vishy0777@gmail.com,m:tahiliani@nitk.edu.in,m:hemendranaik@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:sidraya@linux.ibm.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hwippel@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[hemendranaik@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:dkim,asu.edu:email,asu.edu:mid,asu.edu:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 575A16E7349
+X-Rspamd-Queue-Id: 8B4806E738B
 
-smc_cdc_rx_handler() looks up the connection by token under the link
-group's conns_lock, drops the lock, and then dereferences conn and the
-smc_sock derived from it, ending in sock_hold(&smc->sk) inside
-smc_cdc_msg_recv(). No reference is held across the lock release.
-
-The only reference pinning the socket while the connection is
-discoverable in the link group is taken in smc_lgr_register_conn()
-(sock_hold) and dropped in __smc_lgr_unregister_conn() (sock_put), both
-under conns_lock. Once the handler drops conns_lock, a concurrent
-close() -> smc_release() -> smc_conn_free() -> smc_lgr_unregister_conn()
-can drop that reference and free the smc_sock, so the handler's later
-sock_hold() runs on freed memory:
-
-  WARNING: lib/refcount.c:25 at refcount_warn_saturate
-  Workqueue: rxe_wq do_work
-   refcount_warn_saturate (lib/refcount.c:25)
-   smc_cdc_msg_recv (net/smc/smc_cdc.c:430)
-   smc_cdc_rx_handler (net/smc/smc_cdc.c:502)
-   smc_wr_rx_tasklet_fn (net/smc/smc_wr.c:445)
-   tasklet_action_common (kernel/softirq.c:938)
-   handle_softirqs (kernel/softirq.c:622)
-  Kernel panic - not syncing: panic_on_warn set
-
-Only SMC-R is affected. The SMC-D receive tasklet is stopped by
-tasklet_kill(&conn->rx_tsklet) in smc_conn_free() before the connection
-is unregistered, so it cannot run concurrently with the free.
-
-Take the socket reference while still holding conns_lock, so the
-registration reference can no longer be the last one, and drop it once
-the handler is done.
-
-Fixes: d7b0e37c1ac1 ("net/smc: restructure CDC message reception")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
+ FQ-PIE runs an independent PIE controller per flow but exposes no
+ per-flow statistics. This series wires up fq_pie_class_ops to expose
+ per-flow AQM state (prob, delay, deficit, avg_dq_rate) 
+ via 'tc -s class show', following a similar pattern as FQ-CoDel.
 ---
-v2:
-- Take the reference under conns_lock, and compute smc once
-- Initialize smc = NULL at declaration
+ Changelog:
 
- net/smc/smc_cdc.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ v3: 
+  - No changes since v2.
+  - Resending as the previous submission was deferred when the net-next tree closed during review.
+  - Corresponding iproute2 patch updated in response to review comments; no changes required for this patch.
 
-diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
-index 619b3bab3824..32d6d03df321 100644
---- a/net/smc/smc_cdc.c
-+++ b/net/smc/smc_cdc.c
-@@ -470,9 +470,9 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
- {
- 	struct smc_link *link = (struct smc_link *)wc->qp->qp_context;
- 	struct smc_cdc_msg *cdc = buf;
-+	struct smc_sock *smc = NULL;
- 	struct smc_connection *conn;
- 	struct smc_link_group *lgr;
--	struct smc_sock *smc;
- 
- 	if (wc->byte_len < offsetof(struct smc_cdc_msg, reserved))
- 		return; /* short message */
-@@ -483,21 +483,26 @@ static void smc_cdc_rx_handler(struct ib_wc *wc, void *buf)
- 	lgr = smc_get_lgr(link);
- 	read_lock_bh(&lgr->conns_lock);
- 	conn = smc_lgr_find_conn(ntohl(cdc->token), lgr);
--	read_unlock_bh(&lgr->conns_lock);
--	if (!conn || conn->out_of_sync)
-+	if (!conn || conn->out_of_sync) {
-+		read_unlock_bh(&lgr->conns_lock);
- 		return;
-+	}
- 	smc = container_of(conn, struct smc_sock, conn);
-+	sock_hold(&smc->sk);
-+	read_unlock_bh(&lgr->conns_lock);
- 
- 	if (cdc->prod_flags.failover_validation) {
- 		smc_cdc_msg_validate(smc, cdc, link);
--		return;
-+		goto out;
- 	}
- 	if (smc_cdc_before(ntohs(cdc->seqno),
- 			   conn->local_rx_ctrl.seqno))
- 		/* received seqno is old */
--		return;
-+		goto out;
- 
- 	smc_cdc_msg_recv(smc, cdc);
-+out:
-+	sock_put(&smc->sk);
- }
- 
- static struct smc_wr_rx_handler smc_cdc_rx_handlers[] = {
+ v2: 
+ - Addressed ABI backward compatibility issue for tc_fq_pie_xstats. (https://lore.kernel.org/netdev/20260614125000.6058-1-hemendranaik@gmail.com/)
+
+ v1: 
+ - https://lore.kernel.org/netdev/20260531125314.22492-1-hemendranaik@gmail.com/
+
+Hemendra M. Naik (2):
+  net/sched: sch_fq_pie: add per-flow statistics via class ops
+  selftests: tc-testing: add fq_pie per-flow class stats test
+
+ include/uapi/linux/pkt_sched.h                |  29 ++++-
+ net/sched/sch_fq_pie.c                        | 118 +++++++++++++++++-
+ tools/include/uapi/linux/pkt_sched.h          |   4 +-
+ .../tc-testing/tc-tests/qdiscs/fq_pie.json    |  22 ++++
+ 4 files changed, 163 insertions(+), 10 deletions(-)
+
 -- 
-2.43.0
+2.34.1
 
 
