@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-302882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mBEsBHgfQ2o6RQoAu9opvQ
-	(envelope-from <netdev+bounces-302882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:44:24 +0200
+	id FLLRDcofQ2pvRQoAu9opvQ
+	(envelope-from <netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:45:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC6A6DFA1C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:44:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1316DFA22
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:45:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZosgIJpp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302882-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302882-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JqtuBAKF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302883-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 10244302D94C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:44:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73399302BBAC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF550369D43;
-	Tue, 30 Jun 2026 01:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0823B2C029D;
+	Tue, 30 Jun 2026 01:45:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BD8248F64
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 01:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980EC25332E;
+	Tue, 30 Jun 2026 01:45:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782783861; cv=none; b=AuMIffGKdKpycINkj6M+dodYQpO4rBuQHzS4dKfAtSgavoJ8Ga71ionNOj5qsNIHNf28J4geQcet9sNfgJZhI+ZGByL9i0Gf0+QhMGpuof6aJLXqiAx03saCmw4UFRGUQ5EtTLvM4jGvGvWMg50+5Xq4IjAcM1DQaI5lE1GJzIQ=
+	t=1782783942; cv=none; b=c13isEgbu7NDYh2qDz83v86m5IDQOoxepJvw2EW4ftAHOudzGvo8o6C6TyolvezkdIrWAP52h1QMEqncW0Ph8DVA3RUKqKlXtSYWOTeM958Ty044mHkM1tnxfQx4q1b/VbyeRwbAtrpNlRhNYi2pw4gRE6R4OMIemPtE36SVLAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782783861; c=relaxed/simple;
-	bh=Vvt/56gy8G8/h1bEPGg954eTCgoQLln1hfdkZhLsSDY=;
+	s=arc-20240116; t=1782783942; c=relaxed/simple;
+	bh=D94q21odBhNf5SmUDYFZ7h+7mfurDN0SNw/pbDxsQNg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YhVmUsBhdLxkQZmro9R6juWMUKRdMsyNdMee+Mlt3tDVuNgn1PHsItWobu+IRpZzyupCdPmCINGvSoDevi7dSY3OkVG6n1anBeJ9vJYuMI/rkEbOPHfzQSGUcB3kI5WifbtYs41r5OxlG0gr1+GVQw0SpZuBmiEoUNPRz795/BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZosgIJpp; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E741F00A3A;
-	Tue, 30 Jun 2026 01:44:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=vGIgnMla0jcRUhKX51TOW2bWSFyngUHSfbAerBsW3Zk2LcdElYJ5ZVIWTZPtUtiit7XoL0zbV31zorVJs135hMPXBPLQI5ImktSuuemYd3uhq6QGK56AAi3OUvhnLbdjUhyejAu2tW9cSDZWonlm+1iytc49RG632wrLpLGpj3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JqtuBAKF; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49D021F000E9;
+	Tue, 30 Jun 2026 01:45:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782783858;
-	bh=oZjMZHJiDHz+w25IYGC9p7Z1RAZDQsxO1VxwuLW+Q/o=;
+	s=k20260515; t=1782783940;
+	bh=kgpqgyIQx2BD+vAJtEmQ4KIj0mfEfZD8qoHQYPrvpj0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ZosgIJppFsBMcY3e+7NAQHjC+byOxDD3kbLJRZmLnPkm25SXNrQW8rtZG83Bcro3B
-	 gDNJXe8FHUf0pW4nShsUD+kwiiDK7DyzOKSVJLIoXukHNI3F6sPXH6WB6J07mh8s7v
-	 34lCaQH0H3YZ/G/Ds+R3rBotkLgdQbmOn6XEYkP6V5L6sNRINLGD1FdbbZwF0E6hR+
-	 9aci6RZLjjHYIrQcCGo0SN7LfpPbdnFiymzOHhLb4RgqVpw9lFF1JSYwlF5R/j2Yvz
-	 1j516NDX5enOEW4ZwZ/wmzVa5beP779Pk+jMe02KbRVMKm2aicFEVFoz3QHBmydUvz
-	 oSp0icNVAFPcw==
-Date: Mon, 29 Jun 2026 18:44:17 -0700
+	b=JqtuBAKF4iG5BAwrNz+A6oRJJzs7RMs+uY/Pn/Ibmo0J5xgyV3eQxUyZehcb9x2Wc
+	 Wh4Kyjyg91w6iDLAxtoZaF24Oob8Qgi1aaNsOHzo/E8vLHW2FoAy19DhfRGwETX5t/
+	 anzl+PxjmuRoUoaVRNm2ujbmkIPhQc+1+MFORvVEjh4QflJWAETBVlQ4lmntovIAST
+	 9OQjTSQXeralF4LuFUXItVuPHVuiIuLnGnItS14E4KBeC5kuovyE2NcbCk6jBqpctK
+	 zDs/ikqHzo0y0ZQMjykAn2Yagm9jFHwq3CKF3XhLJx0w6bJhi7izCuFwZhfwnexZ2n
+	 L62KmsLijcg2Q==
+Date: Mon, 29 Jun 2026 18:45:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Harsha M <h.mahadeva@chelsio.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, bharat@chelsio.com
-Subject: Re: [PATCH net v1] cxgb4: flower: fix 802.1ad VLAN TPID matching in
- tc flower filters
-Message-ID: <20260629184417.31b21223@kernel.org>
-In-Reply-To: <20260626134848.91281-1-h.mahadeva@chelsio.com>
-References: <20260626134848.91281-1-h.mahadeva@chelsio.com>
+To: Dawei Feng <dawei.feng@seu.edu.cn>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, bbhushan2@marvell.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ jbrandeb@kernel.org, richardcochran@gmail.com, amakarov@marvell.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, jianhao.xu@seu.edu.cn, zilin@seu.edu.cn
+Subject: Re: [PATCH net] octeontx2-pf: fix SQ resource leaks on init failure
+Message-ID: <20260629184538.353a477d@kernel.org>
+In-Reply-To: <20260627060350.2544241-1-dawei.feng@seu.edu.cn>
+References: <20260627060350.2544241-1-dawei.feng@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,68 +78,38 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-302882-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:h.mahadeva@chelsio.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:bharat@chelsio.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-302883-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:dawei.feng@seu.edu.cn,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jbrandeb@kernel.org,m:richardcochran@gmail.com,m:amakarov@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:zilin@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,vger.kernel.org,seu.edu.cn];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4DC6A6DFA1C
+X-Rspamd-Queue-Id: AA1316DFA22
 
-On Fri, 26 Jun 2026 19:18:22 +0530 Harsha M wrote:
-> +		if (be16_to_cpu(match.key->vlan_tpid) == ETH_P_8021AD) {
+On Sat, 27 Jun 2026 14:03:50 +0800 Dawei Feng wrote:
+> Subject: [PATCH net] octeontx2-pf: fix SQ resource leaks on init failure
 
-nit: put the byteswap on the constant to let the compiler do it a build
-time
-
-> +			struct adapter *adap = netdev2adap(dev);
-> +			u32 ovlan_reg, ctl_reg, val, port_id;
-> +
-> +			if (!adap) {
-> +				netdev_err(dev, "%s: adap not found\n", __func__);
-> +				return;
-> +			}
-> +
-> +			val = (be16_to_cpu(match.mask->vlan_tpid) << 16) |
-
-Looks like this is changing a per-port register. Presumably the mask
-must be the same for all filters. Why not enforce that mask is ~0 and
-program a constant?
-
-> +			      be16_to_cpu(match.key->vlan_tpid);
-
-you compared tpid to ETH_P_8021AD above, why not use the constant?
-
-> +			port_id = netdev2pinfo(dev)->port_id;
-> +			fs->val.ovlan = vlan_tci;
-> +			fs->mask.ovlan = vlan_tci_mask;
-> +			fs->val.ovlan_vld = 1;
-> +			fs->mask.ovlan_vld = 1;
-> +			ovlan_reg = PORT_REG(port_id, MPS_PORT_RX_OVLAN0_A);
-> +			ctl_reg = PORT_REG(port_id, MPS_PORT_RX_CTL_A);
-> +			t4_write_reg(adap, ovlan_reg, val);
-> +			val = t4_read_reg(adap, ctl_reg);
-> +			t4_write_reg(adap, ctl_reg, val | 1);
-> +			t4_tp_wr_bits_indirect(adap, TP_INGRESS_CONFIG_A, 1U << 9, 0);
+patches does not apply, please rebase and repost.
 -- 
 pw-bot: cr
 
