@@ -1,375 +1,155 @@
-Return-Path: <netdev+bounces-303315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303316-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZlP3HKYARGqpnAoAu9opvQ
-	(envelope-from <netdev+bounces-303315-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:45:10 +0200
+	id NVObLrMERGpDnQoAu9opvQ
+	(envelope-from <netdev+bounces-303316-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:02:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA476E7039
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:45:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795406E711F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 20:02:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=QrLyV+od;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303315-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303315-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=bW2LtgBu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303316-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303316-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5D53F300B510
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:44:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B454E30461EE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 18:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1993DE422;
-	Tue, 30 Jun 2026 17:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE593DEACC;
+	Tue, 30 Jun 2026 18:02:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEA93DDDC4
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:44:02 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782841443; cv=pass; b=JgtSZxAjx9DO02x4yRpKnJUds1jJZUvkdLe+qbDVWkOcBLqDpk4cmVjAamVKb0e5hfAZ1XVNd8HAq+/B+Fta90zSuoes1swl8to/+uVzbuQQuaBKf8oJAoHQpFCwH3WRimr9AIPRgU8IPIID0UeixYdTKvSq797GOKk1M4uNPzA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782841443; c=relaxed/simple;
-	bh=JawNW4Pqc50AtoDA7MmXMZBmvwYBX2KlZo2Gx2Uk9xo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C3PR82ZmU1oDrI7Zxt7p/jMIoYjlyTh3+MQxyLzEbTUQjzS3oXcyPQgltGOcls95DhkTZkMNBeZK52Fqmi2h24yhN2g+Vah5zfJzd++aPr85HhoYcJJWEqkGGrE1OwLG41a8nvxLulbanlcHmTlvzLhwoxGlvdYuNeM1jeV8uPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=QrLyV+od; arc=pass smtp.client-ip=209.85.214.181
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2c74383c93cso44160665ad.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 10:44:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782841441; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RU/kuk80E7up+NVBpUTvhH2JDoRVkAhO/shGelR0o5yYOEynK4wuAJb3JAThgChmFY
-         PeIX5UQAdIa1tzqvh8XTm6VHsFvEvCAe9lZpVCg3UbcResSatgx0UnAlm81fzKmRgzEz
-         kNW5coszyTbyfsiG6DOZzqjC4D5aiXsgz4OIgTgPbgt+uOhrFkthsDvVkx7YYZ8VBKEe
-         calL26AyZ10zI626XnJse1XsaZ/aZvwdqIJxkZcqDAXL8lQIcavlgpdHMj8bHvvft5H3
-         qf09oOD5cvEvVhdgxZ6EZPLRHLCDN3ljDuqsdxxI+q/6kkn0iGrXJfhwhNktKSsBuYY3
-         pCig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=URUGPjnqsQCliGYebP4MIXMTsTKoR6R+RTcTkNmd7wk=;
-        fh=tmNaBeXQ49tCQYYWZLiMksWdbnbN87gvs+kgI40JWAI=;
-        b=KQZ6pmNTIxQ3BY8gdnf6DD2cX9BXEW+VjY0DPogTzpTSnuhOUsIOxgcQe+xRir9bii
-         cxWeI81TGO0reO7jI4vDLQK0+2JwgwvpIs5o/ELGd4GQ3NdxCOWvF0LPvg/wAAnImFLB
-         QJgRtqBf7pOADstTgMgZVx6G7CqpCqDsp0amUkXPKENQyTJ6n3A1Pv4SwC4ZCYrdyNJg
-         tGvGYLX6ATzVNvKOt4lyjbT5oSmqLcinHWXPVmNN8IXei3AkfL4fMp/hmG96FLnFb9lV
-         NDicQIJAzhLbilCqkUg9vfWEAGU+bbn9ZgUGz/Wtvloz++eO0ZrGL65atzdRoZ/gHT4z
-         dwoA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1782841441; x=1783446241; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=URUGPjnqsQCliGYebP4MIXMTsTKoR6R+RTcTkNmd7wk=;
-        b=QrLyV+od9PlDgQBC4XE+Tk/sLHlkBAN5jFl+EfTrIgCPHGAre17AhRsIXkj2ojbLr7
-         /+F8BS+ut/EDq6eErORXIw+ZxC2vHqzL5cgfgOe5Pxm7PO52JfPe308prVUHjJfSW1Fk
-         eJWT3M/eapqUVDX7RzQOvQAVsFDv1bgeiYIQKao4iP1pvjM7BFfmCT43rkI+as5xP35t
-         0ozk8zZIrhfYetDtrqpvXAUFDZM85tRvbsVNHMY8/jH8CVusuR5e8bJm5gHDJANJLcOB
-         tz/Gy9gehN3zzOokbNewNsEzelYrhE59eTCIUSWiZXD7T/CTrpDB3yFgQXISB/iGP6qF
-         d/0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782841441; x=1783446241;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=URUGPjnqsQCliGYebP4MIXMTsTKoR6R+RTcTkNmd7wk=;
-        b=kzQFAbYnCyI4An1TtuQYvfYYLiW+N5VkWr0/XcuogXjakTSJ/4dMlAWPNYVE7Mogu7
-         TWfzqdmIM1eeieh1F6wdThOgIuH529wKCr96zm4Ri9RGeTk3gWH2cXGp6ytSwRMQUMN8
-         UXlMLbv69ecbzUHbi2Gx3Dig9IUZ3OVV6PBbcu8eAJCIEaP1GO5i09BEGw16zGqtbqaP
-         9zPaFr97ooWuZj9wpZf3B5V2SgEIY+GC6fPvqRn5fOQCwTveb/Sv6n6EcOBE9IdIpsQq
-         03i2F0Tj4Gx3bVmDxJtlO6hQFDZaPq9gd5FKA5YQIiDJ4kH7UFJ/B3M+2Vg88SuzlcBG
-         Q45g==
-X-Forwarded-Encrypted: i=1; AHgh+RrjBqmmWrSQXE7sYT5fYbLgOY/WjLxkhKZxYVPS/B/Vv6jjznuzQ9xOjhpFsqgLN35OE2VwbNw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx8yMqxlKXb/95j3H+CdVyZGZ6viLAdAE2vJcCajqk6StD0VyV
-	ysAFhrcJGn/TmGxCDEVU9l4TSHik4TReACbvi+sBvrYR3TDIbC01L39bHHte67D1OC1QAjsHANL
-	FNw4RI+Sy4GtBgWzUT+25B5f5CIzPR2jyRQrHDkq1
-X-Gm-Gg: AfdE7cnnei0X7S66meJHPy+GjuxKNeS39UZXWoDtnS8ijlRaAdQlq7dIvdI3i/4pkR2
-	EdUgJBOZNbbooXoaxjaacjIYttBYZZ3ry+e77OrTPb9vtAkNWzOxrdbuGz/5mjsEmTXSOVWzbBV
-	yWCuZbdY/zUdEE8CMSQMYFL8rMHBUX6xS1BNktN7tyjI5vftbM4M+gVMfsG5ZW/FpSRKaqMrOJK
-	b7jf5MqUr3g8vWhX2y+NOHAVCApHuIFGmMOKax5ltIwCw48eD+C/nC7IT91k7KMi2p0FF0SBv+Z
-	YubfxVonZePvM5MssynRaqqc8w3k
-X-Received: by 2002:a17:902:da88:b0:2c9:e6d7:fbb4 with SMTP id
- d9443c01a7336-2ca5a6101d9mr12888615ad.31.1782841441354; Tue, 30 Jun 2026
- 10:44:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B171F12CDBE;
+	Tue, 30 Jun 2026 18:02:20 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782842541; cv=none; b=HY5uuORJQgWLnQaRoNT6A4TDhCOtXsbVR9jeZqD73iH4iNa8W37z6oGNHPPAZhOR6P/kgNoWGCr3cOdvkZAieaWmz1ttWZSv9rQMXrkqwhHpJHWZyggechlJA9ck1+ScnE7GCW4gX4oXp4+mvpNqYKrASSo09dmtEElMwZZHI0U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782842541; c=relaxed/simple;
+	bh=V16u8iU0zk+lCqlS1wIv/DHcIm7oRipJJhddV2VDekY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jbJ2hMw/+Vq/pFsMsKTj8FKzDhpW4T/fiI68JKB8snivEHVN4luFKCI0Ryz2sNRcNhDb7ONGaB7b0Kdsjd9ps7uZxjjQTAFoUGlMx5Y66YW9mGQ8pnHcAkOtFmEHgXVa5edmDf8L9ACP8f4WmgbOx5TL5RG4soRY1OyS1aJ+9Oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bW2LtgBu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D4201F000E9;
+	Tue, 30 Jun 2026 18:02:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782842540;
+	bh=xrqqsPqaXbkExbvl7l6TbPo4VTzO9ytLt6edYlDgBT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=bW2LtgBuXbPQAq4eiMMa8cUMnVjLuqj3Q6ugsddafkV7o5cM+0nsN+QgGxgqaE9Ke
+	 Hd2L/gR2uB4HHXsgPXibU6mlHo7TutX96zAGXa4SDB3W0MssskuFm1/Eozs7oBwvBA
+	 arL/o6a4H3Fr26i7Cxlgj1M2y63FOHzWKO/ny5MVsnEGMsX3sys6c3Cs30jcJHkO9+
+	 XRCna9Z2QOrPjFQ4omy9vh5UCxbCXgIqPfvOAEHTQtsCudlU/X2XioMfoqlzkl5rr7
+	 lEWWmTRxZJRsYFaORIATLAzNFLotlOzIx22OKAL6w1ojr3Hk3eIYpyEl3bK8vY9eJe
+	 Hrdb/XaxU/e/g==
+Date: Tue, 30 Jun 2026 13:02:19 -0500
+From: Rob Herring <robh@kernel.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	daniel@makrotopia.org, stable@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v6 1/9] block: partitions: of: Skip child nodes without
+ reg property
+Message-ID: <20260630180219.GA4139943-robh@kernel.org>
+References: <20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com>
+ <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260630174110.2003121-1-xmei5@asu.edu>
-In-Reply-To: <20260630174110.2003121-1-xmei5@asu.edu>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Tue, 30 Jun 2026 10:43:49 -0700
-X-Gm-Features: AVVi8CccJahYpOmchuic4l9yBmy1i9BwC8vBSl9Tk5g4PsMcnfGQHAM0THUL6rA
-Message-ID: <CAPpSM+SkjzOKfKBC00E19ZQ930GbamqonpwVV7_91e2WkNJHYQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: qualcomm: rmnet: validate MAP frame length
- before ingress parsing
-To: subash.a.kasiviswanathan@oss.qualcomm.com
-Cc: sean.tranchetti@oss.qualcomm.com, netdev@vger.kernel.org, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
-	bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-303315-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:subash.a.kasiviswanathan@oss.qualcomm.com,m:sean.tranchetti@oss.qualcomm.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303316-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	MISSING_XM_UA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:ulfh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:ansuelsmth@gmail.com,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:daniel@makrotopia.org,m:stable@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com
+ ,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk,vger.kernel.org,lists.infradead.org,makrotopia.org,oss.qualcomm.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,qualcomm.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6FA476E7039
+X-Rspamd-Queue-Id: 795406E711F
 
-Thanks so much for your refactor. It's better! I took it for v2 with
-two small changes:
+On Mon, Jun 29, 2026 at 10:55:20AM +0200, Loic Poulain wrote:
+> Child nodes of a fixed-partitions node are not necessarily partition
+> entries, for example an nvmem-layout node has no reg property. The
+> current code passes a NULL reg pointer and uninitialized len to the
+> length check, which can result in a kernel panic or silent failure to
+> register any partitions.
 
-- Dropped the goto err1/err0; the helper has no cleanup, so it just returns
-  0 or packet_len directly. (err0 was the success path anyway.)
+That does not sound right to me. A fixed-partitions node should only be 
+defining partitions with address ranges. I would expect a partition node 
+could be nvmem-layout, but not the whole address range. If you wanted 
+the latter, then just do:
 
-- The no-agg caller leaks the skb when validation fails, since
-  __rmnet_map_ingress_handler() is the one that owns and frees it:
+partitions {
+  ...
+};
 
-if (rmnet_map_validate_packet_len(skb, port))
-__rmnet_map_ingress_handler(skb, port);
-else
-kfree_skb(skb);
+nvmem-layout {
+  ...
+};
 
-I also bounds-check the MAP header up front (skb->len < sizeof(*maph)),
-since the no-agg path can get a frame shorter than the header before
-maph->pkt_len is read.
-
-v2 sent with you as Suggested-by. Tested with the original repro: OOB gone
-on the no-agg path, valid frames and the deagg path unaffected.
-
-Xiang
-
-On Tue, Jun 30, 2026 at 10:41=E2=80=AFAM Xiang Mei <xmei5@asu.edu> wrote:
->
-> When ingress deaggregation is disabled, rmnet_map_ingress_handler() passe=
-s
-> the skb straight to __rmnet_map_ingress_handler(), skipping the length
-> validation that rmnet_map_deaggregate() performs on the aggregated path.
-> The parser then dereferences the MAP header and csum header/trailer based=
- on
-> the on-wire pkt_len without checking skb->len, so a short frame is read o=
-ut
-> of bounds:
->
->   BUG: KASAN: slab-out-of-bounds in rmnet_map_checksum_downlink_packet
->   Read of size 1 at addr ffff88801118ed00 by task exploit/147
->   Call Trace:
->    ...
->    rmnet_map_checksum_downlink_packet (drivers/net/ethernet/qualcomm/rmne=
-t/rmnet_map_data.c:413)
->    __rmnet_map_ingress_handler (drivers/net/ethernet/qualcomm/rmnet/rmnet=
-_handlers.c:96)
->    rmnet_rx_handler (drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c=
-:129)
->    __netif_receive_skb_core.constprop.0 (net/core/dev.c:6089)
->    netif_receive_skb (net/core/dev.c:6460)
->    tun_get_user (drivers/net/tun.c:1955)
->    tun_chr_write_iter (drivers/net/tun.c:2001)
->    vfs_write (fs/read_write.c:688)
->    ksys_write (fs/read_write.c:740)
->    do_syscall_64 (arch/x86/entry/syscall_64.c:94)
->    ...
->
-> Factor that validation out of rmnet_map_deaggregate() into
-> rmnet_map_validate_packet_len() and run it on the no-aggregation path too=
-.
-> The MAP header is bounds-checked first, since this path can receive a fra=
-me
-> shorter than the header.
->
-> Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial im=
-plementation")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Suggested-by: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@os=
-s.qualcomm.com>
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
-> v2: Validate on the no-aggregation path by reusing the deaggregation
->     length checks (factored into rmnet_map_validate_packet_len()) instead
->     of adding separate pskb_may_pull() guards in __rmnet_map_ingress_hand=
-ler().
->
->  .../ethernet/qualcomm/rmnet/rmnet_handlers.c  |  5 +-
->  .../net/ethernet/qualcomm/rmnet/rmnet_map.h   |  1 +
->  .../ethernet/qualcomm/rmnet/rmnet_map_data.c  | 72 ++++++++++---------
->  3 files changed, 45 insertions(+), 33 deletions(-)
->
-> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c b/drive=
-rs/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-> index 9f3479500f85..d055a2628d8c 100644
-> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
-> @@ -126,7 +126,10 @@ rmnet_map_ingress_handler(struct sk_buff *skb,
->
->                 consume_skb(skb);
->         } else {
-> -               __rmnet_map_ingress_handler(skb, port);
-> +               if (rmnet_map_validate_packet_len(skb, port))
-> +                       __rmnet_map_ingress_handler(skb, port);
-> +               else
-> +                       kfree_skb(skb);
->         }
->  }
->
-> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h b/drivers/ne=
-t/ethernet/qualcomm/rmnet/rmnet_map.h
-> index b70284095568..60ca8b780c88 100644
-> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
-> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
-> @@ -59,5 +59,6 @@ void rmnet_map_tx_aggregate_init(struct rmnet_port *por=
-t);
->  void rmnet_map_tx_aggregate_exit(struct rmnet_port *port);
->  void rmnet_map_update_ul_agg_config(struct rmnet_port *port, u32 size,
->                                     u32 count, u32 time);
-> +u32 rmnet_map_validate_packet_len(struct sk_buff *skb, struct rmnet_port=
- *port);
->
->  #endif /* _RMNET_MAP_H_ */
-> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c b/drive=
-rs/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-> index 8b4640c5d61e..305ae15ae8f3 100644
-> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
-> @@ -333,54 +333,62 @@ struct rmnet_map_header *rmnet_map_add_map_header(s=
-truct sk_buff *skb,
->         return map_header;
->  }
->
-> -/* Deaggregates a single packet
-> - * A whole new buffer is allocated for each portion of an aggregated fra=
-me.
-> - * Caller should keep calling deaggregate() on the source skb until 0 is
-> - * returned, indicating that there are no more packets to deaggregate. C=
-aller
-> - * is responsible for freeing the original skb.
-> - */
-> -struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
-> -                                     struct rmnet_port *port)
-> +u32 rmnet_map_validate_packet_len(struct sk_buff *skb, struct rmnet_port=
- *port)
->  {
->         struct rmnet_map_v5_csum_header *next_hdr =3D NULL;
->         struct rmnet_map_header *maph;
->         void *data =3D skb->data;
-> -       struct sk_buff *skbn;
-> -       u8 nexthdr_type;
->         u32 packet_len;
->
-> -       if (skb->len =3D=3D 0)
-> -               return NULL;
-> +       if (skb->len < sizeof(*maph))
-> +               return 0;
->
->         maph =3D (struct rmnet_map_header *)skb->data;
-> +
-> +       /* Some hardware can send us empty frames. Catch them */
-> +       if (!maph->pkt_len)
-> +               return 0;
-> +
->         packet_len =3D ntohs(maph->pkt_len) + sizeof(*maph);
->
->         if (port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV4) {
->                 packet_len +=3D sizeof(struct rmnet_map_dl_csum_trailer);
-> -       } else if (port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV5) {
-> -               if (!(maph->flags & MAP_CMD_FLAG)) {
-> -                       packet_len +=3D sizeof(*next_hdr);
-> -                       if (maph->flags & MAP_NEXT_HEADER_FLAG)
-> -                               next_hdr =3D data + sizeof(*maph);
-> -                       else
-> -                               /* Mapv5 data pkt without csum hdr is inv=
-alid */
-> -                               return NULL;
-> -               }
-> +       } else if ((port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV5) =
-&&
-> +                  !(maph->flags & MAP_CMD_FLAG)) {
-> +               /* Mapv5 data pkt without csum hdr is invalid */
-> +               if (!(maph->flags & MAP_NEXT_HEADER_FLAG))
-> +                       return 0;
-> +
-> +               packet_len +=3D sizeof(*next_hdr);
-> +               next_hdr =3D data + sizeof(*maph);
->         }
->
-> -       if (((int)skb->len - (int)packet_len) < 0)
-> -               return NULL;
-> +       if (skb->len < packet_len)
-> +               return 0;
->
-> -       /* Some hardware can send us empty frames. Catch them */
-> -       if (!maph->pkt_len)
-> -               return NULL;
-> +       if (next_hdr &&
-> +           u8_get_bits(next_hdr->header_info, MAPV5_HDRINFO_HDR_TYPE_FMA=
-SK) !=3D
-> +           RMNET_MAP_HEADER_TYPE_CSUM_OFFLOAD)
-> +               return 0;
->
-> -       if (next_hdr) {
-> -               nexthdr_type =3D u8_get_bits(next_hdr->header_info,
-> -                                          MAPV5_HDRINFO_HDR_TYPE_FMASK);
-> -               if (nexthdr_type !=3D RMNET_MAP_HEADER_TYPE_CSUM_OFFLOAD)
-> -                       return NULL;
-> -       }
-> +       return packet_len;
-> +}
-> +
-> +/* Deaggregates a single packet
-> + * A whole new buffer is allocated for each portion of an aggregated fra=
-me.
-> + * Caller should keep calling deaggregate() on the source skb until 0 is
-> + * returned, indicating that there are no more packets to deaggregate. C=
-aller
-> + * is responsible for freeing the original skb.
-> + */
-> +struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
-> +                                     struct rmnet_port *port)
-> +{
-> +       struct sk_buff *skbn;
-> +       u32 packet_len;
-> +
-> +       packet_len =3D rmnet_map_validate_packet_len(skb, port);
-> +       if (!packet_len)
-> +               return NULL;
->
->         skbn =3D alloc_skb(packet_len + RMNET_MAP_DEAGGR_SPACING, GFP_ATO=
-MIC);
->         if (!skbn)
-> --
-> 2.43.0
->
+Rob
 
