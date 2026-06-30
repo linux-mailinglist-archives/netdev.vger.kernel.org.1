@@ -1,71 +1,64 @@
-Return-Path: <netdev+bounces-303399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9OjbBN9LRGrWsAoAu9opvQ
-	(envelope-from <netdev+bounces-303399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:06:07 +0200
+	id cctYMwBNRGpEsQoAu9opvQ
+	(envelope-from <netdev+bounces-303400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:10:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02ACA6E8936
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:06:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 558836E899F
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:10:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Sp3Rh6QS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303399-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303399-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kOps5RWp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303400-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303400-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 420EF300F271
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:06:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 167C13028EED
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB3D31F997;
-	Tue, 30 Jun 2026 23:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820A93346B4;
+	Tue, 30 Jun 2026 23:10:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B602D1F44;
-	Tue, 30 Jun 2026 23:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8431F8287E;
+	Tue, 30 Jun 2026 23:10:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782860758; cv=none; b=nkmYuJzWZgEoU2s5o4U7enGRVFDOhdT7mMuOKDxzRWdBefLSmHrXFZYsHuObADAt2e2HQ2dszluFEbSYBn9YgPDaq6zEHoo73scNU3Qie2PGIzWNl5eNGhbW6/Z7fCUv3/3t7xUyRzBlFSYNGtUxhv4Wxofi7EkYckWRvGLZ730=
+	t=1782861054; cv=none; b=gMsF+9P4XRj0t109j+PO305ouw1COqzIKYccic2YzrDt8IwVS5sbOOdtBUAJflTX6kAIjzKP0XA1bqwC9SJwC93mOKgCP+O+oX5kULC6OueV3iqfUawjDzmTjxskRIK9VJ3KdONrBVn7nj7Bqe76rWQJ22EO0sgZslwXJ8mY+HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782860758; c=relaxed/simple;
-	bh=as2AH+swBCP/OHIkj3mwvYyZ71kqHokbMzPrMnDz4UM=;
+	s=arc-20240116; t=1782861054; c=relaxed/simple;
+	bh=AL4uozShYOI1kt0IXqbXn0Czx/rrSXJSZBL/coKto0I=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sz6yPj9ZwIt0kySbCv9vnKE+6BoGhCEFjn9zZza6eJHFrxPZzClV9lvK3UdCoYn+8c1cdWWZalE8WeJhzUVYeTuSJcYywIipmAsQ92p9bc6Q4CnCZ2MRBWAsZU3RCS9MwdByGMvqIBxnEsuH/t/CiuMKfUxg6ZtJqBfTe9yJAlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sp3Rh6QS; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AADFC1F000E9;
-	Tue, 30 Jun 2026 23:05:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fxXFx8lo0Rn4HZMeKKfldCzcJ3m44Dg6vw8tQ58wJO1JVCHR2/PFWaZmyENuuAksQGMhM22uHaBSUlwQ0AeA1z+xKmCpkCe+L1BasvexwfELJVCYCpIiMs6F9NLxtvRTnf1jehaBy7wljO+Uga3if0yRNp7l5duTZxzf4tH0Qik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOps5RWp; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AC241F000E9;
+	Tue, 30 Jun 2026 23:10:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782860757;
-	bh=7cQ+oNW/YJFawXWPCbHUU3zJTsMASw9/tH0G0Srn6mU=;
+	s=k20260515; t=1782861053;
+	bh=tcyq1Z/mLzF0BxxZDLST/jGqYX4Y9mNzgVvE2Nh4lc8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Sp3Rh6QSCQC/Cb6fL7AjuWd5aEVLvkPoqNr75rDTgsnKxR+79xQZjylzgYSGoLbPk
-	 zPmUMnh1JHUsKI4hPZ8p5jxskDqfTTOxBmuvtduKbA1TiC4Kj0g/sFuZyDFe/WqtTn
-	 zGpK7L58Avwi031LILnOER1EnXQpYS1SfOi54PMKM24Sy462NnOzPpIdXiGWXDiNeg
-	 ZpG7+rtKhmvGZs+P2rT7/vVNQgJqyllwo43ksaPtBS63EMGeE3tZiqqZov8ZX9YUj0
-	 Fid8jisDVQjg9kKmPHU1tH54tGEuCNHM5K8wsH4uGJhUoHFKdWODcGPqAJEchOIICh
-	 9WvT8bQGsFn/Q==
-Date: Tue, 30 Jun 2026 16:05:55 -0700
+	b=kOps5RWpguUX6bjMG5yXxLNm4QMUn3xAuOSq4hP0Gqq9p0O5n9O7VHYLDuWRJh69A
+	 2x1jujG2iBOGpeqmT5TpSrmZzBotaeFPWnkHESIEYXae0/GL+lBGPnDPgHaHaj5sRU
+	 S1zlZ1lhd88e3WVDrs7ZKA8+rKAaBvH+nX8tvCRjLWRPQNyVq5oGufq343oWNmvc+J
+	 RTPJk0D6OQPMdWCv1VlS9VbWqR6TGdsKhFh2FT0caRY4CrBFem39t9Zx5i+d4JMFXu
+	 LMYUuzwRN3AStVOBsa8ZuK1ZJvxZ7ZCyXr7P+UH58zRtbejA7L4g8V0BUD+IKoG2Kj
+	 YF+GIC6S3K8WA==
+Date: Tue, 30 Jun 2026 16:10:52 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Harshitha Ramamurthy <hramamurthy@google.com>, Jordan Rhee
- <jordanrhee@google.com>, Shuhao Tan <tanshuhao@google.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, Samiullah Khawaja
- <skhawaja@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shuah@kernel.org, willemb@google.com, noren@nvidia.com, gal@nvidia.com,
  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v1 0/2] Reuse threaded NAPI kthread across
- napi_del()/napi_add().
-Message-ID: <20260630160555.3736f900@kernel.org>
-In-Reply-To: <CAHS8izNeoJiLyoyiPgzmX5CGcyivYqBpVxOcFnoxeOX_zzFd4Q@mail.gmail.com>
-References: <20260629192029.4013794-1-tanshuhao@google.com>
-	<20260629162619.55297244@kernel.org>
-	<CAABY+HEcNnh+ATyA_JMg4LnVpP=egprTTi4UXxV9CfW2+71z+g@mail.gmail.com>
-	<20260629181955.00e63b61@kernel.org>
-	<CAHS8izNeoJiLyoyiPgzmX5CGcyivYqBpVxOcFnoxeOX_zzFd4Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: drv-net: toeplitz: cap the Rx queue
+ count
+Message-ID: <20260630161052.5a6c2ec3@kernel.org>
+In-Reply-To: <willemdebruijn.kernel.23684913d1fd4@gmail.com>
+References: <20260629234354.2154541-1-kuba@kernel.org>
+	<willemdebruijn.kernel.23684913d1fd4@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,20 +73,21 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303399-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:almasrymina@google.com,m:hramamurthy@google.com,m:jordanrhee@google.com,m:tanshuhao@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:shuah@kernel.org,m:skhawaja@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303400-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:willemdebruijn.kernel@gmail.com,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shuah@kernel.org,m:willemb@google.com,m:noren@nvidia.com,m:gal@nvidia.com,m:linux-kselftest@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -106,41 +100,26 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 02ACA6E8936
+X-Rspamd-Queue-Id: 558836E899F
 
-On Tue, 30 Jun 2026 10:38:01 -0700 Mina Almasry wrote:
-> > > It feels surprising that the userspace needs to reconfigure thread
-> > > properties when changing NIC configurations unrelated to threading.
-> > > Another downside is that when userspace configures NIC configurations
-> > > in quick succession, re-application becomes messy because a previous
-> > > re-application might still be in progress when the thread is gone.  
-> >
-> > Can you explain more about your deployment and system configuration
-> > flow? We may be adding micro optimizations when the problem is that
-> > we recreate the NAPIs in the first place.  
+On Tue, 30 Jun 2026 13:11:15 -0400 Willem de Bruijn wrote:
+> > +def _cap_queue_count(cfg):
+> > +    ehdr = {"header": {"dev-index": cfg.ifindex}}
+> > +    chans = cfg.ethnl.channels_get(ehdr)
+> > +
+> > +    config = {}
+> > +    restore = {}
+> > +    for key in ("combined-count", "rx-count"):  
 > 
-> We have an AF_XDP application with extremely low latency and jitter
-> requirements running on our servers. Sami developed busypolling
-> threaded napi for them. Since it's an AF_XDP application, they attach
-> their umem to specific RX queues, and then configure threaded NAPI
-> busypolling to achieve low latency. That involves using the Netlink
-> API to set the threaded/busypolling property, grabbing the kthread
-> PID, and setting some properties on the kthread.
+> This assumes that combined and rx are not set at the same time.
+> SGTM, not expected in real devices. But technically they could be.
 
-What I don't understand is how you have an "application with extremely
-low latency and jitter requirements" and at the same time "user runs 
-an unrelated ethtool command" reallocating NAPIs and disrupting that
-application.
-
-Honestly, the last two times y'all were touching NAPI it was a major
-effort to get the code into acceptable shape. I don't have the cycles
-right now to help another unknown-upstream (intern?) get their patches
-into shape.
-
-Can y'all not open a pidfs fd for the NAPI thread? You'll get a
-notification when the existing kthread dies?
+Ack, some tests just assume the NIC uses combined, which is most common.
+If this ever causes issues we should probably add support for
+provisioning min/max number of queues in the env setup itself.
+IIRC someone even posted that at some point.
 
