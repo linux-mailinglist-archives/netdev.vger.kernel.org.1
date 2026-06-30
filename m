@@ -1,162 +1,327 @@
-Return-Path: <netdev+bounces-303280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id w3+lKsrhQ2rqkwoAu9opvQ
-	(envelope-from <netdev+bounces-303280-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:33:30 +0200
+	id b3MuEdfjQ2pjlAoAu9opvQ
+	(envelope-from <netdev+bounces-303281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:42:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3123A6E5F9A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:33:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF6F6E6093
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:42:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=l9gR71D9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303280-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303280-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=mojatatu.com header.s=google header.b=rK2LbYjc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303281-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303281-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 545583119648
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:30:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ADC363031125
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1433E5A20;
-	Tue, 30 Jun 2026 15:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8EBD449EC2;
+	Tue, 30 Jun 2026 15:37:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCFB3E1732
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 15:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AAE4048BB
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 15:37:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782833358; cv=none; b=tiJOJbVaHaNgB6UeAJxtPjjAaOBOejQHUSsp4z8gLaBvghwdCAHbDXNk/dm5G66ZUCgqjnrgRfHEyTEd2qxrjJ9Cfs0SJDvBSR4b+gscwcZ8S/q6nNpImW17wPl+61ibN7K4zPlqeAZPfrRbYVeOVYnBcR2KYUCnOtfD41Sx5mU=
+	t=1782833821; cv=none; b=oRP4E9GAoGKYIk0jbh14/RX+VVbeaIjrPfEqB4BiX3LKs45lv2tCjTTMyHUkStClA64UpzV20ZyZCvGKsqfQALSHNtzQtM3Mx41ShWJKoKMWnDC9PwGhNr+CTcDytB+2G9eKZtW2tU8YUpPT9z0y3gMEhiI6ztaNNA4xlR3+FXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782833358; c=relaxed/simple;
-	bh=WQRlvOCE1auyNFN25FfdvwAf8yTgJGPbfJqgPD3mkZg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q8896pTfqafjxFIB9JQBnsSECskZcBYUzwD9XOX2DQZy0O69hyAzkCQ8CRABXzgVInrXCDC0BGcNfguuGoNn/GaPGdd+Bilf2owpCjH4z24DFngQuh3tfy3n1nIBuylt7keE8NEF4nVxlEk+V2SrwY/MFIrhwDRtKpD//nJK0YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9gR71D9; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555631F00ADE
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 15:29:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782833355;
-	bh=WQRlvOCE1auyNFN25FfdvwAf8yTgJGPbfJqgPD3mkZg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=l9gR71D9A6uav7d5RvE8QcK9rQeFL2y3W1qche7RQUI9lOP2HhOU7uzwnleAUzXDc
-	 H5xzmFMe3gMPOEwSRZqy9u/bJQjUvWcKmo2ID//e3KXWnM2A5FwCLI5whSjBhSYTN+
-	 lcwp6M4pno6s8K0fCEvGVh96vBQegwRBPEzKykcKZpHhUMXr+KFvm07eaUZKm3Yk5h
-	 rLhaA+01Q0wiv1qrc3JC2BBJBOUCPHTRJ+lpBNpelvyEolCVdX1OkgTdQ3rkdxZZSI
-	 wJ3JrwmjqDTYwedbN/JY8gACsAP0ZLdFuRAO47jIJUuO9anmhtrPaBcm63E6d2+4D5
-	 Puuc2/AUqIJzg==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c127a694ccbso262617166b.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 08:29:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoM1oVtlIUDKmaCO6VCTYDaMNUAlFojA3dhw9gc99ph7UDODNjA9s+xDwpL0VmSAo8mJETI82k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk7nTIFgwmwbMslnyBiIT5Kz8BZAGsSUA0lV9xqITLLyWG5dFl
-	soM3Awe0FaAwj0Riq3cyqxS3DmLrnxnaT3IZFR5mOOBVWbUqyYOGMcKUqmXaA2xfgow3i+4z+PC
-	dplARoQinm+OuByRo4ai9HcgLDVpNRw==
-X-Received: by 2002:a05:6938:a08a:20b0:c12:7e9f:5ae3 with SMTP id
- a640c23a62f3a-c12872a34b4mr141132866b.15.1782833353756; Tue, 30 Jun 2026
- 08:29:13 -0700 (PDT)
+	s=arc-20240116; t=1782833821; c=relaxed/simple;
+	bh=/HHA73eb3XSlyGAILsGJwy2p/y/r7JCgeQ2+EYu+VJY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RJs9fWHAcb2snGYl0y33zWWj1pQ7LtGJNnPNwVkGBrQVuu9IwZiThqeZjtNwDHvuxyUZGm0h+dASUBt6K5/8b0rb0WbUCuuDQNWReD4qb8w1PDpzfB+qSadvXQDPYL+6Q4YWxcNDMbk4sCUnZ1h9pv77m2Ur+dQ7FH1GOstVfzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=rK2LbYjc; arc=none smtp.client-ip=74.125.82.43
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-13a97ffb312so3477456c88.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 08:37:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1782833819; x=1783438619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=02wc41T6DWOXZJ4TY7zH1GCdBUbd2Je3Glv9F89OTUs=;
+        b=rK2LbYjcghoJdoYBMFcbDUKlW/4e30yTH/0TWSmkk4SSHAiufYdVptDqlpeAeNAxOp
+         9q77JVMuE42aUQfozEtEG5pojBbtZFVEiBCCc8KZDN9V2l14cMM4tyuJz2cfrX3tfHjD
+         Tm845o3plwXD7sDOMhQlNZyouEO1qYTnHjLzg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782833819; x=1783438619;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=02wc41T6DWOXZJ4TY7zH1GCdBUbd2Je3Glv9F89OTUs=;
+        b=CE/5pTbKUzwYt4OiIoytWb0BandvB1wBmHc3X+AG+j+MKmV+vNKflpWPxFNFxN18Dy
+         zIsIab7nTq588DyNpaZh8ZAX+d6trVDuTIONcSHW+1lwimw5WmZ09yeqd9V9DOMMacMX
+         FNnGxWNzX41Esu7vk8CwTSVfgfJbMzbAbmzGGd23OlXjhQz2FJpExZgiiZUvlHvHVyHP
+         Q9EJ6mjIa1+aDHPeepV3lgvPjljQgsTYjTtEV6Juxnb7onsS9+rYBkyv6/gRNjvJ+8hw
+         /dl/XGAnoMLZ2Cx5VVp//nODn20bjf+FyP9b50/ltSyGl07WBwFZ2UBkpzEcqnga2OnI
+         uelA==
+X-Gm-Message-State: AOJu0YxjjGAosZIQDstSOHJiNq+1kqn0iAPwqRm+L1zl8i6jf+N11nSz
+	KU7/HJTr3XNaBShGYGqXKns+TeGicJPABJ9LyHWc++51wHMPjpIT5Tdlno0v+IJE1w==
+X-Gm-Gg: AfdE7ck/it1ptOi0QYyQyQjS8rJ21Uk9QVNMuY3j+Vg8FXOhweLgpYJQs+MpeajEV5c
+	tVvHIsSIvc6PpuOuXfSwhvU/Ku+DYmnqHYtPHttbTkwz19fwV824CxjBAomvzAFXf0d1LzEiOsA
+	MfWbYJ43hJzj8M4xA79vWHI1praUNuO8PIiOAiywQ5HW/nL5gMp12/yqyttrsql0hfFgIkkVdIQ
+	X7Q70ik7+pEo4mrGMG45FMcMLG+h4Km8Xf6zKJmKNxUkGYM6vUdKxESkmmV6XjZv4g1WmhzrRFQ
+	zt2k3tIKIgwNfBixF44pRSo9KNV7PInfYBFL8tQd3YG7MwjxHAf03f0YCkreleryKInJy98+Krl
+	sD6IcN07rxZ1V4AT/t3CBVLRH+pl54IwNldZSXEUHSL5nSDoUm4PnOe/APF6DYzU/pLkjH2bt
+X-Received: by 2002:a05:7022:fa5:b0:135:608a:2864 with SMTP id a92af1059eb24-13b2a1dbb23mr2989645c88.33.1782833819052;
+        Tue, 30 Jun 2026 08:36:59 -0700 (PDT)
+Received: from exu-caveira ([2804:14d:5c54:4d67::1c9d])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b2ab2dc1fsm8131309c88.6.2026.06.30.08.36.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 08:36:57 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	jiri@resnulli.us
+Cc: netdev@vger.kernel.org,
+	hexlabsecurity@proton.me,
+	pctammela@mojatatu.com
+Subject: [PATCH net] selftests/tc-testing: Add tests that force multiq and taprio to enqueue to child's gso_skb
+Date: Tue, 30 Jun 2026 12:36:51 -0300
+Message-ID: <20260630153651.249752-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260614-s2500-mac-phy-support-v5-0-89874b72f725@onsemi.com>
- <20260614-s2500-mac-phy-support-v5-14-89874b72f725@onsemi.com>
- <20260615041056.GA1426553-robh@kernel.org> <CYYPR02MB9828308552BBC60427E8EF2283E82@CYYPR02MB9828.namprd02.prod.outlook.com>
-In-Reply-To: <CYYPR02MB9828308552BBC60427E8EF2283E82@CYYPR02MB9828.namprd02.prod.outlook.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 30 Jun 2026 10:29:02 -0500
-X-Gmail-Original-Message-ID: <CAL_Jsq+H5qSep2+Wd6i+pir0fK8NDAdPj=7Ka7+qoG82QZeFqg@mail.gmail.com>
-X-Gm-Features: AVVi8CcE2u2osQeWDN_q0N5A5Le8-51ZMka5QYUjnRlp7Tx6YdkygDNIGVndh54
-Message-ID: <CAL_Jsq+H5qSep2+Wd6i+pir0fK8NDAdPj=7Ka7+qoG82QZeFqg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 14/15] dt-bindings: net: add onsemi's S2500
-To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Piergiorgio Beruto <Pier.Beruto@onsemi.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jerry Ray <jerry.ray@microchip.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303280-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:Selvamani.Rajagopal@onsemi.com,m:andrew@lunn.ch,m:Pier.Beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:richardcochran@gmail.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:hexlabsecurity@proton.me,m:pctammela@mojatatu.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303281-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mojatatu.com];
+	RCVD_TLS_LAST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,onsemi.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:mid,mojatatu.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3123A6E5F9A
+X-Rspamd-Queue-Id: 7EF6F6E6093
 
-On Mon, Jun 29, 2026 at 12:07=E2=80=AFPM Selvamani Rajagopal
-<Selvamani.Rajagopal@onsemi.com> wrote:
->
-> > -----Original Message-----
-> > From: Rob Herring <robh@kernel.org>
-> > Sent: Sunday, June 14, 2026 9:11 PM
-> > To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-> > Subject: Re: [PATCH net-next v5 14/15] dt-bindings: net: add onsemi's S=
-2500
-> >
-> >
-> >
-> > And you are missing tags from prior versions. It is your responsibility
-> > to add them.
->
-> I added the prior version's link under each version. Somehow "b4 prep --s=
-how-revision" command doesn't pickup the older
-> versions. It shows v4 and v5 correctly as the emails containing patches w=
-ere sent in a threaded manner.
->
-> But with v1,v2,v3, as each patch was sent through individual email (with =
-proper subject line, of course) using outlook.
-> I don't know if there is a way to fix this.
+Add test cases to reproduce scenarios fixed recently [1] where
+multiqueue and taprio forced their children into enqueueing an skb to
+gso_skb (during peek), but failed to dequeue from gso_skb because they
+called the child's dequeue callback directly. This causes a desync in the
+child's qlen/backlog and results in an eventual null-ptr-deref (with a
+qfq or dualpi2 child).
 
-While links to prior versions is nice, tags means Reviewed-by,
-Acked-by, etc. lines. If you get those on version N, then you have to
-add them on version N+1 and later unless there are significant changes
-that nullify them. However, you don't need to send another version
-only to add tags. The tools will pickup tags from the current version.
+Test cases are the following:
 
-The only advice for outlook is don't use it. It is incapable of
-following maillist etiquette.
+- Force multiq to dequeue from its child's gso_skb with qfq leaf (fb6c)
+- Force multiq to dequeue from its child's gso_skb with dualpi2 leaf (1922)
+- Force taprio to dequeue from its child's gso_skb with qfq leaf (476f)
+- Force taprio to dequeue from its child's gso_skb with dualpi2 leaf (0235)
 
-Rob
+[1] https://lore.kernel.org/netdev/20260625-b4-disp-31bcb279-v1-0-85c40b83c529@proton.me/
+
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+---
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 164 ++++++++++++++++++
+ 1 file changed, 164 insertions(+)
+
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+index a1f97a4b606e..0cf12c50fb74 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+@@ -1540,5 +1540,169 @@
+             "$TC qdisc del dev $DUMMY root",
+             "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
+         ]
++    },
++    {
++        "id": "fb6c",
++        "name": "Force multiq to dequeue from its child's gso_skb with qfq leaf",
++        "category": [
++            "qdisc",
++            "tbf",
++            "multiq",
++            "qfq"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "echo \"1 1 4\" > /sys/bus/netdevsim/new_device",
++            "$IP link set dev $ETH up || true",
++            "$IP l set addr 01:02:03:04:05:06 dev $ETH || true",
++            "$IP n add dev $ETH 10.10.11.1 lladdr 01:02:03:04:05:06 dev $ETH || true",
++            "$IP addr add 10.10.11.10/24 dev $ETH || true",
++            "$TC qdisc add dev $ETH root handle 1: tbf rate 88bit burst 1661b peakrate 2257333 minburst 1024 limit 7b",
++            "$TC qdisc add dev $ETH parent 1: handle 2: multiq",
++            "$TC qdisc add dev $ETH parent 2:1 handle 3: qfq",
++            "$TC class add dev $ETH classid 3:1 parent 3: qfq maxpkt 512 weight 1",
++            "$TC filter add dev $ETH parent 2: protocol all prio 1 matchall action skbedit queue_mapping 0",
++            "$TC filter add dev $ETH parent 3: protocol all prio 1 matchall classid 3:1 action ok"
++        ],
++        "cmdUnderTest": "ping -c 1 10.10.11.1 -W0.01 -I$ETH || true",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s -j qdisc ls dev $ETH parent 1:",
++        "matchJSON": [
++            {
++                "kind": "multiq",
++                "handle": "2:",
++                "bytes": 98,
++                "packets": 1,
++                "backlog": 0,
++                "qlen": 0
++            }
++        ],
++        "teardown": [
++            "$TC qdisc del dev $ETH handle 1: root",
++            "echo \"1\" > /sys/bus/netdevsim/del_device"
++        ]
++    },
++    {
++        "id": "1922",
++        "name": "Force multiq to dequeue from its child's gso_skb with dualpi2 leaf",
++        "category": [
++            "qdisc",
++            "tbf",
++            "multiq",
++            "dualpi2"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "echo \"1 1 4\" > /sys/bus/netdevsim/new_device",
++            "$IP link set dev $ETH up || true",
++            "$IP l set addr 01:02:03:04:05:06 dev $ETH || true",
++            "$IP n add dev $ETH 10.10.11.1 lladdr 01:02:03:04:05:06 dev $ETH || true",
++            "$IP addr add 10.10.11.10/24 dev $ETH || true",
++            "$TC qdisc add dev $ETH root handle 1: tbf rate 88bit burst 1661b peakrate 2257333 minburst 1024 limit 7b",
++            "$TC qdisc add dev $ETH parent 1: handle 2: multiq",
++            "$TC qdisc add dev $ETH parent 2:1 handle 3: dualpi2",
++            "$TC filter add dev $ETH parent 2: protocol ip prio 1 u32 match ip dst 10.10.11.1 action skbedit queue_mapping 0",
++            "$TC filter add dev $ETH parent 3: protocol ip prio 1 u32 match ip dst 10.10.11.1 classid 3:1 action ok"
++        ],
++        "cmdUnderTest": "ping -c 1 10.10.11.1 -W0.01 -I$ETH || true",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j -s qdisc ls dev $ETH handle 3:",
++        "matchJSON": [
++            {
++                "kind": "dualpi2",
++                "handle": "3:",
++                "bytes": 98,
++                "packets": 1,
++                "backlog": 0,
++                "qlen": 0
++            }
++        ],
++        "teardown": [
++            "$TC qdisc del dev $ETH handle 1: root",
++            "echo \"1\" > /sys/bus/netdevsim/del_device"
++        ]
++    },
++    {
++        "id": "476f",
++        "name": "Force taprio to dequeue from its child's gso_skb with qfq leaf",
++        "category": [
++            "qdisc",
++            "tbf",
++            "multiq",
++            "qfq"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "echo \"1 1 4\" > /sys/bus/netdevsim/new_device",
++            "$IP link set dev $ETH up || true",
++            "$IP l set addr 01:02:03:04:05:06 dev $ETH || true",
++            "$IP n add dev $ETH 10.10.11.1 lladdr 01:02:03:04:05:06 dev $ETH || true",
++            "$TC qdisc add dev $ETH root handle 1: taprio num_tc 2 map 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 1@1 base-time 9000000000000000000 sched-entry S 03 200000 flags 0x0 clockid CLOCK_TAI",
++            "$TC qdisc add dev $ETH parent 1:1 handle 3: qfq",
++            "$TC class add dev $ETH classid 3:1 parent 3: qfq maxpkt 512 weight 1",
++            "$TC filter add dev $ETH parent 3: protocol all prio 1 matchall classid 3:1 action ok"
++        ],
++        "cmdUnderTest": "ping -c 1 10.10.11.1 -W0.01 -I$ETH || true",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s -j qdisc ls dev $ETH",
++        "matchJSON": [
++            {
++                "kind": "taprio",
++                "handle": "1:",
++                "bytes": 98,
++                "packets": 1,
++                "backlog": 0,
++                "qlen": 0
++            }
++        ],
++        "teardown": [
++            "$TC qdisc del dev $ETH handle 1: root",
++            "echo \"1\" > /sys/bus/netdevsim/del_device"
++        ]
++    },
++    {
++        "id": "0235",
++        "name": "Force taprio to dequeue from its child's gso_skb with dualpi2 leaf",
++        "category": [
++            "qdisc",
++            "tbf",
++            "taprio",
++            "dualpi2"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "echo \"1 1 4\" > /sys/bus/netdevsim/new_device",
++            "$IP link set dev $ETH up || true",
++            "$IP l set addr 01:02:03:04:05:06 dev $ETH || true",
++            "$IP n add dev $ETH 10.10.11.1 lladdr 01:02:03:04:05:06 dev $ETH || true",
++            "$TC qdisc add dev $ETH root handle 1: taprio num_tc 2 map 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 1@1 base-time 9000000000000000000 sched-entry S 03 200000 flags 0x0 clockid CLOCK_TAI",
++            "$TC qdisc replace dev $ETH parent 1:1 handle 3: dualpi2",
++            "$TC filter add dev $ETH parent 3: protocol ip prio 1 u32 match ip dst 10.10.11.1 classid 3:1 action ok"
++        ],
++        "cmdUnderTest": "ping -c 1 10.10.11.1 -W0.01 -I$ETH || true",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j -s qdisc ls dev $ETH handle 3:",
++        "matchJSON": [
++            {
++                "kind": "dualpi2",
++                "handle": "3:",
++                "bytes": 98,
++                "packets": 1,
++                "backlog": 0,
++                "qlen": 0
++            }
++        ],
++        "teardown": [
++            "$TC qdisc del dev $ETH handle 1: root",
++            "echo \"1\" > /sys/bus/netdevsim/del_device"
++        ]
+     }
+ ]
+-- 
+2.54.0
+
 
