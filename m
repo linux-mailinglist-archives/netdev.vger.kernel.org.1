@@ -1,154 +1,184 @@
-Return-Path: <netdev+bounces-303337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Yr9vNN8WRGpeoQoAu9opvQ
-	(envelope-from <netdev+bounces-303337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:19:59 +0200
+	id mW0bEQ8aRGopogoAu9opvQ
+	(envelope-from <netdev+bounces-303346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:33:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 235B26E7848
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:19:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3208C6E79A5
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:33:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=OXfeWnlw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303337-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303337-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303346-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303346-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE6A330F64FD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:15:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ADFDE300B520
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE6D37475B;
-	Tue, 30 Jun 2026 19:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262103C108A;
+	Tue, 30 Jun 2026 19:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CF63019BA
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 19:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A845D282F1E
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 19:33:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782846954; cv=none; b=OXKTsx4tievrF5Zm7UwUZ/PSweemDEaoxXicf92/LW9now1Bn1tshnfD1MqnfeZOkYwbjCWGrhTKwQI0rSSNoy34EtLs4xt9EaCerZdEiFK8CkCkAR4GjrEsFa+0jtHGlXtRBKIXfsiheaATxlkcATIXA8MIIeMghHpltep06EQ=
+	t=1782848006; cv=none; b=EZ4P2Zv5GygdqCC8zZBpINl0l7Kj0zeH6TIW+BedTKnsDDJ3AyZ99OiMFdscF8FefKFZd8v2Jt5U7dZRWCbBroPSZEDDqaA+84pCHxT0jsygveQLcTiGKOBGkWkSSE+4EVZyqkMFMuozWa1p9ED82gO4lmQs5stUKVOVobvHVXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782846954; c=relaxed/simple;
-	bh=V8iiieoM4chbcM6uxH0t+6M1my8HsWOoynsGIWvgwiI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OAAY238x5eU2B/FNjnXDwzzMtJb7hDlG9frqO5c+9YvQmLHTZlEfEY1/oW33W3IJF+LYw4bGadKjoLFFmMhEN/U1VnQ71rJkVMPvM7SUjIUinPbSk/DxPABjI8LGAZSrnRGvgkxTZDjYIGyuRUetGqP+GLi3B/r8qGGzxSpix2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OXfeWnlw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 930CE1F000E9;
-	Tue, 30 Jun 2026 19:15:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782846953;
-	bh=apooQY66Tp01aRQkf67rYoR7AtFFMg8jb2Oxmu13TRA=;
-	h=From:To:Cc:Subject:Date;
-	b=OXfeWnlwb4UU8geO9/jHtxr/gfH/RHd5xgFN4nZjVAZih2ij+3Trgao2E0ZrujRln
-	 Kzyy/w7tfieZedgek2qBFO0JTW6ODkmlxCsDKqmDlXPntyRniTKgsvTk7Pf+IN6+fF
-	 +MNwELlkYNyhtcNfmfiCpzVGrBOXV2eUgpkSt49eddqipOTYAzVxzt86IZoAe34XzZ
-	 dlZMfPRWOri0U5wNfm8KmmVFOEJuH+kE3YSlRAu+uwdTFgFnjzCCJevHw1dWT7IiC+
-	 jHK72bXolab9Fpf9LrumjBZ3zQd2YQvwHPN8w00Fw5B+D6etb/AvnT7VOY1H+VKHYJ
-	 5XOob7aaY7RIQ==
-From: Chuck Lever <cel@kernel.org>
-To: john.fastabend@gmail.com,
-	kuba@kernel.org,
-	sd@queasysnail.net
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net/tls: Consume empty data records in tls_sw_read_sock()
-Date: Tue, 30 Jun 2026 15:15:51 -0400
-Message-ID: <20260630191551.875664-1-cel@kernel.org>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1782848006; c=relaxed/simple;
+	bh=TJg+PTJkYd9/0ku8b/CRQqtSDTsx14fZLzROWdCDbYE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=duqtARDXTzGNGZxrtlEK66VGGlJN9/N1O6Nxo1pp2OksqrR49IA3jeBbcIxo61sQ4n7UV6LqBlUxxPwwuvxzyL/5uusoNgf3TQIgqguYBinRjDsy4o4bhyNUJu/nff8Zb4CcTetg3/2Qd9FKRyM30k5erX1YGC6SzjIQhEZ+kMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-49601a1b80cso209635b6e.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:33:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782848004; x=1783452804;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+rWZ8k73TMV9DNYwCNJH7ZdxXY5ZdbASYCz+2kmGPs=;
+        b=DSTU22pLohpyyjzsPg9YVm5sf+Ad5YpcdmdqRzDMj3Q5OIvoffxLmW04vLHPo3+ggI
+         i3xPs4evF6AlZRd9vv8f/hRvRFMRIhcG/5KsB3+JDTQTPbjInEMDyOSQDojWHJ9a/miS
+         otmisJJbgtusxKdConKCvBBe7IIevigDwGsNIsM6lHYFox7ToBn/AOfAham9hcXeCnv+
+         7+EVizPewXL0pmgOyDIO8DdOOEd/DiLrGfyCNKdCFz9DmTXqXoGKrqDdN71Tmt0EHfOR
+         14Mrk+n+FSIolxWASCG9IHXvfT1pMIaMczdSspFbWpozHoNmbrYq3w/gYCKBTBCqB2BB
+         Amww==
+X-Forwarded-Encrypted: i=1; AFNElJ8CO/mljKEQpgH/87qbW+fG+poP/NVnlrQgHmHoI1FXPk/4dexFjfN32aSraKrb/lrg4r1sYZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCuHPM0JkGxgjhvsVXgXPsoLN+zk2mwkVceb8A8BTZxJmZZFdv
+	X3xZOlKmEE37+Lg3mnZeGV26siEon5PhYSY9m0NRzHriS+S8YHCsapx7RnQ5hhYMLAs9RBdbH8J
+	2S+agY14ia1GHX2sToxk57RSStZg40bhHSpVlG5j0+qtjwCdEwydkg6FlR1Y=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:87d1:b0:485:5f3f:bd1b with SMTP id
+ 5614622812f47-495fd49fef3mr1320558b6e.3.1782848003808; Tue, 30 Jun 2026
+ 12:33:23 -0700 (PDT)
+Date: Tue, 30 Jun 2026 12:33:23 -0700
+In-Reply-To: <6a00f268.170a0220.1c0296.021c.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a441a03.b42ede87.8e801.0009.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in mac80211_hwsim_tx (2)
+From: syzbot <syzbot+435fdb053cf98bfa5778@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=3c3d59be33cf7e9a];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-303337-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net];
-	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303346-lists,netdev=lfdr.de,435fdb053cf98bfa5778];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,syzkaller.appspot.com:url,appspotmail.com:email,storage.googleapis.com:url];
+	FORGED_RECIPIENTS(0.00)[m:johannes@sipsolutions.net,m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 235B26E7848
+X-Rspamd-Queue-Id: 3208C6E79A5
 
-A peer may send a zero-length TLS application_data record; TLS 1.3
-explicitly permits these as a traffic-analysis countermeasure (RFC
-8446, Section 5.1). After decryption such a record has full_len ==
-0. tls_sw_read_sock() hands it to the read_actor, which has no
-payload to consume and returns zero. The loop treats a zero return
-as backpressure (used <= 0), requeues the skb at the head of
-rx_list, and stops. rx_list is serviced head-first on the next
-call, so the empty record is dequeued, fails the same way, and is
-requeued again; every later record on the connection is blocked
-behind it.
+syzbot has found a reproducer for the following issue on:
 
-tls_sw_recvmsg() does not stall on this: a zero-length data record
-copies nothing and falls through to consume_skb(). Mirror that in
-the read_sock() path by recognizing an empty data record before
-the actor runs, consuming it, and continuing.
+HEAD commit:    dc59e4fea9d8 Linux 7.2-rc1
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12f58032580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3c3d59be33cf7e9a
+dashboard link: https://syzkaller.appspot.com/bug?extid=435fdb053cf98bfa5778
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13a73289580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135db61e580000
 
-Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
-Signed-off-by: Chuck Lever <cel@kernel.org>
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-dc59e4fe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9ee1f0ea24f2/vmlinux-dc59e4fe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/729e963a1370/bzImage-dc59e4fe.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+435fdb053cf98bfa5778@syzkaller.appspotmail.com
+
+mac80211_hwsim hwsim5 wlan1: entered allmulticast mode
+------------[ cut here ]------------
+hwsim_get_chanwidth(bw) > hwsim_get_chanwidth(confbw)
+WARNING: drivers/net/wireless/virtual/mac80211_hwsim_main.c:2248 at mac80211_hwsim_tx+0x1ab4/0x2500 drivers/net/wireless/virtual/mac80211_hwsim_main.c:2248, CPU#0: syz.0.17/5510
+Modules linked in:
+CPU: 0 UID: 0 PID: 5510 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+RIP: 0010:mac80211_hwsim_tx+0x1ab4/0x2500 drivers/net/wireless/virtual/mac80211_hwsim_main.c:2248
+Code: c6 05 da 65 07 09 01 48 c7 c7 e0 74 7a 8c be 6b 08 00 00 48 c7 c2 20 76 7a 8c e8 a7 d6 8c fa e9 ff ee ff ff e8 7d eb b0 fa 90 <0f> 0b 90 49 bc 00 00 00 00 00 fc ff df e9 dd fe ff ff e8 65 eb b0
+RSP: 0018:ffffc9000278efe0 EFLAGS: 00010293
+RAX: ffffffff87158693 RBX: 0000000000000000 RCX: ffff888000ad8000
+RDX: 0000000000000000 RSI: 0000000000000014 RDI: 00000000000000a0
+RBP: ffffc9000278f170 R08: ffff888000ad8000 R09: 000000000000000e
+R10: 000000000000000d R11: 0000000000000000 R12: 0000000000000014
+R13: ffff8880120b3cb0 R14: 00000000000000a0 R15: 0000000000000030
+FS:  000055559073c500(0000) GS:ffff88808c815000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005562391e0138 CR3: 0000000012ea1000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ drv_tx net/mac80211/driver-ops.h:38 [inline]
+ ieee80211_tx_frags+0x3df/0x890 net/mac80211/tx.c:1746
+ __ieee80211_tx+0x267/0x580 net/mac80211/tx.c:1801
+ ieee80211_tx+0x312/0x4b0 net/mac80211/tx.c:1984
+ ieee80211_monitor_start_xmit+0xb33/0x1280 net/mac80211/tx.c:2479
+ __netdev_start_xmit include/linux/netdevice.h:5400 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5409 [inline]
+ xmit_one net/core/dev.c:3889 [inline]
+ dev_hard_start_xmit+0x2cd/0x830 net/core/dev.c:3905
+ __dev_queue_xmit+0x1435/0x37f0 net/core/dev.c:4872
+ packet_snd net/packet/af_packet.c:3082 [inline]
+ packet_sendmsg+0x3d95/0x5040 net/packet/af_packet.c:3114
+ sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+ __sock_sendmsg net/socket.c:790 [inline]
+ __sys_sendto+0x408/0x5a0 net/socket.c:2252
+ __do_sys_sendto net/socket.c:2259 [inline]
+ __se_sys_sendto net/socket.c:2255 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2255
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fc04219ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcb766be38 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007fc042415fa0 RCX: 00007fc04219ce59
+RDX: 0000000000000030 RSI: 0000200000000640 RDI: 0000000000000008
+RBP: 00007fc042232e6f R08: 0000200000000380 R09: 0000000000000014
+R10: 0000000004000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fc042415fac R14: 00007fc042415fa0 R15: 00007fc042415fa0
+ </TASK>
+
+
 ---
- net/tls/tls_sw.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 9324e4ed20a3..d4afc90fd796 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2115,6 +2115,17 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- 			goto read_sock_requeue;
- 		}
- 
-+		/* An empty data record (legal in TLS 1.3) gives a zero
-+		 * read_actor return, indistinguishable from the consumer
-+		 * stalling; the used <= 0 path would requeue it at the
-+		 * head of rx_list and block all later records. Consume it
-+		 * here instead.
-+		 */
-+		if (rxm->full_len == 0) {
-+			consume_skb(skb);
-+			continue;
-+		}
-+
- 		used = read_actor(desc, skb, rxm->offset, rxm->full_len);
- 		if (used <= 0) {
- 			if (!copied)
--- 
-2.54.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
