@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-303025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303026-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Q8FqB9d1Q2o8YwoAu9opvQ
-	(envelope-from <netdev+bounces-303025-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:52:55 +0200
+	id ApXVNO11Q2pGYwoAu9opvQ
+	(envelope-from <netdev+bounces-303026-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:53:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78616E1682
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:52:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A0D76E168D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 09:53:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=bfHt2ZcE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303025-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303025-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=KU1qj9du;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303026-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303026-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 189693021749
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:50:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B8E93038A1C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 07:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07FB83EA97E;
-	Tue, 30 Jun 2026 07:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5233E9C23;
+	Tue, 30 Jun 2026 07:49:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010066.outbound.protection.outlook.com [52.101.84.66])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010056.outbound.protection.outlook.com [52.101.69.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665DE3EDAD2;
-	Tue, 30 Jun 2026 07:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700E83EA971;
+	Tue, 30 Jun 2026 07:49:53 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782805786; cv=fail; b=mKZYkutOmRZbmGQJI0aRwbfpPgJ3l/edwMGvU67Pme0U+dT8FtPWOGLi7a4Un27o4/FcTlFtVJH01TzvHulaYXqztAONHHUJbBih5buN+TOi4AeQwReLrzUUQyDDWjQqpijArRJVtAjUcQ/QeOxwCEQ63Ct1WeYbsQW0Gx+h0mU=
+	t=1782805795; cv=fail; b=WePsS+2QYSMQvowgF52eEWpg7tZHtxFPhQbvqK60JXLIwsUHE9pPQaMitgDWoTXLpZ/UWuIWeKv/5UcN0lX4ElUl9HCrAMY+32k6OJKa8K2HEDDDoDvcYamNbQL9y/QPuxCWMxFlsalHpwK7MzOy4iNiY1j+wu48LvThcGo+OJw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782805786; c=relaxed/simple;
-	bh=VZ6tklCrHxhfA0jIQY0+ogrwpEr9IkTTSVB8gBpNKFA=;
+	s=arc-20240116; t=1782805795; c=relaxed/simple;
+	bh=/FkriXiq/fQ6Mll+FFAseFlbY6AdqqL1B66K6IkkwKk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Fg4TASUH/mRYkMAr1AQy67HTdadA9Z8zPnfhQhzbE2INsIrN/5HJbIUpjdX9T6/JcOrG214zi1ChPmc8Z8okMwpnV2kD68CWpL/Ey+rBdECIKLflkashfMEHYjx1pNv3DB/SXihgD8dLy9+gUUN76/hjcyU85uixMeidS3zWvpw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=bfHt2ZcE; arc=fail smtp.client-ip=52.101.84.66
+	 Content-Type:MIME-Version; b=dOhsy7yyD1AMP3g3NcmTNwKggo1+yP+fhFZOdhz55CpssonvB6bme+26ksPo9DIRh8DGSBRk7muUDv6QwYb6AktwKUhdfE1DQTjYqPZNq3cI1JtSi3Yhb/BhT4xu06CiJZztA/NTz6WJEfKITm8oIU7C4ID7oRxGMjlxRyzwKuI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=KU1qj9du; arc=fail smtp.client-ip=52.101.69.56
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SFvCYo6Yx0QrJzE0bMZ3LuZywBMqVIIx+tJgUYraJN3i2fqYx+SMnCR69c4nMNzRTT/yHPFQ6tvOxzGvmMZVfU2V6wUMZ9h9ztJ3osvmyfv1/jMF4Y+AVpH2fYzNZCs5FeP/hY6UFBbfVgHNgyads0gJZP5EURec11MHK9m3BULJcaAUfZf7wyYnBd7EUf53tv4qYv14MBzgwrmqYW85LEgxvyfG9R9pctL2jaiPMYCcYGLjRml6K7+zzZDAjPk/AcLXphIbklbgOMWkerSCcZu5/5FccTxeTEHUaqjvdkY++RIxvMZR4swnL6YvFj4yApQtikbTQaMhiGAd2KCGbQ==
+ b=JQH/0jVhDI4n1wFFEM5MgSqMethUlLKqQBszPdhjPFqfgfqUjBmIdSFJGPkR8zPpIYY7qfgSb5m2LPRcmUHgZVfP2iZ450WG0C4TsX2KeNYLblihl6QNY0UWclwVwVdr+1K5nsEaNIy6DZUBG7zwkbYXS00mIZGG+ZPVjGmked1tIhAj5TMKFN7Ey/TvG8PSxkKGMtuv1O1V8NGL725HhZ+huqG1guCWy4zCFR8ib2ZK97b/oHZglrL+VDZvPfxTmH2D6bJuwNJ27ToPg7lkG313FdZiEVOP4WWRgf0UltKICunTKgunEfE2OJK1Rq17PEb6dc7vKJyBYiSI6PIMQg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mgOknO2lE+xqVZxduxkSrQUwltbTHSa4nCtX4e8daq4=;
- b=jNOkptCmqHrmOO8+pI0pvar19cWiInQYyiGbKBrZsP1vPEfSJ7rEUyh3Il6gEbqnCqbobcgC5jhWrT4AUz3Aow//26TF6ua8HYMmT3w/dOk8FIk+AnB394r2VLd7wzWisYpxV3WXsL8MjMCS+4FyictbVpQQRvQMy6NKIjbyBpc1wb4mlIM5r4TzuyZPtHagfpfZDmkesm3KGPQgHLOYn9hZaou8qUWqgR6zsqnds61syu0gFfCQnki6l/W44gwIYbVzx/B/TfONwd8m+HFbPle1I4h7FJapHXMCwW1sdB4SRziWpUAN1LSn5FYDBsfy7cA/xxOOLwdp/a18/xayRw==
+ bh=H2aNDUtTpvMZSHHH68Kz+CpRELw5sQlUW3RfIv/bH0M=;
+ b=GCrd7HzN6mvZ8fU846AlxKQxswS8KeHZ+2LZQ+92t1Z42H7Hn2609LKpBx4SfCzQ9i7EwKl8nnqAeaAk/cgA/kLSRhqyrzavfyxy4nE8IKtg7ZsQbvvHgOyHSAYAqBEHPNNgnwal1q2h1XjNc9WPwd5Up//0SojtZQyiOugBBmaK5GXrBv2eDorLk6F7XJAaqF7rgz3rBZrzsFgDhOK2hNKC6kLDKb6TzuQaP+NNjTK0pDPU266Z757tyol3mtfojsT0Lu4TVDoT/V2j0rsfq1n8t+kbKvmzF971mHCCeMvGDYXwwIMmzPgVDTYNSO5mP+I/Dl5CsnJ2OiUXD4sqFg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector1-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mgOknO2lE+xqVZxduxkSrQUwltbTHSa4nCtX4e8daq4=;
- b=bfHt2ZcECS3coLHP9FAoTKk1lY5FfImopw/Po6nMo7Jx6TfuCJABG1ttkgL4NMUP2PuM9YYokUVePfJS9QMmAPtd70/GFseDUyEZ6TyAA589+fXfnbRugW2lsxTVwbZeZsE4uNrhpQdnHfgrncievIqu0yg3vP2ak+U0pgixlV5Mv7pSCULpM8pIHzyjIbb7tJfEBf7XiUU+B6cYUypdJxrhDsfiYpiMaAZoAOfTyEp1J9Zdq/zMXaewz++Aiqmmveq9SDFIZ2DhO8Q9yOXb/Vb64hMZCEqtjDYjsiMsxoSrhq1wOF6xk9XWJss+tPmTp7oivYcbDvsSAu2vWYG5+g==
+ bh=H2aNDUtTpvMZSHHH68Kz+CpRELw5sQlUW3RfIv/bH0M=;
+ b=KU1qj9du/cxqS792Ua7uYoF3Llh/ujE800u1gD/UB/Knl7YV70o0dhChoIcCSUQ5npDMNgWsClnaUCDe9jQHKDv9aPYFJmCOd1alP4TVcfnhANdP2Cq+Jo5VeTLJzSsIB4j7cmL6tHhj/j7IxLQKidDi2DTSIMUnHyNPQmDL49I2vfclhrZjWPYdwxF8Tb9539JWemtzWWkpUoP2DPld67J9aQaaRkLXvgWGGzcDQmtylIXXO2yaCeoe4hgxJfn1iLP94/3akik3H/p7MEXfJ2FGAmR+GZadalhuWY6pBaMz6LBgfwyRG7n73hDqDmAcPsgFoCCVg8CScENxOcC57w==
 Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
  by DUZPR04MB9918.eurprd04.prod.outlook.com (2603:10a6:10:4db::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Tue, 30 Jun
- 2026 07:49:42 +0000
+ 2026 07:49:50 +0000
 Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
  ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
  ([fe80::a9a5:cf83:dbe8:1f74%3]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
- 07:49:42 +0000
+ 07:49:48 +0000
 From: wei.fang@oss.nxp.com
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -75,16 +75,16 @@ Cc: imx@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next 11/14] net: enetc: move enetc_set_si_vlan_promisc() to enetc_pf_common.c
-Date: Tue, 30 Jun 2026 15:20:33 +0800
-Message-Id: <20260630072036.382761-12-wei.fang@oss.nxp.com>
+Subject: [PATCH net-next 12/14] net: enetc: remove redundant num_vsi field from enetc_port_caps
+Date: Tue, 30 Jun 2026 15:20:34 +0800
+Message-Id: <20260630072036.382761-13-wei.fang@oss.nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260630072036.382761-1-wei.fang@oss.nxp.com>
 References: <20260630072036.382761-1-wei.fang@oss.nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SI2PR04CA0006.apcprd04.prod.outlook.com
- (2603:1096:4:197::13) To VE1PR04MB7216.eurprd04.prod.outlook.com
+X-ClientProxiedBy: SI2P153CA0011.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::14) To VE1PR04MB7216.eurprd04.prod.outlook.com
  (2603:10a6:800:1b0::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,57 +94,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|DUZPR04MB9918:EE_
-X-MS-Office365-Filtering-Correlation-Id: 33d0058a-dae0-4027-b6b7-08ded67c2502
+X-MS-Office365-Filtering-Correlation-Id: 7a142af1-5788-4c6e-fcbf-08ded67c28b8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|23010399003|376014|19092799006|1800799024|366016|921020|22082099003|18002099003|11063799006|56012099006;
+	BCL:0;ARA:13230040|7416014|23010399003|376014|19092799006|1800799024|366016|921020|6133799003|22082099003|18002099003|11063799006|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	nd0JXCM/hKUqGV/GWjH5JtokSlQ6nl94DdVQZRNUlCCNXxS3zMkCFHePhwZEoV8Bc2BoUq0njFIeOQ3KVKxajttpNYhPhDcCgpjtzy6hrKEEPuUEmN5aHgcNp9cRr25o43N7Adi4sw4IGhZWwtOXbCVoepk06zex5FKlpvY5p+uA8AjtuDBfTcOTL9VrJTy/PycxUUikbwNSzqON0vvcdA/I+PWx/ZhmgdM/VgUWtMcL+1SyaRvCbdTkS3SvnVqEZ0XgiPsZvPwpeaZ8UhJK8aO7rYvn3Auvf5ZvWOwAVOX+FARCC958W3vpHzrSSZ+33eixR/Urx5BSXpZS2NvkvwcQv95ypWf/+UoCGNTW+dJ63KZIjbjhvOWjn6r2RsuEyFKeaSr/aDXpdhNJ2TRaufuMCmzdqGnTvP4eCqvUnT8zEFxkUZTFVIsrsHLE9UdaflDak636rMD9R1rHJXq+OlkV/4+CckH4M+Zc+x0zkpODiyNRfJfokLzqzqlLfLUIIC3VVutCMK6uZ+zvI5IyILIMZHfHoEgF9dl+0X1XbHGp31GiaN4teDHaI+4pktIKzX6SCmpg5R4qu0Z1CRGNoa5CtqnTXmwhHaHl37zg4IJCDSvdrgjf3Ts6lsRK1Kmlgl+BzLFsqYAlo5BTJvYCgzb19NL29o0bX+Zb39IoYEbZg5W2spUXxBbuu6e9KEXmx6dYCXo8OF1HU+g+v/EN8g==
+	aNbc8Xqt2hnAMfUGC1q0zxQTD4TNZC5HL21m1b7wBotaWdMZpKBpwiMo9ZKdHtgoTSGJYjjNu9I8c7wuiXXJcYp09ybQytG3kacm6FoR9xQ5cE4PHUgSCotvl6wbQ+P12zpqy2buWpRBX3Aojnu3EwnSOF79WFtJ8Gm3Q1fcYi/9PaAlplG7gnsMrQLUbwMBY/pVCESW1TXE+lJI1Uzwl9hURUYFBXXGgmmAxC4xUGBagd8eTjtkT8yNaHeRPDcMoi+9JjgrflDW+lSQtjdgZBjA1Oj8oRn2gKGjPhO77tY2ydrVdp9jk/IN0w4QPQfZU80b4xbQ6f/PpRmAFv84BNivLU6LWVXV/IH/WvYIpHJg/W8l4b/5GTi01wDrbsAWlwDt5UeEnOfQtiJxarXq3c8Cm81kywrh0GoepTdxZl3COTcXP0dHFGNdkbaaCSFGrkEatWVgibrmIxDHnZh367gV7gQR18vUABw9pPStfZXTMWfz7lsN5aMajVGmgKr62Y57g3xZM14SfOjEsFd/dLN5X4KUC8/dtYVSAgpsrWPta5j05tCzR3ozFeZvpPyn39va0HIHFKhRLpqklRj1txmOCMN9e2mPngn9m0QvNRmjmK6PRzYDQl4c39eGQJA8U6k/BdJljnBD+I4qjs/N4BSrCic5OnbTTbSG0pAHgJztuuj48BOE/pSWDaXzfhTObc7RIOt6pJ0zYgu6GlJHBA==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(376014)(19092799006)(1800799024)(366016)(921020)(22082099003)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(376014)(19092799006)(1800799024)(366016)(921020)(6133799003)(22082099003)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?n3g8D33kj/LtoikH11STT/+/8MpnL19bLbhbC1E2w5rvEGzDVtnToX/Gqcgi?=
- =?us-ascii?Q?EaW9bVbIIyM0Y0eDWL+Rp71Iv9CGdYWLkvPvvEsvBjgQCorKRCYZ6GNdJyDn?=
- =?us-ascii?Q?qH/9agBVJVxXABQST9ZaqSQ88K72Ku8oBxVfZprI/waQI+vvx36HikNNspwB?=
- =?us-ascii?Q?C5V8jKxZU47UibuGaLGzrKYHnY9duCHD6Ht8TGS81udH0LkOKG9pnzBf3WQE?=
- =?us-ascii?Q?TWAZ4O5zBvvnejehVY1SqrNB9VeM1KuKFY9zdB6o7gTMJlo1UL9kZdijZDuP?=
- =?us-ascii?Q?qVJUaqdbmyIKxw4YP2eCqFyowqkG/yLxGXummnVH8cPgtKla105LMacjDqzO?=
- =?us-ascii?Q?pFKjhZ7sS5yvYD+CCgUwq5FmR0iZSC6S07oHLrkYNrN7ShXStbFXHQz+4j0L?=
- =?us-ascii?Q?VyCS2TNb9GKSDMWp4nRqcUmWiVm3g92vWZbyUexqHt1ga7fZX+YIW8dtLSrV?=
- =?us-ascii?Q?gd8ajW8MfxmPNmCvl1zMF/d7JabKGLVin9cx+o51B+7EYE6imgE3NsdSpXA+?=
- =?us-ascii?Q?7O+Tn+ndKew881zoyJmHhrGZq++5sTo6ZoVHTrRcp3gbo8VRDW6lLHW+uxoL?=
- =?us-ascii?Q?437dYmkFRUjbjRj6TD9UiAQEUURA+uD3QKg8rtPFl2cHuKbTcBqbBohjy60Y?=
- =?us-ascii?Q?EqtjaUHWMRVPZA4qL43ZTHEmXTKHAEgLvjx6XHx34i43FzdzmfiXLaAIMAEW?=
- =?us-ascii?Q?0ACWdTeaP8utfsJd7jyzaTdQS79XsECxNyD70dlt8lzLVUemTUIZCYws3vi2?=
- =?us-ascii?Q?kQ09BkJvMXr+hb4UKa43qS/4NSYK1lMnNayzzNe/0qUa3c+ZmVplUKcsMHCj?=
- =?us-ascii?Q?03/4ayIfGFy8/LvCTKFFqpHwpXdDiiJuy1oTyD07mX7hqbC0TH2aXm7181Tl?=
- =?us-ascii?Q?aZ1MaKEHaewu1BwOUQfeS2YMlveuYDGhNpnh7NbsBspp+JieEZ63pJiTUC5f?=
- =?us-ascii?Q?ARS94FQlbpNpozNKqpO9UUhKcAuOV0d6bYMm7OsoUR5WxNBYRQUJ+UU0Ejvw?=
- =?us-ascii?Q?YEgbw4l4vQE9FZU2TR5nLwQiPrv5ckJQ5vkHIZhBXnx49hN+J1PUfl3gCU1R?=
- =?us-ascii?Q?Iy3rz4FJIs40UkrPrt8+bqYre+FsPimAIUWyxM/A2P17RB6/YlltHcmPcGQ8?=
- =?us-ascii?Q?/Hhppe3CQKQGwT72zdP7OjyEq4w78eDqeEHlOkqwres48vaxdaf9K/2IGbpm?=
- =?us-ascii?Q?lKM2XnO/grdNwu94J/AIRnxE+5++6VB4BU5SYc0H5laS04MATq8HQpkZCvJS?=
- =?us-ascii?Q?iDRGDUkONsN8rC3jRqKpVLt2TajE0DFLF/0jcxkLSTH4lyROJwTHw3bc4x/l?=
- =?us-ascii?Q?IfuiQUAV4+zuQ5cgjwjtkAcA/tOtOrm5z7oGB+p8RaL9xLkStLTiElzubAMQ?=
- =?us-ascii?Q?N569KX2irRSDhkC/rPhW/o0hJ4Th440nmJiY5rDY98tOHwBmPPyEzfgN3xk/?=
- =?us-ascii?Q?DjnwM5r9FiitjuuMG7KrVEGO/l/gQACfetqwO9R+EnTWAHrgmkNNZ42aUoOS?=
- =?us-ascii?Q?y5VNAyea53Lgm/1YQnhept9lK4luPWejjATJbO6S2Ywmx1HM6miXy689R2zd?=
- =?us-ascii?Q?v8OLEdTDEnvakOuZPEsebOlT9sM+8cNH38IL9uXa4HOoWVNSLBMMl9qNVufu?=
- =?us-ascii?Q?t6MmefjNKkEEAybSG6vVhJi4Z9jhr5LF4LO1JZ+rhsgbb8GWunlTRWO07q/Y?=
- =?us-ascii?Q?VnmHYU05NFga/kX/9gY+ohAj6rkOGde2w1J9gbQFu53oVkrSgJNvUAE+dGEB?=
- =?us-ascii?Q?gY/n46/MwL4nwhuj0HXhUw+4a/CecXU0nsY02Xv62JxUzpDhOArx?=
+	=?us-ascii?Q?YnbRedkb75w2VkmPu2BjYLKnvSuFqYD4jP09NKvILfLv7/q2I9TfDKgSM4v4?=
+ =?us-ascii?Q?erA8EiBVdsCSE//Oyk+1FcXplBpFusE5t577Dw9X3U5XKhc2ExREF+DdVoyd?=
+ =?us-ascii?Q?kSS3T+6zRPU9Udm4pwPSxY9AfeT7labnx9yVS5p0oPsgElQNfcOq9y+Iswnd?=
+ =?us-ascii?Q?Tu8F7+njs2tDYlsZNH06+hxeXZ/XHSDim84Wf65VfPNfRx85mNvYqZ5W2cLM?=
+ =?us-ascii?Q?DN4q1QFT0ekrco8JmGD9/HQnnYCzETfBHUTyGe/F12M2wu6uNietZ2gxDVoO?=
+ =?us-ascii?Q?0z2KlgQRrCW4UhxgvER8VDarZG2/aRFhULz2GbCMXN/dNstWFY2q9GwZWgud?=
+ =?us-ascii?Q?ELw+/z6f6LI1kLiByHK25WsgFY8RT2JwDxPepOjUXoBsJRCf7KDJpbiPugV9?=
+ =?us-ascii?Q?UjgtHubdmEhmHdwnUjZX7ITfKkMZdBrd5+i1xUP02oNZrb6I4kE5r5ceF1OZ?=
+ =?us-ascii?Q?+b+JLKliKO2ssnxRMRwmtnEKSwCsAO+nHk8R1ah+MKUe6t3LmO0dBobTCaTN?=
+ =?us-ascii?Q?n0CfHG5t0gixCHempEOyM+pDUWQkGABJ/XtAQgQV0z0vQpNv/+LEs9jfvNrB?=
+ =?us-ascii?Q?z/P0Zua9814LwTikg69AsygCDXO/1zi1RqgTa1i2pzNDaGu73muKDVMgRyby?=
+ =?us-ascii?Q?d9cUc6ND3uTPg7pHLZZaYZ6u3c9Qie2knhAajCmwRJ+ai0fMREuYS3C3KquF?=
+ =?us-ascii?Q?5ofT1od2+yT9De3g7oh3eROL0Ctlj0nLtPhpCkDr7jdV2+t5U0C+/+nrPmZK?=
+ =?us-ascii?Q?J7qHB9WuqDlmlAuSHaQWeSbWZyHO+dVrpx+vJziMTRkiUE0phX1T1KME2vQq?=
+ =?us-ascii?Q?VpD8lHl9nvvYyv4+RaGG7NgQEbtAhj5PofSqG/+s06YCIKE4BXXdY3E7ay2l?=
+ =?us-ascii?Q?O293Rnd+MGKTJyQuB5IOBy3CSCl0ksDpf4C7xYECA++JRRegHC41J1iwqA2q?=
+ =?us-ascii?Q?cCZW4JEWTrKqZRwYWM3PBThQoDeKAoR3GbalLMiuI8CWPIvfMpWu0Eng1x6j?=
+ =?us-ascii?Q?QqB0i6j1JH2bq+r0aQjTWp4ajT8EL2/8nRQHSXiZ8dRNwyWlAGk8agu0Anpk?=
+ =?us-ascii?Q?vB6wdtvskMFJ5PV2cqw4lPiTw6wyBvjoREAL5cnK2HspLCfU+LeHQ87/6riJ?=
+ =?us-ascii?Q?CXc3BrwKp+QJZGCzS3Bg5dEuupfJ5xN0zd+ABxj3tZHurnma5pFtyQNWtTV3?=
+ =?us-ascii?Q?mzeXVCh73OdiyywEO0kGERpwyIeVWBOWymI+7xkzUpg1ZSk/Y3FjSsP29fIv?=
+ =?us-ascii?Q?cXe3haRIMDTwIVqVzl2H2oYdvbtLyKEAqkQwu64codiqR1Z+gCf0m+ebsTsR?=
+ =?us-ascii?Q?6ZfOIIUlouMtMYZQ09Btk4Q/Ls9XUXz/Ms9xkBhA99R+bf5Dwpo1ydPxBGmS?=
+ =?us-ascii?Q?uK+fhg/preudU8o8j1p7evXLMcY0IqxAEYPS7xVFY8/VYlwqPxufx0s+Ais/?=
+ =?us-ascii?Q?1hCdUkcblBePs6hXgsGEUjBwtleLjWT6LcQ0l3CQwRrOA4iDudP6LZ8i9qLX?=
+ =?us-ascii?Q?8xXq5RGYh0SbnM90hY3SxLb1AyG0TEVY3iVIFTc/qMUaFjx13UItPVbvptb8?=
+ =?us-ascii?Q?prLBL4iQOd5CjfrmuESaSd95f8FX0tada4OmvWFxLgCsCsXnLUS+zfaJV42s?=
+ =?us-ascii?Q?d28D0KIouSa6c+qzRarNkNAA2z9j3o2FsL+sQOcRIO3eWhSLgbYdbbK3+atS?=
+ =?us-ascii?Q?YFnf27JGyeQ4izrb+FEGTTOf7F4HwQfCbwMMAjv+S4eyeUGGY4YejTVetexi?=
+ =?us-ascii?Q?Jck757/Dzu4dPj8QL9Y1qEXcCtPdMR1feMm54VQuL42t6B5lRXw0?=
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33d0058a-dae0-4027-b6b7-08ded67c2502
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a142af1-5788-4c6e-fcbf-08ded67c28b8
 X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 07:49:41.9769
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 07:49:48.3711
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EgyR7GEfOXiZJPQ6wNYjHrBvEdWbi6d0JoCr2taJXwkL/mg+4XBYQTXcad0F2gXe/PO022sahKPOlQc8yVUg5rP7oV2WNI3xH0yLn81t8y4lRFJavWNCtvwsXev5znrt
+X-MS-Exchange-CrossTenant-UserPrincipalName: bDAuymZcozzCbcmsDs2uMCrz48xwURWf2Fhk2npfX0zf5hOaduMdypXtzZPN9f2eSzWpsUpMYCDksAGLBN+EnLzV9gCpC0HsOPqYGStKVaIbPPWlFroECpVV/xwh0Qg/
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9918
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [3.44 / 15.00];
@@ -153,12 +153,12 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303025-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303026-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -176,149 +176,187 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_NO_DN(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.nxp.com:mid,oss.nxp.com:from_mime,nxp.com:email,NXP1.onmicrosoft.com:dkim,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A78616E1682
+X-Rspamd-Queue-Id: 9A0D76E168D
 
 From: Wei Fang <wei.fang@nxp.com>
 
-The PSIPVMR in ENETC v4 has the same bit layout and functionality as the
-PSIPVMR register in ENETC v1: bit n (n <= 15) controls VLAN promiscuous
-mode for SI n. The only difference between the two hardware generations
-is the register address offset.
+The num_vsi field in struct enetc_port_caps is populated by reading the
+NUM_VSI field of the ECAPR1 register, which reports the number of VSIs
+supported by the ENETC4 port. This value is equivalent to the total
+number of VFs reported by the PCI SR-IOV capability, which is already
+stored in pf->total_vfs during probe via pci_sriov_get_totalvfs().
 
-Since the register functionality is identical, the VLAN promiscuous mode
-setting code can be shared between ENETC v1 and v4 drivers.
-
-Move enetc_set_si_vlan_promisc() from enetc_pf.c to enetc_pf_common.c
-and export it so that it can be shared between the two drivers. Add a
-revision check using is_enetc_rev1() to select the correct register
-offset (ENETC_PSIPVMR for v1 and ENETC4_PSIPVMR for v4) while keeping
-the same logic.
-
-Remove the v4-specific enetc4_pf_set_si_vlan_promisc() from enetc4_pf.c
-and replace its call site with the new common enetc_set_si_vlan_promisc()
-to eliminate code duplication.
+Since pf->total_vfs carries the same information and is already
+available throughout the driver, there is no need to read and cache
+num_vsi separately in the port capabilities structure. Remove the
+num_vsi field from enetc_port_caps and the associated ECAPR1_NUM_VSI
+macro, and replace all uses of pf->caps.num_vsi with pf->total_vfs in
+the ring allocation, MSI-X configuration, SI enable, and debugfs code
+paths.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- .../net/ethernet/freescale/enetc/enetc4_pf.c  | 15 +------------
- .../net/ethernet/freescale/enetc/enetc_pf.c   | 16 --------------
- .../freescale/enetc/enetc_pf_common.c         | 22 +++++++++++++++++++
- .../freescale/enetc/enetc_pf_common.h         |  1 +
- 4 files changed, 24 insertions(+), 30 deletions(-)
+ .../ethernet/freescale/enetc/enetc4_debugfs.c | 13 +++----
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |  1 -
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  | 37 +++++++++----------
+ .../net/ethernet/freescale/enetc/enetc_pf.h   |  1 -
+ 4 files changed, 23 insertions(+), 29 deletions(-)
 
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_debugfs.c b/drivers/net/ethernet/freescale/enetc/enetc4_debugfs.c
+index be378bf8f74d..5029038bf99f 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc4_debugfs.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc4_debugfs.c
+@@ -28,17 +28,14 @@ static void enetc_show_si_mac_hash_filter(struct seq_file *s, int i)
+ 
+ static int enetc_mac_filter_show(struct seq_file *s, void *data)
+ {
+-	struct enetc_si *si = s->private;
+-	struct enetc_hw *hw = &si->hw;
++	struct enetc_pf *pf = enetc_si_priv(s->private);
++	struct enetc_hw *hw = &pf->si->hw;
++	int num_si = pf->total_vfs + 1;
+ 	struct maft_entry_data maft;
+ 	struct ntmp_user *user;
+-	struct enetc_pf *pf;
+ 	u32 val, entry_id;
+-	int i, num_si;
+ 	int err = 0;
+-
+-	pf = enetc_si_priv(si);
+-	num_si = pf->caps.num_vsi + 1;
++	int i;
+ 
+ 	val = enetc_port_rd(hw, ENETC4_PSIPMMR);
+ 	for (i = 0; i < num_si; i++) {
+@@ -52,7 +49,7 @@ static int enetc_mac_filter_show(struct seq_file *s, void *data)
+ 	for (i = 0; i < num_si; i++)
+ 		enetc_show_si_mac_hash_filter(s, i);
+ 
+-	user = &si->ntmp_user;
++	user = &pf->si->ntmp_user;
+ 	rtnl_lock();
+ 
+ 	if (bitmap_empty(user->maft_eid_bitmap, user->maft_num_entries))
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
+index 7a3ccc94b036..72b54fe02e65 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
+@@ -50,7 +50,6 @@
+ #define  ECAPR1_NUM_MCH			GENMASK(9, 8)
+ #define  ECAPR1_NUM_UCH			GENMASK(11, 10)
+ #define  ECAPR1_NUM_MSIX		GENMASK(22, 12)
+-#define  ECAPR1_NUM_VSI			GENMASK(27, 24)
+ #define  ECAPR1_NUM_IPV			BIT(31)
+ 
+ #define ENETC4_ECAPR2			0x8
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index 43883b55974a..52f84b5b838e 100644
+index 52f84b5b838e..b4b8d3f08ab8 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -298,18 +298,6 @@ static void enetc4_allocate_si_rings(struct enetc_pf *pf)
- 	enetc4_default_rings_allocation(pf);
- }
+@@ -23,7 +23,6 @@ static void enetc4_get_port_caps(struct enetc_pf *pf)
+ 	u32 val;
  
--static void enetc4_pf_set_si_vlan_promisc(struct enetc_hw *hw, int si, bool en)
--{
--	u32 val = enetc_port_rd(hw, ENETC4_PSIPVMR);
--
--	if (en)
--		val |= BIT(si);
--	else
--		val &= ~BIT(si);
--
--	enetc_port_wr(hw, ENETC4_PSIPVMR, val);
--}
--
- /* Allocate the number of MSI-X vectors for per SI. */
+ 	val = enetc_port_rd(hw, ENETC4_ECAPR1);
+-	pf->caps.num_vsi = (val & ECAPR1_NUM_VSI) >> 24;
+ 	pf->caps.num_msix = ((val & ECAPR1_NUM_MSIX) >> 12) + 1;
+ 
+ 	val = enetc_port_rd(hw, ENETC4_ECAPR2);
+@@ -258,34 +257,35 @@ static void enetc4_default_rings_allocation(struct enetc_pf *pf)
+ {
+ 	struct enetc_hw *hw = &pf->si->hw;
+ 	u32 num_rx_bdr, num_tx_bdr, val;
++	int num_vfs = pf->total_vfs;
+ 	u32 vf_tx_bdr, vf_rx_bdr;
+ 	int i, rx_rem, tx_rem;
+ 
+-	if (pf->caps.num_rx_bdr < ENETC_SI_MAX_RING_NUM + pf->caps.num_vsi)
+-		num_rx_bdr = pf->caps.num_rx_bdr - pf->caps.num_vsi;
++	if (pf->caps.num_rx_bdr < ENETC_SI_MAX_RING_NUM + num_vfs)
++		num_rx_bdr = pf->caps.num_rx_bdr - num_vfs;
+ 	else
+ 		num_rx_bdr = ENETC_SI_MAX_RING_NUM;
+ 
+-	if (pf->caps.num_tx_bdr < ENETC_SI_MAX_RING_NUM + pf->caps.num_vsi)
+-		num_tx_bdr = pf->caps.num_tx_bdr - pf->caps.num_vsi;
++	if (pf->caps.num_tx_bdr < ENETC_SI_MAX_RING_NUM + num_vfs)
++		num_tx_bdr = pf->caps.num_tx_bdr - num_vfs;
+ 	else
+ 		num_tx_bdr = ENETC_SI_MAX_RING_NUM;
+ 
+ 	val = enetc4_psicfgr0_val_construct(false, num_tx_bdr, num_rx_bdr);
+ 	enetc_port_wr(hw, ENETC4_PSICFGR0(0), val);
+ 
+-	if (!pf->caps.num_vsi)
++	if (!num_vfs)
+ 		return;
+ 
+ 	num_rx_bdr = pf->caps.num_rx_bdr - num_rx_bdr;
+-	rx_rem = num_rx_bdr % pf->caps.num_vsi;
+-	num_rx_bdr = num_rx_bdr / pf->caps.num_vsi;
++	rx_rem = num_rx_bdr % num_vfs;
++	num_rx_bdr = num_rx_bdr / num_vfs;
+ 
+ 	num_tx_bdr = pf->caps.num_tx_bdr - num_tx_bdr;
+-	tx_rem = num_tx_bdr % pf->caps.num_vsi;
+-	num_tx_bdr = num_tx_bdr / pf->caps.num_vsi;
++	tx_rem = num_tx_bdr % num_vfs;
++	num_tx_bdr = num_tx_bdr / num_vfs;
+ 
+-	for (i = 0; i < pf->caps.num_vsi; i++) {
++	for (i = 0; i < num_vfs; i++) {
+ 		vf_tx_bdr = (i < tx_rem) ? num_tx_bdr + 1 : num_tx_bdr;
+ 		vf_rx_bdr = (i < rx_rem) ? num_rx_bdr + 1 : num_rx_bdr;
+ 		val = enetc4_psicfgr0_val_construct(true, vf_tx_bdr, vf_rx_bdr);
+@@ -302,26 +302,25 @@ static void enetc4_allocate_si_rings(struct enetc_pf *pf)
  static void enetc4_set_si_msix_num(struct enetc_pf *pf)
  {
-@@ -517,12 +505,11 @@ static int enetc4_pf_set_features(struct net_device *ndev,
- {
- 	netdev_features_t changed = ndev->features ^ features;
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
--	struct enetc_hw *hw = &priv->si->hw;
+ 	struct enetc_hw *hw = &pf->si->hw;
+-	int i, num_msix, total_si;
++	int num_si = pf->total_vfs + 1;
++	int i, num_msix;
+ 	u32 val;
  
- 	if (changed & NETIF_F_HW_VLAN_CTAG_FILTER) {
- 		bool promisc_en = !(features & NETIF_F_HW_VLAN_CTAG_FILTER);
+-	total_si = pf->caps.num_vsi + 1;
+-
+-	num_msix = pf->caps.num_msix / total_si +
+-		   pf->caps.num_msix % total_si - 1;
++	num_msix = pf->caps.num_msix / num_si +
++		   pf->caps.num_msix % num_si - 1;
+ 	val = num_msix & PSICFGR2_NUM_MSIX;
+ 	enetc_port_wr(hw, ENETC4_PSICFGR2(0), val);
  
--		enetc4_pf_set_si_vlan_promisc(hw, 0, promisc_en);
-+		enetc_set_si_vlan_promisc(priv->si, 0, promisc_en);
- 	}
- 
- 	if (changed & NETIF_F_LOOPBACK)
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 096ccb35508c..ac282d17c0d3 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -42,22 +42,6 @@ static void enetc_pf_destroy_pcs(struct phylink_pcs *pcs)
- 	lynx_pcs_destroy(pcs);
+-	num_msix = pf->caps.num_msix / total_si - 1;
++	num_msix = pf->caps.num_msix / num_si - 1;
+ 	val = num_msix & PSICFGR2_NUM_MSIX;
+-	for (i = 0; i < pf->caps.num_vsi; i++)
++	for (i = 0; i < pf->total_vfs; i++)
+ 		enetc_port_wr(hw, ENETC4_PSICFGR2(i + 1), val);
  }
  
--static void enetc_set_si_vlan_promisc(struct enetc_si *si, int si_id,
--				      bool promisc)
--{
--	struct enetc_hw *hw = &si->hw;
--	u32 val;
--
--	val = enetc_port_rd(hw, ENETC_PSIPVMR);
--
--	if (promisc)
--		val |= PSIPVMR_SI_VLAN_P(si_id);
--	else
--		val &= ~PSIPVMR_SI_VLAN_P(si_id);
--
--	enetc_port_wr(hw, ENETC_PSIPVMR, val);
--}
--
- static void enetc_set_isol_vlan(struct enetc_hw *hw, int si, u16 vlan, u8 qos)
+ static void enetc4_enable_all_si(struct enetc_pf *pf)
  {
- 	u32 val = 0;
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index adf79a99a8c8..cbcf43bac826 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -171,6 +171,28 @@ void enetc_set_si_mc_hash_filter(struct enetc_si *si, int si_id, u64 hash)
- }
- EXPORT_SYMBOL_GPL(enetc_set_si_mc_hash_filter);
+ 	struct enetc_hw *hw = &pf->si->hw;
+-	int num_si = pf->caps.num_vsi + 1;
++	int num_si = pf->total_vfs + 1;
+ 	u32 si_bitmap = 0;
+ 	int i;
  
-+void enetc_set_si_vlan_promisc(struct enetc_si *si, int si_id, bool promisc)
-+{
-+	struct enetc_hw *hw = &si->hw;
-+	int psipvmr_off;
-+	u32 val;
-+
-+	if (is_enetc_rev1(si))
-+		psipvmr_off = ENETC_PSIPVMR;
-+	else
-+		psipvmr_off = ENETC4_PSIPVMR;
-+
-+	val = enetc_port_rd(hw, psipvmr_off);
-+
-+	if (promisc)
-+		val |= PSIPVMR_SI_VLAN_P(si_id);
-+	else
-+		val &= ~PSIPVMR_SI_VLAN_P(si_id);
-+
-+	enetc_port_wr(hw, psipvmr_off, val);
-+}
-+EXPORT_SYMBOL_GPL(enetc_set_si_vlan_promisc);
-+
- void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
- 			   const struct net_device_ops *ndev_ops)
- {
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-index bf9029b0a017..8243ce0de57f 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-@@ -21,6 +21,7 @@ void enetc_set_si_uc_promisc(struct enetc_si *si, int si_id, bool promisc);
- void enetc_set_si_mc_promisc(struct enetc_si *si, int si_id, bool promisc);
- void enetc_set_si_uc_hash_filter(struct enetc_si *si, int si_id, u64 hash);
- void enetc_set_si_mc_hash_filter(struct enetc_si *si, int si_id, u64 hash);
-+void enetc_set_si_vlan_promisc(struct enetc_si *si, int si_id, bool promisc);
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
+index 574ab4e76d8b..9c36ba50a7f0 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
+@@ -18,7 +18,6 @@ struct enetc_vf_state {
  
- static inline u16 enetc_get_ip_revision(struct enetc_hw *hw)
- {
+ struct enetc_port_caps {
+ 	u32 half_duplex:1;
+-	int num_vsi;
+ 	int num_msix;
+ 	int num_rx_bdr;
+ 	int num_tx_bdr;
 -- 
 2.34.1
 
