@@ -1,491 +1,168 @@
-Return-Path: <netdev+bounces-303200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eHXRFzvMQ2qdiQoAu9opvQ
-	(envelope-from <netdev+bounces-303200-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:01:31 +0200
+	id Rm/FODzIQ2r0hgoAu9opvQ
+	(envelope-from <netdev+bounces-303188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:44:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF07A6E52B2
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 16:01:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E516E4FE5
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:44:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=dGKDy5Nc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303200-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303200-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=huawei.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YXMCdVpn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303188-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303188-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FE3F303B7E5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:57:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C12EB3030C9B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63716366DA4;
-	Tue, 30 Jun 2026 13:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84EA40BCD5;
+	Tue, 30 Jun 2026 13:44:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78BF283FD9;
-	Tue, 30 Jun 2026 13:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63EC368D60
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 13:44:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782827869; cv=none; b=pDFas1AEfuOslAgJ/2/UV856cmC9v7VSjQocY3bj8v9pIf8XJyolzm4n354ajeUw8r28IwH4wMhZ14oTf48PJDJ3h1r+/J/fSknbbWoaPVYjyxxGLDLtmJ5Hve5iGALTI/W8pLJUoyioXz9Cczr2+BqJeAEHWvOgnRNLzleq/bA=
+	t=1782827060; cv=none; b=lYNPD50x4Fu2nQesLuJHUXtiv5ogZzMqPQC0iVsQ7jiWHjR5jDg+mkEtM/5WqDrKHqJPqaaEVmVEvguO/atKXazYTEr8CQEF9+PBUCYPDBivYyJ+Gp3rn2z1gT3kKeChyYXD8QGMbnJ9dX1h725Jtz4jiOt0bPU9KfjiHu61kfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782827869; c=relaxed/simple;
-	bh=bH51/Q+iOUjJiNvz6xoWiMrE4J0oG1BuWWDDBtt9dPw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gNfOgMb8gzvIy/tswZ+UFKnjmt1ci6jQdybwF7OBDwlSO6MkawFvWD8IzJEZLW9QTEikan0ZHe4s2XQKyJpwodDKO5K4cT7w1cxoTi/tFGQ5nnAUJGGfnWc8vmKsOPG4/m5OGMTKqL8VBWpvwlVDc8M1e58JKDUMYbZ2W3CxobE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=dGKDy5Nc; arc=none smtp.client-ip=113.46.200.222
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=eeukvJX5KwCSVly2WekvpKMZdG6t6xhN9pFndw03sqc=;
-	b=dGKDy5NcgnL/4/HGaru8tW2ZRCPs03skRH2nTlBAtEZ5+RnsgLu/b1INCZmW2mnt4iYwyjAwq
-	SRmS3n4cS8X9t6up+x9h0rKcE6tme9oCFDSbrgxSkpf9oMmnXdgBHtfwUI8lOjmaa7OIW8dmfYj
-	AAX63hwExQw96YGLzcbOxIw=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4gqPFH3RBkzLmGv;
-	Tue, 30 Jun 2026 21:31:47 +0800 (CST)
-Received: from kwepemo500018.china.huawei.com (unknown [7.202.195.199])
-	by mail.maildlp.com (Postfix) with ESMTPS id A22D14057C;
-	Tue, 30 Jun 2026 21:40:56 +0800 (CST)
-Received: from localhost.huawei.com (10.90.31.46) by
- kwepemo500018.china.huawei.com (7.202.195.199) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 30 Jun 2026 21:40:55 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <yangshuaisong@h-partners.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH RESEND net-next] net: hns3: add support to query/set TX pfc_prevention_tout for ethtool with RX prevention disabled
-Date: Tue, 30 Jun 2026 21:40:43 +0800
-Message-ID: <20260630134043.1532431-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1782827060; c=relaxed/simple;
+	bh=OYCefOR8vjCtIV8BcqF9Hkp33X+MIV9fQRrf2VF2Prw=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IOOFYHBWWzkMZk3TxoPjG654NjEQ3IMAo6bUNcOJb5QRQ76xv2U/52dKQvFHXrZEkDDxCWsKBG6ac8tpR52T9D2oHVWL8Oj/cKwbmDbhA5NZyruHhj7jNLcTnyz9mwaCqfSJHJViyDSvEhxQUHnskCJMCGEk4vl8F9dIpag24FI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YXMCdVpn; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CFC1F01559
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 13:44:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782827059;
+	bh=PTgTBVx6F2sw1dT8/Wpsaw/p93LgkfWgt2++tnwdsew=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=YXMCdVpntJnB93OzkvUVDbtYFd5zhX6pWrdfMuh2JCwfvuYS4n1e7MUgDjDc7Ox4t
+	 s6th2MipiElRnWHqws9n7L/cj9offTB/GKb3qsHlugOAtLecitT0cneyhDagFiS6B1
+	 2OMwTRqTEtXpBfNywSUPHXLxwqAqhoTI5AmZNel9mDUAg0RznYYyBhcXxVje6V7rBB
+	 kMQkHkNLoixA4SJRMtRN8KNDkTVz14wg5vSiv4Va/CllGVLgpz17B+G6SY4lQ6N32l
+	 JCjx0VVRdj91MSRW5CMXNffi/RGslJBYsxhbcNyVHWF7xY8WhqIbBdFW68U1fhhwTV
+	 tCC/dXQCAbdrg==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5aea4cbeb94so3211721e87.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 06:44:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rri0fHfq0D6yrPD2W+yLuCYB5BgvETpXU7lbA/JcRrxwXHiB5ClbsC2WFZEQbXu0nOlh38Uo5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIXXk1kmLVRabgx+WCGrBiFibb/cE+9y8XpdJNcD1PGeoQsrQr
+	dRoxu/Q+uMszgP3WWcRo5Oq1Fu7Np86t9h3BY8ZZ3E3gxR8nc7VVffSKpk26vSeRomVB9sTD0mS
+	AOFEiGpKBX2pj+1NfQCsGPNokQ6b5oSnKz/y38bk12g==
+X-Received: by 2002:a05:6512:247:b0:5ae:b36c:81c7 with SMTP id
+ 2adb3069b0e04-5aebdbd6a94mr630626e87.35.1782827058195; Tue, 30 Jun 2026
+ 06:44:18 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 30 Jun 2026 06:44:16 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 30 Jun 2026 06:44:16 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <akOZFIowVvprnAMf@vaman>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemo500018.china.huawei.com (7.202.195.199)
+References: <20260629-qcom-sa8255p-emac-v11-0-1b7fb95b51f9@oss.qualcomm.com>
+ <20260629-qcom-sa8255p-emac-v11-1-1b7fb95b51f9@oss.qualcomm.com>
+ <CAMuHMdXen+E-Ai51aWBa_KV9W8Fz2cQPpT-FG_kQ7akhrrYa_A@mail.gmail.com>
+ <CAMRc=Me3jaZXiXa1sFXr=8Do4sCd+XN1pKTcWC8-0j78SjCkKA@mail.gmail.com>
+ <CAMuHMdVUBgG0EFB16OxHisbxx-sBvDKvBPNZdpyDnmBrnX4ptQ@mail.gmail.com> <akOZFIowVvprnAMf@vaman>
+Date: Tue, 30 Jun 2026 06:44:16 -0700
+X-Gmail-Original-Message-ID: <CAMRc=MfgAB8bc6PD-6jw_KR0uNBfH+PO2XtCeL1SUF2nCiT0xg@mail.gmail.com>
+X-Gm-Features: AVVi8CeqiAShkPsoXNMgDMxOo0pT0xgKjAcbHHtz1YU8sQeDIyMdI3B6eTWFAXU
+Message-ID: <CAMRc=MfgAB8bc6PD-6jw_KR0uNBfH+PO2XtCeL1SUF2nCiT0xg@mail.gmail.com>
+Subject: Re: [PATCH net-next v11 1/7] dt-bindings: phy: document the serdes
+ PHY on sa8255p
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>, 
+	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>, Romain Gantois <romain.gantois@bootlin.com>, 
+	Magnus Damm <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>, 
+	Christophe Roullier <christophe.roullier@foss.st.com>, Radu Rendec <rrendec@redhat.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	RSPAMD_URIBL_FAIL(0.00)[huawei.com:query timed out];
+	RCPT_COUNT_TWELVE(0.00)[48];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303200-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RSPAMD_EMAILBL_FAIL(0.00)[chenhao418.huawei.com:query timed out,netdev@vger.kernel.org:query timed out,shaojijie.huawei.com:query timed out];
+	TAGGED_FROM(0.00)[bounces-303188-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:vkoul@kernel.org,m:geert@linux-m68k.org,m:brgl@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:peppe.cavallaro@st.com,m:wens@kernel.org,m:jernej.skrabec@gmail.com,m:neil.armstrong@linaro.org,m:khilman@baylibre.com,m:jbrunet@baylibre.com,m:shawnguo@kernel.org,m:festevam@gmail.com,m:jan.petrous@oss.nxp.com,m:s32@nxp.com,m:mohd.anwar@oss.qualcomm.com,m:romain.gantois@bootlin.com,m:magnus.damm@gmail.com,m:mripard@kernel.org,m:christophe.roullier@foss.st.com,m:rrendec@redhat.com,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:dfustini@tenstorrent.com,m:linux-sunxi@lists.linux.d
+ ev,m:linux-amlogic@lists.infradead.org,m:linux-mips@vger.kernel.org,m:imx@lists.linux.dev,m:linux-renesas-soc@vger.kernel.org,m:linux-rockchip@lists.infradead.org,m:sophgo@lists.linux.dev,m:linux-riscv@lists.infradead.org,m:bartosz.golaszewski@linaro.org,m:bartosz.golaszewski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:jernejskrabec@gmail.com,m:magnusdamm@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux-m68k.org,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st.com,linaro.org,baylibre.com,oss.nxp.com,nxp.com,oss.qualcomm.com,bootlin.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,tenstorrent.com,lists.linux.dev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AF07A6E52B2
+X-Rspamd-Queue-Id: B8E516E4FE5
 
-From: Hao Chen <chenhao418@huawei.com>
+On Tue, 30 Jun 2026 12:23:16 +0200, Vinod Koul <vkoul@kernel.org> said:
+> On 29-06-26, 16:51, Geert Uytterhoeven wrote:
+>> > Russell King asked me to put the PHY logic for SCMI pm domains into the PHY
+>> > driver instead of the MAC driver where it was previously. Instead of cramming
+>> > both HLOS and firmware handling into the same driver, I figured it makes more
+>> > sense to have a dedicated, cleaner driver as the two share very little code (if
+>> > any).
+>>
+>> I think you are mixing up DT bindings and driver implementation?
+>
+> Should the bindings change if we have different driver and firmware
+> implementations? Isn't binding supposed to be agnostic of
+> implementations..?
+>
 
-Add ethtool support to query and configure the PFC (Priority Flow Control)
-storm prevention timeout. When TX continuously sends PFC frames, the peer
-end is suppressed from sending packets. If this persists, a PFC frame storm
-may occur.
+The way sa8255p implements SCMI is with SMC exclusively but - since even base
+support is not yet upstream -  maybe it would be possible to expose SCMI clocks
+like some platforms do and reuse the same binding.
 
-This feature allows configuring a timeout to prevent such storms.
+Would it make sense?
 
-Signed-off-by: Hao Chen <chenhao418@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  14 ++
- .../hns3/hns3_common/hclge_comm_cmd.h         |   3 +
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  12 ++
- .../hisilicon/hns3/hns3pf/hclge_cmd.h         |   9 +
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 172 ++++++++++++++++++
- .../hisilicon/hns3/hns3pf/hclge_main.h        |   7 +
- 6 files changed, 217 insertions(+)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index a8798eecd9fb..4286af9239b0 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -602,6 +602,10 @@ typedef int (*read_func)(struct seq_file *s, void *data);
-  *   Config wake on lan
-  * dbg_get_read_func
-  *   Return the read func for debugfs seq file
-+ * set_pfc_prevention_tout
-+ *   Set PFC storm prevention timeout
-+ * get_pfc_prevention_tout
-+ *   Get PFC storm prevention timeout
-  */
- struct hnae3_ae_ops {
- 	int (*init_ae_dev)(struct hnae3_ae_dev *ae_dev);
-@@ -810,6 +814,8 @@ struct hnae3_ae_ops {
- 	int (*hwtstamp_set)(struct hnae3_handle *handle,
- 			    struct kernel_hwtstamp_config *config,
- 			    struct netlink_ext_ack *extack);
-+	int (*set_pfc_prevention_tout)(struct hnae3_handle *handle, u16 times);
-+	int (*get_pfc_prevention_tout)(struct hnae3_handle *handle, u16 *times);
- };
- 
- struct hnae3_dcb_ops {
-@@ -891,6 +897,14 @@ struct hnae3_roce_private_info {
- 	unsigned long state;
- };
- 
-+struct hnae3_pfc_storm_para {
-+	u32 dir;
-+	u32 enable;
-+	u32 period_ms;
-+	u32 times;
-+	u32 recovery_period_ms;
-+};
-+
- #define HNAE3_SUPPORT_APP_LOOPBACK    BIT(0)
- #define HNAE3_SUPPORT_PHY_LOOPBACK    BIT(1)
- #define HNAE3_SUPPORT_SERDES_SERIAL_LOOPBACK	BIT(2)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-index 2c2a2f1e0d7a..6dde07dde1e8 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-@@ -314,6 +314,9 @@ enum hclge_opcode_type {
- 
- 	/* Query link diagnosis info command */
- 	HCLGE_OPC_QUERY_LINK_DIAGNOSIS	= 0x702A,
-+
-+	/* Config pause storm param command */
-+	HCLGE_OPC_CFG_PAUSE_STORM_PARA = 0x7019,
- };
- 
- enum hclge_comm_cmd_return_status {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index 442f15476af3..e7318f236315 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -1895,6 +1895,12 @@ static int hns3_get_tunable(struct net_device *netdev,
- 	case ETHTOOL_TX_COPYBREAK_BUF_SIZE:
- 		*(u32 *)data = h->kinfo.tx_spare_buf_size;
- 		break;
-+	case ETHTOOL_PFC_PREVENTION_TOUT:
-+		if (!h->ae_algo->ops->get_pfc_prevention_tout)
-+			return -EOPNOTSUPP;
-+
-+		ret = h->ae_algo->ops->get_pfc_prevention_tout(h, (u16 *)data);
-+		break;
- 	default:
- 		ret = -EOPNOTSUPP;
- 		break;
-@@ -2020,6 +2026,12 @@ static int hns3_set_tunable(struct net_device *netdev,
- 			netdev_info(netdev, "the active tx spare buf size is %u, due to page order\n",
- 				    priv->ring->tx_spare->len);
- 
-+		break;
-+	case ETHTOOL_PFC_PREVENTION_TOUT:
-+		if (!h->ae_algo->ops->set_pfc_prevention_tout)
-+			return -EOPNOTSUPP;
-+
-+		ret = h->ae_algo->ops->set_pfc_prevention_tout(h, *(u16 *)data);
- 		break;
- 	default:
- 		ret = -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_cmd.h
-index 4ce92ddefcde..1c029dc32ab8 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_cmd.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_cmd.h
-@@ -890,6 +890,15 @@ struct hclge_query_wol_supported_cmd {
- 	u8 rsv[20];
- };
- 
-+struct hclge_pfc_storm_para_cmd {
-+	__le32 dir;
-+	__le32 enable;
-+	__le32 period_ms;
-+	__le32 times;
-+	__le32 recovery_period_ms;
-+	__le32 rsv;
-+};
-+
- struct hclge_hw;
- int hclge_cmd_send(struct hclge_hw *hw, struct hclge_desc *desc, int num);
- #endif
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index fc8587c80813..a08d8a35aef9 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -3524,6 +3524,122 @@ static int hclge_set_vf_link_state(struct hnae3_handle *handle, int vf,
- 	return ret;
- }
- 
-+static int hclge_set_pfc_storm_para(struct hclge_dev *hdev,
-+				    struct hnae3_pfc_storm_para *para)
-+{
-+	struct hclge_pfc_storm_para_cmd *para_cmd;
-+	struct hclge_desc desc;
-+	int ret;
-+
-+	if (hdev->ae_dev->dev_version < HNAE3_DEVICE_VERSION_V3)
-+		return -EOPNOTSUPP;
-+
-+	hclge_cmd_setup_basic_desc(&desc, HCLGE_OPC_CFG_PAUSE_STORM_PARA,
-+				   false);
-+	para_cmd = (struct hclge_pfc_storm_para_cmd *)desc.data;
-+	para_cmd->dir = cpu_to_le32(para->dir);
-+	para_cmd->enable = cpu_to_le32(para->enable);
-+	para_cmd->period_ms = cpu_to_le32(para->period_ms);
-+	para_cmd->times = cpu_to_le32(para->times);
-+	para_cmd->recovery_period_ms = cpu_to_le32(para->recovery_period_ms);
-+
-+	ret = hclge_cmd_send(&hdev->hw, &desc, 1);
-+	if (ret)
-+		dev_err(&hdev->pdev->dev,
-+			"failed to set pfc storm para, ret = %d\n", ret);
-+	return ret;
-+}
-+
-+static int hclge_get_pfc_storm_para(struct hclge_dev *hdev,
-+				    struct hnae3_pfc_storm_para *para)
-+{
-+	struct hclge_pfc_storm_para_cmd *para_cmd;
-+	struct hclge_desc desc;
-+	int ret;
-+
-+	if (hdev->ae_dev->dev_version < HNAE3_DEVICE_VERSION_V3)
-+		return -EOPNOTSUPP;
-+
-+	hclge_cmd_setup_basic_desc(&desc, HCLGE_OPC_CFG_PAUSE_STORM_PARA, true);
-+	para_cmd = (struct hclge_pfc_storm_para_cmd *)desc.data;
-+	para_cmd->dir = cpu_to_le32(para->dir);
-+	ret = hclge_cmd_send(&hdev->hw, &desc, 1);
-+	if (ret) {
-+		dev_err(&hdev->pdev->dev,
-+			"failed to get pfc storm para, ret = %d\n", ret);
-+		return ret;
-+	}
-+
-+	para->enable = le32_to_cpu(para_cmd->enable);
-+	para->period_ms = le32_to_cpu(para_cmd->period_ms);
-+	para->times = le32_to_cpu(para_cmd->times);
-+	para->recovery_period_ms = le32_to_cpu(para_cmd->recovery_period_ms);
-+
-+	return 0;
-+}
-+
-+static int hclge_enable_pfc_storm_prevent(struct hclge_dev *hdev,
-+					  int dir, bool enable)
-+{
-+	struct hnae3_pfc_storm_para para = {0};
-+	int ret;
-+
-+	para.dir = dir;
-+	ret = hclge_get_pfc_storm_para(hdev, &para);
-+	if (ret)
-+		return ret;
-+
-+	para.enable = enable;
-+	return hclge_set_pfc_storm_para(hdev, &para);
-+}
-+
-+static int hclge_set_pfc_prevention_tout(struct hnae3_handle *h, u16 times)
-+{
-+	struct hclge_vport *vport = hclge_get_vport(h);
-+	struct hclge_dev *hdev = vport->back;
-+	struct hnae3_pfc_storm_para para;
-+	int ret;
-+
-+	if (times > HCLGE_MAX_PFC_PREVENTION_TOUT) {
-+		dev_err(&hdev->pdev->dev,
-+			"times %u should be no more than %u!\n",
-+			times, HCLGE_MAX_PFC_PREVENTION_TOUT);
-+		return -EINVAL;
-+	}
-+
-+	para.dir = HCLGE_DIR_TX;
-+	ret = hclge_get_pfc_storm_para(hdev, &para);
-+	if (ret)
-+		return ret;
-+
-+	para.enable = times ? 1 : 0;
-+	para.times = (u32)times;
-+	ret = hclge_set_pfc_storm_para(hdev, &para);
-+	if (ret)
-+		return ret;
-+
-+	hdev->pfc_prevention_tout = times;
-+
-+	return 0;
-+}
-+
-+static int hclge_get_pfc_prevention_tout(struct hnae3_handle *h, u16 *times)
-+{
-+	struct hclge_vport *vport = hclge_get_vport(h);
-+	struct hclge_dev *hdev = vport->back;
-+	struct hnae3_pfc_storm_para para;
-+	int ret;
-+
-+	para.dir = HCLGE_DIR_TX;
-+	ret = hclge_get_pfc_storm_para(hdev, &para);
-+	if (ret)
-+		return ret;
-+
-+	*times = para.enable ? (u16)para.times : 0;
-+
-+	return 0;
-+}
-+
- static void hclge_set_reset_pending(struct hclge_dev *hdev,
- 				    enum hnae3_reset_type reset_type)
- {
-@@ -4317,6 +4433,26 @@ static int hclge_reset_prepare(struct hclge_dev *hdev)
- 	return hclge_reset_prepare_wait(hdev);
- }
- 
-+static void hclge_restore_pfc_storm_prevention_tout(struct hclge_dev *hdev)
-+{
-+	struct hnae3_handle *handle = &hdev->vport[0].nic;
-+	int ret;
-+
-+	ret = hclge_enable_pfc_storm_prevent(hdev, HCLGE_DIR_RX, false);
-+	if (ret == -EOPNOTSUPP)
-+		return;
-+	else if (ret)
-+		dev_warn(&hdev->pdev->dev,
-+			 "failed to disable rx pfc storm prevent, ret = %d\n",
-+			 ret);
-+
-+	ret = hclge_set_pfc_prevention_tout(handle, hdev->pfc_prevention_tout);
-+	if (ret)
-+		dev_warn(&hdev->pdev->dev,
-+			 "failed to set tx pfc storm prevent, ret = %d\n",
-+			 ret);
-+}
-+
- static int hclge_reset_rebuild(struct hclge_dev *hdev)
- {
- 	int ret;
-@@ -9278,6 +9414,32 @@ static int hclge_init_wol(struct hclge_dev *hdev)
- 	return hclge_update_wol(hdev);
- }
- 
-+static void hclge_init_pfc_prevention_tout(struct hclge_dev *hdev)
-+{
-+	struct hnae3_handle *handle = &hdev->vport[0].nic;
-+	u16 times;
-+	int ret;
-+
-+	ret = hclge_enable_pfc_storm_prevent(hdev, HCLGE_DIR_RX, false);
-+	if (ret == -EOPNOTSUPP)
-+		return;
-+	else if (ret)
-+		dev_warn(&hdev->pdev->dev,
-+			 "failed to disable rx pfc storm prevent, ret = %d\n",
-+			 ret);
-+
-+	ret = hclge_get_pfc_prevention_tout(handle, &times);
-+	if (ret) {
-+		dev_warn(&hdev->pdev->dev,
-+			 "failed to get tx pfc prevention timeout, ret = %d\n",
-+			 ret);
-+		times = HCLGE_DEFAULT_PFC_PREVENTION_TOUT;
-+	}
-+
-+	hdev->pfc_prevention_tout = times;
-+	hdev->pfc_prevention_tout_default = times;
-+}
-+
- static void hclge_get_wol(struct hnae3_handle *handle,
- 			  struct ethtool_wolinfo *wol)
- {
-@@ -9547,6 +9709,8 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
- 		dev_warn(&pdev->dev,
- 			 "failed to wake on lan init, ret = %d\n", ret);
- 
-+	hclge_init_pfc_prevention_tout(hdev);
-+
- 	ret = hclge_devlink_init(hdev);
- 	if (ret)
- 		goto err_ptp_uninit;
-@@ -9946,6 +10110,8 @@ static int hclge_reset_ae_dev(struct hnae3_ae_dev *ae_dev)
- 		dev_warn(&pdev->dev,
- 			 "failed to update wol config, ret = %d\n", ret);
- 
-+	hclge_restore_pfc_storm_prevention_tout(hdev);
-+
- 	dev_info(&pdev->dev, "Reset done, %s driver initialization finished.\n",
- 		 HCLGE_DRIVER_NAME);
- 
-@@ -9977,6 +10143,10 @@ static void hclge_uninit_ae_dev(struct hnae3_ae_dev *ae_dev)
- 	hclge_config_nic_hw_error(hdev, false);
- 	hclge_config_rocee_ras_interrupt(hdev, false);
- 
-+	/* Restore hw default values for the next initialization */
-+	hclge_set_pfc_prevention_tout(&hdev->vport->nic,
-+				      hdev->pfc_prevention_tout_default);
-+
- 	hclge_comm_cmd_uninit(hdev->ae_dev, &hdev->hw.hw);
- 	hclge_misc_irq_uninit(hdev);
- 	hclge_devlink_uninit(hdev);
-@@ -10539,6 +10709,8 @@ static const struct hnae3_ae_ops hclge_ops = {
- 	.set_wol = hclge_set_wol,
- 	.hwtstamp_get = hclge_ptp_get_cfg,
- 	.hwtstamp_set = hclge_ptp_set_cfg,
-+	.set_pfc_prevention_tout = hclge_set_pfc_prevention_tout,
-+	.get_pfc_prevention_tout = hclge_get_pfc_prevention_tout,
- };
- 
- static struct hnae3_ae_algo ae_algo = {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index 7419481422c3..0cee8947f6b4 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -346,6 +346,11 @@ enum hclge_link_fail_code {
- #define HCLGE_LINK_STATUS_DOWN 0
- #define HCLGE_LINK_STATUS_UP   1
- 
-+#define HCLGE_DIR_RX 0
-+#define HCLGE_DIR_TX 1
-+#define HCLGE_MAX_PFC_PREVENTION_TOUT		2000
-+#define HCLGE_DEFAULT_PFC_PREVENTION_TOUT	1000
-+
- #define HCLGE_PG_NUM		4
- #define HCLGE_SCH_MODE_SP	0
- #define HCLGE_SCH_MODE_DWRR	1
-@@ -898,6 +903,8 @@ struct hclge_dev {
- 	u16 vf_rss_size_max;		/* HW defined VF max RSS task queue */
- 	u16 pf_rss_size_max;		/* HW defined PF max RSS task queue */
- 	u32 tx_spare_buf_size;		/* HW defined TX spare buffer size */
-+	u16 pfc_prevention_tout;	/* User config, restored after reset */
-+	u16 pfc_prevention_tout_default; /* HW default, to avoid stale state */
- 
- 	u16 fdir_pf_filter_count; /* Num of guaranteed filters for this PF */
- 	u16 num_alloc_vport;		/* Num vports this driver supports */
-
-base-commit: cef9d6804030793cf8b8796fd6936197d065dd3e
--- 
-2.33.0
-
+Bart
 
