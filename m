@@ -1,248 +1,157 @@
-Return-Path: <netdev+bounces-303148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303149-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DcQHMRi2Q2plfgoAu9opvQ
-	(envelope-from <netdev+bounces-303148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:27:04 +0200
+	id f+R8B6O3Q2rNfgoAu9opvQ
+	(envelope-from <netdev+bounces-303149-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:33:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D6C76E4286
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:27:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 879806E433D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 14:33:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=kEQp0xcl;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=O7VKq9mj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303148-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303148-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=qhzzuu2o;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303149-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303149-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=iogearbox.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A9FD73043C1F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:26:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A60C305C102
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 12:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8509740B6DF;
-	Tue, 30 Jun 2026 12:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBEF40757B;
+	Tue, 30 Jun 2026 12:33:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2020040B37A
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833D2391E77;
+	Tue, 30 Jun 2026 12:33:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782822394; cv=none; b=A1mZebf7s2NkuiqaYotD/JpsUrzYDJUCf0/2z0EEInWRhFI9OnOIOue92jE7Gkv8b6HrW8DDRXeKJSAoAkv1Wd5SJRO4xoLyPTXZVTtSDCnf5j7qAYkuV4IHMxRgc3ZaVVoQMEca8bE8lrUQTkWDlsySJKAK8M58gqllhrgjGck=
+	t=1782822816; cv=none; b=OjtTRbX2RhAd7th6M2jQHuDwogFIwSKnp3wWtMelDHaxmvrRpv3qk3A3Hy24ImnlFr3kgdCYlHZ4Qssb8nSqqu5968Jzmow7Psimov9NEs5ip6Ifu9W1AC0we4KpX/65FtXNPWsW+IIiRETNKhPhW49eaiN0HCVgbBnVxbyx0i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782822394; c=relaxed/simple;
-	bh=NoqTc953wGUfCirDeH3SqH5nOnq9U+JWJtIMrbyMGAc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ILkDkxSV/98I9PtuIk756mHy60ky+yE5NyXliNaTjBxH8jpqBOapppTDFqYh2mC7ciGe65AQMVEx+BVYsCwV5ngjQFWv2+2DhPcrsdD3PYW+q2xvHkNdGmOBDD7o3JpZvKDMoHmYSH+TIJqwHJU5iWKvK8de5PUoNWPgkJnHAMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kEQp0xcl; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=O7VKq9mj; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65U9nCAX1522721
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:26:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Em4j1rjfTFXHEN5Lun83H7ijLdbaGF+xPI/HxI4Nw7k=; b=kEQp0xcloYmwQX4c
-	kvEzpYrN1l5EVudiD7/Ekt1BdyifNskaaBNsuAayUDPXO09VfiZH3G9rkoNG/8nF
-	W4/BwOAxCCgx3DbwpAchJG4MMTgpLsVPEbFPIPRLs2Cd0Rnf6XipGK9EutlPEc6V
-	JIHMdAD8LSjmwjJfDtDtObrtEv2erqSfEgSdt0e7alfCGwS+PKE35UXxWJRKTloH
-	pPJCM0IvNj4byRf/eUq5bFvN9q4FlvKbOO7lvX2ExBviaM+TU1onx7PIrbIURsdZ
-	8/7ws8eoOAKm+tTQvmWPQoxGjl8N+jV0zu4N7hNqI8EQbch0h2TQuauam303UYl5
-	ZjQcig==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f3yw93b5s-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:26:31 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-92e68cbeb53so9206885a.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 05:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782822391; x=1783427191; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Em4j1rjfTFXHEN5Lun83H7ijLdbaGF+xPI/HxI4Nw7k=;
-        b=O7VKq9mjwAbhh8yxUfTxeJ8m/w+t22DsNy6X5A0luIr2gpm8nu70e+BNsur5RBMKj/
-         C/r6rTTNqAzGRGwvzkpwDU8okBqFWnySSNUnxO+VG46iqPNxl1olhxzm7T66NR4gVo4A
-         KoTprlHcIRggnTTEHkeStrUkSGKAGUxCtGdnAvB+1QbowB5/9Kb6OVNK41DzNFcRqVQ4
-         cBmEMvXic1fKYoFEJnGDYnpbO0aAW5ggBqK6l/WqcTgyv/uLLru1F+VLvPyv90lA0LOw
-         N7BA9KGZ7u8dgJLUiRsxy1HC5I3aBin1XGN2BJrGu4LHPtJxwDlzh2EcMaLrx7wq5PMe
-         r9ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782822391; x=1783427191;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Em4j1rjfTFXHEN5Lun83H7ijLdbaGF+xPI/HxI4Nw7k=;
-        b=U3JNwDLZXIxVpIfgEIB3qxwwKTLgmgbEEz1ex3vorp1ub0nSqK12iPBVvtJdYaymek
-         WnY1G3AhlkwHIpGbleR9XYtnDCsI3wJv3JLe5AW9gWmjZZbaEUpKXT6mghZ8ZAwWS7nD
-         13rsWmkh95CFprnj41N12xKzkvXhFuEVPYHWQYFx/3sUfqj+Cr1roJ3nA1lbgMWq4NCA
-         Bl/9Zh/hLs2d6jwkC77Z+Z0Gn5eHtH2IzFGqQWE0eGXMzTNnT3pWNKwYDZqb6lBl4Pai
-         mZIVffN+gD1tMXrc5bKDnG7jb/pxUdQa+M/CVBQfGbUim1mp9RcLfp2rNu0VxcCkKTU1
-         llMA==
-X-Forwarded-Encrypted: i=1; AFNElJ/NKFIJFpVSkJ/4sPcLEPfuets5XwiZKVbxbFAtvNvkn8qOgfMZH3DR4lJA/kaycznEWKwsJqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxs5fQpwGRZ4Y3qcoj6Q30/stQryBYQjTKBr1soQ2D/rFh9yuUG
-	U+p+eWp+plhMbGVkmSnUw8hEPoD7Jxi/B0+endib7bZHBsSVn/uq99DRdDQZULFcBOmVA2NA0eV
-	3bwSZWlm9QOZ1UROSLIsriB8zWKRJNahGMQIXyF73Pc61BI0n7SHqQVHfQq0=
-X-Gm-Gg: AfdE7cn1oKGTwuFCqvGEV5xwiR3KX0ajYmEfcntCrdKy1JLJ2QbsuyBa4W++cwaZYI7
-	YnG2hATC7zpr4nW42QU4ubzL7pfJXyyVSWbPxXajH0FYyVgNi66X8mxDxxHQYctRFJCVTkgDgxV
-	t33z5+GVxf3UE38+CbSuyJ+SOB0GPvDKozWXL7yq9nXKyh67WrtoIBvzLDzDozuMHYVc1a4RJGg
-	VRfsTxmz7GyxrPskAWcYXwOj4mSGtA4iZgI9JgkvJs8ck6SviMRpw4rCtyUJYVyQMeSD4eDdNny
-	cTeJPheKR9ND75azO/Q9kl+EZ7vJaEuNUc8sLxV3sxzE6zSnP4jnuvAY+bEencSFz+vXRQjCW/Y
-	ksu6CdPq++qzxLSBjkZVipQmqFAfi5uYlwpo=
-X-Received: by 2002:a05:620a:6018:b0:920:798b:e290 with SMTP id af79cd13be357-92e62873bb7mr367988085a.7.1782822391323;
-        Tue, 30 Jun 2026 05:26:31 -0700 (PDT)
-X-Received: by 2002:a05:620a:6018:b0:920:798b:e290 with SMTP id af79cd13be357-92e62873bb7mr367979785a.7.1782822390742;
-        Tue, 30 Jun 2026 05:26:30 -0700 (PDT)
-Received: from [192.168.120.170] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1288f4c19esm116380066b.51.2026.06.30.05.26.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jun 2026 05:26:29 -0700 (PDT)
-Message-ID: <e372e66d-7df6-49f2-9530-0c61ad43a18e@oss.qualcomm.com>
-Date: Tue, 30 Jun 2026 14:26:24 +0200
+	s=arc-20240116; t=1782822816; c=relaxed/simple;
+	bh=j/4atb9+pcESumLeAY7R129iJqrRFKgjemNXrb52HZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gx9c8DGqtweTCynWnfYQYWZsj8v6siTFUISL/quZ/dztPKBYO3A13b1AxJFjRpp8h98Ap/Ds++X0GmXzkkOVs9zzoVbCkkaIxwkDzxMgNxwNtI/YNW8cGbhgCJuPwOwvfPv6HfMFl/AOPEHgXBdWwMPSl6bDX3FxJ0TKQpTCLmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=qhzzuu2o; arc=none smtp.client-ip=213.133.104.62
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=z4p7hUd9/x0IqFiaZtRCAdL6WlP2+E1Y5oVefYB42/8=; b=qhzzuu2odfImJinNs9D/14O9nO
+	AfQsvdbBfcOzurIzUsGKpsp7SnDuwYfuaUNzF+o90r3PUtUOrtqC+fRqmZWXuW90R4nqqwP8HUsNp
+	QgGteBoTz4mVcQN3DiWN3K26gU+YQ1htP2J5MQNonnNjLCNuS6dT14T126ZVKf9VhKhrPvhwVby0U
+	E6upjR5pbx8STpmWeSgn/MsYBrpL+wbClc0+JAYe1CJg+QQfHDqt+JyRJyxmPgek1g2dmsVc9sCI9
+	t/4a6fFsUYdrVXvVGHvcyNdJgASsdjPZrxRTOIpxLZvaJ2rjTww7M/fNpQ0/kDzu80VhDH4RJpXnB
+	WsxxDXhQ==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1weXee-000NcL-01;
+	Tue, 30 Jun 2026 14:33:32 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: pabeni@redhat.com,
+	jhs@mojatatu.com,
+	bigeasy@linutronix.de,
+	andrii@kernel.org,
+	memxor@gmail.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net 0/3] Fix broken TC_ACT_REDIRECT from qdiscs
+Date: Tue, 30 Jun 2026 14:33:28 +0200
+Message-ID: <20260630123331.186840-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 02/14] firmware: qcom_scm: Migrate to generic PAS
- service
-To: Sumit Garg <sumit.garg@kernel.org>, andersson@kernel.org
-Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-        vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-        Sumit Garg <sumit.garg@oss.qualcomm.com>,
-        Harshal Dev <harshal.dev@oss.qualcomm.com>
-References: <20260626133440.692849-1-sumit.garg@kernel.org>
- <20260626133440.692849-3-sumit.garg@kernel.org>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260626133440.692849-3-sumit.garg@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjMwMDExNSBTYWx0ZWRfXw92m2u6pXK9v
- AbC2B9R1Tz9S+I7X6lHI/7NGs4PqgAq9cPoVV6LqxY975kxw3/cPpTr8wiJbQWnjH0nRd9cEMAq
- rS51y2a69T2nbP+vXyTeI0GYtesNLAU=
-X-Authority-Analysis: v=2.4 cv=KfDidwYD c=1 sm=1 tr=0 ts=6a43b5f7 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=EUspDBNiAAAA:8 a=TJYwRQMSshrBWr6rMVAA:9 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-GUID: cBntrjLMqg9_lrGln2NpUMtgVTVa6BQe
-X-Proofpoint-ORIG-GUID: cBntrjLMqg9_lrGln2NpUMtgVTVa6BQe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjMwMDExNSBTYWx0ZWRfX988Hp0OpRLVI
- wzlI7c/XwVavD+XngNuYMLyzasp+vYtfDtYHVwWtnNnLwFydcse9/qm57fK/KzyWn7hDxgQSSGF
- K8HtigoQumEGpwYnwrrBLi4VqWIC1S46W7+yLP1fHghlMSmAl5aP9QzOWmuLE6jOiZWEOdf3SF6
- BJiUDHLYkvEATxevZLfxqcDfyi9cA7nf0LlS2DqcKCv7brMsWhZ9bme2NOFqjHmMydt1Dx0G/JT
- T602tbqV3PWwHHNxxY6DRwTLgO0Wo8SosiAItG8WA/SJ57HQ6rPROcnGwyW/plfBuLBU8UYF2Ys
- ///1bTjQoZpDofI9lEVSj+Ik6Ls5/NncUgF9Lb9XH9jQpN5J0CiwUOBOlpppW6u8NVY6P+h5ysk
- QrzgHb9DQU8a+FakBcSzazcWckPRr/i+HcWpE62zC0veyo6pC5IpTLh9ebsDPCNjzvAe6x4D45H
- Pv0hdP7Z8enPtazc6WQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-30_03,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 impostorscore=0 bulkscore=0 clxscore=1015
- spamscore=0 priorityscore=1501 lowpriorityscore=0 malwarescore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606300115
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/28046/Mon Jun 29 08:27:20 2026)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	TAGGED_FROM(0.00)[bounces-303148-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
- comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:harshal.dev@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,mojatatu.com,linutronix.de,kernel.org,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime];
+	TAGGED_FROM(0.00)[bounces-303149-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:bigeasy@linutronix.de,m:andrii@kernel.org,m:memxor@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,iogearbox.net:dkim,iogearbox.net:mid,iogearbox.net:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3D6C76E4286
+X-Rspamd-Queue-Id: 879806E433D
 
-On 6/26/26 3:34 PM, Sumit Garg wrote:
-> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> 
-> With the availability of generic PAS service, let's add SCM calls as
-> a backend to keep supporting legacy QTEE interfaces. The exported
-> qcom_scm* wrappers will get dropped once all the client drivers get
-> migrated as part of future patches.
-> 
-> Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
-> Reviewed-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> Tested-by: Vignesh Viswanathan <vignesh.viswanathan@oss.qualcomm.com> # IPQ9650
-> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> ---
+This is an alternative fix to [0] in order to not uglify
+__dev_queue_xmit() with sprinkled ifdefs given this can be
+simplified and isolated through a simple test into the BPF
+redirect helper itself.
 
-[...]
+I've also added a proper BPF selftest, so there is no need
+to check-in a binary BPF object into selftests given we do
+have BPF infra for all of this.
 
->  struct qcom_scm_pas_context *devm_qcom_scm_pas_context_alloc(struct device *dev,
->  							     u32 pas_id,
->  							     phys_addr_t mem_phys,
->  							     size_t mem_size)
->  {
-> -	struct qcom_scm_pas_context *ctx;
-> +	struct qcom_pas_context *ctx;
->  
->  	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
->  	if (!ctx)
-> @@ -600,11 +569,12 @@ struct qcom_scm_pas_context *devm_qcom_scm_pas_context_alloc(struct device *dev,
->  	ctx->mem_phys = mem_phys;
->  	ctx->mem_size = mem_size;
->  
-> -	return ctx;
-> +	return (struct qcom_scm_pas_context *)ctx;
+  [0] https://lore.kernel.org/netdev/20260629102157.737306-1-jhs@mojatatu.com/
+  [1] https://lore.kernel.org/netdev/20260629102157.737306-4-jhs@mojatatu.com/
 
-"please don't explode"
+Daniel Borkmann (2):
+  bpf: Reject redirect helpers without a bpf_net_context
+  selftests/bpf: Add test for redirect from qdisc qevent block
 
-otherwise
+Jamal Hadi Salim (1):
+  net/sched: Handle TC_ACT_REDIRECT from qdisc filter chains
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+ include/net/pkt_cls.h                         |  14 ++-
+ net/core/filter.c                             |  17 ++-
+ net/sched/cls_api.c                           |   6 +-
+ net/sched/sch_cake.c                          |   2 +-
+ net/sched/sch_drr.c                           |   2 +-
+ net/sched/sch_dualpi2.c                       |   2 +-
+ net/sched/sch_ets.c                           |   2 +-
+ net/sched/sch_fq_codel.c                      |   2 +-
+ net/sched/sch_fq_pie.c                        |   2 +-
+ net/sched/sch_hfsc.c                          |   2 +-
+ net/sched/sch_htb.c                           |   2 +-
+ net/sched/sch_multiq.c                        |   2 +-
+ net/sched/sch_prio.c                          |   2 +-
+ net/sched/sch_qfq.c                           |   2 +-
+ net/sched/sch_sfb.c                           |   2 +-
+ net/sched/sch_sfq.c                           |   2 +-
+ tools/testing/selftests/bpf/config            |   1 +
+ .../selftests/bpf/prog_tests/tc_qevent.c      | 113 ++++++++++++++++++
+ .../selftests/bpf/progs/test_tc_qevent.c      |  23 ++++
+ 19 files changed, 175 insertions(+), 25 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_qevent.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tc_qevent.c
 
-Konrad
+-- 
+2.43.0
 
 
