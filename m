@@ -1,192 +1,174 @@
-Return-Path: <netdev+bounces-303178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TqULECvAQ2oqggoAu9opvQ
-	(envelope-from <netdev+bounces-303178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:10:03 +0200
+	id QH82NPnDQ2qMhAoAu9opvQ
+	(envelope-from <netdev+bounces-303180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:26:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9D26E4A55
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:10:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E17A6E4D38
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 15:26:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qq.com header.s=s201512 header.b=NRTwWo8i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303178-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303178-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=qq.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=AwMqGpzZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303180-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303180-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDD31302C5E4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:10:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7709330CD93D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92D4413D8E;
-	Tue, 30 Jun 2026 13:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87794218A0;
+	Tue, 30 Jun 2026 13:22:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-209.mail.qq.com (out203-205-221-209.mail.qq.com [203.205.221.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4F8406829;
-	Tue, 30 Jun 2026 13:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0278A41B35C
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 13:22:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782824999; cv=none; b=WkOENgiQkr9fhh81/CIjLcaSdEDRlxENMlSfs1caTsOKrPcNMy3b1YRjFE+t5bS9Eq4FZUhuvuOSSOxq2V0QKg+rBOUokwnOLzWYrnFjcM43R5QIU81CI/9ateuN7bNzlPLRIaMxNiOedCTXqSiQCHSZ6DUlA6wz/MUKg8IZumk=
+	t=1782825741; cv=none; b=dxs3ZF7mSAkcmDA6AzYzIiX88WAm7SjsVtpy5qr/mFzHDMmKjOVP7fj+TfSRbqPeD1vW8toBXquzNtGiiHFOkHW9h+hsROzS7a2eviDj0B2zCPbOOb4ko1c/7RbFUi3COXoGIupib2vMepk2+2aWIfY++OvQA2uq9mibeBMQDsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782824999; c=relaxed/simple;
-	bh=dnu21409BfWniyjA2dNfWjGlJbexQMqKOmfzZid0lQo=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=ooihhOHxLIn2GEk62jPHzknOI0YyKuPAwP8JEBXa3fpQeoHu4elUeLYEPhyABIQYam6LD5edlQEhcj5J49ydPSXU7NDEuYeheVjSE1pKwhTYimSPogRc9J2m+AUnmAD0uAVLalajA7t/fqEHu7ft0vy4pVO5P/Zr6/ccG6TyMWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=NRTwWo8i; arc=none smtp.client-ip=203.205.221.209
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1782824994; bh=7HskIzzUHXw3md6kiQ2qF8NTdxNXoTsE1DQjR31NoGw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=NRTwWo8iP6U+iF/5XtXFPYDxL0Nl30ykl37rvcLZjNQTIEAMYlGhQaXoMBnjVBOcr
-	 LHY1cFxcFuJdxPZBY6wyNwlOxwqZ6sfTZYq20Jt/iIoehf0WqPtcUNTAsYADFTX7gX
-	 zBzY2VE/8R3iH/oGMGZxmuJOMZjtBuTuSUre4Pe8=
-Received: from lxu-ped-host.. ([111.198.231.89])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id 2720E82B; Tue, 30 Jun 2026 21:09:50 +0800
-X-QQ-mid: xmsmtpt1782824990tfudmil50
-Message-ID: <tencent_4F9E5F1B854B1D1BB42574BA76BB5133BF08@qq.com>
-X-QQ-XMAILINFO: MZg/qcWmVFFr2+zJK0Ieu9UNm2IFC9pNiLCARFSy6AdxMgyfPOh0P6+id5WEFX
-	 KMfw/4BtJYG2OkuEzNAefUcXoIDtRr+qMrebpxPxiwN8Z1bnMH/A1o/g/LcongHpQS8i47FHv8Ir
-	 mu+ej7SA9cV5hp8Ur5V35wlpBb4fp9QTRfYpZc9zyVM0jeq64ZOInrDLimC4C71/W4l4q+gr8uEa
-	 dFV1GZbDgnNkgjTQHjClZoFzjYvG8hgBOM7V/I2c80+O+PI0o87dBbPd75p8giI82a9nm0ne2Oyq
-	 LxuVt0hv0dhEg9W2Lz6ElZH7gMwcPHK33r5NaulpqweMeZ27WtiMTi0vWIyvxtFndp+vHPUXfW0P
-	 NjLDhW/OfRxzL+9PDln2dfmi4+4XO6RuAZe4aoMAuW4kssKzvtVU7tyqm8uGKtQtO1eL03rEJuDL
-	 JjGcFf6VrlP2+vnaBTgzOQyxl0JNHqkjodowP9wwbnFMSbfwhC5rEUqAoXbtdjvWQFEr2Lvqtt7q
-	 dbqlDt/A1hKPZn1Nhp9F0AeaAtD5CCUGeU24U4peZxZJCGwLXSMrY5jIOTtuy01eQwZLOIbvkIHG
-	 wk4wEZ5XGwwYusGS/xAnl1aT7GxJLxrxP1obSz9O7EmrT5ZPdEw9zB/13xwG2BIdu7c02Ntco+YB
-	 guH1MdyJ55g37438y79w90yaLqt3T3DuaT26M0YI9peyYHtD4UPTBME9LjhH4oO7YMCkqfeiJDUL
-	 3ii72B/YxWC6nrxm3HP+p624xSOC7ebYZXWLmP16E0Od2soH4AYL9H5xpWntrjagl7hwqhF99mnq
-	 +ZmpagotP8wFPRsKx+TVk71o/KdCBWDJ0MpkBstfZjdhH8/uHrlSpRKhkF4AL0qYjFOqnFEyknl7
-	 aWxphlWuvA9vIq8tpkOcaKxN4qnvN/im75OAOwtsQVqaIK7+4x3QT0tyzkj6yVZaMAbYv70ZK8uv
-	 WR6D9zlit4Tzezg7Wjk0Zt/OO7oHO5cwU4cQkRQw5afZtdQ/2jrlqfraGVU87PkC0tFJFlggj8Bj
-	 tV8K3p6biIlFj/qiJfowAVBnEMr730ebrfPD0/bTFSCShPG0GXdaAEPNe/fmZg8+EZeIq8AqxGkO
-	 LZCa5VtGtbGWRza6pXGGgVDstqKMMhzbIkSdyc1XYE0k0hT7Y=
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-From: Edward Adam Davis <eadavis@qq.com>
-To: eadavis@qq.com
-Cc: jiayuan.chen@linux.dev,
-	sashiko-bot@kernel.org,
-	sashiko-reviews@lists.linux.dev,
-	andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	emil@etsalapatis.com,
-	jolsa@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	memxor@gmail.com,
-	netdev@vger.kernel.org,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: [PATCH v3] bpf: Fix smp_processor_id() call trace for preemptible kernels
-Date: Tue, 30 Jun 2026 21:09:50 +0800
-X-OQ-MSGID: <20260630130949.954947-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <tencent_B6259ABAF5BB63335B9E3C1BB74B071BD608@qq.com>
-References: <tencent_B6259ABAF5BB63335B9E3C1BB74B071BD608@qq.com>
+	s=arc-20240116; t=1782825741; c=relaxed/simple;
+	bh=Yu5mqQ8nw8gfVDomx+A+E2dr0aoWMwEfUHHcXE5j1Sc=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hOVw3s3ThjxTu6bW+DwtTIHLgftEHxs2S5gl1VvUU6B5jJQ+a9GKd7ryOAWNvGQVCJAYXXkYqgXuh+BYJgkV4IXyvRqBoo47jSMcG9NWSbWIpyJjoA3MPK9UqolitHGgdATn7qI7N5UXApq81xlFHBe4dM7jf6OZCPJxj8oDBWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AwMqGpzZ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AAC21F01562
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 13:22:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782825739;
+	bh=siJF0S+CSX6SKMbF6lhMt/C1v2E/StqLW87OFuT5mug=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=AwMqGpzZSvDnV5vSM2z0wkwmPZcuy6Z0HxhXFqaldHKlF6D4sOyHQK4L/B0fF/itF
+	 Z9C2BVuksw1mr1+6ch02R+Zz8gUAI5fDmwZjU0wGMt2h6Gvq8cC5ZOCtMOofX5R+yU
+	 1Hy/oyLq2B0fQTEZyfgl3xfrexpVhETu+CQgBxy7/99a3XMItUDuxVCBl4oiSjn1eD
+	 o38KeGOoUlFVb5zZeSXv+WtlmGXFDo9Wxn8ecfVThX04SgSmZnYMsm+XWmLmYZpjIC
+	 zdm9J6iEsk3ibRX/F7HoLCPZU+tHrUTrb8Qp73PbRYfYDyWDS2X2Ru7diIgwCebdnz
+	 9GKoHZxfVlf+A==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5aebf9a509eso501113e87.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 06:22:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RqbW0W1/Owny/dttwip6N8aCMapBtJF+07TwOQNNT+TbmwPiunaDrPYqCu6PFhhpklxzrUAUHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvn4dcOGsQ6I1mGpg4c1YnqLCnAtlbS98hjTN2Tz8/+u0lT5lP
+	4IXP2JShH71FzAN/ilKQ+ya5XmQ9g/2OHUc/AeY/Ja6ocNFzT6L2K03mp4ynyTExxeK+OoGv9Ek
+	EfgYBjFbsUqlSasBGorDwmkdw4NLhHzZkZSNswoy0jg==
+X-Received: by 2002:a05:6512:8041:b0:5ad:4f1c:8e50 with SMTP id
+ 2adb3069b0e04-5aebdba2f7fmr745427e87.37.1782825738263; Tue, 30 Jun 2026
+ 06:22:18 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 30 Jun 2026 09:22:16 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 30 Jun 2026 09:22:16 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <263f58b418a27a2339fc2478f93234e0208b0ad9.camel@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260629-pdev-fwnode-ref-v2-0-8abe2513f96e@oss.qualcomm.com>
+	 <20260629-pdev-fwnode-ref-v2-2-8abe2513f96e@oss.qualcomm.com> <263f58b418a27a2339fc2478f93234e0208b0ad9.camel@mailbox.org>
+Date: Tue, 30 Jun 2026 09:22:16 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MdQURjypSn+QjSDJfEiOMC8bbEZmZLgjpt=EquAM1Q1pw@mail.gmail.com>
+X-Gm-Features: AVVi8CeQXBZd5M2B6MhLUb095jshYyZGAJu3z11iktq0q6r491Qj_z_hr6U3W70
+Message-ID: <CAMRc=MdQURjypSn+QjSDJfEiOMC8bbEZmZLgjpt=EquAM1Q1pw@mail.gmail.com>
+Subject: Re: [PATCH v2 02/19] driver core: platform: provide platform_device_set_of_node()
+To: Manuel Ebner <manuelebner@mailbox.org>
+Cc: brgl@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org, 
+	driver-core@lists.linux.dev, devicetree@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-pm@vger.kernel.org, imx@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, intel-xe@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-usb@vger.kernel.org, 
+	linux-mips@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Lee Jones <lee@kernel.org>, 
+	Thierry Reding <thierry.reding@avionic-design.de>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Srinivas Kandagatla <srini@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Vinod Koul <vkoul@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@kernel.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
+	Andi Shyti <andi.shyti@kernel.org>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+	Doug Berger <opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Ulf Hansson <ulfh@kernel.org>, 
+	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
+	Matthew Brost <matthew.brost@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Peter Chen <peter.chen@kernel.org>, 
+	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Maximilian Luz <luzmaximilian@gmail.com>, 
+	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,linux.intel.com,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org];
+	TAGGED_FROM(0.00)[bounces-303180-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303178-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:eadavis@qq.com,m:jiayuan.chen@linux.dev,m:sashiko-bot@kernel.org,m:sashiko-reviews@lists.linux.dev,m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:eddyz87@gmail.com,m:emil@etsalapatis.com,m:jolsa@kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:netdev@vger.kernel.org,m:song@kernel.org,m:syzkaller-bugs@googlegroups.com,m:yonghong.song@linux.dev,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[linux.dev,kernel.org,lists.linux.dev,vger.kernel.org,iogearbox.net,gmail.com,etsalapatis.com,googlegroups.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:email,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[qq.com];
+	FORGED_RECIPIENTS(0.00)[m:manuelebner@mailbox.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:lee@kernel.org,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.a
+ u,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:andriy.shevchenko@linux.intel.com,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[qq.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[66];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qq.com:dkim,qq.com:email,qq.com:mid,qq.com:from_mime,appspotmail.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D9D26E4A55
+X-Rspamd-Queue-Id: 2E17A6E4D38
 
-bpf_mem_cache_free_rcu() maybe called in preemptible context, this
-will trigger the below warning message:
+On Tue, 30 Jun 2026 13:37:54 +0200, Manuel Ebner <manuelebner@mailbox.org> said:
+> On Mon, 2026-06-29 at 11:12 +0200, Bartosz Golaszewski wrote:
+>> [...]
+>>
+>> +/**
+>> + * platform_device_set_of_node - assign an OF node to device
+>> + * @pdev: platform device to add the node for
+>> + * @np: new device node
+>> + *
+>> + * Assign an OF node to this platform device. Internally keep track of the
+>> + * reference count. Devices created with platform_device_alloc() must use this
+>> + * function instead of assigning the node manually.
+>
+> Doesn't it make sense to add a remark to the kernel doc of platform_device_alloc()?
+>
+> Thanks
+>  Manuel
+>
+>>  [...]
+>
 
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.0.17/5820
-caller is bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
-Call Trace:
- check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
- bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
- rhtab_delete_elem+0x185a/0x1b30 kernel/bpf/hashtab.c:2969
- __rhtab_map_lookup_and_delete_batch+0x935/0xcb0 kernel/bpf/hashtab.c:3349
- bpf_map_do_batch+0x445/0x630 kernel/bpf/syscall.c:-1
- __sys_bpf+0x906/0xd90 kernel/bpf/syscall.c:-1
+Sure, will do in the next iteration.
 
-this_cpu_ptr() access needs to be guarded against preemption.
-
-Fixes: 5af6807bdb10 ("bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().")
-Reported-by: syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=fd7e415d891073b83e1f
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-v1 -> v2: using guard against preemption
-v2 -> v3: replace get/put_cpu() to bpf_disable/enable_instrumentation()
-
- kernel/bpf/hashtab.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
-index 9f394e1aa2e8..d3f2f8a379e8 100644
---- a/kernel/bpf/hashtab.c
-+++ b/kernel/bpf/hashtab.c
-@@ -3299,6 +3299,7 @@ static int __rhtab_map_lookup_and_delete_batch(struct bpf_map *map,
- 	dst_val = values;
- 	total = 0;
- 
-+	bpf_disable_instrumentation();
- 	rcu_read_lock();
- 
- 	/*
-@@ -3313,6 +3314,7 @@ static int __rhtab_map_lookup_and_delete_batch(struct bpf_map *map,
- 		elem = rhtab_lookup_elem(map, cursor);
- 		if (!elem) {
- 			rcu_read_unlock();
-+			bpf_enable_instrumentation();
- 			ret = -EAGAIN;
- 			goto free;
- 		}
-@@ -3350,6 +3352,7 @@ static int __rhtab_map_lookup_and_delete_batch(struct bpf_map *map,
- 	}
- 
- 	rcu_read_unlock();
-+	bpf_enable_instrumentation();
- 
- 	if (total == 0) {
- 		ret = -ENOENT;
--- 
-2.43.0
-
+Bart
 
