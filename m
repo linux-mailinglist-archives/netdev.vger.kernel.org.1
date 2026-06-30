@@ -1,174 +1,247 @@
-Return-Path: <netdev+bounces-303351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jaT/NusdRGrbogoAu9opvQ
-	(envelope-from <netdev+bounces-303351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:50:03 +0200
+	id NuY2GcweRGohowoAu9opvQ
+	(envelope-from <netdev+bounces-303352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:53:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F0F6E7A7A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:50:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6B196E7ABB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:53:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=WfEvfRS9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303351-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303351-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=ZhkpPQON;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303352-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303352-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C0EEF3045AC5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:50:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EF8AF3045EF8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D5545BD6B;
-	Tue, 30 Jun 2026 19:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA068472760;
+	Tue, 30 Jun 2026 19:52:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B597305E3B
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 19:49:58 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782848999; cv=none; b=BH2/ERFLZxbga9snjJsxtW6cr8vc69Fbzf2rMvqp+TgplcCzTCIvxD/c+P4tWropCcr7Yuia3bkPYH/z9BulTuFLOLQdGAUYovaow24+l230wdvMDJOEMVXTLTDGKpcrOZ5YIdV/j+Lsm6wLpG/RB1euvFRgRJ/c6NrgvzMP9Mg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782848999; c=relaxed/simple;
-	bh=ndjrqTDd7iJKz5Vy6GvgobLXO+ceomtbKFEb3u3b6EM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hkOYwvI6O5DVmoVXC5BExuonIycqRtbc5gQJsSY8mhew2ULRvTdK0WbzkLqI32NEfSSLPXbX/MNC+xHoOWtJxQPBigJzkgswD0hQLFSq2GuL0SD5bY7eJJJPUR/zaUG9BdC23SQa+Px9itpMgc5vUas1OJt0GPNiAsLYZJRt/LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WfEvfRS9; arc=none smtp.client-ip=209.85.219.50
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8f0d6853360so18513266d6.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:49:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558C03DBD53
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 19:52:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782849170; cv=pass; b=uqH6Ceip7xOW0mtlm84wbe/jZuZ87uS2GroswXBKbuLekfrUWbEnwmJoK6b+gMXJAYqaE4gSq7vakiutTtLCpmayTWT6a8gd0guoGkbdtcyFm++OnG7PMvH1dKk+oOvzJER6OhG7XZAlVtkcILyB/VY7HQFfDRTFfR6UAyNAMkw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782849170; c=relaxed/simple;
+	bh=pQk093UPXkDI2CLgAJS3Ls4ngF+W78fqHwUuBkw7Saw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aMZ1tDe4x2MEWCbjeN+25jHsuHJlmIBKmzyfe8T3GCccJslerBR/PPPEpASgiYKtl2htfwdf2zx6PeAgshwlCbZupQKGy3GgdNsDZesumw9cowE2oV8wrGWpkI0JGsv5t+uiPPa5AQSO3p7Ctr1bbKgnaa0EE79yGXxVh8mEBt0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZhkpPQON; arc=pass smtp.client-ip=74.125.82.51
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-13b2b08a553so2723085c88.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 12:52:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782849168; cv=none;
+        d=google.com; s=arc-20260327;
+        b=dDy2MkptgsVXCvDbasieyCP8orPE0wgb5OynZss4LB0scmpuBWQQ1NiDUJQFKm8+6i
+         LofUERo5Hw+NrxcXlMAsQlEtnkkPUCSap/oaSqhpEwz3H+hj2Nhl1jylTzsgjfVKmv7v
+         k+fYt0dhfwkOOu8ErBdolRBfZmuD5fxNId/Y8o41BDmrfa62Y4eCuQfIBYwrUg8vVuki
+         8Uwr9aFhfIU1G0C5kaHVxlDNfP9ZX5+qvmxmDVkVMO4e7Ug/dkOmDVL0uMw9jvukny7c
+         OmNyfAfjvijdd69sY93B0VLEbF8m+fjH5ro4I8NWdBUUdjbsZuC4SR9CDfG6RgnpQwAG
+         1udg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7jL7x6MybyatejrGYVunRlmuamZBlc/HwD0QKy8gmec=;
+        fh=LZ44XGmTC5sB1XXBumG+6Xy4ekyLIJ2j+d5/uZa9vPE=;
+        b=rG2dSq0DS8ZfIUYFwrdaMV66vn+tBwMCL3dS51EmebkRk53ZK03wOhNEYX/gHm19Qu
+         WS6x4RIUN9udDk+XG/ULShytsRyaghVQjSkSx85RUAAGZD0v3/gLNYxwNlqipAYQKSTc
+         xqVyuYMSItQWKDLhuj4+t/v0x4Zq+x+dFIoUDoG/DA2heWlaQISg/gE6ddEsvb8Cu7WL
+         32JpqgYyhQkIBLvss5figX6pfzwym7LvWlW+6gPvWpMRwufjxd00QHlOkp1GLODcS0/U
+         t1wwAMs5sWTA+Iw5iYEVK5RXpYT6w2syVJJJkQ8VHF3g3B0U5G/wRrBPd/Jp8wkgezbl
+         lWqQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782848997; x=1783453797; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=n1qWlnp0byEBEeqkZdCjA2Jg1Z+PW8t3ekcekpBNKTw=;
-        b=WfEvfRS9wgll8++0qRTBXGf3uVtr4Fd3CdmSt3/ecBmFVdzTaKzgS3ZvLI/ZkMQifh
-         Y6t7k3f3oAGm2zGFRtSJIquyMGPkbCFpUL1VqLePDdDJuimT9uRpZHZkJ9z1/qFB8MTe
-         WiPjcUy1BuU2ioxGPG7cbHJyGDP8daUiFjQKE1gAWZs4P5splOqOBCPLyCcbAj2pqple
-         RB9MS862488hwpaX+xQrJFHmUx8qb7UZ4vXNSIgfxNMiAE7Tp9ScMnIx0SNDd+K9Y/hC
-         C0pds9pUSfVGAFwLKQ8neftJVLax8Grd+6IPUxpmet7TL2/bcG42Nlox4yhY5TaP/wP1
-         4xQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782848997; x=1783453797;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1782849168; x=1783453968; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n1qWlnp0byEBEeqkZdCjA2Jg1Z+PW8t3ekcekpBNKTw=;
-        b=S97rIBgoIdoltyM1a2PVrESc1WhTrUGzYTl+mXESbB3iaFDijaNHWUszMQ7Jgd0XQC
-         vkbA7B8T8eG4QBT/A1BpA/7gD5TnZX1NSpoG88P+hN3PcuhTqGz3oiW6FqQ4/2bVxacK
-         rg8/T5F/elWUxiEFo/+gprHaWF4O4IXZDziOIR4aL1Y5AZ/yWYzHFMbJkTwEmZ3zLgvr
-         1wEVg3Bar/Rgrff8kOt7RRouG1m5NiQyQJnLaLDI0xLEDs+rk/ZA9nJNq+IqxzbQV5et
-         ONea/+AAcrXqZgMQl3g0UGLOjGSPEC2RpZNa8OerNWwUK/vbW9Og9wLha7Clom4Jzecj
-         VHoQ==
-X-Gm-Message-State: AOJu0YyacXJDallWKmrAt9hgu8+5q7jmnWEqinH3GcoToK+U058vCDyG
-	AnEsL+3woqKs7NUaHMBs6UEftgbeU0ZxmP8zvrNNho3G6odXxMMDD6IPbKPpGA==
-X-Gm-Gg: AfdE7cmgpLVPplWUmAAY+JLCpf3Q7cRGC1xeb/L/tI0HAWPQfF6z8hPmU273BNZ4dqZ
-	Na5oSQz1UlsbhkVj+8Xw0CH9Vqv2EtQ7UomDdvZPbwdiL5w4kRUtMinC6bWLKdBiYeTy+4tXrtk
-	oCjvNktXRQlpWBliGc/KzaxV0PIMonKRcP8Lu9KmWzJxoUn8sPiLsabGYig7UcxomnF0ITWHSeB
-	58qz5wEDFoMUB5fdEpPmUPzy/c6z6Hrr5KT3ReW1N5S9XYcIkuwwqGx5FabzuZtRPg6QKs2lDbk
-	76u0DD/u1F3Yh/ukch+VWRDoocWZN65RPmouiQutjVp/TgOgrAnbuFJWNFmo0C71zJpqR9Jyxiq
-	SoFm7gfBawTxxQo+ArVpMkj8/ycwV9JQR4hn74ynSIicwFTVtcQWfbs57gqoEVcBXnjVAn3mXeE
-	OXDsdz5CYTLStgTQEVXYQkqtip5A7aP/dQjRULEz2dBg==
-X-Received: by 2002:ad4:5baf:0:b0:8e9:f5b0:f623 with SMTP id 6a1803df08f44-8f1bd6f20f8mr82544276d6.51.1782848996851;
-        Tue, 30 Jun 2026 12:49:56 -0700 (PDT)
-Received: from i4-l-hqh5357-03.ad.psu.edu ([130.203.139.71])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f1a7e0d5e3sm33242986d6.48.2026.06.30.12.49.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 12:49:56 -0700 (PDT)
-From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shuangpeng Bai <shuangpeng.kernel@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] llc: fix SAP refcount leak in llc_ui_autobind()
-Date: Tue, 30 Jun 2026 15:48:56 -0400
-Message-ID: <20260630194856.1036497-1-shuangpeng.kernel@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=7jL7x6MybyatejrGYVunRlmuamZBlc/HwD0QKy8gmec=;
+        b=ZhkpPQONHxYacGTI0qotm+Ymp1J/BG0bcCuoUAjUxhOGqzuV6FjNhimWXS7jP9vm/5
+         rNBgMj8w9ALtPOa6+jm2vGHEGWOWjcEjie/VHroICGwY8Zf+7Rfo5suvqTGtasdrFJG1
+         m1VtmdmMQE2E3oyUpnO8mGT5cU0td+uXWM84ESmYLXCPKtx/AMbBYEqgFF1nKdxis1qJ
+         +CObol7zE5qMekaHN6PXsYAHcpg3SN/5e60/6l9LoldCSdx5cCWD9lu6MytU8xe4LUxG
+         oXYbvgDt8maemdJVoepAeBNeh6rqlMKytVBIH5gBjUKbrDbpVObOOzIa/s7Xel49EWw7
+         LwPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782849168; x=1783453968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7jL7x6MybyatejrGYVunRlmuamZBlc/HwD0QKy8gmec=;
+        b=p0ppisde3YoVbZVfopuxRYYerywoxr813hFaflE0y9ZsGBoaYeA802uCFndz9f4qqZ
+         mUypnRM2FBrIZW5R+yDKwQpMsDkdTbLkkqLKe7AViD/6DI2W6t9lDKgq1/k1eHo3UWtq
+         3wn6/GpL5tIDe+BmWarCJkjZuIDhSl1bGhNaugYF+/ZBRu/kH+pYSLibpdIGjjvgsAOt
+         Gd5GABoxKJ28AkJ6WsVU+PnWlO+Z32BSYgUN/hIq5TbnJnKguAF9uxl93wL73HNy2Ggl
+         4Mws/SHs4EtdslQ40W2vArCw+K5Q3Ip96a8r7ZAt5AqZauis3tGG7Cw51rdzqWh311qv
+         E/JA==
+X-Forwarded-Encrypted: i=1; AFNElJ/xcsOzPRArzuIS604n1/Lj3Yk0wtgp9aLFspcu9KAbvwwc2F2giERxnA1+5TFzAgfrOuXQcUk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWpmO9WTFI9rD/edbJmTA3LxNmAJOTYkm/q9n0bPwSEqczUyxw
+	RLyxpss09Bk7lqyjW7Z0dwrxt+h7VSMTaURX5hxFBtY+uBzS/gYVEE+aPl8XlvawgvnD8PWOLEY
+	E1crdwUZtB8RC/KJW6fUth1DvdFNkZUg92ayww1vb
+X-Gm-Gg: AfdE7ck3HHuJU8atyCUIqB6leEYP0u7hJVi/BLcA2bmys19eeNnUKdyaeDNsAEX2fUV
+	SUeUoxphNTLdN5gT7WC7DIsURBETi1h2tIR8nkeMG5/y6Z6xYmvY79WlvbF+JbyJDk7Lv39IvOR
+	k1JnSgwm544W7/5rE+GxrEhucMSh8EAQNZuvF87+FNd9fdMCJ+uTughpx7Z4mPvngDDC7PvF5Tt
+	iY1WRsu0NScxLzeKH5FhB4LJGW4HZjYrcBgTsHXOvGokJ95ylouL10attWOanRwfRc0OrWIvBap
+	gV2TCsVkFZPznrjTYgmZAXCQ9D2l6sdVKOlvUZI7Lcso0V20QoqjELLhvKoi110L7/jSVF4gu95
+	7Ii5G39a8ikkG5SxgtbJeuZjsDy3iANafA5r8Ea9KDgmS6TEE
+X-Received: by 2002:a05:7022:41a4:b0:139:819b:f5b7 with SMTP id
+ a92af1059eb24-13b2a1ac2bfmr3338103c88.29.1782849167632; Tue, 30 Jun 2026
+ 12:52:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260629181226.1929658-1-kuniyu@google.com> <20260629181226.1929658-8-kuniyu@google.com>
+In-Reply-To: <20260629181226.1929658-8-kuniyu@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 30 Jun 2026 12:52:36 -0700
+X-Gm-Features: AVVi8CfIKyGVcabDMfxFytwjHCP1PFkY2flhFLcdjP1PkHe3DB6TNIYg_38Z6XI
+Message-ID: <CAAVpQUDtJ4eqxoWe-SA4BiNtxnKNZfa1-Gw9aFKUX0U42MgrRw@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 07/10] net: fib_rules: Drop RTNL assertions.
+To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303351-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303352-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:shuangpeng.kernel@gmail.com,m:stable@vger.kernel.org,m:shuangpengkernel@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 77F0F6E7A7A
+X-Rspamd-Queue-Id: B6B196E7ABB
 
-llc_ui_autobind() opens a SAP after choosing a dynamic LSAP.
-llc_sap_open() returns a reference owned by the caller, and
-llc_sap_add_socket() takes a second reference for the socket's
-membership in the SAP hash tables.
+Replying to Sashiko review.
 
-llc_ui_bind() drops the caller's reference after adding the socket,
-but llc_ui_autobind() keeps it. When the socket is closed,
-llc_sap_remove_socket() releases only the socket reference, leaving
-the SAP on llc_sap_list with sk_count == 0.
+On Mon, Jun 29, 2026 at 11:12=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
+>
+> Now, fib_rule structs are protected by per-fib_rules_ops mutex.
+>
+> Let's drop ASSERT_RTNL_NET() and rtnl_dereference().
+>
+> Note that fib_rules_event() iterates over net->rules_ops without
+> net->rules_mod_lock, but this is fine because all fib_rule users
+> are built-in and concurrent fib_rules_unregister() does not happen.
 
-This is user-visible because repeated autobind and close cycles can consume
-all dynamic SAP values and make later autobinds fail with -EUSERS.
+---8<---
+Is this description accurate?
+---8<---
 
-Drop the caller's reference after a successful autobind, matching
-llc_ui_bind()'s ownership model.
+Yes.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
----
- net/llc/af_llc.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-index 8ed1be1ecccc..b0447c33dbf0 100644
---- a/net/llc/af_llc.c
-+++ b/net/llc/af_llc.c
-@@ -312,6 +312,7 @@ static int llc_ui_autobind(struct socket *sock, struct sockaddr_llc *addr)
- 	/* assign new connection to its SAP */
- 	llc_sap_add_socket(sap, sk);
- 	sock_reset_flag(sk, SOCK_ZAPPED);
-+	llc_sap_put(sap);
- 	rc = 0;
- out:
- 	dev_put(dev);
--- 
-2.43.0
+---8<---
+It appears that unprivileged users can trigger a race here via user
+namespaces. If a user creates two network namespaces with a veth pair, movi=
+ng
+one interface to each, and then triggers netns destruction on one namespace
+while concurrently deleting the veth interface from the other namespace:
+...
+---8<---
 
+Sashiko somehow thinks it's possible to remove a netdev and dismantle
+another netns, both of which require RTNL, so false-positive.
+
+
+
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  net/core/fib_rules.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
+> index 25a3fd997782..5eef5d6ace82 100644
+> --- a/net/core/fib_rules.c
+> +++ b/net/core/fib_rules.c
+> @@ -387,7 +387,6 @@ static int call_fib_rule_notifiers(struct net *net,
+>                 .rule =3D rule,
+>         };
+>
+> -       ASSERT_RTNL_NET(net);
+>         lockdep_assert_held(&ops->lock);
+>
+>         /* Paired with READ_ONCE() in fib_rules_seq() */
+> @@ -955,7 +954,7 @@ int fib_newrule(struct net *net, struct sk_buff *skb,=
+ struct nlmsghdr *nlh,
+>                 list_for_each_entry(r, &ops->rules_list, list) {
+>                         if (r->action =3D=3D FR_ACT_GOTO &&
+>                             r->target =3D=3D rule->pref &&
+> -                           rtnl_dereference(r->ctarget) =3D=3D NULL) {
+> +                           !rcu_access_pointer(r->ctarget)) {
+>                                 rcu_assign_pointer(r->ctarget, rule);
+>                                 if (--ops->unresolved_rules =3D=3D 0)
+>                                         break;
+> @@ -1064,7 +1063,7 @@ int fib_delrule(struct net *net, struct sk_buff *sk=
+b, struct nlmsghdr *nlh,
+>
+>         if (rule->action =3D=3D FR_ACT_GOTO) {
+>                 ops->nr_goto_rules--;
+> -               if (rtnl_dereference(rule->ctarget) =3D=3D NULL)
+> +               if (!rcu_access_pointer(rule->ctarget))
+>                         ops->unresolved_rules--;
+>         }
+>
+> @@ -1082,7 +1081,7 @@ int fib_delrule(struct net *net, struct sk_buff *sk=
+b, struct nlmsghdr *nlh,
+>                 if (&n->list =3D=3D &ops->rules_list || n->pref !=3D rule=
+->pref)
+>                         n =3D NULL;
+>                 list_for_each_entry(r, &ops->rules_list, list) {
+> -                       if (rtnl_dereference(r->ctarget) !=3D rule)
+> +                       if (rcu_access_pointer(r->ctarget) !=3D rule)
+>                                 continue;
+>                         rcu_assign_pointer(r->ctarget, n);
+>                         if (!n)
+> @@ -1400,8 +1399,6 @@ static int fib_rules_event(struct notifier_block *t=
+his, unsigned long event,
+>         struct net *net =3D dev_net(dev);
+>         struct fib_rules_ops *ops;
+>
+> -       ASSERT_RTNL();
+> -
+>         switch (event) {
+>         case NETDEV_REGISTER:
+>                 list_for_each_entry(ops, &net->rules_ops, list) {
+> --
+> 2.55.0.rc0.799.gd6f94ed593-goog
+>
 
