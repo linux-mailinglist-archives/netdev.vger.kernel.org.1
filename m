@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-303117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303118-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kBLKL7KpQ2oOegoAu9opvQ
-	(envelope-from <netdev+bounces-303117-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:34:10 +0200
+	id 4aVqO2SoQ2qmeQoAu9opvQ
+	(envelope-from <netdev+bounces-303118-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:28:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA896E3A73
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:34:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F9D6E397A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:28:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=FCPEqwhs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303117-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303117-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RJBJwYwN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303118-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303118-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 368113042EB5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:20:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF05D3074B2D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFF83FBEC6;
-	Tue, 30 Jun 2026 11:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6E740860B;
+	Tue, 30 Jun 2026 11:20:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8113C3F9F5C
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8BD408001
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:20:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782818399; cv=none; b=RSRWEArofXwU/bVTLh/1z38JedFeToMEyD2umzDE5evTSe2JC5okL9aESiFLuEFsCWmDBZI10N/ilnZdnugarpitcXXvq0Q6UkzvNIX/efZBWjwbXOKFovOqh1rPshgBki9wiw3/ET4IwcLCbZZ54dG8OOusiAcm+twYmHGeLQU=
+	t=1782818403; cv=none; b=FOfXLGYzL6Po9nTaPHaaTtzlCmBghfcrkO1uUEBBhxR9HFs+DRF2gXnU4dgOpXzrSZl2hAqyDM9X3CHs2ngxAs9sTAxyi07JAJe0VUvDhZn4pupe3e8EA1AejA5ISEbw4BDd13+LEyCzXy4W0Vya1twXh6GackGh4EkCPgY1AJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782818399; c=relaxed/simple;
-	bh=Y6wEqE2aBmlLhrwG0GaAOGYINDlF/0Iupi1sNENpE2c=;
+	s=arc-20240116; t=1782818403; c=relaxed/simple;
+	bh=CZvAMWugE+HYe7pENH7A63Y+ys05ZWo7Cpgg8GtVxfU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=I/2mTE0Dv/WIgEhy1xg2FcX38E1CD9xf5CtqjQopAwOjkT36NtlADaoenHL9duWqYZ7RR7j2vdpOzQW8jPs90Fcdv2mgwVy16iEVT2ZbMippac9uE+5Rif2yRnO2kRM5V4YC+a+9o9EgXnDplyes2uAsv7zJo8998G685Dnanj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FCPEqwhs; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4BC91F000E9;
-	Tue, 30 Jun 2026 11:19:55 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BdfNLCD3KUmWksjk4LCAQYYFrXE/GHza1V8Sj1QBqWtLZKtQPmyIOjRYXVSMhYiQB4LW7Ij1U1rG4tiS0w0ZpJEqv+OdyUT7IgCHa60xaE5Aqf4E+uuN+yb6rG4HfuzF5n70vPL81JTVtaB7yZNpLmWmjn+SKME6QclbPytzLo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RJBJwYwN; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D041F00A3A;
+	Tue, 30 Jun 2026 11:19:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782818398;
-	bh=xDEEGaIN1uZR83MvzuYLWvGy2/5sBNkkAGwMawkT3fc=;
+	s=k20260515; t=1782818401;
+	bh=TrVCuoDIZFlW9YDg7QeeyBxIpmpVvc0EYhcX+3/G8FQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=FCPEqwhsnloI42mNuQzaGhJj+zwCUTVtRtcAq0m0JrbDlffwWFTFpsq1f37e/eotz
-	 Q/KoEkD2Hf4g1BYdSYNU/dsOBHwFwbfBbraYlhONG8UrkyMBJTijAmKDqeKhZ/MXx4
-	 gDYkv5HS6N5PR1RDwNYFliGv/Vs+zZfmEKcXPSi80u8UPSMRZC1yTQMxAUv27ICcbc
-	 eRiGLcM2I3dEjeaSNgv/WjsEUNvBP47m3Q4jRSlAMMGPhhLF3PAf2XiFCdkIY8zyGI
-	 NuxDaGAtkqOIJ9tSaayJGpCutH0e4pkzzMD6GHFOWU97ShhqlJkKx+nAZu6b6acGE6
-	 pvurx2lv6XpfA==
+	b=RJBJwYwN4GjHH+1mVDQHNxDfxBgYNo4TqE5ItPIkK4pt4L7vrzohV3wKylrzs/379
+	 no6+OSnTRx1qkjbLpTqO1S7kg2C27LBO2s5Jr7+NqJ7MAcbJcYABiKiCXvoxGYjYB9
+	 ZNeUGxm4NaAaEn+cThIwcOue71FEnsXb6PQFxUoon5L/2Psp2+qQq8wFg6TB7kll5K
+	 6FHPSkhCYmY7PrTZX6ooo3jOHofOofB13rj6MW5iFYeuQgNsLv35nXSfrA9AFxUrg3
+	 xkLx34FC9iwYkZCFEJM+uyS96ORHvGutwms2tIDdeWAazqVdwrKENBT5GKcQS63Vb6
+	 SSL0O+Tl+F25A==
 From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 30 Jun 2026 13:19:43 +0200
-Subject: [PATCH net-next v2 3/5] net: dsa: realtek: rtl8366rb: Use DSA port
- iterators
+Date: Tue, 30 Jun 2026 13:19:44 +0200
+Subject: [PATCH net-next v2 4/5] net: dsa: realtek: rtl8366rb: Disable STP
+ learning on all ports in setup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260630-rtl8366rb-improvements-v2-3-05eb9d6a37f5@kernel.org>
+Message-Id: <20260630-rtl8366rb-improvements-v2-4-05eb9d6a37f5@kernel.org>
 References: <20260630-rtl8366rb-improvements-v2-0-05eb9d6a37f5@kernel.org>
 In-Reply-To: <20260630-rtl8366rb-improvements-v2-0-05eb9d6a37f5@kernel.org>
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
@@ -73,20 +73,20 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:luizluca@gmail.com,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:luizluca@gmail.com,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,bang-olufsen.dk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-303117-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303118-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -99,97 +99,123 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BA896E3A73
+X-Rspamd-Queue-Id: 62F9D6E397A
 
-Instead of custom loops for intializing the ports (including the
-CPU port) use the DSA helpers dsa_switch_for_each_port() and
-dsa_switch_for_each_cpu_port() following the pattern in RTL8365MB by
-accumulatong masks for the upstream and downstream ports.
+When we loop over all ports in the switch .setup() callback,
+make sure to disable learning on all user ports. This is what
+is normally expected and what the RTL8365MB is doing.
 
-This gives us similar enough code to the RTL8365MB that we
-can start using more generic rtl83xx helpers.
+Move the code around to accommodate for the new call.
 
 Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
- drivers/net/dsa/realtek/rtl8366rb.c | 49 +++++++++++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 8 deletions(-)
+ drivers/net/dsa/realtek/rtl8366rb.c | 74 ++++++++++++++++++++-----------------
+ 1 file changed, 40 insertions(+), 34 deletions(-)
 
 diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-index 8b57ef3bf03a..64215a0d5d6d 100644
+index 64215a0d5d6d..155bf0010d5f 100644
 --- a/drivers/net/dsa/realtek/rtl8366rb.c
 +++ b/drivers/net/dsa/realtek/rtl8366rb.c
-@@ -824,7 +824,10 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
+@@ -820,6 +820,40 @@ static int rtl8366rb_port_remove_isolation(struct realtek_priv *priv, int port,
+ 				  RTL8366RB_PORT_ISO_PORTS(mask), 0);
+ }
+ 
++static void
++rtl8366rb_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
++{
++	struct realtek_priv *priv = ds->priv;
++	u32 val;
++	int i;
++
++	switch (state) {
++	case BR_STATE_DISABLED:
++		val = RTL8366RB_STP_STATE_DISABLED;
++		break;
++	case BR_STATE_BLOCKING:
++	case BR_STATE_LISTENING:
++		val = RTL8366RB_STP_STATE_BLOCKING;
++		break;
++	case BR_STATE_LEARNING:
++		val = RTL8366RB_STP_STATE_LEARNING;
++		break;
++	case BR_STATE_FORWARDING:
++		val = RTL8366RB_STP_STATE_FORWARDING;
++		break;
++	default:
++		dev_err(priv->dev, "unknown bridge state requested\n");
++		return;
++	}
++
++	/* Set the same status for the port on all the FIDs */
++	for (i = 0; i < RTL8366RB_NUM_FIDS; i++) {
++		regmap_update_bits(priv->map, RTL8366RB_STP_STATE_BASE + i,
++				   RTL8366RB_STP_STATE_MASK(port),
++				   RTL8366RB_STP_STATE(port, val));
++	}
++}
++
+ static int rtl8366rb_setup(struct dsa_switch *ds)
  {
  	struct realtek_priv *priv = ds->priv;
- 	const struct rtl8366rb_jam_tbl_entry *jam_table;
-+	u32 downports_mask = 0;
- 	struct rtl8366rb *rb;
-+	u32 upports_mask = 0;
-+	struct dsa_port *dp;
- 	u32 chip_ver = 0;
- 	u32 chip_id = 0;
- 	int jam_size;
-@@ -895,17 +898,47 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
- 	if (ret)
- 		return ret;
+@@ -900,6 +934,12 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
  
--	/* Isolate all user ports so they can only send packets to itself and the CPU port */
--	for (i = 0; i < RTL8366RB_PORT_NUM_CPU; i++) {
--		ret = rtl8366rb_port_set_isolation(priv, i, BIT(RTL8366RB_PORT_NUM_CPU));
-+	/* Start with all ports blocked, including unused ports */
-+	dsa_switch_for_each_port(dp, ds) {
-+		/* Start with all ports completely isolated */
-+		ret = rtl8366rb_port_set_isolation(priv, dp->index, 0);
-+		if (ret)
-+			return ret;
-+
-+		/* Collect CPU ports. If we support cascade switches, it should
-+		 * also include the upstream DSA ports.
+ 	/* Start with all ports blocked, including unused ports */
+ 	dsa_switch_for_each_port(dp, ds) {
++		/* Set the initial STP state of all ports to DISABLED, otherwise
++		 * ports will still forward frames to the CPU despite being
++		 * administratively down by default.
 +		 */
-+		if (!dsa_port_is_cpu(dp))
-+			continue;
++		rtl8366rb_port_stp_state_set(ds, dp->index, BR_STATE_DISABLED);
 +
-+		upports_mask |= BIT(dp->index);
-+	}
-+
-+	/* Configure user ports */
-+	dsa_switch_for_each_port(dp, ds) {
-+		if (!dsa_port_is_user(dp))
-+			continue;
-+
-+		/* Forward only to the CPU */
-+		ret = rtl8366rb_port_set_isolation(priv, dp->index, upports_mask);
-+		if (ret)
-+			return ret;
-+
-+		/* If we support cascade switches, it should also include the
-+		 * downstream DSA ports.
-+		 */
-+		downports_mask |= BIT(dp->index);
-+	}
-+
-+	/* Configure CPU ports. If we support cascade switches, this will also
-+	 * include DSA ports.
-+	 */
-+	dsa_switch_for_each_cpu_port(dp, ds) {
-+		/* Forward to all user ports */
-+		ret = rtl8366rb_port_set_isolation(priv, dp->index, downports_mask);
+ 		/* Start with all ports completely isolated */
+ 		ret = rtl8366rb_port_set_isolation(priv, dp->index, 0);
  		if (ret)
- 			return ret;
- 	}
--	/* CPU port can send packets to all ports */
--	ret = rtl8366rb_port_set_isolation(priv, RTL8366RB_PORT_NUM_CPU,
--					   dsa_user_ports(ds));
--	if (ret)
--		return ret;
+@@ -1320,40 +1360,6 @@ rtl8366rb_port_bridge_flags(struct dsa_switch *ds, int port,
+ 	return 0;
+ }
  
- 	/* Set up the "green ethernet" feature */
- 	ret = rtl8366rb_jam_table(rtl8366rb_green_jam,
+-static void
+-rtl8366rb_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+-{
+-	struct realtek_priv *priv = ds->priv;
+-	u32 val;
+-	int i;
+-
+-	switch (state) {
+-	case BR_STATE_DISABLED:
+-		val = RTL8366RB_STP_STATE_DISABLED;
+-		break;
+-	case BR_STATE_BLOCKING:
+-	case BR_STATE_LISTENING:
+-		val = RTL8366RB_STP_STATE_BLOCKING;
+-		break;
+-	case BR_STATE_LEARNING:
+-		val = RTL8366RB_STP_STATE_LEARNING;
+-		break;
+-	case BR_STATE_FORWARDING:
+-		val = RTL8366RB_STP_STATE_FORWARDING;
+-		break;
+-	default:
+-		dev_err(priv->dev, "unknown bridge state requested\n");
+-		return;
+-	}
+-
+-	/* Set the same status for the port on all the FIDs */
+-	for (i = 0; i < RTL8366RB_NUM_FIDS; i++) {
+-		regmap_update_bits(priv->map, RTL8366RB_STP_STATE_BASE + i,
+-				   RTL8366RB_STP_STATE_MASK(port),
+-				   RTL8366RB_STP_STATE(port, val));
+-	}
+-}
+-
+ static void
+ rtl8366rb_port_fast_age(struct dsa_switch *ds, int port)
+ {
 
 -- 
 2.54.0
