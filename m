@@ -1,149 +1,136 @@
-Return-Path: <netdev+bounces-303392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0sz4JtRCRGpCrgoAu9opvQ
-	(envelope-from <netdev+bounces-303392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 00:27:32 +0200
+	id /S0BK5dDRGpqrgoAu9opvQ
+	(envelope-from <netdev+bounces-303393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 00:30:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D958E6E8679
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 00:27:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6CC6E86B7
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 00:30:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=aEquCaiF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303392-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303392-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=a3nZipE5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303393-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303393-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E1FD300915C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 22:25:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58742301F1E8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 22:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B9A3242BE;
-	Tue, 30 Jun 2026 22:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B248328B71;
+	Tue, 30 Jun 2026 22:27:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2F231E858;
-	Tue, 30 Jun 2026 22:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D47F29C327
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 22:27:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782858356; cv=none; b=Xv4Wz06OAJ6zqMB3ErJTXBrickUHu0raUyB431nYJ5Ht9i+VA2scPQs6l76s5GaR13m363fkLvRdzFPs90VvElI3BC/7HW1x6GGkIjNd4ZBg+Eh++zgt9/GOx89UC/27OiToHQ/JO0mRJsgXY0TqIcRaMSE+HEdmmM9wkl85hIo=
+	t=1782858452; cv=none; b=IWCh2gqGFZyGgi293duKXtIvIX+Rbc1ZLx9cYZKVGVBpe+0EepHe/Ld5wEccOR8Y3DSM2jRMYA1kvhSzaj+3eAWLFb38X+1gVEmOhRYR6eyfZBh5XNW59qJlfypts+yWONo4YN0dKfyxxVrLLpnYBZ+DDiwbio5+zXa2GpTZuR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782858356; c=relaxed/simple;
-	bh=UJt3xwA9OUv4ytsi5gs6gUeLW/uZReGQZ4GZ32yz594=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oromQtQROpNw3EPzArdcOZCx5BMfnOK+YIme6xlxc8aeb4TrltrwnqbRr9/PEqsR/f+MYVP0tEZgnoB6hmjwhPHhkfHVrdbGOhwEeFt8W1orwl2hfHQy/RA8V8e402pagC3FUWt9YpIeMIiQdrJJaJA9qaVBOQA4ZM1PUxoDeaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aEquCaiF; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=z3bXcgl09qRXn2GfBaT6Bogy4+hSBh+lv7mb+1qzP9o=; b=aEquCaiFDaxhq+XbRwXbXA5oSr
-	fbTpT+hhwB8PHbmjF975lvoA2oBmrCXO72hP5KyQbtR6JqHWinzqWC4xuNWuhlz1n5M0X0dZC/HO2
-	h0LJd7EN7SRSbcOo+7RajVeyFzD3ry5MX0tOtbEvFV0WdqEnTpmhDr/FqeaB12x8kpr8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wegto-00A3LE-Q3; Wed, 01 Jul 2026 00:25:48 +0200
-Date: Wed, 1 Jul 2026 00:25:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/4] net: dsa: motorcomm: Add LED support
-Message-ID: <a1a943de-b184-408b-86a9-196490a7ff8c@lunn.ch>
-References: <20260629183137.541341-1-mmyangfl@gmail.com>
- <20260629183137.541341-5-mmyangfl@gmail.com>
+	s=arc-20240116; t=1782858452; c=relaxed/simple;
+	bh=TTcVu3N5A2qxImNE8jx0tO9sA0vxx21QZu6VSH0wmU4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XL+Ga00LgMq/n1j65GGqimUD58Ek5u+CnHTPQT9B9PvyrsdQ4x2wze3tQwZH3wE5AslTkEIIXvyt5IZOPdLL+l+AJMMwZ1NlqY5YTgjWmBLtQVTx9BvNifCsxTFUuhQ5mgAJs/vMfWlNLP7ZFMzPOKRsoMQ1jhsgwd8X7ZWSm+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a3nZipE5; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64A761F0155D
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 22:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782858450;
+	bh=TTcVu3N5A2qxImNE8jx0tO9sA0vxx21QZu6VSH0wmU4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=a3nZipE5rJA5y3N4Pt43hJP+a36yVR5xrcMfyXU20kSXL/EMJ9K0p232l6Wre9wwp
+	 XZGaTAaW+es9sgk2ARLIAXeZYTEfZEKo5NkLTX00wcwnR0btmfhuX2qmDgsgRcXS/Q
+	 BaQDKyMcLqkohVenN5e9fDl+zIbBLwde996RnNIGz3h3eKEQE15LGapkSZsv9IMD0m
+	 Iqoina2XyIvqZEumLIqhlDlgyvjWqtUVlH/1DwkhbLX9mv9yy2rvdW7YtvW9bGvLLU
+	 x9VHYe8+Vd4Yjn/Rs6RW4nQMcWgQ6Jl5XlPCKLmcmP5L7dbjrZpWPH2Edj+0omjQhI
+	 Ur0N2LFTC6dYA==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-39af87c4589so33491fa.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 15:27:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RrwrzYGp4dBwtzgb97TbVcNzcpIVkIlCI9Qbp20Kbfk7JFv36ehsslM1pJ+vbqHfUTtfiVVoro=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3Su+OCyuUwD5FxKXXvqSKODQuZHeWlQN7xbcJeTzuRZNNOexf
+	eASmFyW0yXFqhw/HmREygua/qL5GvdHR+QWysiuJNz9Bj1tj1S3SnVmfGfVi39neFt4bix1X4lD
+	EdhMiTFua57c62Kxk6RupOgn1HVrVG0c=
+X-Received: by 2002:ac2:4bd0:0:b0:5ae:a2b5:3ae3 with SMTP id
+ 2adb3069b0e04-5aebdbb32bdmr1526007e87.29.1782858449161; Tue, 30 Jun 2026
+ 15:27:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260629183137.541341-5-mmyangfl@gmail.com>
+References: <20260630092406.150587-1-manikandan.m@microchip.com> <20260630092406.150587-6-manikandan.m@microchip.com>
+In-Reply-To: <20260630092406.150587-6-manikandan.m@microchip.com>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 1 Jul 2026 00:27:17 +0200
+X-Gmail-Original-Message-ID: <CAD++jLmURCUfQNoTgLeTRtxfoWxgyPcmHv6rJpmB1gXWFL+NGA@mail.gmail.com>
+X-Gm-Features: AVVi8CfX0Qclfl00TlhG9NPtI9hB9ExKc-14XAFH9ZzPrWiRzE1N9YyLdRCBq80
+Message-ID: <CAD++jLmURCUfQNoTgLeTRtxfoWxgyPcmHv6rJpmB1gXWFL+NGA@mail.gmail.com>
+Subject: Re: [PATCH v4 5/7] ARM: dts: microchip: sama5d27_wlsom1: use
+ fixed-partitions for QSPI flash
+To: Manikandan Muralidharan <manikandan.m@microchip.com>
+Cc: pratyush@kernel.org, mwalle@kernel.org, takahiro.kuwano@infineon.com, 
+	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, srini@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, linux@armlinux.org.uk, richardcochran@gmail.com, 
+	arnd@arndb.de, michael@walle.cc, linux-mtd@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303392-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mmyangfl@gmail.com,m:netdev@vger.kernel.org,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303393-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:manikandan.m@microchip.com,m:pratyush@kernel.org,m:mwalle@kernel.org,m:takahiro.kuwano@infineon.com,m:miquel.raynal@bootlin.com,m:richard@nod.at,m:vigneshr@ti.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:srini@kernel.org,m:nicolas.ferre@microchip.com,m:alexandre.belloni@bootlin.com,m:claudiu.beznea@tuxon.dev,m:linux@armlinux.org.uk,m:richardcochran@gmail.com,m:arnd@arndb.de,m:michael@walle.cc,m:linux-mtd@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,infineon.com,bootlin.com,nod.at,ti.com,microchip.com,tuxon.dev,armlinux.org.uk,gmail.com,arndb.de,walle.cc,lists.infradead.org,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,microchip.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D958E6E8679
+X-Rspamd-Queue-Id: AF6CC6E86B7
 
-> +	duty_req = YT921X_LED_DUTY(on > off ? off : on, cycle_req);
-> +	for (unsigned int i = ARRAY_SIZE(dutys) - 1;; i--)
-> +		if (i <= 0 || duty_req >= (dutys[i - 1] + dutys[i]) / 2) {
-> +			duty = dutys[i];
-> +			break;
-> +		}
+On Tue, Jun 30, 2026 at 11:26=E2=80=AFAM Manikandan Muralidharan
+<manikandan.m@microchip.com> wrote:
 
-The ;; got the looking at this, since it is unusual.
+> Move the QSPI flash partitions under a "partitions" node with the
+> "fixed-partitions" compatible, as required by the current MTD partition
+> binding, instead of declaring them as direct children of the flash node.
+> No functional change.
+>
+> Signed-off-by: Manikandan Muralidharan <manikandan.m@microchip.com>
 
-i is an unsigned int, so it can never be < 0. The test should be just
-i == 0.
+Reviewed-by: Linus Walleij <linusw@kernel.org>
 
-> +static int
-> +yt921x_led_blink_set(struct yt921x_priv *priv, int port, int group,
-> +		     unsigned long *onp, unsigned long *offp)
-> +{
-> +	struct yt921x_port *pp = priv->ports[port];
-> +	struct yt921x_led *led;
-> +	unsigned short cycle;
-> +	unsigned short duty;
-> +	bool change_cycle;
-> +	bool change_duty;
-> +	bool use_cycle;
-> +	u32 ctrl;
-> +	u32 mask;
-> +	u32 val;
-> +	int res;
-> +
-> +	if (!pp)
-> +		return -ENODEV;
-
-I really do dislike all the tests.
-
-Are LEDs created if pp is NULL?
-
-Please don't use defensive programming, understand the logic of the
-code and decide if this can happen. If it can, then yes, have the
-test. If however yt921x_leds_setup() has this test, and will never
-create and register LEDs with the LED code if pp is NULL, you don't
-need any of these tests. Please look at every instance of such tests
-and really consider, can it happen?
-
-	Andrew
+Yours,
+Linus Walleij
 
