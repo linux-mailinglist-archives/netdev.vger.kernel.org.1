@@ -1,268 +1,310 @@
-Return-Path: <netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cniYNxj/Q2ohnAoAu9opvQ
-	(envelope-from <netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:38:32 +0200
+	id DFvjCc//Q2p+nAoAu9opvQ
+	(envelope-from <netdev+bounces-303314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:41:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528EA6E6F6F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:38:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACEF76E6FBE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 19:41:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=ULVIdvBq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303313-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=asu.edu header.s=google header.b=BmWMhSDk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303314-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303314-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 569963039A12
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:38:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7CF823046CDB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 17:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C663DDDD9;
-	Tue, 30 Jun 2026 17:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D8F3DF001;
+	Tue, 30 Jun 2026 17:41:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120803DE429
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:38:24 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782841107; cv=pass; b=cQFlNynO0Yjvrlg/0/MVNnTuQ4X4ofI7hEdKBeiv3CJbtGnVTGstOIiAwpK0Vrcgvy5ccEZ+izCl9siuwCYpU8L0DRLQK7cbclqrWvSroS6F6hjJ+kgV9j2zLyfWbfXteBX7Ah1QBAbzjDmuTXKhydysOocw0jsIINNEuSNrgQk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782841107; c=relaxed/simple;
-	bh=eIHErhMYQFL0B7YbkMxX5g2Vzr8d25EAgGgSdmM/U7k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JmwfkJLBSvDPBIVnxkqw73N0rofy0p1rqTZiE8K3bxj2Od/EvM30rlBJii1wy285HQlktceMp/o8SNAOxcBkoaBHnb0VTKpI+pbQt63gSnZZYVreoRl5BApqjU+wH5jUug8Iw7U1tsZqRPIgfjNihcWXxtSBFDnG/JQWd8MZRRc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ULVIdvBq; arc=pass smtp.client-ip=209.85.214.171
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2c9b2ac97cdso3235ad.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 10:38:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782841104; cv=none;
-        d=google.com; s=arc-20260327;
-        b=q4QFBo1L0wnWDYP5Z8afrxuKPrp9DTk6gk6h76XmxnegVBBaGTTD1WwlIHDvTsUcdS
-         vcp6a6ozXFLDJwjqpeSCvyHHHt4fgmAVXiWsf0XU3xOjzgbG7BTgsk6Xe8GuyPlytHWI
-         rJUSfX0fe1N/YeZYw76Oe9Rb2KMvvn5rdezKwnJLrHF0ZUzMU3CMNTzJrRL2a8vR1B+q
-         cUS07S0qpEtQqvxkOOHxcLouWOO8W5p5Uo5d9KkHIxY5/d5UOrfzNHi14S+JmLILBr+B
-         ASHnQKbSDxTaxiMY1x3bDAU9yT/8dGqVEtywUg3Kzo05BH9jHHKBZWEs6NNV2HXZGd3e
-         urtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6xvhn4dXUWxUVWf7UvjrsOYZ0ZQQrdCYE7C0z/HL34c=;
-        fh=C38NiLBmKty8N8HcaYkoW6+y3PMS2R9/aELC+jg/9lw=;
-        b=WftJXnGEmcvmN9dqpvMIdW/bUGojMeeBTnmzcztmDSd7CUMAx2l0hKToomgIiKT55m
-         ZN48SOzOCmOy0q1VJVcaXAwagqIO9jh4DnQyvzXW1wKKoXpdgX5eywDGklZ1EfANovVi
-         vLH9Khr+qbRZWi1DiMCXqdu/lof6gTiwIemwGJZZ8BNeybgc8uCSsvVz7+4um8JGm92S
-         2ods1+qMQ0rFVbBsQabS2FKp9dRl39p0eadyaRTtq4H0kQv0gH2QLsCgo5mwjcvvqo+8
-         URoEzT5MbNwsjnGhy/zNqBnRaF6ShqZ4RDrph5gubIurlapRpRO31ExzlOJLEJtuBX43
-         JuLw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C021E3DCD8F
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:41:17 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782841280; cv=none; b=mTIHaeg9x1MfXmKxPBE/iEkwC5L5IqIw7V7931ip4Y0MOTCl/FeD74p4P9B3CaVjhMpzSLwV/wZmzXSD74cUlkcBHdhgPZ54JbcpZnIaLBPkbeQmVFFfutlOsYq6/rdWM3lXQXd0LP0fz2pILAtzBMc6es6qVY1OIl436E7zl10=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782841280; c=relaxed/simple;
+	bh=QgZhmXXDk8xCmK1o0ocNcnCpwru8TZboIRGQ74nopQc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IFm/ut3h1YCeLZcNhS7eK7Mw8bO89FDTq7fRcEsjjqlqaJTwT9bCku72Mx8Re7v9QrOKqAMnQQp5uPIMsMzWnTwGmf1H2U4HtCJFUrB7Sl5PwEAEX1NzNRPCJBKKyZpGL/rYh1uJ9yDWBfEWaj9OJQxjXE6x24k5shD9DLANxrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=BmWMhSDk; arc=none smtp.client-ip=209.85.216.54
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-37fb434c547so2363209a91.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 10:41:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782841104; x=1783445904; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=6xvhn4dXUWxUVWf7UvjrsOYZ0ZQQrdCYE7C0z/HL34c=;
-        b=ULVIdvBqx8lG0U/wPvVzEvBy/N5wOCcMHcKHAWJTG2gLnB/gOKUnRYcNIn8XDD0LxB
-         ku7+GZYlGQDb/LIjy60YhCAoyKP6IkljGbYDAUxcVegxdQsvOezDKcljBNyq+6wHgb8L
-         tamhQrPGOAaX7S9PO5jA/pwEWUZxE6qikB+eiL2eEOujg/M6RoDVOg33KK/12/XX+H8K
-         MyAJR+89RIV56yjV8PnClr0m1JuSPu7F9iNrAAoCoGly/Eb+gRHXB4d1uuhMVGIBVfxY
-         SB/0CS7JkJ97QVbpOTh1XLVg+o0dGZq3O5g8FXwUBKTsHvQfPI11AubGo15+2MnHTo3U
-         rJdw==
+        d=asu.edu; s=google; t=1782841277; x=1783446077; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4BuzdiFicaeGG3kstHee8NskPtG8012B2ydnzFh0pZ8=;
+        b=BmWMhSDkVkWQLuNejCQ8QyV+vheCjTEj+DQFVI1/D5royKU/1FOh7T2S3IFx+SwBaw
+         qBwRcTtht/6ZlNVSOGvSvicebtbZxjBeQgCHNRosnjeGHTSAebRKbZ1+iu/5BfFO98zz
+         B7ItwULN/cDcnMkh9KnMBvwmuJZXsAB9USgq2kFbffSTKj/QWxj4fanwGTW50dr49tYJ
+         2xcPNFJE3LOYD7iORZ96rwsTMPBpSKl90R2O6SLpGSurH32DT9E/i9yYPwpBjxKd1Kzz
+         DHVPi8cK3oIBcHPeqOVCEF5twYw0YFzvxlzzbap9KJm4d0GDc1+4+VK8L68MPxpGFOK4
+         V5Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782841104; x=1783445904;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6xvhn4dXUWxUVWf7UvjrsOYZ0ZQQrdCYE7C0z/HL34c=;
-        b=oMp2CWKO2rW2B2f2pRZ5BEKn/kE0Z6RwkyonOI9P+imMPumWWK2i7eW7YBjRojp7AX
-         1JBhs1leZTSlWwmXjJ8eyBkc7+rkyIDqw/YrzyT9JH/iPoW9iKnFtH+y2+t13FypcWMJ
-         w7gbHzi7p70ZnW/NlLvm+g26xjPwFyz9QFT9WIThYxLy6HopJeIwusSxTyE41He4yVF9
-         wZuRoeFEu44G7PmNCPJMbmjjIF1Nt2bUpNNWvNZojTofpZYMO8Xfi50Zo9KgO/EyTA4b
-         ebJGWmFm+UHW/DOdRA5fLDNCw3yl6eZfGnqpLJQQB/hdDUmGWhodUj8XbqRzE5ozwdyZ
-         526g==
-X-Gm-Message-State: AOJu0Ywt4+uqnOKI7dSgThgN1TlHuB4evFnpbql2PYDpjSewI7QlyfyP
-	UD3VPwyGF9cCEDndt2jrkffmP2Y1snEyqg+G7Y/fPQbrsdS0BfhkilWB7ej9nmi75infG0xT5ih
-	UDs4HlKA/OVaOzE0JCeP62PBnqZ4ne5tQkpVBdseC
-X-Gm-Gg: AfdE7cl+6VuB+IMXHZHw2fan9njHxkZGFXjAOtjD0VeryO+VL5smosH7h6+sZ0OjwXU
-	af1M1gjt9gsyqmpsAN37VQovwmjFeeknoXtz5ox3x/t90jWxC8VkXg2KwNN4vCpBEf4whvmMBEp
-	Hwkncc5i0mES09Y7OhfQ8e8+c9sqPbBWDYvKBn+sX8PfJwdFlIdySd1lrFBSvWM59YRnbCGdfO/
-	aWV13CjytUUSbavdbQEP8dNxYhhnPGCg7aXKDHKEW274WWCQqjmkMZS+eX8hyOwzy5uPWu40fxc
-	5MZmSGHXMeNllKmhxyy1fe2PlYMFZ/Kti7+fNFogzG10eDYlcI1vJsHwZMM8ItqQQZEQKu4=
-X-Received: by 2002:a17:902:e5d2:b0:2bf:3579:cdaa with SMTP id
- d9443c01a7336-2ca68a101d9mr188615ad.10.1782841103452; Tue, 30 Jun 2026
- 10:38:23 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782841277; x=1783446077;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4BuzdiFicaeGG3kstHee8NskPtG8012B2ydnzFh0pZ8=;
+        b=UmUtlJNDciIIp4Mvlk82Xs+jxuLHGOyxNMXjHGeC5xgf3nB/AiPsANb4Yhi5lcA3yZ
+         CFSuFeCcJFD/GRREPwnFZ8nTDoEgl/HTCl3RxZ1koKXktGz0XLAbzNrPdTrjEGxCO9KH
+         YSRFdO87s8zm1zl2g9g+ndECF8Qdzl8NrEb/bXU1K19/MdosbZzZe46Sq7iEi6scn3yR
+         KnonmTsEOBeVDI8R12IgmpITPL535CLIPiuwUxtVzFqpzU6OyLPd1sh/Pdi0ZgNVD+MC
+         lR58hxuRFI3Mc3fXrZMIF2vNP21CdTuO6c9A1XgMw7pnaiY1EIWYJgnlFN3ucHmyhLKt
+         N3cQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpr/y+gStR5P900+AM8ls5XYivldd2pLJPqxgjewNgpax5h7dZ5Fpow5vI9YPkxY5EGFg0guq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw90uW+c+yIM0TizDlfM7S7nF4mRLvIb6He92cH2nK5t+gGoBe/
+	XnzK+699sq5HIvqqsMDwFHBNMoJiqsknXXmAufx4TC7C3CsfFm7nFzxGtMmCaVQ7xS33k8LlC9g
+	tbjHG8w==
+X-Gm-Gg: AfdE7cnJkovpa09sFV3/dR1Y18MhnuNU5LflBEGjGjvqUM90o6wVeAwvzjh7xBS+S9T
+	JFY7CzGIV+C8RhpKztwdYn5UB0mnKiFWyJ5h8lAXl1guMjBKDI7rb2AQGVnzGTr3MHxsQXu17B3
+	+HTrjkkPa/KUmvi3iVrRB+ybuROqt4uNZVI3LYYhl/R9cfJtof55ttAyvLRwr3x5+6d6PJ2Ssyh
+	yskjHsy5rT0R36Oho9BWoUKBKdBd2KXwlWjzqTGO+juR0u0jHFzfiil08Lr5pjF7Xk7cuNIqZIL
+	NiynKMdxWxmYSHZ2awJSN82juTj3+IrNTkEP9h8y0aXhPCdRkrgAJ77HKpgXLj3iXV6c8a51Liv
+	HIKEodq2tiRMHV60xH+k4id7M+K/Y1uxQ6eXrZPFIyX+JfUk5ul6cQxTJSxw76t4S9s6Iqk+mhA
+	==
+X-Received: by 2002:a17:90b:4f4e:b0:37d:8426:40de with SMTP id 98e67ed59e1d1-3808bd49c8cmr1301816a91.1.1782841276983;
+        Tue, 30 Jun 2026 10:41:16 -0700 (PDT)
+Received: from p1.. ([2607:fb91:1582:634e:f23c:351a:5288:3553])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3809641cdfcsm274353a91.12.2026.06.30.10.41.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 10:41:16 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: subash.a.kasiviswanathan@oss.qualcomm.com,
+	sean.tranchetti@oss.qualcomm.com,
+	netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v2] net: qualcomm: rmnet: validate MAP frame length before ingress parsing
+Date: Tue, 30 Jun 2026 10:41:09 -0700
+Message-ID: <20260630174110.2003121-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260630162622.2667086-1-nshettyj@marvell.com>
-In-Reply-To: <20260630162622.2667086-1-nshettyj@marvell.com>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Tue, 30 Jun 2026 10:38:11 -0700
-X-Gm-Features: AVVi8CcAs9srRcQWupEsdwoSR1XEs7xbWr7DnyNaGulL_KAiBtIRAQH7ppp4IqQ
-Message-ID: <CAEAWyHdiHuSq-49YjtB2YUxageMYnTacVKY0Ye-km-07YMh19A@mail.gmail.com>
-Subject: Re: [PATCH net v3] octeontx2-pf: check DMAC extraction support before filtering
-To: nshettyj@marvell.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sgoutham@marvell.com, 
-	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com, 
-	bbhushan2@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, naveenm@marvell.com, 
-	tduszynski@marvell.com, sumang@marvell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,asu.edu];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303313-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:nshettyj@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:naveenm@marvell.com,m:tduszynski@marvell.com,m:sumang@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303314-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:subash.a.kasiviswanathan@oss.qualcomm.com,m:sean.tranchetti@oss.qualcomm.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,marvell.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,qualcomm.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 528EA6E6F6F
+X-Rspamd-Queue-Id: ACEF76E6FBE
 
-On Tue, Jun 30, 2026 at 9:26=E2=80=AFAM <nshettyj@marvell.com> wrote:
->
-> From: Suman Ghosh <sumang@marvell.com>
->
-> Currently, configuring a VF MAC address via the PF (e.g., 'ip link
-> set <pf> vf 0 mac <mac>') blindly attempts to install a DMAC-based
-> hardware filter. However, the hardware parser profile might not
-> support DMAC extraction.
->
-> Check if the hardware parsing profile supports DMAC extraction
-> before adding the filter. Additionally, emit a warning message
-> to inform the operator if the MAC filter installation fails due
-> to missing DMAC extraction support.
->
-> Fixes: f0c2982aaf98 ("octeontx2-pf: Add support for SR-IOV management fun=
-ctions")
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
->
-> ---
-> v3:
->  - Update config->mac only after hardware programming succeeds in
->    otx2_set_vf_mac().
-> v2:
->  - Move the DMAC extraction check from otx2_set_vf_mac() into
->    otx2_do_set_vf_mac() which already holds pf->mbox.lock, so all
->    mbox operations are under a single lock/unlock pair. All error
->    paths now use the existing goto-out pattern, eliminating the
->    scattered mutex_unlock() + return calls from v1.
->  - Return -EOPNOTSUPP instead of 0 when DMAC extraction is not
->    supported, so the caller gets an explicit error rather than a
->    silent success.
-> ---
->  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 44 ++++++++++++++++---
->  1 file changed, 38 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drive=
-rs/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> index b63df5737ff2..697570765957 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> @@ -2517,10 +2517,43 @@ EXPORT_SYMBOL(otx2_config_hwtstamp_set);
->
->  static int otx2_do_set_vf_mac(struct otx2_nic *pf, int vf, const u8 *mac=
-)
->  {
-> +       struct npc_get_field_status_req *freq;
-> +       struct npc_get_field_status_rsp *frsp;
->         struct npc_install_flow_req *req;
->         int err;
->
->         mutex_lock(&pf->mbox.lock);
-> +
-> +       /* Skip installing the DMAC filter if the hardware parser profile
-> +        * does not support DMAC extraction.
-> +        */
-> +       freq =3D otx2_mbox_alloc_msg_npc_get_field_status(&pf->mbox);
-> +       if (!freq) {
-> +               err =3D -ENOMEM;
-> +               goto out;
-> +       }
-> +
-> +       freq->field =3D NPC_DMAC;
-> +       if (otx2_sync_mbox_msg(&pf->mbox)) {
-> +               err =3D -EINVAL;
-> +               goto out;
-> +       }
-> +
-> +       frsp =3D (struct npc_get_field_status_rsp *)otx2_mbox_get_rsp
-> +              (&pf->mbox.mbox, 0, &freq->hdr);
-> +       if (IS_ERR(frsp)) {
-> +               err =3D PTR_ERR(frsp);
-> +               goto out;
-> +       }
-> +
-> +       if (!frsp->enable) {
-> +               netdev_warn(pf->netdev,
-> +                           "VF %d MAC filter not installed: DMAC extract=
-ion not supported by parser profile\n",
-> +                           vf);
-> +               err =3D -EOPNOTSUPP;
-> +               goto out;
-> +       }
-> +
->         req =3D otx2_mbox_alloc_msg_npc_install_flow(&pf->mbox);
->         if (!req) {
->                 err =3D -ENOMEM;
-> @@ -2559,13 +2592,12 @@ static int otx2_set_vf_mac(struct net_device *net=
-dev, int vf, u8 *mac)
->         if (!is_valid_ether_addr(mac))
->                 return -EINVAL;
->
-> -       config =3D &pf->vf_configs[vf];
-> -       ether_addr_copy(config->mac, mac);
-> -
->         ret =3D otx2_do_set_vf_mac(pf, vf, mac);
-> -       if (ret =3D=3D 0)
-> -               dev_info(&pdev->dev,
-> -                        "Load/Reload VF driver\n");
-> +       if (ret =3D=3D 0) {
-> +               config =3D &pf->vf_configs[vf];
-> +               ether_addr_copy(config->mac, mac);
-> +               dev_info(&pdev->dev, "Load/Reload VF driver\n");
-> +       }
+When ingress deaggregation is disabled, rmnet_map_ingress_handler() passes
+the skb straight to __rmnet_map_ingress_handler(), skipping the length
+validation that rmnet_map_deaggregate() performs on the aggregated path.
+The parser then dereferences the MAP header and csum header/trailer based on
+the on-wire pkt_len without checking skb->len, so a short frame is read out
+of bounds:
 
-This is a valid change and would have been nice to mention it in the
-commit message. Either way:
+  BUG: KASAN: slab-out-of-bounds in rmnet_map_checksum_downlink_packet
+  Read of size 1 at addr ffff88801118ed00 by task exploit/147
+  Call Trace:
+   ...
+   rmnet_map_checksum_downlink_packet (drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c:413)
+   __rmnet_map_ingress_handler (drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c:96)
+   rmnet_rx_handler (drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c:129)
+   __netif_receive_skb_core.constprop.0 (net/core/dev.c:6089)
+   netif_receive_skb (net/core/dev.c:6460)
+   tun_get_user (drivers/net/tun.c:1955)
+   tun_chr_write_iter (drivers/net/tun.c:2001)
+   vfs_write (fs/read_write.c:688)
+   ksys_write (fs/read_write.c:740)
+   do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+   ...
 
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Factor that validation out of rmnet_map_deaggregate() into
+rmnet_map_validate_packet_len() and run it on the no-aggregation path too.
+The MAP header is bounds-checked first, since this path can receive a frame
+shorter than the header.
 
->
->         return ret;
->  }
-> --
-> 2.48.1
->
+Fixes: ceed73a2cf4a ("drivers: net: ethernet: qualcomm: rmnet: Initial implementation")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Suggested-by: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+v2: Validate on the no-aggregation path by reusing the deaggregation
+    length checks (factored into rmnet_map_validate_packet_len()) instead
+    of adding separate pskb_may_pull() guards in __rmnet_map_ingress_handler().
+
+ .../ethernet/qualcomm/rmnet/rmnet_handlers.c  |  5 +-
+ .../net/ethernet/qualcomm/rmnet/rmnet_map.h   |  1 +
+ .../ethernet/qualcomm/rmnet/rmnet_map_data.c  | 72 ++++++++++---------
+ 3 files changed, 45 insertions(+), 33 deletions(-)
+
+diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
+index 9f3479500f85..d055a2628d8c 100644
+--- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
++++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_handlers.c
+@@ -126,7 +126,10 @@ rmnet_map_ingress_handler(struct sk_buff *skb,
+ 
+ 		consume_skb(skb);
+ 	} else {
+-		__rmnet_map_ingress_handler(skb, port);
++		if (rmnet_map_validate_packet_len(skb, port))
++			__rmnet_map_ingress_handler(skb, port);
++		else
++			kfree_skb(skb);
+ 	}
+ }
+ 
+diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
+index b70284095568..60ca8b780c88 100644
+--- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
++++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map.h
+@@ -59,5 +59,6 @@ void rmnet_map_tx_aggregate_init(struct rmnet_port *port);
+ void rmnet_map_tx_aggregate_exit(struct rmnet_port *port);
+ void rmnet_map_update_ul_agg_config(struct rmnet_port *port, u32 size,
+ 				    u32 count, u32 time);
++u32 rmnet_map_validate_packet_len(struct sk_buff *skb, struct rmnet_port *port);
+ 
+ #endif /* _RMNET_MAP_H_ */
+diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
+index 8b4640c5d61e..305ae15ae8f3 100644
+--- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
++++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c
+@@ -333,54 +333,62 @@ struct rmnet_map_header *rmnet_map_add_map_header(struct sk_buff *skb,
+ 	return map_header;
+ }
+ 
+-/* Deaggregates a single packet
+- * A whole new buffer is allocated for each portion of an aggregated frame.
+- * Caller should keep calling deaggregate() on the source skb until 0 is
+- * returned, indicating that there are no more packets to deaggregate. Caller
+- * is responsible for freeing the original skb.
+- */
+-struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
+-				      struct rmnet_port *port)
++u32 rmnet_map_validate_packet_len(struct sk_buff *skb, struct rmnet_port *port)
+ {
+ 	struct rmnet_map_v5_csum_header *next_hdr = NULL;
+ 	struct rmnet_map_header *maph;
+ 	void *data = skb->data;
+-	struct sk_buff *skbn;
+-	u8 nexthdr_type;
+ 	u32 packet_len;
+ 
+-	if (skb->len == 0)
+-		return NULL;
++	if (skb->len < sizeof(*maph))
++		return 0;
+ 
+ 	maph = (struct rmnet_map_header *)skb->data;
++
++	/* Some hardware can send us empty frames. Catch them */
++	if (!maph->pkt_len)
++		return 0;
++
+ 	packet_len = ntohs(maph->pkt_len) + sizeof(*maph);
+ 
+ 	if (port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV4) {
+ 		packet_len += sizeof(struct rmnet_map_dl_csum_trailer);
+-	} else if (port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV5) {
+-		if (!(maph->flags & MAP_CMD_FLAG)) {
+-			packet_len += sizeof(*next_hdr);
+-			if (maph->flags & MAP_NEXT_HEADER_FLAG)
+-				next_hdr = data + sizeof(*maph);
+-			else
+-				/* Mapv5 data pkt without csum hdr is invalid */
+-				return NULL;
+-		}
++	} else if ((port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV5) &&
++		   !(maph->flags & MAP_CMD_FLAG)) {
++		/* Mapv5 data pkt without csum hdr is invalid */
++		if (!(maph->flags & MAP_NEXT_HEADER_FLAG))
++			return 0;
++
++		packet_len += sizeof(*next_hdr);
++		next_hdr = data + sizeof(*maph);
+ 	}
+ 
+-	if (((int)skb->len - (int)packet_len) < 0)
+-		return NULL;
++	if (skb->len < packet_len)
++		return 0;
+ 
+-	/* Some hardware can send us empty frames. Catch them */
+-	if (!maph->pkt_len)
+-		return NULL;
++	if (next_hdr &&
++	    u8_get_bits(next_hdr->header_info, MAPV5_HDRINFO_HDR_TYPE_FMASK) !=
++	    RMNET_MAP_HEADER_TYPE_CSUM_OFFLOAD)
++		return 0;
+ 
+-	if (next_hdr) {
+-		nexthdr_type = u8_get_bits(next_hdr->header_info,
+-					   MAPV5_HDRINFO_HDR_TYPE_FMASK);
+-		if (nexthdr_type != RMNET_MAP_HEADER_TYPE_CSUM_OFFLOAD)
+-			return NULL;
+-	}
++	return packet_len;
++}
++
++/* Deaggregates a single packet
++ * A whole new buffer is allocated for each portion of an aggregated frame.
++ * Caller should keep calling deaggregate() on the source skb until 0 is
++ * returned, indicating that there are no more packets to deaggregate. Caller
++ * is responsible for freeing the original skb.
++ */
++struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
++				      struct rmnet_port *port)
++{
++	struct sk_buff *skbn;
++	u32 packet_len;
++
++	packet_len = rmnet_map_validate_packet_len(skb, port);
++	if (!packet_len)
++		return NULL;
+ 
+ 	skbn = alloc_skb(packet_len + RMNET_MAP_DEAGGR_SPACING, GFP_ATOMIC);
+ 	if (!skbn)
+-- 
+2.43.0
+
 
