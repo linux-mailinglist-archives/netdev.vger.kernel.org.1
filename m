@@ -1,92 +1,60 @@
-Return-Path: <netdev+bounces-302885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-302886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8TTQCTEhQ2o8RgoAu9opvQ
-	(envelope-from <netdev+bounces-302885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:51:45 +0200
+	id tmfCGa0hQ2qARgoAu9opvQ
+	(envelope-from <netdev+bounces-302886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:53:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D22C6DFA7C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:51:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E4BC6DFA94
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 03:53:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=sNtJEcuA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302885-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-302885-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=163.com header.s=s110527 header.b=CtUGg3G9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-302886-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-302886-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=163.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92578300FB62
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:51:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 87E3A302C6E2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 01:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315D32E7F2C;
-	Tue, 30 Jun 2026 01:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5A2233958;
+	Tue, 30 Jun 2026 01:53:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0961F280A20
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 01:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9252C15BE
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 01:53:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782784301; cv=none; b=S1B6VmpLyzd336lGiDLoJbIJDtuQ3RRFeLQ+i8bzXE40/F9CIwYYCPxmEgmunqIN4Zmowug2/TT9nrxQ2INRkM52W8tZNY6aQTL7/HsXsHTAOOZJzIEowtrPSzC4o+yUeaIiH44tfBkgGvNT6EI87RteJIohj8uMxmzJTr6S+OY=
+	t=1782784413; cv=none; b=OoXJHf0y0Z8Wwr8CSlfU5xqU6rY30Qu+ZCbnM0kMif4H/vwPQ0XDE5d7tVBaeK53eMhk1Ge3aYmS+QhmT7veCuGi4Qq5hJJHv46M91pUFZ3S8Gnwo/jINkvSLgegYYbgz96dAEiug/4i4S0VPxEPJK7gOX8ETgLhP5TTey3ZiXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782784301; c=relaxed/simple;
-	bh=Nro2/uRBsIACU9/5NnGZIEwc9X7Jc+IgR2TzT+jC3nE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bdkCgtzGUjBAtb+aRSEnWg1ejAQho6IVFiwEgA+b1g9Exfmed06EYpqHU4+nl3eHLwcXQ43P6NOd6+Fkvp490LZ5BeM+v2wThzj5+52o61faNFsl0rYw+FMce3KX8PwFnIPP0Mo++8fMUa0zKchSeeEv5W/aZobjESlKv1K1b8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sNtJEcuA; arc=none smtp.client-ip=209.85.214.178
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c9b42be8feso22279145ad.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jun 2026 18:51:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782784299; x=1783389099; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gcnmiNNJkaSC+0FL1vKeL8WK6R7XjC63mBxVeUEUy60=;
-        b=sNtJEcuAo4vyDPmPWDVmqmy4aA/mf0835cQ300ea8RRmtMnD2utWG1KdCeF3ItJFSd
-         MFg7rTZCS6+dWnl3X9g5vmbFpAbpnQLfCIP5KR0NvvH+OQI34KKEZ8JC7IUDLUDP3omh
-         +Xo8O/rxHu5ApM/xnLMD6gBtB6hj3qKgVXn4L833duowVWSst7VBXZtZABbkxv9k47yd
-         2jSO1OJZ/MB4sLlW8yqWHuTMtwl40GyClglHEGwaMnB/E7hvFvr2a/zthSyGEA2PMT69
-         pbjjGthuIekwrzMFWa2zSuGEmSb27mFc83NHV9eVucxFypL83i2pMrUcTX6pfBn1dw7b
-         xVWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782784299; x=1783389099;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gcnmiNNJkaSC+0FL1vKeL8WK6R7XjC63mBxVeUEUy60=;
-        b=RK9zKrJZp+9otKcgyzHid9004xdlcBGaGvcijILv1NH401DIbBBLA5q16NT/iMafyl
-         j0lFNSVgc8txgGZDtywDEqPTw4peByVtVRBcmcSyJXbqO+ST2GAVLcyQjURNVOc/RjvG
-         nXeUy2EzeoD46L7cnwfbJeMLOL3VcEd+JVqxqq1K5qwgQV59XwmEZgp9NNBagP+/Ba6I
-         RJyG6cAxWrX60tDnKkYxXKMFObnKdmlcdu9kGD8rEXbJcJof294sc0jze4u4DCpktSLW
-         oMOFXyaCeo96nE4X8NzGMeeRLwuVAqbckdVjnAnOp5D4oTKpHDejNcGnC6SI03Iq/8QR
-         h4vQ==
-X-Gm-Message-State: AOJu0YzR6lG39Btp20bVcXlEQCg8yxRkwlSjuEGNlW/IyHxNfE1m23gd
-	u+qygSbf7V062W6aAvteq57RaOKXaFraJVw/1NaWoiQ2Lv5AawZ7HaDGsH073fA8
-X-Gm-Gg: AfdE7ckuzG/De3URVmsTJQrgYqiTqP7nH/xzlGjiYT3phCqgE9NRv92/tfsNMY0RO+d
-	SPuWvVYZMFalTYNVK3BA38zQInMWVFCj3uiu7N9ugrE6QNNbIv+YpexeoLZjMlcX0N/E0VllyKn
-	ZRsS9cECneKPY07dJLO4p5bydjaYRwXNFPm5uG2utpLb7GmbFbvQpjKPyTu90++REYSIbD2D2xz
-	E4i2JB2ce8aj97MyWRoHCWk7ByrQHCZXHC3P/4svEWkAtxdo39sK1BVnFh1pfgmMxUnx3fbhR8Z
-	UbUhA67qwNVzdkwwpdTLLZ7p6orXR+GtitmF3JVhh/awN6yE5PYWur5ExMWseiiSSuph7D0eiJI
-	i1aL9k6i7SokDZH5RAC4WM0Si7d1IopTyHrIhqPCLVYxaZjxYrOCFZcizvNuNWceXlgixE2CpaE
-	pxQHbzeaz2y/GAem17KnQ+g/1MSO5yFZ3IsNWgftLAefuvgg1wokWPjeGzNS/Jxw/SazhG4KD9t
-	cRpZ3JbGg==
-X-Received: by 2002:a17:903:4688:b0:2c9:97a8:8c19 with SMTP id d9443c01a7336-2ca2eb3214fmr12356575ad.44.1782784299209;
-        Mon, 29 Jun 2026 18:51:39 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ca3828b10csm2672685ad.40.2026.06.29.18.51.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 18:51:38 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2 net-next] net: dsa: qca8k: fall back to ethernet-ports node name for LEDs
-Date: Mon, 29 Jun 2026 18:51:37 -0700
-Message-ID: <20260630015137.1591152-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1782784413; c=relaxed/simple;
+	bh=hur7v+iSRA7uTVVQWVvj5R5aISkYo5aT2h/livx+GLk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H/iYN2obK9j7xdEYsTJzEUfpva3X8pEpR08n0mK9Lu7PyAq3vkSUsSj/QnLhE2R1l/3NiJMJehDjUn3ByIMlAwh+zOc6ICr4nXow3elgBelofkMkjoII+B4mvJQAOHd6if2QUmBNnrZ6Vn4X54TLMTkm+0sPb//7YDr39Z8xLyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=CtUGg3G9; arc=none smtp.client-ip=117.135.210.2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=ZG
+	02hvF1WrUDvX1gACNDjW9+lfyeQ+2VpmkYf2vymio=; b=CtUGg3G9Ii69z8ofpA
+	QxEEbggzq61uZlRtQRCBkYG60jb/Gsq4Gbz5buSDExoqtXJYwZjLVM/xgEsDGNsF
+	zZrN/bc7hSr6bMldi/OvhNRXJ4GNMRBfqxIH2vJ4HNmDkeePINO0WyGEpuSwBoRW
+	d9qCkubJzE1PBcdBc9ncosBSU=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wDXVNlvIUNq79ZuGw--.43448S2;
+	Tue, 30 Jun 2026 09:52:48 +0800 (CST)
+From: Lei Zhu <zhulei_szu@163.com>
+To: lorenzo@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	zhulei_szu@163.com
+Subject: [PATCH RESEND net-next] net: airoha: Make use of the helper function dev_err_probe()
+Date: Tue, 30 Jun 2026 09:52:47 +0800
+Message-Id: <20260630015247.43322-1-zhulei_szu@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,72 +62,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXVNlvIUNq79ZuGw--.43448S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ur48tr17Kry8GFyUuFWrGrg_yoW8Zr4fpa
+	9xJFWYqFykJFn8J3s3Grn5ZF95Zw45t348GF4I9r4FyryYyrsFqrs3J3yFgr4FyFWkK3y5
+	JFy2vr9Y93WDXFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pEL0e9UUUUU=
+X-CM-SenderInfo: x2kxzvxlbv63i6rwjhhfrp/xtbC8BDPHWpDIXD3BwAA36
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-302885-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,163.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[zhulei_szu@163.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-302886-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:zhulei_szu@163.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zhulei_szu@163.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[163.com:+];
+	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,kylinos.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8D22C6DFA7C
+X-Rspamd-Queue-Id: 8E4BC6DFA94
 
-The device tree binding allows both "ports" and "ethernet-ports" as
-the container node name.  Try "ethernet-ports" when "ports" is absent
-so that newer DTBs with the preferred name work.
+From: Lei Zhu <zhulei@kylinos.cn>
 
-This matches the handling already present in qca8k-8xxx.c
+Use dev_err_probe() to reduce code size and simplify the code.
 
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Signed-off-by: Lei Zhu <zhulei@kylinos.cn>
 ---
- v2: resend
- drivers/net/dsa/qca/qca8k-leds.c | 3 +++
- 1 file changed, 3 insertions(+)
+The last submission was when net-next is closed.Resending it.
 
-diff --git a/drivers/net/dsa/qca/qca8k-leds.c b/drivers/net/dsa/qca/qca8k-leds.c
-index ef496e345a4e..0ada28377f46 100644
---- a/drivers/net/dsa/qca/qca8k-leds.c
-+++ b/drivers/net/dsa/qca/qca8k-leds.c
-@@ -457,6 +457,9 @@ qca8k_setup_led_ctrl(struct qca8k_priv *priv)
- 	int ret;
+ drivers/net/ethernet/airoha/airoha_eth.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
 
- 	ports = device_get_named_child_node(priv->dev, "ports");
-+	if (!ports)
-+		ports = device_get_named_child_node(priv->dev, "ethernet-ports");
-+
- 	if (!ports) {
- 		dev_info(priv->dev, "No ports node specified in device tree!");
- 		return 0;
---
-2.54.0
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 31cdb11cd78d..189f64e83a46 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -3071,10 +3071,9 @@ static int airoha_probe(struct platform_device *pdev)
+ 	eth->dev = &pdev->dev;
+ 
+ 	err = dma_set_mask_and_coherent(eth->dev, DMA_BIT_MASK(32));
+-	if (err) {
+-		dev_err(eth->dev, "failed configuring DMA mask\n");
+-		return err;
+-	}
++	if (err)
++		return dev_err_probe(eth->dev, err,
++				     "failed configuring DMA mask\n");
+ 
+ 	eth->fe_regs = devm_platform_ioremap_resource_byname(pdev, "fe");
+ 	if (IS_ERR(eth->fe_regs))
+@@ -3087,10 +3086,9 @@ static int airoha_probe(struct platform_device *pdev)
+ 	err = devm_reset_control_bulk_get_exclusive(eth->dev,
+ 						    ARRAY_SIZE(eth->rsts),
+ 						    eth->rsts);
+-	if (err) {
+-		dev_err(eth->dev, "failed to get bulk reset lines\n");
+-		return err;
+-	}
++	if (err)
++		return dev_err_probe(eth->dev, err,
++				     "failed to get bulk reset lines\n");
+ 
+ 	xsi_rsts = devm_kcalloc(eth->dev,
+ 				eth->soc->num_xsi_rsts, sizeof(*xsi_rsts),
+@@ -3105,10 +3103,9 @@ static int airoha_probe(struct platform_device *pdev)
+ 	err = devm_reset_control_bulk_get_exclusive(eth->dev,
+ 						    eth->soc->num_xsi_rsts,
+ 						    eth->xsi_rsts);
+-	if (err) {
+-		dev_err(eth->dev, "failed to get bulk xsi reset lines\n");
+-		return err;
+-	}
++	if (err)
++		return dev_err_probe(eth->dev, err,
++				     "failed to get bulk xsi reset lines\n");
+ 
+ 	eth->napi_dev = alloc_netdev_dummy(0);
+ 	if (!eth->napi_dev)
+-- 
+2.25.1
 
 
