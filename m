@@ -1,293 +1,298 @@
-Return-Path: <netdev+bounces-303100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5RirCvykQ2q+eAoAu9opvQ
-	(envelope-from <netdev+bounces-303100-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:14:04 +0200
+	id 2yhtDW2mQ2oqeQoAu9opvQ
+	(envelope-from <netdev+bounces-303105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:20:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80C406E36DB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:14:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88676E3838
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 13:20:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="fOqY/0CC";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303100-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303100-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=garyguo.net header.s=selector1 header.b=nimkejgQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303105-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303105-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=garyguo.net;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0EAD53074B0E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:06:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 012493122378
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 11:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33DE2409616;
-	Tue, 30 Jun 2026 11:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5699B405860;
+	Tue, 30 Jun 2026 11:09:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022092.outbound.protection.outlook.com [52.101.101.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C2C409610
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 11:02:29 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782817351; cv=none; b=HDVh5qrN1uBOeFX1cqqCfcs4Hgv1XeU40IrOxU9TLf4sBUcIYDs+u31zlOJIWxStXLOkf90kyfexGkaENpLbX4gSnTo4Zj7ffrG5DSQNHtUhpYxZshRmk7bu+rmfOz+CSFoFCwbxRlI4HxUHS2wBujXmRTvlkjiM1g1/aFqpB9M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782817351; c=relaxed/simple;
-	bh=8wZAl9dIq90GZLioFiUpzFcU9diyNdRhpnpQypxIlwA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zx3KWo9Lpoc9I6XmgUPdZFGTklEwtlsVHkLQnwrIKWYcwR1rnLZLGIpuZj+S41eSu/yyOk5nHPR7FhAklvx+Ix+vZepIGtgORTzXNnNbT06i9FsXOAYERFK/KqadfPtCfxFr1DKzSfLmp/owD+lLP4w0eQXdbFulW5G0qf9dhyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fOqY/0CC; arc=none smtp.client-ip=209.85.214.173
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2c825c88744so26455985ad.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 04:02:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782817349; x=1783422149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=710DEh42/SxcOGjoC0hzcAfTSmEIF90NLkpYChDQKCY=;
-        b=fOqY/0CCbio+7XRNKbwvkNQ0tt5ObisYqS/+D6LvltV0Lr2egGZJKkUPRyoa94YJb7
-         rOeV5e9VSwaLUAYjyCxiWZSzh5Qu4hn7VxN23Xqf3NaZbmD9zDdJjaEizKuJHsDXuYhJ
-         xddvtCjL+UpB+vmHW2+9cmKn3tjmAAX0N4Mzh3gy/+d+DK1NwsHVMATDzkyQxUKWuL7F
-         bBwcD9Ff1Tat8XQKHYv6KlZC4dD5CO4zvTTrn1zbGLSU9AU2ztT0BXPeQHoIdkdB5otJ
-         w4oL8i75Fwd9bs+oU+og107VD/qozD2+xKTOvz65j09vACl4TR8cz520SUF2yVT9oAZb
-         cLmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782817349; x=1783422149;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=710DEh42/SxcOGjoC0hzcAfTSmEIF90NLkpYChDQKCY=;
-        b=r4PzGeFI14XvEp/RV5xlkPYhRle4PLb/bT/tCzeNc/b9QrO4jaEU/I6luJumHemU4f
-         LmF4NmjtLk3UGEeZekRZZlPlTSh27j4ZAlgAgpANbFgpSAmI36A+ZPuwfNB2ALjT4rpp
-         Em3WAOZHVwNHKJLBgOPyyN/QS8kPMOxdFA9c2HIy9/evaq87D4AaE3gkq+zKYYK4U1U+
-         pVzNqM4EukzURQ0g3yUUC7EAbagP1CelLlLZcJ8VwdlWmeketHTgELzECHP1/+3FQClM
-         DacWOyp7vkh8JSMCuYmGI5eyIGQ+Z2o9Zn751cr8l+vfZwaZGenbKXO+wHsrothXgxXm
-         qb+A==
-X-Forwarded-Encrypted: i=1; AHgh+Roa/XGgEW0PHh4jvDLcS2AIb2r3TqCHThfZgrUbeHEiX2Xi3H55DagM/nvlSFzRA8eAigXA6xc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC+Uj4tkEjwiRJCMOx1xj/BVas5H435DcH8+qJ1oELUxlqNRdt
-	9AtlRStNY+mqip8w8KIfosMvhpelnNU/bfkFDzOJDk3nhexNu4tpwFPL
-X-Gm-Gg: AfdE7cnPVELajMqgIN7na87x6R6BBqAYS523lKSO49QspK/GZnrCrOrq3yGNAYbHjlN
-	2KUf6kVcTc0Wqo+br9Kmp58qOcjcoSdNxtGALi8u9IBzGjWn3qgSljT/eA4nnCccVxhCj4kEJ2d
-	bDjgfA9uAwjlX+S7whmkPOecppjoJrkdkKogAofvUrNk9r8YwVE5R6ShwMf2TqWbDFLsnnih7Qr
-	5djOFFJDt2zIgoyLlZZKyhbhc8LTYRrFioNUdfmlq3CwlAieEXyT7+aazLqw4Fhyc1kpMfq8DbG
-	ufvEm6IybkkRdlPUqTCvueLr2u6dlcSwCYqJU9MQykFwFO44B/zKgHiHHhNkCv0v+/hf7FNZZJx
-	jQpi02gVdx5bgm2AvZQfLi1ivaX2XW0imCyWxV3DsNDdAL+/tpZDbBPqadFPYXqCQtZFsIXMd+V
-	OantyJvn8yZa3vIBdCtCFrGgo1Yn4GvKJcZHlWe0/5
-X-Received: by 2002:a17:902:f645:b0:2c6:ad70:d870 with SMTP id d9443c01a7336-2ca2d54457emr24425215ad.13.1782817348784;
-        Tue, 30 Jun 2026 04:02:28 -0700 (PDT)
-Received: from m-upc-A520M-HDV.lan ([2400:2410:3f60:500:ae0d:35d1:dac9:a0e9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ca37a701b5sm11455265ad.17.2026.06.30.04.02.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 04:02:28 -0700 (PDT)
-From: Yuyang Huang <sigefriedhyy@gmail.com>
-To: Yuyang Huang <sigefriedhyy@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	David Ahern <dsahern@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 3/3] selftests: net: check multicast group user count
-Date: Tue, 30 Jun 2026 20:02:07 +0900
-Message-ID: <20260630110207.37841-4-sigefriedhyy@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260630110207.37841-1-sigefriedhyy@gmail.com>
-References: <20260630110207.37841-1-sigefriedhyy@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49413F9A1A;
+	Tue, 30 Jun 2026 11:09:33 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782817776; cv=fail; b=sqOOezvU+UoCPzGfTfJ6UE5TaESs+UDylrDROozjU+ZooIYTU6faYX7Fzp4arIfUo5aUsFz37ZtLADdGe0csKfE1FJvZkZUnUz3Hzt+q9w3HauTZUSFqrI49pnDQVtGO3DZjzToPNqL71MADsUe5ejyklJ++q3pKm+xUbqrd3Ss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782817776; c=relaxed/simple;
+	bh=zT8CR1hu18sGi5f9+9wkDL8BzV1/sK8mE83mrlSqGJw=;
+	h=From:Subject:Date:Message-Id:Content-Type:To:Cc:MIME-Version; b=Z6RYtfQO1jk9eIt+NpyVvyuorVWs32RbkxRiQTuG1Li0UomKZDFEcBMw/ljaIGp3gVCuzqVpO4uh84j2j9RvsDX8rdSsD36T7yvj8Ze7HZ+sDAdDkTPbjSqZQl2O8WZkUGrz/Mk2VqclbLR5Foyt0NFNIdgeS8fZWAuNnX4TKhM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=nimkejgQ; arc=fail smtp.client-ip=52.101.101.92
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GlcQPn17G/qv+q/8HvuhuqtdV7HTODLng26BgtSZh3GhLQOWvBgSIW6WrgG4bXScqE9nBL13lADhLwtgiEhVCTIsCnQrZW2WP1DIuq8ojdIvILHdmcTscKEpX1TAQwuw5iS+vYyhlfENfs4VuNP/GwpH4nXcKGrC4dvayF1tMv29lb4VC/5iJXELIc/KrR347+Hebht+Y4SqtqniuYXyDn3p+I0iZdob3rzoWChjhkG8Mr1ttWzh4boUAZbjo0aqJ8pHBFhFoXvDgj6QSa3DBBiJv2wZHKVq4snjLNSUjlLLCs3bBUoN9gmtKVtwynkx+8+bO82Tp61hAjvNG2yYSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BSYPIBBvbhQ1YIoGfEmexoBK4XfmyCD7yKFk9G1YL/8=;
+ b=usrfv99BODLXCDJCsl1CeM7xSZZ59SDSdWoxZ6NshKAWLxTjl7oq696vE5PHrvpORB6VXKSji9a7MpH2YUPeRWiwimglrjPPXTB4rptsFRTnPVw+xTGCYVwE5QlkXJ38WzliajHVCXiGz8lIhN2QFRmLq3C1XPi3xCjJI5FmhE7/a1z3fvyWBiF0851mAc7rVJ0DvlJZXWjhzULBP8mBxoE2qpItkoqWJfgQX4a9tP2GnvOzklx+45nJ7vdTjYwV7BypWcQgfoEoG0/PubLVjFE71Jq3p8GQvQJ8kMhwP84A5rLYbptaKlTqjYgq/8j82j5y+HvNHYSSfqgkiJEY4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BSYPIBBvbhQ1YIoGfEmexoBK4XfmyCD7yKFk9G1YL/8=;
+ b=nimkejgQcsjYf30lBlOP0HjFQq7XgfX6JvbamuLdkavsplRiVbxzuDTCue+Ce+UAQaRf+yZ9XnMew9kCUypPYePk4CU1+o/0wHu4JoZ+d7nnSpCzGebWR9EQNdlMHbRThq+/3RPs2GbxmIto8uPKLUY5KONldEEl7b0l3exR26A=
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by CW1P265MB7689.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:219::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Tue, 30 Jun
+ 2026 11:09:23 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0159.018; Tue, 30 Jun 2026
+ 11:09:23 +0000
+From: Gary Guo <gary@garyguo.net>
+Subject: [PATCH v2 0/7] pci: fix UAF and TOCTOU related to dynamic ID
+Date: Tue, 30 Jun 2026 12:09:00 +0100
+Message-Id: <20260630-pci_id_fix-v2-0-b834a98c0af2@garyguo.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMyjQ2oC/22NQQ6DIBREr2L+ujSAFW1XvUdjDOJXfxdiAE2N4
+ e5Fu+3yTWbe7ODREXp4ZDs4XMmTnRLISwZm1NOAjLrEILlUXEnFZkMNdU1PH1blqNFwXqryBmk
+ wO0zxKXvVP/ZL+0YTDsPRGMkH67bzbRVH7694FYwznRem4nkv2nvxHLTbhsVeJwxQxxi/YX7bW
+ bgAAAA=
+X-Change-ID: 20260626-pci_id_fix-83eaec007674
+To: Bjorn Helgaas <bhelgaas@google.com>, 
+ Zhenzhong Duan <zhenzhong.duan@gmail.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ GOTO Masanori <gotom@debian.or.jp>, 
+ YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Vaibhav Gupta <vaibhavgupta40@gmail.com>, 
+ Jens Taprogge <jens.taprogge@taprogge.org>, 
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-pci@vger.kernel.org, driver-core@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, industrypack-devel@lists.sourceforge.net, 
+ netdev@vger.kernel.org, Gary Guo <gary@garyguo.net>, 
+ Sashiko <sashiko-bot@kernel.org>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782817763; l=2995;
+ i=gary@garyguo.net; s=20221204; h=from:subject:message-id;
+ bh=zT8CR1hu18sGi5f9+9wkDL8BzV1/sK8mE83mrlSqGJw=;
+ b=dAL3MZAHGdq/f1A/Dc23e+hpW7HjiDscNeb1WUmBG8M0zwhxEmtW2JcB1Sxda8l9dM4iS5kFZ
+ gXJhrcBh+apDxEs35LdGkfVA7RpAZjzwYT5L+LNlkyJoV121PGaoRjF
+X-Developer-Key: i=gary@garyguo.net; a=ed25519;
+ pk=vB3uIX95SM4eVrIqo1DWNWKDKD2xzB+yLLLr0yOPYMo=
+X-ClientProxiedBy: LO4P123CA0142.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:193::21) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CW1P265MB7689:EE_
+X-MS-Office365-Filtering-Correlation-Id: ad4e9196-c1f9-41a8-161a-08ded6980aa2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|10070799003|376014|7416014|23010399003|18002099003|5023799004|56012099006|6133799003|921020|3023799007;
+X-Microsoft-Antispam-Message-Info:
+	7SMa+fTXpfOFdZ6s7LkS7UxByOX0tObGy59wMJZvQTmdqGlp27HNMD+U0dS+7uqjYhUHqVfXOPfHL+PGotEAAWvhLnxsupcRhJpo8Ka27y7bfLLmYO0CPplRJQ5FA/nYpL8Vy3HbYxEa+PQX0iEZEcz/u9Ad5unoTuJLnPaDbDhlKTCgQcQk3T2Wmp6fnv6u9++23M98Z/fJdFP9XZbE09fE7jFxfROJPQ0xsl9U1XEPXn+XZsXLZmvLolOjwJb2rEcSYZhRG23HAzd+QOk70MjsEZtyRKSLl95xA2rbD+tryBTaFIvER3Tfk+YEF7jPiHnxrpghY/jRgAcxPrRKaNvGm9eu0C0LHAYEP8cItvNhiIPP6M6dOQWTtLoXS/6UAKt2+MT8koo4qRlgPZw32pmgssGqa9+zVN+KMmOmmj2m5+BqFmIjVvCDZTdugKsEmOykboJPWZhqkQk4tXCIYw9WpdtonSAB4hDPlfxyTy6J25nSSX+jh0Xv6jgS3t7epWpM8nQwUzaOWJzBErPmrl7w+sIinUwlMBTEG/IljHxANhG8w6HgY3wIeXFAO1RupQXfnS7mboTUrC7iYlsVp7oU8DxDx+C2rpfXoi/9HZ7TW75cZ2WWuLQgdPAGSMJ6Moe+J1iNn5B2tsmWlnFSPjk0+20qmxHRRcoBWV4aYuQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(10070799003)(376014)(7416014)(23010399003)(18002099003)(5023799004)(56012099006)(6133799003)(921020)(3023799007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UXd0WWFPcWJHSEQzU3FMY29BaDM5a1g3SGFVTUVPSzhPQjY5VzA4Ti9BVXpx?=
+ =?utf-8?B?RFE1VmdISlR1Nkd6MXVyVHJFdFZmOHpuSE1Ba2RJd25rd0RwSHVqRmRjUHNz?=
+ =?utf-8?B?Wmt6RjZUTTZqYk9CVkdUZU5JYXdZNGVVL2ZiTit3b3BBYXp0Zi83YWx5MUht?=
+ =?utf-8?B?d1NXM1FqazBrY1Y2Ull5UVIwQ05rMlpvT2hBWUROc1FoZDQyNHU2NUJmU2Vx?=
+ =?utf-8?B?S1h1WU8remd6ZFh2VVN2cFNhdUZzNzZiN1U5MnQxV083NnY4S3FqRHc3LzBx?=
+ =?utf-8?B?N2lFc25ubDlORVZJWUJmNlMyeXk3NzlTSFdUUUorSEo5RG0razdNQjFENlVS?=
+ =?utf-8?B?dUxmdndIZjA0UmZFWllPd3c5dVVLOG5UdE5ZZGZTaEptUklUbTRxeHBxYmRZ?=
+ =?utf-8?B?MUp6aHhCcjV4M2grcmpaYVd1bnVSTzQzSUt4Uzg3Y1plTmVSVnJjS21RNWhm?=
+ =?utf-8?B?Zmh2cmhKNnBaekJNKzNoT2lLb3gvTkIwVzhLYlRlNmI1SFBDWFBlQ2ZacCtl?=
+ =?utf-8?B?eFp5OHBaQ1hHT0h6NGFwb1VnK3VydzRSalBaRGpHMGl0WFJMK1I5THE0bGM1?=
+ =?utf-8?B?NzZ6K2FaaG9RRUN5RWtKY0g4cHA1ekJCcjYzSnhGQVEzM2pzYm5NdG5SVkw1?=
+ =?utf-8?B?L2lZZFVWWFN0TloxZW5rRmY1V0M1aG0xbldZK2s5eTRZMG9sdTVVNmx6cE9r?=
+ =?utf-8?B?Vks2RGJlSjJRTGhJMEhkZ3hPUXJxMDJCc2Y1eUZsbk1vbDlEUERKRXd0WUdI?=
+ =?utf-8?B?MjBFQ3NoMjlYTlpBUGNkdkg3YURhODdvTU5VR24yYzBLeklCMTF3T0RjaFJa?=
+ =?utf-8?B?YmVEekhlWkFHOHpIbjNrL2xWNURoaUhNRVczZkRMZGsvSUhCaWs2eXQ4eDJO?=
+ =?utf-8?B?aWdjUjFuTXRFc1AyVzkwNWlsUmxRSFlwSEtOQlNidEkwcjdtUE54RU9uOXV4?=
+ =?utf-8?B?TGpndXlMa1RPd2tuSE9wSGJySkowM3NvekJSeXkzK3ZXY3RuZjI0aGM5Tnpr?=
+ =?utf-8?B?VlBKMUZoVjRNYUgzd0hFVEpCOUhrQk56L1VpOFZzbTBNdWhJbEpzVFpqSU51?=
+ =?utf-8?B?RnUyeUsrTzR0TWhqR24vUXIxWkx6b2RNVHJyc2xFVVhQbWJ0bVhOUXBtSWQ4?=
+ =?utf-8?B?djBEcDVGRXZFMzRrdFFmdmlEMk9LbkJVRExqMTdtcjZEOXRKS0RRcjJkbHpk?=
+ =?utf-8?B?ODZ3MmQzWVJTUTdwUVBDNTZ2R3U1bFRuQjVnU1BBYndadGZhMGlvcDIzQUFu?=
+ =?utf-8?B?ekZ3QnBFSDlMZzRBNmpoV3d0NU1vVXBudEV5UDZWc3RZenREYlNNd3RwWTVm?=
+ =?utf-8?B?VVhQUU4zbDFVSUplQ1JnZk5ad05vUG4xTjFDTjVNVS9admorYmF2Q0xNUHhn?=
+ =?utf-8?B?SHAxUWhUTFRYTm9Hc1V3M1pQQWJtc0pLWGZXSEltMTlGRFI5MFlNQW1OSDB0?=
+ =?utf-8?B?WEd2VHNjd2k5T0V3cDBMTEt0dGg5cWxWM2Q5VTN3UVNoSk5mR1cvWUJHRlN4?=
+ =?utf-8?B?NWliOXN0TTZDcjZQUGhRZzAyVWw5WWZFVklWT3FVeFdJUXNvbS9vVzdJVjRW?=
+ =?utf-8?B?Q3VrRDZZMFlKMkp3dEhldkdMd0RYRERCSEN2TG02WXNLZXBjRjl3cXY5MzJB?=
+ =?utf-8?B?NlFqRHl1b01UdEYvZmlmZmRRaEx4OU41L2VYYjBhOXJVeVlRTk5xam82YmRl?=
+ =?utf-8?B?NGxMZHBTMjJyQXNvQUVJaGhOSG5DZ0hiOXA3ZFpQN01iTS9Wa0RhcWdPZFFa?=
+ =?utf-8?B?dEwrZm1Sa1pLSkM4RVpsVGRqZEllU0RXSDlJdnFzYW5GcUpBRFFjVElZVFZZ?=
+ =?utf-8?B?eVN5ajVscGxlbUE1a1BoSWRGSDRZWENGMkl3R29QZFFTMm1MMDlFZm5ua1Zt?=
+ =?utf-8?B?RFhnTjJRTytJYkVNMHpTR0tzdHFONFdneVlWZ3dXWjVSclFrbGp1MHVCTG1P?=
+ =?utf-8?B?YlpHcDhMOWFCWmxEV3k5ZUNnZVRwYk1KY1RUSUd6Rkhmejg4RWF2OHpQSTZX?=
+ =?utf-8?B?bEwwSFg0NUF0WEtVQk9VSTVCUURYblZqcmJJUnVYY05pMWx0TkxtR2RMZEg0?=
+ =?utf-8?B?a2FDTlVYcVppT2k2WUgzd2l6eGp5d3dZeUU4cU9WQmJSRzdFay9JcDJSeTNh?=
+ =?utf-8?B?YlBSekNsb2xTcW1laUlWRDYxRy9MQ3FwbE52Q1lUUUIxYzZBTnRZTjhRMUpG?=
+ =?utf-8?B?N0FJUkhZTG9Mc1ZDSmUrc3lpNG5sM2ZsRVB1Zmc3ZUVrMHRqaUdyVGtudFNt?=
+ =?utf-8?B?UzVod1N2OVpiQ05zQmJNZkQ3MXk5TmRFa1ZScWVsaFdkWXRSUDJlY3NNRUxv?=
+ =?utf-8?B?RERiU1IxcDRsZWI4ekYzYkhkNE1wbFduVldCWDE3ZXBkVlhTNEpCZz09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad4e9196-c1f9-41a8-161a-08ded6980aa2
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2026 11:09:23.5629
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DP3ZlZgnMbqi0CrRn+o1NeTgleT429F+nzcVvt4E+D4tGEIO2cYyvtvUMyCqFDtmxzZbEEA4EpfbcCrFDHsEmw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P265MB7689
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
+	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303100-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[sigefriedhyy@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:sigefriedhyy@gmail.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:donald.hunter@gmail.com,m:edumazet@google.com,m:idosch@nvidia.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303105-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,gmail.com,google.com,nvidia.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sigefriedhyy@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[google.com,gmail.com,linuxfoundation.org,kernel.org,debian.or.jp,netlab.is.tsukuba.ac.jp,HansenPartnership.com,oracle.com,taprogge.org,nvidia.com,lunn.ch,davemloft.net,redhat.com];
+	FORGED_RECIPIENTS(0.00)[m:bhelgaas@google.com,m:zhenzhong.duan@gmail.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:dakr@kernel.org,m:dlemoal@kernel.org,m:cassel@kernel.org,m:gotom@debian.or.jp,m:yokota@netlab.is.tsukuba.ac.jp,m:James.Bottomley@HansenPartnership.com,m:martin.petersen@oracle.com,m:vaibhavgupta40@gmail.com,m:jens.taprogge@taprogge.org,m:idosch@nvidia.com,m:petrm@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-pci@vger.kernel.org,m:driver-core@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-ide@vger.kernel.org,m:linux-scsi@vger.kernel.org,m:industrypack-devel@lists.sourceforge.net,m:netdev@vger.kernel.org,m:gary@garyguo.net,m:sashiko-bot@kernel.org,m:zhenzhongduan@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[garyguo.net:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,msgid.link:url,garyguo.net:dkim,garyguo.net:email,garyguo.net:mid,garyguo.net:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 80C406E36DB
+X-Rspamd-Queue-Id: C88676E3838
 
-Extend the RTM_GETMULTICAST dump test to verify IFA_MC_USERS for both
-IPv4 and IPv6 multicast groups.
+While working on improving the Rust abstractions [1], Sashiko reported that
+an existing UAF issue related to dynamic ID, which I find to be genuine.
+When taking a look at the code I also find a TOCTOU issue where the
+existence check of dynamic ID happens in a separate critical section as the
+actual insertion. This series fix both issues.
 
-Run each protocol test in a fresh network namespace to avoid changing
-host-network state or racing with unrelated multicast users. Join a
-fixed multicast group twice using separate sockets and check that the
-reported user count increases by two.
+There are two exported functions "pci_match_id" and "pci_add_dynid" which I
+have to tweak to implement this cleanly; I created separate "do_xxx"
+functions to keep the existing APIs because they all have multiple users.
 
-Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+There're a few existing users which stores their pci_device_id argument in
+probe callback. This is a bad pattern because nothing except driver_data
+inside pci_device_id is what they want. Actual ID information can be
+retrieved from pci_dev instead. I've used the following coccinelle script
+to find the cases where the argument is stored and converted them to stop
+storing pci_device_id.
+
+@store@
+identifier fn;
+identifier id;
+expression E;
+parameter list[n] ps;
+@@
+  fn(ps, struct pci_device_id *id, ...)
+  {
+    ...
+*   E = id
+    ...
+  }
+
+@cast@
+identifier fn;
+identifier id;
+parameter list[n] ps;
+@@
+  fn(ps, struct pci_device_id *id, ...)
+  {
+    ...
+*   (void *)id
+    ...
+  }
+
+@in_struct@
+identifier s, fld;
+@@
+  struct s {
+    ...
+*   struct pci_device_id *fld;
+    ...
+  };
+
+Link: https://lore.kernel.org/all/20260618-id_info-v1-0-96af1e559ef9@garyguo.net/ [1]
+Link: https://lore.kernel.org/all/20260619170503.518F61F00A3A@smtp.kernel.org/ [2]
+
 ---
- tools/testing/selftests/net/rtnetlink.py | 101 ++++++++++++++++++++---
- 1 file changed, 90 insertions(+), 11 deletions(-)
+Changes in v2:
+- Fix users which store pci_device_id.
+- Clarify in probe documentation about the lifetime of pci_device_id
+  parameter.
+- Dynamic ID conflict check now ignores override_only. (Sashiko)
+- Link to v1: https://patch.msgid.link/20260626-pci_id_fix-v1-0-a35c803f1b95@garyguo.net
 
-diff --git a/tools/testing/selftests/net/rtnetlink.py b/tools/testing/selftests/net/rtnetlink.py
-index 3622413d793d..0c67c7c00d84 100755
---- a/tools/testing/selftests/net/rtnetlink.py
-+++ b/tools/testing/selftests/net/rtnetlink.py
-@@ -2,27 +2,106 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- import socket
-+import struct
- import time
--from lib.py import bkg, ip, ksft_exit, ksft_run, ksft_ge, ksft_true, KsftSkipEx
-+from lib.py import bkg, ip, ksft_exit, ksft_run, ksft_eq, ksft_ge, ksft_true, KsftSkipEx
- from lib.py import CmdExitFailure, NetNS, NetNSEnter, RtnlAddrFamily
- 
- IPV4_ALL_HOSTS_MULTICAST = b'\xe0\x00\x00\x01'
-+IPV4_TEST_MULTICAST = b'\xef\x01\x01\x01'
-+IPV6_TEST_MULTICAST = bytes.fromhex('ff020000000000000000000000000123')
-+
-+
-+def _users_for(rtnl: RtnlAddrFamily, family: int, grp: bytes, ifindex: int):
-+    """Return mc-users for grp on ifindex, or 0 if absent."""
-+
-+    addrs = rtnl.getmulticast({"ifa-family": family}, dump=True)
-+    matches = [addr for addr in addrs
-+               if addr['multicast'] == grp and addr['ifa-index'] == ifindex]
-+    if not matches:
-+        return 0
-+    if 'mc-users' not in matches[0]:
-+        return None
-+
-+    return matches[0]['mc-users']
-+
- 
- def dump_mcaddr_check() -> None:
-     """
--    Verify that at least one interface has the IPv4 all-hosts multicast address.
--    At least the loopback interface should have this address.
-+    Verify IPv4 multicast addresses and their user counts in RTM_GETMULTICAST.
-+    """
-+
-+    with NetNS() as ns:
-+        with NetNSEnter(str(ns)):
-+            ip("link set lo up")
-+            rtnl = RtnlAddrFamily()
-+            lo_idx = socket.if_nametoindex('lo')
-+            addresses = rtnl.getmulticast({"ifa-family": socket.AF_INET}, dump=True)
-+
-+            all_host_multicasts = [
-+                addr for addr in addresses
-+                if addr['multicast'] == IPV4_ALL_HOSTS_MULTICAST
-+            ]
-+
-+            ksft_ge(len(all_host_multicasts), 1,
-+                    "No interface found with the IPv4 all-hosts multicast address")
-+
-+            mreq = IPV4_TEST_MULTICAST + socket.inet_aton('127.0.0.1')
-+            before = _users_for(rtnl, socket.AF_INET, IPV4_TEST_MULTICAST, lo_idx)
-+            if before is None:
-+                raise KsftSkipEx("kernel does not expose IFA_MC_USERS")
-+
-+            s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+            s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+            try:
-+                s1.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-+                s2.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-+
-+                after_join = _users_for(rtnl, socket.AF_INET,
-+                                        IPV4_TEST_MULTICAST, lo_idx)
-+                if after_join is None:
-+                    raise KsftSkipEx("kernel does not expose IFA_MC_USERS")
-+                ksft_eq(after_join - before, 2,
-+                        f"users delta != 2 after two joins "
-+                        f"(before={before}, after={after_join})")
-+            finally:
-+                s1.close()
-+                s2.close()
-+
-+
-+def dump_mcaddr6_check() -> None:
-+    """
-+    Verify IPv6 multicast addresses and their user counts in RTM_GETMULTICAST.
-     """
- 
--    rtnl = RtnlAddrFamily()
--    addresses = rtnl.getmulticast({"ifa-family": socket.AF_INET}, dump=True)
-+    with NetNS() as ns:
-+        with NetNSEnter(str(ns)):
-+            ip("link set lo up")
-+            rtnl = RtnlAddrFamily()
-+            lo_idx = socket.if_nametoindex('lo')
-+            before = _users_for(rtnl, socket.AF_INET6,
-+                                IPV6_TEST_MULTICAST, lo_idx)
-+            if before is None:
-+                raise KsftSkipEx("kernel does not expose IFA_MC_USERS for IPv6")
-+
-+            mreq = IPV6_TEST_MULTICAST + struct.pack('=I', lo_idx)
-+            s1 = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+            s2 = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+            try:
-+                s1.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_JOIN_GROUP, mreq)
-+                s2.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_JOIN_GROUP, mreq)
- 
--    all_host_multicasts = [
--        addr for addr in addresses if addr['multicast'] == IPV4_ALL_HOSTS_MULTICAST
--    ]
-+                after_join = _users_for(rtnl, socket.AF_INET6,
-+                                        IPV6_TEST_MULTICAST, lo_idx)
-+                if after_join is None:
-+                    raise KsftSkipEx("kernel does not expose IFA_MC_USERS for IPv6")
-+                ksft_eq(after_join - before, 2,
-+                        f"IPv6 users delta != 2 after two joins "
-+                        f"(before={before}, after={after_join})")
-+            finally:
-+                s1.close()
-+                s2.close()
- 
--    ksft_ge(len(all_host_multicasts), 1,
--            "No interface found with the IPv4 all-hosts multicast address")
- 
- def ipv4_devconf_notify() -> None:
-     """
-@@ -56,7 +135,7 @@ def ipv4_devconf_notify() -> None:
-               f"No 'forwarding on' notificiation found for interface {ifname}")
- 
- def main() -> None:
--    ksft_run([dump_mcaddr_check, ipv4_devconf_notify])
-+    ksft_run([dump_mcaddr_check, dump_mcaddr6_check, ipv4_devconf_notify])
-     ksft_exit()
- 
- if __name__ == "__main__":
--- 
-2.43.0
+---
+Gary Guo (7):
+      ata: don't keep pci_device_id
+      nsp32: don't keep pci_device_id
+      ipack: tpci200: don't keep pci_device_id
+      mlxsw: don't keep pci_device_id
+      pci: make pci_match_one_device match on ID instead of device
+      pci: fix dyn_id add TOCTOU
+      pci: fix UAF when probe runs concurrent to dyn ID removal
+
+ drivers/ata/ata_generic.c                 |   6 +-
+ drivers/ipack/carriers/tpci200.c          |   1 -
+ drivers/ipack/carriers/tpci200.h          |   1 -
+ drivers/net/ethernet/mellanox/mlxsw/pci.c |  11 +-
+ drivers/pci/pci-driver.c                  | 219 ++++++++++++++++--------------
+ drivers/pci/pci.h                         |  36 +++--
+ drivers/pci/search.c                      |   6 +-
+ drivers/scsi/nsp32.c                      |   8 +-
+ drivers/scsi/nsp32.h                      |   8 +-
+ include/linux/pci.h                       |   1 +
+ 10 files changed, 166 insertions(+), 131 deletions(-)
+---
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+change-id: 20260626-pci_id_fix-83eaec007674
+
+Best regards,
+--  
+Gary Guo <gary@garyguo.net>
 
 
