@@ -1,159 +1,158 @@
-Return-Path: <netdev+bounces-303371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id n9iLAMI3RGrNqgoAu9opvQ
-	(envelope-from <netdev+bounces-303371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:40:18 +0200
+	id GLaJFLM4RGr/qgoAu9opvQ
+	(envelope-from <netdev+bounces-303372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:44:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6571A6E82C3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:40:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C93A06E8304
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:44:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hvKTMsSL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303371-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303371-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=intel.com header.s=Intel header.b="In/F0pO6";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303372-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303372-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 36BC53023E0C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:40:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D93B530102C0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 21:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225F23009D4;
-	Tue, 30 Jun 2026 21:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDEF431F9B3;
+	Tue, 30 Jun 2026 21:44:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C996326F288
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 21:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C193191BD
+	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 21:44:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782855609; cv=none; b=GqjY6t8+zIzJzn6izuTCh5bZU8/9Ex2/8jncNavWLDnwN/zHVmMkUGSBmjPCiHHBjGHrMAyfXcuHiwf/iYqvHZU6K0WIoyu2OpIK+emcz0LI84I12NNGZTzI4yFXkWYQBnb4ULvLs6P53ze6cmlApnI5Nb1SgoTAXKfbK5eZHPI=
+	t=1782855853; cv=none; b=oVMqh6st/VoEEdvmdiK7P5wWifwjjfMV92COlJ0uFtzg3+JR5LMgY8VxbpsiPqBq8q7xycU78RL0HhjoiHAH1h8paqBbSmKDyq3uNxxZiX0tvjQDqO/o+NNH539IGUCs9G/6oPdQCt/8i6OoKX7sTB9BRDViSKyobRyIPtbpsIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782855609; c=relaxed/simple;
-	bh=La2xNvf/TCB9nBGYKaS8YDOIJOCNSEjb9+oJx13QQCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mI3hA1st3n3wX2clCo1Ez09ElUGlI6vMzG3iHA62YggQNfuxeE9cInNpQf51nt72dTefxae8feCccbVRJjw7jzi0D36vVjgkErtDOC+C8IP7iGXvLFdj99kGchM8VVPEQBuenxYyoCLqOCJqUhtCOT3NARffZNDAl4UrcfpPoAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvKTMsSL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881421F0155C
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 21:40:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782855606;
-	bh=La2xNvf/TCB9nBGYKaS8YDOIJOCNSEjb9+oJx13QQCM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=hvKTMsSLWpQ7iwnKPdGvgwo9HJsX1KaQ0ubrkEyF6jRtv6mdeKaQvRSrk8mJbQzxW
-	 ig6k3MT8xKA+lTAcOlkAAOJcWdXKrFmGykfXLZNsJrC4ZUwxYU8idfhr4PDNNRiJQl
-	 dL4jtvbz1PpTkasUpdlMtraBeP+0Obg7Sy1MnUWXzAfKz9u+WjtyjvDJMWkxSdE48F
-	 JlrnDpUpZ2kdUZnpGkFx0rw7VpM4s3JAFfKvDSckb101eyILjgH9sF32uBzeJUlAqw
-	 rc0o03G7Elsp6K6Z1gVl7D5Bnr8tmbDdWDEdfx3fznr2bRRsBeoZllbucPhSQwYNf0
-	 zkw1ib+Apn52w==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aeb2bc82ccso3526976e87.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 14:40:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpJSzO67CfoHmPec/4YQ0ZY5i+/mr9jiSp2fe2zCULjGAPK9pXMKtxbE2TB24m6oMFoeRBLOKU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZsY9WsOW3hCYxFrk0NaqIDFWBhKjFqNnedb7E6aO98v6duae0
-	R099ZEo1yCssaoUhWQ3J82E3I5ESV0UUp8rIbuauNA3VT4Uv1tIFhGBoDs5S7MRVMNcigmFi3WD
-	9NMH5K3+p3uAxH6UXYZBkAm8brCGMTb8=
-X-Received: by 2002:a05:6512:3d19:b0:5ae:b604:4c9 with SMTP id
- 2adb3069b0e04-5aebdbc9489mr1240118e87.65.1782855605213; Tue, 30 Jun 2026
- 14:40:05 -0700 (PDT)
+	s=arc-20240116; t=1782855853; c=relaxed/simple;
+	bh=DB8Jy0O/QAKj2WKj3i2mZ5XNjpKqc3Atmbbw6HZZJb0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=usTM1Q1YHX9NKmeOW7Vkdm39SoBsRLb4cciuF7FxEVdw44kn3yfHvd+ccXxZf2c6h8y8uOV2/a9dOHOic9Jd1MoVskhWYiLN2srTCRS7Dg3AwhKxnlsbcoYrq94Bomn15i5zHTVne/u1yfENIcDkvy1jBbP2HpafSE6W+TfQdzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=In/F0pO6; arc=none smtp.client-ip=192.198.163.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782855852; x=1814391852;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DB8Jy0O/QAKj2WKj3i2mZ5XNjpKqc3Atmbbw6HZZJb0=;
+  b=In/F0pO6Z5D+9ZpumiJxNw1KeGiwd3bpcsLnAsEJjaAUOMPl7UdxCI6v
+   n/c5BEJXr0A94zYiBC24ZjQlKO9IBH+ggXn2l6IYwsL2pqt+ngayttYGx
+   +cFI49/KHxYJlEzpciOXWQul/W2l6bPyrhaim1jWm0N2H9iAKT1RLlA5u
+   c7g26Xkxqehv6Qk2A+d6T4MDAYKwreVW/LCyI4G5hN96MJRZGD8swuLPl
+   O3FGaI7gN1MHemV4ZIZcktzqjW9H0Us7jb0xWgeQVw5agXFXS1yeM/47O
+   5qWKKIW+NFXAzKW9JcMJAOt3ArpFe2L4LcpNRisPoOLOunfb2efeCJwgu
+   Q==;
+X-CSE-ConnectionGUID: voFcKybWQ8KjUz5WXx0B9A==
+X-CSE-MsgGUID: NH1tbBu+Temy+Vv1sXL4NA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="83637556"
+X-IronPort-AV: E=Sophos;i="6.24,234,1774335600"; 
+   d="scan'208";a="83637556"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 14:44:11 -0700
+X-CSE-ConnectionGUID: yIadeugfQh2tXxy7Gqyt9A==
+X-CSE-MsgGUID: 0Hq0ln96TAyT6ZEYM7+rAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,234,1774335600"; 
+   d="scan'208";a="254296564"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa004.fm.intel.com with ESMTP; 30 Jun 2026 14:44:11 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates 2026-06-30 (ice, idpf, igbvf)
+Date: Tue, 30 Jun 2026 14:43:58 -0700
+Message-ID: <20260630214404.930923-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260629132633.1300009-1-arnd@kernel.org>
-In-Reply-To: <20260629132633.1300009-1-arnd@kernel.org>
-From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 30 Jun 2026 23:39:50 +0200
-X-Gmail-Original-Message-ID: <CAD++jLkpTa4hxNRscbiFFKZTM28ThuJMo1f3SX96LheC8L5BEQ@mail.gmail.com>
-X-Gm-Features: AVVi8CfBoAND9VanduyO4lm3tElbURSYx2nmpdkO8PSRH7aiVql7RmWg2jM4Qb0
-Message-ID: <CAD++jLkpTa4hxNRscbiFFKZTM28ThuJMo1f3SX96LheC8L5BEQ@mail.gmail.com>
-Subject: Re: [PATCH 00/13] treewide: replace linux/gpio.h
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
-	Gregory Clement <gregory.clement@bootlin.com>, Frank Li <Frank.Li@nxp.com>, 
-	Robert Jarzmik <robert.jarzmik@free.fr>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Greg Ungerer <gerg@linux-m68k.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Hauke Mehrtens <hauke@hauke-m.de>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
-	Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Dominik Brodowski <linux@dominikbrodowski.net>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org, 
-	patches@opensource.cirrus.com, linux-m68k@lists.linux-m68k.org, 
-	linux-mips@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-media@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-phy@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303371-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:arnd@kernel.org,m:linux-gpio@vger.kernel.org,m:arnd@arndb.de,m:brgl@kernel.org,m:andrew@lunn.ch,m:sebastian.hesselbarth@gmail.com,m:gregory.clement@bootlin.com,m:Frank.Li@nxp.com,m:robert.jarzmik@free.fr,m:krzk@kernel.org,m:gerg@linux-m68k.org,m:tsbogend@alpha.franken.de,m:hauke@hauke-m.de,m:zajec5@gmail.com,m:ysato@users.sourceforge.jp,m:glaubitz@physik.fu-berlin.de,m:dmitry.torokhov@gmail.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@dominikbrodowski.net,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-samsung-soc@vger.kernel.org,m:patches@opensource.cirrus.com,m:linux-m68k@lists.linux-m68k.org,m:linux-mips@vger.kernel.org,m:linux-sh@vger.kernel.org,m:linux-input@vger.kernel.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-sunxi@lists.linux.dev,m:linux-phy@lists.infradead.org,m:linux-rockchip@lists.infradead.org,m:linux-sound@vger.kernel.org,m:sebastianhesselbarth@gmail.com,m:dmitrytorokhov@gmail.com,s:li
- sts@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,kernel.org,lunn.ch,gmail.com,bootlin.com,nxp.com,free.fr,linux-m68k.org,alpha.franken.de,hauke-m.de,users.sourceforge.jp,physik.fu-berlin.de,redhat.com,dominikbrodowski.net,lists.infradead.org,opensource.cirrus.com,lists.linux-m68k.org,lists.linux.dev];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303372-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,intel.com:mid,intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6571A6E82C3
+X-Rspamd-Queue-Id: C93A06E8304
 
-On Mon, Jun 29, 2026 at 3:26=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
-te:
+Aaron Ma adds a wait for reset completion before returning from resume
+on ice driver.
 
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> The linux/gpio.h header used to be the global definition for the gpio
-> interfaces, with 1100 users back in linux-3.17. In linux-7.2, only about
-> 130 of those remain, so this series cleans out the rest.
->
-> In each subsystem, we can replace the header either with
-> linux/gpio/consumer.h for users of the modern gpio descriptor interface,
-> or linux/gpio/legacy.h for the few remaining users of the old number
-> based interface.
->
-> All patches in this series can get applied independently, so my
-> preference would be for each subsystem maintainer to apply these
-> directly, with the rest going into the gpio tree at some point.
->
-> The final patch here obviously needs to wait for all the others
-> to get merged first.
+Dawid completely disables and clears VF interrupts during reset on ice.
 
-This is helpful.
-The series:
-Reviewed-by: Linus Walleij <linusw@kernel.org>
+David Carlier adds handling for a NULL adev when reporting MTU change
+event for idpf.
 
-Yours,
-Linus Walleij
+Matt Vollrath removes incorrect decrement of count which could cause
+leaking due to off-by-one issue.
+
+The following are changes since commit 2a00517db8de4be7df3d483b215c5544fb30a191:
+  bridge: stp: Fix a potential use-after-free when deleting a bridge
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+
+Aaron Ma (1):
+  ice: wait for reset completion in ice_resume()
+
+David Carlier (1):
+  idpf: handle NULL adev in idpf_idc_vdev_mtu_event
+
+Dawid Osuchowski (1):
+  ice: fix VF interrupts cleanup
+
+Matt Vollrath (1):
+  igbvf: Fix leak in TX DMA error cleanup
+
+ drivers/net/ethernet/intel/ice/ice_main.c     | 10 +++++++
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 27 +++++++++++++++++++
+ .../ethernet/intel/ice/ice_vf_lib_private.h   |  1 +
+ drivers/net/ethernet/intel/ice/virt/queues.c  | 21 +++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_idc.c    | 11 +++++---
+ drivers/net/ethernet/intel/igbvf/netdev.c     |  2 --
+ 6 files changed, 66 insertions(+), 6 deletions(-)
+
+-- 
+2.47.1
+
 
