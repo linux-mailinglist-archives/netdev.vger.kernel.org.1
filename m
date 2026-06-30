@@ -1,151 +1,171 @@
-Return-Path: <netdev+bounces-303038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303037-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Uo7oHliBQ2rHZQoAu9opvQ
-	(envelope-from <netdev+bounces-303038-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:42:00 +0200
+	id sqUKDT2AQ2qbZQoAu9opvQ
+	(envelope-from <netdev+bounces-303037-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:37:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7651C6E1BDB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:41:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EBC86E1B8B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 10:37:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=chelsio.com (policy=reject);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303038-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303038-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=Wbfs4TxI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303037-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303037-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9B29F3007283
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:41:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ECA71300AB34
+	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 08:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF062D2486;
-	Tue, 30 Jun 2026 08:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C341E5724;
+	Tue, 30 Jun 2026 08:37:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stargate.chelsio.com (unknown [12.32.117.8])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8636B2D0C82;
-	Tue, 30 Jun 2026 08:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D9B19067C;
+	Tue, 30 Jun 2026 08:37:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782808916; cv=none; b=aJbCM9w+n85uLI3X58JSntmV4cT1er8j9Mm0RsVF+cgJwvIqIGJ9AAbqdmGJcysp0S2Y8CmPjZSeJ+p/7Px7oKhdoy8pBH2nAvlm3sgY86pz7ANTZN9J6nnziUo7wPUlmHMXPpT4ErYNIPR19vdRcDlCCrkDCbQhA87sosHj/gA=
+	t=1782808634; cv=none; b=eWS60Epfl+WxZdvy7S8fzm/2hkiSbe3UOvSPfLSYMrJZMVpTDnPDZbBbe80Snt7qRKG4Imbtw6Kb9AxXkikxNmiD43khFaMe5qZXi2w+MdEOlaRDGGZ5C93vgk0o50LzRQvAede1WWkfOC2s45DjoGSBAefhEmDgGAOWXNki/js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782808916; c=relaxed/simple;
-	bh=87u65cYfvDzYnS7FJ4gbEX79iiGZMqB5TqN9Adkcvrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Phv4FUxVjF4ip+/izntER2QaWzMWZacjS1sgihuxnnIP7XSV80rhrM462ZjcvRlZmBEFYjZ8Rxd1bQBwT+pbmzBScUR9oBgquDSeAxaB6UhP8W53ajeSBWK5N4b1VBUDV0ALeIf3BWj7531YuUAjTsA4gpP/A3yEEASwj09RcO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
-Received: from localhost (bharat.asicdesigners.com [10.193.191.32])
-	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 65U8ZU57017800;
-	Tue, 30 Jun 2026 01:35:32 -0700
-Date: Tue, 30 Jun 2026 14:05:20 +0530
-From: Potnuri Bharat Teja <bharat@chelsio.com>
-To: Markov Gleb <markov.gi@npc-ksb.ru>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net] cxgb4: Fix decode strings dump for T6 adapters
-Message-ID: <akN/yC11CPSPV0Kv@chelsio.com>
-References: <20260629130856.1168-1-markov.gi@npc-ksb.ru>
+	s=arc-20240116; t=1782808634; c=relaxed/simple;
+	bh=aooLG63bV4zknygq7xk22oDT4j7FegkFgEwk2Un2eec=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nx+4oZTmhbUZO2dyoZgU174G+Q+nJvw0kph2DQRZkRJC0PpJefQ85KG9cQLIqXUpnK+sW4pn37a0pDtUoVBUQ0KiaMxsnsixa1JAgZ/8cKoMWR9po8b69PvS+LunSC5ScIzZRY6HeMmCR7aKfNqclfcdt1kbXYAcBOUaIbiIcSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Wbfs4TxI; arc=none smtp.client-ip=185.246.85.4
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 6403E4E40B94;
+	Tue, 30 Jun 2026 08:37:09 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2F9A160233;
+	Tue, 30 Jun 2026 08:37:09 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 77EC2106F1C74;
+	Tue, 30 Jun 2026 10:37:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782808628; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=fd/QA6acfgIrDHgg6VpbFw+QypozMGr8wd9fRrr3/8Q=;
+	b=Wbfs4TxI74pThMevE/iwEHtgj27864fo5QxSfoWLoOsGVI9u8NDKPR6j4KnxsiEZsW1KBJ
+	mlVGDH993x+KgcgiAi3XEnUEgnEUcrY0X4KyJSRWx/WAOg117a0d0qZzF5Dk1yPvNA5tNp
+	RIZqAMPsLpLiWq4ZgfgoefLZZDN1pH+yKPkGC5eluWuWwVlP7jEFmQewnaO2A+sx62Rrid
+	kVzXMpfnBNaEbYFrPY4X51Mq7nEN3u8XJJm/kZ+F5e/dAY2YqxHJ7/8zpqUg+G6hi4ippT
+	vdkSbEe8DGir749qvy0+x/rztAfCPMPVL/PwTyXHBzybeJj/C0uMJcmIMTvG3A==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com
+Subject: [PATCH net-next] net: phylink: Drop references to the .validate() method in comments
+Date: Tue, 30 Jun 2026 10:37:00 +0200
+Message-ID: <20260630083700.2041915-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260629130856.1168-1-markov.gi@npc-ksb.ru>
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.04 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[chelsio.com : SPF not aligned (relaxed), No valid DKIM,reject];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303038-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:markov.gi@npc-ksb.ru,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303037-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[bharat@chelsio.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bharat@chelsio.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,npc-ksb.ru:email,linuxtesting.org:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7651C6E1BDB
+X-Rspamd-Queue-Id: 9EBC86E1B8B
 
-On Monday, June 06/29/26, 2026 at 18:38:54 +0530, Markov Gleb wrote:
-> From: Gleb Markov <markov.gi@npc-ksb.ru>
-> 
-> Depending on the value of chip_version, the correct decode set is selected.
-> However, the subsequent matching with the t4 encoding type in the if-else
-> block results in a reassignment, which leads to the loss of support for
-> t6_decode as well as reinitializing of values t4_decode and t5_decode.
-> 
-> The component history shows that the if-else block previously used for
-> this purpose, as well as the execution order, was not affected by the
-> change.
-> Furthermore, it is suggested by the execution order that the scenario with
-> overwriting and loss of support will be implemented.
-> 
-> Delete the if-else block.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Fixes: 6df397539cb0 ("cxgb4: Update correct encoding of SGE Ingress DMA States for T6 adapter")
-> Signed-off-by: Gleb Markov <markov.gi@npc-ksb.ru>
-> ---
+The phylink_mac_ops '.validate()' has been removed in:
 
-Thank you, This redundant code can be removed.
+commit da5f6b80ad64 ("net: phylink: remove .validate() method")
 
-Reviewed-by: Potnuri Bharat Teja <bharat@chelsio.com>
+There are still a few comments around in phylink that references that,
+related to the ports fields as well as the Pause configuration. Let's
+drop these references and update the comments related to Pause handling.
 
->  drivers/net/ethernet/chelsio/cxgb4/t4_hw.c | 8 --------
->  1 file changed, 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-> index 8d719f82854a..f3e8153a7a0b 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-> +++ b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-> @@ -6735,14 +6735,6 @@ void t4_sge_decode_idma_state(struct adapter *adapter, int state)
->  		return;
->  	}
->  
-> -	if (is_t4(adapter->params.chip)) {
-> -		sge_idma_decode = (const char **)t4_decode;
-> -		sge_idma_decode_nstates = ARRAY_SIZE(t4_decode);
-> -	} else {
-> -		sge_idma_decode = (const char **)t5_decode;
-> -		sge_idma_decode_nstates = ARRAY_SIZE(t5_decode);
-> -	}
-> -
->  	if (state < sge_idma_decode_nstates)
->  		CH_WARN(adapter, "idma state %s\n", sge_idma_decode[state]);
->  	else
-> -- 
-> 2.43.0
-> 
-> 
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/phy/phylink.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 087ac63f9193..59dfe35afa54 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -153,8 +153,7 @@ static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
+  * phylink_set_port_modes() - set the port type modes in the ethtool mask
+  * @mask: ethtool link mode mask
+  *
+- * Sets all the port type modes in the ethtool mask.  MAC drivers should
+- * use this in their 'validate' callback.
++ * Sets all the port type modes in the ethtool mask.
+  */
+ void phylink_set_port_modes(unsigned long *mask)
+ {
+@@ -2095,9 +2094,9 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
+ 	/*
+ 	 * This is the new way of dealing with flow control for PHYs,
+ 	 * as described by Timur Tabi in commit 529ed1275263 ("net: phy:
+-	 * phy drivers should not set SUPPORTED_[Asym_]Pause") except
+-	 * using our validate call to the MAC, we rely upon the MAC
+-	 * clearing the bits from both supported and advertising fields.
++	 * phy drivers should not set SUPPORTED_[Asym_]Pause"). MAC drivers
++	 * set their support using the MAC_SYM_PAUSE and MAC_ASYM_PAUSE
++	 * capabilities and must NOT change the phy's pause settings directly.
+ 	 */
+ 	phy_support_asym_pause(phy);
+ 
+@@ -3931,9 +3930,9 @@ static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
+ 	/*
+ 	 * This is the new way of dealing with flow control for PHYs,
+ 	 * as described by Timur Tabi in commit 529ed1275263 ("net: phy:
+-	 * phy drivers should not set SUPPORTED_[Asym_]Pause") except
+-	 * using our validate call to the MAC, we rely upon the MAC
+-	 * clearing the bits from both supported and advertising fields.
++	 * phy drivers should not set SUPPORTED_[Asym_]Pause"). MAC drivers
++	 * set their support using the MAC_SYM_PAUSE and MAC_ASYM_PAUSE
++	 * capabilities and must NOT change the phy's pause settings directly.
+ 	 */
+ 	phy_support_asym_pause(phy);
+ 
+-- 
+2.54.0
+
 
