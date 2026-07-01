@@ -1,165 +1,219 @@
-Return-Path: <netdev+bounces-303547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303548-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id I4IZMNbWRGpP1woAu9opvQ
-	(envelope-from <netdev+bounces-303547-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 10:59:02 +0200
+	id nNkSM+PYRGoa2AoAu9opvQ
+	(envelope-from <netdev+bounces-303548-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 11:07:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A1D6EB60F
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 10:59:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ED876EB755
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 11:07:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=a5p+6Lt+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303547-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303547-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=ragnatech.se header.s=fm1 header.b="zb666/DC";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="ZD/hwl9R";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303548-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303548-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ragnatech.se;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9E637300AD9A
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 08:58:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5EEF8302A7E7
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 09:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC363EE1FC;
-	Wed,  1 Jul 2026 08:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEB03F23D5;
+	Wed,  1 Jul 2026 09:06:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29193603E9
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 08:58:54 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782896335; cv=pass; b=hYL/+oREEc6d84A5FUdSksb/Sv8g9KVUWe0X9eIFVvQPbnxxNH9QF51JXVhJ37WO0y81EZoV4jqnM7uVTfq91iRhXm29OwVBXwu1n5poX3xSWbLZgmp8rpRSTMk6Y3pGt3NjXyJkcqbrp1WHdWl3P8rkZAsYSPh9SjTi5+t2+tE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782896335; c=relaxed/simple;
-	bh=sqKBSuTZ+7jhHsloBIo37CW++VR7xfCKmMq1YQyy6A0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r17DYjrHivInLrSt1s71Am562WDCdyAnbvTHyYR7FtI8tMyQKMkP4hfRQGJYOtbP4HDxi5/mNhYkMk9xTRmI1YAZ2vdaqsbE9Gdcl3VIfDu3OzyZMFvBMr1R6wx7lw7WRhkZJHfalmnpSef8zxAeiKeD3lCn0M7wfb3Xi30TXsY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a5p+6Lt+; arc=pass smtp.client-ip=209.85.160.176
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-51c10e86e52so159161cf.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 01:58:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782896333; cv=none;
-        d=google.com; s=arc-20260327;
-        b=DJHCRRQsCfiPPwV5weBjmAB4tWNIGHHNxdlR7+wV3D3dxiH09qgmz6QqsAHouVRl6L
-         sY5oGCij2xz0smdG5mN+EcyrG94p/B/L+tIvghVhNpM9a0sTaf0sDglyhc3SDrZEewOl
-         kiMZKQ0boAdL6XKwnp3aFNdODOYv/lncLDIlEuT8nSwuG/QCVAXvi7bkuQzpqJ2AS4Rb
-         WJOI8ruCPAu3vmH71rOXfbkfpZb0tuINrrZd6dzlswMeiPKKeSB+SwdkL6B/asXqxqEv
-         ii5bUScp+z8k2Bczjf/qLZbjxEoRPgmn9WApwzMz6EMvW+81VjJNBsyd+XgSCIbHxhYs
-         33gg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=sqKBSuTZ+7jhHsloBIo37CW++VR7xfCKmMq1YQyy6A0=;
-        fh=7LjqgKv/3WKR1wwxkZfgLnMRZNSCLQEqK4TLqbbwaWg=;
-        b=bYIbHj3VWhqEpbWwMrwlBB4qmMxso2IgsNTEyYoGoFgpWqsiZxO/ps16c4/O5et2B7
-         XyvbC5vcavBSQMztF3Y/MWg2dZXQWV5Fs9BVURxRK8i1PTDrJQ9q1HGENWnMgYtXojg5
-         r6IRfAD4aqbR1Ql/xWuy0tA3dU4jSF2QfWMuxhuLrx4o730lr7ctF+yv0OYJS9c2Hyyx
-         uN5LJWdxtVaVLK61fsHnZaashPqcSsq8UL6F/jZfE+MFGvOBvs98RAHhn57XeZN9kP+p
-         dnTEfF9er27mncNceFoU1Z90MHP3vRA1IROUMkvvaF1IuXLP7x2MsoMwG3ksfP6JnPld
-         Lb6A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782896333; x=1783501133; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sqKBSuTZ+7jhHsloBIo37CW++VR7xfCKmMq1YQyy6A0=;
-        b=a5p+6Lt+hoMv9LkRbad299jZW2WuKre4zcaaJL4Vnp5wDc5L18twLyTXlt5gMko5wT
-         ILm4ELEVvtffyLvZmFyHVuHZ2sOmF6ULm1eIhkW4MEshfmMZif6glwUwVgRsHn3K1xVZ
-         CGacqc6MBo0PKMs2t2lMfcWKkGltpHqrhqMdPfXC0WEwlQgCOJTKOtiAn/J1lw/MYh/2
-         XzDYIgZmRj7yUSODj1Iq3W4mv6UApug9x3O2sdC9Q+vHrtbqUlGzzQ0cddneRqVGMLMk
-         Z1mvrjU8LqCFKLliFz3pm8ftbxkrEz03Xnv/4Lhprx0LBtIMxNv/FL2VPMX8SSDe1bMX
-         UCzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782896333; x=1783501133;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sqKBSuTZ+7jhHsloBIo37CW++VR7xfCKmMq1YQyy6A0=;
-        b=EabzVRfBDyNjO5DbqKfsA0/RNIDs787r1X6+v0VYQdCp3MPxtqjBDpaEjoaSYAp8CX
-         SDcQ8o24jesWzF+MYoHwvk7c5dqjRI2tJFQz80GNGj84THya+hoFxMz4PEzZdHN63fA1
-         ESamUMuhshw3E1h7ZN/cIe9gXr5SrmtlwVoCC6PLl+lbtNcmGE+k/BPGZ9Mz3eGtKIe4
-         3H9yTgKZafC1suFBQddlbpmGInDf3kwvMOIehyAE3Gyzg0//Ib6ZKq3F82rW9o6jX5py
-         SfXSfkUDsHIgfL0nFR0G5jQ7d2zAJxHSJ8wEiZ0bNWg3dLgk3o7scTnO21MfPMygffw9
-         WEuA==
-X-Forwarded-Encrypted: i=1; AFNElJ/NcqSBXCPYKGn2fhZ1MZWHCff/Rg4eVXJUv08KyVBCDU+so3kFto3b41QYIPZUooXLMipVp8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEUr65AzYEStmsLJQ2nufrruFSf097JN/SB3uQ7pMW7wJOEsfX
-	L+Hl4HeGM6ln+PefU9qsVUhiLsFtNqPUQzkkkxQSDZ86am+WOo2AWcRrsDB03LsCVvbIImT0hIX
-	ktyUh/rCf6D4zO2TSJXwrv88mv7uIImarwscuArRt
-X-Gm-Gg: AfdE7cmMRmVRSr7Rhfo0aYuO7p7N7aWPBifgYxD52MEikHDxfKFdBqYMqZjD1gXa+mV
-	jCmfjoG12EZn/EyBTGPZm4g2zJnhiSgtylokL94g1f3CFdx9WllWCrOgpAiWq3QTz8AZLfpC8GN
-	wJM7gSe48SI74MUtLLp4UFpNc2aWzg9Uobkmr1iCB3VuuVTkd/15OVHfJSTByrMM1xsa2aNyqTF
-	M7a2Vy5sPFb6MM3zSwmMovBkQcCoPryLo5fsEDp2Fr2+b8F+uBPtXGYV08q2nRm0MmaqSK0vp7J
-	lC0nLCDIMejqWdECoJyj280eyeHJuBfMvriq0/BarBERrZAgEk0HxUohFQ==
-X-Received: by 2002:a05:622a:1489:b0:51c:289:6979 with SMTP id
- d75a77b69052e-51c24ad22dbmr4359061cf.21.1782896333014; Wed, 01 Jul 2026
- 01:58:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375763EF0C9;
+	Wed,  1 Jul 2026 09:06:30 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782896795; cv=none; b=pTbY8Xbd19aCclm3QZq3KGKNAORfVFqx1xuQiHD+2eV5OPR/DwCa1hIGVTzDo9h36+YobkN/iKb1cPW9R1+S+3VgFahswjkoBuTbHqHSX5IchqMGT7zmEbb3sG7WinNYZG6QPMeSCFFh0vxamHCu4WcClAEgpkbLkgDN7FZ+kNQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782896795; c=relaxed/simple;
+	bh=a+zCYslTwctUlC57LcXB9oxyfds+8RQag5BpzcB63UY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UmcNoSj7xsp7dFk4DKa8lQjtRzrV3rULanyALiGdy2plvSPNAWWa+BKMFyKP0vXW8CZpJFtvqe9qfn25Niypg2JudGyREsFlQQHzwazeNkInBnHOWCSvUQ8Z9GHE/4UWK86I0bLWqG2F5nTVDOOmAzmIa+VJx4FhYENgLlUGOrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=zb666/DC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZD/hwl9R; arc=none smtp.client-ip=202.12.124.154
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id E38A47A0023;
+	Wed,  1 Jul 2026 05:06:29 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Wed, 01 Jul 2026 05:06:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm1; t=1782896789; x=1782983189; bh=xl
+	Zj2IWS/yEA6l0YeXQHz6alZLDpsMjmTq7ALHs5DH4=; b=zb666/DCHWlohGfoHv
+	kbTFenalCDnrm5i4G4uIleBfTT7NFDkJGhY+shX4oXdVvAr71Os50UuiwZrN3C4r
+	alM0nQ3hChrjKb2qymyPnYD86MWWqB+nS5fnPswMWpkVORFHYi2iVf6f4gNhj+08
+	CA2I4O9QLM84BXRlFdN8VaNF0iYelQa9vciiLkHWnOIcLziL2ccyAK6NSgs8Dqcu
+	ByCPvY0mGSCPIhiTnkm9Wigxxh+zw+uY/w8hAHMVU9ja7Ms1Yy8ZkfpXnjM/dRAu
+	RIFt4beqhRsJ4mNhkKJEaqR/RugOxWSMxd2BTFKR0oXz8ak2oHHZyBp+qR3e/8Sw
+	wUZw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1782896789; x=1782983189; bh=xlZj2IWS/yEA6l0YeXQHz6alZLDp
+	sMjmTq7ALHs5DH4=; b=ZD/hwl9Rp73GrQld64ORoxQIruQzgekiJ82SvgvXfMDr
+	bqkoEWJyqkPbCpbDillF6jRwZ1VNzaCAPlbU6AInnVCEK5cIVChQiS87TBjFCXa9
+	MyOg4gtaxhO6FtcnMTfvo3IaNDTqMASWTMov7HWIqKm6G7AeUS3vGaDh2hvEuCdI
+	kSNhyJcNKkIbL5rzZEEaQtm45+ABtStYDMoHbOUZtvnVzr2pO1on7XLnf9l6xEgy
+	eJMYpiQ804fPy5PvPe3Bbi3zxotJBr678+IPRXXfCgiVdKm7FlTXKbckHikWwM6P
+	7qOJJtfNPFYTPQ6x4FsG5nh1z5YvJXq8RtCEBzd9xA==
+X-ME-Sender: <xms:ldhEahbKEOL3bP5wazLu1dqdWLIoynxkB9BIH7zc2YDj1q8Ixs7yFw>
+    <xme:ldhEam4NhJbx96cs44q6FdOKBaYr_08rutrSOMy4TRdYNHlmsRCAHfsWvEIvcoqrN
+    3D6xRBf4yLdY9E3xuo9SvfodZ4Wdbcg0V0fhMrZicUEK0TGCMzWb8E>
+X-ME-Received: <xmr:ldhEaqynrvWD0eSoj2taQCCFeN2nVefWIzn0i1QDPugE2MYuG6zRvixEijaYUxPTZJRhrUfKBHktalHoyc91TKhdW64fIkQ>
+X-ME-Proxy-Cause: dmFkZTEHujSBr1tDaokBlMPhjd6bwLitmOzJH4SPn38E53cEG/mtMfseyYzpcFUtwkBqlR
+    246XuYVy3uWfXg1U/HJhaQgnhi+rCVaNEtGRTLBxdeikAQ6pDYFkLdbgBzunYATlvaw/BM
+    prgy6iCYv5g/tuExxyE+3eMmfTLtQRNv51ssgN+lHoKT+t00YR0VmrABAFvOb2kzoGhqY+
+    nWbiS42JRSONB12mGApxDlCuwfeTiCmXEI2AOCK8MBsPHMikxalIbnaH8XtO+Yi34liHiM
+    X96kLJb/Tw0mVlXh1CoVbsj21e9gIrYmIf82uv9K/TlXv5aqM+o/OxCU70Mciqgloy1SDM
+    C4ynpVi/wzlPp+4dmvhOt5SAK8TFxRoJkfTuihD/1c0vrpn2LzV3Zz6NeptosYGjMbYsow
+    UTryaM+G6+zBsIlzhUhvDQSw9FtyAdHXLhb5BxNDDwvnOLvp0cPoSEtceZp/iUeN0daC9+
+    wQnVcynQQOvXaO4IQ61vVoRZ0EexGZDmkZUMtpCfMHBmqV8NSveryRd5sj20Am1casL2q8
+    m/r//bvg5hVLpcjQ6PBLAThrEJSYDzR+DhLdg5rf9Btv25YD+CTCPCOso+KJ9lsKDCbAan
+    Mk0p9dPEVs3jRpUPTRfuBhQ52nqMdRvdurq2pjm2myeGqYcIk72EfO/A/Kkw
+X-ME-Proxy: <xmx:ldhEavo3-BGUcKYegOVyYdZ7-_aQY45E1pAr4OX6ixdGBoakWffNcw>
+    <xmx:ldhEak2vcd8t41cuNvQdRPmTAfJIKYP8sAr6MmsVC92Bk4UJSyvu1A>
+    <xmx:ldhEagBQG-SzRjwNU1l8NS5N_6rYfy0iS-ubAuN-mSf82smCgPu2gw>
+    <xmx:ldhEatMVLkiV0M1hjESSjafHJ3Sy9_kPjSFa3gvHZ8CULA1Xw4L03w>
+    <xmx:ldhEaisqlq9X_etyLuzRp4Ldz8UoZ6MT7nC6Q-aKLiTCMQU9JNFmfPF2>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 1 Jul 2026 05:06:28 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"DavidS. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [PATCH net-next v3 0/3] ptp: Add driver for R-Car Gen4 gPTP timer
+Date: Wed,  1 Jul 2026 11:06:04 +0200
+Message-ID: <20260701090607.1108208-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260630165934.GA1227354@shredder> <20260630211527.3365952-1-kuniyu@google.com>
- <20260701081105.GA1289614@shredder>
-In-Reply-To: <20260701081105.GA1289614@shredder>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Wed, 1 Jul 2026 17:58:16 +0900
-X-Gm-Features: AVVi8Cc1rAr25dd49A9JO9lvFPQG_n_mwEhSvbyWPb18EHHe4GPs2gGpkEnaGN8
-Message-ID: <CADXeF1Hp8kJgDOKsR7bXA7ZW=r9spycEWmWsK_v3KTN_qo-KuQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] ipv4: igmp: remove multicast group from hash
- table on device destruction
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, jedrzej.jagielski@intel.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm1,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:kuniyu@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:jedrzej.jagielski@intel.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:xiyou.wangcong@gmail.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303547-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-303548-lists,netdev=lfdr.de,renesas];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,glider.be,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:niklas.soderlund+renesas@ragnatech.se,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:andrew@lunn.ch,m:niklas.soderlund@ragnatech.se,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,intel.com,vger.kernel.org,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,nvidia.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,ragnatech.se:dkim,ragnatech.se:mid,ragnatech.se:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B2A1D6EB60F
+X-Rspamd-Queue-Id: 6ED876EB755
 
-On Wed, Jul 1, 2026 at 5:11=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wro=
-te:
->
-> I agree, but let's do it as a separate change in net-next. The current
-> one line fix is correct and fixes the root cause. Clearing the pointer
-> happens to fix the problem because it relies on mc_hash only being
-> accessible via dev->in_dev (vs reaching in_dev via a different path).
+Hello,
 
-Acked, I can send out a separate patch for fixing this part and keep
-this change as it.
+This series is the first part cleaning up how PTP timer support is
+implemented on R-Car Gen4. Currently there is partial support for it in
+some of the Ethernet devices that can use it, but not all.
+
+The partial support have been implemented by hacking the gPTP module
+directly into the first Ethernet device driver that used it, RTSN for
+V4H and RSWITCH for S4. This is understandable as earlier R-Car
+generations had a dedicated gPTP timer for each Ethernet device, but on
+Gen4 there is a single system-wide PTP timer shared by all.
+
+The current implementation makes it impossible for other Ethernet
+devices on the platform to use the PTP timer without messing around with
+other Ethernet device drivers.
+
+The effort to clean this up starts with this series which adds the
+system-wide gPTP timer as its own driver and device tree node.
+
+This series will then be followed by work to add proper PTP support to
+the R-Car RAVB Gen4 driver, which currently advertises to user-space it
+supports PTP but which implementation is broken and does not work.
+
+This will in turn be followed by work to the RTSN and RSWITCH drivers
+will be be switched from its current partial support by mapping the gPTP
+address space directly to instead use this driver.
+
+Having both this and RTSN/RSWITCH described and enabled (!) in device
+tree will not work as they will try to use the same memory region. For
+this reason this new solution will only be enabled on platforms
+after all user's of the gPTP clock have moved to only use the new
+centralized timer. But in the interim both devices will be described
+(but not enabled) in the platforms base dtsi file.
+
+For some platforms this is straight forward, such as V4H Sparrow Hawk,
+which only have the RAVB Ethernet interface. This platform currently
+have no users of the PTP timer, but still advertise it supports it. This
+and the soon to be posted RAVB patches solves that.
+
+As the RAVB patches depends on this series the device tree node for the
+gPTP clock is added in this series but will be enabled and linked to
+consumers in the RAVB gPTP series for platforms where it will not
+conflict with RTSN and RSWITCH. And further enabled as more of this is
+cleaned up.
+
+The gPTP driver itself is heavily influence by the existing partial
+support for gPTP in the RTSN and RSWITCH drivers and the Renesas BSP.
+
+Niklas Söderlund (3):
+  dt-bindings: ptp: renesas,rcar-gen4-gptp: Add R-Car Gen4
+  ptp: Add driver for R-Car Gen4
+  arm64: dts: renesas: r8a779g0: Add gPTP node
+
+ .../bindings/ptp/renesas,rcar-gen4-gptp.yaml  |  64 +++++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/renesas/r8a779g0.dtsi     |   9 +
+ drivers/ptp/Kconfig                           |  12 +
+ drivers/ptp/Makefile                          |   1 +
+ drivers/ptp/ptp_rcar_gen4.c                   | 219 ++++++++++++++++++
+ 6 files changed, 312 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/ptp/renesas,rcar-gen4-gptp.yaml
+ create mode 100644 drivers/ptp/ptp_rcar_gen4.c
+
+-- 
+2.55.0
+
 
