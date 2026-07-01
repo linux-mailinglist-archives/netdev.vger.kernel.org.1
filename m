@@ -1,182 +1,214 @@
-Return-Path: <netdev+bounces-303624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1Wn5JFsFRWqt5AoAu9opvQ
-	(envelope-from <netdev+bounces-303624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:17:31 +0200
+	id +dUvBPMFRWrg5AoAu9opvQ
+	(envelope-from <netdev+bounces-303625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:20:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4BF6ED204
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:17:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85B8E6ED267
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:20:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=blackwall.org header.s=google header.b=DSJpN07v;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303624-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303624-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=doyensec.com header.s=google header.b=NS5x2ez2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303625-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303625-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=doyensec.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9014530680DF
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:12:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 93F8A312B715
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B804480DCB;
-	Wed,  1 Jul 2026 12:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D708480DF7;
+	Wed,  1 Jul 2026 12:14:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDF33FC5A7
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AAE47F2C3
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:14:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782907923; cv=none; b=d029OmaF3hxFXiIK1vNyP3I2wHvNr7nJn0Fsj++fY6jnniBZjE5o1BF62kZUZH/P/CaE28Cv2VgmreLLbueg5eSibRqb0eISTS/qg4cmuuOyyl0AL5oIhqy35lIJ9mnoKr4rZLo4EQx5/Vydr6wawdDkQyE0UYmLfl6i+5jf5wg=
+	t=1782908098; cv=none; b=efK2EG3XmQHegGhbztABVmn2sd+4bvugweZIFHDOa4G5yqrooHwtk6HC+PsPacz8DxzIPPraCWheeYJ903JBy0qZoffVuxWxt2oTFYRvF/nX7L9J2dZTgyNWFXYUAH6coq926f+S4EIUcam1r6tV4SysyBf/eis0Wz46rN1/B9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782907923; c=relaxed/simple;
-	bh=ROlxj8Cc1VAGXf30YbaxSaZ37M2GQ1wwd10sk5YEUPQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PIqli6Zp2s7f5eNrUbzoEjipVlTZKvjPwfPY1pTk9Kos4DSCUNAss30WtdrlDnGP9O6yxCVSyfdA1TeUekd8gAh0SQm9eb+0VQey7aEfVPXetcwPw8FX6ELnwkk1sEPc6aMxvJYklJNbgGQnlwk15TJ2Pu0V4rjem+yLHRImvto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=DSJpN07v; arc=none smtp.client-ip=209.85.128.50
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-493bb510ce4so4317445e9.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 05:12:01 -0700 (PDT)
+	s=arc-20240116; t=1782908098; c=relaxed/simple;
+	bh=XQfDBrOpxqJvC4z3cP1uub6nk8+1HPUoMdvMzo6qDoY=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=dERede9BfOLPD5kmUttPbct4WOJFNvRGFW6ePqL0FVNXrh6bWtv4+M01euZl3qdLH2J2BtbgAa2+lt28QUw4s8xupCZSnrcdEhz2tgF6DeLp7fpgsvZ8c8JLsqR6QrbTqpFsusQfZcp3SCVsEh6uJ+sauHv1l6VEP6MBoRYiAg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=doyensec.com; spf=pass smtp.mailfrom=doyensec.com; dkim=pass (2048-bit key) header.d=doyensec.com header.i=@doyensec.com header.b=NS5x2ez2; arc=none smtp.client-ip=209.85.218.51
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c1276b8c7e2so63338666b.3
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 05:14:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1782907920; x=1783512720; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Ne/M8n0H/GY5faSBTuOE3v7ExKoklUKwfPoQLquDss=;
-        b=DSJpN07vCljxXX9E/UAfroi91ZMm94P8YVqgv13iJxtUiNWFbaCl1z2RfR22vvppSo
-         auxDnHg56pddhhVVSGoHEhYjiLeukLM+wwiQlRhqKxHee/LgMv9LocDWdlVjCannoZHL
-         NbJeSrG9q/nkXAb5wgcMhmkSzJOikT9CxqW/ZRjds5i6P4fMdd2LIfZK7uFWpVlMcV1y
-         I+Qn1ZAJDLDdC8qCBvuZD9RoHIoVudwa1n93LD/C4pA2RJovWqUDzM3D+9HEpFDHGIJd
-         HWxQhjWSmMx3EsvqCivTygHSfJTulaOQ0jAKs/eeJDaZyQpD7pFtKBy8LvsflNNcsKeL
-         hAqQ==
+        d=doyensec.com; s=google; t=1782908093; x=1783512893; darn=vger.kernel.org;
+        h=to:cc:date:message-id:subject:mime-version
+         :content-transfer-encoding:content-type:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=eCxR6sHZjR/sDxJZ6wuTaGYWiC2E9v8L6TCtUcqEsF0=;
+        b=NS5x2ez2ZUpilU2FG1vXtp+JqbdPREwr9R6o9OHft7blLgee1+My8Ks0x+K/I5K2Kt
+         85VM2yQrJ4xIPBZ9sBk58HkJY43QU2dXX26eTU+0sMjMagEgvYsl4QEm4URPY+v1Agxw
+         Br0yYgk72zV/cyrC6Gxv1KJcDoN/DK5OmbZ/DzkoBlJjKnFrA1sjNaQnxC+tY4N4Wk7Q
+         95HCpkxLYaIQ7no6Qg6YNOfWjEKZL1MMDbm4mlK5j1kCf3LzaizE64ttqGtNhaKfYo3L
+         TWnc+aRa8MptdJHqfGaP1CmgG5C3yeeiss8m/Pgn5GBAOsiGU9Da02uuVcUzVyS79G3g
+         3ziA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782907920; x=1783512720;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3Ne/M8n0H/GY5faSBTuOE3v7ExKoklUKwfPoQLquDss=;
-        b=MXeC8lWCNQAOMK0yDEPNP4coSBAXzizGuVEmCNsOwVfe8yYoaL/fjEyXc4SpqHwmGJ
-         uG707QWVMfpPwJoYEf3wS/iAVSI9C1o4jpp4f4L9KBgP0g+ybiz4Rcyp3K8Ps3jMqzEj
-         vX8wYL8jJ8j/Oy8uHks4UXW2gOS5E1PkKCsoogIKet1rI8CVZT1jL14ZZe7ftBca1voh
-         4hyfc1IRHgTwGldQ98Hty6cyxRp4pwMHTHVnYVe3G49aRHqOtyi/KUAAjROz8qskwXDM
-         38iUgXpqOMIbKctbXBy3SstckepVoZb5e6Fzp8M0W397bupEUZKuSH/CJKtX0DUsLFaD
-         Lu0Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8ewcZscMkPe7oBrl0rlZHrqNd7TpDsaTN9jya3c4t7ncP04xXaDgF0W3SLepfUcM2/qipEjLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW6G41o9yWZ7SXSiTmLnE9xGe0CWX8O/QSxSoD5QBLcZkpATqH
-	JixtgNdZRbgM1paLRL9qV7NENxn6LFk7wmTzUzGQ4zJllJGt6sG09hGESujHDlSCJxs=
-X-Gm-Gg: AfdE7cmEI7be8qoMwFRrjjmH6E1diSrtPeqmBaAAb8IEsQdtybpF0C2QImPQO0nEavn
-	GTaP9OLX6YP7fX00bgmxwKcqNvlDZT91b1+OKT4iPZQL1Ljkbz6C1i+Avjm2ttEAj0PLxBzFi3j
-	yvnEHu5VG95jicEjgiMCOt7EeJ8ru9nLS8jKuP1cLuJlvyyFvsfphQqHuDyIjozu10J89sIK3tK
-	oLRTe0KuR+v1ngNe9PyqnacqD8uJv+dSSTLjemtmO8x3ywaAWsUv4m/V59bn2Gc6NV0+00pL6KI
-	Jl13IGTDDAMyZvz1tzygM/OevBCmObLtY5MKR9Um59ggYoqL07FI5K6IX8qejntw2bGCrwQ23Ja
-	Do8gb5j2NOb48l5D2qSe7yajClosXj7bewi1139LUH4Y1O8A7jGHZ+ADpfEde56Kvv1psDElSCu
-	qFCkMFd1s0ZcMnYVcQHpfgmM9Y357ruEZ9rh3LRwd5mU8=
-X-Received: by 2002:a05:600c:8b2a:b0:492:6113:d4fc with SMTP id 5b1f17b1804b1-493c2b56fccmr21817145e9.17.1782907920116;
-        Wed, 01 Jul 2026 05:12:00 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493be4c89ccsm79485005e9.4.2026.07.01.05.11.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2026 05:11:59 -0700 (PDT)
-Message-ID: <3f70661e-539a-4157-9e5f-1ee94a720519@blackwall.org>
-Date: Wed, 1 Jul 2026 15:11:58 +0300
+        d=1e100.net; s=20251104; t=1782908093; x=1783512893;
+        h=to:cc:date:message-id:subject:mime-version
+         :content-transfer-encoding:content-type:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=eCxR6sHZjR/sDxJZ6wuTaGYWiC2E9v8L6TCtUcqEsF0=;
+        b=SwuR+6iTV4S29uC1/oO66s+izaMNpt2BbYlmfsEVPHYcBRICoRem7h6uR7AMEsvCSp
+         B2Cbye3nIFcrhgD8TphdPKCDe71BeJcVgbWQ2SfjRMgAIBjSJZWGoGCBY4L2csExO4qO
+         eglxSwVEk2qHHJ69g7KWAI7kWI25Tl0Z55TXOcHUSYaFA1JJ2pkvfdhx4l+Q2k9Fnp/r
+         Zj5a1hmrOVvNFCghBxy0Na8+BuwXMcnWsYg/C4ST4HAX6b5H6Z9OUHrNeGRVpY+JkJs0
+         Hx7QvVvPfBaBQ9YIe3pFSGqwvU3KG5vwx5hGI+SHI/PTGS2aRqTkf20GmtPslD8R/iUl
+         yX7w==
+X-Gm-Message-State: AOJu0YzaZH2hi9LzNHJXqRMNljvOxqEwQyCHfPi7SPU8K6Hp4RX2FU4O
+	/9SMgpBRvqqoxNsOzGIQp8qhQiiYEn4Q28bYvps3dJ/5e+QD8FxBYPqxQJePllbDn4+nuHyBo0V
+	6Vu7/C+tdUCj3
+X-Gm-Gg: AfdE7cmWV0V/q6U8HaCL8ZimhnNpkkd3ndIWQQlG+timkUTk1cm6X425Pr8Eb7kLaih
+	l9tLJGEIngztR8PbW1tqMzr/K3p9ZnLSLEQ46DaR1sgrjw+haGF7qiRHiun2pklc8AfiaMmGO0t
+	2g3Jr7Id/jbNzRglNeOKDtY9xsM6SU3lDaFyP1V+3nx5yuOGudhA6oDrXICDumzwIw+x1C5h3pa
+	inNMEVEWeYSTDageEPyyj6/M6guml7NCYJPYl4qQs0gR5bLVT3RvL4RyuToS+foRf39iqVo9gtb
+	2CBhx92j4Rmg4msJt0wbrMJwcAZz+gY4NTdyOxvHpfMdjGDKbbQHE8o5hHxqWbm94CbWSvFQUOE
+	AEWvXYB5pwl7aPQgR6gYE1S912BtFEscjIBmF9jTs5+WtehdiFnf4NW51BNmYg9JRiuf38khbh9
+	08ID3gSzi7qNRS8jvLrjZp+m3Di7jdrh3LlL2kGaQLHw+WpkQCLY6a6Ow2ByMo7e+5h6X6T4IuJ
+	fGU
+X-Received: by 2002:a17:906:26db:b0:c12:2b6c:4fd2 with SMTP id a640c23a62f3a-c12ae52bec6mr24027066b.42.1782908092998;
+        Wed, 01 Jul 2026 05:14:52 -0700 (PDT)
+Received: from smtpclient.apple (83.10.35.68.ipv4.supernova.orange.pl. [83.10.35.68])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6987c9503f5sm2644061a12.20.2026.07.01.05.14.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 01 Jul 2026 05:14:51 -0700 (PDT)
+From: Norbert Szetei <norbert@doyensec.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] macvlan: no longer rely on RTNL in
- macvlan_fill_info()
-Content-Language: en-US, bg
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20260701082214.2974946-1-edumazet@google.com>
- <20260701082214.2974946-3-edumazet@google.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260701082214.2974946-3-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
+Subject: [PATCH net] ppp: defer channel free to an RCU grace period to fix
+ pppol2tp RX UAF
+Message-Id: <C954A7EA-AA98-4E3C-80B5-42C34B3183A3@doyensec.com>
+Date: Wed, 1 Jul 2026 14:14:39 +0200
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Qingfang Deng <qingfang.deng@linux.dev>,
+ Taegu Ha <hataegu0826@gmail.com>,
+ Yue Haibing <yuehaibing@huawei.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Kees Cook <kees@kernel.org>,
+ linux-ppp@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+To: netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.700.81.1.4)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[doyensec.com,none];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[doyensec.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303624-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
+	TAGGED_FROM(0.00)[bounces-303625-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[norbert@doyensec.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:qingfang.deng@linux.dev,m:hataegu0826@gmail.com,m:yuehaibing@huawei.com,m:bigeasy@linutronix.de,m:kees@kernel.org,m:linux-ppp@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,gmail.com,huawei.com,linutronix.de,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[norbert@doyensec.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[doyensec.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,blackwall.org:dkim,blackwall.org:email,blackwall.org:mid,blackwall.org:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0B4BF6ED204
+X-Rspamd-Queue-Id: 85B8E6ED267
 
-On 01/07/2026 11:22, Eric Dumazet wrote:
-> Add READ_ONCE()/WRITE_ONCE() annotations on vlan->mode, vlan->flags,
-> vlan->bc_queue_len_req and port->bc_cutoff.
-> 
-> Fill IFLA_MACVLAN_MACADDR_DATA nested attribute and compute
-> on the fly the precise number of elements we put in it,
-> to fill an accurate IFLA_MACVLAN_MACADDR_COUNT attribute
-> as some user space applications could depend on its value
-> and the attributes order.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->   drivers/net/macvlan.c | 71 +++++++++++++++++++++++++++++--------------
->   1 file changed, 48 insertions(+), 23 deletions(-)
-> 
+pppol2tp_recv() runs in the L2TP UDP-encap softirq RX path:
 
-The snippet that sets macaddr_count gave me pause. :)
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+ l2tp_udp_encap_recv() -> l2tp_recv_common() -> pppol2tp_recv()
+   -> ppp_input(&po->chan)
 
-[snip]
-> +
-> +	if (READ_ONCE(vlan->macaddr_count) > 0) {
->   		nest = nla_nest_start_noflag(skb, IFLA_MACVLAN_MACADDR_DATA);
->   		if (nest == NULL)
->   			goto nla_put_failure;
->   
->   		for (i = 0; i < MACVLAN_HASH_SIZE; i++) {
-> -			if (macvlan_fill_info_macaddr(skb, vlan, i))
-> +			cnt = macvlan_fill_info_macaddr(skb, vlan, i);
-> +			if (cnt < 0)
->   				goto nla_put_failure;
-> +			macaddr_count += cnt;
->   		}
-> -		nla_nest_end(skb, nest);
-> +		if (!macaddr_count)
-> +			nla_nest_cancel(skb, nest);
-> +		else if (nla_nest_end_safe(skb, nest) < 0)
-> +			goto nla_put_failure;
->   	}
-> -	if (nla_put_u32(skb, IFLA_MACVLAN_BC_QUEUE_LEN, vlan->bc_queue_len_req))
-> +	*(u32 *)nla_data(attr) = macaddr_count;
-> +
+It runs under rcu_read_lock() holding only an l2tp_session reference and
+takes NO reference on the internal PPP channel (struct channel,
+chan->ppp) that ppp_input() dereferences.
+
+The pppox socket is SOCK_RCU_FREE, so 'po' and the embedded ppp_channel
+are RCU-safe.  But the internal struct channel is a separate allocation
+that ppp_release_channel() frees with a plain kfree():
+
+ close(data socket) -> pppol2tp_release() -> pppox_unbind_sock()
+   -> ppp_unregister_channel() -> ppp_release_channel() -> kfree(pch)
+
+For a channel that is bound (PPPIOCGCHAN) but not attached to a ppp unit
+(no PPPIOCCONNECT, pch->ppp =3D=3D NULL) and not bridged, teardown skips
+both ppp_disconnect_channel()'s synchronize_net() and
+ppp_unbridge_channels()'s synchronize_rcu(), so the kfree() has no grace
+period.  rcu_read_lock() in pppol2tp_recv() does not protect against a
+plain kfree(), so an in-flight ppp_input() on one CPU can dereference
+the channel just freed by close() on another CPU.
+
+The bug is reachable by an unprivileged user.
+
+Free the channel with kfree_rcu() instead of kfree() so the grace period
+fences any in-flight ppp_input(). Done in ppp_release_channel(), this
+covers all callers in one place.
+
+Fixes: ee40fb2e1eb5 ("l2tp: protect sock pointer of struct =
+pppol2tp_session with RCU")
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Norbert Szetei <norbert@doyensec.com>
+---
+ drivers/net/ppp/ppp_generic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ppp/ppp_generic.c =
+b/drivers/net/ppp/ppp_generic.c
+index 57c68efa5ff8..cb8fe37170d3 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -184,6 +184,7 @@ struct channel {
+ 	struct list_head clist;		/* link in list of channels per =
+unit */
+ 	spinlock_t	upl;		/* protects `ppp' and 'bridge' =
+*/
+ 	struct channel __rcu *bridge;	/* "bridged" ppp channel */
++	struct rcu_head	rcu;		/* for RCU-deferred free of the =
+channel */
+ #ifdef CONFIG_PPP_MULTILINK
+ 	u8		avail;		/* flag used in multilink stuff =
+*/
+ 	u8		had_frag;	/* >=3D 1 fragments have been =
+sent */
+@@ -3583,7 +3584,7 @@ static void ppp_release_channel(struct channel =
+*pch)
+ 	}
+ 	skb_queue_purge(&pch->file.xq);
+ 	skb_queue_purge(&pch->file.rq);
+-	kfree(pch);
++	kfree_rcu(pch, rcu);
+ }
+=20
+ static void __exit ppp_cleanup(void)
+--=20
+2.54.0=
 
