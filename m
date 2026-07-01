@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-303614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303615-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qW36GOX5RGp64QoAu9opvQ
-	(envelope-from <netdev+bounces-303614-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:28:37 +0200
+	id 1bK6OfT5RGqD4QoAu9opvQ
+	(envelope-from <netdev+bounces-303615-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:28:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F646ECCF2
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:28:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 838786ECD17
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:28:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=bdqk4XXE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303614-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303614-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ot+XN4C2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303615-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303615-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 63C5C300D34F
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:28:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AFE433010BDF
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B919E477E34;
-	Wed,  1 Jul 2026 11:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9D447AF67;
+	Wed,  1 Jul 2026 11:28:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9497647276A
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB5F47AF6D
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:28:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782905313; cv=none; b=CTT9W6MGAeCqpVA1Z3l7szqwLT/+1Spl/yu0B36L0VJzyW3zwAA5/giuBxr7q6FYjiwXtFqYT0YV0G1e+yaA2XM8epP2RTAI8ROzikXcg9V+DHKJNpSgRem2i7UUezBtjNvUBdafwoHvpoZZ5wRy5e6B6IdC8jNIqlgDwGM/ofY=
+	t=1782905319; cv=none; b=seWik4ckw3ueL4muMENldbVYwCsTjUH3s+0xzweXGvVHzMGrxCo3LQhawtlzyAyTOtL5E3c40iDlrLt25eaHaRH7rrkwCgIhMhNvcafZsfNuaob5mPqPxIytddo4L0uQzqNOvA+lUTbnezzCbaKSjSjEd1jbRwDiAhqnX9lCqJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782905313; c=relaxed/simple;
-	bh=ROdAMjb3eA4W23vGlRJRTF5lyshTQSGeez9dWAooIcU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Emcxl+Y25iYyuDA2W7j9Rdhf0XhGkTh/85pPQpIYwthe6K7u50soDg6CgHEBhkk5zQSXLbj8w8QgcKAZgPuVg2qMjiJ5HJePifnk7ceKFYNFWp/uaHty5fPstwVHes+GkinsOeWnKQIQYGGbI7OpcUx09JnA/Rped0LIl2eW4No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdqk4XXE; arc=none smtp.client-ip=209.85.215.174
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c85c531d4a9so189322a12.2
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 04:28:32 -0700 (PDT)
+	s=arc-20240116; t=1782905319; c=relaxed/simple;
+	bh=dH5EIq8uJv+DLGh/8edth3FqKBiNu/NXZg3yrCuZPwQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Y+8ycusN4XOGA/e7FImxiuOaBYiV1IrSlxfsA/EeoKyV6jqwL2dbAfJjWtemEhr34RIU8dwxDmTWO2ruf6iJ1fMM4PTql6T6wxeXsBhJ7FDrxULVQxnekpzfAFUSAdmEWrwPY562BWrwRQLYu3TeQMO3Q8/+Ix0xwTm15UwHrMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ot+XN4C2; arc=none smtp.client-ip=209.85.210.170
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8478a25f268so307329b3a.2
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 04:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782905312; x=1783510112; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWi/fVkUZ7mIoJEg9OEnvhoOeXrktxNnqMlaoxF8830=;
-        b=bdqk4XXEQpnggU4LIOCaTkYWqq91Wk2OBLUKUXp6KUsOHJl/pkkNzcbWVnLj7zifUl
-         RINqUJIPckbAAXwHwAIf45fcQ/NG6/Y0JcfD4pUC6gp9aW1wTfUPUWN7jMBBfTRaJNeK
-         E6avQ6IPe2X/Ojn+GJ/SdpSS0s0MneB8WvNEHJPeC3SuohDraFWpoz8CM8ANDWPMDZob
-         xQ5cRoa12tw2DtKnISYcrDVAQzQxA+cejRUlRJp0lx36DMYuS1UcLGcniFsVepyHwQfr
-         q8SELx7X3peIOJB3YfOKFuIMPhUuRUTlKLyf5W+9DaSEfQiyf84xhpqhGGgBoODic+02
-         2xpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782905312; x=1783510112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782905315; x=1783510115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oWi/fVkUZ7mIoJEg9OEnvhoOeXrktxNnqMlaoxF8830=;
-        b=f/GD7nJdC5iBgHI4m6uPA2crRuv6yCPHaGT92gSwreT0nF5OYObYaGVYrAUGvTn0ZD
-         55zV5UkUnFY1xFsc/oDNRWK18BR2Ytk3p2t+XFw/TDZzfaeQqcJ+eh8MMBb4i48bkLI7
-         dm07Nu8uhA6JNOn8NhGwj00UX1Jtbm2RV6XQ/KZT/JOPmzS5fRuWpAqyLYcTV3qPAIWI
-         pB3f4DH4l76L8JxpjHHILo5xEe2XVxMjhuKA72MrKtW1JuDQ5u9BHADTjLBayC+sfRZm
-         i7kAxeEOl0gUMup+VipGmUQ9tK1rp9Twe7pc8MJyljFlN59svIIHJun/agO3Ob+jhXn/
-         uuYA==
-X-Forwarded-Encrypted: i=1; AFNElJ8iOpQ4qbWNRPsnWCOykSqPpt7+bA99h+tBgaxzOBohIj0INvSszU3dvlwMv9dW/sv4M3bn0yI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeBu+AyU+N3Wu8x1V3Q8E0DFCNuUPO+AjVTrf3KyueKImc9Xt9
-	qKdR5muQye064p4jL5PXquNRJzP4jxhQHJxNb/gckbL9d7aTeu/YpA23
-X-Gm-Gg: AfdE7cm00gvndT9iQdv6nsdIH46sG71N0wIxRrO9Njq6t3f5NopnawGBj5/FTthN5eE
-	yAv2HSjPAqTf1JVKA91lKZ5WBveBbtWXdN8U8yc9xnGxF//y6vtbMOE9ll4WubaCQ3WIJNAadRf
-	LKzKt2p9UKMjAcahhMI68W7ZoaEhEKSLGCs4U7g7Kg1UsyUpj+Q8fRl/qQnrvM2rjj3xsqy18Ok
-	eSjdjrxGK+uTCXJJSgkMAaEoTC+zt2yyr1lSTPKbwucHBxtMe9ZA2I22tcdRAH5ZzCnL2cqvzYE
-	38qhGILdbSsQZoDK5V6kMq+uZor4W/HwVg6Ik47OfAAx2gQ+iuuwy4AMlOsaLw3IByoNHw17RCQ
-	061ImllKSR2IU/wFu18/w/ZyuWhAN9LLipbk15lP6wf//8z4LOZqk75b8wdEUaK0rU4/GYnQiK0
-	KEpc/qDDupbC45FdtLzT6tTU90sJW/IMJK4u2D8Q==
-X-Received: by 2002:a05:6a21:a97:b0:3bb:2883:a723 with SMTP id adf61e73a8af0-3bfed3e8a2emr1323024637.35.1782905311729;
-        Wed, 01 Jul 2026 04:28:31 -0700 (PDT)
+        bh=96KziMX+rGVpoJYIBo0SzFKVDh+T7GIMIX3qVY3Kn8Q=;
+        b=Ot+XN4C25PBd6giX0CdaezVu3PL/yxQcos5r1NYswVzgpdS7D/rQ2HThVcLliKHOyT
+         EFDba8Oxgzy1MNIckoUD/B2kcVmsHStjX+ffcWQ+vfzA8h3vsY52me8TmPGSYCqvZMdM
+         dxWLYtkh1+w/ntw8S67b5cNpF4VPTTwRDABQZGpAh7PGH4P8T81lbGStG2gwbqEX57DO
+         aK8skVaoZsVQP/lg41PPQeAVnWc7veOC3cZZKtS8WfufJxFzO8VZBpn4BnQDU2IpALMt
+         mqiJ0IYLq4ytxpxwG7A0X+Hf4J6qv67YLuF3KKtOxx0Uf0m8czS9e1RMK7nir0Ydiezo
+         iEmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782905315; x=1783510115;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=96KziMX+rGVpoJYIBo0SzFKVDh+T7GIMIX3qVY3Kn8Q=;
+        b=IFGNseZ3hLJ4OE2r3WuX7L8iYydjhHhQqjhmdYCaUyMfRmSK82MQGtY4D6OKM8AYlE
+         G7hzdzIKxeewqTZOqpIAhTPx+qZPW7CA+sEDAYexwsjsYknQrGGffzbql0il2LCV6YrN
+         sncpgchw50W/rEdZy1DUx/m8QPqf+v+xYuZoYVJRU4e+zXzz7qzMr81vq4c/Umxtdae+
+         Ea1r9t3JK/e7t4suIcNUzvyxr03fc3TUTSEh7i4M0v3mhrRPhVPTLb4O6rCl5EBwIrkF
+         mcdu4urABj+GsN6WicveCphm1oywprk1hYljeCwTKh00lRT0B/4bQYvlrLsyRRNh2Yq7
+         LLCA==
+X-Forwarded-Encrypted: i=1; AHgh+RoblcdD5jLxbhZwp62TD6uU4mMLrdfWxBnTMARbFlG7JdjXkbunBNKhSE0YKn0T6akYraYa/iM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK8LKA0f60Q8sGRbND0VEij37q6mvh+s1P0z1rpkImIh4qmzrY
+	NpzehmfkXlfYrrrXjdfrweopq1600QNFIUzYhh2AOzNFWUChkxT/O+iw
+X-Gm-Gg: AfdE7clshsOLXlJAFJDxzPz+0tacIdQIe9vi8d3CijBg+5IX0OPBCIZaG8zH7XOSlzb
+	gZvVNQXnMRf7bsCukqaRj26g/gO4n7VFOPKQmChNnXdVJtk1zzqPQLyj3YGsJ7mvhp7zJ6VWdBu
+	Cmrl//PWcEYaEB0eRlM4Erj1zICzN6IgEpT+kbQHog9XlxoNyhRYlpDKxKijiD4f/uE4ljq8l8o
+	jS+KppEe5NH22Bmg1H+ZvV66qs6NvedGhRqm40qyRJJ0umruUfCclbvecjibgew6lRuGoc2BunM
+	eg4AFq5IMPBcxwmYGDOMX9zG1XgyWavYJu41/ohwKGlg+1tvq2Wzp1Zg7gtESpRm0zwg4Rz+Pg7
+	ZUoDJFUZwMaWyspSOjybzDZr82puYLtqFrbtA4gi0EQQZZnonQDozJjPND0HwmAB0N+NubxhEXD
+	CbVEk/i7TeH1NHq7YknwBEqd6VgR8qJBBDySrgTQ==
+X-Received: by 2002:a05:6a00:3d14:b0:845:d285:3b6a with SMTP id d2e1a72fcca58-847c51ea690mr298858b3a.54.1782905315240;
+        Wed, 01 Jul 2026 04:28:35 -0700 (PDT)
 Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbff28998sm2934290a12.22.2026.07.01.04.28.28
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9bbff28998sm2934290a12.22.2026.07.01.04.28.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 04:28:30 -0700 (PDT)
+        Wed, 01 Jul 2026 04:28:34 -0700 (PDT)
 From: Maoyi Xie <maoyixie.tju@gmail.com>
 To: Veerasenareddy Burru <vburru@marvell.com>,
 	Sathesh Edara <sedara@marvell.com>
@@ -84,10 +86,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 0/2] octeon_ep, octeon_ep_vf: fix skb frags overflow in the RX path
-Date: Wed,  1 Jul 2026 19:28:23 +0800
-Message-Id: <20260701112825.1653044-1-maoyixie.tju@gmail.com>
+Subject: [PATCH net 1/2] octeon_ep: fix skb frags overflow in the RX path
+Date: Wed,  1 Jul 2026 19:28:24 +0800
+Message-Id: <20260701112825.1653044-2-maoyixie.tju@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260701112825.1653044-1-maoyixie.tju@gmail.com>
+References: <20260701112825.1653044-1-maoyixie.tju@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,7 +114,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303614-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303615-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:vburru@marvell.com,m:sedara@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
@@ -129,30 +133,60 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0F646ECCF2
+X-Rspamd-Queue-Id: 838786ECD17
 
-The PF (octeon_ep) and VF (octeon_ep_vf) RX paths add one skb fragment per
-buffer_size chunk of a multi-buffer packet. Neither bounds the count
-against MAX_SKB_FRAGS. The packet length comes from the device. A long packet
-yields about 18 fragments. The default MAX_SKB_FRAGS is 17, so the last
-skb_add_rx_frag() overflows frags[]. Both patches drop such a packet,
-matching the recent fixes in atlantic and t7xx.
+__octep_oq_process_rx() builds an skb for a multi-buffer packet by adding
+one fragment per buffer_size chunk:
 
-Patch 1 fixes the PF, patch 2 the VF.
+	data_len = buff_info->len - oq->max_single_buffer_size;
+	while (data_len) {
+		...
+		skb_add_rx_frag(skb, shinfo->nr_frags, buff_info->page, 0,
+				buff_info->len, buff_info->len);
+		...
+	}
 
-This was posted as an inquiry on 2026-06-23 with no reply:
-https://lore.kernel.org/r/178219996724.2539184.5129396914438743404@maoyixie.com
+buff_info->len comes from the device response header
+(be64_to_cpu(resp_hw->length)). Nothing bounds the fragment count against
+MAX_SKB_FRAGS. data_len can be close to 65535. buffer_size defaults to
+about 3776 on 4K pages, so a full packet yields about 18 fragments. That
+is one more than the default MAX_SKB_FRAGS of 17, so skb_add_rx_frag()
+writes past shinfo->frags[].
 
-Maoyi Xie (2):
-  octeon_ep: fix skb frags overflow in the RX path
-  octeon_ep_vf: fix skb frags overflow in the RX path
+The driver now drops a packet that would need more fragments than the skb
+can hold. octep_oq_drop_rx() consumes its descriptors, as on the build_skb
+failure path. The same class was fixed in other RX paths, including
+commit 5ffcb7b890f6 ("net: atlantic: fix fragment overflow handling in RX
+path") and commit f0813bcd2d9d ("net: wwan: t7xx: fix potential skb->frags
+overflow in RX path").
 
- .../net/ethernet/marvell/octeon_ep/octep_rx.c   |  6 ++++++
- .../ethernet/marvell/octeon_ep_vf/octep_vf_rx.c | 17 +++++++++++++++++
- 2 files changed, 23 insertions(+)
+Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
+Co-developed-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+Signed-off-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+---
+ drivers/net/ethernet/marvell/octeon_ep/octep_rx.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+index e6ebc7e44a00c..4ee911b6c0107 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+@@ -476,6 +476,12 @@ static int __octep_oq_process_rx(struct octep_device *oct,
+ 			skb_put(skb, oq->max_single_buffer_size);
+ 			shinfo = skb_shinfo(skb);
+ 			data_len = buff_info->len - oq->max_single_buffer_size;
++			if (DIV_ROUND_UP(data_len, oq->buffer_size) > MAX_SKB_FRAGS) {
++				dev_kfree_skb_any(skb);
++				octep_oq_drop_rx(oq, buff_info,
++						 &read_idx, &desc_used);
++				continue;
++			}
+ 			while (data_len) {
+ 				buff_info = (struct octep_rx_buffer *)
+ 					    &oq->buff_info[read_idx];
 -- 
 2.34.1
 
