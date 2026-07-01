@@ -1,215 +1,158 @@
-Return-Path: <netdev+bounces-303776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BDUUBDtKRWqW+AoAu9opvQ
-	(envelope-from <netdev+bounces-303776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:11:23 +0200
+	id zKQuHvVKRWrR+AoAu9opvQ
+	(envelope-from <netdev+bounces-303777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:14:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336776F0322
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:11:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA2D6F03D7
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:14:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=OOGb8xWw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303776-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303776-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=nX6eeoJU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303777-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303777-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1DEF300D6BC
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 17:01:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D6D94301982B
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 17:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F36337C922;
-	Wed,  1 Jul 2026 17:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699BF385D89;
+	Wed,  1 Jul 2026 17:05:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AA337BE6B
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 17:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE3F37DE98;
+	Wed,  1 Jul 2026 17:05:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782925301; cv=none; b=knZolGk2JFLlaergsGCT7zxKMm95NjUXQ+eWgMNaRJTKogv7+b6YaqRy9UjMMleGQSUSoVmZEk2eivUw8Z4xo00D7hmBWusxzrQb/CJQvWhwGAOGiTcTU0PtNIDtFsHcjiEa6M12K/2s8ptjsj1+0xELc4fCPsp1yR7XrzNdFYk=
+	t=1782925524; cv=none; b=IsvQshr/8oZof2nxP6Mbnx4Xd1Dr6bsC6r7krLcAkZCQ8kx0Za55BNjmw1CwXzbbmoDwisTWWSb3O/QaZAaWGD4XvdR3mFWR0JrlPKYSMWkqxfDNjBoyDMOLPzFCC3BcwTtKLrBGHmHWaV65koFOumRaUVU27us39Fqh8P5Olyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782925301; c=relaxed/simple;
-	bh=cXZvzRGh9+LC8x/UZFSBxmdI7wez4U+orwjoklAgSXU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S6TDscLpeBPZHWkZkEdX3xUou1HTDfQo01QN2Hxspmj+MXsT8LDmtHoU/Sgfi8UgsDs6HDBqOEqBmDsJEgljGK1Esu6whjRWATvaB5DsqPIRvS6mdYVy6dx2v63Srw2PjZiKLRF+w8UzHlmGOkjoGAUegiGDP5a22WxwV3qbdRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOGb8xWw; arc=none smtp.client-ip=209.85.128.47
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-493b27c7451so20719725e9.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 10:01:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782925297; x=1783530097; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9CayLh9sn6SyGJSkLYj3J5jM0EP4cWj8SDd1cZ9x18Y=;
-        b=OOGb8xWwC4dT+eqE2W+82SR8+5YiBL6+gA+J3O9vPOIqYF8cNEW9CbKmpL1S4txGAL
-         zjlsI8fpR4/u62hnbiyVPzSwdNSyTUyPtJ6SKlh57P0l12u7ktpL+UZEdx9ZZIkbHvGr
-         PFrMl83B6G1ioFUPX1RGCqSCF8GFmA6W8NWnQ3Pk5UVP9w6+E2gIlz8WZJkK3UUxlfr0
-         EdqZZEJGQj9hyQDw0KmItfSoN3JypGgVg80aHsRQpQNVosHmKHHhQgsoHOEHGRMfOwza
-         DFC5Wv/zBgkflczP+yDpAWg37lXwU5IhicnU8d+Ya2ZM/x+WfMr6OistQX8NcbGUsEHw
-         vW7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782925297; x=1783530097;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9CayLh9sn6SyGJSkLYj3J5jM0EP4cWj8SDd1cZ9x18Y=;
-        b=S7O/7I0A6jI1B0CcAYk75JGz1AxYUya1NuMqARr6SfTu/JqUJJ2jLi9amXhKJtUwsz
-         CTBpgdkd3/yynM3boWg4bSTuh/FNXw2p1OXqYz/b9Bfz7AOo7dQIYsCnnpuuYxXb4tZd
-         tMLg4u+CsSznVWWXRnkQCoi8B1sU0RMdazLuBc4grGwZ4PLQSuXULV2h0P6J/gknd5U6
-         EEhFzLaPEU/ugeqk33LGDdHh4DVmQ8TnZw7vswkglrWA1g/o6B69IrKb9ozbsWwhYkhB
-         8wpyS44JRfN2Q1XR3b3cWpCa5rXJvMxUC40rUflqkzX4vgoIhtBzpyoZ/PlX4Saug0bt
-         Pd6w==
-X-Forwarded-Encrypted: i=1; AFNElJ9I8MmZhWl87BQD+V1z9pj6P4FzSNs+1cwfeYNBm6ewLRBxckE7/aUbiBAWGiNAWD4QfDaQOS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy01LV4rRkVR6YMBDJ7ZxsPuXkv9HNxZVXd1qvzi62ovwmcXMU2
-	PPNL46z5/cntUlGpKUqhl2ruvN8HxefMbyVepnaZVgnh3ZnkKR8lyi5q
-X-Gm-Gg: AfdE7clXGTSU1Q51tP0fDOedBmcsri5IykfFF41Co/clQpvj0OjR35Y+SCSGAW03sfB
-	cVb8ot03MQDIzH+0zOWNUQTq9coJSVHX2Dln6V4R6pk+DHA1+fI4XkZ41+NORiSwyK6s7z3JgVe
-	eGmGsbkttD2NQthJjSkkwK1bDdT2Hi0DeRMBMdTSc1hjDj/rbyBWJTrmtGGY6SUE+9CPRhME9NR
-	mBejquVOSkJTjUeGrZ7ZKcplWPG89bGh8lvnxl+w2IupOHIeldottVEhRznmhnvlEWz4459xJq8
-	RWiznCiYa81TqygAW7gtQxRahNqJcLvPScMm/dCz1dDt1ertNKqyzvonkalMz3RaGv5qorkC4l3
-	l+XSpR2q3gUQc86vudpyjRuYCdt3uPez6Uibf4Q1uu6WYfDHSk4oLQr5q04QdRAHp6tUeUCQq7l
-	fyK5QreBHFSAPwT1ZbYEd1Jg1RMAFoYoWkoro05jLkyZgmW068SXEy8BjcybM2gyg/ACGdqVmkx
-	cQ=
-X-Received: by 2002:a05:600c:4685:b0:490:af63:2cb1 with SMTP id 5b1f17b1804b1-493c231f913mr37259535e9.7.1782925296780;
-        Wed, 01 Jul 2026 10:01:36 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493be4bfd47sm122822645e9.2.2026.07.01.10.01.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2026 10:01:36 -0700 (PDT)
-Message-ID: <d069d958-e069-45ea-87b6-95ad4a5fca29@gmail.com>
-Date: Wed, 1 Jul 2026 18:01:35 +0100
+	s=arc-20240116; t=1782925524; c=relaxed/simple;
+	bh=kyikHHYq7103RTtVY1DSWkKPeB/tAEKF9dHlVnGrOrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kRGfryftUauJr73KXHgKwOHic6Ymg951ZiW1oGAnrPzm5ywRgn4+xmu/9jV8i5HsbbgCs9cGvl4OKo38q9TtmPlESxQOrOZxYJILUNy+ptVjHgXFMHMaZtz8HGsA3Gis7EQ4tcjPR65y9KInDvcGGPgahZB2GQGUM2Rc+eJepPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nX6eeoJU; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MxFSTPpY0FYKfF60h712NAcU5QinacG+K9Gn0XhlhBY=; b=nX6eeoJUSnQgzOPWTnnShNnPoq
+	WFe9k3hTbmCmA/U0LVQR31IrW+xbdBsoHglTvb0xuMse62n9H01BmCNrWMNQ7eunrKCIa6aUehZ1N
+	/zsuj/Ywgvp4jsV43zvp2hN6cKxh+nTlOBXAB1mW45I+dPHNupv4uUhyL/Anqd4n94F0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1weyN6-00ADHN-QP; Wed, 01 Jul 2026 19:05:12 +0200
+Date: Wed, 1 Jul 2026 19:05:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/9] ax88179_178a: Add support for ethtool pause
+ parameter configuration
+Message-ID: <46553470-9be3-4ae0-824d-ae85441c920d@lunn.ch>
+References: <20260701-ax88179a-v1-0-13685df67515@birger-koblitz.de>
+ <20260701-ax88179a-v1-5-13685df67515@birger-koblitz.de>
+ <587499ee-d87e-4056-8d2a-8fda2ef3f0f1@bootlin.com>
+ <947860cc-de6e-48b8-804b-e27f27b2f82c@lunn.ch>
+ <d2edb164-91c8-40e4-a104-db690609cb57@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] sfc/siena: use kmalloc() to allocate logging buffer
-To: "Mike Rapoport (Microsoft)" <rppt@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Manish Chopra <manishc@marvell.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Sudarsana Kalluru <skalluru@marvell.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-net-drivers@amd.com,
- netdev@vger.kernel.org
-References: <20260701-b4-drivers-ethernet-v1-0-58776615db6e@kernel.org>
- <20260701-b4-drivers-ethernet-v1-3-58776615db6e@kernel.org>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20260701-b4-drivers-ethernet-v1-3-58776615db6e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2edb164-91c8-40e4-a104-db690609cb57@birger-koblitz.de>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303776-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[ecreexilinx@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:rppt@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:manishc@marvell.com,m:pabeni@redhat.com,m:przemyslaw.kitszel@intel.com,m:skalluru@marvell.com,m:anthony.l.nguyen@intel.com,m:intel-wired-lan@lists.osuosl.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-net-drivers@amd.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303777-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mail@birger-koblitz.de,m:maxime.chevallier@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ecreexilinx@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 336776F0322
+X-Rspamd-Queue-Id: 6BA2D6F03D7
 
-On 01/07/2026 14:57, Mike Rapoport (Microsoft) wrote:
-> efx_siena_mcdi_init() allocates a logging buffer for MCDI firmware
-> communication diagnostics.
+On Wed, Jul 01, 2026 at 06:22:31PM +0200, Birger Koblitz wrote:
+> Hi Andrew,
 > 
-> This buffer can be allocated with kmalloc() as there's nothing special
-> about it to go directly to the page allocator.
+> thanks for reviewing this patch-series! I will answer to the other questions later,
+> so that the answers stay together. But it is probably best if I give this answer
+> immediately:
+> On 7/1/26 17:08, Andrew Lunn wrote:
+> > > > +static void ax88179a_get_pauseparam(struct net_device *net, struct ethtool_pauseparam *pause)
+> > > > +	if (!(bmcr & BMCR_ANENABLE)) {
+> > > > +		pause->autoneg = 0;
+> > > > +		pause->rx_pause = 0;
+> > > > +		pause->tx_pause = 0;
+> > > The best way to have this correct is to use phylink, but for that you'd need to
+> > > have a proper PHY driver instead of using the mii_ API here.
+> > 
+> > I said the some to one of the other patches.
+> > 
+> > Do we know what PHYs are being used? Can register 2 and 3 be read to
+> > get the PHY IDs?
+> > 
+> > 	Andrew
 > 
-> kmalloc() provides a better API that does not require ugly casts and
-> kfree() does not need to know the size of the freed object.
+> I tested
+>   id1 = ax88179_mdio_read(dev->net, dev->mii.phy_id, MII_PHYSID1);
+>   id2 = ax88179_mdio_read(dev->net, dev->mii.phy_id, MII_PHYSID2);
 > 
-> Performance difference between kmalloc() and __get_free_pages() is not
-> measurable as both allocators take an object/page from a per-CPU list for
-> fast path allocations.
-> 
-> For the slow path the performance is anyway determined by the amount of
-> reclaim involved rather than by what allocator is used.
-> 
-> Replace use of __get_free_page() with kmalloc() and free_page() with
-> kfree().
-> 
-> Link: https://lore.kernel.org/all/635405e4-9423-4a25-a6e7-e03c8ea0bcbe@redhat.com
-> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> and got:
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+Thanks for these numbers.
 
-(resending since I hit 'reply' instead of 'reply all' the first time)
+> Renkforce AX88179A: ID1 7c9f, ID2 7061
+> Delock AX88279  ID1 03a2, ID2 a411
 
-> ---
->  drivers/net/ethernet/sfc/siena/mcdi.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/siena/mcdi.c b/drivers/net/ethernet/sfc/siena/mcdi.c
-> index 4d0d6bd5d3d1..048c1e6017c0 100644
-> --- a/drivers/net/ethernet/sfc/siena/mcdi.c
-> +++ b/drivers/net/ethernet/sfc/siena/mcdi.c
-> @@ -7,6 +7,7 @@
->  #include <linux/delay.h>
->  #include <linux/moduleparam.h>
->  #include <linux/atomic.h>
-> +#include <linux/slab.h>
->  #include "net_driver.h"
->  #include "nic.h"
->  #include "io.h"
-> @@ -73,7 +74,7 @@ int efx_siena_mcdi_init(struct efx_nic *efx)
->  	mcdi->efx = efx;
->  #ifdef CONFIG_SFC_SIENA_MCDI_LOGGING
->  	/* consuming code assumes buffer is page-sized */
-> -	mcdi->logging_buffer = (char *)__get_free_page(GFP_KERNEL);
-> +	mcdi->logging_buffer = kmalloc(PAGE_SIZE, GFP_KERNEL);
->  	if (!mcdi->logging_buffer)
->  		goto fail1;
->  	mcdi->logging_enabled = efx_siena_mcdi_logging_default;
-> @@ -116,7 +117,7 @@ int efx_siena_mcdi_init(struct efx_nic *efx)
->  	return 0;
->  fail2:
->  #ifdef CONFIG_SFC_SIENA_MCDI_LOGGING
-> -	free_page((unsigned long)mcdi->logging_buffer);
-> +	kfree(mcdi->logging_buffer);
->  fail1:
->  #endif
->  	kfree(efx->mcdi);
-> @@ -142,7 +143,7 @@ void efx_siena_mcdi_fini(struct efx_nic *efx)
->  		return;
->  
->  #ifdef CONFIG_SFC_SIENA_MCDI_LOGGING
-> -	free_page((unsigned long)efx->mcdi->iface.logging_buffer);
-> +	kfree(efx->mcdi->iface.logging_buffer);
->  #endif
->  
->  	kfree(efx->mcdi);
-> 
+air_en8811h.c:#define EN8811H_PHY_ID		0x03a2a411
+
+> UGreen AX88772D ID1 e65b, ID2 2c61
+> TP-Link AX88179A ID1 e65b, ID2 2c61
+
+The two ID registers contain part of an OUI, but it has some bits
+missing. So it is not so easy to look it up.
+
+However, anything using the MII framework basically assumes a very
+simple PHY and only looks at the 802.3 defined registers. So the
+genphy generic PHY driver might be sufficient for when there is not a
+specific driver. At lot depends on how much extra code there is
+accessing the PHY registers in the driver.
+
+	 Andrew
 
