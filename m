@@ -1,329 +1,177 @@
-Return-Path: <netdev+bounces-303885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6zrAGTqVRWosCgsAu9opvQ
-	(envelope-from <netdev+bounces-303885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:31:22 +0200
+	id 2mWeLHeURWr+CQsAu9opvQ
+	(envelope-from <netdev+bounces-303886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:28:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9A2A6F21B1
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:31:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C99A6F2185
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:28:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=RzcH37kE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303885-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303885-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b="I8M2/bw9";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303886-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303886-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6EAFB315DAD0
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:26:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 80439301BA5F
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72475420E8E;
-	Wed,  1 Jul 2026 22:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C9B4189CB;
+	Wed,  1 Jul 2026 22:28:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13C6420E7F
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:26:06 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782944768; cv=none; b=rkoHgE5WrbNZF1O2qF9Nsu4fPXx5Bxcw6ApXosKxCwNHYDd1rwGWFYsuQURdq8LQQgTF4Olr1uP7UH2P7g0m6oD6jhJP0/7G6tS95BSJVhlsK6GDM+nOJMcWaI1CC5ANBXSjtZbYKtdaFSDikrPaluxCRfYpU4P1DaTZeA69uzo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782944768; c=relaxed/simple;
-	bh=lfY1BPxGWhADpJp9Ko6tp8pAnOvHrLtkOS1G/4nji+c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m/P/4JriUYKCfDL+Mvdo/fM/EEWkAOWvr44s0gY0F0bRVpgGBwO3Qj4LMHu7FxHWzWTYHD3AkQttXGzmlNGAUrUtzJNhAbcOccYpDkI8NPM2H3v2Tld1uhurQmLXtUuhALMslNZ4SH3m1k8+etBZ2/k8zKePjlu99b1JmzNsfpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RzcH37kE; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661LmTEw2030169;
-	Wed, 1 Jul 2026 22:25:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=5WFgnhjFb3ujhWuLu
-	5dC/j92ByllA3Et568vLAlecps=; b=RzcH37kEjYAPrFffzm4RhNtZmbRuwW9xq
-	mD/JeYNOdyVlXaKBwt8h3OGBj/0ABTaClZ01QL44Vrry0dM5qGR5n29MUnZrDEYk
-	aYBtWSDh7cNvYKozpuTOXGPfeLPC9Z8JYr/BEw/LgXsJuUg2CUNMq+mOIW/YuCJj
-	mb48D0ZOsCFBxBclHVXaMS820maMbBuEorfObChJzYqCa4XWRSUGoWL2QjuirHQM
-	Ui4PbPWNhAMXqWdhWT24yENDG6+x6Sqzc2GPl/bSu8EoHZvFLdyAIp4dS5P4WHeT
-	+fGR7rusY0VAnuDEZh8dfYopcLKD3hHjqZ38avASKAYfvrd5C39ig==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26n5xynn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Jul 2026 22:25:55 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 661MJbLe001383;
-	Wed, 1 Jul 2026 22:25:54 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f2uhyh4v7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Jul 2026 22:25:54 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 661MPrKM29819478
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 1 Jul 2026 22:25:53 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 87B4F5804B;
-	Wed,  1 Jul 2026 22:25:53 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2199E58066;
-	Wed,  1 Jul 2026 22:25:52 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.61.150.53])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  1 Jul 2026 22:25:52 +0000 (GMT)
-From: Mingming Cao <mmc@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
-        ricklind@linux.ibm.com, mmc@linux.ibm.com, kuba@kernel.org,
-        edumazet@google.com, pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
-        maddy@linux.ibm.com, mpe@ellerman.id.au,
-        Dave Marquardt <davemarq@linux.ibm.com>
-Subject: [PATCH net-next v2 15/15] ibmveth: Fix MQ RX poll and shutdown hangs after queue resize
-Date: Wed,  1 Jul 2026 15:23:27 -0700
-Message-Id: <20260701222327.61325-16-mmc@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20260701222327.61325-1-mmc@linux.ibm.com>
-References: <20260701222327.61325-1-mmc@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8772B3CC327
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:28:00 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782944881; cv=pass; b=cvByqUTCtwfgDMZn/av6ck5NZsq6hxFh52af9e42ZoUozmQ0enZf2W7wkM2LMlE0P/a++hnzIhq7ygBplS0ZxG/zkTKKfX5Z/04aiy2rdRs2eHGRHV5gfGCjkDPurHhRBv+PyFHRj+efv5p+hwi2JNU/vrTSqJRFlYO29OiCytE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782944881; c=relaxed/simple;
+	bh=Sm8YNKS3FiFCcj7xBJJ/yxMqcZTUYh51cN/OPPDJEvk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kGP1UR+RZ3IJMRtJx5YNFC/NPRaRR5i83GZyEkONtvweWBqQr31F38GGFGcKrTYnTxSTC8k8AQWysHJnMXD7wg7aXf2Hl4CnZpTTiue8HVftY1legSiKf03FScZ7OKq5LGidJt4udeIybu3JONPxbOdz5PhAepqG7acON1NAnrs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I8M2/bw9; arc=pass smtp.client-ip=209.85.218.44
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c125bce2294so136487666b.3
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 15:28:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782944879; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ZcH9c1tvxjEZcuf+8DjHQgscg9BSDnuJ3j3dWedth6w7Vp/sgmoLE+xa5S8I9CG6D7
+         Cl9zvok+3DhRM01QQcmFAJyZgRhBpcMRob2vguM7xyEDooEHbmh/+C+abduuJ28mbf//
+         ZHvOIv6fPTBtu0GPJCMXFJ1AY/aW23i3OfIWZy4IYGZ61n8mV8bWnren8u9P3DfqGuG+
+         Zy4eqHbI/fY8xM4S+CbhSC0R+dhmJ8158fR6DIczQADzOr1JOO5f6Opwx0/zSBQo7vJo
+         Zsu1JVOk5Qi5PVQF25UPNyMhekqmaKFEUZ9bWx+UUHc/z9ibJV+OTO1w2mpgmfOXPFVX
+         ZjJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Sm8YNKS3FiFCcj7xBJJ/yxMqcZTUYh51cN/OPPDJEvk=;
+        fh=v5Zkpky2q7N6hK0/4JoL1gqflNZUi5tXXG4jhYzP5Rk=;
+        b=jHdHPfabM9uX9lz0QWUetcScdyfTuH10h0SFPB7JzqQ/TZX7iTP82FB7AE83vVlWUI
+         c63NGsLLkENIVA36ROhs0YwDReG7/vG4QOg9sL+DpTqdDP+XKsrmPYNVnShwEdkMHm/f
+         7QolwsDzABmn3/jbJWjMX2+UrjAHORE431TfFn696LqQ5LhFaEoeesT8m+ZK7OnfNDrQ
+         mQRdrHVF8wwmThq99vYpmdcePa977a1kXpfrvAFB7mdvvqbT/5tsokuZCZwd719laZn+
+         FWg5xU/iJLxjgjxgWFBSRC5nlWafNl6ivDdJ3F1q5rhDzq9HXwgC+q1Zvi8y/vzz7p1c
+         /zJA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782944879; x=1783549679; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sm8YNKS3FiFCcj7xBJJ/yxMqcZTUYh51cN/OPPDJEvk=;
+        b=I8M2/bw9Xvykau/HhQMRxt5ldJUKpjQzkTymikh1mh6t5ukW9cERCg6/FjbjIuamPb
+         M2va9gC9nybI3DPgSlMfSrpaD2SpOHbPdGPN57vdEfA49wqAS+9naaNm2zfvq1tyjDx0
+         u8dHN1v3N/XydaLiqI8gHZ8Ie+mNe7i15bomcMyxLgcJRIGh4YUtQpqlV1lWKsIcMFn6
+         e2uquYI6z1tD1s1sBDqWYzQOfPBrh02vW26hCm6BUjSC6FZ7sBhmvINB+n5DnrH47Tx/
+         BIFnh3VPzS7NgPUBt/fZgBfCtNP4L3/qgsYK2biPiaFl5GRtEX/drnp1Uysc0kNunqk6
+         Y2Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782944879; x=1783549679;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Sm8YNKS3FiFCcj7xBJJ/yxMqcZTUYh51cN/OPPDJEvk=;
+        b=mO5mAmjJiZqSfDH5dBLo7XhAZslJBRl84TS4n+JG0EF0lnRv0v6x0PF4OzWTgyWIzy
+         MrS4eLWjGlPBGgMm8Cyjax9FMnKmmAp9qa00nrxd1MIp8nfdDzyZD7CXYF7R5kvJPoQE
+         xFQGfG1lk8q0M9xt8fKpZJ7HPpjGSFdTqPMPbWQ0FEPzw0xODogaOHhZUi3/1BaGHuFj
+         YHk/iK0CMYML5Ueen97YAiZxE+YGmzrctC6/VF4xWe73RqHdDLLI87dJHu+xOPdi/mGV
+         ytvNR4ZzCxK6llMYjOMxBj5I0nXn1Eg7HMkFpCLQ1T6F1s/AusYWOnEzFkK/x1UdTlyY
+         /qJg==
+X-Forwarded-Encrypted: i=1; AHgh+RrSgGhD2pI4ygzLTSj0DFWiCRRFt6AEkG2X12gxlKxlPylOu5ofYbs8aDnWjVwNzqio6lWM2dw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6UBzIW15qHej743hvnn8AlShtDX/hdw+euYtrSNM3xvAOZWbl
+	vyGpe4uW/enU9QYWX5uBli0KqL1h8Sja4d8Ax5IZ+6UMit4zhtqizLuM7Nc/faGy2n8zp/98DiT
+	azzVXdeE8c/9u+AbJAEKAhHXYZG2m7e7jXYpoZeVd
+X-Gm-Gg: AfdE7cnU6jNAMmF6zxzKE3kVSdF6d4Cpi+Mud0vbsRzB77bZsWPomtr1yQYq8cRAVqY
+	iIu3KhLjOXT6Hkf0bgb0bjuISebEJ+t4URLIhem0sCQ87IpjzSjl4vFxdAIqoLuL+PFhJF+25t6
+	cx5Ks9udvCXvILxinE9MPYWMqFXlGR5ntXtWuW5A2lu0I4PIN1nMdySWB3RGzGuBB+giiXn50Td
+	lC9q34v+JlOqJf6uL4MEhXIMSPDvGkiRwzq4yylfZBufDo+1JcPX0KowWKWFttsQPV/Ywg+0YUc
+	RAET+Dh+MLuhSkYlzCn5Nhyv/EaD6PW9Pq3TkZ3SAD4l9D0c+uSlRa6y5/y7RZXtIVSiDNjF0jn
+	EPfViqN89JHGtz1CnH5oS7jzsQoGufb6jkCZ1MjynIsTWCHttvr+5
+X-Received: by 2002:a17:907:7805:b0:c12:a588:4113 with SMTP id
+ a640c23a62f3a-c12ae4f2182mr95940966b.29.1782944878426; Wed, 01 Jul 2026
+ 15:27:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfX9yYGwphyZA0M
- QVB9oQDVA53C69eedTsnuJ0k0qQ3mnKQInpDrGjG+3XGNA5eprv5csSCmYAMDgpDAKNEA25najP
- NeWCki1MJ3WgeR0joDi5hKbX7Q+L3o/LP6ZhgtZtnwUKsCDXI8py8BdFX9TrA9gzI4Nn2YfC6qW
- +2EpHkonNLzeYe3lLIkwVFb60UrOKodItctG6wCRDwpKoCffVQfUO3kI6eNPqUvUplmhzwvvCZx
- LcSmUnkCfXFeL4cfCBq7uhOuGDYWEvzAnCALOxP/vG0ZOipYlz+sOls5I8r2F7SmiCJu//SQAF1
- kvUCoEcr83/odfVXg8Ow0oratud0Mdh0YptJ5u0qe88fCQkNoaoKi5Yw33K2Ivg3VBB0I/cMfy0
- vLbugUiLa37pGevSlyvM4VQ+jc6bQ6utFLrvu4C4PEIaKUM3kl0XYLzo235RI6ujPLxAIkTLqfK
- GJWB3Kz4DDx60tP9B4g==
-X-Authority-Analysis: v=2.4 cv=V45NF+ni c=1 sm=1 tr=0 ts=6a4593f4 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=H2PsU0_gVjd1cLIlZ3YA:9
-X-Proofpoint-ORIG-GUID: KY8kV9KCYWYTDSrFI9h-_1fcIFEWL17U
-X-Proofpoint-GUID: Th7arcEAi8i9hshMNlDnsy_vFDZFfp1m
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfXzvGm269p7jrx
- PLGRw9rn3HYvDh/UZoXENxMttqKAXSDqNyl7gxYga7k4U9Wlg2KIS4MNPCQY6VdnukL7Q7H6Ttz
- uWHBNo1VovNV9k9oCvGrHzMCWgX4854=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-01_05,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607010239
+References: <20260701094341.3218199-1-edumazet@google.com>
+In-Reply-To: <20260701094341.3218199-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 1 Jul 2026 15:27:44 -0700
+X-Gm-Features: AVVi8CcDbMj1Le7OngcM0-5y7rl3ZXDkK6ahwP0ZeeriCLL_VcXrcK09fmFc2Sg
+Message-ID: <CAAVpQUBrecJMKQpSq6RYaAY_E2=EbCncFHAZ6BobhByWNKLjQA@mail.gmail.com>
+Subject: Re: [PATCH net-next] macsec: no longer rely on RTNL in macsec_fill_info()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Sabrina Dubroca <sd@queasysnail.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-303885-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303886-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,queasysnail.net,lunn.ch];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:sd@queasysnail.net,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:mmc@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.ibm.com:mid,linux.ibm.com:from_mime];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B9A2A6F21B1
+X-Rspamd-Queue-Id: 2C99A6F2185
 
-After aggressive ethtool -L cycling, PHYP can leave a VALID RX descriptor
-with a correlator that no longer matches the per-queue buffer pools. Poll
-treated this as fatal: ibmveth_rxq_get_buffer() WARNed and returned NULL
-without advancing the ring, then restart_poll retried the same slot forever.
+On Wed, Jul 1, 2026 at 2:43=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> Add READ_ONCE()/WRITE_ONCE() annotations on fields that can be
+> changed concurrently in macsec_changelink() and macsec_update_offload():
+>
+> - secy->key_len
+> - secy->xpn
+> - tx_sc->encoding_sa
+> - tx_sc->encrypt
+> - secy->protect_frames
+> - tx_sc->send_sci
+> - tx_sc->end_station
+> - tx_sc->scb
+> - secy->replay_protect
+> - secy->validate_frames
+> - secy->replay_window
+> - macsec->offload
+>
+> This allows macsec_fill_info() to run locklessly without RTNL.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Advance past bad correlators instead of spinning: validate correlators
-without WARN_ON, skip invalid slots in poll (count as invalid_buffers),
-and advance the RX ring when remove_buffer_from_pool cannot map the
-correlator. Rate-limit the bad correlator message.
-
-Complete NAPI when the interface is down or napi_disable is pending so
-ibmveth_cleanup_rx_interrupts() can finish. Do not restart_poll in that
-window. Close keeps hypervisor IRQ disable before napi_disable (via
-cleanup_rx_interrupts()).
-
-Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
----
- drivers/net/ethernet/ibm/ibmveth.c | 76 ++++++++++++++++++++++--------
- 1 file changed, 57 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 50a332ab83fd..d7bf01271161 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -158,6 +158,25 @@ static inline int ibmveth_rxq_frame_length(struct ibmveth_adapter *adapter,
- 	return be32_to_cpu(rxq->queue_addr[rxq->index].length);
- }
- 
-+static inline bool
-+ibmveth_rxq_correlator_valid(struct ibmveth_adapter *adapter, int queue_index,
-+			     u64 correlator)
-+{
-+	unsigned int pool = correlator >> 32;
-+	unsigned int index = correlator & 0xffffffffUL;
-+
-+	return pool < IBMVETH_NUM_BUFF_POOLS &&
-+	       index < adapter->rx_buff_pool[queue_index][pool].size;
-+}
-+
-+static inline void ibmveth_rxq_advance(struct ibmveth_rx_q *rxq)
-+{
-+	if (++rxq->index == rxq->num_slots) {
-+		rxq->index = 0;
-+		rxq->toggle = !rxq->toggle;
-+	}
-+}
-+
- static inline int ibmveth_rxq_csum_good(struct ibmveth_adapter *adapter,
- 					int queue_index)
- {
-@@ -1284,17 +1303,12 @@ static int ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
- 	unsigned int free_index;
- 	struct sk_buff *skb;
- 
--	if (WARN_ON(pool >= IBMVETH_NUM_BUFF_POOLS) ||
--	    WARN_ON(index >= adapter->rx_buff_pool[queue_index][pool].size)) {
--		schedule_work(&adapter->work);
-+	if (!ibmveth_rxq_correlator_valid(adapter, queue_index, correlator))
- 		return -EINVAL;
--	}
- 
- 	skb = adapter->rx_buff_pool[queue_index][pool].skbuff[index];
--	if (WARN_ON(!skb)) {
--		schedule_work(&adapter->work);
-+	if (!skb)
- 		return -EFAULT;
--	}
- 
- 	/* if we are going to reuse the buffer then keep the pointers around
- 	 * but mark index as available. replenish will see the skb pointer and
-@@ -1335,11 +1349,8 @@ static inline struct sk_buff *ibmveth_rxq_get_buffer(struct ibmveth_adapter *ada
- 	unsigned int pool = correlator >> 32;
- 	unsigned int index = correlator & 0xffffffffUL;
- 
--	if (WARN_ON(pool >= IBMVETH_NUM_BUFF_POOLS) ||
--	    WARN_ON(index >= adapter->rx_buff_pool[queue_index][pool].size)) {
--		schedule_work(&adapter->work);
-+	if (!ibmveth_rxq_correlator_valid(adapter, queue_index, correlator))
- 		return NULL;
--	}
- 
- 	return adapter->rx_buff_pool[queue_index][pool].skbuff[index];
- }
-@@ -1365,14 +1376,15 @@ static int ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
- 
- 	cor = rxq->queue_addr[rxq->index].correlator;
- 	rc = ibmveth_remove_buffer_from_pool(adapter, cor, queue_index, reuse);
--	if (unlikely(rc))
-+	if (unlikely(rc)) {
-+		if (rc == -EINVAL || rc == -EFAULT)
-+			goto advance;
- 		return rc;
--
--	if (++rxq->index == rxq->num_slots) {
--		rxq->index = 0;
--		rxq->toggle = !rxq->toggle;
- 	}
- 
-+advance:
-+	ibmveth_rxq_advance(rxq);
-+
- 	return 0;
- }
- 
-@@ -2931,11 +2943,19 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 	if (WARN_ON(queue_index < 0 || queue_index >= adapter->num_rx_queues))
- 		return 0;
- 
-+	if (!netif_running(netdev) || napi_disable_pending(napi)) {
-+		napi_complete_done(napi, 0);
-+		return 0;
-+	}
-+
- 	if (adapter->rx_qstats)
- 		adapter->rx_qstats[queue_index].polls++;
- 
- restart_poll:
- 	while (frames_processed < budget) {
-+		if (!netif_running(netdev) || napi_disable_pending(napi))
-+			break;
-+
- 		if (!ibmveth_rxq_pending_buffer(adapter, queue_index))
- 			break;
- 
-@@ -2959,8 +2979,21 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 			__sum16 iph_check = 0;
- 
- 			skb = ibmveth_rxq_get_buffer(adapter, queue_index);
--			if (unlikely(!skb))
--				break;
-+			if (unlikely(!skb)) {
-+				if (net_ratelimit())
-+					netdev_err(netdev,
-+						   "bad correlator on queue %d, skipping slot\n",
-+						   queue_index);
-+				if (adapter->rx_qstats)
-+					adapter->rx_qstats[queue_index].invalid_buffers++;
-+				else
-+					adapter->rx_invalid_buffer++;
-+				rc = ibmveth_rxq_harvest_buffer(adapter, queue_index,
-+								true);
-+				if (unlikely(rc))
-+					break;
-+				continue;
-+			}
- 
- 			/* if the large packet bit is set in the rx queue
- 			 * descriptor, the mss will be written by PHYP eight
-@@ -3034,8 +3067,11 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 
- 	ibmveth_replenish_task(adapter, queue_index);
- 
--	if (frames_processed == budget)
-+	if (frames_processed == budget) {
-+		if (!netif_running(netdev) || napi_disable_pending(napi))
-+			napi_complete_done(napi, frames_processed);
- 		goto out;
-+	}
- 
- 	if (!napi_complete_done(napi, frames_processed))
- 		goto out;
-@@ -3053,6 +3089,8 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (ibmveth_rxq_pending_buffer(adapter, queue_index) &&
-+	    netif_running(netdev) &&
-+	    !napi_disable_pending(napi) &&
- 	    napi_schedule(napi)) {
- 		lpar_rc = ibmveth_disable_irq(adapter, queue_index);
- 		WARN_ON(lpar_rc != H_SUCCESS);
--- 
-2.39.3 (Apple Git-146)
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
