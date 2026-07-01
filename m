@@ -1,168 +1,133 @@
-Return-Path: <netdev+bounces-303821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303822-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id A5shFrF5RWpCAwsAu9opvQ
-	(envelope-from <netdev+bounces-303821-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 22:33:53 +0200
+	id wpnbCfB/RWrnBAsAu9opvQ
+	(envelope-from <netdev+bounces-303822-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:00:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D1E6F17CC
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 22:33:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7446F1B78
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:00:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=XdApi4HK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303821-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303821-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=linux.dev header.s=key1 header.b=bP5Y1uth;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303822-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303822-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 602AF3048DF7
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 20:33:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 624BE314183F
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 20:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A1832D0FC;
-	Wed,  1 Jul 2026 20:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F8F27B35F;
+	Wed,  1 Jul 2026 20:54:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CAC431E68
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 20:33:49 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782938031; cv=pass; b=a6A6Mrgg3JqzIsv3puQCI1TWyf6c0cNN3RxacmaDUJyeHeEQ42Sy1mVx9OO5NvtWbAqONRJQPYIku1zskkbwcbzdO3ZbIaJQQ8AmEwiDmyOlZJ3lsPjYzAsJm0qUqBwYQAgWehXEclI3kDl7DOVAIp+hEl/Z8XuLWzHKvslpavc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782938031; c=relaxed/simple;
-	bh=Up0tRfswt+77mjFqWVZX5W7neMwaKjOkcEe3Ahf+TVs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RneQh+fsvkDXs8HY2zVtVQ6r1klO8axGSgBxThFO6VCW9pLPeSnT9YHhViNiDpJDtP5VceCP3Ar33K8IJ+PpiAyyuHVzp2uT3iVW+/L8O2oE1fLcN+sFehux4RO65SEFrZP8MRtFFDomeuJl3tjckA2GoaYPtaz4blFcgNqRKbk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=XdApi4HK; arc=pass smtp.client-ip=209.85.216.54
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-37de8008910so719849a91.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 13:33:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782938029; cv=none;
-        d=google.com; s=arc-20260327;
-        b=OGfaqnqNgMb66TqRmpHkcFLxckDZ9+tQQi6yiqfD/Hh/eqgA/0VFxxXhfmUAtCPta+
-         veOO7fjzGQAkkeylgW+VmJnsTn+DqHNDs0wfWAfBXcK1wqkIXnB+xhGART/m9Jnllaa9
-         Jnzlm6z3LdOEUKqkYYN8vVjYdgikLlNpzUN59+uPlKiPHgnOuJNwzUWPCvMrIqw2KPhq
-         p5JhHVMBX/Z0EMwMkWWP/YXuy3FpKE1U7O2kY1Q5wqeHSJfn2imLfTrFKwpo2qkdXxls
-         jOIGrXgpGR3B3PtQq5qIPV5xIiY2Q6r3r/Rawvj7SeLZFDjL2+z30TJjf/c5JROewP84
-         TlKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Up0tRfswt+77mjFqWVZX5W7neMwaKjOkcEe3Ahf+TVs=;
-        fh=eHEX98iP+rW1fEM80zXJ1fREOI7CHyRAtdbFOu/KvEI=;
-        b=elRgM27HcmobkwwD3D/prNHALf5ZC3UqhzTs02Qq3htyNkgRjlbZIaZp6Ug0SU4pRv
-         MRXR/UXNqGhG/A3S48r6oWSLMASZdWCrOilcZEVWEMLjWF4MAMxQsq94oI5z170A64i2
-         NYH3JHLFzopP0HVzb9B2mGFz6S8Cv7dKev9m2SIx29WrWU2plnjSaKH2hgdT++yawvDd
-         rh+ePGub4ORUY8ANfHdxrCN1L0HukCCXK4pOmn36NheGBdERQx4LylWV3usNgeev/hOW
-         wdiRcKNvJgjtq5VNuFiKoRM7JVcQF4IFfbpZqyP1E4LLF0vtQeDdPPmF3TbCvsg16D11
-         +1Jg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1782938029; x=1783542829; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Up0tRfswt+77mjFqWVZX5W7neMwaKjOkcEe3Ahf+TVs=;
-        b=XdApi4HKez9CjQJPYdQr+A/fLFMgqKRmxF/6j/pOxWpHPBiCdMgXtk6kSsCpFuDtHO
-         xAREFsYmoZdr1h2MXlgBH5a7wIJrMZEpcTB28g0xzcIxAd6puuGhxc/P2sznQlfqA/d5
-         2tA2thAtJUu4BTeoD5kA4vW2693L4MGdHJmhGuaVNxbrQAq3zsCwyQAy8Nk3XXnFUCwW
-         Zn6cHd9phNz3GQCYHuD7YHh/sUHaXjBU6vov2Glf8Bbtx2OBolGFc//Ywr4t/9H8JbFn
-         YvWUuMcjWqnoke/U9ScpQbP0oFUGpNIhueD3MD4OFadK0CK5DUbqx3pPbwJA1ufdidhY
-         X2ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782938029; x=1783542829;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Up0tRfswt+77mjFqWVZX5W7neMwaKjOkcEe3Ahf+TVs=;
-        b=m8kfEFQaRwGMhZpdrSKjZuFNRsVcbssKYVFt/NE3/6AgB1Z+ZBTGIvYNIQog9nQj1W
-         b5+Rz/sRqcv9kuyjoFwpJ4Za/gN9eyVEJL7RvFiSsDkWu9teoNN/qP8DG426RAR6rgA6
-         CNHD4FC3KVciv777K8COmyA02UZx5QRKhM6u1sJj3VrLZUym91SAiBrhbhp6n9kIMBgk
-         mS1XK0cnLSdC0NdmKfCTD33QFDoA05HEZWOgtJB9VNpErMG3QWKnZK5okXrA3mcAOmzo
-         3FLqURbSbYkdZoeyZAqBg0sv1fLjoloL9FC1MTbsGrcA8S3OmjCLuWaOWBfrIvqpaMkx
-         9DUg==
-X-Gm-Message-State: AOJu0YwQ+vKABt7rmOytQLVs++8xEYRxUOquhvnMaGhuqyatlEtfoN6E
-	NbHdMvdzuIH11clx6rarOxsL2/kMsbQP5ICdlQdq4y+uAXy79K4krE8DXyEeRSnZmC8muYdX23N
-	7V4Q+WwQTiP/JhLtr8pmcQnflhU50UibOJ+5cNtEc
-X-Gm-Gg: AfdE7clKfelvkIvBs0tjnGnkknNEi7GCD9h2vpYwjChqGD//r+ZJrYUPI7bgwH1kDu3
-	9FUxM/tdVBd16zvJzrocObv+q80SpmG3xhGUChC4d7zCDBS27m3MG84IPGTPs7qk4obKZ5at92c
-	za4VZlU60kuF4cLNFMbSocUpUHrdD9r01szFNcViW8PuiMHH3i8XcDDwt5qyy/MmNj+DkXm0EUj
-	HpzfSc/SlEVBCCU++4GeSKtd2sGAzjFe/STY5QbkJg2MeyeiVC4jgZDMmLa3tYoM/Ac9mF6FBkp
-	PKuIhYjlI3mgS9srIwGmmYmF4mxu
-X-Received: by 2002:a17:90a:d44f:b0:37f:133a:3e07 with SMTP id
- 98e67ed59e1d1-380aa0fc88cmr3135081a91.2.1782938029026; Wed, 01 Jul 2026
- 13:33:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3129F3A7F6B;
+	Wed,  1 Jul 2026 20:54:18 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782939262; cv=none; b=T2SUpCW2CHPOeU0mDnB0u22qxuYga/vpPmFvrouUlBaMYTeOeZ6DKf9qWgRxL5NAbXOp4CVsIasOYv9UdXXCuE2eqcYjHdG2qaGGjUDhDoMzS7ckmesWik/R5i+4PgNHRoo/LoqiK+aFAvFD4r8XZRxuQvFfoCWXDYozChngBRI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782939262; c=relaxed/simple;
+	bh=pflyARrIC1PkECp+vY/Xn1BVY0ujTQ/JDr52eHmBJF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NgS0bahADaddHMUFsUq/HKV/sv6Kc7Y8mRvAvUibKVmm22/ehlAPLD37F6SnsYh9dlINnqhvkN56pU6zyKKc0aUJyjDmWu2YrMk3DqJ1E2oKAZhSqJzxVUFJcHSNgQFFAy0HQHQbYtm4+CKTaScHa0eTC2q4AC6jYdeQnjZEi6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bP5Y1uth; arc=none smtp.client-ip=91.218.175.188
+Message-ID: <75aafe76-fa22-4985-b277-fb51debf8852@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782939256;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sTSQsuTdzdnUYTD7BTPntQLkPU6l8HPheSNnHeBOHHQ=;
+	b=bP5Y1uth5XwlVbKmRMA1yvUclZCCZcHoAQdvdFQRqGGeW3y0luZx3MAiC8IP9y14Z/U4gQ
+	bpnlxzMOMOJjiyVRS/Tlp3I0aOLPSj8XDkLexvIfGXcrXvugY/SLz00wwQyddbRkT60fF7
+	msh/WM6xC58NsXos//1rGdxe5gS/big=
+Date: Wed, 1 Jul 2026 21:54:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260630045243.2657-1-fw@strlen.de> <20260630045243.2657-4-fw@strlen.de>
- <akShGOr3YKg1bs3r@strlen.de>
-In-Reply-To: <akShGOr3YKg1bs3r@strlen.de>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Wed, 1 Jul 2026 13:33:38 -0700
-X-Gm-Features: AVVi8CdAP4E5HbEEHn2Qa8InlB22fwub2VUQjNn1UnK_2DY9jxOTTw931Ja-CW4
-Message-ID: <CAPpSM+Q0jAO7F_NOTsRngOkkvzFZNoULGvf9pHi8OVp9Co9+4A@mail.gmail.com>
-Subject: Re: [PATCH net 3/9] netfilter: ipset: fix race between dump and
- ip_set_list resize
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	kadlec@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 1/3] net: ipv4: report multicast group user count
+To: Yuyang Huang <sigefriedhyy@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+References: <20260630110207.37841-1-sigefriedhyy@gmail.com>
+ <20260630110207.37841-2-sigefriedhyy@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260630110207.37841-2-sigefriedhyy@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303821-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:sigefriedhyy@gmail.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:dsahern@kernel.org,m:donald.hunter@gmail.com,m:edumazet@google.com,m:idosch@nvidia.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303822-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:kadlec@netfilter.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,gmail.com,google.com,nvidia.com,redhat.com,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E3D1E6F17CC
+X-Rspamd-Queue-Id: 5C7446F1B78
 
-Thanks, Florian,
+On 30/06/2026 12:02, Yuyang Huang wrote:
+> RTM_GETMULTICAST has been part of the rtnetlink ABI for a long time
+> and already reports IPv4 multicast group membership through
+> IFA_MULTICAST and IFA_CACHEINFO. It does not report how many consumers
+> hold each membership, so userspace still has to parse /proc/net/igmp to
+> get the Users column.
+> 
+> Add IFA_MC_USERS as a u32 attribute carrying ip_mc_list::users in
+> RTM_GETMULTICAST replies and entry-lifecycle notifications.
+> 
+> This gives iproute2 enough information to migrate the IPv4 part of
+> "ip maddr show" from procfs parsing to rtnetlink.
+> 
+> Signed-off-by: Yuyang Huang <sigefriedhyy@gmail.com>
+> ---
+>   Documentation/netlink/specs/rt-addr.yaml | 4 ++++
+>   include/uapi/linux/if_addr.h             | 1 +
+>   net/ipv4/igmp.c                          | 2 ++
+>   3 files changed, 7 insertions(+)
+> 
 
-I'll deliver an independent patch for that issue.
-
-Xiang
-
-On Tue, Jun 30, 2026 at 10:09=E2=80=AFPM Florian Westphal <fw@strlen.de> wr=
-ote:
->
-> Florian Westphal <fw@strlen.de> wrote:
-> > From: Xiang Mei <xmei5@asu.edu>
->
-> Xiang, Jozsef, could you please have a look at
->
-> https://sashiko.dev/#/patchset/20260630045243.2657-1-fw%40strlen.de
->
-> AFAICS it's correct but should be handled in a followup patch rather
-> than a v2.
->
-> Thanks!
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
