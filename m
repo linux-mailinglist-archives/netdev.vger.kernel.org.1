@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-303733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EVETMoo5RWpo8woAu9opvQ
-	(envelope-from <netdev+bounces-303733-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:00:10 +0200
+	id iikQMGA5RWpb8woAu9opvQ
+	(envelope-from <netdev+bounces-303732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:59:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A476EF70F
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:00:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D59B6EF6F4
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:59:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=jGH2Q3wn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303733-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303733-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b="Yhd/Brw+";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303732-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303732-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF8643010257
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 15:59:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 41669300E249
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 15:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37915428473;
-	Wed,  1 Jul 2026 15:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE96048C8DA;
+	Wed,  1 Jul 2026 15:59:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6605549251E
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 15:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EE43546EF;
+	Wed,  1 Jul 2026 15:59:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782921562; cv=none; b=Bu+ucDhh+s0ncxqhQ2Flp36X3Qgl5T1GL8ATx9Y4/vjYu8CD273+/GXiplavNMvFeZlcRdQasttJk7vvTgZBCkfBl64xGArtoNrv7nCXSA1F8O9is16TMjebFRg3bH8sYVXywLVv104X4DBDHvsq7Cm9nChyJb1ja8eGuGyXo3M=
+	t=1782921558; cv=none; b=VWUPEFaB0K/8zbn0ZS/M9oaqp/hzXa1cUfIyu3lq8AwY84uq2Kf8kBOD8nol+YyQEMOn7kElKjaoJXqMSZYUdfnMCFR4OHNmhUOuZqsvxqKI3pSjDpxo6iqHltJdXWG2l2IgkuRxHnNBWkkSXwo2t6aSyAc6rLFPlNmbWJ+vARY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782921562; c=relaxed/simple;
-	bh=prPFly5ezm3C1Dvts+psV9mCn00GZ3shOaavLauKZkc=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rfDvjYrzad0lxY9xCnO04b5DYffSIXXYi2SAUh9BdPIuJ5nJpfzLvOwew5gm4y9cTYZyT+/m9SjJwZ90J4KwAWd8fAhUm/iDigeedumH6HKH+yB11Dxq2yao/ggIis85HFpJOAbb+7mbC5q+2PdpqwQBfZcDzSL26hG86VTuNvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jGH2Q3wn; arc=none smtp.client-ip=185.171.202.116
+	s=arc-20240116; t=1782921558; c=relaxed/simple;
+	bh=EVVHUEAGMBiAkNXRvqQ0md7sIb4G+gir1ZkuPwyWUxc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=QyY7C1ru8NFeTk1woVWw0glBKZTMoES6qWRXLDwHNW5z/Txhp5qwJ/xw/Fbvm8tl6yzW0lFnm3cZHTIcVXx6iV78jzC47zHsC037y1LFBDmL1M6G7OW5TfI0cyiqhvC03/f46nI54lN92EWzjZGaWrS3FlvUsRDcZ5423LA8+pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Yhd/Brw+; arc=none smtp.client-ip=185.246.84.56
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 26063C4FECB;
-	Wed,  1 Jul 2026 15:59:24 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id DAD681A0DB9;
+	Wed,  1 Jul 2026 15:59:15 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1331960288;
-	Wed,  1 Jul 2026 15:59:13 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BEE71104C967E;
-	Wed,  1 Jul 2026 17:59:06 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id AF1F460288;
+	Wed,  1 Jul 2026 15:59:15 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 41DD9104C967F;
+	Wed,  1 Jul 2026 17:59:12 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782921551; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=pqPkWt3NjnuYgtecTC80VCR92378sKkmYJAPWo/XleM=;
-	b=jGH2Q3wnl07s+ox9GFLyeLfJfNcZp+ZTRb+XMbkpltj6lYFGwrLtWYyt6n/SO+8WdFGcYs
-	xlo1U500XBt8kwpnNlBf5J6P7yj7cki72oCPuS3FJx56ohAIFLjLhd1IUN0SQJaiCPKPbH
-	52lHRZYO9pa273qEWAvYLPZjAVqKJnQi7FV+SDx/Xyky07EJpWae1IwYa95V0P/DMw7wcK
-	g+wnMNEER3i3oA87hj0a6Eil6pkuX+YqDJNtyhIrQXxSofrB7qWwG9o5otV31Mrdk8F4El
-	lnm6VnvnxVu4XoasFK6TtmQVZDtWpmcN3rk6cuYd0aH4V/vXecuEvW0cHhEVUA==
+	t=1782921554; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=IrhSpt2aptNeyN+BmWYKYU3AotvUPsK1MLmZ8vMBUas=;
+	b=Yhd/Brw+qzMOk/ThPDQ8kuuedq7tNCiVB/g4QuEjKc2Hy79tKEwatAdwgK2RQ6ibECCCvr
+	iyEU8+O7VkygKevmkF9rKRI8nSoChxgpHQUA/uZJtfga6/f6CMR/6o+EZ2HNtufaeTUgAS
+	w9KvO4S4XhDSQxKMSow5E0Ti5+ZytCyC4jkaBu4LTW0lM61znQUNa0AKNlMYpv0OpcvfGg
+	+VraXv61xwa8GFfgmRlckA39eibnCctfuEW2+58mEv5hqEJoAet2Bd3/J5nzQ5wS9u2eV2
+	hJJX2BQfs0QggWq9csfMlrlS8uPT/HxiA3vhN3CMIpvHXBJK15zMctbQ/nRikw==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: [PATCH net-next v3 00/15] net: macb: implement context swapping
-Date: Wed, 01 Jul 2026 17:59:03 +0200
-Message-Id: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
+Date: Wed, 01 Jul 2026 17:59:04 +0200
+Subject: [PATCH net-next v3 01/15] net: macb: drop "consistent" from
+ alloc/free function names
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +63,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22Nyw7CIBREf6VhLeZCX6kr/8O44GkxFgwgqWn67
- 1LcqHE5mTlnFhSUNyqgQ7Ugr5IJxtkc6l2FxMjsRWEjc0YUaAcNEDwxwbFwNqo5Yi5BME2hIY1
- EGbl7pc1cdCdkVcQ2r9D53YQHvyoRN9u2HU2Izj/LcyKF+H+SCAY8tAOIlvGe9vTInYs3Y/fCT
- UWe6AdO4AenGWe6HnRPZAO8+8bXdX0BKEm7vwUBAAA=
-X-Change-ID: 20260401-macb-context-bd0caf20414d
+Message-Id: <20260701-macb-context-v3-1-00268d5b1502@bootlin.com>
+References: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
+In-Reply-To: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
 To: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
  Conor Dooley <conor.dooley@microchip.com>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -91,11 +91,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303733-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303732-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
@@ -115,139 +115,86 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F2A476EF70F
+X-Rspamd-Queue-Id: 5D59B6EF6F4
 
-MACB has a pretty primitive approach to buffer management. They are all
-stored in `struct macb *bp`. On operations that require buffer realloc
-(set_ringparam & change_mtu at the moment), the only option is to close
-the interface, change our global state and re-open the interface.
+Since commit 4df95131ea80 ("net/macb: change RX path for GEM") those
+functions have not been only allocating or freeing consistent memory
+mappings.
 
-Two issues:
-- It doesn't fly on memory pressured systems; we free our precious
-  buffers and don't manage to reallocate fully, meaning our machine
-  just lost its network access.
-- Anecdotally, it is pretty slow because it implies a full PHY reinit.
-
-Instead, we shall:
- - allocate a new context (including buffers) first
- - if it fails, early return without any impact to the interface
- - stop interface
- - update global state (bp, netdev, etc)
- - pass newly allocated buffer pointers to the hardware
- - start interface
- - free old context
-
-This is what we implement here. Both .set_ringparam() and
-.ndo_change_mtu() are covered by this series. In the future,
-at least .set_channels() [0], XDP [1] and XSK [2] would benefit.
-
-The change is super intrusive so conflicts will be major. Sorry!
-
-Thanks,
-Have a nice day,
-Théo
-
-[0]: https://lore.kernel.org/netdev/20260317-macb-set-channels-v4-0-1bd4f4ffcfca@bootlin.com/
-[1]: https://lore.kernel.org/netdev/20260323221047.2749577-1-pvalerio@redhat.com/
-[2]: https://lore.kernel.org/netdev/20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com/
+Rename from macb_alloc_consistent() to macb_alloc() and
+       from macb_free_consistent()  to macb_free().
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
-Changes in v3:
-- Use `const struct macb_info *info` instead of bare `u32 caps` as
-  helper arguments, for type safety.
-- macb_interrupt(): the pre-lock readl(ISR) to detect spurious
-  interrupts is only done if CLEAR_ON_WRITE.
-- Don't forget allocating context in at91ether_open().
-- swap:
-  - Refuse swap for EMAC HW; it would crash because codepaths are so
-    different.
-  - Grab new bp->mac_cfg_lock to serialise with phylink MAC callbacks.
-    We cannot rely on phydev->lock because it isn't present in the SFP
-    or fixed-link cases. We also want to avoid phylink_stop() which
-    triggers a slow PHY retrain.
-- swap start:
-  - We used to do disable-irqs-and-hw then drain-all-bh-features, but
-    then HW might be raced against. Instead we disable-irqs then
-    drain-all-bh then disable-hw which means at disable-hw step no BH
-    context can be active.
-  - Use macb_halt_tx() helper to properly stop HW.
-  - Disable BH features before netif_tx_disable() call to avoid queue
-    wakeup races.
-  - Use macb_queue_isr_clear() helper instead of manual if-then-writel.
-- swap end:
-  - Grab bp->lock for the hardware reinit sequence composed of DMACFG
-    and NCR writes.
-  - Drop now useless EMAC check (we refuse EMAC HW before swapping).
-- nits:
-  - New patch to rename macb_{alloc,free}_consistent() which don't only
-    allocate consistent buffers since a long time ago.
-  - Fix the start_xmit verbose netdev_vdbg() format string from %hu to %u
-    because the queue index type changed.
-  - Strong commit reword from "unify `struct macb *` naming convention"
-    to "unify variable naming convention in at91ether functions" which
-    was underselling the changes.
-- Rebase upon latest net-next/main (1c664ec4b9ea).
-- Link to v2: https://patch.msgid.link/20260410-macb-context-v2-0-af39f71d40b6@bootlin.com
+ drivers/net/ethernet/cadence/macb_main.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Changes in v2:
-- Patch "add subset of `struct macb` to `struct macb_context`" was
-  messed up. It contained much more than what the name implied. Split
-  into three commits (I caused trouble by rebase reordering).
-- Fix tieoff; V1 allocated it without initialisation.
-- Fix NULL pointer dereference on context in mab_get_regs() and
-  macb_get_ringparam() when interface is offline.
-- Patch "unify device pointer naming convention":
-  - Fix build issue when CONFIG_NETCONSOLE=y.
-  - Rename `struct net_device *dev` to `netdev` in macb.h.
-  - Rename `struct phy_device *phy` to `phydev` in macb_main.c.
-- On swap, call netdev_tx_reset_queue() to reset all DQL counters.
-- At end of swap, add missing kfree(old_ctx).
-- During HW disabling in swap, grab bp->lock to protect against IRQ
-  handler.
-- On swap, cancel the three BH features MACB has:
-  bp->hresp_err_bh_work, bp->tx_lpi_work and queue->tx_error_task.
-- On swap, call macb_configure_dma() which writes buffer size to
-  hardware registers. This is important because the change_mtu codepath
-  changes the buffer size.
-- Rebase onto latest net-next/main (58dd34dbd5b0) & resolve conflicts.
-- Link to v1: https://patch.msgid.link/20260401-macb-context-v1-0-9590c5ab7272@bootlin.com
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index fd282a1700fb..d677a93b9d72 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -2646,7 +2646,7 @@ static unsigned int macb_rx_ring_size_per_queue(struct macb *bp)
+ 	return macb_dma_desc_get_size(bp) * bp->rx_ring_size + bp->rx_bd_rd_prefetch;
+ }
+ 
+-static void macb_free_consistent(struct macb *bp)
++static void macb_free(struct macb *bp)
+ {
+ 	struct device *dev = &bp->pdev->dev;
+ 	struct macb_queue *queue;
+@@ -2711,7 +2711,7 @@ static int macb_alloc_rx_buffers(struct macb *bp)
+ 	return 0;
+ }
+ 
+-static int macb_alloc_consistent(struct macb *bp)
++static int macb_alloc(struct macb *bp)
+ {
+ 	struct device *dev = &bp->pdev->dev;
+ 	dma_addr_t tx_dma, rx_dma;
+@@ -2769,7 +2769,7 @@ static int macb_alloc_consistent(struct macb *bp)
+ 	return 0;
+ 
+ out_err:
+-	macb_free_consistent(bp);
++	macb_free(bp);
+ 	return -ENOMEM;
+ }
+ 
+@@ -3157,7 +3157,7 @@ static int macb_open(struct net_device *dev)
+ 	/* RX buffers initialization */
+ 	macb_init_rx_buffer_size(bp, bufsz);
+ 
+-	err = macb_alloc_consistent(bp);
++	err = macb_alloc(bp);
+ 	if (err) {
+ 		netdev_err(dev, "Unable to allocate DMA memory (error %d)\n",
+ 			   err);
+@@ -3202,7 +3202,7 @@ static int macb_open(struct net_device *dev)
+ 		napi_disable(&queue->napi_rx);
+ 		napi_disable(&queue->napi_tx);
+ 	}
+-	macb_free_consistent(bp);
++	macb_free(bp);
+ pm_exit:
+ 	pm_runtime_put_sync(&bp->pdev->dev);
+ 	return err;
+@@ -3235,7 +3235,7 @@ static int macb_close(struct net_device *dev)
+ 	netif_carrier_off(dev);
+ 	spin_unlock_irqrestore(&bp->lock, flags);
+ 
+-	macb_free_consistent(bp);
++	macb_free(bp);
+ 
+ 	if (bp->ptp_info)
+ 		bp->ptp_info->ptp_remove(dev);
 
----
-Théo Lebrun (15):
-      net: macb: drop "consistent" from alloc/free function names
-      net: macb: unify device pointer naming convention
-      net: macb: unify variable naming convention in at91ether functions
-      net: macb: unify queue index variable naming convention and types
-      net: macb: enforce reverse christmas tree (RCT) convention
-      net: macb: allocate tieoff descriptor once across device lifetime
-      net: macb: introduce macb_context struct for buffer management
-      net: macb: avoid macb_init_rx_buffer_size() modifying state
-      net: macb: make `struct macb` subset reachable from macb_context struct
-      net: macb: change caps helpers signatures
-      net: macb: change function signatures to take contexts
-      net: macb: introduce macb_context_alloc() helper
-      net: macb: re-read ISR inside IRQ handler locked section
-      net: macb: use context swapping in .set_ringparam()
-      net: macb: use context swapping in .ndo_change_mtu()
-
- drivers/net/ethernet/cadence/macb.h      |  127 +-
- drivers/net/ethernet/cadence/macb_main.c | 1849 +++++++++++++++++-------------
- drivers/net/ethernet/cadence/macb_pci.c  |   46 +-
- drivers/net/ethernet/cadence/macb_ptp.c  |   26 +-
- 4 files changed, 1199 insertions(+), 849 deletions(-)
----
-base-commit: 64e6f7613459a9b344fb09a129584435b281088b
-change-id: 20260401-macb-context-bd0caf20414d
-
-Best regards,
---  
-Théo Lebrun <theo.lebrun@bootlin.com>
+-- 
+2.55.0
 
 
