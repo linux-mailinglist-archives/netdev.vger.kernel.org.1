@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-303642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1MqVDEUPRWrG6AoAu9opvQ
-	(envelope-from <netdev+bounces-303642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:59:49 +0200
+	id H1UOIGcVRWrH6goAu9opvQ
+	(envelope-from <netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:25:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 916796EDBD2
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:59:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D886EE13A
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:25:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=O3ke+wHs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303642-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303642-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b="Al/056my";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E75C0309BE99
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:50:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E8021302B541
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33BE481AB2;
-	Wed,  1 Jul 2026 12:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7586481242;
+	Wed,  1 Jul 2026 12:51:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27056480DF1
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB95441020
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:51:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782910221; cv=none; b=Tcsxb7etJNa9rSZ7iOwSVDhOYcjalgSJL0ZBTIzywMbSCHV6+Va5oZSFE7FnGIO6iKUBRRoncKy4wYluBsFtwgMtIxc4ggauYzZXdF3Bs4fMXw9yzhGe+DRUGAUPuDzOSwcVianBOv7KyyxYSthzuUMfnOJLjCc1+MOCjcalwYM=
+	t=1782910277; cv=none; b=fFA10XElNo3jCjoL87pVMzICYcgef2SlWSnb7IdqlTuRoAHvKinNfPbW47WopbynG6P9g+ug0/xTgXwaUkWNB8ftWYKVqcQ/hpQFi5RuY2/5zFpRJxhjezrFw8H3jS4y0ygvY8SShvtmmW49N/YaRQ91ZCvEyjHmd+9yu11uOu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782910221; c=relaxed/simple;
-	bh=4/5hZ9cbmrsQ4k5Z/epZV6QVjMC1Uf9ZkMtLN1bLuIs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=acnky2KgMRrNnJR+FpnL/6Y2NvNSmgOGsw4wP7YtA3QNjizco561gcDRk+84CC5qAR7XniVgYk/nwePwJG/8iUjrZA1myWPSYMefyylLqUVGODU2FaSUepV6eKfjdIHBNM9P4b1ej9ReO9nnHo5z6nf8T3xK4cH1ULHdu5i9EsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O3ke+wHs; arc=none smtp.client-ip=209.85.219.73
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8f08560ea44so8120256d6.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 05:50:19 -0700 (PDT)
+	s=arc-20240116; t=1782910277; c=relaxed/simple;
+	bh=PENB+CoBg7mSObGy0+iQEGvtVADHoZjqLWA1D9TdOgg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sbUnnIW6xW/v9Wo1XgQnllrwkZIxXf4ifleGO2qLmcG8d2b/GDzmPoSfeDvpT2vl08r0AIHQ6IR3A6+kHHFOLn7DU6JaWz0gpF3e7SK1asJXlQ5oTQfr3+ZO4Q8WW9uL+hH1IvWPsQ0nPpU+y4QG8U67X+BpyDNdudBXhLNawoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Al/056my; arc=none smtp.client-ip=209.85.160.202
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-51a8db414c7so8344331cf.0
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 05:51:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782910219; x=1783515019; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782910275; x=1783515075; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=BwxDAKe+w0NZdPsfTmKtfLvYJwM6S2oD4n9yV7QHkhU=;
-        b=O3ke+wHsYf3OwI8r2VwOHtBMtdDYLCxCOtVzey8EOJ+60h4MUu/LzuC5245AUnaj2X
-         EeGJAcuGpEpH6ZalsoJaDwZbdUxmLV1btuBjHwykdERHjBu9ryALLjZE3pKZ7WfCN6Pe
-         r9o/NYaNUbcqOQvr43CZgHhDzroPO2PkgSFiwmokhOIWb0r21WMShahoIMhxRhNzzf4+
-         cehJR8LVFveRYb2XoO4mvpMA8i2CBM4oOdRRxcjxdsV/rKHPX0Xoq90sIU5G2xQp6VrQ
-         9GOm8By0mL/yy+dr8MX+s9DVdDnjS1ns9wddflqLviQUuGxT9jvtxyOejr/Xmz9KsWmR
-         30aQ==
+        bh=RAdHoc06kNUcL6i6T2Fy+ea+CKxasL1CrBm+tvJBzC4=;
+        b=Al/056my/tppkxfGFPALnvaT7m6B4LolWAazQYDwhkt9eEvN4DAnySNTpF1eEEFdgM
+         L84XXZzkMi1QiN5dZlhT1d64IAWjVqAfvZjp2oPueqfrMocP/EEsD0InvDN2vJBQ+rFs
+         H2L81xzdnWRszzybt3VittsQ8y5HmhzTE2di8xa37S2ktzV4ASSRW18G4RT1mxx2f3tn
+         WdDfooE8aerKuXTG7IylPhShb+ApqD7hQyjfR6/iOY0ZY4Q4Et1aaP6edXbMepsQo4D+
+         tZ3DQAuJh1H5hH7RfJvvFhPVNyDmr+iSpuptirxwBSkvd6hf4LXr7M4rA/YDuvwYbTRL
+         y+BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782910219; x=1783515019;
+        d=1e100.net; s=20251104; t=1782910275; x=1783515075;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BwxDAKe+w0NZdPsfTmKtfLvYJwM6S2oD4n9yV7QHkhU=;
-        b=Co8zEw9MegAVeGN8mxtG1x3KorIMqkNX57MvNaDuCUl5qYev4ZUz/ICuA+rhuw/f9R
-         MSOv1teE+k4Z4Z5RNX4YZDcETjvRVsRgLLdZXfS/A6uA2DQPjhUHZmzDrD9z9r8/SMyM
-         W4xRiYUXyNa/95+4usSQrOzJEZ+L5b25znN2YPjbiMHlueT++vaSVh2XahmR8ukOUCOi
-         J53Eu96E0+8PPFUQfX0VmzbzmhlpukaiTXYXkTMQ33SHHlcc9B55YS9bO0HguVIy2oEF
-         bB6/lTlncZ9g+uk3uxsXTGWDpRoyluemJW1O8FufJ8ggW/KOYXTD7S1tVFmTNCgW8Tgo
-         Smzw==
-X-Forwarded-Encrypted: i=1; AHgh+RoT9FPKAfrY1YIcxvoF2sBm4dXaYVSdPpWR95ckKhxx10y502Sv6nh1RYUiXPvbQ+O011RkWkU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPJBDz14SRVpdjT4kXGp0FSjJmkiTN7HvUo9XwA7YJRnDCdr6f
-	CYEXe5QICyc3TgwkpkMngLkzWrKTtOyL8W1323vNI68OzxULdPLHjeHpsBQrTA6dXZay99wwEoZ
-	aR9MhknRE1p36Qw==
-X-Received: from qvbge9.prod.google.com ([2002:a05:6214:27c9:b0:8cc:c97:1de3])
+        bh=RAdHoc06kNUcL6i6T2Fy+ea+CKxasL1CrBm+tvJBzC4=;
+        b=XEr04atmlCgs91NZcz4cp2rYju//e1U5vnI4Ps49tVE28FaD4DRup9xjF/AO3EDj7f
+         nZkHrXz5bb1kRwVD6IONZ5IYtdzD0QzyWi9TYegH12SErdmZysqVKFivNL1TmsEt7zoR
+         vFJLx9yXQT8qK6tP7q8o4HOoS0p5W9LpoVj3nmODROnPu+GQ7pbhq2ka0160fKPLe945
+         BR30DrpFTXiD+5tVr4HSLrUUDqw3mSZn4gqt/w9BxRMmCnyVl6I+9R+QuFWQJ7eol6ra
+         qg23EKBPkUm2SNx+mLbgv+6TikAh41UvfBUd6Uk2HlkxHKwAtAiHXT3wbFRkdO4+GMFL
+         Ao4g==
+X-Forwarded-Encrypted: i=1; AFNElJ/9IYBfmjaqLihBxtK6m5GslLP3oFhxNqwru6N0hfDgbHzNbGmdf4XB64zxeLEOLPZ5Ve9dNXM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZAmezLp3V8lAOT7SX5tQjvM8HEJ8Cxefrnd2hN46d9kg3b7NW
+	RWTjY6I71n19ItnAmqI1dCRO+bZN53TcFHAVsPXUFBSdJ6Xr/+I3Ojd+vPup3Sck6LuRdVQnnJ4
+	ZjTcEGS8mgpjD0A==
+X-Received: from qvbgg11.prod.google.com ([2002:a05:6214:252b:b0:8b1:f2c0:cb0b])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:4ee3:0:b0:8ef:e3c9:533e with SMTP id 6a1803df08f44-8f421ca879bmr7786746d6.9.1782910218549;
- Wed, 01 Jul 2026 05:50:18 -0700 (PDT)
-Date: Wed,  1 Jul 2026 12:50:16 +0000
+ 2002:a05:622a:d4:b0:519:b5ef:7fdd with SMTP id d75a77b69052e-51c26a2c1ccmr20677191cf.6.1782910275022;
+ Wed, 01 Jul 2026 05:51:15 -0700 (PDT)
+Date: Wed,  1 Jul 2026 12:51:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,8 +73,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260701125016.3650708-1-edumazet@google.com>
-Subject: [PATCH net-next] amt: no longer rely on RTNL in amt_fill_info()
+Message-ID: <20260701125112.3652880-1-edumazet@google.com>
+Subject: [PATCH net-next] tun: no longer rely on RTNL in tun_fill_info()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -90,12 +90,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303642-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303643-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -113,214 +113,190 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 916796EDBD2
+X-Rspamd-Queue-Id: 97D886EE13A
 
-Update amt_fill_info() to run under RCU read lock instead of RTNL.
+Update tun_fill_info() to read device configuration fields (flags, owner,
+group, numqueues, numdisabled) locklessly using READ_ONCE().
 
-The AMT device configuration fields (mode, relay_port, gw_port, local_ip,
-discovery_ip, max_tunnels) and stream_dev pointer are initialized during
-device creation (amt_newlink) and are immutable. Accessing them locklessly
-is safe. The stream_dev net_device structure is protected from being freed
-by RCU.
-
-The only field that can change concurrently is amt->remote_ip, which is
-updated in the packet receive path (amt_advertisement_handler) and
-workqueue (amt_req_work). Add READ_ONCE()/WRITE_ONCE() annotations
-around amt->remote_ip to prevent data races.
+Annotate all writes to these fields in the control paths with WRITE_ONCE()
+to prevent data races, as these fields can be modified concurrently via
+ioctls (TUNSETPERSIST, TUNSETOWNER, TUNSETGROUP, TUNSETIFF) or queue
+attaching/detaching.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/amt.c | 43 +++++++++++++++++++++++++++----------------
- 1 file changed, 27 insertions(+), 16 deletions(-)
+ drivers/net/tun.c | 64 +++++++++++++++++++++++++----------------------
+ 1 file changed, 34 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 724a8163a5142a6835950abb63d80f29417b2654..5cf97c65576fc23b6faac1d686b0fd90b0e05433 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -708,11 +708,13 @@ static void amt_send_request(struct amt_dev *amt, bool v6)
- 	struct iphdr *iph;
- 	struct rtable *rt;
- 	struct flowi4 fl4;
-+	__be32 remote_ip;
- 	struct sock *sk;
- 	u32 len;
- 	int err;
- 
- 	rcu_read_lock();
-+	remote_ip = READ_ONCE(amt->remote_ip);
- 	sk = rcu_dereference(amt->sk);
- 	if (!sk)
- 		goto out;
-@@ -721,7 +723,7 @@ static void amt_send_request(struct amt_dev *amt, bool v6)
- 		goto out;
- 
- 	rt = ip_route_output_ports(amt->net, &fl4, sk,
--				   amt->remote_ip, amt->local_ip,
-+				   remote_ip, amt->local_ip,
- 				   amt->gw_port, amt->relay_port,
- 				   IPPROTO_UDP, 0,
- 				   amt->stream_dev->ifindex);
-@@ -762,7 +764,7 @@ static void amt_send_request(struct amt_dev *amt, bool v6)
- 	udph->check	= 0;
- 	offset = skb_transport_offset(skb);
- 	skb->csum = skb_checksum(skb, offset, skb->len - offset, 0);
--	udph->check = csum_tcpudp_magic(amt->local_ip, amt->remote_ip,
-+	udph->check = csum_tcpudp_magic(amt->local_ip, remote_ip,
- 					sizeof(*udph) + sizeof(*amtrh),
- 					IPPROTO_UDP, skb->csum);
- 
-@@ -773,7 +775,7 @@ static void amt_send_request(struct amt_dev *amt, bool v6)
- 	iph->tos	= AMT_TOS;
- 	iph->frag_off	= 0;
- 	iph->ttl	= ip4_dst_hoplimit(&rt->dst);
--	iph->daddr	= amt->remote_ip;
-+	iph->daddr	= remote_ip;
- 	iph->saddr	= amt->local_ip;
- 	iph->protocol	= IPPROTO_UDP;
- 	iph->tot_len	= htons(len);
-@@ -962,7 +964,7 @@ static void amt_event_send_request(struct amt_dev *amt)
- 		amt->qi = AMT_INIT_REQ_TIMEOUT;
- 		WRITE_ONCE(amt->ready4, false);
- 		WRITE_ONCE(amt->ready6, false);
--		amt->remote_ip = 0;
-+		WRITE_ONCE(amt->remote_ip, 0);
- 		amt_update_gw_status(amt, AMT_STATUS_INIT, false);
- 		amt->req_cnt = 0;
- 		amt->nonce = 0;
-@@ -999,6 +1001,7 @@ static bool amt_send_membership_update(struct amt_dev *amt,
- 				       struct sk_buff *skb,
- 				       bool v6)
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index ffbe6f13fb1fa2333227a6b085806c82a362c0a4..fc8ad6a35708825006f7d199a8f220f30e43df9e 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -532,7 +532,7 @@ static void tun_disable_queue(struct tun_struct *tun, struct tun_file *tfile)
  {
-+	__be32 remote_ip = READ_ONCE(amt->remote_ip);
- 	struct amt_header_membership_update *amtmu;
- 	struct iphdr *iph;
- 	struct flowi4 fl4;
-@@ -1018,13 +1021,13 @@ static bool amt_send_membership_update(struct amt_dev *amt,
- 	skb_reset_inner_headers(skb);
- 	memset(&fl4, 0, sizeof(struct flowi4));
- 	fl4.flowi4_oif         = amt->stream_dev->ifindex;
--	fl4.daddr              = amt->remote_ip;
-+	fl4.daddr              = remote_ip;
- 	fl4.saddr              = amt->local_ip;
- 	fl4.flowi4_dscp        = inet_dsfield_to_dscp(AMT_TOS);
- 	fl4.flowi4_proto       = IPPROTO_UDP;
- 	rt = ip_route_output_key(amt->net, &fl4);
- 	if (IS_ERR(rt)) {
--		netdev_dbg(amt->dev, "no route to %pI4\n", &amt->remote_ip);
-+		netdev_dbg(amt->dev, "no route to %pI4\n", &remote_ip);
- 		return true;
- 	}
- 
-@@ -2272,8 +2275,8 @@ static bool amt_advertisement_handler(struct amt_dev *amt, struct sk_buff *skb)
- 	    amt->nonce != amta->nonce)
- 		return true;
- 
--	amt->remote_ip = amta->ip4;
--	netdev_dbg(amt->dev, "advertised remote ip = %pI4\n", &amt->remote_ip);
-+	WRITE_ONCE(amt->remote_ip, amta->ip4);
-+	netdev_dbg(amt->dev, "advertised remote ip = %pI4\n", &amta->ip4);
- 	mod_delayed_work(amt_wq, &amt->req_wq, 0);
- 
- 	amt_update_gw_status(amt, AMT_STATUS_RECEIVED_ADVERTISEMENT, true);
-@@ -2773,6 +2776,7 @@ static int amt_rcv(struct sock *sk, struct sk_buff *skb)
- {
- 	struct amt_dev *amt;
- 	struct iphdr *iph;
-+	__be32 remote_ip;
- 	int type;
- 	bool err;
- 
-@@ -2783,6 +2787,7 @@ static int amt_rcv(struct sock *sk, struct sk_buff *skb)
- 		kfree_skb(skb);
- 		goto out;
- 	}
-+	remote_ip = READ_ONCE(amt->remote_ip);
- 
- 	skb->dev = amt->dev;
- 	iph = ip_hdr(skb);
-@@ -2807,7 +2812,7 @@ static int amt_rcv(struct sock *sk, struct sk_buff *skb)
- 			}
- 			goto out;
- 		case AMT_MSG_MULTICAST_DATA:
--			if (iph->saddr != amt->remote_ip) {
-+			if (iph->saddr != remote_ip) {
- 				netdev_dbg(amt->dev, "Invalid Relay IP\n");
- 				err = true;
- 				goto drop;
-@@ -2818,7 +2823,7 @@ static int amt_rcv(struct sock *sk, struct sk_buff *skb)
- 			else
- 				goto out;
- 		case AMT_MSG_MEMBERSHIP_QUERY:
--			if (iph->saddr != amt->remote_ip) {
-+			if (iph->saddr != remote_ip) {
- 				netdev_dbg(amt->dev, "Invalid Relay IP\n");
- 				err = true;
- 				goto drop;
-@@ -3000,7 +3005,7 @@ static int amt_dev_open(struct net_device *dev)
- 		return err;
- 
- 	amt->req_cnt = 0;
--	amt->remote_ip = 0;
-+	WRITE_ONCE(amt->remote_ip, 0);
- 	amt->nonce = 0;
- 	get_random_bytes(&amt->key, sizeof(siphash_key_t));
- 
-@@ -3045,7 +3050,7 @@ static int amt_dev_stop(struct net_device *dev)
- 	amt->ready4 = false;
- 	amt->ready6 = false;
- 	amt->req_cnt = 0;
--	amt->remote_ip = 0;
-+	WRITE_ONCE(amt->remote_ip, 0);
- 
- 	list_for_each_entry_safe(tunnel, tmp, &amt->tunnel_list, list) {
- 		list_del_rcu(&tunnel->list);
-@@ -3244,7 +3249,7 @@ static int amt_newlink(struct net_device *dev,
- 					    "gateway port must not be 0");
- 			goto err;
- 		}
--		amt->remote_ip = 0;
-+		WRITE_ONCE(amt->remote_ip, 0);
- 		amt->discovery_ip = nla_get_in_addr(data[IFLA_AMT_DISCOVERY_IP]);
- 		if (ipv4_is_loopback(amt->discovery_ip) ||
- 		    ipv4_is_zeronet(amt->discovery_ip) ||
-@@ -3308,8 +3313,10 @@ static size_t amt_get_size(const struct net_device *dev)
- 
- static int amt_fill_info(struct sk_buff *skb, const struct net_device *dev)
- {
--	struct amt_dev *amt = netdev_priv(dev);
-+	const struct amt_dev *amt = netdev_priv(dev);
-+	__be32 remote_ip;
- 
-+	rcu_read_lock();
- 	if (nla_put_u32(skb, IFLA_AMT_MODE, amt->mode))
- 		goto nla_put_failure;
- 	if (nla_put_be16(skb, IFLA_AMT_RELAY_PORT, amt->relay_port))
-@@ -3322,15 +3329,19 @@ static int amt_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		goto nla_put_failure;
- 	if (nla_put_in_addr(skb, IFLA_AMT_DISCOVERY_IP, amt->discovery_ip))
- 		goto nla_put_failure;
--	if (amt->remote_ip)
--		if (nla_put_in_addr(skb, IFLA_AMT_REMOTE_IP, amt->remote_ip))
-+
-+	remote_ip = READ_ONCE(amt->remote_ip);
-+	if (remote_ip)
-+		if (nla_put_in_addr(skb, IFLA_AMT_REMOTE_IP, remote_ip))
- 			goto nla_put_failure;
- 	if (nla_put_u32(skb, IFLA_AMT_MAX_TUNNELS, amt->max_tunnels))
- 		goto nla_put_failure;
- 
-+	rcu_read_unlock();
- 	return 0;
- 
- nla_put_failure:
-+	rcu_read_unlock();
- 	return -EMSGSIZE;
+ 	tfile->detached = tun;
+ 	list_add_tail(&tfile->next, &tun->disabled);
+-	++tun->numdisabled;
++	WRITE_ONCE(tun->numdisabled, tun->numdisabled + 1);
  }
  
+ static struct tun_struct *tun_enable_queue(struct tun_file *tfile)
+@@ -541,7 +541,7 @@ static struct tun_struct *tun_enable_queue(struct tun_file *tfile)
+ 
+ 	tfile->detached = NULL;
+ 	list_del_init(&tfile->next);
+-	--tun->numdisabled;
++	WRITE_ONCE(tun->numdisabled, tun->numdisabled - 1);
+ 	return tun;
+ }
+ 
+@@ -600,7 +600,7 @@ static void __tun_detach(struct tun_file *tfile, bool clean)
+ 		rcu_assign_pointer(tun->tfiles[tun->numqueues - 1],
+ 				   NULL);
+ 
+-		--tun->numqueues;
++		WRITE_ONCE(tun->numqueues, tun->numqueues - 1);
+ 		if (clean) {
+ 			RCU_INIT_POINTER(tfile->tun, NULL);
+ 			sock_put(&tfile->sk);
+@@ -663,7 +663,7 @@ static void tun_detach_all(struct net_device *dev)
+ 		tfile->socket.sk->sk_shutdown = RCV_SHUTDOWN;
+ 		tfile->socket.sk->sk_data_ready(tfile->socket.sk);
+ 		RCU_INIT_POINTER(tfile->tun, NULL);
+-		--tun->numqueues;
++		WRITE_ONCE(tun->numqueues, tun->numqueues - 1);
+ 	}
+ 	list_for_each_entry(tfile, &tun->disabled, next) {
+ 		tfile->socket.sk->sk_shutdown = RCV_SHUTDOWN;
+@@ -786,7 +786,7 @@ static int tun_attach(struct tun_struct *tun, struct file *file,
+ 	if (publish_tun)
+ 		rcu_assign_pointer(tfile->tun, tun);
+ 	rcu_assign_pointer(tun->tfiles[tun->numqueues], tfile);
+-	tun->numqueues++;
++	WRITE_ONCE(tun->numqueues, tun->numqueues + 1);
+ 	tun_set_real_num_queues(tun);
+ out:
+ 	return err;
+@@ -943,8 +943,8 @@ static int tun_net_init(struct net_device *dev)
+ 			       NETIF_F_HW_VLAN_STAG_TX);
+ 	dev->lltx = true;
+ 
+-	tun->flags = (tun->flags & ~TUN_FEATURES) |
+-		      (ifr->ifr_flags & TUN_FEATURES);
++	WRITE_ONCE(tun->flags, (tun->flags & ~TUN_FEATURES) |
++			       (ifr->ifr_flags & TUN_FEATURES));
+ 
+ 	INIT_LIST_HEAD(&tun->disabled);
+ 	err = tun_attach(tun, tun->file, false, ifr->ifr_flags & IFF_NAPI,
+@@ -2370,32 +2370,36 @@ static size_t tun_get_size(const struct net_device *dev)
+ 
+ static int tun_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ {
+-	struct tun_struct *tun = netdev_priv(dev);
++	const struct tun_struct *tun = netdev_priv(dev);
++	unsigned int flags = READ_ONCE(tun->flags);
++	kuid_t owner = READ_ONCE(tun->owner);
++	kgid_t group = READ_ONCE(tun->group);
+ 
+-	if (nla_put_u8(skb, IFLA_TUN_TYPE, tun->flags & TUN_TYPE_MASK))
++	if (nla_put_u8(skb, IFLA_TUN_TYPE, flags & TUN_TYPE_MASK))
+ 		goto nla_put_failure;
+-	if (uid_valid(tun->owner) &&
++	if (uid_valid(owner) &&
+ 	    nla_put_u32(skb, IFLA_TUN_OWNER,
+-			from_kuid_munged(current_user_ns(), tun->owner)))
++			from_kuid_munged(current_user_ns(), owner)))
+ 		goto nla_put_failure;
+-	if (gid_valid(tun->group) &&
++	if (gid_valid(group) &&
+ 	    nla_put_u32(skb, IFLA_TUN_GROUP,
+-			from_kgid_munged(current_user_ns(), tun->group)))
++			from_kgid_munged(current_user_ns(), group)))
+ 		goto nla_put_failure;
+-	if (nla_put_u8(skb, IFLA_TUN_PI, !(tun->flags & IFF_NO_PI)))
++	if (nla_put_u8(skb, IFLA_TUN_PI, !(flags & IFF_NO_PI)))
+ 		goto nla_put_failure;
+-	if (nla_put_u8(skb, IFLA_TUN_VNET_HDR, !!(tun->flags & IFF_VNET_HDR)))
++	if (nla_put_u8(skb, IFLA_TUN_VNET_HDR, !!(flags & IFF_VNET_HDR)))
+ 		goto nla_put_failure;
+-	if (nla_put_u8(skb, IFLA_TUN_PERSIST, !!(tun->flags & IFF_PERSIST)))
++	if (nla_put_u8(skb, IFLA_TUN_PERSIST, !!(flags & IFF_PERSIST)))
+ 		goto nla_put_failure;
+ 	if (nla_put_u8(skb, IFLA_TUN_MULTI_QUEUE,
+-		       !!(tun->flags & IFF_MULTI_QUEUE)))
++		       !!(flags & IFF_MULTI_QUEUE)))
+ 		goto nla_put_failure;
+-	if (tun->flags & IFF_MULTI_QUEUE) {
+-		if (nla_put_u32(skb, IFLA_TUN_NUM_QUEUES, tun->numqueues))
++	if (flags & IFF_MULTI_QUEUE) {
++		if (nla_put_u32(skb, IFLA_TUN_NUM_QUEUES,
++				READ_ONCE(tun->numqueues)))
+ 			goto nla_put_failure;
+ 		if (nla_put_u32(skb, IFLA_TUN_NUM_DISABLED_QUEUES,
+-				tun->numdisabled))
++				READ_ONCE(tun->numdisabled)))
+ 			goto nla_put_failure;
+ 	}
+ 
+@@ -2814,8 +2818,8 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 			return 0;
+ 		}
+ 
+-		tun->flags = (tun->flags & ~TUN_FEATURES) |
+-			      (ifr->ifr_flags & TUN_FEATURES);
++		WRITE_ONCE(tun->flags, (READ_ONCE(tun->flags) & ~TUN_FEATURES) |
++				       (ifr->ifr_flags & TUN_FEATURES));
+ 
+ 		netdev_state_change(dev);
+ 	} else {
+@@ -3213,13 +3217,13 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 		/* Disable/Enable persist mode. Keep an extra reference to the
+ 		 * module to prevent the module being unprobed.
+ 		 */
+-		if (arg && !(tun->flags & IFF_PERSIST)) {
+-			tun->flags |= IFF_PERSIST;
++		if (arg && !(READ_ONCE(tun->flags) & IFF_PERSIST)) {
++			WRITE_ONCE(tun->flags, READ_ONCE(tun->flags) | IFF_PERSIST);
+ 			__module_get(THIS_MODULE);
+ 			do_notify = true;
+ 		}
+-		if (!arg && (tun->flags & IFF_PERSIST)) {
+-			tun->flags &= ~IFF_PERSIST;
++		if (!arg && (READ_ONCE(tun->flags) & IFF_PERSIST)) {
++			WRITE_ONCE(tun->flags, READ_ONCE(tun->flags) & ~IFF_PERSIST);
+ 			module_put(THIS_MODULE);
+ 			do_notify = true;
+ 		}
+@@ -3235,10 +3239,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 			ret = -EINVAL;
+ 			break;
+ 		}
+-		tun->owner = owner;
++		WRITE_ONCE(tun->owner, owner);
+ 		do_notify = true;
+ 		netif_info(tun, drv, tun->dev, "owner set to %u\n",
+-			   from_kuid(&init_user_ns, tun->owner));
++			   from_kuid(&init_user_ns, owner));
+ 		break;
+ 
+ 	case TUNSETGROUP:
+@@ -3248,10 +3252,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 			ret = -EINVAL;
+ 			break;
+ 		}
+-		tun->group = group;
++		WRITE_ONCE(tun->group, group);
+ 		do_notify = true;
+ 		netif_info(tun, drv, tun->dev, "group set to %u\n",
+-			   from_kgid(&init_user_ns, tun->group));
++			   from_kgid(&init_user_ns, group));
+ 		break;
+ 
+ 	case TUNSETLINK:
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
