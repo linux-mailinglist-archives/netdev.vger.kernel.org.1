@@ -1,269 +1,128 @@
-Return-Path: <netdev+bounces-303595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Db7bNKb0RGry3woAu9opvQ
-	(envelope-from <netdev+bounces-303595-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:06:14 +0200
+	id 9DOSEZP0RGrp3woAu9opvQ
+	(envelope-from <netdev+bounces-303594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:05:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81A3D6EC8C6
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E87C6EC8AC
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:05:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=ElGUKYke;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b="NJ86M/Py";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303595-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303595-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=o8lzDtNE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303594-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303594-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 63BE33075D97
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:02:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 75297301ABA0
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0756F436374;
-	Wed,  1 Jul 2026 11:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E770542983E;
+	Wed,  1 Jul 2026 11:02:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5096426D16
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E539F4219FF;
+	Wed,  1 Jul 2026 11:01:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782903722; cv=none; b=D2d8eQzo+KH72iNc9FvFK1JBD4PhA9JVgnuwjBlSQlbgCBVR8ylZfN/bkY9vYX7IGNpW7DzBxUTcO/tdCNEmkYKK3JLPg15A9C48KMaraMO2l0AtZsMgAJYNtdqpD/1VS+Q5ua5KOYsylDIbVrvmx/b2NMZCDBYdDE78cM4zSS4=
+	t=1782903721; cv=none; b=p3KCgX7uhSU5+FSLDmO+KT/ewXhK/yJY8qW3w7eepvoKTcX0EIhhN0d/5EkPXSDQORpiqwWhExMZKIbiZQX1/76FRYbhsMxmaUuu1ompeOsqP2jdGVZ2rz4SZ8KDtKb0G9mMGSKA7qPMIifrUoHliHx5YjC23M7ypf/yFXAgdEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782903722; c=relaxed/simple;
-	bh=Br8s1Od3JEOL8qZORdm4eG395Bw56pWcnLaBfgp/wGM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FnrTbtXMjKmo3HCDCb7MWxV/6Zib/5wKuOQ13gSaezkXXhXTcDXrBwGBLyhlXdsNpdeVG+4cmcyCgN9CEpTEUR9o2sU8bOLcx6dLDS+/n9QmAbRk11xbrogKdttNktnI8EMTiv1i5ew7VaGi39rTOTk3dGBG9zUh4IGD/uoIMH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ElGUKYke; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=NJ86M/Py; arc=none smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661A8UJw680776
-	for <netdev@vger.kernel.org>; Wed, 1 Jul 2026 11:02:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	VxGUWVh7XlY2oaLv4zshgCYnYU/gzVpwiXufl467KvU=; b=ElGUKYkeMmxIkgOz
-	thIHzWjBi816QcqEqbreeIRMyIZU+6rVG+rebZE9G66w0v2luGay9FWAi2p11+1b
-	WamPKZU6YNqu7ehEZvQLIGFOubMPljNHBV6TpY9kaACuypXi8Tws1YrI7JRqy8fv
-	/6poc5jXITgCRmlN4UxleWMjee9AhxwgIFQia+bLF2p52rMPRZzlNMD0jtzleArO
-	QPMnxD96dfuxWEZRWaUJJKBAiWutTS2hZg4RH8cER7WZY+ny5Mh/FPfQU0YASFbQ
-	QLPI+AisWhheOktOthSyv7cWpKLU0IzeZfN9AUvYqC1zqfwKOtZAN14rBvDkutKP
-	bTNfPA==
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com [209.85.217.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f4k3skt54-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 11:02:00 +0000 (GMT)
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-737ddaf8c57so15369137.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 04:02:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782903720; x=1783508520; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VxGUWVh7XlY2oaLv4zshgCYnYU/gzVpwiXufl467KvU=;
-        b=NJ86M/PywGH353GBtBowoRzMKI3udNfy2UyMYJveHrxx4CX3JO7HVCAXZtsc/SyWQT
-         wY5h4ODE1vUunQoPy73EEw6PC+P700Aq5zvMLBTar3/HwheXr/fp2cZJkQPa6V7/NyXK
-         SDVuoEELaXP3AxHg4InRmMl08Bd1luMdZYyr1DYJwUzISYF/hqVEVAdluOn14113CHso
-         U68aJtQ+rWieoVbTRUpHaWGp7gvJ1//4+9uPVa5fiuKEfrbgdcr6EyQKlgtGI95ftUdu
-         10Z3cWAz5qgSZhASLXsP7EQef4kmz2aiaud9QuSJwW6mW1G+WcbpUF7JIkwCBgYgaBMM
-         c6dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782903720; x=1783508520;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=VxGUWVh7XlY2oaLv4zshgCYnYU/gzVpwiXufl467KvU=;
-        b=mZBDhC5QN5e5qUCzOBiqQIo7IGLpSXOHjmDkhz/vm6NIm1YO9IB0S1G+iI8VfYwHK+
-         K9vUjl5ip4pINNiQZB3XDxHKo2idkFxTc/Y6tULQ0eqybeVirYzUL9zINu5mK0NPw119
-         jV/98+GwmzyF/8axObtrIzGv1oEW8KRWmilx1KZwscMzA9e9dbNZtbbvnDkbNMdcvaMM
-         lDC4iteYtz/ue6hlJKlaF0wjzpdtUUOYBtWQ+jpPW/NzQhr9kB4Hem9WCWIOgrnu/zYu
-         dKCivJWl4CeAiT13tmIMNOXD7G3xSm/gWSRULzU9d76LRdKt6EihF/DiPHCBWfv1nj80
-         8gUQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoLlhyz31araa37cD3WpnwmroOaUOzU8o1+4gXQX00hVud+O1X0YtJ7CR/g21UWskhhs/SpHf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjKosbt+5G2ECKc2fR5eegaoqL24Suv2R9EVPiRypBybfIRUVR
-	DaInwd+Sw1+RnC+37CT9vm9dJFZYg1+f8rdGlKki4fTzr93KrNT7nJRFNWUXcvhrfItKP6+tVQN
-	fmJf+W8nDWs6qqlxDa4E6wPbH31Kw7cKoG/Qwkd4K1hgxpVpxEp8i16hXvAY=
-X-Gm-Gg: AfdE7cmXLz/RqcTOJI6oAdCVIJTQ3ew3N7q3OdiCwnm4+8VnBHqgoJ1JpB9HfAvfUjm
-	x+NbQPusvyDXTe7ayZp3Fv9qJ1vnerXwsajlpv06JRFMO4BA3qcBwcEH6kxhesIP9xeAHX3zGGC
-	JfxImwU+0MyzRuwtcgMwgPIOLK5NylEGpqA1OBYdXO5bTWPkgZOynaxP/RaBcVRQDvPSsJc6l0T
-	M5jJM62qV/YnxA064CWSNjsQE9H+rXxMdF86Ubs67vGV2hyA/y3NCE5seC6XSlkIOxCRXhJq7uE
-	qviU6mdRzvaqMWr93j6AEh4d74ECenRGAxCAUcNXmTz0WL0WPD7Q0JWr2xOF+NQ2oLPp37aklDD
-	IShN32VL2oRcl3c0w/EyVRG+Nw638vHKQ+2c=
-X-Received: by 2002:a05:6102:3e0b:b0:739:5c3d:605b with SMTP id ada2fe7eead31-73da8836a74mr86227137.1.1782903719623;
-        Wed, 01 Jul 2026 04:01:59 -0700 (PDT)
-X-Received: by 2002:a05:6102:3e0b:b0:739:5c3d:605b with SMTP id ada2fe7eead31-73da8836a74mr86169137.1.1782903719140;
-        Wed, 01 Jul 2026 04:01:59 -0700 (PDT)
-Received: from [192.168.120.170] ([178.235.128.140])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c128917536csm257546366b.56.2026.07.01.04.01.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2026 04:01:58 -0700 (PDT)
-Message-ID: <c93b47af-e291-4a6a-ae4b-cc46f25c422b@oss.qualcomm.com>
-Date: Wed, 1 Jul 2026 13:01:52 +0200
+	s=arc-20240116; t=1782903721; c=relaxed/simple;
+	bh=XaYWtMGNgt5FOX7HON74P5yka1JQED5HVnel31HcEoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Da1VhmmHGg/lHK5MEmyPTTkrwJI3f4XJSy9U+LYD/5FlUB38xeFFqx8FlBho83TeE44WGC53EBtqc2eeT957Bb2RdMKUpZg4gjhthxJKpLsi4457oXNUq/1RrRZWCdWqtfDLTDsi91qfAXG3Ql1IDmttfaSmDW7ZJmQ3JM6uWMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=o8lzDtNE; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 3C62760588;
+	Wed,  1 Jul 2026 13:01:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1782903717;
+	bh=QxPuanMrXViRFbZ/7f1IxjQONUCuWhm+IzkoyoL4DB0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o8lzDtNER8nYIuqXeHHb6FJZAoZ1lRZirWcx1tp/q8AMbha2SITBChlZS4ziyGKGp
+	 aqyqES01Q5lveMQMsxf4YHS3Jw4XdlktfQ3j17pwDqM2nPk7cr5bvecsQsd3NNOsqP
+	 iz8d1J+IPCrfZpe5tOdE9UDvq0MwE6pXnZWeEIWmT57Os/m3p9ac0rGqZakxpfhLys
+	 tho6eubVUprj5Xy5SGQ/HzT6bZuzLvwFzkPwq03TYb8B3yu506Y8uyyCxQday+PDO1
+	 q7E2kxxxLQEBAwDXnmMTy4mGOit3bbXxPqiKSaCE6aX/aH5VkbzxZ5WHl+yyBp/BBy
+	 F7vCwrNfn/QlQ==
+Date: Wed, 1 Jul 2026 13:01:54 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net 4/9] netfilter: nf_conntrack_sip: validate skb_dst()
+ before accessing it
+Message-ID: <akTzomC4Qz8u8teJ@chamomile>
+References: <20260630045243.2657-1-fw@strlen.de>
+ <20260630045243.2657-5-fw@strlen.de>
+ <akS1W7XGQ3LiP0LC@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 10/14] media: qcom: Pass proper PAS ID to
- set_remote_state API
-To: Sumit Garg <sumit.garg@kernel.org>
-Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        linux-media@vger.kernel.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, konradybcio@kernel.org,
-        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-        robin.clark@oss.qualcomm.com, sean@poorly.run,
-        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-        airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-        mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-        jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-        vignesh.viswanathan@oss.qualcomm.com,
-        srinivas.kandagatla@oss.qualcomm.com,
-        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-        skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-        Sumit Garg <sumit.garg@oss.qualcomm.com>
-References: <20260626133440.692849-1-sumit.garg@kernel.org>
- <20260626133440.692849-11-sumit.garg@kernel.org>
- <c251430d-2184-4ecc-8d05-9cb47533e5ec@oss.qualcomm.com>
- <akTFZgKBQYQUYxx4@sumit-xelite>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <akTFZgKBQYQUYxx4@sumit-xelite>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 2tPgZzYMU5E_cbFZXzo4MzIKiC47aR8q
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDExNSBTYWx0ZWRfX9bl4VsFs6/gJ
- 5vIx+E7Qxq9+xxL+B3+1T9dRm1pX2JYR74pWO7bqfCFb4NWmo3HvoWDJIbdsCVQs0FAQuY2O8Cg
- f6pD1oim3gA+dKLNskh0/tAH9wNco9ehTBpUibrZqVlu5AmyOTIKT8rrJ+5JBEcJhc04ziH6BBB
- uRHOKiK5SeI1tt3B5bwDLZqWJXczokyMDvhX2HwBkAiN4kFvaxlHsuqsFqvQ8jbQCuVTrvJTjHO
- K8BW38g+ZN4I3W6WL0ZM7MA+PJHwaZDyy6QchcuACFYf0oj/yVQ2J3f5H5gXvV2n4l/lxBwPNKR
- 3F3wa9mncK5/tmfl1SOQJNCAFhEZBzI9+2N5hTcZcmoU5+MXkP2OxGllo7ypx9G6OEW26AaOko+
- cAUqaEaB847/Hc/vr9oFJih9UFXE+ZaFGA1fVrusxFQjN0R39UhKRYy8JtwmxtKkZGIdUujnvJS
- PPomkoPVV7xW7sIOKWQ==
-X-Proofpoint-ORIG-GUID: 2tPgZzYMU5E_cbFZXzo4MzIKiC47aR8q
-X-Authority-Analysis: v=2.4 cv=Ff4HAp+6 c=1 sm=1 tr=0 ts=6a44f3a8 cx=c_pps
- a=5HAIKLe1ejAbszaTRHs9Ug==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=EUspDBNiAAAA:8 a=uyZSW4wqkseYk8rkHTIA:9 a=QEXdDO2ut3YA:10
- a=gYDTvv6II1OnSo0itH1n:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDExNSBTYWx0ZWRfXy7dQD0D7Ridk
- hIaCaz/GUyQ1RKKhGRxzqWhyXEziQsxmSVhJNkKnflDvv6Er2Ml0bSCDhPX9uOwx2J2/JpOdr/M
- SA+fe9Llv+WmYoUJRtg+vYiHBopA/3Y=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-01_03,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 priorityscore=1501 impostorscore=0 phishscore=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607010115
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <akS1W7XGQ3LiP0LC@strlen.de>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	TAGGED_FROM(0.00)[bounces-303595-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
- comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,qualcomm.com:dkim,qualcomm.com:email,vger.kernel.org:from_smtp,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-303594-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,strlen.de:email,chamomile:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 81A3D6EC8C6
+X-Rspamd-Queue-Id: 9E87C6EC8AC
 
-On 7/1/26 9:44 AM, Sumit Garg wrote:
-> On Tue, Jun 30, 2026 at 02:42:25PM +0200, Konrad Dybcio wrote:
->> On 6/26/26 3:34 PM, Sumit Garg wrote:
->>> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
->>>
->>> As per testing the SCM backend just ignores it while OP-TEE makes
->>> use of it to for proper book keeping purpose.
->>>
->>> Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
->>> Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
->>> Reviewed-by: Vikash Garodia <vikash.garodia@oss.qualcomm.com>
->>> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
->>> ---
->>>  drivers/media/platform/qcom/iris/iris_firmware.c | 2 +-
->>>  drivers/media/platform/qcom/venus/firmware.c     | 2 +-
->>>  2 files changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/media/platform/qcom/iris/iris_firmware.c b/drivers/media/platform/qcom/iris/iris_firmware.c
->>> index ea9654dd679e..d2e7ba4f37e3 100644
->>> --- a/drivers/media/platform/qcom/iris/iris_firmware.c
->>> +++ b/drivers/media/platform/qcom/iris/iris_firmware.c
->>> @@ -110,5 +110,5 @@ int iris_fw_unload(struct iris_core *core)
->>>  
->>>  int iris_set_hw_state(struct iris_core *core, bool resume)
->>>  {
->>> -	return qcom_pas_set_remote_state(resume, 0);
->>> +	return qcom_pas_set_remote_state(resume, IRIS_PAS_ID);
->>>  }
->>> diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
->>> index 3a38ff985822..3c0727ea137d 100644
->>> --- a/drivers/media/platform/qcom/venus/firmware.c
->>> +++ b/drivers/media/platform/qcom/venus/firmware.c
->>> @@ -59,7 +59,7 @@ int venus_set_hw_state(struct venus_core *core, bool resume)
->>>  	int ret;
->>>  
->>>  	if (core->use_tz) {
->>> -		ret = qcom_pas_set_remote_state(resume, 0);
->>> +		ret = qcom_pas_set_remote_state(resume, VENUS_PAS_ID);
->>
->> This should not be in the middle of a mildly related series..
->> The PAS IDs should be centralized into a single header. And the
->> name of the driver shouldn't be part of the define. I would guesstimate
->> that on the secure side it's probably called VPU or VIDEO
+On Wed, Jul 01, 2026 at 08:36:11AM +0200, Florian Westphal wrote:
+> Florian Westphal <fw@strlen.de> wrote:
+> > From: Pablo Neira Ayuso <pablo@netfilter.org>
+> > 
+> > tc ingress and openvswitch do not guarantee routing information to be
+> > available. These subsystems use the conntrack helper infrastructure, and
+> > the SIP helper relies on the skb_dst() to be present if
+> > sip_external_media is set to 1 (which is disabled by default as a module
+> > parameter).
 > 
-> I agree with your comments, this is something I would also like to
-> consolidate on OP-TEE side as well: see discussion here [1].
+> The sashiko drive-by appears real, I submitted a patch for it.
+> Its not a regression added by this patch but a unrelated issue.
 > 
-> However, the patch itself was needed to do book keeping on OP-TEE side
-> but I can drop it since anyhow the video isn't functional yet in
-> upstream dependent on the proper IOMMU support.
+> https://patchwork.ozlabs.org/project/netfilter-devel/patch/20260701062922.9660-1-fw@strlen.de/
 
-For this patch.. I think QCTZ may be ignoring the argument so it
-may not matter.. on a second thought you already have it reviewed
-and it's already a cross-subsys merge so might as well pull it in,
-worst case scenario it'll revert cleanly
+Is skb_ensure_writable() bogus here?
 
-Once this lands, please move all PAS defines to.. hmm.. qcom_pas.h
-sounds like a good candidate?
-
-Konrad
+As you said, skb is already linearized. As for clones, they should
+only happen in br_netfilter? In such case, it should be br_netfilter
+that should be audited not to pass cloned skbuffs before calling the
+inet hooks.
 
