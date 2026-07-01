@@ -1,72 +1,55 @@
-Return-Path: <netdev+bounces-303408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303410-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H4JJKClVRGontAoAu9opvQ
-	(envelope-from <netdev+bounces-303408-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:45:45 +0200
+	id did2DplYRGr5tAoAu9opvQ
+	(envelope-from <netdev+bounces-303410-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:00:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E709E6E8B34
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 01:45:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0EF16E8BE2
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:00:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=jbTiGrGR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303408-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303408-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HGVFGx93;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303410-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303410-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF6A33073ED5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jun 2026 23:45:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CBB2D302D4EB
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5E72D2397;
-	Tue, 30 Jun 2026 23:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79255330B01;
+	Wed,  1 Jul 2026 00:00:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C893A272816
-	for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 23:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB08284B29;
+	Wed,  1 Jul 2026 00:00:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782863131; cv=none; b=kg3mStTeas1oClROC6usJTJTXyT80Q5zeADUp4c4ck0g5xTK3cmnOXUwTi1+xmvmtFr6WFa7Y2dEzsRhJ6UNA5qHCdoPAa9b1ZZXatGs8ggZV9W0Y9pMPl8acMTWhWzaWTIwyB4rMprwaqB25ZSVBU8Bpz6fTeM1K0Rx8O5QCFU=
+	t=1782864023; cv=none; b=Lz+UPAUupt7nipgN4NHpRirV0e8xvB7/KKpghwi3cGx4+FHOcOVEjmHuOFu4olKWmO5BjvaYkHtHb8+4lepxxAhJ6tBMxYqAMVM/INpz6h7PDMpIkcOqltS6679Waabk1QyJxXLoewfBXaTlp3LLZlbu6Ygud2fKvAR7XIh0y1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782863131; c=relaxed/simple;
-	bh=VVU1Aawok25MxGOIJ6dAsnFw5aNp2IWcF/0CXay64Sw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SnHncvvR8SRyQip6CJCbX0aKJ2comzObIrXRg/QpeJqGiMwyCzOyLc/nTCyeKTLmXgi901XtUCsY21OUpYVbUh0rZsfmSEOmfX90MKYA+Xw4w4nKCipFmXURNS9KWKaHWM2i3d+Ke0hka32tG3PvXT4HqUSrZ+eEserQfvGC690=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jbTiGrGR; arc=none smtp.client-ip=192.198.163.16
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782863130; x=1814399130;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VVU1Aawok25MxGOIJ6dAsnFw5aNp2IWcF/0CXay64Sw=;
-  b=jbTiGrGRN4HAZQ312lTFC9vvilduxzEXuN2x0KVf5PwZIHbA3CCrd3GY
-   00GQ/kll5wf18voXsknXBDBQOo+TYsBrqQcasx1T6/D7AMTHFDUp+oPxD
-   8Op9CrxXj8sZ0xfnlzKh5XaFn+/C1dXAZ5IxNQBFAfwOp2H+rK071T7ng
-   ocDB4DeO+T35PqY79V5QygbypZCchixYTo1sOJk7AEAQj60NoHLrmcrmy
-   LGy9PbWaLbrZkFnRjI0ywDK7XCZCbmoXgGnLHR8YzLXZ/cOkqa15E1x/f
-   HqAeMH4p5sJSn0AuM3/7fy/N1+T4QNO2vSMVpTPvWSLD35KcfBsDtbvLM
-   A==;
-X-CSE-ConnectionGUID: jaknYnzyRdyYaIL5qkJ65w==
-X-CSE-MsgGUID: SNz7brtfTuaXsyxr1nPovw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="71111734"
-X-IronPort-AV: E=Sophos;i="6.24,234,1774335600"; 
-   d="scan'208";a="71111734"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 16:45:29 -0700
-X-CSE-ConnectionGUID: 2jDqwQ7pTVSDiSUDqEDaPw==
-X-CSE-MsgGUID: 3mr3C2r+TA6fqJv4NmV1YA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,234,1774335600"; 
-   d="scan'208";a="246061748"
-Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
-  by fmviesa009.fm.intel.com with ESMTP; 30 Jun 2026 16:45:27 -0700
-From: Joshua Hay <joshua.a.hay@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org
-Subject: [Intel-wired-lan][PATCH iwl-net] idpf: adjust TxQ ring count minimum
-Date: Tue, 30 Jun 2026 16:56:19 -0700
-Message-Id: <20260630235619.756633-1-joshua.a.hay@intel.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1782864023; c=relaxed/simple;
+	bh=cl3Iat4nUIW3kY20Flk8kF90PyH0SDbaQoW4rPAYJx0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ihwrMNeKZw/XIT+gE1o3VoN+lL8GlfwTEN0Iy7hckbA99zWK8Y9jPZVtXjnS9AQCY6KjjR/jLjrkqg0Mxkp5CVC+a8l284XSXx/eLNJ0P1L/APxTDGUTxWIcQLeC/f2HluP0FapcwBjIUPITgsikPEO2ZTE8evBFra6P0mcq78E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HGVFGx93; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110A11F00A3A;
+	Wed,  1 Jul 2026 00:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782864022;
+	bh=LShLHA0wxK2eW4t/XdclT0v1hf8/BEGAbO795ip3YEg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=HGVFGx93YPWO2GmYsvGZrVHOuhN8EsSEQlbKFZwG7GlecgBfCQUIMFY46f7H0bwob
+	 Rm53bv/6MMhBU4geKOFlyng3LHaEjcCqegFRMXGuBr5Dhy9CoP0vaFYNHmAScleJz3
+	 rf82NFh5+iDAx4l72Myqc4qkLKe4hT32GO7aVyvdFPKaL6HfKLafA2lUCkdPvkEKoo
+	 IwEs6bPpkJNfX5EQhGvXkrmv1+wLyDj1SEPHIhuGZ7ng3Ku62dy7gFt3jeRce7lkDa
+	 Z77xQFR11XMxs2/0624UKNtM2yjhbIiNGBHg4gN0RzxB3Cvnh3IpJC7f4/fVAqPGHT
+	 ZfCjW8hz0sQBg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19664393A963;
+	Wed,  1 Jul 2026 00:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,100 +57,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: net: bump default cmd() timeout to 20
+ seconds
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178286400564.341356.9563391960804788182.git-patchwork-notify@kernel.org>
+Date: Wed, 01 Jul 2026 00:00:05 +0000
+References: <20260629233348.2145841-1-kuba@kernel.org>
+In-Reply-To: <20260629233348.2145841-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ petrm@nvidia.com, leitao@debian.org, dw@davidwei.uk, noren@nvidia.com,
+ gal@nvidia.com, linux-kselftest@vger.kernel.org
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303410-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shuah@kernel.org,m:petrm@nvidia.com,m:leitao@debian.org,m:dw@davidwei.uk,m:noren@nvidia.com,m:gal@nvidia.com,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303408-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWO(0.00)[2];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E709E6E8B34
+X-Rspamd-Queue-Id: C0EF16E8BE2
 
-Set the TxQ ring count minimum to 128 descriptors. Any lower than this,
-and the queue will stall and trigger Tx timeouts in flow based
-scheduling mode. This is because next_to_clean might never be updated.
+Hello:
 
-In flow based scheduling mode, next_to_clean is only updated after a
-descriptor completion is processed, i.e. after the RE bit is set in the
-last descriptor of a Tx packet. This will never happen with a ring size
-of 64 and an IDPF_TX_SPLITQ_RE_MIN_GAP of 64. No matter what the value
-of last_re is initialized/set to, the calculated gap will be at most 63
-and never trigger the RE bit.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Even a ring size of 96 does not solve this. Because of how infrequent
-next_to_clean is updated and how small the ring is, IDPF_DESC_UNUSED
-will be much smaller on average. This increases the chance the queue
-will be stopped because a multi-descriptor packet, e.g. a large LSO
-packet, does not see enough resources on the ring. In this case, the
-queue will trigger the stop logic. The queue permanently stalls because
-there is no chance for a descriptor completion to update next_to_clean
-since it is dependent on a packet being sent.
+On Mon, 29 Jun 2026 16:33:48 -0700 you wrote:
+> We always used 5 sec as the default command timeout. But soon after
+> it was introduced, David effectively made us ignore the timeout
+> (it was passed to process.communicate() as the wrong argument).
+> Gal recently fixed that, but turns out the 5 sec is not enough
+> for a lot of tests and setups. The fix regressed regressions.
+> 
+> In particular running reconfig commands (e.g. XDP attach) on mlx5
+> with 32 rings and 9k MTU, on a heavily-debug-enabled kernel takes
+> more than 5 sec. The XDP installation command will time out after
+> 5 sec but since the sleeps in the kernel are non interruptible
+> the command finishes anyway, leaving the XDP program attached,
+> but with non-zero exit code. defer()ed cleanups are not installed,
+> breaking the environment for subsequent tests.
+> 
+> [...]
 
-Fixes: 5f417d551324 ("idpf: replace flow scheduling buffer ring with buffer pool")
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 5 +----
- drivers/net/ethernet/intel/idpf/idpf_txrx.h | 2 +-
- 2 files changed, 2 insertions(+), 5 deletions(-)
+Here is the summary with links:
+  - [net] selftests: net: bump default cmd() timeout to 20 seconds
+    https://git.kernel.org/netdev/net/c/57bb59ab6fa3
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 7f9056404f64..c724d429a7aa 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3097,10 +3097,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 
- 		tx_params.dtype = IDPF_TX_DESC_DTYPE_FLEX_FLOW_SCHE;
- 		tx_params.eop_cmd = IDPF_TXD_FLEX_FLOW_CMD_EOP;
--		/* Set the RE bit to periodically "clean" the descriptor ring.
--		 * MIN_GAP is set to MIN_RING size to ensure it will be set at
--		 * least once each time around the ring.
--		 */
-+		/* Set the RE bit periodically to "clean" the descriptor ring */
- 		if (idpf_tx_splitq_need_re(tx_q)) {
- 			tx_params.eop_cmd |= IDPF_TXD_FLEX_FLOW_CMD_RE;
- 			tx_q->txq_grp->num_completions_pending++;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 4be5b3b6d3ed..908dfa28674e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -21,7 +21,7 @@
- /* Mailbox Queue */
- #define IDPF_MAX_MBXQ				1
- 
--#define IDPF_MIN_TXQ_DESC			64
-+#define IDPF_MIN_TXQ_DESC			128
- #define IDPF_MIN_RXQ_DESC			64
- #define IDPF_MIN_TXQ_COMPLQ_DESC		256
- #define IDPF_MAX_QIDS				256
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
