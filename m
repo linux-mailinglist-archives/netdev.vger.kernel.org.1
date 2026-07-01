@@ -1,219 +1,167 @@
-Return-Path: <netdev+bounces-303452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3URZC+iGRGo7wQoAu9opvQ
-	(envelope-from <netdev+bounces-303452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 05:18:00 +0200
+	id xGvtHjCIRGrawQoAu9opvQ
+	(envelope-from <netdev+bounces-303454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 05:23:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FF86E9690
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 05:17:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF836E9717
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 05:23:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=altera.com header.s=selector2 header.b=hqgovt8y;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303452-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303452-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=altera.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303454-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303454-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4C2533012C48
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 03:17:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3F85E302B838
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 03:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECD91891A9;
-	Wed,  1 Jul 2026 03:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D913655CE;
+	Wed,  1 Jul 2026 03:23:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010021.outbound.protection.outlook.com [52.101.193.21])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6DB2628D;
-	Wed,  1 Jul 2026 03:17:51 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782875873; cv=fail; b=PnLz8zAmS5/wej/bqTRVc2F+bisQLQEkORGU6jq32Su0q79kjAMLV19wjHe1UCd/TR7X5H3LxBC3FyXyWU766VedLSy9laifmS5vm5DPlgV3y1bd3AcPnPTiTn2J5CKQH9+t1Sf5xT5qrbkwMyhdNpHzSsvgerLSJJjCKFZ1l0s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782875873; c=relaxed/simple;
-	bh=cRg6YwgP0IBjafluwQefWP9gqiDfA57ZcytAt/7DpkI=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=vFxr5mXc0tCwFyHyr6ceE9J0o22j6u3mGjrPC6D08LUs6HZ5ncktDNmHNWyy71oUcupgv99SK/VVo2y/qV+3dtwu2WIBNTKBy9RdhYXTaaMspvleykcWbmWMNU4bOmBO/SFEZSHyyWzHImkfyOKJ1lKQSZjmcumJ5Y2cF/Dq8ws=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=hqgovt8y; arc=fail smtp.client-ip=52.101.193.21
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=prbRkQr3ayulSY/LkQpmdN7sr/0YQNYwOHGG+EBjFlu9S24LWTyF6ncIHWUcE8C1VHUXDeH6HHBJ1u0mH6xbBnlRwLAZcrFI02KM9QHk0pKHexRDtoad3b37CxdvupLDE6n6mv/5PlK3JQ/+nRnNLRD3ZQQHiCApRHar8IdqvV9H3aaX7zd3Snl5mQR9qqhJT52ngEGUQ3F0yN3tHQiNwzvvQtKyg4H4zyh1RT7yWRQwgXtubDYccZWQXGj/+3IHUmnW+660maJIRrOnf8fcYZFwEXQ9j4XJWl8wDGTbcWyAcwxGLCfTrbiYYpCIYW8oPAwS8AaY1axGRBNQSCh/CA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dNDd+3crtArV4qJ9hQ45PWQJWDET7BQkIelN49qwE8s=;
- b=p4O4OHdUURWp4j+UeaqgPY4v2aRaWHWFZo5vKeDK5/YmU+MI9vs19rgIDttCNva1j6/IABL3breB5prR6dy7rkZ0fWFGgeW2TAsKMTjhjzjEABUI98Z5mq6R3CMg4SHdBLw6TsPUv0jwa6yPCBC1heMQsAb2cbWBz0YJSdn5H954lQ8O459/+T2k6wvPmUXc6cSDakoqIXURFJeoHsxogQ/diyx67sjn7jBLaOcjSU58Wx3QDaz+U9wYyk4c95cvB+ALyo/RBiYABoBYc1Svr6kOZ2tinVdAaNMZeDNrBo5+s4dPcdY/ZRwtV/fqld6jf2Tf+lHdMlBBDIiWHV0J4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dNDd+3crtArV4qJ9hQ45PWQJWDET7BQkIelN49qwE8s=;
- b=hqgovt8yzWq00crx+d8/2ygTkKy1Egv+a/8KIIb2Be+DepsdrblBQONYBNRFIPZ96TGgcLMPDZdBQs9ojsnxJszHAvQZKKG+uDEXVk4mHu+PhQnlS87NXwUkmEBg1btYhFf3o10R+RF0LR0YNR10Enm/BZ7h7MzT5p0QjnqtLLelyMBwYZgykW1MYEJskgtxH2mgkDUkLnY4vEC20DJS5wEN4QynCXz5CE1R5eRkW7bphCD704F42mX9e+/oTlnztp2XVr+ZR0YSMNUnM2Rvtr4Ya7TsraoCG0N5s3HH+ZFEe/wLnejJ7OcFPrgWsJQZb1OgrYvHyUk8R/Wn40p4mQ==
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
- by PH8PR03MB989112.namprd03.prod.outlook.com (2603:10b6:510:3a9::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Wed, 1 Jul
- 2026 03:17:49 +0000
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775%4]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
- 03:17:49 +0000
-From: muhammad.nazim.amirul.nazle.asmade@altera.com
-To: linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F7033ADB2;
+	Wed,  1 Jul 2026 03:23:18 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782876203; cv=none; b=rT92Nev/JlbUdrKd5aIrusqRFIl1yvyFImLJHSVXhNDOrVuSnAVJGiXEcjVn3XDYEcSg2cW+C/QrH5rDj1TULA8ISlDzxi8e72FJI9esBvRE5zLs3ctXCN0imkK0AgCOEjkKSlW3W4QkYFc9l6ISreiLT6MYoGGcYa0LL8a1DtQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782876203; c=relaxed/simple;
+	bh=aPWUk+CO9bjN4NjZO1G52GZEFQTWx69FZ7cYLq8xaQs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=d+W24ckDCJqN3MrACRDjFzS4utwhdqJelGqcQxVda/eQePg0wLwAwhDpKmAigPwp7LR3bOB47UNuvBOZNkWUaJacvXuMWVFv6ZRRg0DZEO2INh0ZhSlrG9Lc/U2CPhEFFB7eveA/SwbmZQzgwBR1Di9RFp4hao+A7plmFHqckJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.92.39.34
+X-QQ-mid: zesmtpgz3t1782876137tdc809c9e
+X-QQ-Originating-IP: kI4mQ4Ekd8zOmb7dsnp5hItCpnL6aeGM0Vc6lilaad8=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 01 Jul 2026 11:22:15 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 74903392030740245
+EX-QQ-RecipientCnt: 10
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: phylink: reject unsupported speed/duplex in ksettings_set() with PHY
-Date: Tue, 30 Jun 2026 20:17:46 -0700
-Message-ID: <20260701031746.23448-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-X-Mailer: git-send-email 2.43.7
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0082.namprd13.prod.outlook.com
- (2603:10b6:a03:2c4::27) To SJ0PR03MB6964.namprd03.prod.outlook.com
- (2603:10b6:a03:432::18)
+	vadim.fedorenko@linux.dev
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dong100@mucse.com,
+	yaojun@mucse.com
+Subject: [PATCH net-next v2 0/1] net: rnpgbe: fix mailbox endianness
+Date: Wed,  1 Jul 2026 11:22:07 +0800
+Message-Id: <20260701032208.1843156-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|PH8PR03MB989112:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b25b2c2-0e98-4e13-e447-08ded71f5400
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|23010399003|1800799024|55112099003|6133799003|56012099006|11063799006|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	Pa0ASjw9NDdN3dX9aAYM7G1glZp3Jdkd/bBMP2mLObhggaPLWE86vIi+r4NhYoQej1fVJEqYWFyWaNFtsun94Km21PkKsHD/FKSj1MjWLlEq+uHbEizURIq5gDW6oEfYI0G5QnOSQqbQzI076fgliGZ7ErGVE8SgRQOMkNfWC6cp84v/lHTslnnzFYEAYeMV8iB38kPfKDXIQoMSA7241jp1uLa60P32hJCtT/mftbeSYqyiAtTTRayrkU+dEik5jO6dGpWfCOsbhpiZMxtXVc6lij/EdL7jfXd9m8jAarqqXkIwNKq+YmkeYpxOU2lZckxFw4t+hfubn1juJ6hF7J1bc0l9mZ53xZnlocixEzhIwtiOXYzlf04UiMXntVpREt243aSzcjHJ6/aLgyWG9D2Z2p+5Iqb6zbqlWYGBneiuUz097iB/HsBwqcfzeLeBbw3IkZst5EC5uHAyvYNLVMbLZol1+pX+habzUfo0OHm7XFcGtcwyQGm7Ht6w4gKkG/kPCoKkASAI1avQBkFzYpQXUF+jSOFxDXpdFPpn+6rx60f0r/pi0sjjLjegqK3W3+Y61Z/r+jero0T18JcdBFTR6AcnjOryJbImHK2/z2l7IMkGUIcr9kqHfxFmVJdgnFmF1byuB3hlptNQhCOSXwGrrLIWQtd+zuLcyR7ikRE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(1800799024)(55112099003)(6133799003)(56012099006)(11063799006)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9gn6Wgih/cL7OdPvBnbOWSZEW/2bvpiieaf1l/XH/jgWvJ5PMKQtyQeHmIpX?=
- =?us-ascii?Q?E+PxZTfD4vqMBH6mz2McIdDNO8ccbFOHpImnhlQjJvJuMKP05YbGEdwSNKi2?=
- =?us-ascii?Q?QHcupLzAw41JsH9gUsmJMGArH0DKMiGkttRrGm5lhZIGCwHYuiDqW6LOPRHS?=
- =?us-ascii?Q?YiH3csnYumAAJqtOIbnh/EEb9c7a3J4ipq2E2fmZLM96pG/VP9L7S5JuomDZ?=
- =?us-ascii?Q?JViocrrJQGapVTud4Wp7sP/oqGaR1MNBkxd5guUqY00prId2Hi1v5PkehGmm?=
- =?us-ascii?Q?t90pcC5htzjnjqz03E87ad49mCn26ymMk5BXsnPS1Q8ukbmN3mn1NLsKUkRw?=
- =?us-ascii?Q?Yqx0ujnuECGAXIcVbq1UVefmc3lsOhLWiNQ/uQyWc/iCOPjm0VVaS8oxchh1?=
- =?us-ascii?Q?bdczKSx9CYMvlTrb0zvUFlLoQPUT5d2ojmOAZKEjRwPXkBl36U65pSrF9myz?=
- =?us-ascii?Q?om6U/uPNdfwasi9zSNRsQtgMqkh8J5uJxt0K+OZhQY2T0B159SQ6CkvdRwk9?=
- =?us-ascii?Q?dSstSi5u4ScK+MW/yYMjRFqsjC5Ct8Ox0Mu3KeOwhodiJQOjsCF4U+AR99I2?=
- =?us-ascii?Q?ixZIStbbK7iKtpH7cdaDR9Vvn1taTlckli7Cd3TBsTrPF+zXpLKhV4M0K+Py?=
- =?us-ascii?Q?Ls2WIwaF2HppHomkC0T0J6hd3ivvORsSvIZILlV9zn+8ys3kcVEGRw5xIMTz?=
- =?us-ascii?Q?9b5qjWNQspFXxaHkKez6b5ytbcQN0Xjc8Lpb6lMY/yxkIVi3RZN7IqqILi5V?=
- =?us-ascii?Q?68ijgSuy91TrdB65GSL7bxRt3I1oz/8zukk5+g6HuP4GtI4RglKvcTlgUnLQ?=
- =?us-ascii?Q?H/kAoO9qZ251vExeKhMlIGaCkOFB1IrwC+acs3wM9qp0bTU762H0tLhFhkhr?=
- =?us-ascii?Q?zd0spECWn0h2Emf0MMXgbniKisNBxWo+9XaHPgs5NAtX+Iom9UcdQnK2Fnko?=
- =?us-ascii?Q?+TfUwTwpNauHL+sglVZeiArOJcA+Rsu8Y4E1GmjfC+CrUJU0KKcUriSjOcVK?=
- =?us-ascii?Q?7B2JoFNC4VWIVuL8UBo+3xIDnZluoEIB4eYhX766lKAOU7wenHpRc+lWx54z?=
- =?us-ascii?Q?NYY6ma71fXXoR3xLgtreYTa8Q+T/iHYdG/BHCiCP715IRhMmsBUDXCWF1iYs?=
- =?us-ascii?Q?pXGqFPjpp66svvv8whCb7SRRsgCC+X+A9wQahONvkzxPixCgH+zwY3KSIE65?=
- =?us-ascii?Q?8HDG56Ar6mh0igMZC+4vPSClXHYn7az/EC84YwTIlyHP0V0iwMIBu8qLq1fp?=
- =?us-ascii?Q?Wi1XrnE6ll9TZkD0HFaggBVw47tTZhpNjb4DaYFplHLJNHJ9t7S81hzBp37x?=
- =?us-ascii?Q?+27sulxUjB4B9G9jmvG6HsOxRVxBWiVKIg3cA6GlqDpE8shH/Mkf6YAQdCU2?=
- =?us-ascii?Q?e3KhCaJQ5TnJ2HEyQtT3R98oZ5SnH/HRRPC7Qzt304ZB8avgE1gAi3e/SWp+?=
- =?us-ascii?Q?uRjmyZVYGSSCUUhDz7pqyIZgcU26wgKFOwvZrU1yxyI/dbcZaWKRKTkO0js/?=
- =?us-ascii?Q?//A8gHWnZRLHDLSPfoxVGFwlzjqLmq0i4PeoC94uXSlunNc2Moj+mc0rGcWx?=
- =?us-ascii?Q?gD9GExobaJUczB49Qu50ckLfP8KNZmuqYTwDHS/vNUZqZSYwcb+dYArbZB3O?=
- =?us-ascii?Q?SIIPHlUkjbnZnBkfzLBqFR/HRSZz7SMKYjrD1v6iqQFdMc+otLCvjg2StB6e?=
- =?us-ascii?Q?wZwbCPllmmOKmaRN8mQ2S5QB4G3eAV9HBGsA4dTSgwgIbYJOla4uGSUX57La?=
- =?us-ascii?Q?i46Wp5Q4mbnDJLUYtzS4B5neTMwQyiKJ529edYIKsT+Qal4m0VZNYVfFpYEb?=
-X-MS-Exchange-AntiSpam-MessageData-1: 9ljlM+fLezetFQ==
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b25b2c2-0e98-4e13-e447-08ded71f5400
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 03:17:49.0792
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0YH9pBklWbf7csDzjBVjuY0LFCYmOgUbbMFEWp+v75WohkgZXIlk40GGPlbDO+7KwnjfqrxBYW9rSmf9g1sY1xdZsD7GYiCjcGeuU9a0EdUaLUWsIkYTB3gXnERpKJm7nIR5vgpOz+mh1EiipCLrzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR03MB989112
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
+X-QQ-XMAILINFO: Ndw/mc8X39ObX3VadK+edLdvMpfRCvquyJ79NJWD0b+3681ROGpPTpHT
+	hsBjB2QVI+nVc1ZpW+5iCHfeYaiOskFGzo6n4D9CUPW+cdhsY7PTi7ptnjL6VRbV2ePBq/X
+	3Sh30WsrHe0ZEId68DZBWIRVpoANp8goAcc23oepLFk2HTw22r2dUe5VwtRz25ty4y3PLG5
+	OoPLY7zydb36nLHbfX3x1l/X9PdNGRirj0krOYYYvCHC54iDyRen/J35d1zkEHZqIirzhuz
+	k78juo9iIbsQUPc1uTHg77kwo9gnOQDA4WB06JvfHS3T87MAlQA7IJrDRajjKFrqJYCgXKc
+	taTViT4q99mWvFY24k8paMHAKcTiTt5mDVDLeBbkiULzr9lhC3YvySOAkSkfeE5mBUOdtt8
+	D4/v8cN3Vqwl8KIV/oiY73QzzocgkOeU98tYWONuRqnL81tHYZoVpWeTz2sf5B2iSNhzsbE
+	5gcy2WgX5aho+zr6GvDTkY09PmyyZEApyXVfl5mMBAFmU30btQh3lxbjlw+15+iV8yEnSzI
+	dRfQa+I9bnOB9956b9hY7NWn/kdM9nHmxpL6yoQh6Ih5NQxgDCrHAaQ8PALO3w/GeZLObrs
+	wJxiRooSbFukJNOriPXlz4j3Fdi6TeIert0ljF0ucb1QsCle33aGiB/2wembNE/xxMmCZu2
+	T2U79QkvHQ9wJ0JphxnkFPB3SXYa0AA8rx1vexaA+1T9pxmCDUZCWh56Yf+bVTGU8Q2HXN/
+	4ww3rdqukiVtWXCU7fNSyRQllns8TtyjD1veP4STJDdywzRwUkGN/9wWOTiNzyG7KdCXZQa
+	O2H9Xz7ER0/FaxbMA8yZJqqrtTtp9LGvvTvVDlzpE52eAop9oFEP9dyYt2UFc1CT/a0LnDG
+	pnG8SS7EzCeRd9GI9OkjJNoVHPhQJmBmVp2ckKdIatb24zKf0ktLD6RfN6wmAwHOYiGCvcf
+	1+oJ29d/2znuudqYf2xJGVT3glXsUdHLBtvNyRhUd098yBLyn24Cf8Sq2NyCoK6qE9gkk3H
+	QlDJAQuJPW0Ty9QehBb1j+mDdkxNxXTX7wTI0/FcA/KRDL7hWtF+Lgjgs6TQKve+dBs42ZE
+	A==
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [1.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-303452-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303454-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[altera.com:+];
-	FROM_NO_DN(0.00)[];
+	DMARC_NA(0.00)[mucse.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dong100@mucse.com,m:yaojun@mucse.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,altera.com:dkim,altera.com:email,altera.com:mid,altera.com:from_mime]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 33FF86E9690
+X-Rspamd-Queue-Id: AFF836E9717
 
-From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+The rnpgbe mailbox exchanges data through 32-bit MMIO registers in
+little-endian wire format.  The original code had two problems:
 
-When using ethtool to change speed and duplex on a phylink-managed
-interface with a PHY attached, the requested speed/duplex combination
-is not validated against the MAC's supported capabilities before being
-passed down to the PHY layer.
+ 1. FW structs with __le16/__le32 fields were cast to (u32 *) before
+    reaching the transport, hiding the endian annotations from sparse.
 
-commit df0acdc59b09 ("net: phylink: fix ksettings_set() ethtool call")
-and commit 03c44a21d033 ("net: phylink: actually fix ksettings_set()
-ethtool call") introduced masking of the PHY advertising modes against
-pl->supported, but did not add an explicit check that the requested
-speed/duplex itself is within the MAC's capability set.
+ 2. No cpu_to_le32()/le32_to_cpu() conversion was performed between
+    the CPU-endian MMIO values and the little-endian payload, causing
+    data corruption on big-endian systems.
 
-The AUTONEG_DISABLE path in the non-PHY case already uses
-phy_caps_lookup() to validate speed/duplex against pl->supported.
-Extend the same validation to the pl->phydev path so that ethtool
-requests for unsupported speed/duplex combinations are rejected with
--EINVAL before reaching the PHY layer.
+v2 fixes this by introducing union wrappers around the FW structs
+and adding the missing byte-order conversions in the transport layer.
+All pointer casts on the mailbox data path are eliminated.
 
-Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+Changelog:
+v1 -> v2:
+- Remove all pointer casts on the mailbox data path.  Use union
+  wrappers (mbx_fw_cmd_req_u, mbx_fw_cmd_reply_u) that overlay
+  each FW struct with a __le32 dwords[] array.  Callers fill
+  named fields with cpu_to_le16/32() and pass dwords[] directly
+  to the transport — no casts needed.
+- Change transport signatures from u32 */void * to explicit
+  __le32 * so sparse can verify endian correctness.
+- Add comments in mucse_read_mbx_pf() and mucse_write_mbx_pf()
+  explaining why memcpy_toio() cannot replace the readl()/writel()
+  loop (the mailbox uses 32-bit MMIO registers, not byte-
+  addressable RAM).
+
+links:
 ---
- drivers/net/phy/phylink.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v1: https://lore.kernel.org/netdev/20260617083531.251119-1-dong100@mucse.com/
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 087ac63f9193..22f9bbd381bd 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2989,6 +2989,10 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
- 	if (pl->phydev) {
- 		struct ethtool_link_ksettings phy_kset = *kset;
- 
-+		if (!phy_caps_lookup(kset->base.speed, kset->base.duplex,
-+				     pl->supported, true))
-+			return -EINVAL;
-+
- 		linkmode_and(phy_kset.link_modes.advertising,
- 			     phy_kset.link_modes.advertising,
- 			     pl->supported);
+Dong Yibo (1):
+  net: rnpgbe: fix mailbox endianness and remove pointer casts
+
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 26 ++++--
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  5 +-
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 82 ++++++++++---------
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 14 ++++
+ 4 files changed, 80 insertions(+), 47 deletions(-)
+
 -- 
-2.43.7
+2.25.1
 
 
