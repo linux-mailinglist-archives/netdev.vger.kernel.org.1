@@ -1,303 +1,221 @@
-Return-Path: <netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303644-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H1UOIGcVRWrH6goAu9opvQ
-	(envelope-from <netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:25:59 +0200
+	id cFG4HD8RRWqO6QoAu9opvQ
+	(envelope-from <netdev+bounces-303644-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:08:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97D886EE13A
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:25:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D12026EDD96
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:08:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="Al/056my";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303643-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=z+D4x2mG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303644-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303644-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E8021302B541
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:51:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6635730C7DA6
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7586481242;
-	Wed,  1 Jul 2026 12:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5B1481673;
+	Wed,  1 Jul 2026 12:52:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB95441020
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C903E0C75;
+	Wed,  1 Jul 2026 12:52:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782910277; cv=none; b=fFA10XElNo3jCjoL87pVMzICYcgef2SlWSnb7IdqlTuRoAHvKinNfPbW47WopbynG6P9g+ug0/xTgXwaUkWNB8ftWYKVqcQ/hpQFi5RuY2/5zFpRJxhjezrFw8H3jS4y0ygvY8SShvtmmW49N/YaRQ91ZCvEyjHmd+9yu11uOu0=
+	t=1782910343; cv=none; b=qwWFkuyKeRHAVpdk7fqgBQGce3e7ssdSY8744YY+pob/LU2bskc2iBNDaKFWd16dkYoSJC9dwww4GRpsJBvLjkMK8kru26ig/FEPbn5eA85CUhU7RE+pIM6Rgm/2lr3hkuodEffwRcQ+/XGZwkYC3Vtol8aPbT7r98PUqlIwA+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782910277; c=relaxed/simple;
-	bh=PENB+CoBg7mSObGy0+iQEGvtVADHoZjqLWA1D9TdOgg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sbUnnIW6xW/v9Wo1XgQnllrwkZIxXf4ifleGO2qLmcG8d2b/GDzmPoSfeDvpT2vl08r0AIHQ6IR3A6+kHHFOLn7DU6JaWz0gpF3e7SK1asJXlQ5oTQfr3+ZO4Q8WW9uL+hH1IvWPsQ0nPpU+y4QG8U67X+BpyDNdudBXhLNawoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Al/056my; arc=none smtp.client-ip=209.85.160.202
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-51a8db414c7so8344331cf.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 05:51:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782910275; x=1783515075; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RAdHoc06kNUcL6i6T2Fy+ea+CKxasL1CrBm+tvJBzC4=;
-        b=Al/056my/tppkxfGFPALnvaT7m6B4LolWAazQYDwhkt9eEvN4DAnySNTpF1eEEFdgM
-         L84XXZzkMi1QiN5dZlhT1d64IAWjVqAfvZjp2oPueqfrMocP/EEsD0InvDN2vJBQ+rFs
-         H2L81xzdnWRszzybt3VittsQ8y5HmhzTE2di8xa37S2ktzV4ASSRW18G4RT1mxx2f3tn
-         WdDfooE8aerKuXTG7IylPhShb+ApqD7hQyjfR6/iOY0ZY4Q4Et1aaP6edXbMepsQo4D+
-         tZ3DQAuJh1H5hH7RfJvvFhPVNyDmr+iSpuptirxwBSkvd6hf4LXr7M4rA/YDuvwYbTRL
-         y+BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782910275; x=1783515075;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RAdHoc06kNUcL6i6T2Fy+ea+CKxasL1CrBm+tvJBzC4=;
-        b=XEr04atmlCgs91NZcz4cp2rYju//e1U5vnI4Ps49tVE28FaD4DRup9xjF/AO3EDj7f
-         nZkHrXz5bb1kRwVD6IONZ5IYtdzD0QzyWi9TYegH12SErdmZysqVKFivNL1TmsEt7zoR
-         vFJLx9yXQT8qK6tP7q8o4HOoS0p5W9LpoVj3nmODROnPu+GQ7pbhq2ka0160fKPLe945
-         BR30DrpFTXiD+5tVr4HSLrUUDqw3mSZn4gqt/w9BxRMmCnyVl6I+9R+QuFWQJ7eol6ra
-         qg23EKBPkUm2SNx+mLbgv+6TikAh41UvfBUd6Uk2HlkxHKwAtAiHXT3wbFRkdO4+GMFL
-         Ao4g==
-X-Forwarded-Encrypted: i=1; AFNElJ/9IYBfmjaqLihBxtK6m5GslLP3oFhxNqwru6N0hfDgbHzNbGmdf4XB64zxeLEOLPZ5Ve9dNXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZAmezLp3V8lAOT7SX5tQjvM8HEJ8Cxefrnd2hN46d9kg3b7NW
-	RWTjY6I71n19ItnAmqI1dCRO+bZN53TcFHAVsPXUFBSdJ6Xr/+I3Ojd+vPup3Sck6LuRdVQnnJ4
-	ZjTcEGS8mgpjD0A==
-X-Received: from qvbgg11.prod.google.com ([2002:a05:6214:252b:b0:8b1:f2c0:cb0b])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:d4:b0:519:b5ef:7fdd with SMTP id d75a77b69052e-51c26a2c1ccmr20677191cf.6.1782910275022;
- Wed, 01 Jul 2026 05:51:15 -0700 (PDT)
-Date: Wed,  1 Jul 2026 12:51:12 +0000
+	s=arc-20240116; t=1782910343; c=relaxed/simple;
+	bh=7hoqZw8gsVMfAofuJcYWp0E3vtrEdG2pjlapqWtFwyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T3M/AzcdE29h17JeWyWNabJcTgYtY0/WyWJvedbFw2lbsHIcZX1vuRAkz3bSkzjq3M/K1pDmLxi6ayrWKAnl33ifPtVY4yLOU7brxAiMESQePG5BhtC1Th8atz9ZNEA9HsVYZMArmPg2LLxwEvp8jP9EqI3VZUzIpXW/kMFFc+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=z+D4x2mG; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MhS0SGh3C2hhdExW2aB+oeJNZvenZv6woq8kraPMVTQ=; b=z+D4x2mGh71AnmUwekGDPP2J4G
+	N5RwVekBH/Xq5SZEnG/Ohdx3gQ2KCuVWHEMV/CVk7gUFZ2cL4jsn4Jcz2xtqDcSmrvWtQt9pUZogE
+	eVoYMBZkHJ+urxJKN5PAY9KrUeMdKIcf0Yg61e/a6vjfpMx2GNFuy6/JcBocHTIar5Ik=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1weuQB-00AAOf-7p; Wed, 01 Jul 2026 14:52:07 +0200
+Date: Wed, 1 Jul 2026 14:52:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javen <javen_xu@realsil.com.cn>
+Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	=?utf-8?B?6aG+5pmT5Yab?= <freddy_gu@realsil.com.cn>,
+	"nb@tipi-net.de" <nb@tipi-net.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"nic_swsd@realtek.com" <nic_swsd@realtek.com>
+Subject: Re: [PATCH net-next v7 4/4] net: phy: realtek: load firmware for
+ RTL8261C_CG
+Message-ID: <6aae96fd-2033-40f8-a99e-0f641067e88e@lunn.ch>
+References: <20260629064718.1349-1-javen_xu@realsil.com.cn>
+ <20260629064718.1349-5-javen_xu@realsil.com.cn>
+ <1ac195f7-29c2-45a3-84a9-cfc5366aee6f@lunn.ch>
+ <00ed7993f38d4597a8c20f71bc7da58e@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260701125112.3652880-1-edumazet@google.com>
-Subject: [PATCH net-next] tun: no longer rely on RTNL in tun_fill_info()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00ed7993f38d4597a8c20f71bc7da58e@realsil.com.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303643-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303644-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:nic_swsd@realtek.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de,vger.kernel.org,makrotopia.org,nxp.com,realtek.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,lunn.ch,vger.kernel.org,gmail.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,realsil.com.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 97D886EE13A
+X-Rspamd-Queue-Id: D12026EDD96
 
-Update tun_fill_info() to read device configuration fields (flags, owner,
-group, numqueues, numdisabled) locklessly using READ_ONCE().
+On Wed, Jul 01, 2026 at 03:12:34AM +0000, Javen wrote:
+> >
+> >On Mon, Jun 29, 2026 at 02:47:18PM +0800, javen wrote:
+> >> From: Javen Xu <javen_xu@realsil.com.cn>
+> >>
+> >> This patch adds support for loading firmware. Download some parameters
+> >> for RTL8261C_CG.
+> >>
+> >> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> >> ---
+> >> Changes in v2:
+> >>  - remove __pack, struct rtl8261x_fw_header and rtl8261x_fw_entry will
+> >> not pad
+> >>  - reverse xmas tree for some definition
+> >>  - add explanation on rtl_phy_write_mmd_bits()
+> >>
+> >> Changes in v3:
+> >>  - add struct rtl8261x_priv
+> >>
+> >> Changes in v4:
+> >>  - add struct device *dev
+> >>
+> >> Changes in v5:
+> >>  - no changes
+> >>
+> >> Changes in v6:
+> >>  - replace rtl_phy_write_mmd_bits with phy_modify_mmd, keep mdio lock
+> >>  - check msb and lsb at the beginning of rtl8261x_fw_execute_entry()
+> >>  - add comments on rtl8261x_config_init()
+> >>
+> >> Changes in v7:
+> >>  - no changes
+> >> ---
+> >>  drivers/net/phy/realtek/realtek_main.c | 220
+> >> +++++++++++++++++++++++++
+> >>  1 file changed, 220 insertions(+)
+> >>
+> >> diff --git a/drivers/net/phy/realtek/realtek_main.c
+> >> b/drivers/net/phy/realtek/realtek_main.c
+> >> index ef3700894ebf..bf7bc19fb44c 100644
+> >> --- a/drivers/net/phy/realtek/realtek_main.c
+> >> +++ b/drivers/net/phy/realtek/realtek_main.c
+> >> @@ -8,7 +8,9 @@
+> >>   * Copyright (c) 2004 Freescale Semiconductor, Inc.
+> >>   */
+> >>  #include <linux/bitops.h>
+> >> +#include <linux/crc32.h>
+> >>  #include <linux/ethtool_netlink.h>
+> >> +#include <linux/firmware.h>
+> >>  #include <linux/of.h>
+> >>  #include <linux/phy.h>
+> >>  #include <linux/pm_wakeirq.h>
+> >> @@ -281,6 +283,42 @@
+> >>                                        RTL8261X_INT_ALDPS_CHG | \
+> >>                                        RTL8261X_INT_JABBER)
+> >>
+> >> +#define FW_MAIN_MAGIC                        0x52544C38
+> >> +#define FW_SUB_MAGIC_8261C           0x32363143
+> >> +#define RTL8261X_POLL_TIMEOUT_MS     100
+> >> +
+> >> +#define RTL8261C_CE_FW_NAME  "rtl_nic/rtl8261c.bin"
+> >> +MODULE_FIRMWARE(RTL8261C_CE_FW_NAME);
+> >> +
+> >> +enum rtl8261x_fw_op {
+> >> +     OP_WRITE = 0x00,        /* Write */
+> >> +     OP_POLL  = 0x02,        /* Polling */
+> >> +};
+> >> +
+> >> +struct rtl8261x_fw_header {
+> >> +     __le32 main_magic;      /* Main magic number 0x52544C38 ("RTL8") */
+> >> +     __le32 sub_magic;       /* Sub magic number */
+> >> +     __le16 version_major;   /* Major version */
+> >> +     __le16 version_minor;   /* Minor version */
+> >> +     __le16 num_entries;     /* Number of entries */
+> >> +     __le16 reserved;        /* Reserved */
+> >> +     __le32 crc32;           /* CRC32 checksum */
+> >> +};
+> >> +
+> >> +struct rtl8261x_fw_entry {
+> >> +     __u8  type;             /* Operation type (OP_*) */
+> >> +     __u8  dev;              /* MMD device */
+> >> +     __le16 addr;            /* Register address */
+> >> +     __u8  msb;              /* MSB bit position */
+> >> +     __u8  lsb;              /* LSB bit position */
+> >> +     __le16 value;           /* Value to write/compare */
+> >> +     __le16 timeout_ms;      /* Poll timeout in milliseconds */
+> >> +     __u8  poll_set;         /* Poll for set (1) or clear (0) */
+> >> +     __u8  reserved;         /* Reserved */
+> >> +};
+> >
+> >Are there other devices which need firmware download? Do they use the
+> >same header? I'm just wondering if this will be reused by other devices?
+> >
+> Hi Andrew,
+> 
+> Currently, RTL8261C is the only device which needs this firmware download flow.
+> 
+> Future Realtek PHY ICs which require firmware download are expected to use the same firmware format, so
+> the current header/entry definition is intended to be reusable.
 
-Annotate all writes to these fields in the control paths with WRITE_ONCE()
-to prevent data races, as these fields can be modified concurrently via
-ioctls (TUNSETPERSIST, TUNSETOWNER, TUNSETGROUP, TUNSETIFF) or queue
-attaching/detaching.
+If this is going to be re-used, then O.K. I was asking because it is
+more complex than it needs to be for just one PHY.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/tun.c | 64 +++++++++++++++++++++++++----------------------
- 1 file changed, 34 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index ffbe6f13fb1fa2333227a6b085806c82a362c0a4..fc8ad6a35708825006f7d199a8f220f30e43df9e 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -532,7 +532,7 @@ static void tun_disable_queue(struct tun_struct *tun, struct tun_file *tfile)
- {
- 	tfile->detached = tun;
- 	list_add_tail(&tfile->next, &tun->disabled);
--	++tun->numdisabled;
-+	WRITE_ONCE(tun->numdisabled, tun->numdisabled + 1);
- }
- 
- static struct tun_struct *tun_enable_queue(struct tun_file *tfile)
-@@ -541,7 +541,7 @@ static struct tun_struct *tun_enable_queue(struct tun_file *tfile)
- 
- 	tfile->detached = NULL;
- 	list_del_init(&tfile->next);
--	--tun->numdisabled;
-+	WRITE_ONCE(tun->numdisabled, tun->numdisabled - 1);
- 	return tun;
- }
- 
-@@ -600,7 +600,7 @@ static void __tun_detach(struct tun_file *tfile, bool clean)
- 		rcu_assign_pointer(tun->tfiles[tun->numqueues - 1],
- 				   NULL);
- 
--		--tun->numqueues;
-+		WRITE_ONCE(tun->numqueues, tun->numqueues - 1);
- 		if (clean) {
- 			RCU_INIT_POINTER(tfile->tun, NULL);
- 			sock_put(&tfile->sk);
-@@ -663,7 +663,7 @@ static void tun_detach_all(struct net_device *dev)
- 		tfile->socket.sk->sk_shutdown = RCV_SHUTDOWN;
- 		tfile->socket.sk->sk_data_ready(tfile->socket.sk);
- 		RCU_INIT_POINTER(tfile->tun, NULL);
--		--tun->numqueues;
-+		WRITE_ONCE(tun->numqueues, tun->numqueues - 1);
- 	}
- 	list_for_each_entry(tfile, &tun->disabled, next) {
- 		tfile->socket.sk->sk_shutdown = RCV_SHUTDOWN;
-@@ -786,7 +786,7 @@ static int tun_attach(struct tun_struct *tun, struct file *file,
- 	if (publish_tun)
- 		rcu_assign_pointer(tfile->tun, tun);
- 	rcu_assign_pointer(tun->tfiles[tun->numqueues], tfile);
--	tun->numqueues++;
-+	WRITE_ONCE(tun->numqueues, tun->numqueues + 1);
- 	tun_set_real_num_queues(tun);
- out:
- 	return err;
-@@ -943,8 +943,8 @@ static int tun_net_init(struct net_device *dev)
- 			       NETIF_F_HW_VLAN_STAG_TX);
- 	dev->lltx = true;
- 
--	tun->flags = (tun->flags & ~TUN_FEATURES) |
--		      (ifr->ifr_flags & TUN_FEATURES);
-+	WRITE_ONCE(tun->flags, (tun->flags & ~TUN_FEATURES) |
-+			       (ifr->ifr_flags & TUN_FEATURES));
- 
- 	INIT_LIST_HEAD(&tun->disabled);
- 	err = tun_attach(tun, tun->file, false, ifr->ifr_flags & IFF_NAPI,
-@@ -2370,32 +2370,36 @@ static size_t tun_get_size(const struct net_device *dev)
- 
- static int tun_fill_info(struct sk_buff *skb, const struct net_device *dev)
- {
--	struct tun_struct *tun = netdev_priv(dev);
-+	const struct tun_struct *tun = netdev_priv(dev);
-+	unsigned int flags = READ_ONCE(tun->flags);
-+	kuid_t owner = READ_ONCE(tun->owner);
-+	kgid_t group = READ_ONCE(tun->group);
- 
--	if (nla_put_u8(skb, IFLA_TUN_TYPE, tun->flags & TUN_TYPE_MASK))
-+	if (nla_put_u8(skb, IFLA_TUN_TYPE, flags & TUN_TYPE_MASK))
- 		goto nla_put_failure;
--	if (uid_valid(tun->owner) &&
-+	if (uid_valid(owner) &&
- 	    nla_put_u32(skb, IFLA_TUN_OWNER,
--			from_kuid_munged(current_user_ns(), tun->owner)))
-+			from_kuid_munged(current_user_ns(), owner)))
- 		goto nla_put_failure;
--	if (gid_valid(tun->group) &&
-+	if (gid_valid(group) &&
- 	    nla_put_u32(skb, IFLA_TUN_GROUP,
--			from_kgid_munged(current_user_ns(), tun->group)))
-+			from_kgid_munged(current_user_ns(), group)))
- 		goto nla_put_failure;
--	if (nla_put_u8(skb, IFLA_TUN_PI, !(tun->flags & IFF_NO_PI)))
-+	if (nla_put_u8(skb, IFLA_TUN_PI, !(flags & IFF_NO_PI)))
- 		goto nla_put_failure;
--	if (nla_put_u8(skb, IFLA_TUN_VNET_HDR, !!(tun->flags & IFF_VNET_HDR)))
-+	if (nla_put_u8(skb, IFLA_TUN_VNET_HDR, !!(flags & IFF_VNET_HDR)))
- 		goto nla_put_failure;
--	if (nla_put_u8(skb, IFLA_TUN_PERSIST, !!(tun->flags & IFF_PERSIST)))
-+	if (nla_put_u8(skb, IFLA_TUN_PERSIST, !!(flags & IFF_PERSIST)))
- 		goto nla_put_failure;
- 	if (nla_put_u8(skb, IFLA_TUN_MULTI_QUEUE,
--		       !!(tun->flags & IFF_MULTI_QUEUE)))
-+		       !!(flags & IFF_MULTI_QUEUE)))
- 		goto nla_put_failure;
--	if (tun->flags & IFF_MULTI_QUEUE) {
--		if (nla_put_u32(skb, IFLA_TUN_NUM_QUEUES, tun->numqueues))
-+	if (flags & IFF_MULTI_QUEUE) {
-+		if (nla_put_u32(skb, IFLA_TUN_NUM_QUEUES,
-+				READ_ONCE(tun->numqueues)))
- 			goto nla_put_failure;
- 		if (nla_put_u32(skb, IFLA_TUN_NUM_DISABLED_QUEUES,
--				tun->numdisabled))
-+				READ_ONCE(tun->numdisabled)))
- 			goto nla_put_failure;
- 	}
- 
-@@ -2814,8 +2818,8 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
- 			return 0;
- 		}
- 
--		tun->flags = (tun->flags & ~TUN_FEATURES) |
--			      (ifr->ifr_flags & TUN_FEATURES);
-+		WRITE_ONCE(tun->flags, (READ_ONCE(tun->flags) & ~TUN_FEATURES) |
-+				       (ifr->ifr_flags & TUN_FEATURES));
- 
- 		netdev_state_change(dev);
- 	} else {
-@@ -3213,13 +3217,13 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 		/* Disable/Enable persist mode. Keep an extra reference to the
- 		 * module to prevent the module being unprobed.
- 		 */
--		if (arg && !(tun->flags & IFF_PERSIST)) {
--			tun->flags |= IFF_PERSIST;
-+		if (arg && !(READ_ONCE(tun->flags) & IFF_PERSIST)) {
-+			WRITE_ONCE(tun->flags, READ_ONCE(tun->flags) | IFF_PERSIST);
- 			__module_get(THIS_MODULE);
- 			do_notify = true;
- 		}
--		if (!arg && (tun->flags & IFF_PERSIST)) {
--			tun->flags &= ~IFF_PERSIST;
-+		if (!arg && (READ_ONCE(tun->flags) & IFF_PERSIST)) {
-+			WRITE_ONCE(tun->flags, READ_ONCE(tun->flags) & ~IFF_PERSIST);
- 			module_put(THIS_MODULE);
- 			do_notify = true;
- 		}
-@@ -3235,10 +3239,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 			ret = -EINVAL;
- 			break;
- 		}
--		tun->owner = owner;
-+		WRITE_ONCE(tun->owner, owner);
- 		do_notify = true;
- 		netif_info(tun, drv, tun->dev, "owner set to %u\n",
--			   from_kuid(&init_user_ns, tun->owner));
-+			   from_kuid(&init_user_ns, owner));
- 		break;
- 
- 	case TUNSETGROUP:
-@@ -3248,10 +3252,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 			ret = -EINVAL;
- 			break;
- 		}
--		tun->group = group;
-+		WRITE_ONCE(tun->group, group);
- 		do_notify = true;
- 		netif_info(tun, drv, tun->dev, "group set to %u\n",
--			   from_kgid(&init_user_ns, tun->group));
-+			   from_kgid(&init_user_ns, group));
- 		break;
- 
- 	case TUNSETLINK:
--- 
-2.55.0.rc0.799.gd6f94ed593-goog
-
+     Andrew
 
