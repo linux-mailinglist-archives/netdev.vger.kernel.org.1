@@ -1,192 +1,231 @@
-Return-Path: <netdev+bounces-303710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303709-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id C16mCUEqRWpv8AoAu9opvQ
-	(envelope-from <netdev+bounces-303710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:54:57 +0200
+	id SrWgFNkqRWqH8AoAu9opvQ
+	(envelope-from <netdev+bounces-303709-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:57:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0306EF06D
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:54:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4736EF0BD
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:57:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=fastmail.com header.s=fm1 header.b=GzAidCKZ;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=Xr7RvzgK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303710-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303710-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=fastmail.com;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=l+6aY+Bb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303709-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303709-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A242B31281AC
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 14:47:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F763303E2F9
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 14:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99AD35E1B6;
-	Wed,  1 Jul 2026 14:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971293546FE;
+	Wed,  1 Jul 2026 14:47:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a8-smtp.messagingengine.com (flow-a8-smtp.messagingengine.com [103.168.172.143])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D22C35677B;
-	Wed,  1 Jul 2026 14:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BB92DC331;
+	Wed,  1 Jul 2026 14:47:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782917274; cv=none; b=geDCYzYNqPU+vKisFAzEA/Z43w9dvLJ7u9cLAUV3qvQ1lpHXkng3rvkB6fGZYFYPRb1gzWqKmM8zSBFEyFtxTqySXPY5nq1/Xc4alf5IhmZex2a6l4noX20tIlx3LW4542Su8uX0eH3dH+NruZy74vkLEijRirMU8nDKJ/x2RwA=
+	t=1782917255; cv=none; b=NDaf8CbuMzYMZZ0Y+attF+i9ang5vqP8kiUIvYJJeLHF6faBIQCSNTf+cuZqZqIb2xBk+djkfCFQghjxaB9DTlAiO/DqK263u5MX/srCeDGlJYLH0hoo9GI9QpqkfqRIjv1kreXT450/SZIcP2fgPXOYoEQj6tkZ/1w0HlINvns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782917274; c=relaxed/simple;
-	bh=chwqUtFfoaH+phiZDhb4n4xB87S5XJuIQlDuEXO9TR8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=trD3Fy69skeumFo5IYS3lMfvuTTmN0d2sBMRWtt820fHQkkmhcTaIZhoq9fXLh2vPk226QEIP1xd0hfIlwXMkqst7001BSDlasglq7yJbrn3mAYQ+AIZHZ1qo8C2ub30elEotR4bgcCemqWcuhRzSqKhYPRA+sIvWn+Z7Ob0HEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=GzAidCKZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Xr7RvzgK; arc=none smtp.client-ip=103.168.172.143
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.phl.internal (Postfix) with ESMTP id 78F3113801A5;
-	Wed,  1 Jul 2026 10:47:52 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Wed, 01 Jul 2026 10:47:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-	cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm1; t=1782917272; x=1782920872; bh=nR83Y66O6HcybvxGSiG+a
-	2C9qoPvKTT4HMsoPirDD6U=; b=GzAidCKZCBlhexEVkXMBzVzY3+TcCAtA4EV8E
-	FxFsy3n9c6Vxinfe+c8WVe3/HC7ay0QTKHQpm+m4yDU6Oq63kT2bSq04RrjNX2I7
-	dbWRcwwKvELN9s+fs+7kQ2OJ1Lp8E/qXfIEC8MmX/8Nwin0Kb0oU5T8d4HRd3FTB
-	co6IceuBWbt9vJ3OIdv0d4x2CDhl8/7gqNmQ4X8zjxBiBSO9S7OeVkvmTeCjV3yl
-	DHDwXvOzunO1hH5fFOt1BeHyRo2ZYwyg3edMXcnz+MbpWK09R0XguWOv5YKEhRCP
-	IMDOBMccgz6kTY5QFYp473KR/alR4fM4OCU6MalRVvmVkydlQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:date:date:feedback-id:feedback-id:from:from:in-reply-to
-	:message-id:mime-version:reply-to:subject:subject:to:to
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1782917272; x=1782920872; bh=nR83Y66O6HcybvxGSiG+a2C9qoPvKTT4HMs
-	oPirDD6U=; b=Xr7RvzgKgbll7nVkeoMAjbm0+sa5aKtxYzWAntWKFKneQsiBRCW
-	XfK5013HWwgNWp5+xsNmuy7szhJGkSeE4fNMjjA5SkT3fCwQxB4DKPsPDJsCkuao
-	dliYeO6Bs1LFtdA7FNjthQbxIH1KHX2Fhay0H+oJ8EDiJLLiFw+ZB94wekQWnAHU
-	geHiiE8vABDiXGC7b4fAmnh7gUTEzq1acMWp/QnuzrPlQqtxEe4WqfoRR7Ua4EIO
-	5xYxlT+g4/9tFKzxzgg6VZSVyCGnFYQNwNqy0AJfh+UtnsU+fNexKf4LAY9BG8DH
-	UMGcocCSxMu25mm750+t6JMEliCTGqzmT/g==
-X-ME-Sender: <xms:mChFar6ZuMqh6OdHkzt51zuK5NTAyIVEC9r8__7yFdc4WkSLHbmyFw>
-    <xme:mChFal3fbrcoh2YoB2itR4lkABOESLvktwMv0bjy7qK3kpnQgt2yZKj5os8Srfuz3
-    65OHIZKZxDdGFL5ctOhwhX2iQkM27veszyPQacjTXcl3EIPiyUwqrE>
-X-ME-Received: <xmr:mChFamvYHsiP-jOjsUQkfPSOZ24UQTsF0eIXCXv1AnT_b-qzWt7ERtSW>
-X-ME-Proxy-Cause: dmFkZTFI1//L2IKbO8J3DS5he9OqHSuFZVu6lUEe7oIeWMlq3I43UQy8Y8u542SuhZD90a
-    4iefhJnApC1J1Xc/mA2G3r6OF04wDQknPtnvcikb2TToKrArH4CRHNTg9PzrhMCssso/YV
-    zTqhzpC7EFJLymeqbR1JxyP7npHa2rXzwVPAweZmpYhFuQfNvU5yr6mVMnkkT0TvjMNNLN
-    f0H5h4sCtlPzlY/9IoQ3n4bkqKz4Nju8a83uJJxSySCNZXlNqrcRdtDBeL/lkcJA0vzcDJ
-    4BlgH3B+PA98n00Y9LMOGCuo3bjQHJ8q4xZhEsjgmVe9BkPL8icVk+N+3FRpf2PiCjEgNt
-    wFLlAGPG5PV20FT8lw91+NNdEVacwNAH5hVvEJvCE17GTJ+3K/eARhlIXmS+Tl1eG7oQEU
-    a0ZR8PONPkzzg5cnEyKP7/bfQqrEvjPlU95pYJcOhZl+BbvvNDeXIuWQvI4K+g4Px5bMEa
-    uAl8num9RrwqGk67AGLDEUEyBudu9H3xnhsLkCcg/cQHfK3k6QEJZmSeFlo8YJJ54YWnQ2
-    7ode12Znb9HLgbS+DlxqdJ4s5qaP8BYS7r48JDkLuVmKiFaCVA8TqrxN0XBaKXU8d5Mtq+
-    rer++IHjgcGTsZ7jBLUbZT9y8w7CcUerCInoomKq3hJ6VfeIfVNQ6XCbn3Rw
-X-ME-Proxy: <xmx:mChFar7910mAWApSS4YrAJgfF5uByBWAV_WqBR0dnj_ms_gQeSwmaQ>
-    <xmx:mChFaie6HvePn6B3eccTAJp6t1KZnrSUmxzvZxvq53RFQG6WoC_Iyg>
-    <xmx:mChFaowzFLmkgNU7x_oTx0OXocqpXo7J2SaYgpwUZZGgx9gzw9wVPQ>
-    <xmx:mChFan_zn1SXcG9tumdmKcL7P9kbps0aLMSnNlpcekH5U8u0GKwzbw>
-    <xmx:mChFalOMFB7XUo_TxrwjcErQGdpdu3JXGy5vtnnIf1y_o8TQMZsIxg1x>
-Feedback-ID: i9dce4b48:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 1 Jul 2026 10:47:50 -0400 (EDT)
-From: Baran Tuna <barant@fastmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Baran Tuna <barant@fastmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	netdev@vger.kernel.org (open list:QLOGIC QL4xxx ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] qede: Prevent possible snprintf() truncation by bounding %s string format
-Date: Wed,  1 Jul 2026 17:47:11 +0300
-Message-ID: <20260701144713.197557-1-barant@fastmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1782917255; c=relaxed/simple;
+	bh=FwG9XPxIQQfsuFlFND0+WxSwKM5jedQZzWqkuukEI9A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Vpjka40OcSl+Ey5cHEXUX1edO1ZMAGekuVFZBUQHKx9q+6UCBQFH6pa3VrqFzt6VAMLWXt+u7OhTfXtwr4WOjCl3tLarUT+uNzXEDB/iys92H2WSZIobe8Tc59wASVUrXBM6MswxeywnOnuI//RPOab1gancZoBZw+TPCY2MF0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+6aY+Bb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EC715C2BCB8;
+	Wed,  1 Jul 2026 14:47:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782917255;
+	bh=FwG9XPxIQQfsuFlFND0+WxSwKM5jedQZzWqkuukEI9A=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=l+6aY+BbqWKSOCJwobLTZMq07FORvQQs29Mlx+0pVzNM8BGhZWk1oDARo7wIylV/2
+	 +TAXajSesfNz2xNa1JAZCxfxXxyrbTnAOAQfANXvKBAQHBCSONB5SfSe0n7QNYxdns
+	 8bXRyozzRbpCOawvW5GsSWod0QDPGJBOB1t25CXs45wYTF6COcC1uf+KTBx7Lr+QFE
+	 AhqEsL2b6ocjPxVJoMNfi8DExr7W34B1OSGhnqtSiNaH8Am5qCcLKVnWhGpKde5gdx
+	 zXXI8r7dNuwvc7AQNH7VlmIDKW3vdNGXL0uAaMy2o5MhItTDW3nDd76nLlJZX6yayn
+	 Lw5j5Gnj/AJzQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3ECC43458;
+	Wed,  1 Jul 2026 14:47:34 +0000 (UTC)
+From: Enrico Pozzobon via B4 Relay <devnull+enrico.pozzobon.dissecto.com@kernel.org>
+Date: Wed, 01 Jul 2026 16:47:23 +0200
+Subject: [PATCH net v3] net: usb: lan78xx: disable VLAN filter in
+ promiscuous mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260701-lan78xx-vlan-promisc-v3-1-232266d32743@dissecto.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNyw7CIBBFf6VhLYaHoejK/zAugA4WY0sDldQ0/
+ XcpXZgY3c2d3HvOjCIEBxGdqhkFSC463+fAdxUyrepvgF2TM2KECSIYxw/V13KacMoHHoLvXDR
+ YcmWlOkhVg0F5OgSwbirYC+phRNftGZ/6DmZcgWutdXH04VXkiZby5uHktydRTLHVltgj4bqR9
+ ty4GDPR743viiWxD6cm9A+HrRzgmkoiRM3kF2dZljcwRYVzGgEAAA==
+X-Change-ID: 20260623-lan78xx-vlan-promisc-83af8a48a7ec
+To: Thangaraj Samynathan <Thangaraj.S@microchip.com>, 
+ Rengarajan Sundararajan <Rengarajan.S@microchip.com>, 
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Woojung.Huh@microchip.com
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Enrico Pozzobon <enrico.pozzobon@dissecto.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3497;
+ i=enrico.pozzobon@dissecto.com; h=from:subject:message-id;
+ bh=T6eb/DFqmbo3Thzxo2uZwZZS2rw6/n4NBOq19Ptob6M=;
+ b=owEBbQGS/pANAwAKAfB2RbS6BRipAcsmYgBqRSiDWot391JCMA+RzCsVgv41t1o4jYkto4Fu0
+ if2vEGAbSyJATMEAAEKAB0WIQT58xDVmo5qdqM1wSrwdkW0ugUYqQUCakUogwAKCRDwdkW0ugUY
+ qUgXB/9YDmHTo+TjghaT/gOUctwAoag3jyvjGuh/WCCjs47KZGsqNnjIdxX2goE20s3hWtcvVxf
+ MkT1SSzUfDZ9eoxXI0RODlRHsxvYUMZbriwlDLVoGBRHnku8MvnCkcQR/I5mVDhh1TMbr0ejlao
+ oHuIfk1aDqNDNLaqHP9tspqZYWRcSNIlkRg+OGxdJvW+1QY+KwhW/yI/mOT++ysBEFLGpEN7Om3
+ f/JYgxXjvWAqCWRLmDM2j7YyjW72M8eHNBFfoFVoSNpGsvGqc1Zyr+Xheva+3xXUjE3YU6rOgRE
+ 3XJrLVZCTnLxDhCfj54ROBtOjKWMKmC7LsYbnkbzvhNCI3/i
+X-Developer-Key: i=enrico.pozzobon@dissecto.com; a=openpgp;
+ fpr=53D697CA0B11F68C9552A59DA3D0B3A0924EA5BB
+X-Endpoint-Received: by B4 Relay for enrico.pozzobon@dissecto.com/default
+ with auth_id=836
+X-Original-From: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
+Reply-To: enrico.pozzobon@dissecto.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.com,none];
-	R_DKIM_ALLOW(-0.20)[fastmail.com:s=fm1,messagingengine.com:s=fm1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303710-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,fastmail.com,debian.org,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303709-lists,netdev=lfdr.de,enrico.pozzobon.dissecto.com];
+	FORGED_RECIPIENTS(0.00)[m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:enrico.pozzobon@dissecto.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:barant@fastmail.com,m:leitao@debian.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[barant@fastmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[barant@fastmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[fastmail.com:+,messagingengine.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_REPLYTO(0.00)[enrico.pozzobon@dissecto.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[fastmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,fastmail.com:dkim,fastmail.com:email,fastmail.com:mid,fastmail.com:from_mime,messagingengine.com:dkim]
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dissecto.com:replyto,dissecto.com:email,dissecto.com:mid,lunn.ch:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,msgid.link:url,microchip.com:email,davemloft.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8E0306EF06D
+X-Rspamd-Queue-Id: AA4736EF0BD
 
-GCC warning shows that formatted strings may
-exceed the fixed-size destination buffers.
+From: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
 
-Bounding the %s string format
-so the maximum formatted output always fits.
+The hardware VLAN filter (RFE_CTL_VLAN_FILTER_) drops VLAN-tagged frames
+whose VID has not been registered via lan78xx_vlan_rx_add_vid(). It is
+left enabled in promiscuous mode, so packet capture (e.g. tcpdump or
+Wireshark) does not see tagged frames for unregistered VIDs.
 
-This eliminates the -Wformat-truncation warning.
+Clear the filter while the interface is promiscuous and restore it from
+NETIF_F_HW_VLAN_CTAG_FILTER otherwise. Enforce the same condition in
+lan78xx_set_features() so netdev_update_features() cannot re-enable the
+filter while promiscuous.
 
-Signed-off-by: Baran Tuna <barant@fastmail.com>
+Fixes: 55d7de9de6c3 ("Microchip's LAN7800 family USB 2/3 to 10/100/1000 Ethernet device driver")
+Signed-off-by: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
 ---
- drivers/net/ethernet/qlogic/qede/qede_ethtool.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Currently, on microchip lan7801, enabling promiscuous mode does not
+result in VLAN tagged packets being captured. This patch fixes this,
+forcing the RFE_CTL_VLAN_FILTER_ flag to be off when promiscuous mode is
+enabled.
+---
+Changes in v3:
+- EDITME: describe what is new in this series revision.
+- EDITME: use bulletpoints and terse descriptions.
+- Link to v2: https://patch.msgid.link/20260701-lan78xx-vlan-promisc-v2-1-fe3b18066728@dissecto.com
 
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-index 647f30a16a94..5428f53150a0 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-@@ -618,10 +618,10 @@ static void qede_get_drvinfo(struct net_device *ndev,
- 	if ((strlen(storm) + strlen("[storm]")) <
- 	    sizeof(info->version))
- 		snprintf(info->version, sizeof(info->version),
--			 "[storm %s]", storm);
-+			 "[storm %.16s]", storm);
- 	else
- 		snprintf(info->version, sizeof(info->version),
--			 "%s", storm);
-+			 "%.16s", storm);
+Changes in v2:
+- moved VLAN filter logic into lan78xx_update_vlan_filter()
+- Link to v1: https://patch.msgid.link/20260630-lan78xx-vlan-promisc-v1-1-fbf0f903bd8f@dissecto.com
+
+To: Thangaraj Samynathan <Thangaraj.S@microchip.com>
+To: Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+To: UNGLinuxDriver@microchip.com
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Woojung.Huh@microchip.com
+Cc: netdev@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ drivers/net/usb/lan78xx.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index c4cebacabcb5..cb782d81d84f 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -1499,6 +1499,17 @@ static void lan78xx_deferred_multicast_write(struct work_struct *param)
+ 	return;
+ }
  
- 	if (edev->dev_info.common.mbi_version) {
- 		snprintf(mbi, ETHTOOL_FWVERS_LEN, "%d.%d.%d",
-@@ -632,10 +632,10 @@ static void qede_get_drvinfo(struct net_device *ndev,
- 			 (edev->dev_info.common.mbi_version &
- 			  QED_MBI_VERSION_0_MASK) >> QED_MBI_VERSION_0_OFFSET);
- 		snprintf(info->fw_version, sizeof(info->fw_version),
--			 "mbi %s [mfw %s]", mbi, mfw);
-+			 "mbi %.10s [mfw %.10s]", mbi, mfw);
- 	} else {
- 		snprintf(info->fw_version, sizeof(info->fw_version),
--			 "mfw %s", mfw);
-+			 "mfw %.16s", mfw);
++static void lan78xx_update_vlan_filter(struct lan78xx_priv *pdata,
++				       struct net_device *netdev,
++				       netdev_features_t features)
++{
++	if ((features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
++	    !(netdev->flags & IFF_PROMISC))
++		pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
++	else
++		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
++}
++
+ static void lan78xx_set_multicast(struct net_device *netdev)
+ {
+ 	struct lan78xx_net *dev = netdev_priv(netdev);
+@@ -1533,6 +1544,8 @@ static void lan78xx_set_multicast(struct net_device *netdev)
+ 		}
  	}
  
- 	strscpy(info->bus_info, pci_name(edev->pdev), sizeof(info->bus_info));
--- 
-2.54.0
++	lan78xx_update_vlan_filter(pdata, dev->net, dev->net->features);
++
+ 	if (netdev_mc_count(dev->net)) {
+ 		struct netdev_hw_addr *ha;
+ 		int i;
+@@ -3074,10 +3087,7 @@ static int lan78xx_set_features(struct net_device *netdev,
+ 	else
+ 		pdata->rfe_ctl &= ~RFE_CTL_VLAN_STRIP_;
+ 
+-	if (features & NETIF_F_HW_VLAN_CTAG_FILTER)
+-		pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
+-	else
+-		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
++	lan78xx_update_vlan_filter(pdata, netdev, features);
+ 
+ 	spin_unlock_irqrestore(&pdata->rfe_ctl_lock, flags);
+ 
+
+---
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+change-id: 20260623-lan78xx-vlan-promisc-83af8a48a7ec
+
+Best regards,
+--  
+Enrico Pozzobon <enrico.pozzobon@dissecto.com>
+
 
 
