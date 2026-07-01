@@ -1,182 +1,204 @@
-Return-Path: <netdev+bounces-303492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ck/RL2C7RGr3zgoAu9opvQ
-	(envelope-from <netdev+bounces-303492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:01:52 +0200
+	id CCeJLpa7RGoEzwoAu9opvQ
+	(envelope-from <netdev+bounces-303493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:02:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297236EA6A4
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:01:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 270806EA6C3
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:02:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=ECc5Rtjw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303492-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303492-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=ebkahP8+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303493-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303493-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7ECA430547F2
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 06:58:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1285630422CE
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 07:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99A63B388B;
-	Wed,  1 Jul 2026 06:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61CB3B1EFC;
+	Wed,  1 Jul 2026 07:01:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2911F0E25;
-	Wed,  1 Jul 2026 06:58:02 +0000 (UTC)
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D91432AAC5;
+	Wed,  1 Jul 2026 07:00:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782889087; cv=none; b=PUqrTCxq7yrhVUW995GyHGyXHrrCfN807gNutORrGGYO7gfYfKOaKMSHRaIGiqyfR+83uZesbhWeuro9oJEalIENORzUMTLGLVTYPkpKcGWkGqEVFFGuqA1RYfbksQJJgDm/4Nx/wpF3m/EIZ4LjREmaIV8d+W72JKKbOI+LfEM=
+	t=1782889264; cv=none; b=qbAqbp1OSx9vxb50tOtY8QwvaDMHm4dLoOMam9z6MXhjsI/IHnHdABfDg1UkX9af3Ghgd0mtEOmeFOlWlLIpUj4sAGcKwRoq+UQmzkcI3/3IOqKt2L/ptqoXU4etqWRUVzoIAK1dXyXPxevmHI/3OBZnxZJZTCPXfkSCYqg4X6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782889087; c=relaxed/simple;
-	bh=bLdoS07tbGVp0trP/myZ9hyqCySu9UwIvaC5xa43064=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=cBqf/hPqhc/0F8u39PmRrts9ITewjM1mE5MosjVJVLMF5mUGwmAd9BMhUE06lBo9LHUsFBUk9TYj5rjLDVl5rbEPj5oFMnmbUM0+yJBxLodYG7Kh7LHx+6vXWnNbqBG9NwNXdyFthSYQXECncbFOe7jpQdNErcco1YMogWgwfOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=ECc5Rtjw; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0C86CA38D4;
-	Wed,  1 Jul 2026 08:57:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1782889074; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=f4MXihyQe/D1JcyYwuGidDbu2z428fVDqLCoOVo9Fkw=;
-	b=ECc5RtjwiMclFiVSL5OJt3SfN3jQ5hY0grzQXHMb8+2W52nX0/KIqpKgYcaZ9BYS3KUrBt
-	CZX1pP+APWFeftxw2bxJCbpmfGtKqsyv22truxGJdSjOyAfHatVZxuh/m/92ciB7yy+BHv
-	B7E+bpIu0SRA9VEsURfrDH2BzIpEZUxCAIzbVTxRhM3JSfQ771VAZxIm7W3KPD1yyslH/4
-	DsuLdmcnmuyg+Fto0d9s0u9XcNgrvFGPPGRcdYtWXMb5nHiR93Y6pzngimQzbiYV1+N/Lr
-	+KkxF4NX6mkqGr27/vH9szEHVEzn5atiSJtIo8YNfJfjaXMQkz8Tx/DZ3hV09g==
+	s=arc-20240116; t=1782889264; c=relaxed/simple;
+	bh=cw7i0cd2QohmmQ/IPMBa+DNnv4Eq9NyNfIk394gQg1E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C3QXvQaQoE0ylcuVPf3Yq4DoE3bNyhikEviYOjGCvk/LSvGQUBgtZFOBBbPNlxpvLBuqtrTpjDssw9OOtzuJioQDhMPkgcAPzQnkzlhsJKOWDqqY91vt6UAjI17uUiFY70R6h5zvFTGoIbyWclN5KaHMrsujTGb8+p2xDlR59Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=ebkahP8+; arc=none smtp.client-ip=209.97.182.222
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=0csrI
+	h9NbqUGd1HTtZbXAxrP8rkXEwSRDAuiXdVwyvw=; b=ebkahP8+tQxFfhLOuiIba
+	ujxW+79XS6VUnpqsqImZ1/Y/QFI9ffvUY+ioNusqGF+kk2jFafELmhiqJ8ePG7nB
+	szaOcbi4CYI7ryqxNw10kw7nTLwTLJIr+ZKgSSTp6hCTU/3OeWufvcMjqX+dC6N6
+	9ZNWVnLz/8lzMVumGprjdk=
+Received: from localhost.localdomain (unknown [211.102.241.101])
+	by web5 (Coremail) with SMTP id zAQGZQBHAMDtukRqnMrVAg--.25970S2;
+	Wed, 01 Jul 2026 14:59:58 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>
+Subject: [PATCH net] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
+Date: Wed,  1 Jul 2026 14:59:40 +0800
+Message-ID: <20260701065941.46249-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 01 Jul 2026 08:57:52 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: enrico.pozzobon@dissecto.com
-Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>, Rengarajan
- Sundararajan <Rengarajan.S@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Woojung.Huh@microchip.com, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: usb: lan78xx: disable VLAN filter in promiscuous
- mode
-In-Reply-To: <20260630-lan78xx-vlan-promisc-v1-1-fbf0f903bd8f@dissecto.com>
-References: <20260630-lan78xx-vlan-promisc-v1-1-fbf0f903bd8f@dissecto.com>
-Message-ID: <c5cd452bae7891e386458e93c0d2df45@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zAQGZQBHAMDtukRqnMrVAg--.25970S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxuF1kZryfXF17Ar4Dur1Utrb_yoW5AF4fpF
+	WIk397ArZ7JF42qw1kXrWxZ3y3KrZ7JF4xWrZ5K345Z3Z0g3WrtFZYy34YgFn0y3yUK345
+	Jr1qy3yUAan8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67
+	AK6r47MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sR_w0eJUU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgUPAWpEQp7gLwAAs0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:enrico.pozzobon@dissecto.com,m:Thangaraj.S@microchip.com,m:Rengarajan.S@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303493-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-303492-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:horms@verge.net.au,m:ja@ssi.bg,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,verge.net.au,ssi.bg,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,dissecto.com:email,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:from_mime]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime,seu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 297236EA6A4
+X-Rspamd-Queue-Id: 270806EA6C3
 
-Hi Enrico
+When an ICMP Fragmentation Needed error is received for a tunneled IPVS
+connection, ip_vs_in_icmp() recomputes the MTU that the original packet
+can use by subtracting the tunnel overhead from the reported next-hop
+MTU.
 
-On 30.6.2026 16:15, Enrico Pozzobon via B4 Relay wrote:
-> From: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
-> 
-> The hardware VLAN filter (RFE_CTL_VLAN_FILTER_) drops VLAN-tagged 
-> frames
-> whose VID has not been registered via lan78xx_vlan_rx_add_vid(). It is
-> left enabled in promiscuous mode, so packet capture (e.g. tcpdump or
-> Wireshark) does not see tagged frames for unregistered VIDs.
-> 
-> Clear the filter while the interface is promiscuous and restore it from
-> NETIF_F_HW_VLAN_CTAG_FILTER otherwise. Enforce the same condition in
-> lan78xx_set_features() so netdev_update_features() cannot re-enable the
-> filter while promiscuous.
-> 
-> Fixes: 55d7de9de6c3 ("Microchip's LAN7800 family USB 2/3 to 10/100/1000 
-> Ethernet device driver")
-> Signed-off-by: Enrico Pozzobon <enrico.pozzobon@dissecto.com>
-> ---
-> Currently, on microchip lan7801, enabling promiscuous mode does not
-> result in VLAN tagged packets being captured. This patch fixes this,
-> forcing the RFE_CTL_VLAN_FILTER_ flag to be off when promiscuous mode 
-> is
-> enabled.
-> ---
->  drivers/net/usb/lan78xx.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-> index c4cebacabcb5..a1a53ef85cb9 100644
-> --- a/drivers/net/usb/lan78xx.c
-> +++ b/drivers/net/usb/lan78xx.c
-> @@ -1525,7 +1525,14 @@ static void lan78xx_set_multicast(struct 
-> net_device *netdev)
->  	if (dev->net->flags & IFF_PROMISC) {
->  		netif_dbg(dev, drv, dev->net, "promiscuous mode enabled");
->  		pdata->rfe_ctl |= RFE_CTL_MCAST_EN_ | RFE_CTL_UCAST_EN_;
-> +		/* bypass VLAN filter so all tagged frames are captured */
-> +		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
->  	} else {
-> +		if (dev->net->features & NETIF_F_HW_VLAN_CTAG_FILTER)
-> +			pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
-> +		else
-> +			pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
-> +
->  		if (dev->net->flags & IFF_ALLMULTI) {
->  			netif_dbg(dev, drv, dev->net,
->  				  "receive all multicast enabled");
-> @@ -3074,7 +3081,9 @@ static int lan78xx_set_features(struct net_device 
-> *netdev,
->  	else
->  		pdata->rfe_ctl &= ~RFE_CTL_VLAN_STRIP_;
-> 
-> -	if (features & NETIF_F_HW_VLAN_CTAG_FILTER)
-> +	/* keep VLAN filter off while promiscuous */
-> +	if ((features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
-> +	    !(netdev->flags & IFF_PROMISC))
->  		pdata->rfe_ctl |= RFE_CTL_VLAN_FILTER_;
->  	else
->  		pdata->rfe_ctl &= ~RFE_CTL_VLAN_FILTER_;
+The current code always subtracts sizeof(struct iphdr), which is only
+the IPIP overhead. For GUE and GRE tunnels, ipvs_udp_decap() and
+ipvs_gre_decap() already compute the additional tunnel header length,
+but that value is scoped to the decapsulation block and is lost before
+the ICMP_FRAG_NEEDED handling. As a result, the ICMP error sent back to
+the client advertises an MTU that is too large, so PMTUD can fail to
+converge for GUE/GRE-tunneled real servers.
 
-nit: Could this be addressed as helper for both callers?
+With a reported next-hop MTU of 1400, a GUE tunnel currently returns
+1380 to the client. The correct value is 1368:
 
-> [...]
+  1400 - sizeof(struct iphdr) - sizeof(struct udphdr) -
+  sizeof(struct guehdr)
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Hoist the tunnel header length into the main ip_vs_in_icmp() scope and
+subtract sizeof(struct iphdr) + ulen in the Fragmentation Needed path.
+The IPIP path keeps ulen as 0, so its existing 1400 - 20 = 1380 result
+is unchanged.
 
-Thanks
-Nicolai
+Fixes: 508f744c0de3 ("ipvs: strip udp tunnel headers from icmp errors")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: Claude Code:GLM-5.2
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+ net/netfilter/ipvs/ip_vs_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
+index d40b404c1bf62..74c5bd8b5f48 100644
+--- a/net/netfilter/ipvs/ip_vs_core.c
++++ b/net/netfilter/ipvs/ip_vs_core.c
+@@ -1765,8 +1765,9 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+ 	struct ip_vs_proto_data *pd;
+ 	unsigned int offset, offset2, ihl, verdict;
+ 	bool tunnel, new_cp = false;
+ 	union nf_inet_addr *raddr;
+ 	char *outer_proto = "IPIP";
++	int ulen = 0;
+ 
+ 	*related = 1;
+ 
+@@ -1831,7 +1832,6 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+ 		   /* Error for our tunnel must arrive at LOCAL_IN */
+ 		   (skb_rtable(skb)->rt_flags & RTCF_LOCAL)) {
+ 		__u8 iproto;
+-		int ulen;
+ 
+ 		/* Non-first fragment has no UDP/GRE header */
+ 		if (unlikely(cih->frag_off & htons(IP_OFFSET)))
+@@ -1936,8 +1936,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+ 				if (dest_dst)
+ 					mtu = dst_mtu(dest_dst->dst_cache);
+ 			}
+-			if (mtu > 68 + sizeof(struct iphdr))
+-				mtu -= sizeof(struct iphdr);
++			if (mtu > 68 + sizeof(struct iphdr) + ulen)
++				mtu -= sizeof(struct iphdr) + ulen;
+ 			info = htonl(mtu);
+ 		}
+ 		/* Strip outer IP, ICMP and IPIP/UDP/GRE, go to IP header of
+
 
