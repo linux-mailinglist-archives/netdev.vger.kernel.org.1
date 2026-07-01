@@ -1,235 +1,228 @@
-Return-Path: <netdev+bounces-303647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GcXaBnERRWqe6QoAu9opvQ
-	(envelope-from <netdev+bounces-303647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:09:05 +0200
+	id cY9aOj0URWqD6goAu9opvQ
+	(envelope-from <netdev+bounces-303648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:21:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF8C6EDDC5
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:09:04 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5052A6EE048
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:21:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=T4ED8TA7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303647-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303647-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=ssi.bg header.s=ssi header.b=BFriuHLn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303648-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303648-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=ssi.bg;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5DDC830A469A
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 13:00:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7241D3289EAA
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 13:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C16481FD0;
-	Wed,  1 Jul 2026 12:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7582B4A2E06;
+	Wed,  1 Jul 2026 12:58:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010063.outbound.protection.outlook.com [40.93.198.63])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502FC481AA0;
-	Wed,  1 Jul 2026 12:57:37 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782910658; cv=fail; b=u9OWPStjomRv+6r7ubzt0LWRy5hDbQLDgXt1IwFFj6HVBL0G0UbrLom6bz0u67VmfuHlzPeliXro+cAr0hnqIwPj5Aj8mlS9OoasrwFIey++gOKKQWKPXYBuWT5CnITLlJvbdFIjCeJ/5E4/rw+IhzosVY8hJg3+fZu+WH6FzKM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782910658; c=relaxed/simple;
-	bh=Daa4SUPX7CmSAAa8n4mlHyzD5uiqOwbTSluXsEcNnZo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qZK7wbiihnl3qOF1rGgtswuoWNsIwRYE5XtUgbW2MuqVAg5KdSFEGm0GXVzwioamhxonYGyQ6Ye56zTRPI6NqDx1NQBFfH3xhOwiLhV0JU2G9yklo963IXJz4QBivx4HKZBoR6xQn8dsO8+KcXhG8ePPkcwxtzB9JSNE1V3/B8o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=T4ED8TA7; arc=fail smtp.client-ip=40.93.198.63
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YbO8Xg2XKhe9zCe6bsYh34josfrSmfLY9hnXNcEi6VhopgrdLRHRlskN0PzljhuEvPyFZhp0SaveM95YwIYEtdflJJIrCvRpZEK0UjKCGsmt210Nwi7TcGdAI0hruA3atwFqYCOrESYXOBGdd9zywrwfLz4x7kyW0XaJ7O29YgRJrsu5tE057tI5iS8UwcDF9X2kOX+pyXQZ3CtlSFk/xX8iih6asYiBjZs8NJ5JoH1FTjXzjzWGq7eKYIh8SaELSc5yUcxBBjOwEOV7h1cQEJi13lxwLwvw7BY2b67k5k7dwwEfb80Yvm7wVitv/3S3/MPtJI6jumHYD+w4Wvz5oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fCXoGGuT/6DBFClE5vYHNEUFwwnY1aCRlkvAgJs5T/w=;
- b=DTbSvVGyGHCuyMOUl+2hIoIC7E81EfRpk7J5dytbLPSgVoNnvkFh2w52dp0bT5/hgDUiAnFn3trE1grRjoHhZqkwMzrIQqjbkrF6+XjotTO7hpVFDCssfGmsH7tb02zRcRpk+ezPEieI0kQBhkB4UMyIOWw+JEcmLHqKmidAJmpCIalkGpTQAR4RWh5dgk+fRUrJFTG3gnkQiT3R7wx52IFDaYFfMjD4z5DQaU9y9MpfqOQndlQpHFeIqBARtskRCZ/zr/aNSh7VjZpp8lrS253/VRdnYseDVFu1vZPBE4AA9m5Udwwt4q8D9qFe0wSZO6THulETD3uVPph8482Ssg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fCXoGGuT/6DBFClE5vYHNEUFwwnY1aCRlkvAgJs5T/w=;
- b=T4ED8TA7/vvwijDbaT2slo0Sz5ILSUEjB8c1QDpbBZRAx0KetSnrrOZv+JiCackir19VUKwBLz3sZoUEFK+nhDzTiuMyhM44MNw+nWIVgoXyMSpc2cprhasssFk/9QXU6QzMBqpeeIUn4thtDp2UjlyujRl9H/0oEbn19XFg9+LL9e+meMcZ031JVRTUBTpXxWzjtPK6JuDszJSh/D6/diQQYLyOEPBd88Zw4Ya+Xb0/f6xCqtuDzaO9gVm8aroVT1hu6Q4XL/6uO/ntmV5E+coOSKPT6aHyC22hmZ9KqAu32L2BqOFbNXAlbh84WHTfMvj4GNId+XAEuAWqa2W59w==
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by CY5PR12MB6407.namprd12.prod.outlook.com (2603:10b6:930:3c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 1 Jul 2026
- 12:57:24 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
- 12:57:24 +0000
-Message-ID: <1d4ca929-82b8-4891-9058-1451bf71a660@nvidia.com>
-Date: Wed, 1 Jul 2026 15:57:21 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V4 4/6] devlink: Apply eswitch mode boot defaults
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20260629182102.245150-1-mbloch@nvidia.com>
- <20260629182102.245150-5-mbloch@nvidia.com> <akThPmvUHvCMT2cp@FV6GYCPJ69>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <akThPmvUHvCMT2cp@FV6GYCPJ69>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0003.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::18) To CH3PR12MB7548.namprd12.prod.outlook.com
- (2603:10b6:610:144::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E92495527;
+	Wed,  1 Jul 2026 12:58:28 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782910713; cv=none; b=lfD61Waoyk21lTdpj8vM8EEUQ5LADbTcFv9RfRBHqkZ6v64JputuXhhu4Xsis8ZE/kfjaZxCdQMTPherPfEySij/iOhiizi5UBU7r9CgEhJzOzzJUfciTUUFEXgNZmpTEhRq2nP/Q5Ls0NL2+d2WA2Zg8mG5yS4Fc/5JSs594ng=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782910713; c=relaxed/simple;
+	bh=MNnNF6aqKKWPoGFSYiIOGC6pM3ndilJbEB5mQda/JZs=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=CkvvQ/Jmft70DQ9DlrECP9UgnunYhH8fAn0uunLMvopl7WlsMIme7WwdwPrLsKiuafMlVm+8priRuyfycjUiXDEnPpr8GZIPnWh9/byaFq8jDyepkBqqJOj1/0LeHAzjiSSwWSdSzmMw/Ais2Mqj7P8U1ukYwQFwOpYwZ3Aa5vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=BFriuHLn; arc=none smtp.client-ip=193.238.174.39
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id A484E229E5;
+	Wed, 01 Jul 2026 15:58:23 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=FbsxZDGlGm1ZDRal0BJRWSKMr6tW8cq7eQhkh5ZB/bg=; b=BFriuHLng6oy
+	qKXUSdOnPdpHPo2L31yeS6RBfGxcc9VRXnReZ7qxGvgLF6/uhydUnNrYgsOr7mCV
+	ehrp98XrrimPPDvRYahzKE7jjIal+4edNl3SMDmLSrA8SUON0PDJm/VVVeg3KiX8
+	8TRxkX9B/IEDV/W9rBU1E6aab8fFmJP3oQN4e6VQ8hwKMBxjpl0mh8WP2v1DD/C+
+	FINxoxS7M9J/fSNNmLOpF4uf0FKJ576Jdk9FmolvkD3vwxFEFV10CncZLcx2CUON
+	pL0zk9cVp/IosG7afeHCLDP0aXSt2A/aqgd+Vo8sJ67MtQ27+4r2htxkGTGi7j70
+	ungiNsZptnAto9n2sm4N1NR4v9+muzaXlicoY9I2rsuLL0d9MpKZZKKK30uDx7Yy
+	4O6ltRbKUPN6j32nZk4GlLR7J5rpqWPOKG58U3WAew/de4AErY5EIvrzApFejpja
+	Tkq/3D4QdnlESoNC/ZRF+T+DoDQOM4xxT0Q65iGtpJOlRQpP7ZDgr5cuuEwq86N7
+	84G81l8jlvIj0nt+iVpYb9Rl2gnk7bXLD7ZHUQLliZs0qJ/lBhMlZHwx7BWRAuD6
+	aaMDFo1511h2rAVj5YX4BqV1EgBnPAYbVME44R1jRnnc+IvGQD47XAxmAmfXvS/X
+	gUzQumO7NlsqjU3ic1difK+U7rximZc=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Wed, 01 Jul 2026 15:58:23 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 0FCC460672;
+	Wed,  1 Jul 2026 15:58:18 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 661Cw6mQ044569;
+	Wed, 1 Jul 2026 15:58:07 +0300
+Date: Wed, 1 Jul 2026 15:58:06 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+cc: netdev@vger.kernel.org, Simon Horman <horms@verge.net.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
+        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
+Subject: Re: [PATCH net] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
+In-Reply-To: <20260701065941.46249-1-zhaoyz24@mails.tsinghua.edu.cn>
+Message-ID: <b9ebd0cb-9aea-7b57-5ae4-bf379860171f@ssi.bg>
+References: <20260701065941.46249-1-zhaoyz24@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|CY5PR12MB6407:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d1c51c2-1d64-4997-e9db-08ded7704be3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|23010399003|22082099003|18002099003|3023799007|11063799006|4143699003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	7C/zVCi3iN8zBfQKUmfWAAj/TkO3uXn5nRKgEc6pfM4PhTHR+SNYJ04fOqUotwQk1J0nIwct0LJCelwNElKXGMUZFDrX+sMg1fx9mVvdxSF/AIBJtc4lxKe11XaJNICYGNQk9jNhYeQPrnV3lzMgabO31pTI1qS+q+s8u21vg/iTxucwAyEFmZzMa0y5NIv0HUoQaxKMtnhraaJWjTpbZyWm9fi+rYvOAIdP2k6eru76czaxKumwK0106IOupqp0w0x8zieZ38J2jQQOOLQXuO59BGmoD1WvvOyp7TuwePOR2N4GLqjxBJ1U4oZcGXxgijp0cs5BU2mAxSINs8K+bbmu6Q8z+8guEMom2YK2cF8hm0kErTwRns9eZS/ARAcs85eGIOY6vC33ZWOGayTSgvUlwyPeGtrpkTrQqse+cnDJsZ+man34AAEW9he1gDOzuwdUT6eo8zQBmB5VsDsX8g2vhLBnw+C2x53s+MPKYFj9ZE4QYkLADk8fZSluVLeRyLcWfNwZ/+nUH4yu6vmOUzIH7XnkC/uEvrbenqDhKKtovH4ol2nkODscsnVLRo+CjZJFe30CJcnuCqOD33DKzIergST3d1MbJ/p6FIrv7q/vkX1ynYhUR1OsDR7w7CbdZw1f5YHAhCkRizo9Nt6yJdQilbkuWz5fAGsCAQURYEw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(23010399003)(22082099003)(18002099003)(3023799007)(11063799006)(4143699003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OG1aVTNaNkpYRUdGYTFzTFBVZ3k3ODkxSTM5Nythc1h4L1lxeStid2ZFV0Nt?=
- =?utf-8?B?OVlEL1A5cyt5N2NzS2EzVXFFOWhlTm1Qcm9JMU5IdUJUVmtlMGowREdoaHA4?=
- =?utf-8?B?T3JCOVRjby9BUlNXQWFCQ1krL3NFZ2p4WnBaQm5oS0Ridml6V0ZVQ1FWY0pQ?=
- =?utf-8?B?VzFlQUZQKzhsNU53bWUwdWl4emUyNHIzb3FUOHM0dkhRYi9aYkk0MkFVSzJR?=
- =?utf-8?B?bTVObzRkM05JRThreTZiY3l2b2lwSGMzM1B0VWxBN1VRb2FBUTRlN3dHZmxj?=
- =?utf-8?B?RkhvQkQ0M21IUmd4V3V2T2dTZ1NRNWpvVlV2SnB6S0cwMk5qZXhJL2ozS0ZT?=
- =?utf-8?B?Ump1OTJoaHNrUlczMjVINVhBakpCMTRnaStBRnRieTNuRnZMNWdnc1BTSUVG?=
- =?utf-8?B?SjBQNVZjSFNQd2tlUEdJek9PNVgxZVNnSjJ4NnZPRFFGclM0Q1hja1pwMmU2?=
- =?utf-8?B?QTdzcTFVSGlnenUyNTN6ZGxwZ3kybTdvYjMwN0ZHTEIyais3Y0JxU3VYV2JM?=
- =?utf-8?B?S3h3ZW5tdHZEYVo3bzRnVFVVWE5RY2F2YVlkeWN2Z3prRnlCUmZoN0dDTGYr?=
- =?utf-8?B?ZE9QTnNKaUpUcEVuY1ZHZEJXb1NHV2NGdUxVbUl5M3ZqTzlaRlVwS1lxaEpZ?=
- =?utf-8?B?ZE9YRW9uS2pXRDNEU0xYLytraVVWaE5KMmNwaGVoeUprZWpzWm5kRFB6ZkFk?=
- =?utf-8?B?QzBic1ZTV1BwYTNQcm95cll3U1plS0ZjOWl3bG80WVNHc3pMVzZHaERscXRI?=
- =?utf-8?B?VlJ2c2gycFdPUUw4enB6Qms5SE0ybjJWL3RiL0JoOWN5NnoxcGRTdzBhWnQ1?=
- =?utf-8?B?NGhSU3M4TmE2REFjSHMzM0tpYjZYNGZPLzhpV0V5RXJUb2JpZktMMTdUOWsv?=
- =?utf-8?B?RzlPcUMzcEVIenU5N0pXNmZBWml6UmNDdVpkYURGVzBHWk52eVdaWGtwak9n?=
- =?utf-8?B?cmFhcE5IY1IwNW5TRWEvdHh6UWhicm5tS1J2alVpTkJLTEZvendwY2thNHZs?=
- =?utf-8?B?cGprOHZabU1jUmMwVVk5cjNvVG9TZUw5OTBnUUxOY1NVL3FvWnJJaEQxTnU3?=
- =?utf-8?B?R3FjTFJ0MmpCUk5JTjNPdTYxUzhOVTVJZ28wU2JYZ3ovN3E0OW5pTlllYVJn?=
- =?utf-8?B?dUpLTGNNSjF0UkY1WkNTNnJRYXdOV09vcUNZYndGeS85ZE9zdEpCVDMxYTBo?=
- =?utf-8?B?NCtTQk1jYmV6MGxUSWNRc2dlR2lpMk42TnRSRjJZT2M2a0pmdjNodEpzaXlE?=
- =?utf-8?B?WWxyQ0xZVERZWmpsRXFmS2dxOFlCb3ozVTNWY1hPRC9uZFgxa3JtR1p6T3Rh?=
- =?utf-8?B?TnFWdFFGd1ZiQzNYK2k1cGZTTmtDeCtTSU11aTc5WTZOMFNUZ2Z2YkpUbnNm?=
- =?utf-8?B?b1UvTTZVSm44N0twaWpjVEthdVZxLzdPMnZhQTBzZVdVbEJUaVhoREtPWWt5?=
- =?utf-8?B?cU5wM05INWZ3SWZuZnUxN3RUY0hhdCt3a2hJdTd3bGJKell0clJsbnhNZGpr?=
- =?utf-8?B?VlIvcmR2NUdETnZmV1VZSzdQTGFEenhkMFdpa3JManE5UVE1YWZkWEdPUVZs?=
- =?utf-8?B?d096THJNemdtY0ZBNUtLSkk5a2E0STZWSXFTK0g2bVRZT1hSNWc0cTdYaWpH?=
- =?utf-8?B?Njg5Z1UrZW1SSGk4TG9OSnF0RWtNVnNmVUJnRzh1TGNLYnhCU0IweXRUUys3?=
- =?utf-8?B?S1h2S25mdEhLbGpHeGhHRnVoaVQ0K2ZDcWpIZUpCVUZ3SWVCNHV6cmY3ZHU5?=
- =?utf-8?B?QWkzcUlISjZPUjliczUzWXcwZy9JRDRUdEhxaWdvNUpxbzJadlRJTFBPMDU2?=
- =?utf-8?B?ZFNvOTFQelVWUHBoQ2EwTkRVSzMzNUI0dlYrQi82UXFNWk1Dd2NiOVVCOTh1?=
- =?utf-8?B?a2JVYmtoNlp1NklPeTlHNkdHK1czaGdJMktvelZGK0dIZ1JYOEg1azhoSkpK?=
- =?utf-8?B?d3RoVEd1Umk4eGdBYkp1M3VLTHJwZ00xdkhqdmhJRWtxSEh0OGRPemZSSVA4?=
- =?utf-8?B?RDZxVk1rNFlGTGhDUmZRMFJNSFJLZ05reXExbXA2YXN4SUo3OVN5MEhMa0Qx?=
- =?utf-8?B?djhmaUZVYkdSc0lMUzM3VEM3YWJSUStnVUlXcXdvZmhQclFVWTlkYjgwZU01?=
- =?utf-8?B?TUYrTUhTVVRLd0hvVWpDRDZIMFJwZnZIMGVIdEJUL3NCdHpTYkthVWZaUTky?=
- =?utf-8?B?dmRVTnovdkE5bWFYNkpjWEphWG95N1JCOERrbFhQT0l2SkR6bjhyVUp5TVFU?=
- =?utf-8?B?TnRyT3dVQlNwakN4Uy9WdjJtOUphc2lVMjltelV3MWN2L1pIbTllcjhmVjAr?=
- =?utf-8?Q?/tBWRcvbzAcTekArqt?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d1c51c2-1d64-4997-e9db-08ded7704be3
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 12:57:24.4267
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sdrHbGbX5a9l4gmFUSXBNSKnOgvS2MyFSAAwddxsf2zTGtIRk9C0OpYmkjhQtGEKS4r1qiRBgA2B1AOMNtXqAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6407
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303647-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303648-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,Nvidia.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9FF8C6EDDC5
+X-Rspamd-Queue-Id: 5052A6EE048
 
 
+	Hello,
 
-On 01/07/2026 12:48, Jiri Pirko wrote:
-> Mon, Jun 29, 2026 at 08:20:59PM +0200, mbloch@nvidia.com wrote:
->> Apply parsed devlink_eswitch_mode= defaults after devlink registration
->> and after successful reload.
->>
->> devl_register() may still be called before the device is ready for an
+On Wed, 1 Jul 2026, Yizhou Zhao wrote:
+
+> When an ICMP Fragmentation Needed error is received for a tunneled IPVS
+> connection, ip_vs_in_icmp() recomputes the MTU that the original packet
+> can use by subtracting the tunnel overhead from the reported next-hop
+> MTU.
 > 
-> How so? I would assume that driver calls devl_register only after
-> everything is up and running and ready. If not, isn't it a bug?
+> The current code always subtracts sizeof(struct iphdr), which is only
+> the IPIP overhead. For GUE and GRE tunnels, ipvs_udp_decap() and
+> ipvs_gre_decap() already compute the additional tunnel header length,
+> but that value is scoped to the decapsulation block and is lost before
+> the ICMP_FRAG_NEEDED handling. As a result, the ICMP error sent back to
+> the client advertises an MTU that is too large, so PMTUD can fail to
+> converge for GUE/GRE-tunneled real servers.
 > 
-
-You would think so :)
-
-Some drivers, mlx5 included, call devl_register() while holding the
-devlink instance lock and then finish setting up state before releasing
-the lock.
-
-In v3 I tried to enforce exactly that model, move devl_register() to
-be the last thing the driver does. Jakub pushed back on making that a
-general rule. So in v4 I changed the approach. devl_register() only
-schedules the work, and the actual eswitch mode change can run only
-after the driver releases the devlink lock.
-
-Mark
-
+> With a reported next-hop MTU of 1400, a GUE tunnel currently returns
+> 1380 to the client. The correct value is 1368:
 > 
->> eswitch mode change, so keep a per-devlink delayed work item and pending
->> flag for the registration path. Registration queues the work, and the
->> worker tries to take the devlink instance lock.
->>
->> If the lock is busy, the worker requeues itself with a delay.
->>
->> For successful reloads that performed DRIVER_REINIT, devlink_reload()
->> already holds the devlink instance lock and the driver has completed
->> reload_up(). Clear pending work and apply the default directly from the
->> reload path instead of queueing work.
->>
->> If a user sets eswitch mode through netlink before the pending
->> registration work runs, clear the pending flag so the queued default does
->> not override that user request. Cancel pending default apply work when
->> freeing the devlink instance.
+>   1400 - sizeof(struct iphdr) - sizeof(struct udphdr) -
+>   sizeof(struct guehdr)
 > 
-> These AI generated code descriptive messages are generally not very
-> useful :(
+> Hoist the tunnel header length into the main ip_vs_in_icmp() scope and
+> subtract sizeof(struct iphdr) + ulen in the Fragmentation Needed path.
+> The IPIP path keeps ulen as 0, so its existing 1400 - 20 = 1380 result
+> is unchanged.
 > 
+> Fixes: 508f744c0de3 ("ipvs: strip udp tunnel headers from icmp errors")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+> Reported-by: Ao Wang <wangao@seu.edu.cn>
+> Reported-by: Xuewei Feng <fengxw06@126.com>
+> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+> Assisted-by: Claude Code:GLM-5.2
+> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+> ---
+>  net/netfilter/ipvs/ip_vs_core.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
+> index d40b404c1bf62..74c5bd8b5f48 100644
+> --- a/net/netfilter/ipvs/ip_vs_core.c
+> +++ b/net/netfilter/ipvs/ip_vs_core.c
+> @@ -1765,8 +1765,9 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+>  	struct ip_vs_proto_data *pd;
+>  	unsigned int offset, offset2, ihl, verdict;
+>  	bool tunnel, new_cp = false;
+>  	union nf_inet_addr *raddr;
+>  	char *outer_proto = "IPIP";
+> +	int ulen = 0;
+>  
+>  	*related = 1;
+>  
+
+	The change look correct but there is something to fix:
+
+1. first hunk is bad, does not apply to the nf tree (-8+9 vs -6+7
+lines):
+
+# patch -p1 --dry-run < /tmp/file.patch
+checking file net/netfilter/ipvs/ip_vs_core.c
+Hunk #1 succeeded at 1765 with fuzz 2.
+
+2. the first two words in Assisted-by line should not contain
+white spaces:
+
+# scripts/checkpatch.pl --strict /tmp/file.patch
+
+WARNING: Assisted-by expects 'AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]' format
+#40: Assisted-by: Claude Code:GLM-5.2
+
+	Please send v2 after solving the above problems. Thanks!
+
+> @@ -1831,7 +1832,6 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+>  		   /* Error for our tunnel must arrive at LOCAL_IN */
+>  		   (skb_rtable(skb)->rt_flags & RTCF_LOCAL)) {
+>  		__u8 iproto;
+> -		int ulen;
+>  
+>  		/* Non-first fragment has no UDP/GRE header */
+>  		if (unlikely(cih->frag_off & htons(IP_OFFSET)))
+> @@ -1936,8 +1936,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+>  				if (dest_dst)
+>  					mtu = dst_mtu(dest_dst->dst_cache);
+>  			}
+> -			if (mtu > 68 + sizeof(struct iphdr))
+> -				mtu -= sizeof(struct iphdr);
+> +			if (mtu > 68 + sizeof(struct iphdr) + ulen)
+> +				mtu -= sizeof(struct iphdr) + ulen;
+>  			info = htonl(mtu);
+>  		}
+>  		/* Strip outer IP, ICMP and IPIP/UDP/GRE, go to IP header of
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
