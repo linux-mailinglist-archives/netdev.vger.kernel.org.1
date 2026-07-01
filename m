@@ -1,132 +1,337 @@
-Return-Path: <netdev+bounces-303628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rZY/EbELRWob5woAu9opvQ
-	(envelope-from <netdev+bounces-303628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:44:33 +0200
+	id 4ov1AtsNRWrw5woAu9opvQ
+	(envelope-from <netdev+bounces-303629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:53:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01A46ED80D
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:44:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF9B6ED9F0
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:53:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b="JlS/zuC6";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303628-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303628-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=none;
 	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303629-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303629-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABEE630C846F
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:33:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 18C253154546
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8F6494A07;
-	Wed,  1 Jul 2026 12:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4306248B361;
+	Wed,  1 Jul 2026 12:27:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9225F4949F6;
-	Wed,  1 Jul 2026 12:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF416481679
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:27:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782908625; cv=none; b=I+14zVdUmHfBWtECCSwrExl1zZb4n0GKiF28sD397qQ9/tEwPlVXItSd1NuggRE879dGaet4nvo2lBi0WYRV6Ij5goKT7f5+Ntorta97JTz00rxJ69G51NgKtFq4jlVpX05v8zUiv8RGz/jzBws987aKnDdNOR2oY2r1LtKfSPU=
+	t=1782908855; cv=none; b=e0uZWmg2paUqaThWJeRkFuSMB8Qno8Bg+lmAIIyavaMHprQP7piibVTrfMMbvOcPaP7gUc5Hj1LukBmudWgyoli/cRbaKjiAOXUXZJkhDogZGqKWIPq+VF1Rb3N1SRZ16v9tiIkDEVVLGPBiWAK6YBF/rDzPanDLHlVdMfrYZrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782908625; c=relaxed/simple;
-	bh=k+TtxdtUUMAMOmrO0Jqc9RQB983Yil6KUMLWD0iKzLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cap3uVbXjhXOFGYUalDN0If2hUXgYxIKl8DoBAgMjkPugfsltkt6Md9LJaeCH0ZAEfgrdxVW/EKfeOB4SZ1zzXDa8jy75gBndtzW9igz+Ed21CGjZbkgNhNruc73ZW5ZboNA8WyqOZRaz/rOtNK9OVQgNKiZYdV1u35nynXTPAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=JlS/zuC6; arc=none smtp.client-ip=217.70.190.124
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 6203E60195;
-	Wed,  1 Jul 2026 14:23:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1782908621;
-	bh=sCh18bJ0wsKk0ClQVCz3RmLPmzhnTlCWwrzk5awYpIA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JlS/zuC6eaRW07/3ttn8IKtHI5B6NLUh594swdJuIqwGV3gRrfhZYd8kMrLYk6Pz4
-	 RgsbmIOgBnwNyTBU/+xrdKLUd9mY7nUKJRzeVcqWCC+Bb8kCayw3E5HmrVVcaolUpR
-	 r/F6woxJkuPPIgVT6rOVwh5this4WcknsV/VX4yI9B4+5GcS4LqIkINhqYedlLg+82
-	 YnZTaE1vZGtM8M6KX6Igq9eKlGkTbPT2+2T139GAUG4l5F0G3sFctG4z0IUmBdqmAM
-	 9Iehqf5uG6u2U6dBCULw7bbhJJuZ6Q05FIcbRr35yicn+0LPOTNilslF2AC4V9znr4
-	 l6gO8PEDcp3Dw==
-Date: Wed, 1 Jul 2026 14:23:38 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net 4/9] netfilter: nf_conntrack_sip: validate skb_dst()
- before accessing it
-Message-ID: <akUGynHszNDwFjJ6@chamomile>
-References: <20260630045243.2657-1-fw@strlen.de>
- <20260630045243.2657-5-fw@strlen.de>
- <akS1W7XGQ3LiP0LC@strlen.de>
- <akTzomC4Qz8u8teJ@chamomile>
+	s=arc-20240116; t=1782908855; c=relaxed/simple;
+	bh=7cLVAYMUd5AnQOsYPgCAB602Jl0VgHgpVGTyL4/nLJc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=trUSmwP7qg/m94L4QxCEhoOD29gbIdvmxsq5ndm1NIUgTF8uIRC06iQlPqGKYzeeehKmXgId9uclTWU1Q6D/OnVwRURgiKFjUJ0h9Utg6D5I5eUv2RmE4y8x9g9+E2JyBftWSWCveudW9/7yVFzLcnitEAnYuv3+CVxpjijCq2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 9AB5B4C2C37D66;
+	Wed, 01 Jul 2026 14:27:01 +0200 (CEST)
+Message-ID: <fb13640b-0171-457a-84c5-f6dbdd6d7471@molgen.mpg.de>
+Date: Wed, 1 Jul 2026 14:27:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <akTzomC4Qz8u8teJ@chamomile>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ixgbe: E610: force phy link
+ to get down when interface is down
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ netdev@vger.kernel.org, Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20260701113519.49859-1-jedrzej.jagielski@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260701113519.49859-1-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_NA(0.00)[mpg.de];
+	FORGED_RECIPIENTS(0.00)[m:jedrzej.jagielski@intel.com,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303628-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,strlen.de:email,ozlabs.org:url,chamomile:mid]
+	TAGGED_FROM(0.00)[bounces-303629-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B01A46ED80D
+X-Rspamd-Queue-Id: 6DF9B6ED9F0
 
-On Wed, Jul 01, 2026 at 01:01:58PM +0200, Pablo Neira Ayuso wrote:
-> On Wed, Jul 01, 2026 at 08:36:11AM +0200, Florian Westphal wrote:
-> > Florian Westphal <fw@strlen.de> wrote:
-> > > From: Pablo Neira Ayuso <pablo@netfilter.org>
-> > > 
-> > > tc ingress and openvswitch do not guarantee routing information to be
-> > > available. These subsystems use the conntrack helper infrastructure, and
-> > > the SIP helper relies on the skb_dst() to be present if
-> > > sip_external_media is set to 1 (which is disabled by default as a module
-> > > parameter).
-> > 
-> > The sashiko drive-by appears real, I submitted a patch for it.
-> > Its not a regression added by this patch but a unrelated issue.
-> > 
-> > https://patchwork.ozlabs.org/project/netfilter-devel/patch/20260701062922.9660-1-fw@strlen.de/
-> 
-> Is skb_ensure_writable() bogus here?
-> 
-> As you said, skb is already linearized. As for clones, they should
-> only happen in br_netfilter? In such case, it should be br_netfilter
-> that should be audited not to pass cloned skbuffs before calling the
-> inet hooks.
+Dear Jedrzej,
 
-Forget this, this skb_ensure_writable() is really needed here.
+
+Thank you for your patch.
+
+Am 01.07.26 um 13:35 schrieb Jedrzej Jagielski:
+> For the E610 family, similarly to the E8xx adapters, the default behavior
+> is for the PHY link to remain up even when the corresponding OS interface
+> is down.
+> 
+> Add function setting down the PHY config IXGBE_ACI_PHY_ENA_LINK bit
+> what leads to disabling PHY link.
+
+It’d extend it a little:
+
+… by factoring the code out into ixgbe_handle_link_down(), and call it 
+in ixgbe_close().
+
+> Align functionality with the implementation of the ice driver.
+
+Please add a paragraph detailing regression potential. Are there users 
+that might depend on the current default, as uncommon it might be?
+
+> Let user to configure link-down-on-close enablement through ethtool.
+
+Please provide examples, and how to test your change. Doing this you can 
+also paste the new log messages.
+
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 ++++++++++++++++++-
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  1 +
+>   .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 15 ++++++++
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 27 +++++++++++---
+>   5 files changed, 73 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> index 30f62174acf2..7bbb82dd962c 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> @@ -685,6 +685,7 @@ struct ixgbe_adapter {
+>   #define IXGBE_FLAG2_MOD_POWER_UNSUPPORTED	BIT(22)
+>   #define IXGBE_FLAG2_API_MISMATCH		BIT(23)
+>   #define IXGBE_FLAG2_FW_ROLLBACK			BIT(24)
+> +#define IXGBE_FLAG2_LINK_DOWN_ON_CLOSE		BIT(25)
+>   
+>   	/* Tx fast path data */
+>   	int num_tx_queues;
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index da445fb673fc..46d8a3ea86b8 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -1923,6 +1923,33 @@ void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw)
+>   	hw->fc.current_mode = hw->fc.requested_mode;
+>   }
+>   
+> +/**
+> + * ixgbe_disable_phy_link - force phy link to get down
+> + * @hw: pointer to hardware structure
+> + *
+> + * Send 0x0601 with the IXGBE_ACI_PHY_ENA_LINK bit set down.
+> + *
+> + * Return: the exit code of the operation.
+
+At least for me it’s not that helpful. Shouldn’t the return values be 
+listed? What is success? What is failure?
+
+> + */
+> +int ixgbe_disable_phy_link(struct ixgbe_hw *hw)
+> +{
+> +	struct ixgbe_aci_cmd_get_phy_caps_data pcaps = {};
+> +	struct ixgbe_aci_cmd_set_phy_cfg_data pcfg = {};
+> +	int err;
+> +
+> +	err = ixgbe_aci_get_phy_caps(hw, false, IXGBE_ACI_REPORT_ACTIVE_CFG,
+> +				     &pcaps);
+> +	if (err)
+> +		return err;
+> +
+> +	ixgbe_copy_phy_caps_to_cfg(&pcaps, &pcfg);
+> +
+> +	pcfg.caps &= ~IXGBE_ACI_PHY_ENA_LINK;
+> +	pcfg.caps |= IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
+> +
+> +	return ixgbe_aci_set_phy_cfg(hw, &pcfg);
+> +}
+> +
+>   /**
+>    * ixgbe_disable_rx_e610 - Disable RX unit
+>    * @hw: pointer to hardware structure
+> @@ -2207,6 +2234,7 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
+>   	u8 rmode = IXGBE_ACI_REPORT_TOPO_CAP_MEDIA;
+>   	u64 sup_phy_type_low, sup_phy_type_high;
+>   	u64 phy_type_low = 0, phy_type_high = 0;
+> +	bool force_on_required;
+>   	int err;
+>   
+>   	err = ixgbe_aci_get_link_info(hw, false, NULL);
+> @@ -2272,6 +2300,11 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
+>   		phy_type_high |= IXGBE_PHY_TYPE_HIGH_10G_USXGMII;
+>   	}
+>   
+> +	/* If IXGBE_ACI_PHY_ENA_LINK has been explicitly disabled that means
+> +	 * we need to force interface enablement after reaching that point
+
+It’d be great, if you rephrased “that point”.
+
+> +	 */
+> +	force_on_required = !(pcfg.caps & IXGBE_ACI_PHY_ENA_LINK);
+> +
+>   	/* Mask the set values to avoid requesting unsupported link types. */
+>   	phy_type_low &= sup_phy_type_low;
+>   	pcfg.phy_type_low = cpu_to_le64(phy_type_low);
+> @@ -2280,7 +2313,7 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
+>   
+>   	if (pcfg.phy_type_high != pcaps.phy_type_high ||
+>   	    pcfg.phy_type_low != pcaps.phy_type_low ||
+> -	    pcfg.caps != pcaps.caps) {
+> +	    pcfg.caps != pcaps.caps || force_on_required) {
+>   		pcfg.caps |= IXGBE_ACI_PHY_ENA_LINK;
+>   		pcfg.caps |= IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
+>   
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+> index 2cb76a3d30ae..59044d67ebeb 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+> @@ -50,6 +50,7 @@ int ixgbe_cfg_phy_fc(struct ixgbe_hw *hw,
+>   		     enum ixgbe_fc_mode req_mode);
+>   int ixgbe_setup_fc_e610(struct ixgbe_hw *hw);
+>   void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw);
+> +int ixgbe_disable_phy_link(struct ixgbe_hw *hw);
+>   void ixgbe_disable_rx_e610(struct ixgbe_hw *hw);
+>   int ixgbe_init_phy_ops_e610(struct ixgbe_hw *hw);
+>   int ixgbe_identify_phy_e610(struct ixgbe_hw *hw);
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> index 4dfae53b4ea1..0fcb9d738984 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> @@ -139,6 +139,8 @@ static const char ixgbe_priv_flags_strings[][ETH_GSTRING_LEN] = {
+>   	"vf-ipsec",
+>   #define IXGBE_PRIV_FLAGS_AUTO_DISABLE_VF	BIT(2)
+>   	"mdd-disable-vf",
+> +#define IXGBE_PRIV_LINK_DOWN_ON_CLOSE	BIT(3)
+> +	"link-down-on-close",
+>   };
+>   
+>   #define IXGBE_PRIV_FLAGS_STR_LEN ARRAY_SIZE(ixgbe_priv_flags_strings)
+> @@ -3842,6 +3844,9 @@ static u32 ixgbe_get_priv_flags(struct net_device *netdev)
+>   	if (adapter->flags2 & IXGBE_FLAG2_AUTO_DISABLE_VF)
+>   		priv_flags |= IXGBE_PRIV_FLAGS_AUTO_DISABLE_VF;
+>   
+> +	if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE)
+> +		priv_flags |= IXGBE_PRIV_LINK_DOWN_ON_CLOSE;
+> +
+>   	return priv_flags;
+>   }
+>   
+> @@ -3879,6 +3884,16 @@ static int ixgbe_set_priv_flags(struct net_device *netdev, u32 priv_flags)
+>   		}
+>   	}
+>   
+> +	flags2 &= ~IXGBE_FLAG2_LINK_DOWN_ON_CLOSE;
+> +	if (priv_flags & IXGBE_PRIV_LINK_DOWN_ON_CLOSE) {
+> +		if (adapter->hw.mac.type == ixgbe_mac_e610) {
+> +			flags2 |= IXGBE_FLAG2_LINK_DOWN_ON_CLOSE;
+> +		} else {
+> +			e_info(probe, "Cannot set private flags: Unsupported hardware\n");
+
+Please print hw.mac.type, and mention, that it’s only supported on E610.
+
+> +			return -EOPNOTSUPP;
+> +		}
+> +	}
+> +
+>   	if (flags2 != adapter->flags2) {
+>   		adapter->flags2 = flags2;
+>   
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index 62c2d83e1577..58ee4a186039 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -7544,6 +7544,17 @@ static void ixgbe_close_suspend(struct ixgbe_adapter *adapter)
+>   	ixgbe_free_all_rx_resources(adapter);
+>   }
+>   
+> +static void ixgbe_handle_link_down(struct ixgbe_adapter *adapter)
+> +{
+> +	struct net_device *netdev = adapter->netdev;
+> +
+> +	if (test_bit(__IXGBE_PTP_RUNNING, &adapter->state))
+> +		ixgbe_ptp_start_cyclecounter(adapter);
+> +
+> +	e_info(drv, "NIC Link is Down\n");
+> +	netif_carrier_off(netdev);
+> +}
+> +
+>   /**
+>    * ixgbe_close - Disables a network interface
+>    * @netdev: network interface device structure
+> @@ -7566,6 +7577,16 @@ int ixgbe_close(struct net_device *netdev)
+>   
+>   	ixgbe_fdir_filter_exit(adapter);
+>   
+> +	if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE) {
+> +		int err;
+> +
+> +		err = ixgbe_disable_phy_link(&adapter->hw);
+> +		if (err)
+> +			e_warn(drv, "Cannot set PHY link down\n");
+
+Log the error?
+
+> +
+> +		ixgbe_handle_link_down(adapter);
+> +	}
+> +
+>   	ixgbe_release_hw_control(adapter);
+>   
+>   	return 0;
+> @@ -8244,11 +8265,7 @@ static void ixgbe_watchdog_link_is_down(struct ixgbe_adapter *adapter)
+>   	if (ixgbe_is_sfp(hw) && hw->mac.type == ixgbe_mac_82598EB)
+>   		adapter->flags2 |= IXGBE_FLAG2_SEARCH_FOR_SFP;
+>   
+> -	if (test_bit(__IXGBE_PTP_RUNNING, &adapter->state))
+> -		ixgbe_ptp_start_cyclecounter(adapter);
+> -
+> -	e_info(drv, "NIC Link is Down\n");
+> -	netif_carrier_off(netdev);
+> +	ixgbe_handle_link_down(adapter);
+>   }
+>   
+>   static bool ixgbe_ring_tx_pending(struct ixgbe_adapter *adapter)
+
+
+Kind regards,
+
+Paul
 
