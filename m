@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vOIyMpJdRGpytgoAu9opvQ
-	(envelope-from <netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:21:38 +0200
+	id GeaiNLVdRGqAtgoAu9opvQ
+	(envelope-from <netdev+bounces-303421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:22:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555A86E8E4F
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:21:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBE86E8E5C
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:22:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=X6x60UYS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=LVXBY30W;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303421-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303421-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DB37330433D3
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:20:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 07FDE304EE81
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B9D1AA1F4;
-	Wed,  1 Jul 2026 00:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EF1225A38;
+	Wed,  1 Jul 2026 00:20:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE04219FC;
-	Wed,  1 Jul 2026 00:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C847F1CAA7D
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 00:20:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782865234; cv=none; b=Ak0kBMuBxfS39FP9OE8QORw6wgYRBvxPfs6VnI6+sB0XWq9oi1mYDH+zRzingWBKbkyrENkHcOiaVfXfq/KDlztPtj6nBaw1Ihb6mHpouOm8Avt0prvD/Cj7OovpTLpsS2McrumQ/jiL8evTE/bx6XrzwFPxCGlyOsUF+tcFDM4=
+	t=1782865235; cv=none; b=bM6CJzsTJ+RlUMzwV9vqn4oov6Txw+QXCpNrs6He6aEi5dUU95Keb9p+8pJZFOFi4bGfDSZkcSDvGKXiZmil3Oxue8IQsjvq31S5HL8L4FX5LSzFoLrLZhfoD2JRE5Iq3TXrLJnqDubmINN+4s8+KjcYAaUMDBON/rbAR8iUXEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782865234; c=relaxed/simple;
-	bh=OxqYkdm5oukw/D3esIbkiVQa9chWlaRAg7W5RbvRH+s=;
+	s=arc-20240116; t=1782865235; c=relaxed/simple;
+	bh=lXwJVfboG13WrDn2SUCesqqIcWwUA/r+mE25SODpWBI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U6Vt6pFAh8csUai9ii5ady9tuG/KAo9OIFqEkn/vSceyGPFcMSPKl4vbQzABhNc6A6JmrmjOYUSRuaNVuN3jNHbqZHwAuV7Sj2hZhjfn8wzcA+/FEz0md88dpvq/FyMGj5TmushY751fCxLeqySyDQbkiVOJl+mWPeBmE8jgcsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X6x60UYS; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E981F000E9;
-	Wed,  1 Jul 2026 00:20:33 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uVn1k03mgAzfZTbc9J9mHR0wYDNfpbSOMDnHy7TbUEHZDoN0BOaU3K1a2WUXy/ftpRredaxcQ2zIy+Pijf7EH8tSgEu22i1S+NVRlz7JC2cjKDlgiGneasgDw6Pgdx5Q4q9zWuSKHIqrwB80l8143ZH3woIIC3Zqw8F0/1Gr5b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVXBY30W; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF421F000E9;
+	Wed,  1 Jul 2026 00:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782865233;
-	bh=GDWm7UoY/GN1c2wmlf+OtBoCfI1+yNa848uEEQNmsW4=;
+	s=k20260515; t=1782865234;
+	bh=fFH1f1zljQGut6nXy3zxBffRmqvy/56HlL61A3NE7UQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=X6x60UYSAeIFQPpJNA3E3PDheiJwJNLv0DBAmXAWrURY2bT8oD+vEnUd6bdMLdGYR
-	 2O4k4b7M67h1RPvYcO1d6YnIDwE6f4Gbv4Jf44BdG1O/A7WY4zIfaT+qEBxR0ZMSB4
-	 yjC9Sa/9DtHygMvpbUBZmjH1DCy0uic3HWnlTrjJIK0GpZBFf9xum92IQCNe+Nw3Se
-	 SpFtDqlDqR9rMm5ugVMIqvdTA2R+JWXnHzsKCys2voAyJv5Pgo8mdJunFBrvaBQ4Ny
-	 Ej7Xz9mq5reOLUw3tyJUCc6gsF1iWTtlhnO2YK7pDCuF36btqj6zNiQHYIob9HoDCF
-	 vgW2Vt12r7MKA==
+	b=LVXBY30W2A9+wfP4Oh8/scbuvljX7VxEuoEnmeqzEOgfEW6Rd9h8FucJlKeDvuSlM
+	 5+kZdBi1/D0qw/AQVzHt9CNrrKSirr5dx/gDssT2DoeAnhY91HVX/nWCKQxH8dZfK4
+	 1ha40pU66werxx6tl2LtkbaBXol2Ri9mGQb8tTm5R3Dg6ce3YmzgodaoeAlT4E75Fw
+	 TFjKQm6w62B3rIxbl3qAPYaUhYHJzE2AySxDidLv3v6bPhCfInhmprQ4tTs5CZJ4Yf
+	 ptnukHK5wLxepXEJAdtIO6fNS80jMvOcnaB39o5Rm3L8lDg+gqLEhY8JggcJ0JbaXc
+	 S03fHbWJ4hDtA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19AA6393A963;
-	Wed,  1 Jul 2026 00:20:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9392A393A963;
+	Wed,  1 Jul 2026 00:20:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,18 +57,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: sgi: ioc3-eth: fix split TX DMA mapping lengths
+Subject: Re: [PATCH v4 net-next] bonding: no longer rely on RTNL in
+ bond_fill_info()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178286521663.349616.4283880275529616693.git-patchwork-notify@kernel.org>
-Date: Wed, 01 Jul 2026 00:20:16 +0000
-References: <4E1486BC4536407E+20260629080623.908426-1-raoxu@uniontech.com>
-In-Reply-To: <4E1486BC4536407E+20260629080623.908426-1-raoxu@uniontech.com>
-To: Xu Rao <raoxu@uniontech.com>
-Cc: tsbogend@alpha.franken.de, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-mips@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <178286521813.349616.3126953661731602268.git-patchwork-notify@kernel.org>
+Date: Wed, 01 Jul 2026 00:20:18 +0000
+References: <20260629173200.469953-1-edumazet@google.com>
+In-Reply-To: <20260629173200.469953-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, jv@jvosburgh.net,
+ andrew+netdev@lunn.ch
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -80,57 +80,53 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303420-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:raoxu@uniontech.com,m:tsbogend@alpha.franken.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-mips@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,jvosburgh.net,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-303421-lists,netdev=lfdr.de,netdevbpf];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[uniontech.com:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 555A86E8E4F
+X-Rspamd-Queue-Id: 3EBE86E8E5C
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Jun 2026 16:06:23 +0800 you wrote:
-> From: Xu Rao <raoxu@uniontech.com>
+On Mon, 29 Jun 2026 17:32:00 +0000 you wrote:
+> Add READ_ONCE()/WRITE_ONCE() annotations on port->is_enabled.
+> While this field is written under bond->mode_lock protection,
+> is is read without this lock being held.
 > 
-> When a linear skb crosses a 16 KiB boundary, ioc3_start_xmit()
-> splits it into two buffers of lengths s1 and s2.  The descriptor
-> advertises those lengths through B1CNT and B2CNT.
-> 
-> The first buffer is mapped with s1, but the second buffer is also
-> mapped with s1 even though the device is told to fetch s2 bytes from
-> it.  When the lengths differ, the DMA mapping does not cover the same
-> region as the second descriptor buffer, which can result in incorrect
-> cache maintenance or a DMA fault on implementations that enforce the
-> mapped range.
+> Change bond_fill_info() to acquire RCU and use READ_ONCE()
+> to read bond->params fields that can be updated concurrently
+> from sysfs/procfs/rtnetlink.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: sgi: ioc3-eth: fix split TX DMA mapping lengths
-    https://git.kernel.org/netdev/net-next/c/cd066559a073
+  - [v4,net-next] bonding: no longer rely on RTNL in bond_fill_info()
+    https://git.kernel.org/netdev/net-next/c/317cefdcaacc
 
 You are awesome, thank you!
 -- 
