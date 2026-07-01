@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-303418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vyaOBWddRGprtgoAu9opvQ
-	(envelope-from <netdev+bounces-303418-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:20:55 +0200
+	id vOIyMpJdRGpytgoAu9opvQ
+	(envelope-from <netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:21:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD306E8E31
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:20:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 555A86E8E4F
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:21:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZD4djcxp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303418-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303418-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=X6x60UYS;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303420-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C514E300A7F9
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:20:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB37330433D3
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F69B640;
-	Wed,  1 Jul 2026 00:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B9D1AA1F4;
+	Wed,  1 Jul 2026 00:20:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1D9219FC;
-	Wed,  1 Jul 2026 00:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE04219FC;
+	Wed,  1 Jul 2026 00:20:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782865223; cv=none; b=jCSCKYb5YR1v9vZ24ipvvJ6P0eGrEDabBUX/S2sfmyv8XnrYkUFTHQ2JwUcW02k03K8kP+IxSS55kGiA0TEOqwy35YvIQ5cjCdHbvgbSS1HpUTbj0nWlzQ7Nh3z4ijK8YREp+l/Jqjbbbt0aJFEWPhJbSwo7K2uZI17luWfY3+A=
+	t=1782865234; cv=none; b=Ak0kBMuBxfS39FP9OE8QORw6wgYRBvxPfs6VnI6+sB0XWq9oi1mYDH+zRzingWBKbkyrENkHcOiaVfXfq/KDlztPtj6nBaw1Ihb6mHpouOm8Avt0prvD/Cj7OovpTLpsS2McrumQ/jiL8evTE/bx6XrzwFPxCGlyOsUF+tcFDM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782865223; c=relaxed/simple;
-	bh=TffaeaZ0/qHBYSA5RFOVOakKWtw2Dy4q32bJqISPWZ0=;
+	s=arc-20240116; t=1782865234; c=relaxed/simple;
+	bh=OxqYkdm5oukw/D3esIbkiVQa9chWlaRAg7W5RbvRH+s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Taip+ZTkGjJ5cSUYOb0exnbcCs54LihMKEQZHu/vhEFu0UpFObGvybPwyUAfEaA2TByUhKA0N/s80w/yFSIozmtZ5/XW2oYyA18lVlxpUP7LeQ83XowKx0DYlZJAV04cR2g5O4gzDY2mSRYFe8Ana/Krh71B2swkJI2cVAV7LVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZD4djcxp; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA2351F000E9;
-	Wed,  1 Jul 2026 00:20:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=U6Vt6pFAh8csUai9ii5ady9tuG/KAo9OIFqEkn/vSceyGPFcMSPKl4vbQzABhNc6A6JmrmjOYUSRuaNVuN3jNHbqZHwAuV7Sj2hZhjfn8wzcA+/FEz0md88dpvq/FyMGj5TmushY751fCxLeqySyDQbkiVOJl+mWPeBmE8jgcsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X6x60UYS; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10E981F000E9;
+	Wed,  1 Jul 2026 00:20:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782865221;
-	bh=FhHoEVJX47i6Sq0muV3ZK6X4+lfzLqPfe/vKM7lETeI=;
+	s=k20260515; t=1782865233;
+	bh=GDWm7UoY/GN1c2wmlf+OtBoCfI1+yNa848uEEQNmsW4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=ZD4djcxpxUu+P5dJ2j7cr7KejIwE827lFoOldk1DvQGUrWZMYgHivWdJ9Fwi7qJkM
-	 yoShvViqEe/8lMElMUNA9alILc4tGVTqdy6aXdh1VT2TbOQMDlQeNc/3/spiczPu+U
-	 SqMEgbqBDZKy5Mc0DJGDjmJia5jD+AxmbKP2aFqRa7/XQqKIDunW7tFBPTSTfAEEuN
-	 Ljchj++UtV5X3cMNxOJYyxBCMV28PkgRlipIEhD6g1Rivm70EQSB1DOLlWK9fchMcl
-	 lMY44rMhVtVNQn3l8bBl2e2BIl4AtL79vtOk05fnJIhnmkkwFXrStd/kOKY9o6TejU
-	 dXgFeI9845GZg==
+	b=X6x60UYSAeIFQPpJNA3E3PDheiJwJNLv0DBAmXAWrURY2bT8oD+vEnUd6bdMLdGYR
+	 2O4k4b7M67h1RPvYcO1d6YnIDwE6f4Gbv4Jf44BdG1O/A7WY4zIfaT+qEBxR0ZMSB4
+	 yjC9Sa/9DtHygMvpbUBZmjH1DCy0uic3HWnlTrjJIK0GpZBFf9xum92IQCNe+Nw3Se
+	 SpFtDqlDqR9rMm5ugVMIqvdTA2R+JWXnHzsKCys2voAyJv5Pgo8mdJunFBrvaBQ4Ny
+	 Ej7Xz9mq5reOLUw3tyJUCc6gsF1iWTtlhnO2YK7pDCuF36btqj6zNiQHYIob9HoDCF
+	 vgW2Vt12r7MKA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0C9E393A963;
-	Wed,  1 Jul 2026 00:20:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19AA6393A963;
+	Wed,  1 Jul 2026 00:20:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,36 +57,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] virtio_net: disable cb when NAPI is busy-polled
+Subject: Re: [PATCH net] net: sgi: ioc3-eth: fix split TX DMA mapping lengths
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178286520539.349616.104964929108327778.git-patchwork-notify@kernel.org>
-Date: Wed, 01 Jul 2026 00:20:05 +0000
-References: <20260629024230.37325-1-lange_tang@163.com>
-In-Reply-To: <20260629024230.37325-1-lange_tang@163.com>
-To: Longjun Tang <lange_tang@163.com>
-Cc: kuba@kernel.org, horms@kernel.org, mst@redhat.com, jasowang@redhat.com,
- edumazet@google.com, virtualization@lists.linux.dev, netdev@vger.kernel.org,
- tanglongjun@kylinos.cn
+ <178286521663.349616.4283880275529616693.git-patchwork-notify@kernel.org>
+Date: Wed, 01 Jul 2026 00:20:16 +0000
+References: <4E1486BC4536407E+20260629080623.908426-1-raoxu@uniontech.com>
+In-Reply-To: <4E1486BC4536407E+20260629080623.908426-1-raoxu@uniontech.com>
+To: Xu Rao <raoxu@uniontech.com>
+Cc: tsbogend@alpha.franken.de, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-mips@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303420-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303418-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[163.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lange_tang@163.com,m:kuba@kernel.org,m:horms@kernel.org,m:mst@redhat.com,m:jasowang@redhat.com,m:edumazet@google.com,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:tanglongjun@kylinos.cn,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:raoxu@uniontech.com,m:tsbogend@alpha.franken.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-mips@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
@@ -96,35 +97,40 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,kylinos.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[uniontech.com:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8FD306E8E31
+X-Rspamd-Queue-Id: 555A86E8E4F
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Jun 2026 10:42:30 +0800 you wrote:
-> From: Longjun Tang <tanglongjun@kylinos.cn>
+On Mon, 29 Jun 2026 16:06:23 +0800 you wrote:
+> From: Xu Rao <raoxu@uniontech.com>
 > 
-> When busy-poll is active, napi_schedule_prep() returns false in
-> virtqueue_napi_schedule(), so virtqueue_disable_cb() is skipped.
-> The device may keep firing irqs until reaches virtqueue_napi_complete().
-> Under load (received == budget), it will lead to a large number
-> of spurious interrupts.
+> When a linear skb crosses a 16 KiB boundary, ioc3_start_xmit()
+> splits it into two buffers of lengths s1 and s2.  The descriptor
+> advertises those lengths through B1CNT and B2CNT.
+> 
+> The first buffer is mapped with s1, but the second buffer is also
+> mapped with s1 even though the device is told to fetch s2 bytes from
+> it.  When the lengths differ, the DMA mapping does not cover the same
+> region as the second descriptor buffer, which can result in incorrect
+> cache maintenance or a DMA fault on implementations that enforce the
+> mapped range.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5] virtio_net: disable cb when NAPI is busy-polled
-    https://git.kernel.org/netdev/net/c/1eb8fc67ca41
+  - [net] net: sgi: ioc3-eth: fix split TX DMA mapping lengths
+    https://git.kernel.org/netdev/net-next/c/cd066559a073
 
 You are awesome, thank you!
 -- 
