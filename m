@@ -1,516 +1,196 @@
-Return-Path: <netdev+bounces-303887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YjJ1CByYRWq9CgsAu9opvQ
-	(envelope-from <netdev+bounces-303887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:43:40 +0200
+	id CGjrGOibRWrFCwsAu9opvQ
+	(envelope-from <netdev+bounces-303888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:59:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A80B6F2234
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:43:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5326F2362
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:59:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=S6eGCbfu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303887-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303887-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=SYgHKdg0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303888-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303888-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 56C613009E13
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:43:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B962302F71A
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDEC3ABDA4;
-	Wed,  1 Jul 2026 22:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067B73EC2E1;
+	Wed,  1 Jul 2026 22:59:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84524239085;
-	Wed,  1 Jul 2026 22:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5073BBFD1
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:59:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782945813; cv=none; b=eW1sOZqZ9aarJnIY+OoxR48GZyzj6xJR7Gx9+MrfLeNYuw0NlgvOkf/PS9tiKvyJ59m6QNwnuQq4v5ztzmv8MbCsU4mrZ6t17rFXXTK2eBajWSiIc/41dcaQsTf5uejYhB7OkWoDRphl4erQuWrI9G8W+CbaXt6aNwDpQHFIq68=
+	t=1782946780; cv=none; b=F8ZrpGf7vqeUqY8alNLwr+V8eIWnsBQO9UR7hPU01GLOE5TM+Ox8TVjmyncsgK/TT0v8j4kQSAMwE3NzqGH2izVp1dflFxqfUKVvtir574jqU+cFtGRiRCyTLOQmFlfDbIERzm3ba+inh7TGX2NEfZXKkts6wt2kQOBAIXfFLD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782945813; c=relaxed/simple;
-	bh=SHiao2IBtC9KZ/uDMpRsEiST/OPYZRQIIOh33XGearI=;
+	s=arc-20240116; t=1782946780; c=relaxed/simple;
+	bh=b7hCX9/rBhLq6D0U13TWkBKOZW1C8WElJk7v2c6wHGg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DGCjJjpHkthIHVLiDDAp05Q1qf2YUKxRR9t+bwkgdmw035LLan6oq7ur9fs5UZ1gVY73+n7dp1VREakzNsKrsWPeUycj8kX2E2VQxNmcqJGdxYV4jD242y4apPUJOVD5bgHCKrL1DXQpz+LfHFY1AlkUIGH39JETcqYFUF8cYg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S6eGCbfu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 916711F000E9;
-	Wed,  1 Jul 2026 22:43:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782945812;
-	bh=wmf0yIErl+HxkobvYAzz7ozHbW2IIVmNhGXMLcFGe94=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=S6eGCbfuLq7coiGwPOBQ+CoM9l4p0roRt3RBFZsFi5yWHPyH7XIBstSio2/ezP/Dg
-	 xatrM1i1Pt8E2FIKnnpzmS1Cz61vVqyTV946KGDKf7KXucgTOzcXW0Ny2+b1i7wWTm
-	 yJxHG/12eRqWCWX0jUtsfmrDS5GxhZJPNoYrwL0bDdYR506pFmUSRZAUhiCM7k9n1L
-	 iqGAyAAF0VGq8s44xDS06NIr+ezeXifRE7VDF9lcoV57hHjRr2jeYFphIry6bsXlc+
-	 BOlwxHWOGOTDr0IuSHdD8P5svvWkq5Eh24/9RCsNx1xezychxYsBBnVWOxZVM9mIiU
-	 CCn/+8jhsDAAQ==
-Date: Thu, 2 Jul 2026 00:43:29 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Aniket Negi <aniket.negi03@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: airoha: fix MIB stats collection to be
- lossless
-Message-ID: <akWYEf5wusTq9_ol@lore-desk>
-References: <20260630111834.233643-1-aniket.negi03@gmail.com>
- <20260701173941.314795-1-aniket.negi03@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FTj1T7EsFicGeclTYzuBTFU47QPg5+ym1+VEqeDv0h5rM5dxiZck2ZR7O00shM1JpbSYbzEh9OkkDDqtWP2BD6xBHokwSv7p4tPBpvXv5b8oZD+Ip3jqOvX7jHEBGeRtc8/lK5eJk1Byk77G0vmGcX+8CAx4zLRc8ZFfPVLkcKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYgHKdg0; arc=none smtp.client-ip=209.85.215.178
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c9e607d81fcso347455a12.2
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 15:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782946778; x=1783551578; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=giEqW7q9VcfExLik9phOW3EsB4XFWvu/oaZfoJVW5+M=;
+        b=SYgHKdg0agRvsDKUClXirSvqPSa/5BPj4Jj6Eks6GD/km9VzI+nGMDdddeYngntAdL
+         EMIeQUSlXJjct7AwQlCMlWBGeOHuD09kFn09YOAYlcMysFbjhLTMBO+wXluTBU7rbF8Q
+         /LIolGkD5Ygl3CmBCj12elvVQ6rMnJd8JJ/NHzwaNWRL72+kGzaTDypC56EhQ3N4CeiP
+         Tf52tt3FgfoalUPrE5sYNQGg7l8vYoRkyWgjs2W32v09W47nhWRCsQ9u7rJ56wtU9rSt
+         JgWnDvgTAxhsgucvdLaPvzxYZmkgZebIIedqQDN5Af8w+pkpVlU4BhsFghcq6a2gjLp9
+         /4ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782946778; x=1783551578;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=giEqW7q9VcfExLik9phOW3EsB4XFWvu/oaZfoJVW5+M=;
+        b=kMeycjAoncuxt+bmICGeYfAuF8CP7C2eqwYvarsEdMxcPzGPZOqfs+tBnWmPMhHx31
+         8lEicbar4moiJ5rcRKGuIykyHL5DOO+zCd9czGNg9QHoxLfW9yByy+7gpwhQg2yQy4cR
+         IUlOcuFQXy5xk/YtyahsXtKwem36uOjlWJHMAGnPyLmhT1C1J2vodmQBH9TN6k7byonT
+         deQbJBpB0NyJ9Vee+HSrSPzvSadbvMwhTHg/EoZkB0JaajpWOZgb3oaBRCyURIQKGSUy
+         2Iy/6eEzOG+nEgNl13F0r8sx7gILeNwdmGK9kZ4Gv5QRXCubXJPE2kqLu5qpVNqXMADo
+         wDMA==
+X-Forwarded-Encrypted: i=1; AFNElJ8rkaScRJSnUzTCe7BxznBj88JWVSZ11vFAnUM6xSeOnYtzMW1gKJqz5VN0pHaiCm2mEUFNdzk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxnnh4JGKL4FA0qqhvot+WG+8o65S/VLz89VKWFZrZBmhk7L+nQ
+	etvleiq31hUBh3uW5zo0QBUFpGR5uTZLexX4x4bGBRM1AR+s1FZUmMM3
+X-Gm-Gg: AfdE7cngSKKTy3TYFuWq8HblE8KcmnuYpjFYU8nSIcul7jAE9ZNcw/zrvw6lWHN8Wd4
+	XGfwv55xQbgSp8KVTQdvJEUV6l25rqedUhvgJIyBxguEYw/75LJqGL7wVwbtwxba2vcpaRO7rVP
+	+ftKGU0101hc/Jce1rk/4eN6n6qpnl5Gbaq7eg4ZJrYnJcEQCFFYRfQLr3gdFjf4baeXwv2pkr6
+	mNl2VKR/EB/4X30j4Hroqh0dCfdmuqsbcUa5Xo3DuMjuPonxRdzLZUrCr8tiU6Nw25Dc/+4n6Xa
+	y75xUelZnAxP8ZdcVB02oARvR1eVBW/WWcMe0kQvuMFfLjnglfYgA6Jd8E4rKYPUO4NwRN/KEQQ
+	hNaSnQl2fLJ3DMC01tOLFQE7yoyPkwH0e8hzKBRChQj1hlsaWklfZ1VxXMRBfBTeOFGK/QbTv1x
+	kd5snDa+onIQ==
+X-Received: by 2002:a05:6a20:4310:b0:3bf:c12c:2ecf with SMTP id adf61e73a8af0-3bff430fae9mr2922510637.59.1782946777855;
+        Wed, 01 Jul 2026 15:59:37 -0700 (PDT)
+Received: from john-p8 ([98.97.43.89])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9e8eb0ef50sm442748a12.6.2026.07.01.15.59.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jul 2026 15:59:37 -0700 (PDT)
+Date: Wed, 1 Jul 2026 15:59:35 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Michal Luczaj <mhal@rbox.co>, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Jiayuan Chen <jiayuan.chen@linux.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Cong Wang <cong.wang@bytedance.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	Jiri Olsa <jolsa@kernel.org>, Emil Tsalapatis <emil@etsalapatis.com>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf v2 1/4] bpf, sockmap: Reject unhashed UDP sockets on
+ sockmap update
+Message-ID: <akWbxAwIhjJdPtjA@john-p8>
+References: <20260626-sockmap-lookup-udp-leak-v2-0-7e7e201c951a@rbox.co>
+ <20260626-sockmap-lookup-udp-leak-v2-1-7e7e201c951a@rbox.co>
+ <87pl1937c7.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GwVceFzz02rhH5Cx"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20260701173941.314795-1-aniket.negi03@gmail.com>
+In-Reply-To: <87pl1937c7.fsf@cloudflare.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303888-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303887-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:aniket.negi03@gmail.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:aniketnegi03@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jakub@cloudflare.com,m:mhal@rbox.co,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:ast@kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[rbox.co,google.com,redhat.com,linux.dev,davemloft.net,kernel.org,bytedance.com,iogearbox.net,gmail.com,etsalapatis.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rbox.co:email,john-p8:mid,cloudflare.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A80B6F2234
+X-Rspamd-Queue-Id: EE5326F2362
 
+On Mon, Jun 29, 2026 at 01:38:00PM +0200, Jakub Sitnicki wrote:
+>On Fri, Jun 26, 2026 at 10:36 PM +02, Michal Luczaj wrote:
+>> UDP sockets get SOCK_RCU_FREE set when (auto-)bound. This means
+>> sk_is_refcounted(unbound) = true, while sk_is_refcounted(bound) = false.
+>>
+>> Because sockmap accepts unbound UDP sockets, a BPF program can increment a
+>> socket's refcount via lookup. If the socket is subsequently bound, the
+>> transition from unbound to bound causes bpf_sk_release() to skip the
+>> decrement of the refcount, causing a memory leak.
+>>
+>> unreferenced object 0xffff88810bc2eb40 (size 1984):
+>>   comm "test_progs", pid 2451, jiffies 4295320596
+>>   hex dump (first 32 bytes):
+>>     7f 00 00 01 7f 00 00 01 d2 04 1b b7 04 d2 00 00  ................
+>>     02 00 01 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
+>>   backtrace (crc bdee079d):
+>>     kmem_cache_alloc_noprof+0x557/0x660
+>>     sk_prot_alloc+0x69/0x240
+>>     sk_alloc+0x30/0x460
+>>     inet_create+0x2ce/0xf80
+>>     __sock_create+0x25b/0x5c0
+>>     __sys_socket+0x119/0x1d0
+>>     __x64_sys_socket+0x72/0xd0
+>>     do_syscall_64+0xa1/0x5f0
+>>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>
+>> Instead of special-casing for refcounted sockets, reject unhashed UDP
+>> sockets during sockmap updates, as there is no benefit to supporting those.
+>> This effectively reverts the commit under Fixes, with two exceptions:
+>>
+>> 1. sock_map_sk_state_allowed() maintains a fall-through `return true`.
+>> 2. In the spirit of commit b8b8315e39ff ("bpf, sockmap: Remove unhash
+>>    handler for BPF sockmap usage"), the proto::unhash BPF handler is not
+>>    reintroduced.
+>>
+>> Historical note: this issue is related to commit 67312adc96b5 ("bpf: reject
+>> unhashed sockets in bpf_sk_assign").
+>>
+>> Fixes: 0c48eefae712 ("sock_map: Lift socket state restriction for datagram sockets")
+>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+>
+>Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
---GwVceFzz02rhH5Cx
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For me as well.
 
-> The current driver resets hardware MIB counters after every read via
-> REG_FE_GDM_MIB_CLEAR. This creates a race window: packets arriving
-> between the read and the clear are silently lost from statistics.
->=20
-> Fix this by removing the MIB clear and switching to a delta-based
-> software tracking approach:
->=20
-> - 64-bit H+L registers (tx/rx ok pkts, ok bytes, E64..L1023):
->   read the absolute hardware total directly each poll.
->=20
-> - 32-bit registers (drops, bc, mc, errors, runt, long, ...):
->   store the previous raw register value in mib_prev and accumulate
->   (u32)(curr - prev) into a 64-bit software counter. Unsigned
->   subtraction handles wrap-around transparently.
->=20
-> - tx_len[0]/rx_len[0] ({0,64} RMON bucket) combines RUNT_CNT
->   (32-bit, delta-tracked via mib_prev.tx_runt_cnt) and E64_CNT
->   (64-bit, absolute). A u64 accumulator tx_runt_accum64 holds the
->   running RUNT delta sum so that each poll sets:
->     tx_len[0] =3D tx_runt_accum64 + E64_abs
->   without double-counting the E64 value.
->=20
-> Merge airoha_dev_get_hw_stats() into airoha_update_hw_stats(),
-> moving the port spin_lock inside so callers do not need a separate
-> wrapper.
->=20
-> Signed-off-by: Aniket Negi <aniket.negi03@gmail.com>
-
-Hi Aniket,
-
-just few nits inline. Fixing them:
-
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-
-> ---
->=20
-> Changes in v2:
->   - Store _CNT_L register reads in val before adding to stats, improving
->     readability (suggested by Lorenzo Bianconi)
->   - Fix double-counting bug in the RUNT+E64 combined bucket: previously
->     "+=3D" for E64 re-added the full absolute counter each poll; now a
->     dedicated tx_runt_accum64/rx_runt_accum64 accumulator holds the
->     running RUNT delta, and tx_len[0] is assigned (not accumulated) each
->     poll as runt_accum64 + E64_abs
->   - Replace 7-element tx_len[]/rx_len[] shadow arrays in mib_prev with
->     focused tx_runt_cnt/tx_long_cnt and rx_runt_cnt/rx_long_cnt fields;
->     only RUNT and LONG are 32-bit and need wrap-around tracking
->   - Rename inner struct hw_prev_stats to mib_prev; rename accumulator
->     fields to tx_runt_accum64/rx_runt_accum64 for clarity
->   - Fix comment alignment in mib_prev struct block
->   - Rename airoha_dev_get_hw_stats() to airoha_update_hw_stats() and
->     move the port spin_lock inside, removing the separate wrapper
->=20
->  drivers/net/ethernet/airoha/airoha_eth.c | 115 +++++++++++++----------
->  drivers/net/ethernet/airoha/airoha_eth.h |  27 ++++++
->  2 files changed, 92 insertions(+), 50 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 59001fd4b6f7..4b7c547de165 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -1686,12 +1686,14 @@ static void airoha_qdma_stop_napi(struct airoha_q=
-dma *qdma)
->  	}
->  }
-> =20
-> -static void airoha_dev_get_hw_stats(struct airoha_gdm_dev *dev)
-> +static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
->  {
->  	struct airoha_gdm_port *port =3D dev->port;
->  	struct airoha_eth *eth =3D dev->eth;
->  	u32 val, i =3D 0;
-> =20
-> +	spin_lock(&port->stats_lock);
-> +
->  	/* Read relevant MIB for GDM with multiple port attached */
->  	if (port->id =3D=3D AIROHA_GDM3_IDX || port->id =3D=3D AIROHA_GDM4_IDX)
->  		airoha_fe_rmw(eth, REG_FE_GDM_MIB_CFG(port->id),
-> @@ -1701,152 +1703,165 @@ static void airoha_dev_get_hw_stats(struct airo=
-ha_gdm_dev *dev)
-> =20
->  	u64_stats_update_begin(&dev->stats.syncp);
-> =20
-> -	/* TX */
-> +	/* TX - 64-bit H+L registers: hw accumulates the total, read directly. =
-*/
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_H(port->id));
-> -	dev->stats.tx_ok_pkts +=3D ((u64)val << 32);
-> +	dev->stats.tx_ok_pkts =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_L(port->id));
->  	dev->stats.tx_ok_pkts +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_BYTE_CNT_H(port->id));
-> -	dev->stats.tx_ok_bytes +=3D ((u64)val << 32);
-> +	dev->stats.tx_ok_bytes =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_BYTE_CNT_L(port->id));
->  	dev->stats.tx_ok_bytes +=3D val;
-> =20
-> +	/* TX - 32-bit registers: accumulate delta to handle wrap-around. */
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_DROP_CNT(port->id));
-> -	dev->stats.tx_drops +=3D val;
-> +	dev->stats.tx_drops +=3D (u32)(val - dev->stats.mib_prev.tx_drops);
-> +	dev->stats.mib_prev.tx_drops =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_BC_CNT(port->id));
-> -	dev->stats.tx_broadcast +=3D val;
-> +	dev->stats.tx_broadcast +=3D (u32)(val - dev->stats.mib_prev.tx_broadca=
-st);
-> +	dev->stats.mib_prev.tx_broadcast =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_MC_CNT(port->id));
-> -	dev->stats.tx_multicast +=3D val;
-> +	dev->stats.tx_multicast +=3D (u32)(val - dev->stats.mib_prev.tx_multica=
-st);
-> +	dev->stats.mib_prev.tx_multicast =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_RUNT_CNT(port->id));
-> -	dev->stats.tx_len[i] +=3D val;
-> +	dev->stats.mib_prev.tx_runt_accum64 +=3D
-
-I guess dev->stats.mib_prev.tx_runt64
-
-> +		(u32)(val - dev->stats.mib_prev.tx_runt_cnt);
-
-	dev->stats.mib_prev.tx_runt64 +=3D (u32)(val -
-					       dev->stats.mib_prev.tx_runt);
-
-> +	dev->stats.mib_prev.tx_runt_cnt =3D val;
-> +
-> +	/* tx_len[0]: RUNT (32-bit, delta) + E64 (64-bit, absolute) =E2=86=92 {=
-0, 64} bucket.
-> +	 * Accumulate RUNT delta in tx_runt_accum64, then assign tx_len[0] as
-> +	 * accum + E64_abs so each call gives the correct combined total.
-> +	 */
-
-no new-line here.
-
-> +
-> +	dev->stats.tx_len[i] =3D dev->stats.mib_prev.tx_runt_accum64;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_H(port->id));
-> -	dev->stats.tx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.tx_len[i] +=3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_L(port->id));
->  	dev->stats.tx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L64_CNT_H(port->id));
-> -	dev->stats.tx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.tx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L64_CNT_L(port->id));
->  	dev->stats.tx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L127_CNT_H(port->id));
-> -	dev->stats.tx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.tx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L127_CNT_L(port->id));
->  	dev->stats.tx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L255_CNT_H(port->id));
-> -	dev->stats.tx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.tx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L255_CNT_L(port->id));
->  	dev->stats.tx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L511_CNT_H(port->id));
-> -	dev->stats.tx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.tx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L511_CNT_L(port->id));
->  	dev->stats.tx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L1023_CNT_H(port->id));
-> -	dev->stats.tx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.tx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L1023_CNT_L(port->id));
->  	dev->stats.tx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_LONG_CNT(port->id));
-> -	dev->stats.tx_len[i++] +=3D val;
-> +	dev->stats.tx_len[i++] +=3D (u32)(val - dev->stats.mib_prev.tx_long_cnt=
-);
-> +	dev->stats.mib_prev.tx_long_cnt =3D val;
-> =20
->  	/* RX */
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_PKT_CNT_H(port->id));
-> -	dev->stats.rx_ok_pkts +=3D ((u64)val << 32);
-> +	dev->stats.rx_ok_pkts =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_PKT_CNT_L(port->id));
->  	dev->stats.rx_ok_pkts +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_BYTE_CNT_H(port->id));
-> -	dev->stats.rx_ok_bytes +=3D ((u64)val << 32);
-> +	dev->stats.rx_ok_bytes =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_BYTE_CNT_L(port->id));
->  	dev->stats.rx_ok_bytes +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_DROP_CNT(port->id));
-> -	dev->stats.rx_drops +=3D val;
-> +	dev->stats.rx_drops +=3D (u32)(val - dev->stats.mib_prev.rx_drops);
-> +	dev->stats.mib_prev.rx_drops =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_BC_CNT(port->id));
-> -	dev->stats.rx_broadcast +=3D val;
-> +	dev->stats.rx_broadcast +=3D (u32)(val - dev->stats.mib_prev.rx_broadca=
-st);
-> +	dev->stats.mib_prev.rx_broadcast =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_MC_CNT(port->id));
-> -	dev->stats.rx_multicast +=3D val;
-> +	dev->stats.rx_multicast +=3D (u32)(val - dev->stats.mib_prev.rx_multica=
-st);
-> +	dev->stats.mib_prev.rx_multicast =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ERROR_DROP_CNT(port->id));
-> -	dev->stats.rx_errors +=3D val;
-> +	dev->stats.rx_errors +=3D (u32)(val - dev->stats.mib_prev.rx_errors);
-> +	dev->stats.mib_prev.rx_errors =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_CRC_ERR_CNT(port->id));
-> -	dev->stats.rx_crc_error +=3D val;
-> +	dev->stats.rx_crc_error +=3D (u32)(val - dev->stats.mib_prev.rx_crc_err=
-or);
-> +	dev->stats.mib_prev.rx_crc_error =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OVERFLOW_DROP_CNT(port->id));
-> -	dev->stats.rx_over_errors +=3D val;
-> +	dev->stats.rx_over_errors +=3D (u32)(val - dev->stats.mib_prev.rx_over_=
-errors);
-> +	dev->stats.mib_prev.rx_over_errors =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_FRAG_CNT(port->id));
-> -	dev->stats.rx_fragment +=3D val;
-> +	dev->stats.rx_fragment +=3D (u32)(val - dev->stats.mib_prev.rx_fragment=
-);
-> +	dev->stats.mib_prev.rx_fragment =3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_JABBER_CNT(port->id));
-> -	dev->stats.rx_jabber +=3D val;
-> +	dev->stats.rx_jabber +=3D (u32)(val - dev->stats.mib_prev.rx_jabber);
-> +	dev->stats.mib_prev.rx_jabber =3D val;
-> =20
->  	i =3D 0;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_RUNT_CNT(port->id));
-> -	dev->stats.rx_len[i] +=3D val;
-> +	dev->stats.mib_prev.rx_runt_accum64 +=3D
-> +		(u32)(val - dev->stats.mib_prev.rx_runt_cnt);
-
-ditto.
-
-> +	dev->stats.mib_prev.rx_runt_cnt =3D val;
-> +
-> +	/* rx_len[0]: RUNT (32-bit, delta) + E64 (64-bit, absolute) =E2=86=92 {=
-0, 64} bucket.
-> +	 * then assign rx_len[0] =3D rx_runt_accum64 + E64_abs.
-> +	 */
-> =20
-ditto.
-
-> +	dev->stats.rx_len[i] =3D dev->stats.mib_prev.rx_runt_accum64;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_H(port->id));
-> -	dev->stats.rx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.rx_len[i] +=3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_L(port->id));
->  	dev->stats.rx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L64_CNT_H(port->id));
-> -	dev->stats.rx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.rx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L64_CNT_L(port->id));
->  	dev->stats.rx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L127_CNT_H(port->id));
-> -	dev->stats.rx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.rx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L127_CNT_L(port->id));
->  	dev->stats.rx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L255_CNT_H(port->id));
-> -	dev->stats.rx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.rx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L255_CNT_L(port->id));
->  	dev->stats.rx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L511_CNT_H(port->id));
-> -	dev->stats.rx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.rx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L511_CNT_L(port->id));
->  	dev->stats.rx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L1023_CNT_H(port->id));
-> -	dev->stats.rx_len[i] +=3D ((u64)val << 32);
-> +	dev->stats.rx_len[i] =3D (u64)val << 32;
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L1023_CNT_L(port->id));
->  	dev->stats.rx_len[i++] +=3D val;
-> =20
->  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_LONG_CNT(port->id));
-> -	dev->stats.rx_len[i++] +=3D val;
-> +	dev->stats.rx_len[i] +=3D (u32)(val - dev->stats.mib_prev.rx_long_cnt);
-> +	dev->stats.mib_prev.rx_long_cnt =3D val;
-> =20
->  	u64_stats_update_end(&dev->stats.syncp);
-> -}
-> -
-> -static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
-> -{
-> -	struct airoha_gdm_port *port =3D dev->port;
-> -	int i;
-> -
-> -	spin_lock(&port->stats_lock);
-> -
-> -	for (i =3D 0; i < ARRAY_SIZE(port->devs); i++) {
-> -		if (port->devs[i])
-> -			airoha_dev_get_hw_stats(port->devs[i]);
-> -	}
-> -
-> -	/* Reset MIB counters */
-> -	airoha_fe_set(dev->eth, REG_FE_GDM_MIB_CLEAR(port->id),
-> -		      FE_GDM_MIB_RX_CLEAR_MASK | FE_GDM_MIB_TX_CLEAR_MASK);
-> =20
->  	spin_unlock(&port->stats_lock);
->  }
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index f6d01a8e8da1..3af1c49dd62d 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -245,6 +245,33 @@ struct airoha_hw_stats {
->  	u64 rx_fragment;
->  	u64 rx_jabber;
->  	u64 rx_len[7];
-> +
-> +	struct {
-> +		/* Previous HW register values for 32-bit counter delta
-> +		 * tracking. Storing the last seen value and accumulating
-> +		 * (u32)(curr - prev) into the 64-bit software counter
-> +		 * handles wrap-around transparently via unsigned arithmetic.
-> +		 * tx_runt_accum64/rx_runt_accum64 hold the running sum of
-> +		 * runt deltas. These fields are never reported to userspace.
-> +		 */
-> +		u32 tx_drops;
-> +		u32 tx_broadcast;
-> +		u32 tx_multicast;
-> +		u32 tx_runt_cnt;
-
-		u32 tx_runt;
-
-> +		u32 tx_long_cnt;
-
-		u32 tx_long;
-
-> +		u64 tx_runt_accum64;
-
-		64 tx_runt64;
-
-> +		u32 rx_drops;
-> +		u32 rx_broadcast;
-> +		u32 rx_multicast;
-> +		u32 rx_errors;
-> +		u32 rx_crc_error;
-> +		u32 rx_over_errors;
-> +		u32 rx_fragment;
-> +		u32 rx_jabber;
-> +		u32 rx_runt_cnt;
-
-		u32 rx_runt;
-
-> +		u32 rx_long_cnt;
-
-		u32 rx_long;
-
-> +		u64 rx_runt_accum64;
-
-		u64 rx_runt64;
-
-> +	} mib_prev;
->  };
-> =20
->  enum {
->=20
-> base-commit: a225f8c20712713406ae47024b8df42deacddd4a
-> --=20
-> 2.43.0
->=20
-
---GwVceFzz02rhH5Cx
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCakWYEQAKCRA6cBh0uS2t
-rI/KAQDj7HnMgKz2CDJF2bsStuvQ8Yx1Lkss7GR1FTF+TdsnqgD+OrfAJNP8iTFH
-XOEipPlOOiEnjr1+U91ZWspbMkK5PQM=
-=+eVZ
------END PGP SIGNATURE-----
-
---GwVceFzz02rhH5Cx--
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
