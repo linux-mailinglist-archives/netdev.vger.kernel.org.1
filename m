@@ -1,172 +1,302 @@
-Return-Path: <netdev+bounces-303458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DcVGN3ySRGp7xAoAu9opvQ
-	(envelope-from <netdev+bounces-303458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 06:07:24 +0200
+	id uy1uO9+SRGq7xAoAu9opvQ
+	(envelope-from <netdev+bounces-303459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 06:09:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C060C6E9A04
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 06:07:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D4176E9A2B
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 06:09:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=T+TN43gB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303458-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303458-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=NMT6BH8o;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303459-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303459-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0D7DA303B936
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 04:01:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 06775300680E
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 04:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C85E37A488;
-	Wed,  1 Jul 2026 04:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC383390237;
+	Wed,  1 Jul 2026 04:09:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8A6379964
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 04:01:20 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782878484; cv=pass; b=XLJGEwSZFG76Zd4BBO8FrBY9Q+2zRP3lWjb5Fc6TudTk6jh12vrxJKaHlNCVtEYn3qnx/Nbbnix1M4ew7TYvTClVonUwgQUeH6CfdnNMhFGVwRjbQDszyni9A7nWeXq9oZjftiF442SL0qdO2xoTnETZIBJlkjtnhgRKjIpQKiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782878484; c=relaxed/simple;
-	bh=nbcaEzsRX9Wd5cutUSGHKNyzPWPZ9Pa/dME/ipm/wTw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sF/vFt2iR/YYbhbQ1lgOfB5YBXLft0j1DPuFncP3HjvUNaqmrjp3NnqJmDutbGStIGlxXajjaS556wCvkUamOqDwnK494D/dOe44G6sBaJbgLa/miBh5cBQ2IJXyZ+8dG3RojFJ8UVdfusiM+LtwNIf3kI48Pc/Fn3B9eN2VeIc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+TN43gB; arc=pass smtp.client-ip=209.85.218.49
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c128c8c7a76so40625966b.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 21:01:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782878478; cv=none;
-        d=google.com; s=arc-20260327;
-        b=CP/GRHIdxxhKDODfd6MsQ8V+EncW1RpI5OZbzvQyZWESXLl6zGHVwEitc8E0HiCNfr
-         YK0jGbAVTi5+XjSJ4l0wb1iH9uUhjr5VFMpr7qYNDU8i4KZv8aU/l7zyxPpqte2O7QrK
-         1PMreI4Rxji77xHJfUhYQZmiYjP3AbAd2hZYPyDTUsyuH21rbeAAG4x/55JtI1wja8R0
-         niDWWi29Yn+i2L5Kj01eWmuO4Ej9y6AKU2pggFW4DdWBsA/VvOId7+OgkMP2sRvZXlYU
-         MXpJdMEAH1XZlu3acVq4M5ZCvRwJhkD7wqAm/szkeTiEz5vS9pCDJrkrzowXxMEzPfMV
-         KiTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=nbcaEzsRX9Wd5cutUSGHKNyzPWPZ9Pa/dME/ipm/wTw=;
-        fh=c8VsDb+7qoET8m87XigSnZhmMvXEeSrWaG7yczHbtgw=;
-        b=ZajjVYT44R5D96YGAtpNDFB6RX+cu6SdfKy6GLY2pyQucZFnkYce/ukOUDqdQWhAKb
-         BOAJXmA4UhMvOHNSQMOOQdGbdgghUjxMxMF6MqRFhPPNT30jUqdKOLgiF8IyyGU5OXcf
-         AaeuIPOps0RwY8dIXrdXqPLqs7uqpGYNTNaGpAt2T0QywdPqk749lB9JfS02QnvJqZQs
-         pD+ppPNqV/n5WTaZOS/1mXUGN9Qo93xaDf8yN9a2YbQ0lYcQgvrcjdIq+2WRZ78QPyV3
-         CLqMRYajzsk5yhsKIpJG1XPns8ZpXUTF6T0GDojZ/1z+ElZQ3Si6B9Zm3V6r2bo5D3UP
-         utWg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E1F38F957
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 04:08:52 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782878940; cv=none; b=M6dpzSqkfhpxDF6CBzTJ+MykxjlAmcFiEvIQ4Yw2Ii9C9pUhziaqbF7y0lE9RLv5tVHFEZ7uIB0+mN3tBp9PEhY4EbsQ3bkfpD4KGxOlAnBq4+5C/AxeVzBTxWHPlMMUYqy3lYnYSnHttcXnl3Jf4PVVE4POmj6UPNRT2e3L1Eo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782878940; c=relaxed/simple;
+	bh=hvT7JLBtMKlW8UeJ63Gs978aQAyA8oK61EamMUG8cLM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=plNKngfHrfWaerHYksjC5efp9nIxTSqeqAGxDKTz2cQ5At3yFisoHx+N7oivN0bmSo/TRsNqa7yHoH1Z2RfDiYEVmrNsAaG1E7Ow0QwCuht9nbavyVzz587fSl6Tv0JwCwJggeBgEBGlkMwDzkiL3pxXF1RrafqqOHi9uzTLamk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NMT6BH8o; arc=none smtp.client-ip=209.85.160.180
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-51bf11ba4f6so1728761cf.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 21:08:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782878478; x=1783483278; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nbcaEzsRX9Wd5cutUSGHKNyzPWPZ9Pa/dME/ipm/wTw=;
-        b=T+TN43gBQVKrBdVmq3uBpm9OUZnWTc73cJaWcOQyH2zC5IFTKsqSbnW459D3TOkP1r
-         T85xFxouLO0ID5qQP8ltAvZFmnSP6R1IFhEKTp8CRE4apE2+G58EGxok+Lpu/rvALvXB
-         wzTm7KHngZ+6esh8D4Q778IWDHLYa25cITYjwEJ7J1pcHQPcE6tMNHobsAl9NWE9MyrX
-         AInBI6vTtramaQ6gDyatXRPVXYy8CPL8qz9Sf2EmTca/0FX2qTBdP4UhiBrOWfdOdOpd
-         nPnaLf7+jVMLQUt3ffEXVZCHhAgtbBGE8007E9mHQ8cwWQti6oLSBKd89yGZ8AO8kSxj
-         lUgw==
+        d=gmail.com; s=20251104; t=1782878931; x=1783483731; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hQC+Zuo8/BXFOdZBqV/xbASkSWVoxyYlD7997dQNoBQ=;
+        b=NMT6BH8on4fNWzFFuFM5onnQxm/gd3HvGtch3fHeS2gRh2CYXliGL2IO/kDdwI1a57
+         FB/gyUU9zoVHf1X4dBeXD8R1tbXny5ZMS0vYHHQuu+spdisVdUmJwDzahRKk9F9AXFUX
+         H+RTfHoRDzwXuBFHkAzMKYhv0BximG1yrkmgfq3Er1xGvz+1YBuRKAxuVMKPfHTUYNAb
+         l+7kQLTSYfU/nVp3JGcA/nAH0aID3hqTS08pONi0Sh/3Zi67udR36zuOW8ATlny0IGQs
+         kT+daACIcLwhPblQr/hX7t8yUIzeis+IG+2gnOBwLfY6wATaHTHt1zvAadd8SaWmq4de
+         W2iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782878478; x=1783483278;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nbcaEzsRX9Wd5cutUSGHKNyzPWPZ9Pa/dME/ipm/wTw=;
-        b=KN1vcJyB7PWXYIIicRqrObCDs38+TZIhwiCuviFf+3zuh8ObRXMpIkdwwWzKEqRC5o
-         VRg++BEU7cRLdq1Mj/57N8x8LWgEEY6w2WdVDLKiFlg/uoT/K0bljZgQU/LAgLDYMDwr
-         CMi++PKuUOSNVEAEWd45Hd7YVAJNhlEGatDRaFkV5m0shnnHlI+XBS1c/xXuKBpT0LXQ
-         Gah2IZUyQ6ueimw67qWz3m93Wntj0T7Nqqvz1CxlzCRT9lRd3e0kpJRrO9PQmffcLpg7
-         15DN/Oby4csWPiGoNYSXHXZRSd0Fx+lsREvxelDRTeaFo0eZZrUjKkDN46RSH6sspP9E
-         hV5Q==
-X-Forwarded-Encrypted: i=1; AHgh+RpvFcIF55YuDqeBLJWXVPRVII8Vr+cPr7MN5RY+5no9w4aJyIMom6CnknHA7zcR0/+aO1H+s2I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYuQXvH71061hIrdwfaSJH+8R7O64hs37lJSIVCQ0mmDHYmiQy
-	fswqsOqRa6Bcs8rLTxLJAEpeCjwJ76YAofhgUEd14IKWwEc5u4BjtspwSFgj4IB0MwrMFxsMxk0
-	R76BlrMxVw5iGdgbmB9Pz5R8Ekt3/qqY=
-X-Gm-Gg: AfdE7cmU64RTt1hzOGSbNSadyodBmVgpJ3kM3vK6Ima+2G02AgY3bjNkhpQZyWMVreC
-	vWy5an8EdPuNzFDT9xM1xxGkN9Je1rAj7MWu3EJcdt4rIhYIWIU4tL83Y9wKIFLyFWrbTaYknUF
-	Dt6N/RoJJp9Scf7qmTEo9peyMAC4gBYQ05osaj3e6Tp1ORUg0VCCH2Xy4h/1Oc/6N2uR5VBS3k6
-	UX0cnUXVJbRkd6wf0tPB79FmI3lEIWslH0SteeR7n5T1XpVcf3o/N2EjPaAgS4MJdgioDttQqAH
-	7OKtGoQ=
-X-Received: by 2002:a17:907:9694:b0:c0d:7c31:26a9 with SMTP id
- a640c23a62f3a-c12a79b53f2mr2792166b.2.1782878477949; Tue, 30 Jun 2026
- 21:01:17 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782878931; x=1783483731;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hQC+Zuo8/BXFOdZBqV/xbASkSWVoxyYlD7997dQNoBQ=;
+        b=TGBw70fgLnCSHiedao5s3u7PJ4wITnc1wyVGI0haMuL5p4C3FWeJmgf7srIRAAuw/i
+         J3+VlXeT4WgDActin1qQRE5PoHUi7evvg0YocPVGKS/nMTf2D0Ipj3p1iLlADd4xItq7
+         S5QxmSUH+CwUTDR6xjAyx72fmiXOJKRWG0T471L+ZPzF6pyzMEr5pxiYW/zhD1Pjsrw4
+         l7q/cEg+MZGT4TSAJHMUXusBvOSymrf8zozToxVESKMzqKfbmn5zfQZEGRSV6LSfazFC
+         F081A7GKzrXQmNYAXyjF/l+y00Lq3Psq1z00fSfpaEU3a1K0r6VoSMp/ESaDavgixjbF
+         dZQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9z3S+bdNxBgV1h55m8bJ1AQUgiLpL9q/Tj48DKfwa6/K87jR+pUiDXObWVXzJEKe/pryr8N+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXyK8IF2kYwkwdskmwOxPrA5+OGO4llGWcIrR9IbPT0al4x0v9
+	DNQZP6tz/IwKAerHKnGF4Lrh+CrbTJWdn7P31vDXp5kWv3dEfLGKLG04
+X-Gm-Gg: AfdE7cm691IMY+0f17CgEFkykwLlBbTFC0nFoVhWocNkxCA+xRTA5ufzfe+ywpvX4sz
+	k2dxcNDNPuvkeMjQPmdqM4gBhY2PCWUNYMiLqAPBK0wyRvqAtt3e5dQJF6q4P5uhNrDv1fg+Y3t
+	7zyP98FShkcScHs7E01eOE4dO6ahBSHSj6mvd27L9DQmMmDABUV2w+YxmWpA1JXlG6oxpQY4uRM
+	zgoYgekzSRlWGusJnpQJKsxQpJgd0004qLf6Z3Daip8rU9NMfbIecZh50C1YzlpUc8eth5uvivo
+	pY0OGm80F74+FSn008U38bUABtGRSv+AxCFjxgvyBi8Gabbl/YoJvkgE4fvbUsFna9eXxd+C0/R
+	dilnqHXNMjIl2DXADX6tGJs5d59USw/lLt6AjLFKifr4reEeDtpDVzZPHUbu+jzk70H+VIEcYiQ
+	OqKnoE+/CyCNXCv1PFI7OVba2yjsy0MQ==
+X-Received: by 2002:ac8:7f4c:0:b0:517:9570:c1bd with SMTP id d75a77b69052e-51c26a4aa41mr1185021cf.25.1782878931399;
+        Tue, 30 Jun 2026 21:08:51 -0700 (PDT)
+Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51c10a3307csm33402791cf.29.2026.06.30.21.08.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 21:08:50 -0700 (PDT)
+From: Yuho Choi <dbgh9129@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Zilin Guan <zilin@seu.edu.cn>,
+	Arend van Spriel <arend.vanspriel@broadcom.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	Yuho Choi <dbgh9129@gmail.com>
+Subject: [PATCH v3] net/liquidio: drop cached VF pci_dev LUT
+Date: Wed,  1 Jul 2026 00:08:47 -0400
+Message-ID: <20260701040847.1897845-1-dbgh9129@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <89ea76b3-e956-4232-8180-ee3929adf905@kernel.org>
- <20260625101132.3859505-1-safinaskar@gmail.com> <63f7860c-4f5c-4682-8914-27978b9fbfe1@kernel.org>
- <20260629-bauland-knabbern-abgeladen-c0acbfa62cc2@brauner>
-In-Reply-To: <20260629-bauland-knabbern-abgeladen-c0acbfa62cc2@brauner>
-From: Askar Safin <safinaskar@gmail.com>
-Date: Wed, 1 Jul 2026 07:00:41 +0300
-X-Gm-Features: AVVi8CdRVGURQNkveI8Kk-KHYrlO3h9NseHLMt2SfGvb89Oznrvksp3ZeC4J-SY
-Message-ID: <CAPnZJGAJROqfCWSeeBu31HsE6nmgxVqHTNeC554S5y1Y-VN19w@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] vmsplice: fix some problems in my previous
- vmsplice patchset
-To: Christian Brauner <brauner@kernel.org>
-Cc: "David Hildenbrand (Arm)" <david@kernel.org>, akpm@linux-foundation.org, avagin@gmail.com, 
-	axboe@kernel.dk, collin.funk1@gmail.com, david.laight.linux@gmail.com, 
-	dhowells@redhat.com, fuse-devel@lists.linux.dev, hch@infradead.org, 
-	jack@suse.cz, joannelkoong@gmail.com, kernel@infinite-source.de, 
-	linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, luto@amacapital.net, 
-	metze@samba.org, miklos@szeredi.hu, netdev@vger.kernel.org, 
-	patches@lists.linux.dev, pfalcato@suse.de, torvalds@linux-foundation.org, 
-	val@packett.cool, viro@zeniv.linux.org.uk, w@1wt.eu, willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:brauner@kernel.org,m:david@kernel.org,m:akpm@linux-foundation.org,m:avagin@gmail.com,m:axboe@kernel.dk,m:collin.funk1@gmail.com,m:david.laight.linux@gmail.com,m:dhowells@redhat.com,m:fuse-devel@lists.linux.dev,m:hch@infradead.org,m:jack@suse.cz,m:joannelkoong@gmail.com,m:kernel@infinite-source.de,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:luto@amacapital.net,m:metze@samba.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:torvalds@linux-foundation.org,m:val@packett.cool,m:viro@zeniv.linux.org.uk,m:w@1wt.eu,m:willy@infradead.org,m:collinfunk1@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303458-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303459-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[bootlin.com,seu.edu.cn,broadcom.com,suse.com,baylibre.com,linux.dev,vger.kernel.org,gmail.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kory.maincent@bootlin.com,m:zilin@seu.edu.cn,m:arend.vanspriel@broadcom.com,m:marco.crivellari@suse.com,m:u.kleine-koenig@baylibre.com,m:vadim.fedorenko@linux.dev,m:linux-kernel@vger.kernel.org,m:dbgh9129@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[safinaskar@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,linux-foundation.org,gmail.com,kernel.dk,redhat.com,lists.linux.dev,infradead.org,suse.cz,infinite-source.de,vger.kernel.org,kvack.org,amacapital.net,samba.org,szeredi.hu,suse.de,packett.cool,zeniv.linux.org.uk,1wt.eu];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C060C6E9A04
+X-Rspamd-Queue-Id: 8D4176E9A2B
 
-On Mon, Jun 29, 2026 at 11:56=E2=80=AFAM Christian Brauner <brauner@kernel.=
-org> wrote:
-> The amount of regression reports that we got in short succession doesn't
-> make it likely that we can merge a plain degradation.
+The PF SR-IOV enable path caches VF pci_dev pointers in
+dpiring_to_vfpcidev_lut[] by iterating with pci_get_device(). Those
+entries do not own a reference, because the iterator drops the previous
+device reference on each step. The cached pointer is then dereferenced
+later when handling OCTEON_VF_FLR_REQUEST.
 
-Let me repeat: this v2 patchset fixes all regressions found so far,
-except for major CRIU performance regression
+Replace the cached VF mapping with runtime lookup on the mailbox DPI
+ring: derive the VF index from q_no, resolve the VF via exported PCI
+IOV helpers, validate it with the PF pointer and VF ID, then issue
+pcie_flr() and drop the reference with pci_dev_put(). Remove the
+unused VF lookup table initialization and cleanup.
 
---=20
-Askar Safin
+Fixes: ca6139ffc67ee ("liquidio CN23XX: sysfs VF config support")
+Fixes: 8c978d059224 ("liquidio CN23XX: Mailbox support")
+Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
+---
+Changes in v3:
+- Drop unrelated Xgene PCI probe note from the commit message.
+Changes in v2:
+- Replace use of pci_iov_virtfn_bus() with runtime VF lookup using exported helpers.
+ .../net/ethernet/cavium/liquidio/lio_main.c   | 27 ---------------
+ .../ethernet/cavium/liquidio/octeon_device.h  |  3 --
+ .../ethernet/cavium/liquidio/octeon_mailbox.c | 33 ++++++++++++++++++-
+ 3 files changed, 32 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index 0db08ac3d098..e303956b4bf1 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -3779,9 +3779,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
+ static int octeon_enable_sriov(struct octeon_device *oct)
+ {
+ 	unsigned int num_vfs_alloced = oct->sriov_info.num_vfs_alloced;
+-	struct pci_dev *vfdev;
+ 	int err;
+-	u32 u;
+ 
+ 	if (OCTEON_CN23XX_PF(oct) && num_vfs_alloced) {
+ 		err = pci_enable_sriov(oct->pci_dev,
+@@ -3794,23 +3792,6 @@ static int octeon_enable_sriov(struct octeon_device *oct)
+ 			return err;
+ 		}
+ 		oct->sriov_info.sriov_enabled = 1;
+-
+-		/* init lookup table that maps DPI ring number to VF pci_dev
+-		 * struct pointer
+-		 */
+-		u = 0;
+-		vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-				       OCTEON_CN23XX_VF_VID, NULL);
+-		while (vfdev) {
+-			if (vfdev->is_virtfn &&
+-			    (vfdev->physfn == oct->pci_dev)) {
+-				oct->sriov_info.dpiring_to_vfpcidev_lut[u] =
+-					vfdev;
+-				u += oct->sriov_info.rings_per_vf;
+-			}
+-			vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-					       OCTEON_CN23XX_VF_VID, vfdev);
+-		}
+ 	}
+ 
+ 	return num_vfs_alloced;
+@@ -3818,8 +3799,6 @@ static int octeon_enable_sriov(struct octeon_device *oct)
+ 
+ static int lio_pci_sriov_disable(struct octeon_device *oct)
+ {
+-	int u;
+-
+ 	if (pci_vfs_assigned(oct->pci_dev)) {
+ 		dev_err(&oct->pci_dev->dev, "VFs are still assigned to VMs.\n");
+ 		return -EPERM;
+@@ -3827,12 +3806,6 @@ static int lio_pci_sriov_disable(struct octeon_device *oct)
+ 
+ 	pci_disable_sriov(oct->pci_dev);
+ 
+-	u = 0;
+-	while (u < MAX_POSSIBLE_VFS) {
+-		oct->sriov_info.dpiring_to_vfpcidev_lut[u] = NULL;
+-		u += oct->sriov_info.rings_per_vf;
+-	}
+-
+ 	oct->sriov_info.num_vfs_alloced = 0;
+ 	dev_info(&oct->pci_dev->dev, "oct->pf_num:%d disabled VFs\n",
+ 		 oct->pf_num);
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_device.h b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+index 19344b21f8fb..858a0fff2cc0 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_device.h
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+@@ -390,9 +390,6 @@ struct octeon_sriov_info {
+ 
+ 	struct lio_trusted_vf	trusted_vf;
+ 
+-	/*lookup table that maps DPI ring number to VF pci_dev struct pointer*/
+-	struct pci_dev *dpiring_to_vfpcidev_lut[MAX_POSSIBLE_VFS];
+-
+ 	u64	vf_macaddr[MAX_POSSIBLE_VFS];
+ 
+ 	u16	vf_vlantci[MAX_POSSIBLE_VFS];
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
+index ad685f5d0a13..697fcdc41e3c 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
+@@ -26,6 +26,31 @@
+ #include "octeon_mailbox.h"
+ #include "cn23xx_pf_device.h"
+ 
++static struct pci_dev *lio_vf_pci_dev_by_qno(struct octeon_device *oct, u32 q_no)
++{
++	struct pci_dev *vfdev = NULL;
++	int vfidx;
++
++	if (!oct->sriov_info.rings_per_vf)
++		return NULL;
++
++	if (q_no % oct->sriov_info.rings_per_vf)
++		return NULL;
++
++	vfidx = q_no / oct->sriov_info.rings_per_vf;
++	if (vfidx >= oct->sriov_info.num_vfs_alloced)
++		return NULL;
++
++	while ((vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
++				       OCTEON_CN23XX_VF_VID, vfdev))) {
++		if (pci_physfn(vfdev) && pci_physfn(vfdev) == oct->pci_dev &&
++		    pci_iov_vf_id(vfdev) == vfidx)
++			return vfdev;
++	}
++
++	return NULL;
++}
++
+ /**
+  * octeon_mbox_read:
+  * @mbox: Pointer mailbox
+@@ -237,6 +262,7 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
+ 				   struct octeon_mbox_cmd *mbox_cmd)
+ {
+ 	struct octeon_device *oct = mbox->oct_dev;
++	struct pci_dev *vfdev;
+ 
+ 	switch (mbox_cmd->msg.s.cmd) {
+ 	case OCTEON_VF_ACTIVE:
+@@ -260,7 +286,12 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
+ 		dev_info(&oct->pci_dev->dev,
+ 			 "got a request for FLR from VF that owns DPI ring %u\n",
+ 			 mbox->q_no);
+-		pcie_flr(oct->sriov_info.dpiring_to_vfpcidev_lut[mbox->q_no]);
++		vfdev = lio_vf_pci_dev_by_qno(oct, mbox->q_no);
++		if (!vfdev)
++			break;
++
++		pcie_flr(vfdev);
++		pci_dev_put(vfdev);
+ 		break;
+ 
+ 	case OCTEON_PF_CHANGED_VF_MACADDR:
+-- 
+2.43.0
+
 
