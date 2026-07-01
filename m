@@ -1,161 +1,154 @@
-Return-Path: <netdev+bounces-303514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303521-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /fhpGprDRGoJ0goAu9opvQ
-	(envelope-from <netdev+bounces-303514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:36:58 +0200
+	id QHlfL8jFRGoH0woAu9opvQ
+	(envelope-from <netdev+bounces-303521-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:46:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67AC56EAB5A
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:36:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3040B6EAD23
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 09:46:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=EZXazlFd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303514-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303514-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=cAU5uV7t;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303521-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303521-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A550F301515F
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 07:35:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CFE0430DB790
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 07:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486403BED1F;
-	Wed,  1 Jul 2026 07:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494C63BBFBC;
+	Wed,  1 Jul 2026 07:39:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC863BBFBC;
-	Wed,  1 Jul 2026 07:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244413B4E9F;
+	Wed,  1 Jul 2026 07:39:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782891331; cv=none; b=aRSwdz/JYBuTVA4VVGNuHHBfoLFXNvVP8z2RJwMxDxroc0fBVpTTDsJK9jZKyFho+vY0xr7r28XJqSkjDpayr1yB9flORckADEoHDogdkydpNMjw4v2R4jgYBv17peXK3OZWqHl/1nyGEeeqAuxvAZFG3nt8wZzZ96KQXufyFGg=
+	t=1782891545; cv=none; b=CPD+DN62hNhJnX03UsWp66Ic2PO5Qc0N9iBMxuIs65iHWBAoEG5ick9yiHX276XIDlx64SovWJUpCxl4b7M1IJNC+YVbZrW3PaPEhoD4TCIO0HfTicOR/tvLgBFLqgA2sYWTQj8bCwLaGbnnE3qchoaGCoQqhLLpsctol9FVgWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782891331; c=relaxed/simple;
-	bh=AS/o9NhNXcOqBn4KHzybhUDDFTKtJyf5CY6etHArtWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RblTjHInc8NU7TXw/KM/oMN3Y0H+l6LS+aq6bl5JSaw8ZLzSYNDy/KDR1SnSt+jfEeOVKnCrVtj5Z54lgQeS2M43NxM+5hgf1OobkEpKd2W1eK0ZPPeMvNGvp0hPD3p8lD1MLuPpMVhUce9LFWhX8qgEwy/3d5tQOCOD+oHkdmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZXazlFd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 644DB1F000E9;
-	Wed,  1 Jul 2026 07:35:15 +0000 (UTC)
+	s=arc-20240116; t=1782891545; c=relaxed/simple;
+	bh=XaX53Po4ovU7ZPzq7QPVyNbQo32xCiYFUNR5s061QE8=;
+	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
+	 References:Date:Message-Id; b=jShWqXnSvZHlCn/8hWofhlds1SJqCTbXFu6Ob0JizRV8ZQvy+curM1b2oheeKK7ZnxX4HRBMSpuiHJxw6qPEkd/itCb0mYb1HJX+fo2zraoW1X9ylIUURWphP6n81Sij7HMmezBx2fyaPY5HcHxJsq85xLAhDLeB/jJBM817rso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cAU5uV7t; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270391F000E9;
+	Wed,  1 Jul 2026 07:39:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782891329;
-	bh=kGEf3SeZYgm8dFwF9x3Ecpp2cSEz1doIyoAXcK2ExLk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EZXazlFdkvJYULlF2W57c/IBuIHM5bksnlkhn4JZaEZIsV9u2rxfmgVZDWz/sZzM9
-	 TqD+fNJP5Gg69c84izlEtOmv1hXtdA+ae6nzZAfzliStrhO5HzV2wLG4qKigklMyQv
-	 q28Z1sdgYOeeXbjkxyXoJBjXn2qaEFZMf68fviUkyMhpHgkLiOBmo+aVmig+ldi9vy
-	 o6htvUykVi39Ey/ZaVPRgmG7pTTIyJ8j7dR3CBapLqAzJnt7VK0UPPNcDN8kaUUbyn
-	 XLt68BOXBx0lyB/fVegvFbVv6Y+rwjzrNI8Hs+1xo1QRp6g/qlg07x/zc2QicnMnSz
-	 GHT3VNckuu4Qw==
-Date: Wed, 1 Jul 2026 13:05:12 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: andersson@kernel.org, linux-arm-msm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org, konradybcio@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
-	mathieu.poirier@linaro.org, trilokkumar.soni@oss.qualcomm.com,
-	mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
-	jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-	vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v8 04/14] remoteproc: qcom_q6v5_pas: Switch over to
- generic PAS TZ APIs
-Message-ID: <akTDMOvu5H9qMDUK@sumit-xelite>
-References: <20260626133440.692849-1-sumit.garg@kernel.org>
- <20260626133440.692849-5-sumit.garg@kernel.org>
- <594cf827-819e-4262-9dff-a35c7f69f86b@oss.qualcomm.com>
+	s=k20260515; t=1782891543;
+	bh=FxIvamBqMlsBi+/SKXVzsQl47j+QQeYfU7+8GoYnQGg=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=cAU5uV7tHfUD4td7WzW6SzahXNQ60itbL99iMJxhdna24U4WLd6S7c1p92etgRCBI
+	 3BZ+StpTbDDWlHBE9PRIHxB2xBJRXlZnnWutnEwxdNoeuDB/UabooEKnbWNLW12aWV
+	 m0082uXFSIcVGL9oyTBzPX22pC+F/mLXViKdRsaiJ5G4W0Gczvi0aL5ct/K4YBPOAq
+	 +JfKjr4eEz75j9ZdLhfj5n/iEa9GApBokvCb3Zmc5CDSVDH1P2YfU++NtEneGHRdcF
+	 ZbrPduZWB0jCnAHB+P2yjYLTAhHrHZgv2t/8emYqKXtOKRbZRM6JyvGPcsPXl+u0tJ
+	 KfN39AxK0Y5Zg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <594cf827-819e-4262-9dff-a35c7f69f86b@oss.qualcomm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v3 5/5] selftest: Add tests for useful
+ handling of LSM denials on SCM_RIGHTS
+From: Christian Brauner <brauner@kernel.org>
+To: Jori Koolstra <jkoolstra@xs4all.nl>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ Christian Brauner <brauner@kernel.org>, Aleksa Sarai <cyphar@cyphar.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <1957659940.3537950.1782830112890@kpc.webmail.kpnmail.nl>
+References: <20260629194327.2270798-1-jkoolstra@xs4all.nl>
+ <20260629194327.2270798-6-jkoolstra@xs4all.nl>
+ <20260630071701.6b583d1e@kernel.org>
+ <1957659940.3537950.1782830112890@kpc.webmail.kpnmail.nl>
+Date: Wed, 01 Jul 2026 09:38:58 +0200
+Message-Id: <20260701-malen-gutmachen-stengel-2c70ad5d2971@brauner>
+X-Mailer: b4 0.16-dev-4217c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1241; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=XaX53Po4ovU7ZPzq7QPVyNbQo32xCiYFUNR5s061QE8=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS5HBHZseCnxmzODOetfPIblGoySp7JHFiq4Pkq+dKp6
+ Q35ztsvdpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEykpJfhf9Ff9Unze/s33vth
+ 8WxeXb78+gxWZyf2mbOqfy4Qsv3hvJjhn8mb8LxHM3ILp1+83hpdbqHdP+1Rybkc9VzGmvrbqWy
+ PWAA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:andersson@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez
- @oss.qualcomm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303514-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jkoolstra@xs4all.nl,m:kuba@kernel.org,m:brauner@kernel.org,m:cyphar@cyphar.com,m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_TO(0.00)[xs4all.nl];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	FROM_NEQ_ENVFROM(0.00)[brauner@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303521-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sumit-xelite:mid,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,brauner:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 67AC56EAB5A
+X-Rspamd-Queue-Id: 3040B6EAD23
 
-On Tue, Jun 30, 2026 at 02:34:59PM +0200, Konrad Dybcio wrote:
-> On 6/26/26 3:34 PM, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Switch qcom_q6v5_pas client driver over to generic PAS TZ APIs. Generic PAS
-> > TZ service allows to support multiple TZ implementation backends like QTEE
-> > based SCM PAS service, OP-TEE based PAS service and any further future TZ
-> > backend service.
-> > 
-> > Since qcom_q6v5_pas depends on MDT loader for PAS firmware loading, it
-> > has to be switched over to generic PAS APIs in this commit to avoid any
-> > build issues.
-> > 
-> > Reviewed-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>
-> > Tested-by: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com> # Lemans
-> > Tested-by: Vignesh Viswanathan <vignesh.viswanathan@oss.qualcomm.com> # IPQ9650
-> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > ---
+On 2026-06-30 16:35 +0200, Jori Koolstra wrote:
 > 
-> I assume that the leftover qcom_scm_assign_mem() will be handled
-> in a separate effort, presumably through something like FF-A lend
-> on the backend
-
-The qcom_scm_assign_mem() is already handled as a SiP call in TF-A.
-
+> > Op 30-06-2026 16:17 CEST schreef Jakub Kicinski <kuba@kernel.org>:
+> > 
+> >  
+> > On Mon, 29 Jun 2026 21:43:27 +0200 Jori Koolstra wrote:
+> > > The test uses the following Smack labels:
+> > > 
+> > >    "Sender"   - label for the sending process
+> > >    "Receiver" - label for the receiving process
+> > >    "SecretX"   - labels for the files being passed
+> > 
+> > Not sure this test belongs in net/
+> > 99.9% of people running this test do not use Smack.
+> > At the very least you need to use XFAIL instead of SKIP
+> > we use skip for problems with the env which are fixable,
+> > like a command missing.
 > 
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> Ah, right, because you can only use one of these LSMs at a time?
+> I mean one of AppArmour, SELinux, Smack, TOMOYO.
 > 
+> I just need some LSM to trigger the reject of security_file_receive()
+> and Smack was the easiest to get going. The series is totally agnostic
+> to the used LSM. I am fine with moving the tests elsewhere or porting
+> them to SELinux if that is really necessary. We could also drop them
+> altogether.
+> 
+> What do you propose?
 
-Thanks.
+I'm pretty sure the easiest will be to use a tiny bpf program to reject
+security_file_receive().
 
--Sumit
 
