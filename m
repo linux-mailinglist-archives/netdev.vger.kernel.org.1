@@ -1,229 +1,158 @@
-Return-Path: <netdev+bounces-303856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303857-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id l/fyLfGKRWryBgsAu9opvQ
-	(envelope-from <netdev+bounces-303856-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:47:29 +0200
+	id RlQ4CBCMRWo9BwsAu9opvQ
+	(envelope-from <netdev+bounces-303857-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:52:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C876F1EE0
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:47:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D036F1F70
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:52:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=buffet.re header.s=mx1 header.b=H6wlb5P+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303856-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303856-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=buffet.re;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=rzoGVCf9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303857-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303857-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7A606302FEAB
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 21:47:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63DD9305488C
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 21:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377BC29B8D0;
-	Wed,  1 Jul 2026 21:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA0937206F;
+	Wed,  1 Jul 2026 21:47:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A1834750D;
-	Wed,  1 Jul 2026 21:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7B825333F
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 21:47:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782942427; cv=none; b=B3yAL9uFP5p6YKFB88vh2CBC+fmx7L0Ewbx6RmEcK/jx7AFGyxXS0pg4V5vHpNfB2XsHYaTouDodt/5hzFUPFn7Yv8o+DYfXqULInF4JaVcEzzewk/XG84BeH5D5lM1dChWXxzqPsmPO8fdJnUJSCVtsJ+AXNAyzVyHge5/gKdA=
+	t=1782942454; cv=none; b=S5CRMFoCNsBRlBpLT8tYg3PlGU/g1YtVpca5ekmArLGg27aoabGBdpwaeDmDkkbOXKiJ09rjSwdUx12o4HBhCbYtMoQ6dP3wSvQOH6PrB96NeNnbGn79C8UvrHTVdBUNkXneqj3v+rFsjN2Cta64wWzmayK6HYZ4I33eFwWeOeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782942427; c=relaxed/simple;
-	bh=sYqET8iBnZ9CzC1EMtZSzdgfCWgPui5wQiV209F/tTU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DXfx6Hpw6QjqgD1z1i0DjaQkPPkOg2GVzRHdssZaPMkcLwbjhMVI/UWI3hJGjmI6hh0MWmcNReZLF0835h+pu9tIbBKX7JG6N4oJcVZU9jYQNUqKIz+gySN5HV0TuNrBpeS/frDMsmWxolan2or5HcGCFVxGatBXkS8D1mPjBi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=H6wlb5P+; arc=none smtp.client-ip=51.83.41.69
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
-	t=1782942422; bh=sYqET8iBnZ9CzC1EMtZSzdgfCWgPui5wQiV209F/tTU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H6wlb5P+3g0jcY7bcAfMzHMteJK9MOkfZT/WaMcFYqdiiOrFiN7uZhNz2zLhEKxI3
-	 S2XPQd/RLba+9/bfG24f6z973eQnUBFu1DD0Kc0ik7578ItIdvO6d+iGovlKcpRSvF
-	 H3eZoII7RijXHc6/++yG0n+T9c24T6tzuiSOVKsbjp4HK3a2kzEEaIljlC1zryrUbG
-	 9MXauw+G/mzkDZgTkh2sKeC0hIz1LUAXTCCkVl9j3TbJcMqGd2+vtGKP+bYFaPmcd0
-	 +gRL/P6MiX+xUyRNIm/Su/DzJnobZKvsjDbMi+rjZOQ/6jcv4Nu0hgXj6M81rHV9ef
-	 IxF1RwETjRPqg==
-Received: from localhost.localdomain (unknown [10.0.1.3])
-	by mx1.buffet.re (Postfix) with ESMTPSA id DFA0112667B;
-	Wed,  1 Jul 2026 23:47:02 +0200 (CEST)
-From: Matthieu Buffet <matthieu@buffet.re>
-To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-Cc: Bryam Vargas <hexlabsecurity@proton.me>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	linux-security-module@vger.kernel.org,
-	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: [PATCH v2 2/2] selftests/landlock: Add test for TCP fast open
-Date: Wed,  1 Jul 2026 23:46:28 +0200
-Message-ID: <20260701214628.33319-2-matthieu@buffet.re>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260701214628.33319-1-matthieu@buffet.re>
-References: <c21cf4f3-6c21-4170-b578-13c1bfd48b87@buffet.re>
- <20260701214628.33319-1-matthieu@buffet.re>
+	s=arc-20240116; t=1782942454; c=relaxed/simple;
+	bh=U1MHLwzs2hVH2Bl+EC1aDM8E/bTMCVplBdWelSXv1rA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=hZHyYQv3Xx270ul+mvDp9xm5Nz7jqtsktmW+slO7UIICgT8qr0aWTYBT9ZUrxGQHMGmypjWwOw2dJwikMB7bZ+crwuYp5VcTmcaxwP67O/zFyXUx+2Nr4h71Z6UXKQWLH+Nl+ev14TP00DojPsf5bWs0JW5XcQ2q3Ino5Mg+7PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rzoGVCf9; arc=none smtp.client-ip=95.215.58.189
+Message-ID: <89720193-e8ad-4bb3-b6d2-3253413b18ab@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782942450;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zfnpZAPYTjU1y1/bwelr25Tajv7sMv4wyV/Tmx+tLN8=;
+	b=rzoGVCf9Acoz9pVzpj75/n7UWOFKgNHVycrnsStv71NID/Qz5Ub0cTx3lcOw5vNVod2J6N
+	TsrOJMMr/45V3a5iN9QYmSE0AT8pNjLNo09jOfmP6GhFin4fHZ8svOooad4TGjqFxRENlu
+	Ic/WX4RdMeR75Zo13tcGVVOEwoSEDrA=
+Date: Wed, 1 Jul 2026 22:47:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v3 2/3] ptp: Add driver for R-Car Gen4
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "DavidS. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-renesas-soc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260701090607.1108208-1-niklas.soderlund+renesas@ragnatech.se>
+ <20260701090607.1108208-3-niklas.soderlund+renesas@ragnatech.se>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260701090607.1108208-3-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[buffet.re,quarantine];
-	R_DKIM_ALLOW(-0.20)[buffet.re:s=mx1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:mic@digikod.net,m:hexlabsecurity@proton.me,m:gnoack@google.com,m:linux-security-module@vger.kernel.org,m:ivanov.mikhail1@huawei-partners.com,m:paul@paul-moore.com,m:edumazet@google.com,m:ncardwell@google.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:matthieu@buffet.re,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303856-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303857-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund+renesas@ragnatech.se,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:niklas.soderlund@ragnatech.se,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[ragnatech.se,kernel.org,glider.be,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[matthieu@buffet.re,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matthieu@buffet.re,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[buffet.re:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 30C876F1EE0
+X-Rspamd-Queue-Id: 69D036F1F70
 
-Enforce that TCP Fast Open is controlled by
-LANDLOCK_ACCESS_NET_CONNECT_TCP. Semantics of connect() and
-sendmsg(MSG_FASTOPEN) should be identical from Landlock's perspective.
-Also enforce error code consistency, since UDP sockets ignore
-the MSG_FASTOPEN flag while Unix sockets reject it.
+On 01/07/2026 10:06, Niklas SÃ¶derlund wrote:
+> Add driver for the gPTP timer found on R-Car Gen4 devices. The timer is
+> system-wide and shared by different Ethernet devices on each Gen4
+> platform. The operation of the timer is however not completely in
+> depended of the systems Ethernet devices.
+> 
+>    - On R-Car S4 is gated by the RSWITCH Ethernet module clock.
+> 
+>    - On R-Car V4H is gated by the RTSN Ethernet module clock.
+> 
+>    - On R-Car V4M is gated by its own module clock, the system have
+>      neither RTSN or RSWITCH device. But the module clock is the same as
+>      RTSN on V4H and the documentation referees to it as tsn (EtherTSN).
+> 
+> The gPTP device do have its own register space on all three platforms.
+> But on S4 and V4H it will share its clock and reset property with
+> RSWITCH or RTSN, respectively.
+> 
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
----
- tools/testing/selftests/landlock/net_test.c | 94 +++++++++++++++++++++
- 1 file changed, 94 insertions(+)
+[...]
 
-diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-index 2ed1f76b7a8b..2e4dc5025b04 100644
---- a/tools/testing/selftests/landlock/net_test.c
-+++ b/tools/testing/selftests/landlock/net_test.c
-@@ -1281,6 +1281,100 @@ TEST_F(protocol, connect_unspec)
- 	EXPECT_EQ(0, close(bind_fd));
- }
- 
-+TEST_F(protocol, tcp_fastopen)
-+{
-+	const bool restricted = variant->sandbox == TCP_SANDBOX &&
-+		variant->prot.type == SOCK_STREAM &&
-+		(variant->prot.protocol == IPPROTO_TCP || variant->prot.protocol == IPPROTO_IP) &&
-+		(variant->prot.domain == AF_INET || variant->prot.domain == AF_INET6);
-+	const struct landlock_ruleset_attr ruleset_attr = {
-+		.handled_access_net = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+	};
-+	int bind_fd, client_fd, status;
-+	char buf;
-+	pid_t child;
-+
-+	bind_fd = socket_variant(&self->srv0);
-+	ASSERT_LE(0, bind_fd);
-+	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
-+	if (self->srv0.protocol.type == SOCK_STREAM)
-+		EXPECT_EQ(0, listen(bind_fd, backlog));
-+
-+	child = fork();
-+	ASSERT_LE(0, child);
-+	if (child == 0) {
-+		int connect_fd, ret;
-+
-+		/* Closes listening socket for the child. */
-+		EXPECT_EQ(0, close(bind_fd));
-+
-+		connect_fd = socket_variant(&self->srv0);
-+		ASSERT_LE(0, connect_fd);
-+
-+		if (variant->sandbox == TCP_SANDBOX) {
-+			const int ruleset_fd = landlock_create_ruleset(
-+				&ruleset_attr, sizeof(ruleset_attr), 0);
-+			ASSERT_LE(0, ruleset_fd);
-+
-+			enforce_ruleset(_metadata, ruleset_fd);
-+			EXPECT_EQ(0, close(ruleset_fd));
-+		}
-+
-+		/* Fast Open with no address. */
-+		ret = sendto_variant(connect_fd, NULL, NULL, 0, MSG_FASTOPEN);
-+		if (self->srv0.protocol.domain == AF_UNIX) {
-+			EXPECT_EQ(-ENOTCONN, ret);
-+		} else if (self->srv0.protocol.type == SOCK_DGRAM) {
-+			EXPECT_EQ(-EDESTADDRREQ, ret);
-+		} else {
-+			EXPECT_EQ(-EINVAL, ret);
-+		}
-+
-+		/* Fast Open to a denied address. */
-+		ret = sendto_variant(connect_fd, &self->srv0, "A", 1, MSG_FASTOPEN);
-+		if (restricted) {
-+			EXPECT_EQ(-EACCES, ret);
-+		} else if (self->srv0.protocol.domain == AF_UNIX &&
-+			   self->srv0.protocol.type == SOCK_STREAM) {
-+			EXPECT_EQ(-EOPNOTSUPP, ret);
-+		} else {
-+			EXPECT_EQ(0, ret);
-+		}
-+
-+		EXPECT_EQ(0, close(connect_fd));
-+		_exit(_metadata->exit_code);
-+		return;
-+	}
-+
-+	client_fd = bind_fd;
-+	if (!restricted && self->srv0.protocol.type == SOCK_STREAM &&
-+	    self->srv0.protocol.domain != AF_UNIX) {
-+		client_fd = accept(bind_fd, NULL, 0);
-+		ASSERT_LE(0, client_fd);
-+	}
-+
-+	if (restricted) {
-+		EXPECT_EQ(-1, read(client_fd, &buf, 1));
-+		EXPECT_EQ(ENOTCONN, errno);
-+	} else if (self->srv0.protocol.domain == AF_UNIX &&
-+		   self->srv0.protocol.type == SOCK_STREAM) {
-+		EXPECT_EQ(-1, read(client_fd, &buf, 1));
-+		EXPECT_EQ(EINVAL, errno);
-+	} else {
-+		EXPECT_EQ(1, read(client_fd, &buf, 1));
-+		EXPECT_EQ('A', buf);
-+	}
-+
-+	EXPECT_EQ(child, waitpid(child, &status, 0));
-+	EXPECT_EQ(1, WIFEXITED(status));
-+	EXPECT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
-+
-+	if (client_fd != bind_fd)
-+		EXPECT_LE(0, close(client_fd));
-+
-+	EXPECT_EQ(0, close(bind_fd));
-+}
-+
- TEST_F(protocol, sendmsg_stream)
- {
- 	int srv0_fd, tmp_fd, client_fd, res;
--- 
-2.47.3
+> +static int ptp_rcar_gen4_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+> +{
+> +	struct ptp_rcar_gen4_priv *priv = ptp_to_priv(ptp);
+> +	s64 addend = priv->default_addend;
+> +	bool neg_adj = scaled_ppm < 0;
+> +	unsigned long flags;
+> +	s64 diff;
+> +
+> +	if (neg_adj)
+> +		scaled_ppm = -scaled_ppm;
+> +	diff = div_s64(addend * scaled_ppm_to_ppb(scaled_ppm), NSEC_PER_SEC);
+> +	addend = neg_adj ? addend - diff : addend + diff;
+> +
+> +	spin_lock_irqsave(&priv->lock, flags);
+> +	iowrite32(addend, priv->base + PTPTIVC0_REG);
+
+how are you so sure that addend will always fit into s32? It looks like
+it may go over in some cases, no?
+
+> +	spin_unlock_irqrestore(&priv->lock, flags);
+> +
+> +	return 0;
+> +}
 
 
