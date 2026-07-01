@@ -1,206 +1,242 @@
-Return-Path: <netdev+bounces-303869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303870-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cxMFEUeRRWpXCQsAu9opvQ
-	(envelope-from <netdev+bounces-303869-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:14:31 +0200
+	id vpO9I9qTRWrSCQsAu9opvQ
+	(envelope-from <netdev+bounces-303870-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:25:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843036F2097
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:14:30 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 915136F2123
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:25:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=RWvo8frp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303869-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303869-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=c5oAPjwS;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303870-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303870-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ibm.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F74630214C7
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:14:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B81EB3006023
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A071E3D6CCE;
-	Wed,  1 Jul 2026 22:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD50B431E6B;
+	Wed,  1 Jul 2026 22:25:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7453A6411
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:14:26 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782944068; cv=pass; b=jxRufovc+60Od0+X4lOBDvfXZeVKYphamQwMmUjAyiRBN0NUpC/YV9KGBOss8pC69nYdXuT2xEvrcHEZ1dNobVHEoAg5ATJaEbJQISVyTKRP8U52smnaE02NS4SgbfTmAOaH40p3Aa4OkHhRJHJ8ti1ikkv/4TirtFPzl7mODCE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782944068; c=relaxed/simple;
-	bh=9LjznsPm4SlUVd3KyUW7TfpnMRpfZadRiTB9bvXYEcw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ei+Su3h1kftk0ttOnDq3T7OfPzDjwMVNaIt7G9QMxN9+ZVl4eYUDVrYwi9EEgX9G3nsOVOg3cJgFzfMQtuGfziqkkRTd3mzYyXaQbx63t5nq5th3EOySx0lnioMsHzEvPQ4FIGoWc6a+wzUTHYJLUuti7eqdmjNGvaLlJrQGB5A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RWvo8frp; arc=pass smtp.client-ip=209.85.208.45
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-697ce8cfe65so2103606a12.3
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 15:14:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782944065; cv=none;
-        d=google.com; s=arc-20260327;
-        b=J5unc7cvgYnLfm42tB4kW1sqkAU6DcT+VqdJ0Xqu/PqB6zD2zlNlpiSAzX7pr4pnDT
-         d/ZztSBiPUKJiIQrZT77/LxoGKlujXyE8fmR+C3x10G1tnKTbITJD1R57B/rtCgag/Oj
-         kWoYt4y8Li89A+psdiyFhImgL+n0vfEr0meQxNHoD+oPYMvttEnb5aU2aXriQMmYKjn/
-         BCgxhW2ZdwuaAQrhc1KD6tEAtI/JYHs1ZojHvV7kKscNbgWjDqhBhnkPoDq/CCAxBDS3
-         B0i/PK/eYgI6MFTqsmVww3sNCDc27QD045W306ldAERUE85hBsap6hDPrnBJ3z+jJ56P
-         aUkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6tJMm8pjeN1npzA3k7JqmvYhhfH3Iv6sGcCtY9C+w58=;
-        fh=5H2Bu6KWt4hCHs4awdWzOSdHMtDz8wP9vtex26FM7v0=;
-        b=sovxaga0Rlk41koYJprZuuehVzK7sDccdN4L+4reO7fn8Koln/rQPYE/yjDxUpIRUe
-         hGS0CACNDuwkowzkun2bNT8a+9AiZKzMtehC4ZX34v53qlkwqAy/NU3IAM91s1hs77ke
-         4kK4kZgpXfNC1a6HguBJj03HvXrDlWmR7/f7K8lXrf6n3JS9NsP3cUcwM+mvXL88pNL4
-         AbZbhu9t2C7Md0tqXCUCfPBmYa16zoBRA2UR2+pCZEAPwUU8FHuCYkjRccms1kz8F1Ta
-         HUlfS9Rjr/ef3SzT7jEOIkRkgHKHeqr7mp3TfsFNmQ5Hyzi07gNAp47EfTAB262yfsXx
-         XQuA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782944065; x=1783548865; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6tJMm8pjeN1npzA3k7JqmvYhhfH3Iv6sGcCtY9C+w58=;
-        b=RWvo8frp8rHaQ+oHHQmHGJAwksDCPnz9Bz3iGi2QhGNrdFIZsVtoAVwxgwOYH1RnWu
-         waVPXlOWuSdxrvPvwkhRzP6/2h3bMXCIC5lhSUV0JAW/huxMTHjdxNz6mQNHWOuHUNie
-         x0/+daJ2F9zdRscqX7K5wZ7wfTJl6vfpRQTQRWjbWIA6S3ZBebRc+s///C76Qaw2uU26
-         EYMrhBRqqcCsT4WZQL45q+TiJYYY6XFCJlzegjklISwyT8vkZ6SqvcucRVTnys2dFA4k
-         kRbv766akyOWo1FRu1cpExsE/gSBQnJoPbyWjQQ2FNQf3z6HInG3ZWfCLVyrwpdJyJz3
-         4E/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782944065; x=1783548865;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6tJMm8pjeN1npzA3k7JqmvYhhfH3Iv6sGcCtY9C+w58=;
-        b=czg10f06Hh7PTHIdov3JbBoDKE0ZebqLeC6k3eFmAYUJUQ54j+oGtqvkQRU1gZ5s4v
-         1lAfVxTTXcRNyluqEgmtUb/WCdzRusX0a0NzyjuefNsXhguMtOdOI9HYCMk/abeBpZ0y
-         tPA7+11i4whcEntcFX14iJjNlzQnJkeErxYrpeCou4H7oT65+wxapjfd95JM3K6sRuO+
-         l6aHidA/VVIYaguYGquBw8gRxZvimusuFO0Rk4FySsa0YWkKggN8hwXxmduS7yePU2y0
-         MDYB9InKWSpWXbcxbgczclBtExAcBQPAsUWQvWxi+4JS+q4UUJpWGVbJi53kWPQH5US4
-         LmTg==
-X-Forwarded-Encrypted: i=1; AHgh+RoKSJR3LWeY1F51wmkB8LbGBZjG+2CifNyv7u2S5jwmAO/aieFf+Wqtm0ZSdt5u8p3x8B1qppU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9132cZKa6bQOOFycX5YsI4zceDKHCiwbXKHCoW3S2GGkvFj36
-	/5uTVa2LJjo9b9gN0S7o3xQQ7F/vWBSleiZP5YUxVV91Id6JvkZPiWgjJvSZH9S0twZYqsl8TUs
-	BW7x6pK97UqExAigexzxshNIH2NGlpRX+t57YSC1w
-X-Gm-Gg: AfdE7ckM5KmomIPKFY4ey9EL8oqrTV7p+FQs9esPodzpDRRYxQrcZSRHiswW1Hq/wtX
-	ATYifQnC7R9WAjjnnpika1GshVMvxI0WpsOBjkRFeBUh8q7Ye8HQaRB92mRqwYEm03vcmppBoFU
-	q8Le04Y7BsTeGnQuLH+mrhSeRNwDcGQ24qVNX4UF9RduzDQtJ7dViD93QOVvnFyEEYdjrj6lPFI
-	EtSYORkAU1ln+y3GRyekYl2ZF2UqV4Qd6pEEOPYVSly+OEmYdk8He9QS9SPHM8Ci0q8/D8LuvS4
-	iOhuOtqzUrJXi8mK7+70+xZ+JJ6u6wcKNfqWRF+M9ezhjvtLU2nwSfnLY29RFouXm/BRJGSjawB
-	yzbQr22tnAOiCPzcH9OtrwUgR3UnuBgPiF+OGyEJ7Tw==
-X-Received: by 2002:a05:6402:35d4:b0:697:be0e:4b72 with SMTP id
- 4fb4d7f45d1cf-6989f2ec718mr1706177a12.1.1782944065189; Wed, 01 Jul 2026
- 15:14:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483D43749E7
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:25:24 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782944725; cv=none; b=GmVwVMmvGixtpatoD7rwSbqhiCtUiWPuIr6MaTg3nFjyvFLtrC6yjJ6kvrUtemxlUuz90FGRDuZoRqnxigl5nRrf5+2oPpUaC70MlBGWKn7DTwhvSl08MxLD49TMI/dSbTKlQ51gqUr35Rfmmm30vJvIM56c3E0k/QdIch3Grb4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782944725; c=relaxed/simple;
+	bh=OWf9+d8osKAbd3Ht2RYOZt6lvAu78vS7nnLThlFYyDw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZvIIcciD9PlzlU/erbvnebPfFetqtMIxegzAkhsMITsy5ARLOwft4/yy1bVLwdrCNvdarsamJCGO5iB6F5kE6k3JW/SZnvlpLr0vN6F6Bpcf1dF7h6s6ptav9gu58k9i9jF9NJ34ulq4fuqnbr0/zXqGyzLseCM+r5JVt9f94rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c5oAPjwS; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661LmJhw2088530;
+	Wed, 1 Jul 2026 22:25:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=0fkLdttprbBe77Om5hw+qsoUsI6u
+	6LPA68nv4ZHJj2M=; b=c5oAPjwSX3NIfrHctp1h5UCL62LinU9xFnOTU+RAitkX
+	JI0LT2NZLQhirjc/EcVVJXIFPo/h4DvbDZipB5reBKj8/Omb1Qzkh3+25gSaqrN4
+	HcFE2C1Cq6lIvGDJ+nUr2JveXzYnPx+4dAkR4Gq1qLmXBu42I5SC/FK9kA+niRud
+	QaUPnxp+z42jlnJlX1agJIX7gOczlN4KGVE7QG8bb3aAlkoL3NyhnNJNxGEeo900
+	voBi6or6kUgdRKiqsnMJbX4P9J2L9HurRxFs8r2leeSmpdG3APnxdBr6Luy3RG3H
+	7H3FN/NkSuY0ShRlayh4Z3quw7B3XOQdw5BaSmNF6A==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26pe70ua-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Jul 2026 22:25:08 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 661MOEBi026051;
+	Wed, 1 Jul 2026 22:25:08 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f2ruqhk84-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Jul 2026 22:25:07 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 661MP6KE66650544
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 1 Jul 2026 22:25:06 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 61EAD58055;
+	Wed,  1 Jul 2026 22:25:06 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFE6E58059;
+	Wed,  1 Jul 2026 22:25:04 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.150.53])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  1 Jul 2026 22:25:04 +0000 (GMT)
+From: Mingming Cao <mmc@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+        ricklind@linux.ibm.com, mmc@linux.ibm.com, kuba@kernel.org,
+        edumazet@google.com, pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
+        maddy@linux.ibm.com, mpe@ellerman.id.au
+Subject: [PATCH net-next v2 00/15] ibmveth: Add multi-queue RX support
+Date: Wed,  1 Jul 2026 15:23:12 -0700
+Message-Id: <20260701222327.61325-1-mmc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260701082214.2974946-1-edumazet@google.com> <20260701082214.2974946-3-edumazet@google.com>
- <3f70661e-539a-4157-9e5f-1ee94a720519@blackwall.org>
-In-Reply-To: <3f70661e-539a-4157-9e5f-1ee94a720519@blackwall.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 1 Jul 2026 15:14:11 -0700
-X-Gm-Features: AVVi8CdngDweFELt6BJqrVpj67inCDDKWn3TJgBvq4Nxt7XP3BH-FbqUVIEB2aQ
-Message-ID: <CAAVpQUAQBrd9gH_EavP2DytLaheGFfAuAwZNS-jUWjy58Hxp1A@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] macvlan: no longer rely on RTNL in macvlan_fill_info()
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: 9lO4ofEvRTrPGz0AdSPQFmLxuM_5IJFq
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfX80mg0i5RU80u
+ 31Wo0F9JY2jFrmTsyB92fq+hfeUU861KBY4lrxR9X7NQHfT6Tvs1Rw3KpfJp+97UquwfHAju2ov
+ DNeH9yMnvWtjaQyk06h7dG8f9p3vWe8=
+X-Authority-Analysis: v=2.4 cv=edsNubEH c=1 sm=1 tr=0 ts=6a4593c5 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=W5LMyInF-Pr_ibXwEbYA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfX7F0+HLtELjt3
+ RtdVvNrgGyyuY/FgUF6dSPTBF+Ve4yloBmT9HnOWcWgTTYGczpV0rQHNpG6eVpRjsaRovmGCBU2
+ NvX0k6eHXS8aCPlY9dMBzUgMnaEIHG4ujuPkIMVE646pFQznCaCwY1Pkx2i98qA2QqsNYZHgxPD
+ bfaSOLXFT7FBpl7BFMijEf7QBxDeRi3ZfDUa0YPus0Jt0YeiAgNQ4K5v8ejhR/WUWDVtdbhN27P
+ +3yENow8vnVLYnAjVaxepI2DBPTV1eKmfAWkIaK3cNmXNZNWwE63uTOF78h2HTvwSOr7+nifX9B
+ SI3Ijwb7bVRCS1OTFAE1Owkcpr2Rb7Y3obJpeWXD/sc8zlbSVShzRR3qj+nazi0BMDsZfJYalMx
+ bHt8AdxdhxdDIsNiJM4l73s9epFCkBIm28diroU6YF7KRwLj1XLSk5Zr0ZEsfWIyXOPwXf2sgez
+ /QNXlkrLh9aWhbVI1ZA==
+X-Proofpoint-ORIG-GUID: zgsVb830IFifhpKEsqtM7UxwMyoypamQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-07-01_05,2026-06-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0
+ spamscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607010239
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303869-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:razor@blackwall.org,m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:mmc@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303870-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,linux.ibm.com:from_mime,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 843036F2097
+X-Rspamd-Queue-Id: 915136F2123
 
-On Wed, Jul 1, 2026 at 5:12=E2=80=AFAM Nikolay Aleksandrov <razor@blackwall=
-.org> wrote:
->
-> On 01/07/2026 11:22, Eric Dumazet wrote:
-> > Add READ_ONCE()/WRITE_ONCE() annotations on vlan->mode, vlan->flags,
-> > vlan->bc_queue_len_req and port->bc_cutoff.
-> >
-> > Fill IFLA_MACVLAN_MACADDR_DATA nested attribute and compute
-> > on the fly the precise number of elements we put in it,
-> > to fill an accurate IFLA_MACVLAN_MACADDR_COUNT attribute
-> > as some user space applications could depend on its value
-> > and the attributes order.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
-> >   drivers/net/macvlan.c | 71 +++++++++++++++++++++++++++++-------------=
--
-> >   1 file changed, 48 insertions(+), 23 deletions(-)
-> >
->
-> The snippet that sets macaddr_count gave me pause. :)
-> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Hi,
 
-same here :p
+Power11 PHYP firmware adds Virtual Ethernet multi-queue (MQ) RX for
+the ibmveth device: multiple logical-LAN RX queues, per-queue buffer
+posting, and completion delivery. Guest Linux did not use that
+platform support; ibmveth still registered one RX queue even when
+PHYP was MQ-capable.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+This series adds the ibmveth MQ client. When PHYP advertises the
+capability through H_ILLAN_ATTRIBUTES, the driver registers
+multiple RX queues, receives on per-queue NAPI, and exposes queue
+count through ethtool. Older firmware without the bit is unchanged.
+Please apply to net-next.
 
+Background
+ibmveth today registers one logical LAN, one set of buffer pools, and
+one NAPI context. PHYP MQ mode gives each RX queue its own handle:
+buffers are posted with H_ADD_LOGICAL_LAN_BUFFERS_QUEUE, subordinate
+queues register through H_REG_LOGICAL_LAN_QUEUE, and traffic can
+land on any active queue. Queue selection is firmware-defined; v1
+does not program RSS or hash tables. The driver needs per-queue
+pools, IRQs, and poll state to match.
 
->
-> [snip]
-> > +
-> > +     if (READ_ONCE(vlan->macaddr_count) > 0) {
-> >               nest =3D nla_nest_start_noflag(skb, IFLA_MACVLAN_MACADDR_=
-DATA);
-> >               if (nest =3D=3D NULL)
-> >                       goto nla_put_failure;
-> >
-> >               for (i =3D 0; i < MACVLAN_HASH_SIZE; i++) {
-> > -                     if (macvlan_fill_info_macaddr(skb, vlan, i))
-> > +                     cnt =3D macvlan_fill_info_macaddr(skb, vlan, i);
-> > +                     if (cnt < 0)
-> >                               goto nla_put_failure;
-> > +                     macaddr_count +=3D cnt;
-> >               }
-> > -             nla_nest_end(skb, nest);
-> > +             if (!macaddr_count)
-> > +                     nla_nest_cancel(skb, nest);
-> > +             else if (nla_nest_end_safe(skb, nest) < 0)
-> > +                     goto nla_put_failure;
-> >       }
-> > -     if (nla_put_u32(skb, IFLA_MACVLAN_BC_QUEUE_LEN, vlan->bc_queue_le=
-n_req))
-> > +     *(u32 *)nla_data(attr) =3D macaddr_count;
-> > +
+Queue-aware hcalls are selected only when probe sets multi_queue
+from H_ILLAN_ATTRIBUTES; legacy firmware keeps the original hcall
+path unchanged through the entire series.
+
+This splits the work so review follows the actual bring-up sequence:
+  1. Hypercall definitions and MQ data structures (patches 1-2)
+  2. Refactor open/close into helpers - RX, per-queue pools,
+     IRQ, TX, PHYP (3-9)
+  3. Turn on the MQ datapath at probe/open (10)
+  4. Per-queue RX/TX stats and sysfs pool readout (11-12)
+  5. Runtime RX queue resize via ethtool -L (13-14)
+  6. LPAR stability fix (15)
+
+- Helper patches (3-9) reshape ibmveth_open()/close() into
+queue-aware helpers. Runtime behaviour is unchanged through that
+block: num_rx_queues stays 1 and multi_queue is false until patch 10.
+- Patch 10 is the switch: probe sets multi_queue from firmware, raises
+num_rx_queues, registers subordinates, and replenishes every active
+queue.
+- Patch 15 fixes poll hangs after aggressive ethtool -L cycling and
+NAPI/close deadlocks on ip link down.
+
+Testing
+Tested on ppc64le PowerVM LPAR with MQ-capable firmware:
+* Aggressive ethtool -L cycling (16/1/8/11/1/3/16/8/1) with ping
+* MQ path: ethtool -L under iperf3 load, link down/up during traffic
+* Legacy firmware (no MQ bit): full open/close/stress on the
+  refactored helper path to confirm single-queue behaviour is
+  unchanged
+
+Changes in v2
+v1 resubmit as 15 patches (Patchwork limit): same code and LPAR testing;
+squashed split plus checkpatch fixes in patch 15 only.
+v1: https://lore.kernel.org/r/cover.1782758799.git.mmc@linux.ibm.com
+Patchwork: https://patchwork.kernel.org/project/netdevbpf/list/?series=1119106
+
+Future work
+* IRQ affinity hints for subordinate queue IRQs returned by PHYP
+* Summed global no_buffer drop counter across all RX queues in MQ mode
+
+Comments and suggestions on patch split, design, and testing are
+welcome.
+
+Mingming Cao <mmc@linux.ibm.com>
+
+Mingming Cao (15):
+  ibmveth: Refactor RX resource allocation for MQ RX bring-up
+  ibmveth: Refactor buffer pool management for per-queue MQ RX
+  ibmveth: Refactor RX interrupt control for MQ RX queues
+  ibmveth: Refactor TX resource allocation in open/close paths
+  ibmveth: Add RX queue register/deregister helpers for MQ
+  ibmveth: Refactor open/close into MQ-ready resource pipeline
+  ibmveth: Add queue-aware RX buffer submit helper for MQ
+  ibmveth: Enable multi-queue RX receive path
+  ibmveth: Add per-queue RX statistics collection and reporting
+  ibmveth: Add per-queue TX statistics reporting
+  ibmveth: Expose per-queue buffer pool details via sysfs
+  ibmveth: Add helpers for incremental MQ RX queue resize
+  ibmveth: Implement incremental MQ RX queue resize
+  ibmveth: Wire ethtool set_channels to MQ RX queue resize
+  ibmveth: Fix MQ RX poll and shutdown hangs after queue resize
+
+ drivers/net/ethernet/ibm/ibmveth.c | 2350 +++++++++++++++++++++++-----
+ drivers/net/ethernet/ibm/ibmveth.h |   25 +-
+ 2 files changed, 2014 insertions(+), 361 deletions(-)
+
 
