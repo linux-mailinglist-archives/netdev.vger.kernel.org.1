@@ -1,269 +1,314 @@
-Return-Path: <netdev+bounces-303465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303466-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nfoPE0WkRGpsyQoAu9opvQ
-	(envelope-from <netdev+bounces-303465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:23:17 +0200
+	id olKMJYamRGrIyQoAu9opvQ
+	(envelope-from <netdev+bounces-303466-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:32:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A886E9D45
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:23:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D62AD6E9D98
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:32:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=arh5hMwn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303465-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303465-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=altera.com header.s=selector2 header.b=huaBOJk4;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303466-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303466-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=altera.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 402293034DFF
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 05:23:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8E0DA3024176
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 05:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87EC35F607;
-	Wed,  1 Jul 2026 05:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4D8241686;
+	Wed,  1 Jul 2026 05:32:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011071.outbound.protection.outlook.com [40.93.194.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D31182D6;
-	Wed,  1 Jul 2026 05:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9532EB0F
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 05:32:49 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782883394; cv=fail; b=uND/GVIrrlcGZxoKtWkTaDhRrlDdfuQCwXNa7SKhnRbkl4jgBDqHNMJ95E5Y2EhsU3AnG23kud0aOrmVyk5hMmNVMxHj/RDFyjEYLLGbWVuCBADE5xV2cew0wBV6dl4LBseDHxRZI+suU/ECVW3sSRe/GVENh1gAK77poxeue14=
+	t=1782883971; cv=fail; b=E6HI4hoKR2R2x/SWrGxWtkWGZ89/If2greToYc3W81n+mzooXXYrmlxZS/mgJi/NvoTMZvgL0AamYBbfDBTYj8Ar8hv8ZxzSMriBnnVH3wBeeOXKVtHksnW9pDNC5CXcTH3OiCsX7sjg57SNYvqIyeBANWRKJprH0wzzpJu84d0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782883394; c=relaxed/simple;
-	bh=+fQq1nhQlStYLt68wkdkqsq34GD/pj1M4n0zEGjHOGI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fsb3KjM2pD4iTK5ufoZimpuXASiGIRsTVHqEixdb+DwgLI5hG0ofv1cKqVNxk5vRYVsZY37n10Mks4jvH0SoNRrG7q4sxqx9kx1V0MubSZntITPd7hgoSFSWO9v2YWjY2S8lVDux+dOj+oWLIkCEGjZHy6xXrWx+PeAWjkYWEWY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=arh5hMwn; arc=fail smtp.client-ip=198.175.65.9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782883393; x=1814419393;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+fQq1nhQlStYLt68wkdkqsq34GD/pj1M4n0zEGjHOGI=;
-  b=arh5hMwnjisgp5WwOutT/0xmRJbGukqPPpBHjVtjn5VG8/G3l6gsAAVA
-   gswwRuuK/YheUkrgEn8wYOGKWKNjVHubruDbmF+/lpeEInEiavjD4TFSI
-   AObf8Z9S/TsQpnSgW3ueNnMO5XbMz4gTndyr2MsXBFsCe2+JP9vP1/s2f
-   Tm3wxGn2519LpH0WX3enTcstI0ckRaNfRxUIpmUoXTC7wAM/3eRAnU+Yl
-   z88nRNAryKwd+rihQM3tLx12zl7llmElHZSdDFTiyJtbxOLj9+s6UW19N
-   v5RC5wnj0KB9bQtXkCAeWiiqCf9/L8y5YCzGJICCbCKkC0kfgoE59k06r
-   Q==;
-X-CSE-ConnectionGUID: PxCSkgqvTUG/Jn3Opg9eiA==
-X-CSE-MsgGUID: 3DMPGJvbSPCjA9m8DACenQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="106395913"
-X-IronPort-AV: E=Sophos;i="6.24,235,1774335600"; 
-   d="scan'208";a="106395913"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 22:23:12 -0700
-X-CSE-ConnectionGUID: cEx39nzuSaa2mdPSNCAQaQ==
-X-CSE-MsgGUID: vIMvNreDT6SbpkU9Xx473Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,235,1774335600"; 
-   d="scan'208";a="247987150"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 22:23:12 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 30 Jun 2026 22:23:11 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Tue, 30 Jun 2026 22:23:11 -0700
-Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.64) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Tue, 30 Jun 2026 22:23:11 -0700
+	s=arc-20240116; t=1782883971; c=relaxed/simple;
+	bh=L6BWpjko38uJ6kE/H3uONrDHrmr2qXZ1y1luNPSc7iw=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MpwW9nXDwqCalvsN81QHE2sX5TXZ+NY2RZojO9aE4BwViBx88Jqv3EePOA+29IcrIMI7slCYJSEktsOxkrhiJEX+HcyEOakJAQYuehn81BYicor10BmSg76NrX7Pu5UVa+arRPCtPOczsg2gICbZTE5pU6uURH0FgNbbc2XQcpM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=huaBOJk4; arc=fail smtp.client-ip=40.93.194.71
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VHAMAfJAiTCoPMkYT1N03uKgCvh0xY43TEm8OIZ3dAzjCs5QfFR0tX+t49qQxWC7wy5kBMrBPtZS5rZMty5OiuHiaOLAZFsq1PglhYZG0srFXOEmVNRGg0DCsguH2u6x51ckatOEhEnR+q8AiN2d1Rkr7OBadXxz7YEnCmq9eBYlf6FP1elsj4YU/e7cIwA6nEwB1SYKn6Z3Ic/0c6X//71xX83AqkJAnvJRf+cr3VfPkiXKg7kPCUXYPCI5IQuqxFQirUc1FoGgPN0hKLZOfCo/KWcRGm0IVAIt+XOUpwPimdpBqnmgucwk990uye3TymeLA+k5L711CTp+Dh4YBw==
+ b=nFT2cqBQdGLgAEYFVkaEifaJfRgHhkZX5PZuWNMp7k52MT2zLEV5rnp7MLaHU43ZGleq/LzP64eRp8fH7WEHU6KoSVo5wQtapecsCewSlhJl5xdQcPADybKy5r1eLP4JKrtrdw3Nig1M0m4AyfJ+BCWFwEVi1+c4lDUa7bQxx9P0uGy2gs22inkgZiIfP5i86XL2thfdgBMavsrsRz7Z/sqhvMNDKzgSCqhEDZ8o8YXqdXQ/W/P2OXI2ORrOyuBbLvC3ajPuFmjlbxwa9uLvBk1gSEQsq9/z/pQB2PB46zLF9suCmxtC6LEY7Ftf7AUqq8vJt2BkSO5cyES3j5B9OA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YtheAx/vEvt24SeSLiZdqpBVUdzxcu81uP40XThY4ps=;
- b=J0z5V9eCQ2d3Y/3U9ouhRFO7iSUdbV7IWZDmKb6Umc7FHoB5ktvSnrmJfK92Kaw2ROluxrx+r7iS82h3Rty7a10dS+gYcsL52CbOTLfQRHuT88uWCBD5FpZWU6iZvrWdxvOx3TijNi9XhTVuhnzwLH2ZdhtBiXrqUaWiv0LSO/7qxVMwXb4XwaSFJvedBSuj7PMo1jW1WYjF/qWfxmZx67iwyzWn5r+kocZm4cIVsYv5U6E2bAEnaQtmMbS71qmNDYymUWxwvM9Ii9ZA58s4SVfyQSNIMWxe80KPKTGNF8MBlPP+BuntX0UhRMjteLe9UHRjGECrNyPom0AVYWVdOw==
+ bh=JoZsTNL5KtpInVNQMxoj4qhQlsNqVrbiGVWAQ5OjIXQ=;
+ b=iVJoAtGFBvlGfcgB/fZ85Oc68w04/4c/rbJiipXad7Kg2Ye8lOng+VSLlFQOZaEqnxUFFGwXe1l6LgTJ9aBvfrRBQBZnsiZ2OjCk8s7dAUxjJa94AxxNBrIBpd56B4Ihykf3zfjJVvIfiCne6xqyBemBPN/yOcfgm1ofD2meWahaXWPkbJXerZH8TJEQbCXDJXbwxK0BvpTXVGZ7i5YbwkdXqv5xCVkj7Zptfia44iSmsAtmmGU5Uhg8CXdQqHgqbzD/lKTDUm/cR+AZiqxt5d3go502CMFLoSMJlzXYzUsaSHkTQRW7OaCsqdeRRHbldJLjcOK8pz7OlJksNZ3sMA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by IA4PR11MB9347.namprd11.prod.outlook.com (2603:10b6:208:565::17) with
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JoZsTNL5KtpInVNQMxoj4qhQlsNqVrbiGVWAQ5OjIXQ=;
+ b=huaBOJk4XDQV+kFuSDIlR5oZFDTic4WUn8VLTMoMP83vdSatTdsrPvIlMtwn0Bs6s2dJFvKGocGWgDDdgX9Gg1mI/4x+vvcGlfWRws/EtwzzOBfA1z8/PAHrfq/NAHwCz6Mcr3blSMvH8Bsq6bKpxPWFFhKBIaLDD462V3gjSF1ipq+zLzYPZLVR3np+pUPZd97dOgmobiYYcSuN/OlAe/5SoXVJKR+Qh9ryg+K9RCg0Gh/39zX7668jvUFWEQrAgRLxVxG33m9mPnF7wqw4yyAQUaaEB7KEypY32MPhx9OFLEPYXhy1Xggf4CVW0gb9fNEP3RYwTfFQWQe/jtYRIw==
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
+ by SA3PR03MB8232.namprd03.prod.outlook.com (2603:10b6:806:45e::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Wed, 1 Jul
- 2026 05:23:09 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%3]) with mapi id 15.21.0159.018; Wed, 1 Jul 2026
- 05:23:09 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Lobakin,
- Aleksander" <aleksander.lobakin@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Blair Steven
-	<blair.steven@alliedtelesis.co.nz>, Carl Smith
-	<carl.smith@alliedtelesis.co.nz>
-Subject: RE: [Intel-wired-lan] [PATCH net-next] i40e: Avoid repeating RX
- filter warning
-Thread-Topic: [Intel-wired-lan] [PATCH net-next] i40e: Avoid repeating RX
- filter warning
-Thread-Index: AQHc4znuLpR0W/EHl0iT2wHfAaotorY0qWsA
-Date: Wed, 1 Jul 2026 05:23:09 +0000
-Message-ID: <IA1PR11MB62411492DE66FA0A58A37F4E8BF62@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20260514003733.1718771-1-chris.packham@alliedtelesis.co.nz>
-In-Reply-To: <20260514003733.1718771-1-chris.packham@alliedtelesis.co.nz>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|IA4PR11MB9347:EE_
-x-ms-office365-filtering-correlation-id: 3d32a405-5a51-4733-fee1-08ded730d68d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|38070700021|11063799006|56012099006|18002099003|22082099003|921020;
-x-microsoft-antispam-message-info: ywEM/MBJzV+/6GyXBdLe+gpmR8kacVT7I5XlMUPoFFuxSjlzE3Md5xHBRV9+rr5xZh6M2BsFjqMJQmlFVp2+Lu21Gn0YpWFDe0ofx2ef+UzN+X0l3J0IusvTfYvcnSwH0aiwgAFsuRtKAirggX14Lo59mTUxfKK/c29f1XsUTdtRL/aGxEXJX+rQkirh89VE14yNmC+IOc0CTjArj0f/Tn1cKjh8u6DAaJd5jnDp2voPnKgEdTx9fv9sJ13kiB9stVMvlixTQMAOvARwvlAQ8bhWvxxDJnkyR9gIwFNgIIWMigqraGfnnwgBmvy7/Hpyc0REXqnbl5AEYyOaD0f3v+g7OC/kEXHrp7XhRNkdIvWr6t09ccHjuvXDXJHHD07U6S1AWXAx6k8aXnfM0URxY9mPA8y7MbQYk1TsIhzJzNRNCu2mFWduhAIm356kdKF2IDJBdAs9MhXOlzK4qnrfIwdVY/tYDwSqnGNEpPJhVwTb9Mj/mgSLp9oErpdmHO/EbXUwAWAUwRFXiOXW66s38Kub/b18gK7IIRaEbbwWe4iUaWii+QgGy9EZCUtZTPrwGvUeRLpt5qgBddTfrerCcDm5cIyA6+BX8kZe1rEAJXQ+CeNrEIdgZchNrEYMplw7xFOXMDXYWqarTT+uISxgS6mauNLv3fv+00oKYNeQsVboHGisL9X0pbhE/k+SEgKXYtYNy2QQF2kIv/0UJXvW2KFB4VzZ08X07RK79ECVZGIlWrBn4raumFQ5/IOTjwpj
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(38070700021)(11063799006)(56012099006)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NxT47U7zM3bLvqqkJMqq44OlZrwwYkuHKNKdqRqdTM2yGLXp6LbfYEv39FHw?=
- =?us-ascii?Q?qVW6muDtoxPuqHWZW7VeOSSAYdYj8FuWBOZN0xHfJq1Wd18u9lzyv+smOGNY?=
- =?us-ascii?Q?jUSVVvb0SY3McLq0eIgI0ydUqTvd4COrq4JxXE4jbEreFTMx8EtBujTT5wEF?=
- =?us-ascii?Q?Ek4lBdU6HS3qe3yRanHqPCgs0ZjIfq6a29mymL44/pVQEDuvqpiSVra/FlLB?=
- =?us-ascii?Q?TyTtnsGL+vdNKYDqdX6BFZGfPMi0EXyIQb7Kv8VwaiYZ5htN7dxHX3HKWxIX?=
- =?us-ascii?Q?dzuHZk+VCHxeChaI/q7mk27QrwwVID/8oQ5b4G6onZdTsc56yftaBjhs0VFo?=
- =?us-ascii?Q?MnHjz8IMufYxKTdqPki2ayrNDNyxyqEqBAYzCqibQJEycF41YXnomi+O/jMv?=
- =?us-ascii?Q?5Arj4xgXzuJjg8uh6ADzDBKJVViOHeSrc8kXcLdkjbe0LyTWfglvibw1KTM8?=
- =?us-ascii?Q?nByIHnr7jryUU/e9XNbOC+dwnO4oIurAGv7PpiEtjdyTTHV7KfGhAYPp9lrj?=
- =?us-ascii?Q?sGzIXp7r8LfjzI/pipqjZZFd+GyNDBCaNEMiIn2buAlVWS/oKCw2+JcDq7JH?=
- =?us-ascii?Q?amNFL/aoa0CheSX4YFNK68d7H7S8gZ95cceUnO63HulxwfoVErSABE4/zcky?=
- =?us-ascii?Q?Hy2CKRERGxFK657dLXsCNhFBJZQfrBPSUrmUN9JGHSBGf/5gjrNNVWr6PVv9?=
- =?us-ascii?Q?COi3p3az9xpgh49J1labONCxkDolIorEkHcaAOWZVe+xwm4Adl4eryxnboG5?=
- =?us-ascii?Q?kRZZq4jmNRcE4HM9TzuNTE84xm6G+q/dr8j11iW0YTook+WghSoyWB58EFO1?=
- =?us-ascii?Q?FMgiuYbOz73wt91BhYEhDOzrBN4M896gQm0NVy/tBCK9R+UBk6WXejdMWlVw?=
- =?us-ascii?Q?Wn/tfj+PjiemC/K8mXjt0sIS4AVd1Jc/D3TfLy6giFJeEFtdAKo+5P1Gx0eM?=
- =?us-ascii?Q?RCPbPbCPuywt+8hErjVJcAq/LuePjh9N2Yb9CHiOnZWKRvf1pUfUpTK1cKlE?=
- =?us-ascii?Q?QGfQKYRXR9WahWZ1rPtwMxzsGPuZ6TKSK20zAyNIvMSmFtZzJyvNttBKsgM+?=
- =?us-ascii?Q?awnXXWlZUSXZgx9h9j1apVszlnSmIQPDeZbPCmWis8peuD+URuHS4IlcQ+Gn?=
- =?us-ascii?Q?SlgQgZnYkN92l7A0R/o2fY5VkYnEq9ccczhNpZ7DzkpjYpYI3E//FlqmjqxG?=
- =?us-ascii?Q?EQx/MGI/4d3l7Cwa9qAck6eAF+jSKZzufzr4dIKAUpiCxX0EzFHnDLY0V8v4?=
- =?us-ascii?Q?8qiPa5+FgTXZMvZtC+7Ub7fnOiqUaq50n6ElJb3tteVS0kYuTJMKFfUqrBYl?=
- =?us-ascii?Q?+HfEEkRwB04EawNRNqYyb6pZqKMp43ehPUekjYPHCrDtGS3zReuvhqe3NjCS?=
- =?us-ascii?Q?ZjzSrEkytjMBnYs6NvWapqN3nBgapJN9x06VwTHFz9Q4BGphB6OQCLgjfV4z?=
- =?us-ascii?Q?uUqKXz5brs4UZ+6U5sVjb1xZpkCQX3Xb5boJcRS+51IBeYXMzFa7d6gzIwQV?=
- =?us-ascii?Q?xEeUlFXx0NFGuPYtbiraSclH1tfzQNO3UVMxL35JVsqsKoQdg+8w6llK9wtx?=
- =?us-ascii?Q?c0EwlcxpV2HbVn8uG37XneBgctpgK+y74bX4qZXbNmSZsGiMrnukmHsTchmW?=
- =?us-ascii?Q?VKMpiYJM6hX3t1kOCt9p+isR3+9RIxRgVD7c7V4UYNaYnz68XJwQbFP+viQc?=
- =?us-ascii?Q?xpX/saqA0rgRsZLqO8ZxGn8/TLO02X2hCFckj+8vqWRVoGdM?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 1 Jul 2026
+ 05:32:47 +0000
+Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
+ ([fe80::b965:bfa8:58fb:e775%4]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
+ 05:32:46 +0000
+From: muhammad.nazim.amirul.nazle.asmade@altera.com
+To: netdev@vger.kernel.org,
+	kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com
+Subject: [PATCH] net: stmmac: recalibrate CBS idle slope when EST is enabled
+Date: Tue, 30 Jun 2026 22:32:44 -0700
+Message-ID: <20260701053244.17172-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0137.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::22) To SJ0PR03MB6964.namprd03.prod.outlook.com
+ (2603:10b6:a03:432::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: nI6yhzTlDy1F0SnBBbSrHYT0ma1Bs5SaUYTONS7kgN1h6Kd0Y/cMaKGY6hSAbFd3lrVDHbt0TKIvzZAijtwBeZoFUCDzKuDY87heAgLvozvUqbI2W2fCfPI9gh2AbH5/4GfU/GOfZH2/pwpHjiEMsIT8DnwcUVFVZnDytTtfHi2W+30mV1yEt1v+Zz+KmFUVJ1cjwHF2zpCBSJ0GbTeAVmZx4Z1BBO2oZCp0aKBNyx+PpDYskM/oD7CRt+TpZwnSjNBXwq/BlPKglJJIw0ttI5FKSywKiOeeQtYqT84ZO7aZlvQMpduZANyfM2kyvk8CH9G0tLDkHdANaqg9Y70kZQ==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|SA3PR03MB8232:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8f040413-f4f0-4edd-f4cc-08ded7322e64
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|18002099003|5023799004|11063799006|56012099006|55112099003;
+X-Microsoft-Antispam-Message-Info:
+	yu7Onseq4wqdNBJ1ayjH/pFkl5K9VBsH16qYJuZftN2c+SNM15dOidFR/wGUuscvPiUBm5CpJjcz2IfCKgzTF4WppoG1QS1Vz6qCx1pgPqpzpTGDd/MMtTwp2uMwNb0nRgzxXNgIpNNrRFL4lDolgM9ImZVTdAVQasINUzEBODvs2LKe6ZfNrhBWeiQVrKKKsLPPqMLWJCRQsSfBwjY+DuyVp7fUQF4gT1QE6Lro0VTeqrnQ7W7i/LNgeQme5TKa7/45DO1n1xt6+qq4DX/2dp9Rmh/j+rXHolCHBLIQ0sxLV0xVYkN0/gQxllSKqeXsbKBjNC8q0LCWmynJgZCgleeWXRWbLiXiLpTJ799ZC6tHKGubqPTXLwYiioCRQ8u7wygCGshtaq95TO9xVXtU0IaNCXt3+1OQ/zGsxsB61DZPpHaf5sjOqhoSlSLMttPTdte1+KDZ+4mi5jhmUydddvl+hlWZn2NcLHNy5auVYQ/fSrouLUKJH4o1pTVdkA/6PmTpa0k75PhaQdsaxM/OGSy8SIdZA/1H5QVsNKRCRIx+HBY23+bNA+kuxSe4EYGZBESx4+shAOWZ6JKGajJFD3UPyCdBM+TrabIbgStmmm0Z3IyUz/Dt6PP7PaMZRP/fvue54IeVS7ssfL/CXUwQ1yNAOqCT9oI+5BeG9XGixUc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(18002099003)(5023799004)(11063799006)(56012099006)(55112099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UG3F+pU+rlFwMKoUWASy3u4WoGOymwfdtXR3ClEyJNKhhMci7YAv1gv3uRan?=
+ =?us-ascii?Q?6ZiVoVnlAFyrh+y1oEXAdu2X+TAbERRGRf533KgayOVJsHja8R8q4RAigyAJ?=
+ =?us-ascii?Q?ro6dt5lIzTjqWYXPNW/FQz07lsXniK32YSJcWYyWz24So6IvVMTE9mfN32ZR?=
+ =?us-ascii?Q?U2hL5f61DZyJbDUP7bG+fXjXRNMxC9U/e+hZ9yfCjbUOFpMfDRlWfJmds4uQ?=
+ =?us-ascii?Q?wHkHCJ588CzzsDF7wGk5FjfxgVbJFRUMq7lB8p6gnokxSfNedNtWn/xZY39q?=
+ =?us-ascii?Q?/+BHPIxeK53Ljk7wIAxfIv80bQRQ0bwMOHdWDztaEum59SeuZgNfWO0mAQxL?=
+ =?us-ascii?Q?PpyEfQKcaxrPdvb0fzIcJR2YwMAMU9b2vuzXvli1OyFDgEt/qcSsF1XtF+ZD?=
+ =?us-ascii?Q?L6MyE27cUx/83bq33d53OnR81HX7p6VEQDDwoFnRz+7qniEMnip45ly2MRaV?=
+ =?us-ascii?Q?ilv5qFBbJ0XRmMWZfeebKQzrvaU8JdzsKqa8rY8m4cb+TfkD78L/WL+XUxR7?=
+ =?us-ascii?Q?YT8Dv8Y8e7/cAsuRTAif0b1GNZCfgMN49dTzMlLDqP2vkLXJqoMHDtR5QLyb?=
+ =?us-ascii?Q?GqqZjGwDPHkdK3aSFH3ESN/Uut5qnkRjbT0vY24JHZCt+Ic2KE/EaL8jQ1IT?=
+ =?us-ascii?Q?xV8ZANELJKxzz8dcXlDj6D6y0M2HZrr1p21O/IZywH3WlflBd+DioBPxx7SA?=
+ =?us-ascii?Q?rCVtpl74nOYnwAVEiEPzWp4/U/YBJu1rNiH30k9hn0H7rj/5E3bbi2c77zEL?=
+ =?us-ascii?Q?KbaQuTO9uDjsjlsH3NMyJzAUh98ynlANCeDklLJWOWJt70gCmqWKQL6CaJ78?=
+ =?us-ascii?Q?3w+nrQJYnH/F72WXnXO3/kJjBumDEMQyzQzJKXkRPUoiWiqCtcILD4bV5x40?=
+ =?us-ascii?Q?gc73FQwYNkqUXhhrsU8it2wiXKjIGU/ynnUuVYvk9C7G2mIxV2FrogTOUiGr?=
+ =?us-ascii?Q?BkPaRGT3r7SC4iPS5l+ziNBHLN4UZ+vHy0//a8pkQG7k7cYKM621UtX9TSk2?=
+ =?us-ascii?Q?In206YMN2v6vLNmwgQO0h80/GZTWcJSXbr5Ou3Wsb8JLzU7+Afyq4ngukDq7?=
+ =?us-ascii?Q?9oHXEmofLF+30G6WVjDuwoSAKirURdQK4OP2bUCSZeyN4w5oeul+D+0o87C+?=
+ =?us-ascii?Q?uiBwE1d/5fW3LLLHrsRJZdDoOSLg/z224uWVSpOIV6rgB7h1QacKhhOjcWTZ?=
+ =?us-ascii?Q?rcuOykXO//75ekwuIjvAfOJfrEI3Q5Z9QCdnqhntt20HEhaZhtAnOIyijkoB?=
+ =?us-ascii?Q?oYuIW1VfIBIdVc9WXboYrCTdEcMCgFfFk14kBq2aJ9j1qGnA+q5F+Yoik9rn?=
+ =?us-ascii?Q?0qliKOLbpPNcc7nOv7sxk9vcnHSXbCLkd4RTA8BLJKxYlgjvoBIhEw+qQiwb?=
+ =?us-ascii?Q?4HHrdFZ26BgODalPsYEfT+AMPMS8UJfY4uhbQThWgJ20CuGJcn+mWHP/J5jG?=
+ =?us-ascii?Q?Bj7lzHyvYxJh3RnJxYYYi569gwlS9uT9u4g0gOBopa6KWG54e8SwTo0meoOD?=
+ =?us-ascii?Q?qy6CZ4kds9M4F8xxyocwRUeIydzxEVxdXuw/85CHoRCe+P0px2rVpAMbfRxB?=
+ =?us-ascii?Q?bnuHkR3dYgXC4DrudNPrWe5KUwh69jMrIyIRBm8ZzBNLpOiecqdwe1oWTf2W?=
+ =?us-ascii?Q?6w9UsfOxqFaImP1EaAjh0LpQrpCPGUSfluyyURI3iDbqCShTN1GLJimHhe41?=
+ =?us-ascii?Q?IB8zNY/gItM7kVsnUasDDR0sB4lx0FTlISG0DvWI0EVq2LLygp4nBhmLKDrW?=
+ =?us-ascii?Q?tOYcBk+GMU9NG2uhjOUxVxeMC4+shLXZda9Zn1Bpca9yn+q7pJmW2PP+79Mm?=
+X-MS-Exchange-AntiSpam-MessageData-1: UCPCC+Xa0qpDMw==
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f040413-f4f0-4edd-f4cc-08ded7322e64
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d32a405-5a51-4733-fee1-08ded730d68d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2026 05:23:09.1022
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 05:32:46.6155
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uGFy/eYAtj5Zwzfryr3gNFUAzGCObsCnAPRLN+g7quBaOW0n0B52oORyreIw0D7GhE6yD/NGv9cDqkud9pHxXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9347
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: S1wD2zAf4CRpq8rwWoqUGmSyJX2rpOg2rMQt6zQaf9uPY8UToJgN1h5kr3OSX66Y/Tw3J8L7Vyi/vjqqclUuWCkwQMSdAcJoSjswYGv7lyQnxBjl9QwWQJd9vDOgYb6LYle74VKVeXtb0pnT+ilHfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR03MB8232
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303466-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303465-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:chris.packham@alliedtelesis.co.nz,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:aleksander.lobakin@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:blair.steven@alliedtelesis.co.nz,m:carl.smith@alliedtelesis.co.nz,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[altera.com:+];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 85A886E9D45
+X-Rspamd-Queue-Id: D62AD6E9D98
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of C=
-hris Packham
-> Sent: 14 May 2026 06:08
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
-przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch; davem@davemloft.net; =
-edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Lobakin, Aleksande=
-r <aleksander.lobakin@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-kerne=
-l@vger.kernel.org; Blair Steven <blair.steven@alliedtelesis.co.nz>; Carl Sm=
-ith <carl.smith@alliedtelesis.co.nz>; Chris Packham <chris.packham@alliedte=
-lesis.co.nz>
-> Subject: [Intel-wired-lan] [PATCH net-next] i40e: Avoid repeating RX filt=
-er warning
->
-> When the i40e runs out of space for RX filters the driver switches to pro=
-miscuous mode and warns that it has done so. In scenarios with a large numb=
-er of these filters this can generate a lot of warnings. For
-example:
->
->   $ dmesg -c > /dev/null
->   $ ip link add dev br0 type bridge vlan_filtering 1 vlan_default_pvid 1
->   $ ip link set dev eth7 master br0
->   $ bridge vlan add vid 1 dev eth7 pvid untagged self
->   $ bridge vlan add vid 2-4094 dev eth7 tagged
->   $ dmesg
->   [   25.601705] i40e 0000:01:00.1: Error LIBIE_AQ_RC_ENOSPC, forcing ove=
-rflow promiscuous on PF
->   [   25.601833] i40e 0000:01:00.1: Error LIBIE_AQ_RC_ENOSPC, forcing ove=
-rflow promiscuous on PF
->   [   25.601961] i40e 0000:01:00.1: Error LIBIE_AQ_RC_ENOSPC, forcing ove=
-rflow promiscuous on PF
->   [   25.602088] i40e 0000:01:00.1: Error LIBIE_AQ_RC_ENOSPC, forcing ove=
-rflow promiscuous on PF
->   [   25.602216] i40e 0000:01:00.1: Error LIBIE_AQ_RC_ENOSPC, forcing ove=
-rflow promiscuous on PF
->   [   25.602344] i40e 0000:01:00.1: Error LIBIE_AQ_RC_ENOSPC, forcing ove=
-rflow promiscuous on PF
->   ...
->
-> Use test_and_set_bit() so that the warning is only issued when the driver=
- enables promiscuous mode and not on the addition of subsequent RX filters.
->
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-> ---
->
-> Resend with net-next tag
->
-> drivers/net/ethernet/intel/i40e/i40e_main.c | 18 ++++++++++--------
-> 1 file changed, 10 insertions(+), 8 deletions(-)
->
+From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+When both CBS (Credit-Based Shaper) and EST (Enhanced Scheduled
+Transmit, IEEE 802.1Qbv) are active simultaneously, the CBS idle slope
+configured for a queue must be adjusted to account for the EST gate
+duty cycle.
+
+Under normal CBS operation, credit accumulates continuously at the
+configured idle slope rate. However, when EST is enabled, credit can
+only accumulate while the queue's transmission gate is open. This means
+the effective bandwidth delivered by CBS is reduced proportionally to
+the fraction of time the gate is open.
+
+To preserve the intended bandwidth allocation, the idle slope must be
+scaled up by the ratio of the cycle time to the gate open time:
+
+  idleSlope = operIdleSlope * (cycleTime / gateOpenTime)
+
+Store the time interval (ti_ns) and gate mask for each GCL entry when
+configuring EST via tc-taprio, then use these values in tc_setup_cbs to
+recalculate the idle slope when EST is active.
+
+If EST is not enabled, the cycle time is zero, or the queue's gate open
+time is zero, the idle slope is left unchanged. The recalculated value
+is capped at MAX_IDLE_SLOPE_CREDIT to prevent hardware register overflow.
+
+Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 55 ++++++++++++++++++-
+ 2 files changed, 54 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 8ba8f03e1ce0..8eb73ca6e7e4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -237,6 +237,8 @@ struct stmmac_est {
+ 	u32 ter;
+ 	u32 gcl_unaligned[EST_GCL];
+ 	u32 gcl[EST_GCL];
++	u32 ti_ns[EST_GCL];
++	u32 gates[EST_GCL];
+ 	u32 gcl_size;
+ 	u32 max_sdu[MTL_MAX_TX_QUEUES];
+ };
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+index d78652718599..1215946e49cb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+@@ -11,6 +11,8 @@
+ #include "dwmac5.h"
+ #include "stmmac.h"
+ 
++#define MAX_IDLE_SLOPE_CREDIT 0x1FFFFF
++
+ static void tc_fill_all_pass_entry(struct stmmac_tc_entry *entry)
+ {
+ 	memset(entry, 0, sizeof(*entry));
+@@ -332,13 +334,14 @@ static int tc_init(struct stmmac_priv *priv)
+ static int tc_setup_cbs(struct stmmac_priv *priv,
+ 			struct tc_cbs_qopt_offload *qopt)
+ {
++	u64 value, scaling = 0, cycle_time_ns = 0, open_time = 0, tti_ns = 0;
+ 	u32 tx_queues_count = priv->plat->tx_queues_to_use;
++	u32 gate = 0x1 << qopt->queue;
+ 	s64 port_transmit_rate_kbps;
+ 	u32 queue = qopt->queue;
++	u32 ptr, idle_slope;
+ 	u32 mode_to_use;
+-	u64 value;
+-	u32 ptr;
+-	int ret;
++	int ret, row;
+ 
+ 	/* Queue 0 is not AVB capable */
+ 	if (queue <= 0 || queue >= tx_queues_count)
+@@ -402,6 +405,50 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
+ 	value = qopt->locredit * 1024ll * 8;
+ 	priv->plat->tx_queues_cfg[queue].low_credit = value & GENMASK(31, 0);
+ 
++	/* If EST is not enabled, no need to recalibrate idle slope */
++	if (!priv->est)
++		goto config_cbs;
++	if (!priv->est->enable)
++		goto config_cbs;
++
++	cycle_time_ns = (priv->est->ctr[1] * NSEC_PER_SEC) +
++			 priv->est->ctr[0];
++	if (!cycle_time_ns)
++		goto config_cbs;
++
++	/* Sum the gate open time for this queue across all GCL entries. Entries
++	 * beyond the cycle time are truncated. Any remaining cycle time after
++	 * the last GCL entry is treated as gate-open (implicit open).
++	 */
++	for (row = 0; row < priv->est->gcl_size; row++) {
++		tti_ns += priv->est->ti_ns[row];
++		if (priv->est->gates[row] & gate)
++			open_time += priv->est->ti_ns[row];
++		if (tti_ns > cycle_time_ns) {
++			if (priv->est->gates[row] & gate)
++				open_time -= tti_ns - cycle_time_ns;
++			break;
++		}
++	}
++	if (tti_ns < cycle_time_ns)
++		open_time += cycle_time_ns - tti_ns;
++	if (!open_time)
++		goto config_cbs;
++
++	/* When EST is active, credit accumulates only when the gate is open,
++	 * so scale up the idle slope by the duty cycle:
++	 * idleSlope = operIdleSlope * (cycleTime / gateOpenTime)
++	 */
++	scaling = cycle_time_ns;
++	do_div(scaling, open_time);
++	idle_slope = priv->plat->tx_queues_cfg[queue].idle_slope;
++	idle_slope *= scaling;
++	if (idle_slope > MAX_IDLE_SLOPE_CREDIT)
++		idle_slope = MAX_IDLE_SLOPE_CREDIT;
++
++	priv->plat->tx_queues_cfg[queue].idle_slope = idle_slope;
++
++config_cbs:
+ 	ret = stmmac_config_cbs(priv, priv->hw,
+ 				priv->plat->tx_queues_cfg[queue].send_slope,
+ 				priv->plat->tx_queues_cfg[queue].idle_slope,
+@@ -1031,6 +1078,8 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
+ 		}
+ 
+ 		priv->est->gcl[i] = delta_ns | (gates << wid);
++		priv->est->ti_ns[i] = delta_ns;
++		priv->est->gates[i] = gates;
+ 	}
+ 
+ 	mutex_lock(&priv->est_lock);
+-- 
+2.43.7
+
 
