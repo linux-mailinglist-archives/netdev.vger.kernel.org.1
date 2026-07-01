@@ -1,372 +1,246 @@
-Return-Path: <netdev+bounces-303609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LMxOBbz4RGor4QoAu9opvQ
-	(envelope-from <netdev+bounces-303609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:23:40 +0200
+	id cXxVI0H3RGqw4AoAu9opvQ
+	(envelope-from <netdev+bounces-303610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:17:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0918B6ECC2F
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:23:39 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28BFD6ECAC0
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:17:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=QRnvYhKi;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303609-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303609-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=N8dl8lUk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303610-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4463430A3867
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:09:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EB060307C70F
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB2844CAC2;
-	Wed,  1 Jul 2026 11:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88CF42E013;
+	Wed,  1 Jul 2026 11:08:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9528343637D;
-	Wed,  1 Jul 2026 11:08:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782904114; cv=none; b=iR9iVCa2aysB+vFs1Am8U6jJA9V0uXvX0RmE/YtkQ03NdoShRo6yLUGGLPwy8/XFwsV5u1hkdZi4z8nL/8A04imcj5s6Auxl6EO/e2w7rlWEiQEzZnpYBW4dVapuqCUvJqkJ7kNTJyf86NbL9TNSo2Og9ZULqkl0jl/g06PqzR0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782904114; c=relaxed/simple;
-	bh=S9U/QQkOj2QcN7GOUDf8Nq4vJ3cWwPyQIEl2/pEFaPo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kKqfYrPMMtRjByZsakL5vlqIu8RDlC/porwbV+EY/X+Jj9W3fGQ2JVzTMgHChj6U5oxh/+xWUv2W+DAbDDkJiS7KS9eDPDCmvhIxkkvNsibMetJp77YrOHf0L+2x8Z20NrFQp002+l5oP/AhbnD+3usivHw10XAkUxqddKyCofU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QRnvYhKi; arc=none smtp.client-ip=91.218.175.177
-Message-ID: <0efcc0a9-a51d-4de8-8406-b8fa536a91b7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782904099;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ieMgPSS1eIBfAPTWcoeMePMwN2vKLGAwkXUol+yS3JM=;
-	b=QRnvYhKi7ifn2CAOqwrrTALRRhFuKdBNRY4USBSzQESgxOH79yyPbWsw+wvjxJGm9pDQu3
-	75wHltVABewcdEultw97xVO9Srux+vxmHLrM1y3qkyY8Qi8RlcbW/19L2d+jmEkSOqKAw5
-	8d3ZpLHm3o4fEt3mWUbZ+Ie+mvfoBxk=
-Date: Wed, 1 Jul 2026 19:07:22 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE379426D16
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:08:44 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782904125; cv=fail; b=XSE7jErG54Yuk3RhJd+1X0YOiXczQoE1pftB/+R/34QBaR+7ieT7SmbLckjLlRk8lMFG12+PrHOZFn26aEwIOTdjtezyWj+qyIc/ok3m5y419Hp/mtF1ByqL8C+X29E/hKwD63a0sHOF95lk231vNg6PSKubjf/aPOYhmTAgKNY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782904125; c=relaxed/simple;
+	bh=fKaLCVe6Y1pcUH3AMcop5M/5kk1t2iAy61HUPvsZ8TI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YMfzFwu1B+WKizckONXKuzwMv/WZCEDb5CrrYiFYbqa2CtTX9tLO3TCRKnyfLstc9qrPM6MDoFZWhRi3Pb3T9+ep4xNZ71SrXXWvhuR5bp4bFVsCAmJH50wDOSXj80HgoBxNJS7X2JDvZXNp5I6nEkIlWeEs/FS/o42J++kswPw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N8dl8lUk; arc=fail smtp.client-ip=198.175.65.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782904124; x=1814440124;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=fKaLCVe6Y1pcUH3AMcop5M/5kk1t2iAy61HUPvsZ8TI=;
+  b=N8dl8lUkY3Vux3L0Rsc0osDOvCICyr/9NaR/W0MJqJ/AhULpbiCbJ/UR
+   7ZSRZKJXwQ+V3RfFMkAOjO4fnk4HB4k1Tio+/+qhfKopL3dDJ1eM7gnPF
+   QZH0PsYTIn+2m6vEopFSJL9XGFAG8jltnozw9YL3B2GW3zqP/a5m+DLyd
+   nB+taRCSgZsJvx0H3YrJbGuoAYkprPPxePJiqD7Djdc33CK1kD6Ghxvjt
+   7B/4Y94DLGdIY/wlXxTJFFckxWsKGnNpxkjvM1m65B9SKETLucpF6HQoO
+   r2I2iXyafT7X5uOTuBxG+cD3Ai+LruoyN0tvrbFBD3DPS1edfm6XMo8dt
+   Q==;
+X-CSE-ConnectionGUID: s3G3YmrXQ/m2meQtRSHEwg==
+X-CSE-MsgGUID: eXyUED4JRBqoaWFWI/GHFw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="87546287"
+X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
+   d="scan'208";a="87546287"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 04:08:44 -0700
+X-CSE-ConnectionGUID: GSuqByzIR0Ww7joUgbtBhA==
+X-CSE-MsgGUID: z6So+sPFSwq7cNe5vtX43g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
+   d="scan'208";a="248563632"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 04:08:44 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 1 Jul 2026 04:08:43 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Wed, 1 Jul 2026 04:08:43 -0700
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.54) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 1 Jul 2026 04:08:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OrSLE1mj66rqVw2dffMpzyFLthfmdRjpuf2O29tUhZYuh8E0vX4j6pe2dH5yn3uhE/KaSjLib1yH1EnpzbC8aC3pmcwI07LAL7lZCQ35ZrzCi9eNDmKrYcJDNpdKH/ukvLaV0f1PCOLzxOCjwl6MqZyTYcR3jGXShEFbh4EWXDDsUsUvi6V6NuDELbnU+BRktpM9v3VaPzdpJPpyE4mf8T463XfhI7SruujpzrD8jFMws5Qaq5BVbmM8Uf20ljmx7onsgEd4eJkHGTHyo+Yq/GlHYVetk/Sq53sRutfSL/8LEf4BMuCYhPRIe2cZ8L66vyVpsGk0Utz31EA/4SBKIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7JZ6V67V0I0kaUxJAh5bOvUUvGJA3EDHBUFAawb0ksM=;
+ b=H5otueC9Jmj0opdQtn90k2FeyLrSCNepmSWhKI5y3P6g5MptNeG0U+Ibclk07Tt8VruycS8rQtTwRSlkc6yO/ov+O53BdrRdVkI3QhO0F+ddQ2ezA2t66SbjD8f+XKCs/se+uDv2QPNO2DFwAzGPIVGBLMmICQgmrZYfSEN5kr6cAII2RA03Ud4hmyVshE23ogALIPiYqBbW5lUC6MHKaXEPP4ApqDLfoRv25IED11GQw7m5txRYGPwwDYQlBLSM7G7tzbpdpPXdYCGCJEy297WyEEyz8/nRmJkzgAcUoZgLFDwVKOqoaPpe6BCmhjtAqsp72bbr9G5oakbI3yfUMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH3PR11MB7323.namprd11.prod.outlook.com (2603:10b6:610:152::6)
+ by DS0PR11MB7903.namprd11.prod.outlook.com (2603:10b6:8:f7::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 1 Jul 2026
+ 11:08:41 +0000
+Received: from CH3PR11MB7323.namprd11.prod.outlook.com
+ ([fe80::abb8:c470:36ca:e556]) by CH3PR11MB7323.namprd11.prod.outlook.com
+ ([fe80::abb8:c470:36ca:e556%6]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
+ 11:08:41 +0000
+Message-ID: <dd1a53fe-4713-4e21-b854-cf6314915519@intel.com>
+Date: Wed, 1 Jul 2026 13:08:37 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [TEST] intel: low timeout
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <leszek.pepiak@intel.com>
+References: <20260627095400.3c3d9f80@kernel.org>
+ <35ccefb4-a588-4556-87c0-ade880eaa8d6@intel.com>
+ <20260630155022.27c9a271@kernel.org>
+Content-Language: pl
+From: "Pielech, Adrian" <adrian.pielech@intel.com>
+In-Reply-To: <20260630155022.27c9a271@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2PEPF000008A8.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d8::648) To CH3PR11MB7323.namprd11.prod.outlook.com
+ (2603:10b6:610:152::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
-To: Jani Nikula <jani.nikula@linux.intel.com>,
- David Laight <david.laight.linux@gmail.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- "David Hildenbrand (Arm)" <david@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Shakeel Butt <shakeel.butt@linux.dev>, David Howells <dhowells@redhat.com>,
- Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>,
- Muchun Song <muchun.song@linux.dev>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <20260622040533.29824-2-kaitao.cheng@linux.dev>
- <20260622094242.64531b9a@pumpkin>
- <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
- <cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
- <20260624152324.3def88ce@pumpkin>
- <0ed6b5c3-e955-46e2-9fc6-075a0dfd1c4f@linux.dev>
- <734f66ca51485ee3ec9788c0eaaead681e00664b@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <734f66ca51485ee3ec9788c0eaaead681e00664b@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB7323:EE_|DS0PR11MB7903:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc51e24b-d62c-4ba0-8321-08ded7611bb6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|366016|376014|1800799024|11063799006|4143699003|56012099006|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info: idoMCGz5VLdSIIGtaxl/cjhQ/r4ibklWibcvokFlEUJatv+MD+YmZlHvQsLTsGvJLjZ1I/0Pt1jQvLEMrFoo2Oo37ly5eztGnE/J0GxARNkqkPbWMc3SiZ8vc/Yfxs7FJVdK+B/6MLhqOFK6cdg0oCF74mEjWFkv/7ROYxvrf5DbolFE8Krx27KnfdKR9grf2zhrwVwjHBwfivzFWBizE7mGynCGsmKeHDHlxxUGHixmtAVtNcKAYDQnuUFFibN4tdEwbvtyLQHFus4fjgA+1PquBwQncrPN6nFWSyZYL0r3cbnqo6wHQ2bjqX6U9/ve7D/rmruHUGJRFyE+2DJFjUdq8FefX0RJJgjT+LT/3Y1b1KK8C2C6o2HgcD4F7SP8oP5PAoFJ7OvZFkegIWEUL8FHO9X46ksj7I7tP162AF2s5NtA7Er5Ht8OQZLH6DHBRYnaaRr8PzGKpUkfy+Yl0XlUfNnDk5A7TbwKIkNHj2TI3GQBtrMpGi1mF/vn3A4w72B+saE07TtdZP5PWXnn7O2EfS61UHcxqnFdCsBTnYxjnUObAGv0T8z0oOBIQJbgpB+vMji/gaEb4tq7ud8ju6H8Ouc0YmJA+qsgDnzWSLMlgqAoXIq0Laz0Yz4ChFmaebd3sZyrP0RWZY3MRUlEgi8N0UJPqXmIiUQBjXcTE+o=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB7323.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(376014)(1800799024)(11063799006)(4143699003)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WFRTdEZBaklwODNVWFg4WHFZeTFpWDFFSElSN2VscElVTnArRzZQYmtna0d4?=
+ =?utf-8?B?R3lkMng2ZXBrbmpLMU45NFU5L0FGclhNNk85R2QvMTNyUlJha3g0RkZ2MnZ4?=
+ =?utf-8?B?OEFJVGwzTENFQmRsd2QxVGtRckdkbU13VFVmYnZWR1h4alNySDRReG13cURZ?=
+ =?utf-8?B?S3NjR2ZIZGVoU09wZGtiS3dzcXJvTVhwM3k2cHNjSkRtYzI4UGdPNlUyTnpq?=
+ =?utf-8?B?VUtWQkZCNUJFV2Q4cmNHYzIzNVBnbjhXUUpzT2tlamRCLzFDMHprYXhyc0lm?=
+ =?utf-8?B?YzlKVTFzNEFaaVBFM1VsNVMrcGpNYnZ3ZGxEMEtYUjRKRWFFUkJCNXZTZUtr?=
+ =?utf-8?B?WFNQOUFkRGdpc0pNRE5LY0pySVZaOUxmOUpTWE1CeVVNU3NhSEVmZVl0b1FE?=
+ =?utf-8?B?Ty8yU09mLzdFbmR5WEszUmtQb3paK2dFZi9lNEgzaHFpK0NZZjFTc2hsNHIy?=
+ =?utf-8?B?REw0c3FDY1NmMGRLNHdmWXZUL3ZFN1M3V0tTYTRkWHVTem90RURQSWVITVhr?=
+ =?utf-8?B?RkQ3SFhYajVscmhkVHhXQVpqZk1IeHloeUYrbk05R3Y4Nlp3c0VyaVh1SER0?=
+ =?utf-8?B?QnVHY1UwVmpxeG9SM2Zzem5WY2dIakphaUdKUStuMENSSmFWdWlqM3QrMGpq?=
+ =?utf-8?B?d0owTW9jaHU0U29MOFlBbmppZGUwL0o3ZFVnMHZXR0NKTmdOaHRlcm1vdnBo?=
+ =?utf-8?B?TElwMGFFU2k1ZWtxRjRPV3hsMzlSZU9ub2tldklxTnFPdWwzTHoyc0h6SFJx?=
+ =?utf-8?B?MG0vYXRlWWJONVNqalE0b25YR1Rrdi9aOGRZSFNOT2dSaWdORFpxVTNtNVpK?=
+ =?utf-8?B?S1VTVzFnU2pQT1BRS1EzWWlTRVVpV2xLRjlXZXBJRitnUnJ3cHgvMUUxZnJY?=
+ =?utf-8?B?aWNYSVUyUDVpaHBBajMvbk93QVJqMSt1S3lFRHVoSEwveUtIK3FlbllYZ2N2?=
+ =?utf-8?B?ZGdFQXR1VHpCUExHTWZndTU2ZXdsSGR4ODVFeG8yWElIcmZxVzJUWE5nNXZV?=
+ =?utf-8?B?UW1qTzJmWm9YemphbHVlNXlQeHp2UUx3QkdoTjRQZ2RoTFcwUDA3NlZ2WTE1?=
+ =?utf-8?B?eG8yMTFWRFZZRGpGNURjNTlEOWZGOUdNMHhRL0ppWVRUaGNsVEZaanF2QVBm?=
+ =?utf-8?B?VzBVdm56eFdSME5VT253VlpVN0M3eHYrK3RIVldwL1pBYTM4c09CQmNsQUpw?=
+ =?utf-8?B?d1pYeHlZZ1NNc3luSDJZcUVSR1M2V3R4bEplUWJFeE1wdklLMDVMUmlGY2My?=
+ =?utf-8?B?STlueWkvZzdyUE8yeExDKytQT1NxbHlTb0hzUkpQN2dFWEhzZE4zb2hodHBN?=
+ =?utf-8?B?a1hBSU5oQjVwSlRoSFhUOHRjK1UzOGxMTnVpUUdZU0EyNHkzVE5qWm1kNTRE?=
+ =?utf-8?B?ZXlLVVo2SFpSRkd0cGFiUkJFNnhkUTB5VjFic2lXZFNwZ2U5K1FXaExGNUth?=
+ =?utf-8?B?MUQzVVhRanJpbjFiYWFFK3M5SlNIeVRqN3lUV2JYMU9jdjBnUTZyc0hZSDBP?=
+ =?utf-8?B?R2Q3Z01YOXZxSTYyanlSQmRQVFlWemlISmh6aU1Ib2JQVElwNGd0bWVpbml2?=
+ =?utf-8?B?eXFUOWRBamwxb1MwbXBhbWNncnB1NnVzSmU0TkVtVGJ4TkY0UjBqdXdGZGI3?=
+ =?utf-8?B?eE82eTJrUE51RTZNU3J2Q3JqK2dHcnNzVVlvM3M2SWV3c0dzeVdiSHR0RGFx?=
+ =?utf-8?B?cTdnckFyQkFSZmlGWFAzM29JVWNaaFYrc0c3K1U0Q01DbmIwNWZ1S2xNam1I?=
+ =?utf-8?B?U2NsNFd2a3J1dS8rNExwRWhjRldISVc3RHVpZlBjRlVZb3JkQ2V6T0MyRnls?=
+ =?utf-8?B?clg3VFR4SWpMR1ZOeHE3YmNLbG5MVjdqUWhKRHlITmI2VGxoQ3RIOUtPR3Nj?=
+ =?utf-8?B?dUdEUkV3Q3hzTmpWc01nNlBRU3VKYUxjMm5vMlhCSklOUHNNOG85OHZ4c1hC?=
+ =?utf-8?B?YjQrSU9HQjkveERhWWJXM2RUK2pXYjFwZUhVSm9UL205Z29zRGQzT1dYWmVs?=
+ =?utf-8?B?SzVoT0hXQzltNkVYRllOS1hBZU45NHAvMTBDREpkU1lSMDhBZ0VvcEI3eDUw?=
+ =?utf-8?B?SzJhc2wwTHJBazhCb010QlY4NWI5VEQrZUd6NVYrd3NidTRiUjhiSHZuOVdU?=
+ =?utf-8?B?VGtpVXd2T0ZUaDZIWERvcFc1aWo5bWp2aWN2K1VUV2Z0YjI0cUdveXhFbXdw?=
+ =?utf-8?B?eWxDaUtOZ3JYdnlGVGcxd093TXV4UW9MemR1QVRjdE5oMElrZHRDbFlyMkZu?=
+ =?utf-8?B?UjJBaEdQL2V0K2QrM0tSV1dnNjdNU1U0RTB1SmhCRDZjZmNkb0hCbEQ1RWwz?=
+ =?utf-8?B?a2JjSklnTExFODRFK0t0dHFtMzBSNTBFM2JFK1BrdnJiUXMwOUpxZz09?=
+X-Exchange-RoutingPolicyChecked: Z/zCO4FdFaVz8fQstSSj85QCmoVVUqm25+hGqVxebtfxfABU8vAdKO5kAG08h5Lj2UOfqrK0XVMWeC8tCS3DoazTwqp8QS7EGiPxmns7s4dQek6hB+RcElDq9KeFRUKClyfK8kJdsa3Tedz7s2DlFbuEDerPHfsIOQ9f9I4mI8sakDLE+BV4VBPuZQ9EBn3grAG4pPbLvO9M6uKKIgDdx23k4SKxe/XFEd7igYNe5NyFfg1DbSth/4hHuKQ410dNQ625/4NQHr07jgNDPR2sZ9vcvNXch7IWSOyiDtD+kVaGXVuUcc31DF/BHtXWLOp3TqOesI8li+R/1eFlEpX/JA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc51e24b-d62c-4ba0-8321-08ded7611bb6
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB7323.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 11:08:41.3045
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2p4bu32YGdlWWunl98LqLgynSQL8nEcqMOxcdYF2R0VW14FiSX94RBHp9Sj8XaFKWV2/pfmJAOqn+HDQrov2JCAIz6gwCK2tt/MiEWR+Z8M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7903
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303609-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303610-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jani.nikula@linux.intel.com,m:david.laight.linux@gmail.com,m:christian.koenig@amd.com,m:david@kernel.org,m:ast@kernel.org,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:tj@kernel.org,m:viro@zeniv.linux.org.uk,m:brauner@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:hannes@cmpxchg.org,m:peterz@infradead.org,m:mingo@redhat.com,m:acme@kernel.org,m:namhyung@kernel.org,m:tglx@kernel.org,m:juri.lelli@redhat.com,m:vincent.guittot@linaro.org,m:paul@paul-moore.com,m:andriy.shevchenko@linux.intel.com,m:paulmck@kernel.org,m:shakeel.butt@linux.dev,m:dhowells@redhat.com,m:simona.vetter@ffwll.ch,m:rdunlap@infradead.org,m:luca.ceresoli@bootlin.com,m:phasta@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cgroups@vger.kernel.org,m:linux-ntfs-dev@lists.sourceforge.net,m:linux-fsdevel@vger.kernel.org,m:io-uring@vger.kernel.org,m:audit@vger.kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-pe
- rf-users@vger.kernel.org,m:linux-trace-kernel@vger.kernel.org,m:kexec@lists.infradead.org,m:live-patching@vger.kernel.org,m:linux-modules@vger.kernel.org,m:linux-crypto@vger.kernel.org,m:linux-pm@vger.kernel.org,m:rcu@vger.kernel.org,m:sched-ext@lists.linux.dev,m:linux-mm@kvack.org,m:virtualization@lists.linux.dev,m:damon@lists.linux.dev,m:llvm@lists.linux.dev,m:chengkaitao@kylinos.cn,m:muchun.song@linux.dev,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[linux.intel.com,gmail.com,amd.com,kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:przemyslaw.kitszel@intel.com,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:leszek.pepiak@intel.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[adrian.pielech@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:dkim,intel.com:mid,intel.com:url,intel.com:from_mime];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[54];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kaitao.cheng@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[adrian.pielech@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,amd.com:email,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0918B6ECC2F
+X-Rspamd-Queue-Id: 28BFD6ECAC0
 
-在 2026/6/25 19:00, Jani Nikula 写道:
-> On Thu, 25 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
->> 在 2026/6/24 22:23, David Laight 写道:
->>> On Wed, 24 Jun 2026 15:23:47 +0200
->>> Christian König <christian.koenig@amd.com> wrote:
->>>> On 6/24/26 15:14, Kaitao Cheng wrote:
->>>>> 在 2026/6/22 16:42, David Laight 写道:  
->>>>>> On Mon, 22 Jun 2026 12:05:31 +0800
->>>>>> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
->>>>>>  
->>>>>>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
->>>>>>>
->>>>>>> The list_for_each*_safe() helpers are used when the loop body may
->>>>>>> remove the current entry.  Their API exposes the temporary cursor at
->>>>>>> every call site, even though most users only need it for the iterator
->>>>>>> implementation and never reference it in the loop body.
->>>>>>>
->>>>>>> Add *_mutable() variants for list and hlist iteration.  The new helpers
->>>>>>> support both forms: callers may keep passing an explicit temporary cursor
->>>>>>> when they need to inspect or reset it, or omit it and let the helper use
->>>>>>> a unique internal cursor.  
->>>>>>
->>>>>> I'm not really sure 'mutable' means anything either.
->>>>>> It is possible to make it valid for the loop body (or even other threads)
->>>>>> to delete arbitrary list items - but that needs significant extra overheads.
->>>>>>
->>>>>> It might be worth doing something that doesn't need the extra variable,
->>>>>> but there is little point doing all the churn just to rename things.
->>>>>>  
->>>>>>>
->>>>>>> This makes call sites that only mutate the list through the current entry
->>>>>>> less noisy, while keeping the existing *_safe() helpers available for
->>>>>>> compatibility.
->>>>>>>
->>>>>>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
->>>>>>> ---
->>>>>>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
->>>>>>>  1 file changed, 231 insertions(+), 38 deletions(-)
->>>>>>>
->>>>>>> diff --git a/include/linux/list.h b/include/linux/list.h
->>>>>>> index 09d979976b3b..1081def7cea9 100644
->>>>>>> --- a/include/linux/list.h
->>>>>>> +++ b/include/linux/list.h
->>>>>>> @@ -7,6 +7,7 @@
->>>>>>>  #include <linux/stddef.h>
->>>>>>>  #include <linux/poison.h>
->>>>>>>  #include <linux/const.h>
->>>>>>> +#include <linux/args.h>
->>>>>>>  
->>>>>>>  #include <asm/barrier.h>
->>>>>>>  
->>>>>>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
->>>>>>>  #define list_for_each_prev(pos, head) \
->>>>>>>  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
->>>>>>>  
->>>>>>> -/**
->>>>>>> - * list_for_each_safe - iterate over a list safe against removal of list entry
->>>>>>> - * @pos:	the &struct list_head to use as a loop cursor.
->>>>>>> - * @n:		another &struct list_head to use as temporary storage
->>>>>>> - * @head:	the head for your list.
->>>>>>> +/*
->>>>>>> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
->>>>>>>   */
->>>>>>>  #define list_for_each_safe(pos, n, head) \
->>>>>>>  	for (pos = (head)->next, n = pos->next; \
->>>>>>>  	     !list_is_head(pos, (head)); \
->>>>>>>  	     pos = n, n = pos->next)
->>>>>>>  
->>>>>>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
->>>>>>> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\  
->>>>>>
->>>>>> Use auto
->>>>>>  
->>>>>>> +	     !list_is_head(pos, (head));				\
->>>>>>> +	     pos = tmp, tmp = pos->next)
->>>>>>> +
->>>>>>> +#define __list_for_each_mutable1(pos, head)				\
->>>>>>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
->>>>>>> +
->>>>>>> +#define __list_for_each_mutable2(pos, next, head)			\
->>>>>>> +	list_for_each_safe(pos, next, head)
->>>>>>> +
->>>>>>>  /**
->>>>>>> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
->>>>>>> + * list_for_each_mutable - iterate over a list safe against entry removal
->>>>>>>   * @pos:	the &struct list_head to use as a loop cursor.
->>>>>>> - * @n:		another &struct list_head to use as temporary storage
->>>>>>> - * @head:	the head for your list.
->>>>>>> + * @...:	either (head) or (next, head)
->>>>>>> + *
->>>>>>> + * next:	another &struct list_head to use as optional temporary storage.
->>>>>>> + *		The temporary cursor is internal unless explicitly supplied by
->>>>>>> + *		the caller.
->>>>>>> + * head:	the head for your list.
->>>>>>> + */
->>>>>>> +#define list_for_each_mutable(pos, ...)					\
->>>>>>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
->>>>>>> +		(pos, __VA_ARGS__)  
->>>>>>
->>>>>> The variable argument count logic really just slows down compilation.
->>>>>> Maybe there aren't enough copies of this code to make that significant.
->>>>>> But just because you can do it doesn't mean it is a gooD idea.
->>>>>> I'm also not sure it really adds anything to the readability.
->>>>>>
->>>>>> And, it you are going to make the middle argument optional there is
->>>>>> no need to change the macro name.  
->>>>>
->>>>> Christian König and Jani Nikula also disagree with the variadic-argument
->>>>> implementation approach. If we abandon that method, it means we will
->>>>> inevitably need to add some new macros. If mutable is not a good name,
->>>>> suggestions for better alternatives would be welcome; coming up with a
->>>>> suitable name is indeed rather tricky.  
->>>>
->>>> I don't think you need to add a new macro for the specific use case that people want to modify the next element of the iteration.
->>>>
->>>> If I remember your numbers correctly that is a really corner case and keeping using the existing *_safe() macros for that sounds perfectly fine to me.
+On 7/1/2026 12:50 AM, Jakub Kicinski wrote:
+> On Tue, 30 Jun 2026 14:56:02 +0200 Pielech, Adrian wrote:
+>> On 6/27/2026 6:54 PM, Jakub Kicinski wrote:
+>>> Hi!
 >>>
->>> IIRC currently you have a choice of either:
->>> 	define               Item that can't be deleted
->>> 	list_for_each()	     The current item.
->>> 	list_for_each_safe() The next item.
->>> There is also likely to be code that updates the variables to allow
->>> for other scenarios.
+>>> Some of the tests need more than 5min, could you increase the timeout
+>>> in the runner to 10 or 15min? Looks like it's hard-killing tests right
+>>> now after 2min:
 >>>
->>> Note that if increase a reference count and release a lock then list_for_each()
->>> is likely safer than list_for_each_safe() :-)
+>>> https://netdev-ci-results.intel.com/ice-results/net-next-hw-2026-06-27--16-00/ice-E810-XXV4/xdp.py/stdout
 >>>
->>> list.h has 9 variants of the 'safe' loop.
->>> The bloat of another 9 is getting excessive.
+>>> which leaks config across tests:
 >>>
->>> It has to be said that this is one of my least favourite type of list...
+>>> https://netdev-ci-results.intel.com/ice-results/net-next-hw-2026-06-27--16-00/ice-E810-XXV4/irq.py/stdout
+>>>
+>>> BTW the JSON reports the timed out tests as pass.
 >>
->> Hi Christian König, David Laight, Jani Nikula, David Hildenbrand,
->> Andy Shevchenko, Alexei Starovoitov
+>> Hi Jakub,
 >>
->> For ease of discussion, I need to summarize the currently possible
->> approaches and briefly describe their respective pros and cons,
->> using the list_for_each_entry* interfaces as examples.
->>
->> 1. Add list_for_each_entry_mutable, while keeping list_for_each_entry
->> and list_for_each_entry_safe unchanged. list_for_each_entry_mutable
->> would be used specifically for safe deletion scenarios that do not
->> need to expose the temporary cursor externally. The code can refer to
->> the v1 version.
->>
->> Pros: Does not depend on immediate per-subsystem adaptation and can be
->>       merged directly.
->> Cons: Requires adding a whole set of mutable interfaces, which makes the
->>       code somewhat redundant.
+>> I've increased timeout to 10 minutes per test run. It seems to help with
+>> XDP tests score.
 > 
-> Seems fine, and the original _safe naming is ambiguous anyway.
+> Great, thank you!
 > 
->> 2. Directly optimize away the temporary cursor in list_for_each_entry_safe
->> and define it inside the loop instead, changing the interface from four
->> arguments to three.
->>
->> Pros: Does not add redundant interfaces.
->> Cons: (1) Users need to manually update special cases that use the
->>       traversal variable of list_for_each_entry_safe, the new
->>       list_for_each_entry_safe would no longer apply there and would
->>       need to be open-coded.
->>       (2) Because the macro arguments changes, all list_for_each_entry_safe
->>       callers would need to be modified and merged together, making it
->>       difficult to merge such a large amount of code at once.
+>> I'll later take a look on default behavior of runner in case of timeouts.
 > 
-> This won't fly because there are literally thousands of
-> list_for_each_entry_safe() users.
-> 
->> 3. Use a variadic macro approach to optimize list_for_each_entry_safe,
->> so that it supports both three and four arguments.
->>
->> Pros: (1) Does not add redundant interfaces.
->>       (2) Does not depend on immediate per-subsystem adaptation and can
->>       be merged directly.
->> Cons: (1) Increases compile time.
->>       (2) Makes the interface harder for users to use.
-> 
-> Basically I'm against any variadic macro tricks where the optional
-> argument is not the last argument. That's just way too surprising, and
-> goes against common practice in just about all other languages.
-> 
->> 4. Optimize list_for_each_entry by defining the temporary cursor internally,
->> making it compatible with the functionality of list_for_each_entry_safe.
->> The code can refer to the v2 version.
->>
->> Pros: (1) Does not add redundant interfaces.
->>       (2) The number of externally visible arguments of list_for_each_entry
->>       remains unchanged, still three.
->> Cons: (1) list_for_each_entry and list_for_each_entry_safe would be merged
->>       into one, and list_for_each_entry_safe would gradually be deprecated.
->>       (2) Users need to manually update special cases that use the traversal
->>       variable of list_for_each_entry, the new list_for_each_entry would no
->>       longer apply there and would need to be open-coded. There are 15 such
->>       cases in total.
-> 
-> This sounds good to me, though I take it there's some code size increase
-> and/or performance penalty?
-> 
-> Maybe the 15 cases are questionable anyway?
-> 
->> 5. Use a variadic macro approach to optimize list_for_each_entry, so that
->> it supports both three and four arguments.
->>
->> Pros: (1) Does not add redundant interfaces.
->>       (2) Does not depend on immediate per-subsystem adaptation and can be
->>       merged directly.
->> Cons: (1) Increases compile time.
->>       (2) list_for_each_entry and list_for_each_entry_safe would be merged
->>       into one, and list_for_each_entry_safe would gradually be deprecated.
-> 
-> Please don't do the macro tricks.
-> 
->> 6. Make no changes, keep the current logic unchanged, and close the current
->> email discussion.
-> 
-> I like hiding the temporary stuff when possible.
-> 
-> BR,
-> Jani.
+> default behavior == pass/fail status for the test?
 
-Hi all,
-If there are no objections, I will make the changes using the first approach.
-
-
-Hi David Laight,
-You previously expressed a different opinion. Do you have any further comments
-on the current proposed approach?
-
--- 
-Thanks
-Kaitao Cheng
-
+Yes, pass/fail status selection. I've found the culprit and since next 
+run timeouts should be reported as fail.
 
