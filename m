@@ -1,176 +1,151 @@
-Return-Path: <netdev+bounces-303565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0OqgJOnjRGqm2goAu9opvQ
-	(envelope-from <netdev+bounces-303565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 11:54:49 +0200
+	id PU/oDevlRGof2woAu9opvQ
+	(envelope-from <netdev+bounces-303566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:03:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E536EBC41
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 11:54:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C75C6EBD96
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:03:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b=Oae3uNUB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303565-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303565-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=163.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="MaL/yjKM";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303566-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303566-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3E965300B9FF
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 09:54:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 799F7313D13C
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 09:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF103F44C1;
-	Wed,  1 Jul 2026 09:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D155F3FD95C;
+	Wed,  1 Jul 2026 09:58:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5700F3B27EE;
-	Wed,  1 Jul 2026 09:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76FFB3FAE09
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 09:58:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782899684; cv=none; b=Qdx1lt94rbwwaOXH0RUJUfzvPu5bD2an4mQZGDXc3+QBTAFesCzL5LhaosQC1kwp885ULqyC3NV249f1mHJkS7Nav2Y0acyDro9P+USBnyBNUkf/rLI6MTpqGssDQmBb14JNIgTvFLJ1ufK4PxVmdevcAi/aB42AH6Yxkm4E5TY=
+	t=1782899921; cv=none; b=jpi5UTqovo+FhbArQFCUxbDFe1r159sDH9aw6u67+c1b4rwYVW4R0otnd4EreEU5avie1rdsUZFCE+i9ULBIzVzNyXCP99YeUMHQ8i00Kh2WGnCeGqW4X22xEIi8EXwMnoYRHjT9XpZW5qY0H8QQRnaWnlTKKaV9rDBqJj0xIgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782899684; c=relaxed/simple;
-	bh=78GZqLBubj8E9uX/o9e6hxnuHbGruLQCoTLyXDTACW0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hGAOOTeWAArguTgkTUCXkTSa/+4qb7oH+jz4dvmFKmZAymb/7pGsXp7bU+4OBOHH4ilXeHWRuqHyiU1g4kpnccOHczP6z51/YDNq6wwZhc0XIgtgivwOObJXlGDbTsoUHemP1h75qF3MO25IReeSH0LiGXCPbsAhvfVB0YMy/G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Oae3uNUB; arc=none smtp.client-ip=220.197.31.2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=su
-	nDimvKPAGXr1s3eNxIeBtTHJPCyhFgFWGTZXYX4go=; b=Oae3uNUBWnLZyIfBV6
-	XXUfuPtOiKuT/5dHMyrN8XZHbgOyWsIJ1n05S3Fh7kwAQPdm9BFQ0ol/X2S0/cU1
-	psXXdstEvL5HiIGKvJfN/vB2ypvXop1cWML9HfVeTF5Dlu0Z0xtezlDvzG2lPKz9
-	qvsjXQAsEcJ7d6r+6SrcnMgIs=
-Received: from GHT-5854251031.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wAnZKKq40RqU6VxHA--.29763S2;
-	Wed, 01 Jul 2026 17:53:47 +0800 (CST)
-From: zwq2226404116@163.com
-To: mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: mani@kernel.org,
-	loic.poulain@oss.qualcomm.com,
-	ryazanov.s.a@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	Wanquan Zhong <wanquan.zhong@fibocom.com>
-Subject: [PATCH v3 1/1] bus: mhi: pci_generic: fix Rolling Wireless RW135R-GL and RW151 support
-Date: Wed,  1 Jul 2026 17:53:44 +0800
-Message-ID: <20260701095344.309409-1-zwq2226404116@163.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782899921; c=relaxed/simple;
+	bh=ydO8Ft5Urm5M09KG8cScRhJ3iye6Vu29eRTcwv+lefo=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cyzxA57NHz0mCdvdwskqnNspxvG+LFkTHcKpiOnovcphSF2N5neJnuTESMtqm0Kdk5Vz5O74jIYrPloVHXg5QdEaUNuizLh+2+ODr8TuIc9AjZKtob3kfxzxOd/S/oqfY/wNsPw8pno8D2PxsUtKxO/+Y2xpgiJNjVY71Ocvf84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaL/yjKM; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A6E61F0155E
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 09:58:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782899919;
+	bh=ydO8Ft5Urm5M09KG8cScRhJ3iye6Vu29eRTcwv+lefo=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=MaL/yjKM23uRludhdmmZ/pKii3StVcH78bbsWWybDYwbISt2i7e25j9KBm/ltPtyN
+	 XGTqeiB7Ui1fTWOKe6cmbDOaCa0Gh2ukI1Blgh4/JscEquN0V7NidxbWcCsMFv+Jd5
+	 zQ0wlXT1RcXbBR8YbeJ4zQJVuoPwzoSktWAr5ZLETC3SShkGudys8nIebgKuotKHkP
+	 IX/H5FlnXGYAgS4ozo7QnUmxjTPjq8d3Ak552DqwKFVad8dtMolWhL9gdsliRc1QHb
+	 BhmUGZrXTuZoVIIBCLI8L+AAXP/DLxfCSDDCslKePeVul25emIdooLYApll/O+VzH1
+	 yilRymzKctFNQ==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5aec201b582so451489e87.1
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 02:58:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rpyd7YApO6VufbX55azP/ha3Yhm2rB5gfPs2hK+Witw69qA8PXep/pcCV8KRv+0QwVS5PrzRXk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd/+x7LL0MEyeUsYiS7ENKq2w9MDbi9Z6h8BvwZL6vBj3DsnTN
+	QbVKvvLrSkY3sgM4l0MCXBR2QWI6n6Lfs7yAvgPwZ0K+XQBNJcZfP3fXBVZo1jdppx6257pV6g9
+	Yl+H11aeCha2KkxiIA0PnAeLpIeff2asudnk5yryomg==
+X-Received: by 2002:a05:6512:a34d:b0:5ae:b952:6c with SMTP id
+ 2adb3069b0e04-5aec6797747mr213198e87.13.1782899917728; Wed, 01 Jul 2026
+ 02:58:37 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 1 Jul 2026 05:58:36 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 1 Jul 2026 05:58:36 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAnZKKq40RqU6VxHA--.29763S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWFWxCF15ZF18Gr18Gw13CFg_yoW5Gr1kpF
-	4SvrWUtr4vvFyF9ay8A3s7GFyrXan8XrZrKF98G34xC34Yy34UtrW0g34agFyYvFZ2qFWY
-	vrsYg3yxZF4UAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Um1v-UUUUU=
-X-CM-SenderInfo: h2ztjjaswuikqrrwqiywtou0bp/xtbC0gvOJmpE46uzyAAA3s
+References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com> <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
+Date: Wed, 1 Jul 2026 05:58:36 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MfTh4-RM7R-Ku=MFjo2EQLoe9dt5-AFBtrMx+zZJRHKLQ@mail.gmail.com>
+X-Gm-Features: AVVi8CcMVsM_VtMs4RD3avK1gS-7SxkMAq-P9mHbEgm5Sdw31SbqOo7iHTS4Zj8
+Message-ID: <CAMRc=MfTh4-RM7R-Ku=MFjo2EQLoe9dt5-AFBtrMx+zZJRHKLQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/6] firmware: qcom: scm: Add support for setting
+ Bluetooth power modes
+To: george.moussalem@outlook.com
+Cc: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan <saravanak@kernel.org>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303565-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:mhi@lists.linux.dev,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:mani@kernel.org,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:kuba@kernel.org,m:wanquan.zhong@fibocom.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[zwq2226404116@163.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-303566-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:george.moussalem@outlook.com,m:devnull+george.moussalem.outlook.com@kernel.org,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:devnull@kernel.org,m:krzk@kern
+ el.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,outlook.com:email];
+	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_TO(0.00)[outlook.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,gmail.com,lunn.ch,davemloft.net,fibocom.com];
-	DKIM_TRACE(0.00)[163.com:+];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.infradead.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zwq2226404116@163.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,george.moussalem.outlook.com,dt];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E7E536EBC41
+X-Rspamd-Queue-Id: 8C75C6EBD96
 
-From: Wanquan Zhong <wanquan.zhong@fibocom.com>
+On Mon, 29 Jun 2026 15:01:46 +0200, George Moussalem via B4 Relay
+<devnull+george.moussalem.outlook.com@kernel.org> said:
+> From: George Moussalem <george.moussalem@outlook.com>
+>
+> The Bluetooth subsystem (BTSS) on the IPQ5018 SoC supports setting power
+> modes which are required to be configured through a Secure Channel
+> Manager (SCM) call to TrustZone. However, not all Trusted Execution
+> Environment (QSEE) images support this call, so first check if the call
+> is available.
+>
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
 
-bus: mhi: pci_generic: fix Rolling Wireless RW135R-GL and RW151 support
-
-- Increase RW151 MBIM channel ring size from 4 to 32
-
-On HP and Lenovo laptop platforms the device probes successfully and
-WWAN ports are created, but pci_generic enables runtime autosuspend
-(PCI D3hot/M3) after a short idle period. Resume from runtime PM leaves
-the modem in MHI SYS ERROR; driver recovery (reset) fails and the device
-becomes inaccessible (PCIe config space reads as 0x7f). The failure is not
-self-recoverable while runtime PM remains enabled; keeping power/control=on
-avoids the issue.
-
-Set no_m3 on RW135R-GL and RW151 so probe does not enable runtime M3
-autosuspend for these modules.
-
-Power management testing (separate from runtime PM above):
-- Suspend-to-RAM (S3/mem): tested on RW135R-GL and RW151; MHI/MBIM/wwan
-  function after wake.
-- Suspend-to-disk (hibernate): not available on the test platforms
-  (/sys/power/state lacks "disk", ENODEV).
-
-Signed-off-by: Wanquan Zhong <wanquan.zhong@fibocom.com>
-
----
-v2 -> v3: RW151 MBIM ring size 32; disable runtime M3 (no_m3)
- drivers/bus/mhi/host/pci_generic.c | 4 +++-
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-index d598bb3b3981..d0fee7e3ba3a 100644
---- a/drivers/bus/mhi/host/pci_generic.c
-+++ b/drivers/bus/mhi/host/pci_generic.c
-@@ -942,6 +942,7 @@ static const struct mhi_pci_dev_info mhi_rolling_rw135r_info = {
- 	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
- 	.dma_data_width = 32,
- 	.sideband_wake = false,
-+	.no_m3 = true,
- 	.mru_default = 32768,
- 	.edl_trigger = true,
- };
-@@ -949,8 +950,8 @@ static const struct mhi_pci_dev_info mhi_rolling_rw135r_info = {
- static const struct mhi_channel_config mhi_rolling_rw151_channels[] = {
- 	MHI_CHANNEL_CONFIG_UL(4, "DIAG", 16, 1),
- 	MHI_CHANNEL_CONFIG_DL(5, "DIAG", 16, 1),
--	MHI_CHANNEL_CONFIG_UL(12, "MBIM", 4, 0),
--	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 4, 0),
-+	MHI_CHANNEL_CONFIG_UL(12, "MBIM", 32, 0),
-+	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 32, 0),
- 	MHI_CHANNEL_CONFIG_UL(14, "NMEA", 32, 0),
- 	MHI_CHANNEL_CONFIG_DL(15, "NMEA", 32, 0),
- 	MHI_CHANNEL_CONFIG_UL(32, "DUN", 32, 0),
-@@ -986,6 +987,7 @@ static const struct mhi_pci_dev_info mhi_rolling_rw151_info = {
- 	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
- 	.dma_data_width = 32,
- 	.sideband_wake = false,
-+	.no_m3 = true,
- 	.mru_default = 32768,
- 	.edl_trigger = true,
- };
-
---
-2.50.0
-
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
