@@ -1,126 +1,182 @@
-Return-Path: <netdev+bounces-303901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id W9hmBIOoRWo2DgsAu9opvQ
-	(envelope-from <netdev+bounces-303901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:53:39 +0200
+	id 43OSLrCpRWpaDgsAu9opvQ
+	(envelope-from <netdev+bounces-303902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:58:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823B36F27DE
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:53:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D756F2824
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:58:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MWdyE69Z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303901-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303901-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=trailofbits.com header.s=google header.b=U9EnC6WR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303902-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303902-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ED8703037809
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 23:53:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 79AE2303BDF3
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 23:58:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04F43491E1;
-	Wed,  1 Jul 2026 23:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7D23EDAA6;
+	Wed,  1 Jul 2026 23:58:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B659B26CE32;
-	Wed,  1 Jul 2026 23:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2C53C9EF0
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 23:58:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782950016; cv=none; b=Xa+ptsf6meSibKLjzKYg67CrnHBMb3HIPTSMCSsJT6MR6MtpG/VgEx8qBZY0J8NZ+W3bAJDmKeF8lsBuxiSGEXF2kZp6xuu4W91i92pvYEEIOpZ5exVPF2V5i+A3jSW30hEq3hrJu2Ln1OWbHwILWm7gty+X0PSLZhTeLvkmEVc=
+	t=1782950316; cv=none; b=p21cUMgWQl88Ro8WlZG0f3QHXdxDs4/bCrJrvvyohNJXV89w37ixO3Q9I48A3IZGEEG308fzQrbx2HeXP7ULYP0ZmoeuphOOg4viYNDtQlQxI+zeRQLM/sgsN1OJ6EROJggUHO1/W5PcdjZ8ovRNouEVF82gaRz0uns4DrI6k2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782950016; c=relaxed/simple;
-	bh=KNSqXdpgheGfVhc2Ab18vWbJXmdOphqCpe53J8+RDMw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lXFFw9qpemcQ8A1vHeUMwb1qd9W7nFU3kaR9jNdSj9GGcXyJ6RiwHRbu3KQhxbqhz6Kys6HOHVRxaM1E3ezzzBt48IN5hlm7dXz/hGnXXK0k8nrqQrAUK+4oZZ/xq8icZwhqADATwT36rp5hz6b6A1BIcT1aQZfWsckenXpkgZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWdyE69Z; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9E571F000E9;
-	Wed,  1 Jul 2026 23:53:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782950015;
-	bh=SfV/2f3NAL+W2OX/1VdR3LTuYKPCvxTp30dOIVYBcT8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=MWdyE69Zz6x+YTCCMxtplMnzkxr2Ln63vBGTZU+k+vG5K6rAAIOzxEolkPJq0PsSA
-	 bqFU79OCAkC8PbiyXUJBQ13uHSciFIStIShUtIePuL7m0F0AISiJp4SjxWr6plkd4T
-	 d9ost0GHAk5rUd0zewcq/00uUuTpQfIuQ4z1Wk7DAaS5uWbo4t9kdsz4JCRQw8YNcd
-	 EcKwktUl4eHKdDFq+wkc0jfADgTsDj2ZPUQW74eqsABAXG/vksJJGFSjW11bM8re1w
-	 sHjo+dzDCMQBj1rq1mZDpcCySJ0EtzrCNY8P14qO5K1tgHKtbItkUhdWmC8rWY3O8F
-	 WYhKgDHbYG/aQ==
-Message-ID: <6c59d8f0-9a70-46d1-bf70-1e69c1869fb5@kernel.org>
-Date: Wed, 1 Jul 2026 17:53:33 -0600
+	s=arc-20240116; t=1782950316; c=relaxed/simple;
+	bh=++E0U5aWCMtv8XTC4iwlRdxhbI6lt2ULgAfP1yOkzT4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJnuQ/W/0ntfmM3C16ZiPfTMp2JlmvAbfBGQfZBuxFu1zsY7deCvLlLglsh0Dfq2fsjMTjv+YB0SwnEQ03seUTAkV5QU/z5G7RRc7t+8Pfa9aG5jBomtkcMRWtb2QKP8YG5TtX8+wUUCBC47IJ2bKK148YjLYf2hSb3AzY4kP2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=U9EnC6WR; arc=none smtp.client-ip=209.85.160.180
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-51bfb91795eso6390701cf.1
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 16:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=trailofbits.com; s=google; t=1782950315; x=1783555115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LvF1S3B+dNSeFpU1X93IfKv9JF+ggDHfHPlB1rF6bww=;
+        b=U9EnC6WRyWoEvFYJzOilAR0rd1XAwKR/KPds0HEGIsVMKEmzXE1RW5DGbocLudGUv0
+         ylAmXZvuzdKoka8FwzDCBEU1QpoTFHzTYwlz1+RsaJy9edBPx9QaDtT8roRmK6efiaYt
+         MxPiIxTy7HEPCLiJLRkjiwpcMpF5ejEbNZ2ewHhkOsS1NyNYXji7nipdxP/0SbRmE2Qd
+         eCuAV5ek8JIjwm10Hj7uzdXe7tqS+oKjkGXMBIJzsclcdaWaIWjrB/LZcncH8xmgwCGV
+         9Il1laysYKim4yPXQyVc4RnpvoruvUmme425dyz41YNG2X6j13vIjcbUhODzUFgsdaKe
+         oFYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782950315; x=1783555115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LvF1S3B+dNSeFpU1X93IfKv9JF+ggDHfHPlB1rF6bww=;
+        b=HbKf2dhqmbrZaKRADIXqjvBz94xlrOj2bnGnQqNwrbe2C5OiAH2dzyC9RbZI/PFDjt
+         stUjtgITqFBB85QmCYNCZhijvWsABmRbvR90MFwc3OVNalED/A5lq2Fnh+kaegk9XyAU
+         +aAPbR39TNBZXZvM7ZZbtKUMleMyPRg8X6OP0ullUBtUBvonRwXhsacBaRid8DH+BSHI
+         5fD2S4vyeYDO8rtp0x0hfFiufhmt1StbTuHF2HVfScsclKijnq3Lix8GKOqPvKlVMVfl
+         pBOoToYrwVhutRO+VtZ0KbGZfBzYCVi1wUDJY4Aoxeu7iFw2xqdv7U2/4G2mlqgenh95
+         aq6w==
+X-Forwarded-Encrypted: i=1; AFNElJ+7jAHMv4Dq7HIYKjosnCH5x7OALRZqQ18JlpufOD/ubW7jaONhViXHgnRNqTkbboQEtUaC3Ss=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1fJgUTQ3cKk9k6Kpq+iH1M7PnQxe85Pu9eX4LA5fX90u7u71c
+	GXvfvd85JSolCYRAWH7lXiU65nYjB65jr3IVTCBJghW24L+1KDwzO0ZdbSW+609Uc2Us+4zribL
+	Qo854+9M=
+X-Gm-Gg: AfdE7ckRM0tCpljPEx9YMJd1OD3dtW3y8u+6aZDq0Du7NFC802pxw4J64uVs72mPRXr
+	hAIre0oIlIvO76w1ZP82WOtu3tA/u1kOaFxoY5YHYzlcL9GLfGZXc60ackSdVQ+5rcRHd55FtYR
+	xqMhGyvCREWE6o429/jZ64qvx4RUovWOshioxnKFz5caIqAhpv6JwRwPn2E9OjuMlWfd+L0KJNl
+	yIiPLyBZYgsrNMYHg+lazsosWta3C26vtVKhK5m/9D7+O6yfJel10A4tEUy+LdWzSkrPpoa++VQ
+	y3FtTFNYpB0wu64zcmoXiGarzW4VJW/ZKPeMbF6kz6zMpSj2uAq28wRzIt+MjDW9jiGe810T2bS
+	7TWLCBYPlmD7G08k0eAM92PgUbQPb/yY8dIvcT+wb8U75XS3zuQIuFCWDg3bJQA8iodlpKpSLkM
+	h5s3osbyBX7rWhTr9H
+X-Received: by 2002:a05:622a:1e8c:b0:51c:1ec5:d00 with SMTP id d75a77b69052e-51c26b066admr50911551cf.44.1782950314724;
+        Wed, 01 Jul 2026 16:58:34 -0700 (PDT)
+Received: from localhost ([161.35.96.86])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-51c30c1582esm3231531cf.16.2026.07.01.16.58.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2026 16:58:33 -0700 (PDT)
+From: Samuel Moelius <sam.moelius@trailofbits.com>
+To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	cake@lists.bufferbloat.net (moderated list:CAKE QDISC),
+	netdev@vger.kernel.org (open list:TC subsystem),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] net/sched: cake: reject overhead values that underflow length
+Date: Wed,  1 Jul 2026 23:56:57 +0000
+Message-ID: <20260701235656.296208.68e320e0746d.cake-overhead-underflow@trailofbits.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v3 2/2] devlink: support u64-array values in
- devlink param show/set
-Content-Language: en-US
-To: Ratheesh Kannoth <rkannoth@marvell.com>, stephen@networkplumber.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- jiri@resnulli.us
-References: <20260701031359.839221-1-rkannoth@marvell.com>
- <20260701031359.839221-3-rkannoth@marvell.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260701031359.839221-3-rkannoth@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303901-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:stephen@networkplumber.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303902-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:toke@toke.dk,m:sam.moelius@trailofbits.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:cake@lists.bufferbloat.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:mid,trailofbits.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 823B36F27DE
+X-Rspamd-Queue-Id: 44D756F2824
 
-On 6/30/26 9:13 PM, Ratheesh Kannoth wrote:
-> Add support for DEVLINK_VAR_ATTR_TYPE_U64_ARRAY parameters that carry
-> multiple DEVLINK_ATTR_PARAM_VALUE_DATA attributes. Parse and display
-> u64 array values in param show, and accept space- or comma-separated
-> u64 values in devlink and port param set commands.
-> 
->   - Show search order
-> 
->   devlink dev param show pci/0002:01:00.0 name npc_srch_order
->   pci/0002:01:00.0:
->     name npc_srch_order type driver-specific
->       values:
->         cmode runtime value  value  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+CAKE accepts signed overhead values and stores them in an s16, but the
+adjusted packet length calculation uses unsigned arithmetic.  A negative
+effective length can therefore wrap to a large value.
 
-"value value"? Is that correct or a typo in the commit message?
+Such configurations make rate accounting depend on integer wraparound
+rather than on the packet size userspace intended to model.  A static
+netlink lower bound is not enough because packets reaching CAKE can be
+smaller than any reasonable manual-overhead allowance.
 
-You are dumping it as a string which for json is wrong -- it should be
-an array.
+Fold the signed overhead adjustment into the existing datapath MPU clamp
+so negative adjusted lengths are clamped before link-layer framing
+adjustments.
+
+Fixes: a729b7f0bd5b ("sch_cake: Add overhead compensation support to the rate shaper")
+Assisted-by: Codex:gpt-5.5-cyber-preview
+Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+---
+Changes in v3:
+  - Adjust how check is performed
+Changes in v2:
+  - Add fixes tag
+
+ net/sched/sch_cake.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index a3c185505afc..f78f8e950776 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1389,10 +1389,7 @@ static u32 cake_calc_overhead(struct cake_sched_data *qd, u32 len, u32 off)
+ 	if (qd->min_netlen > len)
+ 		WRITE_ONCE(qd->min_netlen, len);
+ 
+-	len += q->rate_overhead;
+-
+-	if (len < q->rate_mpu)
+-		len = q->rate_mpu;
++	len = max((s32)len + q->rate_overhead, (s32)q->rate_mpu);
+ 
+ 	if (q->atm_mode == CAKE_ATM_ATM) {
+ 		len += 47;
+-- 
+2.43.0
 
 
