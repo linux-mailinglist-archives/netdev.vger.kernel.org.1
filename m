@@ -1,179 +1,193 @@
-Return-Path: <netdev+bounces-303692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Muh2FuogRWoD7goAu9opvQ
-	(envelope-from <netdev+bounces-303692-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:15:06 +0200
+	id hN0JGf4jRWra7goAu9opvQ
+	(envelope-from <netdev+bounces-303691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:28:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B6A06EE960
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:15:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFADF6EEBC6
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:28:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=h-partners.com header.s=dkim header.b=BSOoP2EC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303692-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303692-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=h-partners.com;
+	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=n41nM9bK;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303691-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303691-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8569630CD8C7
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 14:09:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDE5B31218E9
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 14:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3272DAFAA;
-	Wed,  1 Jul 2026 14:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACBF2DA765;
+	Wed,  1 Jul 2026 14:09:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B012D97B5;
-	Wed,  1 Jul 2026 14:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDCE2D97B5
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 14:09:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782914973; cv=none; b=jshpskWyn/Cr7dv6uTJQcIhKn5mdlS1ACaSeOiUJjOUyGiraRgySjUQho20ddyqAPQNlHV//FZTb54cci1688HzZFAOUk8PhCXzmqBZghExdK1XbIb7WxkofJ7+/rCgWPjcUGTkUPmxXZJOarHvkPDqHMdpg+xuPCq7bY41CJUA=
+	t=1782914962; cv=none; b=YG4xwxZSpkHMFDWxOnUYZCbRW+NcaWEHXr/KxwkgK4z1VVN3dy9+pTOdpSJEA0IyhRMgM5w4t0RUyYXquROZvVk05Lw25IIDz5mmFluhxNVPAHBA3K64wPtAQbI1ktgmeMFB/AgWYY2tjVx107INnA+kS5yDgRWAxFoSgvHdjfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782914973; c=relaxed/simple;
-	bh=ZILN6gtte3VTuWz2MDDPVacKzfJyPzK8qQQjXqjTEqs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YRIKYxaFXn6tgcRWK5HMch9MR1VftrmnrTEn1aeCZaTR13n8VWY/dHj6Wccq/I6CMzu3+3HeSHk/MZ/55osfKJXqmQxB3d/w8cY2J/xJzpqgOzsf8SqfXfPS/umOS1aRPUvRC3hhDbKC2hMhjzhBzVW8uZiPWBwrCwXz9s8ADko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=h-partners.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=BSOoP2EC; arc=none smtp.client-ip=113.46.200.220
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=x+YQQZdl+zcGOGPMuUavo8t+GSogJ59TL26Izpzh+CI=;
-	b=BSOoP2ECTYDILZF7Zy50EpMtsKHKDJzIYalhdbVM+WCkITo8iVto8ldJ8ynAED/CEmsQZuUXL
-	Ga3ygHFCpt/K5EfvYkP2GmWmp8iozmVBPzaKuVDtveSd7n2NBvNriZ9MpuyuzISx4H0h5mV25Ye
-	88N7usBGTukLOQGo/Hi5c7Q=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4gr1r42CTxz12LCv;
-	Wed,  1 Jul 2026 22:00:36 +0800 (CST)
-Received: from kwepemr100001.china.huawei.com (unknown [7.202.195.168])
-	by mail.maildlp.com (Postfix) with ESMTPS id 59F894057F;
-	Wed,  1 Jul 2026 22:09:19 +0800 (CST)
-Received: from [10.136.112.147] (10.136.112.147) by
- kwepemr100001.china.huawei.com (7.202.195.168) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 1 Jul 2026 22:09:18 +0800
-Message-ID: <0ad60f06-387e-49bc-9e26-3dcebf182cb4@h-partners.com>
-Date: Wed, 1 Jul 2026 22:09:00 +0800
+	s=arc-20240116; t=1782914962; c=relaxed/simple;
+	bh=9573nrWrSx/Y9UOpr/TlheCNkMPqUyYtfuIixr6r3Rg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxEqGHCE9gcgLa5vZy3zQUT1BAkJhnS/tDqi/zxE3w4mC/CVjmv86mKNeeRgkjBY2mXJpgft2QBVEPwIhiPy61d532/Ef9vH+va/UG3377pJueI1CdarTWShTIVCjY7NE+xszfAsXkJhruVryO4SC1VjwbUL0tXxdZi9wkDm4SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=n41nM9bK; arc=none smtp.client-ip=209.85.218.52
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c1269e4721aso102525866b.0
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 07:09:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1782914957; x=1783519757; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h5yGg7xTrcKVGSs2/RAkolvsvNsO9JL3VCUQsl5nfCM=;
+        b=n41nM9bKknfDSII57sUQPENrA4Ng5DsEfRL3eWWCo/bbwhodzoikFkhqKLOweRDaci
+         7pyaqeO+O32WrlUmGJSf46JU91myU51QRi5yMo89WymHVuGtOSiF6gpkg3WTbIcsewnC
+         zzz83E61Q/ukK9yzOE2did4Klq4Bp6TB7RjRXE4LvhS+xDTegZe4CcJmggUaAAS+AfJo
+         8tZPOGn/pVVJkHAKeC3xqzHKuVO0v6pQcrb8gXCI488U1e/bczogCOWyKdyH72/KDAZV
+         7UxEHJC0ctXfPVk0vGJIAfkHsOtIlOlVtnXp445XuNJK3oZCCYMegSj5Ez/nxm7CYYCG
+         tazQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782914957; x=1783519757;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h5yGg7xTrcKVGSs2/RAkolvsvNsO9JL3VCUQsl5nfCM=;
+        b=g6NHIejgHEUmmuN9yv8sovLfPURZhCVEuJMupz6A1g9yIyKWe7flQ1ECMxAOv4oE9R
+         UfhuptJ2MdelP/Ax6eqn36Wh98XbsWWiWWgKXkjcSipvd155nTvrWOmPrSqJg7ZcsuAe
+         SDF50xhLfYq1MxmfgcyNGIHy6f73cgdgNL4dwc+Z5Qg/RnVposZnWvhnBA5zqbNrSD1A
+         1XfnmUt/zysq+alFngGzQ4zQuOneuCaHCklyZXkQj7Jrc1cIoUpCW1d22cbvsGOhd+bG
+         el0ydDvWFNRgWAznw2kRAnVDNA7UHbHbhsQ54/FQXJ5dN3Z6F/n2/qUWutn9CxgScpRS
+         IKkQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpIM45K6JuVJUj26p1raIxFqcI1J0Z8674pFJVrK5dzLWstKTFFS8zDF/7iqOtxhnomobR5Em8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaSVW8sfIqhri/zZtYbwWnMrYOUEZwqLU9pZCDoZtbXb372tE2
+	g6XSS6rXDVCks5cQ3Q6aZkzcLVJMsT7TEmLvKcp666IvzXPTmlkPIl/IWvcr5GCBkFM=
+X-Gm-Gg: AfdE7cnxfWJRMya3dbOXlEd4igayx8PYKIv4tJe+Mcg8/e55cACgWdjxBIsMXfe4FVH
+	1BdijrT21eZkDvCyknlKPZWwbcCe4A/dkzOEvmm7QaFyAd7iXmIcehSegSqHcXxYomCkX8DOZ+w
+	F79Ti//p5Ak/YDsovaOO/9tSxGk28j5Yv8PNU2U31XAxS8QCNLpoGF0+RyFe3b4cak77T/iyJDd
+	TJXLdCfV8bfLjpAhtYw9AVn7Pok+xzMYpS4w0U8uAcHM1inlQNhaVF1BLbiRcAhYqbOzMig/7uL
+	jNz3DAMGXvJId30P2rJAnohkPDclPxE9L1nvkxkXRdEnW18gQQeQN+Hx8NJVd56u1B7IrhOEUud
+	jgECcRojQ+3vCKP53QcNdWO3uN6TZGHVSijYw3x0qDVWATEwJbk6gqcVm9ITBpO9PYD9XF5RsQT
+	g3PhZDTU+h1QEU2VH/GzH8YA==
+X-Received: by 2002:a17:906:e907:b0:c12:8ec5:eb8 with SMTP id a640c23a62f3a-c12aa1411eemr71054966b.41.1782914957090;
+        Wed, 01 Jul 2026 07:09:17 -0700 (PDT)
+Received: from localhost ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1288d6a3e8sm281311366b.19.2026.07.01.07.09.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jul 2026 07:09:16 -0700 (PDT)
+Date: Wed, 1 Jul 2026 16:09:12 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next V4 4/6] devlink: Apply eswitch mode boot defaults
+Message-ID: <akUfXyKioGNAO_iB@FV6GYCPJ69>
+References: <20260629182102.245150-1-mbloch@nvidia.com>
+ <20260629182102.245150-5-mbloch@nvidia.com>
+ <akThPmvUHvCMT2cp@FV6GYCPJ69>
+ <1d4ca929-82b8-4891-9058-1451bf71a660@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] netfilter: nf_nat_masquerade: recalculate TCP TS
- offset when port is randomized
-To: Florian Westphal <fw@strlen.de>
-CC: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>, "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, gaoxingwang <gaoxingwang1@huawei.com>, huyizhen
-	<huyizhen2@huawei.com>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-References: <20260629093408.3927103-1-xietangxin@h-partners.com>
- <akKN4cywAsFRdefX@strlen.de>
-Content-Language: en-US
-From: xietangxin <xietangxin@h-partners.com>
-In-Reply-To: <akKN4cywAsFRdefX@strlen.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100001.china.huawei.com (7.202.195.168)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1d4ca929-82b8-4891-9058-1451bf71a660@nvidia.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[h-partners.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[h-partners.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303692-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:pablo@netfilter.org,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:gaoxingwang1@huawei.com,m:huyizhen2@huawei.com,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[xietangxin@h-partners.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[resnulli.us];
+	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-303691-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[h-partners.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@h-partners.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,h-partners.com:dkim,h-partners.com:email,h-partners.com:mid,h-partners.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,resnulli.us:from_mime,resnulli-us.20251104.gappssmtp.com:dkim,nvidia.com:email,FV6GYCPJ69:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9B6A06EE960
+X-Rspamd-Queue-Id: AFADF6EEBC6
 
+Wed, Jul 01, 2026 at 02:57:21PM +0200, mbloch@nvidia.com wrote:
+>
+>
+>On 01/07/2026 12:48, Jiri Pirko wrote:
+>> Mon, Jun 29, 2026 at 08:20:59PM +0200, mbloch@nvidia.com wrote:
+>>> Apply parsed devlink_eswitch_mode= defaults after devlink registration
+>>> and after successful reload.
+>>>
+>>> devl_register() may still be called before the device is ready for an
+>> 
+>> How so? I would assume that driver calls devl_register only after
+>> everything is up and running and ready. If not, isn't it a bug?
+>> 
+>
+>You would think so :)
+>
+>Some drivers, mlx5 included, call devl_register() while holding the
+>devlink instance lock and then finish setting up state before releasing
+>the lock.
+>
+>In v3 I tried to enforce exactly that model, move devl_register() to
+>be the last thing the driver does. Jakub pushed back on making that a
+>general rule. So in v4 I changed the approach. devl_register() only
+>schedules the work, and the actual eswitch mode change can run only
+>after the driver releases the devlink lock.
 
+Wouldn't it make sense to use a completion instead of loop-reschedule of
+delayed work?
 
-On 6/29/2026 11:23 PM, Florian Westphal wrote:
-> xietangxin <xietangxin@h-partners.com> wrote:
->> Problem observed in Kubernetes environments where MASQUERADE target with
->> --random-fully is configured by default. after commit
->> 165573e41f2f ("tcp: secure_seq: add back ports to TS offset") TCP short
->> connection QPS dropped from ~20000 to ~10000. This added source and
->> destination ports into TS offset calculation.
->>
->> However, with MASQUERADE --random-fully, when multiple internal connections
->> (e.g sport 10000,20000) are mapped to the same external port (e.g 30000),
->> their TS offsets are calculated as ts_offset(10000) and ts_offset(20000).
->> If the server reuses the TIME_WAIT slot from the first connection, there is
->> a chance that ts_offset(20000) < ts_offset(10000), breaking TSval
->> monotonicity for the same 4-tuple and causing RST packets:
->>   Client -> Server 24870 -> 80 [SYN] TSval=2294041168
->>   Server -> Client 80 -> 24870 [ACK] TSecr=2846236456
->>   Client -> Server 24870 -> 80 [RST] Seq=855605690
->>
->> After nf_nat_setup_info() successfully assigns a new randomized
->> source port, recalculate the TS offset using the new port and
->> update the SYN packet's TSval accordingly.
-> 
-> I don't think this is related to masquerade but to snat (port address
-> rewrite) in general.
-> 
-> I think you could place your new helper in nf_nat_core.c and call it
-> from nf_nat_l4proto_unique_tuple() once we've found a usable tuple:
-> 
->  668 another_round:
->  669         for (i = 0; i < attempts; i++, off++) {
->  670                 *keyptr = htons(min + off % range_size);
->  671                 if (!nf_nat_used_tuple_harder(tuple, ct, attempts - i))
-> 
-> 	 		     ... here.
->  672                         return;
->  673         }
-> 
-Hi Florian,
-
-Thank you for the insightful feedback. You are absolutely right that
-this issue is releated to SNAT with port rewrite, rather masquerade.
-
-Shifting the helper down to nf_nat_l4proto_unique_tuple() as you suggested
-encounters a structural roadblock. we don't have access to the skb there.
-Adding skb to all intermediate callers (like nf_nat_setup_info, get_unique_tuple)
-would severely pollute the core NAT APIs.
-
-would it be acceptable to place this logic in nf_nat_inet_fn() before do_nat?
-
- 963 do_nat:
-             ..here
- 964         return nf_nat_packet(ct, ctinfo, state->hook, skb);
- 965
- 966 oif_changed:
- 967         nf_ct_kill_acct(ct, ctinfo, skb);
- 968         return NF_DROP;
- 969 }
-
-Best regards,
-Tangxin Xie
-
+>
+>Mark
+>
+>> 
+>>> eswitch mode change, so keep a per-devlink delayed work item and pending
+>>> flag for the registration path. Registration queues the work, and the
+>>> worker tries to take the devlink instance lock.
+>>>
+>>> If the lock is busy, the worker requeues itself with a delay.
+>>>
+>>> For successful reloads that performed DRIVER_REINIT, devlink_reload()
+>>> already holds the devlink instance lock and the driver has completed
+>>> reload_up(). Clear pending work and apply the default directly from the
+>>> reload path instead of queueing work.
+>>>
+>>> If a user sets eswitch mode through netlink before the pending
+>>> registration work runs, clear the pending flag so the queued default does
+>>> not override that user request. Cancel pending default apply work when
+>>> freeing the devlink instance.
+>> 
+>> These AI generated code descriptive messages are generally not very
+>> useful :(
+>> 
+>
 
