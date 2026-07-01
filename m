@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-303769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1CPrL6ZCRWpR9goAu9opvQ
-	(envelope-from <netdev+bounces-303769-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:39:02 +0200
+	id 57dsGAtCRWoa9goAu9opvQ
+	(envelope-from <netdev+bounces-303770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:36:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CBDB6EFDF5
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:39:02 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF446EFDA2
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:36:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=hIMhVLbn;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=Vh7it3+N;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303769-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303769-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linutronix.de header.s=2020 header.b=cFjXXlOc;
+	dkim=pass header.d=linutronix.de header.s=2020e header.b=MhTy3XKh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303770-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303770-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B270300D724
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 16:36:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5F8203067AD5
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 16:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E155366051;
-	Wed,  1 Jul 2026 16:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3239E377EB8;
+	Wed,  1 Jul 2026 16:36:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A546374A0B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1548376497;
 	Wed,  1 Jul 2026 16:36:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782923768; cv=none; b=BY14KLwZO1AsTK1G8YwblDkdWxNmUMd2bSNYRMn80eirRN0390gUUqFTSGg6yQbeszfoYZRusdwGPBJ4h5FFmocePWb9xwy/fGoeTmr3LJ3wZdNnyJLSk6+BRGTam6R1Lia5Y7EtJ5BBDUD/Ly4DKPZTOckABKOsnAstwzj7s+Y=
+	t=1782923768; cv=none; b=O6+P5DCPgR/rc+KT3ZhYZ5bsM7AACHC0Dbwi0S6Az1YRZPiMTFmNN1mo/Ij0PCefY7jwIaDGfqt5Iz/vSJpzdXmCpGlzsZaoXNaH0GMft8DaSRD0wVfMHGTdziCY/kxJBMxBy/GlLn0zsTAji3IkZ996rNSi7j5PSZxdKnLqr2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782923768; c=relaxed/simple;
-	bh=dGqjQNYHP3AKe7QVSruy5pq6XjGy/UjGWXch8I2wCqI=;
+	bh=LtZorQCC1Q1RYWrb7kd+YV0ztZUF6kqN7X9u7clnLB8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gkqnSGcNrW6uF/ZPBQwUr144WjVF7zQX5Gy3iA2xXGKr0ulN30QWWGy7CDOJelwrJRsZkiNDXxbzEjgjJ21mKQzJxp1LlGj5hue+xENdnFn3JGoBN5gsMp5DwxhCTrjGCTfwwzLy2sEjeby8gYSpuGA+O4WormyORikoPrjfDVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hIMhVLbn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Vh7it3+N; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=K1DdMKuSONr5ZPXWISwLh5tupkDSkS7FyUGnYx6wW8SS+4BTyCtHbYdFqZU5L6Rv6TKJIHLDEbo9bKjHkSOYj15O6YvHrslye0+y/A8LyGZ8PufN/XJ+YBSm0wVvU6VRy/8j4mxQ2ydGsZOB/l0zvqnxO+q117Zb1kfbdExwywA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cFjXXlOc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MhTy3XKh; arc=none smtp.client-ip=193.142.43.55
 From: Nam Cao <namcao@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1782923762;
+	s=2020; t=1782923763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5H2RMSAKmJoGY+DThXDisriGJ1Qn+QePthjBOB1RimY=;
-	b=hIMhVLbnIB1PefXMfbm/EMOg6mKFIdrxotbTAq78FklFXkHvLDKnnSOxQGjheeBqoF+MSB
-	/RJ4wpAY1LpNxpoVDRXbyAs+pN3f1cAQwzgMMKni2TlSK1vj0Hf1dCEaqh/FXpK06yjGge
-	EVdlksNkeovxiIEjUmifPEL7CE39QBFn9C/gdeGWpqqez/TC05uqc4TFrOUVcvZq4VIwAC
-	XONzSq5r1p+4yRorHSk41mnvX3+zTgTa/HfRu8YLmF/NWUA2wdGJRCY6Y3/6lB536zhmiK
-	3iwPrJExYb5vG2NpdnKKYxqPRDJseAPMvUbZXy5Qp38rtXYFUye0bggCE0pAUw==
+	bh=HpPxfHjNVp/v6IB8DNtSUfTsO1JBv2zEZ0/vIk7YYIw=;
+	b=cFjXXlOcbo1GW/Y8p350NcjyVVnKNBjCpGjd4nH2n4yVsh0y/9/PUQgmrsqleYV+XQhwVO
+	4TVqLerTf6ywqnYsdwMg/D6toYyiXFojLMqJ2MyYnnGqqNHjJtS71ET6BErxtA08t9Ec1J
+	WXLNhBrxlYWeVWGs4y0z0QRvAtjqhh9mhDceINe/ARAsBibXTYJSoEjt6jOFAVHNOWzJlV
+	SVtdXYEqlr3DABe9CmEOe7oEKiJFFqrveIAPIX0y/KfkAgkneSw0GeikW/L2/WPkTf2krF
+	3cu5RRKHj9HFrhf6SGt8kIgq+sin7MOr+6dlrlxplS5oe2T1t+BjvAgWvSBs8Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1782923762;
+	s=2020e; t=1782923763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5H2RMSAKmJoGY+DThXDisriGJ1Qn+QePthjBOB1RimY=;
-	b=Vh7it3+NUYTxkGM8g0mUS+gepqlrvG5Vqbdg+e9N/H7WDBq8zzK8W14/7+nVpp0qR29B8g
-	o6XJBK9itxGbjWCA==
+	bh=HpPxfHjNVp/v6IB8DNtSUfTsO1JBv2zEZ0/vIk7YYIw=;
+	b=MhTy3XKhl0H3mGsbdJveUCLYj4N7WIA0lYI20FEMq3hmrh7nlyCBuIUSQ/wFKyOO6QASBo
+	mzHxHrufYIy35dBw==
 To: Kuniyuki Iwashima <kuniyu@google.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -67,9 +67,9 @@ To: Kuniyuki Iwashima <kuniyu@google.com>,
 	linux-kernel@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
 Cc: Nam Cao <namcao@linutronix.de>
-Subject: [PATCH 1/2] af_unix: Do not wait for garbage collector in sendmsg()
-Date: Wed,  1 Jul 2026 18:35:53 +0200
-Message-ID: <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
+Subject: [PATCH 2/2] af_unix: Clean up unix_schedule_gc()
+Date: Wed,  1 Jul 2026 18:35:54 +0200
+Message-ID: <8e1eda7344d490498839bf99b906968b66512de9.1782922354.git.namcao@linutronix.de>
 In-Reply-To: <cover.1782922354.git.namcao@linutronix.de>
 References: <cover.1782922354.git.namcao@linutronix.de>
 Precedence: bulk
@@ -86,11 +86,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
 	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303769-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303770-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
@@ -109,80 +109,78 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:email,linutronix.de:mid,linutronix.de:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linutronix.de:dkim,linutronix.de:email,linutronix.de:mid,linutronix.de:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2CBDB6EFDF5
+X-Rspamd-Queue-Id: ECF446EFDA2
 
-AF_UNIX sockets' sendmsg() schedules and blocks on the garbage collector if
-user has too many inflight unix sockets. This causes real-time issues, as
-high priority processes who do need to send lots of unix sockets get
-blocked by the garbage collector which runs as workqueue, causing a
-priority inversion scenario.
-
-The reason for blocking on garbage collector goes back to 2008, when
-it was reported that "Local/unprivileged users can cause soft lockups
-and take out system processes by triggering the OOM killer":
-https://bugzilla.redhat.com/show_bug.cgi?id=3D470201
-
-The soft lockup was because a process can keep queueing AF_UNIX sockets to
-another process that is exiting. Back in 2008, the garbage collector was
-run synchronously by the exiting process, therefore keep queueing AF_UNIX
-sockets blocks that process from exiting.
-
-The solution to that issue was forcing sendmsg() to wait for ongoing
-garbage collector.
-
-The OOM killer issue was brought up again in 2010:
-https://lore.kernel.org/lkml/AANLkTi=3DQ967xpX0KLMwX-=3D_4_1AKO5wjHEuJ1TrNj=
-Cj9@mail.gmail.com/
-
-To resolve that report, beside blocking on the garbage collector, sendmsg()
-also schedules the garbage collector if the number of inflight AF_UNIX
-sockets in the system is too high.
-
-Then in 2015, once again, the OOM killer problem was brought up:
-https://lore.kernel.org/lkml/20151228141435.GA13351@1wt.eu/
-
-That time, the issue was resolved by disallowing a user from having more
-inflight AF_UNIX sockets than their RLIMIT_NOFILE. That was done by commit
-712f4aad406b ("unix: properly account for FDs passed over unix sockets")
-and commit 415e3d3e90ce ("unix: correctly track in-flight fds in sending
-process user_struct").
-
-Now, sendmsg() does not have to block on the garbage collector anymore,
-because:
-
-  - The OOM killer issue has already been addressed by checking
-    RLIMIT_NOFILE.
-
-  - The soft lockup issue is no longer relevant, because the garbage
-    collector now runs asynchronously since commit d9f21b361333 ("af_unix:
-    Try to run GC async.")
-
-Therefore, remove that to prevent priority inversion. Running all the
-reproducers from the mentioned bug reports after this patch, no problem is
-observed.
+The only caller of unix_schedule_gc() passes NULL as an argument. Therefore
+simplify by deleting the parameter.
 
 Signed-off-by: Nam Cao <namcao@linutronix.de>
 ---
- net/unix/garbage.c | 2 --
- 1 file changed, 2 deletions(-)
+ net/unix/af_unix.c |  2 +-
+ net/unix/af_unix.h |  2 +-
+ net/unix/garbage.c | 14 +-------------
+ 3 files changed, 3 insertions(+), 15 deletions(-)
 
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index f7a9d55eee8a..759db734a866 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -733,7 +733,7 @@ static void unix_release_sock(struct sock *sk, int embr=
+ion)
+=20
+ 	/* ---- Socket is dead now and most probably destroyed ---- */
+=20
+-	unix_schedule_gc(NULL);
++	unix_schedule_gc();
+ }
+=20
+ struct unix_peercred {
+diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
+index 8119dbeef3a3..600d56fdcde4 100644
+--- a/net/unix/af_unix.h
++++ b/net/unix/af_unix.h
+@@ -30,7 +30,7 @@ void unix_update_edges(struct unix_sock *receiver);
+ int unix_prepare_fpl(struct scm_fp_list *fpl);
+ void unix_destroy_fpl(struct scm_fp_list *fpl);
+ void unix_peek_fpl(struct scm_fp_list *fpl);
+-void unix_schedule_gc(struct user_struct *user);
++void unix_schedule_gc(void);
+=20
+ /* SOCK_DIAG */
+ long unix_inq_len(struct sock *sk);
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 0783555e2526..f180c59b3da9 100644
+index f180c59b3da9..d46aeb9d2051 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -300,8 +300,6 @@ int unix_prepare_fpl(struct scm_fp_list *fpl)
- 	if (!fpl->edges)
- 		goto err;
+@@ -635,23 +635,11 @@ static void unix_gc(struct work_struct *work)
 =20
--	unix_schedule_gc(fpl->user);
+ static DECLARE_WORK(unix_gc_work, unix_gc);
+=20
+-#define UNIX_INFLIGHT_SANE_USER		(SCM_MAX_FD * 8)
 -
- 	return 0;
+-void unix_schedule_gc(struct user_struct *user)
++void unix_schedule_gc(void)
+ {
+ 	if (READ_ONCE(unix_graph_state) =3D=3D UNIX_GRAPH_NOT_CYCLIC)
+ 		return;
 =20
- err:
+-	/* Penalise users who want to send AF_UNIX sockets
+-	 * but whose sockets have not been received yet.
+-	 */
+-	if (user &&
+-	    READ_ONCE(user->unix_inflight) < UNIX_INFLIGHT_SANE_USER)
+-		return;
+-
+ 	if (!READ_ONCE(gc_in_progress))
+ 		queue_work(system_dfl_wq, &unix_gc_work);
+-
+-	if (user && READ_ONCE(unix_graph_cyclic_sccs))
+-		flush_work(&unix_gc_work);
+ }
 --=20
 2.47.3
 
