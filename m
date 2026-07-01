@@ -1,195 +1,139 @@
-Return-Path: <netdev+bounces-303764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wsPiEmxARWqu9QoAu9opvQ
-	(envelope-from <netdev+bounces-303764-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:29:32 +0200
+	id E6NXBuBFRWp79woAu9opvQ
+	(envelope-from <netdev+bounces-303766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:52:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 626676EFCCC
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:29:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 150DD6F0036
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:52:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=fastmail.com header.s=fm1 header.b=pgzXdUaP;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="c LxJZny";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303764-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303764-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=fastmail.com;
+	dkim=pass header.d=dolcini.it header.s=default header.b=jnTiTMoL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303766-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303766-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=dolcini.it;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E65530B8542
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 16:23:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 972D83099F94
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 16:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7962C367B6F;
-	Wed,  1 Jul 2026 16:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D683769FB;
+	Wed,  1 Jul 2026 16:31:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A63279798;
-	Wed,  1 Jul 2026 16:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2347837754C;
+	Wed,  1 Jul 2026 16:31:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782923014; cv=none; b=trWir/lSTqtQeyWfPpCbchP172BQKOZPAFVpuYQybDqsBoZMuPu12Amy+ke+GHPhVgJYk86skDdfVEgDK2UMA970XBOtFR450NIrhZLokycJCHXFErmmw18FKKGZs+6WQ5mP0AKfHnT6lSJ8tlqRUpQ4oWKv1akYAVd0Bnl/V1c=
+	t=1782923500; cv=none; b=tDiQq3fSO7vUrqWU9JMtcTHaJGm7pk5eUI6Vf5hortblynpXCoufjYrXQTc1w3PPHVnYnRJxXKtuKlePAUqO5cEzh08EGjVPDYn6P7tPxgGV++PzXpyUq9RyQPtMIPo2qVSWM7v49HMZDKXrlCSsjQ2kt1H3lJnm0PrW3ACaR5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782923014; c=relaxed/simple;
-	bh=x10C5v/pkDN5JEhi5Z90muc7qgtwdJDaeB1HgP/pcHo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WLE2f4foDbPNJrRJ3j6Y5sklUTbtFfW2UFV3FIDfBU2E9ubS9lWKw2O8PrzmcDccpv/yqpmuYlZbwNGmwwe7zqklCNgtJdRMkpQp8R8SjNhBN/+DuEacmCo2q8RZCwfo5DRHGo2zgihpzwZ5vmXi/HQAbbHPdJvUBoogokRbq8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=pgzXdUaP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cLxJZnyt; arc=none smtp.client-ip=103.168.172.140
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailflow.phl.internal (Postfix) with ESMTP id BA85013803FA;
-	Wed,  1 Jul 2026 12:23:31 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Wed, 01 Jul 2026 12:23:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1782923011;
-	 x=1782926611; bh=bIIdkaiZyLJ8dGaBsy+pOB1LtJlZqvLnI/SY4kK7MsE=; b=
-	pgzXdUaPLJ59bm5PICdUUbPY4QKNEAuIenH4eOEV6jc0vrgkONRWWwsIQKAhsZd3
-	90fZFVaF0+7dET/zgxPwjp2nF3EFcGJ8cHHJ676NnMPtOJ45I0snDn3B3GgNyTA4
-	MAIbJ9bPUPXanAa7GO+vL26wYF5t6FfOHYL6TsK5zUZYQIqSTOcEWv6RMmT329zC
-	JzCX8JupRxOg7kgHFeOlg4/K2lF4DOiS3mx3g3h3Q/0tSCbRQjJ4HutKmukVWycA
-	6DQxaEoySrFPpg3Ady70qQGJETOMBYoe0gHyvSZAcLjEaXb9VCB+wRFHWZkJFzkU
-	5/wy2vRiX5FhqafaDpuzSg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1782923011; x=
-	1782926611; bh=bIIdkaiZyLJ8dGaBsy+pOB1LtJlZqvLnI/SY4kK7MsE=; b=c
-	LxJZnytS/Tsv+E6zFyJz2sDFARGejdBa+611xVW6J4K8ExVcQQ7821+Z4Md4vKNe
-	yY/0FEH3bfXpC1UV98oA9x+SbsEyrUyUhN3IcPmRQu+cpSDLX5Hc5Sdp7bLb7SKE
-	F79fANlOZRzUgTFZqVlPN+CRkzMVKaE4XRahebYiB8B8pjs8KlUnx1XQd0L8xA6V
-	4ltzH1zzwUYNtn/9JiF/gUogelwMkEvDAu1Ebdw4B1F9nFY37E761quF89Pf7f9u
-	URwiMP59+vqsN2KWvhGPJchxSJ0ftsHzcndfAdTTMc8vucP4q/fIJVPVdfgaTw3/
-	2JW0NyobZfPSCmpursITA==
-X-ME-Sender: <xms:Az9FanA6nZdvvh80sryBZc0yAwO-d8RWxYUgm4bVAFswfvcrF2BBfQ>
-    <xme:Az9Fanifm0Tn4oHnl5x7ulmY0aa_TuNOWYlb4O8pU1wAWbH7gEtbmE_dxqIM5jFuY
-    9Ktwk5EcXEaJFbEesT_Vv43ZMmdTDtSfW-KJ2spKkxdPiDumKWgiA>
-X-ME-Received: <xmr:Az9FapNEZ0KoUHXrNDSbn6CFdfMRFCa48AC8dLPAN1fqtxMVnBeNfSbutoZum6az9A>
-X-ME-Proxy-Cause: dmFkZTE4zoAaZe8L2+jvZaacThwtfnpMPC6LLvbRLosiLXdN5TxmBr60aNb8A08/c4yk10
-    rCva1N2EQrNvsd+TFvLDW12DsF4qfnYXGB+3XNnrCiHAr72tANSXf99ZHOSryWtQ4mpg9u
-    FQ1neFOoU6VFX3cb2SR4lwTNkqVM3HAoWu8mHUzjv6hWxlYrg1bllFJMuvCm2KwbjOeHdr
-    en5TZcFEf5lWtcngTgtA+JUlrs3qe5KsFaFg+qUU0N5o9yxOqnydem7SNHsZOKJVpLNNKD
-    uf2q/MpwAUHpZfj0UjqgVy4aS5NXqW3DRtp9MVJna1NNgBuZU2KW32CnAuQ0/abf7bLAci
-    p8ttWjRHa2xaStm7lJf/ZANB2+tIGvZ4Pnn2LXaVUpjS4c00q9wHb964z1d6TtZzMq3K/c
-    3ov6ezT2MmjtoLgK1QMBP3qe9+vBy9n6tEZCsR5bObwWxBHjyqprfMt2AyScy0Q88wIfYV
-    J7EkHzfZqUX9ZIfUKey4b78TgR5r+0xMWIk6P3B5xH4Vv/Ae06f86Jey5kDSe6XPUcewh0
-    0gH7Amom3VgvBGgmz0fdJWbxTgRHfAkM95fgrSxvV4NW5+4F9Uvt7bcofOt3Vtgs5Rkt5K
-    PvCFRpCY7HcTRxJpwhyOWJ5q1tdop90NA7kGokl6d/viQCmxRo4PABs579sw
-X-ME-Proxy: <xmx:Az9Fan9C0J-o1xbpeh1PuSyYeR1ZSOT1ZXfwMXl9OlFhKxOF51IuCg>
-    <xmx:Az9Faqe6QRktZSkJ-_OtikT0gbokATpQZYHSel46uqxwLx4GCVWCnA>
-    <xmx:Az9FamxjVuXg80nBscT5k3vRAfKjAKCLOfuHVidNe4FxFHTa8oSyUw>
-    <xmx:Az9FavIxyRlDTayDd1tayuy8lNAwV674R8sK4hkoPebJlKJd7siOyA>
-    <xmx:Az9FakW0d48ptBsfSbrFxNY0HsifCMXqeio4jMF6Y5qqJpMSGK1o5TJP>
-Feedback-ID: i9dce4b48:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 1 Jul 2026 12:23:29 -0400 (EDT)
-Message-ID: <fe22e7b2-4cf9-4816-a513-5dfa9d3bf84f@fastmail.com>
-Date: Wed, 1 Jul 2026 19:23:27 +0300
+	s=arc-20240116; t=1782923500; c=relaxed/simple;
+	bh=baAqVdzOpKAOKFi/sIJGRPY78tXPIQcLc/tgXscx/9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MDUlfnelMkMyb+U82yRC1RxNwgBqAinOyOu+WIYzNUZQx3CK2gamV2PCrPyCm9RS2b7Z6c71P8znrjzGsNb7NFrTdLPf267OIN/+kgpEI0HLvbbTOshlh27oCrkFP6dj5fY2Lqe13S6A3t/vQsVfNSm0mcB0gZvHyWVf7Or/aWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=jnTiTMoL; arc=none smtp.client-ip=217.194.8.81
+Received: from francesco-nb (2-224-25-112.ip168.fastwebnet.it [2.224.25.112])
+	by mail11.truemail.it (Postfix) with ESMTPA id 893E0228E1;
+	Wed,  1 Jul 2026 18:24:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1782923051;
+	bh=j9BoCiRz+jTMzZ774GPA0gBs0cqXHfYMScxVG2VZtj8=; h=From:To:Subject;
+	b=jnTiTMoL2sl59fl3xrOn7icJksQ1c1zAouKZ6ZN1of6J9D+7GiPp4teflbxHaMEQr
+	 rMesX1MgeXn8rGclp21gk+OXT0xQE0ZTxSuFKYp5fBa1elg63QcS9skrryY7iGJNqB
+	 F+VLwuUevm3RXeRI9/VGBcHWbyedu0qfQQ9Sx5J4U7Yld6SydBWwV3WoRjZEtx4lZb
+	 CrAB6jB72BBRv1PxJ9GnYIQsm3pM+ZXeCz82ey1/7ArYu5oKTodRdQYIaZe/xaiJud
+	 tVOhbYJ8JkyUtmNVR+VgsWRb7T8NiLxaedru0BzkmvJmWoJiVP4b/GnhrYCEXX9FT2
+	 d7odGKWJv/lHg==
+Date: Wed, 1 Jul 2026 18:24:05 +0200
+From: Francesco Dolcini <francesco@dolcini.it>
+To: "Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Jeff Chen <jeff.chen_1@nxp.com>
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	Brian Norris <briannorris@chromium.org>,
+	Francesco Dolcini <francesco@dolcini.it>,
+	Jakub Kicinski <kuba@kernel.org>, b43-dev@lists.infradead.org,
+	libertas-dev@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 3/4] mwifiex: debugfs: use kzalloc() to allocate
+ formatting buffers
+Message-ID: <20260701162405.GA38581@francesco-nb>
+References: <20260701-b4-drivers-wireless-v1-0-60264cdf2efe@kernel.org>
+ <20260701-b4-drivers-wireless-v1-3-60264cdf2efe@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] qede: Prevent possible snprintf() truncation by bounding
- %s string format
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "open list:QLOGIC QL4xxx ETHERNET DRIVER" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20260701144713.197557-1-barant@fastmail.com>
- <akUw_GsNELK4NKTN@gmail.com>
-Content-Language: en-US
-From: Baran TUna <barant@fastmail.com>
-In-Reply-To: <akUw_GsNELK4NKTN@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260701-b4-drivers-wireless-v1-3-60264cdf2efe@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.com,none];
-	R_DKIM_ALLOW(-0.20)[fastmail.com:s=fm1,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[dolcini.it,none];
+	R_DKIM_ALLOW(-0.20)[dolcini.it:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303764-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[barant@fastmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:rppt@kernel.org,m:jeff.chen_1@nxp.com,m:johannes.berg@intel.com,m:briannorris@chromium.org,m:francesco@dolcini.it,m:kuba@kernel.org,m:b43-dev@lists.infradead.org,m:libertas-dev@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[francesco@dolcini.it,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303766-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[fastmail.com:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[barant@fastmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[fastmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[francesco@dolcini.it,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dolcini.it:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,francesco-nb:mid,dolcini.it:dkim,dolcini.it:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 626676EFCCC
+X-Rspamd-Queue-Id: 150DD6F0036
 
-The current solution is pretty arbitrary.
++Jeff
 
-Numbers are coming from a simple calculation, to make sure output always 
-fits.
+Jeff: this is relevant also for nxpwifi.
 
+On Wed, Jul 01, 2026 at 04:59:12PM +0300, Mike Rapoport (Microsoft) wrote:
+> mwifiex debugfs functions allocate buffers for formatting debug output
+> text using get_zeroed_page().
+> 
+> These buffers can be allocated with kmalloc() as there's nothing special
+> about them to go directly to the page allocator.
+> 
+> kmalloc() provides a better API that does not require ugly casts and
+> kfree() does not need to know the size of the freed object.
+> 
+> Performance difference between kmalloc() and __get_free_pages() is not
+> measurable as both allocators take an object/page from a per-CPU list for
+> fast path allocations.
+> 
+> For the slow path the performance is anyway determined by the amount of
+> reclaim involved rather than by what allocator is used.
+> 
+> Replace use of get_zeroed_page() with kzalloc() and free_page() with
+> kfree().
+> 
+> Link: https://lore.kernel.org/all/635405e4-9423-4a25-a6e7-e03c8ea0bcbe@redhat.com
+> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 
-I will take a further look and send a patch if there is a more 
-generalized solution.
+Reviewed-by: Francesco Dolcini <francesco.dolcini@toradex.com>
 
-On 7/1/26 6:27 PM, Breno Leitao wrote:
-> On Wed, Jul 01, 2026 at 05:47:11PM +0300, Baran Tuna wrote:
->> GCC warning shows that formatted strings may
->> exceed the fixed-size destination buffers.
->>
->> Bounding the %s string format
->> so the maximum formatted output always fits.
->>
->> This eliminates the -Wformat-truncation warning.
->>
->> Signed-off-by: Baran Tuna <barant@fastmail.com>
->> ---
->>   drivers/net/ethernet/qlogic/qede/qede_ethtool.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
->> index 647f30a16a94..5428f53150a0 100644
->> --- a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
->> +++ b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
->> @@ -618,10 +618,10 @@ static void qede_get_drvinfo(struct net_device *ndev,
->>   	if ((strlen(storm) + strlen("[storm]")) <
->>   	    sizeof(info->version))
->>   		snprintf(info->version, sizeof(info->version),
->> -			 "[storm %s]", storm);
->> +			 "[storm %.16s]", storm);
-> Where is this 16 coming from?
->
-> Also, isn't the if above checking for no overflow? I.e,
-> we got here only if strlen(storm) + strlen("[storm]") < sizeof(info->version))
->
-> For whoever else is reviwewing this, this the buffers:
->
-> 	#define ETHTOOL_FWVERS_LEN      32
->          char    version[32];
-> 	char storm[ETHTOOL_FWVERS_LEN];
->
 
