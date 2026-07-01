@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-303881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cgJgHPuTRWrfCQsAu9opvQ
-	(envelope-from <netdev+bounces-303881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:26:03 +0200
+	id XXTwENGURWoSCgsAu9opvQ
+	(envelope-from <netdev+bounces-303880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:29:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26CE6F213B
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:26:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9854C6F2197
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 00:29:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=hBAznz8H;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303881-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303881-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=ibm.com header.s=pp1 header.b="G/BR1joK";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303880-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303880-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=ibm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B2581303BC25
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:26:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94407300AB31
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 22:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E036B420E78;
-	Wed,  1 Jul 2026 22:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851B6420E7F;
+	Wed,  1 Jul 2026 22:25:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471B73CC337
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C183CC327
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 22:25:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782944760; cv=none; b=M8oiebRuKO+NY07hvQGWw+rs5kQkPKu7+PkGDUnAfrlfgZL83CQPugaDKeTLa6tmOv9os2Hcmv+k+oz1e37jio+7ihLBDXgWgNEoGO1/XwCXEH68rOdJ4SgPByhgklZrjZk32037qjdriyljltcPVAAG+4aU6c8DyhfSMMheB+U=
+	t=1782944759; cv=none; b=otJs920uyD+ZF2ynq9Fh2hsnU6DnhxeQJsguGAUxNzm6jiYda9SyIpL50R47FGTC0NcJ2wLZXokZrTdQQAoxPak87kq2cwxThoLsHaOunxLIhNm4Hb1tZBTx4HaGsZmivRM+CZMvg3cCrM1dFLmIi3vhcUa/IViMzHy0EJq61Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782944760; c=relaxed/simple;
-	bh=gN3kPCchD/A3Non22s4OMeFsuIpwKxdb5VwdEprlR8A=;
+	s=arc-20240116; t=1782944759; c=relaxed/simple;
+	bh=c0UlIyPzVoS38lOqKuNemaPiDL0OuUcyCHqPIE6Dv2g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=K2mGU3JmTfCSpRIrSk1RgR9ARQEHeU2RjqJ7pMOCofOzzqMs8lGQH9AAw5s809HlExTqjgHh20qNh48+LTkldDDsTrjq2l8SbhxVT0yvFZNOvL8QfyvuvrDZY+YyqTbcLPGnCxqdlz8C9JtJhXunrcM9xs6VExuhqXhAhP3fWyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hBAznz8H; arc=none smtp.client-ip=148.163.158.5
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661LmdAM1926471;
-	Wed, 1 Jul 2026 22:25:46 GMT
+	 MIME-Version; b=YJz80hMhPFd+p2h0TtGW0kETcZ3hwEzDnuKDYajy2Lwn4BxkP6om+HQcCEPOv5IRvZdPD104M/UL+/PA/xKcCzLPiL8nMpTk07RzSlX2SCL5iM+k7WAfUt/2qzq2lbMKaolVjdCvFOVKJYdEXnSR9x6kzvwU+ev/uJAok6s9rVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=G/BR1joK; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661LoQlk2229186;
+	Wed, 1 Jul 2026 22:25:47 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=+pUyZ4MUz9j84RZWm
-	Cd/0CX0xUn3pEC7D/yomefZtXA=; b=hBAznz8HPNAsDGjIru47bw6ZL6ArhOQA+
-	8+/EBgaEowtiFCbVI1T8vTrXpUZ8PjdCYA/ROCHiV7lQbVj6LeT6e21m5EJt9IRM
-	BcocouGOjrAUaMvF967lQki71nI7esFuBCbdGdKsaTcUnDVWqXqh5oa4c40/fyHQ
-	Y5EgJ41g6oLxxrbASbBfeKN4+XDM8d3ANnSxvipT3muJswtgHHWKR2KpIq4QpuAW
-	s8afLQAYBXPpvp9zX+WG+KGNUKyh3X44dD0CwXFnxkLr2eZ47IYDiLwr5reG6ieA
-	uiBLBIkU6sfgmoTJNKFgX4kdvoyWPWI/NhhzpWXvk7Mj9Ya4YX5dw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26mjxm4u-1
+	:mime-version:references:subject:to; s=pp1; bh=cQrIpqT0bGUKwqhkD
+	Nycoj7YMDQ9fXIeDCvrzwtwXyI=; b=G/BR1joK6CbABK/jlfT6yXhqt1KdGdqsu
+	uDG46AVxNC3UlU1CxDIylVvPPkXdZjfb3LJogs4LwfHkS/q0g11l3LJ61tunnTbT
+	d0gnH6jEHZ8jMHWOzSi44yrPEMlOFvMhb10E0sPm9L/1C1eztHD5oZAtoS7r/dmy
+	SE30LkUIA5Iy1+gukpYq8dMQWqRalbFKdzSHDPiFC/14aGwdmrsxCk6g0SZOpf2g
+	8YvyC4LSePcLQ3Ib7tDGr1to1Dq7rYZrqv+UJNMric+b8fQR7q2gZ2YnvNrUuAfh
+	pch3I3uehhkBkVUBVSPKCKAF6ji9ssQ+qWRyk84zR9aTBqHhVD3hw==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4f26qg6x4n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Jul 2026 22:25:46 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 661MJadP025324;
+	Wed, 1 Jul 2026 22:25:45 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f2u2gh8ay-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 01 Jul 2026 22:25:45 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 661MOKrP026520;
-	Wed, 1 Jul 2026 22:25:43 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4f2ruqhkak-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Jul 2026 22:25:43 +0000 (GMT)
 Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 661MPfAr66519402
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 661MPicK60883374
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 1 Jul 2026 22:25:42 GMT
+	Wed, 1 Jul 2026 22:25:44 GMT
 Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DEA4058055;
-	Wed,  1 Jul 2026 22:25:41 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4DF9E58067;
+	Wed,  1 Jul 2026 22:25:44 +0000 (GMT)
 Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6CE795804B;
-	Wed,  1 Jul 2026 22:25:40 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id D92F458055;
+	Wed,  1 Jul 2026 22:25:42 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.61.150.53])
 	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  1 Jul 2026 22:25:40 +0000 (GMT)
+	Wed,  1 Jul 2026 22:25:42 +0000 (GMT)
 From: Mingming Cao <mmc@linux.ibm.com>
 To: netdev@vger.kernel.org
 Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
@@ -77,9 +77,9 @@ Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
         edumazet@google.com, pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
         maddy@linux.ibm.com, mpe@ellerman.id.au,
         Dave Marquardt <davemarq@linux.ibm.com>
-Subject: [PATCH net-next v2 10/15] ibmveth: Add per-queue TX statistics reporting
-Date: Wed,  1 Jul 2026 15:23:22 -0700
-Message-Id: <20260701222327.61325-11-mmc@linux.ibm.com>
+Subject: [PATCH net-next v2 11/15] ibmveth: Expose per-queue buffer pool details via sysfs
+Date: Wed,  1 Jul 2026 15:23:23 -0700
+Message-Id: <20260701222327.61325-12-mmc@linux.ibm.com>
 X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 In-Reply-To: <20260701222327.61325-1-mmc@linux.ibm.com>
 References: <20260701222327.61325-1-mmc@linux.ibm.com>
@@ -92,29 +92,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfX+psJjxLvwo+y
- kPVAIFoZKLTf/m1EvMB7bGF+mJcb3luwfhAEJx0OL1pVsVKSUFFB5FogjtCvcpr7kztCmwHpCln
- rgVgZApCE6DF9Tdm+rtkyX4i6bO29rCK2KG0MpnJkUq5AvRWApX8wCC9yrf0noIclLs+H0qxZCV
- XulSozcb0Uj3urHU50jujwRW99+GFajbqKKZTMFMDfefypTK3Lz3VtE8W7DXSJCTASSf70GXQmj
- 7K+sJE+7LB3CND/EYBPhvMKBpo7+EUYjs0xtXoOG6SwZsLfG4MoTzj+KDgnvoM7l6QDXAnncZRZ
- t2qKPPHe0G4gDVU/0Ajkv+arHYujLjJv0vk4XjgzVACoPfZ2rKS+rANApq9HgwVTip3sYI3VLxO
- VLRK/r5Wl+rlhlhA2zvqGz1V/+cPgSbkJ/OoTi8RXLbFReF+RnlWOQeQvuppTkLB2JKHv4TmLHk
- zkHYCC4SYW2L2H6tMGw==
-X-Proofpoint-GUID: FVGdm4mffJGOtv5oRHEFqbvWQLck4bPq
-X-Authority-Analysis: v=2.4 cv=Z8bc2nRA c=1 sm=1 tr=0 ts=6a4593e9 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+X-Authority-Analysis: v=2.4 cv=RYqgzVtv c=1 sm=1 tr=0 ts=6a4593eb cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=9-YVOS1jIkQ23tt7c54A:9
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfXxW24z6hzD0KJ
- 2uPC4jpypeBFDIu3vq/XDzJr13W/cRUF+q89X28oP8H3pbg9InnDR2qyPg9lcZUNVLvekCdTnz2
- DXHOcyiCdFKG/6Ik199TyRCcBJNBoU4=
-X-Proofpoint-ORIG-GUID: eeZEylVeuTRWR5shmQqA_1CG9ySLP-Hi
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=Pa5pnD676arj_S7OnbYA:9
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfX8j1T7YHEV+Rn
+ RAUKfQETu2JAi5qc05JKp2kRT8PJOfNgSee9Il2HugVWX1vpkKH6N0yT3Mv5SEzm8BhrpZc01dQ
+ VQDF/MWMwBMluHZur1XjZwcBpytEW6E=
+X-Proofpoint-GUID: PffDoAkj4RYSDf35OJ8v1LC4veQ_Cvm5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDIzOSBTYWx0ZWRfX2WepJEnZc6WR
+ Wchsu2JGN6zVSOw24NcIwrYaqdgewLCsqMaUAHfQiReplJQujHHy9hAi0g8YUAtEnmdkPMkUTFw
+ Lvo/dtqOeFCj4b6WAlHOL17IaJxy/r2y/yMlGL7uwKWwyg/XmiFontqR2uMh2dkmtfhecUg1QQz
+ G9MTWCS0rU4H3pg3m0/dVesvJ19nDtVV35r/8xPfpfRlKxGE0eCrD8+Wr9JhcOlh9P2/K+Af4Ou
+ Eaa5JTLht8jxlsEy7JOkqwk/eptbZP1Jgs9+TBYtgj6ctxBaVvVSmjRtoXPiMIVNuvQlHYmxvWW
+ 8B+yAecpbi35xYViJRxalz5OESx/K1a1pitNgV+IywIPS+6L6B9iwO5T7dWr6BHO+L9E5cXkdIX
+ WGyxkiuwpnXtwRI76+R/PzmJ+SjAPOZj4eD1twN0mEXjstP8oXU8rDCFHrYz/KWEwv9e2tiN25F
+ UX7DvGEZAyw8H1UnOPw==
+X-Proofpoint-ORIG-GUID: F4OzQSCLrICuB1FUj-rKlTyBs2w58o0q
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-07-01_05,2026-06-26_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 spamscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
+ phishscore=0 impostorscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 suspectscore=0 bulkscore=0 clxscore=1015
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607010239
 X-Rspamd-Action: no action
@@ -124,360 +124,127 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
 	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-303881-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303880-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:bjking1@linux.ibm.com,m:haren@linux.ibm.com,m:ricklind@linux.ibm.com,m:mmc@linux.ibm.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linuxppc-dev@lists.ozlabs.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:davemarq@linux.ibm.com,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[ibm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,linux.ibm.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.ibm.com:mid,linux.ibm.com:from_mime,vger.kernel.org:from_smtp];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F26CE6F213B
+X-Rspamd-Queue-Id: 9854C6F2197
 
-Track transmit counters per TX queue to avoid cache line contention in
-the xmit hot path and expose per-queue visibility via ethtool -S and
-ndo_get_stats64() aggregation.
-
-Global tx_large_packets and tx_send_failed continue to be aggregated on
-the ethtool read path for backward compatibility with existing tools.
+Add a read-only buffer_pools sysfs attribute under the VIO device that
+lists size, buff_size, active, and available for every RX queue and
+pool: runtime per-queue buffer pressure during MQ operation. ethtool -S
+pool%d_* (previous patch) reports queue-0 static probe geometry only;
+sysfs is the right place for dynamic per-queue pool state at scale.
 
 Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
 Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
 ---
- drivers/net/ethernet/ibm/ibmveth.c | 129 +++++++++++++++++++++++++----
- drivers/net/ethernet/ibm/ibmveth.h |  13 +++
- 2 files changed, 124 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/ibm/ibmveth.c | 56 ++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 1c08082ffbd6..4e3f49b6346f 100644
+index 4e3f49b6346f..ecc472ee8f71 100644
 --- a/drivers/net/ethernet/ibm/ibmveth.c
 +++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -252,6 +252,33 @@ static void ibmveth_free_rx_qstats(struct ibmveth_adapter *adapter)
- 	adapter->rx_qstats = NULL;
- }
- 
-+/**
-+ * ibmveth_alloc_tx_qstats - Allocate per-queue TX statistics
-+ * @adapter: ibmveth adapter structure
-+ *
-+ * Return: 0 on success, -ENOMEM on failure
-+ */
-+static int ibmveth_alloc_tx_qstats(struct ibmveth_adapter *adapter)
-+{
-+	adapter->tx_qstats = kcalloc(IBMVETH_MAX_QUEUES,
-+				     sizeof(struct ibmveth_tx_queue_stats),
-+				     GFP_KERNEL);
-+	if (!adapter->tx_qstats)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ibmveth_free_tx_qstats - Free per-queue TX statistics
-+ * @adapter: ibmveth adapter structure
-+ */
-+static void ibmveth_free_tx_qstats(struct ibmveth_adapter *adapter)
-+{
-+	kfree(adapter->tx_qstats);
-+	adapter->tx_qstats = NULL;
-+}
-+
- /**
-  * ibmveth_alloc_rx_queues - Allocate per-queue RX resources
-  * @adapter: ibmveth adapter structure
-@@ -1628,6 +1655,10 @@ static int ibmveth_open(struct net_device *netdev)
- 	if (rc)
- 		goto out_cleanup_rx_interrupts;
- 
-+	rc = ibmveth_alloc_tx_qstats(adapter);
-+	if (rc)
-+		goto out_free_tx_resources;
-+
- 	netif_tx_start_all_queues(netdev);
- 
- 	netdev_dbg(netdev, "open complete\n");
-@@ -1668,6 +1699,7 @@ static int ibmveth_close(struct net_device *netdev)
- 		}
- 	}
- 
-+	ibmveth_free_tx_qstats(adapter);
- 	ibmveth_free_tx_resources(adapter);
- 	ibmveth_cleanup_rx_interrupts(adapter);
- 	ibmveth_update_rx_no_buffer(adapter);
-@@ -1960,6 +1992,32 @@ static void ibmveth_aggregate_rx_qstats(struct ibmveth_adapter *adapter)
- 	adapter->rx_large_packets = total_large;
- }
- 
-+/**
-+ * ibmveth_aggregate_tx_qstats - Sum per-queue TX stats into globals
-+ * @adapter: ibmveth adapter
-+ *
-+ * Cold path only (ethtool). Keeps legacy global counters meaningful for
-+ * tools that read the adapter-level fields in ibmveth_stats[].
-+ */
-+static void ibmveth_aggregate_tx_qstats(struct ibmveth_adapter *adapter)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+	u64 total_large = 0;
-+	u64 total_send_failed = 0;
-+	int i;
-+
-+	if (!adapter->tx_qstats)
-+		return;
-+
-+	for (i = 0; i < netdev->real_num_tx_queues; i++) {
-+		total_large += adapter->tx_qstats[i].large_packets;
-+		total_send_failed += adapter->tx_qstats[i].send_failures;
-+	}
-+
-+	adapter->tx_large_packets = total_large;
-+	adapter->tx_send_failed = total_send_failed;
-+}
-+
- static void ibmveth_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- {
- 	struct ibmveth_adapter *adapter = netdev_priv(dev);
-@@ -1984,6 +2042,15 @@ static void ibmveth_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- 		ethtool_sprintf(&p, "rx%d_no_buffer_drops", i);
- 	}
- 
-+	for (i = 0; i < dev->real_num_tx_queues; i++) {
-+		ethtool_sprintf(&p, "tx%d_packets", i);
-+		ethtool_sprintf(&p, "tx%d_bytes", i);
-+		ethtool_sprintf(&p, "tx%d_large_packets", i);
-+		ethtool_sprintf(&p, "tx%d_dropped_packets", i);
-+		ethtool_sprintf(&p, "tx%d_send_failures", i);
-+		ethtool_sprintf(&p, "tx%d_checksum_offload", i);
-+	}
-+
- 	for (i = 0; i < IBMVETH_NUM_BUFF_POOLS; i++) {
- 		ethtool_sprintf(&p, "pool%d_size", i);
- 		ethtool_sprintf(&p, "pool%d_active", i);
-@@ -1999,6 +2066,7 @@ static int ibmveth_get_sset_count(struct net_device *dev, int sset)
- 	case ETH_SS_STATS:
- 		return ARRAY_SIZE(ibmveth_stats) +
- 		       adapter->num_rx_queues * IBMVETH_NUM_RX_QSTATS +
-+		       dev->real_num_tx_queues * IBMVETH_NUM_TX_QSTATS +
- 		       IBMVETH_NUM_BUFF_POOLS * 3;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -2012,6 +2080,7 @@ static void ibmveth_get_ethtool_stats(struct net_device *dev,
- 	int i, j;
- 
- 	ibmveth_aggregate_rx_qstats(adapter);
-+	ibmveth_aggregate_tx_qstats(adapter);
- 
- 	for (i = 0; i < ARRAY_SIZE(ibmveth_stats); i++)
- 		data[i] = IBMVETH_GET_STAT(adapter, ibmveth_stats[i].offset);
-@@ -2030,6 +2099,19 @@ static void ibmveth_get_ethtool_stats(struct net_device *dev,
- 		}
- 	}
- 
-+	for (j = 0; j < dev->real_num_tx_queues; j++) {
-+		if (adapter->tx_qstats) {
-+			data[i++] = adapter->tx_qstats[j].packets;
-+			data[i++] = adapter->tx_qstats[j].bytes;
-+			data[i++] = adapter->tx_qstats[j].large_packets;
-+			data[i++] = adapter->tx_qstats[j].dropped_packets;
-+			data[i++] = adapter->tx_qstats[j].send_failures;
-+			data[i++] = adapter->tx_qstats[j].checksum_offload;
-+		} else {
-+			i += IBMVETH_NUM_TX_QSTATS;
-+		}
-+	}
-+
- 	for (j = 0; j < IBMVETH_NUM_BUFF_POOLS; j++) {
- 		data[i++] = adapter->rx_buff_pool[0][j].size;
- 		data[i++] = adapter->rx_buff_pool[0][j].active;
-@@ -2152,8 +2234,10 @@ static int ibmveth_send(struct ibmveth_adapter *adapter,
- }
- 
- static int ibmveth_is_packet_unsupported(struct sk_buff *skb,
--					 struct net_device *netdev)
-+					 struct ibmveth_adapter *adapter,
-+					 int queue_num)
- {
-+	struct net_device *netdev = adapter->netdev;
- 	struct ethhdr *ether_header;
- 	int ret = 0;
- 
-@@ -2161,7 +2245,8 @@ static int ibmveth_is_packet_unsupported(struct sk_buff *skb,
- 
- 	if (ether_addr_equal(ether_header->h_dest, netdev->dev_addr)) {
- 		netdev_dbg(netdev, "veth doesn't support loopback packets, dropping packet.\n");
--		netdev->stats.tx_dropped++;
-+		if (adapter->tx_qstats)
-+			adapter->tx_qstats[queue_num].dropped_packets++;
- 		ret = -EOPNOTSUPP;
- 	}
- 
-@@ -2177,7 +2262,7 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 	int i, queue_num = skb_get_queue_mapping(skb);
- 	unsigned long mss = 0;
- 
--	if (ibmveth_is_packet_unsupported(skb, netdev))
-+	if (ibmveth_is_packet_unsupported(skb, adapter, queue_num))
- 		goto out;
- 	/* veth can't checksum offload UDP */
- 	if (skb->ip_summed == CHECKSUM_PARTIAL &&
-@@ -2188,7 +2273,7 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 	    skb_checksum_help(skb)) {
- 
- 		netdev_err(netdev, "tx: failed to checksum packet\n");
--		netdev->stats.tx_dropped++;
-+		adapter->tx_qstats[queue_num].dropped_packets++;
- 		goto out;
- 	}
- 
-@@ -2200,6 +2285,8 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 
- 		desc_flags |= (IBMVETH_BUF_NO_CSUM | IBMVETH_BUF_CSUM_GOOD);
- 
-+		adapter->tx_qstats[queue_num].checksum_offload++;
-+
- 		/* Need to zero out the checksum */
- 		buf[0] = 0;
- 		buf[1] = 0;
-@@ -2211,7 +2298,7 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 	if (skb->ip_summed == CHECKSUM_PARTIAL && skb_is_gso(skb)) {
- 		if (adapter->fw_large_send_support) {
- 			mss = (unsigned long)skb_shinfo(skb)->gso_size;
--			adapter->tx_large_packets++;
-+			adapter->tx_qstats[queue_num].large_packets++;
- 		} else if (!skb_is_gso_v6(skb)) {
- 			/* Put -1 in the IP checksum to tell phyp it
- 			 * is a largesend packet. Put the mss in
-@@ -2220,7 +2307,7 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 			ip_hdr(skb)->check = 0xffff;
- 			tcp_hdr(skb)->check =
- 				cpu_to_be16(skb_shinfo(skb)->gso_size);
--			adapter->tx_large_packets++;
-+			adapter->tx_qstats[queue_num].large_packets++;
- 		}
- 	}
- 
-@@ -2228,7 +2315,7 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 	if (unlikely(skb->len > adapter->tx_ltb_size)) {
- 		netdev_err(adapter->netdev, "tx: packet size (%u) exceeds ltb (%u)\n",
- 			   skb->len, adapter->tx_ltb_size);
--		netdev->stats.tx_dropped++;
-+		adapter->tx_qstats[queue_num].dropped_packets++;
- 		goto out;
- 	}
- 	memcpy(adapter->tx_ltb_ptr[queue_num], skb->data, skb_headlen(skb));
-@@ -2245,7 +2332,7 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 	if (unlikely(total_bytes != skb->len)) {
- 		netdev_err(adapter->netdev, "tx: incorrect packet len copied into ltb (%u != %u)\n",
- 			   skb->len, total_bytes);
--		netdev->stats.tx_dropped++;
-+		adapter->tx_qstats[queue_num].dropped_packets++;
- 		goto out;
- 	}
- 	desc.fields.flags_len = desc_flags | skb->len;
-@@ -2254,11 +2341,11 @@ static netdev_tx_t ibmveth_start_xmit(struct sk_buff *skb,
- 	dma_wmb();
- 
- 	if (ibmveth_send(adapter, desc.desc, mss)) {
--		adapter->tx_send_failed++;
--		netdev->stats.tx_dropped++;
-+		adapter->tx_qstats[queue_num].send_failures++;
-+		adapter->tx_qstats[queue_num].dropped_packets++;
- 	} else {
--		netdev->stats.tx_packets++;
--		netdev->stats.tx_bytes += skb->len;
-+		adapter->tx_qstats[queue_num].packets++;
-+		adapter->tx_qstats[queue_num].bytes += skb->len;
- 	}
- 
- out:
-@@ -2759,12 +2846,13 @@ static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
- }
- 
- /**
-- * ibmveth_get_stats64 - Return aggregated per-queue RX statistics
-+ * ibmveth_get_stats64 - Return aggregated per-queue statistics
-  * @dev: network device
-  * @stats: rtnl link statistics storage
-  *
-- * Sums per-queue rx_qstats into rx_packets/rx_bytes for multi-queue mode.
-- * TX counters continue to come from netdev->stats (updated in start_xmit).
-+ * Sums per-queue rx_qstats and tx_qstats into the rtnl counters.
-+ * Callers use ndo_get_stats64(); avoid updating netdev->stats on the
-+ * xmit/poll paths to keep per-queue counters off the hot cache line.
-  */
- static void ibmveth_get_stats64(struct net_device *dev,
- 				struct rtnl_link_stats64 *stats)
-@@ -2779,9 +2867,14 @@ static void ibmveth_get_stats64(struct net_device *dev,
- 		}
- 	}
- 
--	stats->tx_packets = dev->stats.tx_packets;
--	stats->tx_bytes = dev->stats.tx_bytes;
--	stats->tx_dropped = dev->stats.tx_dropped;
-+	if (adapter->tx_qstats) {
-+		for (i = 0; i < dev->real_num_tx_queues; i++) {
-+			stats->tx_packets += adapter->tx_qstats[i].packets;
-+			stats->tx_bytes += adapter->tx_qstats[i].bytes;
-+			stats->tx_dropped += adapter->tx_qstats[i].dropped_packets;
-+		}
-+	}
-+
- 	stats->tx_errors = dev->stats.tx_errors;
- }
- 
-diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-index f7b20fd01acb..390c660af979 100644
---- a/drivers/net/ethernet/ibm/ibmveth.h
-+++ b/drivers/net/ethernet/ibm/ibmveth.h
-@@ -316,9 +316,21 @@ struct ibmveth_rx_queue_stats {
- 	u64 no_buffer_drops;
+@@ -2896,6 +2896,52 @@ static const struct net_device_ops ibmveth_netdev_ops = {
+ #endif
  };
  
-+struct ibmveth_tx_queue_stats {
-+	u64 packets;
-+	u64 bytes;
-+	u64 large_packets;
-+	u64 dropped_packets;
-+	u64 send_failures;
-+	u64 checksum_offload;
++static const struct attribute_group ibmveth_attr_group;
++
++static ssize_t buffer_pools_show(struct device *dev,
++				 struct device_attribute *attr,
++				 char *buf)
++{
++	struct net_device *netdev = dev_get_drvdata(dev);
++	struct ibmveth_adapter *adapter = netdev_priv(netdev);
++	int len = 0;
++	int i, j;
++
++	len += scnprintf(buf + len, PAGE_SIZE - len,
++			 "Queue  Pool  Size  BuffSize  Active  Available\n");
++	len += scnprintf(buf + len, PAGE_SIZE - len,
++			 "-----  ----  ----  --------  ------  ---------\n");
++
++	for (i = 0; i < adapter->num_rx_queues; i++) {
++		for (j = 0; j < IBMVETH_NUM_BUFF_POOLS; j++) {
++			struct ibmveth_buff_pool *pool =
++				&adapter->rx_buff_pool[i][j];
++
++			len += scnprintf(buf + len, PAGE_SIZE - len,
++					 "%5d  %4d  %4u  %8u  %6d  %9d\n",
++					 i, j, pool->size, pool->buff_size,
++					 pool->active,
++					 atomic_read(&pool->available));
++
++			if (len >= PAGE_SIZE - 100)
++				goto out;
++		}
++	}
++
++out:
++	return len;
++}
++static DEVICE_ATTR_RO(buffer_pools);
++
++static struct attribute *ibmveth_attrs[] = {
++	&dev_attr_buffer_pools.attr,
++	NULL,
 +};
 +
- #define IBMVETH_NUM_RX_QSTATS \
- 	(sizeof(struct ibmveth_rx_queue_stats) / sizeof(u64))
- 
-+#define IBMVETH_NUM_TX_QSTATS \
-+	(sizeof(struct ibmveth_tx_queue_stats) / sizeof(u64))
++static const struct attribute_group ibmveth_attr_group = {
++	.attrs = ibmveth_attrs,
++};
 +
- struct ibmveth_buff_pool {
-     u32 size;
-     u32 index;
-@@ -386,6 +398,7 @@ struct ibmveth_adapter {
- 	/* Multi-queue statistics */
- 	struct ibmveth_hcall_stats hcall_stats;
- 	struct ibmveth_rx_queue_stats *rx_qstats;
-+	struct ibmveth_tx_queue_stats *tx_qstats;
+ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ {
+ 	int rc, i, mac_len;
+@@ -3056,6 +3102,14 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
  
- 	/* Ethtool settings */
- 	u8 duplex;
+ 	netdev_dbg(netdev, "registered\n");
+ 
++	rc = sysfs_create_group(&dev->dev.kobj, &ibmveth_attr_group);
++	if (rc) {
++		netdev_err(netdev, "failed to create sysfs attributes rc=%d\n", rc);
++		unregister_netdev(netdev);
++		free_netdev(netdev);
++		return rc;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -3067,6 +3121,8 @@ static void ibmveth_remove(struct vio_dev *dev)
+ 
+ 	cancel_work_sync(&adapter->work);
+ 
++	sysfs_remove_group(&dev->dev.kobj, &ibmveth_attr_group);
++
+ 	for (i = 0; i < IBMVETH_NUM_BUFF_POOLS; i++)
+ 		kobject_put(&adapter->rx_buff_pool[0][i].kobj);
+ 
 -- 
 2.39.3 (Apple Git-146)
 
