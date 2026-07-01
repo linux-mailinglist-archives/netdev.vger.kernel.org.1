@@ -1,216 +1,363 @@
-Return-Path: <netdev+bounces-303427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303428-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 79CKFJhiRGrctwoAu9opvQ
-	(envelope-from <netdev+bounces-303427-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:43:04 +0200
+	id 1SpbDxxlRGpQuAoAu9opvQ
+	(envelope-from <netdev+bounces-303428-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:53:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62216E8F24
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:43:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C51E6E8F78
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 02:53:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=bqZ6TaS6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303427-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303427-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=bPmAt6pP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303428-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303428-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7E583053DFA
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:42:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A7CC305775A
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 00:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D5611CA9;
-	Wed,  1 Jul 2026 00:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800F81DF75B;
+	Wed,  1 Jul 2026 00:53:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9822D1FE471
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 00:42:30 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782866551; cv=pass; b=qmOMXb7KcWt7IcDGu2a92LgM9iP2W84dt0VxQMhhzchhmoCOVfz1XOwsk7Ba+TEMT+HUYLQF3yKgSNW42Tjh9TDau7Ds0LZxt3+8O4ncRA9KYXlPYUF7/AByxIWKWIEplA/tpeqhboE/wYMRopFtrzSGIbK+Ppp4hhOx3HJhFtw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782866551; c=relaxed/simple;
-	bh=TRZpMbXxvWIGuD0bc74Z+j+sksRDReMxCxEfFHCoq5o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kRKbZbxECDTYukK/R8p+c4i79HFTivonCo/Blh4K6hOK60XN/Y+mf8noUmeiGOhbG+Y28o0bFAC52C5FBeVMdnC5xqsEUkRzxMsqgZhs59EwDZfdDv2OxL2yvmRaglPXX+O92NZSrLqaeXKgQwSixuwCfLBWH2DclQrijOMp/cQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bqZ6TaS6; arc=pass smtp.client-ip=209.85.160.182
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51c10e86e52so70801cf.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:42:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782866549; cv=none;
-        d=google.com; s=arc-20260327;
-        b=B/6xl9bqrFiGzndGytUeYeL4ZaTLUaol1SWFsebW7bdL0fFKq7WxXdTbfCZafXDwQm
-         TXQZi5WjdCaqcm1GQFDY/JkYL18EkayZlFDarK0wcFw/kUHjvvs243/gros/HoWQmpuc
-         O6bkXfOwUQ5+FqLOBaiVjysBTasmvdSiqw1vROuAVLWrpvXgnf9LRexdlqmHSWYVwztw
-         a/7ITJ8BxL7Gz7rBTuVKZ1MLVq3m0A/o1SqtehO6SCGYVD5RyC9A0g31phMXTA2Z+8C/
-         lWUJe7j7OBUUIOQ9sRbxUSm73sCbS30ZDd9de/twBJSWxajjVff1XnGkAkX9Y5G4cmjj
-         SVUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=VngOKqlNcuFoJfPyP6oUsU1l4CeneuTItZPhFh+5Klg=;
-        fh=QfAcYiyeFY8XWAWMjQxrHotom0j9JBJrXWlkmSz/DJs=;
-        b=HYJVPX4Q31Lqrl8pzm4H7o8cYrSE0y+c1piBjf8eBWMmW70d9wQTrhT7hFMq8Mr3Su
-         Au6rfamuUNUiZOPB6Rxwy8lKvU5qvsG7kceUGvcouuxSSsAWB75vrzMqQax0fd001cH1
-         QiNOEiIB2g8Xewh1MwrdhpJKRNnAc0egWHAN9JrY4PpFS7sWpxE5uvEvqm8vsjRj7dvy
-         azob1nbpP/8ozjv3tz4PwkgUZ8oMRoF5roCWtt8dkxhG6nA6hQoFfQOSt4frKQZhY1TV
-         usBJAtkHR02SfxMeCeJwP3UikFpihsnOGj0nf6/XuIBBcOYAvUOo86QzHMTbhUbTgStY
-         iGIg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6E418CC13
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 00:53:44 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782867225; cv=none; b=W/mchSOXDIR6Z8a5jhkEBRGb89wvXv5zSzS85nBGj/4NZtYBHeMoBtKiQlcqKPIrd2WGHWNq4bgIqPNKkX7F3Q+cgLoder34UOIdh66o/eAc5Rawjpd3XvwLZ2cY4JYcWQvta7VFH/RNx6Tfg5QmjwmoxLXW0TcheCFk7Z6Fafk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782867225; c=relaxed/simple;
+	bh=bSo7UrGXcDTB6T487uVQHoggxPZSU9AjJIhy2JYY8Nk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kl+HdBwdies7lcpV7MqlO2+spJB5JBsi9K1aA81JfLdCOEkKu3gmstui/y65IH19RrnnQUi3r7c8otIeuM1ySpXjWXCjX6DIYU7YS/9C3jRrP7fEGiw45lAVaaPpzxCwEXDKuvHNa2IFiioQBjW+zaaZ0eLz2hiXG0ZGqS2u0e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bPmAt6pP; arc=none smtp.client-ip=209.85.214.201
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ca0331d0b1so2532275ad.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 17:53:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782866549; x=1783471349; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=VngOKqlNcuFoJfPyP6oUsU1l4CeneuTItZPhFh+5Klg=;
-        b=bqZ6TaS6qnIsJ3PV9zqIDmK+a0E5yZz5sl244hKuIlLtNQfTppFKL/04qmB/swwgfx
-         Gm29NH1DE+cnqdvEif86yef49Cu0EhQZCZ13nmZk1QlfSzPaopg+6IFkj32n6VYgW+eF
-         IyvYE6jv2q56Zu8G5KXSXRbP7QEBROuaVQwB5NVuvcZRAcxN0IXfza4hKSeAvXHTX6kt
-         j5JuEqYHHwhYQuWsqDWtB7kqfmOFZElGFNBb0vmrif8F3hljmWX4hNaw5Zz8M80kIbRP
-         SuqgFkOVnIp1DjtgXJ0kLncSitIIBu3S1ZJFQ/FgR8a63vZnVALAAelvOUY0ElPeGGh+
-         eorA==
+        d=google.com; s=20251104; t=1782867223; x=1783472023; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TYxx5kClgfNIkaBKfBGqC0VpNEaGmmFN+tkQm/boFWE=;
+        b=bPmAt6pPZ0KrClQ53e/YNCpeX3ET55EbEej1ICyuMi8q3ASTB2PvW51i0a9ijl/w4Y
+         ToHZNg6wtESkRtT/nZzjiPH7QBGvqcHNtN69HguzF0wNG9eqTtlfpvopc2rpqF/jbuZQ
+         X7Y19+dCVzH37ZkvBCeV2un1U/5EV97eTZHxQb74Qbn7eFV6eNBz6SVywnA9SHqbNV9h
+         Zqq9NPymkVwIvwEeD2W4SxdZbPKsMQmmJdEbXskeS6iMIPpu77BUT3t/85YEq9ift1EX
+         hDg/rlVYg+5+7zsZvARCDtC17G+of4GaOsQ7PyMknOv39raPi3o5b8M/PsLIKUMjgskD
+         w+Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782866549; x=1783471349;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VngOKqlNcuFoJfPyP6oUsU1l4CeneuTItZPhFh+5Klg=;
-        b=FiTTI8jv5osAts+g1S1UMFqiz6EQ3nfPqnHQmN4vx4cJ3S+Rf1iAmERPL2Vu1UBqSc
-         WUkChyVLdJjEFCiCOsfjTao+nUMpCoSeNNKjmG7T/RPOD0J7dwL19x70FKFuHIm10NoZ
-         eNL7Bh2iymeyUOuK/jG+9OKY6frcVh0FqAN9RAgJbxVVk2UCQJ4bgbjY137F3g6c73XG
-         hB98/OugCWpOHUNDShFD9hZ4LtkZXHT5z4ugxcf3tnXdRamNp3fwYGB+hTHFDfZfbg5F
-         A0Ls4YF9YgowGkrI60lsX0088e4TNNZvoG0omzLHlg5Wa2AgiGYVqIGMRHu62AuEOpTH
-         4SyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+y8bqdmuoRIErqn2BxFV03inUaFIFHlieUg+2SsZsjMoqzDVSr2QrmwRAd+fhjOcKJk6IZOGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUtyYaKc4tpi+8/8kK3bxTrZVjFdRraEZ2pGPfhGt2kTqL2j4U
-	i2LsRooqk0gIHYNGnX7q04Ex9KT3IupA0Gs/9C64RxRHwOnpvJmJ9HBPCwlu49bGQ2Nhz0jcx3i
-	bl1zS4xxbRu3MzjAj/61QZUANtkWkzIEvbLSLtJN/
-X-Gm-Gg: AfdE7cmJkOHjMAS23VuBD+vJ4uAU2iqazWyMGtJlY/+ir6a26Jw2LhalJTnjZFe8S2Q
-	ZNlzuRg4OoDrwfVzMb6e6k+XXiE+HnCC/BS1Td5tW5nCjUAAP9IEL//Fm3WCcaK+a02Ab/7UeSZ
-	sEfYJKoO5q5G2J6h2N60zXCQMa2urafMkvWPlKcRf/A5rKQCiBUxvUYl3wAObkl170PFcGmoxCm
-	yNO7XVjmzEOH26487cQvCBATp+wXibLD7Hgbn0Avj51CwnYb2jUe+Ex3yBO6H6nw5VZE3f2B3BB
-	/61R42CU090GfJbBwGBf5F75jREgHEcrEmWOtmX3jFT1y1Yl6xbFQLU173wRGzK8NppzdQ==
-X-Received: by 2002:a05:622a:15d3:b0:51c:523:953d with SMTP id
- d75a77b69052e-51c20699740mr5207251cf.14.1782866549002; Tue, 30 Jun 2026
- 17:42:29 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782867223; x=1783472023;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TYxx5kClgfNIkaBKfBGqC0VpNEaGmmFN+tkQm/boFWE=;
+        b=hmdEAslXiHGS/ZDLDPP5sy4xs5LK9+D6pIJ5RndRdSskRjjn/LrwNLxPw07eBoAYik
+         DOsoNVtURswzzqsd4g0uYkeIvSFvNRgHN2244SvDXPpbaY5bI0MUR8NumRVDG3assFxA
+         P0orzNmWhMe9JzZs6RGYlMcnrH3KvYlVxri4n9BfRPG/SlCg2bfWHObyFoKQ2CBS7Cwb
+         X+VT8fdnX/p4O0LQYzApHh0E64H5DPK1oZmtXHkjb2Xaoe5GaSq7gGVDrH9eFROyxLDk
+         UBETYsiD4vO3xvEOVxgeBcYft7Zk3u6EJz6m1xzpjXZEG0UQUj6Irtuok+XVo03gzMww
+         m4wA==
+X-Gm-Message-State: AOJu0YwVoV38Ka/Xudm3a80z27QMmb5h8OJczGbIvKVRi2W9kycI43vc
+	oWWfztuTDQXwBvOZMLhzVuFKvpLgxAG5T02HJFyluM5QDH4RhVrt5iWG6xkHC/EwHmGIUUJZe5G
+	/QTiBQaXbrZU3ontLqOP6a9b7qDCDSBeHFbZHRHY5NmoFbqziS2tQQSxWqyTWxZ2IqIvzgBC7BY
+	F/NIn1EAYcxft/sXqS327A+h4VrHo8evE8cwqk0bJLb5DdC9eQro7kHTpPWwl5tao=
+X-Received: from plblk15.prod.google.com ([2002:a17:903:8cf:b0:2c7:f338:5690])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:da86:b0:2c1:f262:4962 with SMTP id d9443c01a7336-2ca5a59d7e9mr22625805ad.20.1782867222982;
+ Tue, 30 Jun 2026 17:53:42 -0700 (PDT)
+Date: Wed,  1 Jul 2026 00:53:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260630165934.GA1227354@shredder> <20260630211527.3365952-1-kuniyu@google.com>
-In-Reply-To: <20260630211527.3365952-1-kuniyu@google.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Wed, 1 Jul 2026 09:41:53 +0900
-X-Gm-Features: AVVi8CcuV7ilFgf3kVds2y1pkioC4Vy8LsyafWa8osyTqozvONdsETL6OG8mpJo
-Message-ID: <CADXeF1HY0EGdFwe6DXu21BmpYUQebHLp89kQ0MpDgb_DDGSaqQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] ipv4: igmp: remove multicast group from hash
- table on device destruction
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: idosch@nvidia.com, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, jedrzej.jagielski@intel.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, xiyou.wangcong@gmail.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260701005341.3699161-1-hramamurthy@google.com>
+Subject: [PATCH net] gve: fix Rx queue stall on alloc failure
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, bpf@vger.kernel.org, sdf@fomichev.me, 
+	willemb@google.com, jordanrhee@google.com, nktgrg@google.com, 
+	maolson@google.com, jacob.e.keller@intel.com, thostet@google.com, 
+	csully@google.com, bcf@google.com, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Eddie Phillips <eddiephillips@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:idosch@nvidia.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:jedrzej.jagielski@intel.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:xiyou.wangcong@gmail.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303427-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303428-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:joshwash@google.com,m:hramamurthy@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:bpf@vger.kernel.org,m:sdf@fomichev.me,m:willemb@google.com,m:jordanrhee@google.com,m:nktgrg@google.com,m:maolson@google.com,m:jacob.e.keller@intel.com,m:thostet@google.com,m:csully@google.com,m:bcf@google.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:eddiephillips@google.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuyanghuang@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,kernel.org,google.com,intel.com,vger.kernel.org,redhat.com,gmail.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org,fomichev.me,intel.com];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A62216E8F24
+X-Rspamd-Queue-Id: 7C51E6E8F78
 
-On Wed, Jul 1, 2026 at 6:15=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
->
-> From: Ido Schimmel <idosch@nvidia.com>
-> Date: Tue, 30 Jun 2026 19:59:34 +0300
-> > On Tue, Jun 30, 2026 at 04:55:22PM +0900, Yuyang Huang wrote:
-> > > > Hi,
-> > > >
-> > > > why sending this to net-next not to net if that's a bug fix?
-> > > >
-> > > > In the v1 thread it was said
-> > > > >This is a long-standing bug, not a recent regression.
-> > > >
-> > > > so why do not cc stable kernel to get rid of this bug from
-> > > > stable kernels in such case?
-> > >
-> > > Thanks for the advise, will send this patch to stable kernel.
-> >
-> > Please target v3 at net and add a trace given you're claiming for a
-> > use-after-free. That way we know that the problem is real and not a
-> > false-positive from some tool. You can reproduce it by adding enough
-> > delay in inetdev_destroy():
->
-> I guess delay was added between ip_mc_destroy_dev() and
-> RCU_INIT_POINTER(dev->ip_ptr, NULL) ?
->
-> I feel like we should clear it first and destroy everything
-> as done in IPv6 addrconf_ifdown().
->
->
-> >
-> > BUG: KASAN: slab-use-after-free in ip_check_mc_rcu+0x2cc/0x500
-> > Read of size 4 at addr ffff88810c571208 by task mausezahn/419
-> >
-> > CPU: 2 UID: 0 PID: 419 Comm: mausezahn Not tainted 7.1.0-virtme-g15d4a7=
-c23bf6 #17 PREEMPT(lazy)
-> > Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> > Call Trace:
-> >  <IRQ>
-> >  dump_stack_lvl+0x4d/0x70
-> >  print_report+0x153/0x4c2
-> >  kasan_report+0xda/0x110
-> >  ip_check_mc_rcu+0x2cc/0x500
-> >  ip_route_input_rcu.part.0+0x13d/0xbc0
-> >  ip_route_input_noref+0xb6/0x110
-> >  ip_rcv_finish_core+0x41b/0x1d90
-> >  ip_rcv_finish+0xea/0x1b0
-> >  ip_rcv+0xb7/0x1b0
-> >  __netif_receive_skb_one_core+0xfc/0x180
-> >  process_backlog+0x1ea/0x5e0
-> >  __napi_poll+0x97/0x480
-> >  net_rx_action+0x97c/0xfa0
-> >  handle_softirqs+0x18c/0x4f0
-> >  do_softirq+0x42/0x60
-> >  </IRQ>
-> >
+From: Eddie Phillips <eddiephillips@google.com>
 
-Thanks for the advise, I will try to add a trace in v3. For more
-reference, the issue is pointed out in the following discussion:
+When the system is under extreme memory pressure, page allocations can
+fail during the Rx buffer refill loop. If the number of buffers posted
+to hardware falls below a critical low threshold and the refill loop
+exits due to allocation failures, the queue can stall:
 
-https://lore.kernel.org/netdev/95adff35-ee56-49d3-8567-382ac17810b3@redhat.=
-com/#t
+1. The device drops incoming packets because there are no descriptors.
+2. Since no packets are processed, no Rx completions are generated.
+3. Because no completions occur, NAPI is never scheduled, preventing
+   the refill loop from running again even after memory is freed.
+
+This results in a permanent queue stall.
+
+Resolve this by introducing a starvation recovery timer for each Rx queue.
+If the number of buffers posted to hardware falls below a critical low
+threshold, start a timer to periodically reschedule NAPI. Once NAPI runs
+and successfully refills the queue above the threshold, the timer is
+not rescheduled.
+
+Also add a new ethtool statistic "rx_critical_low_bufs" to track the
+number of times the starvation recovery timer is triggered.
+
+Cc: stable@vger.kernel.org
+Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+Signed-off-by: Eddie Phillips <eddiephillips@google.com>
+Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+---
+ drivers/net/ethernet/google/gve/gve.h         |  4 ++++
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 14 +++++++++++++-
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index 2f7bd330..8378bef2 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -13,6 +13,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/net_tstamp.h>
+ #include <linux/pci.h>
++#include <linux/timer.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/u64_stats_sync.h>
+ #include <net/page_pool/helpers.h>
+@@ -41,6 +42,7 @@
+ 
+ /* Interval to schedule a stats report update, 20000ms. */
+ #define GVE_STATS_REPORT_TIMER_PERIOD	20000
++#define GVE_RX_NAPI_RESCHED_MS 20 /* msecs */
+ 
+ /* Numbers of NIC tx/rx stats in stats report. */
+ #define NIC_TX_STATS_REPORT_NUM	0
+@@ -318,6 +320,7 @@ struct gve_rx_ring {
+ 	u64 rx_copied_pkt; /* free-running total number of copied packets */
+ 	u64 rx_skb_alloc_fail; /* free-running count of skb alloc fails */
+ 	u64 rx_buf_alloc_fail; /* free-running count of buffer alloc fails */
++	u64 rx_critical_low_bufs; /* count of critical low buffer events */
+ 	u64 rx_desc_err_dropped_pkt; /* free-running count of packets dropped by descriptor error */
+ 	/* free-running count of unsplit packets due to header buffer overflow or hdr_len is 0 */
+ 	u64 rx_hsplit_unsplit_pkt;
+@@ -334,6 +337,7 @@ struct gve_rx_ring {
+ 	struct gve_queue_resources *q_resources; /* head and tail pointer idx */
+ 	dma_addr_t q_resources_bus; /* dma address for the queue resources */
+ 	struct u64_stats_sync statss; /* sync stats for 32bit archs */
++	struct timer_list starvation_timer; /* for queue starvation recovery */
+ 
+ 	struct gve_rx_ctx ctx; /* Info for packet currently being processed in this ring. */
+ 
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index a0e0472b..71b6efbf 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -46,6 +46,7 @@ static const char gve_gstrings_main_stats[][ETH_GSTRING_LEN] = {
+ 	"rx_hsplit_unsplit_pkt",
+ 	"interface_up_cnt", "interface_down_cnt", "reset_cnt",
+ 	"page_alloc_fail", "dma_mapping_error", "stats_report_trigger_cnt",
++	"rx_critical_low_bufs",
+ };
+ 
+ static const char gve_gstrings_rx_stats[][ETH_GSTRING_LEN] = {
+@@ -58,6 +59,7 @@ static const char gve_gstrings_rx_stats[][ETH_GSTRING_LEN] = {
+ 	"rx_xdp_aborted[%u]", "rx_xdp_drop[%u]", "rx_xdp_pass[%u]",
+ 	"rx_xdp_tx[%u]", "rx_xdp_redirect[%u]",
+ 	"rx_xdp_tx_errors[%u]", "rx_xdp_redirect_errors[%u]", "rx_xdp_alloc_fails[%u]",
++	"rx_critical_low_bufs[%u]",
+ };
+ 
+ static const char gve_gstrings_tx_stats[][ETH_GSTRING_LEN] = {
+@@ -151,12 +153,14 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ {
+ 	u64 tmp_rx_pkts, tmp_rx_hsplit_pkt, tmp_rx_bytes, tmp_rx_hsplit_bytes,
+ 		tmp_rx_skb_alloc_fail, tmp_rx_buf_alloc_fail,
++		tmp_rx_critical_low_bufs,
+ 		tmp_rx_desc_err_dropped_pkt, tmp_rx_hsplit_unsplit_pkt,
+ 		tmp_tx_pkts, tmp_tx_bytes,
+ 		tmp_xdp_tx_errors, tmp_xdp_redirect_errors;
+ 	u64 rx_buf_alloc_fail, rx_desc_err_dropped_pkt, rx_hsplit_unsplit_pkt,
+ 		rx_pkts, rx_hsplit_pkt, rx_skb_alloc_fail, rx_bytes, tx_pkts, tx_bytes,
+-		tx_dropped, xdp_tx_errors, xdp_redirect_errors;
++		rx_critical_low_bufs, tx_dropped, xdp_tx_errors,
++		xdp_redirect_errors;
+ 	int rx_base_stats_idx, max_rx_stats_idx, max_tx_stats_idx;
+ 	int stats_idx, stats_region_len, nic_stats_len;
+ 	struct stats *report_stats;
+@@ -197,6 +201,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 
+ 	for (rx_pkts = 0, rx_bytes = 0, rx_hsplit_pkt = 0,
+ 	     rx_skb_alloc_fail = 0, rx_buf_alloc_fail = 0,
++	     rx_critical_low_bufs = 0,
+ 	     rx_desc_err_dropped_pkt = 0, rx_hsplit_unsplit_pkt = 0,
+ 	     xdp_tx_errors = 0, xdp_redirect_errors = 0,
+ 	     ring = 0;
+@@ -212,6 +217,8 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 				tmp_rx_bytes = rx->rbytes;
+ 				tmp_rx_skb_alloc_fail = rx->rx_skb_alloc_fail;
+ 				tmp_rx_buf_alloc_fail = rx->rx_buf_alloc_fail;
++				tmp_rx_critical_low_bufs =
++					rx->rx_critical_low_bufs;
+ 				tmp_rx_desc_err_dropped_pkt =
+ 					rx->rx_desc_err_dropped_pkt;
+ 				tmp_rx_hsplit_unsplit_pkt =
+@@ -226,6 +233,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 			rx_bytes += tmp_rx_bytes;
+ 			rx_skb_alloc_fail += tmp_rx_skb_alloc_fail;
+ 			rx_buf_alloc_fail += tmp_rx_buf_alloc_fail;
++			rx_critical_low_bufs += tmp_rx_critical_low_bufs;
+ 			rx_desc_err_dropped_pkt += tmp_rx_desc_err_dropped_pkt;
+ 			rx_hsplit_unsplit_pkt += tmp_rx_hsplit_unsplit_pkt;
+ 			xdp_tx_errors += tmp_xdp_tx_errors;
+@@ -269,6 +277,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 	data[i++] = priv->page_alloc_fail;
+ 	data[i++] = priv->dma_mapping_error;
+ 	data[i++] = priv->stats_report_trigger_cnt;
++	data[i++] = rx_critical_low_bufs;
+ 	i = GVE_MAIN_STATS_LEN;
+ 
+ 	rx_base_stats_idx = 0;
+@@ -337,6 +346,8 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 				tmp_rx_hsplit_bytes = rx->rx_hsplit_bytes;
+ 				tmp_rx_skb_alloc_fail = rx->rx_skb_alloc_fail;
+ 				tmp_rx_buf_alloc_fail = rx->rx_buf_alloc_fail;
++				tmp_rx_critical_low_bufs =
++					rx->rx_critical_low_bufs;
+ 				tmp_rx_desc_err_dropped_pkt =
+ 					rx->rx_desc_err_dropped_pkt;
+ 				tmp_xdp_tx_errors = rx->xdp_tx_errors;
+@@ -381,6 +392,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 			} while (u64_stats_fetch_retry(&priv->rx[ring].statss,
+ 						       start));
+ 			i += GVE_XDP_ACTIONS + 3; /* XDP rx counters */
++			data[i++] = tmp_rx_critical_low_bufs;
+ 		}
+ 	} else {
+ 		i += priv->rx_cfg.num_queues * NUM_GVE_RX_CNTS;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 02cba280..303db4fa 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -18,6 +18,16 @@
+ #include <net/tcp.h>
+ #include <net/xdp_sock_drv.h>
+ 
++static void gve_rx_starvation_timer(struct timer_list *t)
++{
++	struct gve_rx_ring *rx = timer_container_of(rx, t, starvation_timer);
++	struct gve_priv *priv = rx->gve;
++	struct gve_notify_block *block;
++
++	block = &priv->ntfy_blocks[rx->ntfy_id];
++	napi_schedule(&block->napi);
++}
++
+ static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
+ {
+ 	struct device *hdev = &priv->pdev->dev;
+@@ -120,6 +130,7 @@ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+ 
+ 	if (rx->dqo.page_pool)
+ 		page_pool_disable_direct_recycling(rx->dqo.page_pool);
++	timer_delete_sync(&rx->starvation_timer);
+ 	gve_remove_napi(priv, ntfy_idx);
+ 	gve_rx_remove_from_block(priv, idx);
+ 	gve_rx_reset_ring_dqo(priv, idx);
+@@ -136,6 +147,8 @@ void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+ 	u32 qpl_id;
+ 	int i;
+ 
++	timer_shutdown_sync(&rx->starvation_timer);
++
+ 	completion_queue_slots = rx->dqo.complq.mask + 1;
+ 	buffer_queue_slots = rx->dqo.bufq.mask + 1;
+ 
+@@ -232,6 +245,7 @@ int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 	rx->gve = priv;
+ 	rx->q_num = idx;
+ 	rx->packet_buffer_size = cfg->packet_buffer_size;
++	timer_setup(&rx->starvation_timer, gve_rx_starvation_timer, 0);
+ 
+ 	if (cfg->xdp) {
+ 		rx->packet_buffer_truesize = GVE_XDP_RX_BUFFER_SIZE_DQO;
+@@ -365,6 +379,7 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+ 	struct gve_rx_compl_queue_dqo *complq = &rx->dqo.complq;
+ 	struct gve_rx_buf_queue_dqo *bufq = &rx->dqo.bufq;
+ 	struct gve_priv *priv = rx->gve;
++	u32 num_bufs_avail_to_hw;
+ 	u32 num_avail_slots;
+ 	u32 num_full_slots;
+ 	u32 num_posted = 0;
+@@ -400,6 +415,23 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+ 	}
+ 
+ 	rx->fill_cnt += num_posted;
++
++	/* If the queue has fewer than GVE_RX_BUF_THRESH_DQO descriptors
++	 * visible to the hardware, and no doorbell was written, the hardware
++	 * is in danger of starving and cannot trigger interrupts. Start the
++	 * timer to periodically reschedule NAPI and recover from starvation.
++	 */
++	num_bufs_avail_to_hw =
++		((bufq->tail & ~(GVE_RX_BUF_THRESH_DQO - 1)) -
++		 bufq->head) & bufq->mask;
++
++	if (num_bufs_avail_to_hw < GVE_RX_BUF_THRESH_DQO) {
++		u64_stats_update_begin(&rx->statss);
++		rx->rx_critical_low_bufs++;
++		u64_stats_update_end(&rx->statss);
++		mod_timer(&rx->starvation_timer,
++			  jiffies + msecs_to_jiffies(GVE_RX_NAPI_RESCHED_MS));
++	}
+ }
+ 
+ static void gve_rx_skb_csum(struct sk_buff *skb,
+-- 
+2.55.0.rc2.803.g1fd1e6609c-goog
+
 
