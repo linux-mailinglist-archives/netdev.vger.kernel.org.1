@@ -1,46 +1,47 @@
-Return-Path: <netdev+bounces-303570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +quSLw7nRGpe2woAu9opvQ
-	(envelope-from <netdev+bounces-303570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:08:14 +0200
+	id DubrECfnRGpl2woAu9opvQ
+	(envelope-from <netdev+bounces-303571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:08:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C576EBE7C
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:08:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6B06EBE94
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:08:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303570-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303570-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303571-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303571-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AE3933088C83
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 10:02:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F136F302737A
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 10:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A451403B10;
-	Wed,  1 Jul 2026 10:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E55A3FAE04;
+	Wed,  1 Jul 2026 10:02:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6180930C154
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC76A3EAC74
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:02:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782900150; cv=none; b=nyOoZNX+RqoDi0m4waKpXOlSnvKZfnbxEUw+nSoY8QeSEKMbZ/0sHeQ4Y+L1Njty7GXiYLQ6t0AxCKv1uD8urqNQ6/G7Ak4q9o1kgYdnw2HI6GXjWkTWkZJVfqBdrU2QoR1TjxInPwWCaDkYFLEqQA15CG0O8bLAjUnNqtaEtrw=
+	t=1782900164; cv=none; b=OdAQshfZ+Fw3Lq0RqAJmvnhqQhrL72EPU6Ps8g2cMmqhk+fTiulCIymPkx16gE63H/Uqc+4+HHd+Zc6QpJ87KgBSmCYpOOC3XcGwxJIvRPNKjc4oLVr3F3MGcxZTEer/HCl/O1FKaO0ZgPQFgga1YxZshB//L1pVA3FPbotIseE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782900150; c=relaxed/simple;
-	bh=Vm75Am+3esaz56D/8REMriBXwVrCo5HUy6JpUIrbYkw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Tmnt1J9MEzFmwvZ/IDl4PGm8uT19e4Nbx5vNEmy3MbFctkmByHylZjZ76/05Zf9cLD3GhlLhMy1jblcThtgnYKMdQ+ARydplBMKWo8tym2zdZ+8rSia7f1wtqRXWFHVswBuiraVkuQK8/NkFDsfyfW+r+5Pf9zJ9G+bPSVvNX0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
-X-QQ-mid: zesmtpgz4t1782900112t591a54a0
-X-QQ-Originating-IP: asckYuLMWxurpVG/C7IzBMMPHTdlU9p/qA5f1AwRwj0=
+	s=arc-20240116; t=1782900164; c=relaxed/simple;
+	bh=PhAGNmSo69Z2m6XNhnVOoP106UEeayX8JsvFki6CVo8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=rGCtPaowFGH8HZZCX2y1qqGBTgUMGEEK5bYw3Goj7K6S+GzpVUc6VbgNBhhdoGdRPeFbLpO8J7c0ANfG1PkqiiwHW+cERoUJtIOQt0hC/6iqGCcCmvtuaKQMtAJnrt+QDqqRC118IdSjtBFmHYrlPLxR+dWXKIGWah/Em/6+CWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=52.59.177.22
+X-QQ-mid: zesmtpgz4t1782900115t6266496b
+X-QQ-Originating-IP: k3+kHaNuopit1xeUx9ilhiZiyVIhS5MsqvSuU80dS1w=
 Received: from localhost.localdomain ( [36.24.190.76])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 01 Jul 2026 18:01:51 +0800 (CST)
+	id ; Wed, 01 Jul 2026 18:01:54 +0800 (CST)
 X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 11878846642514610118
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 16115072362845468618
 EX-QQ-RecipientCnt: 7
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
@@ -50,10 +51,12 @@ Cc: jiawenwu@trustnetic.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v6 0/3] net: libwx: improve VF ethtool support
-Date: Wed,  1 Jul 2026 18:01:42 +0800
-Message-Id: <20260701100145.23738-1-mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v6 1/3] net: libwx: add support for set_ringparam in wx_ethtool_ops_vf
+Date: Wed,  1 Jul 2026 18:01:43 +0800
+Message-Id: <20260701100145.23738-2-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20260701100145.23738-1-mengyuanlou@net-swift.com>
+References: <20260701100145.23738-1-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,25 +66,25 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
-X-QQ-XMAILINFO: OeKnwO9PF+b4nUExRHF5rhjNGsEmIYpItY1ZM9myn04NRayszTUUR/Np
-	4v5jceZmrLr4qvpn+v/bHoYYa73yf9VLHP2twFlsVcVHIw1v+51y4//3h5zCHxtgFxxtX1M
-	zcZocpNqe6gANbJs1NzMAnTdp70kAWm19rsCpOQ6EIgzc/9cSJuvm/ewAvtzBpK86mU3+HG
-	8gmma6RK1K7X/XZ5bgnQ6Urrj58UK7C2FyHgFI5oi5nTIpPGl0ig/qpXVEADIkmYlmH1/JY
-	roaI4NXoV88n3mXvbhPFHo0UH+l9hyXCWFX6ZGwDnyWygghJfexYI7DLFTHfT+b8KKfo7DU
-	CyFqBzwDS67dWn7jLdMTC+mYsqlI+HVCvRlAcmcT2Dz0NDmqrFAw/XbwxdgsIDCrl3/kfKw
-	2jHFIJCsbFhTtGYDL8fWA6I7cxE9VC0n57lR5K6Bvgz6vGAL2BHtw0hUfDNoxzIc3mqW/mV
-	fAns1ICCShV1Z2Gh7fpqJ7qdm5nddMXOhq084Vzfxx1RqcX6CIICNMB7nCCYHLhN+GCqoIp
-	RlONQ42zgkVsyzH9LIJ7apsRbcMkYmcy0Go4MHSLh5X27oMmRQpqTkbO+FfszIrxPVq0qcE
-	U7m8fSnBaNUxbK2TKtZ0Q6BBJBcXLz7k1V7y/IXnz59RiUbSsfdFCqsNxfc7zYjp0fvZpeb
-	TvTShpLz/sueGLRjrWwZxyaJHGd5LEzWCNy6LTBKggOz4zqI56/jPk4fd7qOdz7QbUwmrAe
-	7XKx+eNLbkbeAv+jg8ydsJAHXXYMZ2bJX15mqvP21iJFDgxlP+QWi1t2AuLkv84awfMrLep
-	y/UgKJWlUbbiHc7f57L4L1LbgLM31r1ekWJytZBXzTVcctfP3jVo/MhgMq+0RDsG02INd/x
-	asuS+e1LLeMOK7pPM1kz5TibfyT98ChpT5PvmZKQn/A2hN07QfaGJh9xBQLeReV+iU1W1qU
-	/XYzIgfFRsNiaWO/6fS2hUtgPkMASHpKRd5i6oAwcsGyMM9wYAJREGoZAvaq6fztvRJb16N
-	tEJrPG3hQRvvD1RQCMUTvSoLKZoRVfFDPAFNktxrS8jpw2GJBWgF6DLrxJbBaKqlwIquMOY
-	A/UFHnIpDFeNOxE4aWvsqwwdO9BLzsOYpHCcFFn+Ziv7+MMoDHz7PDnbaDldsDiCa3n9iZn
-	aey9wFNFMdpbqD3KFWp4Wl1WKCwjs4uDr7NEOH+k5BGBz/g=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-XMAILINFO: N/qyVNBeLtyyPPz2yZXZYAf/vGueTDXJQILe5Wd/y6jpMwH9GemYtUXo
+	p1M0i+Bbd9ftR2vFgk2jrbNbXjkVHTWbpUHH7Oa2ZSwEKF3lE4xJX2KcOeQkHcjEOaNutgD
+	UolJkmn7WepLaQJd3UwAyLpEm52JreWb1aD4M7W8eDRoC7zLEMiuQE9N/j4gCwC+3cgVQ/R
+	hTMEPYb7W9f/KO75WQZ4mbDUyiq4fPXy7mQQf7fC5Eotk/HkMTbzyQeoUy+vPn7ARaGpxD8
+	cb+hswghe5nFVQkAqaHriWK93GXGS5UgkRhQhHv4p1K3c9NNy1K8fz8YdnmBRu1HkZxcolt
+	HMjRSGTuupeo3wicmTmbM5XDOW7ZZBUTdGdJBfa73CcfYVsn6HFcp0FJKdSwo5lmFmXoZ+3
+	AjKKKk+1MtVCkWRI2Z0aPV05lW29NmXQRjkhkTDCh+M7zjOqh7iMPxg1nwHZ8SU/Wb16p1g
+	Q44D3zdirM0lrU/tjC7RmxJgPvSEMjyikrJ3Aycu4rX7Xa3dRres6Ut0c7bUA3757zCc/XY
+	IoAdfxVPfhtLiG7YpO4ImJ47EWOPqyDFKJRePaADUZiSy7HVXEGSRvbWW9LucLZGVYmlPWz
+	aY2Myct5j0OFrQKoi+D7CGSw6kmMQp/NOWsh3v8ZNWJYaLKsvtNmzLCIO+b+lmG5hUsVvSi
+	QMfyqKy9s+IB+NWV1L9EjTqDwMl2jNWiK2f+j//0Q+2HY07zX1Xd9oc9G/vCoQVk6I7mGfp
+	lFZBoLDqRx8DRyoPE+WJiuR3E7axJbTA7bGvecX8P0OZM8ZPinfH8DpWz8GBMSI9c8oQDv1
+	8K5nIcCPa8IYCPEvLq53bZFv+3J7LoQZWYCCUK5yOwN9go7XqhQdjKdMaRJJQpvtJ86H9rU
+	WB4t78lGMA/IZq0U65eDUYClLsEbOGgMvNx7pbBtAqzQQCCxBcnVytnb/GqwWn4yB/2z4Tt
+	96napc4W6hF+ONzdyVVLwnpxYJ59eWjjsK79bgR7W2/fBxNuqEJKw2TKmnhLscZ9k1W4tBl
+	CYjmktyi6Yl4xjxQvYndg5QoFW60y5NKM+sOroZw2sAzqO13Wf9ZIV3yEYrEczbUBDAiSoo
+	kTXGN+xwh2avQjx0m5dDlNWA62O7jndUtq9Mjq3buUT9s019ZjIG4/1bc1zyTLzicNIEPkW
+	8wlXJZn1W9CcrFDYp6Cucfvywg==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
 X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.04 / 15.00];
@@ -93,12 +96,12 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303570-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303571-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[net-swift.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:mengyuanlou@net-swift.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:mengyuanlou@net-swift.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -113,79 +116,200 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[net-swift.com:mid,net-swift.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,net-swift.com:email,net-swift.com:mid,net-swift.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 30C576EBE7C
+X-Rspamd-Queue-Id: AE6B06EBE94
 
-This series improves ethtool support for Wangxun VF drivers
-(ngbevf and txgbevf) in libwx.
+Add support for the set_ringparam in wx_ethtool_ops_vf,
+which is used to set ring sizes for ngbevf and txgbevf.
 
-This series extends VF support by enabling:
-ring parameter configuration via ethtool -G
-interrupt coalescing configuration via ethtool -C
-per-queue statistics reporting via ethtool -S
+Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+---
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 61 +++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  9 +--
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  4 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.c |  4 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.h |  2 +
+ 5 files changed, 72 insertions(+), 8 deletions(-)
 
-Patch 1 adds support for set_ringparam in wx_ethtool_ops_vf,
-allowing VF users to adjust TX/RX descriptor ring sizes.
-Patch 2 enables set_coalesce support for VF devices and updates
-EITR programming to use the VF-specific register access helper.
-Patch 3 adds VF statistics support so ethtool -S can
-report useful runtime counters for VF interfaces.
-
-Changelog:
-v6:
-- Patch 1:
-  Clarify comments describing wx_set_ring() failure semantics.
-- Patch 2:
-  Expand commit message to explain VF ITR encoding changes.
-- Patch 3:
-  Protect ring accesses in wx_update_stats().
-v5: https://lore.kernel.org/all/20260615104849.60444-1-mengyuanlou@net-swift.com
-- Patch 3:
-  Convert WX_NUM_{RX,TX}_QUEUES macros to take explicit netdev parameter
-  as suggested by Simon Horman.
-v4: https://lore.kernel.org/all/20260608103946.25786-1-mengyuanlou@net-swift.com
-  sashiko: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260529075147.88398-1-mengyuanlou%40net-swift.com
-- Patch 2:
-  PF and VF share the same ITR value range. Update wx_write_eitr_vf() to apply
-  identical range clamping as the PF path, ensuring consistent coalesce behavior
-  across both device types.
-- Patch 3:
-  Remove wx_update_stats in wxvf_down.
-  Replace both WX_GLOBAL_STATS_LEN and WX_STATS_LEN macros with type-safe
-  static helpers wx_global_stats_len() and wx_stats_len().
-v3: https://lore.kernel.org/all/20260529075147.88398-1-mengyuanlou@net-swift.com
-- Patch 3:
-  Drop netdev_stat_ops support from this patch.
-v2: https://lore.kernel.org/all/20260525101115.13151-1-mengyuanlou@net-swift.com
-- Patch 3:
-  Remove some stats which can be replaced by standard stats defined in
-  include/net/netdev_queues.h.
-- Patch 1:
-  Adding a return value to wx_set_ring to make wx_set_ringparam_vf can
-  be passed back to userspace.
-  Remove freeing and requesting of IRQs. Ring resize only updates descriptor
-  resources and does not change MSI-X vector or interrupt configuration,
-  so IRQs do not need to be reallocated.
-v1: https://lore.kernel.org/all/20260514103405.42175-1-mengyuanlou@net-swift.com
-
-
-
-Mengyuan Lou (3):
-  net: libwx: add support for set_ringparam in wx_ethtool_ops_vf
-  net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
-  net: libwx: support vf per-queue statistics via ethtool -S
-
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 139 +++++++++++++++---
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |   8 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   9 +-
- drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   4 +-
- drivers/net/ethernet/wangxun/libwx/wx_vf.h    |   1 -
- .../net/ethernet/wangxun/libwx/wx_vf_common.c |   6 +-
- .../net/ethernet/wangxun/libwx/wx_vf_common.h |   2 +
- .../net/ethernet/wangxun/libwx/wx_vf_lib.c    |  13 +-
- 8 files changed, 150 insertions(+), 32 deletions(-)
-
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 5df971aca9e3..eae038df6875 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -9,6 +9,7 @@
+ #include "wx_ethtool.h"
+ #include "wx_hw.h"
+ #include "wx_lib.h"
++#include "wx_vf_common.h"
+ 
+ struct wx_stats {
+ 	char stat_string[ETH_GSTRING_LEN];
+@@ -775,6 +776,65 @@ static int wx_get_link_ksettings_vf(struct net_device *netdev,
+ 	return 0;
+ }
+ 
++static int wx_set_ringparam_vf(struct net_device *netdev,
++			       struct ethtool_ringparam *ring,
++			       struct kernel_ethtool_ringparam *kernel_ring,
++			       struct netlink_ext_ack *extack)
++{
++	struct wx *wx = netdev_priv(netdev);
++	u32 new_rx_count, new_tx_count;
++	struct wx_ring *temp_ring;
++	int i, err = 0;
++
++	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
++	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
++
++	new_rx_count = clamp_t(u32, ring->rx_pending, WX_MIN_RXD, WX_MAX_RXD);
++	new_rx_count = ALIGN(new_rx_count, WX_REQ_RX_DESCRIPTOR_MULTIPLE);
++
++	if (new_tx_count == wx->tx_ring_count &&
++	    new_rx_count == wx->rx_ring_count)
++		return 0;
++
++	mutex_lock(&wx->reset_lock);
++	set_bit(WX_STATE_RESETTING, wx->state);
++
++	if (!netif_running(wx->netdev)) {
++		for (i = 0; i < wx->num_tx_queues; i++)
++			wx->tx_ring[i]->count = new_tx_count;
++		for (i = 0; i < wx->num_rx_queues; i++)
++			wx->rx_ring[i]->count = new_rx_count;
++		wx->tx_ring_count = new_tx_count;
++		wx->rx_ring_count = new_rx_count;
++
++		goto clear_reset;
++	}
++
++	/* allocate temporary buffer to store rings in */
++	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
++	temp_ring = kvmalloc_objs(struct wx_ring, i);
++	if (!temp_ring) {
++		err = -ENOMEM;
++		goto clear_reset;
++	}
++
++	wxvf_down(wx);
++	/* wx_set_ring() may partially apply changes before
++	 * returning an error. The error indicates that not all
++	 * requested ring parameters could be configured.
++	 */
++	err = wx_set_ring(wx, new_tx_count, new_rx_count, temp_ring);
++	if (err)
++		wx_err(wx, "failed to set ring parameters: %d", err);
++	wx_configure_vf(wx);
++	wxvf_up_complete(wx);
++	kvfree(temp_ring);
++clear_reset:
++	clear_bit(WX_STATE_RESETTING, wx->state);
++	mutex_unlock(&wx->reset_lock);
++	return err;
++}
++
+ static const struct ethtool_ops wx_ethtool_ops_vf = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ |
+@@ -782,6 +842,7 @@ static const struct ethtool_ops wx_ethtool_ops_vf = {
+ 	.get_drvinfo		= wx_get_drvinfo,
+ 	.get_link		= ethtool_op_get_link,
+ 	.get_ringparam		= wx_get_ringparam,
++	.set_ringparam		= wx_set_ringparam_vf,
+ 	.get_msglevel		= wx_get_msglevel,
+ 	.get_coalesce		= wx_get_coalesce,
+ 	.get_ts_info		= ethtool_op_get_ts_info,
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index d042567b8128..2e5dba88d04a 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -3248,8 +3248,8 @@ netdev_features_t wx_features_check(struct sk_buff *skb,
+ }
+ EXPORT_SYMBOL(wx_features_check);
+ 
+-void wx_set_ring(struct wx *wx, u32 new_tx_count,
+-		 u32 new_rx_count, struct wx_ring *temp_ring)
++int wx_set_ring(struct wx *wx, u32 new_tx_count,
++		u32 new_rx_count, struct wx_ring *temp_ring)
+ {
+ 	int i, err = 0;
+ 
+@@ -3271,7 +3271,7 @@ void wx_set_ring(struct wx *wx, u32 new_tx_count,
+ 					i--;
+ 					wx_free_tx_resources(&temp_ring[i]);
+ 				}
+-				return;
++				return err;
+ 			}
+ 		}
+ 
+@@ -3299,7 +3299,7 @@ void wx_set_ring(struct wx *wx, u32 new_tx_count,
+ 					i--;
+ 					wx_free_rx_resources(&temp_ring[i]);
+ 				}
+-				return;
++				return err;
+ 			}
+ 		}
+ 
+@@ -3311,6 +3311,7 @@ void wx_set_ring(struct wx *wx, u32 new_tx_count,
+ 
+ 		wx->rx_ring_count = new_rx_count;
+ 	}
++	return 0;
+ }
+ EXPORT_SYMBOL(wx_set_ring);
+ 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
+index aed6ea8cf0d6..bc671786978e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
+@@ -36,8 +36,8 @@ netdev_features_t wx_fix_features(struct net_device *netdev,
+ netdev_features_t wx_features_check(struct sk_buff *skb,
+ 				    struct net_device *netdev,
+ 				    netdev_features_t features);
+-void wx_set_ring(struct wx *wx, u32 new_tx_count,
+-		 u32 new_rx_count, struct wx_ring *temp_ring);
++int wx_set_ring(struct wx *wx, u32 new_tx_count,
++		u32 new_rx_count, struct wx_ring *temp_ring);
+ void wx_service_event_schedule(struct wx *wx);
+ void wx_service_event_complete(struct wx *wx);
+ void wx_service_timer(struct timer_list *t);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+index 0d2db8d38cd5..26de78e9a69e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+@@ -269,7 +269,7 @@ static void wxvf_irq_enable(struct wx *wx)
+ 	wr32(wx, WX_VXIMC, wx->eims_enable_mask);
+ }
+ 
+-static void wxvf_up_complete(struct wx *wx)
++void wxvf_up_complete(struct wx *wx)
+ {
+ 	/* Always set the carrier off */
+ 	netif_carrier_off(wx->netdev);
+@@ -324,7 +324,7 @@ int wxvf_open(struct net_device *netdev)
+ }
+ EXPORT_SYMBOL(wxvf_open);
+ 
+-static void wxvf_down(struct wx *wx)
++void wxvf_down(struct wx *wx)
+ {
+ 	struct net_device *netdev = wx->netdev;
+ 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
+index cbbb1b178cb2..d45d5d8ac3ab 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
+@@ -15,7 +15,9 @@ void wx_set_rx_mode_vf(struct net_device *netdev);
+ void wx_configure_vf(struct wx *wx);
+ int wx_set_mac_vf(struct net_device *netdev, void *p);
+ void wxvf_watchdog_update_link(struct wx *wx);
++void wxvf_up_complete(struct wx *wx);
+ int wxvf_open(struct net_device *netdev);
++void wxvf_down(struct wx *wx);
+ int wxvf_close(struct net_device *netdev);
+ void wxvf_init_service(struct wx *wx);
+ 
 -- 
 2.30.1
 
