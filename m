@@ -1,135 +1,83 @@
-Return-Path: <netdev+bounces-303597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303599-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id a51QDIb1RGon4AoAu9opvQ
-	(envelope-from <netdev+bounces-303597-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:09:58 +0200
+	id gGhGF9f1RGo+4AoAu9opvQ
+	(envelope-from <netdev+bounces-303599-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:11:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F136EC955
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C21286EC977
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:11:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RTtuXmSo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303597-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303597-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=AG1WrQqP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303599-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303599-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E33C130684DF
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:04:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8E3C23063638
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E452B43C063;
-	Wed,  1 Jul 2026 11:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F5E449EB0;
+	Wed,  1 Jul 2026 11:04:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497B443900D
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B48F436379;
+	Wed,  1 Jul 2026 11:04:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782903867; cv=none; b=EjuqRhuXjZKnbBeZQNISUYpFjClZspfRboCG0Eb+0duLAOxnc6ebS1wcuNRJXoj3hPFk8teTEu5WthecxLEZ/Lu6EjA+VIIl1Ut4xQf1XYw9Dsgt9hc8HhXhYBHtAzShG/3W6Y5rGXsjjxJE6zQCQTDLkFUwbaPsGSOalIB9t8w=
+	t=1782903888; cv=none; b=CgUov3YawQWqrChqgmm080mG1r9qnAZKJ6f2Lkd7zU1g2XAIp78+0BzqqQPOnRKSMrJPLQSgju9d3gqHnTFO9vvmXBeWqJH325EHd3Jm5+VdY12JGvegyBOoIH9+gyYJZHhhdfHI5okYmzBwWMZvRWANgnbL7QjvRShUlQ2F9vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782903867; c=relaxed/simple;
-	bh=EoiXCnMfqaEvp6ChiEvuJfXjBruKNhqBu88qaW28Izs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JI3tvLWJNe6fQrb9hzb+rS4ENeacUAYo9EwML3nW/L4LJ5q9E8QnP5QtJy6ysS+MmanDqVVnwPLRWXig8PvJ/QZeYPYoj12/bE6GLwfZ3LiaRFslq6L4n5A4qKSJTdeUSioeFTvDTOuTmw5tAvAZwlwO8hLTvrnOdI/zMnMtCYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RTtuXmSo; arc=none smtp.client-ip=209.85.221.44
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-472493849a3so642523f8f.2
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 04:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782903865; x=1783508665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=DzEMcOPWAAc3ya4BWHLrviknUVsExWDTeL6YrPN8Pco=;
-        b=RTtuXmSoNCy23Dy+USryl6rjSjXPFRSIcQmSdzdcHTnzJmFRkGr23m2v8wvWFcys01
-         z7TLOr8Zsiv8qgbw24lE5m8JIciWViuaBd+4kZISYQUCYYS9V6AXb8I0NvJBl27X6Puw
-         nVK2ZbK3Y/ZKmxV+S3wNRQs96FWx1FyGy+snm3A9EtFgj1n9A9VYpVje/M1vgcwq7wKz
-         nrEiHpgpF6dtRZs/Pbs5xNKWy4doI1ieQHQreHa/iXzBZyoRULysvM73PlznyC6kwrNc
-         nJ5ZWeX20frHwNyCJN4VLSGHq/lNQD/Yo5MdISBVNUisIpbKY7LM3Lmd6ZMEn/mZkLha
-         nXFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782903865; x=1783508665;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DzEMcOPWAAc3ya4BWHLrviknUVsExWDTeL6YrPN8Pco=;
-        b=HbR9fGUUDEBw8hWDmEbP7gCqpKY+F60P3lHqK1b9AzT6gRvRVd/cTgxa7JdW3lo/mC
-         O27QkMJjpSRyrI23wYkxp0ww3/DcaYpWmcsaB19IPe8IDeRKr+G/u+FqOMgFo1seAGm6
-         siR0W4fbQ5ARDJny+ZESalcoVE3ta3V59oNm5EE7lvh8tBSpNtpibYXaNr2qooS79j/5
-         /2luDMU4FepQukarj30li16c7vPYpYMOQldP5HfTbC/unC8zE2CBfgLvHz8sFNlJnQLu
-         /UsL0nYX5caAdfEhAgb0QatSKtbqa1taRswaUSmBVFRnRDO5POQnQaoVQ/JoJ6hnhyOw
-         gBQg==
-X-Forwarded-Encrypted: i=1; AFNElJ/+ljLAAwSS9KI5Y5tKuu8NGBItPcnuuRJB+dWvxVlwr6MgGcTPFK4F3n/fQxtyoOqeVLbHgMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVQdba0vXQ1jPhlOWV2AgpLhjvNgHERFa7Q/q8JDcjTYNrXwiO
-	WNVW98Il2509/JU9Wd+C+Lm3KvuIqL7t5y0t02EYV6SPoUh4UbVoBPv7
-X-Gm-Gg: AfdE7ckrmOEcbiaQxoaJsNLvyIYRa2l7CmmJJYxFV83dyhvUlV+OwKKdCbZSd7LWl34
-	FcT1ssS9PpJoo4v5ZCykN31X6Ijj64DQjbAVsMcJPU1OOlAm/LTn0lzta9vwGU+0EfsBG5kq7YI
-	BlwLm3oSKxl3fpgNNB/dEJxZ3DDj6QJyCAsTqdQtA5DMkGylp3eMaUnwqLZ3EjcGkf3QPvind9J
-	VxArLgjRgxETm8AmvZSwx/ehIJox7XNFfXZSDvKjlEdjJ3CmRHCe7jLMQV9mGBFDd2L2ag3Cs5w
-	a48KGv7Gf009E+fef/t/iSk44UxZPqGQgXwJ1haOR9gZs9c7mMs+xVbFq4nE6X9o7QYClMwNWTM
-	Rqg6GiBfNELdPT8eQM+wDknuYoAl+hkLao59/1bOS2pK/KBHiCGHKKad8fVnWPQp1G/7bmSjMIA
-	zTStNE/3ICBFdWmrWtnYzGRQ11zga+eyNneBsipDNL5AGwmj66CTrLuEAH++/U5lvkhO2h+lrzF
-	BYe
-X-Received: by 2002:a05:600c:64c5:b0:493:c3e0:99ab with SMTP id 5b1f17b1804b1-493c3e099bbmr437705e9.25.1782903864587;
-        Wed, 01 Jul 2026 04:04:24 -0700 (PDT)
-Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-475641e4659sm17142835f8f.12.2026.07.01.04.04.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 04:04:24 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From: Julian Braha <julianbraha@gmail.com>
-To: andersson@kernel.org
-Cc: sumit.garg@kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
+	s=arc-20240116; t=1782903888; c=relaxed/simple;
+	bh=oe8Z1+pcjVjhWXsYlBXVisc9CzQltuCRYFTN0O+3Dzg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b1on7/BsVjPm5vioFDBxnn01NSAtccYextJbFi4cco73S6ffwI3+tysY/oluYH2e6uvZXlPYNV+h1/nJO/2SyOUh360wG/J2Rhi7MtAJddqddsm/n+rHh81++7KEz2H9KLHQXo4JOQ8aMu6JYXJV1+D6TqkNXdKe/KQPsRPB3Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AG1WrQqP; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 71DCBC79AB8;
+	Wed,  1 Jul 2026 11:04:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 70F5860288;
+	Wed,  1 Jul 2026 11:04:39 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9B43F104C9E3C;
+	Wed,  1 Jul 2026 13:04:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782903878; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=kmE/KeW2h5Awvut4lpnR8qxKjqJopBpIq6u/507jZ38=;
+	b=AG1WrQqPxKJytn0OYo5QutZnUwBOyjSnmsbt8Wd1jta4xl3rJyPgfKhOBHalqKIE010u3G
+	5U5eYD1p5DI1M4A6OykucWG/1fvsBXqPgj1fUtFCYbmznT5OX6UhfJNVTGKE+3m8JhyxVH
+	zJjT67SdJ5kFecujebwD+ce5k5+GFvKYgeeWz9Kqr1PaLukrhuWDFgjNriH5EQ33pwguJg
+	g9BNfwKV+70zQKJZ+ckDJwz6jO13ISaHOPNqXIavu2mFpYfq2+/d+4RylYyOeFpG0EOiW3
+	bf6T+nzkYA7RdSjsJjX84DZBHeEjf3t2UVvpuDBp1ECixIhDMUIeUt/vGtdqCQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org,
-	konradybcio@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	robin.clark@oss.qualcomm.com,
-	sean@poorly.run,
-	akhilpo@oss.qualcomm.com,
-	lumag@kernel.org,
-	abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com,
-	marijn.suijten@somainline.org,
-	airlied@gmail.com,
-	simona@ffwll.ch,
-	vikash.garodia@oss.qualcomm.com,
-	bod@kernel.org,
-	mchehab@kernel.org,
-	elder@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jjohnson@kernel.org,
-	mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com,
-	mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com,
-	jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com,
-	vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com,
-	jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org,
-	apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com,
 	linux-kernel@vger.kernel.org,
-	sumit.garg@oss.qualcomm.com,
-	harshal.dev@oss.qualcomm.com,
-	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH] firmware: qcom: scm: add missing IRQ_DOMAIN select to QCOM_SCM
-Date: Wed,  1 Jul 2026 12:03:38 +0100
-Message-ID: <20260701110344.1999068-1-julianbraha@gmail.com>
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Frank Wunderlich <frank.wunderlich@linux.dev>
+Subject: [PATCH net-next v13 00/10] net: phy_port: SFP modules representation and phy_port listing
+Date: Wed,  1 Jul 2026 13:04:16 +0200
+Message-ID: <20260701110427.143945-1-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -137,79 +85,286 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303597-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303599-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andersson@kernel.org,m:sumit.garg@kernel.org,m:linux-arm-msm@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
- comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jens.wiklander@linaro.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:harshal.dev@oss.qualcomm.com,m:julianbraha@gmail.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:andrew@lunn.ch,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:christophe.leroy@csgroup.eu,m:herve.codina@bootlin.com,m:f.fainelli@gmail.com,m:vladimir.oltean@nxp.com,m:kory.maincent@bootlin.com,m:kabel@kernel.org,m:o.rempel@pengutronix.de,m:nicveronese@gmail.com,m:horms@kernel.org,m:mwojtas@chromium.org,m:romain.gantois@bootlin.com,m:daniel@makrotopia.org,m:dimitri.fedrau@liebherr.com,m:frank.wunderlich@linux.dev,m:ffainelli@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_GT_50(0.00)[50];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D2F136EC955
+X-Rspamd-Queue-Id: C21286EC977
 
-'drivers/firmware/qcom/qcom_scm.c' calls 'irq_create_fwspec_mapping'
-so it will fail to compile if IRQ_DOMAIN is disabled:
+Hello everyone,
 
-drivers/firmware/qcom/qcom_scm.c: In function ‘qcom_scm_get_waitq_irq’:
-  drivers/firmware/qcom/qcom_scm.c:2512:16: error: implicit declaration
-of function ‘irq_create_fwspec_mapping’; did you mean
-‘irq_create_of_mapping’? [-Wimplicit-function-declaration]
-   2512 |         return irq_create_fwspec_mapping(&fwspec);
-        |                ^~~~~~~~~~~~~~~~~~~~~~~~~
-        |                irq_create_of_mapping
+Here's V13 for the phy_port improved SFP support and netlink interface.
 
-A patch-set in review proposes making QCOM_SCM visible in the kconfig
-frontend, so let's ensure that it's safe for users to enable:
-https://lore.kernel.org/lkml/akS_6izxrhgK-I22@sumit-xelite/
+V13 rebases on net-next, which includes some fixes for more
+sashiko-reported issues, mostly on a cleanup path in patch 5.
 
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
----
- drivers/firmware/qcom/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+This work extends on the recent addition of phy_port representation to enable
+listing the front-facing ports of an interface. For now, we don't control
+these ports, we merely list their presence and their capabilities.
 
-diff --git a/drivers/firmware/qcom/Kconfig b/drivers/firmware/qcom/Kconfig
-index b477d54b495a..9d137fa2aa23 100644
---- a/drivers/firmware/qcom/Kconfig
-+++ b/drivers/firmware/qcom/Kconfig
-@@ -7,6 +7,7 @@
- menu "Qualcomm firmware drivers"
- 
- config QCOM_SCM
-+	select IRQ_DOMAIN
- 	select QCOM_TZMEM
- 	tristate
- 
+As the most common use-case of multi-port interfaces is combo-ports that
+provide both RJ45 and SFP connectors on a single MAC, there's a lot of
+SFP stuff in this series.
+
+This series is in 2 main parts. The first one aims at representing the
+SFP cages and modules using phy_port, as combo-ports with RJ45 + SFP are
+by far the most common cases for multi-connector setups.
+
+The second part is the netlink interface to list those ports, now that
+most use-cases are covered.
+
+Let's see what we can do with some examples of the new ethtool API :
+
+- Get MII interfaces supported by an empty SFP cage :
+
+# ethtool --show-ports eth3
+
+Port for eth3:
+	Port id: 1
+	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
+	Port type: sfp
+
+- Get Combo-ports supported modes, on each port :
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+- Get Achievable linkmodes on a SFP module (combo port with a DAC in the
+SFP cage)
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+Port for eth1:
+	Port id: 3
+	Upstream id: 2
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+
+Note that here, we have 3 ports :
+ - The Copper port
+ - The SFP Cage itself, marked as 'occupied'
+ - The SFP module
+
+This series builds on top of phy_port and phy_link_topology to allow
+tracking the ports of an interface. We maintain a list of supported
+linkmodes/interfaces on each port, which allows for fine-grained
+reporting of each port's capability.
+
+What this series doesn't do :
+ - We don't support selecting which port is active. This is the next step.
+ - We only support PHY-driven combo ports. The end-goal of this whole
+   journey that started with phy_link_topology is to get support for MII
+   muxes, such as the one we have on the Turris Omnia. This will eventually
+   be upstreamed as well.
+
+If you want to play around with it, here's [1] the patched ethtool that I've
+been using to produce the outputs above.
+
+Thanks !
+
+Maxime
+
+[1] : https://github.com/minimaxwell/ethtool/tree/mc/ethtool_port
+
+Changelog :
+
+Changes in V13:
+
+ - Rebase on net-next
+ - Fix the SFP bus cleanup path in patch 5
+
+Changes in V12:
+V12: https://lore.kernel.org/r/20260615153907.862987-1-maxime.chevallier@bootlin.com
+ - Rebased on net-next, including fixes on the phy probing and cleanup
+   paths
+ - Rebased on Jakub's netdev_ops_locked changes in phy_link_topology
+ - Fixed some typos reported by Andrew and sashiko in the documentation
+
+Changes in v11:
+V11:https://lore.kernel.org/r/20260521121040.1199622-1-maxime.chevallier@bootlin.com
+ - Aggregated Andrew's reviews :)
+ - Removed the "vacant" field, replaced it with "upstream_port"
+
+Changes in V10:
+V10: https://lore.kernel.org/r/20260513130521.1064094-1-maxime.chevallier@bootlin.com
+ - Rebase on net-next
+ - Rename phylink/phy_device sfp_bus_port to sfp_cage_port
+ - Sashiko's reviews were mostly unrealistic or wrong :(
+
+Changes in V9:
+V9: https://lore.kernel.org/r/20260403123755.175742-1-maxime.chevallier@bootlin.com
+ - Added missing netlink doc updates for u8->u32 conversion
+ - Removed dead code with a condition that can never be true in
+   phylink's mod_port code
+ - Fixed the error path in phy_sfp_connect_phy
+
+Changes in v8:
+V8: https://lore.kernel.org/r/20260325081937.571115-1-maxime.chevallier@bootlin.com
+ - Set the new phydev.has_sfp_mod_phy field when we're sure that no
+   errors occured
+ - Fix formatting of the copyright info in ethnl port
+ - Use a policy to validate the range of port_id
+ - Use GENL_REQ_ATTR_CHECK
+ - alpha-sort headers
+ - use u32 in netlink messages
+ - return better error codes
+ - don't check the skb len, the core does that
+
+Changes in V7:
+V7: https://lore.kernel.org/all/20260309152747.702373-1-maxime.chevallier@bootlin.com/
+ - Changed the port cleanup path to use list_for_each_entry_continue_reverse
+ - Adjusted the cleanup path in phylink for the port vacant state
+ - Pass the right cmd for the netlink dump message
+
+Changes in V6:
+V6: https://lore.kernel.org/r/20260304145444.442334-1-maxime.chevallier@bootlin.com
+ - Added some comments in th mod_port cleanup
+ - changed some kmalloc to kmalloc_obj
+ - Removed some phy_link_topo_del_port that wasn't needed
+
+Changes in V5:
+V5: https://lore.kernel.org/r/20260205092317.755906-1-maxime.chevallier@bootlin.com
+ - Fixed a check on a potentially un-initialized pointer, reported by
+   Simon
+ - Fixed a documentation formatting issue
+ - Remove a stray pr_info
+ - Rebased on net-next
+
+Changes in V4:
+V4 : https://lore.kernel.org/netdev/20260203172839.548524-1-maxime.chevallier@bootlin.com/
+ - Add a cleanup patch for the of port parsing
+ - Added a match to sync the port's linkmodes with the PHY's for OF
+   ports
+ - Added RTNL assert in the port_get topo helper
+ - nullify the bus port for phylink support
+ - Fix some typos
+
+Changes in V3:
+V3: https://lore.kernel.org/netdev/20260201151249.642015-1-maxime.chevallier@bootlin.com/
+ - Remove the sfp bus ops for nophy, and use .module_start() as
+   suggested by Russell
+ - Added missing cleanup for the topology, as per AI review
+ - Fixed a few typos as per Romain's review
+ - Changed "occupied" to "vacant" as per Romain's review
+ - Added missing checks for null ports, per AI review
+
+Changes in V2:
+V2: https://lore.kernel.org/netdev/20260128204526.170927-1-maxime.chevallier@bootlin.com/
+ - Fix the cleanup path of phy_link_topo_add_phy, as per AI review
+ - Fix the cleanup path of phy_sfp_probe, as per AI review
+ - Fix the call-site of the disconnect_nophy sfp bus ops, per AI review
+ - Fix the netdev-less case uin phylink, per AI review
+ - Fix the prototype of phy_link_topo_get_port for the stubs
+ - Dropped patch 11. It ended-up breaking 'allnoconfig', so instead we
+   built a phy_interface_names array in net/ethtool/netlink.c
+ - Fix an ethool-netlink spec discrepancy with the type of an attribute
+ - Fix the size computation in the netlink port API
+ - Fix the cleanup path in the netlink port API
+
+V1: https://lore.kernel.org/netdev/20260127134202.8208-1-maxime.chevallier@bootlin.com/
+
+
+
+Maxime Chevallier (10):
+  net: phy: phy_link_topology: Add a helper for opportunistic alloc
+  net: phy: phy_link_topology: Track ports in phy_link_topology
+  net: phylink: Register a phy_port for MAC-driven SFP cages
+  net: phy: Create SFP phy_port before registering upstream
+  net: phy: Represent PHY-less SFP modules with phy_port
+  net: phy: phy_port: Store information about a port's upstream
+  net: phy: phy_link_topology: Add a helper to retrieve ports
+  netlink: specs: Add ethernet port listing with ethtool
+  net: ethtool: Introduce ethtool command to list ports
+  Documentation: networking: Update the phy_port infrastructure
+    description
+
+ Documentation/netlink/specs/ethtool.yaml      |  50 +++
+ Documentation/networking/ethtool-netlink.rst  |  34 ++
+ Documentation/networking/phy-port.rst         |  26 +-
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/phy-caps.h                    |   2 +
+ drivers/net/phy/phy_caps.c                    |  26 ++
+ drivers/net/phy/phy_device.c                  | 183 ++++++++-
+ drivers/net/phy/phy_link_topology.c           |  82 +++-
+ drivers/net/phy/phylink.c                     | 128 +++++-
+ include/linux/phy.h                           |  10 +
+ include/linux/phy_link_topology.h             |  39 ++
+ include/linux/phy_port.h                      |   5 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  19 +
+ net/core/dev.c                                |   1 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/netlink.c                         |  25 ++
+ net/ethtool/netlink.h                         |   9 +
+ net/ethtool/port.c                            | 373 ++++++++++++++++++
+ 18 files changed, 981 insertions(+), 34 deletions(-)
+ create mode 100644 net/ethtool/port.c
+
 -- 
 2.54.0
 
