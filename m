@@ -1,73 +1,90 @@
-Return-Path: <netdev+bounces-303618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303583-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gW6gGQAARWp04woAu9opvQ
-	(envelope-from <netdev+bounces-303618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:54:40 +0200
+	id 6uQPOovvRGpK3goAu9opvQ
+	(envelope-from <netdev+bounces-303583-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:44:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 493236ECFF1
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:54:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F54C6EC519
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:44:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=P3Wh079m;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303618-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303618-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=AMN9U1DF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303583-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303583-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 765913006085
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:54:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C3C603005799
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 10:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DEF23C2B8D;
-	Wed,  1 Jul 2026 11:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5F14192F2;
+	Wed,  1 Jul 2026 10:41:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010016.outbound.protection.outlook.com [52.101.85.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56273947B5
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:54:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782906876; cv=none; b=cMh1mBZAnSBgP7jMgeboi2SlOaUlJpjDn4J7O+sxmIq3czdYujtGBcv1dsgn1ZMJm0ZPqE993YtbOH+ZnAWKRXG53an+9tj4fzl++Mv+sGej1fbuMc9lI6BOh40PcuUCxg5qBKRGGbxmEHE6MdkGu2hfJ70MgYdJdn2EW1csolo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782906876; c=relaxed/simple;
-	bh=hdtWniKBVjFZVT372OPazJSB8XYsV8BEec8tXq+U4QE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c3DZI5DtRGWrxL8wmwHz1enSoPxmRA5yuTWuxPtLcb8JgEPULvdMHrwLTm1iGDvSiWCOxM27fwYvFt1Pam529kAxENbOMvOeySY7Jd/n8KmYg9F/3yHqeqVeVR8xarbOjY7WiErfqKsMWfFGWG/QZk0y3Qyzuawn9/z1PnSIZt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P3Wh079m; arc=none smtp.client-ip=192.198.163.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782906874; x=1814442874;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hdtWniKBVjFZVT372OPazJSB8XYsV8BEec8tXq+U4QE=;
-  b=P3Wh079mR40Ru0+VLNNBpPerth3LQ2X4hxPe745zshhmMCkzv9jfmMHB
-   hhAwQrfHANu5R2e6zuwrU2eFvRhnE7+4T7skvR+hrG/HcV75yv1U+bsNF
-   hWTFpuv41aDyHJzV5b0pLZjBYOF0IJLfOsd2ZVpOZuryUgHq3Ic1sTk/D
-   NjZ4UmU8M4BLa3yCaeC6hf1t1f8s7NlVFxFxHufYKAP52nvHejQXbtx9Y
-   Ynv97d3m0S8ycoQZ9YMQAXSt32lRMtNHtkEMVrTR+aHkS2j+EEM2RvquQ
-   tNlOnff4BDr1pYHgynzLkY03XVcYR23seljj8qaxUT2L8dGj9Q0XWwTg/
-   w==;
-X-CSE-ConnectionGUID: 5VTlnpvhTOWMEJbCYWimNA==
-X-CSE-MsgGUID: jeOmgpd1QjKqHHD/PpiwvQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="82754030"
-X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
-   d="scan'208";a="82754030"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 04:54:33 -0700
-X-CSE-ConnectionGUID: 2o4c0HpAQb6U0Btrbwa+8A==
-X-CSE-MsgGUID: g/sNsBCkQHu7952gBy/1CA==
-X-ExtLoop1: 1
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by fmviesa003.fm.intel.com with ESMTP; 01 Jul 2026 04:54:32 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-next v1] ixgbe: E610: force phy link to get down when interface is down
-Date: Wed,  1 Jul 2026 13:35:19 +0200
-Message-Id: <20260701113519.49859-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D952413D9C
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:41:37 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782902498; cv=fail; b=apz3WWGH8ReqFSgo+3H29gbx3olpXseRsCgUDP8PW3oD8RlEW6G2vWaeeeEltapus9o4XxCTeG02C6RjI3ZK+hTBGPY8DIaFzY1ah7g4ZU5vGQiQp/IRyHQF2rWQOYZ8+PDORiRXWg31mDZl+CX3gNj7Vgha9qAsksjvYo4Qy6Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782902498; c=relaxed/simple;
+	bh=Rn4du4+t/+4Dn8aRWovzN69qTRj0JL2HlbdXHcXUyC8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PjXJb9zW/1AgKWWdn1KFrhD8CHCipzXLXkLkOzbR727EHvjl0d9Hu3IeiN1Pk1+MqfjPO54Uh2iQNHHwF4a9gor1NIN3Vjdc10w+EJt/qjilnaxajtyZkQ4BJDSTOEL/9GYRBQwgnkF+qcuJsxpO4hzK3v7/8+yTAlrvwoyvs3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AMN9U1DF; arc=fail smtp.client-ip=52.101.85.16
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M0tNSMIEItbwL+L5EZUblXI0grcZWtOh+AF9AUixZg0dwJuktlz83nARZcSBP5gZGMDL2YcVhG9alAVxDM37k747mRu6DffbzZYfsM5HEo99Qdrh2LVeHcXgKZJfh5WKQLHcOV/03Z7TuwzsrYbErg883jyqhUrst2i5osXZ1wmJG9itQtXwqoMBd4pAYyDPTNijl8Qxd0GXL/SXvsI3mIJZiqyTnKNqUsH9SUFB0C/Zy8rvxPDoPUF8xFdNXyIPrYB7GWa7uzrjaWjAfaugCQcnIDe6Ln4UWEfpGqRwkeVknqhSR63Uq/I+cXz0XxUYHmrCYm5mZgpb0KhhduO9fg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E8nddcQaFZToWb4S1W15Ih7zdKlmSk0PZbQLlPYg5Ak=;
+ b=k1o1tg3do1jc1T0HyzltF1yL5v0g8n2ard9EviY+7rMl7+GvyXRcL0lOGk+6c0UlwL5HY+sYgX28YKALJ95oFT+giZV6mNMJs4E3v3C1NczUiYHZiCgUmiPrkCy14JSDoy1ekuuOeK86MSAJ3s87AVFYk7RssZLRqAFE2eCE7QDGTFivtwVB3miAAV7Oh8DDW41aqeRpm3a9lslT5Wp59Harr6WGLEANdEshU4DNRq+wzfkIsUKVrRLrizeVeYVBWCb9oSw1Uov7BFGOl2hiuoyfMrDsdZGkQV+L7lsNEW/pbPm0x6eP/dvQPPxzrb4VnN8sUGUDaMaV7gsGSRp+8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E8nddcQaFZToWb4S1W15Ih7zdKlmSk0PZbQLlPYg5Ak=;
+ b=AMN9U1DF0Kj7VrQK/HOIpnTdJQgf7pWFLHXGGR5Xu2/APfijH3/UBMEebgwmG9YlO3M6vJx0ZBR2IBWk/k5pXaIPZ8ejtTaOfV4HVTCju0MYjfFbikvd9UiZgmR5GFjnFwojrWbtcP+A4DLYtL8ugGAsbA3eoS/Cji+LOZAF99U=
+Received: from SA9PR13CA0127.namprd13.prod.outlook.com (2603:10b6:806:27::12)
+ by MW4PR12MB7144.namprd12.prod.outlook.com (2603:10b6:303:21b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 1 Jul 2026
+ 10:41:29 +0000
+Received: from SA2PEPF00003AEB.namprd02.prod.outlook.com
+ (2603:10b6:806:27:cafe::a0) by SA9PR13CA0127.outlook.office365.com
+ (2603:10b6:806:27::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.8 via Frontend Transport; Wed, 1
+ Jul 2026 10:41:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ SA2PEPF00003AEB.mail.protection.outlook.com (10.167.248.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.6 via Frontend Transport; Wed, 1 Jul 2026 10:41:28 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 1 Jul
+ 2026 05:41:28 -0500
+Received: from galena-46a8.xcblab.xilinx.com (10.180.168.240) by
+ satlexmb08.amd.com (10.181.42.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.41 via Frontend Transport; Wed, 1 Jul 2026 05:41:27 -0500
+From: <alejandro.lucero-palau@amd.com>
+To: <netdev@vger.kernel.org>, <kuba@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<dave.jiang@intel.com>
+CC: Alejandro Lucero <alucerop@amd.com>
+Subject: [PATCH net 0/7] pull request: sfc 2026-07-01
+Date: Wed, 1 Jul 2026 12:37:58 +0100
+Message-ID: <20260701113805.14072-1-alejandro.lucero-palau@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,247 +92,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003AEB:EE_|MW4PR12MB7144:EE_
+X-MS-Office365-Filtering-Correlation-Id: f0f559b2-7b66-4f69-3a90-08ded75d4edc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|82310400026|1800799024|376014|23010399003|56012099006|11063799006|18002099003|5023799004;
+X-Microsoft-Antispam-Message-Info:
+	Fi80SbUzqqf7rdRlrmkqx4Y1Qa/08ghXIpMYszBdWvUwCQA5lB8jVD9r+QVkdC/ci9VVT+iVS8SCslrIMMdeJ5h6DdFI91010p8HSt14DN7gvAeolA5YkjECdAVrDFm31aAq5sufHOjMLO2NATpFyjDEgvBPRXDVO3M4zSK8+93Az8ScJ6GOXjqEsQeQlvsNLGcpeMRqUrYLka8YDOWgTaw2c7Bq0u4ZHbDcDxVk5hw0FkOuO1318SoWhX6X5cgaezZaTecGUyOIOB36QNVuXV7IbUA58FJeCZRkQsjFA1HFmqPeZbCvLsHtfC+QwLSmu4v5B8LZdUqHXwSXoQ7uYL5e7U8R1uRsD8Pi5EsUmQgo/N/u75gf346F35iMfEAOjOH2FdnI/IqDZChw4qYRqORiDHv1Wc09v4+M+4gw3e83TRA6nVHEjWNeH1FivOuqv0tkwfLOku9e174NgAWC4dksRVeEl74VQJRpHodeJuzjFjQnOil+xz5l4e7LDcgVManKqqqmKp1wQWP4zkMfNrUvqOUGfiSkFZvLO8Ee1kf4UojUEohBBNn5DRCR5MsGgBy0vO7Ha+hoTzIExajI1dPewmDpKQoIN9ZKK6GBt3JK43aovzZeaq1itDUwtUdHLNkqsJVwguS1+UtmTh3ppEYylMSPMsF1JdR+B75mf7sM+uX4MIlKrf3KNN8RefB+WFcVshnRBr88Zn3Pn+1jGg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(1800799024)(376014)(23010399003)(56012099006)(11063799006)(18002099003)(5023799004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	NQ7rYr8TWKzsnnB3c9aCdv895xtwhkghuJQvNR0dVac+MqZGGn45XNCpxzRc1LZTVN7ZbtP4grLc6wgOjNU3UGFxhJi7CLVwwq0piK6vdsGbDt2r4uUP635gAjmIShgawBw/bMdgvQRvROshVB6k7/jitwc8TW2DnwmmkWBlZB2htFvqndReuv/ks3h0QycELV9i1mSq0qtt4nMtZYnmuYiZle9bGmlpFBjp0Alo/2Pb8vixeZepTNdXJeHCQz2hlAZ0mLtWlEEbXasY0J2kPYVuZzs7hKmBlFSzKVltwjF8NvhxchX9ZuN56wy6yK2auz1zOgf8mUdsyHb7cZzqLPFJXIaNCOBB0glUeN6Kd3yW1ImxA9NjH+plrka2dbwX9MNJQDSQjKzPaE0jqINeRLuZ0DOdAEyqgcrowNN3PDws4Bq6Qq+Y4sta6gX2OHMv
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 10:41:28.7850
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0f559b2-7b66-4f69-3a90-08ded75d4edc
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003AEB.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7144
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303618-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:netdev@vger.kernel.org,m:jedrzej.jagielski@intel.com,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:dave.jiang@intel.com,m:alucerop@amd.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303583-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[alejandro.lucero-palau@amd.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:email,amd.com:mid,amd.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alejandro.lucero-palau@amd.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 493236ECFF1
+X-Rspamd-Queue-Id: 3F54C6EC519
 
-For the E610 family, similarly to the E8xx adapters, the default behavior
-is for the PHY link to remain up even when the corresponding OS interface
-is down.
+From: Alejandro Lucero <alucerop@amd.com>
 
-Add function setting down the PHY config IXGBE_ACI_PHY_ENA_LINK bit
-what leads to disabling PHY link.
+Dear net maintainers,
 
-Align functionality with the implementation of the ice driver.
+here are the last CXL core changes for enabling CXL Type2 drivers to
+initialize a CXL-capable device plus the netdev sfc driver changes using
+this new CXL core Type2 support.
 
-Let user to configure link-down-on-close enablement through ethtool.
+Please pull or let me know of any problem!
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 ++++++++++++++++++-
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  1 +
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 15 ++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 27 +++++++++++---
- 5 files changed, 73 insertions(+), 6 deletions(-)
+Thank you,
+      Alejandro
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 30f62174acf2..7bbb82dd962c 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -685,6 +685,7 @@ struct ixgbe_adapter {
- #define IXGBE_FLAG2_MOD_POWER_UNSUPPORTED	BIT(22)
- #define IXGBE_FLAG2_API_MISMATCH		BIT(23)
- #define IXGBE_FLAG2_FW_ROLLBACK			BIT(24)
-+#define IXGBE_FLAG2_LINK_DOWN_ON_CLOSE		BIT(25)
- 
- 	/* Tx fast path data */
- 	int num_tx_queues;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index da445fb673fc..46d8a3ea86b8 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -1923,6 +1923,33 @@ void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw)
- 	hw->fc.current_mode = hw->fc.requested_mode;
- }
- 
-+/**
-+ * ixgbe_disable_phy_link - force phy link to get down
-+ * @hw: pointer to hardware structure
-+ *
-+ * Send 0x0601 with the IXGBE_ACI_PHY_ENA_LINK bit set down.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+int ixgbe_disable_phy_link(struct ixgbe_hw *hw)
-+{
-+	struct ixgbe_aci_cmd_get_phy_caps_data pcaps = {};
-+	struct ixgbe_aci_cmd_set_phy_cfg_data pcfg = {};
-+	int err;
-+
-+	err = ixgbe_aci_get_phy_caps(hw, false, IXGBE_ACI_REPORT_ACTIVE_CFG,
-+				     &pcaps);
-+	if (err)
-+		return err;
-+
-+	ixgbe_copy_phy_caps_to_cfg(&pcaps, &pcfg);
-+
-+	pcfg.caps &= ~IXGBE_ACI_PHY_ENA_LINK;
-+	pcfg.caps |= IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
-+
-+	return ixgbe_aci_set_phy_cfg(hw, &pcfg);
-+}
-+
- /**
-  * ixgbe_disable_rx_e610 - Disable RX unit
-  * @hw: pointer to hardware structure
-@@ -2207,6 +2234,7 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
- 	u8 rmode = IXGBE_ACI_REPORT_TOPO_CAP_MEDIA;
- 	u64 sup_phy_type_low, sup_phy_type_high;
- 	u64 phy_type_low = 0, phy_type_high = 0;
-+	bool force_on_required;
- 	int err;
- 
- 	err = ixgbe_aci_get_link_info(hw, false, NULL);
-@@ -2272,6 +2300,11 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
- 		phy_type_high |= IXGBE_PHY_TYPE_HIGH_10G_USXGMII;
- 	}
- 
-+	/* If IXGBE_ACI_PHY_ENA_LINK has been explicitly disabled that means
-+	 * we need to force interface enablement after reaching that point
-+	 */
-+	force_on_required = !(pcfg.caps & IXGBE_ACI_PHY_ENA_LINK);
-+
- 	/* Mask the set values to avoid requesting unsupported link types. */
- 	phy_type_low &= sup_phy_type_low;
- 	pcfg.phy_type_low = cpu_to_le64(phy_type_low);
-@@ -2280,7 +2313,7 @@ int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw)
- 
- 	if (pcfg.phy_type_high != pcaps.phy_type_high ||
- 	    pcfg.phy_type_low != pcaps.phy_type_low ||
--	    pcfg.caps != pcaps.caps) {
-+	    pcfg.caps != pcaps.caps || force_on_required) {
- 		pcfg.caps |= IXGBE_ACI_PHY_ENA_LINK;
- 		pcfg.caps |= IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-index 2cb76a3d30ae..59044d67ebeb 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
-@@ -50,6 +50,7 @@ int ixgbe_cfg_phy_fc(struct ixgbe_hw *hw,
- 		     enum ixgbe_fc_mode req_mode);
- int ixgbe_setup_fc_e610(struct ixgbe_hw *hw);
- void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw);
-+int ixgbe_disable_phy_link(struct ixgbe_hw *hw);
- void ixgbe_disable_rx_e610(struct ixgbe_hw *hw);
- int ixgbe_init_phy_ops_e610(struct ixgbe_hw *hw);
- int ixgbe_identify_phy_e610(struct ixgbe_hw *hw);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 4dfae53b4ea1..0fcb9d738984 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -139,6 +139,8 @@ static const char ixgbe_priv_flags_strings[][ETH_GSTRING_LEN] = {
- 	"vf-ipsec",
- #define IXGBE_PRIV_FLAGS_AUTO_DISABLE_VF	BIT(2)
- 	"mdd-disable-vf",
-+#define IXGBE_PRIV_LINK_DOWN_ON_CLOSE	BIT(3)
-+	"link-down-on-close",
- };
- 
- #define IXGBE_PRIV_FLAGS_STR_LEN ARRAY_SIZE(ixgbe_priv_flags_strings)
-@@ -3842,6 +3844,9 @@ static u32 ixgbe_get_priv_flags(struct net_device *netdev)
- 	if (adapter->flags2 & IXGBE_FLAG2_AUTO_DISABLE_VF)
- 		priv_flags |= IXGBE_PRIV_FLAGS_AUTO_DISABLE_VF;
- 
-+	if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE)
-+		priv_flags |= IXGBE_PRIV_LINK_DOWN_ON_CLOSE;
-+
- 	return priv_flags;
- }
- 
-@@ -3879,6 +3884,16 @@ static int ixgbe_set_priv_flags(struct net_device *netdev, u32 priv_flags)
- 		}
- 	}
- 
-+	flags2 &= ~IXGBE_FLAG2_LINK_DOWN_ON_CLOSE;
-+	if (priv_flags & IXGBE_PRIV_LINK_DOWN_ON_CLOSE) {
-+		if (adapter->hw.mac.type == ixgbe_mac_e610) {
-+			flags2 |= IXGBE_FLAG2_LINK_DOWN_ON_CLOSE;
-+		} else {
-+			e_info(probe, "Cannot set private flags: Unsupported hardware\n");
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
- 	if (flags2 != adapter->flags2) {
- 		adapter->flags2 = flags2;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 62c2d83e1577..58ee4a186039 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -7544,6 +7544,17 @@ static void ixgbe_close_suspend(struct ixgbe_adapter *adapter)
- 	ixgbe_free_all_rx_resources(adapter);
- }
- 
-+static void ixgbe_handle_link_down(struct ixgbe_adapter *adapter)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+
-+	if (test_bit(__IXGBE_PTP_RUNNING, &adapter->state))
-+		ixgbe_ptp_start_cyclecounter(adapter);
-+
-+	e_info(drv, "NIC Link is Down\n");
-+	netif_carrier_off(netdev);
-+}
-+
- /**
-  * ixgbe_close - Disables a network interface
-  * @netdev: network interface device structure
-@@ -7566,6 +7577,16 @@ int ixgbe_close(struct net_device *netdev)
- 
- 	ixgbe_fdir_filter_exit(adapter);
- 
-+	if (adapter->flags2 & IXGBE_FLAG2_LINK_DOWN_ON_CLOSE) {
-+		int err;
-+
-+		err = ixgbe_disable_phy_link(&adapter->hw);
-+		if (err)
-+			e_warn(drv, "Cannot set PHY link down\n");
-+
-+		ixgbe_handle_link_down(adapter);
-+	}
-+
- 	ixgbe_release_hw_control(adapter);
- 
- 	return 0;
-@@ -8244,11 +8265,7 @@ static void ixgbe_watchdog_link_is_down(struct ixgbe_adapter *adapter)
- 	if (ixgbe_is_sfp(hw) && hw->mac.type == ixgbe_mac_82598EB)
- 		adapter->flags2 |= IXGBE_FLAG2_SEARCH_FOR_SFP;
- 
--	if (test_bit(__IXGBE_PTP_RUNNING, &adapter->state))
--		ixgbe_ptp_start_cyclecounter(adapter);
--
--	e_info(drv, "NIC Link is Down\n");
--	netif_carrier_off(netdev);
-+	ixgbe_handle_link_down(adapter);
- }
- 
- static bool ixgbe_ring_tx_pending(struct ixgbe_adapter *adapter)
+The following changes since commit dc59e4fea9d83f03bad6bddf3fa2e52491777482:
+
+  Linux 7.2-rc1 (2026-06-28 12:01:31 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/cxl/cxl.git tags/sfc-net-pullrequest-20260630
+
+for you to fetch changes up to bd6550bcdb0c0bcc6e29706ffe2e64708192342b:
+
+  sfc: support pio mapping based on cxl (2026-06-30 15:24:16 -0700)
+
+----------------------------------------------------------------
+
+SFC changes for CXL type2 enabling
+
+----------------------------------------------------------------
+
+Alejandro Lucero (7):
+  cxl: Support Type2 cxl regs mapping
+  cxl: Support dpa without a mailbox
+  sfc: add cxl support
+  sfc: Map cxl regs
+  sfc: Initialize cxl dpa
+  sfc: obtain and map cxl range using devm_cxl_probe_mem
+  sfc: support pio mapping based on cxl
+
+ drivers/cxl/core/core.h               |   2 +
+ drivers/cxl/core/mbox.c               |  51 +------------
+ drivers/cxl/core/memdev.c             |  67 ++++++++++++++++
+ drivers/cxl/core/pci.c                |   1 +
+ drivers/cxl/core/port.c               |   1 +
+ drivers/cxl/core/regs.c               |   1 +
+ drivers/cxl/cxlpci.h                  |  12 ---
+ drivers/cxl/pci.c                     |   1 +
+ drivers/net/ethernet/sfc/Kconfig      |   9 +++
+ drivers/net/ethernet/sfc/Makefile     |   1 +
+ drivers/net/ethernet/sfc/ef10.c       |  41 ++++++++--
+ drivers/net/ethernet/sfc/efx.c        |  18 ++++-
+ drivers/net/ethernet/sfc/efx_cxl.c    | 105 ++++++++++++++++++++++++++
+ drivers/net/ethernet/sfc/efx_cxl.h    |  32 ++++++++
+ drivers/net/ethernet/sfc/net_driver.h |  10 +++
+ drivers/net/ethernet/sfc/nic.h        |   3 +
+ include/cxl/cxl.h                     |   2 +
+ include/cxl/pci.h                     |  22 ++++++
+ 18 files changed, 309 insertions(+), 70 deletions(-)
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+ create mode 100644 include/cxl/pci.h
+
 -- 
-2.31.1
+2.34.1
 
 
