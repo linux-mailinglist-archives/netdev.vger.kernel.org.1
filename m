@@ -1,149 +1,149 @@
-Return-Path: <netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aGqvBazvRGph3goAu9opvQ
-	(envelope-from <netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:45:00 +0200
+	id Wx4aNSPyRGoD3woAu9opvQ
+	(envelope-from <netdev+bounces-303591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:55:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01A06EC531
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:44:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE406EC6A3
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:55:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=RSa6cvkk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jj9yNpcE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303591-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303591-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1CFD8301DD05
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 10:44:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FBD0300823A
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 10:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD20C426D16;
-	Wed,  1 Jul 2026 10:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B23340801E;
+	Wed,  1 Jul 2026 10:54:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCCA3FBB66
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC76540488C
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:54:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782902697; cv=none; b=lNDvneNL9+wVLQSX6bl4oRwTJUXNNU+6eNRLJNV5MaZ/N/+lxhI7pcSjqPWLUIrV5Ga3u4TJDQujNxyQbN696lov1d3AYZnbn5R1gTAqRFxzue7O++T1m3C+UmswIR+YeW+GYy/VPwkXl3QENi/cVsp9qcF8Yu/gOiTF2ZEdImM=
+	t=1782903248; cv=none; b=Wp0YS4bg7fyle2T5wvxR3Q8pJ5yJ+6NCDSoJ44oVLq2y8mOCkObuhNcs6WXnbXF8dOiTwoWcnYXJ7ATtFrchJVMyC/SnewV+B4Het2t7a7M5FfCJ98unvbPaTk5Vyr6bfDvZveBXPN9LkH+GjsQMBstUJhNMcuetT7rs82rHm10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782902697; c=relaxed/simple;
-	bh=D/vBBwBsOv6LCFJVb8CYh/XxO4FuXAOFO0vEjsc9Mps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWloaQUO9iEkC7StTJaIY1taS9LYTDeeCNOmUWGHmAzzR8/aWifHpAyT6Uxe/05jyp1leCSYR4w2wn1lD1r98IoDsm3+TF+MaHMmChH5i7Zz8R9vJGa64zAeS3ZY4/PNGz2EU2jbgdB2CvMeFm/UtIcaOXs1iuqNWa0bZpXERAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=RSa6cvkk; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=MlO9/xg58sbko0NqILOg0eZp8g27KvCJW04RWhfiJUI=; b=RSa6cvkkwFrNTNhFaXT8r6cHd0
-	hYJtXgUqy22fmyMIzJWPAHxcnHeqVv7oTNl0w3LJ8NbhIJeJ3ovza5IKACjxwNZSsVri8AM7K7jHo
-	CaS9XME8c2jbmonHiWFpWsGEaHtLY07quanJRlt2TSELgXWQPtA4zdCMLO8WnsKWdM4KHKCc+d5EF
-	O9xqojk+7bQWaajzbXjTlrmWZJbUyV5C3A2MDb4+S7INPumkyOvoBtHIdFwQSh2tXJSsiu2HYhlcB
-	YPlzooKsWmaSE20rcPROl2nDS6yA4EeajtzHUX35ecEc2eI4EW0SzEkz/tbuB3QUk2yUQvcqYV127
-	ql0CPkNg==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wesQq-007mqI-15;
-	Wed, 01 Jul 2026 10:44:40 +0000
-Date: Wed, 1 Jul 2026 03:44:34 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
-	Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Larysa Zaremba <larysa.zaremba@intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Rongguang Wei <weirongguang@kylinos.cn>, 
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>, Fabio Baltieri <fabio.baltieri@gmail.com>
-Subject: Re: [PATCH net-next v9 5/5] net: wangxun: add pcie error handler
-Message-ID: <akTvTF7n9P1lrqCN@gmail.com>
-References: <20260701072357.33984-1-jiawenwu@trustnetic.com>
- <20260701072357.33984-6-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1782903248; c=relaxed/simple;
+	bh=KfPLUHbv6VqfMJCkJoMTAP4YFtOSL1LJmXwMk+chWo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Que/iiUYOSSDxDAeV6Nvwxqt732iUj6HzFIFt6Ld0AU/88rE4K00doSfPIIeLcC+LqonUeKBubz/7hVIvMY0vt8tfA50vAGIiQUOwyYPBfJh/f3Jwa7iEM76b9a+qNA3+vXtxnh2z5aEiA9IfoYkqyof6Bkzqug1ObQeeg3dstE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jj9yNpcE; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270B31F00AC4
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:54:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782903244;
+	bh=3dFhZqVXlPw7AKqdGyCXcF9/T5J+z7jeRJ0PFE89kgg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=jj9yNpcE4V6NcdQD4g05CJvWOH6GRskIlx3Mmm69xy5BxwxpnrT5BqC0gHnRaUFyt
+	 O23edhYADsdZPU+HZKUrz/oCTTvue+X/Sp2hJmpFu2roFbszryTFSeR5HMka7v15M0
+	 piz/7BCnE+I5rarI7mx8TRbeX572MZy+4DIlZ/RUU66TBUrN+Iq/kEMOXU8miLkKR/
+	 QaT0LjyVP4y6A2O8sI1q6SOw1xZHoV69d7p4H5xqnwLeHBVh4QgicvGaOohR+OLjXv
+	 72+VPyRgVlGIGtnMYgbqhMcUS4kG1TMB0E3Vyt8d/L1Qp43iVzWVF/2cfTSmxugvBM
+	 17ZM8I8DSAy/A==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5aeb18fe7ceso306564e87.0
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 03:54:04 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RovwAfCexDRmUVOzG7umPm+/7j/GZvDEG5tLWv/Je3PouUHtvrZu7qGY10Onsoujdb33h0VZKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi4B8qViF1LRFMG1rOqJHZMote6uyY9uUPVuRIhHXfD++lGDhZ
+	wcKnIxzbhsS/KXPtUz1JMnx9JO9/4DbJcr1/DA9GASPUW4EhxPFobRvRSxdLLmxNGfNHzIqC7AO
+	UA0NxeBJEkCEyPtzkmzs9YHaH2aSTmrI=
+X-Received: by 2002:a05:6512:1043:b0:5ad:67d6:a2d9 with SMTP id
+ 2adb3069b0e04-5aec68b453fmr281719e87.39.1782903242946; Wed, 01 Jul 2026
+ 03:54:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260701072357.33984-6-jiawenwu@trustnetic.com>
-X-Debian-User: leitao
+References: <20260630092406.150587-1-manikandan.m@microchip.com>
+ <20260630092406.150587-2-manikandan.m@microchip.com> <CAD++jL=FkEfpz-LW0vmPpZ28fLfGFMWo5E479Mapz55YUxKNAQ@mail.gmail.com>
+ <DJN3HIIAY4LE.3MXU9Q2YFSCJJ@walle.cc>
+In-Reply-To: <DJN3HIIAY4LE.3MXU9Q2YFSCJJ@walle.cc>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 1 Jul 2026 12:53:49 +0200
+X-Gmail-Original-Message-ID: <CAD++jLntmnwU3gAQfDn2nd4CQ_7HY6S_kBguVtZvVT1PktFCPw@mail.gmail.com>
+X-Gm-Features: AVVi8Ce_77SqNNQU5uO1pZpVOGBbpgsRt39tcDkp1nPUZH97o9So0gRgVCLSXDs
+Message-ID: <CAD++jLntmnwU3gAQfDn2nd4CQ_7HY6S_kBguVtZvVT1PktFCPw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/7] dt-bindings: mtd: jedec,spi-nor: allow the SFDP to
+ be exposed via NVMEM
+To: Michael Walle <michael@walle.cc>
+Cc: Manikandan Muralidharan <manikandan.m@microchip.com>, pratyush@kernel.org, mwalle@kernel.org, 
+	takahiro.kuwano@infineon.com, miquel.raynal@bootlin.com, richard@nod.at, 
+	vigneshr@ti.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	srini@kernel.org, nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, linux@armlinux.org.uk, richardcochran@gmail.com, 
+	arnd@arndb.de, linux-mtd@lists.infradead.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303590-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jiawenwu@trustnetic.com,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:larysa.zaremba@intel.com,m:gregkh@linuxfoundation.org,m:tglx@kernel.org,m:weirongguang@kylinos.cn,m:u.kleine-koenig@baylibre.com,m:fabio.baltieri@gmail.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303591-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:michael@walle.cc,m:manikandan.m@microchip.com,m:pratyush@kernel.org,m:mwalle@kernel.org,m:takahiro.kuwano@infineon.com,m:miquel.raynal@bootlin.com,m:richard@nod.at,m:vigneshr@ti.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:srini@kernel.org,m:nicolas.ferre@microchip.com,m:alexandre.belloni@bootlin.com,m:claudiu.beznea@tuxon.dev,m:linux@armlinux.org.uk,m:richardcochran@gmail.com,m:arnd@arndb.de,m:linux-mtd@lists.infradead.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,linuxfoundation.org,kylinos.cn,baylibre.com];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microchip.com,kernel.org,infineon.com,bootlin.com,nod.at,ti.com,tuxon.dev,armlinux.org.uk,gmail.com,arndb.de,lists.infradead.org,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A01A06EC531
+X-Rspamd-Queue-Id: 2FE406EC6A3
 
-On Wed, Jul 01, 2026 at 03:23:57PM +0800, Jiawen Wu wrote:
-> +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	pci_ers_result_t result;
-> +
-> +	if (pci_enable_device_mem(pdev)) {
-> +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-> +		result = PCI_ERS_RESULT_DISCONNECT;
-> +	} else {
-> +		/* make all memory operations done before clearing the flag */
-> +		smp_mb__before_atomic();
-> +		clear_bit(WX_STATE_DISABLED, wx->state);
-> +		clear_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
-> +		pci_set_master(pdev);
-> +		pci_restore_state(pdev);
-> +		pci_wake_from_d3(pdev, false);
-> +
-> +		rtnl_lock();
-> +		if (netif_running(wx->netdev) && wx->down_suspend)
-> +			wx->down_suspend(wx);
-> +		if (wx->do_reset)
-> +			wx->do_reset(wx->netdev, false);
-> +		rtnl_unlock();
-> +		result = PCI_ERS_RESULT_RECOVERED;
-> +	}
-> +
-> +	pci_aer_clear_nonfatal_status(pdev);
+On Wed, Jul 1, 2026 at 10:34=E2=80=AFAM Michael Walle <michael@walle.cc> wr=
+ote:
 
-After bfcb79fca19d ("PCI/ERR: Run error recovery callbacks for all
-affected devices"), AER errors are always cleared by the PCI core and
-drivers don't need to do it themselves.
+> If I'm correct, this is the old style, see commit bd912c991d2e
+> ("dt-bindings: nvmem: layouts: add fixed-layout"). So it should
+> eventually look like:
+>
+> sfdp {
+>      compatible =3D "jedec,sfdp";
+(...)
+> Also I'm not sure if we really need to add the "nvmem-cells" here.
+> IIRC in MTD it was there to tell a driver to add an nvmem device to
+> an already existing compatible/node.
+>
+> Apart from the MTD case, I've just found qcom,smem-part,yaml which
+> has compatible =3D "nvmem-cells".
+
+You're right, I was using old information, discard my comments...
+Reviewed-by: Linus Walleij <linusw@kernel.org>
+
+I think my comment in the driver to check for the compatible
+instead of the node name is still valid though.
+
+Yours,
+Linus Walleij
 
