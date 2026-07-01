@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-303634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303635-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3dR6DZcPRWrp6AoAu9opvQ
-	(envelope-from <netdev+bounces-303634-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:01:11 +0200
+	id 7djpIr0ORWpI6AoAu9opvQ
+	(envelope-from <netdev+bounces-303635-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:57:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA346EDC19
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:01:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 297C66EDAAF
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 14:57:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=Kr3D3+JC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303634-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303634-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=coHcBY4Y;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303635-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303635-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C9A1330FCBFE
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:46:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 003A5312F750
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 12:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABA3481652;
-	Wed,  1 Jul 2026 12:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7211548164A;
+	Wed,  1 Jul 2026 12:45:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455F748123F
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC72481A84
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 12:45:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782909934; cv=none; b=aqFsgYnc/xN3eKkgLmiBpbhZB/uHWLmKwiz+N+PWyIHPLJ7hYSXSMjF5UatUjK68kMLpqGxmaHn2kNVw8i6rKuOkmz+xxgeQV4y5le0Y/h/4TLiWsxXlDktkoXzGj+75KCE2VV/Rqa8Wn+HcH+6u44QY/yaL5tGpL0fDZWavAz0=
+	t=1782909936; cv=none; b=dmMyHeY8m1M/0xjEoJ21ZN4PLcw+pqf9UzHCN62iBBS5MAtHMI5lk+9InH00raPr1FgVzfNspAheW+Q5ftVp9L7xERhxPZmiGr5D+3zJuijbK9RSPm6oX8xvbNVOfEWfNs9y+dVwBWdV1vh/o2Uc5H2aa7zJo6rCuvF8AWeFFPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782909934; c=relaxed/simple;
-	bh=MuMCGAKuSURSGZ99zUqZ6MIKOG38p+S2gkvkQ9ek3SE=;
+	s=arc-20240116; t=1782909936; c=relaxed/simple;
+	bh=8Dwvhzji6WxYV9lCY1qvZHWe+fj258rib/mlG/ST8ek=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mbGDWYFovbQZ7jaAmmb/ZhLobnSeRuuS+1hd31aAcJ59aBP6RcZhFQP1J8oPjwFY7SW0ui3XgjVzOQO3ubPf5YjRVNMIIwCP4edfrm4raZWfsPuNl+s8GACiWi3ANB+vwzGCPWlcX3rF60lPf+tN/V3qfWA1FNkuhiZbr4lmgSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kr3D3+JC; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=L5NvsafzqTZPoWhm+fFhat7vNtSD0tAgpb7RcofRM/hxdAHBoUfD65+2yx/FhtmC17K8Ps1azlZnP5e+D8nv2myxQAcbjqZCpjAqdVdJvLfSIB2cRzYbLHF0UhQUFwn1W338jbV+1Y51DgG8bGdFEiDKNjTD2bz2J1l7lhM3jeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=coHcBY4Y; arc=none smtp.client-ip=198.175.65.16
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782909933; x=1814445933;
+  t=1782909935; x=1814445935;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MuMCGAKuSURSGZ99zUqZ6MIKOG38p+S2gkvkQ9ek3SE=;
-  b=Kr3D3+JC0vj4qHqo58fG7X6FP6mUd0yyXe2WDTqDzFU8X3F53clAyVio
-   g/Qgf0myQoD2pYFhXnF1XUixxC5bIhuDpsmw/Y8I/aOQI1yXPO+x2qo0A
-   EiFNGi/b4bipvMPR27KNCPkSz3AEROf5LmPr/OjgZqHD6IFZbc0uEWfM6
-   Ss/slmEncD7EtskA6UVJC3OKDO/bPngLAoht4kY3R1FIQfU5zSWPkJJuE
-   lSUOoFeIzknjllOUN5CpseEo1FZ1OHJ0/vsCPqx37cB/ZHOb9hOV4vVM1
-   dirAF/g270ZhqwRWO5x6MG0sdV3CzP8BZlBeGTIImHu0g0k8LvsJjN6LG
+  bh=8Dwvhzji6WxYV9lCY1qvZHWe+fj258rib/mlG/ST8ek=;
+  b=coHcBY4YYyUej1qlOsuPNNH3dJvLibFWGDcl5hymXutmCKgnvp9Hjc/G
+   SAXdgfyjNDDO+tzKuigVyUfX1q1sQw4pF356WNB2mR/UbKrPv5QWCAm8G
+   niq4LYwlTET/NjpMyZVkHvE9VVchWyFP3+STbJxtbPIVZ/cNmfL+4jc5/
+   wOoAGvK+s4MwdvRFPySIL2NxUWXNERCMMKCvr1qEpc2u/e67N/cAMacVz
+   gsR0jC8Jwj/8aCJvrfD8StoITpnuBU6BGR84Tzl2ygYfNL1in7/ewawXi
+   77ihyriH3h+CM3paR3TjV+3P11Cpreru1QDH5LPdUaB9MQx+bvGct8r0o
    A==;
-X-CSE-ConnectionGUID: GBbeAqASQ0yM85Kh1A04SA==
-X-CSE-MsgGUID: xzFq1dTdR1W+uzuq2iAuFg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="83839228"
+X-CSE-ConnectionGUID: FbXqvPpdS9upNmxpbTU4LQ==
+X-CSE-MsgGUID: b4xAjanBRb2iorzfeltD7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="83839233"
 X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
-   d="scan'208";a="83839228"
+   d="scan'208";a="83839233"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 05:45:33 -0700
-X-CSE-ConnectionGUID: SYJ/FOJZT0ql9g0XrJ51jw==
-X-CSE-MsgGUID: zPZCRhowQVWeltK5uRG2Jw==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 05:45:35 -0700
+X-CSE-ConnectionGUID: JrurodIYSPK7D0Al54FJfg==
+X-CSE-MsgGUID: vC4dkGwdRrOKZEUqD5DpfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
-   d="scan'208";a="276864896"
+   d="scan'208";a="276864905"
 Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa001.fm.intel.com with ESMTP; 01 Jul 2026 05:45:30 -0700
+  by fmviesa001.fm.intel.com with ESMTP; 01 Jul 2026 05:45:33 -0700
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: netdev@vger.kernel.org,
 	jacob.e.keller@intel.com,
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
 	Sashiko AI Review <sashiko-bot@kernel.org>
-Subject: [PATCH v5 net 2/7] i40e: avoid null ptr dereference in i40e_ptp_stop()
-Date: Wed,  1 Jul 2026 14:45:19 +0200
-Message-Id: <20260701124524.13644-3-maciej.fijalkowski@intel.com>
+Subject: [PATCH v5 net 3/7] i40e: make ring pointers unreachable before freeing via rcu
+Date: Wed,  1 Jul 2026 14:45:20 +0200
+Message-Id: <20260701124524.13644-4-maciej.fijalkowski@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20260701124524.13644-1-maciej.fijalkowski@intel.com>
 References: <20260701124524.13644-1-maciej.fijalkowski@intel.com>
@@ -93,11 +93,11 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303634-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303635-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:magnus.karlsson@intel.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:przemyslaw.kitszel@intel.com,m:jacob.e.keller@intel.com,m:maciej.fijalkowski@intel.com,m:sashiko-bot@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -117,56 +117,65 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ECA346EDC19
+X-Rspamd-Queue-Id: 297C66EDAAF
 
 Sashiko reports:
 ***
-If an allocation fails here during i40e_rebuild(), i40e_vsi_clear()
-frees the
-main VSI and sets pf->vsi[vsi->idx] = NULL, and the rebuild will abort
-without
-stopping the PTP clock.
-Later, if the device is removed or unbound, i40e_remove()
-unconditionally
-calls i40e_ptp_stop(), which does:
-drivers/net/ethernet/intel/i40e/i40e_ptp.c:i40e_ptp_stop() {
-    ...
-	struct i40e_vsi *main_vsi = i40e_pf_get_main_vsi(pf);
-    ...
-	dev_info(&pf->pdev->dev, "%s: removed PHC on %s\n", __func__,
-		 main_vsi->netdev->name);
-    ...
-}
-Would this cause a NULL pointer dereference since main_vsi is now NULL?
+>  err_config:
+> +	i40e_vsi_free_q_vectors(vsi);
+> +err_qvec:
+>  	i40e_vsi_clear_rings(vsi);
+This is a pre-existing issue, but can the sequence in i40e_vsi_clear_rings()
+lead to an RCU ordering violation?
+In i40e_vsi_clear_rings(), the rings are freed before the array pointers are
+nullified:
+	kfree_rcu(vsi->tx_rings[i], rcu);
+	WRITE_ONCE(vsi->tx_rings[i], NULL);
+Under RCU rules, a pointer must be made unreachable to new readers before it
+is handed off to kfree_rcu(). Could a new RCU reader (like
+i40e_get_netdev_stats_struct_tx()) fetch the pointer after kfree_rcu() is
+invoked, and access freed memory if the grace period expires while the
+reader is still active?
 ***
 
-Check if main_vsi is not null before calling dev_info().
+Save the Tx ring pointer before clearing the published ring array slots
+and pass the saved pointer to kfree_rcu(). This preserves the intended
+RCU ordering, where new readers can no longer discover the ring through
+vsi->tx_rings/rx_rings/xdp_rings before the object is queued for
+deferred freeing, while avoiding a NULL kfree_rcu() argument after the
+slot has already been cleared. Since the Tx pointer is the base of the
+per-queue-pair allocation block, re-reading vsi->tx_rings[i] after
+WRITE_ONCE(..., NULL) would otherwise turn the free into a no-op and
+leak the whole ring block.
 
-Fixes: beb0dff1251d ("i40e: enable PTP")
+Fixes: 9f65e15b4f98 ("i40e: Move rings from pointer to array to array of pointers")
 Reported-by: Sashiko AI Review <sashiko-bot@kernel.org>
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_ptp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index ff62b5f2c815..ca93df4d6785 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -1556,8 +1556,9 @@ void i40e_ptp_stop(struct i40e_pf *pf)
- 	if (pf->ptp_clock) {
- 		ptp_clock_unregister(pf->ptp_clock);
- 		pf->ptp_clock = NULL;
--		dev_info(&pf->pdev->dev, "%s: removed PHC on %s\n", __func__,
--			 main_vsi->netdev->name);
-+		if (main_vsi)
-+			dev_info(&pf->pdev->dev, "%s: removed PHC on %s\n", __func__,
-+				 main_vsi->netdev->name);
- 	}
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 471fa7f7b643..a29a89192a7a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -11699,11 +11699,13 @@ static void i40e_vsi_clear_rings(struct i40e_vsi *vsi)
  
- 	if (i40e_is_ptp_pin_dev(&pf->hw)) {
+ 	if (vsi->tx_rings && vsi->tx_rings[0]) {
+ 		for (i = 0; i < vsi->alloc_queue_pairs; i++) {
+-			kfree_rcu(vsi->tx_rings[i], rcu);
++			struct i40e_ring *tx_ring = vsi->tx_rings[i];
++
+ 			WRITE_ONCE(vsi->tx_rings[i], NULL);
+ 			WRITE_ONCE(vsi->rx_rings[i], NULL);
+ 			if (vsi->xdp_rings)
+ 				WRITE_ONCE(vsi->xdp_rings[i], NULL);
++			kfree_rcu(tx_ring, rcu);
+ 		}
+ 	}
+ }
 -- 
 2.43.0
 
