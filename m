@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-303659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303660-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1VXIBRoURWp16goAu9opvQ
-	(envelope-from <netdev+bounces-303659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:20:26 +0200
+	id NNeUBrwXRWpw6woAu9opvQ
+	(envelope-from <netdev+bounces-303660-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:35:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA7A6EE020
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:20:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AC76EE30B
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:35:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=collabora.com header.s=mail header.b=lS276rFa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303659-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303659-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=collabora.com header.s=mail header.b=qug4yfrq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303660-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303660-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=collabora.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1372B30B0C70
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 13:13:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12CEB327126E
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 13:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A574921BD;
-	Wed,  1 Jul 2026 13:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85405492531;
+	Wed,  1 Jul 2026 13:11:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E9348C8DA;
-	Wed,  1 Jul 2026 13:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BA2492197;
+	Wed,  1 Jul 2026 13:11:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782911492; cv=none; b=PGTwTvfSATcWXpUIrZ6FkpSMv6oRsQNFH2mjfKxV3VatrzFNUGMrh2thlhEtfxxTy0BjO1mAs6ouWsbACgY/ZAYb6VqFqz2sYn+6Iwfi0yF8Jd9Xak8FAsf+5SVaDLYer0cuuWc19IX4efS82WZWNlpy+wibTAzHMVfQhrq7Cws=
+	t=1782911493; cv=none; b=FMQOLBIvLbz7G5z/6QYtObzKdViaQaVUKCCGdl1wXxtnDl5U7xZPUbUrP6piAmHr3a4kt9829aWqUBE8bpUKArRrK7v/GakD5LFkvaexGdiKQt0fZkgRaUJOVL6EiKCWddeij0aBEFkk+kAEQZCKbprDLpvfMcv/JEbcCre/2LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782911492; c=relaxed/simple;
-	bh=+hRHFz0agduJr5pnmY0TtLeRwfae7FsBp+NKq8nJMXw=;
+	s=arc-20240116; t=1782911493; c=relaxed/simple;
+	bh=zDRp0gc07u7dHssZ9PgMsLDpVBlNq50qtWtj6ChvsG4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jwyiJifDBY9tNARHr8wTHpBViif8f8bSj5LzMcexKMFDyd1FZws31cTd2n2LDMnGLOzoXMJ3sG3jwOguBmlNC1Ru4hKPNZgHPPnik0AwilUKjnLg3k4cvdlDU17z+CIkM7AqxnWHL/KyxVcBWAZq0J2hBfzv6SksfJsHeORlxNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=lS276rFa; arc=none smtp.client-ip=148.251.105.195
+	 In-Reply-To:To:Cc; b=HG7sO5tuN2HbxGsjs4/1qVy7TRI8XGPADbD4ZfvipxaUjQg5Kh/lwFdkX/2Ptle8dLRjj01yuyGQU4+Wys3Mi0qcrO5a0/7C3YAPTvPiPO2r34QBvGe2Jx1PZCIOj5snKdKNTxNDxm42MHNxcF+cgwbh6QHn2N3PGQdAfu9q6cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qug4yfrq; arc=none smtp.client-ip=148.251.105.195
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1782911488;
-	bh=+hRHFz0agduJr5pnmY0TtLeRwfae7FsBp+NKq8nJMXw=;
+	s=mail; t=1782911490;
+	bh=zDRp0gc07u7dHssZ9PgMsLDpVBlNq50qtWtj6ChvsG4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=lS276rFa0DUdezKMvixD8MgrRt2XuTxrT7vcjsKbFxQXQaZwJdSE2+7wTmtTT3Esf
-	 olJ69pZDlQTODhLhxZSyjfzCvFnJkDnYeUeiGnGGDj13/17YOQ6xOyiTAeo/X6cekl
-	 mj41dIB9/ukUfyX0qWIGN/WMLG6Bgi8PdHyrrLo+J452LWxg1/5kTVp7gf45oJazcy
-	 wrkGd+AP3zrNshZs8LBOELQpEcCK7Y3NbUDzy5pXcmliidCFZheb/MWj4BeuBcLwFc
-	 JSOl+e5TBdIsm/cHBQaIfXt8u/v9lJWeBcl0RWG23yCH4lcbW8PSuaDVst4uffoLKQ
-	 wwGZUliDxxAEg==
+	b=qug4yfrqHeuTZ7NMqU/K/b52mWLjpSeFGlsD3uA8a2Rb0hi7K9bF8RyW+T3zJ49ea
+	 1/fGu3IcB8Bb8OembQEiWefKbO9/SHW0/M7g/Tm4BrWVOVVTjKRbIs8nZDWeMFZK9I
+	 ake/urCdImbYegJsO0NgDw11eLxDlP8ciqdsFEHb/MQQ4QieXZRjFziADYdEQvOyiP
+	 3RoxG/59t4sCSLRzqxuG72eIheNL8sm4t3lz0k+idWi2QporCRgkPNvJ+eahoQpPH2
+	 Kz2HVaNwr+GVHN+DRpwHx/eVlHknrAlNMFQ3jOtNGXlDFccXGmoMEPw8QghcyXjgzL
+	 zus5cNMw+73qQ==
 Received: from yukiji.home (unknown [100.64.0.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: laeyraud)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id AC24E17E35C9;
-	Wed,  1 Jul 2026 15:11:27 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E96FD17E35CD;
+	Wed,  1 Jul 2026 15:11:28 +0200 (CEST)
 From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Date: Wed, 01 Jul 2026 15:11:13 +0200
-Subject: [PATCH 08/15] clk: mediatek: Add MT8189 vlpckgen clock support
+Date: Wed, 01 Jul 2026 15:11:14 +0200
+Subject: [PATCH 09/15] clk: mediatek: Add MT8189 vlpcfg clock support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260701-mt8189-clocks-system-base-v1-8-2b048feea50a@collabora.com>
+Message-Id: <20260701-mt8189-clocks-system-base-v1-9-2b048feea50a@collabora.com>
 References: <20260701-mt8189-clocks-system-base-v1-0-2b048feea50a@collabora.com>
 In-Reply-To: <20260701-mt8189-clocks-system-base-v1-0-2b048feea50a@collabora.com>
 To: Michael Turquette <mturquette@baylibre.com>, 
@@ -81,11 +81,11 @@ Cc: kernel@collabora.com, linux-clk@vger.kernel.org,
  netdev@vger.kernel.org, Irving-CH Lin <irving-ch.lin@mediatek.com>, 
  Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782911477; l=10027;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782911477; l=6481;
  i=louisalexis.eyraud@collabora.com; s=20250113; h=from:subject:message-id;
- bh=+hRHFz0agduJr5pnmY0TtLeRwfae7FsBp+NKq8nJMXw=;
- b=bwOze7aEpkH/crR7i4KZbyftHa6gxW3c23czXydnKnUpe0LraE3OpZyDsSAc3krkpOV5jBZeC
- oRieoEC5PvKAuLLFf+SlddXnNp4qOYS0wkUr7oaklcU6Jzt7UAMbY3Q
+ bh=zDRp0gc07u7dHssZ9PgMsLDpVBlNq50qtWtj6ChvsG4=;
+ b=FFEgQaeJBSuL/yvRxYAfiepsiufL0NWwJKx/Ei2SERzZ6p/OHRWt7XrYXoI44FyHo+GVYuMQD
+ IHpRTRO/qcvDCh+w+hfKPYCwDMF+ObHUj8PB7BGgjtw2q8QfUsnQlfU
 X-Developer-Key: i=louisalexis.eyraud@collabora.com; a=ed25519;
  pk=CHFBDB2Kqh4EHc6JIqFn69GhxJJAzc0Zr4e8QxtumuM=
 X-Rspamd-Action: no action
@@ -94,11 +94,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
 	R_DKIM_ALLOW(-0.20)[collabora.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303659-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303660-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:chun-jie.chen@mediatek.com,m:p.zabel@pengutronix.de,m:edward-jw.yang@mediatek.com,m:richardcochran@gmail.com,m:kernel@collabora.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:irving-ch.lin@mediatek.com,m:louisalexis.eyraud@collabora.com,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,redhat.com,gmail.com,collabora.com,mediatek.com,pengutronix.de];
@@ -119,14 +119,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mediatek.com:email,vger.kernel.org:from_smtp,collabora.com:dkim,collabora.com:email,collabora.com:mid,collabora.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[collabora.com:dkim,collabora.com:email,collabora.com:mid,collabora.com:from_mime,mediatek.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8EA7A6EE020
+X-Rspamd-Queue-Id: 74AC76EE30B
 
-Add support for the MT8189 vlpckgen clock controller, which provides
-muxes and dividers for clock selection in vlp domain for other IP blocks.
+Add support for the MT8189 vlpcfg clock controller,
+which provides clock gate control for vlp domain IPs.
 
 Co-developed-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
 Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
@@ -134,30 +134,29 @@ Co-developed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora
 Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 ---
- drivers/clk/mediatek/Makefile              |   3 +-
- drivers/clk/mediatek/clk-mt8189-vlpckgen.c | 284 +++++++++++++++++++++++++++++
- 2 files changed, 286 insertions(+), 1 deletion(-)
+ drivers/clk/mediatek/Makefile            |   2 +-
+ drivers/clk/mediatek/clk-mt8189-vlpcfg.c | 115 +++++++++++++++++++++++++++++++
+ 2 files changed, 116 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
-index 9d3d2983bfb2..3b25df9e7b50 100644
+index 3b25df9e7b50..d9279b237b7b 100644
 --- a/drivers/clk/mediatek/Makefile
 +++ b/drivers/clk/mediatek/Makefile
-@@ -123,7 +123,8 @@ obj-$(CONFIG_COMMON_CLK_MT8188_VDOSYS) += clk-mt8188-vdo0.o clk-mt8188-vdo1.o
- obj-$(CONFIG_COMMON_CLK_MT8188_VENCSYS) += clk-mt8188-venc.o
+@@ -124,7 +124,7 @@ obj-$(CONFIG_COMMON_CLK_MT8188_VENCSYS) += clk-mt8188-venc.o
  obj-$(CONFIG_COMMON_CLK_MT8188_VPPSYS) += clk-mt8188-vpp0.o clk-mt8188-vpp1.o
  obj-$(CONFIG_COMMON_CLK_MT8188_WPESYS) += clk-mt8188-wpe.o
--obj-$(CONFIG_COMMON_CLK_MT8189) += clk-mt8189-apmixedsys.o clk-mt8189-topckgen.o
-+obj-$(CONFIG_COMMON_CLK_MT8189) += clk-mt8189-apmixedsys.o clk-mt8189-topckgen.o \
-+				   clk-mt8189-vlpckgen.o
+ obj-$(CONFIG_COMMON_CLK_MT8189) += clk-mt8189-apmixedsys.o clk-mt8189-topckgen.o \
+-				   clk-mt8189-vlpckgen.o
++				   clk-mt8189-vlpckgen.o clk-mt8189-vlpcfg.o
  obj-$(CONFIG_COMMON_CLK_MT8192) += clk-mt8192-apmixedsys.o clk-mt8192.o
  obj-$(CONFIG_COMMON_CLK_MT8192_AUDSYS) += clk-mt8192-aud.o
  obj-$(CONFIG_COMMON_CLK_MT8192_CAMSYS) += clk-mt8192-cam.o
-diff --git a/drivers/clk/mediatek/clk-mt8189-vlpckgen.c b/drivers/clk/mediatek/clk-mt8189-vlpckgen.c
+diff --git a/drivers/clk/mediatek/clk-mt8189-vlpcfg.c b/drivers/clk/mediatek/clk-mt8189-vlpcfg.c
 new file mode 100644
-index 000000000000..39ca051b9ef8
+index 000000000000..81e2d44bd320
 --- /dev/null
-+++ b/drivers/clk/mediatek/clk-mt8189-vlpckgen.c
-@@ -0,0 +1,284 @@
++++ b/drivers/clk/mediatek/clk-mt8189-vlpcfg.c
+@@ -0,0 +1,115 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2025-2026 MediaTek Inc.
@@ -168,279 +167,110 @@ index 000000000000..39ca051b9ef8
 + *                    Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
 + */
 +
-+#include <linux/clk.h>
-+#include <linux/delay.h>
-+#include <linux/mfd/syscon.h>
++#include <linux/clk-provider.h>
 +#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_address.h>
 +#include <linux/of_device.h>
 +#include <linux/platform_device.h>
-+#include <linux/slab.h>
 +
 +#include "clk-mtk.h"
-+#include "clk-mux.h"
 +#include "clk-gate.h"
 +
 +#include <dt-bindings/clock/mediatek,mt8189-clk.h>
 +
-+static DEFINE_SPINLOCK(mt8189_vlpclk_lock);
-+
-+static const char * const vlp_26m_oscd10_parents[] = {
-+	"clk26m",
-+	"osc_d10"
++static const struct mtk_gate_regs vlpcfg_ao_reg_cg_regs = {
++	.set_ofs = 0x0,
++	.clr_ofs = 0x0,
++	.sta_ofs = 0x0,
 +};
 +
-+static const char * const vlp_vadsp_vowpll_parents[] = {
-+	"clk26m",
-+	"vowpll"
++#define GATE_VLPCFG_AO_REG(_id, _name, _parent, _shift)		\
++	GATE_MTK(_id, _name, _parent, &vlpcfg_ao_reg_cg_regs, _shift, &mtk_clk_gate_ops_no_setclr)
++
++static const struct mtk_gate vlpcfg_ao_reg_clks[] = {
++	GATE_VLPCFG_AO_REG(CLK_VLPCFG_AO_APEINT_RX, "vlpcfg_ao_apeint_rx", "clk26m", 8),
 +};
 +
-+static const char * const vlp_sspm_ulposc_parents[] = {
-+	"ulposc",
-+	"univpll_d5_d2",
-+	"osc_d10"
++static const struct mtk_clk_desc vlpcfg_ao_reg_mcd = {
++	.clks = vlpcfg_ao_reg_clks,
++	.num_clks = ARRAY_SIZE(vlpcfg_ao_reg_clks),
 +};
 +
-+static const char * const vlp_aud_adc_parents[] = {
-+	"clk26m",
-+	"vowpll",
-+	"aud_adc_ext",
-+	"osc_d10"
++static const struct mtk_gate_regs vlpcfg_reg_cg_regs = {
++	.set_ofs = 0x4,
++	.clr_ofs = 0x4,
++	.sta_ofs = 0x4,
 +};
 +
-+static const char * const vlp_scp_iic_spi_parents[] = {
-+	"clk26m",
-+	"mainpll_d5_d4",
-+	"mainpll_d7_d2",
-+	"osc_d10"
++#define GATE_VLPCFG_REG_FLAGS(_id, _name, _parent, _shift, _flags)		\
++	GATE_MTK_FLAGS(_id, _name, _parent, &vlpcfg_reg_cg_regs, _shift,	\
++		       &mtk_clk_gate_ops_no_setclr_inv, _flags)
++
++#define GATE_VLPCFG_REG(_id, _name, _parent, _shift)		\
++	GATE_VLPCFG_REG_FLAGS(_id, _name, _parent, _shift, 0)
++
++static const struct mtk_gate vlpcfg_reg_clks[] = {
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SCP, "vlpcfg_scp",
++			      "vlp_scp_sel", 28, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_RG_R_APXGPT_26M, "vlpcfg_r_apxgpt_26m",
++			      "clk26m", 24, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_DPMSRCK_TEST, "vlpcfg_dpmsrck_test",
++			      "clk26m", 23, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_RG_DPMSRRTC_TEST, "vlpcfg_dpmsrrtc_test",
++			      "clk32k", 22, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_DPMSRULP_TEST, "vlpcfg_dpmsrulp_test",
++			      "osc_d10", 21, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SPMI_P_MST, "vlpcfg_spmi_p",
++			      "vlp_spmi_p_sel", 20, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SPMI_P_MST_32K, "vlpcfg_spmi_p_32k",
++			      "clk32k", 18, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_PMIF_SPMI_P_SYS, "vlpcfg_pmif_spmi_p_sys",
++			      "vlp_pwrap_ulposc_sel", 13, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_PMIF_SPMI_P_TMR, "vlpcfg_pmif_spmi_p_tmr",
++			      "vlp_pwrap_ulposc_sel", 12, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG(CLK_VLPCFG_REG_PMIF_SPMI_M_SYS, "vlpcfg_pmif_spmi_m_sys",
++			"vlp_pwrap_ulposc_sel", 11),
++	GATE_VLPCFG_REG(CLK_VLPCFG_REG_PMIF_SPMI_M_TMR, "vlpcfg_pmif_spmi_m_tmr",
++			"vlp_pwrap_ulposc_sel", 10),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_DVFSRC, "vlpcfg_dvfsrc",
++			      "vlp_dvfsrc_sel", 9, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_PWM_VLP, "vlpcfg_pwm_vlp",
++			      "vlp_pwm_vlp_sel", 8, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SRCK, "vlpcfg_srck",
++			      "vlp_srck_sel", 7, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SSPM_F26M, "vlpcfg_sspm_f26m",
++			      "vlp_sspm_f26m_sel", 4, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SSPM_F32K, "vlpcfg_sspm_f32k",
++			      "clk32k", 3, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_SSPM_ULPOSC, "vlpcfg_sspm_ulposc",
++			      "vlp_sspm_ulposc_sel", 2, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_VLP_32K_COM, "vlpcfg_vlp_32k_com",
++			      "clk32k", 1, CLK_IS_CRITICAL),
++	GATE_VLPCFG_REG_FLAGS(CLK_VLPCFG_REG_VLP_26M_COM, "vlpcfg_vlp_26m_com",
++			      "clk26m", 0, CLK_IS_CRITICAL),
 +};
 +
-+static const char * const vlp_vadsp_uarthub_b_parents[] = {
-+	"clk26m",
-+	"osc_d10",
-+	"univpll_d6_d4",
-+	"univpll_d6_d2"
++static const struct mtk_clk_desc vlpcfg_reg_mcd = {
++	.clks = vlpcfg_reg_clks,
++	.num_clks = ARRAY_SIZE(vlpcfg_reg_clks),
 +};
 +
-+static const char * const vlp_axi_kp_parents[] = {
-+	"clk26m",
-+	"osc_d10",
-+	"osc_d2",
-+	"mainpll_d7_d4",
-+	"mainpll_d7_d2"
-+};
-+
-+static const char * const vlp_sspm_parents[] = {
-+	"clk26m",
-+	"osc_d10",
-+	"mainpll_d5_d2",
-+	"ulposc",
-+	"mainpll_d6"
-+};
-+
-+static const char * const vlp_pwm_vlp_parents[] = {
-+	"clk26m",
-+	"osc_d4",
-+	"clk32k",
-+	"osc_d10",
-+	"mainpll_d4_d8"
-+};
-+
-+static const char * const vlp_pwrap_ulposc_parents[] = {
-+	"clk26m",
-+	"osc_d10",
-+	"osc_d7",
-+	"osc_d8",
-+	"osc_d16",
-+	"mainpll_d7_d8"
-+};
-+
-+static const char * const vlp_vadsp_parents[] = {
-+	"clk26m",
-+	"osc_d20",
-+	"osc_d10",
-+	"osc_d2",
-+	"ulposc",
-+	"mainpll_d4_d2"
-+};
-+
-+static const char * const vlp_scp_parents[] = {
-+	"clk26m",
-+	"univpll_d4",
-+	"univpll_d3",
-+	"mainpll_d3",
-+	"univpll_d6",
-+	"apll1",
-+	"mainpll_d4",
-+	"mainpll_d6",
-+	"mainpll_d7",
-+	"osc_d10"
-+};
-+
-+static const char * const vlp_spmi_p_parents[] = {
-+	"clk26m",
-+	"f26m_d2",
-+	"osc_d8",
-+	"osc_d10",
-+	"osc_d16",
-+	"osc_d7",
-+	"clk32k",
-+	"mainpll_d7_d8",
-+	"mainpll_d6_d8",
-+	"mainpll_d5_d8"
-+};
-+
-+static const char * const vlp_camtg_parents[] = {
-+	"clk26m",
-+	"univpll_192m_d8",
-+	"univpll_d6_d8",
-+	"univpll_192m_d4",
-+	"osc_d16",
-+	"osc_d20",
-+	"osc_d10",
-+	"univpll_d6_d16",
-+	"tvdpll1_d16",
-+	"f26m_d2",
-+	"univpll_192m_d10",
-+	"univpll_192m_d16",
-+	"univpll_192m_d32"
-+};
-+
-+static const struct mtk_mux vlp_ck_muxes[] = {
-+	/* VLP_CLK_CFG_0 */
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_SCP_SEL, "vlp_scp_sel",
-+			     vlp_scp_parents, 0x008, 0x00c, 0x010,
-+			     0, 4, 7, 0x04, 0),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_PWRAP_ULPOSC_SEL, "vlp_pwrap_ulposc_sel",
-+			vlp_pwrap_ulposc_parents, 0x008, 0x00c, 0x010,
-+			8, 3, 0x04, 1),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SPMI_P_MST_SEL, "vlp_spmi_p_sel",
-+			vlp_spmi_p_parents, 0x008, 0x00c, 0x010,
-+			16, 4, 0x04, 2),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_DVFSRC_SEL, "vlp_dvfsrc_sel",
-+			vlp_26m_oscd10_parents, 0x008, 0x00c, 0x010,
-+			24, 1, 0x04, 3),
-+	/* VLP_CLK_CFG_1 */
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_PWM_VLP_SEL, "vlp_pwm_vlp_sel",
-+			vlp_pwm_vlp_parents, 0x014, 0x018, 0x01c,
-+			0, 3, 0x04, 4),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_AXI_VLP_SEL, "vlp_axi_vlp_sel",
-+			vlp_axi_kp_parents, 0x014, 0x018, 0x01c,
-+			8, 3, 0x04, 5),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SYSTIMER_26M_SEL, "vlp_timer_26m_sel",
-+			vlp_26m_oscd10_parents, 0x014, 0x018, 0x01c,
-+			16, 1, 0x04, 6),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SSPM_SEL, "vlp_sspm_sel",
-+			vlp_sspm_parents, 0x014, 0x018, 0x01c,
-+			24, 3, 0x04, 7),
-+	/* VLP_CLK_CFG_2 */
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SSPM_F26M_SEL, "vlp_sspm_f26m_sel",
-+			vlp_26m_oscd10_parents, 0x020, 0x024, 0x028,
-+			0, 1, 0x04, 8),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SRCK_SEL, "vlp_srck_sel",
-+			vlp_26m_oscd10_parents, 0x020, 0x024, 0x028,
-+			8, 1, 0x04, 9),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SCP_SPI_SEL, "vlp_scp_spi_sel",
-+			vlp_scp_iic_spi_parents, 0x020, 0x024, 0x028,
-+			16, 2, 0x04, 10),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SCP_IIC_SEL, "vlp_scp_iic_sel",
-+			vlp_scp_iic_spi_parents, 0x020, 0x024, 0x028,
-+			24, 2, 0x04, 11),
-+	/* VLP_CLK_CFG_3 */
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SCP_SPI_HIGH_SPD_SEL,
-+			"vlp_scp_spi_hs_sel",
-+			vlp_scp_iic_spi_parents, 0x02c, 0x030, 0x034,
-+			0, 2, 0x04, 12),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SCP_IIC_HIGH_SPD_SEL,
-+			"vlp_scp_iic_hs_sel",
-+			vlp_scp_iic_spi_parents, 0x02c, 0x030, 0x034,
-+			8, 2, 0x04, 13),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_SSPM_ULPOSC_SEL, "vlp_sspm_ulposc_sel",
-+			vlp_sspm_ulposc_parents, 0x02c, 0x030, 0x034,
-+			16, 2, 0x04, 14),
-+	MUX_CLR_SET_UPD(CLK_VLP_CK_APXGPT_26M_SEL, "vlp_apxgpt_26m_sel",
-+			vlp_26m_oscd10_parents, 0x02c, 0x030, 0x034,
-+			24, 1, 0x04, 15),
-+	/* VLP_CLK_CFG_4 */
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_VADSP_SEL, "vlp_vadsp_sel",
-+			     vlp_vadsp_parents, 0x038, 0x03c, 0x040,
-+			     0, 3, 7, 0x04, 16),
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_VADSP_VOWPLL_SEL,
-+			     "vlp_vadsp_vowpll_sel",
-+			     vlp_vadsp_vowpll_parents, 0x038, 0x03c, 0x040,
-+			     8, 1, 15, 0x04, 17),
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_VADSP_UARTHUB_BCLK_SEL,
-+			     "vlp_vadsp_uarthub_b_sel",
-+			     vlp_vadsp_uarthub_b_parents,
-+			     0x038, 0x03c, 0x040, 16, 2, 23, 0x04, 18),
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_CAMTG0_SEL, "vlp_camtg0_sel",
-+			     vlp_camtg_parents, 0x038, 0x03c, 0x040,
-+			     24, 4, 31, 0x04, 19),
-+	/* VLP_CLK_CFG_5 */
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_CAMTG1_SEL, "vlp_camtg1_sel",
-+			     vlp_camtg_parents, 0x044, 0x048, 0x04c,
-+			     0, 4, 7, 0x04, 20),
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_CAMTG2_SEL, "vlp_camtg2_sel",
-+			     vlp_camtg_parents, 0x044, 0x048, 0x04c,
-+			     8, 4, 15, 0x04, 21),
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_AUD_ADC_SEL, "vlp_aud_adc_sel",
-+			     vlp_aud_adc_parents, 0x044, 0x048, 0x04c,
-+			     16, 2, 23, 0x04, 22),
-+	MUX_GATE_CLR_SET_UPD(CLK_VLP_CK_KP_IRQ_GEN_SEL, "vlp_kp_irq_sel",
-+			     vlp_axi_kp_parents, 0x044, 0x048, 0x04c,
-+			     24, 3, 31, 0x04, 23),
-+};
-+
-+static const struct mtk_gate_regs vlp_ck_cg_regs = {
-+	.set_ofs = 0x1f4,
-+	.clr_ofs = 0x1f8,
-+	.sta_ofs = 0x1f0,
-+};
-+
-+#define GATE_VLP_CK_FLAGS(_id, _name, _parent, _shift, _flag) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &vlp_ck_cg_regs,		\
-+		.shift = _shift,			\
-+		.flags = _flag,				\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_VLP_CK(_id, _name, _parent, _shift)	\
-+	GATE_VLP_CK_FLAGS(_id, _name, _parent, _shift, 0)
-+
-+static const struct mtk_gate vlp_ck_clks[] = {
-+	GATE_VLP_CK(CLK_VLP_CK_VADSYS_VLP_26M_EN, "vlp_vadsys_vlp_26m", "clk26m", 1),
-+	GATE_VLP_CK_FLAGS(CLK_VLP_CK_FMIPI_CSI_UP26M_CK_EN, "vlp_fmipi_csi_up26m",
-+			  "fmipi_csi_up26m", 11, CLK_IS_CRITICAL),
-+};
-+
-+static const struct mtk_clk_desc vlpck_desc = {
-+	.mux_clks = vlp_ck_muxes,
-+	.num_mux_clks = ARRAY_SIZE(vlp_ck_muxes),
-+	.clks = vlp_ck_clks,
-+	.num_clks = ARRAY_SIZE(vlp_ck_clks),
-+	.clk_lock = &mt8189_vlpclk_lock,
-+};
-+
-+static const struct of_device_id of_match_clk_mt8189_vlpck[] = {
-+	{ .compatible = "mediatek,mt8189-vlpckgen", .data = &vlpck_desc },
++static const struct of_device_id of_match_clk_mt8189_vlpcfg[] = {
++	{ .compatible = "mediatek,mt8189-vlpcfg", .data = &vlpcfg_reg_mcd },
++	{ .compatible = "mediatek,mt8189-vlpcfg-ao", .data = &vlpcfg_ao_reg_mcd },
 +	{ /* sentinel */ }
 +};
 +
-+static struct platform_driver clk_mt8189_vlpck_drv = {
++static struct platform_driver clk_mt8189_vlpcfg_drv = {
 +	.probe = mtk_clk_simple_probe,
 +	.remove = mtk_clk_simple_remove,
 +	.driver = {
-+		.name = "clk-mt8189-vlpck",
-+		.of_match_table = of_match_clk_mt8189_vlpck,
++		.name = "clk-mt8189-vlpcfg",
++		.of_match_table = of_match_clk_mt8189_vlpcfg,
 +	},
 +};
-+module_platform_driver(clk_mt8189_vlpck_drv);
++module_platform_driver(clk_mt8189_vlpcfg_drv);
 +
-+MODULE_DESCRIPTION("MediaTek MT8189 vlpckgen clocks driver");
++MODULE_DESCRIPTION("MediaTek MT8189 vlpcfg clocks driver");
 +MODULE_LICENSE("GPL");
 
 -- 
