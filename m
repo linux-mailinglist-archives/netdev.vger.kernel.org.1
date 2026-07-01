@@ -1,166 +1,226 @@
-Return-Path: <netdev+bounces-303442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KM6qFyV7RGocvgoAu9opvQ
-	(envelope-from <netdev+bounces-303442-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 04:27:49 +0200
+	id tQEoJ6Z7RGphvgoAu9opvQ
+	(envelope-from <netdev+bounces-303443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 04:29:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF04C6E93FF
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 04:27:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A7A6E9411
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 04:29:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=mbFt8Rad;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303442-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303442-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=V8d74ggy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303443-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303443-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B144730254FB
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 02:27:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B15E2300D78B
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 02:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E255032B132;
-	Wed,  1 Jul 2026 02:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F6F361651;
+	Wed,  1 Jul 2026 02:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFE438DD3
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 02:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4DF27144B;
+	Wed,  1 Jul 2026 02:29:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782872866; cv=none; b=pLgII+7W85hTVKrxIG7ur547i1x6KvCJklWyvu227ns3LHcJPES6lb1sKVh2jQjy94LT+Sxl1v5+5hyu99ziZV/caPbHfjmEXwlWRFqhPXFQhnCuh5vsozg0o13K7+igZfgOwSvQJTzPrGmGwCuAUZ/NQ3WcdQvwz16n29kihFQ=
+	t=1782872991; cv=none; b=jhaLD8tBLAWlHiJAZiCY1aMxfxoc8H6jTIe5e4CpUKnjKXoDRwGppbB1im2AbEz+mxjGLvNlzZOMdg1+QMZBq/nKlswN6ryN+oS5cYRl3yObQvu1gGa+Ia0FwrNHmM5qe+BO8jpm+6iSiozJbZPNldVl/4PytelO5qCOIN/tldY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782872866; c=relaxed/simple;
-	bh=ASJbbeteDzLgU0XexrpY74NzlPC6v7TblQzX6hnha+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PkSnqQzpWRtxsxG2E/aPThzrX9NFBNnywEkVBfuYWraa55Ke8GGF9MabX0+6mRpdycpCMj9h8c70vVUkUpnXVnDhufVnaJWX9gIsfMSzIfb8LfdLqIZlX2UM1POXxpWc3/zP1F9s/fBHoCEeuW+jn1c9uDia98xgj1eKg21auv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mbFt8Rad; arc=none smtp.client-ip=209.85.210.181
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-84537d04408so44897b3a.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jun 2026 19:27:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782872865; x=1783477665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Pjv7ncS/ZvY549eEPTpAyU1eZ5j+inDjH3QZwj+bDo0=;
-        b=mbFt8RadNzGlUyX9feduPY38ULRLk4EIE2qwbWSpfBhQZEIoE4ZAZ+wZH2vyhB3syy
-         Bhp28gITZE3kng4qy3QeimNYD3yrISXoRiT6sg35BV0xnDuMNNu3I+0xyQug8ET9OvOq
-         vRUpI9+xA2zv0Kwi8Ypv8Ra4ExntIBOewzNFkLhsk1glxxU/3ROiE6+d4mt2k9I4lhOY
-         0nC8h88PObXysYrkSqNyBlNiVnPLFdgB20OcFm1BpwIaCebEPibFOOkbj/a+FzVq4HU6
-         jCWeYKJHl1kdluWI6Gm8nvb5iTt7LwbBjfpM35kKTAlCFxSDanqGGmwET313XkD0j1wJ
-         Fsqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782872865; x=1783477665;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Pjv7ncS/ZvY549eEPTpAyU1eZ5j+inDjH3QZwj+bDo0=;
-        b=KnO/038TGNZCmxQs1Jrm0SOtwyoqgxSGrL1ndKbJziEOBXH/NssXid4Qhfk6mrKjF5
-         xPfwSnxWh0gHcuAqSM8FVM0fjzcYXJfZ116XDNBsWRfPLQa0A/B2y4d7IL+Tk56SldL5
-         LWUruYTRWhkwv8LzMx/CD48Z9OylQNEZg/FT5XprXTwKv32gx7JiObEbrhHSEV+DgFn9
-         nLGSwp8ZLDIgElf0g2e41EEhx0pcKTGUvCoaRpTucbNFG/vGIHMSz1wjpxnsAs3AsyRZ
-         862A6FIogIUXepEeAeNCx+tuUJjrjVxfxIQRGT9ykZSxvrxpmMlwocln1nLG4YYtTOr7
-         tWAg==
-X-Gm-Message-State: AOJu0Yzei0Y5ZtGWs8Qy3JWU0EgWOTN36bvMPvWatolVxzx8UhDZNZRL
-	4vu24C8zOhO6Z4d9glFd3hzFsgytCT2F2cfisoIsJZ0WbJDhG9NayG++06tRnNSB
-X-Gm-Gg: AfdE7ck3Fp96btwfZoaSqhmQUg1lX28n989m4W8736hzwrk7f84/Xv0zrUYXYGq2Cnk
-	X09m1xU0JgAy/YTRzKGCyvZfwP+sLnHnU6LuifcWGE5aCSCOo+FYVOmHstpvRcr1JjRLwi7u/ox
-	CcwaudOzDqKtffAIC0h0EiCeJ6LuJNVFANDQ5GqaSL+DMrERZzkFaEZEzE3zZe6TBi/F4rWg1ns
-	UrPwHdDl6RP5l6E7N9QEIwklSob5/A/r3hWpGyCgRRlmMAUdCSy0IQW+ANlcqR6KKjKyAxPyqeK
-	lcJyRTgRUA1LBoJjUzLn99u0M16gXcQaO36fjwHdkY+jdEVcbZn+20jAtN1acXKkI1jz+wl0Q7L
-	3xklMuwaW+NxDxDRi0GET33Hnf5STf7bU/LSXZAhXMvglKJxfvyEmGECqFIiX9jYBfLV+Osh1Ag
-	qitqJGzDy62e/2CcP7/r6x65rsocWS0cTMSnGVveW5e8E=
-X-Received: by 2002:a05:6a21:600f:b0:3b4:6681:3d51 with SMTP id adf61e73a8af0-3bfc4c32f57mr3563777637.0.1782872864933;
-        Tue, 30 Jun 2026 19:27:44 -0700 (PDT)
-Received: from localhost.localdomain ([139.159.170.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847a005af85sm3066940b3a.25.2026.06.30.19.27.42
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 30 Jun 2026 19:27:44 -0700 (PDT)
-From: Qihang <q.h.hack.winter@gmail.com>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	Qihang <q.h.hack.winter@gmail.com>
-Subject: [PATCH net] gue: validate REMCSUM private option length
-Date: Wed,  1 Jul 2026 10:26:17 +0800
-Message-ID: <20260701022617.53171-1-q.h.hack.winter@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1782872991; c=relaxed/simple;
+	bh=NJkSlL75XIDiy2hfGGOtliYcxvA38oFZYUv23FHufac=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sKfcl23L0zoHIVmodpi8EHUiOcCIuOFCDb2lxCFteudj49bcNSO11foLjnltOPNyYYak/XF3ZgNzOnwI2k2QApHEQK4Bv3yBaiDraJSTS400pFSDbLsyth0jTVZZWx33uEUuev656BSBvdWtekSieIQEI8JZqoWBtEShXqBCeHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=V8d74ggy; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65UNLfLU1795273;
+	Tue, 30 Jun 2026 19:29:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=pd3LQo5n1jM4Mcv7nkl2/buzQ
+	ZnB0rzE9KkpaSv2nRc=; b=V8d74ggyd+R+w9mvWawNZBhbupMw65AX6ad5av59R
+	ATXzL0TsByKamJA74lBYfCE/jjN0QzEzhxlB5JQuO83itdcWkja2DCVOrEUFFSb9
+	TVwPmyQY8iAXlsvvqCeGVveObJu01bS9mhVryb9MzxAwJ3YS8wxiCVfwAeWWdF4l
+	nc4hIGddNTzxGtM4k7xbUGC5eWPhRNZTC5W3EPnLsdQIxcaCA6J723ckYezODbeF
+	dWe7DW5z2DSGAB9zcXnfx6HvCA3bDM2v9sYISxGJFM3QZ4zBw8C94Xl6K/urSbaH
+	rcFj3c5K5v4ERBY3wCtmVW952A/PGZs42NOqfuF284E3A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f4cty37pp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jun 2026 19:29:28 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 30 Jun 2026 19:29:27 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 30 Jun 2026 19:29:27 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 554F03F706B;
+	Tue, 30 Jun 2026 19:29:24 -0700 (PDT)
+Date: Wed, 1 Jul 2026 07:59:23 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: David Ahern <dsahern@kernel.org>
+CC: <stephen@networkplumber.org>, <kuba@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew+netdev@lunn.ch>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <jiri@resnulli.us>
+Subject: Re: [PATCH iproute2-next v2 2/2] devlink: support u64-array values
+ in devlink param show/set
+Message-ID: <akR7g8aWfws3h2jx@rkannoth-OptiPlex-7090>
+References: <20260630015012.3728870-1-rkannoth@marvell.com>
+ <20260630015012.3728870-3-rkannoth@marvell.com>
+ <9d9cceae-3934-4dd6-ae8e-af995ae6b0ab@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <9d9cceae-3934-4dd6-ae8e-af995ae6b0ab@kernel.org>
+X-Authority-Analysis: v=2.4 cv=etnvCIpX c=1 sm=1 tr=0 ts=6a447b88 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8
+ a=M5GUcnROAAAA:8 a=g_DBIgpxiuV_V6QC3ggA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDAyNCBTYWx0ZWRfXyQmWYrGZzMvr
+ 0iK8VlWFzjb4QJk4fq5/Qlik1OWzYidXhcnhdzhwcEs+FrnKKTEi6joxDwmagLiOo8z1BvaxMkw
+ Nw6F4ka6fYHxKhOQ/kV3c2zBKzHalMc=
+X-Proofpoint-GUID: eEfOPbK8Ze3mQ5g8OY8CESEBej82ex0e
+X-Proofpoint-ORIG-GUID: eEfOPbK8Ze3mQ5g8OY8CESEBej82ex0e
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDAyNCBTYWx0ZWRfX664aNGVuOzan
+ kOmvnN+HrUy9cOLb/HY+5xJTTIam9IkiYuB5ziP9f5rMQ5ffSm1VsF247WcSpNDHA1ciBjw1Ug+
+ BDzztRORkGARpKyhTCcp4BhncP6yD10N4TuM3Sn9+OP/v1z3PHsgO34NpFn6Sht3LDBRnEydK3m
+ 5SNl5m+VmBiyScUaDO8kkf8D2ACkZKr1Pagg7GZ8UpfVIaLXLnSqZ82i6ddm71Pu6XmA2WRZs41
+ EcEaFrLdjVcCsJuYOoOcp04426e8u6xBs1RSQV+v2/HI5gFVstJaYU+fvnXe8vET0KMDJWr8rvY
+ BdzghaQb5nIfCe060toISMDRsyz4ZxuBX48nYOE1mEUz6uOdH85EKyt0w9SbriUxJLrUZoQcwLX
+ KXo5lkMx+S+ZoJhIlxqmICJejz442oO5jmUWPmj+VI4pIdG8A4ZM4XeKKKrQDA7cPxSiIBl6syY
+ s1nzzBwqVeQRSYSib3g==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-30_06,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303443-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303442-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:q.h.hack.winter@gmail.com,m:qhhackwinter@gmail.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,marvell.com:dkim,marvell.com:from_mime,rkannoth-OptiPlex-7090:mid];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:stephen@networkplumber.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,davemloft.net,redhat.com,gmail.com];
-	FORGED_SENDER(0.00)[qhhackwinter@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qhhackwinter@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BF04C6E93FF
+X-Rspamd-Queue-Id: 94A7A6E9411
 
-GUE private flags can indicate that remote checksum offload metadata is
-present. The private flags field itself is accounted for by
-guehdr_flags_len(), but guehdr_priv_flags_len() currently returns 0 even
-when GUE_PFLAG_REMCSUM is set.
+On 2026-06-30 at 20:06:17, David Ahern (dsahern@kernel.org) wrote:
+> On 6/29/26 7:50 PM, Ratheesh Kannoth wrote:
+> > diff --git a/devlink/devlink.c b/devlink/devlink.c
+> > index 9372e92f..3c29601d 100644
+> > --- a/devlink/devlink.c
+> > +++ b/devlink/devlink.c
+> > @@ -3496,13 +3496,115 @@ static const struct param_val_conv param_val_conv[] = {
+> >  };
+> >
+> >  #define PARAM_VAL_CONV_LEN ARRAY_SIZE(param_val_conv)
+> > +#define DEVLINK_PARAM_MAX_ARRAY_SIZE 32
+>
+> Why 32? Is that based on current code?
+Yes, this aligns with the current kernel-side limits. See:
+https://lore.kernel.org/all/20260609040453.711932-5-rkannoth@marvell.com/
 
-This lets a packet with only the private flags field pass
-validate_gue_flags(), after which gue_remcsum() and gue_gro_remcsum()
-read the missing REMCSUM start/offset fields from the following bytes.
+>How does the kernel side handle
+> the number of parameters? What happens if the kernel sends more than 32
+> parameters - from a user's perspective, not this code and processing the
+> output?
+The kernel strictly validates and restricts the number of parameters. To be safe, this patch
+adds an explicit bounds check to prevent userspace issues if that threshold is ever crossed.
 
-Account for GUE_PLEN_REMCSUM when GUE_PFLAG_REMCSUM is present so that
-malformed packets are rejected during option validation.
+Ideally, since "union devlink_param_value" is omitted from the UAPI, we have to define
+DEVLINK_PARAM_MAX_ARRAY_SIZE here. Moving the underlying structures to the UAPI in the
+future would allow us to share a single definition and avoid this hardcoded value in userspace.
 
-Fixes: c1aa8347e73e ("gue: Protocol constants for remote checksum offload")
-Signed-off-by: Qihang <q.h.hack.winter@gmail.com>
----
- include/net/gue.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/net/gue.h b/include/net/gue.h
-index dfca298bec9c..caefd6da8693 100644
---- a/include/net/gue.h
-+++ b/include/net/gue.h
-@@ -80,7 +80,7 @@ static inline size_t guehdr_flags_len(__be16 flags)
- 
- static inline size_t guehdr_priv_flags_len(__be32 flags)
- {
--	return 0;
-+	return (flags & GUE_PFLAG_REMCSUM) ? GUE_PLEN_REMCSUM : 0;
- }
- 
- /* Validate standard and private flags. Returns non-zero (meaning invalid)
--- 
-2.50.1 (Apple Git-155)
-
+>
+> > +
+> > +struct devlink_param_u64_array {
+> > +	uint64_t size;
+> > +	uint64_t val[DEVLINK_PARAM_MAX_ARRAY_SIZE];
+> > +};
+> > +
+> > +
+> > +static int param_value_u64_array_put_from_str(struct nlmsghdr *nlh,
+> > +					      const char *param_value,
+> > +					      const struct devlink_param_u64_array *cur)
+> > +{
+> > +	struct devlink_param_u64_array new_arr = {};
+> > +	char *copy, *token, *saveptr = NULL;
+> > +	char delim[] = " ,";
+> > +	uint64_t val;
+> > +	int err;
+> > +
+> > +	copy = strdup(param_value);
+> > +	if (!copy)
+> > +		return -ENOMEM;
+> > +
+> > +	token = strtok_r(copy, delim, &saveptr);
+> > +	while (token) {
+> > +		if (new_arr.size >= DEVLINK_PARAM_MAX_ARRAY_SIZE) {
+> > +			free(copy);
+> > +			pr_err("Too many array elements (max %d)\n",
+> > +			       DEVLINK_PARAM_MAX_ARRAY_SIZE);
+> > +			return -EINVAL;
+> > +		}
+> > +		err = get_u64((__u64 *)&val, token, 10);
+> > +		if (err) {
+> > +			free(copy);
+> > +			pr_err("Value \"%s\" is not a number or not within range\n",
+> > +			       token);
+> > +			return err;
+> > +		}
+> > +		new_arr.val[new_arr.size++] = val;
+> > +		token = strtok_r(NULL, delim, &saveptr);
+> > +	}
+> > +	free(copy);
+> > +
+> > +	if (cur && param_value_u64_array_equal(&new_arr, cur))
+> > +		return 1;
+> > +
+> > +	for (uint64_t i = 0; i < new_arr.size; i++)
+>
+> put the declaration at the top of the function with the rest of them.
+> global comment; fix all of them.
+ACK.
+>
+> > +		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, new_arr.val[i]);
+>
+> Why can't this put be done in the loop above as the string is processed?
+ACK.
+>
 
