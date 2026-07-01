@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-303478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303476-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id l0YiD5KrRGoaywoAu9opvQ
-	(envelope-from <netdev+bounces-303478-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:54:26 +0200
+	id MM2DNhurRGrqygoAu9opvQ
+	(envelope-from <netdev+bounces-303476-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:52:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 870E96EA026
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:54:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735AA6E9F9E
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 07:52:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=birger-koblitz.de header.s=default header.b="M/GbF/uk";
-	dkim=pass header.d=birger-koblitz.de header.s=default header.b=hSeZZi7S;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303478-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303478-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=birger-koblitz.de header.s=default header.b=Fn5OcRaQ;
+	dkim=pass header.d=birger-koblitz.de header.s=default header.b=OC8GMah0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303476-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303476-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDCEC306AA34
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 05:52:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 054DE3025732
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 05:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059633988EB;
-	Wed,  1 Jul 2026 05:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABF73955C4;
+	Wed,  1 Jul 2026 05:52:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97493921F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9930392825;
 	Wed,  1 Jul 2026 05:52:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782885127; cv=none; b=RUtk6XlWLFnIzjFEQHwYp+xzac2FrEBAXOHCy5ieWHy/6njQ9VtTGE8mdH5QIuRWRM4VPgSRil9dwckh9h+3ft5UwYQTW0oNWFqzo695CwJQqUyRO8bg+ruZMokZtbb4TGPORyt6tJ1nsP5nbJAUn3PI5z82L+DcMHQ+IIJldqM=
+	t=1782885126; cv=none; b=e5u8xfJwdxvahKuYLJaZfzfDMkfi/hkZ0birrIIcLtDM8kbMjDDLAgN7dA7RI+9rT6Dk+N0VvFdzgEV5PY7he6Kk5EmyfkZrf5KmG4CkAXB91uZPlG6KFOkPtvpXfmLTUD396V1zBzldq5PHADlBTNI1RIKMAPWPt6YTNYudObY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782885127; c=relaxed/simple;
-	bh=BRpPs07sEdDB6fcxRC8XET2M6KQcY10lDRYsWyoMh8E=;
+	s=arc-20240116; t=1782885126; c=relaxed/simple;
+	bh=QJ3DqbnEjLc9syBgVS8xDr1CkYAEVo36iER8tltwc8U=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iHSUsMMGSLITXS5513l7sgb0ZLQCa7/NPZ+koDkXW2Hin9V5JOD+Dbv/It9olIPqUQ0CBTYkHHC5C6lH1fOJfVrv5Obb3+5NipeB8X0Gi/OSKiA+UWr8jIUL4w/U78wLsCZXhM/S7FGgfA7glyggciuls8xljTu+6D3QrGQeIDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=M/GbF/uk; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=hSeZZi7S; arc=none smtp.client-ip=23.88.97.239
+	 In-Reply-To:To:Cc; b=BCZAxMnkL6wnpjgzvmUpplfDRzujpZFWScVkK7ZBLJlePcPnDI5tmd9yD69YLnJzr3CA44GG+TQF68gaz8tBRgTmVT0kl2825GtW6VIfsfxQojZeAAUUs5gubBGrg7ZMzJXk+Ss5+04fwQXDD2TuF31VV555Q4kjl7+z6dRuWzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=Fn5OcRaQ; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=OC8GMah0; arc=none smtp.client-ip=23.88.97.239
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
-	s=default; t=1782884574;
-	bh=BRpPs07sEdDB6fcxRC8XET2M6KQcY10lDRYsWyoMh8E=;
+	s=default; t=1782884575;
+	bh=QJ3DqbnEjLc9syBgVS8xDr1CkYAEVo36iER8tltwc8U=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=M/GbF/ukcKcNpkGgPW+AbmHo6SV7kbPtT2GA2KSE5OWK+JBT62LfxH/riugY8aR5c
-	 ziLUDPUeKfjaHa89tWy5KUWHf/jG/WdxD6k9ZbL8KXnBMOu+gp7HYaI2+bygexXsPf
-	 UW0pFIgmyZdkwxpT85uRpUtTSnm3sVpx+km0k687Gwy63QnwbPylewyLuqfA+QaA97
-	 J3urmszP09N4L5u67jDTCw/Dtz13pLBDV7kdYll0gdsFU1BSIAQo4mbUAL1aJziz9M
-	 3FwuiM5txAFGBmmXWK4dEemI6N2nGdVF2p+hZ4P4oNP+wTK89APo4o6nr9rKppAxvS
-	 v8pGVXkXP+P6g==
+	b=Fn5OcRaQ+X+2vxj4VADeOmjer3/lTjt3I5Yb81+FXGuySazMfWpa0smpsnUwwiiea
+	 rL1Y6VBkouCOF/hggHtjsZJyZMY9G9skoO3Gf/+j584aT56oC3jtaO7SBqoQXhQ5F8
+	 Dhs4QYGdHkXe0zRP5US25u4JySRr0MSohsa30Bj8ZFbZ/ep8lzZqPvkxr2iWWxFgKi
+	 HCFy82+cRuACvByBS1yHvWfE7TmkrRIXRamaTFj9LzgF1V8h1VFZ96Xe8NOWYXtVU2
+	 x7d37wqlr3dC2A7mKvqb9gr/jm88C+p9B9v0rg+1lk6IxNNqu74ze7lGe87CjImF04
+	 ydGSxSTcNHr/Q==
 Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
-	id DDB2C49352; Wed,  1 Jul 2026 05:42:54 +0000 (UTC)
+	id 6723449365; Wed,  1 Jul 2026 05:42:55 +0000 (UTC)
 X-Spam-Level: 
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
 	s=default; t=1782884571;
-	bh=BRpPs07sEdDB6fcxRC8XET2M6KQcY10lDRYsWyoMh8E=;
+	bh=QJ3DqbnEjLc9syBgVS8xDr1CkYAEVo36iER8tltwc8U=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hSeZZi7SplwQJx3mnUIFJ7Yl/kvpCsDBj/9F4tUtRMjoUxEK7cheZpscnLgWZ/NXa
-	 olCu/ZgJvoQH222eHpEDO/Lr/suppZUMnOpVhP3zDVnPsGrVrIHNBND9ccK04FQ20N
-	 XD8paJE3XycULuzrl/Y1Uls1NgeATgOUgdNniRPQFIj2aQ8AogFqsJVAprMnsIy7RO
-	 6Sc+fXG8H93rdLzW6FRBe5gH+6KOYKPhRSb89HVv1bvZCyD54zgImx6od5P0p7En0E
-	 nDSnzcl/ZPv3VcVizkLNcVLJ1mU8m/TJuoE699nf2pR3OvB2zAz/ysAU3HUuMDv3Wp
-	 n9ujFcBfz2aOg==
+	b=OC8GMah0uOH5EiPH5iKajF6poO7vB5Qap7I5czid2im3wtRFmWe+6TuWMnefZRs4P
+	 Mfdy1KLrhE4Tc7e4UUQ/JcVDEA1Z7R3aVwg0rSfnythgYXMM8OfTlMJm7mi3RCFYEO
+	 mOh4btLsCnoVN+pRONUeHEIIXYbfuMhVZywfXOj1juHJJs9ozsNpghPSff9cZVPipc
+	 JHpJB8vZ7RvfKxW2lJfVPi99KzF5+hzkQCPw6mP45DbCXu56a2OPUJZJxCECdo6ULH
+	 PYo9U760FpG5mNQ302JIKIpAabYmpunkqp86pIJzFj0XjTzT7QTRUtoUknPtr0xlMl
+	 /ytE2cqkHUSTA==
 Received: from DebianDesktop.lan (p200300c69f1c3c0000000000000001c8.dip0.t-ipconnect.de [IPv6:2003:c6:9f1c:3c00::1c8])
-	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id D031749340;
-	Wed,  1 Jul 2026 05:42:50 +0000 (UTC)
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 182A849341;
+	Wed,  1 Jul 2026 05:42:51 +0000 (UTC)
 From: Birger Koblitz <mail@birger-koblitz.de>
-Date: Wed, 01 Jul 2026 07:42:48 +0200
-Subject: [PATCH 2/9] ax88179_178a: Add HW support for AX179A-based chips
+Date: Wed, 01 Jul 2026 07:42:49 +0200
+Subject: [PATCH 3/9] ax88179_178a: Add support for AX88179A MMD access
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,7 +72,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260701-ax88179a-v1-2-13685df67515@birger-koblitz.de>
+Message-Id: <20260701-ax88179a-v1-3-13685df67515@birger-koblitz.de>
 References: <20260701-ax88179a-v1-0-13685df67515@birger-koblitz.de>
 In-Reply-To: <20260701-ax88179a-v1-0-13685df67515@birger-koblitz.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -85,12 +85,12 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303478-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303476-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:mail@birger-koblitz.de,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_SENDER(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -113,1219 +113,403 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,birger-koblitz.de:dkim,birger-koblitz.de:email,birger-koblitz.de:mid,birger-koblitz.de:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[birger-koblitz.de:dkim,birger-koblitz.de:email,birger-koblitz.de:mid,birger-koblitz.de:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 870E96EA026
+X-Rspamd-Queue-Id: 735AA6E9F9E
 
-This adds bindings and HW support for AX179A-based USB-Ethernet
-controllers. The AX179A-family of chips consists of the
-AX88279 (2.5GBit PHY)
-AX88179A/B (1GBit PHY, B variant has wider temperature range)
-AX772D/E (100Mbit PHY)
+The AX88179A uses a much simpler Clause-45 MMD access interface,
+make use of this interface and abstract MMD read/write operations
+for the AX88179 and AX88179A architecture by introducing
+ax_read_mmd() and ax_write_mmd(), which in turn call the chips'
+respective implementation.
 
-The controllers all have the same vendor and device ID
-(0x0b95, 0x1790) and are distinguished by their BCD device versions,
-which are
-2.00 AX88179A/B
-3.00 AX88772D/E
-4.00 AX88279
-
-For all chips, the driver calls the same ax88179a_bind() function
-and the chips are then distinguished by the chip version and
-BCD device ID. The AX179A-based chips all provide both a CDC-NCM
-compatible USB interface, and a proprietary vendor interface. By default,
-the proprietary vendor interface is not active and Linux will load the
-CDC-NCM driver to support the devices. If the ax88179_178a module is
-configured by the OS to have precedence over CDC-NCM, then this driver
-will switch the device to use the vendor interface, and the device will
-be controlled by the ax88179_178a driver when the device is probed again
-after an automatic reset by the device.
+Make use of the MMD read/write functions in the link-speed and EEE
+configuration settings via ethtool in order to support the
+AX179A-based chips. The AX88279 supports EEE only at 1000MBit speed,
+the other chips require full duplex.
 
 Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
 ---
- drivers/net/usb/ax88179_178a.c | 946 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 908 insertions(+), 38 deletions(-)
+ drivers/net/usb/ax88179_178a.c | 238 +++++++++++++++++++++++++++--------------
+ 1 file changed, 155 insertions(+), 83 deletions(-)
 
 diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 945c071dfd1d2f0816c779e1a401ac158adc8d99..c6945e131e63fd053a23bf14ab5d5948456ce4a5 100644
+index c6945e131e63fd053a23bf14ab5d5948456ce4a5..fadf449fa5df70d4aed706b7488ac61d4cdf4cc9 100644
 --- a/drivers/net/usb/ax88179_178a.c
 +++ b/drivers/net/usb/ax88179_178a.c
-@@ -13,6 +13,7 @@
- #include <linux/usb/usbnet.h>
- #include <uapi/linux/mdio.h>
- #include <linux/mdio.h>
-+#include <linux/if_vlan.h>
- 
- #define AX88179_PHY_ID				0x03
- #define AX_EEPROM_LEN				0x100
-@@ -32,17 +33,28 @@
- #define AX_ACCESS_EEPROM			0x04
- #define AX_ACCESS_EFUS				0x05
+@@ -35,8 +35,10 @@
  #define AX_RELOAD_EEPROM_EFUSE			0x06
-+#define AX88179A_WAKEUP_SETTING			0x07
-+#define AX_FW_MODE				0x08
-+#define AX88179A_FLASH_READ			0x21
-+#define AX88179A_FLASH_WRITE			0x24
-+#define AX88179A_ACCESS_BL			0x2A
-+#define AX88179A_PHY_POWER			0x31
-+#define AX88179A_AUTODETACH			0xC0
- #define AX_PAUSE_WATERLVL_LOW			0x54
- #define AX_PAUSE_WATERLVL_HIGH			0x55
+ #define AX88179A_WAKEUP_SETTING			0x07
+ #define AX_FW_MODE				0x08
++#define AX_GPHY_CTL				0x0F
+ #define AX88179A_FLASH_READ			0x21
+ #define AX88179A_FLASH_WRITE			0x24
++#define AX88179A_PHY_CLAUSE45			0x27
+ #define AX88179A_ACCESS_BL			0x2A
+ #define AX88179A_PHY_POWER			0x31
+ #define AX88179A_AUTODETACH			0xC0
+@@ -113,6 +115,9 @@
+ 	#define AX_PHYPWR_RSTCTL_AT	0x1000
  
-+#define AX_FW_MODE_179A				0x01
- #define PHYSICAL_LINK_STATUS			0x02
- 	#define	AX_USB_SS		0x04
- 	#define	AX_USB_HS		0x02
-+	#define AX_USB_FS		0x01
- 
- #define GENERAL_STATUS				0x03
- /* Check AX88179 version. UA1:Bit2 = 0,  UA2:Bit2 = 1 */
- 	#define	AX_SECLD		0x04
- 
-+#define AX_CHIP_STATUS				0x05
+ #define AX_RX_BULKIN_QCTRL			0x2e
 +
- #define AX_SROM_ADDR				0x07
- #define AX_SROM_CMD				0x0a
- 	#define EEP_RD			0x04
-@@ -62,6 +74,15 @@
- 	#define AX_RX_CTL_PRO		0x0001
- 	#define AX_RX_CTL_STOP		0x0000
- 
-+#define AX88179A_ETH_TX_GAP			0x0D
++#define AX_GPHY_EEE_CTRL			0x01
 +
-+#define AX88179A_BFM_DATA			0x0E
-+	#define AX_TX_QUEUE_CFG		0x02
-+	#define AX_TX_QUEUE_SET		0x08
-+	#define AX_TX_Q1_AHB_FC_EN	0x10
-+	#define AX_TX_Q2_AHB_FC_EN	0x20
-+	#define AX_XGMII_EN		0x80
-+
- #define AX_NODE_ID				0x10
- #define AX_MULFLTARY				0x16
- 
-@@ -111,7 +132,51 @@
- 	#define AX_TXCOE_TCPV6		0x20
- 	#define AX_TXCOE_UDPV6		0x40
- 
-+#define AX88179A_MAC_BM_INT_MASK		0x41
-+#define AX88179A_MAC_BM_RX_DMA_CTL		0x43
-+#define AX88179A_MAC_BM_TX_DMA_CTL		0x46
-+
-+#define AX88179A_MAC_RX_STATUS_CDC		0x6D
-+	#define AX_LSOFC_WCNT_7_ACCESS	0x03
-+	#define AX_GMII_CRC_APPEND	0x10
-+
- #define AX_LEDCTRL				0x73
-+#define AX88179A_MAC_ARC_CTRL			0x9E
-+#define AX88179A_MAC_SWP_CTRL			0xB1
-+
-+#define AX88179A_MAC_TX_PAUSE			0xB2
-+
-+#define AX88179A_MAC_CDC_DELAY_TX		0xB5
-+
-+#define AX88179A_MAC_PATH			0xB7
-+	#define AX_MAC_RX_PATH_READY	0x01
-+	#define AX_MAC_TX_PATH_READY	0x02
-+
-+#define AX88179A_NEW_PAUSE_CTRL			0xB8
-+	#define AX_NEW_PAUSE_EN		0x01
-+
-+#define AX88179A_MAC_BULK_OUT_CTRL		0xB9
-+	#define AX_MAC_EFF_EN		0x02
-+
-+#define AX88179A_MAC_RX_DATA_CDC_CNT		0xC0
-+	#define AX_MAC_LSO_ERR_EN	0x04
-+	#define AX_MAC_MIQFFCTRL_FORMAT	0x10
-+	#define AX_MAC_MIQFFCTRL_DROP_CRC 0x20
-+
-+#define AX88179A_AUTODETACH_DELAY	(5UL << 8)
-+#define AX88179A_AUTODETACH_EN		1
-+
-+#define AX88179A_MAC_LSO_ENHANCE_CTRL		0xC3
-+	#define AX_LSO_ENHANCE_EN	0x01
-+
-+#define AX88179A_MAC_TX_HDR_CKSUM		0xCC
-+#define AX88179A_EP5_EHR			0xF9
-+
-+#define AX_PHY_POWER				0x02
-+
-+#define EPHY_LOW_POWER_EN			0x01
-+#define S5_WOL_EN				0x04
-+#define S5_WOL_LOW_POWER			0x20
- 
- #define GMII_PHY_PHYSR				0x11
- 	#define GMII_PHY_PHYSR_SMASK	0xc000
-@@ -164,8 +229,56 @@
- 	#define GMII_PHY_PGSEL_PAGE3	0x0003
- 	#define GMII_PHY_PGSEL_PAGE5	0x0005
- 
-+/* TX Descriptor */
-+#define AX179A_TX_DESC_LEN_MASK		0x1FFFFF
-+#define AX179A_TX_DESC_DROP_PADD	BIT(28)
-+#define AX179A_TX_DESC_VLAN		BIT(29)
-+#define AX179A_TX_DESC_MSS_MASK		0x7FFF
-+#define AX179A_TX_DESC_MSS_SHIFT	0x20
-+#define AX179A_TX_DESC_VLAN_MASK	0xFFFF
-+#define AX179A_TX_DESC_VLAN_SHIFT	0x30
-+
-+/* RX Packet Descriptor */
-+#define AX179A_RX_PD_L4_ERR		BIT(0)
-+#define AX179A_RX_PD_L3_ERR		BIT(1)
-+#define AX179A_RX_PD_L4_TYPE_MASK	0x1C
-+#define AX179A_RX_PD_L4_UDP		0x04
-+#define AX179A_RX_PD_L4_TCP		0x10
-+#define AX179A_RX_PD_L3_TYPE_MASK	0x60
-+#define AX179A_RX_PD_L3_IP		0x20
-+#define AX179A_RX_PD_L3_IP6		0x40
-+
-+#define AX179A_RX_PD_VLAN		BIT(10)
-+#define AX179A_RX_PD_RX_OK		BIT(11)
-+#define AX179A_RX_PD_DROP		BIT(31)
-+#define AX179A_RX_PD_LEN_MASK	0x7FFF0000
-+#define AX179A_RX_PD_LEN_SHIFT	0x10
-+#define AX179A_RX_PD_VLAN_SHIFT	0x20
-+
-+/* RX Descriptor header */
-+#define AX179A_RX_DH_PKT_CNT_MASK		0x1FFF
-+#define AX179A_RX_DH_DESC_OFFSET_MASK	0xFFFFE000
-+#define AX179A_RX_DH_DESC_OFFSET_SHIFT	0x0D
-+
-+#define AX179A_RX_HW_PAD			0x02
-+
- static int ax88179_reset(struct usbnet *dev);
- 
-+enum ax_ether_link_speed {
-+	ETHER_LINK_NONE = 0,
-+	ETHER_LINK_10   = 1,
-+	ETHER_LINK_100  = 2,
-+	ETHER_LINK_1000 = 3,
-+	ETHER_LINK_2500 = 4,
-+};
-+
-+enum ax_chip_version {
-+	AX_VERSION_INVALID		= 0x0,
-+	AX_VERSION_AX88179		= 0x4,
-+	AX_VERSION_AX88179A		= 0x6,	/* Also AX88772D */
-+	AX_VERSION_AX88279		= 0x7,
-+};
-+
- struct ax88179_data {
- 	u8  eee_enabled;
- 	u8  eee_active;
-@@ -174,6 +287,16 @@ struct ax88179_data {
- 	u32 wol_supported;
- 	u32 wolopts;
- 	u8 disconnecting;
-+	u8 chip_version;
-+	u8 fw_version[4];
-+	u8 is_ax88772d;
-+	u8 ip_align;
-+	u8 link;
-+	u8 speed;
-+	u8 full_duplex;
-+	u8 rx_checksum;
-+	u8 eeprom_read_cmd;
-+	u16 eeprom_block;
- };
- 
- struct ax88179_int_data {
-@@ -181,15 +304,48 @@ struct ax88179_int_data {
- 	__le32 intdata2;
- };
- 
--static const struct {
-+struct ax_bulkin_settings {
- 	unsigned char ctrl, timer_l, timer_h, size, ifg;
--} AX88179_BULKIN_SIZE[] =	{
-+};
-+
-+static const struct ax_bulkin_settings AX88179_BULKIN_SIZE[] =	{
- 	{7, 0x4f, 0,	0x12, 0xff},
- 	{7, 0x20, 3,	0x16, 0xff},
- 	{7, 0xae, 7,	0x18, 0xff},
- 	{7, 0xcc, 0x4c, 0x18, 8},
- };
- 
-+static const struct ax_bulkin_settings AX88179A_BULKIN_SIZE[] = {
-+	{5, 0x7B, 0x00,	0x17, 0x0F},	/* 1G, SS */
-+	{5, 0xC0, 0x02,	0x06, 0x0F},	/* 1G, HS */
-+	{7, 0xF0, 0x00,	0x0C, 0x0F},	/* 100M, Full, SS */
-+	{6, 0x00, 0x00,	0x06, 0x0F},	/* 100M, Half, SS */
-+	{5, 0xC0, 0x04,	0x06, 0x0F},	/* 100M, Full, HS */
-+	{7, 0xC0, 0x04,	0x06, 0x0F},	/* 100M, Half, HS */
-+	{7, 0x00, 0x00,	0x03, 0x3F},	/* FS */
-+};
-+
-+static const struct ax_bulkin_settings AX88772D_BULKIN_SIZE[] = {
-+	{0, 0x00, 0x00,	0x00, 0x00},	/* 1G, SS (unused) */
-+	{0, 0x00, 0x00,	0x00, 0x00},	/* 1G, HS (unused) */
-+	{0, 0x00, 0x00,	0x00, 0x00},	/* 100M, Full, SS (unused) */
-+	{0, 0x00, 0x00,	0x00, 0x00},	/* 100M, Half, SS (unused) */
-+	{5, 0xC0, 0x04,	0x06, 0x0F},	/* 100M, Full, HS */
-+	{7, 0xC0, 0x04,	0x06, 0x0F},	/* 100M, Half, HS */
-+	{7, 0x00, 0x00,	0x03, 0x3F},	/* FS */
-+};
-+
-+static const struct ax_bulkin_settings AX88279_BULKIN_SIZE[] = {
-+	{5, 0x10, 0x01,	0x11, 0x0F},	/* 2.5G */
-+	{7, 0xB3, 0x01,	0x11, 0x0F},	/* 1G, SS */
-+	{7, 0xC0, 0x02,	0x06, 0x0F},	/* 1G, HS */
-+	{7, 0x80, 0x01,	0x03, 0x0F},	/* 100M, Full, SS */
-+	{7, 0x80, 0x01,	0x03, 0x0F},	/* 100M, Half, SS */
-+	{7, 0x80, 0x01,	0x03, 0x0F},	/* 100M, Full, HS */
-+	{7, 0x80, 0x01,	0x03, 0x0F},	/* 100M, Half, HS */
-+	{7, 0x00, 0x00,	0x03, 0x3F},	/* FS */
-+};
-+
- static void ax88179_set_pm_mode(struct usbnet *dev, bool pm_mode)
- {
- 	struct ax88179_data *ax179_data = dev->driver_priv;
-@@ -414,7 +570,6 @@ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	usbnet_suspend(intf, message);
- 
--	/* Enable WoL */
- 	if (priv->wolopts) {
- 		ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MONITOR_MOD,
- 				 1, 1, &tmp8);
-@@ -425,6 +580,26 @@ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MONITOR_MOD,
- 				  1, 1, &tmp8);
-+
-+		if (priv->chip_version >= AX_VERSION_AX88179A) {
-+			ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE, 2, 2, &tmp16);
-+			tmp16 |= AX_MEDIUM_RECEIVE_EN;
-+			ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE, 2, 2, &tmp16);
-+		}
-+
-+		if (priv->chip_version == AX_VERSION_AX88279)
-+			ax88179_write_cmd(dev, AX88179A_WAKEUP_SETTING, 8,
-+					  EPHY_LOW_POWER_EN | S5_WOL_EN
-+					  | S5_WOL_LOW_POWER | 0x8000, 0, NULL);
-+
-+	} else if (priv->chip_version == AX_VERSION_AX88279) {
-+		ax88179_write_cmd(dev, AX88179A_WAKEUP_SETTING, 8, 0x8000, 0, NULL);
-+	}
-+
-+	if (priv->chip_version >= AX_VERSION_AX88179A) {
-+		ax88179_write_cmd(dev, AX88179A_WAKEUP_SETTING, 0, EPHY_LOW_POWER_EN, 0, NULL);
-+		ax88179_set_pm_mode(dev, false);
-+		return 0;
- 	}
- 
- 	/* Disable RX path */
-@@ -436,11 +611,11 @@ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	/* Force bulk-in zero length */
- 	ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL,
--			 2, 2, &tmp16);
-+			2, 2, &tmp16);
- 
- 	tmp16 |= AX_PHYPWR_RSTCTL_BZ | AX_PHYPWR_RSTCTL_IPRL;
- 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL,
--			  2, 2, &tmp16);
-+			2, 2, &tmp16);
- 
- 	/* change clock */
- 	tmp8 = 0;
-@@ -456,12 +631,19 @@ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
+ #define AX_CLK_SELECT				0x33
+ 	#define AX_CLK_SELECT_BCS	0x01
+ 	#define AX_CLK_SELECT_ACS	0x02
+@@ -559,6 +564,32 @@ ax88179_phy_write_mmd_indirect(struct usbnet *dev, u16 prtad, u16 devad,
+ 	return 0;
  }
  
- /* This function is used to enable the autodetach function. */
--/* This function is determined by offset 0x43 of EEPROM */
-+/* This function is determined by offset 0x43 of EEPROM for the AX88179 */
- static int ax88179_auto_detach(struct usbnet *dev)
++static int ax_read_mmd(struct usbnet *dev, u16 dev_addr, u16 reg)
++{
++	struct ax88179_data *priv = dev->driver_priv;
++	u16 res;
++	int ret;
++
++	if (priv->chip_version >= AX_VERSION_AX88179A) {
++		ret = ax88179_read_cmd(dev, AX88179A_PHY_CLAUSE45, dev_addr, reg, 2, &res);
++		if (ret < 0)
++			return ret;
++		return res;
++	}
++
++	return ax88179_phy_read_mmd_indirect(dev, reg, dev_addr);
++}
++
++static int ax_write_mmd(struct usbnet *dev, u16 dev_addr, u16 reg, u16 data)
++{
++	struct ax88179_data *priv = dev->driver_priv;
++
++	if (priv->chip_version >= AX_VERSION_AX88179A)
++		return ax88179_write_cmd(dev, AX88179A_PHY_CLAUSE45, dev_addr, reg, 2, &data);
++
++	return ax88179_phy_write_mmd_indirect(dev, reg, dev_addr, data);
++}
++
+ static int ax88179_suspend(struct usb_interface *intf, pm_message_t message)
+ {
+ 	struct usbnet *dev = usb_get_intfdata(intf);
+@@ -853,12 +884,39 @@ ax88179_set_eeprom(struct net_device *net, struct ethtool_eeprom *eeprom,
+ }
+ 
+ static int ax88179_get_link_ksettings(struct net_device *net,
+-				      struct ethtool_link_ksettings *cmd)
++				       struct ethtool_link_ksettings *cmd)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
++	struct ax88179_data *data;
++	int v;
++
++	data = dev->driver_priv;
+ 
+ 	mii_ethtool_get_link_ksettings(&dev->mii, cmd);
+ 
++	if (data->chip_version >= AX_VERSION_AX88279) {
++		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++				 cmd->link_modes.supported);
++
++		v = ax88179_mdio_read(dev->net, dev->mii.phy_id, MII_ADVERTISE);
++		if (v >= 0 && v & ADVERTISE_RESV)
++			linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++					 cmd->link_modes.advertising);
++
++		v = ax_read_mmd(dev, MDIO_MMD_AN, MDIO_AN_10GBT_STAT);
++		if (data->speed == ETHER_LINK_2500) {
++			cmd->base.speed = SPEED_2500;
++			/* MDIO_AN_10GBT_STAT_LP2_5G is broken, but we can deduce that
++			 * the link-partner advertised 2500M if remotely AN succceded
++			 * for link speed > 1000M and we locally have a link speed of
++			 * 2500M
++			 */
++			if (v >= 0 && v & MDIO_AN_10GBT_STAT_REMOK)
++				linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++						 cmd->link_modes.lp_advertising);
++		}
++	}
++
+ 	return 0;
+ }
+ 
+@@ -866,34 +924,63 @@ static int ax88179_set_link_ksettings(struct net_device *net,
+ 				      const struct ethtool_link_ksettings *cmd)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
++	struct ax88179_data *data;
++	int v;
++
++	data = dev->driver_priv;
++
++	/* mii_ethtool_set_link_ksettings handles unknown bits in MII_ADVERTISE
++	 * transparently, so for the 2.5GBit link speed of the AX_VERSION_AX88279
++	 * we just set up ADVERTISE_RESV before calling mii_ethtool_set_link_ksettings
++	 * at least for speeds < 2500
++	 */
++	if (data->chip_version == AX_VERSION_AX88279) {
++		v = ax88179_mdio_read(net, dev->mii.phy_id, MII_ADVERTISE);
++		if (v < 0)
++			return v;
++
++		if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++				      cmd->link_modes.advertising))
++			v |= ADVERTISE_RESV;
++		else
++			v &= ~ADVERTISE_RESV;
++		ax88179_mdio_write(net, dev->mii.phy_id, MII_ADVERTISE, v);
++		if (cmd->base.speed == SPEED_2500)
++			return mii_nway_restart(&dev->mii);
++	}
++
+ 	return mii_ethtool_set_link_ksettings(&dev->mii, cmd);
+ }
+ 
+ static int
+ ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_keee *data)
+ {
++	struct ax88179_data *priv = dev->driver_priv;
+ 	int val;
+ 
+ 	/* Get Supported EEE */
+-	val = ax88179_phy_read_mmd_indirect(dev, MDIO_PCS_EEE_ABLE,
+-					    MDIO_MMD_PCS);
++	val = ax_read_mmd(dev, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE);
+ 	if (val < 0)
+ 		return val;
+ 	mii_eee_cap1_mod_linkmode_t(data->supported, val);
+ 
+ 	/* Get advertisement EEE */
+-	val = ax88179_phy_read_mmd_indirect(dev, MDIO_AN_EEE_ADV,
+-					    MDIO_MMD_AN);
++	val = ax_read_mmd(dev, MDIO_MMD_AN, MDIO_AN_EEE_ADV);
+ 	if (val < 0)
+ 		return val;
+ 	mii_eee_cap1_mod_linkmode_t(data->advertised, val);
+ 
+ 	/* Get LP advertisement EEE */
+-	val = ax88179_phy_read_mmd_indirect(dev, MDIO_AN_EEE_LPABLE,
+-					    MDIO_MMD_AN);
++	val = ax_read_mmd(dev, MDIO_MMD_AN, MDIO_AN_EEE_LPABLE);
+ 	if (val < 0)
+ 		return val;
+ 	mii_eee_cap1_mod_linkmode_t(data->lp_advertised, val);
++	if (priv->chip_version >= AX_VERSION_AX88279) {
++		val = ax_read_mmd(dev, MDIO_MMD_AN, MDIO_AN_EEE_LPABLE2);
++		if (val < 0)
++			return val;
++		mii_eee_cap2_mod_linkmode_adv_t(data->lp_advertised, val);
++	}
+ 
+ 	return 0;
+ }
+@@ -903,8 +990,7 @@ ax88179_ethtool_set_eee(struct usbnet *dev, struct ethtool_keee *data)
+ {
+ 	u16 tmp16 = linkmode_to_mii_eee_cap1_t(data->advertised);
+ 
+-	return ax88179_phy_write_mmd_indirect(dev, MDIO_AN_EEE_ADV,
+-					      MDIO_MMD_AN, tmp16);
++	return ax_write_mmd(dev, MDIO_MMD_AN, MDIO_AN_EEE_ADV, tmp16);
+ }
+ 
+ static int ax88179_chk_eee(struct usbnet *dev)
+@@ -914,40 +1000,27 @@ static int ax88179_chk_eee(struct usbnet *dev)
+ 
+ 	mii_ethtool_gset(&dev->mii, &ecmd);
+ 
+-	if (ecmd.duplex & DUPLEX_FULL) {
++	priv->eee_active = 0;
++	if ((priv->chip_version < AX_VERSION_AX88279 && (ecmd.duplex & DUPLEX_FULL)) ||
++	    (ecmd.speed == SPEED_1000 && (ecmd.duplex & DUPLEX_FULL))) {
+ 		int eee_lp, eee_cap, eee_adv;
+ 		u32 lp, cap, adv, supported = 0;
+ 
+-		eee_cap = ax88179_phy_read_mmd_indirect(dev,
+-							MDIO_PCS_EEE_ABLE,
+-							MDIO_MMD_PCS);
+-		if (eee_cap < 0) {
+-			priv->eee_active = 0;
++		eee_cap = ax_read_mmd(dev, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE);
++		if (eee_cap < 0)
+ 			return false;
+-		}
+ 
+ 		cap = mmd_eee_cap_to_ethtool_sup_t(eee_cap);
+-		if (!cap) {
+-			priv->eee_active = 0;
++		if (!cap)
+ 			return false;
+-		}
+ 
+-		eee_lp = ax88179_phy_read_mmd_indirect(dev,
+-						       MDIO_AN_EEE_LPABLE,
+-						       MDIO_MMD_AN);
+-		if (eee_lp < 0) {
+-			priv->eee_active = 0;
+-			return false;
+-		}
++		eee_lp = ax_read_mmd(dev, MDIO_MMD_AN, MDIO_AN_EEE_LPABLE);
++		if (eee_lp < 0)
++			return true;
+ 
+-		eee_adv = ax88179_phy_read_mmd_indirect(dev,
+-							MDIO_AN_EEE_ADV,
+-							MDIO_MMD_AN);
+-
+-		if (eee_adv < 0) {
+-			priv->eee_active = 0;
+-			return false;
+-		}
++		eee_adv = ax_read_mmd(dev, MDIO_MMD_AN, MDIO_AN_EEE_ADV);
++		if (eee_adv < 0)
++			return true;
+ 
+ 		adv = mmd_eee_adv_to_ethtool_adv_t(eee_adv);
+ 		lp = mmd_eee_adv_to_ethtool_adv_t(eee_lp);
+@@ -955,65 +1028,53 @@ static int ax88179_chk_eee(struct usbnet *dev)
+ 			     SUPPORTED_1000baseT_Full :
+ 			     SUPPORTED_100baseT_Full;
+ 
+-		if (!(lp & adv & supported)) {
+-			priv->eee_active = 0;
+-			return false;
+-		}
++		if (!(lp & adv & supported))
++			return true;
+ 
+ 		priv->eee_active = 1;
+ 		return true;
+ 	}
+ 
+-	priv->eee_active = 0;
+ 	return false;
+ }
+ 
+-static void ax88179_disable_eee(struct usbnet *dev)
+-{
+-	u16 tmp16;
+-
+-	tmp16 = GMII_PHY_PGSEL_PAGE3;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  GMII_PHY_PAGE_SELECT, 2, &tmp16);
+-
+-	tmp16 = 0x3246;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  MII_PHYADDR, 2, &tmp16);
+-
+-	tmp16 = GMII_PHY_PGSEL_PAGE0;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  GMII_PHY_PAGE_SELECT, 2, &tmp16);
+-}
+-
+-static void ax88179_enable_eee(struct usbnet *dev)
++static void ax88179_eee_config(struct usbnet *dev, bool enable)
  {
 +	struct ax88179_data *priv = dev->driver_priv;
  	u16 tmp16;
- 	u8 tmp8;
  
-+	if (priv->chip_version >= AX_VERSION_AX88179A) {
-+		tmp16 = AX88179A_AUTODETACH_DELAY;
-+		ax88179_write_cmd(dev, AX88179A_AUTODETACH, tmp16, 0, 0, NULL);
-+		return 0;
-+	}
-+
- 	if (ax88179_read_cmd(dev, AX_ACCESS_EEPROM, 0x43, 1, 2, &tmp16) < 0)
- 		return 0;
- 
-@@ -484,11 +666,31 @@ static int ax88179_auto_detach(struct usbnet *dev)
- static int ax88179_resume(struct usb_interface *intf)
- {
- 	struct usbnet *dev = usb_get_intfdata(intf);
-+	struct ax88179_data *ax179_data;
-+	u8 reg8;
- 
-+	ax179_data = dev->driver_priv;
- 	ax88179_set_pm_mode(dev, true);
- 
- 	usbnet_link_change(dev, 0, 0);
- 
-+	if (ax179_data->chip_version >= AX_VERSION_AX88179A) {
-+		ax88179_read_cmd(dev, AX88179A_PHY_POWER, 0, 0, 1, &reg8);
-+		if (!(reg8 & AX_PHY_POWER)) {
-+			reg8 = AX_PHY_POWER;
-+			ax88179_write_cmd(dev, AX88179A_PHY_POWER, 0, 0, 1, &reg8);
-+			msleep(250);
-+		}
-+		ax88179_write_cmd(dev, AX_FW_MODE, AX_FW_MODE_179A, 0, 0, NULL);
-+
-+		/* Now, that AX_FW_MODE_179A is enabled, the PHY needs a power-cycle.
-+		 * PHY-power is re-enabled in ax88179_reset()
-+		 */
-+		reg8 = 0;
-+		ax88179_write_cmd(dev, AX88179A_PHY_POWER, 0, 0, 1, &reg8);
-+		msleep(250);
-+	}
-+
- 	ax88179_reset(dev);
- 
- 	ax88179_set_pm_mode(dev, false);
-@@ -1293,6 +1495,17 @@ static int ax88179_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	dev->driver_priv = ax179_data;
- 
-+	ret = ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_CHIP_STATUS,
-+			       1, 1, &ax179_data->chip_version);
-+	if (ret < 0)
-+		goto err_nodev;
-+
-+	ax179_data->chip_version = (ax179_data->chip_version & 0xf0) >> 4;
-+	ax179_data->is_ax88772d = 0;
-+	ax179_data->ip_align = 1;
-+	ax179_data->eeprom_read_cmd = AX_ACCESS_EEPROM;
-+	ax179_data->eeprom_block = 2;
-+
- 	dev->net->netdev_ops = &ax88179_netdev_ops;
- 	dev->net->ethtool_ops = &ax88179_ethtool_ops;
- 	dev->net->needed_headroom = 8;
-@@ -1317,6 +1530,120 @@ static int ax88179_bind(struct usbnet *dev, struct usb_interface *intf)
- 	ax88179_reset(dev);
- 
- 	return 0;
-+
-+err_nodev:
-+	kfree(ax179_data);
-+	ax179_data = NULL;
-+
-+	return ret;
-+}
-+
-+static int ax88179a_bind(struct usbnet *dev, struct usb_interface *intf)
-+{
-+	struct usb_device *udev = interface_to_usbdev(intf);
-+	struct ax88179_data *ax179_data;
-+	int ret;
-+
-+	/* Check if vendor configuration */
-+	if (udev->actconfig->desc.bConfigurationValue != 1) {
-+		netdev_info(dev->net, "Switching to vendor mode\n");
-+		usb_driver_set_configuration(udev, 1);
-+		return -ENODEV;
-+	}
-+
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret < 0)
-+		return ret;
-+
-+	ax179_data = kzalloc_obj(*ax179_data);
-+	if (!ax179_data)
-+		return -ENOMEM;
-+
-+	dev->driver_priv = ax179_data;
-+
-+	ret = ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_CHIP_STATUS,
-+			       1, 1, &ax179_data->chip_version);
-+	if (ret < 0)
-+		goto err_nodev;
-+
-+	ax179_data->chip_version = (ax179_data->chip_version & 0xf0) >> 4;
-+	ax179_data->is_ax88772d = 0;
-+	if (ax179_data->chip_version == AX_VERSION_AX88179A) {
-+		if (udev->descriptor.bcdDevice == 0x300)
-+			ax179_data->is_ax88772d = 1;
-+	}
-+
-+	for (int i = 0; i < 3; i++) {
-+		ret = ax88179_read_cmd(dev, AX88179A_ACCESS_BL, (0xFD + i),
-+				       1, 1, &ax179_data->fw_version[i]);
-+		if (ret < 0)
-+			ax179_data->fw_version[i] = 0xff;
-+	}
-+	netdev_info(dev->net, "AX88179A/279/772D Chip Version: %x, FW: %d.%d.%d.%d\n",
-+		    ax179_data->chip_version,
-+		    ax179_data->fw_version[0], ax179_data->fw_version[1],
-+		    ax179_data->fw_version[2], ax179_data->fw_version[3]);
-+
-+	/* The AX88279 requires both the AX_RX_CTL_IPE and AX_RX_CTL_DROPCRCERR
-+	 * bits set in AX_RX_CTL for creating correct RX-URBs. AX_RX_CTL_DROPCRCERR
-+	 * is anyway set for all chips, make sure AX_RX_CTL_IPE is set via ip_align.
-+	 * Also configure eeprom access parameters.
-+	 */
-+	if (ax179_data->chip_version == AX_VERSION_AX88279) {
-+		ax179_data->ip_align = 1;
-+		ax179_data->eeprom_read_cmd = AX88179A_FLASH_READ;
-+		ax179_data->eeprom_block = 256;
-+	} else {
-+		ax179_data->ip_align = 0;
-+		ax179_data->eeprom_read_cmd = AX_ACCESS_EFUS;
-+		ax179_data->eeprom_block = 20;
-+	}
-+
-+	dev->net->netdev_ops = &ax88179_netdev_ops;
-+	dev->net->ethtool_ops = &ax88179_ethtool_ops;
-+	dev->net->needed_headroom = 8;
-+	dev->net->needed_tailroom = 8;
-+	dev->net->min_mtu = ETH_MIN_MTU;
-+	dev->hard_mtu = 9 * 1024;
-+	dev->net->max_mtu = dev->hard_mtu - dev->net->hard_header_len;
-+
-+	/* Initialize MII structure */
-+	dev->mii.dev = dev->net;
-+	dev->mii.mdio_read = ax88179_mdio_read;
-+	dev->mii.mdio_write = ax88179_mdio_write;
-+	dev->mii.phy_id_mask = 0xff;
-+	dev->mii.reg_num_mask = 0xff;
-+	dev->mii.phy_id = 0x03;
-+	if (!ax179_data->is_ax88772d)
-+		dev->mii.supports_gmii = 1;
-+
-+	dev->net->features |= NETIF_F_SG | NETIF_F_IP_CSUM |
-+			      NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM | NETIF_F_TSO |
-+			      NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX |
-+			      NETIF_F_HW_VLAN_CTAG_FILTER;
-+
-+	dev->net->hw_features |= dev->net->features;
-+
-+	dev->net->vlan_features = NETIF_F_SG | NETIF_F_IP_CSUM |
-+				  NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM | NETIF_F_TSO;
-+
-+	netif_set_tso_max_size(dev->net, 16384);
-+
-+	/* Enable Transmission of Link Speed byte in interrupt URB */
-+	ax88179_write_cmd(dev, AX_FW_MODE, AX_FW_MODE_179A, 0, 0, NULL);
-+	ax88179_write_cmd(dev, AX_RELOAD_EEPROM_EFUSE, 0, 0, 0, NULL);
-+
-+	/* Read MAC address from DTB or ASIX chip */
-+	ax88179_get_mac_addr(dev);
-+	memcpy(dev->net->perm_addr, dev->net->dev_addr, ETH_ALEN);
-+
-+	return 0;
-+
-+err_nodev:
-+	kfree(ax179_data);
-+	ax179_data = NULL;
-+
-+	return ret;
- }
- 
- static void ax88179_unbind(struct usbnet *dev, struct usb_interface *intf)
-@@ -1338,6 +1665,22 @@ static void ax88179_unbind(struct usbnet *dev, struct usb_interface *intf)
- 	kfree(ax179_data);
- }
- 
-+static void ax88179a_unbind(struct usbnet *dev, struct usb_interface *intf)
-+{
-+	struct ax88179_data *ax179_data = dev->driver_priv;
-+	u16 tmp16;
-+	u8 tmp8;
-+
-+	/* Configure RX control register => stop operation */
-+	tmp16 = AX_RX_CTL_STOP;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &tmp16);
-+
-+	tmp8 = 0;
-+	ax88179_write_cmd(dev, AX88179A_PHY_POWER, 0, 0, 1, &tmp8);
-+
-+	kfree(ax179_data);
-+}
-+
- static void
- ax88179_rx_checksum(struct sk_buff *skb, u32 *pkt_hdr)
- {
-@@ -1354,6 +1697,21 @@ ax88179_rx_checksum(struct sk_buff *skb, u32 *pkt_hdr)
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
- }
- 
-+static void ax88179a_rx_checksum(struct sk_buff *skb, u64 pkt_desc)
-+{
-+	u32 pkt_type;
-+
-+	skb->ip_summed = CHECKSUM_NONE;
-+	/* checksum error bit is set */
-+	if (pkt_desc & AX179A_RX_PD_L4_ERR || pkt_desc & AX179A_RX_PD_L3_ERR)
-+		return;
-+
-+	pkt_type = pkt_desc & AX179A_RX_PD_L4_TYPE_MASK;
-+	/* It must be a TCP or UDP packet with a valid checksum */
-+	if (pkt_type == AX179A_RX_PD_L4_TCP || pkt_type == AX179A_RX_PD_L4_UDP)
-+		skb->ip_summed = CHECKSUM_UNNECESSARY;
-+}
-+
- static int ax88179_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- {
- 	struct sk_buff *ax_skb;
-@@ -1472,6 +1830,121 @@ static int ax88179_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+static int ax88179a_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
-+{
-+	struct ax88179_data *ax179_data = dev->driver_priv;
-+	struct sk_buff *ax_skb;
-+	u32 hdr_off, pkt_end;
-+	u64 *pkt_desc_ptr;
-+	u16 vlan_tag;
-+	u16 pkt_cnt;
-+	u64 rx_hdr;
-+
-+	/* SKB contents for AX179A-based chips:
-+	 *   <packet 1>
-+	 *   ...
-+	 *   <packet N>
-+	 *   <per-packet metadata entry 1>
-+	 *   ...
-+	 *   <per-packet metadata entry N>
-+	 *   <rx_hdr>
-+	 *
-+	 * where:
-+	 *   <packet N> contains pkt_len data bytes and padding:
-+	 *		2 bytes of IP alignment (optional, depends on AX_RX_CTL_IPE flag)
-+	 *		packet data received
-+	 *		optional padding to 8-bytes boundary
-+	 *   <per-packet metadata entry N> contains 8 bytes:
-+	 *		pkt_len and fields AX_RXHDR_*
-+	 *   <rx-hdr>	contains 8 bytes:
-+	 *		pkt_cnt and hdr_off (offset of <per-packet metadata entry 1>)
-+	 *
-+	 * pkt_cnt is number of entries in the per-packet metadata array.
-+	 */
-+
-+	if (!skb || skb->len < sizeof(rx_hdr))
-+		goto err;
-+
-+	/* RX Descriptor Header */
-+	skb_trim(skb, skb->len - sizeof(rx_hdr));
-+	rx_hdr = le64_to_cpup((u64 *)skb_tail_pointer(skb));
-+
-+	/* Check these packets */
-+	hdr_off = (rx_hdr & AX179A_RX_DH_DESC_OFFSET_MASK) >> AX179A_RX_DH_DESC_OFFSET_SHIFT;
-+	pkt_cnt = rx_hdr & AX179A_RX_DH_PKT_CNT_MASK;
-+
-+	/* Consistency check header position */
-+	if (hdr_off != skb->len - (pkt_cnt * sizeof(rx_hdr)))
-+		goto err;
-+
-+	/* Make sure that the bounds of the metadata array are inside the SKB
-+	 * (and in front of the counter at the end).
-+	 */
-+	if (pkt_cnt * 8 + hdr_off > skb->len)
-+		goto err;
-+
-+	/* Packets must not overlap the metadata array */
-+	skb_trim(skb, hdr_off);
-+
-+	if (!pkt_cnt)
-+		goto err;
-+
-+	/* Get the first RX packet descriptor */
-+	pkt_desc_ptr = (u64 *)(skb->data + hdr_off);
-+
-+	pkt_end = 0;
-+	while (pkt_cnt--) {
-+		u64 pkt_desc = le64_to_cpup(pkt_desc_ptr);
-+		u32 pkt_len_plus_padd;
-+		u32 pkt_len;
-+
-+		pkt_len = (u32)((pkt_desc & AX179A_RX_PD_LEN_MASK) >> AX179A_RX_PD_LEN_SHIFT)
-+			  - (ax179_data->ip_align ? 2 : 0);
-+		pkt_len_plus_padd = ((pkt_len + 7 + (ax179_data->ip_align ? 2 : 0)) & 0x7FFF8);
-+
-+		pkt_end += pkt_len_plus_padd;
-+		if (pkt_end > hdr_off || (pkt_cnt == 0 && pkt_end != hdr_off))
-+			goto err;
-+
-+		if (pkt_desc & AX179A_RX_PD_DROP || !(pkt_desc & AX179A_RX_PD_RX_OK) ||
-+		    pkt_len > (dev->hard_mtu + AX179A_RX_HW_PAD)) {
-+			skb_pull(skb, pkt_len_plus_padd);
-+
-+			/* Next RX Packet Descriptor */
-+			pkt_desc_ptr++;
-+			continue;
-+		}
-+
-+		ax_skb = netdev_alloc_skb_ip_align(dev->net, pkt_len);
-+		if (!ax_skb)
-+			goto err;
-+
-+		skb_put(ax_skb, pkt_len);
-+		memcpy(ax_skb->data, skb->data + (ax179_data->ip_align ? AX179A_RX_HW_PAD : 0),
-+		       pkt_len);
-+
-+		if (ax179_data->rx_checksum)
-+			ax88179a_rx_checksum(ax_skb, pkt_desc);
-+
-+		if (pkt_desc & AX179A_RX_PD_VLAN) {
-+			vlan_tag = pkt_desc >> AX179A_RX_PD_VLAN_SHIFT;
-+			__vlan_hwaccel_put_tag(ax_skb, htons(ETH_P_8021Q),
-+					       vlan_tag & VLAN_VID_MASK);
-+		}
-+
-+		usbnet_skb_return(dev, ax_skb);
-+		skb_pull(skb, pkt_len_plus_padd);
-+
-+		/* Next RX Packet Header */
-+		pkt_desc_ptr++;
-+	}
-+
-+	return 1;
-+
-+err:
-+	return 0;
-+}
-+
- static struct sk_buff *
- ax88179_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
- {
-@@ -1505,6 +1978,59 @@ ax88179_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
- 	return skb;
- }
- 
-+static struct sk_buff *
-+ax88179a_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
-+{
-+	u64 tx_desc = skb->len & AX179A_TX_DESC_LEN_MASK;
-+	int frame_size = dev->maxpacket;
-+	struct sk_buff *ax_skb;
-+	u64 *tx_desc_ptr;
-+	int padding_size;
-+	int headroom;
-+	int tailroom;
-+	u16 tci = 0;
-+
-+	/* TSO MSS */
-+	tx_desc |= ((u64)(skb_shinfo(skb)->gso_size & AX179A_TX_DESC_MSS_MASK)) <<
-+		   AX179A_TX_DESC_MSS_SHIFT;
-+
-+	headroom = (skb->len + sizeof(tx_desc)) % 8;
-+	padding_size = headroom ? 8 - headroom : 0;
-+
-+	if (((skb->len + sizeof(tx_desc) + padding_size) % frame_size) == 0) {
-+		padding_size += 8;
-+		tx_desc |= AX179A_TX_DESC_DROP_PADD;
-+	}
-+
-+	if ((dev->net->features & NETIF_F_HW_VLAN_CTAG_TX) && (vlan_get_tag(skb, &tci) >= 0)) {
-+		tx_desc |= AX179A_TX_DESC_VLAN;
-+		tx_desc |= ((u64)tci & AX179A_TX_DESC_VLAN_MASK) << AX179A_TX_DESC_VLAN_SHIFT;
-+	}
-+
-+	if (!dev->can_dma_sg && (dev->net->features & NETIF_F_SG) && skb_linearize(skb))
-+		return NULL;
-+
-+	headroom = skb_headroom(skb);
-+	tailroom = skb_tailroom(skb);
-+
-+	if (!(headroom >= sizeof(tx_desc) && tailroom >= padding_size)) {
-+		ax_skb = skb_copy_expand(skb, sizeof(tx_desc), padding_size, flags);
-+		dev_kfree_skb_any(skb);
-+		skb = ax_skb;
-+		if (!skb)
-+			return NULL;
-+	}
-+	if (padding_size != 0)
-+		skb_put_zero(skb, padding_size);
-+	/* Copy TX header */
-+	tx_desc_ptr = skb_push(skb, sizeof(tx_desc));
-+	*tx_desc_ptr = cpu_to_le64(tx_desc);
-+
-+	usbnet_set_skb_tx_stats(skb, 1, 0);
-+
-+	return skb;
-+}
-+
- static int ax88179_link_reset(struct usbnet *dev)
- {
- 	struct ax88179_data *ax179_data = dev->driver_priv;
-@@ -1580,72 +2106,343 @@ static int ax88179_link_reset(struct usbnet *dev)
- 	return 0;
- }
- 
-+static void ax88179a_bulkin_config(struct usbnet *dev, u8 link_sts)
-+{
-+	struct ax88179_data *ax179_data = dev->driver_priv;
-+	const struct ax_bulkin_settings *bulkin_data;
-+	int index = 0;
-+
-+	switch (ax179_data->speed) {
-+	case ETHER_LINK_2500:	/* AX88279 only */
-+		index = 0;
-+		break;
-+
-+	case ETHER_LINK_1000:	/* AX88279 & AX88178A */
-+		if (ax179_data->chip_version == AX_VERSION_AX88279) {
-+			if (link_sts & AX_USB_SS)
-+				index = 1;
-+			else if (link_sts & AX_USB_HS)
-+				index = 2;
-+		} else {
-+			if (link_sts & AX_USB_SS)
-+				index = 0;
-+			else if (link_sts & AX_USB_HS)
-+				index = 1;
-+		}
-+		break;
-+
-+	case ETHER_LINK_100:
-+		if (ax179_data->chip_version == AX_VERSION_AX88279) {
-+			if (link_sts & AX_USB_SS)
-+				index = 3;
-+			else if (link_sts & AX_USB_HS)
-+				index = 5;
-+			if (!ax179_data->full_duplex)
-+				index++;
-+		} else {
-+			/* AX88279A & AX88277D */
-+			if (link_sts & AX_USB_SS)
-+				index = 2;
-+			else if (link_sts & AX_USB_HS)
-+				index = 4;
-+			if (!ax179_data->full_duplex)
-+				index++;
-+		}
-+		break;
-+
-+	case ETHER_LINK_10:
-+		if (ax179_data->chip_version == AX_VERSION_AX88279)
-+			index = 7;
-+		else
-+			index = 6;
-+		break;
-+
-+	default:	/* No link */
-+		index = 0;
-+	}
-+
-+	if (ax179_data->chip_version == AX_VERSION_AX88279 && (link_sts & AX_USB_FS))
-+		index = 7;
-+
-+	if (ax179_data->chip_version == AX_VERSION_AX88279) {
-+		bulkin_data = AX88279_BULKIN_SIZE;
-+	} else {
-+		if (ax179_data->is_ax88772d)
-+			bulkin_data = AX88772D_BULKIN_SIZE;
-+		else
-+			bulkin_data = AX88179A_BULKIN_SIZE;
-+	}
-+
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_BULKIN_QCTRL, 5, 5, &bulkin_data[index]);
-+}
-+
-+static int ax88179a_link_reset(struct usbnet *dev)
-+{
-+	struct ax88179_data *ax179_data = dev->driver_priv;
-+	u8 tmp8, link_sts, reg8[3];
-+	u16 tmp16, mode, speed;
-+
-+	if (!ax179_data->link) {
-+		netdev_info(dev->net, "ax88179a - Link status is: 0\n");
-+		return 0;
-+	}
-+
-+	/* Stop RX/TX for link configuration */
-+	tmp16 = AX_RX_CTL_STOP;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &tmp16);
-+	tmp8 = 0;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_PATH, 1, 1, &tmp8);
-+
-+	tmp8 = 0xa5;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_CDC_DELAY_TX, 1, 1, &tmp8);
-+
-+	tmp16 = 0x0410;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_LOW, 2, 2, &tmp16);
-+
-+	tmp8 = 0;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_ETH_TX_GAP, 1, 1, &tmp8);
-+
-+	tmp8 = 0x07;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_EP5_EHR, 1, 1, &tmp8);
-+
-+	tmp8 = 0x28 | AX_NEW_PAUSE_EN;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_NEW_PAUSE_CTRL, 1, 1, &tmp8);
-+
-+	mode = AX_MEDIUM_RECEIVE_EN | AX_MEDIUM_TXFLOW_CTRLEN | AX_MEDIUM_RXFLOW_CTRLEN;
-+
-+	/* Link is up, but some older AX88179A FW versions do not send link speed
-+	 * and duplex status in interrupt URB, so read it via MII
-+	 */
-+	if (!ax179_data->speed) {
-+		struct ethtool_link_ksettings cmd;
-+
-+		mii_ethtool_get_link_ksettings(&dev->mii, &cmd);
-+		ax179_data->full_duplex = cmd.base.duplex;
-+		switch (cmd.base.speed) {
-+		case SPEED_1000:
-+			ax179_data->speed = ETHER_LINK_1000;
-+			break;
-+		case SPEED_100:
-+			ax179_data->speed = ETHER_LINK_100;
-+			break;
-+		case SPEED_10:
-+		default:
-+			ax179_data->speed = ETHER_LINK_10;
-+			break;
-+		};
-+	}
-+
-+	speed = 0;
-+	switch (ax179_data->speed) {
-+	case ETHER_LINK_2500:
-+		reg8[0] = 0x00;
-+		reg8[1] = 0xF8;
-+		reg8[2] = 0x07;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_TX_PAUSE, 3, 3, reg8);
-+
-+		reg8[0] = 0x78;
-+		reg8[1] = (AX_LSOFC_WCNT_7_ACCESS << 5);
-+		reg8[2] = 0;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_RX_STATUS_CDC, 3, 3, reg8);
-+
-+		reg8[0] = 0x40;
-+		reg8[1] = AX_MAC_MIQFFCTRL_FORMAT | AX_MAC_MIQFFCTRL_DROP_CRC | AX_MAC_LSO_ERR_EN;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_RX_DATA_CDC_CNT, 2, 2, reg8);
-+
-+		tmp8 = AX_XGMII_EN;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_BFM_DATA, 1, 1, &tmp8);
-+
-+		tmp8 = 0x1C | AX_LSO_ENHANCE_EN;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_LSO_ENHANCE_CTRL, 1, 1, &tmp8);
-+
-+		mode |= AX_MEDIUM_GIGAMODE | AX_MEDIUM_FULL_DUPLEX;
-+
-+		speed = 2500;
-+		break;
-+
-+	case ETHER_LINK_1000:
-+		mode |= AX_MEDIUM_GIGAMODE;
-+		speed = 1000;
-+		fallthrough;
-+
-+	case ETHER_LINK_100:
-+		reg8[0] = 0x78;
-+		reg8[1] = (AX_LSOFC_WCNT_7_ACCESS << 5) | AX_GMII_CRC_APPEND;
-+		reg8[2] = 0;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_RX_STATUS_CDC, 3, 3, reg8);
-+
-+		tmp8 = 0x40;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_RX_DATA_CDC_CNT, 1, 1, &tmp8);
-+
-+		speed = speed ? speed : 100;
-+		break;
-+
-+	case ETHER_LINK_10:
-+		reg8[0] = 0xFA;
-+		reg8[1] = (AX_LSOFC_WCNT_7_ACCESS << 5) | AX_GMII_CRC_APPEND;
-+		reg8[2] = 0xFF;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_RX_STATUS_CDC, 3, 3, reg8);
-+
-+		tmp8 = 0xFA;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_RX_DATA_CDC_CNT, 1, 1, &tmp8);
-+
-+		speed = 10;
-+		break;
-+	}
-+
-+	ax88179_read_cmd(dev, AX_ACCESS_MAC, PHYSICAL_LINK_STATUS, 1, 1, &link_sts);
-+	ax88179a_bulkin_config(dev, link_sts);
-+
-+	if (ax179_data->chip_version < AX_VERSION_AX88279) {
-+		tmp8 = 0;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_BFM_DATA, 1, 1, &tmp8);
-+	}
-+
-+	if (ax179_data->full_duplex)
-+		mode |= AX_MEDIUM_FULL_DUPLEX;
-+
-+	if (dev->net->mtu > 1500)
-+		mode |= AX_MEDIUM_JUMBO_EN;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE, 2, 2, &mode);
-+
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &ax179_data->rxctl);
-+
-+	tmp8 = AX_MAC_RX_PATH_READY | AX_MAC_TX_PATH_READY;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_PATH, 1, 1, &tmp8);
-+
-+	ax179_data->eee_enabled = ax88179_chk_eee(dev);
-+
-+	netif_carrier_on(dev->net);
-+
-+	netdev_info(dev->net, "ax88179a - Link status is: 1, Link speed: %d, Duplex: %d\n",
-+		    speed, ax179_data->full_duplex);
-+
-+	return 0;
-+}
-+
- static int ax88179_reset(struct usbnet *dev)
- {
--	u8 buf[5];
--	u16 *tmp16;
--	u8 *tmp;
- 	struct ax88179_data *ax179_data = dev->driver_priv;
- 	struct ethtool_keee eee_data;
-+	u16 *tmp16;
-+	u8 buf[5];
-+	u8 *tmp;
- 
- 	tmp16 = (u16 *)buf;
- 	tmp = (u8 *)buf;
- 
- 	/* Power up ethernet PHY */
--	*tmp16 = 0;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, tmp16);
-+	if (ax179_data->chip_version < AX_VERSION_AX88179A) {
-+		*tmp16 = 0;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, tmp16);
- 
--	*tmp16 = AX_PHYPWR_RSTCTL_IPRL;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, tmp16);
--	msleep(500);
-+		*tmp16 = AX_PHYPWR_RSTCTL_IPRL;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, tmp16);
-+		msleep(500);
- 
--	*tmp = AX_CLK_SELECT_ACS | AX_CLK_SELECT_BCS;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_CLK_SELECT, 1, 1, tmp);
--	msleep(200);
-+		*tmp = AX_CLK_SELECT_ACS | AX_CLK_SELECT_BCS;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_CLK_SELECT, 1, 1, tmp);
-+		msleep(200);
-+	} else {
-+		*tmp = AX_PHY_POWER;
-+		ax88179_write_cmd(dev, AX88179A_PHY_POWER, 0, 0, 1, tmp);
-+		msleep(250);
-+	}
-+
-+	if (ax179_data->chip_version == AX_VERSION_AX88279) {
-+		*tmp16 = ax88179_mdio_read(dev->net, dev->mii.phy_id, MII_ADVERTISE);
-+		*tmp16 &= ~(ADVERTISE_10FULL | ADVERTISE_10HALF);
-+		*tmp16 |= ADVERTISE_RESV; /* Advertise 2.5GBit link */
-+		ax88179_mdio_write(dev->net, dev->mii.phy_id, MII_ADVERTISE, *tmp16);
-+	}
- 
- 	/* Ethernet PHY Auto Detach*/
- 	ax88179_auto_detach(dev);
- 
-+	if (ax179_data->chip_version >= AX_VERSION_AX88179A) {
-+		*tmp = AX_MAC_EFF_EN;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_BULK_OUT_CTRL, 1, 1, tmp);
-+
-+		*tmp16 = 0;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, tmp16);
-+
-+		*tmp = 0x04;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_LOW, 1, 1, tmp);
-+		*tmp = 0x10;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_HIGH, 1, 1, tmp);
-+
-+		*tmp = 0;
-+		if (dev->net->features & NETIF_F_HW_VLAN_CTAG_FILTER)
-+			*tmp |= AX_VLAN_CONTROL_VFE;
-+		if (dev->net->features & NETIF_F_HW_VLAN_CTAG_RX)
-+			*tmp |= AX_VLAN_CONTROL_VSO;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_VLAN_ID_CONTROL, 1, 1, tmp);
-+
-+		*tmp = 0xff;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_BM_INT_MASK, 1, 1, tmp);
-+
-+		*tmp = 0;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_BM_RX_DMA_CTL, 1, 1, tmp);
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_BM_TX_DMA_CTL, 1, 1, tmp);
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_ARC_CTRL, 1, 1, tmp);
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_SWP_CTRL, 1, 1, tmp);
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX88179A_MAC_TX_HDR_CKSUM, 1, 1, tmp);
-+	}
-+
- 	/* Read MAC address from DTB or asix chip */
- 	ax88179_get_mac_addr(dev);
- 	memcpy(dev->net->perm_addr, dev->net->dev_addr, ETH_ALEN);
- 
- 	/* RX bulk configuration */
--	memcpy(tmp, &AX88179_BULKIN_SIZE[0], 5);
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_BULKIN_QCTRL, 5, 5, tmp);
+-	tmp16 = GMII_PHY_PGSEL_PAGE3;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  GMII_PHY_PAGE_SELECT, 2, &tmp16);
 -
--	dev->rx_urb_size = 1024 * 20;
+-	tmp16 = 0x3247;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  MII_PHYADDR, 2, &tmp16);
 -
--	*tmp = 0x34;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_HIGH, 1, 1, tmp);
+-	tmp16 = GMII_PHY_PGSEL_PAGE5;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  GMII_PHY_PAGE_SELECT, 2, &tmp16);
 -
--	*tmp = 0x52;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_LOW, 1, 1, tmp);
-+	if (ax179_data->chip_version < AX_VERSION_AX88179A) {
-+		memcpy(tmp, &AX88179_BULKIN_SIZE[0], 5);
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_BULKIN_QCTRL, 5, 5, tmp);
-+		*tmp = 0x34;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_LOW, 1, 1, tmp);
+-	tmp16 = 0x0680;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  MII_BMSR, 2, &tmp16);
++	if (priv->chip_version < AX_VERSION_AX88179A) {
++		tmp16 = GMII_PHY_PGSEL_PAGE3;
++		ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
++				  GMII_PHY_PAGE_SELECT, 2, &tmp16);
 +
-+		*tmp = 0x52;
-+		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PAUSE_WATERLVL_HIGH,
-+				  1, 1, tmp);
-+		dev->rx_urb_size = 1024 * 20;
++		tmp16 = enable ? 0x3247 : 0x3246;
++		ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
++				  MII_PHYADDR, 2, &tmp16);
++		if (enable) {
++			tmp16 = GMII_PHY_PGSEL_PAGE5;
++			ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
++					  GMII_PHY_PAGE_SELECT, 2, &tmp16);
++
++			tmp16 = 0x0680;
++			ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
++					  MII_BMSR, 2, &tmp16);
++		}
+ 
+-	tmp16 = GMII_PHY_PGSEL_PAGE0;
+-	ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
+-			  GMII_PHY_PAGE_SELECT, 2, &tmp16);
++		tmp16 = GMII_PHY_PGSEL_PAGE0;
++		ax88179_write_cmd(dev, AX_ACCESS_PHY, AX88179_PHY_ID,
++				  GMII_PHY_PAGE_SELECT, 2, &tmp16);
 +	} else {
-+		/* The Bulk-Register configuration for the AX88179A is done in
-+		 * ax88179a_link_reset(), once the link is up for a given link and USB-speed.
-+		 */
-+		if (ax179_data->is_ax88772d)
-+			dev->rx_urb_size = 1024 * 24;
-+		else
-+			dev->rx_urb_size = 1024 * 48;
++		ax88179_write_cmd(dev, AX_GPHY_CTL, AX_GPHY_EEE_CTRL, enable, 0, NULL);
 +	}
+ }
  
- 	/* Enable checksum offload */
- 	*tmp = AX_RXCOE_IP | AX_RXCOE_TCP | AX_RXCOE_UDP |
- 	       AX_RXCOE_TCPV6 | AX_RXCOE_UDPV6;
- 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RXCOE_CTL, 1, 1, tmp);
-+	ax179_data->rx_checksum = 1;
- 
- 	*tmp = AX_TXCOE_IP | AX_TXCOE_TCP | AX_TXCOE_UDP |
- 	       AX_TXCOE_TCPV6 | AX_TXCOE_UDPV6;
- 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_TXCOE_CTL, 1, 1, tmp);
- 
- 	/* Configure RX control register => start operation */
--	*tmp16 = AX_RX_CTL_DROPCRCERR | AX_RX_CTL_IPE | AX_RX_CTL_START |
--		 AX_RX_CTL_AP | AX_RX_CTL_AMALL | AX_RX_CTL_AB;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, tmp16);
--
--	*tmp = AX_MONITOR_MODE_PMETYPE | AX_MONITOR_MODE_PMEPOL |
--	       AX_MONITOR_MODE_RWMP;
-+	ax179_data->rxctl = AX_RX_CTL_DROPCRCERR | AX_RX_CTL_START |
-+			    AX_RX_CTL_AP | AX_RX_CTL_AMALL | AX_RX_CTL_AB;
-+	if (ax179_data->ip_align)
-+		ax179_data->rxctl |= AX_RX_CTL_IPE;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &ax179_data->rxctl);
+ static int ax88179_get_eee(struct net_device *net, struct ethtool_keee *edata)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+-	struct ax88179_data *priv = dev->driver_priv;
++	struct ax88179_data *priv;
 +
-+	if (ax179_data->chip_version < AX_VERSION_AX88179A)
-+		*tmp = AX_MONITOR_MODE_PMETYPE | AX_MONITOR_MODE_PMEPOL | AX_MONITOR_MODE_RWMP;
-+	else
-+		*tmp = AX_MONITOR_MODE_RWMP;
- 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MONITOR_MOD, 1, 1, tmp);
++	priv = dev->driver_priv;
  
- 	/* Configure default medium type => giga */
- 	*tmp16 = AX_MEDIUM_RECEIVE_EN | AX_MEDIUM_TXFLOW_CTRLEN |
--		 AX_MEDIUM_RXFLOW_CTRLEN | AX_MEDIUM_FULL_DUPLEX |
--		 AX_MEDIUM_GIGAMODE;
--	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
--			  2, 2, tmp16);
-+		 AX_MEDIUM_RXFLOW_CTRLEN | AX_MEDIUM_FULL_DUPLEX;
-+	if (!ax179_data->is_ax88772d)
-+		*tmp16 |= AX_MEDIUM_GIGAMODE;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE, 2, 2, tmp16);
+ 	edata->eee_enabled = priv->eee_enabled;
+ 	edata->eee_active = priv->eee_active;
+@@ -1024,18 +1085,20 @@ static int ax88179_get_eee(struct net_device *net, struct ethtool_keee *edata)
+ static int ax88179_set_eee(struct net_device *net, struct ethtool_keee *edata)
+ {
+ 	struct usbnet *dev = netdev_priv(net);
+-	struct ax88179_data *priv = dev->driver_priv;
++	struct ax88179_data *priv;
+ 	int ret;
  
- 	/* Check if WoL is supported */
- 	ax179_data->wol_supported = 0;
-@@ -1653,7 +2450,11 @@ static int ax88179_reset(struct usbnet *dev)
- 			     1, 1, &tmp) > 0)
- 		ax179_data->wol_supported = WAKE_MAGIC | WAKE_PHY;
++	priv = dev->driver_priv;
++
+ 	priv->eee_enabled = edata->eee_enabled;
+ 	if (!priv->eee_enabled) {
+-		ax88179_disable_eee(dev);
++		ax88179_eee_config(dev, false);
+ 	} else {
+ 		priv->eee_enabled = ax88179_chk_eee(dev);
+ 		if (!priv->eee_enabled)
+ 			return -EOPNOTSUPP;
  
--	ax88179_led_setting(dev);
-+	/* For chips starting with AX88179A, LEDS are configured by the adapter
-+	 * firmware directly from EEPROM/EFUSE values
-+	 */
-+	if (ax179_data->chip_version < AX_VERSION_AX88179A)
-+		ax88179_led_setting(dev);
+-		ax88179_enable_eee(dev);
++		ax88179_eee_config(dev, true);
+ 	}
  
+ 	ret = ax88179_ethtool_set_eee(dev, edata);
+@@ -2459,11 +2522,20 @@ static int ax88179_reset(struct usbnet *dev)
  	ax179_data->eee_enabled = 0;
  	ax179_data->eee_active = 0;
-@@ -1706,6 +2507,24 @@ static int ax88179_stop(struct usbnet *dev)
- 	return 0;
- }
  
-+static int ax88179a_stop(struct usbnet *dev)
-+{
-+	u16 reg16;
-+	u8 reg8;
-+
-+	ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE, 2, 2, &reg16);
-+	reg16 &= ~AX_MEDIUM_RECEIVE_EN;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE, 2, 2, &reg16);
-+
-+	reg16 = 0;
-+	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &reg16);
-+
-+	reg8 = 0;
-+	ax88179_read_cmd(dev, AX88179A_PHY_POWER, 0, 0, 1, &reg8);
-+
-+	return 0;
-+}
-+
- static const struct driver_info ax88179_info = {
- 	.description = "ASIX AX88179 USB 3.0 Gigabit Ethernet",
- 	.bind = ax88179_bind,
-@@ -1732,6 +2551,45 @@ static const struct driver_info ax88178a_info = {
- 	.tx_fixup = ax88179_tx_fixup,
- };
+-	ax88179_disable_eee(dev);
++	if (ax179_data->chip_version < AX_VERSION_AX88179A) {
++		ax88179_eee_config(dev, false);
  
-+static const struct driver_info ax88179a_info = {
-+	.description = "ASIX AX88179A USB 3.2 Gigabit Ethernet",
-+	.bind = ax88179a_bind,
-+	.unbind = ax88179a_unbind,
-+	.status = ax88179_status,
-+	.link_reset = ax88179a_link_reset,
-+	.reset = ax88179_reset,
-+	.stop = ax88179a_stop,
-+	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET | FLAG_AVOID_UNLINK_URBS,
-+	.rx_fixup = ax88179a_rx_fixup,
-+	.tx_fixup = ax88179a_tx_fixup,
-+};
-+
-+static const struct driver_info ax88772d_info = {
-+	.description = "ASIX AX88772D/E USB 2.0 Fast Ethernet",
-+	.bind = ax88179a_bind,
-+	.unbind = ax88179a_unbind,
-+	.status = ax88179_status,
-+	.link_reset = ax88179a_link_reset,
-+	.reset = ax88179_reset,
-+	.stop = ax88179a_stop,
-+	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET | FLAG_AVOID_UNLINK_URBS,
-+	.rx_fixup = ax88179a_rx_fixup,
-+	.tx_fixup = ax88179a_tx_fixup,
-+};
-+
-+static const struct driver_info ax88279_info = {
-+	.description = "ASIX AX88279 USB 3.2 2.5Gigabit Ethernet",
-+	.bind = ax88179a_bind,
-+	.unbind = ax88179a_unbind,
-+	.status = ax88179_status,
-+	.link_reset = ax88179a_link_reset,
-+	.reset = ax88179_reset,
-+	.stop = ax88179a_stop,
-+	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET | FLAG_AVOID_UNLINK_URBS,
-+	.rx_fixup = ax88179a_rx_fixup,
-+	.tx_fixup = ax88179a_tx_fixup,
-+};
-+
- static const struct driver_info cypress_GX3_info = {
- 	.description = "Cypress GX3 SuperSpeed to Gigabit Ethernet Controller",
- 	.bind = ax88179_bind,
-@@ -1877,6 +2735,18 @@ static const struct driver_info at_umc2000sp_info = {
+-	ax88179_ethtool_get_eee(dev, &eee_data);
+-	linkmode_zero(eee_data.advertised);
+-	ax88179_ethtool_set_eee(dev, &eee_data);
++		ax88179_ethtool_get_eee(dev, &eee_data);
++		linkmode_zero(eee_data.advertised);
++		ax88179_ethtool_set_eee(dev, &eee_data);
++	} else {
++		ax88179_eee_config(dev, true);
++		ax88179_ethtool_get_eee(dev, &eee_data);
++		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, eee_data.advertised);
++		if (ax179_data->chip_version >= AX_VERSION_AX88279)
++			linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, eee_data.advertised);
++		ax88179_ethtool_set_eee(dev, &eee_data);
++	}
  
- static const struct usb_device_id products[] = {
- {
-+	/* ASIX AX88179A/B USB 3.2 Gigabit Ethernet */
-+	USB_DEVICE_VER(0x0b95, 0x1790, 0x0200, 0x0200),
-+	.driver_info = (unsigned long)&ax88179a_info,
-+}, {
-+	/* ASIX AX88772D USB 2.0 100Mbit Ethernet */
-+	USB_DEVICE_VER(0x0b95, 0x1790, 0x0300, 0x0300),
-+	.driver_info = (unsigned long)&ax88772d_info,
-+}, {
-+	/* ASIX AX88279 USB 3.2 2.5GBit Ethernet */
-+	USB_DEVICE_VER(0x0b95, 0x1790, 0x0400, 0x0400),
-+	.driver_info = (unsigned long)&ax88279_info,
-+}, {
- 	/* ASIX AX88179 10/100/1000 */
- 	USB_DEVICE_AND_INTERFACE_INFO(0x0b95, 0x1790, 0xff, 0xff, 0),
- 	.driver_info = (unsigned long)&ax88179_info,
+ 	/* Restart autoneg */
+ 	mii_nway_restart(&dev->mii);
 
 -- 
 2.47.3
