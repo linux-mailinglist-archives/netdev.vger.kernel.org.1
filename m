@@ -1,231 +1,231 @@
-Return-Path: <netdev+bounces-303800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tleMBEVkRWov/QoAu9opvQ
-	(envelope-from <netdev+bounces-303800-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:02:29 +0200
+	id UbBZLbRnRWrG/QoAu9opvQ
+	(envelope-from <netdev+bounces-303801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:17:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DF56F0C35
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:02:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 219806F0C8D
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:17:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=P4U57qCY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303800-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303800-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303801-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303801-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C39C130312BB
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 19:02:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 05A63300DA6B
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 19:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1ED3385BC;
-	Wed,  1 Jul 2026 19:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F8238E8CE;
+	Wed,  1 Jul 2026 19:17:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011025.outbound.protection.outlook.com [40.107.208.25])
+Received: from bregans-0.gladserv.net (bregans-0.gladserv.net [185.128.210.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B8B2417D1;
-	Wed,  1 Jul 2026 19:02:22 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782932544; cv=fail; b=sgmnu0audiIxQtyc3kdjWgyhmGa5bvSmH4YBXkEzBQx45VaTdwI948SVupdmt1s/VbQGykFRL6WT8ZHlkoLirWqXCQpyj2p3uwP46pvh40d2aRQN2iRxVYcA8ScutGgx/YwIoBRQ3rdTZ3E4HRMOVnrhyv5uNbHSfJXeBroYzpo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782932544; c=relaxed/simple;
-	bh=bkNovMIFo7ggMxK15D7bVmI+V+a+eX3n1WadFs6dy5s=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dbH9FhxLBgPpuqWLeCFzmnR43yB0p4jVYRESEAlInu8QlQvShcZURCE+whtmEQjtVjX93MqOoh0Yam+pTYgiI0E950B44WVjs+O8gc9BjuRnVq/nn4oPB3JfoVZUGQLURGnTgYkZr0UznIqtXaU4qOixFTxCrDpiJ+YccK9nfYE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=P4U57qCY; arc=fail smtp.client-ip=40.107.208.25
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uf2y8twOQvZCDyOGbbjSLuRphLwFpRMnIV5EMMgxSmXd9tC9JX118V5UumCUuuU8BsYrbdz3eaw3qZURwyrpchl3D5QDGfnEIw3lWVbxV64Vqln1PdM1QQ6gzxv3yh9tVNDVAd/oyJWT1X/wj5fWUdtRS1zyr0TpmaorqiE+Tgjmjy5yA2M9W1gvgWD9s1K5ha4HA/ysm/1M2XCm7Yu1ETzrsvvKdU7XLkjbORD9K0VNS+elHSGwy79wgYXUUb/RVOz2qLKMyS8Lm66N+7yRg68PkZ9NG4quOocCoFB8bDynAt9CYUWpAPJFSKD21wRZjZzj51I3p2S0i8tyU0SlBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1KMgbkc71Q6M+bmdfUHJjGIFuUoC5xO0riVDhaO9Wmg=;
- b=GUg7UtMdt8FmhC3vVH7gW09n4zKQSQfTVgo/5g+tAKysy3eJMN/9k+XHmrmjrRxgm7XT2WmrPzrVcpefGX4BJzNazjsj+IMI/q2BcbJGQJm5Ckrw4cqA+ECIOShpCjR56DHgo90TNQB9SGBPiJykOUNaTddaf8JRe5eMHCjBpaAX1fZG8qWtT+TMUbYFdphzPGhaiBAwyWDQnJaEWSxtw8pXns6zv6TkWlyDvb59Heqc1UzPHCXUqzJ9YM9iV7N1kaFfk1SjzoLYAGOuoY7kdRODjsWHeDxrQP32X2UzRXg/0sUZpH20ph3YO73tuGUg1FmZyk5pXRjZAekqwHb3JQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1KMgbkc71Q6M+bmdfUHJjGIFuUoC5xO0riVDhaO9Wmg=;
- b=P4U57qCYPapIf1/NefTEdHffb5/n2H8yJOMyYJNebbB+pQmtPeP1EVDyeyjLQN4EAeDbcZ2JrTieq38oUtyFktbUJChriB1PJ+fMgPcJHvBm4VAmwLpu760Lou49AzmM9Wngc1lZ0ot4xJlkNoM2A9xD1UI7ylgi7IbA6VATXdYKZgwB29ut7pW0UpHeXfezb9m+YGBZy7RC9BuUVshZ+XfBPwGNvp0OUvfEalG4XTINxlVc6eYFbzKNZ/QyTVpIl3QV11Oczz+G3qZoALRK1igO7IDUMz8jhdQ+U8G9Pwq89KdfxPJZViGQ1xJ4d7k4Lv5OVJmRxh7zUrN8op/Ueg==
-Received: from MW6PR12MB7086.namprd12.prod.outlook.com (2603:10b6:303:238::20)
- by SAWPR12MB999115.namprd12.prod.outlook.com (2603:10b6:806:4e3::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 1 Jul 2026
- 19:02:19 +0000
-Received: from MW6PR12MB7086.namprd12.prod.outlook.com
- ([fe80::4eb8:7fcb:fe8d:e95e]) by MW6PR12MB7086.namprd12.prod.outlook.com
- ([fe80::4eb8:7fcb:fe8d:e95e%6]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
- 19:02:19 +0000
-Message-ID: <dc2b9fc8-9f5c-4767-916b-a27665c8647b@nvidia.com>
-Date: Wed, 1 Jul 2026 22:02:13 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: HWS, fix matcher leak on resize target
- setup failure
-To: Paolo Abeni <pabeni@redhat.com>, saeedm@nvidia.com, tariqt@nvidia.com,
- mbloch@nvidia.com, leon@kernel.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, kliteyn@nvidia.com, vdogaru@nvidia.com, horms@kernel.org,
- kees@kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- jianhao.xu@seu.edu.cn, zilin@seu.edu.cn, Dawei Feng <dawei.feng@seu.edu.cn>
-References: <20260629064049.3852759-1-dawei.feng@seu.edu.cn>
- <8138f145-6a4d-465e-a45c-b8ffbf9e05bc@redhat.com>
-Content-Language: en-US
-From: Tariq Toukan <tariqt@nvidia.com>
-In-Reply-To: <8138f145-6a4d-465e-a45c-b8ffbf9e05bc@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0200.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e5::9) To MW6PR12MB7086.namprd12.prod.outlook.com
- (2603:10b6:303:238::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC4739BFFC;
+	Wed,  1 Jul 2026 19:17:02 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782933425; cv=none; b=SQ2UOsnGowS2XGi6G3ZWhRCE4IqrIXdOu4+KvdQesypaOYh/mxdzSohfMj0XgW5jjXja3zuAOP0T80HxFsG+HLj5gjKXQkBaglcJa8w2VBH4+B6oxt/RY7Hqx5gIsZfvtwdBnAMOA/rYYywPCIRYQM5oJq/yYnkFuGB0xd9/fKA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782933425; c=relaxed/simple;
+	bh=wqaB8Da37laHFc58cKhsEgK0j08j5cjtH5A4EJaj4bw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=gO/1lKCIxZU7cX3oIM8mI9ww31ushOs2aMO5bpWh64KCn6Q2BHSAemkiGuqEjKZGw7ureMbHkLNelDDRiUvvw43hFldtG04ZPC75fqYYZ0bsScTvXEdT+8Hl7wuqa+jY+lhi9upxjffWd/2OjB/TiPXV2VxLezZnyv90UNBOK8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.210.58
+Date: Wed, 1 Jul 2026 21:16:48 +0200
+From: Brett Sheffield <bacs@librecast.net>
+To: regressions@lists.linux.dev, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Simon Schippers <simon.schippers@tu-dortmund.de>,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [REGRESSION][BISECTED] tun/tap & vhost-net: multi-threaded network
+ performance
+Message-ID: <akVnoOYQOrt8k-Gu@karahi.librecast.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB7086:EE_|SAWPR12MB999115:EE_
-X-MS-Office365-Filtering-Correlation-Id: beaea064-f1a8-49eb-c20f-08ded7a34605
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|1800799024|376014|23010399003|5023799004|4143699003|11063799006|22082099003|18002099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	8Yn5JoRgY+u/I0e8uYAmtIiLMhT6JaPhmvLWLXEo2qewfwvLQPSRwgFGLt+2LOZcIvHV99GX6+H4lQ3Cl4LW5sDLMAFs9SxWIVixB/nQKmGoG4uHEmO+nnuZJJoznxefXxLlOOL2x+vfB+iZcJPHBHfErVx18prBhqf00nIiaJwZ/lV04pLbZ0CA+yOWoV16KOkRAZdPyXgNhPTjJZ2xDAi4SIx7Lr6TlKyGDaLxeM+xTX1datZ+UME+fQLFY/d+hNy1Zk30ViuMJckiv0Xw5t9vjztd0tp/qd1md2CroPA0a4t4yvIatpZZgz06uD17Tp5Xe7nttmkGmDD0QxcF7A+be9OqE/cCoMY2PMbtQqUEqDL41RSu4Sksz7OEIjL1m7o8oopFyddAKvQgcfv9itmQl9CA/o8qW66xNM0V6knYswrsX33SxqQjUlHiD9ZZbcmE6sVFYI9FnbGwvzq2CCxWnBiscYmW3BPIbAdWAk+u7NE0GnTuOMuw2YdvLM4ppf7Ik9/eKuzBGYyTe1nmOZhD31h2mgb4NAvBmV6ByNYdlq7iMfySvr7GFl9er24UwlOaO2cx++e3oe/vxbE/DrwxlR4Uio59Nib2CqiVpp/rVaW6DItj4FyWT1lrGYdNlZgQbvx/TsX95yCnaCnCurnkXmqSy9ifzlWFqAXigHk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB7086.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(23010399003)(5023799004)(4143699003)(11063799006)(22082099003)(18002099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cld5MlFBajZMY09mY3VpYVc0Z3hrL1ZLSDR1MU9OVVJRUUZNaW1ubVlGVFFN?=
- =?utf-8?B?b24rRjRVL0dBQWo2TFZxWlBnWWl5akxWNk92UjZ0N0hzMGxpSCtHam5LVnVN?=
- =?utf-8?B?bkNCSHhhMG91ZnRJWmxLNVZWVGlYUFNMT012V3pUSmlXNGpBYTZSVWZoNXFR?=
- =?utf-8?B?MURtYjlXSEtFcFFXV2RBcVgySzZQWHNBbFRxUE1Nb0RYbldhN2M5cGh6UUlZ?=
- =?utf-8?B?S1JZdHQ0bHN2UThMZDJIdG44UG9MUUhnRDNIbEtsbHJUNWREWU90ejZHRGk1?=
- =?utf-8?B?djFjK1lsZzcxSklwN2wraTdZUkowOHpNSHQ1MFpsMzAxMXQ5aDdBWTExaEVr?=
- =?utf-8?B?S1haWndWeS9sV2MzK3NBdmhrRU9wRVZ1bGxIOHZ0dTFFa0haSXhrNUdVVGlG?=
- =?utf-8?B?aitleWp4UFBmdUFyak5GV3pQRWJMMm9OcnBtMmpuN0VNR2pjS0QzUkV4S21D?=
- =?utf-8?B?V0pmQWdyM1RpTTZPVm00Qzk4TGJERjhGYTZuQWhSOEZUejJ6UUQwd0l4eGxz?=
- =?utf-8?B?UVBET1lYL2syeVhGOFl3dS9CNnR5NnAxQWFWaWZIYVdIbzg3VnY3eDFXZ091?=
- =?utf-8?B?bHFva2M5ZU5zVHp4MFdweklNTGVlemJTTVAySkdyMnpVeEZIOW1HZnhub3FL?=
- =?utf-8?B?MmhET25CQ05aakRKSDZjRFNSSGgwcll0RGJLMWhJU0hYRTlhd281YlFIc3Nw?=
- =?utf-8?B?cm9lZVVteEY0WlNJMWVHYWNuOTBpczFPZlNSRFhTWlFxNTMwQ2JUT1FNQkhi?=
- =?utf-8?B?cnRMOVMwRlFHMmFWdHczM1VDdVpGdFRHZVJqVDloTWJZTldlZk8yMFpzL2tY?=
- =?utf-8?B?OEVrZFZlQ3EyMzRtak5UWmk0d1VzM0ZtbUVoVEJiaEJsSFNIUzloQUZDYUd1?=
- =?utf-8?B?RFM2eEZjTHNidHhQUE0yWDNoQlFoeitCaE9IUTBIdzcwaG9KZHhPZmZYTU5k?=
- =?utf-8?B?cDV6VXBqRnJrdUpubTlJZGR2UzA5WTdTS2pvdC8vdDNpVkcxTjB6ZkVkUFN0?=
- =?utf-8?B?TmN5Yndnc0RUVUtndlMzV3pubnVHOFFyQmlIQ0tZY1RYZC8weEcvUG1BZzYy?=
- =?utf-8?B?dzBoWmNDNjdsaVVYVUFmR0Nha2k5QnVZRHEvMmFScVZDOVhaSmhMeFlRS0Ew?=
- =?utf-8?B?c2djUTBCekFrZEZ2OEVwQ1VCb0o5bmFHUWZxZlRCZDFpS2hVY3JCRW5wVFhi?=
- =?utf-8?B?YUZ1cFRGMDhqcG14ZC8yc1FZdGVhYjUzNGNjY3pNOHhKQktlY3lrN013SWsx?=
- =?utf-8?B?RWF6cG9BL0dmNG1mZm9pMDFzRXNwNFBhUmxMdTZRVEhLNzZFVTJ6L3Fja21m?=
- =?utf-8?B?T1QwWjJKemJ0U2kzckdaN2dnSExqd29HYnh5aU8vTlVtV2NiaEhwQ2d0ZlVh?=
- =?utf-8?B?eU5taURsWC8rRzVrblpoempzQ3N4a0huR081WnhHakd2V2dlZ290NEErY1pp?=
- =?utf-8?B?cnNDZGptbWFDbTNBKzBWKzJ4enl0ejUySFRQSkhueVlVZkl4ZjlDVHNYdVM0?=
- =?utf-8?B?R3NRZ0hZYzRFZ1dUMHVxNERJeXluZEI5WE1DQUc2NHNaU1NMNWpBK0JXZjlv?=
- =?utf-8?B?WTdTTEVidkxSemJKZno3YTJ2SDlpRWZjaVpscXJIb2cwaUNlRkFxcXNQTlRU?=
- =?utf-8?B?dzA2dG81VHA1YkNCeEVXU1EvKzdxQ2tQdmsvekc3YWVKZWtFM2FsRCtFZWk5?=
- =?utf-8?B?WFdpK3BUTVl6Uk1rQzBHeEp6RE5lTUNETEtXVDV0VjVUQnpuaWdoN2J1Q3A5?=
- =?utf-8?B?SitZVkFLL0FuNGZaU2RJSzd4QVZHQSttSVV2aURnbEUvVWVWSUpoZVFkd1ZX?=
- =?utf-8?B?OEVXUzdWVnpUd2E5R0VhUTFXMXEyczg5U29ZczBCQWxKaGNpTWl6b1llOTVT?=
- =?utf-8?B?L2FnSms1MEdxenkzUFI2NFRib0xXY0pMZWJkTGNjZlVFcENIOGdWYVZNMEtC?=
- =?utf-8?B?bmhKeVBJM0JVVFNhWkhkMkR3S0ZtYnBhWGpVR2drcktKSytzVHJ5VFhQSkNL?=
- =?utf-8?B?cUc2elBmSWRENGhla0o0bVR3YmxjV3lGc2xvTElNVVVPUS9KVWNmMUxWRE5M?=
- =?utf-8?B?UUM5eXNENWZGdmxiRFRWSEZmZjBuelcyWWQ3WVlUbmVKWTFPV3ZqZWE1UWUx?=
- =?utf-8?B?aWdxQVZHVkNxcWZtSFM0cHdlK0xLNEM4OERWZlNqcG0wME9CQ0FtdVBkbWhF?=
- =?utf-8?B?S1FvYmIyZTFmTU15aVN4NVYzcHVoMmUvOUJqejJqWmE2bTVMYnJNQXBOMStL?=
- =?utf-8?B?cU1YdmdZQzdBUEFSOHJGY09iVE9MTkZhM1ZQUWFEL1cvcUNNYW9YVTBSTkcx?=
- =?utf-8?B?V1RSZ2s4NU8rUDQwaUt5Um9IY2hlQitLbmRqU0xLbXZNUmFtNWV4UT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: beaea064-f1a8-49eb-c20f-08ded7a34605
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB7086.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 19:02:19.0129
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wKrP5d7JhfIo4HgXOw2cC6Ria9AXU3wGEeorVqjtMLBVGvlduHoyE7LWbfkscx/haZVwNvZ0JrJi6ekqhJE/hg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SAWPR12MB999115
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303800-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303801-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	DMARC_NA(0.00)[librecast.net];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:kliteyn@nvidia.com,m:vdogaru@nvidia.com,m:horms@kernel.org,m:kees@kernel.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:zilin@seu.edu.cn,m:dawei.feng@seu.edu.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[bacs@librecast.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:regressions@lists.linux.dev,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:mst@redhat.com,m:simon.schippers@tu-dortmund.de,m:tim.gebauer@tu-dortmund.de,m:willemdebruijn.kernel@gmail.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,tu-dortmund.de,gmail.com,lunn.ch,davemloft.net,google.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bacs@librecast.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,Nvidia.com:dkim]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,karahi.librecast.net:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 92DF56F0C35
+X-Rspamd-Queue-Id: 219806F0C8D
+
+TL;DR - Commit 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3 causes
+significant performance regressions with TAP interfaces and multithreaded
+network code. Please revert.
 
 
+Librecast is an IPv6 multicast library. One of the tests (0055) fails under
+Linux 7.2-rc1. The test performs data synchronization over IPv6 multicast using a TAP
+interface. This test has run successfully on every stable, LTS and mainline RC
+released in the past year. Every kernel with my Tested-by has run this test.
 
-On 01/07/2026 17:38, Paolo Abeni wrote:
-> On 6/29/26 8:40 AM, Dawei Feng wrote:
->> hws_bwc_matcher_move() allocates a replacement matcher before setting it
->> as the resize target. If mlx5hws_matcher_resize_set_target() fails, the
->> replacement matcher is not attached anywhere and is leaked.
->>
->> Fix the leak by destroying the replacement matcher before returning from
->> the resize-target failure path.
->>
->> The bug was first flagged by an experimental analysis tool we are
->> developing for kernel memory-management bugs while analyzing
->> v6.13-rc1. The tool is still under development and is not yet publicly
->> available. Manual inspection confirms that the bug is still
->> present in v7.1.1.
->>
->> An x86_64 allyesconfig build showed no new warnings. As we do not have a
->> mlx5 HWS-capable device to test with, no runtime testing was able to be
->> performed.
->>
->> Fixes: 2111bb970c78 ("net/mlx5: HWS, added backward-compatible API handling")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
-> 
-> @nvidia team, double checking I did not miss any relevant communication.
-> The last process update I recall is that one of the people listed in
-> maintainer file will ack patches for us to merge directly into the
-> net/net-next trees.
-> 
+There have been a bunch of changes to MLDv2 so I started bisecting there, but
+the culprit is actually 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3 "tun/tap &
+vhost-net: avoid ptr_ring tail-drop when a qdisc is present"
 
-Ack.
+Reverting this commit fixes the test.
 
-> Should we consider any ack from @nvidia sufficient to take over?
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> 
+To eliminate my code and any multicast weirdness, I ran tests with iperf3
+comparing the same host running 7.2-rc1 both with and without 1d6e569b7d0
+reverted.
 
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
+CPU: AMD Ryzen 9 9950X
 
+[ host ] - [ bridge ] - [ tap ] - [ guest (qemu) ]
+
+Running matching kernels on host and guest, I started iperf3 in server mode on
+the guest and tested from the host so traffic passes through the tap interface.
+
+iperf3 -s -V                 # server
+iperf3 -c guest -P nthreads  # client
+
+7.2.0-rc1 (threads 1):
+
+[  5]   0.00-10.00  sec  20.2 GBytes  17.4 Gbits/sec    0            sender
+[  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 1, reverted):
+
+[  5]   0.00-10.00  sec  15.3 GBytes  13.1 Gbits/sec  368            sender
+[  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 2):
+
+[SUM]   0.00-10.00  sec  10.9 GBytes  9.33 Gbits/sec    0             sender
+[SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 2, reverted):
+
+[SUM]   0.00-10.00  sec  15.9 GBytes  13.7 Gbits/sec  1567             sender
+[SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 4):
+
+[SUM]   0.00-10.00  sec  10.9 GBytes  9.33 Gbits/sec    0             sender
+[SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 4, reverted):
+
+[SUM]   0.00-10.00  sec  16.5 GBytes  14.1 Gbits/sec  6701             sender
+[SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 8):
+
+[SUM]   0.00-10.00  sec  10.7 GBytes  9.15 Gbits/sec    0             sender
+[SUM]   0.00-10.01  sec  10.6 GBytes  9.13 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 8, reverted):
+
+[SUM]   0.00-10.00  sec  16.2 GBytes  14.0 Gbits/sec  19319             sender
+[SUM]   0.00-10.00  sec  15.7 GBytes  13.5 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 16):
+
+[SUM]   0.00-10.00  sec  10.9 GBytes  9.35 Gbits/sec    0             sender
+[SUM]   0.00-10.01  sec  10.9 GBytes  9.32 Gbits/sec                  receiver
+
+7.2.0-rc1 (threads 16, reverted):
+
+[SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec  43593             sender
+[SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec                  receiver
+
+
+As you can see, the new code works for single threaded, but for all other cases
+there's a significant performance drop. I see this trade-off is mentioned in the
+commit, but the performance drop off is much worse than suggested with the
+current patch.
+
+In our multicast use case data is sent by multiple threads to multiple groups
+simultaneously, this just breaks things to the extent that a <2 second test
+times out after 5 minutes.
+
+
+git bisect start
+# status: waiting for both good and bad commits
+# bad: [dc59e4fea9d83f03bad6bddf3fa2e52491777482] Linux 7.2-rc1
+git bisect bad dc59e4fea9d83f03bad6bddf3fa2e52491777482
+# status: waiting for good commit(s), bad commit known
+# good: [36bdc0e815b4e8a05b9028d8ef8a25e1ead35cc1] net: usb: asix: ax88772: re-add usbnet_link_change() in phylink callbacks
+git bisect good 36bdc0e815b4e8a05b9028d8ef8a25e1ead35cc1
+# good: [db314398f618a3a23315f73c87f7d318eaf06c1b] Merge branch 'net-bridge-mcast-support-exponential-field-encoding'
+git bisect good db314398f618a3a23315f73c87f7d318eaf06c1b
+# bad: [079a028d6327e68cfa5d38b36123637b321c19a7] string: Remove strncpy() from the kernel
+git bisect bad 079a028d6327e68cfa5d38b36123637b321c19a7
+# bad: [f396f4005180928cd9e15e352a6512865d3bc908] Bluetooth: btmtk: fix URB leak in alloc_mtk_intr_urb error path
+git bisect bad f396f4005180928cd9e15e352a6512865d3bc908
+# bad: [ec1806a730a1c0b3d68a7f9afe81514fb0dd7991] netfilter: x_tables: disable 32bit compat interface in user namespaces
+git bisect bad ec1806a730a1c0b3d68a7f9afe81514fb0dd7991
+# good: [50c2d91c5dfa0e465826ec1f8dbad9cdc254bd85] mptcp: do not drop partial packets
+git bisect good 50c2d91c5dfa0e465826ec1f8dbad9cdc254bd85
+# good: [68993ced0f618e36cf33388f1e50223e5e6e78cc] Merge tag 'net-7.1-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+git bisect good 68993ced0f618e36cf33388f1e50223e5e6e78cc
+# good: [34c78dff59a25110a4ce50c208e42a91490fe615] Merge branch 'net-use-ip_outnoroutes-drop-reason'
+git bisect good 34c78dff59a25110a4ce50c208e42a91490fe615
+# bad: [9587ed8137fb83d93f84b858337412f4500b21e9] Merge branch 'gve-add-support-for-ptp-gettimex64'
+git bisect bad 9587ed8137fb83d93f84b858337412f4500b21e9
+# bad: [83ea7fd73b11dd8cbf4416507a5eac3890b49fb0] net: dsa: microchip: remove unused phylink_mac_link_up() callback
+git bisect bad 83ea7fd73b11dd8cbf4416507a5eac3890b49fb0
+# bad: [f0de88303d5e7e04a1224bc7a00512b5a1c4fe7a] net: make is_skb_wmem() available to modules
+git bisect bad f0de88303d5e7e04a1224bc7a00512b5a1c4fe7a
+# bad: [c411baa463e85a779a7e68a00ba6298770b58c4c] netconsole: move push_ipv6() from netpoll
+git bisect bad c411baa463e85a779a7e68a00ba6298770b58c4c
+# good: [fba362c17d9d9211fc51f272156bb84fc23bdf98] ptr_ring: move free-space check into separate helper
+git bisect good fba362c17d9d9211fc51f272156bb84fc23bdf98
+# bad: [d0273dbe8be1640e597552f81faf1d6c9997d3e3] ipvlan: use netif_receive_skb() in ipvlan_process_multicast()
+git bisect bad d0273dbe8be1640e597552f81faf1d6c9997d3e3
+# bad: [3803065cd6b0630d4161d86aa04e2d1db0f3a0b5] Merge branch 'tun-tap-vhost-net-apply-qdisc-backpressure-on-full-ptr_ring-to-reduce-tx-drops'
+git bisect bad 3803065cd6b0630d4161d86aa04e2d1db0f3a0b5
+# bad: [1d6e569b7d0c0b2736636749e4be0a27f3cefcb3] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
+git bisect bad 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3
+# first bad commit: [1d6e569b7d0c0b2736636749e4be0a27f3cefcb3] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
+
+-- 
+Brett Sheffield (he/him)
+Librecast - Decentralising the Internet with Multicast
+https://librecast.net/
+https://blog.brettsheffield.com/
 
