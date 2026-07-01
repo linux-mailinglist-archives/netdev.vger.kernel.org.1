@@ -1,63 +1,51 @@
-Return-Path: <netdev+bounces-303809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303810-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XqGOEaBqRWpt/goAu9opvQ
-	(envelope-from <netdev+bounces-303809-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:29:36 +0200
+	id KKGRFq5rRWrR/goAu9opvQ
+	(envelope-from <netdev+bounces-303810-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:34:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F17A6F0DB3
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:29:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C570C6F0E8A
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 21:34:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=G9BcdIwD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303809-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303809-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303810-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303810-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AADAC3011C59
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 19:29:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 998D03061093
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 19:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817544BC034;
-	Wed,  1 Jul 2026 19:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BCF3A1D02;
+	Wed,  1 Jul 2026 19:31:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4E1360ECD;
-	Wed,  1 Jul 2026 19:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897F7224AF2;
+	Wed,  1 Jul 2026 19:31:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782934173; cv=none; b=DRAlePkWxxZLTW1tJeQceiML1WpuJNE16E9P0dALExCqTJkCjWZUoVP+ZnZvV4QBS9CYzdSCVwHhtbw2C7qDEKnz8b0P6LQ4B+3fwvNiyAaHuClkvuk+RBaUHQZBcbf/x8m3UiVdMK1N19Yq6sOyqPPxaQmdVih4pgxMwY4PnKQ=
+	t=1782934314; cv=none; b=d2yfVGLekPq7kmrBJz5hs4RnCwTSUuBu7wDbxz16AjPx7waorZwKchqgozoht1TMkYQE6Wk32pQkaEJYeRpLL4/QaUS/mPL3iKZGbQpwiaSCzmaVAkG6ZADqJnLyDtJ//PsknM9dYfpTGzCagNwe+38fpucN4wd41rGBARI3s8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782934173; c=relaxed/simple;
-	bh=kHVC/vtNwrT1HqBTKmwYI61YVPu6xaxQ45SQLFsaBbk=;
+	s=arc-20240116; t=1782934314; c=relaxed/simple;
+	bh=mLzcRSnztu80B3fI2V8y3dsoxit704VRlvjta6+On38=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bUVczvS9pQu5sjdYbaURf2S978iErqVzeSgMXZB1N5dxzTFEzTah46hj8T/zkKjQEFE2dSzDvQgE6wNXH88/54VlP8zhiAaYJHxgjdYwR1N+Is8/vvy+jAcUQ6rTjhLpCCi8tCRQCgNha/JY+P6OCzDqrv5J36qu4rI8fF1zkaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G9BcdIwD; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tNT+14cbVtp0W75j5lih7s5tZTzgV8pvNl9tFErCdQg=; b=G9BcdIwDOCVOpsy9xMSd1pFwwB
-	dKHoJbW7ECmyvSn1eJtaMNhfRqi9aW7L+VDQBdgXSr2g9Dvjek2PmXObN3CfzCJ8V2hVZQNJXnXXI
-	2dx5AdwySFMjWYzAVNxulHpifAEaClfBAlC6imffaoPPWdUKFWwLaVT48XFm+jPWNPo8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wf0ca-00AEME-11; Wed, 01 Jul 2026 21:29:20 +0200
-Date: Wed, 1 Jul 2026 21:29:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Birger Koblitz <mail@birger-koblitz.de>
-Cc: Jan Hendrik Farr <kernel@jfarr.cc>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, hsu.chih.kai@realtek.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, olek2@wp.pl,
-	pabeni@redhat.com
-Subject: Re: RTL8159 firmware
-Message-ID: <8f349e00-1710-428d-8c70-5d1b1f4d42f3@lunn.ch>
-References: <20260505-rtl8159_net_next-v4-3-1a648a9c4d8d@birger-koblitz.de>
- <20260701171327.2916132-1-kernel@jfarr.cc>
- <5dc0e654-0bdb-422c-9049-94ee6d8867e4@birger-koblitz.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NIiaGtgH21D9+rMlObLAX90F6V3CYoyCEvkHA4CZaG7Ahvqi6mznRL0nntjsqkwj9IzLFwEdWykDl7G3TLs3Jx7BmzNKi6WzkMj0p7i7DQuwD4wBiS4jBdJaPqT+UyaszSHD64ONtpTb4K6OO7imtoOzbm3pm2ZVl/E7RNVEm9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 1EB2060543; Wed, 01 Jul 2026 21:31:45 +0200 (CEST)
+Date: Wed, 1 Jul 2026 21:31:39 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Melbin K Mathew <mlbnkm1@gmail.com>
+Cc: pablo@netfilter.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: nft_set_rbtree: reject interval-end get
+ for open intervals
+Message-ID: <akVrG9sRqSDPbkXb@strlen.de>
+References: <20260630155507.92815-1-mlbnkm1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,70 +54,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5dc0e654-0bdb-422c-9049-94ee6d8867e4@birger-koblitz.de>
+In-Reply-To: <20260630155507.92815-1-mlbnkm1@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303809-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mlbnkm1@gmail.com,m:pablo@netfilter.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:mail@birger-koblitz.de,m:kernel@jfarr.cc,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:hsu.chih.kai@realtek.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:olek2@wp.pl,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[strlen.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[jfarr.cc,lunn.ch,davemloft.net,google.com,realtek.com,kernel.org,vger.kernel.org,wp.pl,redhat.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303810-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,gitlab.com:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,strlen.de:mid,strlen.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F17A6F0DB3
+X-Rspamd-Queue-Id: C570C6F0E8A
 
-On Wed, Jul 01, 2026 at 07:24:13PM +0200, Birger Koblitz wrote:
-> Hi Jan,
+Melbin K Mathew <mlbnkm1@gmail.com> wrote:
+> nft_rbtree_get() uses the interval endpoint selected by
+> nft_array_get_cmp(). For NFT_SET_ELEM_INTERVAL_END requests, the function
+> uses interval->to to recover struct nft_rbtree_elem.
 > 
-> On 7/1/26 19:13, Jan Hendrik Farr wrote:
-> > Hi Birger,
-> > 
-> > it looks like the firmware file rtl_nic/rtl8159-1.fw isn't in linux-firmware yet.
-> > Could you send it for people to potentially test?
-> > 
-> > Jan
-> > 
-> The code to create the binary firmware file is at:
-> https://gitlab.com/koblitz-rtlnic/rtlnic_fw
-> But I cannot submit the firmware itself to linux-firmware, as the sourcecode from
-> which the binary data is extracted is published by Realtek under the GPL.
+> Open-ended intervals can have a NULL end endpoint. In that case,
+> nft_array_get_cmp() treats the missing endpoint as b = -1, which can
+> still match an interval-end query. Avoid deriving an element pointer
+> from a NULL endpoint and report the element as not found instead.
+> 
+> Return -ENOENT for interval-end requests against open-ended intervals.
+> 
+> Fixes: 2aa34191f06f ("netfilter: nft_set_rbtree: use binary search array in get command")
+> Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
+> ---
+> Notes:
+>   A reduced userspace model confirms the comparator returns match for a
+>   NULL-ended interval when NFT_SET_ELEM_INTERVAL_END is set, and that
+>   container_of(NULL, ext) produces a garbage pointer (UBSAN fires).
+> 
+>   I have not reproduced an end-to-end crash through normal nft CLI usage.
+>   An instrumented WARN in this branch did not fire during interval-set
+>   tests with nft add/get/list. The patch is a defensive fix for the NULL
+>   endpoint case.
+> 
+>   Tested on 7.2-rc1 with KASAN and UBSAN enabled. Function tracing
+>   confirms nft_rbtree_get() is reached via nft get element. The added
+>   guard returns -ENOENT for a NULL interval endpoint in the instrumented
+>   test case.
+> ---
+>  net/netfilter/nft_set_rbtree.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
+> index 018bbb6df4..024a2cd3a6 100644
+> --- a/net/netfilter/nft_set_rbtree.c
+> +++ b/net/netfilter/nft_set_rbtree.c
+> @@ -184,10 +184,13 @@ nft_rbtree_get(const struct net *net, const struct nft_set *set,
+>  	if (!interval || nft_set_elem_expired(interval->from))
+>  		return ERR_PTR(-ENOENT);
+>  
+> -	if (flags & NFT_SET_ELEM_INTERVAL_END)
+> +	if (flags & NFT_SET_ELEM_INTERVAL_END) {
+> +		if (!interval->to)
+> +			return ERR_PTR(-ENOENT);
+>  		rbe = container_of(interval->to, struct nft_rbtree_elem, ext);
+> -	else
+> +	} else {
+>  		rbe = container_of(interval->from, struct nft_rbtree_elem, ext);
+> +	}
 
-The obvious work around is to not convert it to binary.
+Hmm, I don't think the query should have returned a match in the first
+place, i.e. we should have left via (!interval || ... condition.
 
-8152.c has a clear GPL-2.0 header. So you can edit that file, extract
-the two arrays, and it would still be GPL. You can make the firmware
-loader in the driver parse the ASCII array as it is. It also looks
-like you can .xz or .zst compress it, and the kernel
-_request_firmware() will handle the decompression for you.
+Pablo, could you please have a look?
 
-Just clearly document what you have done, and i think you are O.K. But
-IANAL.
+I suspect we want something like this:
 
-	Andrew
+diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
+--- a/net/netfilter/nft_set_rbtree.c
++++ b/net/netfilter/nft_set_rbtree.c
+@@ -150,10 +150,12 @@ static int nft_array_get_cmp(const void *pkey, const void *entry)
+ 		b = memcmp(ctx->key, nft_set_ext_key(interval->to), ctx->klen);
+ 
+ 	if (a >= 0) {
+-		if (ctx->flags & NFT_SET_ELEM_INTERVAL_END && b <= 0)
+-			return 0;
+-		else if (b < 0)
++		if (ctx->flags & NFT_SET_ELEM_INTERVAL_END && b <= 0) {
++			if (interval->to)
++				return 0;
++		} else if (b < 0) {
+ 			return 0;
++		}
+ 	}
+ 
+ 	if (a < 0)
+
+When userspace asks for end interval, but we have an open interval,
+then cmp callback shouldn't indicate a match.
 
