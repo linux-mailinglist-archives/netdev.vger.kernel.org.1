@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-303896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tEmCJPOiRWrNDAsAu9opvQ
-	(envelope-from <netdev+bounces-303896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:29:55 +0200
+	id n21FA+yiRWrKDAsAu9opvQ
+	(envelope-from <netdev+bounces-303897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:29:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298446F24B7
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66A5E6F24AA
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 01:29:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=rbox.co header.s=selector2 header.b=fdx1MEod;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303896-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303896-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=rbox.co header.s=selector2 header.b="iU465mY/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303897-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303897-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=rbox.co;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0ABD7304B290
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 23:29:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96C47303FBBC
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 23:29:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA4240C5D4;
-	Wed,  1 Jul 2026 23:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EBF40FDA5;
+	Wed,  1 Jul 2026 23:29:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8003EDAA6;
-	Wed,  1 Jul 2026 23:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD9B40911F
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 23:29:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782948557; cv=none; b=dhqWHH+Y+BB/Qbo8miUOvqtvu04W4AoNZlCSQ1Uev26xRjeLr8lD9AHYdSf56EsGif//T1y0nLz8YyBfrmc8dQ/Nh1qzx88RZIhF11MWkwC3ZtVrauhne0Bo/i2HwTKfQS9DnlHo661NkhkKO/UTpkzW+KtfaR8n1tV/+o55TZM=
+	t=1782948558; cv=none; b=UBchG2Wa+vh1/gvgDgoM1v4dQbEnQxvVtd1DRP2sl1cIACfscLnpZn9dpr+asomF8JrbJ6xvsl+8rgjaHoJhD66OM/6InWWBu2x1EMfGLTPz5+XnFAwPg8iKrmIjvOCv7k5a6YZyPhTRCGT31Irv9axYyruBDt/3Tpy4cTOZN5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782948557; c=relaxed/simple;
-	bh=18ormh6WpaMUFkWy+F/eMepCNoe1mF1rQb/Pfxtm6Ec=;
+	s=arc-20240116; t=1782948558; c=relaxed/simple;
+	bh=OGCGWAGSijpW8eWKWktu1kHLtJas49l379AJo6RCdD4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gGyl5Q1Glk+g4NORRBvFC+oIhZxnhnUguGem9vTZ/rLAHycvYuWdg+kaAOtcV1vCch7L7nydoe4xU1GwuX/99Uw06bF2j/GybVt1ibN+BLrCdfL4Qn27QPxzBVCqredXkmTWPoTMRY2MYURE7E9/2FTMSaTZwL1JhuSFPsbHQA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=fdx1MEod; arc=none smtp.client-ip=185.226.149.37
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	 In-Reply-To:To:Cc; b=utggvpgPAQ5yVCBUzQOGpzTVtjrmpRntbzj3idGehTUpSqgNlofdakGJ6mCaDMmm+eHjiGaTNvZNdE+7/e207rVuHBb0vltcEyRyzJz4XTFpJdEQUGXusDJsciVUUXevcX1+jdQIsvquUto5WBWxs1rusZZO7PLalLhcKGebLXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=iU465mY/; arc=none smtp.client-ip=185.226.149.37
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1wf4Md-007jxo-4E; Thu, 02 Jul 2026 01:29:07 +0200
+	id 1wf4Md-007jxp-8r; Thu, 02 Jul 2026 01:29:07 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=rus+5ion3oWjiPDrvUa7w2H85YbXoAhjJ5vWpwXdoNk=; b=fdx1MEodxUTHSpOMuPNzHDEciN
-	10hDphWWuROcgYdIdX6dgmDcZkYg2fhfbYiIeXD1MrgX3OHyQe+3nu4aFUb5HAvHjgFB7jZ70G6Dv
-	wzXAkdEb1Kqux+CmRMfjPKVMg+dQlN1YgDo22q3+5dbhYqyhQ6sS1OwI98+Bo1hGqQ2NrtEmUYJsl
-	z5Vl+VFiP3tTtKAiBHAFSMdy2nsJeLdNn1oaGC4yIECPmJ+KHlT0pcimMcfwUcJuCPISyeoYmYBO8
-	qtPDXJzeBtVcShAHYm2mnnVkibIUokiVCP+dlyuMeUv55+tQXi6f0BvBcplrAJHsp6L3VOJs6vuAb
-	FCeHNeRg==;
+	bh=Fpm1SGDR7fp18kXWlUj50JHgFJ5Mw92FAv77/jq72gk=; b=iU465mY/9/67IxNnzA6WgQogju
+	d+yqhUgQMkWOiGeU1ZJYuPRwNw0g77eGmvpaEy/UfaHrIDDQMcEwvma4RtwaNrlenle0CfqxWVXzp
+	fyP86BFUW0DxgdVE24ikPCuFmrCiApQibJphKA5Y6aJLtOY/VRLnLmuxiPLKuhmSt4t2RieInBwwG
+	NaXvNW1DcRTClVxsMSQnMPIp8YL5cxECb6OvOM0j0MKux8vubU3LTATNYtFw2kR8Qf1BQiFoOmuXv
+	fJl3ZqyMjfnNcbDKDq0L2SNwXRGtWpuz/lHfNDZzmfYdfHcIHSRNVwqFDFCY7GXHJPsFMPKjBpSm8
+	Ig3Wv9Kw==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1wf4MX-0005G2-Et; Thu, 02 Jul 2026 01:29:01 +0200
+	id 1wf4MX-0003iU-N9; Thu, 02 Jul 2026 01:29:01 +0200
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1wf4MO-00467f-3L;
-	Thu, 02 Jul 2026 01:28:52 +0200
+	id 1wf4MP-00467f-IH;
+	Thu, 02 Jul 2026 01:28:53 +0200
 From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 02 Jul 2026 01:28:19 +0200
-Subject: [PATCH bpf v3 1/4] selftests/bpf: Ensure UDP sockets are bound
+Date: Thu, 02 Jul 2026 01:28:20 +0200
+Subject: [PATCH bpf v3 2/4] bpf, sockmap: Reject unhashed UDP sockets on
+ sockmap update
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260702-sockmap-lookup-udp-leak-v3-1-ff8de8782468@rbox.co>
+Message-Id: <20260702-sockmap-lookup-udp-leak-v3-2-ff8de8782468@rbox.co>
 References: <20260702-sockmap-lookup-udp-leak-v3-0-ff8de8782468@rbox.co>
 In-Reply-To: <20260702-sockmap-lookup-udp-leak-v3-0-ff8de8782468@rbox.co>
 To: Alexei Starovoitov <ast@kernel.org>, 
@@ -99,7 +100,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303896-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303897-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[27];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -121,50 +122,69 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,rbox.co:dkim,rbox.co:email,rbox.co:mid,rbox.co:from_mime,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rbox.co:dkim,rbox.co:email,rbox.co:mid,rbox.co:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,cloudflare.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 298446F24B7
+X-Rspamd-Queue-Id: 66A5E6F24AA
 
-Update sockmap_basic tests to bind sockets before they are used. This
-accommodates the recent change in sockmap that rejects unbound UDP sockets.
+UDP sockets get SOCK_RCU_FREE set when (auto-)bound. This means
+sk_is_refcounted(unbound) = true, while sk_is_refcounted(bound) = false.
 
+Because sockmap accepts unbound UDP sockets, a BPF program can increment a
+socket's refcount via lookup. If the socket is subsequently bound, the
+transition from unbound to bound causes bpf_sk_release() to skip the
+decrement of the refcount, causing a memory leak.
+
+unreferenced object 0xffff88810bc2eb40 (size 1984):
+  comm "test_progs", pid 2451, jiffies 4295320596
+  hex dump (first 32 bytes):
+    7f 00 00 01 7f 00 00 01 d2 04 1b b7 04 d2 00 00  ................
+    02 00 01 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
+  backtrace (crc bdee079d):
+    kmem_cache_alloc_noprof+0x557/0x660
+    sk_prot_alloc+0x69/0x240
+    sk_alloc+0x30/0x460
+    inet_create+0x2ce/0xf80
+    __sock_create+0x25b/0x5c0
+    __sys_socket+0x119/0x1d0
+    __x64_sys_socket+0x72/0xd0
+    do_syscall_64+0xa1/0x5f0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Instead of special-casing for refcounted sockets, reject unhashed UDP
+sockets during sockmap updates, as there is no benefit to supporting those.
+This effectively reverts the commit under Fixes, with two exceptions:
+
+1. sock_map_sk_state_allowed() maintains a fall-through `return true`.
+2. In the spirit of commit b8b8315e39ff ("bpf, sockmap: Remove unhash
+   handler for BPF sockmap usage"), the proto::unhash BPF handler is not
+   reintroduced.
+
+Historical note: this issue is related to commit 67312adc96b5 ("bpf: reject
+unhashed sockets in bpf_sk_assign").
+
+Fixes: 0c48eefae712 ("sock_map: Lift socket state restriction for datagram sockets")
+Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- tools/testing/selftests/bpf/prog_tests/sockmap_basic.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/core/sock_map.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index cb3229711f93..2d22a9058a8e 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -853,7 +853,7 @@ static void test_sockmap_many_socket(void)
- 		return;
- 	}
- 
--	udp = xsocket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
-+	udp = socket_loopback(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK);
- 	if (udp < 0) {
- 		close(dgram);
- 		close(tcp);
-@@ -922,7 +922,7 @@ static void test_sockmap_many_maps(void)
- 		return;
- 	}
- 
--	udp = xsocket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
-+	udp = socket_loopback(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK);
- 	if (udp < 0) {
- 		close(dgram);
- 		close(tcp);
-@@ -993,7 +993,7 @@ static void test_sockmap_same_sock(void)
- 		return;
- 	}
- 
--	udp = xsocket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
-+	udp = socket_loopback(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK);
- 	if (udp < 0) {
- 		close(dgram);
- 		close(tcp);
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index c60ba6d292f9..9efbd8ca7db8 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -542,6 +542,8 @@ static bool sock_map_sk_state_allowed(const struct sock *sk)
+ {
+ 	if (sk_is_tcp(sk))
+ 		return (1 << sk->sk_state) & (TCPF_ESTABLISHED | TCPF_LISTEN);
++	if (sk_is_udp(sk))
++		return sk_hashed(sk);
+ 	if (sk_is_stream_unix(sk))
+ 		return (1 << READ_ONCE(sk->sk_state)) & TCPF_ESTABLISHED;
+ 	if (sk_is_vsock(sk) &&
 
 -- 
 2.54.0
