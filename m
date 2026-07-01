@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-303848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303850-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cH8YCSCKRWrSBgsAu9opvQ
-	(envelope-from <netdev+bounces-303848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:44:00 +0200
+	id Lb3VN8KKRWrmBgsAu9opvQ
+	(envelope-from <netdev+bounces-303850-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:46:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1946F1E99
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:43:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416866F1EC9
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:46:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=sY5cApmm;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303848-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303848-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=V6R5Svv9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303850-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303850-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 947D13030E93
+	by sea.lore.kernel.org (Postfix) with ESMTP id E4C61311D572
 	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 21:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011473BED38;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BA7349CC1;
 	Wed,  1 Jul 2026 21:43:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C4D3B5854
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 21:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DAC3B7753
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 21:43:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782942233; cv=none; b=p4sf/IoC3bGMdUybpU1gWmEVp0ZFeoaXlxWjenaSE6RzQl+e2AFRGrtIeC3hD5NThsjuSASXB5aiqrhmBVsQ6E8NQdQkDDZ9b8KiJsKTZ92U1y3OWIgtaGEbKTMvrvTsH2YzXwuwdkFnPPw1tdDe0LXb9Uex5VIpvCwdj2IVIg0=
+	t=1782942234; cv=none; b=NRpb2gSXPMRy3/3izVX1DdmAIkv1t+1TqD82tVQM/EKu+MAVvCaD7V2oKvW1NEVMO9JtEKvHl7mP7WozXMI9fX2rgtr4++vVe+oGWVBLIQYjBN4AaWnhj8Dx7ooOxorhzCskq/C/VL+JtsSlRceBGS5tgf3bJm0MGXG0tD2DhRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782942233; c=relaxed/simple;
-	bh=nv/k+xLrZ+J99caVonP7y5vrNLctECzZPSVB6oubxVQ=;
+	s=arc-20240116; t=1782942234; c=relaxed/simple;
+	bh=ZeIw1Lv1MM6xDl2w1A6Jwv7YPFGPnCh+bCupk0+6zTA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B3OHDMbfHP3pSRzAywVAbZJm41DDFoFrSqOLR89h9RW2MjAmeYhaTLVKNTgTxGDqZMQqInHWrYugl0R031xDeJSOTbXb99SFq/5mLuTHOvjHAw2Ec62DRrXXD3aeALyyqGI2XkmTgpCO2QTCLwvxCV8QKnswKoC5P4kxWqw0UO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sY5cApmm; arc=none smtp.client-ip=209.85.214.202
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2c804e38c65so21297285ad.2
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 14:43:51 -0700 (PDT)
+	 To:Cc:Content-Type; b=eVh5ZfxecdtLQhmRloieDn3FF4Pr1nUS+PRgMmg6ZGaWCFZ0UekYxMUeLamTxGbYO3JVDvpHCMFz+c6u5VTKEbqDlTFOBAe1+Y4TLymza4skQ4eM8lt7dlmMR0YNSlOHDOkuQJ3ppMvvjM01ir3GqdIbl2iZfGA6dZzLY+ou/C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V6R5Svv9; arc=none smtp.client-ip=209.85.210.201
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-84786d85ec2so1166580b3a.1
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 14:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782942231; x=1783547031; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782942232; x=1783547032; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9ie3bzKgeyYiuFvUKcNeHB0MegGvZ6/Yth4SJ9PFQc=;
-        b=sY5cApmmqVdV9mbuF/1bZNmsr8ofUSyO5nxcQWGGINu6FeGb4w8kvFLxazIW0wplYG
-         6EBvkddlEH3WIgZkDfRCyAgkzMQdJbb9P7k1jevsaoEymkflvtrTC9Rbdx293/DFG6eo
-         YMPFy0Dwf/EZnLnExDDDzirPKj8qkcqWCfyWMTQMQ8M4+dKoLzsQMw2ZRt3tW2Uw3OEm
-         KBWv5XzMlppB/jhmkqi7ZcNtRQmj23Zkqm68CbfLICPDG8eyY88wphTASvDVYmvBtUYT
-         67SNW5S5ixBqPViYj3uMYueSm2pB+QTkqVWrneHmZoTNceKGLw8SJ0X1MduJG0k9FotZ
-         GZrg==
+        bh=W4S8chRcbYHIzuZiXMgtlX/KF1+2v+ZqceA6HRBq1Ss=;
+        b=V6R5Svv9rej9HxOOMQ/JgFJFM0uYiTVsjIiCd5aSQfNR4+lgUEHoqp2F1bwQCyStbI
+         gNBW6cvPsdxMF7g1u1W6JoAQw4pUj/2OdgHEeLDW1m/3Ye+6EGoB/q0K5mdlXVmZO/J4
+         h2YfHV9c6iFcIT31wZjcdjEdn4SROyBnAweSP+6RtArkjlAHKlx9Nj9opfx8hWl4xROJ
+         l8AlzCXCG3aubazD21i7g2DCaILDFifGwcKfXNogUP+3j2AugT6i58WQi2Vw9LoShSUK
+         4EmJhLba+P8L2YNxQOKR0uwNvb+XCQUhA4+wUBhDX+g/bOHEuhxd0T/O0kMvLvNd4MqB
+         SARw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782942231; x=1783547031;
+        d=1e100.net; s=20251104; t=1782942232; x=1783547032;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9ie3bzKgeyYiuFvUKcNeHB0MegGvZ6/Yth4SJ9PFQc=;
-        b=RbK/d/1AG6DXnG7sxI9wG+H43BNcgGKiZUmIajIHHGqlE7L4oOcpIyB64AbkTB9XM5
-         TUarkHhUxtBF22nPNp3LKH8DWi8jtXRmSnphUOlXP6TWKvQJ+Wd/MUntKE1YTfaPDcEH
-         wY6Jlj5acP9IdkKFUwkW2wpZ5Ot72qL7IeQJkBxFB1XI1WE2oHj5Ahbp7fIwCpXhp6q6
-         L5T6Nbf76XfpHVdaX8UZq1F5t58273rWIidDxbz+KMlWdZ4wUWWyBZYTBzzpsJNS7vvz
-         RCL8HIU5CoRmQgh1ilIdm4/RU3ojSZtN6tP7wl5+1XlpiWdifBSEsbXavyp2/I9Pucmu
-         PRkA==
-X-Forwarded-Encrypted: i=1; AHgh+RodnpfoU0jdgmLSalR7ECeiG6zsTSEbACQryBiCZ3IGsUGoP8y1j8KFAIR3zVsGHd5aGdtkVAw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlkJ71qOsSIOpvyzlq/ACL65WyK8BetuQ9FtpqDRvAMm6yOIFO
-	E9inQZBlXfxtoOyds3VtGKiIC+1x/OYHRs5Eq/krbcXXj3GFkwN5vkUVQ13+H0mOg1kx+GWBbB2
-	V7rK9Fw==
-X-Received: from plpl11.prod.google.com ([2002:a17:903:3dcb:b0:2b0:46bd:4fe5])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:240a:b0:2c6:c9de:cd0e
- with SMTP id d9443c01a7336-2ca7e75afccmr37696925ad.23.1782942231139; Wed, 01
+        bh=W4S8chRcbYHIzuZiXMgtlX/KF1+2v+ZqceA6HRBq1Ss=;
+        b=BYi4nO0kThZiLieoa3+T2rkDBn8mKFUAMHRjyXTJDKCEmSPoD31wKoOAKTi3bsi2tE
+         hAEMoTdcgP9RQdi1ZiW9OMINrzGHBEAZPItEIZ6V2kRaOSPyUR7O5B/D6PdznMsk+ZOf
+         f+eLS9sVQA3NIfctDcIcyXza4pNxEVhj6xJk0nbOSKDbs5tEgxN8McbDbUHOPmmqh9Bw
+         akDYS2FqT7VUgpgW79rz0uqIdL82irig28hT7D1vz1emHlVatrcPWGgYtZ/Bzl0TqCai
+         03dn1mHKpKBb10jHitNL27yCpSBWFrFSHKDHYYz7mrS+0RWWE2Bu8ABzBUvz6MV1TYan
+         yGJw==
+X-Forwarded-Encrypted: i=1; AFNElJ9iKVirFEwPgidrkTindm+dx/S0K5kcwIYc/eFDaruc5osXfcH+GL00AE0CQyYi4lvhe9VWqJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHmI+UkazzGjlc7EWJAD3/C3g0K2zMbWU52WQd1gSW/ApJ+rIG
+	+bfsY2frpMXUids9jCSrWWk9HQklGc2jnOYE+qERLgj9xnMSQOoiuPRH/KLt9LPlQdgBc55D8Ym
+	cIyIkyg==
+X-Received: from pfbfd15.prod.google.com ([2002:a05:6a00:2e8f:b0:845:e35b:3495])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:94f6:b0:847:8dec:141f
+ with SMTP id d2e1a72fcca58-847c0a47a8dmr3360596b3a.51.1782942231878; Wed, 01
  Jul 2026 14:43:51 -0700 (PDT)
-Date: Wed,  1 Jul 2026 21:41:48 +0000
+Date: Wed,  1 Jul 2026 21:41:49 +0000
 In-Reply-To: <20260701214334.266991-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260701214334.266991-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260701214334.266991-11-kuniyu@google.com>
-Subject: [PATCH v1 net-next 10/14] bareudp: Support per-netns netdev unregistration.
+Message-ID: <20260701214334.266991-12-kuniyu@google.com>
+Subject: [PATCH v1 net-next 11/14] ipvlan: Convert ipvl_port.count to refcount_t.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
@@ -92,12 +92,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-303848-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303850-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -114,141 +114,214 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BA1946F1E99
+X-Rspamd-Queue-Id: 416866F1EC9
 
-bareudp_exit_rtnl_net() iterates bareudp devices whose sockets
-are in the dying netns and queues them for destruction.
+struct ipvl_port is shared between a lower device and its upper
+ipvlan devices.
 
-So the devices may reside in different netns.
+While each upper device can always access ipvl_port safely via
+ipvlan_dev.port, the lower device relies on RTNL to access it
+via net_device.rx_handler_data.
 
-Let's use unregister_netdevice_queue_net() to support per-netns
-device unregistration.
+Once RTNL is removed, the lower device cannot read ipvl_port safely
+in ipvlan_device_event() because the port could be freed concurrently
+and net_device.rx_handler_data is set to NULL if the last ipvlan
+device in another namespace is unregistered.
 
-list_del() is changed to list_del_init() to avoid queueing the
-same device twice.
+Let's convert ipvl_port.count to refcount_t and use RCU along with
+refcount_inc_not_zero() in ipvlan_device_event().
 
-Even after bareudp_exit_rtnl_net() queues a cross-netns bareudp
-device, bareudp_dellink() could be called concurrently for it
-(once RTNL is removed).  In such a case, __rtnl_net_unlock() will
-perform the unregistration.
+netdev_put() in ipvlan_port_destroy() is also moved down after
+cancel_work_sync(), which is the last user of port->dev.
 
-Note that bareudp uses register_pernet_subsys() instead of _device(),
-so default_device_exit_batch() guarantees that the async per-netns
-works are flushed before ->exit().
-
-Tested:
-
-1. Create bareudp device across two netns.
-
-  # ip netns add ns1
-  # ip netns add ns2
-  # ip -n ns1 link add bareudp0 link-netns ns2 type bareudp \
-    dstport 9292 ethertype ipv4
-
-2. Run bpftrace to check that bareudp_uninit() is called between
-   ->exit_rtnl() and ->exit().
-
-  # bpftrace -e '#include <linux/netdevice.h>
-  kprobe:bareudp_uninit {
-      $dev = (struct net_device *)arg0;
-      printf("PID: %d | DEV: %s%s\n", pid, $dev->name, kstack());
-  }
-  kprobe:bareudp_exit_rtnl_net,
-  kprobe:bareudp_exit_net {
-      printf("PID: %d%s\n", pid, kstack());
-  }'
-
-3. Remove the netns where the bareudp socket resides
-
-  # ip netns del ns2
-
-Now, we can see bareudp0 is unregistered by per-netns work
-instead of cleanup_net() and it finishes before ->exit() to
-avoid WARN_ON_ONCE(!list_empty(&gn->sock_list)) there.
-
-  PID: 576
-          bareudp_exit_rtnl_net+5
-          ops_undo_list+702
-          cleanup_net+1122
-          process_scheduled_works+2538
-  ...
-  PID: 470 | DEV: bareudp0
-          bareudp_uninit+5
-          unregister_netdevice_many_notify+7129
-          unregister_netdevice_many_net+1050
-          rtnl_net_work_func+136
-          process_scheduled_works+2538
-  ...
-  PID: 576
-          bareudp_exit_net+5
-          ops_undo_list+1064
-          cleanup_net+1122
-          process_scheduled_works+2538
+Note that ipvlan->port is now set in ipvlan_init() so that it can
+be used in ipvlan_uninit(), instead of ipvlan_port_get_rtnl()
+(rtnl_dereference()).
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- drivers/net/bareudp.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ drivers/net/ipvlan/ipvlan.h      |  2 +-
+ drivers/net/ipvlan/ipvlan_main.c | 75 ++++++++++++++++++++++----------
+ 2 files changed, 52 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-index 7dedf4867e7b..c3b5ed52d877 100644
---- a/drivers/net/bareudp.c
-+++ b/drivers/net/bareudp.c
-@@ -701,12 +701,13 @@ static int bareudp_link_config(struct net_device *dev,
+diff --git a/drivers/net/ipvlan/ipvlan.h b/drivers/net/ipvlan/ipvlan.h
+index 80f84fc87008..78f9107fa752 100644
+--- a/drivers/net/ipvlan/ipvlan.h
++++ b/drivers/net/ipvlan/ipvlan.h
+@@ -96,7 +96,7 @@ struct ipvl_port {
+ 	u16			dev_id_start;
+ 	struct work_struct	wq;
+ 	struct sk_buff_head	backlog;
+-	int			count;
++	refcount_t		count;
+ 	struct ida		ida;
+ 	netdevice_tracker	dev_tracker;
+ };
+diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
+index ed46439a9f4e..b4906a8d24ef 100644
+--- a/drivers/net/ipvlan/ipvlan_main.c
++++ b/drivers/net/ipvlan/ipvlan_main.c
+@@ -86,6 +86,7 @@ static int ipvlan_port_create(struct net_device *dev)
+ 		goto err;
+ 
+ 	netdev_hold(dev, &port->dev_tracker, GFP_KERNEL);
++
+ 	return 0;
+ 
+ err:
+@@ -93,16 +94,18 @@ static int ipvlan_port_create(struct net_device *dev)
+ 	return err;
+ }
+ 
+-static void ipvlan_port_destroy(struct net_device *dev)
++static void ipvlan_port_destroy(struct ipvl_port *port)
+ {
+-	struct ipvl_port *port = ipvlan_port_get_rtnl(dev);
++	struct net_device *dev = port->dev;
+ 	struct sk_buff *skb;
+ 
+-	netdev_put(dev, &port->dev_tracker);
+ 	if (port->mode == IPVLAN_MODE_L3S)
+ 		ipvlan_l3s_unregister(port);
++
+ 	netdev_rx_handler_unregister(dev);
+ 	cancel_work_sync(&port->wq);
++	netdev_put(dev, &port->dev_tracker);
++
+ 	while ((skb = __skb_dequeue(&port->backlog)) != NULL) {
+ 		dev_put(skb->dev);
+ 		kfree_skb(skb);
+@@ -111,6 +114,27 @@ static void ipvlan_port_destroy(struct net_device *dev)
+ 	kfree(port);
+ }
+ 
++static void ipvlan_port_put(struct ipvl_port *port)
++{
++	if (refcount_dec_and_test(&port->count))
++		ipvlan_port_destroy(port);
++}
++
++static struct ipvl_port *ipvlan_port_get(struct net_device *dev)
++{
++	struct ipvl_port *port = NULL;
++
++	rcu_read_lock();
++	if (netif_is_ipvlan_port(dev)) {
++		port = ipvlan_port_get_rcu(dev);
++		if (!refcount_inc_not_zero(&port->count))
++			port = NULL;
++	}
++	rcu_read_unlock();
++
++	return port;
++}
++
+ #define IPVLAN_ALWAYS_ON_OFLOADS \
+ 	(NETIF_F_SG | NETIF_F_HW_CSUM | \
+ 	 NETIF_F_GSO_ROBUST | NETIF_F_GSO_SOFTWARE | NETIF_F_GSO_ENCAP_ALL)
+@@ -159,24 +183,24 @@ static int ipvlan_init(struct net_device *dev)
+ 			free_percpu(ipvlan->pcpu_stats);
+ 			return err;
+ 		}
++		port = ipvlan_port_get_rtnl(phy_dev);
++		refcount_set(&port->count, 1);
++	} else {
++		port = ipvlan_port_get_rtnl(phy_dev);
++		refcount_inc(&port->count);
+ 	}
+-	port = ipvlan_port_get_rtnl(phy_dev);
+-	port->count += 1;
++
++	ipvlan->port = port;
++
  	return 0;
  }
  
--static void __bareudp_dellink(struct net_device *dev, struct list_head *head)
-+static void __bareudp_dellink(struct net *net, struct net_device *dev,
-+			      struct list_head *head)
+ static void ipvlan_uninit(struct net_device *dev)
  {
- 	struct bareudp_dev *bareudp = netdev_priv(dev);
+ 	struct ipvl_dev *ipvlan = netdev_priv(dev);
+-	struct net_device *phy_dev = ipvlan->phy_dev;
+-	struct ipvl_port *port;
  
--	list_del(&bareudp->next);
--	unregister_netdevice_queue(dev, head);
-+	list_del_init(&bareudp->next);
-+	unregister_netdevice_queue_net(net, dev, head);
+ 	free_percpu(ipvlan->pcpu_stats);
+-
+-	port = ipvlan_port_get_rtnl(phy_dev);
+-	port->count -= 1;
+-	if (!port->count)
+-		ipvlan_port_destroy(port->dev);
++	ipvlan_port_put(ipvlan->port);
  }
  
- static void bareudp_dellink(struct net_device *dev, struct list_head *head)
-@@ -717,7 +718,8 @@ static void bareudp_dellink(struct net_device *dev, struct list_head *head)
- 	bn = net_generic(bareudp->net, bareudp_net_id);
+ static int ipvlan_open(struct net_device *dev)
+@@ -594,9 +618,7 @@ int ipvlan_link_new(struct net_device *dev, struct rtnl_newlink_params *params,
+ 	if (err < 0)
+ 		return err;
  
- 	mutex_lock(&bn->lock);
--	__bareudp_dellink(dev, head);
-+	if (!list_empty(&bareudp->next))
-+		__bareudp_dellink(dev_net(dev), dev, head);
- 	mutex_unlock(&bn->lock);
- }
+-	/* ipvlan_init() would have created the port, if required */
+-	port = ipvlan_port_get_rtnl(phy_dev);
+-	ipvlan->port = port;
++	port = ipvlan->port;
  
-@@ -811,14 +813,22 @@ static void __net_exit bareudp_exit_rtnl_net(struct net *net,
- 	mutex_lock(&bn->lock);
+ 	/* If the port-id base is at the MAX value, then wrap it around and
+ 	 * begin from 0x1 again. This may be due to a busy system where lots
+@@ -729,14 +751,13 @@ static int ipvlan_device_event(struct notifier_block *unused,
+ 	struct netdev_notifier_pre_changeaddr_info *prechaddr_info;
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+ 	struct ipvl_dev *ipvlan, *next;
++	int err, ret = NOTIFY_DONE;
+ 	struct ipvl_port *port;
+ 	LIST_HEAD(lst_kill);
+-	int err;
+-
+-	if (!netif_is_ipvlan_port(dev))
+-		return NOTIFY_DONE;
  
- 	list_for_each_entry_safe(bareudp, next, &bn->bareudp_list, next)
--		__bareudp_dellink(bareudp->dev, dev_kill_list);
-+		__bareudp_dellink(net, bareudp->dev, dev_kill_list);
+-	port = ipvlan_port_get_rtnl(dev);
++	port = ipvlan_port_get(dev);
++	if (!port)
++		return ret;
  
- 	mutex_unlock(&bn->lock);
- }
+ 	switch (event) {
+ 	case NETDEV_UP:
+@@ -788,8 +809,10 @@ static int ipvlan_device_event(struct notifier_block *unused,
+ 			err = netif_pre_changeaddr_notify(ipvlan->dev,
+ 							  prechaddr_info->dev_addr,
+ 							  extack);
+-			if (err)
+-				return notifier_from_errno(err);
++			if (err) {
++				ret = notifier_from_errno(err);
++				break;
++			}
+ 		}
+ 		break;
  
-+static void __net_exit bareudp_exit_net(struct net *net)
-+{
-+	struct bareudp_net *bn = net_generic(net, bareudp_net_id);
+@@ -802,7 +825,8 @@ static int ipvlan_device_event(struct notifier_block *unused,
+ 
+ 	case NETDEV_PRE_TYPE_CHANGE:
+ 		/* Forbid underlying device to change its type. */
+-		return NOTIFY_BAD;
++		ret = NOTIFY_BAD;
++		break;
+ 
+ 	case NETDEV_NOTIFY_PEERS:
+ 	case NETDEV_BONDING_FAILOVER:
+@@ -810,7 +834,10 @@ static int ipvlan_device_event(struct notifier_block *unused,
+ 		list_for_each_entry(ipvlan, &port->ipvlans, pnode)
+ 			call_netdevice_notifiers(event, ipvlan->dev);
+ 	}
+-	return NOTIFY_DONE;
 +
-+	WARN_ON_ONCE(!list_empty(&bn->bareudp_list));
-+}
++	ipvlan_port_put(port);
 +
- static struct pernet_operations bareudp_net_ops = {
- 	.init = bareudp_init_net,
- 	.exit_rtnl = bareudp_exit_rtnl_net,
-+	.exit = bareudp_exit_net,
- 	.id   = &bareudp_net_id,
- 	.size = sizeof(struct bareudp_net),
- };
++	return ret;
+ }
+ 
+ /* the caller must held the addrs lock */
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
