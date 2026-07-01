@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-303726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SNAkL0o4RWou8woAu9opvQ
-	(envelope-from <netdev+bounces-303726-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:54:50 +0200
+	id hTOtNGE4RWov8woAu9opvQ
+	(envelope-from <netdev+bounces-303727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:55:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB1B6EF677
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:54:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C2286EF67C
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:55:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=SXWw2Vi8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303726-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303726-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=RO4AT6ui;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303727-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303727-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B209D304C7EC
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 15:51:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F6FF30575E8
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 15:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2C023E320;
-	Wed,  1 Jul 2026 15:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0CE362138;
+	Wed,  1 Jul 2026 15:51:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411DE3B6356
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 15:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E733546EF
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 15:51:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782921100; cv=none; b=JIG03U3FmihAEb8NCoyfnsUKFhjtL/mRgZIvNj94GaL7XAqyvmuAxc5gTBR9bQPQbQ3O14BT27Wxg1u/yD5OUQ/N91fVZSEJOHWxCra8OKhDbqnEsG61B2r2tPwOWVetvWDFwdlnuKziYwEoU3MamWaBdlD6/XXyYQdcX+OIB4k=
+	t=1782921102; cv=none; b=ak9wTBPQbMhpfdAtkxWB5Ah0IZNmdCMbzXkegP9oKT48FqN63t+MOx9tkGEsL+OigdcmElEiBVZLoDmCFTxg1iqtCVXpgQuIwbVtihFMhi/9fb/uONXko3bOuD/LJPCJo5yO1Jb600C+Gnz1xhkKbSNlY0VQ+mC9Zmr1LSSoLgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782921100; c=relaxed/simple;
-	bh=4q3tM/MB3NGkckWK7946pBhSKl1rM1isvRXO8B1mqQ4=;
+	s=arc-20240116; t=1782921102; c=relaxed/simple;
+	bh=IusyAeTQ6w+kHoOf9l3njQ1HSBx3l/RIbp29LrrZ1Xk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ITrxK9xae77dsSgHdovDRdBdUCWn2smiyKMPAmkEusa8H5Xf3EFK+sfEME6GJIu+KvVKgwYfzc5COCSJXs2IsNBA2J6RL4oojiJXvLEV/8/cDyAoJeR75vG6ZEQBLtEPOd2dzpETmsO/5npUrv1jaT8JHHwWDnJbyRYDG6UcEDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SXWw2Vi8; arc=none smtp.client-ip=209.85.219.74
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8e86066fc53so10988176d6.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 08:51:39 -0700 (PDT)
+	 To:Cc:Content-Type; b=b2/Gi+wmL8oJyWTRNb7KFkutaYeeZHXCNf1cRGugBt8Ra4LkCJsdQpoYQOYsKRMlGyjZl4bVmDswCY6yEZyCUpwVHoZoHLAvodRNYUpD5jEHGgmUPtZ3XSHBPa5Lfcl8d8UGGEyQJF7QTEOJhpnIm9nh4NDH2uEXI+X/6ZVGpvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RO4AT6ui; arc=none smtp.client-ip=209.85.160.202
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-51bfe3fa93bso8323341cf.2
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 08:51:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782921098; x=1783525898; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1782921100; x=1783525900; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mOnv67qb55xaEKIoEANfQ7AmQq9cW7Spoo4vpdER+v0=;
-        b=SXWw2Vi81y30Dl+g37YV+3kgGtXQpxEBQr5rWGRyVbVNrd7q4/H9S2DRxJYXGXblSz
-         Y3wYr2rO9GEqT520rzPmXg1eysXSkdk1aJ5mc65WVdq4sqLnW2sRKvpploqGr4WlyNb8
-         ArzwdsacAJMfhtB/zDEG6no0ZviJcU6++564Jyas83paurpwVkSlcUcKkzZzzc8CAlYI
-         zPDB1RG29NuGpQ0MVt5R4ULbmF4SHbjfw0tY0wQlogWQl47DnWoNx4O3hQszyTzeSdPZ
-         Rda52Oo1PXAIBtZ2sUiu3oWqELVcqWat6ML5P+r9OpslgpzUYy0ySU9nhnJCjkZmxulc
-         Hn5g==
+        bh=1jelKamaqWb1Xpu9bUIrf9bmvgwuIyco9/Achrqvuig=;
+        b=RO4AT6uimw/13cMK6RTiz9TT4ZE8zgl3cVzIIZ0VR1G7M5N+T8h0mU1U7PdQ7aeEfx
+         8SNPX02N4n28ALrFboKw2KhISM39Tve8s6Zjem0pDRg86WaAglMUtOlllnMORkNxXF2+
+         ge805kMPqZM7l0Oaua8urz539ykL4egrVS+tbfTLfw8swc6NmJgX2PbCb/4grSh65fDQ
+         CpizEsVOZtusfEg5Rhh4DwWgHbNb9FbHyjEfAYtqb815Vm/OojSnDsgxP95a3EkYobOK
+         eCebvH9FcYFiEUgvkjnwrVgCUNaCGp4Kl4R5ZbR8ZB26qYjeklOarMOsIh2HEfTI2q4l
+         ryRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782921098; x=1783525898;
+        d=1e100.net; s=20251104; t=1782921100; x=1783525900;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mOnv67qb55xaEKIoEANfQ7AmQq9cW7Spoo4vpdER+v0=;
-        b=VMvqmuKYxZsNnpAMzh56glL+zEtroaNPJNTF8c32XtrurCyUXgzEgfYorhu4DpdkNt
-         CXGRoykbPTYUgiNHbhlz1XjqsWsg6nLEkeox670max8P+lSS5YeGn7zbYOiFZJJhTG7F
-         mARIm7ceRyoCNfMHlz34A8AtW7mlwAMeifsjjcOVcc3D2pHdbag8bvuH31w/2LA0J+J3
-         8s1+psAz5zoQewfGhgHRkx45p33BIkYYQQ6ZPOIp2ebBfqqXDSHnfRZQGACh9axTfUWu
-         hrjf04lUaXRRJXFgGl+Uc3elykWVUcCs8EGWOaoH0vc05YYVk4cyY7D/ulnZ/rWlAdQs
-         YLfQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqU1/m9IvbLfbqDdkt14APiWpWTJRSRqOMP0vvqdJVUWlp+uHSzfYq79XgdsgO16n1ssL8weiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLiuiX+ZAXnoq0MU1Q1avblXTwFwMQcbMWOoQauVgnm97/zdRZ
-	whsMeZsCNCZVeb7XY3xQLX0RjDOEO45wSMRpNjq5QSb9CO6uexwnD3UjxPPuQVnKnWGuZ3hP9dp
-	3Yuqd8uGu+Na8ZQ==
-X-Received: from qvbdn15.prod.google.com ([2002:a05:6214:94f:b0:8eb:6e3c:2cdf])
+        bh=1jelKamaqWb1Xpu9bUIrf9bmvgwuIyco9/Achrqvuig=;
+        b=c3e/M1CWCcnVI3g8axfSU+GB27ZrP1idpPlCyNItaEdg8QcoWfNZQbd63ambO6xBgv
+         Y5hkSfpk9Hg65Xz3ZgCfwlWbjps6SHXz2m4z4yWUNLDwDIY6cgST0hYlwjwZDfVRdta6
+         QBpWSCGZ/skRG3LhX3ke8Wm0mBNJwm1TXr/yFI52X2bpUMpJUc5bUUmXc2dnSWMUKbLN
+         RZzb7Ok1eZDZk+/3RUIrSglGljcecs91Fmqkv7bbLuEdkl5FQQiUQCc0RVBN+QzMktGY
+         hoHbGOKNz8eGCDilaj6gVUJI81VAwE71FaNUpaUUAdboqVs9tUPVQQY4zs2PmUBnU99J
+         Ikrw==
+X-Forwarded-Encrypted: i=1; AFNElJ9nAQp9wIlSa15+X7o+6u823NhuMqNDIutqHMIuULM1uHmLhKqB3hRJffoSS7W8ujqou25cuvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEu8V6hiIxqoecLGwwuS7uwE7FFhCMOqUpB97sMvK4xdryg+IP
+	HVWA01Q7FU6su+fCPB93rhSe1gEz5MhTejIH6G6XXvkfQaQY7DwPirLf3grDAsL5G1yWPmWSM8p
+	D2mDHaCGbGO1ipg==
+X-Received: from qvnz10.prod.google.com ([2002:a0c:e98a:0:b0:8f1:551b:f13d])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:3c98:b0:8f0:7950:a2c4 with SMTP id 6a1803df08f44-8f3be2768b5mr31616716d6.17.1782921098031;
- Wed, 01 Jul 2026 08:51:38 -0700 (PDT)
-Date: Wed,  1 Jul 2026 15:51:34 +0000
+ 2002:a05:622a:4d8d:b0:519:f420:d780 with SMTP id d75a77b69052e-51c26a773f3mr27536891cf.30.1782921099545;
+ Wed, 01 Jul 2026 08:51:39 -0700 (PDT)
+Date: Wed,  1 Jul 2026 15:51:35 +0000
 In-Reply-To: <20260701155135.3962058-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260701155135.3962058-1-edumazet@google.com>
 X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
-Message-ID: <20260701155135.3962058-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] ip_tunnel: use WRITE_ONCE in ip_tunnel_encap_setup
+Message-ID: <20260701155135.3962058-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] sit: no longer rely on RTNL in ipip6_fill_info()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -93,12 +93,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303726-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303727-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -116,58 +116,142 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3CB1B6EF677
+X-Rspamd-Queue-Id: 2C2286EF67C
 
-Update ip_tunnel_encap_setup() to use WRITE_ONCE() when writing
-to encap fields (type, sport, dport, flags) and hlen fields.
-This ensures that concurrent lockless readers (like fill_info)
-do not see torn writes.
+Update ipip6_fill_info() to read configuration fields (link, ttl, tos,
+proto, i_flags, fwmark, 6rd prefix, encap type/sport/dport/flags)
+locklessly using READ_ONCE().
 
-Also remove the unsafe memset() on t->encap which could cause
-concurrent readers to transiently see zeroed fields.
-Removing it also fixes a bug where t->encap was left cleared
-even if ip_encap_hlen() failed, resulting in partial configuration.
+Annotate the bitmap reads for i_flags by copying the first element
+atomically using READ_ONCE() into a local variable, as the whole
+bitmap fits in one unsigned long.
 
-Fixes: 56328486539d ("net: Changes to ip_tunnel to support foo-over-udp encapsulation")
+This allows ipip6_fill_info() to run safely without RTNL.
+
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/ip_tunnel.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ net/ipv6/sit.c | 70 ++++++++++++++++++++++++++++----------------------
+ 1 file changed, 40 insertions(+), 30 deletions(-)
 
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 9d114bd575f928b0ab46ef3007e456692d82b497..f7bbdd1bd323b1973ec1ea1d93f0ed6ab703bcd3 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -491,19 +491,17 @@ int ip_tunnel_encap_setup(struct ip_tunnel *t,
+diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
+index a38b24fb838424b6d3cb063d77aa85cf719ce6c5..c7abbb09bfd3dfada6fc1e1682ac42acb7248ad9 100644
+--- a/net/ipv6/sit.c
++++ b/net/ipv6/sit.c
+@@ -1143,17 +1143,17 @@ static void ipip6_tunnel_update(struct ip_tunnel *t,
+ 
+ 	ipip6_tunnel_unlink(sitn, t);
+ 	synchronize_net();
+-	t->parms.iph.saddr = p->iph.saddr;
+-	t->parms.iph.daddr = p->iph.daddr;
++	WRITE_ONCE(t->parms.iph.saddr, p->iph.saddr);
++	WRITE_ONCE(t->parms.iph.daddr, p->iph.daddr);
+ 	__dev_addr_set(t->dev, &p->iph.saddr, 4);
+ 	memcpy(t->dev->broadcast, &p->iph.daddr, 4);
+ 	ipip6_tunnel_link(sitn, t);
+-	t->parms.iph.ttl = p->iph.ttl;
+-	t->parms.iph.tos = p->iph.tos;
+-	t->parms.iph.frag_off = p->iph.frag_off;
+-	if (t->parms.link != p->link || t->fwmark != fwmark) {
+-		t->parms.link = p->link;
+-		t->fwmark = fwmark;
++	WRITE_ONCE(t->parms.iph.ttl, p->iph.ttl);
++	WRITE_ONCE(t->parms.iph.tos, p->iph.tos);
++	WRITE_ONCE(t->parms.iph.frag_off, p->iph.frag_off);
++	if (READ_ONCE(t->parms.link) != p->link || READ_ONCE(t->fwmark) != fwmark) {
++		WRITE_ONCE(t->parms.link, p->link);
++		WRITE_ONCE(t->fwmark, fwmark);
+ 		ipip6_tunnel_bind_dev(t->dev);
+ 	}
+ 	dst_cache_reset(&t->dst_cache);
+@@ -1184,9 +1184,9 @@ static int ipip6_tunnel_update_6rd(struct ip_tunnel *t,
+ 		return -EINVAL;
+ 
+ 	t->ip6rd.prefix = prefix;
+-	t->ip6rd.relay_prefix = relay_prefix;
+-	t->ip6rd.prefixlen = ip6rd->prefixlen;
+-	t->ip6rd.relay_prefixlen = ip6rd->relay_prefixlen;
++	WRITE_ONCE(t->ip6rd.relay_prefix, relay_prefix);
++	WRITE_ONCE(t->ip6rd.prefixlen, ip6rd->prefixlen);
++	WRITE_ONCE(t->ip6rd.relay_prefixlen, ip6rd->relay_prefixlen);
+ 	dst_cache_reset(&t->dst_cache);
+ 	netdev_state_change(t->dev);
+ 	return 0;
+@@ -1693,42 +1693,52 @@ static size_t ipip6_get_size(const struct net_device *dev)
+ 
+ static int ipip6_fill_info(struct sk_buff *skb, const struct net_device *dev)
  {
- 	int hlen;
- 
--	memset(&t->encap, 0, sizeof(t->encap));
+-	struct ip_tunnel *tunnel = netdev_priv(dev);
+-	struct ip_tunnel_parm_kern *parm = &tunnel->parms;
 -
- 	hlen = ip_encap_hlen(ipencap);
- 	if (hlen < 0)
- 		return hlen;
+-	if (nla_put_u32(skb, IFLA_IPTUN_LINK, parm->link) ||
+-	    nla_put_in_addr(skb, IFLA_IPTUN_LOCAL, parm->iph.saddr) ||
+-	    nla_put_in_addr(skb, IFLA_IPTUN_REMOTE, parm->iph.daddr) ||
+-	    nla_put_u8(skb, IFLA_IPTUN_TTL, parm->iph.ttl) ||
+-	    nla_put_u8(skb, IFLA_IPTUN_TOS, parm->iph.tos) ||
++	const struct ip_tunnel *tunnel = netdev_priv(dev);
++	const struct ip_tunnel_parm_kern *parm;
++	IP_TUNNEL_DECLARE_FLAGS(i_flags);
++	__be16 frag_off;
++	__be32 daddr;
++	__be32 saddr;
++
++	parm = &tunnel->parms;
++	i_flags[0] = READ_ONCE(parm->i_flags[0]);
++	frag_off = READ_ONCE(parm->iph.frag_off);
++	saddr = READ_ONCE(parm->iph.saddr);
++	daddr = READ_ONCE(parm->iph.daddr);
++
++	if (nla_put_u32(skb, IFLA_IPTUN_LINK, READ_ONCE(parm->link)) ||
++	    nla_put_in_addr(skb, IFLA_IPTUN_LOCAL, saddr) ||
++	    nla_put_in_addr(skb, IFLA_IPTUN_REMOTE, daddr) ||
++	    nla_put_u8(skb, IFLA_IPTUN_TTL, READ_ONCE(parm->iph.ttl)) ||
++	    nla_put_u8(skb, IFLA_IPTUN_TOS, READ_ONCE(parm->iph.tos)) ||
+ 	    nla_put_u8(skb, IFLA_IPTUN_PMTUDISC,
+-		       !!(parm->iph.frag_off & htons(IP_DF))) ||
+-	    nla_put_u8(skb, IFLA_IPTUN_PROTO, parm->iph.protocol) ||
++		       !!(frag_off & htons(IP_DF))) ||
++	    nla_put_u8(skb, IFLA_IPTUN_PROTO, READ_ONCE(parm->iph.protocol)) ||
+ 	    nla_put_be16(skb, IFLA_IPTUN_FLAGS,
+-			 ip_tunnel_flags_to_be16(parm->i_flags)) ||
+-	    nla_put_u32(skb, IFLA_IPTUN_FWMARK, tunnel->fwmark))
++			 ip_tunnel_flags_to_be16(i_flags)) ||
++	    nla_put_u32(skb, IFLA_IPTUN_FWMARK, READ_ONCE(tunnel->fwmark)))
+ 		goto nla_put_failure;
  
--	t->encap.type = ipencap->type;
--	t->encap.sport = ipencap->sport;
--	t->encap.dport = ipencap->dport;
--	t->encap.flags = ipencap->flags;
-+	WRITE_ONCE(t->encap.type, ipencap->type);
-+	WRITE_ONCE(t->encap.sport, ipencap->sport);
-+	WRITE_ONCE(t->encap.dport, ipencap->dport);
-+	WRITE_ONCE(t->encap.flags, ipencap->flags);
+ #ifdef CONFIG_IPV6_SIT_6RD
+ 	if (nla_put_in6_addr(skb, IFLA_IPTUN_6RD_PREFIX,
+ 			     &tunnel->ip6rd.prefix) ||
+ 	    nla_put_in_addr(skb, IFLA_IPTUN_6RD_RELAY_PREFIX,
+-			    tunnel->ip6rd.relay_prefix) ||
++			    READ_ONCE(tunnel->ip6rd.relay_prefix)) ||
+ 	    nla_put_u16(skb, IFLA_IPTUN_6RD_PREFIXLEN,
+-			tunnel->ip6rd.prefixlen) ||
++			READ_ONCE(tunnel->ip6rd.prefixlen)) ||
+ 	    nla_put_u16(skb, IFLA_IPTUN_6RD_RELAY_PREFIXLEN,
+-			tunnel->ip6rd.relay_prefixlen))
++			READ_ONCE(tunnel->ip6rd.relay_prefixlen)))
+ 		goto nla_put_failure;
+ #endif
  
--	t->encap_hlen = hlen;
--	t->hlen = t->encap_hlen + t->tun_hlen;
-+	WRITE_ONCE(t->encap_hlen, hlen);
-+	WRITE_ONCE(t->hlen, hlen + t->tun_hlen);
+ 	if (nla_put_u16(skb, IFLA_IPTUN_ENCAP_TYPE,
+-			tunnel->encap.type) ||
++			READ_ONCE(tunnel->encap.type)) ||
+ 	    nla_put_be16(skb, IFLA_IPTUN_ENCAP_SPORT,
+-			tunnel->encap.sport) ||
++			READ_ONCE(tunnel->encap.sport)) ||
+ 	    nla_put_be16(skb, IFLA_IPTUN_ENCAP_DPORT,
+-			tunnel->encap.dport) ||
++			READ_ONCE(tunnel->encap.dport)) ||
+ 	    nla_put_u16(skb, IFLA_IPTUN_ENCAP_FLAGS,
+-			tunnel->encap.flags))
++			READ_ONCE(tunnel->encap.flags)))
+ 		goto nla_put_failure;
  
  	return 0;
- }
 -- 
 2.55.0.rc0.799.gd6f94ed593-goog
 
