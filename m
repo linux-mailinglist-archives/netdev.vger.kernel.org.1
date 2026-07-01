@@ -1,275 +1,458 @@
-Return-Path: <netdev+bounces-303669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DJRcIWYZRWri6woAu9opvQ
-	(envelope-from <netdev+bounces-303669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:43:02 +0200
+	id V8SzMtcVRWrl6goAu9opvQ
+	(envelope-from <netdev+bounces-303670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:27:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788366EE41D
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:43:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF176EE197
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 15:27:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=outlook.com header.s=selector1 header.b=fOaD5SGv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303669-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303669-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=outlook.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b="FlOcZ/ll";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303670-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303670-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D79AE31C6209
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 13:17:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 534093009039
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 13:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EE848A2CA;
-	Wed,  1 Jul 2026 13:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F010481AB3;
+	Wed,  1 Jul 2026 13:21:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010020.outbound.protection.outlook.com [52.103.2.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE776481643;
-	Wed,  1 Jul 2026 13:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479D118BC3D;
+	Wed,  1 Jul 2026 13:21:48 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782911762; cv=fail; b=ohQjBX5N3uMxRbqQgrJHW6LT4FRDmKvKEPRyhRnpyF8S9A0jqT1OodbdI3lmnk6/fxgWUj0XSAAno+RtLzCx0YGIQJ9B9BX07BppVS+w6qKv48XlUqvPzDUpUiAyYONltjWKOw83cCAMyAO7t++FxE9N3wn3uEbutTmpMvyMIig=
+	t=1782912110; cv=fail; b=CF7w4LpEQ+PcXNw1BGZ06mmSx5WZjGQdEEQ+snPK6L2NDG5H7uoATNEZh4u7F6L1wpxmd4Lxp7IDe5C8hBkUq/5DtBD0/O/vHjAQaS/gV9uYXtvXfRjcm5daGKm6h8ifY6AXLr/An4JcTb9OTG257LWGhwRBvd3nMplDAOtdFNU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782911762; c=relaxed/simple;
-	bh=9xXPADXa63XTx4EqXxvqlbAdtRGbhtFyYhEy0sVg++I=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=PDIxkEvtsNUr03AmeBFCFIvlGQtRoHZj6mZNNSuWa9iMeV+8mfnDB14/rx3TsBe7JidixeWLOSXPdwUmWbrtKfmhlwWhblWA197bAfd17yoRnC4oQBKfAhDTSiz8r0KBZVwpPCPwoNeHXM31Au+xDR3+SaGrz3K3ExNGVKPeyew=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=fOaD5SGv; arc=fail smtp.client-ip=52.103.2.20
+	s=arc-20240116; t=1782912110; c=relaxed/simple;
+	bh=WbYpYCZmG/2S78sJLsLIA+/djVDUmZK5XHW4LfvAN1I=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JHhLebUSyE+bfc4OjlPHCnAgGK9qtKYaxXlTRGbbiz9aiWSIlvows6Q15BiUVKnJRQ7HUniD9F6dPjvgqjXgF2ygQHCCrteIy5Ss1PQ9p80KR1WnJ+qkFOGJhm1+KTzmtXf7CHjhMED8wZFD32u7/6Ylr9jx88nrOyxOGh3ENb4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FlOcZ/ll; arc=fail smtp.client-ip=192.198.163.9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782912108; x=1814448108;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=WbYpYCZmG/2S78sJLsLIA+/djVDUmZK5XHW4LfvAN1I=;
+  b=FlOcZ/llbokidvz8f9gh4sDOgNtN11fybMemVXGInoanzxT86aaDSm+L
+   Kp1llui/fJKFBWwizfPftZuqD+1/WZI+hFPr5D/mJWELrX90Mj751HHGS
+   CObajvw4tfLOBLTjgtx4pc+ICrn3IpA9irAz0B9fmlPY0SMCWSJ8SAqow
+   E8KPlA9ZlBrtFT52gLoNwzYtb56HUnOGEmdx+j9WaJzJwy30uRQnpmgkG
+   KNjDJxyFeB526heBZwHPAxj/rfbP+6Gyo1v1HOi+JxII4eXIyFMj5QOw6
+   R1yFWr1r01wI9Bi1/YLY0OA3KR6DbaQ4I2TbvBm0jRHJJNjad1x1qFKUm
+   A==;
+X-CSE-ConnectionGUID: 32ivA9cxSzuMHI2HKu/m2g==
+X-CSE-MsgGUID: UsMDiHB1StuSioILY2AaVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="94296309"
+X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
+   d="scan'208";a="94296309"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 06:21:47 -0700
+X-CSE-ConnectionGUID: U+DrHObgQdGCLKBDTlXzUw==
+X-CSE-MsgGUID: AL8mxK7lS+6EpnAVg36xlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
+   d="scan'208";a="276871811"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 06:21:48 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 1 Jul 2026 06:21:47 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Wed, 1 Jul 2026 06:21:47 -0700
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.21) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 1 Jul 2026 06:21:46 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EZxlhEahlEt545XExQ91MXh2bG7p7wLOMlD75N6KmPkAjYEvygDF02NlSdFbru56MWPGpP81MTO+AMp/GQfICInKySPRhFToPlSDWphUjFgsSz+gC1JrlQGsnxdVB9qL6BcmTf9hIRHLX7+hc7tny1hrxITxnrul9kZvB7ipQOcHSXOIRtmo+51P8LDjxBdVbm405/ds9BNQUHRHfmjB83ntI6SH70w4JcKZXbAvbH5tsFgFM4WaEiowT18n1vryecHSy+EVXE757rBOhPR5OUsBnFcWN+QlaWeWoHfEenT2yGQuK1RRwZtn0y3mlJA6f4rHcj7CqTur5kA4iiohlQ==
+ b=MTnW69g17xjod70SAKyDq3DcWUwWRPCzoy+scJXXD+t0YfBngNV2TSAOzn/Dm5WddopFdPgdnX2+olyUfcNFQA40YashFuEEzyXuhuBg3EDHLEbXxEhRWCIpa1NJT4vGkGrUlDogZXubx5bIgQYPfLc+HdwW+Q8MDuG+6peBWZicXaf4BnblyAi1xpt44Kn8lFxVE0n48pn2AErkLBaSHqzPV6Dabq49nncPrdRYKwr9bFD2X3R0BZbz1I5zWA6fGm1w1w4HyVjcGa1iA/Z38De0a0O+BSGdns/ivJp63s/SAj4v2PTjiM2Ps6Kfh0S1uGKaWSp6GNFR+hIsGOK+2g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/xm0FI05XJFZDL+RZtaxrDFvSt9ANySRA+OH3mdIz34=;
- b=IwCqK0U6XKKYF1IBsMd95FYwopZrMp+pBLMsUclpyfjfh0SIZYmBuurRACu8gFoEXjnTV7XC6+140irIuvrJYPmne0Usl3by0525ghk5Qd1/aJOLov4w/Xot1CTSo3XtCpvoCKeZCviEqf00p0DdBM+t53N4RDvR2VWfV+Aq9wUDy9AyFwfRR0irgz/E7rrF6ggA2MmWh8FpolIG3UT2rCaQpA0yvwI6CDIzXYmJ2GHJ54CtvlZyueaGzLxFipkMpLVnK/xsewTht8zu1uyF2RirpBByAQDStcnrH/8+mTzMBN1VkorG8g1JtHbS06hCLcFJH2jm+EUo1UEz7isWNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/xm0FI05XJFZDL+RZtaxrDFvSt9ANySRA+OH3mdIz34=;
- b=fOaD5SGvGJZLhXCc1iPuTzx/kS0IsbEvFkuhXhqWC7qqVdcnAG7h4VyPNmtolCZ+W2JJVYRv6OpG0+7gL163k5kty+eKG/EjRskihMn0/4q0Yv1teOjGAELZ/pE1lPA5HXRoRAaEaComwsLBEdrVx8uR2BDvy6uZRIMDRyTJ6zwUlUGttnXU0T0/16mkSrjmqMZbolXTYjN1mcIatnAEH4MlRW4t8GBpIAL6AipxvelRehSJG2nljAlf3paCaw4ka98ATE+vTFsZyzGOjKkeaajQJreplALvEdkgwWvJwUabuhqsho1+M0q5rqvWpMjmNt4VzigbPreNBkGulr5XDQ==
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
- by SN7PR19MB6969.namprd19.prod.outlook.com (2603:10b6:806:2a4::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.18; Wed, 1 Jul
- 2026 13:15:53 +0000
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
- 13:15:53 +0000
-Message-ID:
- <SN7PR19MB6736B784D6A16CBA531DBD5C9DF62@SN7PR19MB6736.namprd19.prod.outlook.com>
-Date: Wed, 1 Jul 2026 17:15:36 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/6] firmware: qcom: scm: Add support for setting
- Bluetooth power modes
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>,
- Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan
- <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
-References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
- <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
- <175f7835-df18-4bc6-8267-ceef35696af8@oss.qualcomm.com>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <175f7835-df18-4bc6-8267-ceef35696af8@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0002.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:26::7) To SN7PR19MB6736.namprd19.prod.outlook.com
- (2603:10b6:806:263::12)
-X-Microsoft-Original-Message-ID:
- <375f0807-17a1-4561-bade-1f6d2deb472c@outlook.com>
+ bh=/jeKrAmdNmyX91APIL9FQvSO2ABgySTWsf/OP7CoPAc=;
+ b=S8oAvBy7UyyVEoeU1DN4bVTbP227XhTwKCWXugP8ZNpFdDqiyb9+u9sLpxIeEPLR43ga+ozTa3SNbk68RkApMzNB8r8RUH8yntYajja4192cTe2hShzcB8oCMDeT5kwjArtGncTc7VrACLY5sLDyo0jRz5tpN9vaV6XemjNH2rKLnm2N+XRqtEM0uYkfgteLzjnz5Ok5qOALKmn8waLEGV4/ytkZMy3mr1/c7zJLwQhz/da7+/7/qyClxE+nu4TLa7G5nkEkGVPM/sY6kDKfSwbtrQJXX7SGnFAurmSadV0gx6HESnHXMPJ3Vdq+w2Fr1Q142EeNIJ3JVZTnDOSo2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com (2603:10b6:8:6e::21) by
+ DS0PR11MB6351.namprd11.prod.outlook.com (2603:10b6:8:cc::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.8; Wed, 1 Jul 2026 13:21:41 +0000
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485]) by DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485%6]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
+ 13:21:41 +0000
+Date: Wed, 1 Jul 2026 15:21:33 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+CC: <netdev@vger.kernel.org>, <joshwash@google.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <john.fastabend@gmail.com>, <bpf@vger.kernel.org>,
+	<sdf@fomichev.me>, <willemb@google.com>, <jordanrhee@google.com>,
+	<nktgrg@google.com>, <maolson@google.com>, <jacob.e.keller@intel.com>,
+	<thostet@google.com>, <csully@google.com>, <bcf@google.com>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>, Eddie Phillips
+	<eddiephillips@google.com>
+Subject: Re: [PATCH net] gve: fix Rx queue stall on alloc failure
+Message-ID: <akUUXT6UwTTD2yOs@boxer>
+References: <20260701005341.3699161-1-hramamurthy@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260701005341.3699161-1-hramamurthy@google.com>
+X-ClientProxiedBy: VIXP296CA0017.AUTP296.PROD.OUTLOOK.COM
+ (2603:10a6:800:36c::13) To DM4SPRMB0045.namprd11.prod.outlook.com
+ (2603:10b6:8:6e::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|SN7PR19MB6969:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7846a314-40a3-4a84-2140-08ded772dfbf
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|5072599009|25010399006|23021999003|37011999003|12121999013|15080799012|51005399006|41001999006|19110799012|8060799015|24021099003|6090799003|3412199025|440099028|40105399003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aHlLRThGSkx5bGllZ3dRNVZ3QkJWUzBXV1NDVXNybzhsLzRRazhBTTV3Qkxh?=
- =?utf-8?B?T2RBemlVYkNUV0NZZFEzVDI2UjVqSFh5MHVCeWpJQW9mKzlnb21OUEErT3VF?=
- =?utf-8?B?NnRqVVkxNkZMditweWZ5bjI0TjMydllXVzN2K0lQcjJEWHJZL24yTVFjTVV3?=
- =?utf-8?B?WDNhQ1N5emJBZTBqekxzd1A4RXYvdUxzMDh4aDRiYlFhMlZIbUxhK2RGekVN?=
- =?utf-8?B?ekJDS3UxeXZZeUZ3Ujg2d3RCRnJOeFFWeGZmSUxZdDRyakZKakMvVTROMEVR?=
- =?utf-8?B?ZTA0a1ZKbzFRM2NYYkcvUnBtR1V3WEFTQ2FnWlVXNXY2YVErYXptZVpGMVd3?=
- =?utf-8?B?RFQrQS9KTEdiR1FNakd0SFJ1V3BxSDdaeFI2T0VhL0NDaE9yQjVSdFZuSDZL?=
- =?utf-8?B?TEo0dUVjMTZRTUxSMlJ1UE5rOWx0dEpQMzl6eUczdjVidm4vSWNycnpRa29q?=
- =?utf-8?B?V0UybTlXZklvSnBTSmNUVjdRTStUOHJQOWZ3Mkh0ZzljV0hlRFd2NlFUbDJl?=
- =?utf-8?B?UDdiNHZJTXYzN1lHUTBpajVwOEJtbzQ0TFNaTk91QmNKZkE4OEorbEJXWnF2?=
- =?utf-8?B?cXREUDhCa1Njd21iNVJ1Z2I0MHdMZUViclZGVmlKVnpWSjMyUTh5K3lkTFB4?=
- =?utf-8?B?QVlqS3IyS2VnYy9xRUZmdmwxMUwvRWwvNUdzU2RxRnYvS0s4RU1YaUk0RHNV?=
- =?utf-8?B?djcycktlYWhMVjlMR1ltSlpkVWorbC8wYmtOOTFNZnQwUm1LNnJIZGFnNlUz?=
- =?utf-8?B?S1dQbXl4WlM0OEJSYzd3WVFyeFljTGF3NDAzeitIdFZQSlYyYWNsbzA2azZH?=
- =?utf-8?B?dkUxLzNzQXZUWFIwZTRlT3c0dDRQTVo4dktuWmFESy9CbndZR1pDV1Jhc2lP?=
- =?utf-8?B?VlRkeXVaN2FNUnRwVk85M0J3dC8rd2wzcWM3bWo1RzdEUmxWRk1oVFMwVDZ1?=
- =?utf-8?B?SW50VG5NOEVwZFNidm9tc1Jmei84N2tXREtPWmE0WmpaeFhlYUVJaUR5MHZn?=
- =?utf-8?B?cjNwK21NS2wwS3dwVkJ1NVhkc1NNTDkrbUcyeDUzODFINGVqeE8zeW5FUWhO?=
- =?utf-8?B?ajBwM0xJQXk3V2J0L0VtM1BEWGJyQy95eGNQUk9neHU4ZDZ3WXRzcWt3Y2Jx?=
- =?utf-8?B?bVRLMmIySEQzdEFac29uZ09yVmJjV3g0Q3hmL2FqcVVwYkMrNXY2Y0gvUWVw?=
- =?utf-8?B?S0V1cTNuUnlqYm82R0RhN25ybEdjaE03cHNNZm9sQ3MvYWl0Zlhpd1htamNh?=
- =?utf-8?B?M3orb1g4MjJhSWZma012KzVxTm56aEVwSXhKTDVEMUNkblJrVUlSc1gvREdB?=
- =?utf-8?B?YkJ5YWEyNkhLeXpaRnI3NFFwc0h6OFFsQnJ1QlVjVEpOdlFTRWZWTGZUZ3oy?=
- =?utf-8?B?Rm90YmNlVEowY0hmbm94bmJHOG9ObkdQV0ZyekFCazU2R3Fhd1RMRWhvLzRp?=
- =?utf-8?Q?mXxS02UF?=
+X-MS-TrafficTypeDiagnostic: DM4SPRMB0045:EE_|DS0PR11MB6351:EE_
+X-MS-Office365-Filtering-Correlation-Id: b40e03cc-33af-4003-d3ea-08ded773b055
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|366016|22082099003|18002099003|56012099006|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info: u+dGe1NEFtdu7cvyvnJ6HmeZvfhgUfdDMdtTeoADp+qAeosKrOo0fMr8DlaU1fr+YeLsKQRJ+vCViQp6ulS33gWPrWWBz/5jYBOTOrwm2OzUiGDXkFusyu9TyvBgZlWOKF/nCPjNQsYrLIsxridxpyrEiFV9UK+EldRyeGDjepGNuIXAvbkbvqBy+uVAiTYf7/qSaoEjtVeoOoxT4qKNHp7YpzcBBNr/SVpfxZK8zHTbHok9qPFrq1THOgx5K/WWKnig/2/I86UuNOq3y7vjJjgDemRB0EvbPYTJdfZkBIgho44SGDSDdxFkTpanCERJibMqK9Oj0GJgsqKAsqHVSJwP+mGvWL81QY1QB6WJyqha+kikr7hFqQ6ANdidoEEU1WLGMCJUCuc5i/Gi7CXMFGUCUifDqMZ25eYlqQ+ph7trFWS0qI30YTUrW227RL4Y3JXOzbLwFwDQs2jE5Cyc6liVqbWQ/yn3EtX/MWEd8gMd+1TNCM3Vi+ObCeGZCZ7tamJAkawP+3f0z2bpswar81qbBYAec3HkI+Dx7DS6K9Zy1YyBRld51wM82ZBS+yg0kDOGklQZq1Mg7qE4bmcnNM6ZLM+oU3yfagYUZ+uTd8SzYwzW51HQfkbYt8iaZRtttmaADHJceqCGdM/Od8lEyEOixs0GrmX98Vo8eTyZFHU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4SPRMB0045.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(366016)(22082099003)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YURpQmJibTdRWmZiRVFjZVdNWDdubFdnN1ZwZUc2WG5tZkpQaE1tRmE5Ylh0?=
- =?utf-8?B?N3pyVUN4MldlUW42dXN3c2gzK2wyM09iRWdnY2g5Slg3V2RqT1NPT1VxUFJh?=
- =?utf-8?B?ZE1sMnNmNGlZSkFZOFpYNk9QTTRZbzJQYjAzRFZIcjJPUUNaQ3ErbGxuN3d0?=
- =?utf-8?B?VFArSWoycFZHOHF4RCtUQkxDZEtSa2VFZklqSFNPYkxJSTRLc3B1ZkI2S2tP?=
- =?utf-8?B?WHVzVm5ZN2hJTTllaXZ1YlAvOHZ6cloxMWwyeTBuZ1N2TVdrQXJSSmpSQm9y?=
- =?utf-8?B?ZGliaVFOK3pUaXR4bE1XM3N2d2pVYmI0bllpdHM1RGFWcW5kZGo2K2RzVFlM?=
- =?utf-8?B?SXpYUGs4TXBLZWVWL2RLWkRUMjYvL3FhRWt0TTV3VzRGNWZaMnFZcnB4QjVn?=
- =?utf-8?B?cjIwRDlBOVlPcUo2WlZ2NGQrTkVFZVBlbFozaTY5dVNIQVc4OXYwajg5SHJQ?=
- =?utf-8?B?My9tMWZsdmxjakdNcHFoT0ZZMWVicU1nMnMxVjZQVjFYaHhkU2JlSWh5eTVX?=
- =?utf-8?B?VkM0UUI4U1oxaXZmOWlkQ1U2SGI1MG01RWxsNkRsNDZ5OUVoaVJRNnViTWp4?=
- =?utf-8?B?Y1JzNEFtRWlyeDZzSnRxMXp4bGJCK0tncjZLQzF6dHowbHJhNzBkY2g0bDJs?=
- =?utf-8?B?eVFMVjJzYlJtNXhuM3Z2Z2Z3b0ZjdXFMK2NyVlNvdmt5WTZVN2JTRytSWVpX?=
- =?utf-8?B?b1NYc01leGxOSWxRM1BVbTYwSCtFYkNUR0pNZHVFMVBmR3RtSnp0eDNTZ0lM?=
- =?utf-8?B?MnFFd1ovcHRLVk1jeDdtREFVNDZocVhheDQzdXFrazA5ekZDeVBJYnhvdDY0?=
- =?utf-8?B?Rm5aN1VXR010L2pJRGJmUDdqcnp4Qmt5Q0V6ZXdZVFYvOHYyTlEzdHl6M0NJ?=
- =?utf-8?B?TGozdnhhT0JWSm9Kb3h2UWJRcVVkaHkzSk1IR2U4VFFCQXloTnhETU00bmZv?=
- =?utf-8?B?V201VVROOEJUTlRhMFpPYUJ4QVNjaUhwR081RlBzTVZ2cDlUdXdXWi9kUkxL?=
- =?utf-8?B?TTRQSHJNQkhrL3l1MnNRVjh1TzBob1QzakptdnFoTStqYloxUnp3dXRtcXlZ?=
- =?utf-8?B?ak1vUE0yRnUzcHd5cmlxNXZZRmhOb2kvN3JjSWJGb3pScXl6eXRTRFZmb3Jk?=
- =?utf-8?B?MkZJQlh5QUM0UkZ4OGJHZEdnSC9QYzRkeVVFZExONEFBQTZTNGFMcDF3ems0?=
- =?utf-8?B?NnlnamRKelNBRHNFRXpRSlpOdG9obDB4V3drdk5Vdm5PU3RtUk92ZnZZejVV?=
- =?utf-8?B?OEZ1OXl0T2NnQTd3ZEM0c1lDMENTaFp3ZFZzL0tGOFprZFlQRG1RaUxaR1V6?=
- =?utf-8?B?ZVphbzFIdFhBT01nUUFrTXYrRzBTMDBRYzhPZFk5UDdNQkpXTUpBUTU0dDBv?=
- =?utf-8?B?b1dWOU45ZVRRVFZGMkpJNU5mcDkvSnRxNlh3ZFVybVhPeGM5ZU8rNHdWRDJn?=
- =?utf-8?B?ZVlUUUVXREpVNTVCL0tSU05CZ2hWMllsUnJUa1Y1dU9PdkYyeDhSakFlOS9U?=
- =?utf-8?B?MHQzcHdNVVNCRHlBa1h3R1dTK1g5RUk2WFMrV2xseGFNKzBKanFNdzJCVkxR?=
- =?utf-8?B?U2k4SHgweFh5dlg3L05CMWV6bHJLL0tHY1dLMHU4Z2w5Z2ZWck1tRUtMTlpU?=
- =?utf-8?B?RWNmUDFwWFUyTm4rRzhnUm9IRS9xOGZQU2hJdkE5UG5zK2dkb1ViV1RsSE5Y?=
- =?utf-8?B?TDI2dVR0S0Y4ZFF1bmJpUWh4ZjdwbFpRS0NuQnBOK2YvMmZLR2VVNTlobVdh?=
- =?utf-8?B?Yis3bVEySUVEMURqNnQwaHNIdWNFTHlWNUVlRXd0UnNnVTFPUnh3TEt5VThJ?=
- =?utf-8?B?NVp4YWNuU2IraVVxY0RRUnhoaGFjZjc3YWo2WEFhdkExcXVUbkh4MTFoQXdw?=
- =?utf-8?B?TzlpUGp4Z2M5ZHdhKzBsWWE5eUxnWGNYUjFXMzRQWDBwRlE9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7846a314-40a3-4a84-2140-08ded772dfbf
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RD7og5tUvwHi37lJnM045z5yRd7eCF6dCA0v2KiOsu+6qxVHO3SWulcR/U+l?=
+ =?us-ascii?Q?pMEMj+ybT+2x8eLPkzKHOh/KWQgMHbC06z5JclCTAzmZcwHtRBhpNKo/ctz4?=
+ =?us-ascii?Q?cDRw/mqEZWs7VBOO06uegPTgScSypFS/A0Ye1Mc/8FwFi3fu69ObkiDI709h?=
+ =?us-ascii?Q?o3fpoEAMlP+nefAzeebFBM0ZV9tpSJTQSKmZDKbHeiSkhI8BxS8yGi/hJ53C?=
+ =?us-ascii?Q?syre7FXuxqBLcflXh47nw+zPvY6pVdIguANb485GgZZS8iiyXhqkFXemmrgK?=
+ =?us-ascii?Q?8Y9O8aUqvzaby9D5nxP/5m6osKGxP42CTiQgJ20ZKirwMNPHfdhfHDnKmTcM?=
+ =?us-ascii?Q?aKEyxzWRhzhNsXLOsMhGDYZkrD3QVpM7hEH116Yvm3JSRahol1sVnz1y1DbP?=
+ =?us-ascii?Q?7h+KNrmpAJ5VAEWryUDUu6FE8AXLzumXIoDk5WtqfhoSRJNbU93nHkRBPrsT?=
+ =?us-ascii?Q?WX93YkHYXzA5LIAmiREBfCgvmMQ80O1oRDSD09tM9t8UlbeXUEFfzl8KCaHf?=
+ =?us-ascii?Q?NbkAi5mLWMBHRwt+NuKN4ZesKMOnAtHVHppkNTsgNx/BiwoM6TAyFwpzk0LU?=
+ =?us-ascii?Q?IIGFNOZMgGN8mg27wrEFTU9QivzfCE0Ghz0ezCJNjsgBjp3FpXQLVyRqaSF7?=
+ =?us-ascii?Q?YUJ7gbg4l3r4KVeN0lSDxRgB1rhoqyJMIFDrgSmU6z0xVPTSTirE5Xnugx7F?=
+ =?us-ascii?Q?pxz9RV5R09qj9pN+1Q/zS5XMgKHgzmlk54F/c0jRwYg6K+So6292nktp9hHx?=
+ =?us-ascii?Q?FSVYVrOoktK9EJKuiw7JZAkG/yRiq2fRSPyyNfBdukJC9ZgXnmzGnnq+pnrs?=
+ =?us-ascii?Q?Fumlp1JoER1M7XAjItikZ7Rj4/WcvKiS4w5HwYBD3eJASn1Kh3yIR8aXTRJL?=
+ =?us-ascii?Q?5AmInXiQcnKL+smgz1SXxs5E0VDw7ED1jfy9x4uJHyO8ozytjI6oZMWABC8W?=
+ =?us-ascii?Q?+60f/VzdOUjFfl6gVHFylkF3r5HxO7i0J4S4lDNKnOiKqIXOeD6JB2+3FlZw?=
+ =?us-ascii?Q?Ehx9fBdc+QwlCLvxZYEesBb+bHQEU0eURNXCJB84X8sGT5FymPmCdemh8CKO?=
+ =?us-ascii?Q?yCjYEytLcvRfghemc6sM2GExFE0nmfyUv6UBcjIlObBHOxUaqZmPmj4fM4qD?=
+ =?us-ascii?Q?m/rwtrUEMNGBB/5UMXlwWjflTDQbyFHWjL9Dq0yJk8LvRq9LdDM+KyEBOdg4?=
+ =?us-ascii?Q?TY25MgHkyBw7wstnBHLmSxdtAl5RBoeMAgyUbvfVYrLmQ3JVU2BDKY2RmxxS?=
+ =?us-ascii?Q?64FSdoCudMVWK/2sGVqmSQlqukD1YwOiteakODffxyHi5C5utyGN85uqc8ZW?=
+ =?us-ascii?Q?d/xzW0GaqcXwnVbDu0j005nlzdoyGf5bvGJNL0Ymgu3OfKNDSjBY2eQlJ4Le?=
+ =?us-ascii?Q?87UQ8eah7NQBVNv2rjg8vbffNtyTzhAwt5K6CULD0E0xx7T8OVoAoB63OZjd?=
+ =?us-ascii?Q?OcDG2IND/KKcPOhEx/M6cYk97HX6C14SV4Kq/pQi45MN2qPbU1dZrbaXoYl0?=
+ =?us-ascii?Q?OTKRORFweMdYjzjaSnuT/g3BPYQGUCOHfHhoCeK8wKX87LzbYBAUawjMoVep?=
+ =?us-ascii?Q?uQ2+s8IkmrRxP9awnnFJfexUf2TMUYWqVIL5rMhiMpC/vyitJ7goOAMMdI7o?=
+ =?us-ascii?Q?Pwd37gmapi/Ppl/a5JNLjpTA5iBI3ID9WTAL8UmDBVjkVykn872pMHHQIqvc?=
+ =?us-ascii?Q?XkwR0MAOuPVBqz9lLKOoLtTG840IKM+m6hkqMtxnJ/7pVtObJ4u3u6L1UBvY?=
+ =?us-ascii?Q?gu9sxv+Hqvm+LpoOD3m1ySs3Ql1kulc=3D?=
+X-Exchange-RoutingPolicyChecked: UFkDZghu6ZM5I/Q16NBXZ2Gq6I+pdIKpEM0beIAz7PPo+kaeNrQWi2mqAY+xlDohXKkdnWOSxwXp8C1wicdK7atQFLRQvKXP41sEDSqq+EuhdtHoSyMqa20ADJ9Y+WVshdtZUyqd5fxabXZ1uHEYusPptN5DWZVpwTz+//RUv1dDeQS0Kr/Y5M8nwRYBSzMEAjA1k0nKnftKJODvr7NvGmDeymoE0sxcNLs2gNWVjvEQ1Bb2bp/A/4lt/i4+6plDHOTMZNdcxiDdpvtmE3HdA1bi+bMhQNXEGRckUF+8aP5KInUywtnBhXTs7KwTPSWRk16WP7qNIVt2xVpFUeVPhw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: b40e03cc-33af-4003-d3ea-08ded773b055
+X-MS-Exchange-CrossTenant-AuthSource: DM4SPRMB0045.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 13:15:53.1097
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 13:21:41.3948
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR19MB6969
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TbX4MKE+vuyUwvzj0TwBanYqbm+Wm7moPvTFkqfM6dzvSPBi3GE/ae48Qr84MdknETaPymi9GRf7pYTOLa2rnah3PwTvqKvZ0spUxbZPKrw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6351
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
-	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_MUA_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:axboe@kernel.dk,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:saravanak@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mathieu.poirier@linaro.org,m:p.zabel@pengutronix.de,m:linux-block@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-arm-msm@vger.kernel.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-remoteproc@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:hramamurthy@google.com,m:netdev@vger.kernel.org,m:joshwash@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:bpf@vger.kernel.org,m:sdf@fomichev.me,m:willemb@google.com,m:jordanrhee@google.com,m:nktgrg@google.com,m:maolson@google.com,m:jacob.e.keller@intel.com,m:thostet@google.com,m:csully@google.com,m:bcf@google.com,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:eddiephillips@google.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[outlook.com];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.dk,kernel.org,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com,linaro.org,pengutronix.de];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303670-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303669-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[outlook.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[george.moussalem@outlook.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:dkim,intel.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,boxer:mid];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,intel.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:dkim,outlook.com:email,outlook.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,SN7PR19MB6736.namprd19.prod.outlook.com:mid,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 788366EE41D
+X-Rspamd-Queue-Id: 2DF176EE197
 
-On 7/1/26 14:40, Konrad Dybcio wrote:
-> On 6/29/26 3:01 PM, George Moussalem via B4 Relay wrote:
->> From: George Moussalem <george.moussalem@outlook.com>
->>
->> The Bluetooth subsystem (BTSS) on the IPQ5018 SoC supports setting power
->> modes which are required to be configured through a Secure Channel
->> Manager (SCM) call to TrustZone. However, not all Trusted Execution
->> Environment (QSEE) images support this call, so first check if the call
->> is available.
->>
->> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->> ---
+On Wed, Jul 01, 2026 at 12:53:41AM +0000, Harshitha Ramamurthy wrote:
+> From: Eddie Phillips <eddiephillips@google.com>
 > 
-> I'm amazed changing this setting is a secure operation
+> When the system is under extreme memory pressure, page allocations can
+> fail during the Rx buffer refill loop. If the number of buffers posted
+> to hardware falls below a critical low threshold and the refill loop
+> exits due to allocation failures, the queue can stall:
 > 
-> [...]
+> 1. The device drops incoming packets because there are no descriptors.
+> 2. Since no packets are processed, no Rx completions are generated.
+> 3. Because no completions occur, NAPI is never scheduled, preventing
+>    the refill loop from running again even after memory is freed.
 > 
->> +/**
->> + * qcom_scm_pas_set_bluetooth_power_mode() - Configure power optimization mode
->> + *					     for the Bluetooth subsystem (BTSS)
->> + * @pas_id:	peripheral authentication service id
->> + * @val:	0x0 for normal operation, 0x4 for ECO mode
+> This results in a permanent queue stall.
 > 
-> If there's just two values, maybe we should make this take a `bool eco_mode`?
+> Resolve this by introducing a starvation recovery timer for each Rx queue.
+> If the number of buffers posted to hardware falls below a critical low
+> threshold, start a timer to periodically reschedule NAPI. Once NAPI runs
+> and successfully refills the queue above the threshold, the timer is
+> not rescheduled.
+> 
+> Also add a new ethtool statistic "rx_critical_low_bufs" to track the
+> number of times the starvation recovery timer is triggered.
 
-that was the direction I was going in initially but then thought that
-there may be more (undocumented) power modes I'm unaware off so changed
-it to u32. I'll change it back to bool.
+I think this deserves to be pulled out of the timer logic?
 
-> 
->> + *
->> + * Return: 0 on success, negative errno on failure.
->> + * Returns -EOPNOTSUPP if the firmware configuration call is unavailable.
->> + */
->> +int qcom_scm_pas_set_bluetooth_power_mode(u32 pas_id, u32 val)
->> +{
->> +	if (!__qcom_scm_is_call_available(__scm->dev, QCOM_SCM_SVC_PIL,
->> +					  QCOM_SCM_PIL_PAS_BT_PWR_MODE))
->> +		return -EOPNOTSUPP;
->> +
->> +	return __qcom_scm_pas_set_bluetooth_power_mode(pas_id, val);
-> 
-> Let's just inline the whole definition here - it's single-use anyway
-
-will update, thanks.
+Two questions tho:
+- couldn't you detect this case within napi poll loop?
+- if not, does it have to be per-q timer? wouldn't one global per pf timer
+  satisfy your needs?
 
 > 
-> Konrad
-
-Cheers,
-George
-
+> Cc: stable@vger.kernel.org
+> Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
+> Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+> Signed-off-by: Eddie Phillips <eddiephillips@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve.h         |  4 ++++
+>  drivers/net/ethernet/google/gve/gve_ethtool.c | 14 +++++++++++++-
+>  drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 32 ++++++++++++++++++++++++++++++++
+>  3 files changed, 49 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+> index 2f7bd330..8378bef2 100644
+> --- a/drivers/net/ethernet/google/gve/gve.h
+> +++ b/drivers/net/ethernet/google/gve/gve.h
+> @@ -13,6 +13,7 @@
+>  #include <linux/netdevice.h>
+>  #include <linux/net_tstamp.h>
+>  #include <linux/pci.h>
+> +#include <linux/timer.h>
+>  #include <linux/ptp_clock_kernel.h>
+>  #include <linux/u64_stats_sync.h>
+>  #include <net/page_pool/helpers.h>
+> @@ -41,6 +42,7 @@
+>  
+>  /* Interval to schedule a stats report update, 20000ms. */
+>  #define GVE_STATS_REPORT_TIMER_PERIOD	20000
+> +#define GVE_RX_NAPI_RESCHED_MS 20 /* msecs */
+>  
+>  /* Numbers of NIC tx/rx stats in stats report. */
+>  #define NIC_TX_STATS_REPORT_NUM	0
+> @@ -318,6 +320,7 @@ struct gve_rx_ring {
+>  	u64 rx_copied_pkt; /* free-running total number of copied packets */
+>  	u64 rx_skb_alloc_fail; /* free-running count of skb alloc fails */
+>  	u64 rx_buf_alloc_fail; /* free-running count of buffer alloc fails */
+> +	u64 rx_critical_low_bufs; /* count of critical low buffer events */
+>  	u64 rx_desc_err_dropped_pkt; /* free-running count of packets dropped by descriptor error */
+>  	/* free-running count of unsplit packets due to header buffer overflow or hdr_len is 0 */
+>  	u64 rx_hsplit_unsplit_pkt;
+> @@ -334,6 +337,7 @@ struct gve_rx_ring {
+>  	struct gve_queue_resources *q_resources; /* head and tail pointer idx */
+>  	dma_addr_t q_resources_bus; /* dma address for the queue resources */
+>  	struct u64_stats_sync statss; /* sync stats for 32bit archs */
+> +	struct timer_list starvation_timer; /* for queue starvation recovery */
+>  
+>  	struct gve_rx_ctx ctx; /* Info for packet currently being processed in this ring. */
+>  
+> diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+> index a0e0472b..71b6efbf 100644
+> --- a/drivers/net/ethernet/google/gve/gve_ethtool.c
+> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+> @@ -46,6 +46,7 @@ static const char gve_gstrings_main_stats[][ETH_GSTRING_LEN] = {
+>  	"rx_hsplit_unsplit_pkt",
+>  	"interface_up_cnt", "interface_down_cnt", "reset_cnt",
+>  	"page_alloc_fail", "dma_mapping_error", "stats_report_trigger_cnt",
+> +	"rx_critical_low_bufs",
+>  };
+>  
+>  static const char gve_gstrings_rx_stats[][ETH_GSTRING_LEN] = {
+> @@ -58,6 +59,7 @@ static const char gve_gstrings_rx_stats[][ETH_GSTRING_LEN] = {
+>  	"rx_xdp_aborted[%u]", "rx_xdp_drop[%u]", "rx_xdp_pass[%u]",
+>  	"rx_xdp_tx[%u]", "rx_xdp_redirect[%u]",
+>  	"rx_xdp_tx_errors[%u]", "rx_xdp_redirect_errors[%u]", "rx_xdp_alloc_fails[%u]",
+> +	"rx_critical_low_bufs[%u]",
+>  };
+>  
+>  static const char gve_gstrings_tx_stats[][ETH_GSTRING_LEN] = {
+> @@ -151,12 +153,14 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  {
+>  	u64 tmp_rx_pkts, tmp_rx_hsplit_pkt, tmp_rx_bytes, tmp_rx_hsplit_bytes,
+>  		tmp_rx_skb_alloc_fail, tmp_rx_buf_alloc_fail,
+> +		tmp_rx_critical_low_bufs,
+>  		tmp_rx_desc_err_dropped_pkt, tmp_rx_hsplit_unsplit_pkt,
+>  		tmp_tx_pkts, tmp_tx_bytes,
+>  		tmp_xdp_tx_errors, tmp_xdp_redirect_errors;
+>  	u64 rx_buf_alloc_fail, rx_desc_err_dropped_pkt, rx_hsplit_unsplit_pkt,
+>  		rx_pkts, rx_hsplit_pkt, rx_skb_alloc_fail, rx_bytes, tx_pkts, tx_bytes,
+> -		tx_dropped, xdp_tx_errors, xdp_redirect_errors;
+> +		rx_critical_low_bufs, tx_dropped, xdp_tx_errors,
+> +		xdp_redirect_errors;
+>  	int rx_base_stats_idx, max_rx_stats_idx, max_tx_stats_idx;
+>  	int stats_idx, stats_region_len, nic_stats_len;
+>  	struct stats *report_stats;
+> @@ -197,6 +201,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  
+>  	for (rx_pkts = 0, rx_bytes = 0, rx_hsplit_pkt = 0,
+>  	     rx_skb_alloc_fail = 0, rx_buf_alloc_fail = 0,
+> +	     rx_critical_low_bufs = 0,
+>  	     rx_desc_err_dropped_pkt = 0, rx_hsplit_unsplit_pkt = 0,
+>  	     xdp_tx_errors = 0, xdp_redirect_errors = 0,
+>  	     ring = 0;
+> @@ -212,6 +217,8 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  				tmp_rx_bytes = rx->rbytes;
+>  				tmp_rx_skb_alloc_fail = rx->rx_skb_alloc_fail;
+>  				tmp_rx_buf_alloc_fail = rx->rx_buf_alloc_fail;
+> +				tmp_rx_critical_low_bufs =
+> +					rx->rx_critical_low_bufs;
+>  				tmp_rx_desc_err_dropped_pkt =
+>  					rx->rx_desc_err_dropped_pkt;
+>  				tmp_rx_hsplit_unsplit_pkt =
+> @@ -226,6 +233,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  			rx_bytes += tmp_rx_bytes;
+>  			rx_skb_alloc_fail += tmp_rx_skb_alloc_fail;
+>  			rx_buf_alloc_fail += tmp_rx_buf_alloc_fail;
+> +			rx_critical_low_bufs += tmp_rx_critical_low_bufs;
+>  			rx_desc_err_dropped_pkt += tmp_rx_desc_err_dropped_pkt;
+>  			rx_hsplit_unsplit_pkt += tmp_rx_hsplit_unsplit_pkt;
+>  			xdp_tx_errors += tmp_xdp_tx_errors;
+> @@ -269,6 +277,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  	data[i++] = priv->page_alloc_fail;
+>  	data[i++] = priv->dma_mapping_error;
+>  	data[i++] = priv->stats_report_trigger_cnt;
+> +	data[i++] = rx_critical_low_bufs;
+>  	i = GVE_MAIN_STATS_LEN;
+>  
+>  	rx_base_stats_idx = 0;
+> @@ -337,6 +346,8 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  				tmp_rx_hsplit_bytes = rx->rx_hsplit_bytes;
+>  				tmp_rx_skb_alloc_fail = rx->rx_skb_alloc_fail;
+>  				tmp_rx_buf_alloc_fail = rx->rx_buf_alloc_fail;
+> +				tmp_rx_critical_low_bufs =
+> +					rx->rx_critical_low_bufs;
+>  				tmp_rx_desc_err_dropped_pkt =
+>  					rx->rx_desc_err_dropped_pkt;
+>  				tmp_xdp_tx_errors = rx->xdp_tx_errors;
+> @@ -381,6 +392,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+>  			} while (u64_stats_fetch_retry(&priv->rx[ring].statss,
+>  						       start));
+>  			i += GVE_XDP_ACTIONS + 3; /* XDP rx counters */
+> +			data[i++] = tmp_rx_critical_low_bufs;
+>  		}
+>  	} else {
+>  		i += priv->rx_cfg.num_queues * NUM_GVE_RX_CNTS;
+> diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> index 02cba280..303db4fa 100644
+> --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+> @@ -18,6 +18,16 @@
+>  #include <net/tcp.h>
+>  #include <net/xdp_sock_drv.h>
+>  
+> +static void gve_rx_starvation_timer(struct timer_list *t)
+> +{
+> +	struct gve_rx_ring *rx = timer_container_of(rx, t, starvation_timer);
+> +	struct gve_priv *priv = rx->gve;
+> +	struct gve_notify_block *block;
+> +
+> +	block = &priv->ntfy_blocks[rx->ntfy_id];
+> +	napi_schedule(&block->napi);
+> +}
+> +
+>  static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
+>  {
+>  	struct device *hdev = &priv->pdev->dev;
+> @@ -120,6 +130,7 @@ void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
+>  
+>  	if (rx->dqo.page_pool)
+>  		page_pool_disable_direct_recycling(rx->dqo.page_pool);
+> +	timer_delete_sync(&rx->starvation_timer);
+>  	gve_remove_napi(priv, ntfy_idx);
+>  	gve_rx_remove_from_block(priv, idx);
+>  	gve_rx_reset_ring_dqo(priv, idx);
+> @@ -136,6 +147,8 @@ void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+>  	u32 qpl_id;
+>  	int i;
+>  
+> +	timer_shutdown_sync(&rx->starvation_timer);
+> +
+>  	completion_queue_slots = rx->dqo.complq.mask + 1;
+>  	buffer_queue_slots = rx->dqo.bufq.mask + 1;
+>  
+> @@ -232,6 +245,7 @@ int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+>  	rx->gve = priv;
+>  	rx->q_num = idx;
+>  	rx->packet_buffer_size = cfg->packet_buffer_size;
+> +	timer_setup(&rx->starvation_timer, gve_rx_starvation_timer, 0);
+>  
+>  	if (cfg->xdp) {
+>  		rx->packet_buffer_truesize = GVE_XDP_RX_BUFFER_SIZE_DQO;
+> @@ -365,6 +379,7 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+>  	struct gve_rx_compl_queue_dqo *complq = &rx->dqo.complq;
+>  	struct gve_rx_buf_queue_dqo *bufq = &rx->dqo.bufq;
+>  	struct gve_priv *priv = rx->gve;
+> +	u32 num_bufs_avail_to_hw;
+>  	u32 num_avail_slots;
+>  	u32 num_full_slots;
+>  	u32 num_posted = 0;
+> @@ -400,6 +415,23 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+>  	}
+>  
+>  	rx->fill_cnt += num_posted;
+> +
+> +	/* If the queue has fewer than GVE_RX_BUF_THRESH_DQO descriptors
+> +	 * visible to the hardware, and no doorbell was written, the hardware
+> +	 * is in danger of starving and cannot trigger interrupts. Start the
+> +	 * timer to periodically reschedule NAPI and recover from starvation.
+> +	 */
+> +	num_bufs_avail_to_hw =
+> +		((bufq->tail & ~(GVE_RX_BUF_THRESH_DQO - 1)) -
+> +		 bufq->head) & bufq->mask;
+> +
+> +	if (num_bufs_avail_to_hw < GVE_RX_BUF_THRESH_DQO) {
+> +		u64_stats_update_begin(&rx->statss);
+> +		rx->rx_critical_low_bufs++;
+> +		u64_stats_update_end(&rx->statss);
+> +		mod_timer(&rx->starvation_timer,
+> +			  jiffies + msecs_to_jiffies(GVE_RX_NAPI_RESCHED_MS));
+> +	}
+>  }
+>  
+>  static void gve_rx_skb_csum(struct sk_buff *skb,
+> -- 
+> 2.55.0.rc2.803.g1fd1e6609c-goog
+> 
+> 
 
