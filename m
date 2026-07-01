@@ -1,69 +1,110 @@
-Return-Path: <netdev+bounces-303780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303781-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ioFTK8RLRWoA+QoAu9opvQ
-	(envelope-from <netdev+bounces-303780-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:17:56 +0200
+	id VyiNDbBLRWr0+AoAu9opvQ
+	(envelope-from <netdev+bounces-303781-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:17:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAAC96F045C
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:17:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7376F0450
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:17:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=verdict.gg header.s=sig1 header.b=LshjrYu5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303780-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303780-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=jfarr.cc header.s=fm3 header.b="B 6HZxm1";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=dqbaC0gn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303781-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303781-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=jfarr.cc;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1710E300D862
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 17:11:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7591030A1C25
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 17:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC06388E6E;
-	Wed,  1 Jul 2026 17:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1123909A3;
+	Wed,  1 Jul 2026 17:13:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.ms.icloud.com (ms-2005a-snip4-10.eps.apple.com [57.103.72.72])
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6458386559
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 17:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0333905FD;
+	Wed,  1 Jul 2026 17:13:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782925872; cv=none; b=Sc6eqWUD8jseQdtDRHbHzNK54cukYJM9umsC5Unoll6oFwlcsAQ3lCjFvnRBhovsQgRAKo6t/IktiAgv4nMh2/24uw/GVWI/95vcETZotMOaTGI+ziGEQ88cRJFcFm5bobyq+NmhIMGv8N0xEjYIwRqcg1BpgCIzuCglPj7WePA=
+	t=1782926031; cv=none; b=UVSLNK3iE1cdvXDeGHZaRSi9MpO/RK6mTmqwVf63qyJZVfSnxTH3bUBvgDcq01QQoMT6MUlgLY43/L6zIs6hqxT8rGjnONA7y5DtQhYeQaAuQvfxZpHEMn7/NvVdVMkGjD30zadUCgDS7bmljkzwN4+GAmPQt6lz97yYbcA23sM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782925872; c=relaxed/simple;
-	bh=oJRnrYvJPwJWBEXTRVH7A79TUXWT1PIOip4ufaCLJ1g=;
+	s=arc-20240116; t=1782926031; c=relaxed/simple;
+	bh=8HHfCXosk9bds3qhL/OMtnaEsG61dm/HE1FtI3WqEeM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N5in0Iw+8nVX0kf2LF/cZOf15910932QC4wf0O89OjgTThzzUUXntvv2TNn3Hlqi51NJSfewlCMmi1rUGhZRdTXNfdeM6XLpyUG7CZsCIdseEg9nrNimMdiPj9uOMgeplpfm7WyRoYF5+fbzfdm19n04UkkVqiVAOibC1qf0KfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=LshjrYu5; arc=none smtp.client-ip=57.103.72.72
-Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-3a-20-percent-0 (Postfix) with ESMTPS id 809D6180047B;
-	Wed, 01 Jul 2026 17:11:04 +0000 (UTC)
-X-ICL-RepId: 019f1ea9-adcf-71a1-be69-dcd8c6563bff
-X-ICL-Out-Info: HUtFAUMHWwJACUgBTUQeDx5WFlZNRAJCTQhICkMGWQJeCEABQwVdEhVdRVcIWwJAEVc4RQhFD1sTTVZUChcNVk1PHUEJXghGXl4fEx9UVgNDGRBWAVhWXQVNGlwYWQ8cHUpWWg5bBEcUFxtcABcbRgIEIwJfAEUCXglWATAXD1ZNTx1BCV4IRl5eHxMAXg8PTAtIAVsHXAJBCE8CXQJcHEQKSwNABkZWFVURQQxZK0QVSxxaDkNFVRcHWEcURw4PE0wLRwJaNFYfVBlaAw==
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1; t=1782925867; x=1785517867; bh=Ux7+DOdhq925QFrHXROFexh8o7u6tNSyc/XGZzwyn+k=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=LshjrYu5hea0XNelNbATHPHVpRcXMvrvwMtxobwp8CUYBDEG3OiR3S59ps8Goqh0uSXhbX7e8ZtnjMLumMW7dm9geAnouOrZgPhCC3LCOQG83bBUw6oAlzvj9nEkb/Dwcrzef1Ev1MA2nqRwFV2QxcWthVwXMfv0gydr846PLC30MnqkRN98XOhhl0aYr2LYH2iDjDtV6cxsinqRoqWGJioK5aPB0WxlprY1pYwa29evDPWGIrGNEHMTB+85uKdr93Qh/vtQcg41THEkZGERap7mTzI37hB6qQRAkVp39X1gF/CgjoVpns9du91D8rN2ItFEWiZ1nLSuN33BSiAugQ==
-mail-alias-created-date: 1621344842221
-Received: from DelNac.mail.msk (unknown [17.57.154.37])
-	by p00-icloudmta-asmtp-us-west-3a-20-percent-0 (Postfix) with ESMTPSA id A219018004A4;
-	Wed, 01 Jul 2026 17:11:00 +0000 (UTC)
-From: Vladimir Vdovin <deliran@verdict.gg>
-To: lorenzo@kernel.org,
-	sdf@fomichev.me,
-	kuba@kernel.org
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	martin.lau@linux.dev,
-	sdf.kernel@gmail.com,
-	bpf@vger.kernel.org,
+	 MIME-Version; b=AJqHCpVdIUjlXLhRggJNRz9GAAm/hjWDflt8a0OkKzd0W8IRjVihV3D7C86Tb0zLVgOaOQtTycKzpmtC+/2EEZfV0z+kEnyw/8C4usu5g6Xs/YblS2adVuXjpz/3HZCAYZ2prVwSl9p/GVaesSC8r/StstIKPJ3D78fi8Ffpiwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jfarr.cc; spf=pass smtp.mailfrom=jfarr.cc; dkim=pass (2048-bit key) header.d=jfarr.cc header.i=@jfarr.cc header.b=B6HZxm1t; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dqbaC0gn; arc=none smtp.client-ip=202.12.124.155
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C39527A007E;
+	Wed,  1 Jul 2026 13:13:48 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Wed, 01 Jul 2026 13:13:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jfarr.cc; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1782926028; x=
+	1783012428; bh=8HHfCXosk9bds3qhL/OMtnaEsG61dm/HE1FtI3WqEeM=; b=B
+	6HZxm1ta4djUAF62MRXY9vpM/YyvSnqKTtPNJDTh8fPuevREkp51D8x1FMZZ7SEl
+	lQV/s5AST8hlZ5ZEuitsYfcrNhej2YFLEDAQVLYXq3CJ8LM7/cEWpAFVzlc+LBSa
+	z8gk7MKq0/ALnjUc8/bLTA9iOjRMQKA9M9e89GrzrJdBsw1IQjCKrPRYjr+6tQrr
+	DuZA2TYlNUZy6u+PplhcmwGGhBPtDYJFE3w9rN81C0DnC+M7k+084aNplF16Xm9h
+	PgPJmAEAL+gCvA9qD9DbpAKnXmYK5Dxp05YX8FeeLabtdHUkZ70VMvB7/1crbM5l
+	LgpYdZ25mP2TuA22s3PGw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1782926028; x=1783012428; bh=8
+	HHfCXosk9bds3qhL/OMtnaEsG61dm/HE1FtI3WqEeM=; b=dqbaC0gnmCKfP2Fvz
+	KS/JNpCs93a4hyyYv7alxo598x85Cb680ieBYvfxs+ixXK6Nffd1sJ2XAUl/k72X
+	QEbGDrUYWp7EvB1TOkyxErWist0TccKMT3muusFLoPefjSrIma8OVTlarpjZ1XPS
+	T5g1OAYmY8ZUYpSM7ND5irm7eos5PNFqryKfBrxWgJuBJLy5F8O7duupB+WhwNEC
+	Klr3D+2GxcjCoXX+sheE/a+3KzjEgT9HosKTa7drFTQhpctvsVDPQ/Z84UVcVTGF
+	JiUGdd5wgWQPooYoJZ84TNgnANX2hW6MOzuZZQRkZMbuX8WdsxiXHbU19tCqWtcU
+	Z2Jbg==
+X-ME-Sender: <xms:zEpFapjea9ux_IhUrTfXhYCMx5ojdnTrXmgMjqf0aVnaMP_JvKi7XQ>
+    <xme:zEpFamIoCYY03XdU6ZcY6KwzZ32fTnTOxqzcgSQAOC4E9tf-a4u6xmBK5WB6bUfEO
+    bEBbkiaCYBJj898ApRBUaFsnx8XVR_EMzR8paC5145AaB7ZwfcugQ>
+X-ME-Received: <xmr:zEpFaolLH0yk1SDRs1BckyMw56fSSEWie76CVuw0xkev3LiSxf8GTnfKaO7j0Rv-zCPLgdM7fsAAIcDcHkmostgJkockLdiHrPLasF4FIHsZ>
+X-ME-Proxy-Cause: dmFkZTFEq/RU0gPNqPzoIji1nltzjcjaE+0T/yA5LNODFyhfV5a0OV09gNDuR5gvNHCHvY
+    MarStHiTB/FQBOrQ4QH7xEtIXkjCfPfBdDGnhejJ+RnBBakSV+6pQryPPOF/RlzuakGlwP
+    kZE/t7TNS23rBifaJGbkZQBAy+v2ODmHyJz46kelQ429IJyVQ8xkYVw5uEGlvYeQ/goQkf
+    Y7H9162k9KkuwoFAai3DZyo0IkBUt4MG7DQEtfYCtp7/TMoJT4f8OpoGAUkdYwj37+30ep
+    RIFouEcOI+TNTkAQac49UKYkLPYE2TOPWylONYpo06bJ5u8JsIBVpC1WGDZU8ppFjwQgRG
+    CfcNbCS5O9V/fGSxF4rp12khz1wjzKlNs+RhR+8BZuzmUUvIcE7LW/aVUHiJ3dPx6bJxkn
+    6BwZalCnJU6BIDMDcjeap0Jw4anXhXYKhVgzJLSHc8CJuhbS9FicSzM+pNdJjvKBU71JIQ
+    vRKSR3qURku/QUGRqk4f9OX0U0WVsp28AbdPeEZH7nPlDQJGaS1gvlWnmCrYEf6L5vdN5m
+    kvA8eUtSHuOmUgwaVweaLVUPBswH+5zqvpGS3VtZnlc7OYunmM3wHFn3vn8Rnl7WJHtt96
+    O3rUVoRyeHG+U9LeM/4Wf/2w6XF/ORbBzAp9qud72b7hUucl0q3QzPzhIjQg
+X-ME-Proxy: <xmx:zEpFauO95knYJyUtVFIrT7AaEijur2SAlZXCSHtUoEldDyw25MBenA>
+    <xmx:zEpFai7tDCoXkk4TZIYSf6c2XY5ndPF1m768iW0piUs2OdONoZRdqw>
+    <xmx:zEpFaibwbXTQSeB3oozqR7N3GkVZsLLMyMf1KnfHHEXrbr_k-ydq-A>
+    <xmx:zEpFavdug0gIFsdkSFJUxg_AaWmw5YraqN3EOc5-8nmI_DXpgI4DFQ>
+    <xmx:zEpFaiOpH_BnOFieQXaNAdKJosfPBkVa2v--on6pQvx44iy-dF8E4G6e>
+Feedback-ID: i01d149f8:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 1 Jul 2026 13:13:46 -0400 (EDT)
+From: Jan Hendrik Farr <kernel@jfarr.cc>
+To: mail@birger-koblitz.de
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hsu.chih.kai@realtek.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Vladimir Vdovin <deliran@verdict.gg>
-Subject: Re: [RFC PATCH bpf-next v1 0/7] xdp: RX checksum metadata hint and checksum assertion over redirect
-Date: Wed,  1 Jul 2026 20:10:57 +0300
-Message-ID: <20260701171057.4330-1-deliran@verdict.gg>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <akRAUTAqVKkxmoVa@lore-desk>
-References: <20260630191510.81402-1-deliran@verdict.gg> <akQyT2d0wNF5F5LG@devvm7509.cco0.facebook.com> <akRAUTAqVKkxmoVa@lore-desk>
+	olek2@wp.pl,
+	pabeni@redhat.com,
+	Jan Hendrik Farr <kernel@jfarr.cc>
+Subject: RTL8159 firmware
+Date: Wed,  1 Jul 2026 19:13:27 +0200
+Message-ID: <20260701171327.2916132-1-kernel@jfarr.cc>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260505-rtl8159_net_next-v4-3-1a648a9c4d8d@birger-koblitz.de>
+References: <20260505-rtl8159_net_next-v4-3-1a648a9c4d8d@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,97 +112,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: XoCZSw2ihQeYXaZeorvaKpw_P-MtUnbj
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDE4MyBTYWx0ZWRfX7/8CHOYakImc
- JoJQofyUX4ikAALH7wMSE/qCNYvnuRTis7kli79H0PfrprAUtJ8q5YxDnnL0I8OOtT64/Vunrgz
- XfBtX9SlEoKcj7fYO/DE5J28y72VSfNBrMurdJk7FK6wvLh/Tura7iSieMc4lUc3pXzWNdUFDmb
- 6ea+JrUCQarqkHP6NA09Q24idOXcP/b8zu92DhaCZpV81ZzHZc6EDvbadeC11tR1yRQdSKMTlfR
- DaXa4VR9XtYHJJqSeAfmG35sX4D1JHrSSd1QF5855JIxPJKHE1xz/fds590H5wJoiNqb7IZBPJ7
- I7XQH0OOhNAvUFO/4ry
-X-Proofpoint-ORIG-GUID: XoCZSw2ihQeYXaZeorvaKpw_P-MtUnbj
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[jfarr.cc,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[verdict.gg:s=sig1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[jfarr.cc:s=fm3,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303780-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[kernel@jfarr.cc,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,realtek.com,kernel.org,vger.kernel.org,wp.pl,redhat.com,jfarr.cc];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303781-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[verdict.gg];
-	FORGED_SENDER(0.00)[deliran@verdict.gg,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:sdf@fomichev.me,m:kuba@kernel.org,m:andrii@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:martin.lau@linux.dev,m:sdf.kernel@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:deliran@verdict.gg,m:johnfastabend@gmail.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,vger.kernel.org,verdict.gg];
+	FORGED_RECIPIENTS(0.00)[m:mail@birger-koblitz.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:hsu.chih.kai@realtek.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:olek2@wp.pl,m:pabeni@redhat.com,m:kernel@jfarr.cc,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[deliran@verdict.gg,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[verdict.gg:+];
+	FROM_NEQ_ENVFROM(0.00)[kernel@jfarr.cc,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[jfarr.cc:+,messagingengine.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DAAC96F045C
+X-Rspamd-Queue-Id: 8F7376F0450
 
-Hi Lorenzo,
+Hi Birger,
 
-Sorry -- I blindly missed your earlier RX-checksum series before I posted
-mine, thanks Stanislav for the pointer.
+it looks like the firmware file rtl_nic/rtl8159-1.fw isn't in linux-firmware yet.
+Could you send it for people to potentially test?
 
-To answer your question: yes, I'm happy to take on the driver selftest
-Jakub asked for.
+Jan
 
-As for my own series, the read side clearly overlaps yours and you own it,
-so I'll drop my bpf_xdp_metadata_rx_csum() hint and its driver bits.
-
-What's left that is genuinely separate is the "assertion" half -- a non-dev-bound
-bpf_xdp_assert_rx_csum() that preserves the HW verdict across a
-cpumap/redirect: it sets a flag on the xdp_buff that rides into the
-xdp_frame and becomes skb->ip_summed = CHECKSUM_UNNECESSARY in
-__xdp_build_skb_from_frame().
-
-Should I resend that as a small standalone series (v2, assert-only)?
-It also looks like a PoC that you and Jakub discussed on v3 [1].
-
-A few things I'd like to confirm before writing the test:
-
-1. API for v4. In the v3 discussion you agreed to rework the API to report
-   both COMPLETE and UNNECESSARY (+ csum_level), per Jakub. Do you plan to
-   send that in v4, or should the driver selftest target the current v3
-   signature (enum xdp_checksum + cksum_meta)? I'd rather write the test
-   against the API you intend to keep.
-
-2. Documented behavior. The selftest is meant to "check the documented
-   expectation", so which rule should it assert -- "a driver must never
-   report CHECKSUM_COMPLETE while an XDP program is attached", or that the
-   driver downgrades/repairs COMPLETE on the XDP_PASS path? I'll write the
-   doc paragraph and the test to match whatever we settle on.
-
-3. Drivers. Your series adds veth and ice; I don't see mlx5e -- was that
-   intentional (left to the driver maintainers)? I had an mlx5e
-   implementation in my v1 and I'm happy to contribute it to your series if
-   it's useful.
-
-For the test itself I was thinking of extending
-tools/testing/selftests/drivers/net/hw/xdp_metadata.py, gated on the new
-"checksum" xdp-rx-metadata feature, with good-csum / bad-csum / modify +
-XDP_PASS cases. Does that match what you and Jakub had in mind?
-
-[1] https://lore.kernel.org/bpf/20260217-bpf-xdp-meta-rxcksum-v3-0-30024c50ba71@kernel.org/
-
-Thanks,
-Vladimir
 
