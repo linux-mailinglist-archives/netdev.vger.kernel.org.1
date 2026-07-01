@@ -1,232 +1,179 @@
-Return-Path: <netdev+bounces-303783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OWDvETFPRWqk+QoAu9opvQ
-	(envelope-from <netdev+bounces-303783-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:32:33 +0200
+	id Tzo6GmRPRWqq+QoAu9opvQ
+	(envelope-from <netdev+bounces-303784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:33:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E20F6F05EF
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:32:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10996F05F9
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 19:33:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=R3aYYBqw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303783-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303783-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=RDCtjEKy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303784-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303784-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40D323009CC2
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 17:26:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 819363009CD3
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 17:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9984938F947;
-	Wed,  1 Jul 2026 17:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF5E4B8DF1;
+	Wed,  1 Jul 2026 17:32:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141B6363C57
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 17:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEC849251C
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 17:32:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782926808; cv=none; b=VZZm4GZx7b3sehu5Wg6k9yC0ovR0Mi9yWGTu/b9+2HwhdVfNzLj1mq8B8rdb1fvCG1Q4Tnm/t9rAxkBOCQDoP7N0QgW7mn1NsUJbT3HADQn6bKTd1tqC7+wqbaw23TiBR7ZOquxUdP0syScdvkW4f7Nw/LHrQeBpVdlL70IWpeM=
+	t=1782927156; cv=none; b=nIY19rMC+XE+2xWvVZZUU6heU3rAXBZbRulIZQkD5P7f8/X4ny0yBFb1EWe8/yeUw6/ARsfz2rOPPnnbIBn2iWIAubPVczHAcy0k/UrGIN6hrLiuQjv7ZoGaFh0yj709m1aeNYVNNbP/4ZUk+XyfKvKv1pEHXHazhE/2kx5bKFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782926808; c=relaxed/simple;
-	bh=7UEHOxjpf1RZfoI3R9qQR6jFUnvNcPN68KSn3tDiX34=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kl0GLg9DK+nqQrwS7nKOE2qBjsTwMEr5DghBQSbRLryLUumvfmtulKRMKLMcXfBuERyuMkB7nXBwXuduZISHmABFJ8hx5eOTjXA+uJ8OQBRk6jBuwkAGNuPZVGzeYH/sx92jakaFind31XyzWdKrWg29dgZJ65QsJc/r0jvyVbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R3aYYBqw; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782926806;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NpY/TtcLsNQNp6y7nANvL4cIqjFKgOOo69hrHs2qUsI=;
-	b=R3aYYBqw9gSRDukE3oPCpdH5ztqewwT3fSF4b50TVmMqCcGQqUpNB7ETEP959ThSodIgJA
-	l3R6dg815fLPWD+fLPMF3QHXpryqNcVhcC9iJ19+AXJj5lWyuJUnS5LDVfQBcAuuz0yXm8
-	4ZPKOj6/O23Li/s1OfiYIVFDIO6CHXI=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-HqXJenIiPTqWN95tZzp4yw-1; Wed,
- 01 Jul 2026 13:26:44 -0400
-X-MC-Unique: HqXJenIiPTqWN95tZzp4yw-1
-X-Mimecast-MFC-AGG-ID: HqXJenIiPTqWN95tZzp4yw_1782926803
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA4FE184A0B5;
-	Wed,  1 Jul 2026 17:26:43 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.81.35])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B45930001BE;
-	Wed,  1 Jul 2026 17:26:42 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Minxi Hou <houminxi@gmail.com>
-Cc: netdev@vger.kernel.org,  echaudro@redhat.com,
-  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2] selftests/net/openvswitch: add output truncation test
-In-Reply-To: <20260630102208.29140-1-houminxi@gmail.com> (Minxi Hou's message
-	of "Tue, 30 Jun 2026 18:22:08 +0800")
-References: <20260630102208.29140-1-houminxi@gmail.com>
-Date: Wed, 01 Jul 2026 13:26:41 -0400
-Message-ID: <f7tik6y4o4u.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1782927156; c=relaxed/simple;
+	bh=+5WbAPI6giF0rN2NhE/RAchERp6a7S7eH7PbLr/l2tg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A7lFZ5M/DLcjxLbYi2M1GEm6KIjh22yJY0QAO9eLLBPEuxqXc2c/YJHG4Hsa9kDO6H/7dDqOBBQu88BQtaDvF5lOfWjB6pcGOyjId2ro3nbTUQwmlo5QrSxwT4K6L9AfRN/L1+vMT1Chq63LOUxmjpawMSyqE3XCHPdEM58Cu3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RDCtjEKy; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bfZjKiEBjis0+ejAXoyWi/BTqw+kp2F5Q3eJhJCjT3w=; b=RDCtjEKyaoYj276FEFC7HRzAf9
+	JTa6GnE5bzArs0Y7np5IZON8h7zXb5Lrd3BsdR16PPxJEnbE773//hyS2f1v/FtP4QBzAv3MihqeC
+	fFLx1LcTvGbmT/ysSbc9zmLFpOTxhS4Pka+PrdYYNCnk/UO8tfxXGv+47+JAs9qRrylM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1weynW-00ADZx-Fc; Wed, 01 Jul 2026 19:32:30 +0200
+Date: Wed, 1 Jul 2026 19:32:30 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Das, Shubham" <shubham.das@intel.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, Lee Trager <lee@trager.us>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"mkubecek@suse.cz" <mkubecek@suse.cz>,
+	"D H, Siddaraju" <siddaraju.dh@intel.com>,
+	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>,
+	"Lindberg, Magnus" <magnus.k.lindberg@ericsson.com>,
+	"niklas.damberg@ericsson.com" <niklas.damberg@ericsson.com>,
+	"Wirandi, Jonas" <jonas.wirandi@ericsson.com>,
+	"Srinivasan, Vijay" <vijay.srinivasan@intel.com>
+Subject: Re: Ethtool : PRBS feature
+Message-ID: <cb7921f5-cc9a-49fe-9561-cac903cf611e@lunn.ch>
+References: <SN7PR11MB81096CF160930DB8FA278B3CFFE12@SN7PR11MB8109.namprd11.prod.outlook.com>
+ <be5c474b-c969-49af-8235-825580ee945c@bootlin.com>
+ <SN7PR11MB8109149608172808784CDCBEFFEF2@SN7PR11MB8109.namprd11.prod.outlook.com>
+ <5f22c491-b816-421e-a531-bf87a07fea70@lunn.ch>
+ <08f1b0c2-2b09-4c30-b95a-02959d409a03@trager.us>
+ <38359a70-ebc7-49c5-bae5-0d3d7bf82fac@lunn.ch>
+ <CAKgT0Ufpp+AVrW4raMw=_PEWQdu+dkp+9xhrt1se2G7=CS83iA@mail.gmail.com>
+ <SN7PR11MB810921E7DA70DB3F6FD1C41DFFE82@SN7PR11MB8109.namprd11.prod.outlook.com>
+ <6e905826-779a-456d-a37d-7602a37ab6d7@lunn.ch>
+ <SN7PR11MB81098D82A7B377E0AC439979FFF62@SN7PR11MB8109.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN7PR11MB81098D82A7B377E0AC439979FFF62@SN7PR11MB8109.namprd11.prod.outlook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303783-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:netdev@vger.kernel.org,m:echaudro@redhat.com,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-303784-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:shubham.das@intel.com,m:alexander.duyck@gmail.com,m:lee@trager.us,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:siddaraju.dh@intel.com,m:balaji.chintalapalle@intel.com,m:magnus.k.lindberg@ericsson.com,m:niklas.damberg@ericsson.com,m:jonas.wirandi@ericsson.com,m:vijay.srinivasan@intel.com,m:alexanderduyck@gmail.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,trager.us,bootlin.com,vger.kernel.org,suse.cz,intel.com,ericsson.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9E20F6F05EF
+X-Rspamd-Queue-Id: B10996F05F9
 
-Minxi Hou <houminxi@gmail.com> writes:
+On Wed, Jul 01, 2026 at 05:10:43PM +0000, Das, Shubham wrote:
+> > Sorry, but i could not implement that, in a sensible way, given its current
+> > specification.
+> > 
+> > I suppose i could simply flip the first `inject-error-count` bits, and make the rest of
+> > the stream perfect? I could also wait until the stop command is received, and
+> > then flip that many bits before i stop the stream? But none of these seem
+> > sensible.
+> > 
+> > Please make this specification have sufficient details, or references to 802.3, that
+> > you could give it to another engineer and get back a reasonable implementation,
+> > without having to answer any questions.
+> 
+> Andrew,
+> 
+> IEEE has clear documentation of the PRBS Receiver block and the BER counter as an output.
+> Before performing the actual BER validation, it is a usual industry practice to introduce errors
+> to guarantee that the checker is functional and accurately identifying them.
+> 
+> Similarly, in DATA mode, error injection is used to verify the FEC block
+> by ensuring that injected errors are detected and corrected as expected.
+> 
+> Updated description.
+> 
+> +        name: inject-error-count
+> +        type: u32
+> +        doc: |
+> +          Request the PHY to inject exactly this many bit errors into the
+> +          currently active test data stream.
+> +
+> +          This is a diagnostic tool used to validate that the far-end PRBS
+> +          checker or FEC decoder is functioning correctly. For example,
+> +          after enabling a PRBS pattern and confirming ber-lock-status is
+> +          locked, injecting N errors should cause ber-error-count to
+> +          increment by exactly N on the receiving port, confirming the
+> +          checker is actively detecting bit errors. Similarly, in normal
+> +          data mode with FEC enabled, injecting errors verifies that the
+> +          FEC block detects errors as expected.
 
-> Add test_trunc exercising the OVS_ACTION_ATTR_TRUNC action. The test
-> verifies truncation in three steps: first confirm normal forwarding
-> works, then apply trunc(14) which truncates packets to the Ethernet
-> header and verify ping fails, then restore normal forwarding and
-> verify connectivity recovers.
->
-> The trunc action sets OVS_CB(skb)->cutlen, causing pskb_trim at
-> output time. With trunc(14) the IP payload is stripped, so the
-> receiver drops the frame and ICMP echo reply is never generated.
->
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
+There is no mention of how many frames to send in the stream. I don't
+think that is part of the API? Because we have no idea of how many
+frames will be sent, it is not possible to distribute the corrupted
+frames over the duration of the stream. So that means i should flip
+one bit, anywhere in the first inject-error-count frames. All frames
+after that should not have bit flips. The assumption being, the stream
+has a minimum of inject-error-count frames, and if the stream is
+short, the counter will be too low. But it does not matter if the
+stream is longer.
 
-NOTE: The subject should have had net-next I think
+Your description has no mention of frames. Should it? What exactly
+does the ber-error-count count? Can multiple bit flip within one frame
+be counted individually? I don't see how, since the checksum just says
+the frame is bad, and cannot report how bad.
 
->  .../selftests/net/openvswitch/openvswitch.sh  | 66 +++++++++++++++++++
->  1 file changed, 66 insertions(+)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index 2954245129a2..fef21eb4a129 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -32,6 +32,7 @@ tests="
->  	dec_ttl					ttl: dec_ttl decrements IP TTL
->  	flow_set				flow-set: Flow modify
->  	action_set				set: SET action rewrites fields
-> +	trunc					trunc: output truncation
->  	psample					psample: Sampling packets with psample"
->  
->  info() {
-> @@ -443,6 +444,71 @@ test_action_set() {
->  	return 0
->  }
->  
+As i said, give this description to another engineer and ask him/her
+how it could be implemented.
 
-Most of the tests have a comment in front of them that does some
-description.  I haven't been good about enforcing it, but at least I'd
-like to see it here to describe what trunc limits are being tested (in
-this case, just limiting to 14).
+https://www.youtube.com/watch?v=j-6N3bLgYyQ
 
-Perhaps we can also add testing for trunc(1) since that should reject
-(or both trunc(1) and trunc(13))
-
-> +test_trunc() {
-> +	sbx_add "test_trunc" || return $?
-> +	ovs_add_dp "test_trunc" trunctest || return 1
-> +
-> +	info "create namespaces"
-> +	for ns in client server; do
-> +		ovs_add_netns_and_veths "test_trunc" "trunctest" "$ns" \
-> +			"${ns:0:1}0" "${ns:0:1}1" || return 1
-> +	done
-> +
-> +	ip netns exec client ip addr add 10.0.0.1/24 dev c1
-> +	ip netns exec client ip link set c1 up
-> +	ip netns exec server ip addr add 10.0.0.2/24 dev s1
-> +	ip netns exec server ip link set s1 up
-> +
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-> +
-> +	info "verify connectivity without truncation"
-> +	ovs_sbx "test_trunc" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 || return 1
-> +
-> +	ovs_del_flows "test_trunc" trunctest
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +
-> +	info "add truncated forwarding flow"
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4()' \
-> +		'trunc(14),2' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-> +
-> +	info "verify ping fails with truncation"
-> +	ovs_sbx "test_trunc" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 >/dev/null 2>&1 \
-> +		&& { info "FAIL: ping should fail with trunc(14)"
-> +		     return 1; }
-> +
-> +	ovs_del_flows "test_trunc" trunctest
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(1),eth(),eth_type(0x0800),ipv4()' '2' || return 1
-> +	ovs_add_flow "test_trunc" trunctest \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-> +
-> +	info "verify connectivity restored without truncation"
-> +	ovs_sbx "test_trunc" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 || return 1
-> +
-> +	return 0
-> +}
-> +
->  # psample test
->  # - use psample to observe packets
->  test_psample() {
->
-> base-commit: cef9d6804030793cf8b8796fd6936197d065dd3e
-
+	Andrew
 
