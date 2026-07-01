@@ -1,377 +1,266 @@
-Return-Path: <netdev+bounces-303698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MbGRGjUiRWpo7goAu9opvQ
-	(envelope-from <netdev+bounces-303698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:20:37 +0200
+	id 5hFLDkYjRWqo7goAu9opvQ
+	(envelope-from <netdev+bounces-303695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:25:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CB26EEA52
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:20:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11DCD6EEB1F
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 16:25:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.microsoft.com header.s=default header.b=aWXFwwRu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303698-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303698-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.microsoft.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=G3SLaMJV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303695-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303695-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CA847303333B
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 14:19:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3FF9730ED983
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 14:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D494346E68;
-	Wed,  1 Jul 2026 14:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AE534752D;
+	Wed,  1 Jul 2026 14:18:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4963403EF;
-	Wed,  1 Jul 2026 14:18:38 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782915520; cv=none; b=uSfxkLT2J4xB/v8piR7hvr9pMBrnOHtU3lR5bBKnnMHNAgU9faCtsKtCnwfU9rlLdWlaWJH1C18pPtMkGNemLw+05qWH+5TbSvN/4AVFF9rPZqzbwAcXlLpcFQGcPno1APad2dGjpm7B8E4KVl4ggOmTBiL7xTjmvxnF+T8PF6g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782915520; c=relaxed/simple;
-	bh=5Vr8cgJxra3+aKH8S7G8fCdM0dv9xiDYvZL+wlnJHEE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OT5XAFtv5WsATM6N2yPOnmjkKNob8uUPnOS6NKZBeNt7HDyO9hXjqKG9Qysl7RhI3QwZICsmo4pE3GYJpgEEmhWq3/uWQGa/MNhYjmboEQf7ujsv4gaDrdLwQzBDUF7Laxq8zeCHXRYJizZ/q1rJE32F28zfQlNbooYYAZqZ1dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=aWXFwwRu; arc=none smtp.client-ip=13.77.154.182
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id F2D4D20B716E;
-	Wed,  1 Jul 2026 07:18:36 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F2D4D20B716E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1782915517;
-	bh=kG50yi6LXfaOZSDjgu6aPbZgCueNZoRLhJ0qz0wvwZc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=aWXFwwRuVbk6rOCarju4JfpcNXjvkbsVcl6oo2flKAk4UUZXmhRm0EXv/cWF3I/dG
-	 H/SK7XRN0jA9+n25D5NAYJ27vGeItJ//h9raXWIa4ZC5DOrf9SwU0qCjtZjLswb5mK
-	 q+uT6QqDThu9TAirQ+zX+cKQNHOV89KY3MqLX/6E=
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	leon@kernel.org,
-	longli@microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	stephen@networkplumber.org,
-	jacob.e.keller@intel.com,
-	dipayanroy@microsoft.com,
-	leitao@debian.org,
-	kees@kernel.org,
-	john.fastabend@gmail.com,
-	hawk@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	sdf@fomichev.me,
-	yury.norov@gmail.com,
-	pavan.chebbi@broadcom.com
-Subject: [PATCH net-next v11 2/2] net: mana: force full-page RX buffers via ethtool private flag
-Date: Wed,  1 Jul 2026 07:15:46 -0700
-Message-ID: <20260701141808.461554-3-dipayanroy@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260701141808.461554-1-dipayanroy@linux.microsoft.com>
-References: <20260701141808.461554-1-dipayanroy@linux.microsoft.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F84E341062;
+	Wed,  1 Jul 2026 14:18:18 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782915501; cv=fail; b=nVbtvnpn/yJKLqQqZGCuwyb2eRGOYqfaRcgMaN36i8aROmdXBZbx/QSRZVre1J73E887g5m3H7ygSb4lZdhPJ7hzcHNSD/EdxsQ3lErEE1Xlwech9kOwqDK7wmUu0knhtj48o69yzfZE2smJ6lHM+BIluPIPm5tDh1YDY/wOTFE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782915501; c=relaxed/simple;
+	bh=z0xyBTdMy+lckoQGkfuB6wC7BqVjL2rhwPZF3Z61UM4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Fgs33SrkQsvelkf/pyIOba23jmmNBnq6MCcqvdsRoP6xLECDymlQpGpSoEVxuHlKH7w0KrPBQ8N9oZ+8ovTnY4NplAwHXiY3q1wEsvg8v3MSZDlWMgIJRP9sxP5RZOABVU4zSy8e2aR0IbWi20/DH03Jfs2NZH13eRbYvvMo2aU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G3SLaMJV; arc=fail smtp.client-ip=192.198.163.8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782915499; x=1814451499;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=z0xyBTdMy+lckoQGkfuB6wC7BqVjL2rhwPZF3Z61UM4=;
+  b=G3SLaMJVwiCtP8EqkXj2XsHpuJHwJ4YOFPfbLGpavdjr+PANXCcLhYoO
+   RjS16qiYQ9lVMGeBkAPqlbqZyImY+tpomzDGgqaVWsVJnKKJzMm9nOtrA
+   wur91kKH3ezTN5PIHr8dtj1yU1ZfmPTRd9gXhAOSdySqHDBV/UgiCI84z
+   ik2Jk+vsL3O2iHVp/RI+71c28o0C/wxrzq/olb4InNS/RdOdh5ZZ9iclU
+   jqoR86IC8vv8pYJLbDXgo6BUW4oYPck3Tc0WnzVcVWLPma8R9Y9lV9lZ8
+   hJxPvzaCvO0Q45OX2OpeQxJY6yhr6/RF1mcw45F4blkKrJQjCqoakwLw6
+   g==;
+X-CSE-ConnectionGUID: het93BtbStGu1Y7OHRBPWA==
+X-CSE-MsgGUID: iN1F6GdpQQ+Ampq4GYwsmQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="101191888"
+X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
+   d="scan'208";a="101191888"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 07:17:29 -0700
+X-CSE-ConnectionGUID: Zv/vTEkmRmyqSrufnhnvnQ==
+X-CSE-MsgGUID: uZOhigjaQX+WN3XyPS+hIw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
+   d="scan'208";a="290700193"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 07:17:30 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 1 Jul 2026 07:17:29 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Wed, 1 Jul 2026 07:17:29 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.44) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Wed, 1 Jul 2026 07:17:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wZ0pTUu3svYy38ilLbAVCWfS8EZVQwgObfw8YjbzbFXxoh0ryV9N9nCjvLcmCAIjYGu51eFFGQwC9O3TGyt0lvGapNdSw8RSNV8eByp3W8waRJ6pcySPyLVjNKk4c6gJJV89mQyFpMdDsgOVTPfwbN6rQpziiaXYL7o7D5ehUHhNr04FOYhqut2f+pj3DNBBFSPopJH49qZ7XlhlBlQfavXANzadP7bWqAe/EVGTuZyXkn6yP1uPaES7iRAH6YBivyMEBtgs9SYgr/zvuZVPRHSnr9S85YogtROEFjqd9bcoQjhPGxMAyGov6R7irULFlZ5gDDCqHfFvIlGjDlQUdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VK6dNLfWsd4ka9Jdml9K5f2IFFzEMacXZGdMZzB6nYA=;
+ b=ZbFv0d19/7KoKpCWf/FfFlWtVTDpn1+Be2SKCz1GXT2KxnaJTzrsDX3TdOZ2em06N+LXFY97pbPhEiZQoaCQcQIlFhrDM8TvBihtDIBUqYpTTHxxraEGLVUpYaU/eY55Ilu7Aupvi7l8iXabndkHkHPMRqYcUq20EbFiSu38x+2futhyocPKkDDwqnpkVJnwm/Xt43OKRzJl3flJryf52jcpi5Hkl0v+EKY3HyLJ3LjNdiHfP1v5DD67WueO5b92Qse9l5fDpH+yvuj81nNC3ndnUkHNQtjtNZ+e95MCdgkHfYPhcu5snCki/EpqAY8gZmAadCAFZs3ML75ootcWuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com (2603:10b6:8:6e::21) by
+ BY1PR11MB8054.namprd11.prod.outlook.com (2603:10b6:a03:52f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.19; Wed, 1 Jul
+ 2026 14:17:24 +0000
+Received: from DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485]) by DM4SPRMB0045.namprd11.prod.outlook.com
+ ([fe80::b630:ca9c:20e1:f485%6]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
+ 14:17:24 +0000
+Date: Wed, 1 Jul 2026 16:17:13 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+CC: Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara
+	<sedara@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 2/2] octeon_ep_vf: fix skb frags overflow in the RX
+ path
+Message-ID: <akUhaRbe6UjFArFS@boxer>
+References: <20260701112825.1653044-1-maoyixie.tju@gmail.com>
+ <20260701112825.1653044-3-maoyixie.tju@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260701112825.1653044-3-maoyixie.tju@gmail.com>
+X-ClientProxiedBy: WA1P291CA0009.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::20) To DM4SPRMB0045.namprd11.prod.outlook.com
+ (2603:10b6:8:6e::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4SPRMB0045:EE_|BY1PR11MB8054:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4057f9b6-dc71-458e-3c62-08ded77b78e3
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|6133799003|18002099003|22082099003|56012099006|4143699003|11063799006;
+X-Microsoft-Antispam-Message-Info: v7RSsx79z6Yk9F7dSuGSitHMwxhFiDITqux3otIeO4wjh07ekBtozUIWDJyr4xrQOH89orzwb95DWqS5ax8mqOw6hn9Z2pyhMbt5bWlG83G3W7G+VN1F6CTV7VGJPn3buDS6PD/9F+vw2B0u2ewC5VaDqWah31peNuSiOC0lWdDLgPHpFLYZK8yMSBy2RL6mKyTJZuDRhuvZOdqB+hdUO4SEfk+qddZRT2oDa7YYfd0lazRZf71a5fbJvMUZmH4c7EK0J9T0FEIUBGr9Qqi0cgMdIwcjKiKjWQTlEBvuZRkFq2+SFtCK7rgEbyt35cD2iIqpPo2oHA56OkinLEe1iREnDFr/Uw1v5655o4YWlwE/Id0qiizcd0nPT7miu6GTOebJ6bG+0153lmLa0wfuPGEJD2+UVELPykT0f5Pd2AakM3vTq6MVtH5Xj9O//hmh/CHS7U3SFrGQAxeZR+mfCGOvr7tS33KsXovVhB902oUJrtLuxSMbZQjEvl84i7HOZY3SCf1DnnyIZ804qrIOxBtXZtkxV7sdbBDRpMlj8iv4XCxIrAHtY2qnql2Iie+TBOREOwASMfy5emLejPNWm1rKhlHSID3VIYOXnMdP235TSHa4/0T3r2MRVdxV30Pkh3sX0/FjAdXKh+w+ACgxCA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4SPRMB0045.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oLZ48kIH785JEZwozWnxXUp1+yLv2P0nV0AwoERG5Ebe3YgXSWsNe7VsdMR5?=
+ =?us-ascii?Q?8IdzLI/MeVtJsvnEZIfaszApK+hIlrQU7ZcO3d23jyHNJR6a7JK6QlE51Oys?=
+ =?us-ascii?Q?6EucIqoNGe+zcNgAXCAOxsh2347Is0Umirp9I9noQQFnZ3zyIe3QzhS6zh9O?=
+ =?us-ascii?Q?cufSCqmUU8kojnAs98fXAbUKTRhWf5m62Z2DXyCBqHLv6tze+HmKIn5higXR?=
+ =?us-ascii?Q?Gk3+6pIuWggfDKR2+7wWrDCCo8ZT3+YECQfJ9eMzu53/AuljUzvrmr6asYvN?=
+ =?us-ascii?Q?vdmBTuda1ctyfzTHtvQ2ILRIv/3OO4wHV/XV/s3x+E2K83OBO69zfy5Rybw7?=
+ =?us-ascii?Q?+mgRdPhSrJxl7vUBRkFOhJZzCmb1yR2/9ByApMQ0Py/DF7PV+nhqvEmnz53e?=
+ =?us-ascii?Q?cytT3v+T/33+uljU/YURUd6hBACw+qewKW1r5miesPhkcPiGlmcDhvvl2vM0?=
+ =?us-ascii?Q?FKEWxSCi5N+sTRatZeTdqVsqs/ZL6Q9ZPypPGDn8Nle+8rv85nmi6X/f8Yfh?=
+ =?us-ascii?Q?uAzZcJ0cSZo55TMl1s2TXD7NOVtYFoVpXiCJwRvMLCvxR8wnDl5HYeVxLWQY?=
+ =?us-ascii?Q?k87qpGJbVyYbRH8Oa7ekodKuQypoii1Xal3pQa4rNI7iBnqvMvWGWl43MTEa?=
+ =?us-ascii?Q?bWSiiIYkKkzNxdmJBIqEPMh4/BxR/6khUV3LCD5jqgW5A4cMJQw0ugL5VTrs?=
+ =?us-ascii?Q?Z+9nRp0eKeO4K2onwZSkztkOWBMaqr9hbDN4YNhe1rU8DLlTyFBqpUYWB9jy?=
+ =?us-ascii?Q?UDtaklhETuFlDVoyF1fQL0wz1ecoMGRTIcxwXvF9rUaqFyDafIzTJ5OuZgUO?=
+ =?us-ascii?Q?DhO3O2HZw94VCNPKp+tjXikDOOXmL7fIihN29N8J8F6REYwq3wm5ORhFVoXp?=
+ =?us-ascii?Q?L6536r8m+GGnkJRtD8D+1XGFAaF+qQ17VO0u87Fg8uMfEucxGIEHo9M1eKmk?=
+ =?us-ascii?Q?zckC+BCsh43aHc8MTY7nhPo+S3NlCSQQc6OLS/gN07fqA5l0TUhhmlyYfqfl?=
+ =?us-ascii?Q?s63/lI7VAO4Xh4dzGz98rn4Zp+ncyNF+NGrnw1Zk5dX+4Bt30Pv6xrcsX5Zn?=
+ =?us-ascii?Q?DGRS5k0/HroWwjBACBwRqbrFF43VaPyZ+S2246lh9Xr9oc7sxWHakGHxILdj?=
+ =?us-ascii?Q?XbzWLN08KAV8X2eYlVyVP4xPJA1ad+YkvYzUctbmnTBZsqBxdaYpSpTw6ZR0?=
+ =?us-ascii?Q?YDn1XQXGsLxQMq4EpJNL0z+XfOs0lSfvcp+7YWt6q+VDFx9yUYJi7657O/sT?=
+ =?us-ascii?Q?ipBG+HYFyqqJRef9dRtNxuB1GMDbSlcoWz4efOvm8QZHeHsuK7ZuPK93FFQc?=
+ =?us-ascii?Q?AE0vipWb1IrJjSc6/0drYm16uCDqa3USqbeMtXc1JD3W3BQsR3g07IVAhaBf?=
+ =?us-ascii?Q?yD439rXDbWQk2nBL0HiDeMdQ3C1D++b40l/Z1yIcWbU5fEyIBAdFyGa+454I?=
+ =?us-ascii?Q?7V2O4GC9d4Xw491rIeLmW+YYK07RKxwpP5ZKoZt5oD+l02y9Ej605HkV01wN?=
+ =?us-ascii?Q?gXhOYubNLmGfO+5tbvl5To8RFbjJD4f2RxHjQJwtAsrdLXd0UVQYA9IuXPpi?=
+ =?us-ascii?Q?kYU+CJc1IjuJdqpg6PkxxPg8ExogUfGByp4zAJ/uJgL0tyck6m4XZjtnyjeB?=
+ =?us-ascii?Q?J6ZqzEkkwSRhbgmr/8KESW5DJZqbF+D3XfLPyw9uJ8QxNgYkrQY5J8Ldhtl+?=
+ =?us-ascii?Q?VUxOWGQMzpGt3Njm/m9qOhQZ6KnWBEUs1Uow2SYOI7IlITKcTz4ob8v46Ixr?=
+ =?us-ascii?Q?sdSDiK25fAR889i7CzvCI4TsSspnVHY=3D?=
+X-Exchange-RoutingPolicyChecked: JCw45F4WaTHBr1dXNB23C8mM0SgkKl8uUHOZH1gkeODXwr5xLO+Sr2ke7CrRu9Z1Amx4TWseqvkait1yM3IIJ59eJlSA6hfhApUutdi8dtMpAbMMUnD1mPWdipvYb3zVu8Rkjjm/Vb4rVq2K5rZrkISBomifG/tKtbS4mviDmz+EndVwRJxecvjTZH4ycxKFjuN3bD+sgcHCxgFTPAmA/KjtuKPyk5194pbxJ4p9I+hBX8D7LPmurub1cI86zhmWjqM5vd9uuGpf0DJjg7gQWrCmn2RkP2HloiCauQqz80HuCVc+hm7YXxNKIDP+NBH41SEDZVabf8/01PCUJ7OiuQ==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4057f9b6-dc71-458e-3c62-08ded77b78e3
+X-MS-Exchange-CrossTenant-AuthSource: DM4SPRMB0045.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2026 14:17:24.3170
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1OQrgU+8aqHEounQRXt+NbNTb2vJifpCtxwPkIiR9yprTRWhLqMxhOlN0/hxi7TcV3Lf+I3p3feNZfBMZ4yfCOFNBIEdgCeL8vvYO+PNdI0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8054
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-303695-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303698-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me,broadcom.com];
+	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:vburru@marvell.com,m:sedara@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:maoyixietju@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:leon@kernel.org,m:longli@microsoft.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:shradhagupta@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:ernis@linux.microsoft.com,m:shirazsaleem@microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stephen@networkplumber.org,m:jacob.e.keller@intel.com,m:dipayanroy@microsoft.com,m:leitao@debian.org,m:kees@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:ast@kernel.org,m:sdf@fomichev.me,m:yury.norov@gmail.com,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,boxer:mid,vger.kernel.org:from_smtp,ntu.edu.sg:email];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:email]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01CB26EEA52
+X-Rspamd-Queue-Id: 11DCD6EEB1F
 
-On some ARM64 platforms with 4K PAGE_SIZE, page_pool fragment
-allocation in the RX refill path can cause 15-20% throughput
-regression under high connection counts (>16 TCP streams).
+On Wed, Jul 01, 2026 at 07:28:25PM +0800, Maoyi Xie wrote:
+> __octep_vf_oq_process_rx() has the same unbounded fragment loop as the PF
+> driver. buff_info->len comes from the device response header, and one
+> fragment is added per buffer_size chunk with no check against
+> MAX_SKB_FRAGS. A long packet yields about 18 fragments, one past the
+> default MAX_SKB_FRAGS of 17, so skb_add_rx_frag() writes past
+> shinfo->frags[].
+> 
+> The driver now drops a packet that would need more fragments than the skb
+> can hold. It drains the descriptors the same way the build_skb failure
+> path does.
+> 
+> Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
+> Co-developed-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+> Signed-off-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+> ---
+>  .../ethernet/marvell/octeon_ep_vf/octep_vf_rx.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+> index d982474082423..2e666df26b4c3 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+> @@ -463,6 +463,23 @@ static int __octep_vf_oq_process_rx(struct octep_vf_device *oct,
+>  
+>  			shinfo = skb_shinfo(skb);
+>  			data_len = buff_info->len - oq->max_single_buffer_size;
+> +			if (DIV_ROUND_UP(data_len, oq->buffer_size) > MAX_SKB_FRAGS) {
+> +				dev_kfree_skb_any(skb);
+> +				while (data_len) {
+> +					dma_unmap_page(oq->dev, oq->desc_ring[read_idx].buffer_ptr,
+> +						       PAGE_SIZE, DMA_FROM_DEVICE);
+> +					buff_info = (struct octep_vf_rx_buffer *)
+> +						    &oq->buff_info[read_idx];
+> +					buff_info->page = NULL;
+> +					if (data_len < oq->buffer_size)
+> +						data_len = 0;
+> +					else
+> +						data_len -= oq->buffer_size;
+> +					desc_used++;
+> +					read_idx = octep_vf_oq_next_idx(oq, read_idx);
+> +				}
+> +				continue;
+> +			}
 
-Add an ethtool private flag "full-page-rx" that allows the user to
-force one RX buffer per page, bypassing the page_pool fragment path.
-This restores line-rate (180+ Gbps) performance on affected platforms.
+same suggestion/question here pluse there seems to be a bunch of repeated
+code between linear and non-linear skb processing paths...
 
-Usage:
-  ethtool --set-priv-flags eth0 full-page-rx on
-
-There is no behavioral change by default. The flag must be explicitly
-enabled by the user or udev rule.
-
-The existing single-buffer-per-page logic for XDP and jumbo frames is
-consolidated into a new helper mana_use_single_rxbuf_per_page() which
-is now the single decision point for both the automatic and
-user-controlled paths.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c |  22 +++-
- .../ethernet/microsoft/mana/mana_ethtool.c    | 103 ++++++++++++++++++
- include/net/mana/mana.h                       |   8 ++
- 3 files changed, 131 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 26aef21c6c2c..4bd83c782ea3 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -755,6 +755,25 @@ static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
- 	return va;
- }
- 
-+static bool
-+mana_use_single_rxbuf_per_page(struct mana_port_context *apc, u32 mtu)
-+{
-+	/* On some platforms with 4K PAGE_SIZE, page_pool fragment allocation
-+	 * in the RX refill path (~2kB buffer) can cause significant throughput
-+	 * regression under high connection counts. Allow user to force one RX
-+	 * buffer per page via ethtool private flag to bypass the fragment
-+	 * path.
-+	 */
-+	if (apc->priv_flags & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF))
-+		return true;
-+
-+	/* For xdp and jumbo frames make sure only one packet fits per page. */
-+	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc))
-+		return true;
-+
-+	return false;
-+}
-+
- /* Get RX buffer's data size, alloc size, XDP headroom based on MTU */
- static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
- 			       int mtu, u32 *datasize, u32 *alloc_size,
-@@ -765,8 +784,7 @@ static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
- 	/* Calculate datasize first (consistent across all cases) */
- 	*datasize = mtu + ETH_HLEN;
- 
--	/* For xdp and jumbo frames make sure only one packet fits per page */
--	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc)) {
-+	if (mana_use_single_rxbuf_per_page(apc, mtu)) {
- 		if (mana_xdp_get(apc)) {
- 			*headroom = XDP_PACKET_HEADROOM;
- 			*alloc_size = PAGE_SIZE;
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index fa9c49592828..3c498a222965 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -133,6 +133,10 @@ static const struct mana_stats_desc mana_phy_stats[] = {
- 	{ "hc_tc7_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc7_phy) },
- };
- 
-+static const char mana_priv_flags[MANA_PRIV_FLAG_MAX][ETH_GSTRING_LEN] = {
-+	[MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF] = "full-page-rx"
-+};
-+
- static int mana_get_sset_count(struct net_device *ndev, int stringset)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
-@@ -144,6 +148,10 @@ static int mana_get_sset_count(struct net_device *ndev, int stringset)
- 		       ARRAY_SIZE(mana_phy_stats) +
- 		       ARRAY_SIZE(mana_hc_stats)  +
- 		       num_queues * (MANA_STATS_RX_COUNT + MANA_STATS_TX_COUNT);
-+
-+	case ETH_SS_PRIV_FLAGS:
-+		return MANA_PRIV_FLAG_MAX;
-+
- 	default:
- 		return -EINVAL;
- 	}
-@@ -192,6 +200,14 @@ static void mana_get_strings_stats(struct mana_port_context *apc, u8 **data)
- 	}
- }
- 
-+static void mana_get_strings_priv_flags(u8 **data)
-+{
-+	int i;
-+
-+	for (i = 0; i < MANA_PRIV_FLAG_MAX; i++)
-+		ethtool_puts(data, mana_priv_flags[i]);
-+}
-+
- static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
-@@ -200,6 +216,9 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- 	case ETH_SS_STATS:
- 		mana_get_strings_stats(apc, &data);
- 		break;
-+	case ETH_SS_PRIV_FLAGS:
-+		mana_get_strings_priv_flags(&data);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -611,6 +630,88 @@ static int mana_get_link_ksettings(struct net_device *ndev,
- 	return 0;
- }
- 
-+static u32 mana_get_priv_flags(struct net_device *ndev)
-+{
-+	struct mana_port_context *apc = netdev_priv(ndev);
-+
-+	return apc->priv_flags;
-+}
-+
-+static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
-+{
-+	struct mana_port_context *apc = netdev_priv(ndev);
-+	u32 changed = apc->priv_flags ^ priv_flags;
-+	u32 old_priv_flags = apc->priv_flags;
-+	bool schedule_port_reset = false;
-+	int err = 0;
-+
-+	if (!changed)
-+		return 0;
-+
-+	/* Reject unknown bits */
-+	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
-+		return -EINVAL;
-+
-+	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
-+		apc->priv_flags = priv_flags;
-+
-+		if (!apc->port_is_up) {
-+			/* Port is down, flag updated to apply on next up
-+			 * so just return.
-+			 */
-+			return 0;
-+		}
-+
-+		/* Pre-allocate buffers to prevent failure in mana_attach
-+		 * later
-+		 */
-+		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-+		if (err) {
-+			netdev_err(ndev,
-+				   "Insufficient memory for new allocations\n");
-+			apc->priv_flags = old_priv_flags;
-+			return err;
-+		}
-+
-+		err = mana_detach(ndev, false);
-+		if (err) {
-+			netdev_err(ndev, "mana_detach failed: %d\n", err);
-+			apc->priv_flags = old_priv_flags;
-+
-+			/* Port is in an inconsistent state. Restore
-+			 * 'port_is_up' so that queue reset work handler
-+			 * can properly detach and re-attach.
-+			 */
-+			apc->port_is_up = true;
-+			schedule_port_reset = true;
-+			goto out;
-+		}
-+
-+		err = mana_attach(ndev);
-+		if (err) {
-+			netdev_err(ndev, "mana_attach failed: %d\n", err);
-+			apc->priv_flags = old_priv_flags;
-+
-+			/* Restore 'port_is_up' so the reset work handler
-+			 * can properly detach/attach. Without this,
-+			 * the handler sees port_is_up=false and skips
-+			 * queue allocation, leaving the port dead.
-+			 */
-+			apc->port_is_up = true;
-+			schedule_port_reset = true;
-+		}
-+	}
-+
-+out:
-+	mana_pre_dealloc_rxbufs(apc);
-+
-+	if (schedule_port_reset)
-+		queue_work(apc->ac->per_port_queue_reset_wq,
-+			   &apc->queue_reset_work);
-+
-+	return err;
-+}
-+
- const struct ethtool_ops mana_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_CQE_FRAMES,
- 	.op_needs_rtnl		= ETHTOOL_OP_NEEDS_RTNL_SCHANNELS |
-@@ -631,4 +732,6 @@ const struct ethtool_ops mana_ethtool_ops = {
- 	.set_ringparam          = mana_set_ringparam,
- 	.get_link_ksettings	= mana_get_link_ksettings,
- 	.get_link		= ethtool_op_get_link,
-+	.get_priv_flags		= mana_get_priv_flags,
-+	.set_priv_flags		= mana_set_priv_flags,
- };
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 13c87baf018e..8dc496f05938 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -30,6 +30,12 @@ enum TRI_STATE {
- 	TRI_STATE_TRUE = 1
- };
- 
-+/* MANA ethtool private flag bit positions */
-+enum mana_priv_flag_bits {
-+	MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF = 0,
-+	MANA_PRIV_FLAG_MAX,
-+};
-+
- /* Number of entries for hardware indirection table must be in power of 2 */
- #define MANA_INDIRECT_TABLE_MAX_SIZE 512
- #define MANA_INDIRECT_TABLE_DEF_SIZE 64
-@@ -532,6 +538,8 @@ struct mana_port_context {
- 	u32 rxbpre_headroom;
- 	u32 rxbpre_frag_count;
- 
-+	u32 priv_flags;
-+
- 	struct bpf_prog *bpf_prog;
- 
- 	/* Create num_queues EQs, SQs, SQ-CQs, RQs and RQ-CQs, respectively. */
--- 
-2.43.0
-
+>  			while (data_len) {
+>  				dma_unmap_page(oq->dev, oq->desc_ring[read_idx].buffer_ptr,
+>  					       PAGE_SIZE, DMA_FROM_DEVICE);
+> -- 
+> 2.34.1
+> 
+> 
 
