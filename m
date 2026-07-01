@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-303832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qmKON7eBRWpYBQsAu9opvQ
-	(envelope-from <netdev+bounces-303832-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:08:07 +0200
+	id fXN7E+qBRWpgBQsAu9opvQ
+	(envelope-from <netdev+bounces-303833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:08:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0E06F1BFD
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:08:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C23E6F1C03
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 23:08:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b="aQKXeQ/k";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303832-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303832-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=ChJZgRUr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303833-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303833-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE1D1313AF03
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 21:03:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C901E314FE96
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 21:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E813B3C18;
-	Wed,  1 Jul 2026 21:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3CF33A9E2;
+	Wed,  1 Jul 2026 21:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD24E3AEF3B
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 21:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604EE3A9D90
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 21:03:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782939794; cv=none; b=WpZZcz/OG9sKJ943UwAyNCYtYeT5IU92fjPSvxre8yJm63q0Ys1ueBqrpPmM2s1wW2ZdlYsZotwGqwC9a8qGAUFRk/dijUAyjkqNfYNX2wUMcyVjjGAPI6LvBGc9ODqWXN96E2B3aj3JE7YQEIA509iJOau21I2+FG7ANjJodgk=
+	t=1782939797; cv=none; b=FfqX8rwQw/qtp5Z374KrnDsPh5cT0u3ZWWG96vysYkzLKQW9zlRXL+JQ0MpIRMpu7aYLVxpcjCvmjMmBDerMhSp/KotAKxwNn23bGDiCBEByJD69PpPO+v7U5uoSoZzKH4ebHohJOfjkGjCZMLzHWPkCQsZS+yPzk+e652Hn19Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782939794; c=relaxed/simple;
-	bh=zhW/Hy1C31k/FPGGYk5y5DXgtGtanlTGErcBuXQZsGk=;
+	s=arc-20240116; t=1782939797; c=relaxed/simple;
+	bh=+puxbYvPgWKP+rEpz8CvQ8DQ22jA7zhyaftvo5+dG/4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZJZmgxCWGRgDH+RIqHxptnSWRVbkfldhIqHJKqpS0Z9QanxFkVH1kWkMNDlEysEJLpdY+HzUtl0nzwZMm6j/g4xoqhLeHljdnXbwUH0n7PsHMJf3g4ktP31mvMbsiyOVxKRGaDYH4f8lUzKxeO25DTs1BHcATzVdzfb7SQWNaJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aQKXeQ/k; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=p4acKT0FsVsYD5I6bfvL9iZoQ3u5ru2Bra+Ae+ubzBGcXAGgW/b5xLctwhR2u9uTFiOKsYmvVKxG5OOAJ3NTdRnfaHmaDsrPb9q81RMcOPo6Xaywwtnzrx+k4kVIBolQAp+21JayosHXbPv3YafVevsWJT5X13igDbEI7KCqHFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ChJZgRUr; arc=none smtp.client-ip=192.198.163.10
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782939793; x=1814475793;
+  t=1782939794; x=1814475794;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zhW/Hy1C31k/FPGGYk5y5DXgtGtanlTGErcBuXQZsGk=;
-  b=aQKXeQ/kdNuU8CKZkqxFQby9MFsUVjhvGRYuJ+kmaQHHadGvgdTX7dlP
-   fW1IDgNdGy762vc9YjcaMba2D1diyg/7S6c9zgoUR1bFcXLBtftC449Im
-   IkEQPrPC4ZR3zZsju8n1phcwzeRQ7kpfRGKrBTLQncEYiqXw1pal7O7SE
-   1HujpL6lwyruFezbmvyjK6Iw+aGIUVS86QK1/dc8MQ8+rCl+TQgx6aFe0
-   AnAJDBG20nlSiZSRzALzXtbnnSlP3jV5So3XL+6/NRCyBJvGmIQ7DFmJk
-   V9oTdhldWcLy99f6tIoWbEPzN+QYBUAOkQYXCuh0DvCZHAluxOnkjup1N
-   Q==;
-X-CSE-ConnectionGUID: bpjg8YrcTJKC7GL72bHQOw==
-X-CSE-MsgGUID: maLdE45PT9eXN5aRq9SuWA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11834"; a="95069122"
+  bh=+puxbYvPgWKP+rEpz8CvQ8DQ22jA7zhyaftvo5+dG/4=;
+  b=ChJZgRUrOVXxqELMcV0wQXkRWIXxdnp7Umgvcxr3Mqqu+YJ0vI49xWvs
+   8zu+CbIuexYuBcTmWAWzHJBiSxj9in8l/2q4pihYTudXvNgAmhfbaYFmu
+   69TtpYHHHAfAVikDQ/Qr6EOzsRK8SUOa9wszc3Pz/TvDnNGfjBlf/dOWl
+   /RWhlgld/qZNZTqUFtK4ZH0l8AlM5gZGhZRsYHryXi4qBX3+Vm3UxFW4H
+   VMpTvoVKr1OnXvRdXqkwqz9AhoMmPcyKf4c5ZjGkGu26n/NPAP3LH+5td
+   iiPA3giINBuS9JzSvF2NjlgYoXf3CQoXXG5JgbM3SmQMax9MGxGxj2VV5
+   g==;
+X-CSE-ConnectionGUID: UyN8k/FZRmGrD0WKGMJ+zg==
+X-CSE-MsgGUID: J8VYE+OyQgevsoKsbLFGig==
+X-IronPort-AV: E=McAfee;i="6800,10657,11834"; a="95069131"
 X-IronPort-AV: E=Sophos;i="6.25,142,1779174000"; 
-   d="scan'208";a="95069122"
+   d="scan'208";a="95069131"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
   by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 14:03:12 -0700
-X-CSE-ConnectionGUID: kQl4JCXxTmycduT+aF6IZA==
-X-CSE-MsgGUID: 67Fw7YDzQpC2pzdwMIZjGQ==
+X-CSE-ConnectionGUID: BlbRffSYQwqLoz1IKixYYQ==
+X-CSE-MsgGUID: WKLfyAVaTvmKQqX8Q+LG9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,142,1779174000"; 
-   d="scan'208";a="257561418"
+   d="scan'208";a="257561422"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa005.fm.intel.com with ESMTP; 01 Jul 2026 14:03:11 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 01 Jul 2026 14:03:12 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -68,16 +68,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Takashi Kozu <takkozu@amazon.com>,
+Cc: Kohei Enju <kohei@enjuk.jp>,
 	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	enjuk@amazon.com,
 	kohei.enju@gmail.com,
-	Kohei Enju <kohei@enjuk.jp>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 06/11] igb: allow configuring RSS key via ethtool set_rxfh
-Date: Wed,  1 Jul 2026 14:02:55 -0700
-Message-ID: <20260701210303.1745310-7-anthony.l.nguyen@intel.com>
+	horms@kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH net-next 07/11] igb: set skb hash type from RSS_TYPE
+Date: Wed,  1 Jul 2026 14:02:56 -0700
+Message-ID: <20260701210303.1745310-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260701210303.1745310-1-anthony.l.nguyen@intel.com>
 References: <20260701210303.1745310-1-anthony.l.nguyen@intel.com>
@@ -97,19 +96,19 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303832-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-303833-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:takkozu@amazon.com,m:anthony.l.nguyen@intel.com,m:horms@kernel.org,m:enjuk@amazon.com,m:kohei.enju@gmail.com,m:kohei@enjuk.jp,m:sx.rinitha@intel.com,m:andrew@lunn.ch,m:koheienju@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:kohei@enjuk.jp,m:anthony.l.nguyen@intel.com,m:kohei.enju@gmail.com,m:horms@kernel.org,m:aleksandr.loktionov@intel.com,m:pmenzel@molgen.mpg.de,m:andrew@lunn.ch,m:koheienju@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[amazon.com,intel.com,kernel.org,gmail.com,enjuk.jp];
+	FREEMAIL_CC(0.00)[enjuk.jp,intel.com,gmail.com,kernel.org,molgen.mpg.de];
 	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -120,95 +119,102 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,enjuk.jp:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:email,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4C0E06F1BFD
+X-Rspamd-Queue-Id: 9C23E6F1C03
 
-From: Takashi Kozu <takkozu@amazon.com>
+From: Kohei Enju <kohei@enjuk.jp>
 
-Change igb_set_rxfh() to accept and save a userspace-provided
-RSS key. When a key is provided, store it in the adapter and write the
-E1000 registers accordingly.
+igb always marks the RX hash as L3 regardless of RSS_TYPE in the
+advanced descriptor, which may indicate L4 (TCP/UDP) hash. This can
+trigger unnecessary SW hash recalculation and breaks toeplitz selftests.
 
-This can be tested using `ethtool -X <dev> hkey <key>`.
+Use RSS_TYPE from pkt_info to set the correct PKT_HASH_TYPE_*
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Takashi Kozu <takkozu@amazon.com>
-Tested-by: Kohei Enju <kohei@enjuk.jp>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Tested by toeplitz.py with the igb RSS key get/set patches applied as
+they are required for toeplitz.py (see Link below).
+ # ethtool -N $DEV rx-flow-hash udp4 sdfn
+ # ethtool -N $DEV rx-flow-hash udp6 sdfn
+ # python toeplitz.py | grep -E "^# Totals"
+
+Without patch:
+ # Totals: pass:0 fail:12 xfail:0 xpass:0 skip:0 error:0
+
+With patch:
+ # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Link: https://lore.kernel.org/intel-wired-lan/20260119084511.95287-5-takkozu@amazon.com/
+Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igb/igb_ethtool.c | 48 +++++++++++---------
- 1 file changed, 26 insertions(+), 22 deletions(-)
+ drivers/net/ethernet/intel/igb/e1000_82575.h | 21 ++++++++++++++++++++
+ drivers/net/ethernet/intel/igb/igb_main.c    | 17 ++++++++++++----
+ 2 files changed, 34 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index 47fc620026a9..65014a54a6d1 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -3357,35 +3357,39 @@ static int igb_set_rxfh(struct net_device *netdev,
- 	u32 num_queues;
+diff --git a/drivers/net/ethernet/intel/igb/e1000_82575.h b/drivers/net/ethernet/intel/igb/e1000_82575.h
+index 63ec253ac788..9e696d55e512 100644
+--- a/drivers/net/ethernet/intel/igb/e1000_82575.h
++++ b/drivers/net/ethernet/intel/igb/e1000_82575.h
+@@ -87,6 +87,27 @@ union e1000_adv_rx_desc {
+ 	} wb;  /* writeback */
+ };
  
- 	/* We do not allow change in unsupported parameters */
--	if (rxfh->key ||
--	    (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
--	     rxfh->hfunc != ETH_RSS_HASH_TOP))
-+	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-+	    rxfh->hfunc != ETH_RSS_HASH_TOP)
- 		return -EOPNOTSUPP;
--	if (!rxfh->indir)
--		return 0;
- 
--	num_queues = adapter->rss_queues;
-+	if (rxfh->indir) {
-+		num_queues = adapter->rss_queues;
- 
--	switch (hw->mac.type) {
--	case e1000_82576:
--		/* 82576 supports 2 RSS queues for SR-IOV */
--		if (adapter->vfs_allocated_count)
--			num_queues = 2;
--		break;
--	default:
--		break;
--	}
-+		switch (hw->mac.type) {
-+		case e1000_82576:
-+			/* 82576 supports 2 RSS queues for SR-IOV */
-+			if (adapter->vfs_allocated_count)
-+				num_queues = 2;
-+			break;
-+		default:
-+			break;
-+		}
- 
--	/* Verify user input. */
--	for (i = 0; i < IGB_RETA_SIZE; i++)
--		if (rxfh->indir[i] >= num_queues)
--			return -EINVAL;
-+		/* Verify user input. */
-+		for (i = 0; i < IGB_RETA_SIZE; i++)
-+			if (rxfh->indir[i] >= num_queues)
-+				return -EINVAL;
- 
- 
--	for (i = 0; i < IGB_RETA_SIZE; i++)
--		adapter->rss_indir_tbl[i] = rxfh->indir[i];
-+		for (i = 0; i < IGB_RETA_SIZE; i++)
-+			adapter->rss_indir_tbl[i] = rxfh->indir[i];
++#define E1000_RSS_TYPE_NO_HASH		 0
++#define E1000_RSS_TYPE_HASH_TCP_IPV4	 1
++#define E1000_RSS_TYPE_HASH_IPV4	 2
++#define E1000_RSS_TYPE_HASH_TCP_IPV6	 3
++#define E1000_RSS_TYPE_HASH_IPV6_EX	 4
++#define E1000_RSS_TYPE_HASH_IPV6	 5
++#define E1000_RSS_TYPE_HASH_TCP_IPV6_EX	 6
++#define E1000_RSS_TYPE_HASH_UDP_IPV4	 7
++#define E1000_RSS_TYPE_HASH_UDP_IPV6	 8
++#define E1000_RSS_TYPE_HASH_UDP_IPV6_EX	 9
 +
-+		igb_write_rss_indir_tbl(adapter);
-+	}
- 
--	igb_write_rss_indir_tbl(adapter);
-+	if (rxfh->key) {
-+		memcpy(adapter->rss_key, rxfh->key, sizeof(adapter->rss_key));
-+		igb_write_rss_key(adapter);
-+	}
- 
- 	return 0;
++#define E1000_RSS_TYPE_MASK		GENMASK(3, 0)
++
++#define E1000_RSS_L4_TYPES_MASK	\
++	(BIT(E1000_RSS_TYPE_HASH_TCP_IPV4)	| \
++	 BIT(E1000_RSS_TYPE_HASH_TCP_IPV6)	| \
++	 BIT(E1000_RSS_TYPE_HASH_TCP_IPV6_EX)	| \
++	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV4)	| \
++	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV6)	| \
++	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV6_EX))
++
+ #define E1000_RXDADV_HDRBUFLEN_MASK      0x7FE0
+ #define E1000_RXDADV_HDRBUFLEN_SHIFT     5
+ #define E1000_RXDADV_STAT_TS             0x10000 /* Pkt was time stamped */
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index b7d36dd0b8e4..d4a897a8c82c 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -8820,10 +8820,19 @@ static inline void igb_rx_hash(struct igb_ring *ring,
+ 			       union e1000_adv_rx_desc *rx_desc,
+ 			       struct sk_buff *skb)
+ {
+-	if (ring->netdev->features & NETIF_F_RXHASH)
+-		skb_set_hash(skb,
+-			     le32_to_cpu(rx_desc->wb.lower.hi_dword.rss),
+-			     PKT_HASH_TYPE_L3);
++	u16 rss_type;
++
++	if (!(ring->netdev->features & NETIF_F_RXHASH))
++		return;
++
++	rss_type = le16_to_cpu(rx_desc->wb.lower.lo_dword.pkt_info) &
++		   E1000_RSS_TYPE_MASK;
++	if (!rss_type)
++		return;
++
++	skb_set_hash(skb, le32_to_cpu(rx_desc->wb.lower.hi_dword.rss),
++		     (E1000_RSS_L4_TYPES_MASK & BIT(rss_type)) ?
++		     PKT_HASH_TYPE_L4 : PKT_HASH_TYPE_L3);
  }
+ 
+ /**
 -- 
 2.47.1
 
