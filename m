@@ -1,295 +1,149 @@
-Return-Path: <netdev+bounces-303593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yzSwE2vzRGqb3woAu9opvQ
-	(envelope-from <netdev+bounces-303593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:00:59 +0200
+	id aGqvBazvRGph3goAu9opvQ
+	(envelope-from <netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:45:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A1B6EC7BE
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 13:00:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A01A06EC531
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 12:44:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=Rb6a2ACJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303593-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303593-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=RSa6cvkk;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303590-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=debian.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D38E83031CCC
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 11:00:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1CFD8301DD05
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 10:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF84F32470E;
-	Wed,  1 Jul 2026 11:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD20C426D16;
+	Wed,  1 Jul 2026 10:44:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC8442B72C
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 11:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCCA3FBB66
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 10:44:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782903643; cv=none; b=omjvmiNqnhcOAnFZ0FAadSeyjIkShZNgYGIfan3TSQFPV+l1TPTni5AW17y7z9WyucmmgHbBCt4atdMpAMdp3Bb+o/MVZ6GKZydYnU9N/x1xrtA77K0wifNgv0tnkgWaazjVT4Gy8E+j+8GyeLUxxOs45lJF5YQ85ghK9JyoiDM=
+	t=1782902697; cv=none; b=lNDvneNL9+wVLQSX6bl4oRwTJUXNNU+6eNRLJNV5MaZ/N/+lxhI7pcSjqPWLUIrV5Ga3u4TJDQujNxyQbN696lov1d3AYZnbn5R1gTAqRFxzue7O++T1m3C+UmswIR+YeW+GYy/VPwkXl3QENi/cVsp9qcF8Yu/gOiTF2ZEdImM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782903643; c=relaxed/simple;
-	bh=E8RBWXlTTBf2FMiPjS26uKCN4JqiVWr6pCktAz80oVI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ciOha3cqQdL5W/mh9KXIVec68ozSzqNfMO1Hqxw45XLCeBeUNUVMKTEY8618y/Cj3m8twXQRwt+peRt3sRy0YC5cicBKAS1oeXGLZTIycpya7mB6xgET7dviQ8ko8HFNhNIZUqQHcPmxjx4UrFjmStbfu45sPMxZM9z5GtBgvNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rb6a2ACJ; arc=none smtp.client-ip=198.175.65.11
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782903642; x=1814439642;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=E8RBWXlTTBf2FMiPjS26uKCN4JqiVWr6pCktAz80oVI=;
-  b=Rb6a2ACJ1V7Ncb9Wk4ECG1DVqfIYLOI4qAGmCg83V59+7ToAw9A4HhCW
-   TGQM7fzGT3aM9M5dtG9QVA21g0qPhSr7o1iXqC3sy42Cr1uKs/Qpo8gae
-   ADlUVZ5cQhEsHF1JFmATh/Jw0aPqcKFwNAYHHfKPyujftfeFIKMWD03dU
-   u+ruGIuot/1DKyvwoVhnJrBltFY+pIWAGbQwnd1SDxD/lMsw/qPPABm6M
-   DEs2en1OxZn4yclVClg5JHxtP3Sv7+WgNoNU355V4CD26x2zBGaWUkU4J
-   dZMK/yXpbm/LjI4zt64YNBbC6NBzQEWtQgVPuyW9EhDkq6nf5hXkLqKyX
-   g==;
-X-CSE-ConnectionGUID: MEaPN15WR0CgJ962QHwcmQ==
-X-CSE-MsgGUID: uM3h+uBlSG2UneNtAdZ6Vw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11833"; a="93989155"
-X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
-   d="scan'208";a="93989155"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2026 04:00:41 -0700
-X-CSE-ConnectionGUID: kjrr1HkNQy+E9IDKid52og==
-X-CSE-MsgGUID: aIKAe79ESLiJDNl9N41t9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,141,1779174000"; 
-   d="scan'208";a="249887295"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa008.fm.intel.com with ESMTP; 01 Jul 2026 04:00:37 -0700
-Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id CEA1C28763;
-	Wed,  1 Jul 2026 12:00:35 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net 2/2] ice: fix stats array overflow via proper realloc
-Date: Wed,  1 Jul 2026 12:41:03 +0200
-Message-ID: <20260701104141.9740-2-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260701104141.9740-1-przemyslaw.kitszel@intel.com>
-References: <20260701104141.9740-1-przemyslaw.kitszel@intel.com>
+	s=arc-20240116; t=1782902697; c=relaxed/simple;
+	bh=D/vBBwBsOv6LCFJVb8CYh/XxO4FuXAOFO0vEjsc9Mps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SWloaQUO9iEkC7StTJaIY1taS9LYTDeeCNOmUWGHmAzzR8/aWifHpAyT6Uxe/05jyp1leCSYR4w2wn1lD1r98IoDsm3+TF+MaHMmChH5i7Zz8R9vJGa64zAeS3ZY4/PNGz2EU2jbgdB2CvMeFm/UtIcaOXs1iuqNWa0bZpXERAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=RSa6cvkk; arc=none smtp.client-ip=82.195.75.108
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=MlO9/xg58sbko0NqILOg0eZp8g27KvCJW04RWhfiJUI=; b=RSa6cvkkwFrNTNhFaXT8r6cHd0
+	hYJtXgUqy22fmyMIzJWPAHxcnHeqVv7oTNl0w3LJ8NbhIJeJ3ovza5IKACjxwNZSsVri8AM7K7jHo
+	CaS9XME8c2jbmonHiWFpWsGEaHtLY07quanJRlt2TSELgXWQPtA4zdCMLO8WnsKWdM4KHKCc+d5EF
+	O9xqojk+7bQWaajzbXjTlrmWZJbUyV5C3A2MDb4+S7INPumkyOvoBtHIdFwQSh2tXJSsiu2HYhlcB
+	YPlzooKsWmaSE20rcPROl2nDS6yA4EeajtzHUX35ecEc2eI4EW0SzEkz/tbuB3QUk2yUQvcqYV127
+	ql0CPkNg==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wesQq-007mqI-15;
+	Wed, 01 Jul 2026 10:44:40 +0000
+Date: Wed, 1 Jul 2026 03:44:34 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
+	Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Larysa Zaremba <larysa.zaremba@intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Rongguang Wei <weirongguang@kylinos.cn>, 
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>, Fabio Baltieri <fabio.baltieri@gmail.com>
+Subject: Re: [PATCH net-next v9 5/5] net: wangxun: add pcie error handler
+Message-ID: <akTvTF7n9P1lrqCN@gmail.com>
+References: <20260701072357.33984-1-jiawenwu@trustnetic.com>
+ <20260701072357.33984-6-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260701072357.33984-6-jiawenwu@trustnetic.com>
+X-Debian-User: leitao
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303593-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303590-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jiawenwu@trustnetic.com,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:aleksandr.loktionov@intel.com,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:horms@kernel.org,m:kees@kernel.org,m:larysa.zaremba@intel.com,m:gregkh@linuxfoundation.org,m:tglx@kernel.org,m:weirongguang@kylinos.cn,m:u.kleine-koenig@baylibre.com,m:fabio.baltieri@gmail.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:mschmidt@redhat.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:aleksandr.loktionov@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jedrzej.jagielski@intel.com,m:piotr.kwapulinski@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,linuxfoundation.org,kylinos.cn,baylibre.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[atlassian.net:url,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 46A1B6EC7BE
+X-Rspamd-Queue-Id: A01A06EC531
 
-Integrate ice_vsi_alloc_stat_arrays() with realloc variant.
+On Wed, Jul 01, 2026 at 03:23:57PM +0800, Jiawen Wu wrote:
+> +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
+> +{
+> +	struct wx *wx = pci_get_drvdata(pdev);
+> +	pci_ers_result_t result;
+> +
+> +	if (pci_enable_device_mem(pdev)) {
+> +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
+> +		result = PCI_ERS_RESULT_DISCONNECT;
+> +	} else {
+> +		/* make all memory operations done before clearing the flag */
+> +		smp_mb__before_atomic();
+> +		clear_bit(WX_STATE_DISABLED, wx->state);
+> +		clear_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
+> +		pci_set_master(pdev);
+> +		pci_restore_state(pdev);
+> +		pci_wake_from_d3(pdev, false);
+> +
+> +		rtnl_lock();
+> +		if (netif_running(wx->netdev) && wx->down_suspend)
+> +			wx->down_suspend(wx);
+> +		if (wx->do_reset)
+> +			wx->do_reset(wx->netdev, false);
+> +		rtnl_unlock();
+> +		result = PCI_ERS_RESULT_RECOVERED;
+> +	}
+> +
+> +	pci_aer_clear_nonfatal_status(pdev);
 
-Instead of keeping two functions for stat arrays allocation, change the
-ice_vsi_realloc_stat_arrays() to handle initial condition (no vsi_stat
-entry) and replace ice_vsi_alloc_stat_arrays() by the more generic
-ice_vsi_realloc_stat_arrays().
-
-Note that VSIs of ICE_VSI_CHNL type are ignored in realloc variant as they
-were in the replaced ice_vsi_alloc_stat_arrays().
-
-This is a fix for stats array overflow that occurs when VF is given more
-queues (an operation that will be more frequent, and by bigger increase,
-when we will merge my "XLVF" series).
-
-Splat for increasing number of queues thanks to Michal Schmidt:
-KASAN detects the bug:
- ==================================================================
- BUG: KASAN: slab-out-of-bounds in ice_vsi_alloc_ring_stats+0x385/0x4a0 [ice]
- Read of size 8 at addr ffff88810affea60 by task kworker/u131:7/221
-
- CPU: 24 UID: 0 PID: 221 Comm: kworker/u131:7 Not tainted 7.1.0-rc1+ #1 PREEMPT(lazy)
- ...
- Workqueue: ice ice_service_task [ice]
- Call Trace:
-  <TASK>
-  ...
-  kasan_report+0xd7/0x120
-  ice_vsi_alloc_ring_stats+0x385/0x4a0 [ice]
-  ice_vsi_cfg_def+0x12e2/0x2060 [ice]
-  ice_vsi_cfg+0xb5/0x3c0 [ice]
-  ice_reset_vf+0x858/0xf80 [ice]
-  ice_vc_request_qs_msg+0x1da/0x290 [ice]
-  ice_vc_process_vf_msg+0xb15/0x1430 [ice]
-  __ice_clean_ctrlq+0x70d/0x9d0 [ice]
-  ice_service_task+0x840/0xf20 [ice]
-  process_one_work+0x690/0xff0
-  worker_thread+0x4d9/0xd20
-  kthread+0x322/0x410
-  ret_from_fork+0x332/0x660
-  ret_from_fork_asm+0x1a/0x30
-  </TASK>
-
- Allocated by task 2439:
-  kasan_save_stack+0x1c/0x40
-  kasan_save_track+0x10/0x30
-  __kasan_kmalloc+0x96/0xb0
-  __kmalloc_noprof+0x1d8/0x580
-  ice_vsi_cfg_def+0x115c/0x2060 [ice]
-  ice_vsi_cfg+0xb5/0x3c0 [ice]
-  ice_vsi_setup+0x180/0x320 [ice]
-  ice_start_vfs+0x1f3/0x590 [ice]
-  ice_ena_vfs+0x66d/0x798 [ice]
-  ice_sriov_configure.cold+0xe4/0x121 [ice]
-  sriov_numvfs_store+0x279/0x480
-  kernfs_fop_write_iter+0x331/0x4f0
-  vfs_write+0x4c4/0xe40
-  ksys_write+0x10c/0x240
-  do_syscall_64+0xd9/0x650
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
- The buggy address belongs to the object at ffff88810affea40
-                which belongs to the cache kmalloc-32 of size 32
- The buggy address is located 0 bytes to the right of
-                allocated 32-byte region [ffff88810affea40, ffff88810affea60)
-
-Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
-Closes: https://redhat.atlassian.net/browse/RHEL-164321
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-This is an alternative to the fix [1] by Michal Schmidt, which were
-blocked due to AI feedback. My fix was already developed before Michal's,
-just not public back then. We have agreed to go on with my version.
-
-[1] https://lore.kernel.org/netdev/20260520183501.3360810-3-anthony.l.nguyen@intel.com
----
- drivers/net/ethernet/intel/ice/ice_lib.c | 57 +++++-------------------
- 1 file changed, 11 insertions(+), 46 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index e48ee5940f17..ae167b42c558 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -513,51 +513,6 @@ static irqreturn_t ice_msix_clean_rings(int __always_unused irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--/**
-- * ice_vsi_alloc_stat_arrays - Allocate statistics arrays
-- * @vsi: VSI pointer
-- */
--static int ice_vsi_alloc_stat_arrays(struct ice_vsi *vsi)
--{
--	struct ice_vsi_stats *vsi_stat;
--	struct ice_pf *pf = vsi->back;
--
--	if (vsi->type == ICE_VSI_CHNL)
--		return 0;
--	if (!pf->vsi_stats)
--		return -ENOENT;
--
--	if (pf->vsi_stats[vsi->idx])
--	/* realloc will happen in rebuild path */
--		return 0;
--
--	vsi_stat = kzalloc_obj(*vsi_stat);
--	if (!vsi_stat)
--		return -ENOMEM;
--
--	vsi_stat->tx_ring_stats =
--		kzalloc_objs(*vsi_stat->tx_ring_stats, vsi->alloc_txq);
--	if (!vsi_stat->tx_ring_stats)
--		goto err_alloc_tx;
--
--	vsi_stat->rx_ring_stats =
--		kzalloc_objs(*vsi_stat->rx_ring_stats, vsi->alloc_rxq);
--	if (!vsi_stat->rx_ring_stats)
--		goto err_alloc_rx;
--
--	pf->vsi_stats[vsi->idx] = vsi_stat;
--
--	return 0;
--
--err_alloc_rx:
--	kfree(vsi_stat->rx_ring_stats);
--err_alloc_tx:
--	kfree(vsi_stat->tx_ring_stats);
--	kfree(vsi_stat);
--	pf->vsi_stats[vsi->idx] = NULL;
--	return -ENOMEM;
--}
--
- /**
-  * ice_vsi_alloc_def - set default values for already allocated VSI
-  * @vsi: ptr to VSI
-@@ -2319,7 +2274,17 @@ static int ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi)
- 	u16 prev_txq = vsi->alloc_txq;
- 	u16 prev_rxq = vsi->alloc_rxq;
- 
-+	if (vsi->type == ICE_VSI_CHNL)
-+		return 0;
-+
- 	vsi_stat = pf->vsi_stats[vsi->idx];
-+	if (!vsi_stat) {
-+		vsi_stat = kzalloc_obj(*vsi_stat);
-+		if (!vsi_stat)
-+			return -ENOMEM;
-+
-+		pf->vsi_stats[vsi->idx] = vsi_stat;
-+	}
- 
- 	if (req_txq < prev_txq) {
- 		for (int i = req_txq; i < prev_txq; i++) {
-@@ -2379,7 +2344,7 @@ static int ice_vsi_cfg_def(struct ice_vsi *vsi)
- 		return ret;
- 
- 	/* allocate memory for Tx/Rx ring stat pointers */
--	ret = ice_vsi_alloc_stat_arrays(vsi);
-+	ret = ice_vsi_realloc_stat_arrays(vsi);
- 	if (ret)
- 		goto unroll_vsi_alloc;
- 
--- 
-2.54.0
-
+After bfcb79fca19d ("PCI/ERR: Run error recovery callbacks for all
+affected devices"), AER errors are always cleared by the PCI core and
+drivers don't need to do it themselves.
 
