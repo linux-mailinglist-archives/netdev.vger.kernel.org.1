@@ -1,197 +1,138 @@
-Return-Path: <netdev+bounces-303718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6sXfOCMuRWok8QoAu9opvQ
-	(envelope-from <netdev+bounces-303718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:11:31 +0200
+	id igGqBr8vRWqO8QoAu9opvQ
+	(envelope-from <netdev+bounces-303719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:18:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863146EF22D
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:11:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DADD6EF2F0
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 17:18:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=WnlqNMCI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303718-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303718-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b="ZX5/2tA6";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303719-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303719-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BC3CF3071CDF
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 15:09:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6210305288D
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 15:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52950480343;
-	Wed,  1 Jul 2026 15:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA84426ED3;
+	Wed,  1 Jul 2026 15:09:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DCD3C0A03;
-	Wed,  1 Jul 2026 15:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEF018FC97;
+	Wed,  1 Jul 2026 15:09:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782918490; cv=none; b=Sr5IaaVrWA/Wvg7cVficvL6aFE88I3xI1iu2TwQtMk0gtFk5cTtk0SHD+3JLJGouwmqyHjyRZ98pV3GaiQpymb2zCIGbQ2WaUm2DAaMSzsfLb737bhnYDEF9Phlds+iQ9+R3N0sJUilItgAR5u9NR63mIoCVFcy3y1jqxZxuAd8=
+	t=1782918544; cv=none; b=YXuOdHcdB5GI5h2I3uAM7jjGw6/4N6rSNIKW6AV07FucZijcMXSN0Kq6hUV9OSOz8Uk6+h1I7bc62sdy5hP34+lIDen6EaKoKNKgleT0Npr7K2ph9XpEJNBd6Dp/D0zYIr6t6KTwuOIZlubGgx1sE4h5gArPtFX3N0lajm3DbSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782918490; c=relaxed/simple;
-	bh=+IqmZ0jp3BkS12QUziMDsgo4lVv7ySDOmKcheSJJMA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WwyhpSeqMNhov38Z3EhbYpxC0ETwfF4K7GZXp1mxchEEGAU7g/QUapQALOX+/ybjVSs0CMBuf8C6wIVj3hWNDcEV4CTqQAslMKhsP1/E47o2LAMDjhTp4zY5/hGUWl4lHf8AdrKfWkBro5Ox0cWR/dlblOv2KxmHTp97GnAZcGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnlqNMCI; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C11C1F00A3A;
-	Wed,  1 Jul 2026 15:08:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782918488;
-	bh=pcq3/61rIYYvcomftDru58HT4A9zIw36pp+6xIUh46o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=WnlqNMCII1bhQZtjU/NUdR7hJvI/G4uAQE2tN4jrgwB4XtkHVOGzdgKn1nci+WCOI
-	 ySOFXkdGJUyeoZ+9XGl7aLYgwh4ZUYCgFyOn2SrwLapVayh2XCMe9JOwFkKumlV3/h
-	 r09KAHCDVONwoyCz3yg23GeJTSoQ67epvrtzlO8Nqj1updHyyUHe5SatRCaNTIdT4O
-	 BJ9iAsgiSBKgvAtMlvxaAc8qHdtrpjpjAioNMNV75rG3jcVttFQmR9Itk9unevDhZl
-	 dxLHXcCMAu7F2E0bCcddVgljObAWNmU827A94/0TQDUCllubM3qFptuI6Lef4MUcqw
-	 8lpoeYScerfTQ==
-Message-ID: <9d14ff4b-eadd-4ae2-ab68-5927d4f19eeb@kernel.org>
-Date: Wed, 1 Jul 2026 09:08:06 -0600
+	s=arc-20240116; t=1782918544; c=relaxed/simple;
+	bh=dVEvulQ72WCVFoqa6gPcVhv7eBp/Ml+x+rS9+5SK+Aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iAJaQ6KXHutf5VPC3cgbaf9XXuJJz4bfPzaqw74YLWRAidlr6l3ooOBYRVq079Y+q+12GGlsj7delRsqivpVLjS5noJSM8w2ghBSyxISNdopAjBlCp3EEaPechCZMUAe6i4WQSlEqkD1C90xh3tNiDcPbORyIJpDK2ewF1LZnb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZX5/2tA6; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oIMlAFaCIS+fMDslYay9YWXGdoQdS3epU4RzYxH5XmE=; b=ZX5/2tA6zwGCHAZk3T2j6auwA8
+	Ac4Z08b6ZRhT9g9eI7cq+Cc6d3U4RAkV8cDYqNpy7N+SqRNelHIDaCfW6B/gA5nBDLpqWwyaamyTP
+	HbUk3PUoWd7Cr2NQrL1r7FZwvwOY5cNzjtGBopVqDwNkiVbQGuE/6GMODBWo4GBxwC/o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wewYY-00ABg4-Sg; Wed, 01 Jul 2026 17:08:54 +0200
+Date: Wed, 1 Jul 2026 17:08:54 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Birger Koblitz <mail@birger-koblitz.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/9] ax88179_178a: Add support for ethtool pause
+ parameter configuration
+Message-ID: <947860cc-de6e-48b8-804b-e27f27b2f82c@lunn.ch>
+References: <20260701-ax88179a-v1-0-13685df67515@birger-koblitz.de>
+ <20260701-ax88179a-v1-5-13685df67515@birger-koblitz.de>
+ <587499ee-d87e-4056-8d2a-8fda2ef3f0f1@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v5 1/3] bpf: Add BPF_FIB_LOOKUP_VLAN flag to
- bpf_fib_lookup() helper
-Content-Language: en-US
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Avinash Duduskar <avinash.duduskar@gmail.com>, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org
-Cc: eddyz87@gmail.com, memxor@gmail.com, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
- emil@etsalapatis.com, john.fastabend@gmail.com, sdf@fomichev.me,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org,
- yatsenko@meta.com, leon.hwang@linux.dev, kpsingh@kernel.org,
- a.s.protopopov@gmail.com, ameryhung@gmail.com, rongtao@cestc.cn,
- eyal.birger@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260624030530.3342884-1-avinash.duduskar@gmail.com>
- <20260624030530.3342884-2-avinash.duduskar@gmail.com>
- <d820adf6-4a33-45e9-9cfa-17f11a37c9e8@kernel.org> <87se65bd04.fsf@toke.dk>
- <2ffa32dd-5c88-488a-aa23-deef13465eb9@kernel.org> <87echobb5h.fsf@toke.dk>
- <cf25f667-1095-4f84-98ff-bf4662d3faa8@kernel.org> <874iik2ew4.fsf@toke.dk>
- <916191fc-2e10-4449-b82b-c086d90283ae@kernel.org> <87y0fv0y79.fsf@toke.dk>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <87y0fv0y79.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <587499ee-d87e-4056-8d2a-8fda2ef3f0f1@bootlin.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:toke@redhat.com,m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:yatsenko@meta.com,m:leon.hwang@linux.dev,m:kpsingh@kernel.org,m:a.s.protopopov@gmail.com,m:ameryhung@gmail.com,m:rongtao@cestc.cn,m:eyal.birger@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,m:asprotopopov@gmail.com,m:eyalbirger@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[redhat.com,gmail.com,kernel.org,iogearbox.net];
-	TAGGED_FROM(0.00)[bounces-303718-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303719-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:mail@birger-koblitz.de,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 863146EF22D
+X-Rspamd-Queue-Id: 5DADD6EF2F0
 
-On 7/1/26 5:02 AM, Toke Høiland-Jørgensen wrote:
-> David Ahern <dsahern@kernel.org> writes:
->> Seems to me the fib_lookup for xdp needs to return the bottom device,
->> not the vlan device, for forwarding to work. That's why I added the
->> fields to the struct. That allows the program to push the vlan header if
->> required. My preference (dream?) was that Tx path had support to tell
->> the redirect the vlan and h/w added it on send.
-> 
-> Sure, returning the bottom device index with the VLAN tag makes sense,
-> and that's basically what this series does (but bails out on stacked
-> VLANs). However, that's not what the helper does today, which is why the
-> flag is there, to opt-in to the new behaviour. I don't think we can just
-> change the ifindex without breaking existing applications (as noted
-> up-thread).
+> > +static void ax88179a_get_pauseparam(struct net_device *net, struct ethtool_pauseparam *pause)
+> > +{
+> > +	struct usbnet *dev = netdev_priv(net);
+> > +	struct ax88179_data *data;
+> > +	u16 bmcr, lcladv, rmtadv;
+> > +	u8 cap;
+> > +
+> > +	data = dev->driver_priv;
+> > +
+> > +	if (data->chip_version < AX_VERSION_AX88179A)
+> > +		return;
+> > +
+> > +	bmcr = ax88179_mdio_read(net, dev->mii.phy_id, MII_BMCR);
+> > +	lcladv = ax88179_mdio_read(net, dev->mii.phy_id, MII_ADVERTISE);
+> > +	rmtadv = ax88179_mdio_read(net, dev->mii.phy_id, MII_LPA);
+> > +
+> > +	if (!(bmcr & BMCR_ANENABLE)) {
+> > +		pause->autoneg = 0;
+> > +		pause->rx_pause = 0;
+> > +		pause->tx_pause = 0;
+> The best way to have this correct is to use phylink, but for that you'd need to
+> have a proper PHY driver instead of using the mii_ API here.
 
-I do not see it as breaking existing programs which is why I chimed in
-on the thread.
+I said the some to one of the other patches.
 
-> 
->> But really, once stacked devices come into play, I just wanted to make
->> sure thought is given to different use cases. As you know the lookup
->> struct if hard bound to 64B and it is trying to cover a lot of use cases.
-> 
-> Agreed, I don't think we can handle stacked devices in this helper. But
-> we could split it out into a new one. Something like:
-> 
-> struct lower_device_info {
-> 	enum device_type type;
-> 	struct {
-> 		__be16	h_vlan_proto;
-> 		__be16	h_vlan_TCI;
-> 	} vlan;
->         /* add other types here */
-> };
-> 
-> int xdp_get_lower_device(int ifindex, struct lower_device_info *info);
-> 
-> called like:
-> 
-> int xdp_program(struct xdp_md *ctx)
-> {
->         struct lower_device_info dev_info = {};
-> 	int ifindex, ret;
-> 
->         ifindex = find_destination(ctx); /* does fib lookup, or something else */
-> 
->         while ((ret = xdp_get_lower_device_info(ifindex, &dev_info)) > 0) {
->         	if (dev_info.type == VLAN) {
->                       	push_vlan_tag(ctx, &dev_info.vlan);
->                         ifindex = ret;
->                 } else {
->                 	return XDP_PASS; /* we only handle VLAN devices */
->                 }
->         }
-> 
->         return bpf_redirect(ifindex, 0);
-> }
-> 
-> 
-> With a helper like this, we obviously don't strictly speaking need to
-> change the fib lookup helper at all. However, for the single-tagged VLAN
-> case, I think supporting it directly in the fib lookup could still have
-> value, as an optimisation: it saves an extra call for resolving the
-> ifindex, and the fields are already there. So I think my preference
-> would be to merge this series as-is, and then follow up with a new kfunc
-> to handle the stacked case. But we could also just drop this series and
-> go straight to the new kfunc.
-> 
-> WDYT?
+Do we know what PHYs are being used? Can register 2 and 3 be read to
+get the PHY IDs?
 
-no preference. I only chimed in because of the added flag to the uapi
-which I do not see as needed. If the consensus is that it is in fact
-needed, all good then.
-
-
+	Andrew
 
