@@ -1,104 +1,55 @@
-Return-Path: <netdev+bounces-303771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BQ/cAU9ERWql9goAu9opvQ
-	(envelope-from <netdev+bounces-303771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:46:07 +0200
+	id bDp5EZFGRWqr9woAu9opvQ
+	(envelope-from <netdev+bounces-303772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:55:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B936EFEB8
-	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:46:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F766F0099
+	for <lists+netdev@lfdr.de>; Wed, 01 Jul 2026 18:55:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ZSTGIew2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303771-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303771-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=k6eyA3Yu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303772-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303772-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFCB4307024F
-	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 16:42:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42AD630882EC
+	for <lists+netdev@lfdr.de>; Wed,  1 Jul 2026 16:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442D2377EC5;
-	Wed,  1 Jul 2026 16:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDF63749FE;
+	Wed,  1 Jul 2026 16:50:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD10C376BE4
-	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 16:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2873793B3
+	for <netdev@vger.kernel.org>; Wed,  1 Jul 2026 16:50:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782924152; cv=none; b=g+wnAOdg8CR+tFRnE1rsWd6nz4yqlgJz9VrHa3KVpJfFCkWAGOzyFCFYu0e6nugQTAhXKUu08KNzQfKWJrvwLsV5pIMHZVj38uMhWAy4XHE05AM51zVEhfNLr+k28c8STckEXaqAeCj1H3xSh5zCzEwqx2ygm34GXh68fgRB5Ew=
+	t=1782924638; cv=none; b=e/3IEK+9NS780FLgcDkZ9adt808QmcQj+2sPYhMlpVG9JHRrUnQJGzmOyxiLaUUT84zGr1N8cYY6aEE29H4R9EghWLPH/BQ71WQMujP/DZMjed8uiclcqn5WLnsPpPIU9O+2ITkg5/8giZ5rbfQzu42aAE6la7AL29WyGO8OKXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782924152; c=relaxed/simple;
-	bh=d9ZiF7LjaiiY1OZofmWsgVZV2t94SKMbzoBzxGqUi88=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KBfrAaemc8p9ioTs95z99TgTRRMsSOJIIWPz75gtyuoBklCi7UJGBVLGqIYIK+/sPjwH0aCTdUlWmmtwQ12XmjOeRhHQzknlZBZX+CFXOrDjNe0IkNfqhvgVhd/24wzNj94K4wjqmfIQOEDjLY4lu1oE/9zpIKQBhYD/AJvDv9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZSTGIew2; arc=none smtp.client-ip=209.85.128.178
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-80e4455b9a3so12876697b3.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 09:42:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782924150; x=1783528950; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HUTIvVd7hXVFaVubObi/HnQ0CBjtLgoeqk9bLxy6OA4=;
-        b=ZSTGIew275uqpmk0BEhIxaJsx7WtTwHZ7Ty+OwzZBbP0Bm6R4kc9d3qmUMdEDjP8s8
-         5BuliDbXsffYVavapIaqoFTq72zweZw9RDwzH+ijFoU9ndBjQIxdNBemMlxCQwkfKrdn
-         f3AxrXsqMm9Di0mT56nKEv/zm/yTy1e8tYeTxVx2T9xwRwvPtjehnJL4g0FiRVpC2Siq
-         hlbGhxm39ETzbZxQIOIRYBXHXVGsGaMlOiUI+0x5094PQGAUReqqe0vnkgUyHZWKI1jx
-         ApLlTLguAApRmNvyVz48bEpY3oBWQH6Lr9RAxGqPwmbyf48f3xVOn8bQERxcWFF3+yCm
-         aS7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782924150; x=1783528950;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HUTIvVd7hXVFaVubObi/HnQ0CBjtLgoeqk9bLxy6OA4=;
-        b=dVchtGm9OqX/z2ex9I4BKx4VrlbinoVs2lE7Fsx5bQn1dUNHEgoSO24GydiO1c/8vN
-         3zCECE1/fwBW7NxzESC5YfXtmamj7Aze5x3agHsU6/+dEo7kZPEy2De4v3i4xz8eD63F
-         DuHfZcsQl1Ge3kCBmXws0M80E312xqXjrRKMlhirZ2i+LErdyywc1X/rgC9YPaKF9ao2
-         R2kliyNQK8aEpcoYd9oUXiwRWm/uo3+P04zBD8B8HrRexbMpoim3GY7ldp0ca76d3+sz
-         msuzTGK7d3wkdOOsDABeb/XO562o3NIHkD3ct5E71KQvYmnUWecx+NJ15JBb44W9ArzS
-         P1eA==
-X-Forwarded-Encrypted: i=1; AHgh+RogkMRh0I3s16xMYKGvcPGoLlFZu5m5FcBG4dNwuI/b3yWp9oD9lk9+zkeoyUA5Bqou8dnioqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYzIf1kr3PgWsPLBOdecHnfAG56nqDO++Z9H/BTyiBrbXqMNgB
-	NlhlaE0c6UXvGfciGRLLUspaO0qb2Nj6NF49tFPO0B80ONbD5ME0UFZ/
-X-Gm-Gg: AfdE7ckiarygXPeSCmCOF+9yWHj3ADb+ZxTYBzPyTeS9pYR7/ZYu0F3oBU1zk7lFxsF
-	y9s2ARTHICFxeylmtJKt4Pl0YqoOH+GIIShLz820483otQ2hfX640qDvqptWyqG6m+ZLR6NWBNR
-	+V+/3Ixt2dMlL/KwCJl0U7xwaLqrMAqCAfeSltqJj+oSxESCZVEtUaETp7IwAXT/TDXJE8KAg8K
-	5YER7N5xvRY5ytHe0rQ0bZQ+R9D+WoZzc3ZMUuidPosAEeMFN1n1+UgXMomQCFKh6ND7GWM/krl
-	52SyuXozCxuIQFPqKA3sAh9x/48g2o4qILdKO3SCP0/v0Y6ua0Ts32AofXujLWEWIWJODRH3hEZ
-	HhfarAmWxfa2PoMVbJ3jUThE1W19PdxqrnaCyTz1DEhEvpTNqZhWoKDf+OCX2PF0XxkGNm4afzJ
-	xIO8MJ14TxO/Cu5y+UKfZ6C1svZg==
-X-Received: by 2002:a05:690c:734a:b0:80c:85c6:8987 with SMTP id 00721157ae682-8138b95e350mr17913177b3.70.1782924149728;
-        Wed, 01 Jul 2026 09:42:29 -0700 (PDT)
-Received: from Dev-Null-MSI ([2a0d:3344:52ac:a808:98a4:4381:be45:536f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81448cd06a1sm2213857b3.21.2026.07.01.09.42.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 09:42:29 -0700 (PDT)
-From: Yousef Alhouseen <alhouseenyousef@gmail.com>
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	marcel@holtmann.org,
-	kuniyu@google.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	syzbot+36256deb69a588e9290e@syzkaller.appspotmail.com,
-	Yousef Alhouseen <alhouseenyousef@gmail.com>
-Subject: [PATCH net v2] mac802154: remove interfaces with RCU list deletion
-Date: Wed,  1 Jul 2026 18:42:22 +0200
-Message-ID: <20260701164222.9094-1-alhouseenyousef@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260630211808.50440-1-alhouseenyousef@gmail.com>
-References: <20260630211808.50440-1-alhouseenyousef@gmail.com>
+	s=arc-20240116; t=1782924638; c=relaxed/simple;
+	bh=xC08eigTgghYOgw25mXWra61LjC3On8LXm2uLBmUm5Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=W5jd3h5lfCqWhweJmsjAXvPR+ao2d1dIYhJCaxHVdjwk/a5JJfFDMinAWdrnj/x81L5pT1iL8PYmfWE+naDE65Sw+8Gv+FibMfneePAbB6aaHy35DRsPNWb1zn0r9nSjb8STlObAwYf2TSS6ApvxZTJyvV4/9YzvCwpZWE6XdBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6eyA3Yu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B04CD1F000E9;
+	Wed,  1 Jul 2026 16:50:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782924636;
+	bh=08ygD9CE4swe4MjVOp3AAIcdmtQGAAer9jsUCacPnvc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=k6eyA3YuNMhKoi0nNj6iIwRFmAdxWWLDSU/ujVkdqi525ZxYqJgqabawaJaMnJlCa
+	 BCTlTiQjLky/ucNFaj1KA6JQlb2jWAI6Hkhn/g976riMOOzxloJ2c/ynWqKcbrwgZ1
+	 Qj0nI/sWLHOV99ki2eB4n2u+SXwo19lpdAX9tZYV3FYpYd3WhzxGRwgLqu58JAa7ts
+	 19+m2F1ACid0CFY0khjEsNNZKn1W9F9gg0o/I5puDIVuppgJzdKFT5pje3VVEApr4l
+	 V31EDwmo/WhYFxY9Kj0aWzsUL4drgyvYs2mRdIz34rZ9i2RLSLi6AhQ96cJrMsLzIE
+	 q6y77yH130FJw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5695E3926269;
+	Wed,  1 Jul 2026 16:50:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,82 +57,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net-next 00/10] net: fib_rules: RTNL-less RTM_NEWRULE
+ and
+ RTM_DELRULE.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178292461976.1201752.16605175168707843811.git-patchwork-notify@kernel.org>
+Date: Wed, 01 Jul 2026 16:50:19 +0000
+References: <20260629181226.1929658-1-kuniyu@google.com>
+In-Reply-To: <20260629181226.1929658-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kuni1840@gmail.com, netdev@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303771-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303772-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com];
-	FORGED_SENDER(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:alex.aring@gmail.com,m:stefan@datenfreihafen.org,m:miquel.raynal@bootlin.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:marcel@holtmann.org,m:kuniyu@google.com,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:syzbot+36256deb69a588e9290e@syzkaller.appspotmail.com,m:alhouseenyousef@gmail.com,m:alexaring@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,holtmann.org,vger.kernel.org,syzkaller.appspotmail.com,gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alhouseenyousef@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,36256deb69a588e9290e];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 52B936EFEB8
+X-Rspamd-Queue-Id: 94F766F0099
 
-Queue wake, stop, and disable paths walk local->interfaces under RCU.
-The bulk hardware teardown path removes entries with list_del(), so an
-asynchronous transmit completion can follow a poisoned list node in
-ieee802154_wake_queue().
+Hello:
 
-Use list_del_rcu() as in the single-interface removal path. The following
-unregister_netdevice() waits for in-flight RCU readers before freeing the
-netdevice, so no separate grace-period wait is needed.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 592dfbfc72f5 ("mac820154: move interface unregistration into iface")
-Reported-by: syzbot+36256deb69a588e9290e@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=36256deb69a588e9290e
-Cc: stable@vger.kernel.org
-Signed-off-by: Yousef Alhouseen <alhouseenyousef@gmail.com>
----
-Changes in v2:
-- Drop the redundant synchronize_rcu() noted by Kuniyuki Iwashima.
-- Clarify that unregister_netdevice() supplies the required RCU wait.
-- Narrow the subject and commit message to the list deletion bug.
+On Mon, 29 Jun 2026 18:10:52 +0000 you wrote:
+> RTM_NEWRULE and RTM_DELRULE acquire rtnl_net_lock(), but this is
+> only for fib_unmerge() in IPv4.
+> 
+> Since commit d954a67a7dfa ("ipv4: fib_rule: Move fib4_rules_exit()
+> to ->exit()."), RTM_DELRULE no longer needs RTNL.
+> 
+> fib_unmerge() is one-time event for each netns, so we only need
+> RTNL for the first IPv4 rule.
+> 
+> [...]
 
- net/mac802154/iface.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Here is the summary with links:
+  - [v1,net-next,01/10] net: fib_rules: Make fib_rules_ops.delete() return void.
+    https://git.kernel.org/netdev/net-next/c/54fd3962c99d
+  - [v1,net-next,02/10] ipv4: fib_rules: Make the need for fib_unmerge() explicit.
+    https://git.kernel.org/netdev/net-next/c/5cb890ff7357
+  - [v1,net-next,03/10] ipv4: fib: Protect fib_new_table() with spinlock.
+    https://git.kernel.org/netdev/net-next/c/4b8f5c974d14
+  - [v1,net-next,04/10] ipv4: fib: Drop RTNL annotation for net->ipv4.fib_table_hash[].
+    https://git.kernel.org/netdev/net-next/c/763a9437101b
+  - [v1,net-next,05/10] net: fib_rules: Add fib_rules_ops.lock.
+    https://git.kernel.org/netdev/net-next/c/8e133ba99cd8
+  - [v1,net-next,06/10] net: fib_rules: Remove unnecessary EXPORT_SYMBOL.
+    https://git.kernel.org/netdev/net-next/c/a7e87ee40980
+  - [v1,net-next,07/10] net: fib_rules: Drop RTNL assertions.
+    https://git.kernel.org/netdev/net-next/c/facce49f29cc
+  - [v1,net-next,08/10] net: fib_rules: Use dev_get_by_name_rcu().
+    https://git.kernel.org/netdev/net-next/c/34ea2499389e
+  - [v1,net-next,09/10] net: fib_rules: Only hold RTNL for the first IPv4 RTM_NEWRULE.
+    https://git.kernel.org/netdev/net-next/c/eef9bddc3313
+  - [v1,net-next,10/10] ipv6: fib_rules: Convert fib6_rules_net_exit_rtnl() to ->exit().
+    https://git.kernel.org/netdev/net-next/c/ffc8a4b9ad2b
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 000be60d9580..b823720630e7 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -703,7 +703,7 @@ void ieee802154_remove_interfaces(struct ieee802154_local *local)
- 
- 	mutex_lock(&local->iflist_mtx);
- 	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
--		list_del(&sdata->list);
-+		list_del_rcu(&sdata->list);
- 
- 		unregister_netdevice(sdata->dev);
- 	}
+You are awesome, thank you!
 -- 
-2.55.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
