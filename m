@@ -1,599 +1,225 @@
-Return-Path: <netdev+bounces-303930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303931-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iVDXMPHXRWrwFwsAu9opvQ
-	(envelope-from <netdev+bounces-303930-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:16:01 +0200
+	id XWdgEx7YRWrzFwsAu9opvQ
+	(envelope-from <netdev+bounces-303931-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:16:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2656A6F32DD
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:16:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA876F32E7
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:16:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=BDY0aDiT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303930-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303930-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=D8oDRiTE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303931-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303931-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CA6D300C5B6
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:14:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF1713032CF0
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1AE52C187;
-	Thu,  2 Jul 2026 03:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1714130FC39;
+	Thu,  2 Jul 2026 03:14:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49779310784;
-	Thu,  2 Jul 2026 03:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8727C30C608;
+	Thu,  2 Jul 2026 03:14:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782962072; cv=none; b=pOT6HEvoE/+dZvHUbNYHuP5Raz9J6DwSHqn+q03IGZHcSZhETkfMEZsl+IFWnkIXT+FidiWbZUbMvEIiOQ8TL6Nx+uTMShCNX9Pr/2ASvBW2a/MMqva6ZmbWrvWrSt+aW6ElzkkEbZc09XGGsioH1MkUYWBm1qEtX1pALQLlFUE=
+	t=1782962097; cv=none; b=M7FxNBT+Xb4vg1yieHvhrt+VTNs9V9+rg+ysXzRFM6XR484wiDmhwY1iUacZxI74DzV+28EQDBCcfxvZuCn8Jx+yze8+zhqkHp0G+6aWbIePVRoJ52wENXgM5YS+eL02Z6BHgPHhbHyPXQBG0598jvAmjAn0WGEKz8wnorHvj20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782962072; c=relaxed/simple;
-	bh=UgAf5x6dsdq6KUYlazid4BdjNFfDV/DRoqBL4dAPSxA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ki3IOmPKAi2vxTwFdUp8ToVP/PuacunqSlzA43pgmSgmYLLEh0rbizEr0Z6NAlj49uzXe91mkyJUNgMrxg/ZAu9dC+2nR/vk8BlvuN9o2zfjssWaKeGuSrLzWnCo+pnKwH9f3q9REidi8GUqkqdQzHJ5hNaREV3DCxPEBPh3+48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BDY0aDiT; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6621MhMi601502;
-	Wed, 1 Jul 2026 20:14:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=5
-	r9JGxc1jjvn9e8WncHNi9NUjDZZ6EptqFhMSBG24t4=; b=BDY0aDiTnKl9fiwqI
-	zhH9RGGGj/XauUFYJ0tSisE5DPbky3/jbtAeiV0vjru01ivUuzzGA3tMxV79xjYb
-	zGcUYdVFhTBe032LXbSWZyc6qIQc0O7+3zrxtvJHY88xvSVMoj7Rydt70LrnpFgN
-	wGlzZr8RMgWwYuuZH0RRkA+aicfg0Jrq0ANyloeZBuVNiwqP/w7wLCPJWdUk8yKB
-	qC4eBI1d4WO9x64IQ4a27CGBmrHiOkLjq3WawBd10mdN8Ec04MhgXlmsfTqch6Q3
-	zk9+pCGymF4dEWZzM5hP2Tk7vdqnP9GH4k9zzrjtEsMd02FBBbrcIkfJous8sDvk
-	xxuQg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4f50g3kjqh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Jul 2026 20:14:14 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 1 Jul 2026 20:14:12 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 1 Jul 2026 20:14:12 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id B35253F708A;
-	Wed,  1 Jul 2026 20:14:09 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <stephen@networkplumber.org>, <dsahern@kernel.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <rkannoth@marvell.com>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <jiri@resnulli.us>
-Subject: [PATCH iproute2-next v4 2/2] devlink: support u64-array values in devlink param show/set
-Date: Thu, 2 Jul 2026 08:43:59 +0530
-Message-ID: <20260702031359.2392868-3-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260702031359.2392868-1-rkannoth@marvell.com>
-References: <20260702031359.2392868-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1782962097; c=relaxed/simple;
+	bh=Zv6zOOkhVDvrqkwg/FjknHbiL5iANFIai2Qud9WW5fo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PzglwP0Le9Fy7EaoMVqEzwJ//0nwXhfltCEyj1rL95XZ/xl1guqi5mX9VoTDz6VDGxtl7QrodYVnE1v7gntKezlHO9TjnBfYOFC/388wGQeRFne8XLAc6B2ijZC8sFcwh0DR2iDd/yA3gicv4tIdc0MFAca2eUDC4nKgXlgesDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=D8oDRiTE; arc=none smtp.client-ip=115.124.30.113
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1782962091; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=awjN/Bx8yx2Wa4cq+cg8hFgBXfy/kjaifVF3JoRAeCM=;
+	b=D8oDRiTEst2XV/FHXnAUZM/16sHSdYKqYK3Pdvkxj3SpW2jo11y3qGQ8QiiPg+sJq4vLl1uF07NRndm14o3eLiG20HwKLgsUrz/BFQkev4FMMR8A7LPXQ7/HQLnfMiHVp7ZlqkFahSI0hryeNpKrrORxFHkDImKhRkMRElTvAkY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R321e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037033178;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0X6CTmoG_1782962090;
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X6CTmoG_1782962090 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 02 Jul 2026 11:14:50 +0800
+Date: Thu, 2 Jul 2026 11:14:50 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Sechang Lim <rhkrqnwk98@gmail.com>
+Cc: "D . Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Guvenc Gulce <guvenc@linux.ibm.com>,
+	Ursula Braun <ubraun@linux.ibm.com>, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net v3] net/smc: fix out-of-bounds read when sk_user_data
+ holds a sk_psock
+Message-ID: <20260702031450.GA61525@j66a10360.sqa.eu95>
+References: <20260629095140.679754-1-rhkrqnwk98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=Gf4nWwXL c=1 sm=1 tr=0 ts=6a45d786 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=vs2Y_zNTtb1SDWicX50A:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDAyOSBTYWx0ZWRfX0KfbAcB2urxo
- wqrTiqtww0hzudb3JCiFSJLcvuulLCk+BNI3u7fIMckX+E/YJAptN5sHgRDGGrB7WwEOxc9EliS
- UfoLNz+DjSqRxL1Xw/UiV4pDErKtERgdfInbGoEprlr2l+T/l+zwdOsHBSuI1PcZc1yxNY/e29L
- Z+cde7nhd8pfiQR85fOFgPh8gTD3oVjU499RTWeElUOMLgT6V+ZNwizxl14PHtQzELmPEzTAGDM
- N20hMG8xEaV1ZbB+6N26k7h8/sbHWPtE+iiryRe8McnPaiB4BhYphWk7kiQQc1cPGA2k36YqJeq
- XvoZph49dUY6J/Iz1cCxeJ840dKiWfJXujesC788UP8pl8FNhvnBnvpupYvrtz5dtf+LC94ZvS1
- juoIWEgc7Q5B1Qt3ZVyQ3TkYAg1uTKlx39GdTtD8+1GrHFZBsZXHm7qQncCtbMTZu73V8emtRxX
- OD2yWhJxyf3naqBruzw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDAyOSBTYWx0ZWRfX4MGZsGsnam0V
- 8L/DJz+8xtpE8nfdRaprJ9/DSvVF5URvLD4juV3mTuFyR5tDlVL0HEOTetISGiIzjCP2BdraSiW
- ELM6HeDFC5cKmaRrM6GzLaWtKRSBAf0=
-X-Proofpoint-GUID: aicT3EdRBkP1NJAQaQcvhjqoOjPXHoxS
-X-Proofpoint-ORIG-GUID: aicT3EdRBkP1NJAQaQcvhjqoOjPXHoxS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-02_01,2026-06-26_01,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260629095140.679754-1-rhkrqnwk98@gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-12.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303930-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jiayuan.chen@linux.dev,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:guvenc@linux.ibm.com,m:ubraun@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stephen@networkplumber.org,m:dsahern@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:rkannoth@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_SENDER(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-303931-lists,netdev=lfdr.de];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,j66a10360.sqa.eu95:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.alibaba.com:dkim,linux.alibaba.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2656A6F32DD
+X-Rspamd-Queue-Id: 9EA876F32E7
 
-Add support for DEVLINK_VAR_ATTR_TYPE_U64_ARRAY parameters that carry
-multiple DEVLINK_ATTR_PARAM_VALUE_DATA attributes. Parse and display
-u64 array values in param show, and accept space- or comma-separated
-u64 values in devlink and port param set commands.
+On Mon, Jun 29, 2026 at 09:51:33AM +0000, Sechang Lim wrote:
+> A passive-open child inherits the listener's smc_clcsock_data_ready().
+> sk_clone_lock() clears its sk_user_data to NULL because the listener tagged
+> it SK_USER_DATA_NOCOPY. Until accept restores the callback, a BPF sock_ops
+> program can add the established child to a sockmap, and sk_psock_init()
+> installs a sk_psock into the NULL sk_user_data. The inherited callback then
+> reads it back through smc_clcsock_user_data(), which strips only NOCOPY,
+> takes the sk_psock for an smc_sock, and dereferences a clcsk_* field past
+> its end:
+> 
+>   BUG: KASAN: slab-out-of-bounds in smc_clcsock_data_ready+0x84/0x200 net/smc/af_smc.c:2637
+>   Read of size 8 at addr ffff8880013b8674 by task syz.6.12484/67930
+>    <IRQ>
+>    smc_clcsock_data_ready+0x84/0x200 net/smc/af_smc.c:2637
+>    tcp_urg+0x24d/0x360 net/ipv4/tcp_input.c:6264
+>    tcp_rcv_state_process+0x280d/0x4940 net/ipv4/tcp_input.c:7336
+>    tcp_child_process+0x371/0xa50 net/ipv4/tcp_minisocks.c:1002
+>    tcp_v4_rcv+0x1eaa/0x2a00 net/ipv4/tcp_ipv4.c:2186
+>    [...]
+>    </IRQ>
+> 
+>   Allocated by task 67930:
+>    sk_psock_init+0x142/0x740 net/core/skmsg.c:766
+>    sock_hash_update_common+0xd3/0x990 net/core/sock_map.c:1010
+>    bpf_sock_hash_update+0x114/0x170 net/core/sock_map.c:1229
+>    __cgroup_bpf_run_filter_sock_ops+0x74/0xa0 kernel/bpf/cgroup.c:1727
+>    tcp_init_transfer+0x1085/0x1100 net/ipv4/tcp_input.c:6693
+>    [...]
+> 
+> Resolve the conflict on the write path. Reserve the child's sk_user_data
+> with a NULL pointer tagged SK_USER_DATA_NOCOPY so sk_psock_init() returns
+> -EBUSY, and release it at accept. smc_clcsock_user_data() still strips the
+> tag to NULL, so the inherited callback stays a no-op.
+> 
+> Fixes: a60a2b1e0af1 ("net/smc: reduce active tcp_listen workers")
+> Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+> ---
+> v3:
+>  - reserve sk_user_data on the write path instead of the read-side check (D. Wythe)
+> 
+> v2:
+>  - https://lore.kernel.org/netdev/20260619150342.3626224-1-rhkrqnwk98@gmail.com/
+> 
+> v1:
+>  - https://lore.kernel.org/netdev/20260614120931.4041687-1-rhkrqnwk98@gmail.com/
+> 
+>  net/smc/af_smc.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index b5db69073e20..78f162344fe3 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -154,7 +154,11 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+>  					       own_req, opt_child_init);
+>  	/* child must not inherit smc or its ops */
+>  	if (child) {
+> -		rcu_assign_sk_user_data(child, NULL);
+> +		/* reserve sk_user_data so sockmap cannot claim the slot */
+> +		write_lock_bh(&child->sk_callback_lock);
+> +		__rcu_assign_sk_user_data_with_flags(child, NULL,
+> +						     SK_USER_DATA_NOCOPY);
+> +		write_unlock_bh(&child->sk_callback_lock);
+>  
+>  		/* v4-mapped sockets don't inherit parent ops. Don't restore. */
+>  		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
+> @@ -1773,6 +1777,7 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
+>  	/* new clcsock has inherited the smc listen-specific sk_data_ready
+>  	 * function; switch it back to the original sk_data_ready function
+>  	 */
+> +	write_lock_bh(&new_clcsock->sk->sk_callback_lock);
+>  	new_clcsock->sk->sk_data_ready = lsmc->clcsk_data_ready;
+>  
+>  	/* if new clcsock has also inherited the fallback-specific callback
+> @@ -1786,6 +1791,9 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
+>  		if (lsmc->clcsk_error_report)
+>  			new_clcsock->sk->sk_error_report = lsmc->clcsk_error_report;
+>  	}
+> +	/* release the slot reserved in smc_tcp_syn_recv_sock() */
+> +	rcu_assign_sk_user_data(new_clcsock->sk, NULL);
+> +	write_unlock_bh(&new_clcsock->sk->sk_callback_lock);
+>  
+>  	(*new_smc)->clcsock = new_clcsock;
+>  out:
+> -- 
 
-  - Show search order
 
-  devlink dev param show pci/0002:01:00.0 name npc_srch_order
-  pci/0002:01:00.0:
-    name npc_srch_order type driver-specific
-      values:
-        cmode runtime value  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+I do not think this is the right direction.
 
-   - Set search order
+You have now sent three versions of essentially the same patch, but I
+still do not see a clear explanation of why this approach is supposed to
+solve the problem you described. At this point, it looks like you are
+repeatedly posting changes without demonstrating that you fully
+understand the ownership and lifetime rules involved here.
 
-   devlink dev param set pci/0002:01:00.0 name npc_srch_order value 31,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,\
-                22,23,24,25,26,27,28,29,30  cmode runtime
+This is not the approach I suggested. My preference is to keep the
+sk_user_data reserved from the time the clcsock is created, by not
+setting NOCOPY, so that it remains inherited by the passive socket.
+That avoids the release-then-reacquire pattern entirely. The problem
+is more complicated than it may appear, and if you choose this direction,
+you also need to account for how SMC fallback continues to work with
+sockmap.
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- devlink/devlink.c | 233 +++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 209 insertions(+), 24 deletions(-)
+If you do not think you can fully address that approach, then feel free
+to pursue other options that you are able to handle, but I will not ack
+any workaround version. You may seek ack from other maintainers.
 
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 803ea5d7..5d092d92 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -3516,12 +3516,143 @@ static const struct param_val_conv param_val_conv[] = {
- 
- #define PARAM_VAL_CONV_LEN ARRAY_SIZE(param_val_conv)
- 
-+struct devlink_param_u64_array {
-+	uint64_t size;
-+	uint64_t *val;
-+};
-+
-+static void param_value_u64_array_free(struct devlink_param_u64_array *arr)
-+{
-+	free(arr->val);
-+	arr->val = NULL;
-+	arr->size = 0;
-+}
-+
-+static int param_value_nested_u64_attr_cb(const struct nlattr *attr, void *data)
-+{
-+	struct devlink_param_u64_array *arr = data;
-+	unsigned int len;
-+	uint64_t val;
-+	uint64_t *new_val;
-+
-+	if (mnl_attr_get_type(attr) != DEVLINK_ATTR_PARAM_VALUE_DATA)
-+		return MNL_CB_OK;
-+
-+	len = mnl_attr_get_payload_len(attr);
-+	if (len == sizeof(uint32_t))
-+		val = mnl_attr_get_u32(attr);
-+	else if (len == sizeof(uint64_t))
-+		val = mnl_attr_get_u64(attr);
-+	else
-+		return MNL_CB_ERROR;
-+
-+	new_val = realloc(arr->val, (arr->size + 1) * sizeof(uint64_t));
-+	if (!new_val)
-+		return MNL_CB_ERROR;
-+	arr->val = new_val;
-+
-+	arr->val[arr->size] = val;
-+	arr->size++;
-+
-+	return MNL_CB_OK;
-+}
-+
-+static int param_value_u64_array_fill(struct nlattr *nl,
-+				      struct devlink_param_u64_array *arr)
-+{
-+	int err;
-+
-+	param_value_u64_array_free(arr);
-+	err = mnl_attr_parse_nested(nl, param_value_nested_u64_attr_cb, arr);
-+	if (err != MNL_CB_OK) {
-+		param_value_u64_array_free(arr);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static bool param_value_u64_array_equal(const struct devlink_param_u64_array *a,
-+					const struct devlink_param_u64_array *b)
-+{
-+	uint64_t i;
-+
-+	if (a->size != b->size)
-+		return false;
-+
-+	for (i = 0; i < a->size; i++) {
-+		if (a->val[i] != b->val[i])
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static int param_value_u64_array_put_from_str(struct nlmsghdr *nlh,
-+					      const char *param_value,
-+					      const struct devlink_param_u64_array *cur)
-+{
-+	struct devlink_param_u64_array new_arr = {};
-+	char *copy, *token, *saveptr = NULL;
-+	uint64_t val, *new_val;
-+	char delim[] = " ,";
-+	int err, i;
-+
-+	copy = strdup(param_value);
-+	if (!copy)
-+		return -ENOMEM;
-+
-+	token = strtok_r(copy, delim, &saveptr);
-+	while (token) {
-+		err = get_u64((__u64 *)&val, token, 10);
-+		if (err) {
-+			free(copy);
-+			param_value_u64_array_free(&new_arr);
-+			pr_err("Value \"%s\" is not a number or not within range\n",
-+			       token);
-+			return err;
-+		}
-+
-+		new_val = realloc(new_arr.val, (new_arr.size + 1) * sizeof(uint64_t));
-+		if (!new_val) {
-+			free(copy);
-+			param_value_u64_array_free(&new_arr);
-+			return -ENOMEM;
-+		}
-+		new_arr.val = new_val;
-+
-+		new_arr.val[new_arr.size] = val;
-+		new_arr.size++;
-+		token = strtok_r(NULL, delim, &saveptr);
-+	}
-+	free(copy);
-+
-+	if (!new_arr.size) {
-+		param_value_u64_array_free(&new_arr);
-+		pr_err("Value must contain at least one element\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Check current and new values. If both are equal, bail out */
-+	if (cur && param_value_u64_array_equal(&new_arr, cur)) {
-+		param_value_u64_array_free(&new_arr);
-+		return 1;
-+	}
-+
-+	for (i = 0; i < new_arr.size; i++)
-+		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, new_arr.val[i]);
-+
-+	param_value_u64_array_free(&new_arr);
-+	return 0;
-+}
-+
- static int pr_out_param_value_print(const char *nla_name, int nla_type,
- 				     struct nlattr *val_attr, bool conv_exists,
--				     const char *label, bool flag_as_u8)
-+				     const char *label, bool flag_as_u8, struct nlattr *nl)
- {
--	const char *vstr;
-+	struct devlink_param_u64_array u64_arr = { };
- 	int err;
-+	const char *vstr;
- 
- 	print_string(PRINT_FP, NULL, " %s ", label);
- 
-@@ -3582,6 +3713,16 @@ static int pr_out_param_value_print(const char *nla_name, int nla_type,
- 		else
- 			print_bool(PRINT_ANY, label, "%s", val_attr);
- 		break;
-+	case DEVLINK_VAR_ATTR_TYPE_U64_ARRAY:
-+		err = param_value_u64_array_fill(flag_as_u8 ? val_attr : nl, &u64_arr);
-+		if (err)
-+			return err;
-+
-+		for (uint64_t i = 0; i < u64_arr.size; i++)
-+			print_u64(PRINT_ANY, label, "%llu ", u64_arr.val[i]);
-+
-+		param_value_u64_array_free(&u64_arr);
-+		break;
- 	}
- 
- 	return 0;
-@@ -3601,6 +3742,7 @@ static void pr_out_param_value(struct dl *dl, const char *nla_name,
- 
- 	if (!nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE] ||
- 	    (nla_type != MNL_TYPE_FLAG &&
-+	     nla_type != DEVLINK_VAR_ATTR_TYPE_U64_ARRAY &&
- 	     !nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA]))
- 		return;
- 
-@@ -3614,14 +3756,14 @@ static void pr_out_param_value(struct dl *dl, const char *nla_name,
- 					    nla_name);
- 
- 	err = pr_out_param_value_print(nla_name, nla_type, val_attr,
--				       conv_exists, "value", false);
-+				       conv_exists, "value", false, nl);
- 	if (err)
- 		return;
- 
- 	val_attr = nla_value[DEVLINK_ATTR_PARAM_VALUE_DEFAULT];
- 	if (val_attr) {
- 		err = pr_out_param_value_print(nla_name, nla_type, val_attr,
--					       conv_exists, "default", true);
-+					       conv_exists, "default", true, nl);
- 		if (err)
- 			return;
- 	}
-@@ -3704,6 +3846,7 @@ struct param_ctx {
- 		uint64_t vu64;
- 		const char *vstr;
- 		bool vbool;
-+		struct devlink_param_u64_array u64arr;
- 	} value;
- };
- 
-@@ -3745,6 +3888,7 @@ static int cmd_dev_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 
- 		if (!nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE] ||
- 		    (nla_type != MNL_TYPE_FLAG &&
-+		     nla_type != DEVLINK_VAR_ATTR_TYPE_U64_ARRAY &&
- 		     !nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA]))
- 			return MNL_CB_ERROR;
- 
-@@ -3771,6 +3915,12 @@ static int cmd_dev_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 			case DEVLINK_VAR_ATTR_TYPE_FLAG:
- 				ctx->value.vbool = val_attr ? true : false;
- 				break;
-+			case DEVLINK_VAR_ATTR_TYPE_U64_ARRAY:
-+				err = param_value_u64_array_fill(param_value_attr,
-+								 &ctx->value.u64arr);
-+				if (err)
-+					return MNL_CB_ERROR;
-+				break;
- 			}
- 			break;
- 		}
-@@ -3818,10 +3968,11 @@ static int cmd_dev_param_set(struct dl *dl)
- 	ctx.dl = dl;
- 	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, cmd_dev_param_set_cb, &ctx);
- 	if (err)
--		return err;
-+		goto out;
- 	if (!ctx.cmode_found) {
- 		pr_err("Configuration mode not supported\n");
--		return -ENOTSUP;
-+		err = -ENOTSUP;
-+		goto out;
- 	}
- 
- 	if (dl->opts.present & DL_OPT_PARAM_SET_DEFAULT) {
-@@ -3829,7 +3980,8 @@ static int cmd_dev_param_set(struct dl *dl)
- 				       NLM_F_REQUEST | NLM_F_ACK);
- 		dl_opts_put(nlh, dl);
- 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, ctx.nla_type);
--		return mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
-+		err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
-+		goto out;
- 	}
- 
- 	nlh = mnlu_gen_socket_cmd_prepare(&dl->nlg, DEVLINK_CMD_PARAM_SET,
-@@ -3855,7 +4007,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u8 == ctx.value.vu8)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
- 		break;
- 	case DEVLINK_VAR_ATTR_TYPE_U16:
-@@ -3872,7 +4024,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u16 == ctx.value.vu16)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
- 		break;
- 	case DEVLINK_VAR_ATTR_TYPE_U32:
-@@ -3889,7 +4041,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u32 == ctx.value.vu32)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
- 		break;
- 	case DEVLINK_VAR_ATTR_TYPE_U64:
-@@ -3904,7 +4056,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u64 == ctx.value.vu64)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u64);
- 		break;
- 	case DEVLINK_VAR_ATTR_TYPE_FLAG:
-@@ -3912,7 +4064,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_bool == ctx.value.vbool)
--			return 0;
-+			goto out;
- 		if (val_bool)
- 			mnl_attr_put(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
- 				     0, NULL);
-@@ -3921,17 +4073,30 @@ static int cmd_dev_param_set(struct dl *dl)
- 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
- 				  dl->opts.param_value);
- 		if (!strcmp(dl->opts.param_value, ctx.value.vstr))
--			return 0;
-+			goto out;
-+		break;
-+	case DEVLINK_VAR_ATTR_TYPE_U64_ARRAY:
-+		err = param_value_u64_array_put_from_str(nlh, dl->opts.param_value,
-+							 &ctx.value.u64arr);
-+		if (err == 1)
-+			goto out;
-+		if (err)
-+			goto out;
- 		break;
- 	default:
- 		printf("Value type not supported\n");
--		return -ENOTSUP;
-+		err = -ENOTSUP;
-+		goto out;
- 	}
--	return mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
-+	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
-+	goto out;
- 
- err_param_value_parse:
- 	pr_err("Value \"%s\" is not a number or not within range\n",
- 	       dl->opts.param_value);
-+
-+out:
-+	param_value_u64_array_free(&ctx.value.u64arr);
- 	return err;
- }
- 
-@@ -5369,6 +5534,7 @@ static int cmd_port_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 
- 		if (!nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE] ||
- 		    (nla_type != MNL_TYPE_FLAG &&
-+		     nla_type != DEVLINK_VAR_ATTR_TYPE_U64_ARRAY &&
- 		     !nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA]))
- 			return MNL_CB_ERROR;
- 
-@@ -5391,6 +5557,12 @@ static int cmd_port_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 			case MNL_TYPE_FLAG:
- 				ctx->value.vbool = val_attr ? true : false;
- 				break;
-+			case DEVLINK_VAR_ATTR_TYPE_U64_ARRAY:
-+				err = param_value_u64_array_fill(param_value_attr,
-+								 &ctx->value.u64arr);
-+				if (err)
-+					return MNL_CB_ERROR;
-+				break;
- 			}
- 			break;
- 		}
-@@ -5426,7 +5598,7 @@ static int cmd_port_param_set(struct dl *dl)
- 	ctx.dl = dl;
- 	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, cmd_port_param_set_cb, &ctx);
- 	if (err)
--		return err;
-+		goto out;
- 
- 	nlh = mnlu_gen_socket_cmd_prepare(&dl->nlg, DEVLINK_CMD_PORT_PARAM_SET,
- 					  NLM_F_REQUEST | NLM_F_ACK);
-@@ -5451,7 +5623,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u8 == ctx.value.vu8)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
- 		break;
- 	case MNL_TYPE_U16:
-@@ -5468,7 +5640,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u16 == ctx.value.vu16)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
- 		break;
- 	case MNL_TYPE_U32:
-@@ -5485,7 +5657,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u32 == ctx.value.vu32)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
- 		break;
- 	case MNL_TYPE_U64:
-@@ -5500,7 +5672,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_u64 == ctx.value.vu64)
--			return 0;
-+			goto out;
- 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u64);
- 		break;
- 	case MNL_TYPE_FLAG:
-@@ -5508,7 +5680,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		if (err)
- 			goto err_param_value_parse;
- 		if (val_bool == ctx.value.vbool)
--			return 0;
-+			goto out;
- 		if (val_bool)
- 			mnl_attr_put(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
- 				     0, NULL);
-@@ -5517,17 +5689,30 @@ static int cmd_port_param_set(struct dl *dl)
- 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
- 				  dl->opts.param_value);
- 		if (!strcmp(dl->opts.param_value, ctx.value.vstr))
--			return 0;
-+			goto out;
-+		break;
-+	case DEVLINK_VAR_ATTR_TYPE_U64_ARRAY:
-+		err = param_value_u64_array_put_from_str(nlh, dl->opts.param_value,
-+							 &ctx.value.u64arr);
-+		if (err == 1)
-+			goto out;
-+		if (err)
-+			goto out;
- 		break;
- 	default:
- 		printf("Value type not supported\n");
--		return -ENOTSUP;
-+		err = -ENOTSUP;
-+		goto out;
- 	}
--	return mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
-+	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
-+	goto out;
- 
- err_param_value_parse:
- 	pr_err("Value \"%s\" is not a number or not within range\n",
- 	       dl->opts.param_value);
-+
-+out:
-+	param_value_u64_array_free(&ctx.value.u64arr);
- 	return err;
- }
- 
--- 
-2.43.0
+D. Wythe
 
+> 2.43.0
 
