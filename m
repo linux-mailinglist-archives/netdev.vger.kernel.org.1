@@ -1,207 +1,354 @@
-Return-Path: <netdev+bounces-304014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id E7Y2NjMZRmrfJwsAu9opvQ
-	(envelope-from <netdev+bounces-304014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:54:27 +0200
+	id MTvZLTMVRmoUJgsAu9opvQ
+	(envelope-from <netdev+bounces-304015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:37:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C6936F475A
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:54:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C396F442B
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:37:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=lsq3XlS5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304014-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304014-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b="LsD/SWDY";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304015-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304015-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD3033022683
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:35:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 93FD33014360
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D80393DF2;
-	Thu,  2 Jul 2026 07:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55886395D86;
+	Thu,  2 Jul 2026 07:35:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.168.213])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5333739479C;
-	Thu,  2 Jul 2026 07:35:39 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782977749; cv=none; b=JCr4yMMj/8v6UYg8ZNszmA9JLDJzsY8bVuRA7Rkuirn3ZUuG3836OczKY4LS62oSa+lW9TrDhgbEqc7r50VTPtc9vy397xg04k5VbE35PbRibhUR8hBHhXZEpsAmoqu0SdmO0igJylG6gw4Z5IWxz5+AnoSzuFAdN7pp9wb6uMI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782977749; c=relaxed/simple;
-	bh=iW9ysl5y5O9nXf3eQSumHnZWJGFMPjKOmBT9b0boYDQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rx2DQhQamS8X/xYUEua15NR6BA4dKH588YguAxxjE9Bip6doGHXCkOL6+Gq+sc7DPKV6oGClsouOY4N+x7c7J1dXP/V7PN04jPLrNUF2Exp4TujhgghkX1wFepgP+aXt68f1W3SuAL/x0unOfyhtvn3lQdv3rcuJDzeqVrn92x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=lsq3XlS5; arc=none smtp.client-ip=52.229.168.213
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=cuQyn
-	oEYzp+ML2ERoQuf6W9kyau/3ne/pNDm9z3eBB4=; b=lsq3XlS55eTjFw1AI7T5Q
-	POJ3fzE9fX9zSyzTwMrYrOB5agClbcw9J/ycmP9LxEvToJZTknbAzVY8mYWWKxN7
-	XyO/MS7AH824BTTToGJohWt/kOnVa85Orf0vOkABGGG0jZI/YO+5IzBVDvnswfk/
-	dvh3wukwDx5Vr+ZppxWyZw=
-Received: from localhost.localdomain (unknown [101.5.13.242])
-	by web3 (Coremail) with SMTP id ygQGZQDnMY+QFEZqxwHeAg--.2837S2;
-	Thu, 02 Jul 2026 15:34:41 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>
-Subject: [PATCH net v2] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
-Date: Thu,  2 Jul 2026 15:34:28 +0800
-Message-ID: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C31395AC0
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:35:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782977754; cv=fail; b=hVl2RlFKMatiqHZ1ZsnO8JdiEobXcuXpnrG+duUilnMBt5z9mPLgxphB8qK+d+vkzChG445BggiG+vVZNuh8ED1yFYG1sTPJEllU1MOAax8rt0WlsCJf+pO47akhMtB3BVETbUk6CdZe9GN9Qj4cqD1FxKP6ydqQ3yBGh2Gf+6Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782977754; c=relaxed/simple;
+	bh=WGr1MZggNagXalnNwMWuQX6drXUtceoBLvFpJKFDkRk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JlPEDcJk8pKCWbGWL9+cb7YZQPoE4V44kkVipe0F1mvJ5KoTyBTJF056/HweyP2m2XzmryMPp/bUP+lom40449UKX/Cx7BakstuYknx2uVYYP+OGK+8nNnuRKuMxsM8M7bodyZlX72jEAnk1dxweDTWYrfJqDh144mg/nxW8vQ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LsD/SWDY; arc=fail smtp.client-ip=192.198.163.7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782977749; x=1814513749;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WGr1MZggNagXalnNwMWuQX6drXUtceoBLvFpJKFDkRk=;
+  b=LsD/SWDYIEKCN+FtJ9IAYnrn8b1NZozCSilSqoY08XHOUMieHLhExcy/
+   GJZVX/AQiZ+pGIRAbXkoNfkAY93v0al8Bw34tvJZ99nsRyy8LqeE05GkU
+   iKK2wUCKqjXJ4wJN0I8Rw8nLzycGFmyd70JVn6DOoiG8yyTNDgmJ+KfzG
+   NMD8vjiGtHNUrLZ3JWqk7Qh/+GlS5/54ZcabOcNnugonLNAuonlBMfdFU
+   bV8dS4rl6EjnZeiHBIFxOULn+f7vAaxADPo0zFB3F42iBl9o7NCWLwEPt
+   gdnTxU1Mv9iHhE9PnNfkbstFM8dwiY0Dpa7jjSHP1Iow4ifJCzoREaLSf
+   w==;
+X-CSE-ConnectionGUID: glS/cViGQAOUkM0E/JM8mQ==
+X-CSE-MsgGUID: /SZwmamdTdqAi896ZOzp5g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11834"; a="109267717"
+X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
+   d="scan'208";a="109267717"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 00:35:46 -0700
+X-CSE-ConnectionGUID: DPXXP6ekTC+4wYLUXYZ8tA==
+X-CSE-MsgGUID: EB26jeVBSqulfWtg8Kwnlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
+   d="scan'208";a="275991925"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 00:35:47 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Thu, 2 Jul 2026 00:35:46 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43 via Frontend Transport; Thu, 2 Jul 2026 00:35:46 -0700
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.41) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Thu, 2 Jul 2026 00:35:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CP0stGYfxjcpmODhAE12JX/pWElz43OJTgYx0M/2wTLUcppz8Gt2qqlezbxA6QeujjZlFu9zAq/WtbcoaEH8mrfvXt2cPM5PhtRBYeHnqhqh2HuRR8EbO3gtldTPs09vfdLo97BHmJQnjOMGkfmeI9UMhV7aE6kKfzNMhdFEKCDsysqEN3gIpkDNaaxDGna35oNAkKpuE2h1ZBIJACoz/ZPIId50xnS5CKxQAsUvfx7KII1d+j948zuPiioF0bHa0CcctEKqiuSODDG3ePqnONpink8Mkwsh1bP44JNi8GNRA1V714iNgQj9KgV/Ncw5RFrNHN3ey5jXDkFND7ZP+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GDYeCe4GDUkGDUw0KOvOjtvWg0nljlvohW1+v4i1Eig=;
+ b=EJWjSQlFoXTWDgqG4MfqanGs1A9luVK36ceJlMyGgrH2/KLMrS88DqCyvROuA1gLKeyARsiNgBOku1QNo6L/pOvH5SCR/JCpHoaw/q3vVY2TWadyJISwsQsARaYt/nTkv6cL1Em432VNTlwlP6iYfe4M57J2zdx2msPUnuXv6piAsebgPoqbgcaYcms/1mohOGCb5dkeh4NzVQ87f7B3usiE17Lc2yo5ljwKw7dluLxxZQ1qmMbparH6wzkyaMXybeWARa2g3wq29q1BzneJoR/t0YVdm2MLhy9T7do4Mu+UmylSAaUPiJa4WpAib23RKgV8Cz4HOo4z/cGSd75L3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
+ by LV3PR11MB8602.namprd11.prod.outlook.com (2603:10b6:408:1b3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Thu, 2 Jul 2026
+ 07:35:43 +0000
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::f95a:602a:34d3:5d37%5]) with mapi id 15.21.0181.009; Thu, 2 Jul 2026
+ 07:35:42 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: Harsha M <h.mahadeva@chelsio.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "bharat@chelsio.com" <bharat@chelsio.com>
+Subject: RE: [PATCH net v2] cxgb4: flower: fix 802.1ad VLAN TPID matching in
+ tc flower filters
+Thread-Topic: [PATCH net v2] cxgb4: flower: fix 802.1ad VLAN TPID matching in
+ tc flower filters
+Thread-Index: AQHdCd8x74rAaxoDeEefmBSaTLdjRbZZ1t7A
+Date: Thu, 2 Jul 2026 07:35:42 +0000
+Message-ID: <PH0PR11MB590242E0F82125E42DB3F820F0F52@PH0PR11MB5902.namprd11.prod.outlook.com>
+References: <20260702044955.20119-1-h.mahadeva@chelsio.com>
+In-Reply-To: <20260702044955.20119-1-h.mahadeva@chelsio.com>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|LV3PR11MB8602:EE_
+x-ms-office365-filtering-correlation-id: 2769ccab-1a21-46a5-5ad3-08ded80c85c2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|23010399003|1800799024|366016|18002099003|38070700021|56012099006|11063799006|6133799003|22082099003;
+x-microsoft-antispam-message-info: YVSuNnBQeHTpTyxIZbmIHp6WToxm3dt7PENcfVNjvcztwjUySkDVHsgGTwvvvQCvd0FTUkMhi7GS3I/5hxltf8pmSC1qXzAIjHX+ZcqIk6PgavnXhRk5xeSMYP2NEnjLx+24QdmZiN7wWHm0kjOYMhw1nmXJpHdNOy0vDUa6+eDXg65Uw3s4tYJAHEiHDadvGxNN1x1iAwmsiRVoBlewMjdmhfhvYl4UxM9nGKeajU/wVjsvnj5I+dhx2XY1OLpJTeWMVITVAF8jhzwM9XMMWELliK5Nc0MJPgHQVVHOjGNS3PYyOtcgSdRsdnvj3hcCaTetznjzj1CYV0+vlPo/yZxU186Kn6O0GVTrLmrkz08rF0MQkD5gGKbkL1CqVK8h8Rn97pqqsWrz9wy9xC8Xa7w3hzZhOV4eG8NRSdeR/9dk/Ddd1nZcGutyrrLzbCUnZf4+78RKX+w/Db8hm6jkwRvNGhNfzxmQS95/W5JpQgMxCIsl5cpwKTkr0EfCPEcb2UGLDsHZdOTrJ8FEFAugugQ3KM0zh3wHusAcqBkCJijGG0R1oo886weXo8pymqxJ0NuwmBalomSnmu2k7i4paOzKo/UKsTWn5CvF83wY++MfaFMHuMKuc6Mhz2fEAEA7lYtwzY60yabl/ZG8TCtnQxDQ9ApufoMT/Uu6dDU75A2VeAhZaBeKXjGlZeB0pZwh4hAPEoVgsntsIcz8S4ps+jIYl0tja9fgB5kbTnJE9JA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(1800799024)(366016)(18002099003)(38070700021)(56012099006)(11063799006)(6133799003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mlETX1hFxbQxvqMOO6xZoVYfEFdiYADZ1GyDUPWC1OWOVBLHsoGs7hNeEWYM?=
+ =?us-ascii?Q?R1kOVqMBc8asShXTkOI4cbelNXb9eLmpt6+PRi2iadvWAyYZ5fSW/kt3IBFe?=
+ =?us-ascii?Q?T906ixqo4lJTURL5vQ2WnKePSqY6lY8HVmZtKV0m2ompx6CR6qrBDnif3UGa?=
+ =?us-ascii?Q?H5GX6JBXm5CW2fVZ7Mv2vcCYSzW0HMtwTYES8V58r/6hdtDpMBRghKefN7h3?=
+ =?us-ascii?Q?SZvztxObXVw7rSN7fNKgbVKqEWHT4F3glwf+fvWjictYYettc8VgX/6NFP/3?=
+ =?us-ascii?Q?a/NdNM48jFhMmI2JGViQwKrxUWcKHSjwI5hvVYTDeL5frzQJxqicsjntmT2/?=
+ =?us-ascii?Q?ss8zu8Mj+RHtDbhsFGeO1KCozAwgWik/CZdP3kF/EYOTHW9GpWH0IhR7QrPM?=
+ =?us-ascii?Q?wnfdDzkve3owQ1W2v/Cx1WljjPvjnrDUu3jK/oIcfRxbHLYUjXfAbujsf3kv?=
+ =?us-ascii?Q?u15x1z1JAskbT8umDK51sPSNdB5RmmxYzGJhjMVF4DIHFDcuOQm6DjT9+Q0D?=
+ =?us-ascii?Q?hu/GEA+5dwzgJmzN4D8yXSmSZiYAtjJqfVuyeCUGIWbkJ4boViwPKIrJguT4?=
+ =?us-ascii?Q?tDX623NC9au5nPyDOFOaA/Wto3oLzIiSaA4VujtXmZ12vV1da8V3AU3TZQXj?=
+ =?us-ascii?Q?F3UWHzJlLkx46jLQmAN9I9Xfa1lwWAofkL4G72GJIUY34aoeIH3o7ECtdiBU?=
+ =?us-ascii?Q?xU4MXmjRuUh77M8DFb12ShQM4aC2kXtsgaT+5CyubQR0Q0lHUEgrO4tfLBGf?=
+ =?us-ascii?Q?+L15eAoNvBSMUpI+8TFFOdOiWdrQsdh5M4cYKRrCkXaXuTXr0ySAblW9fC2h?=
+ =?us-ascii?Q?02Jch2+JJGIdZpL2w1L4r1YLuotWYk4MWLvPm0TK46Zpu2hJdXPL+cUAUtYB?=
+ =?us-ascii?Q?+lVScd3ODwqvh4MaF9iS83TV9k08xjtZ6RkFjKZFQLDEKKHVBYfBTwUtW3Rx?=
+ =?us-ascii?Q?U6grgYvMzlIb4HxXNMqbeuPyTrFci15wDmikfH+Mm857uAx0LhbGmPJ6eF36?=
+ =?us-ascii?Q?fd4u91Kek3MvL9tvn4baQ2DgEN5t9+DzW48K1ob6EvEmZnqqlV+slVVlO4VK?=
+ =?us-ascii?Q?im7QXD8VtBAuNFf6WXZ3F3mXATAjPtH7a2txRjIAJrQ8o+81elEdHuPXl12I?=
+ =?us-ascii?Q?iDIUqDpmYQzLGdbASVDNDLyq3RBZKNn5DhmkV6AX3w/6S3AzC4Hwbv9/22sY?=
+ =?us-ascii?Q?R+efPnkX6X2wIie2Ipt3Eq/UT8ZAbjoHaHbcsNX0iEs6CD1rJGGGPxp93j0c?=
+ =?us-ascii?Q?bmcHtPL4LZYUQWOIUU+3V6BklNAwNogvA2/ZbQTNsXZgJD6Ut7qQUOWQuKvb?=
+ =?us-ascii?Q?T0BjDCtqXWeXzibFaOWx76lls14ku0xuRwmS3Xtftx2pfcReYJ5VDb1+xnm6?=
+ =?us-ascii?Q?yMJyA7CYPSTXxvvilwtlw5+Hx3XnSH4nQqyh6gD0ID2Rr4nocKXRjt9wo1gg?=
+ =?us-ascii?Q?rrNb3SJmSlV8NWnCXI3bvertu6RxJalHnnryXY9VDtJYZ64p6lfm6MRTDiMv?=
+ =?us-ascii?Q?XQwKs/gjWR7vz+hxVdf4W4719EL/flWLR+0NrduMyVTZ79ycMs/aPcM3tifd?=
+ =?us-ascii?Q?jV+g9vSDbDv7/C9+j6ONIr1UZgYjxlucef4yDIUYASueBe4ykCKOJmBCWVet?=
+ =?us-ascii?Q?yyA2pAuuYyQlG0W9ceWKQieK4MIeJK+fH4qWFQjgCPmwZ5Ccrdu/kMAi4PrI?=
+ =?us-ascii?Q?2tT3Z16PO1k2fBHwz/fnj5y4i8vdiJ+7fbC93Xh3TAbPV8ySBwCxkTvJXPIC?=
+ =?us-ascii?Q?D8sdxkrg9A=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygQGZQDnMY+QFEZqxwHeAg--.2837S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF1kZryfXF17Ar4Dur1Utrb_yoW5Zryxpa
-	y0k397ArZ7JF17Ww1vqrW7Z3y3KrZ7JFWxurZ5K34UZ3Z0gF1rtFZYy3yYgFn0v3y8Kryr
-	tF1qy3yUA3Z8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
-	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
-	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Av
-	z4vE14v_GF4l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1yv35UUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEPAWpEyCnrEgACs6
+X-Exchange-RoutingPolicyChecked: nFDJM3d8vo0Sj+9a7kQQVDIrrSqI7uymUejv/NjHcxDzriZzPkdCFZn6SYTZxvYl0ci/yzeieBvPjhC5tW6jhRnxLu5fbUTaT5O0w7t2BDCa5tisQFdOOnHU4uWYgfkpgAa9uEdTwmNsSUHac0p2HwscCLRFtEzrRSShifcv4FaLUdFn1URFO6xTzXZzyNBRAyiGy/l9c33vnP8sF6M5hcCSEL0WcqcMW4y1CllagRXffHD49N+bBzqLK1YaqfNywP6Pl0cnzmYQH2BaDyTfPrGVUJNw8WplcxHXCbpsJMmyJwFQZQbhgPK2WZYp1idzWSqxebME+4z7gxa7k+e8Cg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2769ccab-1a21-46a5-5ad3-08ded80c85c2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2026 07:35:42.7931
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yOwgGK6jQk+bzMifQVuvTmeiVTx7VAgKs4k8T3QJzDBz6GcSSL3SEZkXuDl7xe3ILl5PR5uRN0vvCL3TC5JVCRye/DrOX/sypB90L+inhWs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8602
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304014-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:horms@verge.net.au,m:ja@ssi.bg,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,verge.net.au,ssi.bg,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304015-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:h.mahadeva@chelsio.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:bharat@chelsio.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,intel.com:dkim,intel.com:from_mime];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime,seu.edu.cn:email,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0C6936F475A
+X-Rspamd-Queue-Id: D4C396F442B
 
-When an ICMP Fragmentation Needed error is received for a tunneled IPVS
-connection, ip_vs_in_icmp() recomputes the MTU that the original packet
-can use by subtracting the tunnel overhead from the reported next-hop
-MTU.
+From: Harsha M <h.mahadeva@chelsio.com>=20
+Sent: Thursday, July 2, 2026 6:49 AM
 
-The current code always subtracts sizeof(struct iphdr), which is only
-the IPIP overhead. For GUE and GRE tunnels, ipvs_udp_decap() and
-ipvs_gre_decap() already compute the additional tunnel header length,
-but that value is scoped to the decapsulation block and is lost before
-the ICMP_FRAG_NEEDED handling. As a result, the ICMP error sent back to
-the client advertises an MTU that is too large, so PMTUD can fail to
-converge for GUE/GRE-tunneled real servers.
+>The cxgb4 driver does not correctly handle tc flower filters that
+>match on an 802.1ad (Q-in-Q) outer VLAN tag. While the VLAN VID is
+>processed, the specified 802.1ad TPID is not programmed into the
+>adapter's outer VLAN matching configuration, resulting in incorrect
+>filter matches.
+>
+>Fix this by configuring the port-specific OVLAN register with the
+>requested TPID value, enabling OVLAN matching through the RX control
+>register, and populating the filter specification with the outer VLAN
+>VID and valid-bit match fields when an 802.1ad TPID is requested.This
+>restores correct matching for tc flower filters that specify an 802.1ad
+>outer VLAN tag
+>
 
-With a reported next-hop MTU of 1400, a GUE tunnel currently returns
-1380 to the client. The correct value is 1368:
+Hi
 
-  1400 - sizeof(struct iphdr) - sizeof(struct udphdr) -
-  sizeof(struct guehdr)
+would be nice to have fixes tag
 
-Hoist the tunnel header length into the main ip_vs_in_icmp() scope and
-subtract sizeof(struct iphdr) + ulen in the Fragmentation Needed path.
-The IPIP path keeps ulen as 0, so its existing 1400 - 20 = 1380 result
-is unchanged.
+>Signed-off-by: Harsha M <h.mahadeva@chelsio.com>
+>Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
+>---
+>v2:
+>- Compare vlan_tpid with 'cpu_to_be16(ETH_P_8021AD)'
+>- Program the OVLAN register using the ETH_P_8021AD constant
+>  and TPID mask as 0xffff instead of deriving the value from the
+>  filter key and mask
+>v1:
+>https://lore.kernel.org/all/20260629184417.31b21223@kernel.org/
+>---
+> .../ethernet/chelsio/cxgb4/cxgb4_tc_flower.c  | 61 +++++++++++++------
+> drivers/net/ethernet/chelsio/cxgb4/t4_regs.h  |  3 +
+> 2 files changed, 46 insertions(+), 18 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c b/driver=
+s/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+>index 3307e5042681..8c5cfa6982e7 100644
+>--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+>+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+>@@ -40,6 +40,7 @@
+> #include "cxgb4.h"
+> #include "cxgb4_filter.h"
+> #include "cxgb4_tc_flower.h"
+>+#include "t4_regs.h"
+>=20
+> #define STATS_CHECK_PERIOD (HZ / 2)
+>=20
+>@@ -266,24 +267,48 @@ static void cxgb4_process_flow_match(struct net_devi=
+ce *dev,
+> 					       VLAN_PRIO_SHIFT);
+> 		vlan_tci_mask =3D match.mask->vlan_id | (match.mask->vlan_priority <<
+> 						     VLAN_PRIO_SHIFT);
+>-		fs->val.ivlan =3D vlan_tci;
+>-		fs->mask.ivlan =3D vlan_tci_mask;
+>-
+>-		fs->val.ivlan_vld =3D 1;
+>-		fs->mask.ivlan_vld =3D 1;
+>-
+>-		/* Chelsio adapters use ivlan_vld bit to match vlan packets
+>-		 * as 802.1Q. Also, when vlan tag is present in packets,
+>-		 * ethtype match is used then to match on ethtype of inner
+>-		 * header ie. the header following the vlan header.
+>-		 * So, set the ivlan_vld based on ethtype info supplied by
+>-		 * TC for vlan packets if its 802.1Q. And then reset the
+>-		 * ethtype value else, hw will try to match the supplied
+>-		 * ethtype value with ethtype of inner header.
+>-		 */
+>-		if (fs->val.ethtype =3D=3D ETH_P_8021Q) {
+>-			fs->val.ethtype =3D 0;
+>-			fs->mask.ethtype =3D 0;
+>+
+>+		if (match.key->vlan_tpid =3D=3D cpu_to_be16(ETH_P_8021AD)) {
+>+			struct adapter *adap =3D netdev2adap(dev);
+>+			u32 ovlan_reg, ctl_reg, val, port_id;
+>+
+>+			if (!adap) {
 
-Fixes: 508f744c0de3 ("ipvs: strip udp tunnel headers from icmp errors")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: Claude-Code:GLM-5.2
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
----
-Changes in v2:
-  - Use the short first hunk context so patch applies without fuzz.
-  - Adjust Assisted-by to checkpatch's agent-name format.
-  - Suggested by Julian.
-  - Link to v1: https://lore.kernel.org/netdev/20260701065941.46249-1-zhaoyz24@mails.tsinghua.edu.cn/
----
- net/netfilter/ipvs/ip_vs_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+is such scenario really even possible?
 
-diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
-index d40b404c1bf6..906f2c361676 100644
---- a/net/netfilter/ipvs/ip_vs_core.c
-+++ b/net/netfilter/ipvs/ip_vs_core.c
-@@ -1767,6 +1767,7 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 	bool tunnel, new_cp = false;
- 	union nf_inet_addr *raddr;
- 	char *outer_proto = "IPIP";
-+	int ulen = 0;
- 
- 	*related = 1;
- 
-@@ -1831,7 +1832,6 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 		   /* Error for our tunnel must arrive at LOCAL_IN */
- 		   (skb_rtable(skb)->rt_flags & RTCF_LOCAL)) {
- 		__u8 iproto;
--		int ulen;
- 
- 		/* Non-first fragment has no UDP/GRE header */
- 		if (unlikely(cih->frag_off & htons(IP_OFFSET)))
-@@ -1936,8 +1936,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
- 				if (dest_dst)
- 					mtu = dst_mtu(dest_dst->dst_cache);
- 			}
--			if (mtu > 68 + sizeof(struct iphdr))
--				mtu -= sizeof(struct iphdr);
-+			if (mtu > 68 + sizeof(struct iphdr) + ulen)
-+				mtu -= sizeof(struct iphdr) + ulen;
- 			info = htonl(mtu);
- 		}
- 		/* Strip outer IP, ICMP and IPIP/UDP/GRE, go to IP header of
+>+				netdev_err(dev, "%s: adap not found\n", __func__);
+>+				return;
+>+			}
+>+
+>+			val =3D (0xffff << 16) | ETH_P_8021AD;
+>+			port_id =3D netdev2pinfo(dev)->port_id;
+>+			fs->val.ovlan =3D vlan_tci;
+>+			fs->mask.ovlan =3D vlan_tci_mask;
+>+			fs->val.ovlan_vld =3D 1;
+>+			fs->mask.ovlan_vld =3D 1;
+>+			ovlan_reg =3D PORT_REG(port_id, MPS_PORT_RX_OVLAN0_A);
+>+			ctl_reg =3D PORT_REG(port_id, MPS_PORT_RX_CTL_A);
+>+			t4_write_reg(adap, ovlan_reg, val);
+>+			val =3D t4_read_reg(adap, ctl_reg);
+>+			t4_write_reg(adap, ctl_reg, val | 1);
+>+			t4_tp_wr_bits_indirect(adap, TP_INGRESS_CONFIG_A, 1U << 9, 0);
+>+		} else {
+>+			fs->val.ivlan =3D vlan_tci;
+>+			fs->mask.ivlan =3D vlan_tci_mask;
+>+			fs->val.ivlan_vld =3D 1;
+>+			fs->mask.ivlan_vld =3D 1;
+>+
+>+			/* Chelsio adapters use ivlan_vld bit to match vlan packets
+>+			 * as 802.1Q. Also, when vlan tag is present in packets,
+>+			 * ethtype match is used then to match on ethtype of inner
+>+			 * header ie. the header following the vlan header.
+>+			 * So, set the ivlan_vld based on ethtype info supplied by
+>+			 * TC for vlan packets if its 802.1Q. And then reset the
+>+			 * ethtype value else, hw will try to match the supplied
+>+			 * ethtype value with ethtype of inner header.
+>+			 */
+>+
+
+isn't this already fs->val.ethtype !=3D ETH_P_8021Q branch and fs has not
+been modified since entering?
+
+>+			if (fs->val.ethtype =3D=3D ETH_P_8021Q) {
+>+				fs->val.ethtype =3D 0;
+>+				fs->mask.ethtype =3D 0;
+>+			}
+> 		}
+> 	}
+>=20
+>diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h b/drivers/net/et=
+hernet/chelsio/cxgb4/t4_regs.h
+>index 695916ba0405..38c585f3b1ad 100644
+>--- a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
+>+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
+>@@ -1921,6 +1921,9 @@
+> #define MAC_PORT_PTP_SUM_LO_A 0x990
+> #define MAC_PORT_PTP_SUM_HI_A 0x994
+>=20
+>+#define MPS_PORT_RX_OVLAN0_A 0x120
+>+#define MPS_PORT_RX_CTL_A    0X100
+>+
+> #define MPS_CMN_CTL_A	0x9000
+>=20
+> #define COUNTPAUSEMCRX_S    5
+>--=20
+>2.43.5
+
 
 
