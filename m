@@ -1,207 +1,164 @@
-Return-Path: <netdev+bounces-304226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304227-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nRsjMAiHRmqbXwsAu9opvQ
-	(envelope-from <netdev+bounces-304226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 17:43:04 +0200
+	id aWdDHVmKRmrHYAsAu9opvQ
+	(envelope-from <netdev+bounces-304227-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 17:57:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145056F9916
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 17:43:04 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B79626F9C92
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 17:57:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=cgWww9OW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304226-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304226-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=pigmoral.tech header.s=zmail header.b="rVuYw//9";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304227-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304227-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7359C3096768
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 15:37:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 793B1304B2B0
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 15:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07E937A854;
-	Thu,  2 Jul 2026 15:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CAF32E143;
+	Thu,  2 Jul 2026 15:45:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41B4353A6D;
-	Thu,  2 Jul 2026 15:37:20 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783006642; cv=none; b=W3YLC53qxymUtRiTiHs3I/0VzUGZnjo+FZVC3+x50GevXQJcL2viIUzkpRFCMpVQtcpNp6XNsMEsLMPgt8IdT+VtfVT0jJmnhYf/gySVjl5AtsIAeeMUmA7B6Ara2TjFM34HcjM7RW7DTRSRoLlq5sBzmgo4YYSxzjr5S4+RXdc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783006642; c=relaxed/simple;
-	bh=AIrYhi5OowtDq9G+B94nZBHdwHjATxJ6Q9liZf5as3s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uyuXChFCVvcDmdQn2gNKJIfnGyT0DAp3rFBhxCa5NJ6WFfxXWfKP730HN/aoaVQFUFJANFjFH/S4I6JAxhMWwR62n+V6f3tbG89DYpgRgEfPCeWIOnxvWxAsYGFzOlrfSqqE+xQ/Fovo+Ok6a5AvGkic3eFKBEnDbEuu+dCAjbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cgWww9OW; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 3D273C4FEE3;
-	Thu,  2 Jul 2026 15:37:30 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id BFDB65FF03;
-	Thu,  2 Jul 2026 15:37:18 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BF14D104C9565;
-	Thu,  2 Jul 2026 17:37:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783006637; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=lTA0HpAPorocbxVlyn/m7V1bsvYRqGh8CYfVJvJ2hys=;
-	b=cgWww9OWl6A6RPBSxJRSknpPFsoMYFnVRCz/9OI3heR1ex+LDpE6gb+0kyBUGmgPlPOBTZ
-	zjEwpJ+QRmqluIFI4X9wbqdQcyH1rsj1h7kVdcVBbMtZPFai9pjFkVy/GqRWkfB7/mjNKL
-	V6NaZ6yweBcoSTurE44hBRDwXEd4XqqtZGnEuKzKPJ7OPBrCjQ8w2Om7L8H8yASr01HPIR
-	Zda43+ydkTn4QPrY/Oi+p393+1V/NbXdXPulwk1aydIiU8Btoxu4gbVXQeUpyI3OqFaigx
-	x6AFkEsgg4Cyd1HBBNV6lDHsKozXffBmyVJXl8uaecCAzg1Bgrku1LTNQpwdDg==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Thu, 02 Jul 2026 17:37:02 +0200
-Subject: [PATCH net v4] net: macb: drop in-flight Tx SKBs on close
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E13032B10D;
+	Thu,  2 Jul 2026 15:45:19 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783007121; cv=pass; b=HihNW9PowX13iHTiY+hgwAqiWMuLrJYQRAqfi7ALZQW9g8zGFSFfMRC3CleCcRZRivv5W9KCBPXarhDSh8s1fG9G62BsNdJjc/Mm4TdbwlaJ7RUip+Yyxk7/jIh95bN8LztPQ95YxwIbGputBF5Jrj5IoYkXi8aut1eR9SIaoyo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783007121; c=relaxed/simple;
+	bh=QQJMn8myl3NxMk5d1ZskradRQLy1mGcGTZNCkisiW0A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=Rq7JdUbDde3x5KZTKDcbDpCPnM5F39rBA59GoBngEVEK9dfguy5HaGR8mmr5OJri07Kzpv0+MIYqTmXyPM2G1Z6vXJ8m0GxoSt/4X3qR2yaKDibbD7YNunlYT54uXNRPi7Cuu0HlnBxZNc0H5SAVPWKhk8uNJ1GFFj34guaOeeo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=rVuYw//9; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal: i=1; a=rsa-sha256; t=1783007077; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=XzPzW8zhLp1++PSVm0XzKWsrOZe0GF0flkwjFuZNZHAbfp3EbOvXla2d8vVLXu4SoFnIAxWM4Byk1PJ9sTLiCfay62YbaFkuqplK64t2ZCQIfp0gbxGYikxtNkArcPWlMjme19GUtG1bsX/sl/nAniBlw5tDzm0LmvNuO07ddSU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1783007077; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=QQJMn8myl3NxMk5d1ZskradRQLy1mGcGTZNCkisiW0A=; 
+	b=cZITeNJ+oB4/NZ4WmLa/xHrbEsSBgeiBrjRV2n4kupPlFJfA4UPPpJUf8EwoC+2vSKDD4DsINTRoHCUFwWRJM8CkMgkobPxSpMVT8Yd3FNcBd5NzCrceQGol68xpwXkUgd1/lpJTeEUdiNUyeZwNg1dnhz3XWTeji5uRNe+jtoo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=pigmoral.tech;
+	spf=pass  smtp.mailfrom=junhui.liu@pigmoral.tech;
+	dmarc=pass header.from=<junhui.liu@pigmoral.tech>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783007077;
+	s=zmail; d=pigmoral.tech; i=junhui.liu@pigmoral.tech;
+	h=Mime-Version:Content-Transfer-Encoding:Content-Type:Date:Date:Message-Id:Message-Id:Subject:Subject:From:From:To:To:Cc:Cc:References:In-Reply-To:Reply-To;
+	bh=QQJMn8myl3NxMk5d1ZskradRQLy1mGcGTZNCkisiW0A=;
+	b=rVuYw//9Vqqpy+NtvvJiCkynLOyTnT0LaFydnguLYH+L0sLNxWoO3Tad7/s2IvHB
+	bwPg2n34dOQHorMZ+339GS0RwlHTKXOVP38cU2B2spDAaJK8lfvL+U9jO8HRl55nMer
+	Ynf1o9j9pTrE4eK0GKeHM/fXbBpOuuv0kLxpNrcM=
+Received: by mx.zohomail.com with SMTPS id 1783007074425420.57335506567745;
+	Thu, 2 Jul 2026 08:44:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260702-macb-drop-tx-v4-1-1c833eebdbc8@bootlin.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2XNSw6CMBCA4auQrh3TlkLBlfcwLmw7SI1S0laiI
- dzdgia+ljOZ75+RBPQWA9lkI/E42GBdlwaxyohuD90RwZo0E055SQXP4XLQCox3PcQbNLVGySW
- nhhYkkd5jY29Lbkc6jGT/XIarOqGOc2g+a22Izt+XpwNbjl998d0fGDBQOWolK2kqYbbKuXi23
- Vq7yxIf+CevfjgHCqWQTcHq2lSm+ef5m5dM/vA8cSO0xCI9r6n65tM0PQCtHESOPwEAAA==
-X-Change-ID: 20260423-macb-drop-tx-f9ce72720d05
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jeff Garzik <jeff@garzik.org>, Conor Dooley <conor.dooley@microchip.com>
-Cc: Paolo Valerio <pvalerio@redhat.com>, Nicolai Buchwitz <nb@tipi-net.de>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, 
- =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, stable@vger.kernel.org, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: b4 0.15.2
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 02 Jul 2026 23:44:18 +0800
+Message-Id: <DJO79318OW0A.2RDQOAXRTHNCW@pigmoral.tech>
+Subject: Re: [PATCH RFC 0/8] clk: sunxi-ng: Add support for Allwinner A733
+ CCU and PRCM
+From: "Junhui Liu" <junhui.liu@pigmoral.tech>
+To: "Enzo Adriano" <enzo.adriano.code@gmail.com>, "Junhui Liu"
+ <junhui.liu@pigmoral.tech>
+Cc: "Michael Turquette" <mturquette@baylibre.com>, "Stephen Boyd"
+ <sboyd@kernel.org>, "Brian Masney" <bmasney@redhat.com>, "Chen-Yu Tsai"
+ <wens@kernel.org>, "Jernej Skrabec" <jernej.skrabec@gmail.com>, "Samuel
+ Holland" <samuel@sholland.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, "Andre Przywara"
+ <andre.przywara@arm.com>, "Jerome Brunet" <jbrunet@baylibre.com>, "Paul
+ Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
+ Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>, "Richard
+ Cochran" <richardcochran@gmail.com>, <linux-clk@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-sunxi@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>
+X-Mailer: aerc 0.21.0
+References: <20260310-a733-clk-v1-0-36b4e9b24457@pigmoral.tech>
+ <20260701160055.320000-a733-ccu-status-enzo.adriano.code@gmail.com>
+In-Reply-To: <20260701160055.320000-a733-ccu-status-enzo.adriano.code@gmail.com>
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[pigmoral.tech:s=zmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-304226-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:enzo.adriano.code@gmail.com,m:junhui.liu@pigmoral.tech,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:wens@kernel.org,m:jernej.skrabec@gmail.com,m:samuel@sholland.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:p.zabel@pengutronix.de,m:andre.przywara@arm.com,m:jbrunet@baylibre.com,m:pjw@kernel.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:alex@ghiti.fr,m:richardcochran@gmail.com,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-sunxi@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:linux-riscv@lists.infradead.org,m:netdev@vger.kernel.org,m:enzoadrianocode@gmail.com,m:jernejskrabec@gmail.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jeff@garzik.org,m:conor.dooley@microchip.com,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:stable@vger.kernel.org,m:theo.lebrun@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[pigmoral.tech];
+	FORGED_SENDER(0.00)[junhui.liu@pigmoral.tech,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304227-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_TO(0.00)[gmail.com,pigmoral.tech];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[pigmoral.tech:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[junhui.liu@pigmoral.tech,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,redhat.com,gmail.com,sholland.org,pengutronix.de,arm.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,vger.kernel.org:from_smtp,msgid.link:url,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,atmel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pigmoral.tech:dkim,pigmoral.tech:mid,pigmoral.tech:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 145056F9916
+X-Rspamd-Queue-Id: B79626F9C92
 
-The MACB driver has since forever leaked the outgoing SKBs that
-have not yet been marked as completed. They live in queue->tx_skb
-which gets freed without remorse nor checking.
+Hi Enzo,
 
-macb_free_consistent() gets called in a few codepaths, but only close will
-trigger the added expressions. In macb_open() and macb_alloc_consistent()
-failure cases, queues' tx_skb just got allocated and are empty.
+On Thu Jul 2, 2026 at 12:07 AM CST, Enzo Adriano wrote:
+> Hi Junhui,
+>
+> Thanks for the A733 CCU/PRCM RFC v1. I've been reading through the
+> series and the review feedback, including the NSI clock/reset handling,
+> the binding naming and ordering comments, the SDM macro cleanup, and the
+> question around modeled but otherwise-unused clocks such as the GIC clock=
+.
+>
+> I do not see a v2 on the list yet, so I wanted to check in: are you still
+> planning to take this series forward? No rush at all, and I am happy to
+> leave it entirely with you if so.
+>
+> If you have moved on to other things, I would be glad to help carry the
+> series forward and address the review comments, keeping your authorship
+> and prior work intact. I have A733 hardware here and can help test the
+> changes.
+>
+> Either way, please let me know what works best for you.
 
-Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
-Cc: stable@vger.kernel.org
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
-Changes in v4:
-- Drop the skb_drop_reason code. No other Ethernet driver does that and
-  the reasoning (because our stats are broken) is a bad one.
-- Take Rb trailer from Nicolai.
-- Drop <hskinnemoen@atmel.com> email that gets rejected.
-- Rebase upon latest net/main (d8e8b85a85fe).
-- Link to v3: https://patch.msgid.link/20260617-macb-drop-tx-v3-0-d4c7e57d890b@bootlin.com
+Thanks for reaching out. I have already been preparing a v2 based on
+Jerome's new RTC patch series. I moved to a new city this week though,
+so there may be some delay, but I will try to get it out as soon as
+possible.
 
-Changes in v3:
-- Drop stats fixing. A proper fix deserves its own net-next refactoring
-  series to migrate to netdev_stat_ops (ynltool uAPI), which will come
-  in later. We keep the tx_dropped++ because they are safe as every
-  other context is disabled when macb_free_consistent() is called.
-- Rebased to latest net/main (406e8a651a7b), nothing to report.
-- Link to v2: https://patch.msgid.link/20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com
+>
+> Thanks,
+> Enzo
 
-Changes in v2:
-- Increment tx_dropped stat once per SKB, not once per frame.
-- Reset tx_head & tx_tail to avoid keeping stalled cursors.
-- Fix SKB dropped reasons throughout by adding the reason as parameter
-  to macb_tx_unmap(). This is a new patch. Then the drop-all-on-close
-  fix can use this ability to report we are not consuming SKBs.
-- Add increment to stats->tx_dropped on DMA mapping failure and
-  tx_error_task. Done as separate patches (3 and 4).
-- Rebase upon net/main @ 46f74a3f7d57, nothing to report.
-- Link to v1: https://patch.msgid.link/20260424-macb-drop-tx-v1-1-b3ecb787d84d@bootlin.com
----
- drivers/net/ethernet/cadence/macb_main.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index fd282a1700fb..d394f1f43b68 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2668,8 +2668,25 @@ static void macb_free_consistent(struct macb *bp)
- 	dma_free_coherent(dev, size, bp->queues[0].rx_ring, bp->queues[0].rx_ring_dma);
- 
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
--		kfree(queue->tx_skb);
--		queue->tx_skb = NULL;
-+		if (queue->tx_skb) {
-+			unsigned int dropped = 0, tail;
-+
-+			for (tail = queue->tx_tail; tail != queue->tx_head;
-+			     tail++) {
-+				if (macb_tx_skb(queue, tail)->skb)
-+					dropped++;
-+				macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0);
-+			}
-+
-+			queue->stats.tx_dropped += dropped;
-+			bp->dev->stats.tx_dropped += dropped;
-+
-+			kfree(queue->tx_skb);
-+			queue->tx_skb = NULL;
-+		}
-+
-+		queue->tx_head = 0;
-+		queue->tx_tail = 0;
- 		queue->tx_ring = NULL;
- 		queue->rx_ring = NULL;
- 	}
-
----
-base-commit: d8e8b85a85fe21954d303db68034aac4639df88d
-change-id: 20260423-macb-drop-tx-f9ce72720d05
-
+--=20
 Best regards,
---  
-Théo Lebrun <theo.lebrun@bootlin.com>
+Junhui Liu
 
 
