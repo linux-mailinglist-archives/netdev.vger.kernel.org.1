@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-304049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304050-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dEDLGTUtRmqNLAsAu9opvQ
-	(envelope-from <netdev+bounces-304049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:19:49 +0200
+	id qwEYC1QtRmqTLAsAu9opvQ
+	(envelope-from <netdev+bounces-304050-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:20:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84BD66F5295
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:19:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7976B6F52AB
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:20:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=m0bqUaPo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304049-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304049-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=lvdk1Vcd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304050-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304050-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 15CA3317E36C
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:09:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AAB1531868CC
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13E647DD70;
-	Thu,  2 Jul 2026 09:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B97A47DFA7;
+	Thu,  2 Jul 2026 09:07:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6361147D945;
-	Thu,  2 Jul 2026 09:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483F247DF80
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:07:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782983269; cv=none; b=sNYgL4PXyuRo0IJFEH39qzdRnqE90PuZ19q/QSMxvVdE+Xl59kpdz0JYHu/ZzVEU8IqmNVy+nue/A10Czqe7JpvrQGkDM6VRreJzsR0DQ5nO03+/E7kDd0NsCUHEWNF82lV9ywUiKI2vSVtv5orK6m5zulXdDAwCYZuRHiE/dCs=
+	t=1782983273; cv=none; b=Vh8s1OiRZF40+HxPwSjV6jZQjI5aWmis6oiWKrnu5WMhC48llzDBq5n6NBjbVKJAvLzMBTWrqOhU6pSY0ij++yCWhpqDPnvA+KWLFhX5PFOc9YFBWL9si/tX0Zgqdz9EENpGKykBAw+D+VhYkMU1xlHg2UXPRKipubkcgyyNmhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782983269; c=relaxed/simple;
-	bh=BTaaYahjvLRWdK5nnnr7T2PUP6NLREyz4fnriNorK6Y=;
+	s=arc-20240116; t=1782983273; c=relaxed/simple;
+	bh=78xOgq41Zhs8EPllccMq+hiSzkfZ+UsfEzT88LTEiX0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J+MkFBdEifievuM6fVGhcES5LgRoiddJSUTT8cK0o6Pk+wIstlZgSpZxCsSxR2rR4gQ1CagJFsHa2cqdWo6CcSXQh7vQQGSpivxmJUuh36yXbAWPHh9i1l/sx+WLWwoRJzPQriHuawAArr0qy8L9MMhcV4Ta+KGKBSWC50qK9mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=m0bqUaPo; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=OzC1RTWc6ERvj6jRplIXxmEmWWJ6ECD+u85BERolJzLSUpvYVuclDcc6Yuqg4ub1f8oPsa0038rYsj+NbvMsTCBktHXH1NBZzBffDPjp57SRMxDlXrlOFxnqrhwXfXiJXlCbfzEERAwhGg5Bu4N0D2hl9AhOPlAYvHudnwvjSS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lvdk1Vcd; arc=none smtp.client-ip=185.246.85.4
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 54C91C4FED7;
-	Thu,  2 Jul 2026 09:07:58 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id E6C3D4E40C2E;
+	Thu,  2 Jul 2026 09:07:48 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0C0ED5FF03;
-	Thu,  2 Jul 2026 09:07:47 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9C872104C9616;
-	Thu,  2 Jul 2026 11:07:44 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BACA65FF03;
+	Thu,  2 Jul 2026 09:07:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5F131104C96DA;
+	Thu,  2 Jul 2026 11:07:46 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782983266; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1782983267; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=KrKhTct7/7J4MdzORAtr/ar9PaS7gkwvZomz+z8SHww=;
-	b=m0bqUaPo70StSXCK0J/ixHLUSoV1BT3n0vQxKSIKxQLlmUC3jvKrrjpix9hI7aI5Oq0sDu
-	0GQLrTlWpYBevXEebtxAIhrIOhFBY7k5SE3lfNFRUm6aEYosiCvhW1WcHwFeUD0RAQW82b
-	yBzvfWWqT0Y/pIVFbRRNeK9f/q81tow8DaQVSQZfHrvErhHlCvFSSNy8zVcwdHqiivtV8p
-	PzsEehM09A4I/NwIgY937EC2lCeTTescu8050Pc73DucsnF1stSQFdLBw7wEbAH8KbitZb
-	URYRvmPJe5A1CAOqsijDatVSD5AeH37uT1PT7nH+2fkDhdOvhzD1s8l0eLGmdg==
+	bh=Ay+Q0kkjYeccDMff4V5yAuUSFZ6ytqoUEoNy84WTxCs=;
+	b=lvdk1VcdTIZSgNrLjSopjC6PTslWMsd5BoSRjjfKGSsnlbPVh3d05U1MC81hmNiS5FNNbQ
+	v6gcmc3X6AzIK6axx0OUbLtqxpZ5YsQII6Anof6Os1hZghI1bdv2X+VSst1AIh4IlfNDo0
+	uwJy8BLi6T6PMoqwGaLTmMUtpFmX65Wgowbb5tKsY6YRo+E8gCddMHB3lKtzCSfH5E4Wxk
+	kq1TJrmh0ezYadvdzN7fiYCNljTYjl0oYgkUvVV/7cbUnQ1xeDitGd1mUP6heZlMW+5l6w
+	Ju6cQg1V3KeUrW2t5+0iHrIIti8wW0IJElPc5OP+cdr2HtT2gD+IpTjsJ3eH8g==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 02 Jul 2026 11:07:28 +0200
-Subject: [PATCH net-next 06/10] net: dsa: microchip: move KSZ9477 errata
- handling to ksz9477.c
+Date: Thu, 02 Jul 2026 11:07:29 +0200
+Subject: [PATCH net-next 07/10] net: dsa: microchip: handle KSZ8-specific
+ tc setup in ksz8.c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,8 +62,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260702-clean-ksz-4th-v1-6-93441e695fa4@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260702-clean-ksz-4th-v1-7-93441e695fa4@bootlin.com>
 References: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
 In-Reply-To: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
 	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bastien.curutchet@bootlin.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304049-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304050-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -111,209 +111,414 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 84BD66F5295
+X-Rspamd-Queue-Id: 7976B6F52AB
 
-The KSZ9477 PHY errata is handled from the common ksz_r_mib_stat64().
-This errata clearly belongs to the KSZ9477 family so it should be handled
-from the ksz9477-specific portion of the driver.
+The setup of QDISC_ETS isn't the same for the KSZ8 switches than for
+the other switches. It leads to is_ksz8() branches in the common code.
 
-Create a ksz9477-specific r_mib_stat64() implementation that handles
-this errata.
-Remove the errata handling from the common ksz_r_mib_stat64().
+Move the KSZ8-specific portions into ksz8.c by creating two setup_tc()
+functions, one dedicated to the KSZ87xx family that only handles the
+TC_SETUP_QDISC_CBS case, one for the rest of the KSZ8 that handles both
+TC_SETUP_QDISC_CBS and TC_SETUP_QDISC_ETS cases.
+It remains some is_kszXXXX() branches because inside the ksz88xx family,
+only the ksz88x3 switches support QDISC_ETS.
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz9477.c    | 24 +++++++++++++++---
- drivers/net/dsa/microchip/ksz9477.h    |  2 --
- drivers/net/dsa/microchip/ksz_common.c | 46 ----------------------------------
- drivers/net/dsa/microchip/ksz_common.h | 39 ++++++++++++++++++++++++++++
- 4 files changed, 60 insertions(+), 51 deletions(-)
+ drivers/net/dsa/microchip/ksz8.c       | 159 ++++++++++++++++++++++++++++++++-
+ drivers/net/dsa/microchip/ksz_common.c | 124 ++-----------------------
+ drivers/net/dsa/microchip/ksz_common.h |   7 ++
+ 3 files changed, 171 insertions(+), 119 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index ad6748905e08..a831eb884ce4 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -483,8 +483,8 @@ static int ksz9477_half_duplex_monitor(struct ksz_device *dev, int port,
- 	return ret;
+diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+index ad7c7a6e1d31..472cc62ea747 100644
+--- a/drivers/net/dsa/microchip/ksz8.c
++++ b/drivers/net/dsa/microchip/ksz8.c
+@@ -1782,6 +1782,159 @@ static void ksz8_port_mirror_del(struct dsa_switch *ds, int port,
+ 			     PORT_MIRROR_SNIFFER, false);
  }
  
--int ksz9477_errata_monitor(struct ksz_device *dev, int port,
--			   u64 tx_late_col)
-+static int ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+				  u64 tx_late_col)
- {
- 	u8 status;
- 	int ret;
-@@ -502,6 +502,24 @@ int ksz9477_errata_monitor(struct ksz_device *dev, int port,
- 	return ret;
- }
- 
-+static void ksz9477_r_mib_stats64(struct ksz_device *dev, int port)
++static u8 ksz8463_tc_ctrl(int port, int queue)
 +{
-+	struct ksz_stats_raw *raw;
-+	struct ksz_port_mib *mib;
++	u8 reg;
++
++	reg = 0xC8 + port * 4;
++	reg += ((3 - queue) / 2) * 2;
++	reg++;
++	reg -= (queue & 1);
++	return reg;
++}
++
++/**
++ * ksz88x3_tc_ets_add - Configure ETS (Enhanced Transmission Selection)
++ *                      for a port on KSZ88x3 switch
++ * @dev: Pointer to the KSZ switch device structure
++ * @port: Port number to configure
++ * @p: Pointer to offload replace parameters describing ETS bands and mapping
++ *
++ * The KSZ88x3 supports two scheduling modes: Strict Priority and
++ * Weighted Fair Queuing (WFQ). Both modes have fixed behavior:
++ *   - No configurable queue-to-priority mapping
++ *   - No weight adjustment in WFQ mode
++ *
++ * This function configures the switch to use strict priority mode by
++ * clearing the WFQ enable bit for all queues associated with ETS bands.
++ * If strict priority is not explicitly requested, the switch will default
++ * to WFQ mode.
++ *
++ * Return: 0 on success, or a negative error code on failure
++ */
++static int ksz88x3_tc_ets_add(struct ksz_device *dev, int port,
++			      struct tc_ets_qopt_offload_replace_params *p)
++{
++	int ret, band;
++
++	/* Only strict priority mode is supported for now.
++	 * WFQ is implicitly enabled when strict mode is disabled.
++	 */
++	for (band = 0; band < p->bands; band++) {
++		int queue = ksz_ets_band_to_queue(p, band);
++		u8 reg;
++
++		/* Calculate TXQ Split Control register address for this
++		 * port/queue
++		 */
++		reg = KSZ8873_TXQ_SPLIT_CTRL_REG(port, queue);
++		if (ksz_is_ksz8463(dev))
++			reg = ksz8463_tc_ctrl(port, queue);
++
++		/* Clear WFQ enable bit to select strict priority scheduling */
++		ret = ksz_rmw8(dev, reg, KSZ8873_TXQ_WFQ_ENABLE, 0);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++/**
++ * ksz88x3_tc_ets_del - Reset ETS (Enhanced Transmission Selection) config
++ *                      for a port on KSZ88x3 switch
++ * @dev: Pointer to the KSZ switch device structure
++ * @port: Port number to reset
++ *
++ * The KSZ88x3 supports only fixed scheduling modes: Strict Priority or
++ * Weighted Fair Queuing (WFQ), with no reconfiguration of weights or
++ * queue mapping. This function resets the port’s scheduling mode to
++ * the default, which is WFQ, by enabling the WFQ bit for all queues.
++ *
++ * Return: 0 on success, or a negative error code on failure
++ */
++static int ksz88x3_tc_ets_del(struct ksz_device *dev, int port)
++{
++	int ret, queue;
++
++	/* Iterate over all transmit queues for this port */
++	for (queue = 0; queue < dev->info->num_tx_queues; queue++) {
++		u8 reg;
++
++		/* Calculate TXQ Split Control register address for this
++		 * port/queue
++		 */
++		reg = KSZ8873_TXQ_SPLIT_CTRL_REG(port, queue);
++		if (ksz_is_ksz8463(dev))
++			reg = ksz8463_tc_ctrl(port, queue);
++
++		/* Set WFQ enable bit to revert back to default scheduling
++		 * mode
++		 */
++		ret = ksz_rmw8(dev, reg, KSZ8873_TXQ_WFQ_ENABLE,
++			       KSZ8873_TXQ_WFQ_ENABLE);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++static int ksz8_tc_setup_qdisc_ets(struct dsa_switch *ds, int port,
++				   struct tc_ets_qopt_offload *qopt)
++{
++	struct ksz_device *dev = ds->priv;
 +	int ret;
 +
-+	ksz_r_mib_stats64(dev, port);
++	if (!(ksz_is_ksz88x3(dev) || ksz_is_ksz8463(dev)))
++		return -EOPNOTSUPP;
 +
-+	if (dev->info->phy_errata_9477 && !ksz_is_sgmii_port(dev, port)) {
-+		mib = &dev->ports[port].mib;
-+		raw = (struct ksz_stats_raw *)mib->counters;
-+
-+		ret = ksz9477_errata_monitor(dev, port, raw->tx_late_col);
-+		if (ret)
-+			dev_err(dev->dev, "Failed to monitor transmission halt\n");
++	if (qopt->parent != TC_H_ROOT) {
++		dev_err(dev->dev, "Parent should be \"root\"\n");
++		return -EOPNOTSUPP;
 +	}
-+};
 +
- void ksz9477_port_init_cnt(struct ksz_device *dev, int port)
++	switch (qopt->command) {
++	case TC_ETS_REPLACE:
++		ret = ksz_tc_ets_validate(dev, port, &qopt->replace_params);
++		if (ret)
++			return ret;
++
++		return ksz88x3_tc_ets_add(dev, port, &qopt->replace_params);
++	case TC_ETS_DESTROY:
++		return ksz88x3_tc_ets_del(dev, port);
++	case TC_ETS_STATS:
++	case TC_ETS_GRAFT:
++		return -EOPNOTSUPP;
++	}
++
++	return -EOPNOTSUPP;
++}
++
++static int ksz87xx_setup_tc(struct dsa_switch *ds, int port,
++			    enum tc_setup_type type, void *type_data)
++{
++	switch (type) {
++	case TC_SETUP_QDISC_CBS:
++		return ksz_setup_tc_cbs(ds, port, type_data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++static int ksz8_setup_tc(struct dsa_switch *ds, int port,
++			 enum tc_setup_type type, void *type_data)
++{
++	switch (type) {
++	case TC_SETUP_QDISC_CBS:
++		return ksz_setup_tc_cbs(ds, port, type_data);
++	case TC_SETUP_QDISC_ETS:
++		return ksz8_tc_setup_qdisc_ets(ds, port, type_data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
+ static void ksz8795_cpu_interface_select(struct ksz_device *dev, int port)
  {
- 	struct ksz_port_mib *mib = &dev->ports[port].mib;
-@@ -2109,7 +2127,7 @@ const struct ksz_dev_ops ksz9477_dev_ops = {
- 	.cfg_port_member = ksz9477_cfg_port_member,
- 	.r_mib_cnt = ksz9477_r_mib_cnt,
- 	.r_mib_pkt = ksz9477_r_mib_pkt,
--	.r_mib_stat64 = ksz_r_mib_stats64,
-+	.r_mib_stat64 = ksz9477_r_mib_stats64,
- 	.freeze_mib = ksz9477_freeze_mib,
- 	.port_init_cnt = ksz9477_port_init_cnt,
- 	.pme_write8 = ksz_write8,
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
-index 25b74d0af6c5..962174a922a0 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -32,8 +32,6 @@ int ksz9477_port_mirror_add(struct dsa_switch *ds, int port,
- 			    bool ingress, struct netlink_ext_ack *extack);
- void ksz9477_port_mirror_del(struct dsa_switch *ds, int port,
- 			     struct dsa_mall_mirror_tc_entry *mirror);
--int ksz9477_errata_monitor(struct ksz_device *dev, int port,
--			   u64 tx_late_col);
- int ksz9477_fdb_dump(struct dsa_switch *ds, int port,
- 		     dsa_fdb_dump_cb_t *cb, void *data);
- int ksz9477_fdb_add(struct dsa_switch *ds, int port,
+ 	struct ksz_port *p = &dev->ports[port];
+@@ -2645,7 +2798,7 @@ const struct dsa_switch_ops ksz8463_switch_ops = {
+ 	.port_hwtstamp_set	= ksz_hwtstamp_set,
+ 	.port_txtstamp		= ksz_port_txtstamp,
+ 	.port_rxtstamp		= ksz_port_rxtstamp,
+-	.port_setup_tc		= ksz_setup_tc,
++	.port_setup_tc		= ksz8_setup_tc,
+ 	.port_get_default_prio	= ksz_port_get_default_prio,
+ 	.port_set_default_prio	= ksz_port_set_default_prio,
+ 	.port_get_dscp_prio	= ksz_port_get_dscp_prio,
+@@ -2695,7 +2848,7 @@ const struct dsa_switch_ops ksz87xx_switch_ops = {
+ 	.port_hwtstamp_set	= ksz_hwtstamp_set,
+ 	.port_txtstamp		= ksz_port_txtstamp,
+ 	.port_rxtstamp		= ksz_port_rxtstamp,
+-	.port_setup_tc		= ksz_setup_tc,
++	.port_setup_tc		= ksz87xx_setup_tc,
+ 	.port_get_default_prio	= ksz_port_get_default_prio,
+ 	.port_set_default_prio	= ksz_port_set_default_prio,
+ 	.port_get_dscp_prio	= ksz_port_get_dscp_prio,
+@@ -2748,7 +2901,7 @@ const struct dsa_switch_ops ksz88xx_switch_ops = {
+ 	.port_hwtstamp_set	= ksz_hwtstamp_set,
+ 	.port_txtstamp		= ksz_port_txtstamp,
+ 	.port_rxtstamp		= ksz_port_rxtstamp,
+-	.port_setup_tc		= ksz_setup_tc,
++	.port_setup_tc		= ksz8_setup_tc,
+ 	.port_get_default_prio	= ksz_port_get_default_prio,
+ 	.port_set_default_prio	= ksz_port_set_default_prio,
+ 	.port_get_dscp_prio	= ksz_port_get_dscp_prio,
 diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 92fcbd9605c7..b54aea92b67d 100644
+index b54aea92b67d..2846041d97a5 100644
 --- a/drivers/net/dsa/microchip/ksz_common.c
 +++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -37,45 +37,6 @@
- 
- #define MIB_COUNTER_NUM 0x20
- 
--struct ksz_stats_raw {
--	u64 rx_hi;
--	u64 rx_undersize;
--	u64 rx_fragments;
--	u64 rx_oversize;
--	u64 rx_jabbers;
--	u64 rx_symbol_err;
--	u64 rx_crc_err;
--	u64 rx_align_err;
--	u64 rx_mac_ctrl;
--	u64 rx_pause;
--	u64 rx_bcast;
--	u64 rx_mcast;
--	u64 rx_ucast;
--	u64 rx_64_or_less;
--	u64 rx_65_127;
--	u64 rx_128_255;
--	u64 rx_256_511;
--	u64 rx_512_1023;
--	u64 rx_1024_1522;
--	u64 rx_1523_2000;
--	u64 rx_2001;
--	u64 tx_hi;
--	u64 tx_late_col;
--	u64 tx_pause;
--	u64 tx_bcast;
--	u64 tx_mcast;
--	u64 tx_ucast;
--	u64 tx_deferred;
--	u64 tx_total_col;
--	u64 tx_exc_col;
--	u64 tx_single_col;
--	u64 tx_mult_col;
--	u64 rx_total;
--	u64 tx_total;
--	u64 rx_discards;
--	u64 tx_discards;
--};
--
- static const struct ksz_mib_names ksz88xx_mib_names[] = {
- 	{ 0x00, "rx" },
- 	{ 0x01, "rx_hi" },
-@@ -1976,7 +1937,6 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int port)
- 	struct rtnl_link_stats64 *stats;
- 	struct ksz_stats_raw *raw;
- 	struct ksz_port_mib *mib;
--	int ret;
- 
- 	mib = &dev->ports[port].mib;
- 	stats = &mib->stats64;
-@@ -2018,12 +1978,6 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int port)
- 	pstats->rx_pause_frames = raw->rx_pause;
- 
- 	spin_unlock(&mib->stats64_lock);
--
--	if (dev->info->phy_errata_9477 && !ksz_is_sgmii_port(dev, port)) {
--		ret = ksz9477_errata_monitor(dev, port, raw->tx_late_col);
--		if (ret)
--			dev_err(dev->dev, "Failed to monitor transmission halt\n");
--	}
+@@ -3097,8 +3097,8 @@ static int ksz_setup_tc_mode(struct ksz_device *dev, int port, u8 scheduler,
+ 			   FIELD_PREP(MTI_SHAPING_M, shaper));
  }
  
- void ksz_get_stats64(struct dsa_switch *ds, int port,
+-static int ksz_setup_tc_cbs(struct dsa_switch *ds, int port,
+-			    struct tc_cbs_qopt_offload *qopt)
++int ksz_setup_tc_cbs(struct dsa_switch *ds, int port,
++		     struct tc_cbs_qopt_offload *qopt)
+ {
+ 	struct ksz_device *dev = ds->priv;
+ 	int ret;
+@@ -3163,8 +3163,8 @@ static int ksz_disable_egress_rate_limit(struct ksz_device *dev, int port)
+ 	return 0;
+ }
+ 
+-static int ksz_ets_band_to_queue(struct tc_ets_qopt_offload_replace_params *p,
+-				 int band)
++int ksz_ets_band_to_queue(struct tc_ets_qopt_offload_replace_params *p,
++			  int band)
+ {
+ 	/* Compared to queues, bands prioritize packets differently. In strict
+ 	 * priority mode, the lowest priority is assigned to Queue 0 while the
+@@ -3173,104 +3173,6 @@ static int ksz_ets_band_to_queue(struct tc_ets_qopt_offload_replace_params *p,
+ 	return p->bands - 1 - band;
+ }
+ 
+-static u8 ksz8463_tc_ctrl(int port, int queue)
+-{
+-	u8 reg;
+-
+-	reg = 0xC8 + port * 4;
+-	reg += ((3 - queue) / 2) * 2;
+-	reg++;
+-	reg -= (queue & 1);
+-	return reg;
+-}
+-
+-/**
+- * ksz88x3_tc_ets_add - Configure ETS (Enhanced Transmission Selection)
+- *                      for a port on KSZ88x3 switch
+- * @dev: Pointer to the KSZ switch device structure
+- * @port: Port number to configure
+- * @p: Pointer to offload replace parameters describing ETS bands and mapping
+- *
+- * The KSZ88x3 supports two scheduling modes: Strict Priority and
+- * Weighted Fair Queuing (WFQ). Both modes have fixed behavior:
+- *   - No configurable queue-to-priority mapping
+- *   - No weight adjustment in WFQ mode
+- *
+- * This function configures the switch to use strict priority mode by
+- * clearing the WFQ enable bit for all queues associated with ETS bands.
+- * If strict priority is not explicitly requested, the switch will default
+- * to WFQ mode.
+- *
+- * Return: 0 on success, or a negative error code on failure
+- */
+-static int ksz88x3_tc_ets_add(struct ksz_device *dev, int port,
+-			      struct tc_ets_qopt_offload_replace_params *p)
+-{
+-	int ret, band;
+-
+-	/* Only strict priority mode is supported for now.
+-	 * WFQ is implicitly enabled when strict mode is disabled.
+-	 */
+-	for (band = 0; band < p->bands; band++) {
+-		int queue = ksz_ets_band_to_queue(p, band);
+-		u8 reg;
+-
+-		/* Calculate TXQ Split Control register address for this
+-		 * port/queue
+-		 */
+-		reg = KSZ8873_TXQ_SPLIT_CTRL_REG(port, queue);
+-		if (ksz_is_ksz8463(dev))
+-			reg = ksz8463_tc_ctrl(port, queue);
+-
+-		/* Clear WFQ enable bit to select strict priority scheduling */
+-		ret = ksz_rmw8(dev, reg, KSZ8873_TXQ_WFQ_ENABLE, 0);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	return 0;
+-}
+-
+-/**
+- * ksz88x3_tc_ets_del - Reset ETS (Enhanced Transmission Selection) config
+- *                      for a port on KSZ88x3 switch
+- * @dev: Pointer to the KSZ switch device structure
+- * @port: Port number to reset
+- *
+- * The KSZ88x3 supports only fixed scheduling modes: Strict Priority or
+- * Weighted Fair Queuing (WFQ), with no reconfiguration of weights or
+- * queue mapping. This function resets the port’s scheduling mode to
+- * the default, which is WFQ, by enabling the WFQ bit for all queues.
+- *
+- * Return: 0 on success, or a negative error code on failure
+- */
+-static int ksz88x3_tc_ets_del(struct ksz_device *dev, int port)
+-{
+-	int ret, queue;
+-
+-	/* Iterate over all transmit queues for this port */
+-	for (queue = 0; queue < dev->info->num_tx_queues; queue++) {
+-		u8 reg;
+-
+-		/* Calculate TXQ Split Control register address for this
+-		 * port/queue
+-		 */
+-		reg = KSZ8873_TXQ_SPLIT_CTRL_REG(port, queue);
+-		if (ksz_is_ksz8463(dev))
+-			reg = ksz8463_tc_ctrl(port, queue);
+-
+-		/* Set WFQ enable bit to revert back to default scheduling
+-		 * mode
+-		 */
+-		ret = ksz_rmw8(dev, reg, KSZ8873_TXQ_WFQ_ENABLE,
+-			       KSZ8873_TXQ_WFQ_ENABLE);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	return 0;
+-}
+-
+ static int ksz_queue_set_strict(struct ksz_device *dev, int port, int queue)
+ {
+ 	int ret;
+@@ -3363,8 +3265,8 @@ static int ksz_tc_ets_del(struct ksz_device *dev, int port)
+ 	return ksz9477_set_default_prio_queue_mapping(dev, port);
+ }
+ 
+-static int ksz_tc_ets_validate(struct ksz_device *dev, int port,
+-			       struct tc_ets_qopt_offload_replace_params *p)
++int ksz_tc_ets_validate(struct ksz_device *dev, int port,
++			struct tc_ets_qopt_offload_replace_params *p)
+ {
+ 	int band;
+ 
+@@ -3405,9 +3307,6 @@ static int ksz_tc_setup_qdisc_ets(struct dsa_switch *ds, int port,
+ 	struct ksz_device *dev = ds->priv;
+ 	int ret;
+ 
+-	if (is_ksz8(dev) && !(ksz_is_ksz88x3(dev) || ksz_is_ksz8463(dev)))
+-		return -EOPNOTSUPP;
+-
+ 	if (qopt->parent != TC_H_ROOT) {
+ 		dev_err(dev->dev, "Parent should be \"root\"\n");
+ 		return -EOPNOTSUPP;
+@@ -3419,16 +3318,9 @@ static int ksz_tc_setup_qdisc_ets(struct dsa_switch *ds, int port,
+ 		if (ret)
+ 			return ret;
+ 
+-		if (ksz_is_ksz88x3(dev) || ksz_is_ksz8463(dev))
+-			return ksz88x3_tc_ets_add(dev, port,
+-						  &qopt->replace_params);
+-		else
+-			return ksz_tc_ets_add(dev, port, &qopt->replace_params);
++		return ksz_tc_ets_add(dev, port, &qopt->replace_params);
+ 	case TC_ETS_DESTROY:
+-		if (ksz_is_ksz88x3(dev) || ksz_is_ksz8463(dev))
+-			return ksz88x3_tc_ets_del(dev, port);
+-		else
+-			return ksz_tc_ets_del(dev, port);
++		return ksz_tc_ets_del(dev, port);
+ 	case TC_ETS_STATS:
+ 	case TC_ETS_GRAFT:
+ 		return -EOPNOTSUPP;
 diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 2c7716d8cf28..245329b6e0e9 100644
+index 245329b6e0e9..7aa4a69d06ef 100644
 --- a/drivers/net/dsa/microchip/ksz_common.h
 +++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -40,6 +40,45 @@ struct vlan_table {
- 	u32 table[3];
- };
+@@ -14,6 +14,7 @@
+ #include <linux/phy.h>
+ #include <linux/regmap.h>
+ #include <net/dsa.h>
++#include <net/pkt_cls.h>
+ #include <linux/irq.h>
+ #include <linux/platform_data/microchip-ksz.h>
  
-+struct ksz_stats_raw {
-+	u64 rx_hi;
-+	u64 rx_undersize;
-+	u64 rx_fragments;
-+	u64 rx_oversize;
-+	u64 rx_jabbers;
-+	u64 rx_symbol_err;
-+	u64 rx_crc_err;
-+	u64 rx_align_err;
-+	u64 rx_mac_ctrl;
-+	u64 rx_pause;
-+	u64 rx_bcast;
-+	u64 rx_mcast;
-+	u64 rx_ucast;
-+	u64 rx_64_or_less;
-+	u64 rx_65_127;
-+	u64 rx_128_255;
-+	u64 rx_256_511;
-+	u64 rx_512_1023;
-+	u64 rx_1024_1522;
-+	u64 rx_1523_2000;
-+	u64 rx_2001;
-+	u64 tx_hi;
-+	u64 tx_late_col;
-+	u64 tx_pause;
-+	u64 tx_bcast;
-+	u64 tx_mcast;
-+	u64 tx_ucast;
-+	u64 tx_deferred;
-+	u64 tx_total_col;
-+	u64 tx_exc_col;
-+	u64 tx_single_col;
-+	u64 tx_mult_col;
-+	u64 rx_total;
-+	u64 tx_total;
-+	u64 rx_discards;
-+	u64 tx_discards;
-+};
-+
- struct ksz_port_mib {
- 	struct mutex cnt_mutex;		/* structure access */
- 	u8 cnt_ptr;
+@@ -481,6 +482,12 @@ void ksz_phylink_mac_link_down(struct phylink_config *config,
+ int ksz_set_mac_eee(struct dsa_switch *ds, int port,
+ 		    struct ethtool_keee *e);
+ 
++int ksz_ets_band_to_queue(struct tc_ets_qopt_offload_replace_params *p,
++			  int band);
++int ksz_setup_tc_cbs(struct dsa_switch *ds, int port,
++		     struct tc_cbs_qopt_offload *qopt);
++int ksz_tc_ets_validate(struct ksz_device *dev, int port,
++			struct tc_ets_qopt_offload_replace_params *p);
+ int ksz_setup_tc(struct dsa_switch *ds, int port,
+ 		 enum tc_setup_type type, void *type_data);
+ 
 
 -- 
 2.54.0
