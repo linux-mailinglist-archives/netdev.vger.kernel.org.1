@@ -1,250 +1,216 @@
-Return-Path: <netdev+bounces-304133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IdaZGO5ORmrPQQsAu9opvQ
-	(envelope-from <netdev+bounces-304133-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:43:42 +0200
+	id PErfHPpTRmqLQwsAu9opvQ
+	(envelope-from <netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 14:05:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA1D66F6E4B
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:43:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F6A6F7475
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 14:05:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JWKLBOQv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304133-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304133-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=ssi.bg header.s=ssi header.b=yCrjjBRw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304148-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=ssi.bg;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0AF7D315C136
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 11:23:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1372331F9D31
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 11:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461A83EDE6E;
-	Thu,  2 Jul 2026 11:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B884189DE;
+	Thu,  2 Jul 2026 11:31:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC433ED11D
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 11:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28394189DD;
+	Thu,  2 Jul 2026 11:31:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782991377; cv=none; b=IuKZVn/LxmMO1YY+WENVwZpPB4NhRO+VXCVwtaqa3AhnuXZaDkXJ52UY+NTFIGpPhjOL0C/t4C228r27SAHOXBVVA3uE5nlFgMRRBWR9nm1iHFaoRD/WfKjqSjge2vqfnIfSSXIPnJSqLcvPJlMOoX+QX822KKlpbvi0OTmNlJM=
+	t=1782991902; cv=none; b=r88YPtFoLqKvK2PHkH202q+78HcDwtE9/IkdPDs53kI4noWt0LZ2sCTgRpksPbLTjNuXZzI+J/YmLy8rTpi9139wBtpPeQOr62037rystVTUxlRaweuBavZA2BfiWJkgNtxxQVYC151NSAjR0Vu5mrJUa9ceZl3T1PfrL35h+N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782991377; c=relaxed/simple;
-	bh=BjCZldRmVu7iIL1qiFQiiS2rf7b4kgTkGMTTxWONjr4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GuB6L8usuqTXIS0vB9pTY4Qk6aOrgw8xN+BGf9UkYn0VnKZoLyC07++26Uvx7I7/ITWQ9NmXql8894HGbchz+PHbrVV+lw82wS0NAa+KA0CNlioWarm3OFKvrbxGDNac6mfDrCGHvXTPQj8/zn3riz/oXfJkifHchtEat0JJKSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JWKLBOQv; arc=none smtp.client-ip=209.85.128.46
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b786d6c0so8726165e9.2
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 04:22:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782991374; x=1783596174; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KhhtWV7Ryh6pz9r0SAzNB6C4UPIw4trYcrpHGw3+K5E=;
-        b=JWKLBOQv5td84hv0LK8aQzdZA2lyEh7d9gRVfDeBB8SdxKlt0gnfGWOikEZPu5cY3y
-         EItywlxa6yN8bfbDDYTD5KW7b7IFEU/Im8Ub/ObaE37pM9a3UqgxsFhlNd3CUk0wJQHv
-         XlxxIRe3pjBZP0fWL8KydwRmfzBkRVI8hWJMDKVhONFgrXvnzvGkLhlHMljngpERSCj6
-         1h/0aG9ybpn+3ReLLDjgqUu3XiHd9lQEx/zHQMkjDwlON+F8geXVo9cFaVpm5wPIzQal
-         ik9n8ZbJSBWaQzWvat9vZIImq5Zxf8+0dOAE6FhJkmvghyxSvoVqkGUMonKqmT5ERqGl
-         LG7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782991374; x=1783596174;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KhhtWV7Ryh6pz9r0SAzNB6C4UPIw4trYcrpHGw3+K5E=;
-        b=e93EifimqvZapySk5jOB4tPbjyJFlGYDPBHG770buwG8sUie28oYjccu7G7mSgFXXI
-         8PQ1XHoC36JnX4oI0VtZPvRK79hOFeT1/ErN2Mg7Ivm2s8h2KKXqdvHsSCzuayNXFyyZ
-         HQ78OgRvVfxE0mQxLMLCZ9KLUgXqbMYk3xB+kH/RnVuas5sb5b4qL+qDedzFHkQ2CvOW
-         PPGEELPfWvv0bdww+wY2Psl4cg8X9ravgLOU6Gsr9RgAaZvw1ac4S954AVUUXw9KjR9K
-         OI0UOfQ/yOBGN7bDhBWUA9inS/kyDSHqqLcNRqzxCzSIjcI9elc3/MpEAUW5GrRffgMB
-         7b2w==
-X-Forwarded-Encrypted: i=1; AFNElJ9RAXlW8Do+jmXjdSrMGZqyTUDRWZ4TalcYntGAuj00zdfyDsRTpCdIM3nsBsBA3cs4/QAe8q8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydJ/WpBxMIp/N5t9uubbkLtdI6stTTqyE1XSxUjILE1VvzyDHP
-	a2l/iFLmQAGqGEY5Qk+NdDS0ahlFrjnEWeS0/1hb0FO7WZ0NalrqP8nO
-X-Gm-Gg: AfdE7cmkFKayFy5oMrkRYOtHYR9zJQpW83vXT8XXvMcgw+0nd9c18KffHg6opL9wpOv
-	z+FDKC3Tv6o6GpN7y8ZwpbQiTGOoEtV4mO/AwhXvBrBnXZfWI13NoeraQPT9JgjOXBTDcrpvvvg
-	lYCyVDIRPJ8B6cq/dgplmAAYCN0BFGA3T70S3GjcaBEwYeA1ATE8KowzVI2Mpuoh3dSqfqywteh
-	DSueU9tIqyGRteThSK3np/LaDcCn4UquTgBVoezgcE+HnqnRxfQ8aLKhVY73ASXHHEBQBfkVDnV
-	aiV4niyKaj+eMxpAwmEXza/pBuzwiaJd9h7QbLKWAetg+LfoK/POsJjeI79MIb9zVSNQfDJkgwW
-	oKODyMPEwbutpioT8vHCjK1zQGC9gTeYl4o/CiQTONzIXwRyiGt2WNOf177YhjbZsyzjfNK8uLp
-	UwjsusTjbKMU+2XiCozISFoBugjTnT2BvDtTE570nKSroJkvlxKO7lgH0xcbBp9cNZ81z0Aea4j
-	rxyvZCo8Dl7AMs=
-X-Received: by 2002:a05:600c:6986:b0:493:bb23:152a with SMTP id 5b1f17b1804b1-493c2baca0cmr76877265e9.34.1782991374089;
-        Thu, 02 Jul 2026 04:22:54 -0700 (PDT)
-Received: from ?IPV6:2001:9e8:f125:6a01:ed38:5886:81fd:d626? ([2001:9e8:f125:6a01:ed38:5886:81fd:d626])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bfe7427dsm76413895e9.2.2026.07.02.04.22.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jul 2026 04:22:53 -0700 (PDT)
-Message-ID: <5177c53c-3885-410e-8f6c-e40e38677b32@gmail.com>
-Date: Thu, 2 Jul 2026 13:22:52 +0200
+	s=arc-20240116; t=1782991902; c=relaxed/simple;
+	bh=tXGbtkdTZWAv2pqpZGDXd8E3ARFn2KxITER5JobuThU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=G4RksqvHGS3Ud7cGOGkarkv4i1QG5u8to5WYw4A7t/8+r8qgV9QwTOnk8/AP6Zf8Af3odEA5eA3evI8Cv5Dof4wFttomxw8jxPECeOylW/MckuWEmYk822T1Dx5u9aoaCurk+ZLyHfL9bQrRY8Efuw60UuueGX7H6BL1MR6DIJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=yCrjjBRw; arc=none smtp.client-ip=193.238.174.39
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id C0191229E7;
+	Thu, 02 Jul 2026 14:31:32 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=vNIDsZvLWhESGHi31+8av3uZRVUZwCUmNhPwcwKeGuY=; b=yCrjjBRw9gkC
+	LC0pjNMVHtdLgT+4Z7rzrnM45BFpaAYiM1fTte9FYqoza4tc7UhtwWV5yKLzdJFu
+	yS6z3o/hlGo1Ig5qIxdv+Ozdokki15BT/xRE2fbrMUJA5cy7ikGFc997M458VIy3
+	/pzXisJostq8f8Yn70GP1BwAnPiJQCcZa60K7uqETuRgTRXTAY/J5/mShiRPIBNH
+	9ja+3JvqKfUssVsF91rSdYfKTLV3/ScVZbKjWCougWdrEf4fDXoMGpj2UxNysA28
+	dWK7/dli4y236S0Aw/E9By1Uhh799Y3wtCrHqwg6eQ+EPR+5W41iZ19t5XzKXbBv
+	7UT2cVNSY4F+pk+cDyolaMiLDhacfPlelmxWet3200LZB0Wo8Uq/v/Hh0uJo2BTL
+	Baw43tgfw9HGGQ77Ne6Vi0vb+/pkPQrQnVc6hDaFiSwXLqf6wCXbKwq97YougY+z
+	MQgR/BcjqELSCnEzOHF86PtXfBoaWO/OJJrLcg0Rmn8LSJIofO4YmHAXxQ01lmCw
+	YPnSD1Gw5hTCIdKvJhB38jGiHQxrgo6EbFWQsDHEmtRD5Z/d/abbcredtURottvE
+	vQsDL5vuT80dMFCTzcBOP9SIe2itXhfyxe7Ygdogc8M1RiT9Cyjn4rLMZeLgzuEP
+	pPThQRfH7D540qdMGw0pr7mSZ4qVF70=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Thu, 02 Jul 2026 14:31:32 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 7602C60B21;
+	Thu,  2 Jul 2026 14:31:31 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.2/8.18.2) with ESMTP id 662BVT4K038906;
+	Thu, 2 Jul 2026 14:31:29 +0300
+Date: Thu, 2 Jul 2026 14:31:29 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+cc: netdev@vger.kernel.org, Simon Horman <horms@verge.net.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+        Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>,
+        Qi Li <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
+Subject: Re: [PATCH net v2] ipvs: fix PMTU for GUE/GRE tunnel ICMP errors
+In-Reply-To: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
+Message-ID: <c6664a17-eea8-edf3-30bc-9997265c9b57@ssi.bg>
+References: <20260702073430.67680-1-zhaoyz24@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/2] net: pse-pd: add Realtek/Broadcom PSE MCU
- driver
-Content-Language: en-US
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Daniel Golle <daniel@makrotopia.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?=
- <bjorn@mork.no>
-References: <20260630105651.756058-1-jelonek.jonas@gmail.com>
- <20260630105651.756058-3-jelonek.jonas@gmail.com>
- <akYPfkRbEzWFuC6j@pengutronix.de>
-From: Jonas Jelonek <jelonek.jonas@gmail.com>
-In-Reply-To: <akYPfkRbEzWFuC6j@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-304133-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,verge.net.au,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	TAGGED_FROM(0.00)[bounces-304148-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:horms@verge.net.au,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CA1D66F6E4B
+X-Rspamd-Queue-Id: C7F6A6F7475
 
-Hi Oleksij,
 
-thanks for your review.
+	Hello,
 
-On 02.07.26 09:13, Oleksij Rempel wrote:
-> Hi Jonas,
->
-> On Tue, Jun 30, 2026 at 10:56:50AM +0000, Jonas Jelonek wrote:
->> [...]
->>
->> +struct rtpse_mcu_port_config {
->> +	bool enable;
-> in this struct we use only enable, do you plan to wire it somewhere
-> later? I assume you wont to keep it as documentation. May be add some
-> debug traces? And add some comments what do you already know about this
-> fields.
->
->> +	u8 function_mode;
->> +	u8 detection_type;
->> +	u8 cls_type;
->> +	u8 disconnect_type;
->> +	u8 pair_type;
->> +};
->> +
->> +struct rtpse_mcu_port_ext_config {
-> Same here.
->
->> +	u8 inrush_mode;
->> +	u8 limit_type;
->> +	u8 max_power;
->> +	u8 priority;
->> +	u8 chip_addr;
->> +	u8 channel;
->> +};
+On Thu, 2 Jul 2026, Yizhou Zhao wrote:
 
-This might be good for follow-up patches. Right now, I don't get
-the full complexity of the pse-pd framework so I'll rather keep it
-simple. I see that at least some of this information is reportable,
-though not configurable (yet).
+> When an ICMP Fragmentation Needed error is received for a tunneled IPVS
+> connection, ip_vs_in_icmp() recomputes the MTU that the original packet
+> can use by subtracting the tunnel overhead from the reported next-hop
+> MTU.
+> 
+> The current code always subtracts sizeof(struct iphdr), which is only
+> the IPIP overhead. For GUE and GRE tunnels, ipvs_udp_decap() and
+> ipvs_gre_decap() already compute the additional tunnel header length,
+> but that value is scoped to the decapsulation block and is lost before
+> the ICMP_FRAG_NEEDED handling. As a result, the ICMP error sent back to
+> the client advertises an MTU that is too large, so PMTUD can fail to
+> converge for GUE/GRE-tunneled real servers.
+> 
+> With a reported next-hop MTU of 1400, a GUE tunnel currently returns
+> 1380 to the client. The correct value is 1368:
+> 
+>   1400 - sizeof(struct iphdr) - sizeof(struct udphdr) -
+>   sizeof(struct guehdr)
+> 
+> Hoist the tunnel header length into the main ip_vs_in_icmp() scope and
+> subtract sizeof(struct iphdr) + ulen in the Fragmentation Needed path.
+> The IPIP path keeps ulen as 0, so its existing 1400 - 20 = 1380 result
+> is unchanged.
+> 
+> Fixes: 508f744c0de3 ("ipvs: strip udp tunnel headers from icmp errors")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+> Reported-by: Ao Wang <wangao@seu.edu.cn>
+> Reported-by: Xuewei Feng <fengxw06@126.com>
+> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+> Assisted-by: Claude-Code:GLM-5.2
+> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 
-I suppose it's preferred to not add unused stuff so I should just
-drop the unused fields and add them later as needed. There isn't
-an urgent need to document it here either, the guide I based my
-driver on is quite available here and there in the web. I haven't
-actually dealt with all those fields close enough, so adding
-half-baked comments about them isn't good either.
+	Looks good to me for the nf tree, thanks!
 
->> +			break;
->> +		msleep(RTPSE_MCU_BOOT_RETRY_MS);
->> +	} while (time_before(jiffies, deadline));
->> +	if (ret)
->> +		return dev_err_probe(pse->dev, ret, "failed to read MCU info\n");
->> +
->> +	switch (info->device_id) {
->> +	case RTPSE_MCU_DEVICE_ID_RTL8238B:
->> +		pse->chip = &rtl8238b_info;
->> +		break;
->> +	case RTPSE_MCU_DEVICE_ID_RTL8239:
->> +		pse->chip = &rtl8239_info;
->> +		break;
->> +	case RTPSE_MCU_DEVICE_ID_RTL8239C:
->> +		pse->chip = &rtl8239c_info;
->> +		break;
->> +	case RTPSE_MCU_DEVICE_ID_BCM59111:
->> +		pse->chip = &bcm59111_info;
->> +		break;
->> +	case RTPSE_MCU_DEVICE_ID_BCM59121:
->> +		pse->chip = &bcm59121_info;
->> +		break;
->> +	default:
->> +		return dev_err_probe(pse->dev, -EINVAL, "unknown PSE id 0x%x\n",
->> +				     info->device_id);
->> +	}
->> +
->> +	if (!info->max_ports || info->max_ports > RTPSE_MCU_MAX_PORTS)
->> +		return dev_err_probe(pse->dev, -EINVAL,
->> +				     "MCU reports invalid port count %u\n", info->max_ports);
->> +
->> +	ret = rtpse_mcu_get_ext_config(pse, &ext_config);
->> +	if (ret)
->> +		return dev_err_probe(pse->dev, ret, "failed to read MCU ext config\n");
->> +
->> +	dev_info(pse->dev, "%s MCU, %s (id 0x%04x), %u ports across %u PSE chip(s)\n",
->> +		 pse->dialect->mcu_type_str(info->mcu_type), pse->chip->name,
->> +		 info->device_id, info->max_ports, ext_config.num_of_pses);
-> Reduce it to debug level print.
+Acked-by: Julian Anastasov <ja@ssi.bg>
 
-Is there any guideline about what drivers are allowed to print during
-probe? Usually, I'm a fan of at least seeing an immediate sign of life
-from a driver, even in success case. And I also see that from drivers in
-other subsystems, e.g. fan controllers or GPIO expanders.
+> ---
+> Changes in v2:
+>   - Use the short first hunk context so patch applies without fuzz.
+>   - Adjust Assisted-by to checkpatch's agent-name format.
+>   - Suggested by Julian.
+>   - Link to v1: https://lore.kernel.org/netdev/20260701065941.46249-1-zhaoyz24@mails.tsinghua.edu.cn/
+> ---
+>  net/netfilter/ipvs/ip_vs_core.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
+> index d40b404c1bf6..906f2c361676 100644
+> --- a/net/netfilter/ipvs/ip_vs_core.c
+> +++ b/net/netfilter/ipvs/ip_vs_core.c
+> @@ -1767,6 +1767,7 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+>  	bool tunnel, new_cp = false;
+>  	union nf_inet_addr *raddr;
+>  	char *outer_proto = "IPIP";
+> +	int ulen = 0;
+>  
+>  	*related = 1;
+>  
+> @@ -1831,7 +1832,6 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+>  		   /* Error for our tunnel must arrive at LOCAL_IN */
+>  		   (skb_rtable(skb)->rt_flags & RTCF_LOCAL)) {
+>  		__u8 iproto;
+> -		int ulen;
+>  
+>  		/* Non-first fragment has no UDP/GRE header */
+>  		if (unlikely(cih->frag_off & htons(IP_OFFSET)))
+> @@ -1936,8 +1936,8 @@ ip_vs_in_icmp(struct netns_ipvs *ipvs, struct sk_buff *skb, int *related,
+>  				if (dest_dst)
+>  					mtu = dst_mtu(dest_dst->dst_cache);
+>  			}
+> -			if (mtu > 68 + sizeof(struct iphdr))
+> -				mtu -= sizeof(struct iphdr);
+> +			if (mtu > 68 + sizeof(struct iphdr) + ulen)
+> +				mtu -= sizeof(struct iphdr) + ulen;
+>  			info = htonl(mtu);
+>  		}
+>  		/* Strip outer IP, ICMP and IPIP/UDP/GRE, go to IP header of
 
->> +	return 0;
->> +}
->> +
-> Best Regards,
-> Oleksij
+Regards
 
-I'll address the other points I've not reacted to explicitly in the next
-version then. Same for the low-severity sashiko-nipa issues.
+--
+Julian Anastasov <ja@ssi.bg>
 
-Best regards,
-Jonas
 
