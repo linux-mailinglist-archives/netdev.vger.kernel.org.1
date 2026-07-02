@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-304047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7chJMT0uRmrpLAsAu9opvQ
-	(envelope-from <netdev+bounces-304047-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:24:13 +0200
+	id 7gqOISMtRmqDLAsAu9opvQ
+	(envelope-from <netdev+bounces-304048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:19:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ADE76F5339
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:24:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 547476F5282
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:19:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=yreQmrnT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304047-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304047-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=my9u+Viy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304048-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304048-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3DEBC30E6750
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:08:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2A933009F9E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C02B47D948;
-	Thu,  2 Jul 2026 09:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6564747DD4A;
+	Thu,  2 Jul 2026 09:07:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D8147CC79
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A3347D94A
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:07:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782983266; cv=none; b=QN1tjROnAKmbyi4/P+q4o0BPN1I0rr3QS5tBX5Um9fZSTMC43XYmnRhcu2XaIRtugLfZM9bBblL14BTd4pm/PNd4zBBE4BZHtjsc2GPCKAaW5cKRvyPK55HsEGKC9q8/ZyystFRHNoJ2SliKe5A3mPjSoinXPYWc5EAucDoqOq4=
+	t=1782983268; cv=none; b=rcK0v4qKUa29LkPmaOnnuetJWBhBu92Uwj2b+kPtYDmSHl/kmRdqGS8eRlofKy288WMonpiUZ4YyJFY978QptCajT9UAkJTvqRJ+Y4iMhvWqfOgADQeyKvf/aE9VFHvwbZSm5WWxkfJV0GUYRxwq7f5MWMvx00zN/6kW+USzyHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782983266; c=relaxed/simple;
-	bh=dBBpP5Lz2+JojJwrPXBdGaqok5/Q3DWB1g9yh7ZGF78=;
+	s=arc-20240116; t=1782983268; c=relaxed/simple;
+	bh=61WSwrssb9c8TNCp/njGvpB1zUaXcun6NGnhBHfB+MM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=unrlGcz37VNabllYzZczMCmvW6eerqdUz2LLrINUnQhUXvxZ3/n4YbUna1u+hrP3FdXLFUhtkRf3o0LpTnGZdLErdGEfQGDnzE1ZBM5h6W/6znBCSRAF9hHpI2UnzDLrp0Ugyzo+18tUSt/PY7O0TK07oWOB4Cx2VOtE4eXbqzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=yreQmrnT; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=t7j3DRzOFGW+2VjIlf3oQd/3vZ3veStH/tnWUC8IfDrc2zgyx3I/LJvUlsqln3+qVCKaPXYSlQx5YBUZ0rd9oXBisv7H08hq1dqke//tpNHPk8XtFJDrBkxbmnZ8bNQ9DwfIDsBgVvF9jXbMLtSvagy60NeDIKxFMAg11LgIm+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=my9u+Viy; arc=none smtp.client-ip=185.171.202.116
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id DC1BCC4FED4;
-	Thu,  2 Jul 2026 09:07:54 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 9E6D0C4FED5;
+	Thu,  2 Jul 2026 09:07:56 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 91BA75FF03;
-	Thu,  2 Jul 2026 09:07:43 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EAD45104C9625;
-	Thu,  2 Jul 2026 11:07:40 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4F81E5FF03;
+	Thu,  2 Jul 2026 09:07:45 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 00705104C9691;
+	Thu,  2 Jul 2026 11:07:42 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782983262; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1782983264; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=XUa+jHULbae5bprqUew3ZFTGiptayYO4M1GUz3gSLkw=;
-	b=yreQmrnTpTWDihKfi87RZDHQy1m1Pvw8SIN9P8EIkxwLsnfgYV5fJs9ogSwQO4hNwIE8q4
-	6RYpyohxaywRGYiX4Cif5I4e7tYNgzcIDcZ0D3pAQdBzvO+Xc/DUo2cQug5f7SnQchYj4h
-	hLw1fojT4O2rd3Onir5+2EaHRqMmg9L6MNcM1hrFCVXTbnTpaS/Zfia52TtTRpJaO0L2yD
-	Qlyzo67fPmev5vZ1RZcejS0OGniZQcdNUQEIDHDoH6qpqJgyAwtjOq6/DvnwERBy/IwWuW
-	uX+x/G60mRNuKqJwEe9G3y2DSEKkXgZXFiULJlrdxEZQy6Olu2Y3sQE7QfyB8Q==
+	bh=KHdhGqOFhwRyNSafdEd66cpF3tWCslIw2j6fNzFnuDU=;
+	b=my9u+Viy8RbQBoNm6OXRsgYESk8KXYYMOBOSEUGHMlQM2Hn1SAHiCofYkz2DJeiDV9rGau
+	AZGb7PvDerjb6/o29IcfdyrSMoBDVNsf2saldxwxiAXJ2T/COo7MTJCA4S7X3oK25TE1H7
+	7e5L3pKVm+tyeUfz3HhKKmn/FzxxNpyBDNLm5R5llET8UBcRfieJylLN4K4WEcTJ6z325g
+	aQemBHgPjCnzTGvvrbscXdkNpic+5IhupvneRz3JT/sUdP+KyvRPtKYIlj5oWciunpDEEz
+	8NhzMIme7QpPd3OQhZYxHYPWfnZaw2WSR7JCGq7tl93LH1IoN8/TuMGf6EeF+A==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 02 Jul 2026 11:07:26 +0200
-Subject: [PATCH net-next 04/10] net: dsa: microchip: move ksz88xx stats
- handling in ksz8.c
+Date: Thu, 02 Jul 2026 11:07:27 +0200
+Subject: [PATCH net-next 05/10] net: dsa: microchip: move ksz_get_gbit()
+ and ksz_get_xmii() to ksz9477.c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260702-clean-ksz-4th-v1-4-93441e695fa4@bootlin.com>
+Message-Id: <20260702-clean-ksz-4th-v1-5-93441e695fa4@bootlin.com>
 References: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
 In-Reply-To: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -96,9 +96,9 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
 	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bastien.curutchet@bootlin.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304047-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304048-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -111,242 +111,179 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3ADE76F5339
+X-Rspamd-Queue-Id: 547476F5282
 
-ksz88xx_r_mib_stats64() is defined in ksz_common while it's clearly
-ksz88xx-specific.
+ksz_get_gbit() and ksz_get_xmii() are defined in the ksz_common while
+they are only used by the ksz9477 driver.
 
-Move its definition in ksz8.c
+Move their definition into ksz9477.c
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz8.c       | 86 ++++++++++++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.c | 86 ----------------------------------
- drivers/net/dsa/microchip/ksz_common.h |  1 -
- 3 files changed, 86 insertions(+), 87 deletions(-)
+ drivers/net/dsa/microchip/ksz9477.c    | 56 ++++++++++++++++++++++++++++++++--
+ drivers/net/dsa/microchip/ksz_common.c | 51 -------------------------------
+ drivers/net/dsa/microchip/ksz_common.h |  2 --
+ 3 files changed, 54 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 2b4720c4c87e..ad7c7a6e1d31 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -36,6 +36,43 @@
- #include "ksz8_reg.h"
- #include "ksz8.h"
- 
-+struct ksz88xx_stats_raw {
-+	u64 rx;
-+	u64 rx_hi;
-+	u64 rx_undersize;
-+	u64 rx_fragments;
-+	u64 rx_oversize;
-+	u64 rx_jabbers;
-+	u64 rx_symbol_err;
-+	u64 rx_crc_err;
-+	u64 rx_align_err;
-+	u64 rx_mac_ctrl;
-+	u64 rx_pause;
-+	u64 rx_bcast;
-+	u64 rx_mcast;
-+	u64 rx_ucast;
-+	u64 rx_64_or_less;
-+	u64 rx_65_127;
-+	u64 rx_128_255;
-+	u64 rx_256_511;
-+	u64 rx_512_1023;
-+	u64 rx_1024_1522;
-+	u64 tx;
-+	u64 tx_hi;
-+	u64 tx_late_col;
-+	u64 tx_pause;
-+	u64 tx_bcast;
-+	u64 tx_mcast;
-+	u64 tx_ucast;
-+	u64 tx_deferred;
-+	u64 tx_total_col;
-+	u64 tx_exc_col;
-+	u64 tx_single_col;
-+	u64 tx_mult_col;
-+	u64 rx_discards;
-+	u64 tx_discards;
-+};
-+
- static void ksz_cfg(struct ksz_device *dev, u32 addr, u8 bits, bool set)
- {
- 	ksz_rmw8(dev, addr, bits, set ? bits : 0);
-@@ -2052,6 +2089,55 @@ static int ksz8_enable_stp_addr(struct ksz_device *dev)
- 	return ksz8_w_sta_mac_table(dev, 0, &alu);
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index 0b08d2175f17..ad6748905e08 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -1181,6 +1181,58 @@ void ksz9477_port_mirror_del(struct dsa_switch *ds, int port,
+ 			     PORT_MIRROR_SNIFFER, false);
  }
  
-+static void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port)
++static bool ksz9477_get_gbit(struct ksz_device *dev, int port)
 +{
-+	struct ethtool_pause_stats *pstats;
-+	struct rtnl_link_stats64 *stats;
-+	struct ksz88xx_stats_raw *raw;
-+	struct ksz_port_mib *mib;
++	const u8 *bitval = dev->info->xmii_ctrl1;
++	const u16 *regs = dev->info->regs;
++	bool gbit = false;
++	u8 data8;
++	bool val;
 +
-+	mib = &dev->ports[port].mib;
-+	stats = &mib->stats64;
-+	pstats = &mib->pause_stats;
-+	raw = (struct ksz88xx_stats_raw *)mib->counters;
++	ksz_pread8(dev, port, regs[P_XMII_CTRL_1], &data8);
 +
-+	spin_lock(&mib->stats64_lock);
++	val = FIELD_GET(P_GMII_1GBIT_M, data8);
 +
-+	stats->rx_packets = raw->rx_bcast + raw->rx_mcast + raw->rx_ucast +
-+		raw->rx_pause;
-+	stats->tx_packets = raw->tx_bcast + raw->tx_mcast + raw->tx_ucast +
-+		raw->tx_pause;
++	if (val == bitval[P_GMII_1GBIT])
++		gbit = true;
 +
-+	/* HW counters are counting bytes + FCS which is not acceptable
-+	 * for rtnl_link_stats64 interface
-+	 */
-+	stats->rx_bytes = raw->rx + raw->rx_hi - stats->rx_packets * ETH_FCS_LEN;
-+	stats->tx_bytes = raw->tx + raw->tx_hi - stats->tx_packets * ETH_FCS_LEN;
-+
-+	stats->rx_length_errors = raw->rx_undersize + raw->rx_fragments +
-+		raw->rx_oversize;
-+
-+	stats->rx_crc_errors = raw->rx_crc_err;
-+	stats->rx_frame_errors = raw->rx_align_err;
-+	stats->rx_dropped = raw->rx_discards;
-+	stats->rx_errors = stats->rx_length_errors + stats->rx_crc_errors +
-+		stats->rx_frame_errors  + stats->rx_dropped;
-+
-+	stats->tx_window_errors = raw->tx_late_col;
-+	stats->tx_fifo_errors = raw->tx_discards;
-+	stats->tx_aborted_errors = raw->tx_exc_col;
-+	stats->tx_errors = stats->tx_window_errors + stats->tx_fifo_errors +
-+		stats->tx_aborted_errors;
-+
-+	stats->multicast = raw->rx_mcast;
-+	stats->collisions = raw->tx_total_col;
-+
-+	pstats->tx_pause_frames = raw->tx_pause;
-+	pstats->rx_pause_frames = raw->rx_pause;
-+
-+	spin_unlock(&mib->stats64_lock);
++	return gbit;
 +}
 +
- static int ksz8_setup(struct dsa_switch *ds)
++static phy_interface_t ksz9477_get_xmii(struct ksz_device *dev, int port,
++					bool gbit)
++{
++	const u8 *bitval = dev->info->xmii_ctrl1;
++	const u16 *regs = dev->info->regs;
++	phy_interface_t interface;
++	u8 data8;
++	u8 val;
++
++	ksz_pread8(dev, port, regs[P_XMII_CTRL_1], &data8);
++
++	val = FIELD_GET(P_MII_SEL_M, data8);
++
++	if (val == bitval[P_MII_SEL]) {
++		if (gbit)
++			interface = PHY_INTERFACE_MODE_GMII;
++		else
++			interface = PHY_INTERFACE_MODE_MII;
++	} else if (val == bitval[P_RMII_SEL]) {
++		interface = PHY_INTERFACE_MODE_RMII;
++	} else {
++		interface = PHY_INTERFACE_MODE_RGMII;
++		if (data8 & P_RGMII_ID_EG_ENABLE)
++			interface = PHY_INTERFACE_MODE_RGMII_TXID;
++		if (data8 & P_RGMII_ID_IG_ENABLE) {
++			interface = PHY_INTERFACE_MODE_RGMII_RXID;
++			if (data8 & P_RGMII_ID_EG_ENABLE)
++				interface = PHY_INTERFACE_MODE_RGMII_ID;
++		}
++	}
++
++	return interface;
++}
++
+ static phy_interface_t ksz9477_get_interface(struct ksz_device *dev, int port)
  {
- 	struct ksz_device *dev = ds->priv;
+ 	phy_interface_t interface;
+@@ -1189,9 +1241,9 @@ static phy_interface_t ksz9477_get_interface(struct ksz_device *dev, int port)
+ 	if (dev->info->internal_phy[port])
+ 		return PHY_INTERFACE_MODE_NA;
+ 
+-	gbit = ksz_get_gbit(dev, port);
++	gbit = ksz9477_get_gbit(dev, port);
+ 
+-	interface = ksz_get_xmii(dev, port, gbit);
++	interface = ksz9477_get_xmii(dev, port, gbit);
+ 
+ 	return interface;
+ }
 diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index be7738ae1f2a..56dd4c27b182 100644
+index 56dd4c27b182..92fcbd9605c7 100644
 --- a/drivers/net/dsa/microchip/ksz_common.c
 +++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -76,43 +76,6 @@ struct ksz_stats_raw {
- 	u64 tx_discards;
- };
- 
--struct ksz88xx_stats_raw {
--	u64 rx;
--	u64 rx_hi;
--	u64 rx_undersize;
--	u64 rx_fragments;
--	u64 rx_oversize;
--	u64 rx_jabbers;
--	u64 rx_symbol_err;
--	u64 rx_crc_err;
--	u64 rx_align_err;
--	u64 rx_mac_ctrl;
--	u64 rx_pause;
--	u64 rx_bcast;
--	u64 rx_mcast;
--	u64 rx_ucast;
--	u64 rx_64_or_less;
--	u64 rx_65_127;
--	u64 rx_128_255;
--	u64 rx_256_511;
--	u64 rx_512_1023;
--	u64 rx_1024_1522;
--	u64 tx;
--	u64 tx_hi;
--	u64 tx_late_col;
--	u64 tx_pause;
--	u64 tx_bcast;
--	u64 tx_mcast;
--	u64 tx_ucast;
--	u64 tx_deferred;
--	u64 tx_total_col;
--	u64 tx_exc_col;
--	u64 tx_single_col;
--	u64 tx_mult_col;
--	u64 rx_discards;
--	u64 tx_discards;
--};
--
- static const struct ksz_mib_names ksz88xx_mib_names[] = {
- 	{ 0x00, "rx" },
- 	{ 0x01, "rx_hi" },
-@@ -2063,55 +2026,6 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int port)
- 	}
+@@ -2966,39 +2966,6 @@ void ksz_set_xmii(struct ksz_device *dev, int port, phy_interface_t interface)
+ 	ksz_pwrite8(dev, port, regs[P_XMII_CTRL_1], data8);
  }
  
--void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port)
+-phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit)
 -{
--	struct ethtool_pause_stats *pstats;
--	struct rtnl_link_stats64 *stats;
--	struct ksz88xx_stats_raw *raw;
--	struct ksz_port_mib *mib;
+-	const u8 *bitval = dev->info->xmii_ctrl1;
+-	const u16 *regs = dev->info->regs;
+-	phy_interface_t interface;
+-	u8 data8;
+-	u8 val;
 -
--	mib = &dev->ports[port].mib;
--	stats = &mib->stats64;
--	pstats = &mib->pause_stats;
--	raw = (struct ksz88xx_stats_raw *)mib->counters;
+-	ksz_pread8(dev, port, regs[P_XMII_CTRL_1], &data8);
 -
--	spin_lock(&mib->stats64_lock);
+-	val = FIELD_GET(P_MII_SEL_M, data8);
 -
--	stats->rx_packets = raw->rx_bcast + raw->rx_mcast + raw->rx_ucast +
--		raw->rx_pause;
--	stats->tx_packets = raw->tx_bcast + raw->tx_mcast + raw->tx_ucast +
--		raw->tx_pause;
+-	if (val == bitval[P_MII_SEL]) {
+-		if (gbit)
+-			interface = PHY_INTERFACE_MODE_GMII;
+-		else
+-			interface = PHY_INTERFACE_MODE_MII;
+-	} else if (val == bitval[P_RMII_SEL]) {
+-		interface = PHY_INTERFACE_MODE_RMII;
+-	} else {
+-		interface = PHY_INTERFACE_MODE_RGMII;
+-		if (data8 & P_RGMII_ID_EG_ENABLE)
+-			interface = PHY_INTERFACE_MODE_RGMII_TXID;
+-		if (data8 & P_RGMII_ID_IG_ENABLE) {
+-			interface = PHY_INTERFACE_MODE_RGMII_RXID;
+-			if (data8 & P_RGMII_ID_EG_ENABLE)
+-				interface = PHY_INTERFACE_MODE_RGMII_ID;
+-		}
+-	}
 -
--	/* HW counters are counting bytes + FCS which is not acceptable
--	 * for rtnl_link_stats64 interface
--	 */
--	stats->rx_bytes = raw->rx + raw->rx_hi - stats->rx_packets * ETH_FCS_LEN;
--	stats->tx_bytes = raw->tx + raw->tx_hi - stats->tx_packets * ETH_FCS_LEN;
--
--	stats->rx_length_errors = raw->rx_undersize + raw->rx_fragments +
--		raw->rx_oversize;
--
--	stats->rx_crc_errors = raw->rx_crc_err;
--	stats->rx_frame_errors = raw->rx_align_err;
--	stats->rx_dropped = raw->rx_discards;
--	stats->rx_errors = stats->rx_length_errors + stats->rx_crc_errors +
--		stats->rx_frame_errors  + stats->rx_dropped;
--
--	stats->tx_window_errors = raw->tx_late_col;
--	stats->tx_fifo_errors = raw->tx_discards;
--	stats->tx_aborted_errors = raw->tx_exc_col;
--	stats->tx_errors = stats->tx_window_errors + stats->tx_fifo_errors +
--		stats->tx_aborted_errors;
--
--	stats->multicast = raw->rx_mcast;
--	stats->collisions = raw->tx_total_col;
--
--	pstats->tx_pause_frames = raw->tx_pause;
--	pstats->rx_pause_frames = raw->rx_pause;
--
--	spin_unlock(&mib->stats64_lock);
+-	return interface;
 -}
 -
- void ksz_get_stats64(struct dsa_switch *ds, int port,
- 		     struct rtnl_link_stats64 *s)
+ bool ksz_phylink_need_config(struct phylink_config *config,
+ 			     unsigned int mode)
  {
+@@ -3034,24 +3001,6 @@ void ksz_phylink_mac_config(struct phylink_config *config,
+ 		ksz_set_xmii(dev, port, state->interface);
+ }
+ 
+-bool ksz_get_gbit(struct ksz_device *dev, int port)
+-{
+-	const u8 *bitval = dev->info->xmii_ctrl1;
+-	const u16 *regs = dev->info->regs;
+-	bool gbit = false;
+-	u8 data8;
+-	bool val;
+-
+-	ksz_pread8(dev, port, regs[P_XMII_CTRL_1], &data8);
+-
+-	val = FIELD_GET(P_GMII_1GBIT_M, data8);
+-
+-	if (val == bitval[P_GMII_1GBIT])
+-		gbit = true;
+-
+-	return gbit;
+-}
+-
+ static int ksz_switch_detect(struct ksz_device *dev)
+ {
+ 	u8 id1, id2, id4;
 diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index f367d6f96fa2..347787ef1f00 100644
+index 347787ef1f00..2c7716d8cf28 100644
 --- a/drivers/net/dsa/microchip/ksz_common.h
 +++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -394,7 +394,6 @@ void ksz_teardown(struct dsa_switch *ds);
- 
+@@ -395,8 +395,6 @@ void ksz_teardown(struct dsa_switch *ds);
  void ksz_init_mib_timer(struct ksz_device *dev);
  void ksz_r_mib_stats64(struct ksz_device *dev, int port);
--void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port);
  void ksz_port_stp_state_set(struct dsa_switch *ds, int port, u8 state);
- bool ksz_get_gbit(struct ksz_device *dev, int port);
- phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit);
+-bool ksz_get_gbit(struct ksz_device *dev, int port);
+-phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit);
+ extern const struct ksz_chip_data ksz_switch_chips[];
+ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
+ 			   struct netlink_ext_ack *extack);
 
 -- 
 2.54.0
