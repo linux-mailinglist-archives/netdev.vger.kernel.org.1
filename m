@@ -1,181 +1,246 @@
-Return-Path: <netdev+bounces-303915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NpQ/ImDRRWraFgsAu9opvQ
-	(envelope-from <netdev+bounces-303915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:48:00 +0200
+	id BOjZJ8LRRWruFgsAu9opvQ
+	(envelope-from <netdev+bounces-303916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:49:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A196F318B
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:47:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA146F31B1
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:49:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=JS1CZaP9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303915-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303915-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=QsF0Qq1w;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303916-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-303916-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C82FF301FD51
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 02:47:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C97AD302DCDC
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 02:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3585F2DA775;
-	Thu,  2 Jul 2026 02:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A242E1F06;
+	Thu,  2 Jul 2026 02:49:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9D1181334;
-	Thu,  2 Jul 2026 02:47:56 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782960478; cv=none; b=fHBxxnXJ6NhSXDZUjyjM73dHOc+MEBIjBnrAqjkZcvrwMgwtIQPUP6pAE33JkxiXBEP1jXlcOMBqf9auJ2j/HYJ7POnAYLbydgVo/KHZBI5p4n4YwHDOLEk6plqMJSXAwL4Ah7W7Hjq3aqrcOyGNIKFbXxXY5YwibXxT1PokVBU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782960478; c=relaxed/simple;
-	bh=hMW9OFC1YmhnysZNwHbuMeHIlhAbFx1GB5PK95bLaD8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lhRVi0IVX16nr0j9TglyroW3PPzS2/sGdKLKwSBTNUihtVJlzfykx1naiGiRDDjF4KHOkoY27JRskFCSKMr0GXMkm/1d8Y4uI8BhbT+7vvIQpeg6MCAvyqVoAGlZHlq6sohtiCvP57fjo5c+asBIbXgJ9BOOLob2x1kJDTiLqho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JS1CZaP9; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6621MSPL205440;
-	Wed, 1 Jul 2026 19:47:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=H2zsb8iX/UR5QSiYRo4J8G0uX
-	ed3SOvrXaCXrE6ESA8=; b=JS1CZaP9k1SE95+ESyMZtAkyKjEfguCWba8DuP3Sh
-	mjRfOUmG3St3BuQpDkoDqHAoBQKT8DnNjQR820dzNNrrwKgh6Ie72/Z7yiJ0OBe9
-	ZmjcyEhznbb+U450ecAM/yp79GhoA/n2w0VBaF5BpcMB2YGSIk+S2TUZA4vyrTRF
-	goeuS5mBbO3a30wR8JpXow1E3twbS2e2NRjbD7gYnq6U9HjUfYbv641kP/gX8fD5
-	UlhRAS/ShBLWMVFoMvMbBRXN3GDEe5Q9auhewde/FsVD1Ko6hyVlGo31k+nqHigl
-	t94E+nSFMA7j4wRAX/T2GvPP8ZDtmBOgXYP9lkgMVatMg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f512737tr-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Jul 2026 19:47:35 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 1 Jul 2026 19:47:28 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 1 Jul 2026 19:47:28 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 5ACA53F708A;
-	Wed,  1 Jul 2026 19:47:25 -0700 (PDT)
-Date: Thu, 2 Jul 2026 08:17:24 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: David Ahern <dsahern@kernel.org>
-CC: <stephen@networkplumber.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <andrew+netdev@lunn.ch>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <jiri@resnulli.us>
-Subject: Re: [PATCH iproute2-next v2 2/2] devlink: support u64-array values
- in devlink param show/set
-Message-ID: <akXRPNxtdVAzoxLF@rkannoth-OptiPlex-7090>
-References: <20260630015012.3728870-1-rkannoth@marvell.com>
- <20260630015012.3728870-3-rkannoth@marvell.com>
- <9d9cceae-3934-4dd6-ae8e-af995ae6b0ab@kernel.org>
- <akR7g8aWfws3h2jx@rkannoth-OptiPlex-7090>
- <87f24e1e-4167-432b-b73c-0fc0c4b7d532@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E34530C176
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 02:49:35 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782960577; cv=pass; b=Ahky+v8Ti7zGF2x6+gZcEeKBljrQ5LJVcBSCb+PIK3AxHkMGyLrsCbBrtgRONYa5maycSecS6/bmQczFdrCOsh3sPjBlHKB+Nfj94e8Z080ydTcJ1hov3CP17EQhb0AYQnd9VVjmasFgS3FMM+OrQVGIOG3ErM1/nGqhClvDlck=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782960577; c=relaxed/simple;
+	bh=20Cs05/1g216Q8Pm02I0IC3Cu9w+JzJeH5u39yu/Z18=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Md+WdhVUqc9YsfO7wuWsRQcupXCWfl+P2lW0dfltxIVHrklanBH1ojEKdQukC4ctfNLRdKzQnsMK22KWZXY9IApI6u+QRMCHxuCEsLaKvJOAFPz/r82I6vZRH1X1CkH8lKKmJK1L5InGvKE4KCZsHZsmq5844yvMyp7ubZz1evs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QsF0Qq1w; arc=pass smtp.client-ip=209.85.216.52
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3804e42ad5fso1245289a91.2
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 19:49:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782960575; cv=none;
+        d=google.com; s=arc-20260327;
+        b=IYL/GRcke9pC4eg+J8omdwrP0mncxMpGn44/HgkPXWK66/J1ZGYPskllQeAWlXLPDX
+         fMgezJv52kz+ntwyAYiXU05K9weAIKQRSSGvCsgLkF5rnjbnjhdBsTL2a84vuS1dm+3k
+         LBvTtkvs/E6VIBiPvy35U52nAnDhFyJIMiUtw0lrLb034yf8pjL5pmcZFh5NHoVJ3uNQ
+         4sy9HAU3nzjWS+Sudh5QrEkpebtegT7XKCKdZdiVaziV1qZMSBOPSewP1mC5ddcPETwA
+         wtZu2YiIz7SWKW5DHGE8b+MLB0Tje7MnUNUEQfkNwIbk8ixDJtnqeAzglqH+BUhTBtfH
+         mBqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=8eQAI0v5Y3TrXT+9Uezh7Aosnjw6vsbtAoQhIAs11SQ=;
+        fh=oTxuMu1kybQnZM+G6X5nngDpfnlm8V0Rh3RQ42EcwI0=;
+        b=IUuSM+MoLAeVyucEcMw3RC7az6lesc0qZgdk68KiO6byNWehMFRIIxIAP9tKwIR1z7
+         qDRkmrdtVVtof0qSk1hDSvFYcE3arOty6UiYTGsFwujd6t+Del6LXyhyrbKlVir4R8WQ
+         Elb5g13GAVMxWUOL91100r0kXVYWhkTRk3ekudwbmXsOkh2h8EkqA0gkMufXhHJp2XWy
+         tVB5s3W+pd+LmTcaGminD1piS361ZJtBfUhHzRHR7CwrylrEpkMlBswNVPAjkFgZcBhZ
+         x4SOMxIwVcFHRNymmA+QOhLbgl+W6sswFgyxBlcjhCnCGsU59ZgtVeq03+nXjJYDgKJH
+         izAQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782960575; x=1783565375; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8eQAI0v5Y3TrXT+9Uezh7Aosnjw6vsbtAoQhIAs11SQ=;
+        b=QsF0Qq1wLI7zkTpBO18RTz0bCIm8JklGkyrVtFgbnP9StfZkieVHW+NbActFoGpGJE
+         z19hjmHqRx3KDRnIemFOM8EkcEqiRsWbfIXEf0/7oPRo8I9IFeYSSwOSGhZZvvHEhilS
+         /7f6Fx5ehLnt8FI1Bp8Ow4wu5t0CHJGH7xqsG3Faj2nstQmJfu1LmAdmKBugFZjZVbsI
+         Q+cD1OqCQEO0ZDdjcjt6HkIWn3b26Osx4Ak1vy0efmY7R0NVJBJZkjPA8olHyT8+qhq6
+         xdXcwrdTFAQ/tHroDjvsg7TXJZNpG/JRWSCTyFwxIMI1YTCD5pa8lBR48FNe+zn3+Lok
+         28ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782960575; x=1783565375;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8eQAI0v5Y3TrXT+9Uezh7Aosnjw6vsbtAoQhIAs11SQ=;
+        b=kn3WK6JSdBJ/+zc5jXWJwfObPDdMMR2+a+xdrr1yE9JU7pJGsOQSyn0Milp0DHlhv6
+         LQaKQuwic7wssZn3ufERBNOLXXcFHueUiok0lXypNFGJ82a1jA+1EFl9rOB5fmRd8IqA
+         lVPu+mdttuqlZc/iuCwVdUPvQ1hHJVDO0zMiSCq/2gBHVcHWEUiUbUKuCGJ9ofEDqjES
+         a5RUrRD0T1lFOHxQtmNxo89DiNxkxE2JO4qbAK6eegF0dKEGmMvL8fGSNhjKTX847hXZ
+         Uuao2sIde+dPG5pUHxU+j2jWNbrZ6KRU8Ais/4bPfvQDlJsz2OjV7Fcp9Q6jW+bX9Q4D
+         kPTw==
+X-Forwarded-Encrypted: i=1; AFNElJ/zKkE/asg5wMExoNCOH2DkTtqrweQ6HWyovkqh3GyFISKZthdPbSzNWA+IytK849lXpGv0zkE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwImruWe58q4743m0Y5tr5BQ9h6Xz6VdJfTUf0gPeB/J+V2t+tZ
+	4Jzjj3klrLelfLZ2O6G/XWEFGA/trQvo0NCZZhwonLSpt3Nk15mkDmjYSSb636rAJz0x1hRpewz
+	nNpCjNOP8FwPYfubtnxzISVm8bIN13FtZRTHOfBbB
+X-Gm-Gg: AfdE7cnM1bglN7I/9a/XHotJBOBnlw9fh0NtqAaokR/kzzXl8HnNaYGeqsbklSuVTOE
+	8GzDWejYWx4xEdtrYPbzMNcM+3sK7tB5/KiFVRGBhDNBW+L+yEJITJ232e2aTlmBYBhNdJruldH
+	biBfg6yzglaCjBURq9apUgfpbfudnyzar5B82NRM/qd4NdujYYkUSrQoLVobNKTk4gtYAnS2IRO
+	rTlz+rgYR93ZK/i9JZ0+1jCUrzYhKQN8QpEq5igAUYmwDI1fl1ZI6dHNY5z9D6m2YoWaIh+LWIi
+	HoOJo9oUCd1nG58XRBtj1YZsD6B5H3mbjod6SJnMFKmDU/ZdlRGQmCh/EWbL9TkgWlwKDn1E1fb
+	iB2Ir3OQm/fodmgHJUSLNLTnZPHP7jwPCg64DLSEhAQ==
+X-Received: by 2002:a05:6a21:38c:b0:3b2:a809:ffe with SMTP id
+ adf61e73a8af0-3bff407cf6dmr3804885637.14.1782960574625; Wed, 01 Jul 2026
+ 19:49:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <87f24e1e-4167-432b-b73c-0fc0c4b7d532@kernel.org>
-X-Proofpoint-ORIG-GUID: IdATO2RZXA18PLFRYF42dauRsMs0PSbs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDAyNiBTYWx0ZWRfX9CTDeNVVS4fX
- OflDzPIeZt3Zl3dxH2ConBkmq0HQTH8yG5Ls23D91r1CMwNvv9bl8itqjopS7Zbfe0seHaEGNOr
- vemrXsorJaaPeJFLBx/VbeYOb5MG+f/bUYak4Kx/VG+MX37Qj9C6HIsEFdcDmy+YsM4K5ta6j1c
- q8kotwfHlh5cA2fcR2zY6yHJmmxIh6xNJiEnsYLL2nOwFhpZCNO5zAIeLYb6S12Y1M6dK9qm4/+
- N0AadBJOpIhnsGeAwjCLa5PqcwGYMUZvJn1iDYR/RR7PRmR0RWfqDYXoRfJkHev8sMAhd6AZejx
- UJ4Inke/L7hWsS4IybVUmxaWgNAG++WZDB+dx8nOs4sKEf5yeSoQ6rhZcgJr0s24zGwUy3lKQT0
- flh/YL4AcqDFkU1fzjGGKHiWmNEdggrHIS/6sMHBDUhgMKG609g/00KCHmDLpa/wZZQftzGo/6y
- PQ2I8sCGaS9yu4iH2ow==
-X-Authority-Analysis: v=2.4 cv=HZkkiCE8 c=1 sm=1 tr=0 ts=6a45d147 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=VwQbUJbxAAAA:8
- a=M5GUcnROAAAA:8 a=rzd6dds-UicYx-ywJxkA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22 a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-GUID: IdATO2RZXA18PLFRYF42dauRsMs0PSbs
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDAyNiBTYWx0ZWRfX9hNr+cuqlzBi
- OMioZ0OdVnnDpIGY6zsX764X0puOb4VdH5S0QNggTz98ZMvNjNztvcgjkUsbCGWT1oH8N+Ko2qu
- h6MbT2cLfT7e0QbcbrhGm0ff34qSFkY=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-02_01,2026-06-26_01,2025-10-01_01
+References: <20260701120454.3533252-1-edumazet@google.com> <20260701120454.3533252-2-edumazet@google.com>
+In-Reply-To: <20260701120454.3533252-2-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 1 Jul 2026 19:49:23 -0700
+X-Gm-Features: AVVi8CcaqUV_D3c45RB2N1qbwLeQJXBi4eS-YxGEKk4deJDSP8YuoX8_lVSnUGw
+Message-ID: <CAAVpQUBDbn6GCxTjDcg56Xb4ni83YuMXOxwBU7Xggke3SN5tNQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] geneve: convert config to RCU-protected pointer
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303915-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303916-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lunn.ch,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:stephen@networkplumber.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:andrew@lunn.ch,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E2A196F318B
+X-Rspamd-Queue-Id: 5CA146F31B1
 
-On 2026-07-01 at 20:04:56, David Ahern (dsahern@kernel.org) wrote:
-> On 6/30/26 8:29 PM, Ratheesh Kannoth wrote:
-> > On 2026-06-30 at 20:06:17, David Ahern (dsahern@kernel.org) wrote:
-> >> On 6/29/26 7:50 PM, Ratheesh Kannoth wrote:
-> >>> diff --git a/devlink/devlink.c b/devlink/devlink.c
-> >>> index 9372e92f..3c29601d 100644
-> >>> --- a/devlink/devlink.c
-> >>> +++ b/devlink/devlink.c
-> >>> @@ -3496,13 +3496,115 @@ static const struct param_val_conv param_val_conv[] = {
-> >>>  };
-> >>>
-> >>>  #define PARAM_VAL_CONV_LEN ARRAY_SIZE(param_val_conv)
-> >>> +#define DEVLINK_PARAM_MAX_ARRAY_SIZE 32
-> >>
-> >> Why 32? Is that based on current code?
-> > Yes, this aligns with the current kernel-side limits. See:
-> > https://lore.kernel.org/all/20260609040453.711932-5-rkannoth@marvell.com/
-> >
-> >> How does the kernel side handle
-> >> the number of parameters? What happens if the kernel sends more than 32
-> >> parameters - from a user's perspective, not this code and processing the
-> >> output?
-> > The kernel strictly validates and restricts the number of parameters. To be safe, this patch
-> > adds an explicit bounds check to prevent userspace issues if that threshold is ever crossed.
-> >
-> > Ideally, since "union devlink_param_value" is omitted from the UAPI, we have to define
-> > DEVLINK_PARAM_MAX_ARRAY_SIZE here. Moving the underlying structures to the UAPI in the
-> > future would allow us to share a single definition and avoid this hardcoded value in userspace.
+On Wed, Jul 1, 2026 at 5:04=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
-> iproute2 needs to be backward and forward compatible. As it stands, a
-> new kernel can allow more than 32 entries and an older iproute2 will not
-> display all of them. That is wrong.
+> geneve_changelink() currently updates configuration by copying it over
+> the old one using memcpy() under RTNL, forcing data path pause via
+> geneve_quiesce() and synchronize_net() to avoid reading torn values.
 >
-> Let's make the limit part of the uapi. If you do not want to do that
-> now, then iproute2 code needs to handle a larger size.
-ACK.
+> Convert geneve->cfg to an RCU-protected pointer, allowing lockless
+> and safe reads under RCU read lock without synchronization overhead.
+>
+> Key changes:
+> - Introduced geneve_config_alloc/free() helpers for lifecycle.
+> - geneve_configure() allocates config and publishes it via RCU.
+> - geneve_changelink() performs RCU swap; old config is freed via call_rcu=
+_hurry().
+> - Allocates new dst_cache during changelink to prevent pcpu sharing.
+> - Removed geneve_quiesce/unquiesce() and synchronize_net() from changelin=
+k.
+> - Added rcu_barrier() to module exit to wait for pending callbacks.
+> - Updated data path to use rcu_dereference().
+> - Updated geneve_fill_info() to use rtnl_dereference() for now.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+
+Thanks for this change !
+Sashiko always complained about this for every geneve patch :)
+
+
+[...]
+> @@ -1539,28 +1551,36 @@ static int geneve6_xmit_skb(struct sk_buff *skb, =
+struct net_device *dev,
+>  static netdev_tx_t geneve_xmit(struct sk_buff *skb, struct net_device *d=
+ev)
+>  {
+>         struct geneve_dev *geneve =3D netdev_priv(dev);
+> -       struct ip_tunnel_info *info =3D NULL;
+> +       const struct ip_tunnel_info *info =3D NULL;
+> +       const struct geneve_config *cfg;
+>         int err;
+>
+> -       if (geneve->cfg.collect_md) {
+> +       rcu_read_lock();
+> +       cfg =3D rcu_dereference(geneve->cfg);
+> +       if (unlikely(!cfg)) {
+> +               err =3D -ENODEV;
+> +               goto tx_err;
+> +       }
+
+Do we need NULL check for geneve->cfg in the fast paths ?
+
+I think genve->cfg is cleared only in the error path of geneve_configure()
+due to NETDEV_REGISTER notifier.   Although dev is already published
+by list_netdevice(), it's not UP and socket is not yet created, so I guess =
+no
+one can reach the fast path when geneve->cfg is NULL.
+
+In that sense, the NULL check in the next patch makes sense.
+
+[...]
+> @@ -1962,10 +2040,13 @@ static int geneve_configure(struct net *net, stru=
+ct net_device *dev,
+>                 }
+>         }
+>
+> -       dst_cache_reset(&geneve->cfg.info.dst_cache);
+> -       memcpy(&geneve->cfg, cfg, sizeof(*cfg));
+> +       new_cfg =3D geneve_config_alloc(cfg);
+> +       if (IS_ERR(new_cfg))
+> +               return PTR_ERR(new_cfg);
+>
+> -       if (geneve->cfg.inner_proto_inherit) {
+> +       rcu_assign_pointer(geneve->cfg, new_cfg);
+> +
+> +       if (cfg->inner_proto_inherit) {
+>                 dev->header_ops =3D NULL;
+>                 dev->type =3D ARPHRD_NONE;
+>                 dev->hard_header_len =3D 0;
+> @@ -1975,10 +2056,15 @@ static int geneve_configure(struct net *net, stru=
+ct net_device *dev,
+>
+>         err =3D register_netdevice(dev);
+>         if (err)
+> -               return err;
+> +               goto err_free_cfg;
+>
+>         list_add(&geneve->next, &gn->geneve_list);
+>         return 0;
+> +
+> +err_free_cfg:
+> +       geneve_config_free(new_cfg);
+> +       RCU_INIT_POINTER(geneve->cfg, NULL);
+
+I think we need to clear geneve->cfg before geneve_config_free()
+in case call_rcu() run before RCU_INIT_POINTER().
 
