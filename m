@@ -1,164 +1,166 @@
-Return-Path: <netdev+bounces-304062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304063-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZKQNFr8wRmrCLQsAu9opvQ
-	(envelope-from <netdev+bounces-304062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:34:55 +0200
+	id QhOVF3QzRmqzLgsAu9opvQ
+	(envelope-from <netdev+bounces-304063-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:46:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8B86F54FB
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:34:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8276F5746
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:46:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=ECMJ5xct;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304062-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304062-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=uniontech.com header.s=onoh2408 header.b=UUmL5Dts;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304063-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304063-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=uniontech.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F9D53042C56
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:24:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1A273010C0D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F81E47B41F;
-	Thu,  2 Jul 2026 09:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D6F47AF71;
+	Thu,  2 Jul 2026 09:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6967D47A0A4
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0C542883D
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:28:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782984291; cv=none; b=Fo1iPkPzex3GwMurmMw6tIkAbSg61NJgqGiLI1PNJSrLZtw50HS3/u5wvSR2gVBt64jz2PKSVSRnruDdAJ3J1oFTLxZWNLVDnt7zDGg+zavSOMrqYFckeIg+S3VOfno5fq0CgHRx8VH77wiqwVHIuYosty9RyXuWQeODBuqiFkM=
+	t=1782984533; cv=none; b=ZBjts/PBqtlKNkP9y0feqPCb3yjH5iT1hZ5xgu5VIYYLsKgUnLTNeBVhAq7HM4i76AFU+n9PFP1QyoqIyTte83puqsiNjZNl3euq/D3B1UhZ7dZOE2HWaYsod45oEh4alEgQzcITjZ+o2c2o1AxeQ0sB2RRrZgP1qBzra5OEAvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782984291; c=relaxed/simple;
-	bh=IVVGqokkt2/CVu9PPDhXlEMtjnDR7rVoThOX533N0d4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I789UpvUG7SrXDnxII6piSQjsKWWqGCshwLEXfWYOhXdzWwL3Joc0JiLVt1xn2GOOfrscDlj7yqG9a2gV6k6Ai0iXmyvyS4PAgM/TbYagxWhwgBjrHbhMOMmXYeIqzQUIpe8ZaNj+mRe0NHLUyWeMbQuVC8o8s9Dj5O2Rzn0Akg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ECMJ5xct; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 0E40F4E40C2D;
-	Thu,  2 Jul 2026 09:24:48 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D57775FF03;
-	Thu,  2 Jul 2026 09:24:47 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 435BE104C960F;
-	Thu,  2 Jul 2026 11:24:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782984287; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=C8ZUCuEdh3L5hiMLxhe72EUm7msl9vPjzpCNBa4UiB4=;
-	b=ECMJ5xctawFPrREzuOI0pNWBVkqC6NQl1qV6ErqDxRadk74nuKAskbqEsPDOaUBzgbXC6e
-	0HAlht92Y8RZBGWcMkBRxZhjQPcJg80COUTTDlFQhyzwUo95PatKSfMDKJJaB/LkBNIhKH
-	TGe5+f4c9m4mkbGJmiuEwnA9hLpvCin0OJXRzzcLYue2OJfuH9DPHX8+hUTiqZf7o8dcXs
-	EvJGW4n0m/DDHaGE/iqdaB6MVzY43eAzFbhgOJmuRzs+lfclI3f4uDxdBDfb8WSN52AJq8
-	XnIfocAV0s5Mw51Tm6Quomn9yMr38tSp3KPW8HD0s0rGoCOCu6Yg6Zfd5agxvg==
-Message-ID: <1e4cedb5-fc16-4007-9a11-8c819f2c5731@bootlin.com>
-Date: Thu, 2 Jul 2026 11:24:41 +0200
+	s=arc-20240116; t=1782984533; c=relaxed/simple;
+	bh=y/Hn1/1rqtxyjVuIe/I9nsOAEPe2vsFy0dLKDjWLjqM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L6awrD9xe5E+ZZCiOmFLPyBtDd/q8qMcf0IY9C37m0sps9fyYBlbAxALM33CDGZAu5yU1Shqed8EDhgnf2ye7JpOeLU/UWxI9q8MvRTgKMCPvRG0SsebP2IaxaHYC1836wrf3UBsic+t2PKpB6+V3KC+3sgI5AtnWKUalRaRGLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=UUmL5Dts; arc=none smtp.client-ip=54.92.39.34
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1782984529;
+	bh=y/Hn1/1rqtxyjVuIe/I9nsOAEPe2vsFy0dLKDjWLjqM=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=UUmL5Dts4dPXIZTha3aWgz4DgURlm2gGNYccvKlGVMEwtN7pCNI51qUTv8QhBe2fX
+	 zUxgGV9TYv4hGbZ7eKlev56AV37zpqJCCChY5F21x0B32txPR2qQlVRo/+kE5NM6SN
+	 DxSCnVrv/mMJw4IJiemUAPx2Hw7oDuT4NB+t7j8g=
+X-QQ-mid: zesmtpsz9t1782984515tdd95c517
+X-QQ-Originating-IP: a5tZZhdSxrCaphevRi49vA3hQewzPsivH7xErfon5qg=
+Received: from localhost.localdomain ( [1.202.39.170])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 02 Jul 2026 17:28:22 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6819691085097765292
+EX-QQ-RecipientCnt: 12
+From: ZhaoJinming <zhaojinming@uniontech.com>
+To: pabeni@redhat.com
+Cc: andrew+netdev@lunn.ch,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	madalin.bucur@nxp.com,
+	netdev@vger.kernel.org,
+	sean.anderson@linux.dev,
+	zhaojinming@uniontech.com
+Subject: Re: [PATCH] net: fman: guard IRQ handlers against pre-init interrupt 
+Date: Thu,  2 Jul 2026 17:28:14 +0800
+Message-Id: <20260702092815.1206704-1-zhaojinming@uniontech.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <e1f8aec9-751b-4a51-ab09-ca3c37522e30@redhat.com>
+References: <e1f8aec9-751b-4a51-ab09-ca3c37522e30@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/stmmac: Set Rx queue page_pool to NULL when
- freeing DMA resources
-To: Jakub Raczynski <j.raczynski@samsung.com>, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- linux-kernel@vger.kernel.org, k.tegowski@samsung.com,
- k.domagalski@samsung.com, Yashwant Varur <yashwant.v@samsung.com>
-References: <CGME20260630101157eucas1p1b1cef0db9381391bdd9400f1d255ce49@eucas1p1.samsung.com>
- <20260630100953.747868-1-j.raczynski@samsung.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260630100953.747868-1-j.raczynski@samsung.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: OGh9fzPfJD5fnMe/sy3klgEbhZXCQNQSEZGKt+ZqCT6QxoNZjCw381q+
+	kvLh3l27iRwC29PMuYIAG0BKclo3ml7BpdXo6Vurb6WdyfY4XW+AGyJCYb7sXWHb5kjXa58
+	d3Y3yYHssm0VNm13g3bfg+YdmmYyBscvurdqvfWHSr28EHGwkWGYuXCzu6y0SDFeeHBPt3K
+	mLdnmQ3ykqyY1jg2QtqzxawEF16Kg9rHdpjqBoDWr/XeE3ORM78Bd9VE4JtzngPbt2plpLd
+	dJbM8onK8glR0wFJuglk1KRvCFR4N8wH6Ry0wvvDXoGTItyNLY9EVkZ4LATyoHsaoW4iu6j
+	AaV+CpdzMIMhfc57HPWzMzjkKaIqduhAagQPgKlwbwlRF7koLk6TfAaOZzs/mwPedfmjbzp
+	oGLl9IkIjWsl/bVXS9Ni7YaKLB9ilaVBoEhHxOsZSkYzLohMA7ZY/5Q4g1te+4Gti03qq4U
+	tAlN4mbbpBioG1CNtiVZoA4AaqYbxAyIozKA8megn68tTc5COFM42p6K6RANZXVV2tqLJay
+	Zo9cW1/Hqyh9JDdS8KxjEccdoB9CaKZM+oDHHf4t17ijjshXcA6ULQbe4F7GXmadBd7BULx
+	uWP8D188AISwy78ouvJyxPPNJ1Oqs2K1WEl4/H2f4tvtpzdC+BcDIna3U6YILPneHlm087H
+	LW4CzcYjcYPYR5yfbOd1sxNd77Y6LLlKyhNGEKLrqbUCUyD1GPNb2+O7UFk6ZaU3CGRuTtk
+	qmLqs5vr4lPTr//UDwRuzlyFXDylcoNoSIIDnJXpIBi85xPksjuOAmlQK8wKij+eakHJCa6
+	JUnrMjRiiumtEF4SHc9OUOuRNQ34NycdOMXNDQ4WgZUSLNCPdHS+Rope+rIOnjwf15BANaH
+	N94h5V6ASFLkPOnuT4y+ZMJTLeuLwXeR1noXAxskJ64jPnDuV5DRM6seNd9TTwz3/DoFvSg
+	4TDeLrl4UTBtMxepuogU0BK+/O96e/GssHbcOBZrdZkKJYs4sfbWdWsGKQiir5z693euhNC
+	Pjf5Vi2OSbWz02SQJg
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304062-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:j.raczynski@samsung.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:linux-kernel@vger.kernel.org,m:k.tegowski@samsung.com,m:k.domagalski@samsung.com,m:yashwant.v@samsung.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,samsung.com];
+	TAGGED_FROM(0.00)[bounces-304063-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:madalin.bucur@nxp.com,m:netdev@vger.kernel.org,m:sean.anderson@linux.dev,m:zhaojinming@uniontech.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[uniontech.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,samsung.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,uniontech.com:dkim,uniontech.com:mid,uniontech.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DC8B86F54FB
+X-Rspamd-Queue-Id: AF8276F5746
 
-Hi,
+Hi Paolo,
 
-On 6/30/26 12:09, Jakub Raczynski wrote:
-> When freeing RX descriptor resources, there is standard clearing of
-> descriptor page_pool via page_pool_destroy() which does destroy
-> page but does not set its pointer to NULL, which must be done by driver
-> calling this function.
-> It is not done in __free_dma_rx_desc_resources() when stopping interface,
-> which is generally not an issue, because __alloc_dma_rx_desc_resources() does
-> setup this regardless of previous state.
-> But above is true assuming reinitialization is successful.
-> 
-> In case of failure of page_pool_create() in __alloc_dma_rx_desc_resources(),
-> all non-NULL pages will be freed, including those already cleared.
-> So there is possible kernel panic due to wrong paging request at address.
-> 
-> Fix this by assigning NULL to page_pool pointer on free
-> 
-> Fixes: da5ec7f22a0f1 ("net: stmmac: refactor stmmac_init_rx_buffers for stmmac_reinit_rx_buffers")
-> Signed-off-by: Yashwant Varur <yashwant.v@samsung.com>
-> Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3591755ea30b..4b8f2814d3b5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -2172,8 +2172,10 @@ static void __free_dma_rx_desc_resources(struct stmmac_priv *priv,
->  		xdp_rxq_info_unreg(&rx_q->xdp_rxq);
->  
->  	kfree(rx_q->buf_pool);
-> -	if (rx_q->page_pool)
-> +	if (rx_q->page_pool) {
->  		page_pool_destroy(rx_q->page_pool);
-> +		rx_q->page_pool = NULL;
-> +	}
+Thanks for the review. You are right -- the irq_ready approach was
+fundamentally flawed, and moving IRQ registration after init is the
+correct fix.
 
-page_pool_destroy can be passed NULL, as you're fixing this I think you might as well
-drop the if(rx_q->page_pool) at the same time :) I agree with the change otherwise.
+I have updated the series to address your feedback:
 
-with that changed,
+Patch 1/2: Move devm_request_irq() out of read_dts_node() and into
+fman_probe(), after fman_config() and fman_init() have completed.
+This eliminates both the pre-init NULL dereference and the UAF on
+probe failure in a single change. A separate UAF fix patch is no
+longer needed.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Patch 2/2: Add proper error cleanup in fman_probe(). The existing
+driver had no unified cleanup path -- fman_init() and devm_request_irq()
+failure paths leaked fman and its sub-resources. This patch adds
+fman_free_resources() and fman_muram_finish() to release everything
+correctly, including explicitly freeing IRQs before kfree(fman) to
+avoid reintroducing the UAF window on the cleanup path itself.
 
-Maxime
+Patches are against net-next/master.
+
+v1 patch (irq_ready + READ_ONCE) is dropped. v3 UAF fix patch is
+superseded.
+
+Thanks,
+Jinming
+
 
 
