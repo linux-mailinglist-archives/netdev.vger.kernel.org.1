@@ -1,119 +1,135 @@
-Return-Path: <netdev+bounces-304204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304205-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id utNjJ5FzRmpdVQsAu9opvQ
-	(envelope-from <netdev+bounces-304204-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:20:01 +0200
+	id ClDhJzB3RmoxWQsAu9opvQ
+	(envelope-from <netdev+bounces-304205-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:35:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC046F8D05
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:19:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAB4C6F8E89
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:35:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linuxfoundation.org header.s=korg header.b=yaCzakvI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304204-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304204-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linuxfoundation.org;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=QTM3q55H;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=QTM3q55H;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304205-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304205-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 138943108DBF
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 14:14:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6353F300C5B9
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 14:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E024CA296;
-	Thu,  2 Jul 2026 14:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0124E3764;
+	Thu,  2 Jul 2026 14:31:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AED4CA264;
-	Thu,  2 Jul 2026 14:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264214B8DF8
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 14:31:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783001642; cv=none; b=sNyM3bc7n6souV9blghRJYUehvFjViU8k8vUEV1yTobTF8Or6lk5gK2qUnnxEcL3neiyq1w115HV12K+XxghB/b5OQtbpzDnCuCBT9V7e2CRXIcLw5ZsIZYOGiEb+lF4O1PiQx/YvlPqB3OyEt52UFWqnHSQnA+58FKZ5eJoQSk=
+	t=1783002715; cv=none; b=duR+K52gfCqJkMhcGtMTWksIqOnOak7yNHuk1S8fNKLCoK/HejjFVdEVbNm69yvAIQvrY5YcuZzp1pEm3blYHxggkya8bWEVXBbwdlqwajAFULhKS2fNP0r9wokvRmrNlarF2JutsHtN0TG6vVWTx4njGpZtNtIcfHwifuMuH3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783001642; c=relaxed/simple;
-	bh=R98QZzYpDR41aXFD47w3kHfUzVNIU5IUGG2s/zcV2As=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ovgUKMegcYSoxWNA+n+rewnIk0iKwEdlBohw4LWTVjSg5bIro99fV+ZPWr5xrGG6rEeyUqFZD3aNffyOH9TZ6MfcwGWI+qrC3gX2tiiwkykqxE6zDYO1H7AdipfovFVD85vJyeaoslFax0ZVSGXrqoYUVn8rcP/a7ouY77ozONs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yaCzakvI; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BCDB1F000E9;
-	Thu,  2 Jul 2026 14:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1783001632;
-	bh=22NrB53quUcL92USbBtWlF+xpexlIHtl2vYI1OOtmKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=yaCzakvI2ONHSQhFmcWi+I3WBUkfJSvEKMpe6DJ5uj8d45bflUf/FCSZVKjGlq6T9
-	 zHEc+fukuaOhNBr6ZSk/G0hvYQuZQ19gOpx1j8sSuI8OsVy0sBsQ88zOjp2CnNUvDt
-	 44CAMBARDqaXB82rV1ZP1CjWaI7fmif+nnrtZeQA=
-Date: Thu, 2 Jul 2026 16:14:03 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Maximilian Heyne <mheyne@amazon.de>
-Cc: stable@vger.kernel.org, Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Eric W. Biederman" <ebiederm@aristanetworks.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	s=arc-20240116; t=1783002715; c=relaxed/simple;
+	bh=kQvdG1ro/qW7OGfA890KSZ36F9gY+uy5npmcKOKCAPo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=q0GCLi+wISCcG9I4UHIq4tx2OtVNu5l5x/xi/0NIxT+rNZckmwDb45b5y+DC+LGH3yENXqiHeUk6UEC4EpLfKTZCjd8IrUgYEJ7GDoFxFMGgOFDmBg4bpxlv8e4Vu7Ymt34w19cRrxM5tOYl/9CINMDvhPmMgjmm5T7yMfEkJIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=QTM3q55H; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=QTM3q55H; arc=none smtp.client-ip=195.135.223.131
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 05D9E75DEB;
+	Thu,  2 Jul 2026 14:31:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1783002708; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=kQvdG1ro/qW7OGfA890KSZ36F9gY+uy5npmcKOKCAPo=;
+	b=QTM3q55HZ89qkyX3br16ATmPNJGJjWwhjA+GyD8JsCu/6Xu/RzGXNmD6YEk44uuOW+P/Zv
+	kip1yAg77OpqXduqARlrEg5I8WX2Vw8vVz+NNL2iBc6482SrbvWfrYIJg3IpKRp1y2o4x7
+	MojqtadMoDjSJTNWAcVOK+ivrrkaEdQ=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1783002708; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=kQvdG1ro/qW7OGfA890KSZ36F9gY+uy5npmcKOKCAPo=;
+	b=QTM3q55HZ89qkyX3br16ATmPNJGJjWwhjA+GyD8JsCu/6Xu/RzGXNmD6YEk44uuOW+P/Zv
+	kip1yAg77OpqXduqARlrEg5I8WX2Vw8vVz+NNL2iBc6482SrbvWfrYIJg3IpKRp1y2o4x7
+	MojqtadMoDjSJTNWAcVOK+ivrrkaEdQ=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BA2F0779AA;
+	Thu,  2 Jul 2026 14:31:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 4RVfLFN2Rmr0MwAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Thu, 02 Jul 2026 14:31:47 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shaoxul@foxmail.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6.6.y] net: add missing ns_capable check for peer netns
-Message-ID: <2026070244-trustable-cresting-2d80@gregkh>
-References: <20260617-sprain-dye-86c242ac@mheyne-amazon>
+Subject: [PATCH net-next 0/4] net: usb: move exported code to usbnet
+Date: Thu,  2 Jul 2026 16:25:29 +0200
+Message-ID: <20260702143142.890654-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260617-sprain-dye-86c242ac@mheyne-amazon>
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -1.30
+X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mheyne@amazon.de,m:stable@vger.kernel.org,m:wg@grandegger.com,m:mkl@pengutronix.de,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ebiederm@aristanetworks.com,m:linux-can@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304204-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304205-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shaoxul@foxmail.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linuxfoundation.org:dkim,linuxfoundation.org:from_mime,gregkh:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,suse.com:dkim,suse.com:mid,suse.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5FC046F8D05
+X-Rspamd-Queue-Id: EAB4C6F8E89
 
-On Wed, Jun 17, 2026 at 08:26:39AM +0000, Maximilian Heyne wrote:
-> The upstream commit 7b735ef81286 ("rtnetlink: add missing
-> netlink_ns_capable() check for peer netns") doesn't apply on older
-> stable kernels due to refactoring. Therefore, this patch is an attempt
-> to implement the same capability check just directly in the respective
-> interface types.
+Some drivers are reusing common code originating in other drivers.
+This means that two drivers need to be loaded for one device.
+Also maintainability is reduced if changes in one driver affect
+another driver.
+Shift common code to usbnet.
 
-Why not just take the upstream commits instead?  That's simpler over
-time than a one-off patch.
-
-thanks,
-
-greg k-h
 
