@@ -1,309 +1,135 @@
-Return-Path: <netdev+bounces-304021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304032-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ID4VA+QZRmocKAsAu9opvQ
-	(envelope-from <netdev+bounces-304021-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:57:24 +0200
+	id FPXwHWMjRmpeKgsAu9opvQ
+	(envelope-from <netdev+bounces-304032-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 10:37:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6806F47E5
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:57:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A08DB6F4DDC
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 10:37:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=OM+roVe9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304021-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304021-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=gqP9UK8s;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304032-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304032-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2F87C300C7EF
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:51:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1794F303ACFB
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 08:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176833CAA57;
-	Thu,  2 Jul 2026 07:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B424935E93E;
+	Thu,  2 Jul 2026 08:27:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m3292.qiye.163.com (mail-m3292.qiye.163.com [220.197.32.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C883C7E0B
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D52390995
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 08:27:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782978657; cv=none; b=hMn/DxTXaNLNSOTr1i34mEyQ4ZD6w6NvTvxlUkTD5NUnfdRK+4MmDXNK0T4XJKJh/BwGeZsl5HTrjJ7TPudvXCyRKhIfdTimhFy++BY42BjvWv9rfcjxZM5u+ydjj7vAS4yBrI7FEQ7qcB+kn8sn6BQLHz5SasyDq64eCdVa1Gs=
+	t=1782980841; cv=none; b=WBYA9ps5tnvJprTqfvGJCueAUjwofGUjUm8NJDfgNDiNiLC5eTcfWkZIH+nBG/sumNH4R1JOkrQ1v/Q65amaxb/drVTLrYi0ygPl1fMVRljdYzFdlYEuZCra+V255yGma6t/zMSEB5AItUqo1Je57u+HqIrxvNiTEqidTbafiyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782978657; c=relaxed/simple;
-	bh=LPKKzLAxEoXPH5mOcbq24gwcNHHJ3iPYqHxz0xV9nWU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=br98kAtTFzLt/N5GZ/IcSW3sstZVeWlnBFAiKcC4AEIpBG2WDza0lhXXn4OCJZWoPwQmtdHX3gk6FEiKNN4lAMqyZ/g+27L0g7lMedSlFszvTXHrqPnr7p4hH+9vDCYfv0KqREE0JhSrvgebPsr6ti/7KbruqDo4/kSwbfjssXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OM+roVe9; arc=none smtp.client-ip=209.85.128.172
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-8143d904b01so8659327b3.3
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 00:50:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782978652; x=1783583452; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LnSLH8TarCnofbwejfF0AMt0gJL72Ru2Rk6q84rX6ps=;
-        b=OM+roVe9de9Mg6L10BfPWL+CzGN7eq4VB9nTmOa6iQ8AWJ/CRYMMQBFonxZP3G8404
-         OrLy7OcYGosH/tcmdQ7NyztsayQP4YOp3WO+trqZ4MzPn65MdrYkzmNOEnXtb4wVYy7Y
-         KQ1DZ2xscXpEF2syhr+Z60AL3FVvpTFqjIAYrsqdLmEgGaWbY3lnOPBaVI6s2DJAQoEm
-         YU709uJk7a6ySXpmoeweMPbYpd1FbrRK8GE984TuqOcczJ3J3QIWSDAxEos9mnYkw0jo
-         MxY7yHa9RwIPDi3Ayp7MKtY+IrJhWRXl+sfipSWp3xZ5ZK2KbZt7xc98YjGQpNlCI37T
-         kBWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782978652; x=1783583452;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LnSLH8TarCnofbwejfF0AMt0gJL72Ru2Rk6q84rX6ps=;
-        b=RI991u7PYHdHKXLbWDdwVfSh922SBPmRH9fmshx9LHISXODmCB1BGjUE6TLLMpcGOK
-         Kximy6ZKJ+goSraag+LMc2R5R+Ev8Dhv1kRwnwpvk7M/D++p1eSCQJBm2jfshRsMu3Y/
-         Vvh9yNlLevg8vQINcxezGmXUp2RCO4pfSmbsg0p0rYn3K2GX+a5TGHdf11mVTSK8av+C
-         QFHiFsEK0WzdEWe3VYhcDJ+xal54fihjJIg2HG872P/MUvHg+4tBo8rnXhytKADVgXO8
-         BBGbE4vSk7z8AOB8pKm2FBGq5iwfh8x8GUxyqvRBA7mD3wv70UUSTg7VydxsUyOYee7q
-         PYgg==
-X-Gm-Message-State: AOJu0YzV8dugw/i1mGcDRb2QlT0WK5Khuk20JpAM4n7sOgx7GC8jU30G
-	OoCzgf365EfRtICeuXaTs7UQVPnhaqnM9TbDAcWZHMGvswwMHLiyzmxYVbdMqu4KuP8JtQ==
-X-Gm-Gg: AfdE7clK3WkDshDGjnAGA8ZHhCK2/x74CFb+sfO3PBI7/KALS2G72rTSV7BKAoa1rP2
-	GNbLEXiQQi6c12x5WOUhEZ/JZco976U/41HUKVsWPlC1Zul3DINpXSF7bb/c4urm6FkLz5sbdEm
-	+1UEzs5bd1K/1cJqYUMd6qdQJRD4PA31+jUzGY0EpyiRjiklZaKBk9YXnfBAJ/QRtQcQoiifERt
-	YZrq1/tMx5gnpQIps3k1oFPm9kBxOl9AIxHbxI53rcGGh4KSaYeXwQ5QwkUfVAWOMTiFuoHmqH6
-	l7tTLstxsEZchkprd7wzL0k32U1n0pBqEzu+mV8Y6I/nurkaUgfAw6eKdtVAvOrXTckPU5D3FpD
-	f86sK5xyy7iIbk6BVi743zWByTGE1Vf12aJJsiHBBGIG60of0rhK6y5bD7Qe4LcBEpiFQPAJmTJ
-	v5einA
-X-Received: by 2002:a05:690c:6201:b0:80c:aff6:9d47 with SMTP id 00721157ae682-812e8dfa5e7mr54752167b3.4.1782978652164;
-        Thu, 02 Jul 2026 00:50:52 -0700 (PDT)
-Received: from houminxi ([23.133.88.228])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8144b049939sm9451747b3.32.2026.07.02.00.50.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 00:50:51 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Minxi Hou <houminxi@gmail.com>,
-	aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v4] selftests/net/openvswitch: add ICMPv6 echo type match test
-Date: Thu,  2 Jul 2026 03:50:44 -0400
-Message-ID: <20260702075044.1176798-1-houminxi@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1782980841; c=relaxed/simple;
+	bh=bPYyaPMVGXJ6fi2007K/Cro/FnneDqwZ1yi13CzKCrw=;
+	h=Content-Type:Message-ID:To:Cc:Subject:References:MIME-Version:
+	 From:Date; b=VEJGpKh+BXad2VBL1WX4umOlXvG+dItmW0L1DEF0wmhmK2wAAm4AeKZXpPh1R3lItOSP/x0ia1jvi1GRxM0AIHaW5LmWCpwLuAzJwB2muEC9rROXzVT3qObD99ndoU1bbIF9mU/IBPtgNrCfs0LqixIPMJ2D7qPIlc0lhcUH+SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=gqP9UK8s; arc=none smtp.client-ip=220.197.32.92
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Message-ID: <AIIAMAAiKrVMQaBAPYx42arb.3.1782978704726.Hmail.220255722@seu.edu.cn>
+To: Sidraya Jayagond  <sidraya@linux.ibm.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, 
+	Wenjia Zhang <wenjia@linux.ibm.com>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, 
+	Mahanta Jambigi <mjambigi@linux.ibm.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
+	Simon Horman <horms@kernel.org>, 
+	Karsten Graul <kgraul@linux.ibm.com>, 
+	linux-rdma <linux-rdma@vger.kernel.org>, 
+	linux-s390 <linux-s390@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	"jianhao.xu" <jianhao.xu@seu.edu.cn>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXRdIG5ldC9zbWM6IGF2b2lkIHJlY3Vyc2l2ZSBza19jYWxsYmFja19sb2NrIGluIGxpc3RlbiBkYXRhX3JlYWR5?=
+X-Priority: 3
+X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com Sirius_WEB_WIN_1.64.1
+References: <20260617152855.1039151-1-runyu.xiao@seu.edu.cn> <17c1cbac-de30-4372-8c24-2acd755f503e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from 220255722@seu.edu.cn( [223.112.146.162] ) by ajax-webmail ( [127.0.0.1] ) ; Thu, 2 Jul 2026 15:51:44 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Date: Thu, 2 Jul 2026 15:51:44 +0800 (GMT+08:00)
+X-HM-Tid: 0a9f21cf9b6e02f2kunmd5c2bf791f8cd
+X-HM-MType: 1
+X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMTUS6Y2fHkyPT6dc03QDwVaZPGiA09TnwhbhTj
+	hLfuFZO94YXwX6xgvkjGVFFRKj5ODenkkczLo6qxkp6YADE5oPA+xgWdLLpCC0H84TwWSeGl6Gxd
+	wNb5mLKCAhELViFYBc6UsltRrkd4duOKE4a1o=
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCTB5LVh0aSUofSkkeSkIaTlYVFA
+	kWGhdVEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVU
+	pLSEpOT0xVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=gqP9UK8sz6mSaQSXwWUvX5IW1dCvOoLuzHheLSdx278rR0VZCmzeKQ+tZi/RiuVNKIzYmjvsiiKh3E2yVV1wA+FSjJRGHDbuUfYllhYz2Q+GWTO0qCqt/NhfA/mCQxFWWVdm+uvaLslyTHTIUaWGAPHcSoatnnArMxAxOhY6g+s=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=bPYyaPMVGXJ6fi2007K/Cro/FnneDqwZ1yi13CzKCrw=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.44 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-304021-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:houminxi@gmail.com,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:sidraya@linux.ibm.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_ALL(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304032-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	HAS_X_PRIO_THREE(0.00)[3];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,seu.edu.cn:dkim,seu.edu.cn:mid,seu.edu.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DE6806F47E5
+X-Rspamd-Queue-Id: A08DB6F4DDC
 
-Register OVS_KEY_ATTR_ICMPV6 in the flow key parser so that
-icmpv6(type=...) can be used in flow specifications. Without this
-registration the parser silently drops the token and the kernel
-rejects the flow with EINVAL because the expected ICMPv6 key
-attribute is missing.
-
-While here, add convert_int() to the ovs_key_ipv6 and ovs_key_icmp
-fields_map entries so that specifying a field value produces the
-correct wildcard mask. The IPv6 flow label uses convert_int(20) to
-produce a 20-bit mask (0x000FFFFF), matching the kernel constraint in
-flow_netlink.c that rejects masks with bits 20-31 set; byte-wide
-fields use convert_int(8). The ipv4 counterpart already does this via
-convert_int(); the ipv6 and icmp classes were simply missing the fifth
-tuple element. Existing callers that pass empty parentheses are
-unaffected because convert_int("") returns (0, 0).
-
-Add test_icmpv6 exercising the ICMPv6 echo flow key. The test uses
-static neighbour entries with nud permanent to prevent racy NDP, then
-verifies in three steps: install icmpv6(type=128) and
-icmpv6(type=129) flows and confirm ping works, remove the flows and
-confirm ping fails, reinstall and confirm recovery.
-
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 70 +++++++++++++++++++
- .../selftests/net/openvswitch/ovs-dpctl.py    | 26 +++++--
- 2 files changed, 89 insertions(+), 7 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 2954245129a2..f88cefa71559 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -32,6 +32,7 @@ tests="
- 	dec_ttl					ttl: dec_ttl decrements IP TTL
- 	flow_set				flow-set: Flow modify
- 	action_set				set: SET action rewrites fields
-+	icmpv6					icmpv6: ICMPv6 echo type match
- 	psample					psample: Sampling packets with psample"
- 
- info() {
-@@ -443,6 +444,75 @@ test_action_set() {
- 	return 0
- }
- 
-+# icmpv6 test
-+# - static neighbours to bypass NDP (nud permanent)
-+# - icmpv6(type=128) echo request, icmpv6(type=129) echo reply
-+# - remove flows and verify ping fails, reinstall and recover
-+test_icmpv6() {
-+	local t="test_icmpv6"
-+	local v6="eth_type(0x86dd),ipv6(proto=58)"
-+
-+	sbx_add "$t" || return $?
-+	ovs_add_dp "$t" icmpv6 || return 1
-+
-+	info "create namespaces"
-+	for ns in client server; do
-+		ovs_add_netns_and_veths "$t" "icmpv6" \
-+		    "$ns" "${ns:0:1}0" "${ns:0:1}1" || return 1
-+	done
-+
-+	ip netns exec client ip addr add fd00::1/64 dev c1 nodad
-+	ip netns exec client ip link set c1 up
-+	ip netns exec server ip addr add fd00::2/64 dev s1 nodad
-+	ip netns exec server ip link set s1 up
-+
-+	local cl_mac sl_mac
-+	cl_mac=$(ip netns exec client ip link show c1 \
-+	    | awk '/link\/ether/ {print $2}')
-+	[ -z "$cl_mac" ] && \
-+	    { info "failed to get c1 hwaddr"; return 1; }
-+	sl_mac=$(ip netns exec server ip link show s1 \
-+	    | awk '/link\/ether/ {print $2}')
-+	[ -z "$sl_mac" ] && \
-+	    { info "failed to get s1 hwaddr"; return 1; }
-+	ip netns exec client ip -6 neigh add fd00::2 \
-+	    lladdr "$sl_mac" nud permanent dev c1 || return 1
-+	ip netns exec server ip -6 neigh add fd00::1 \
-+	    lladdr "$cl_mac" nud permanent dev s1 || return 1
-+
-+	ovs_add_flow "$t" icmpv6 \
-+	    "in_port(1),eth(),$v6,icmpv6(type=128)" \
-+	    '2' || return 1
-+	ovs_add_flow "$t" icmpv6 \
-+	    "in_port(2),eth(),$v6,icmpv6(type=129)" \
-+	    '1' || return 1
-+
-+	info "verify ICMPv6 echo with type-specific flows"
-+	ovs_sbx "$t" ip netns exec client \
-+	    ping -6 -c 1 -W 2 fd00::2 || return 1
-+
-+	ovs_del_flows "$t" icmpv6
-+
-+	info "verify ping fails without echo flows"
-+	ovs_sbx "$t" ip netns exec client \
-+	    ping -6 -c 1 -W 2 fd00::2 >/dev/null 2>&1 \
-+	    && { info "ping should fail without flows"
-+	         return 1; }
-+
-+	ovs_add_flow "$t" icmpv6 \
-+	    "in_port(1),eth(),$v6,icmpv6(type=128)" \
-+	    '2' || return 1
-+	ovs_add_flow "$t" icmpv6 \
-+	    "in_port(2),eth(),$v6,icmpv6(type=129)" \
-+	    '1' || return 1
-+
-+	info "verify connectivity restored"
-+	ovs_sbx "$t" ip netns exec client \
-+	    ping -6 -c 1 -W 2 fd00::2 || return 1
-+
-+	return 0
-+}
-+
- # psample test
- # - use psample to observe packets
- test_psample() {
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index e1ecfad2c03e..f3edd198223f 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -1255,11 +1255,16 @@ class ovskey(nla):
-                 lambda x: ipaddress.IPv6Address(x).packed if x else 0,
-                 convert_ipv6,
-             ),
--            ("label", "label", "%d", lambda x: int(x) if x else 0),
--            ("proto", "proto", "%d", lambda x: int(x) if x else 0),
--            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0),
--            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0),
--            ("frag", "frag", "%d", lambda x: int(x) if x else 0),
-+            ("label", "label", "%d", lambda x: int(x) if x else 0,
-+                convert_int(20)),
-+            ("proto", "proto", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("frag", "frag", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-         )
- 
-         def __init__(
-@@ -1344,8 +1349,10 @@ class ovskey(nla):
-         )
- 
-         fields_map = (
--            ("type", "type", "%d", lambda x: int(x) if x else 0),
--            ("code", "code", "%d", lambda x: int(x) if x else 0),
-+            ("type", "type", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("code", "code", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-         )
- 
-         def __init__(
-@@ -1982,6 +1989,11 @@ class ovskey(nla):
-                 "icmp",
-                 ovskey.ovs_key_icmp,
-             ),
-+            (
-+                "OVS_KEY_ATTR_ICMPV6",
-+                "icmpv6",
-+                ovskey.ovs_key_icmpv6,
-+            ),
-             (
-                 "OVS_KEY_ATTR_TCP_FLAGS",
-                 "tcp_flags",
--- 
-2.54.0
-
+SGkgU2lkcmF5YSwKCk9uIFRodSwgSnVuIDI1LCAyMDI2IGF0IDAyOjAyOjI1UE0gKzA1MzAsIFNp
+ZHJheWEgSmF5YWdvbmQgd3JvdGU6CiZndDsgSW4gc21jX2Nsb3NlX2FjdGl2ZSgpLCB0aGUgVENQ
+IHNvY2tldCByZW1haW5zIGluIFRDUF9MSVNURU4gc3RhdGUgd2hpbGUKJmd0OyBob2xkaW5nIHdy
+aXRlX2xvY2tfYmgoJmFtcDtzbWMtJmd0O2NsY3NvY2stJmd0O3NrLSZndDtza19jYWxsYmFja19s
+b2NrKTsuIFRoZSBwYXRjaCdzCiZndDsgc3RhdGUgY2hlY2sgd291bGQgcGFzcyBkdXJpbmcgdGhp
+cyB3aW5kb3csIG5vdCBwcmV2ZW50aW5nIHRoZSByZWN1cnNpdmUKJmd0OyBsb2NrIHNjZW5hcmlv
+LgomZ3Q7IEl0J3MgdW5jbGVhciB3aGV0aGVyIGl0IGZ1bGx5IHByZXZlbnRzIHRoZSByZWN1cnNp
+dmUgbG9ja2luZyBzY2VuYXJpbwomZ3Q7IGRlc2NyaWJlZCBpbiB0aGUgY29tbWl0IG1lc3NhZ2Ug
+Zm9yIHRoZSBzcGVjaWZpYyBjb2RlIHBhdGggaW4KJmd0OyBzbWNfY2xvc2VfYWN0aXZlKCkuCiZn
+dDsgQ291bGQgeW91IGNvbWUgdXAgd2l0aCBleGFjdCBkZWFkbG9jayBzY2VuYXJpbyBhbmQgaG93
+IHRoZSBwYXRjaAomZ3Q7IGFkZHJlc3NlcyBpdD8KCllvdSBhcmUgcmlnaHQuIEkgZG8gbm90IGhh
+dmUgYSBjb25maXJtZWQgY3VycmVudCBtYWlubGluZSBjYWxsIGNoYWluIHdoZXJlCnRoZSBjYWxs
+YmFjayBpcyBpbnZva2VkIHVuZGVyIHNrX2NhbGxiYWNrX2xvY2ssIGFuZCB0aGUgVENQX0xJU1RF
+TiBjaGVjawpkb2VzIG5vdCBjb3ZlciB0aGUgc21jX2Nsb3NlX2FjdGl2ZSgpIHdpbmRvdyB5b3Ug
+cG9pbnRlZCBvdXQuCgpJIHdpbGwgZHJvcCB0aGlzIHBhdGNoIGZvciBub3cuIFRoYW5rcyBmb3Ig
+cmV2aWV3aW5nIGl0LgoKUnVueXU=
 
