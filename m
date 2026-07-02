@@ -1,180 +1,197 @@
-Return-Path: <netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vHlGIBLmRmocfQsAu9opvQ
-	(envelope-from <netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:28:34 +0200
+	id EazSGIfnRmpffQsAu9opvQ
+	(envelope-from <netdev+bounces-304281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:34:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA2636FD316
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:28:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3AF6FD3A9
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:34:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b="FX/+iBZN";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=meta.com;
+	dkim=pass header.d=queasysnail.net header.s=fm3 header.b="s MlWBhJ";
+	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=Aeb2Tr4W;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304281-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304281-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 82D0430416AF
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:28:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 017C3303EC1F
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4B73BE636;
-	Thu,  2 Jul 2026 22:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19293AB466;
+	Thu,  2 Jul 2026 22:31:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB608364926
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 22:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5443C196B
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 22:30:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783031303; cv=none; b=tlp346QA7/OZlcLDMIXlV46jrEdAA5sr1uFFcRZ2ln4Mdd/bb/e00ckcI7BpWSgpnXi9e4yOJIUMb5W7fpAoUjfPRIJB5nlJ+R8GDRYgmDeRwnMcNT8TdghIcP4OXKc5lD2GXKXgm2qVNFuNpqOrv4QAUnXAkBMs4dbqPTY1wRw=
+	t=1783031466; cv=none; b=akUMtfGYxhWAy6yWZXyyhKeTovhZ6AMzm9kGNEFRxbQUaIXBhky39vHYO6hP85GrblpvqQHHXmKTxOsVx42sqiaBAolYHc3baNpzHRTQwkurJF1v36BzX3cr0NLWqOEZXK3d7TV6jgW44d6Eurc/StB3SQ8VjKC5VtuDm68kr4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783031303; c=relaxed/simple;
-	bh=NhPOBFymM4iytlpbMVnpsIX4tj32JcuO5EuJy37qJ20=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uwtJDptccUDCf2IGFC14eu55/8gsk+1ICXlTYJAq6JVyYgb0PrL1vZVoFJkU6njWn9z1tTxynV2Adlmizb2Ar+sDdt1hz9u0eujtSpBoSPflbBInhAK2DdLvOqljIPppyRMHVGMt7HKvnnkuk7BjYuK9xzTj42NfgHC7oBrAq/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=FX/+iBZN; arc=none smtp.client-ip=67.231.153.30
-Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 662IrZ9p3942411
-	for <netdev@vger.kernel.org>; Thu, 2 Jul 2026 15:28:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=AiFEfhNTIOViBQyl8B
-	wIWC6v3Ib53cvu8YduqIAlzko=; b=FX/+iBZNK+r6qx7+qRW3bQa6AcfQ0ATQ2+
-	uOfqtMejWKeI2jeyzLerMoEsU/8wWbSSpfj6NGQatlEYVopopUbTbXhO0XGIAHRV
-	2hNfRKhnwojDceMCKow8v9WW/sbHy1jH7mUR2O91pDYNmvsADPEuMROfKcEdLFHP
-	4WMEejfkNKR++JJ6e3ugQsRgo0452K6W1WslcqwheHcDSXHCi6CY7qnNg4zHYokt
-	kMY5BQQ9xPIv0Choba8IzVHBDrC/GJIHrSB1mDaXpq7dE1ZSXlP9PJgQUyk0kqGm
-	RkujvzQJtLgcbNmHIpDw2Vqqerr7qTt1afIklNEsxf/dpv3phVEw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4f5c0srq43-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 15:28:20 -0700 (PDT)
-Received: from twshared6916.34.frc3.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Thu, 2 Jul 2026 22:28:18 +0000
-Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
-	id B6F3B40F35B7D; Thu,  2 Jul 2026 15:25:09 -0700 (PDT)
-From: Zhiping Zhang <zhipingz@meta.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Saeed
- Mahameed Michael <saeedm@nvidia.com>,
-        Tariq Toukan <tariqt@nvidia.com>, Mark
- Bloch <mbloch@nvidia.com>
-CC: Michael Guralnik <michaelgur@nvidia.com>, <netdev@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Zhiping Zhang
-	<zhipingz@meta.com>, <stable@vger.kernel.org>
-Subject: [PATCH net v2] net/mlx5: free mlx5_st_idx_data on final dealloc
-Date: Thu, 2 Jul 2026 15:24:58 -0700
-Message-ID: <20260702222507.1234467-1-zhipingz@meta.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1783031466; c=relaxed/simple;
+	bh=zjJRlyMPqYkkzf2sX+4CDQKaI/eahG3+8u3eAkAj3Nc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KObFPHFAolBN5y4I+3JdB9ogq8cJXdXvvTP1pOIr0iZPWi3empChjMb1/P/MCdx+/9QSMs9xpeKkA8Aag0xomQ5szzScIo6Dxi+GWJ31zkaGDlSvv6KyGrMmeV/kl0Ph9MeN26Ls7WjWWPwYWeVayyuUQwRW+AXqWCtmxJsUkrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=sMlWBhJg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Aeb2Tr4W; arc=none smtp.client-ip=202.12.124.157
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id E0ED87A011E;
+	Thu,  2 Jul 2026 18:30:50 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Thu, 02 Jul 2026 18:30:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1783031450; x=
+	1783117850; bh=4HPa8Lg3Uy1GV1K58y9Bs1t4DixOxuUTq7dc1oDREPo=; b=s
+	MlWBhJg7JNbjpm9pcIL3mqULj+snhA3lZjjvmOoSTEMVJmwGboHFCXR0DtSbRT+K
+	SmKRuNHJZH7sQqut9EAlnS4zS8xjkLdHZKuyPzyPYNsXDsH8k2Wy7pJDR0fswjfV
+	So34pAaRKND8HybHATllwAXY4Xr+Q6L5xCT1cext4SMwIGuqKlSx8AbzfjGMrjv5
+	gVPMVF4zzfksyU3+P5Fmo/QPXjfmcm7M00GlF6UZ+XBBmziw2YtaWyLJtz5VI3wI
+	oOclgP17ChcIBrt91TNjUQQ+ebuv7zA2jFKfiuxtfRpi0lrJM+SgCA05ie1lygbS
+	Sv8WFtJNuHdpoHHblM2mQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1783031450; x=1783117850; bh=4HPa8Lg3Uy1GV1K58y9Bs1t4DixOxuUTq7d
+	c1oDREPo=; b=Aeb2Tr4WvMyGRIUR1FXj2M88+JIiMAYZrw08ueJ19/lExqGW1o8
+	afnolF/BJhnCfR2rwlE+1KUHvuEPR27OFlT+svtpFiael//cBA7Fu2qskD6/bAGr
+	sfO0vYYXZ5x+TaOhkzg3qbbUwMe9He2Bzt0q1B4IPJrOG1BB3deGp6wNsf+bF0WI
+	IHjnrBev4GrOGWB+Fw91t6dE9+jbd02xEqjm6dvMZmVffrnkIht89Tk2VqviwALq
+	8c68vPgTUhCt9CyGjxNGN28aHXY7nGKAwuKjj7dkXlNMDEF/d2n8EF5EvyAEp6rB
+	JSXnrLsX4XV/8X17e3Jov9KRzDMKsKSgKog==
+X-ME-Sender: <xms:muZGaqNW6_y3TWL_fWpdGFnLI7xlCQ5s0gZWbijMoBO41b4T0L9OeA>
+    <xme:muZGarg1AovWletUzyTW2ShqslJmyG4X_UUA7c3703rOaUGMR-OmQCF-JqyJYjY_D
+    eRdb-V0VCZvgf1qERmgllLVrdSRFyLP3qtIoNX5kSgQR6QGqomdD3w->
+X-ME-Received: <xmr:muZGak4E8sjaEhn2Fe1Y0gbX78h7mRQug81yqmuz9RR7kBJ0tRFrLBreCZE>
+X-ME-Proxy-Cause: dmFkZTGxib75otGYDAE+7LTjVTMUvh7YtIOlwdsQbM96+W5ha/uoGsbJG5P05AOUHE9RBu
+    L8IQG6YR96aZvWsk5aVetl/sVLlt3HdDJnqaP/T5p42DPWJcPXx9iltbuifU+9tloLYca8
+    XDnx978dSkVq5Mm83bLTf3+BEtuCqzNYCJOzOQfgfN9HCv/u1gpIDx68eZJWD33ojCy69y
+    cgojgCTWB3N97ynajkxOo41fvPi6DpTdEBiCQ+FTjxCN7wPIJdyqsDwRs313/aNZ8lInLr
+    j3MxzWEqLTg9NVr13ZQti68QG75MoCQS8aHWvN7DPwMvfEloe2pLneBrTPrOR8ONNr2nF3
+    z0CSmLWf409s1YPsw/43Z+KtlpusasLB7P68wFcUQ3Oklsvj21Y9LTwgzN0OvgK5U1ArH+
+    /wP/g6ka8AgQ1OvVYu2/0q8EmZjS0VS7S2T+QIDhh5xvX1QqAdsUmbBJQn0UAhVO3kRJEI
+    ChEmAIm8n2huLyNn1SmejBdGSRhEG+WEq3xUoZuB3WJueJvqu/ggl+2MMEnW9KKfwss5gh
+    ySADr4gDGtS64pksVLt7uT1bDIUuQc4Goo8fqBRYQAUR1yz9q+BNp9w5su04sSeO3tXr+e
+    JWBiD1xcVSxbKi4AFhBre1NCS/d16wf2QGhSjzG9cCvge5ez5dTUAAlXVEWA
+X-ME-Proxy: <xmx:muZGaq2eXqjnUOENOUJvK5Mxc878yxWHN2USIPSMIdvPtWhdewanBQ>
+    <xmx:muZGanst1YG-XZpQuMFxulq2Emr1-g36B0_tTj85EeKTCMVL9yBGdg>
+    <xmx:muZGao6VpndAgZunrOu-utkHaPCYfODVMc-_URg3t0xpNtR6oxdxjg>
+    <xmx:muZGarc9Omh3efYX2gzFLHiDPhzXDJBOPyddjAiKUoEGhjbVw88tzw>
+    <xmx:muZGavehnMJ5TON_Yd_naVjQLd53hskGS5Z7rftJ_DbPkH6x7t_txQTO>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 2 Jul 2026 18:30:49 -0400 (EDT)
+Date: Fri, 3 Jul 2026 00:30:47 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>
+Subject: Re: [PATCH net-next] macsec: no longer rely on RTNL in
+ macsec_fill_info()
+Message-ID: <akbml3DkpQJuVYZd@krikkit>
+References: <20260701094341.3218199-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDIzNCBTYWx0ZWRfX2rFJID6GbxqE
- mKUYiG0PHatEyzbqfqPWxdTPDXpaxDvZ+pZuZ+SaxiDcTB+CkGLRo01Lg5Ko+1huhnQbNKMHdGd
- yCGICI5ZNt+wc2wyDCi1F7ODMtzJ12NALEOOv4IKggi0JYQ4shwKpx9vQXWzlqQHEET1G4ZBJ32
- RU8XoPjh8qAOFMrHX6Ovy1tx3fVvGwVID7g34foz7/wgZvpij1Y6CEtLmLJozP6iIyRQAgiUphV
- RpgX8Zx8CvwWLGGlBtARvNvKFVp5rciZR9OcIhQ+RiAcvMdPvwdyf4ca0nVH1J9UVbhTwlQnP4l
- o3gBnx+1esTWXvPyhRBnuYxXbE0RgQqZfVJaiSs18poGmsvxUs3nLkeOOnmRtteC4b29x6G2RR6
- E46Aa04ISPymjCb2muKlrpMi0iSgMH1I1sYmCLhE/VW/GgsZb1Cv/FyyPutJU3HQA6QAGf5B6TX
- 1E9LXtNnIjE4r9R8aOw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDIzNCBTYWx0ZWRfX0fbrVa938Cb9
- l4p0lBo/CyokPZhfdTXHCVy6NckaCKi3t93Msn0Q3if8YT07xPiKg9+PUeTQztA3qtU0YhN9Q+N
- lBRMLTUprKV+p1nTeBiVHV7WY1HpUZo=
-X-Authority-Analysis: v=2.4 cv=H7rrBeYi c=1 sm=1 tr=0 ts=6a46e604 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=GbPsI2Ihf5RTnMjR_gZv:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=Ikd4Dj_1AAAA:8
- a=vNmdTtWwCD1Yl-TW2gAA:9 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-GUID: 0yxEn4R4zRjjgEwYN7f7RUTABUVvADsa
-X-Proofpoint-ORIG-GUID: 0yxEn4R4zRjjgEwYN7f7RUTABUVvADsa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-02_03,2026-06-26_01,2025-10-01_01
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260701094341.3218199-1-edumazet@google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[meta.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304280-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304281-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jgg@ziepe.ca,m:leon@kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:michaelgur@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zhipingz@meta.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[meta.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:andrew+netdev@lunn.ch,m:ericdumazet@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,lunn.ch];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:from_mime,messagingengine.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EA2636FD316
+X-Rspamd-Queue-Id: AE3AF6FD3A9
 
-Workloads that repeatedly allocate and release mkeys carrying TPH
-steering-tag hints (e.g. churning RDMA MRs) leak one
-struct mlx5_st_idx_data per cycle; kmemleak flags it as unreferenced
-and the kmalloc slab grows over time.
+2026-07-01, 09:43:41 +0000, Eric Dumazet wrote:
+> Add READ_ONCE()/WRITE_ONCE() annotations on fields that can be
+> changed concurrently in macsec_changelink() and macsec_update_offload():
+> 
+> - secy->key_len
+> - secy->xpn
 
-When the last reference to an ST table entry is dropped,
-mlx5_st_dealloc_index() removed the entry from idx_xa but the backing
-mlx5_st_idx_data allocation was never freed.
+Those can't be changed, macsec_changelink() rejects
+IFLA_MACSEC_CIPHER_SUITE (as well as IFLA_MACSEC_ICV_LEN and
+IFLA_MACSEC_SCI) and key_len/xpn are fully linked to the cipher suite.
 
-Free idx_data after the xa_erase() so the lifetime of the bookkeeping
-struct matches the lifetime of the ST entry it tracks.
+But I don't mind the extra READ/WRITE_ONCE if you don't want to
+resend.
 
-Cc: stable@vger.kernel.org
-Fixes: 888a7776f4fb ("net/mlx5: Add support for device steering tag")
-Reviewed-by: Michael Gur <michaelgur@nvidia.com>
-Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
----
-v2: respin per maintainer-netdev.rst; no code change.
-v1: https://lore.kernel.org/linux-rdma/20260612170406.3339093-1-zhipingz@=
-meta.com/
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
- drivers/net/ethernet/mellanox/mlx5/core/lib/st.c | 1 +
- 1 file changed, 1 insertion(+)
+> - tx_sc->encoding_sa
+> - tx_sc->encrypt
+> - secy->protect_frames
+> - tx_sc->send_sci
+> - tx_sc->end_station
+> - tx_sc->scb
+> - secy->replay_protect
+> - secy->validate_frames
+> - secy->replay_window
+> - macsec->offload
+> 
+> This allows macsec_fill_info() to run locklessly without RTNL.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c b/drivers/n=
-et/ethernet/mellanox/mlx5/core/lib/st.c
-index 997be91f0a13..7cedc348790d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-@@ -175,6 +175,7 @@ int mlx5_st_dealloc_index(struct mlx5_core_dev *dev, =
-u16 st_index)
-=20
- 	if (refcount_dec_and_test(&idx_data->usecount)) {
- 		xa_erase(&st->idx_xa, st_index);
-+		kfree(idx_data);
- 		/* We leave PCI config space as was before, no mkey will refer to it *=
-/
- 	}
-=20
---=20
-2.53.0-Meta
+And at some point, the whole datapath probably needs some READ_ONCE()
+sprinkled for those fields, too.
 
+
+> @@ -3928,13 +3929,14 @@ static int macsec_changelink_common(struct net_device *dev,
+>  	}
+>  
+>  	if (data[IFLA_MACSEC_WINDOW]) {
+> -		secy->replay_window = nla_get_u32(data[IFLA_MACSEC_WINDOW]);
+> +		u32 replay_window = nla_get_u32(data[IFLA_MACSEC_WINDOW]);
+>  
+>  		/* IEEE 802.1AEbw-2013 10.7.8 - maximum replay window
+>  		 * for XPN cipher suites */
+>  		if (secy->xpn &&
+> -		    secy->replay_window > MACSEC_XPN_MAX_REPLAY_WINDOW)
+> +		    replay_window > MACSEC_XPN_MAX_REPLAY_WINDOW)
+
+nit: no longer > 80 chars
+
+-- 
+Sabrina
 
