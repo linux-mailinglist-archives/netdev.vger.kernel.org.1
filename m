@@ -1,81 +1,94 @@
-Return-Path: <netdev+bounces-303948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MIeJF2XaRWpPGAsAu9opvQ
-	(envelope-from <netdev+bounces-303948-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:26:29 +0200
+	id Q4/zOj3bRWqAGAsAu9opvQ
+	(envelope-from <netdev+bounces-303956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:30:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B7A6F33A1
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:26:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 844DE6F3410
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:30:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mediatek.com header.s=dk header.b=mhmMEvun;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303948-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303948-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mediatek.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=WEO5ErPH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303956-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303956-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C83A8303C2A5
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:26:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B1F923098ABF
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF8B312831;
-	Thu,  2 Jul 2026 03:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652DC31715D;
+	Thu,  2 Jul 2026 03:26:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25D03112C0;
-	Thu,  2 Jul 2026 03:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29937314B76
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 03:26:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782962769; cv=none; b=GBmYfbGxcFBeSEYgBS96ITrD5px294zKJ/pER70J29C3kOyOIPX6B+JTKea35+Z/pBDwZmC8wCsu2B0sJ3gSImbgZ5al957TTyR8kieMotf1zfuYo7ldf5chjotV16JsYZlpMkZ+npoRaySXyeQbN4a8oNC2VoKteIfjh2pZmq8=
+	t=1782962817; cv=none; b=gVZV8uUiNooM97ppwtdUJ2kmuYIe7eJm6SCqvPxgd1UnB9CkuIkjHctx71+V+X+IbEYcC5n2rAkuDovt7+GxQBBVQ28IdLAW78bm9WawBxP0j4wXKILFirwLZ6oiY4Q7/9InF8FObcMH/BEZngF+NYPZtFcENIe8apc5uRMIhAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782962769; c=relaxed/simple;
-	bh=NV6w2JoWpHy3zUvSnRVVQfp87R8d0tS1Fyzs+r8chJc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=M0Nh6nhSDTkN/pyKKG2ufdXhA2rtuW6n1Dj898KwzXz9ssqwYTpSW8m9QCd2CCEb7IjFyFsZO3KQV+5MA1w75u9p4MNgJlxGYoFZXcrjjx5JjDnXwAJ37jitvbi3luEL9w8r/0+CU857bV5XMQfQFTLcU0eG+0L/bI3KFYSfT+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=mhmMEvun; arc=none smtp.client-ip=60.244.123.138
-X-UUID: be7013d075c511f1b1788b6acf885367-20260702
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=lLC3Ud+TVrFH8KiBacdMlSzjHyCVWCIy8gKSFh5QxrA=;
-	b=mhmMEvunyZ1r91peMgk6mmttb45tFYL65CHidmH95ZO8yhbPcHck3+hzeqZeZlxFzZqNkDMznS5JSd/YE+aVhnJfIS3g7HAQmq1pfDFWZ8TGGx2haAkfBh8R1eQb+Fn546eDwu+kRQoR0YD2JmU3XCvJcFL4LNBcAxXc6jib92Y=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.17,REQID:b0e678f1-d0ed-4d07-952b-82784d172ce6,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:d497b38,CLOUDID:5c06e581-6310-4e6b-a6b1-aca20d98ed8b,B
-	ulkID:nil,BulkQuantity:0,SF:102|836|865|888|898,TC:-5,Content:0|15|50|99,E
-	DM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,
-	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: be7013d075c511f1b1788b6acf885367-20260702
-Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 322319382; Thu, 02 Jul 2026 11:25:58 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 2 Jul 2026 11:25:57 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Thu, 2 Jul 2026 11:25:56 +0800
-From: Shiming Cheng <shiming.cheng@mediatek.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <matthias.bgg@gmail.com>,
-	<angelogioacchino.delregno@collabora.com>, <willemb@google.com>,
-	<daniel.zahka@gmail.com>, <alice@isovalent.com>, <sd@queasysnail.net>,
-	<eilaimemedsnaimel@gmail.com>, <imv4bel@gmail.com>, <nbd@nbd.name>,
-	<dsahern@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>
-CC: <stable@vger.kernel.org>, <lena.wang@mediatek.com>,
-	<shiming.cheng@mediatek.com>
-Subject: [PATCH v4] net: gro: fix double aggregation of flush-marked skbs
-Date: Thu, 2 Jul 2026 11:25:15 +0800
-Message-ID: <20260702032535.23754-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1782962817; c=relaxed/simple;
+	bh=lUJuZmfJedsVTrHLnrVZyUNyCZC9m01NVzOw/lh4eDM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XcQe9JBXaZGNGIMOfBbaf3YlSugXvXqzq7G5nudpkhPkw6g/DL1vyXp8lM7OWBkqYusalX8FTvPYHYarBtwumGHPvCEXCsGJ4DKW3dtLu4Brw/wu5B5Kxe8Ds3+4ZRs7yQT5rzgd5VLgfg6juw5GrW+Y5BKgCOKEbVXQ7+P7sgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WEO5ErPH; arc=none smtp.client-ip=209.85.216.45
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36b9d265355so873533a91.2
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 20:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782962815; x=1783567615; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=o1K/++Gs970wFgVMGoTbdrKLAvB1O9sQvsTtAtbYYr4=;
+        b=WEO5ErPHAlfTd5llm0DmJrGz4f+Ok/Nwne9BZbcSkDzxXI/K1lvoxAm5bY6f05Azjx
+         XYy80Cyd69C6BAz5B5Y7+z+wdVIXYAzV7Xc0rFYyrqPCJE5vavqbtsqqbg059PsGeUX0
+         jDSE9Guo7UOP68UtgjDMjY2XbBsk943SiK7NT1zQk/njBmbJsQ59wT+I5NPPCHzyLGiR
+         SV0C85FWRX67Z1I9oByBy10XrmJ+DJhljC74qRjdYMd4+aPXQQail4nuqxRraj+qUl/S
+         xwR8PpxuTyZSGoZZ5UoVfobSq+PbPdpXt4LL9b818iFDk6CV9Sfml7mFNKmcps664/ea
+         6gaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782962815; x=1783567615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=o1K/++Gs970wFgVMGoTbdrKLAvB1O9sQvsTtAtbYYr4=;
+        b=EWI03AAr04PRLYPsAQd7LUGrp6h6QvYwdtvtoC8cpy9+DsBVyR7OtPV4kx1KXBBSWw
+         JMzkfiV2VgakpSIRK92dUKO3rYVeDSEC6/J09Cta1pK/V7lQXdz1Ue5OG4YJ57+X5IBc
+         oL4efX8TQBdKYnUbhF49o+5alhddz1sz63uiAFJcK4AOLu4noqpzl3HEojOwy9gJNH6D
+         oNwmQ/yJr4Auyp4bfQ0QzUVHgB6tJRAg3U02/gIDwNNNq+486uVtDjLxqTRRj9Ghz2Nj
+         SYELV87J3GbmrYFO3hvCw2z9tg9l/C729exp/eybNfac7+N4/zyLJLlOq3iAVc/SzWb0
+         piDw==
+X-Gm-Message-State: AOJu0YybmOtugt0XkGzuNlglW18tzhm+QrU77y8VJqGu3zWGHyvJkmnR
+	z3eeYhv9PQqZ/uvRS/O3dKra3G+DdsN7flo7jBKceDurGnWOo4ZeKzqNTaeRAQ==
+X-Gm-Gg: AfdE7cl4kVu82DWGtuRe72Vk90/MDTEDxxIDzrBQd7uSeXLOhcharV3XD0SPmfv45Ff
+	o+iLYc/w86rw6Brz5rOhVgvPb0O8uhbakDFVBkcp6JnYz9uegxVsdQq/zgpaluqeApYRZFQJG22
+	FJg/Ty1ZYWd60ytZ9IAIGCMRGy//moO8D6krEGIvpheavUzEKUam78ivm/dA57o+vIukDohBrVn
+	hPPyOdi22wJHusjLY/WRTkI2WsL+uJ1bSmhMhG/7yUUsXFY9xGWPb47kQ3uDOlcIxhNtmzGBh7p
+	NESX9ntHqn3TrKzRNOQVhYfRaEbjUN50+c6RYCG64FyZlOUPCIs7X7Lr0KBuOTZ93eDM5jckOMl
+	xV82v2c8FuYTMH4Evk9jaXqU1jSaBIHraV9cgpERUCaP8Oeiw5ZWQElNxqxsuc16z7GyoEbPG9Y
+	hyoqroYpa7kkN0dGUvzwgu1bSp7eWbqmmbMGv2OHANu1NUpCYnGq0930p/lLDTmvwlpNzuOAz44
+	C/08KI1CQ==
+X-Received: by 2002:a17:90b:3e50:b0:37f:9ce1:7359 with SMTP id 98e67ed59e1d1-380ba91d27emr2975847a91.26.1782962815070;
+        Wed, 01 Jul 2026 20:26:55 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38095c0b552sm1651289a91.0.2026.07.01.20.26.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jul 2026 20:26:54 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tianchen Ding <dtcccc@linux.alibaba.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] net: mdio: select REGMAP_MMIO instead of depending on it
+Date: Wed,  1 Jul 2026 20:26:52 -0700
+Message-ID: <20260702032653.1580616-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,120 +96,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-303948-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303956-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:willemb@google.com,m:daniel.zahka@gmail.com,m:alice@isovalent.com,m:sd@queasysnail.net,m:eilaimemedsnaimel@gmail.com,m:imv4bel@gmail.com,m:nbd@nbd.name,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:stable@vger.kernel.org,m:lena.wang@mediatek.com,m:shiming.cheng@mediatek.com,m:matthiasbgg@gmail.com,m:danielzahka@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,collabora.com,isovalent.com,queasysnail.net,nbd.name,vger.kernel.org,lists.infradead.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dtcccc@linux.alibaba.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shiming.cheng@mediatek.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mediatek.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mediatek.com:dkim,mediatek.com:email,mediatek.com:mid,mediatek.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C2B7A6F33A1
+X-Rspamd-Queue-Id: 844DE6F3410
 
-The new skb_gro_receive_list() function is missing a critical safety check
-present in the legacy skb_gro_receive() path. Specifically, it does not
-validate NAPI_GRO_CB(skb)->flush before allowing packet aggregation.
+REGMAP_MMIO is a hidden (non-user-visible) tristate symbol. Using
+depends on it is incorrect because there is no way for the user to
+enable it directly. Change to select, which is the convention used
+by every other driver in the tree that needs REGMAP_MMIO.
 
-This allows already-GRO'd packets with existing frag_list to be
-re-aggregated into a new GRO session, corrupting the frag_list chain
-structure. When skb_segment() attempts to unpack these malformed packets,
-it encounters invalid state and triggers a kernel panic.
-
-Scenario (Tethering/Device forwarding):
-  1. Driver: Generated aggregated packet P1 via LRO with frag_list
-  2. Dev A: Receives aggregated fraglist packet and flush flag set
-  3. Dev A: Re-enters GRO, skb_gro_receive_list() is called
-  4. Missing flush check allows re-aggregation despite flush flag
-  5. Frag_list chain becomes corrupted (loops or dangling refs)
-  6. Dev B: TX path calls skb_segment(), crashes on corrupted frag_list
-
-Root cause in skb_segment():
-  The check at line ~4891:
-    if (hsize <= 0 && i >= nfrags && skb_headlen(list_skb) &&
-        (skb_headlen(list_skb) == len || sg)) {
-
-  When frag_list is corrupted by double aggregation, when list_skb is
-  a NULL pointer from skb->next, skb_headlen(list_skb) dereference
-  NULL/corrupted pointers occurs.
-
-Call Trace:
- skb_headlen(NULL skb)
- skb_segment
- tcp_gso_segment
- tcp4_gso_segment
- inet_gso_segment
- skb_mac_gso_segment
- __skb_gso_segment
- skb_gso_segment
- validate_xmit_skb
- validate_xmit_skb_list
- sch_direct_xmit
- qdisc_restart
- __qdisc_run
- qdisc_run
- net_tx_action
-
-Fix: Add NAPI_GRO_CB(skb)->flush validation to the early-return check in
-skb_gro_receive_list(), matching the defensive programming pattern of
-skb_gro_receive().
-
-Fixes: 8928756d53d5 ("net: move skb_gro_receive_list from udp to core")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+Fixes: 8057cbb8335c ("net: mdio: mscc-miim: Add depend of REGMAP_MMIO on MDIO_MSCC_MIIM")
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- net/core/gro.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/net/mdio/Kconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/gro.c b/net/core/gro.c
-index 35f2f708f010..b1573d98f3a5 100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -229,7 +229,14 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
- 
- int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
- {
--	if (unlikely(p->len + skb->len >= 65536))
-+	/*
-+	 * Packets marked with NAPI_GRO_CB(skb)->flush have already gone
-+	 * through GRO/LRO processing and must not be aggregated again.
-+	 * Re-entering frag_list GRO may corrupt the frag_list chain and
-+	 * later crash during GSO segmentaiont.
-+	 */
-+	if (unlikely(p->len + skb->len >= 65536 ||
-+		     NAPI_GRO_CB(skb)->flush))
- 		return -E2BIG;
- 
- 	if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
--- 
-2.45.2
+diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
+index c591eec8e97a..e57121019153 100644
+--- a/drivers/net/mdio/Kconfig
++++ b/drivers/net/mdio/Kconfig
+@@ -122,7 +122,8 @@ config MDIO_MVUSB
+
+ config MDIO_MSCC_MIIM
+ 	tristate "Microsemi MIIM interface support"
+-	depends on HAS_IOMEM && REGMAP_MMIO
++	depends on HAS_IOMEM
++	select REGMAP_MMIO
+ 	help
+ 	  This driver supports the MIIM (MDIO) interface found in the network
+ 	  switches of the Microsemi SoCs; it is recommended to switch on
+--
+2.55.0
 
 
