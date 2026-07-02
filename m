@@ -1,201 +1,140 @@
-Return-Path: <netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gGhmBZ7qRWqbGgsAu9opvQ
-	(envelope-from <netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:35:42 +0200
+	id 028UCbvsRWr/GgsAu9opvQ
+	(envelope-from <netdev+bounces-303966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:44:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A92D6F36DB
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:35:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D176F370E
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:44:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qq.com header.s=s201512 header.b="r/PzeJEb";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=qq.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=AJ7AFyht;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303966-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303966-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A83A1301690C
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:35:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 26605302C14B
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B7134E745;
-	Thu,  2 Jul 2026 04:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C388934D93B;
+	Thu,  2 Jul 2026 04:44:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FC1231A3B
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 04:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF7730FF27
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 04:44:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782966919; cv=none; b=Ee/AsUlbAsrn4zWWrDHXa/iEJjJqX/rdSG5rHShERSYRZ6ZTh8WTzKZIKkw3DD/ds99q4T8SNLwOfIJLQtoNcMiT2WtxoBrw0bsWwKsp0tD8/5OmAPZKdliKMbBU3b2+lPpnA+KM7r6yHdb5PTMlk1c/9gyxMQBoIyjPCV8Lf/c=
+	t=1782967480; cv=none; b=GlviSEYdLldKHj2O5y0GpUeDyhxWD6pEobuoRwwGTO5Rav5aIsjVQWA2VDydoJqwm6ihmhXzj4R+KycrBNQ6xl/QZEeSwsiUGYbSqnPtRahZOhrADpy9CLw0smGSj4DQtDn4I31qGDHPH8QTYxPIK2ypfWqX5GcKbZ0UMzN/1HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782966919; c=relaxed/simple;
-	bh=3u6EvztuLUlA+ejRxZatA6N+wbu2IiMs7KXilJNbVk4=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=g9NPObCFy9ODXR4xwQOLXpOVU1XJWv4cda36a5c55r22yAVT5L/bDbt3YVtW1SQkc55tYCBTRFljKxtUvJQ7NjygrkVihUYzyiIWfXJTqbV4yEM9cioe3LKgoKUZlsxENs7Hx3R/3CXvpQtA8Z2LoOgSy76EebP7co9KLL81piI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=r/PzeJEb; arc=none smtp.client-ip=203.205.221.235
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1782966894; bh=t1GNANpFuzLE/PYGoogesdPNStNh8vPbm2FDGBZNhLk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=r/PzeJEbRkxUDEkqnJ660hHMqI7SYRjhgFpRl6gS+6hrhyp4vVF3e2NSA9lLfyO2u
-	 euT1nQF4bKCVJq2uV0LUp1bcK4IVIQaKAFTY1LrLx5+n4p+xfpxfwSYlCKslT+LcRh
-	 Y9N0RqvQttB2Hpo3R3c3gmTHIOD/arc/VL32caOM=
-Received: from lxu-ped-host.. ([111.198.231.89])
-	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
-	id 8B10EACB; Thu, 02 Jul 2026 12:34:49 +0800
-X-QQ-mid: xmsmtpt1782966889tpm5fdqw5
-Message-ID: <tencent_30FB52DFC6440984EEF0EEC70C90A7DAC606@qq.com>
-X-QQ-XMAILINFO: NAuAIaytDrXppw3uhnqACGI+GTfyRfCrUZI81C+oro9C457KCvnVIieR7bgYrO
-	 l46J0Yh1z6Y+FMKPn1PaHc9JNECPabpNNua0y7gzYBBTKgaw/5IEQ+UuW/SkTHmdcI+o8XkghSVA
-	 7qlRxQPchEH/z2zhmDwJSjzgqp6neHrDSy0Bq/Wz4hLaNnPk2Tex7ReBlRMeSVOpZugc4FjV0j1n
-	 9MzE/qZQROb4wCLZ2zOKF2vBAAfTjt1k6x05Yi4sIjESNqvzNYq1tgqaf6YyVysxP6AxdmJiXBDI
-	 2te7+BEgIDcNQMGdRq7xKVr/cTwQYppJZsUfNxm9irzAKvrNex7R+eWqvvjspczhJsX089HwW7xM
-	 iDeeOF1BIa4xVCJ7QaM3435QGCIDGB539ttTKOpCOxMbaGxSwKQq5M/TP6YylfyR1+9+gXv0Ke3W
-	 X6CwuS2p1ljngDK8MyVMqnYhW2Dok357WIBGfDySpgNfDutYKINhOESF40cv364CFl5TvExNqzcO
-	 DFY2xrnCuENUVu5gONmsSpTBVke63FFiS+buyl8Ba4dG56x9qx53wVsYtcQgkGlNLL8rD0m4IuJE
-	 C+JpCfAzgY6CuyNRx8BURm46FfSNNNA4v1+rQ68IlEGavh+BVYFRnTz2Jg3qM6N7pLyFE2Y82qYk
-	 MkI3lHgQxsHNWUuCvoIqrKrVLUpYkYQRKnWjdp9caegTvn5XANVdG2z4XsVNJ/Eu1sgEhlYzcTvE
-	 dVon1LaJ5SP49xQYzDGX05jotyTLUEtoRzlINz/JK2JaBuvjegBjRg6hTYY2mELly6SQR+lneIab
-	 t+d8Zw368u1mnqw2rjjCRCFj1Uij8zCOCRsOUjbqhupxVfDmYx4kWWtCWPJSBV2VI930DDG3slZa
-	 lHggq1fam3x9v5P9bR1czk2G026GoUmBYydKWv3A9JY2mokZqMMV7zMZ/PufAfY9A3AI0exqJubD
-	 s/dtOAkg3LlQXYLVuyjSixbvNJj+um6jzXbwKZ2rZvr3fsZpgsAdP/7XtUCKr00wbWmjfZyL+2PH
-	 35iRCWsXfXT60trK5wBXoUVLi5mu31Juq+RZ60cA==
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-From: Edward Adam Davis <eadavis@qq.com>
-To: andrii.nakryiko@gmail.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	eadavis@qq.com,
-	eddyz87@gmail.com,
-	emil@etsalapatis.com,
-	jiayuan.chen@linux.dev,
-	jolsa@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	memxor@gmail.com,
-	netdev@vger.kernel.org,
-	sashiko-bot@kernel.org,
-	sashiko-reviews@lists.linux.dev,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: Re: [PATCH v5] bpf: Fix smp_processor_id() call trace for preemptible kernels
-Date: Thu,  2 Jul 2026 12:34:50 +0800
-X-OQ-MSGID: <20260702043449.1021846-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CAEf4Bzb+OOrdGyxbzjh=7MUEbA5FC05E6_iwCjDXcnSO-HZ=ig@mail.gmail.com>
-References: <CAEf4Bzb+OOrdGyxbzjh=7MUEbA5FC05E6_iwCjDXcnSO-HZ=ig@mail.gmail.com>
+	s=arc-20240116; t=1782967480; c=relaxed/simple;
+	bh=mzRk+vGmxupqTsnfd2sC2Q3s2XV0vj1HMIb8vfZ/gU8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PJF9RKihk4svrHVPLbmFf5yZOV7LUHZo2HoWDnFTLohPvP51dkVz7hBrFTOs+68JGrXWAyTiLqnLx1L6a7wtIBBnIUdgWIGSRxKbQkpUPU2oLg8UXQkanzH804xQsSu812ZDgPtnZxVVVaMaDqfLuPyIz0tZFhNGI/5YZPrEkEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AJ7AFyht; arc=none smtp.client-ip=209.85.210.202
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-8478423e020so1948977b3a.0
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 21:44:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1782967479; x=1783572279; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CrSAvOH53RwfVg0o5n15sIG7RlqJ8qPe+x1UadQEMJ8=;
+        b=AJ7AFyhtHMti2WeB3H1OW0WCs4tFr238n+waFe4OivwGwzGA2aexvGIoe+7vSKnpuk
+         mNlUeqGSdLUlhrrEELKFo/jYvnTzVDvVD6no1HbdYcaqLc5BSbk+/nzfgOpMEutR1xg/
+         txZ//q/tJrfZqg8KwGl1CCvUW5HXkND2ntsjvktO1tBKWHm5eXz/kO3bG6CFaAtPgvPX
+         LHV++qFoIm1ypTYbbBqLQ1Kcam51+eQw4TCRzIRH2KnoDUjgXxDrhQlBAujQVWDo70DG
+         0fgN03QHJxXfhxbYMlrCnaU/j0o5S/g2yGoaw+uE5BovniqrCXKUK27fOkw0U6kd978l
+         2Rmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782967479; x=1783572279;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CrSAvOH53RwfVg0o5n15sIG7RlqJ8qPe+x1UadQEMJ8=;
+        b=Z1wG6m2R+icTQxDfuNfDnJxJ12DQBGMQTFt58NQ8S/wXtfdIKPqON3IOvgjjs5ca/c
+         2KXmg2AqDrgrti+igTquP8Sa2OE/Yj1bBvOA5o1tzl9mMKc2fDqZeRSeZnYH1DKrEADI
+         als1510RY8h0IkJi4UaVfwkM+hUPNvHtB+jlPeoupnEi+O/mOA4f8oDuzs/yUJGo1jV8
+         078UClPA4clUTYgwR69ol/Zvf3r1NAuEGhvEERTq4mjaQiUgIazVjs1yYrHTDmyPpdFI
+         l2mHDNbfdJRDB6XkLiIFvOqiLva5e+YzHaKbFcpq7TLqPzHg+3hSTSrEtf5IrsIjKVPY
+         lQRw==
+X-Forwarded-Encrypted: i=1; AFNElJ+V3aNR6pdG4xY3nwDLE1ojFWUz7OlgjYi8DgAEiApEXI+dPmEMUddYuRu4zA6cLXgYl3jMgg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxgWqUsaaPjbu2zZIAa7Deg8YA5eYO+F4BdIyZvVFVpzqIiiVw
+	tq3X9XYfi3Ue0ueGDfDWVQZ9z/Y8VnhkXhTgu/pHpRI8kIiETco2LXVJy84LS6QmPdCVC10fwJc
+	8Jvh+2g==
+X-Received: from pfbly23.prod.google.com ([2002:a05:6a00:7597:b0:847:9472:cf8e])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9504:b0:847:9745:2f83
+ with SMTP id d2e1a72fcca58-847c06dddf0mr4562617b3a.18.1782967478454; Wed, 01
+ Jul 2026 21:44:38 -0700 (PDT)
+Date: Thu,  2 Jul 2026 04:44:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260702044437.591864-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next 0/2] net: Misc follow-up on RTNL-less fib_rules series.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-303966-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303965-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andrii.nakryiko@gmail.com,m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:eadavis@qq.com,m:eddyz87@gmail.com,m:emil@etsalapatis.com,m:jiayuan.chen@linux.dev,m:jolsa@kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:netdev@vger.kernel.org,m:sashiko-bot@kernel.org,m:sashiko-reviews@lists.linux.dev,m:song@kernel.org,m:syzkaller-bugs@googlegroups.com,m:yonghong.song@linux.dev,m:andriinakryiko@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,qq.com,gmail.com,etsalapatis.com,linux.dev,lists.linux.dev,googlegroups.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[qq.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,appspotmail.com:email,qq.com:dkim,qq.com:email,qq.com:mid,qq.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,syzkaller.appspot.com:url]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6A92D6F36DB
+X-Rspamd-Queue-Id: 68D176F370E
 
-On Wed, 1 Jul 2026 12:57:52 -0700, Andrii Nakryiko wrote:
-> > bpf_mem_cache_free_rcu() maybe called in preemptible context, this
-> > will trigger the below warning message:
-> >
-> > BUG: using smp_processor_id() in preemptible [00000000] code: syz.0.17/5820
-> > caller is bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
-> > Call Trace:
-> >  check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
-> >  bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
-> >  rhtab_delete_elem+0x185a/0x1b30 kernel/bpf/hashtab.c:2969
-> >  __rhtab_map_lookup_and_delete_batch+0x935/0xcb0 kernel/bpf/hashtab.c:3349
-> >  bpf_map_do_batch+0x445/0x630 kernel/bpf/syscall.c:-1
-> >  __sys_bpf+0x906/0xd90 kernel/bpf/syscall.c:-1
-> >
-> > this_cpu_ptr() requires the caller to prevent task migration.
-> > These helpers currently do not enforce that requirement and may
-> > be invoked from preemptible contexts, leading to accesses to another
-> > CPU's per-CPU cache after migration. Use get_cpu_ptr()/put_cpu_ptr()
-> > to pin the task while accessing the per-CPU allocator state.
-> >
-> > Fixes: 5af6807bdb10 ("bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().")
-> > Fixes: 7c8199e24fa0 ("bpf: Introduce any context BPF specific memory allocator.")
-> > Reported-by: syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=fd7e415d891073b83e1f
-> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> > ---
-> 
-> from what I can see, bpf_mem_free() is called through bpf kfuncs only,
-> and all BPF programs run with migration disabled. So this seems like a
-> false positive. For per-cpu checking, it should probably check that
-> either preemption is disabled or migration is disabled. tl;dr, there
-> doesn't seem to be any
-Today, I researched the call sites of bpf_mem_free() in detail; it is
-called directly by bpf kfuns only. 
+Patch 1 moves net->ipv4.fib_table_hash_lock under
+CONFIG_IP_MULTIPLE_TABLES.
 
-Different BPF program types execute in distinct kernel contexts: for
-instance, XDP and TC typically run in non-sleepable networking contexts,
-whereas `raw_tp`, `tracing`, `LSM`, `syscall` and especially sleepable
-BPF programs may run in contexts where preemption and migration are
-enabled. Consequently, any shared BPF code (such as a helper or kfunc)
-that accesses per-CPU data must not rely on the caller having disabled
-migration; instead, it must internally ensure that CPU migration does
-not occur during the access.
+Patch 2 adds mutex_destroy() for fib_rules_ops.lock.
 
-Taking into account the CI reviewer's feedback [1] and my further
-investigation into BPF programs as described above, the adjustments
-related to bpf_mem_free() should be retained.
 
-[1]
-https://lore.kernel.org/all/20260630094823.897BD1F00A3D@smtp.kernel.org
-> 
-> pw-bot: cr
-> 
-> > v1 -> v2: using guard against preemption
-> > v2 -> v3: replace get/put_cpu() to bpf_disable/enable_instrumentation()
-> > v3 -> v4: disable preempt to make this_cpu_ptr() work
-> > v4 -> v5: in mem free disable preemption
-> >
-> 
-> maybe throttle your patch resubmission spree a bit?..
-My earlier actions were driven by a desire to keep pace with the CI
-reviewer's response speed.
-Moving forward, I will slow down the cadence of new patch submissions,
-as you suggested.
+Kuniyuki Iwashima (2):
+  ipv4: fib: Define fib_table_hash_lock under CONFIG_IP_MULTIPLE_TABLES.
+  net: fib_rules: Destroy ops->lock in fib_rules_unregister().
+
+ Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst | 1 +
+ include/net/netns/ipv4.h                                      | 2 +-
+ net/core/fib_rules.c                                          | 1 +
+ net/ipv4/fib_frontend.c                                       | 3 +++
+ 4 files changed, 6 insertions(+), 1 deletion(-)
+
+-- 
+2.55.0.rc0.799.gd6f94ed593-goog
 
 
