@@ -1,299 +1,149 @@
-Return-Path: <netdev+bounces-304097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304098-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id J+hhMq1FRmoKNgsAu9opvQ
-	(envelope-from <netdev+bounces-304097-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:04:13 +0200
+	id JFIiBbFBRmq9MwsAu9opvQ
+	(envelope-from <netdev+bounces-304098-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:47:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35C26F6612
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:04:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383D56F6245
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:47:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=mmbMJopU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304097-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304097-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ex0LboEa;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="QUm/UZC1";
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=0nNK6jVq;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1OWps0PR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304098-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304098-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8630D30C16ED
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:25:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF0CB3010519
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640823EAC90;
-	Thu,  2 Jul 2026 10:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E54365A1D;
+	Thu,  2 Jul 2026 10:31:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823A9416D0C
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 10:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED95346E54
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 10:31:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782987931; cv=none; b=PIacwgbABzJv7qdq1GfhsPdk1ALcZpui7Uqr09QJyl9LLGFWIV5kpjmyacRhAQ1Bs//blaqAcY3O3NMm0gZekiwPGFkcTTeQ+t9GIMBYIuCPitDYoHU25QoRTxGzo2atd6NQ1Amf2nLembEK/osgCmo4t4V17YB+Yax//Beh3Tw=
+	t=1782988310; cv=none; b=t8gO2kPPZdgt423iEdikPLX7icw+uGNuXKW1iEYPgPnNDgHdT5CA25UvKfupaakYwojk5zdZPQJgKVKOYZfPGCafjdQZpVZ80y+m8KmVZXyQd/RNqEdxLTflsZneDHjWD8qCepu3BjoAJM9qzkQqtb9hZHEsqIsvExbqi7KNkAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782987931; c=relaxed/simple;
-	bh=4c9MR/wjhvT2gCHUXqup3VyOlygWwo/sdPuGMz2qwJ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MzPxxPjN7uXviJXTJVjpRzm0YaEl33ml3g9QJk2xmFFCMSUE1tsOkRP7llNMojIsiZCKOulya68Z0xImqVr1sb8U0n7u7/YneMrZYwDsM97BD+KhxXp8f21G0tGmHtCTXdvE+BqglE8rEygZmE3sxx0EK33Jaj1ogyxy4CTn6RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mmbMJopU; arc=none smtp.client-ip=198.175.65.20
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782987930; x=1814523930;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4c9MR/wjhvT2gCHUXqup3VyOlygWwo/sdPuGMz2qwJ4=;
-  b=mmbMJopUkjFY09kSIYPBKB/ybmx/EU94jEJEtIUKI4ywMIjhjgpg4z+0
-   Q71qoS9x9smgLuyI9wMo94Ao5f40gD7n5c+OHPnTqBD2EWWAHPmI5UzsL
-   rHvRmjMCL6rCeuDc6grnOGx75FK/jw71B92LuSrHCPrSUlxMdqQpTW71E
-   svBIVicah3ivvqOLUlCBklVJMt7EAgjnYMLPcTWmNlU2cNZCVJWdMNBuR
-   8nSkd0FOqEEc9Nvp08w8waIpMmmDnjZLkzpXyOg6B0RLPSG0RlpzI1lds
-   umRVL1zPDPOK0oeGxDRFEQBMabWejJMIa6KXMADnu95rdARvhEWpNuzPR
-   A==;
-X-CSE-ConnectionGUID: dgcdX/WYTxKzalW7Fwzxtw==
-X-CSE-MsgGUID: vhREtzQgSLu4tP/mZwFiEw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11834"; a="83517587"
-X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
-   d="scan'208";a="83517587"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 03:25:29 -0700
-X-CSE-ConnectionGUID: pY+dMFr6Qti2xVAGggsMww==
-X-CSE-MsgGUID: Geg4lS0BSdaTqVCAkVNbng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
-   d="scan'208";a="248846372"
-Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.94.248.198]) ([10.94.248.198])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 03:25:25 -0700
-Message-ID: <f2c285ba-8089-41a1-b28a-9062f2b584c8@linux.intel.com>
-Date: Thu, 2 Jul 2026 12:25:22 +0200
+	s=arc-20240116; t=1782988310; c=relaxed/simple;
+	bh=ZIn43INLbi+LDQ+Jho+E7TvyEDjesltuVNzl70tMzXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qFYbV/PF0DNlrFS2To4xPKRmj05wb/TVfWZwNpxhozhw3a/pnAzjfRxMe50LHNc1gnHRm51kTX3JZ3mgbi8QVxqEfCJY+MWf70UmkNHhkN0sxdiZ/SSUswHUIGOpQSUGWIfHvbZwNHioprsgSPyc55kV5A6e82wAcyT3jmHaB2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ex0LboEa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QUm/UZC1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0nNK6jVq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1OWps0PR; arc=none smtp.client-ip=195.135.223.130
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CBF177413D;
+	Thu,  2 Jul 2026 10:31:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1782988308; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZIn43INLbi+LDQ+Jho+E7TvyEDjesltuVNzl70tMzXI=;
+	b=ex0LboEa8fFnAEv0LlWTtFnatYcXb12UGzPYE8RM0RFub6EzMyi6RGWN+ASBSLwsWmyem8
+	egJmmxESX74VD8hiknkNpZyUAffVxWUet7CSy0KgWaRlT0hjOrJLEGC7EyDJFXaD1bNV0r
+	JZMVQN6xdDtNviD5y7ePhJfiB88aSfs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1782988308;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZIn43INLbi+LDQ+Jho+E7TvyEDjesltuVNzl70tMzXI=;
+	b=QUm/UZC149yJeiIYvETGPmY5UYxOQ7xdQ0/WK9YuFlBFkl3o1gCN7rtgSUkKkTgE88n5pL
+	laDIwAqAMucp8eBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1782988306; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZIn43INLbi+LDQ+Jho+E7TvyEDjesltuVNzl70tMzXI=;
+	b=0nNK6jVqThlA/eO3avNstwKg3CyN0nK4aiqiwwF3lvpEtddK/2LGQtA7xmqzqIn2pkYwFD
+	lmfrP38MRPWTmS6iXcfq7sbUaEDhnxoMBAdsEicEH0FT8ZB+dBWPNhSqHoDNoPrENCailp
+	w5ki8zFLX5w0Iv5Ay8oQ5SqrUS6Qbv0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1782988306;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZIn43INLbi+LDQ+Jho+E7TvyEDjesltuVNzl70tMzXI=;
+	b=1OWps0PRdWwT2QFYrjMkvaR4O0jAX/EnbjSyJmqeU0fTSMPKYIuxrdagVsjcEJqfjdxEU9
+	OcQl+H2T/CU3W7CQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A2C6E779AA;
+	Thu,  2 Jul 2026 10:31:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Xj3KJBI+RmqXPAAAD6G6ig
+	(envelope-from <iluceno@suse.de>); Thu, 02 Jul 2026 10:31:46 +0000
+Date: Thu, 2 Jul 2026 12:31:45 +0200
+From: Ismael Luceno <iluceno@suse.de>
+To: linux-kernel@vger.kernel.org
+Cc: "open list:IPVS" <netdev@vger.kernel.org>,
+	"open list:IPVS" <lvs-devel@vger.kernel.org>,
+	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
+	"open list:NETFILTER" <coreteam@netfilter.org>
+Subject: Re: [PATCH v2 nf-next] ipvs: Move defense_work and est_reload_work
+ to system_dfl_long_wq
+Message-ID: <akY-CMqFSLVgK8hG@pirotess>
+References: <20260702101100.24256-2-iluceno@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 2/2] ice: fix stats array
- overflow via proper realloc
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- intel-wired-lan@lists.osuosl.org, Michal Schmidt <mschmidt@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-References: <20260701104141.9740-1-przemyslaw.kitszel@intel.com>
- <20260701104141.9740-2-przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <20260701104141.9740-2-przemyslaw.kitszel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702101100.24256-2-iluceno@suse.de>
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -2.76
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.89 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	HFILTER_URL_ONLY(0.77)[0.35064935064935];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304097-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:mschmidt@redhat.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:aleksandr.loktionov@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jedrzej.jagielski@intel.com,m:piotr.kwapulinski@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304098-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[iluceno@suse.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[iluceno@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,vger.kernel.org:from_smtp,atlassian.net:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,suse.de:dkim,suse.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pirotess:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A35C26F6612
+X-Rspamd-Queue-Id: 383D56F6245
 
-
-
-On 01.07.2026 12:41, Przemek Kitszel wrote:
-> Integrate ice_vsi_alloc_stat_arrays() with realloc variant.
-> 
-> Instead of keeping two functions for stat arrays allocation, change the
-> ice_vsi_realloc_stat_arrays() to handle initial condition (no vsi_stat
-> entry) and replace ice_vsi_alloc_stat_arrays() by the more generic
-> ice_vsi_realloc_stat_arrays().
-> 
-> Note that VSIs of ICE_VSI_CHNL type are ignored in realloc variant as they
-> were in the replaced ice_vsi_alloc_stat_arrays().
-> 
-> This is a fix for stats array overflow that occurs when VF is given more
-> queues (an operation that will be more frequent, and by bigger increase,
-> when we will merge my "XLVF" series).
-> 
-> Splat for increasing number of queues thanks to Michal Schmidt:
-> KASAN detects the bug:
->  ==================================================================
->  BUG: KASAN: slab-out-of-bounds in ice_vsi_alloc_ring_stats+0x385/0x4a0 [ice]
->  Read of size 8 at addr ffff88810affea60 by task kworker/u131:7/221
-> 
->  CPU: 24 UID: 0 PID: 221 Comm: kworker/u131:7 Not tainted 7.1.0-rc1+ #1 PREEMPT(lazy)
->  ...
->  Workqueue: ice ice_service_task [ice]
->  Call Trace:
->   <TASK>
->   ...
->   kasan_report+0xd7/0x120
->   ice_vsi_alloc_ring_stats+0x385/0x4a0 [ice]
->   ice_vsi_cfg_def+0x12e2/0x2060 [ice]
->   ice_vsi_cfg+0xb5/0x3c0 [ice]
->   ice_reset_vf+0x858/0xf80 [ice]
->   ice_vc_request_qs_msg+0x1da/0x290 [ice]
->   ice_vc_process_vf_msg+0xb15/0x1430 [ice]
->   __ice_clean_ctrlq+0x70d/0x9d0 [ice]
->   ice_service_task+0x840/0xf20 [ice]
->   process_one_work+0x690/0xff0
->   worker_thread+0x4d9/0xd20
->   kthread+0x322/0x410
->   ret_from_fork+0x332/0x660
->   ret_from_fork_asm+0x1a/0x30
->   </TASK>
-> 
->  Allocated by task 2439:
->   kasan_save_stack+0x1c/0x40
->   kasan_save_track+0x10/0x30
->   __kasan_kmalloc+0x96/0xb0
->   __kmalloc_noprof+0x1d8/0x580
->   ice_vsi_cfg_def+0x115c/0x2060 [ice]
->   ice_vsi_cfg+0xb5/0x3c0 [ice]
->   ice_vsi_setup+0x180/0x320 [ice]
->   ice_start_vfs+0x1f3/0x590 [ice]
->   ice_ena_vfs+0x66d/0x798 [ice]
->   ice_sriov_configure.cold+0xe4/0x121 [ice]
->   sriov_numvfs_store+0x279/0x480
->   kernfs_fop_write_iter+0x331/0x4f0
->   vfs_write+0x4c4/0xe40
->   ksys_write+0x10c/0x240
->   do_syscall_64+0xd9/0x650
->   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
->  The buggy address belongs to the object at ffff88810affea40
->                 which belongs to the cache kmalloc-32 of size 32
->  The buggy address is located 0 bytes to the right of
->                 allocated 32-byte region [ffff88810affea40, ffff88810affea60)
-> 
-> Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
-> Closes: https://redhat.atlassian.net/browse/RHEL-164321
-
-Is there a simpler reproducer than the script attached in the ticket?
-
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-
-> ---
-> This is an alternative to the fix [1] by Michal Schmidt, which were
-> blocked due to AI feedback. My fix was already developed before Michal's,
-> just not public back then. We have agreed to go on with my version.
-> 
-> [1] https://lore.kernel.org/netdev/20260520183501.3360810-3-anthony.l.nguyen@intel.com
-> ---
->  drivers/net/ethernet/intel/ice/ice_lib.c | 57 +++++-------------------
->  1 file changed, 11 insertions(+), 46 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-> index e48ee5940f17..ae167b42c558 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-> @@ -513,51 +513,6 @@ static irqreturn_t ice_msix_clean_rings(int __always_unused irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> -/**
-> - * ice_vsi_alloc_stat_arrays - Allocate statistics arrays
-> - * @vsi: VSI pointer
-> - */
-> -static int ice_vsi_alloc_stat_arrays(struct ice_vsi *vsi)
-> -{
-> -	struct ice_vsi_stats *vsi_stat;
-> -	struct ice_pf *pf = vsi->back;
-> -
-> -	if (vsi->type == ICE_VSI_CHNL)
-> -		return 0;
-> -	if (!pf->vsi_stats)
-> -		return -ENOENT;
-> -
-> -	if (pf->vsi_stats[vsi->idx])
-> -	/* realloc will happen in rebuild path */
-> -		return 0;
-> -
-> -	vsi_stat = kzalloc_obj(*vsi_stat);
-> -	if (!vsi_stat)
-> -		return -ENOMEM;
-> -
-> -	vsi_stat->tx_ring_stats =
-> -		kzalloc_objs(*vsi_stat->tx_ring_stats, vsi->alloc_txq);
-> -	if (!vsi_stat->tx_ring_stats)
-> -		goto err_alloc_tx;
-> -
-> -	vsi_stat->rx_ring_stats =
-> -		kzalloc_objs(*vsi_stat->rx_ring_stats, vsi->alloc_rxq);
-> -	if (!vsi_stat->rx_ring_stats)
-> -		goto err_alloc_rx;
-> -
-> -	pf->vsi_stats[vsi->idx] = vsi_stat;
-> -
-> -	return 0;
-> -
-> -err_alloc_rx:
-> -	kfree(vsi_stat->rx_ring_stats);
-> -err_alloc_tx:
-> -	kfree(vsi_stat->tx_ring_stats);
-> -	kfree(vsi_stat);
-> -	pf->vsi_stats[vsi->idx] = NULL;
-> -	return -ENOMEM;
-> -}
-> -
->  /**
->   * ice_vsi_alloc_def - set default values for already allocated VSI
->   * @vsi: ptr to VSI
-> @@ -2319,7 +2274,17 @@ static int ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi)
->  	u16 prev_txq = vsi->alloc_txq;
->  	u16 prev_rxq = vsi->alloc_rxq;
->  
-> +	if (vsi->type == ICE_VSI_CHNL)
-> +		return 0;
-> +
->  	vsi_stat = pf->vsi_stats[vsi->idx];
-> +	if (!vsi_stat) {
-> +		vsi_stat = kzalloc_obj(*vsi_stat);
-> +		if (!vsi_stat)
-> +			return -ENOMEM;
-> +
-> +		pf->vsi_stats[vsi->idx] = vsi_stat;
-> +	}
->  
->  	if (req_txq < prev_txq) {
->  		for (int i = req_txq; i < prev_txq; i++) {
-> @@ -2379,7 +2344,7 @@ static int ice_vsi_cfg_def(struct ice_vsi *vsi)
->  		return ret;
->  
->  	/* allocate memory for Tx/Rx ring stat pointers */
-> -	ret = ice_vsi_alloc_stat_arrays(vsi);
-> +	ret = ice_vsi_realloc_stat_arrays(vsi);
->  	if (ret)
->  		goto unroll_vsi_alloc;
->  
-
+Link: https://lore.kernel.org/all/20260317140100.24993-2-iluceno@suse.de/
 
