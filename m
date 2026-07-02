@@ -1,182 +1,208 @@
-Return-Path: <netdev+bounces-304298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LHt+NI35Rmp+gAsAu9opvQ
-	(envelope-from <netdev+bounces-304298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 01:51:41 +0200
+	id jTtUN9T5RmqSgAsAu9opvQ
+	(envelope-from <netdev+bounces-304299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 01:52:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCB36FD817
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 01:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F5E6FD826
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 01:52:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=iXP96XdT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304298-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304298-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=rXVeCXla;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304299-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304299-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D78453040970
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 23:51:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B3763046FC6
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 23:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F39F3D7D77;
-	Thu,  2 Jul 2026 23:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BDE3D6479;
+	Thu,  2 Jul 2026 23:52:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A093D7A16
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 23:51:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783036295; cv=none; b=T48GXOjXPYPojDWSwVoC/fYEtBoGDtHwbu61j7M4nj+XWMoxwf48A27muw8pxnIOlJM/XDNGVQZ/2t31TGC5QOrA42OD+5/bLe9ATgWRvhXbhdD/w/vN7WrzbGExIwZGM6vBAfPjuRLdaJOCwHQ/UdaTaiHCgOIau6ozCoUkSL4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783036295; c=relaxed/simple;
-	bh=rFReXlsu8fSc3FIw2rtMwcoHtkhhlcoHIpQXyaO1YRM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lvj/GsqDWOXopAkOf65tirfhu4uIWychntikHYUs2mFuYljhiTMGOUxyZBbioHKtBFVssAVvZy7dNBQc/RhwHGIo2kk76nU0YtX81IQgo+ZO1JUmJLAmy+wy4BqeB4/S7Q8srPy9u4CM/LQh2GCulmCaCTuaAZhbJS5z4FPklhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXP96XdT; arc=none smtp.client-ip=209.85.222.178
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-92e501244f5so175785a.1
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 16:51:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D53314D0D
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 23:52:20 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783036342; cv=pass; b=ZwnQuG1TsKef9/0H7RBPbwR/gl62q+zqilpRkXXsvpXkusc891wEW0J5JIKoJuJ7KpF8J34hZy14cV4+46vjgOBUK1pQhhup1HPjHdRjMe3S0PKEe0+qipSGLWEO4UT/Lt5hfeAR3CxFESyd5dHdUnMhb7Dr0mYD9XiGeNbEWHw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783036342; c=relaxed/simple;
+	bh=qNOpQc3QGpcRBtaplnIR5dpn4gdaxEI2XoJtH5vsL2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f5ldxRL9NupAMKjv6EjcrtTpl5Tynf4wtRIzu1JD70iYzqxovuLXSOPm6NAARbTqgYIMBDPAcPXJz3Tr8x2Z+ZftUwynI/a23n2vX6hzowKPQUY8e/Jtr+g1SUUkcroLbNgGfpUpXUp8EqJZBxo3gJFB022oq17pR/w6PBRO8RE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rXVeCXla; arc=pass smtp.client-ip=209.85.218.41
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c1269e4721aso300509866b.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 16:52:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783036339; cv=none;
+        d=google.com; s=arc-20260327;
+        b=SSt+kNcDZskoIGwOoGEA4A/cU/RIwLFFxqcVbBepUPbNceS2pH/cuj4GZXBXloUWQI
+         LWJOZ+mSa9FdkpMYrOogiG7LnHQdEBQEDrEBqxGTmUWOUxexVrfx0DpmgkoMXmMjib3F
+         pdoBrfthXW9XOqkv8WmDC0Vk+cJ3nHtYsDxIwWR3OSfhhhfCa7X4QYqxVKRHDijg6MyM
+         TJMtZ6B38C7NfmUrYT2QqDDf06OYUyMba2eBHfRLsHkTpy9AP2PtV1Gb36gC2zFX39mF
+         ObA+e1oQRcpaUQJQ9G8at98So8mnExGKILNnV74WGQMJB1MlD9ZoYzjuTcPIAE7nE0iU
+         BTVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=y8mXmJX+ZzpCqp/w7JpCSA6Qcw3BFMeXA6EyptAd3DY=;
+        fh=jfDdDFVE8k3yuIrxlC12hamEzlLbfAQWBk595SSFbEo=;
+        b=Zat+qce2MT0ivw+PhWxSO6bKO+HYvd/nbdHuADoR0R2YoM7g3i5TGsldo2jvVzpMkV
+         NtRmB7bA8xYD2TAeYLE4ueD0i+JyD6PtL7FuNGfh23Dog/MEa4fW1xhzWCw9kMWzWhHl
+         8xwfFyqS4GffMCMI2mUaQBpY+1LnvY6tEu2LU0BAXRVxi0HF/XoVkbrJmL/DZspd9eIR
+         +OJNB5kGuRLVD5yrhk5Yfshl57mu5EjC3u/uggXiThqwY/iizxUOO0mh2Wb3BzO+F7iC
+         70InmU+WxB/2KaqfLOGAEf9akhoFQvHp+/tuNmacoyqkaD5cIdPqc5Zo+i8gvjc02djW
+         JgyA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783036292; x=1783641092; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=rFReXlsu8fSc3FIw2rtMwcoHtkhhlcoHIpQXyaO1YRM=;
-        b=iXP96XdTOToKzaF6Qp9a4gBV8WDbtF1/SydNBJmoN+pRHI6G5IOqWXClcRvly7c6wi
-         6lEOxRPkzXSYl0/oape9WgG+TliZqXl9MCfP41DYL+SZVD0LGbN46saXfEQ3MpnDhYox
-         FJ4Vx8tM4NW24wLuO5BJcY9q+pl45m1pmpRzIt5sy/PWhKC43S8etATk0F9oBe4kDn42
-         Y2/+O8RaoTzYWYqW9ocHeSK3lfBHJr60ZhAFqqbE7PmI5Ovykxbm7JvgnE0HFZEwXHXR
-         Am8Mltxt6SLghpGlhaWk9sFlUcl8qlVfOKokhIH/YE2EiQB/BhHGVm5E3fxE1JbQG8sh
-         GxNg==
+        d=gmail.com; s=20251104; t=1783036339; x=1783641139; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=y8mXmJX+ZzpCqp/w7JpCSA6Qcw3BFMeXA6EyptAd3DY=;
+        b=rXVeCXlaXvzeehfN8XsGNx6qeCwkpqZ3WUBwUPcoSNgfUTbbiqicVSvRMhhx7CwLcE
+         /Htn/dQI1U6OFgp2sFttfXPaWx4Y9g9sOOqiXwLIOm5GA2XAs0Z206zdyKH6+7p1dwI0
+         TKqZCohJbV+ave1MRqfuABcWLrpn946AQNWgmbk/T/92c3gLBLoELx3YW+uxu6HCGNxv
+         NMyMSUHhFoiOrGsHWJPhs6e8EP4fwlwI/oewDJOmMggoqc03EDjqKBVWHp3XNKZHqKYe
+         B32jncVlTUXIXPIVABfDzNU2yzxIoTOu/9Lj0uhT8PEkp3z7V8wlSXopX45EUId1/QcK
+         H93A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783036292; x=1783641092;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=rFReXlsu8fSc3FIw2rtMwcoHtkhhlcoHIpQXyaO1YRM=;
-        b=E2D9H3qd6GLmCzB1drXFBhA0tfy1BnyrLNvNeFZZHZ9AkH3jDdB5dQlw05CQgyAW4G
-         lcE/LTd5xOCxKb9chpAHhhxdnJyfC6Xcu3MKwFHNSNeiHDReif3LnOpCUykcFIYd5lpl
-         inJ+Ss3atlDPmF3WPTJimVZu0o/qVJlM96b2HSHjk6Rj+EpTeC5SoGv9vcyXKj6vQonk
-         ETKIImBbauJ0epg2eS9uhrUxbeuts6Y+uIZWetfQornCymxbIivXIw/v6si0nXI/ND5K
-         4yVA5UoOEBAsI02jTJJSljvwBLEHIlPiXQEYUQSTaZg8F5cE2fuVATwoGBncmjY+QhBs
-         yyCQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+USPCSIKP0BwhBjd3r7y1+vgiarDthwk515MPnAdVgyTXxYVZb6Z8fbAXrFKpoK9WrE/9PU18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHMCBgVphsw5CvPojzLFew90lffjK5B5cGAdk9ON8VkmU25++j
-	u2om7eOeZNOrDrc1LxhurNEex+/2XMx6Mmd6gGFr27r5yUKPWPOlGl5e
-X-Gm-Gg: AfdE7ckxqSapdIoPTUbMDZY4Kl8F51ZNoJg115U/sQDIGS6I3iEbC7dyHHwBq2DeML/
-	/flRy82yqgqjNnhnfmEZ4mNik23EVMRVvsnUsTwI6hkOBcZajU7o/yTGjM2909rmVxQMMJltpf3
-	rV5UZYHkKR/yWYoQP+q5ZPwIxi4ogO0xHb1ZIHsPW8SdJaqXsUs/5JvZmBoSfrYF+Sxt5/4WG64
-	kT7oR6soZ2XP5sJOZhStvC/PDEd+G6aUqpv9fdFglpN6yHykfFjsXDGDAFGCzNuLhbjfnLxrz4w
-	tNrunLVoHXo4XoI85/J1Ab+bBo3RV0YgOUv/OnAzpDhWujGbva4/NHuooXAUF/ZuExd0/eykCNj
-	MTgGAFvjKAnmNCfa1178LQtJcbF31Hf78AP9GAGNcGl3BZwIOWL/69AABgwZpxMrnMCI0oKwZCv
-	e0H4qIBuSdFEhtC7g3NJiR/oxYmqrtZsa22vAP8xC04ZuoVg3JlsMdRAY1CJHv
-X-Received: by 2002:a05:620a:4410:b0:92e:76a1:96d3 with SMTP id af79cd13be357-92e7b3e82bfmr983241085a.34.1783036292031;
-        Thu, 02 Jul 2026 16:51:32 -0700 (PDT)
-Received: from AMD.home.local (dhcp-9-244-8-156.gobrightspeed.net. [9.244.8.156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e90b80785sm11476585a.3.2026.07.02.16.51.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 16:51:31 -0700 (PDT)
-From: Enzo Adriano <enzo.adriano.code@gmail.com>
-To: Junhui Liu <junhui.liu@pigmoral.tech>
-Cc: Andre Przywara <andre.przywara@arm.com>,
-	Brian Masney <bmasney@redhat.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-clk@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>
-Subject: Re: [PATCH RFC 0/8] clk: sunxi-ng: Add support for Allwinner A733 CCU and PRCM
-Date: Thu,  2 Jul 2026 19:51:18 -0400
-Message-ID: <20260702235118.1225793-1-enzo.adriano.code@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <DJO79318OW0A.2RDQOAXRTHNCW@pigmoral.tech>
-References: <DJO79318OW0A.2RDQOAXRTHNCW@pigmoral.tech>
+        d=1e100.net; s=20251104; t=1783036339; x=1783641139;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=y8mXmJX+ZzpCqp/w7JpCSA6Qcw3BFMeXA6EyptAd3DY=;
+        b=ScaxgsnBLjFwwQtbBh5qBrHsP2plsaJ3UeIiVchr01O8Fc9erOVmACEr9o5OMIQmiN
+         joMZuJTEdMOYTfH2VJ/s/F2p35qIKiweaqpx/Ncwusb8QduoJZCKca8lF/hUh5pqJHtm
+         9yOj4LXkSTiJVqQmJmIYxAHTF4h96l85jWnn25is9OjLI8Uru8ejFIGnlAwDyqfUOi+s
+         y7X4Vnn9QmNH3UNPXJ5QeuKj+InvADOvR5lTLD5fzJf1EEBtAep5eHGK0ppPTl5lgS0O
+         oi9q4RiVlzshWbKk6Vceip6nuSBmz7naSWFDuSh3t5KGQh5trvAhNl4LHwe9o5SU3iQc
+         0fSw==
+X-Forwarded-Encrypted: i=1; AFNElJ/8GOXUr98DnXaDL+cBY2rbg4kidYOPF0BplCJKr3uOXT3njpEimdKdJPbJwvMQ3T6rHrtdCso=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZsYzmV/SbLFdoRRnXo+0tsU6qu0Vn+uWb1qnSErYDtUe/J/0E
+	qeSPFizPyk6UU9duP8FeuFGVTVjHTZ9SBJa78seseAUYw9e9X4USl87UfAkq+bshv7joIC1FMrz
+	/+3jKAevTYaOxaUcI5NSExsPbtVxQAc/sLa7K
+X-Gm-Gg: AfdE7clyUrFjmDvmpsHIO/NfwvoKunNoUgct8473a4AGseTvg5kPqCh8wsngAv6o/pA
+	1XS5AHWQLLcv8J3tvE7bcd4Ca5iPvfxYIxLBB5aG2+BiNBFrV0H9t1xGMLnQhZh0R6I/yzqWTwU
+	z07ZWw/fSOrInY0CWV39rjrO9+Ov8+XRv1JdAq4qaNLa6vrJODGWyGuw0V9EwfQ02pqs4Lavawf
+	RgVXZiRKKASe7dQS1aJuNIUKf4RdTK418pE9mFvWknJQ47Ipr86GC07k6SqnqguoajGN8CRiw==
+X-Received: by 2002:a17:906:6290:b0:c12:919f:f6e3 with SMTP id
+ a640c23a62f3a-c12aa1d5f0dmr386999066b.57.1783036338723; Thu, 02 Jul 2026
+ 16:52:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260630164623.3152625-1-syoshida@redhat.com>
+In-Reply-To: <20260630164623.3152625-1-syoshida@redhat.com>
+From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Date: Fri, 3 Jul 2026 09:52:07 +1000
+X-Gm-Features: AVVi8CdnT0IFD9ALngbaFY-xqzY4hDFoOfiwrX7N0prDeDJiU1rJrt_LQDxa-t8
+Message-ID: <CAAvyFNhY2Jp5aH6YPrtfc0mBpwuSeT-8u8bODqq=pootpQffmw@mail.gmail.com>
+Subject: Re: [PATCH net] qede: fix off-by-one in BD ring consumption on
+ build_skb failure
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matvey Kovalev <matvey.kovalev@ispras.ru>, Pavel Zhigulin <Pavel.Zhigulin@kaspersky.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-304298-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:junhui.liu@pigmoral.tech,m:andre.przywara@arm.com,m:bmasney@redhat.com,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:wens@kernel.org,m:p.zabel@pengutronix.de,m:pjw@kernel.org,m:palmer@dabbelt.com,m:aou@eecs.berkeley.edu,m:alex@ghiti.fr,m:richardcochran@gmail.com,m:linux-clk@vger.kernel.org,m:linux-riscv@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-sunxi@lists.linux.dev,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:jernej.skrabec@gmail.com,m:samuel@sholland.org,m:krzk@kernel.org,m:conor@kernel.org,m:jernejskrabec@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304299-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[jamiebainbridge@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:syoshida@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matvey.kovalev@ispras.ru,m:Pavel.Zhigulin@kaspersky.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[enzoadrianocode@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[arm.com,redhat.com,baylibre.com,kernel.org,pengutronix.de,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,sholland.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enzoadrianocode@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jamiebainbridge@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2DCB36FD817
+X-Rspamd-Queue-Id: 39F5E6FD826
 
-Hi Junhui,
+On Wed, 1 Jul 2026 at 02:47, Shigeru Yoshida <syoshida@redhat.com> wrote:
+>
+> qede_rx_build_skb() and qede_tpa_rx_build_skb() do not check for a
+> NULL return from qede_build_skb(). When it returns NULL under memory
+> pressure, the functions still consume a BD from the ring before
+> returning NULL. The callers then recycle additional BDs, resulting in
+> one extra BD being consumed (off-by-one). This desynchronizes the BD
+> ring, which can corrupt DMA page reference counts and lead to SLUB
+> freelist corruption.
 
-Good to hear from you, and glad the series stays in your hands. I hope
-the move went smoothly. No rush at all from my side, please take
-whatever time you need to settle in.
+Good catch.
 
-For whenever you get to v2: I posted register-check notes on five of
-the patches earlier today, so they are on the list to pick through at
-your convenience. Take from them whatever is useful and ignore the
-rest.
+Reviewed-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
 
-One offer, entirely take-it-or-leave-it: I have three Cubie A7S boards
-here with serial consoles attached, and I am eager to put them to
-use. I can boot v2 the day you post it and report back, if that would
-save you time.
-
-On my side I have Cubie A7S board DTS support staged to follow once
-the clock and pinctrl pieces land, so whenever v2 arrives it will get
-exercised on real hardware right away.
-
-For transparency: I use AI assistance (Claude Code) for the register
-comparisons and the test harness, and I check each finding against the
-manual and vendor sources before posting.
-
-Thanks,
-Enzo
+> Commit 4e910dbe3650 ("qede: confirm skb is allocated before using")
+> added a NULL check inside qede_build_skb() to prevent a NULL pointer
+> dereference, but did not address the missing NULL checks in the
+> callers, making this off-by-one reachable.
+>
+> Fix this by adding NULL checks for the return value of
+> qede_build_skb() in both qede_rx_build_skb() and
+> qede_tpa_rx_build_skb(), returning NULL immediately before any BD ring
+> manipulation.
+>
+> Fixes: 4e910dbe3650 ("qede: confirm skb is allocated before using")
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> ---
+>  drivers/net/ethernet/qlogic/qede/qede_fp.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/qlogic/qede/qede_fp.c b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+> index 33e18bb69774..c11e0d8f98aa 100644
+> --- a/drivers/net/ethernet/qlogic/qede/qede_fp.c
+> +++ b/drivers/net/ethernet/qlogic/qede/qede_fp.c
+> @@ -765,6 +765,9 @@ qede_tpa_rx_build_skb(struct qede_dev *edev,
+>         struct sk_buff *skb;
+>
+>         skb = qede_build_skb(rxq, bd, len, pad);
+> +       if (unlikely(!skb))
+> +               return NULL;
+> +
+>         bd->page_offset += rxq->rx_buf_seg_size;
+>
+>         if (bd->page_offset == PAGE_SIZE) {
+> @@ -812,6 +815,8 @@ qede_rx_build_skb(struct qede_dev *edev,
+>         }
+>
+>         skb = qede_build_skb(rxq, bd, len, pad);
+> +       if (unlikely(!skb))
+> +               return NULL;
+>
+>         if (unlikely(qede_realloc_rx_buffer(rxq, bd))) {
+>                 /* Incr page ref count to reuse on allocation failure so
+> --
+> 2.54.0
+>
 
