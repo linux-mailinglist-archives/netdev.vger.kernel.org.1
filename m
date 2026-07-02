@@ -1,74 +1,78 @@
-Return-Path: <netdev+bounces-303908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id A/Z+AquzRWqZEAsAu9opvQ
-	(envelope-from <netdev+bounces-303908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 02:41:15 +0200
+	id IeK8KyqzRWqCEAsAu9opvQ
+	(envelope-from <netdev+bounces-303909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 02:39:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6171E6F2A8D
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 02:41:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48F806F2A5D
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 02:39:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=DRSYZ+cN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303908-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303908-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mlZcp5LD;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303909-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303909-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F4B830DC688
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 00:38:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C03D53041366
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 00:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAA4261B8A;
-	Thu,  2 Jul 2026 00:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547E925B088;
+	Thu,  2 Jul 2026 00:38:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6C242D65;
-	Thu,  2 Jul 2026 00:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A36323EA84;
+	Thu,  2 Jul 2026 00:38:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782952730; cv=none; b=aL8TcbVPK/49Gquxse7IrPqzqZJM5ARoQVhxmedBltrIeHs6jfHYmAroJp7YXVB8QYkIUoFoFcD36UhuzBUQn4cIkwb25dhoccUnIj7gnm3gh+xdh45fpqY8BMIB/WQ8RNl6M5091ScfMpK7hgXRKpPAkvh1hFiRsMzhfxTkn5w=
+	t=1782952738; cv=none; b=ffHJfhjFCSqzcxtqaCjq0vXS/t1Qr5DK8syPO75/UvI39lTfC/oEGIVL8/uRIpkLpK0IkkGvONOr4II3ZXafzZ82pueFKFpHJqYpFyB3Nr+DZM9CnUdvtlZplX+L3saHcXIwFuz8R9RPJbYVat/cUJ1+AmUw6R8EpLeSwmKf3P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782952730; c=relaxed/simple;
-	bh=kT/NBqQunlWsQ7ubvjZhQleFnca7dO290+Jy4yB4+cU=;
+	s=arc-20240116; t=1782952738; c=relaxed/simple;
+	bh=XpVtySHffmliPkbplhdQWuR3F1r9v/PsDoCVuVnx8Qg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a/xbjw1ODO4chm1y7e5mzpRVz1D7x77ESTt4O0IlqbRaT4cs8qVTZhpYmvtRB3y0zy3WFyapAPokOk8/w1BkRbrkk4pmGBoM+h6OFCM85Bo3n33JgJ6b7Q3JxvbsVj3K8phIZVSisIo5SXZNEpuviBt8BoIfUsi5Hc6T6ECefe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DRSYZ+cN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9EC21F000E9;
-	Thu,  2 Jul 2026 00:38:47 +0000 (UTC)
+	 MIME-Version; b=KGnXI2dDeHbnGufLtxtCNr7rC/ALZsinAiLSZr/Dl7akICqhWB5smhF2XOkv+Ri9lS/h7qWnYbNXl9K3Q6D58YruOZpVQBx6LY1vBGWg5mtHPOplL3m9MppmL7O6+g+9Yret2sslcwDbxQeWLrcbg8GTBWsfH8Yxeux4cHahQEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlZcp5LD; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFEEC1F000E9;
+	Thu,  2 Jul 2026 00:38:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782952729;
-	bh=RQBnHF1qtS6KGf+wzw5MMQOAlTk6sYRCuY6XAJaTSS0=;
+	s=k20260515; t=1782952735;
+	bh=Ik70JGL/KUEmdnFaSVDz6rNF8Zghre5it8AqKqb1vHQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=DRSYZ+cNrD4eaUMA1Yzo5UAlyJZNYfyijYcOlj2OVeGlPPY9GsH1pOdugbAyeMoS4
-	 NChqDFgyYeU7McLKXTf0nYvCFkvviI+yaTpiOFcxsTVGdyZj95XW0xUy0o3yTcmnaj
-	 jI1eyP2zW2Zlrg0MQYoKJf9U4OpRVUMCxFcbvYtydGwRdlQKjJ+ytNKInAj/TZNUQS
-	 Bkw6/sI5mR0fLWCnN8523HCIJej/TfLJnRwUUvMSzmIn8eVgBvMv94iHsyODWSO6Ac
-	 e0/MvxdoPGsBKr2E9i5v6Mg7fGYruiA73OUsMQbwnsQitQYYtbfbfPdJz/zE3qu6cd
-	 rr7sQRTyK90Jg==
+	b=mlZcp5LDIRve2h0cfG3rsftjVutaViINODAu22z/KAUbNW6PKGKksgLnxWCxaKjZf
+	 9rfZWVPTSjLzM5KbQZ+kDOpdZkrzafVzPm/bxjRqeLHMsmlCEFVCX0NHMNPW18mCX2
+	 ba8mCERN7errdz/vIuOi3wz9Q4henh1+s3flR9Z2nsZ2txX+bGkT2sdcCNilUxKJuo
+	 0k1kT6zOTmSzwHHUpQfTKcQJu7MfbZAh4IrFIArEV4eQBV2fEWlk3byjuUji25UFY+
+	 2Vh/W53KhfyKaB6Om7uhDHRIHkEojicpbhC6qpZeLLAiXWl5ME1sLRxrSEeRHAfNNh
+	 0v+vnUUfKnv3w==
 From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: dominique.martinet@atmark-techno.com,
+	stable@vger.kernel.org
 Cc: Sasha Levin <sashal@kernel.org>,
-	Elizaveta Tereshkina <etereshkina@astralinux.ru>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Kevin Hao <haokexin@gmail.com>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Wenshan Lan <jetlan9@163.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	linux-omap@vger.kernel.org,
+	Mat Martineau <mathew.j.martineau@linux.intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH 5.10] net: cpsw_new: Fix potential unregister of netdev that has not been registered yet
-Date: Wed,  1 Jul 2026 20:38:31 -0400
-Message-ID: <stable-reply-cpsw-new-510-20260701193800@kernel.org>
+	Rajat Gupta <rajat.gupta@oss.qualcomm.com>,
+	Yiming Qian <yimingqian591@gmail.com>,
+	Keenan Dong <keenanat2000@gmail.com>,
+	Han Guidong <2045gemini@gmail.com>,
+	Zhang Cen <rollkingzzc@gmail.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Victor Nogueira <victor@mojatatu.com>
+Subject: Re: [PATCH 5.10.y] net/sched: fix pedit partial COW leading to page cache corruption
+Date: Wed,  1 Jul 2026 20:38:34 -0400
+Message-ID: <stable-reply-pedit-cow-510-20260701193800@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260630200717.1994713-1-etereshkina@astralinux.ru>
-References: <20260630200717.1994713-1-etereshkina@astralinux.ru>
+In-Reply-To: <20260630-cve-2026-46331-v1-2-c1986f356f26@atmark-techno.com>
+References: <20260630-cve-2026-46331-v1-2-c1986f356f26@atmark-techno.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,21 +87,21 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:sashal@kernel.org,m:etereshkina@astralinux.ru,m:grygorii.strashko@ti.com,m:davem@davemloft.net,m:kuba@kernel.org,m:haokexin@gmail.com,m:alexander.sverdlin@gmail.com,m:jetlan9@163.com,m:ilias.apalodimas@linaro.org,m:m-karicheri2@ti.com,m:linux-omap@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,m:alexandersverdlin@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:dominique.martinet@atmark-techno.com,m:stable@vger.kernel.org,m:sashal@kernel.org,m:jhs@mojatatu.com,m:xiyou.wangcong@gmail.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:kuba@kernel.org,m:mathew.j.martineau@linux.intel.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rajat.gupta@oss.qualcomm.com,m:yimingqian591@gmail.com,m:keenanat2000@gmail.com,m:2045gemini@gmail.com,m:rollkingzzc@gmail.com,m:dcaratti@redhat.com,m:toke@redhat.com,m:victor@mojatatu.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303908-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-303909-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,astralinux.ru,ti.com,davemloft.net,gmail.com,163.com,linaro.org,vger.kernel.org,linuxtesting.org];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,linux.intel.com,redhat.com,vger.kernel.org,oss.qualcomm.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -107,20 +111,21 @@ X-Spamd-Result: default: False [-3.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6171E6F2A8D
+X-Rspamd-Queue-Id: 48F806F2A5D
 
-> If an error occurs during register_netdev() for the first MAC in
-> cpsw_register_ports(), even though cpsw->slaves[0].ndev is set to NULL,
-> cpsw->slaves[1].ndev would remain unchanged. This could later cause
-> cpsw_unregister_ports() to attempt unregistering the second MAC.
+> [Dominique: plenty of context conflict but the code itself could still
+> mostly be used]
 
-Queued for 5.10.y, thanks.
+Thanks! However, the same upstream fix (899ee91156e5) is already queued for
+5.10.y via Wentao Guan's backport, which brings in the act_pedit
+RCU/percpu-stats prerequisites first and then applies the fix nearly
+verbatim.
 
 -- 
 Thanks,
