@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-304283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MSlJN/7pRmrOfQsAu9opvQ
-	(envelope-from <netdev+bounces-304283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:45:18 +0200
+	id 2YZUOU3pRmq/fQsAu9opvQ
+	(envelope-from <netdev+bounces-304285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:42:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6636FD478
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:45:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8267B6FD453
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:42:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=HHtKaPC4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304283-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304283-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=QMEbFhur;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304285-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304285-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C918D3031336
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:42:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AA154302A9EF
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35564335067;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8ED33D333C;
 	Thu,  2 Jul 2026 22:41:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj2-f1.google.com (mail-pj2-f1.google.com [74.125.227.129])
+Received: from mail-pz2-f1.google.com (mail-pz2-f1.google.com [74.125.228.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB1F3D25B2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032183D3301
 	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 22:41:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783032117; cv=none; b=ihMdoA30qvwvvB7B5K4WtO6I4uR8vZFh7h3GTLuuWYwj/u+ox+i5+gzAAvANmqmXTnBG4oefvvxAzJqkpM80KegQeSEaLJ7NxvEJmdMzOoa8FMJw2uwM2Asb0KNZmfeKi8gkjl4HSCJikDcnfhslkjixi7WEhzGRS7yTfqedICM=
+	t=1783032118; cv=none; b=AlSvst8+IcBi0ForKi0rNErF8rugJSjXC9BeZNSCmbU1J/S4bC6/2tyV1/18x1+2TLmouIJvbxKSamsLKlX2a+jhGzISsdMq/6pghoNnc6MAkjnMLrS06mJNaQsY47VwzUHvXjWvq8eQaHe2J9JZf+hnPvnOocF4edPVhIG9C3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783032117; c=relaxed/simple;
-	bh=EbDXHwZhKWezlvHibLxaPTBKS4CLC+lVVYHUqlY3D6w=;
+	s=arc-20240116; t=1783032118; c=relaxed/simple;
+	bh=+Bck/AIRrSuAnBk1w2hhYEDp6AJYcc5dryvZH3onWLw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qC1IhZS9401FLbznwceQ3uqmzBpOulgBPXJjA292VyKXR2tUia85hQf9+v3hfnMHY7ovNmXZCl3YhuuxFZbaI+gEc07klQHBaTWnBwHwQciNi8CE1BG1rCgkrGSJQW6oMnVTSwHwwWsJs8dwOLHiD7CgWK+PbmdjSpau1ITf6xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHtKaPC4; arc=none smtp.client-ip=74.125.227.129
-Received: by mail-pj2-f1.google.com with SMTP id d9443c01a7336-2cabf1f1051so2082905ad.0
+	 MIME-Version; b=IeQK65UZj+qS6/ygkThQ8+XwOSZpwFJymTpDJeelLVkUy0FhlpIoMfpcIvmM1+Yyus7iUNPs2bNa8Dn+WbE7pff74pjkThS++Oc+4b2bi5FkC763sNiKsLMxhJNKuvjtyiVqvKInMZxyL6lCnvAAm/lS2GuZyblpmcGpFZ2ibHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMEbFhur; arc=none smtp.client-ip=74.125.228.1
+Received: by mail-pz2-f1.google.com with SMTP id 41be03b00d2f7-ca034c989e2so46582a12.0
         for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 15:41:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783032113; x=1783636913; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783032114; x=1783636914; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7upDWRqYnMkDp7WGbybswVJOmwtvnZhv59i8fe7oAhk=;
-        b=HHtKaPC4PkOMIYLJAxJ7YYzoCU/eYSuA3eSZiVXcUlQ3jzxCs7NRgn9sZOolY3VayD
-         8p/b+e/hSfZ3aLpRNs+DzCxDe5PiGvii+6eZsAwoKnXBYpjZvHa58AEGbCY2zbvOwx2f
-         MzVSIN1R/ibOsBlts2oGKxM5WZ8AdyIDf8dIWhCC18lca2S6Z6QhHTZIpk6PxAkhJVro
-         2wRRsfftzBZ3dsulnWj4cD9F7VpZZ0qG3bswXzn6CHPF05duFF9iVlYHSPKvBqVlWgvm
-         ra952QNRHqmN1XNYrOXjDDMrhzL15z+yd5dj4L50WAAqOLTqFq2fnDBZV3sUzv5naEAn
-         8Ycg==
+         :message-id:reply-to;
+        bh=HbiP2ZDbDEF7MxMBi2Cibr1JyKAUZE0Nd+Glad1yqDU=;
+        b=QMEbFhurb9Tfuu8L2qFI6MiF05JFhILZczEgqGKNhpa+pXgkT/+2Fd7PNj/TmQ26Fo
+         LA6IxQ6j9OsHq1MC/YGR6R1Q7Inq1KAxyvuhQJmRGIgaJuTOLOQ91REpHsXvFSHtucvu
+         +mydSuLUyLoyIqXUm1+JEQ/nFfQ7bnayvBEY+rWwKwyaxA3zpQKDuwGT0e0RJFQM1p2L
+         ryOu/6XGCSDWt2SGM0WrHWCTiKggF2I3qg8J+OTwqmcAiJ1/MLXQN2rfbPCDaKn7NV8H
+         uanlpCninZc8gY9NTjLcthkawlbb85eB1cQdoQVfXIwm6UQ9q4ihkmX9upiVz8c6VOwY
+         UjSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783032113; x=1783636913;
+        d=1e100.net; s=20251104; t=1783032114; x=1783636914;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7upDWRqYnMkDp7WGbybswVJOmwtvnZhv59i8fe7oAhk=;
-        b=AQbnLPEJPfhhTmtzXl4t06BDFOOCdMJr2a3zm9Koj8zUrXmlEIGoUVMJwjbfDxkXur
-         jdLdl9sM5trUXQ/PjppS7QxAefhdy6DB9nPWVQCnooC+Bf/t32JyEePS19esnoeEjjnC
-         PY/CZfhoQjC3/tMWl+PrTEAuEX9+Ei0zLK7jkxCVpypZZCwnl07hvaH8YWtsFCjpMA06
-         mr6zuYvOqdJul6t1DKMxbu9Del1aCC7d0ZpX3cUxjkK2ORhb9Ym0x7tqQdIZRfoWRwM9
-         7KiH0PPHewAdtSFDkbXyK4gkTmo4ZoEbpuz03w8X1AWaZfOETfmtiZwtTtZlC06KZ8Ps
-         iSqw==
-X-Gm-Message-State: AOJu0YzkNGooSsJmhac68LyaYspoJ5Q9AnBvilrm5YJqojdBIBce/rdn
-	yIhLsBxgBrqj3p2NV12QlHOdKGFkqrmaKpivwEeOpG7BziWs4bpZBbI1/TC4C7VX
-X-Gm-Gg: AfdE7cmaa4uVzzDe6EcmdklQ03c9cWQg7YyDQCtF19DwelaxMcqxqvcutfSoXvWSy25
-	LqfnpYwAWQWlFGFwQkCZ1C5So8h+XjLBys18cU6ll8Zze7STtUQTQ/M5SW1Hss9sGYx039U9yQK
-	enCk2OET1w2nsP43FO+ufYkkX5s+Rz7PbB6Q5va/BoJhM3H01uBDt8p1KV/laSXvONeIdLs9dLp
-	u31Kd2nTWALzum8t0GnmFW3oJOxlyFnh5kLb1gH+Cjb/0TBsEF4U0VT7E2B0iRFZQiq7F71MY0u
-	rpPG01SG8rq1CCTwTdFENe2160/fWWZrjj7yMdFCreeZNCnQC8pD4FB3sXXtAgSdmJsq66QZ/xm
-	+2qw8iHJqaOfUaZ3eOJcsYmTuIfhN7Wko+sR5ZVHfh1JJh6BeEoEk8cOP9tffUXT8lpskeXSaWi
-	wXDBnjcQ==
-X-Received: by 2002:a05:6a00:1c9a:b0:846:2f3d:6259 with SMTP id d2e1a72fcca58-847c51d2a31mr6795627b3a.57.1783032113338;
-        Thu, 02 Jul 2026 15:41:53 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:74::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847cb7933e1sm1881989b3a.26.2026.07.02.15.41.52
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HbiP2ZDbDEF7MxMBi2Cibr1JyKAUZE0Nd+Glad1yqDU=;
+        b=lFaReE0AxKA6/l8fceI7C52eNraery2H8BQhONHT/4MqA7yx9TAnNn/kRp3mVynLCv
+         BBiCpXVIor8bmdlxP456gfmLlXg8DDDOEcpvtu7Cg49S6ZgNDTwUY4nQHK7AVlWsqqtE
+         019h4RubHe1+LbvD+C9iW7PTVBYP7aVQEQtYrGuqnE/I7EjYxRlAu6RNl0tUFvLc7R2i
+         QRH3okQSAdEI1YCVKFDBOoL2+lh5YFruX18coCDZdKiHJW5kl7isBuSnA7HS1DAKIRqK
+         QDOg0dAtW64SIS3ucsnd5IZis5Du8mEJyldkrwK0D9u2eeOw3lYwrmkGE4bjArHFGUDZ
+         +QnA==
+X-Gm-Message-State: AOJu0YwWfDBgcb8jz7k/+TYHP2aVfRpFRjQQyptdHCaxMbOa0IOOJCvF
+	5Tzc05nYIluM9wQZRmG50IxrijV5w9e44ukQwhkn6pSwJVa8PYkzEbXW9woZagt6
+X-Gm-Gg: AfdE7clmLJXYsXWCjV9bBF1OEiCxQHyS/Ksq0MaeBFL5dMFloE/MrNbfvYzaTR7Rz+M
+	7LWIo18LVShVtmfkQQNViRoklQnGUbOqvrwo4eB+bHy/BOoJGVqJ2pK4dMBV8jhZ6tHZm3H5SAe
+	6KdyZMcAitlHJONbz+PdwH6piCagl20uItBi1fPy5zKO/II3AlsySpDI14EEZxHkKDahVcZOIdh
+	dJNxG04rnlg+iZ2qhkb9dbrAUIY4xfEBg+fLJoo5I15SZtsFt9pLygP1u0Io8Rd+0ZcZqcALa57
+	Hp7OhA4zzvawnp3QVikbBA7JL41xpXEJCbf2FQ4Es0Ohi09NvqpUsyyoVGczTMus6P5By6IJWk1
+	J86HbSf1CcES14Op7tt2InDaM/0xVYM51iUm9TMyXfWEAwADu0FI7p9GQW7WY0aVvNrDiKzx5I8
+	qcP5pG0oxAbN2rIMY=
+X-Received: by 2002:a05:6a00:b51:b0:845:ce5f:c934 with SMTP id d2e1a72fcca58-847c075ccf4mr8451389b3a.2.1783032114241;
+        Thu, 02 Jul 2026 15:41:54 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:1::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847cb9edf07sm1988855b3a.58.2026.07.02.15.41.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 02 Jul 2026 15:41:53 -0700 (PDT)
 From: Stanislav Fomichev <sdf.kernel@gmail.com>
@@ -82,9 +82,9 @@ Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v2 2/6] net: dsa: hold instance lock on close-on-shutdown paths
-Date: Thu,  2 Jul 2026 15:41:46 -0700
-Message-ID: <20260702224150.3730033-3-sdf@fomichev.me>
+Subject: [PATCH net-next v2 3/6] net: mtk_eth_soc: hold instance lock around DMA-device-swap close
+Date: Thu,  2 Jul 2026 15:41:47 -0700
+Message-ID: <20260702224150.3730033-4-sdf@fomichev.me>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260702224150.3730033-1-sdf@fomichev.me>
 References: <20260702224150.3730033-1-sdf@fomichev.me>
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -112,7 +112,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-304283-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304285-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
@@ -126,99 +126,47 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,fomichev.me:mid,fomichev.me:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,fomichev.me:mid,fomichev.me:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3A6636FD478
+X-Rspamd-Queue-Id: 8267B6FD453
 
 netif_close_many will soon assert ops lock (for locked DOWN/GOING_DOWN).
-Update dsa_switch_shutdown to manually grab and release the ops lock.
+Update mtk_eth_set_dma_device to manually grab and release the ops lock.
 
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- net/dsa/dsa.c  | 20 +++++++++++++++++---
- net/dsa/user.c | 19 +++++++++++++++++--
- 2 files changed, 34 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 9cb732f6b1e3..da53a666d4b8 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -18,6 +18,7 @@
- #include <linux/of.h>
- #include <linux/of_net.h>
- #include <net/dsa_stubs.h>
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 5d291e50a47b..fe7610c42e5d 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -26,6 +26,7 @@
+ #include <linux/bitfield.h>
+ #include <net/dsa.h>
+ #include <net/dst_metadata.h>
 +#include <net/netdev_lock.h>
- #include <net/sch_generic.h>
+ #include <net/page_pool/helpers.h>
+ #include <linux/genalloc.h>
  
- #include "conduit.h"
-@@ -1620,10 +1621,23 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
+@@ -5030,10 +5031,14 @@ void mtk_eth_set_dma_device(struct mtk_eth *eth, struct device *dma_dev)
+ 			continue;
  
- 	rtnl_lock();
- 
--	dsa_switch_for_each_cpu_port(dp, ds)
--		list_add(&dp->conduit->close_list, &close_list);
-+	dsa_switch_for_each_cpu_port(dp, ds) {
-+		if (!(dp->conduit->flags & IFF_UP))
-+			continue;
-+		list_add_tail(&dp->conduit->close_list, &close_list);
-+		netdev_lock_ops(dp->conduit);
-+	}
-+
-+	netif_close_many(&close_list, false);
- 
--	netif_close_many(&close_list, true);
-+	while (!list_empty(&close_list)) {
-+		struct net_device *conduit;
-+
-+		conduit = list_first_entry(&close_list, struct net_device,
-+					   close_list);
-+		netdev_unlock_ops(conduit);
-+		list_del_init(&conduit->close_list);
-+	}
- 
- 	dsa_switch_for_each_user_port(dp, ds) {
- 		conduit = dsa_port_to_conduit(dp);
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 8704c1a3a5b7..8ea47444d6d5 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -13,6 +13,7 @@
- #include <linux/of_net.h>
- #include <linux/of_mdio.h>
- #include <linux/mdio.h>
-+#include <net/netdev_lock.h>
- #include <net/rtnetlink.h>
- #include <net/pkt_cls.h>
- #include <net/selftests.h>
-@@ -3600,10 +3601,24 @@ static int dsa_user_netdevice_event(struct notifier_block *nb,
- 			if (dp->cpu_dp != cpu_dp)
- 				continue;
- 
--			list_add(&dp->user->close_list, &close_list);
-+			if (!(dp->user->flags & IFF_UP))
-+				continue;
-+
-+			list_add_tail(&dp->user->close_list, &close_list);
-+			netdev_lock_ops(dp->user);
- 		}
- 
--		netif_close_many(&close_list, true);
-+		netif_close_many(&close_list, false);
-+
-+		while (!list_empty(&close_list)) {
-+			struct net_device *user_dev;
-+
-+			user_dev = list_first_entry(&close_list,
-+						    struct net_device,
-+						    close_list);
-+			netdev_unlock_ops(user_dev);
-+			list_del_init(&user_dev->close_list);
-+		}
- 
- 		return NOTIFY_OK;
+ 		list_add_tail(&dev->close_list, &dev_list);
++		netdev_lock_ops(dev);
  	}
+ 
+ 	netif_close_many(&dev_list, false);
+ 
++	list_for_each_entry(dev, &dev_list, close_list)
++		netdev_unlock_ops(dev);
++
+ 	eth->dma_dev = dma_dev;
+ 
+ 	list_for_each_entry_safe(dev, tmp, &dev_list, close_list) {
 -- 
 2.53.0-Meta
 
