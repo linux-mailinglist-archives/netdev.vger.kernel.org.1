@@ -1,271 +1,255 @@
-Return-Path: <netdev+bounces-303921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vdEEGjLTRWo5FwsAu9opvQ
-	(envelope-from <netdev+bounces-303921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:55:46 +0200
+	id PNS0AyHaRWo7GAsAu9opvQ
+	(envelope-from <netdev+bounces-303940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:25:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349D16F3220
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:55:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4417A6F3360
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:25:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=32wH6hhG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303921-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303921-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=huawei.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b="iIWq/hl9";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303940-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303940-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B2E2D30315FD
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 02:55:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDCFE30177A5
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1707530EF80;
-	Thu,  2 Jul 2026 02:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FD33101A5;
+	Thu,  2 Jul 2026 03:25:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010030.outbound.protection.outlook.com [52.101.69.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61332DF717;
-	Thu,  2 Jul 2026 02:55:36 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782960940; cv=none; b=rICbzpdZvLkGvJExkFD7uyPUVwxs6cVbL5hWCMsPhYOnWlm9EAuKtBpwGBIvmWeAbSouoGtwN8D1h8C5hoLTxOPpstGHEEpS6dLAh8Rn9o3L5zlEYCVPgpngoRp9A0mnT7IK6BHg4xD/5OXdbOnhBrNuCSUh31OPrjvcnEYaeHU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782960940; c=relaxed/simple;
-	bh=FHDJ6S0cme9NFQlijE1zY8pDFCRpU2a8tTQEaGDGWIQ=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KhjHZj8w9G9RRaht1aaDfswPchqsTTzKql/nNoLeuirhmsV6+yHBEPnDFt4SBpGiniA6RTWeVoo4zH1bl1zPCVKcAKvsYwHbYQqkyirK9fN9/g348wD1HBCs95DYFMWIE3UicD9elZoDB0VmAgJPkb8PLAvW0CcvkkS/v9aZV7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=32wH6hhG; arc=none smtp.client-ip=113.46.200.223
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Z/IC9QfT5yS2aAq8dSyLYn2dEGe7oIq6qCnw/Wv2xv8=;
-	b=32wH6hhG+7AriEN4q1uh5ZqPFaebKmU91Fi+7g5dU1IPwGPOtYDdWoEBVLoWjLWs/0POit6nu
-	JU2YD75n1dCGBzl4WJS2mwewyLp7v5555OEpJw8czpb4LphGZmHfBJfqFE/S7oUABYQbj5fEOws
-	jRDf9aMqcwUMA1/bseujL64=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4grLqX435YzmVW1;
-	Thu,  2 Jul 2026 10:46:16 +0800 (CST)
-Received: from kwepemj100016.china.huawei.com (unknown [7.202.194.10])
-	by mail.maildlp.com (Postfix) with ESMTPS id D87A640590;
-	Thu,  2 Jul 2026 10:55:26 +0800 (CST)
-Received: from [10.174.177.15] (10.174.177.15) by
- kwepemj100016.china.huawei.com (7.202.194.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 2 Jul 2026 10:55:23 +0800
-Message-ID: <d1e9d389-affa-4d12-aaf7-3fcf3218966c@huawei.com>
-Date: Thu, 2 Jul 2026 10:55:21 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24C82517A5;
+	Thu,  2 Jul 2026 03:25:16 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782962718; cv=fail; b=Z+6p9snhoLbORwNW/0E7RCn6OpYtuGZYtA/75FxGBj9PcrRMJmJtadheJM+BBR77oc+cvHGs9CpCsIZ88QVZ2equy5J9jz7XhA+ZbQ46LjMGQ6sKRP+/xr3C+yt3B4pSs9IZsi43Owm/q6unmYaHI22MdEX2HRmvZP5m6lNMg0w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782962718; c=relaxed/simple;
+	bh=9jrMCGz0QqBXCs7RGRnmMNqDQxm2r7t8X5ffOzFfHeA=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=VxdTWOpn70/nIR8K4T/935qySyiwt7cRQCpOA7LUSfBw9D2U0cCaO2LZW5zDYgfxb20/Fjwvd785V8drxKzBORuse4kQDrpmM6+ePexu58lLMcAUPK6g/+gQ94xvBlhR+E2uLM70IwCXSkMlQyjfzi8Dr5MsbqfvYdT2F3Z/kLU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=iIWq/hl9; arc=fail smtp.client-ip=52.101.69.30
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jFTnzY3+6Tn93YsEbzwaS+xRL4ar/TGkB3nFAFBxxbMfDnfjsEoT9i9UHx1txaJLZ6K3nOj9VANFV7wOB1Xvv6pvORXtSwrVDibRjSY0dPTx0TOXQt8XF6c9UhRThCc1ZXYluIh36oxP5EW/UWJAXg5OXYbBEj6r4IQ6OgzNoDY0iEv2kZp0bqRABTj0OBvMBx0BvSwgF3UNKLJH/k5CziFcQwUVUFDMkuq5RbVBXNHCx1KDIUimmGhEMkk1UjYr9Q6RVAw8IQzf8fTKlQzRUp5ZLNgsp8slxROC0cqmai/TO5ENcMSTJIUPeK4g5QQflri0hEeXSdtdhbCmjmMH/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tMUXj3WzI94PwQrLVQLTMGCnlEF8ja4dtmXdFXxmtus=;
+ b=imYn/yO0z6yOAWAV2z/0KDjKLsT66IRQ/GvARlpN55pNl8ajv/x/I5tG7tfeBc0aiDmuCM0+oZ1mOhnj6YQqFelI7vtE4qXb1g33buPBRJhgQZtp+5rfajTKCV/epJCrW4JgQbm3HFqJW8rruPwY4o92GYDZ5WpqTS7FyK0akeKaa4fODfRs3AlLsI/TjDd+6wAj1kj4aWz1U2h0v1kFGS6HaoLr4h9fahrpSUcywEbPKYJiAGhBBCER1/CiUoHGF6L5LaB2YDfkxt9gBt/zUqjsSNUKioIO241TBHIajDABubxWI7MA2LqWVKQX9EB+kPao85LMisqdVuP4RCFQyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tMUXj3WzI94PwQrLVQLTMGCnlEF8ja4dtmXdFXxmtus=;
+ b=iIWq/hl9o9qztmCov4ojEjTtBewK7zMs3UWbfrdd7TdcbN+ZhDpqZMrizMXYiBCuDTjPkW/oaeK0cZWopaXYxAbDsqses/6a1w0WXkxj54SmAgjNcIaPslM6fqNXg0Fh7apTO1ZmvzJXsSPcOT0Pl3FvGk1lZAhFPOOc8NFa/HUbpANRxNL1Mm5oP0ZF6XjB6HzeBHGeG++DgBWT8hin3VK/xRjkyUP1PLG6PnxYIMpWvmcum1ynL5BTbv5O1jzJhDcPzNc3uuffAH0I6kvOaHnVv/hi+NofZy3jVZ+Nk5dgHf3O/ozKineSun5KQaYSlG0cWDY3k6ESaqD14YOicA==
+Received: from VE1PR04MB7216.eurprd04.prod.outlook.com (2603:10a6:800:1b0::22)
+ by GVXPR04MB10248.eurprd04.prod.outlook.com (2603:10a6:150:1c1::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Thu, 2 Jul 2026
+ 03:25:11 +0000
+Received: from VE1PR04MB7216.eurprd04.prod.outlook.com
+ ([fe80::a9a5:cf83:dbe8:1f74]) by VE1PR04MB7216.eurprd04.prod.outlook.com
+ ([fe80::a9a5:cf83:dbe8:1f74%3]) with mapi id 15.21.0181.009; Thu, 2 Jul 2026
+ 03:25:11 +0000
+From: wei.fang@oss.nxp.com
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	wei.fang@nxp.com,
+	chleroy@kernel.org
+Cc: imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v2 net-next 00/14] net: enetc: cleanups and improvements
+Date: Thu,  2 Jul 2026 10:57:00 +0800
+Message-Id: <20260702025714.456233-1-wei.fang@oss.nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA5PR01CA0184.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:1ac::10) To VE1PR04MB7216.eurprd04.prod.outlook.com
+ (2603:10a6:800:1b0::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <mawupeng1@huawei.com>, <virtualization@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [syzbot] Monthly virt report (Jun 2026)
-To: <syzbot+listbf7b8eeeb8dda31d6de1@syzkaller.appspotmail.com>,
-	<linux-kernel@vger.kernel.org>, <syzkaller-bugs@googlegroups.com>,
-	<virtualization@lists.linux.dev>, <mst@redhat.com>, <jasowang@redhat.com>,
-	<xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>, <stefanha@redhat.com>,
-	<sgarzare@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-References: <6a3c3ed6.80e5668d.5d0ef.0001.GAE@google.com>
-From: mawupeng <mawupeng1@huawei.com>
-In-Reply-To: <6a3c3ed6.80e5668d.5d0ef.0001.GAE@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemj100016.china.huawei.com (7.202.194.10)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7216:EE_|GVXPR04MB10248:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ef7e238-7820-49a9-b56c-08ded7e98632
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|23010399003|7416014|376014|1800799024|366016|921020|6133799003|56012099006|11063799006|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	x4nPOvR0fAv1y8OAQ0uW1f5prZwoPUHTLQUMK3KzQmuIgu4WrWesy/KhZiUI3Vh0ifV64uaIYWScY1bcTqD/0lPdvX4tiRjOQSDKQ/WoBqfP8Vc795JKHYaJ1dihKj4hIn4oHTZIvd8ZBNvQTrGe5Yzrkyyv7bx0mcsxzt4UQti+morFWMLoVDPj3EfWqjJsSk20qwFPchHvAZUivsjrk2TdXXdKD7iMW0Ofw6dFUsQkFRA1EsUxgurfEVqCl/le6e9Ote9Y5LyILl1QfY5FgyB+8/ztNYRV6a+H8onjy+QV1atIG3FBZ0NCJaH4EVuNL7S1D8uB9Xgz9j4y+U7hMQvtw7KJNzs2MaSpZnNRcmerwpaT4MOXlwniPB/iaMZiQJRzKeOqjgC8QzY1tDZXVzNuwovvS1VRXalhHZI5k0ax7uw/e2ooMFbmbiz3k1WqOZzr6+ZEvsBexBwpSYUJ5pJq1CHBi1HpsCYU5prB1gILmYqCHj6CeFgvWxsvJTxuuzS4Chqk+vwuA6nLNAgnwXaxdgLzvgfSLHmGJkkQzQg2SnyQM766bGILzEdCcRkWc6JVBctJ1az8O3zngam93x++3LrKD9HMyixBUbVVH9xRX813YjxlTq4vqNLufJrVDLF8mfa5iSoP83op98PloBU8lmNpLl4KVxHwe8ur9YB7uhB4vQEkV1QUOBp6qH0VLDZM6CYefWWCGjBgxSNrSA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(23010399003)(7416014)(376014)(1800799024)(366016)(921020)(6133799003)(56012099006)(11063799006)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?R5rvT44AzjEl2N/8/AKMZNt3lO6ujtgkbfQGxzadULRowOiw0WI6aKO2lFeC?=
+ =?us-ascii?Q?gICv2dzQdEKPEWY9e0LJIk0O8K9S2t/BdGOJNTUppSrpN+8qQhJnEIj5u2JW?=
+ =?us-ascii?Q?UGNIatjdlhZHCOTZ/8+RuvabofnqKmnGi5wuYiGYECfTEcwPgD/8++LwvGK2?=
+ =?us-ascii?Q?z3ggAHEpVoOHxWTtuHFiZrw7zlPxKxjq9Z3GPjwllCG7rhVSV9LVjHYiQaaE?=
+ =?us-ascii?Q?PF+VbE+rRJtq9Utu9s5jlkZVMCrbB0PhshPYEuCNDWtfqFYtirdua88stzxn?=
+ =?us-ascii?Q?PkIScwZMfm2dW2f3m75euGbtdBqOuBwqhLP1nSMMeT4gND62XC5yUYvij2Qa?=
+ =?us-ascii?Q?ISjPDJPJhAru62a6OKlYQh5JxJu5XiiPZjHWlR3Tnyxa09SGu+B42OlX5iIa?=
+ =?us-ascii?Q?nShryxXnYQjDdVN3SJZranTeld7NlLlrL6gy6+jm+NNiKkg9pbKqSVAt80xB?=
+ =?us-ascii?Q?v1V2LIOaRpsElX3t2rZpZBNjd6WmznT6TFpedZ4Ronzn9xIQVjVV4hPyddk6?=
+ =?us-ascii?Q?3VCt2wNoC21yho7OakhuP8r+kIAKhzLpGss1GVnjqMFBQURJm8Bwhhp9Bu7N?=
+ =?us-ascii?Q?4U1tYnxT9ZL0sr1LobNtVVusyBCm1Ug8tdYFwAM+tD3mVQr/vLI5GiFpS/yV?=
+ =?us-ascii?Q?5Lbbt1cVzpJ2KrDEsZKYQHHiT0vRouKrNaIXyXFYcdnDcbO/ygiY831xh8JB?=
+ =?us-ascii?Q?4NjI6yKbzkFVANllR7vq1XF0Nis63ox2YdmMykJC3ef+/nxkinhgkJiZEY6h?=
+ =?us-ascii?Q?yrtdz40H9M8AmO+4mPwEZnOjhOto/33J613bACBrcdyIoE3VzM56n2WfTNoe?=
+ =?us-ascii?Q?zcZEVyvVoSwe332Pfl+YBBcv/DrP0qNCRVmV02/TapL/4TaF0cqjDc6GqzgL?=
+ =?us-ascii?Q?NwB6ahArRTsMPXoVFinGvmyTE0mWLaIOfJbDY9A+RQzcJIWNFutJfHj7qrJa?=
+ =?us-ascii?Q?tKHNyup34zbjpnKpMMWJAOak1m0hofG4Hdzy2llgzUvNi1TRAE4fsKt/imeK?=
+ =?us-ascii?Q?piIh/y2fF/S+AH2PTuU4nsdwzMlt6TbxnmA0rF/OVLhtLiY9qSnS16YNAZ4d?=
+ =?us-ascii?Q?cRfVF5GyQkjSgQXsQAfOQmyv0phAsMUtA21dcZWOuMl6EN6Nk2MJryTAwkOA?=
+ =?us-ascii?Q?zXth2glRCxlcIERMWvBG7KAimc2IymMxxwZLjDW85rY7XvGTZc+l/BRYnMvy?=
+ =?us-ascii?Q?scWWhkjyH+afpXX7tPujVhfrNHjIAhgKTihgw7aCWpJVHefbArqHC1/+2E0x?=
+ =?us-ascii?Q?qfrwNXmFQixQh1gD+z8uT45vzCznF3ClWz1fhx8WB2r8+0D90TAg1C38O/bZ?=
+ =?us-ascii?Q?UMgYxx1Aq8zUy7YII9knM2fxaWVq69phMoxHU3i8vMyBOAaHbyTfGF7AcMor?=
+ =?us-ascii?Q?TDKIOReuitz5cH7vrpRXCVtWv2IjcchcZ3nUhzE5tmt5xyrRAnFdOQEek/bv?=
+ =?us-ascii?Q?Ybv7/XJ1SW/SzToTmjF1SDoyFzlsRmLG3NUqlflM8grHzxcQPsimeedfSWYx?=
+ =?us-ascii?Q?RANGIRRw11dbGCSrjsAVRkVubUMEZSra8Dez5aj0C6B7ROUJplvoYscD2Xzv?=
+ =?us-ascii?Q?5Pvn2et8tD6dGdTujK08AwF7+e4PVOC6/gjqP0Eevp7Zwkb29J+UTv7kI3wK?=
+ =?us-ascii?Q?iJbyTnLft40Y/QPZn3JkYyviJSTFrv4JdH8Bb91BUKmYOJPB9EQLAnUk29IP?=
+ =?us-ascii?Q?gNvDSXpLvEqtfeRQt9wW55ZiMaS85nJgXsn3iS3lDpcGBYUdYhIYmayaqCQa?=
+ =?us-ascii?Q?R6lad7cKLUHyzGd8d7V58tRvc5ldxEkH0+/tQUPiLUmtt/oQMbsd?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ef7e238-7820-49a9-b56c-08ded7e98632
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7216.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 03:25:11.4621
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ITyOmS4GQhp5JHceply8IO5RpOjjdUhlPDCHvsCUfiF7CDaT20aD5ItD+BGMvbRohTpQS8yITow5jwMxawmj0n1RTnr5a0CgylLt5YhJu4SJo+hQcg3V18iJJb7Cet1M
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10248
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
+X-Spamd-Result: default: False [3.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	TAGGED_FROM(0.00)[bounces-303940-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303921-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mawupeng1@huawei.com,m:virtualization@lists.linux.dev,m:kvm@vger.kernel.org,m:netdev@vger.kernel.org,m:syzbot+listbf7b8eeeb8dda31d6de1@syzkaller.appspotmail.com,m:linux-kernel@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:stefanha@redhat.com,m:sgarzare@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[mawupeng1@huawei.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:claudiu.manoil@nxp.com,m:vladimir.oltean@nxp.com,m:xiaoning.wang@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:wei.fang@nxp.com,m:chleroy@kernel.org,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mawupeng1@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
 	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,listbf7b8eeeb8dda31d6de1];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,googlegroups.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:dkim,huawei.com:mid,huawei.com:from_mime,syzkaller.appspot.com:url]
+	FROM_NO_DN(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,nxp.com:email,oss.nxp.com:mid,oss.nxp.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 349D16F3220
+X-Rspamd-Queue-Id: 4417A6F3360
 
+From: Wei Fang <wei.fang@nxp.com>
 
+The first group of patches (1, 2, 5-7) eliminates code duplication
+between the ENETC v1 and v4 drivers. Since both hardware generations
+share identical register layouts for MAC promiscuous mode, MAC hash
+filters, and VLAN promiscuous mode - differing only in register address
+offsets - common helper functions are extracted into enetc_pf_common.c
+and shared by both drivers.
 
-On 周四 2026-6-25 04:32, syzbot wrote:
-> Hello virt maintainers/developers,
-> 
-> This is a 31-day syzbot report for the virt subsystem.
-> All related reports/information can be found at:
-> https://syzkaller.appspot.com/upstream/s/virt
-> 
-> During the period, 0 new issues were detected and 0 were fixed.
-> In total, 5 issues are still open and 61 have already been fixed.
-> There are also 2 low-priority issues.
-> 
-> Some of the still happening issues:
-> 
-> Ref Crashes Repro Title
-> <1> 24      No    WARNING: refcount bug in call_timer_fn (4)
->                   https://syzkaller.appspot.com/bug?extid=07dcf509f4c013e25dc5
-> <2> 3       Yes   memory leak in __vsock_create (2)
->                   https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+Patch 3 converts ndo_set_rx_mode() to ndo_set_rx_mode_async(), removing
+the dedicated workqueue that was previously needed to defer MAC address
+list updates to a sleepable context.
 
-Hi,
+Patch 4 replaces counter-based MAFT entry tracking with a bitmap, which
+keeps hardware and software state in sync and avoids partial failures
+during entry allocation.
 
-This is regarding the still-open "memory leak in __vsock_create (2)"
-bug (#2 in the monthly virt report, extid 1b2c9c4a0f8708082678):
-  https://syzkaller.appspot.com/bug?extid=1b2c9c4a0f8708082678
+Patches 8 and 9 fix phylink-related issues: removing invalid code from
+enetc4_pl_mac_link_up() and properly differentiating phylink capabilities
+between pseudo-MAC and standalone MAC.
 
-I spent some time analyzing the root cause and the previous fix
-attempt; below is a summary and a direction that tested out.
+The remaining patches (10-14) are minor cleanups: removing a redundant
+VLAN promiscuous mode initialization in probe, using the PCI device name
+for the debugfs directory, simplifying port speed configuration, removing
+a redundant num_vsi field, using alloc_etherdev_mqs() for the VF driver,
+and using kzalloc_flex() for a flexible array allocation.
 
-== Root cause ==
+---
+v2:
+1. Modify the error log when enetc4_init_ntmp_user() fails
+2. Only set PHY_INTERFACE_MODE_10GBASER and PHY_INTERFACE_MODE_XGMII for
+   ENETC v4, including MAC_5000FD and MAC_10000FD speeds
+3. Improve the commit message of patch 13
+v1 link: https://lore.kernel.org/imx/20260630072036.382761-1-wei.fang@oss.nxp.com/
+---
 
-The leaked object is the child socket created by
-virtio_transport_recv_listen() via __vsock_create() — exactly the
-allocation site kmemleak points at. The reason it never gets freed is
-in the accept() error path, not in the allocation itself.
+Claudiu Manoil (1):
+  net: enetc: differentiate phylink capabilities for pseudo-MAC and
+    standalone MAC
 
-When vsock_accept() dequeues a child but the listener carries an error
-(listener->sk_err, e.g. set by a failed connect() issued on the socket
-before listen()), it sets vconnected->rejected = true, skips
-sock_graft(), drops the dequeue reference and *relies on
-vsock_pending_work()* to clean the child up.
+Wei Fang (13):
+  net: enetc: extract common helpers for MAC promiscuous mode setting
+  net: enetc: extract common helpers for MAC hash filter configuration
+  net: enetc: convert ndo_set_rx_mode() to ndo_set_rx_mode_async()
+  net: enetc: improve MAFT entry management with bitmap tracking
+  net: enetc: use PCI device name for debugfs directory
+  net: enetc: simplify enetc4_set_port_speed()
+  net: enetc: remove invalid code from enetc4_pl_mac_link_up()
+  net: enetc: remove enetc4_set_default_si_vlan_promisc()
+  net: enetc: refactor SI VLAN promiscuous mode configuration
+  net: enetc: move enetc_set_si_vlan_promisc() to enetc_pf_common.c
+  net: enetc: remove redundant num_vsi field from enetc_port_caps
+  net: enetc: use alloc_etherdev_mqs() to create netdev for VF driver
+  net: enetc: use kzalloc_flex() for enetc_psfp_gate allocation
 
-The catch: vsock_pending_work() is never scheduled on the transports
-involved here. It is only ever scheduled by vmci_transport
-(vmci_transport.c:1130); virtio_transport and vsock_loopback never
-schedule it. So the rejected child sits with an unreleased initial
-reference (the one from sk_alloc()) plus the connected-table
-reference, vsock_sk_destruct() is never reached, and the cascade —
-child socket, struct cred, virtio transport, SELinux blob — all leak.
+ drivers/net/ethernet/freescale/enetc/enetc.h  |   4 +-
+ .../ethernet/freescale/enetc/enetc4_debugfs.c |  42 +-
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |   6 +-
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  | 412 +++++++-----------
+ .../ethernet/freescale/enetc/enetc_ethtool.c  |   2 +-
+ .../net/ethernet/freescale/enetc/enetc_hw.h   |  12 +-
+ .../net/ethernet/freescale/enetc/enetc_pf.c   |  93 +---
+ .../net/ethernet/freescale/enetc/enetc_pf.h   |   5 -
+ .../freescale/enetc/enetc_pf_common.c         | 153 ++++++-
+ .../freescale/enetc/enetc_pf_common.h         |   5 +
+ .../net/ethernet/freescale/enetc/enetc_qos.c  |   4 +-
+ .../net/ethernet/freescale/enetc/enetc_vf.c   |   3 +-
+ include/linux/fsl/ntmp.h                      |   2 +
+ 13 files changed, 353 insertions(+), 390 deletions(-)
 
-The earlier commit 3a5cc90a4d17 ("vsock/virtio: remove socket from
-connected/bound list on shutdown") adds an unconditional
-vsock_remove_sock() in virtio_transport_recv_connected() when a
-SHUTDOWN arrives, which drops the connected-table reference for a
-child that later receives a SHUTDOWN; but it does not release the
-sk_alloc() reference. So the leak is not really a regression
-introduced there — rejected children have never been cleaned up on
-transports that don't schedule pending_work. 3a5cc90a4d17 mainly
-changes whether kmemleak can see the leak: on v6.6 it can (the
-cascade shows up), on mainline the smaller struct sock layout leaves a
-residual pointer inside the child that kmemleak counts as a reachable
-reference, so mainline kmemleak stays silent even though
-create/destruct accounting confirms the child never reaches
-vsock_sk_destruct().
-
-== Why the previous attempt didn't land ==
-
-Divya's patch [1] tried to fix it by re-locking the parent listener
-inside virtio_transport_recv_listen() and re-checking the shutdown
-state under that lock before vsock_enqueue_accept(). That re-locks an
-already-held lock — virtio_transport_recv_pkt() holds lock_sock(sk)
-across the call into recv_listen() — and syzbot ci immediately flagged
-"possible recursive locking" [2]. So it was backed out and the bug
-stayed open.
-
-== A direction that tests out ==
-
-Instead of re-locking in the receive path, handle the cleanup directly
-in vsock_accept(): on reject, instead of setting vconnected->rejected
-and relying on pending_work, explicitly release the child's references
-there:
-
-    if (err) {
-        vsock_remove_connected(vconnected);  /* connected-table ref */
-        connected->sk_state = TCP_CLOSE;
-        sock_put(connected);                  /* enqueue_accept ref  */
-    } else {
-        sock_graft(connected, newsock);
-    }
-    ...
-    sock_put(connected);  /* the existing, common put — sk_alloc ref */
-
-This drops exactly the three references the child holds at dequeue
-time (sk_alloc + __vsock_insert_connected + vsock_enqueue_accept),
-lets refcount reach zero and vsock_sk_destruct() run. The `rejected`
-flag and its pending_work handling can then be removed. The receive
-path is not touched, so there is no re-locking and no deadlock.
-
-I verified this on ARM64 QEMU. On linux v6.6.y (where kmemleak can
-see the leak) with the syzbot reproducer:
-  - before: 6 creates / 4 destructs (2 leaked); kmemleak reports the
-    cascade;
-  - after:  6 creates / 6 destructs (0 leaked); kmemleak clean;
-  - 50-iter normal server and 50-iter same-port-reconnect tests both
-    pass 50/50 with zero leaks, no double-put warnings.
-On mainline, kmemleak stays silent (see above) but create/destruct
-accounting confirms the same leak before the fix; the fix is
-code-identical across v6.6.y and mainline (same recv_listen/accept
-paths).
-
-I'm not subscribed to follow the list at full volume; happy to send a
-formal patch (with the af_vsock.h / pending_work changes folded in)
-if the direction looks right to the maintainers.
-
-== Trigger, for completeness ==
-
-The reproducer's atypical-but-legal sequence is what sets
-listener->sk_err: a socket is connect()ed (leaving sk_err set, since
-vsock_connect() only clears it at the start of a new connect) and then
-turned into a listener:
-
-    fd = socket(AF_VSOCK, SOCK_STREAM, 0);
-    bind(fd, ...);
-    connect(fd, &(VMADDR_CID_LOCAL, ...));   /* leaves sk_err set */
-    listen(fd, 5);
-    /* a peer connects to fd; the child created is later rejected */
-    accept4(fd, ...);
-
-Standard servers (listen before any connect on the same fd) don't hit
-it, which is why this went ~2.5 years between the offending commit and
-the syzbot report.
-
-[1] https://lore.kernel.org/all/20260605191922.12720-1-divyakm@unc.edu/
-[2] https://ci.syzbot.org/series/76f40e62-5a21-46d4-a636-10f0ec9c5040
-
-Thanks.
-
-
-> <3> 3913    Yes   INFO: rcu detected stall in do_idle
->                   https://syzkaller.appspot.com/bug?extid=385468161961cee80c31
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> To disable reminders for individual bugs, reply with the following command:
-> #syz set <Ref> no-reminders
-> 
-> To change bug's subsystems, reply with:
-> #syz set <Ref> subsystems: new-subsystem
-> 
-> You may send multiple commands in a single email message.
+-- 
+2.34.1
 
 
