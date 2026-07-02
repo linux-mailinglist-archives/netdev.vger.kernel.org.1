@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-303990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f2xJESQERmqXHwsAu9opvQ
-	(envelope-from <netdev+bounces-303990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:24:36 +0200
+	id Jo3nE3MERmqrHwsAu9opvQ
+	(envelope-from <netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:25:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30A866F3C67
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9226F3CAA
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:25:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b="H1/GRZj5";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303990-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303990-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=TPGvykes;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=nvidia.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 129973008C98
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 06:24:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A3339302C3C0
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 06:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993923876BB;
-	Thu,  2 Jul 2026 06:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BE438B127;
+	Thu,  2 Jul 2026 06:24:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010070.outbound.protection.outlook.com [52.101.193.70])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010035.outbound.protection.outlook.com [52.101.85.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE207363C51;
-	Thu,  2 Jul 2026 06:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91F138AC7C;
+	Thu,  2 Jul 2026 06:24:40 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782973468; cv=fail; b=NcpSgctcSpJJeIMdHfUGb9fpbleLjZ/T61k3ZYK1qG5Q8Fx+dxU7D9NEBd/3GvvbaTqErrWdS3Ivl10E4+T/5Q4zFnOknwB2i6+boZ6Q1Kzi62rs9N+vkTEQQ20owxcURmr2MRA6XiJxF1yhCpAiZ0okNmtiPLRMFwGNWYpFbuA=
+	t=1782973482; cv=fail; b=ZkvdUd3MlbXxDi+P2L6SLHMmQgmuOdkp2UcuKyGa2+oeBi0kZy43/+ee2E2poHJEcxAa1fAOGKD3JFwXvHXzGh8Jp2QIIaeeLhva2ZtbHOPKAk2qRWINfFJmRUyO08BRb5TCFHHIPnBZuLZ/DAdGS6+S+Gy6yqDPBzLnur29ls8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782973468; c=relaxed/simple;
-	bh=Y6+weOrDanuLZ8WhBC/NM7f+ftu4FcJR+/ebxpXDvQw=;
+	s=arc-20240116; t=1782973482; c=relaxed/simple;
+	bh=NavQOWDGtSduDgCBykMN4fYbMGODT6VJwXyqLRj5WLg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=slgsYZMBM8YDAUBa2SoUjTxXcUqAwIIuQUgEmfOMcYAokoGQIHAYwx1uIOH+WgkmMYwZXWgHRhw2CmBMbOej7BUduwNhJFU/NIJsBdEkeXAinwCMHk/5SZx0EAl5hWxOXnIjLsC8Bzb60NksFwirYZ9H/Kx3fYQWauKNLpnnmxc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=H1/GRZj5; arc=fail smtp.client-ip=52.101.193.70
+	 MIME-Version:Content-Type; b=NnHPBVD8SxPovMYPweRynSFXaknDsEIqD7uDPruEo6VjxyjjuI+loR6XmJ1v6gcw0c+oPHnruzScfnV6gRAQCcUWuj39/kYdPEawzCOnVYWgB50JVCLxLvCB/72plhb4rwkvT0AFufKmrD6uMGaqOzLQeSFAYHNUnr5KGY2gEL8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TPGvykes; arc=fail smtp.client-ip=52.101.85.35
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dy0ftoHmhU0V4MLKYKXU4IuiYQrznOBvBIll4ScbSO6l1RyDgjD5FAW0gknQF7d52y+48Lfr1dyunZEmh3xg4bxCv4k6pRwpx8mIPzDWEAnZS4ttqXW9dbHvKr3gkxTsoo2qqyrqpT4FDPBe1Ds9R6Ax+D2Ui1stxFHpG27k+7TfX7VCHzUCf0VE8cH42Kr1Y/HZcgm9k3ObW93BM/rgDM8Y3JNvfZdTOW+dkLvypNzXSP3ouHAf96vqAijHm2b1J7tRrASl9WnnWRZDGjDoo/R9O/9Tdeqf8qOGnJTppBUbUTs7W9IwNSJ4ugmfcuhx+FWX36FP8p0hFZz0iz+VOw==
+ b=BDGnhyEKfREeG5NJ9wZnxWglZ7fSpZjNc+oISpXFwLNmNCnRZHmNA9HfYA1UdG9PFhMX8sRaUVjVthJT2wLfmfy+fNwzLV3+M+VMR1sfylehizNkvT4cGC9SjuUaaVOSQoqcKkLcxNufUUqTyzInDey+zu/lQrtjgHXPr3XLoQYWdaqZk2e0uyIQzsYpFm32KPXiz1/mKNHpHTWUfK3RwTitOEtHXMgTNHYD7N/Fc0286VfVxXm+xWcNXhgNF4PxG+H3gQsO1hRS2+zqnh9EIDikhvRlmENjIFJ8fgcgxCw35EBIGj3sMIMiyRn6sJPpsS56nPxZnxgYe2+A3FPj3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x7d1iDE8V1i2ZdKY4BzW4AObbccy51fUZmnunRaXlZw=;
- b=rNhS6OXBDfhPXzxCXXCvxIk3Yl1yjcZrJXAtCMb3KVGc6YeeV38ZdRW1Vn5zCZy48jY8vRU5mNmujQsn86jKpfGlOZPrGeiMv+HJwUi41drRL4nylniceg2q50bY2k/IpE7hLERSD8bVvlbNNNaEQpKfELoade3X41MpPQ2swEw0IVoAxT5hFm7uJ7WTVfTsb3bakiTIuMAvNjnNNuo9McSr3kZnY7s3UgumroWMsXH3evcE1TluUoeZiDuCjVTa5tiHVWQrHH4FuiUCcV8byMwTeSZvZx/nczFFSxQf0GwdGrVptEseXYkIhzlMSFkj95WSCjuG7KJYRBCnQ4raZA==
+ bh=xwpY1hL5/2oRrVH3xusOME+WKeAW1y7BAHEUKM13eFM=;
+ b=C7o/nBT7TEnyuXIR54ey4Cal6Logzuqpbj9JJ1NI/YNCeR5VVRP2DGpNynMmNHi/IszDbJn4zp4HHU3mr5vDhME2sBO9LI8SDlfQyoCyACldZxNGSGpXw0UW0Z3TBD3RyQ4OntxLB32mzZIGklnp8YSXJ0mJf+9uSa7kF3076wbkqAmoLDfaJG3jglHnb7swYv7Nh07l40iT8oPyUWQnYREgzghFk6lZ2h2B7Y7MRh8Cez7m40TkwPgXoZ/S7bHic1Bz9hJCa3yHm6ZfjA5MeJgnSbSr70xSAJQ6fWjfePD1LfVyUCJpjYRX2mKmZBJQ7Js5Xa52RFRKXCGlQriPxA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ 216.228.118.233) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x7d1iDE8V1i2ZdKY4BzW4AObbccy51fUZmnunRaXlZw=;
- b=H1/GRZj5n8/QdahoVrLd+Krh1hH8D0mKjwzsq0x7raLT45IrBI6FkZTe2YsMcU1t9liqNWXDLbdroE+BETU8nqdOcHdLokgc47m6Nf/1Sf7a/uEEZW76igiCM9Qu24nz2bNTfhV69XGdoirtyNGURNo2ahPynXM/YU/yPOrYNcNcEXCWipmUqoo6onlEzqy9v8UFknlxPAaAtt+IplNgOUDXhRk92SBxbGiL5303II9xv7lLPdXOWEXKB4/LhvJRPuUd05wm6PryDxqmds+SoV84OChylt/gMZhN8YjP9FJhLh8BJLiFEzHwLMfxesJY3PuH9hIY8cUH97TSUokJHg==
-Received: from BN0PR07CA0021.namprd07.prod.outlook.com (2603:10b6:408:141::16)
- by IA1PR12MB6580.namprd12.prod.outlook.com (2603:10b6:208:3a0::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Thu, 2 Jul 2026
- 06:24:20 +0000
-Received: from BN2PEPF00004FC0.namprd04.prod.outlook.com
- (2603:10b6:408:141:cafe::56) by BN0PR07CA0021.outlook.office365.com
- (2603:10b6:408:141::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.9 via Frontend Transport; Thu, 2
- Jul 2026 06:24:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ bh=xwpY1hL5/2oRrVH3xusOME+WKeAW1y7BAHEUKM13eFM=;
+ b=TPGvykesXVFxfUrx7CVmBb6lpEX1jg50HDRObqvWNYR9kLxASknBsQ+PpqgyvkrZjXVGY44J7TNDTLbLIWNh0Pm6OK0aPj59FvvP1wjQUQ9B9dhQq5o+K+WXRUTQ3f8CeMlJzlyTp6P/oBzuL7Kb2GLr/TQt6IXWLJy8jhQ785TaY3pUioICEQOlPj6G2qImGdWd/9VsoilrqrULTKFT0XqaHoXtURjBbRFo7FwbuNRwxquakNRWDUXPKbL5nHTW1GVdIQx989dMGTAsyyFNpQN2PKsrvYL7jE9/bCFxVtRp+uab3m4to/IGAuz8PtEp3W17TX7LmHzMnyGqoDkUlQ==
+Received: from DS7PR03CA0305.namprd03.prod.outlook.com (2603:10b6:8:2b::25) by
+ SA1PR12MB8164.namprd12.prod.outlook.com (2603:10b6:806:338::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.8; Thu, 2 Jul 2026 06:24:25 +0000
+Received: from DS1PEPF00017090.namprd03.prod.outlook.com
+ (2603:10b6:8:2b:cafe::7d) by DS7PR03CA0305.outlook.office365.com
+ (2603:10b6:8:2b::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.10 via Frontend Transport; Thu, 2
+ Jul 2026 06:24:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN2PEPF00004FC0.mail.protection.outlook.com (10.167.243.186) with Microsoft
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Thu, 2 Jul 2026 06:24:20 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Wed, 1 Jul
- 2026 23:24:04 -0700
+ 15.21.181.6 via Frontend Transport; Thu, 2 Jul 2026 06:24:24 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 1 Jul
+ 2026 23:24:11 -0700
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 1 Jul 2026 23:24:03 -0700
+ 15.2.2562.20; Wed, 1 Jul 2026 23:24:10 -0700
 Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Wed, 1 Jul 2026 23:23:58 -0700
+ Transport; Wed, 1 Jul 2026 23:24:05 -0700
 From: Nimrod Oren <noren@nvidia.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
 	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
@@ -95,9 +94,9 @@ CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
 	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<bpf@vger.kernel.org>, Nimrod Oren <noren@nvidia.com>, Carolina Jubran
 	<cjubran@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net-next 1/2] selftests: drv-net: allow switching env IP version
-Date: Thu, 2 Jul 2026 09:23:47 +0300
-Message-ID: <20260702062348.2123960-2-noren@nvidia.com>
+Subject: [PATCH net-next 2/2] selftests: drv-net: xdp: run with both IP versions
+Date: Thu, 2 Jul 2026 09:23:48 +0300
+Message-ID: <20260702062348.2123960-3-noren@nvidia.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20260702062348.2123960-1-noren@nvidia.com>
 References: <20260702062348.2123960-1-noren@nvidia.com>
@@ -112,30 +111,30 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF00004FC0:EE_|IA1PR12MB6580:EE_
-X-MS-Office365-Filtering-Correlation-Id: 84e7a8b7-5cd6-4968-1ef7-08ded8028d2e
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|SA1PR12MB8164:EE_
+X-MS-Office365-Filtering-Correlation-Id: c2e42912-1420-4b1e-c27c-08ded8028fbe
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|23010399003|82310400026|7416014|1800799024|11063799006|56012099006|6133799003|3023799007|22082099003|18002099003;
+	BCL:0;ARA:13230040|23010399003|7416014|376014|82310400026|36860700016|1800799024|22082099003|18002099003|56012099006|6133799003|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	/BIdW4pDNM1yZcPdVKHq5tpTt6GzuC7xIqmqquedVsFzt7pmm6NjatxWtY02cDsgZk80mS1gIT9mWBNRbvqUIallawwqKqMlcLEtJa8ndjKI0zc/iOUAFbXHCm4Wsl7hlGiWuKHKe1VTWavq7QxMli0sbJd8jmf0DLHm0KP6tyqKwJutDb3sfrCO9Vf1PlY7SS3r99y4dEfYCWtjncu9Wnq+QcNMl8Of/tMujWuSJMOb3P3TUJWXo44dsR3jpM+dAPIe5+fFwdPaP/8dvWzYrUlEla4a240yyNf7Jd1sr8g2/c/yOrFWJf7K6k2qrWd70e+3L/jKrHJJ/eGWVaUzDbnJuWUIr5Pv8fDUb6a86ymo/qmAnzwikbXCAQU+bu8+DonL1SYkR7BnsSpzsEL1FQXN+cD+cFLTadyR3Sw1SI8ARfVMmPeHKjR4U16zhh4cshTnClpptm7BAs84Az6aQaDZJDMiI35gq8+JE/En39KK82PXiM67J98tzbhW33N692cUd+AIrMbtSvQh9Wg5y//vAqpy4r0eisLbcn5Fd5M/jyVCvQ0ItqGjIXill22bn4gxurZPjgp1Yt5b4JwiEF37F8VbZd5GIn2YjxLqsuAQURdk1UQXOTO+6aycPJXTA6tEiTiSz1BFP8Wpcl1AHQl5T0Xxp+zBr161ByyqBhaMxQXnSq5A1XMPigXnB1pw48VLbYMpDsXFOJSSpeSbbg==
+	WDslS0Ly1seWWI/CcL4ixxa2ajf3ecZ/E9/oY24PBl/3VllH91i3aCplI1useZuz6naeuxXp8TTydEinfQ1k7NLRa6jNQCZWflPtbxBGfOpBp0GIR4jBZ7MYR9s+WG3UNqzn/2ogVps9YWZIUJvEIL+V73NGYrkMTcIsGvNFti+L2uAnalw6WdrkP9oyG0BG/APhOsLpdri49gqKo/tQLKa6oWUnWEOZcf8oeBxjAH0+K1tPyseoBrmT/1VPhMyKtfUqkW4N+pFhlkdt4eg2qtZW+nWVdMyNooA7x6ptHZAHPAZ8b8DgRZP2DzsPLgf0mgobzS52ugW9YrklxBqpmXXKc6mTwENsTCvLNz90IbrAXvepqyJMzKj7fagUAtfsaXkBIYcqgczmEvBrwDhpLM3xglX//vfAM4hDXdEDobDAOt/sh4Uwi8Cf0cxqU+VsAAWQAy0Zic+/U8VBPnmCHyiIXH75OVl4J706W219rBlZ4jFGA6w/HoNEdGDiE2xKbHKQLseX766pUBoJCi7OjexSnH/qwswEBkw0jFFM17cW0/1HOiGGcrbjUatxJK4/J2F8TyeUiD8M57cwSTxR7Yr5R3hCws3zHoHhGqxYvBEXIKzDgZ8EtZd6vuMq9W+6GKx7qzCUhCZx9fJmAll1KrV99KwymrK1FBOTCDY76z8iowwicwo1Y8CMNtR2wt7+7vxXt8pOtmejtDNxUG6jZQ==
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(376014)(23010399003)(82310400026)(7416014)(1800799024)(11063799006)(56012099006)(6133799003)(3023799007)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(82310400026)(36860700016)(1800799024)(22082099003)(18002099003)(56012099006)(6133799003)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	77gNuN+yDiUYViNZa24Z22aKEjx1hAFPfekk6/hiJMA71HHvImcXEw/P0CP8JWmHyqlrsdeezUDoQlAhdpCXpnh8bjPcQOfSPu3hLdSpu6lva0YBSKvvU3bdgdWV9t7EoLw6gXIGvFa6Lb6PwxNcKDHeW+a67irFF1LVoP/6qi9l1yUmnMRe6Mm565jd0WojkreFyAsYTU6PRwGRhTLDtbpYaEJoAeS6PKZWP1xtjoNKCS2u+rl1D1e4Fh79GxGyizhdNO6ODKh9fqyr5WC9zoB7C2Bae4BqoS5f5V7xfDjOggQKPvp9PdMGj2TPTpNJXNgg60dmxc2lO3e7DcC8lt+LhdL2Wnz7AjfRtax7IRpL3baqhk17pQ1LMeNpBIgXAng8UE9qPP+ioC16ooWeQx4XVDNkYIjt9jZtDvkehnaBDudn3WbLb0J+6hD4/UjV
+	xguh54AF0j/IO9Y184ewrgcW24c0+8HlWm3JWfLchk+A0EWwRmNWXubfigTVsW29CtxJpjdIni58PvQ7iYpwsY1T7hYSoAJLhGaZK+J+gtt6sAQKlx0cVnvH51EAsBxrG062vBp16EYOfvkspoD6UZCmgfs6DKUH+m+60ZkT3tKoriJneVGQDteSJiSqf38zyMZ0QwR6dtkh27HeXtGWwI0F6IHBcAqbvFAmk8uHq78+8nxk/cTiqxXrbUwBMpltCJabj6T6AzNhelprcyzf0mShbbiD7uR6T00zbn7nhpNJko/zPbGyPSR3lr38QcGlT83PRlQpI+w0P4HVGIqGMChTgTiATNgoAZpvbGBKOnYBIyL9LWC4arL4KwpSIMFLi83wiB0LqIV/MCVvR1ft7h/ZP1Hrh6BDHfWqsUS0Ll4f44zaVCZmgnp+Jm1iPvPS
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 06:24:20.1314
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 06:24:24.4594
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84e7a8b7-5cd6-4968-1ef7-08ded8028d2e
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2e42912-1420-4b1e-c27c-08ded8028fbe
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF00004FC0.namprd04.prod.outlook.com
+	DS1PEPF00017090.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6580
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8164
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-4.16 / 15.00];
 	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
@@ -155,7 +154,7 @@ X-Spamd-Result: default: False [-4.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:bobbyeshleman@meta.com,m:willemb@google.com,m:weibunny@fb.com,m:dw@davidwei.uk,m:cratiu@nvidia.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:noren@nvidia.com,m:cjubran@nvidia.com,m:dtatulea@nvidia.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303990-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303991-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -165,7 +164,7 @@ X-Spamd-Result: default: False [-4.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,vger.kernel.org:from_smtp];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
 	ALIAS_RESOLVED(0.00)[];
@@ -173,66 +172,280 @@ X-Spamd-Result: default: False [-4.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 30A866F3C67
+X-Rspamd-Queue-Id: 5C9226F3CAA
 
-NetDrvEpEnv picks a single IP version at init time, preferring IPv6 when
-both are configured.
+Parameterize test cases by IP version using @ksft_variants. Set the
+environment's IP version at the start of each case using a new local
+helper, which also handles restoring the original value via defer().
 
-Add NetDrvEpEnv.set_ipver() to reselect the IP version and recompute the
-derived address fields.
+The last case is left unparameterized because it does not send traffic
+or exercise IP-version-specific code.
 
+While here, fix an int vs str comparison bug `if cfg.addr_ipver == 4`.
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
 Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Nimrod Oren <noren@nvidia.com>
 ---
- .../selftests/drivers/net/lib/py/env.py       | 27 ++++++++++++++-----
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ tools/testing/selftests/drivers/net/xdp.py | 94 ++++++++++++++++++----
+ 1 file changed, 77 insertions(+), 17 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index e4ab99b905b1..e4acf3d8333f 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -159,13 +159,7 @@ class NetDrvEpEnv(NetDrvEnvBase):
+diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
+index 2ad5932299e8..0369929f3c51 100755
+--- a/tools/testing/selftests/drivers/net/xdp.py
++++ b/tools/testing/selftests/drivers/net/xdp.py
+@@ -172,25 +172,45 @@ def _test_pass(cfg, bpf_info, msg_sz):
+     ksft_eq(stats[XDPStats.RX.value], stats[XDPStats.PASS.value], "RX and PASS stats mismatch")
  
-         self.remote = Remote(kind, args, src_path)
  
--        self.addr_ipver = "6" if self.addr_v["6"] else "4"
--        self.addr = self.addr_v[self.addr_ipver]
--        self.remote_addr = self.remote_addr_v[self.addr_ipver]
--
--        # Bracketed addresses, some commands need IPv6 to be inside []
--        self.baddr = f"[{self.addr_v['6']}]" if self.addr_v["6"] else self.addr_v["4"]
--        self.remote_baddr = f"[{self.remote_addr_v['6']}]" if self.remote_addr_v["6"] else self.remote_addr_v["4"]
-+        self.set_ipver("6" if self.addr_v["6"] else "4")
+-def test_xdp_native_pass_sb(cfg):
++_ipvers = [
++    KsftNamedVariant("ipv4", "4"),
++    KsftNamedVariant("ipv6", "6"),
++]
++
++
++def _set_ipver_defer_restore(cfg, ipver):
++    old_ipver = cfg.addr_ipver
++    cfg.set_ipver(ipver)
++    defer(cfg.set_ipver, old_ipver)
++
++
++@ksft_variants(_ipvers)
++def test_xdp_native_pass_sb(cfg, ipver):
+     """
+     Tests the XDP_PASS action for single buffer case.
  
-         self.ifname = self.dev['ifname']
-         self.ifindex = self.dev['ifindex']
-@@ -252,6 +246,25 @@ class NetDrvEpEnv(NetDrvEnvBase):
-         if not self.addr_v[ipver] or not self.remote_addr_v[ipver]:
-             raise KsftSkipEx(f"Test requires IPv{ipver} connectivity")
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
++
+     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
  
-+    def set_ipver(self, ipver):
-+        """
-+        Modify the IP version used by the generic address fields.
-+        """
-+        if ipver == getattr(self, "addr_ipver", None):
-+            return
+     _test_pass(cfg, bpf_info, 256)
+ 
+ 
+-def test_xdp_native_pass_mb(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_pass_mb(cfg, ipver):
+     """
+     Tests the XDP_PASS action for a multi-buff size.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
 +
-+        self.require_ipver(ipver)
+     bpf_info = BPFProgInfo("xdp_prog_frags", "xdp_native.bpf.o", "xdp.frags", 9000)
+ 
+     _test_pass(cfg, bpf_info, 8000)
+@@ -219,25 +239,33 @@ def _test_drop(cfg, bpf_info, msg_sz):
+     ksft_eq(stats[XDPStats.RX.value], stats[XDPStats.DROP.value], "RX and DROP stats mismatch")
+ 
+ 
+-def test_xdp_native_drop_sb(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_drop_sb(cfg, ipver):
+     """
+     Tests the XDP_DROP action for a signle-buff case.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
 +
-+        self.addr_ipver = ipver
-+        self.addr = self.addr_v[ipver]
-+        self.remote_addr = self.remote_addr_v[ipver]
+     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
+ 
+     _test_drop(cfg, bpf_info, 256)
+ 
+ 
+-def test_xdp_native_drop_mb(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_drop_mb(cfg, ipver):
+     """
+     Tests the XDP_DROP action for a multi-buff case.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
 +
-+        # Bracketed addresses, some commands need IPv6 to be inside []
-+        self.baddr = (f"[{self.addr_v['6']}]" if ipver == "6"
-+                      else self.addr_v["4"])
-+        self.remote_baddr = (f"[{self.remote_addr_v['6']}]" if ipver == "6"
-+                             else self.remote_addr_v["4"])
+     bpf_info = BPFProgInfo("xdp_prog_frags", "xdp_native.bpf.o", "xdp.frags", 9000)
+ 
+     _test_drop(cfg, bpf_info, 8000)
+@@ -287,13 +315,17 @@ def _test_xdp_native_tx(cfg, bpf_info, payload_lens):
+         ksft_eq(stats[XDPStats.TX.value], expected_pkts, "TX stats mismatch")
+ 
+ 
+-def test_xdp_native_tx_sb(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_tx_sb(cfg, ipver):
+     """
+     Tests the XDP_TX action for a single-buff case.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
 +
-     def require_nsim(self, nsim_test=True):
-         """Require or exclude netdevsim for this test"""
-         if nsim_test and self._ns is None:
+     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
+ 
+     # Ensure there's enough room for an ETH / IP / UDP header
+@@ -302,13 +334,17 @@ def test_xdp_native_tx_sb(cfg):
+     _test_xdp_native_tx(cfg, bpf_info, [0, 1500 // 2, 1500 - pkt_hdr_len])
+ 
+ 
+-def test_xdp_native_tx_mb(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_tx_mb(cfg, ipver):
+     """
+     Tests the XDP_TX action for a multi-buff case.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
++
+     bpf_info = BPFProgInfo("xdp_prog_frags", "xdp_native.bpf.o",
+                            "xdp.frags", 9000)
+     # The first packet ensures we exercise the fragmented code path.
+@@ -447,13 +483,17 @@ def _test_xdp_native_tail_adjst(cfg, pkt_sz_lst, offset_lst):
+     return {"status": "pass"}
+ 
+ 
+-def test_xdp_native_adjst_tail_grow_data(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_adjst_tail_grow_data(cfg, ipver):
+     """
+     Tests the XDP tail adjustment by growing packet data.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
++
+     pkt_sz_lst = [512, 1024, 2048]
+     offset_lst = [1, 16, 32, 64, 128, 256]
+     res = _test_xdp_native_tail_adjst(
+@@ -465,13 +505,17 @@ def test_xdp_native_adjst_tail_grow_data(cfg):
+     _validate_res(res, offset_lst, pkt_sz_lst)
+ 
+ 
+-def test_xdp_native_adjst_tail_shrnk_data(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_adjst_tail_shrnk_data(cfg, ipver):
+     """
+     Tests the XDP tail adjustment by shrinking packet data.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+     """
++    _set_ipver_defer_restore(cfg, ipver)
++
+     pkt_sz_lst = [512, 1024, 2048]
+     offset_lst = [-16, -32, -64, -128, -256]
+     res = _test_xdp_native_tail_adjst(
+@@ -535,7 +579,7 @@ def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
+             # after we eat into it. We send large-enough packets, but if HDS
+             # is enabled head will only contain headers. Don't try to eat
+             # more than 28 bytes (UDPv4 + eth hdr left: (14 + 20 + 8) - 14)
+-            l2_cut_off = 28 if cfg.addr_ipver == 4 else 48
++            l2_cut_off = 28 if cfg.addr_ipver == "4" else 48
+             if pkt_sz > hds_thresh and offset > l2_cut_off:
+                 ksft_pr(
+                 f"Failed run: pkt_sz ({pkt_sz}) > HDS threshold ({hds_thresh}) and "
+@@ -579,18 +623,22 @@ def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
+     return {"status": "pass"}
+ 
+ 
+-def test_xdp_native_adjst_head_grow_data(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_adjst_head_grow_data(cfg, ipver):
+     """
+     Tests the XDP headroom growth support.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+ 
+     This function sets up the packet size and offset lists, then calls the
+     _test_xdp_native_head_adjst_mb function to perform the actual test. The
+     test is passed if the headroom is successfully extended for given packet
+     sizes and offsets.
+     """
++    _set_ipver_defer_restore(cfg, ipver)
++
+     pkt_sz_lst = [512, 1024, 2048]
+ 
+     # Negative values result in headroom shrinking, resulting in growing of payload
+@@ -600,18 +648,22 @@ def test_xdp_native_adjst_head_grow_data(cfg):
+     _validate_res(res, offset_lst, pkt_sz_lst)
+ 
+ 
+-def test_xdp_native_adjst_head_shrnk_data(cfg):
++@ksft_variants(_ipvers)
++def test_xdp_native_adjst_head_shrnk_data(cfg, ipver):
+     """
+     Tests the XDP headroom shrinking support.
+ 
+     Args:
+         cfg: Configuration object containing network settings.
++        ipver: IP version to use ("4" or "6").
+ 
+     This function sets up the packet size and offset lists, then calls the
+     _test_xdp_native_head_adjst_mb function to perform the actual test. The
+     test is passed if the headroom is successfully shrunk for given packet
+     sizes and offsets.
+     """
++    _set_ipver_defer_restore(cfg, ipver)
++
+     pkt_sz_lst = [512, 1024, 2048]
+ 
+     # Positive values result in headroom growing, resulting in shrinking of payload
+@@ -621,12 +673,19 @@ def test_xdp_native_adjst_head_shrnk_data(cfg):
+     _validate_res(res, offset_lst, pkt_sz_lst)
+ 
+ 
+-@ksft_variants([
+-    KsftNamedVariant("pass", XDPAction.PASS),
+-    KsftNamedVariant("drop", XDPAction.DROP),
+-    KsftNamedVariant("tx", XDPAction.TX),
+-])
+-def test_xdp_native_qstats(cfg, act):
++def _qstats_variants():
++    actions = [
++        ("pass", XDPAction.PASS),
++        ("drop", XDPAction.DROP),
++        ("tx", XDPAction.TX),
++    ]
++    for ipver in ["4", "6"]:
++        for name, act in actions:
++            yield KsftNamedVariant(f"{name}_ipv{ipver}", act, ipver)
++
++
++@ksft_variants(_qstats_variants())
++def test_xdp_native_qstats(cfg, act, ipver):
+     """
+     Send 1000 messages. Expect XDP action specified in @act.
+     Make sure the packets were counted to interface level qstats
+@@ -634,6 +693,7 @@ def test_xdp_native_qstats(cfg, act):
+     """
+ 
+     cfg.require_cmd("socat")
++    _set_ipver_defer_restore(cfg, ipver)
+ 
+     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
+     prog_info = _load_xdp_prog(cfg, bpf_info)
 -- 
 2.45.0
 
