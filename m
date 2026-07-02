@@ -1,185 +1,217 @@
-Return-Path: <netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /xS5LlW5RWpJEQsAu9opvQ
-	(envelope-from <netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 03:05:25 +0200
+	id FLrKK43HRWpEFAsAu9opvQ
+	(envelope-from <netdev+bounces-303912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:06:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5A66F2B75
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 03:05:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 297626F2F0C
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 04:06:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=KjLhFvIc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bzsoD8mY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303912-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303912-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C031C302EEDB
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 01:05:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6298303259E
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 02:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E3F225417;
-	Thu,  2 Jul 2026 01:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691452DEA86;
+	Thu,  2 Jul 2026 02:05:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E977262E
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 01:05:21 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782954323; cv=none; b=aaEpFuD6E0Jw9ezXVMSKwqKJczGZGZLbBemTBCi31HhFdO5UmleXjHZVuQaotB32dsDkJnPc2ZNqvz8/dfkIcO/G15RhzV2rw/EIU47o0xGkhnQyAb+Hf3AJgZR9r0cYQKi4T8MlG2ftY3xdMMge566FfbU8UrCiWhiScgqE5aA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782954323; c=relaxed/simple;
-	bh=BL7fpg+hev2aTdz+USemxNuBl28/n+mItaSQrlZpMJA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pdmkHOH7jOporUNqDzGfVEtFbJ/LRKF+N/ScMsiBc65d542FLheRicq55Ck4UfXqsiq5LGOfmyQogfpaVVdG5vvP5GaONEfA2Mi03BMLpRx08BKcMt0dMF5AFxe/h7NTed2OWyfoGN7iYm5a9V4A6IabL9fHre+oAvqIcHenPoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=KjLhFvIc; arc=none smtp.client-ip=209.85.216.54
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-37fcae0ecb3so933937a91.3
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 18:05:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004CE533D6
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 02:05:52 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782957955; cv=pass; b=tjYI6CArPU3eDNCJTYy4GYwRbXL6YyZHmIRkZXwCXwqL1QeiX015CKsMS+RyRMMsLyo8Ov4JdfQmNGhpmBAaVjFJQqy0Q2Dv8eVJbECuzN7s5CHQuQFydOalCr3oR8Winqhl0PfrSCcCi0pqOBGcVTQqQhN2QepU3dWBCe1U2/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782957955; c=relaxed/simple;
+	bh=sQIib2a4T555M3r9e0VkDf/qT+Uy7dptHEDHa5dtQpY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XvBQFJlUZnGUkOUS0UebbEvjKUqHvrWlrXieYRaA9nl2I9Vu/SSH7If9RwlL8ugXo0ux08/khHVGYymU1Yx5sqkozmZLotuLVk0ptgdNdqCTC8+/jI7Cr+upOZdjEPpwzCa0TIEs22TfIb/4vLXNv7ROqKhXsVbEcm3q8GxCau0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bzsoD8mY; arc=pass smtp.client-ip=209.85.208.46
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-698ae09e356so203473a12.2
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 19:05:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782957951; cv=none;
+        d=google.com; s=arc-20260327;
+        b=WmIefYKFV0xrVJUSliZeTSDrxGg5J8+8fxGU58xDUGx335A5EMKhFh4/16kFen+G2s
+         ieIZjw6Bctz7vS19Z2fgiVEXLatbWXTzLxyBLrFu9ZNwJDaWhGFKL2YdBLr8uxwd4pua
+         KPQ1r4vI+yoMMhCORDvHDbXR1IY4m8RL25qMhIjd8JGjJLuRljtC7fh+jmkul9raor4X
+         zeMg6ztYlXIIRX7aJ5gjcrjikmotpUq9fng6AVSZHMdhmZeslfMqk2AC8EHAUd/+NzmM
+         BWxt9WcVJPAZa0lxm90FC1Xgah9zqJZa/OvSKR3OW/6z0NiQQ0J/cGMnjL2OC1OQohfd
+         qB6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lqmsGzRyf9KXMWuYwJ1qnqPOrw/78lVWzq4bTMsnek8=;
+        fh=C1FVd8PI31p/l+yB/pJYAhbBlbXRY++5+P1zgIdUmtM=;
+        b=JI9y8frn6LOUbOiJRMJRnQsxeAe4e/eU6EywBs/8x5RJQ+OaFfJ2m/6KhHUWCUmAcb
+         7Y4waR94WBn/PWLX8CMwfHYMuXqcxzXLdGwUzKiJXRTNNMyCpEeAjwkuY1pebxC4pegv
+         eAVBO5MsPCFH8qBzyEmiKMzggOk6MRyNYg4Sk2S0fndK0dMgWILMFdT9Uu22okDru0Vv
+         aoAn91CLeaeZrnYv4iZQ6VcVpBFk6Bk3lI6uYoGs2e38vwTtX7UcNdNSsLRlS9EDz2GX
+         SM8iLeFxRCuUC4ahS6tyIN0frMMj7DoPOKLGnH2ZNLq3QNZ2IZhJmXhdhl957/tibHug
+         85Lw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1782954321; x=1783559121; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WeonFO4IjuG4HJdhzbTWC6iM3TkwFvdMtNEruwDISF8=;
-        b=KjLhFvIcDoJD9eF6GAXIC/PRfw9IG2TN6vx/4d5uVKaB/XzQHJjWk6R5ybytuvQKZD
-         O0b77S8m3nG9XW7Aoj2SoetVGt5826Tvh34deidU5VyxwfuxSbcGlJDtSkr5k7i3jmrk
-         /NZtzFRjYWLF/Id3Gvr0JJqXLAt7lYJ/mYJ6sixxZp+2SND06h5zrI0MC4Dqz7hyfx/j
-         fOnKvAs7CUER4HXxKyH4YZ1RwVIsTwXEzPDAlb4YjqoxhwlVJhSOGWXed2Vp5ieNPgTk
-         d8z9huDcPWCNs5/86XCoybi/wJrT7AAI8POCyAOCmu143lDeVSLNwjMVnjUjiDOufeqU
-         QTTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782954321; x=1783559121;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782957951; x=1783562751; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WeonFO4IjuG4HJdhzbTWC6iM3TkwFvdMtNEruwDISF8=;
-        b=pyfgA3BjM+R42KT2yzmJ/JDSFyElhaKL2HI2ShlRV68pGThi1bhFZwveQxXqLcBHih
-         RwfNHsONDUWGHUIZXm1hlgXB5MlRSMMKNSKw1NsIcCttasWUt67NFIVSPbS+nDmHjGCF
-         MnUlls1buOAdfLhzIjZc/g15TeRhNjsTrhrDdM/J/D99QTIjY605yh+mgBr72UlqKuat
-         Qbf9LWbJ8f6Y38oKSS3cobjRI2Bh85k/Qp/hId5UG+2i1rU/TEwW1r6VBZTzAeeo+bSt
-         cjIxV7xVhsLuprF1ONjOw+mmNatxWT8j0dTch56/xpukylsc0pVUO1HFCS6YqlzsV0zt
-         MzOg==
-X-Forwarded-Encrypted: i=1; AHgh+RoNDdjCNm4sQRuaQWTPVkI2u0n0DhhyBAEve1w6xrgM7x4ghVEMTIvwqBqe6NGDvKqcfmF+AZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrCuOGMN8nMf89Axvdmzvs1K39VIhFBslmwiJQ/MroXoKdIVel
-	IapUya7pTD0oAZN4HTKmbrOatrabOry8rgpu/TMrrUgE7wtRnmtBRGSlZdRxJaPG3Q==
-X-Gm-Gg: AfdE7cn+Mj143X02zONo9UAlsM8urZG5WEM5Fs3osf7K9+xH5ADE8KLlQD1q0G2f5TB
-	sxdZgLUDOq4KVcVjENipT029WCWI4z2KfDT1cbdLYTnEgPmUAblIzyCI80Vd9LltJTu+N1SETrB
-	nhrBRI4mCUtFRy9TspzN5z9lCSU/lCSBnkOLgu4uPxYxEKG/epixpTH1mt2httiX6Pup5RuYUnU
-	ZzA7ol7hubyPCRDCDM/KYHCAlBvUEvzGvWy0yDFG2ngcfVE69GDK/77exCtH59U6a8pd/bDrP7K
-	lRkqMFMfGMLejMXn0PyzOMslNpSovks56x4bhi/6Shbr9BlrnOXHix7JnhSJ5/32ZgfE6X6qLCS
-	+mbosBj1+iEwU4nIKtrlcYz4AC8unozCAjpfnZm2R20foWfMx0EbizM34ev/t3YTBrh9GjUL+Xe
-	wqqoLm9pafl5D00V9zUw==
-X-Received: by 2002:a17:90a:e7cf:b0:37f:9ce1:7369 with SMTP id 98e67ed59e1d1-380aa21c833mr4035350a91.31.1782954320615;
-        Wed, 01 Jul 2026 18:05:20 -0700 (PDT)
-Received: from xiang.tailc0aff1.ts.net ([20.171.14.70])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb84366sm3417434eec.16.2026.07.01.18.05.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 18:05:20 -0700 (PDT)
-From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	AutonomousCodeSecurity@microsoft.com,
-	tgopinath@linux.microsoft.com,
-	kys@microsoft.com,
-	"Xiang Mei (Microsoft)" <xmei5@asu.edu>
-Subject: [PATCH ipsec] xfrm6: clear dst.dev on error to avoid double netdev_put in xfrm6_fill_dst()
-Date: Thu,  2 Jul 2026 01:05:16 +0000
-Message-ID: <20260702010516.221830-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        bh=lqmsGzRyf9KXMWuYwJ1qnqPOrw/78lVWzq4bTMsnek8=;
+        b=bzsoD8mYmayeFYWM3KBYCvJha/GLk8Ssp2y7+HP/Y08eUCYSx68+xsfRYAMeA5Z2X6
+         iUEj7a3a1E/9268JgO1/N4pgVY/DBkks+8HYqExZRzWr1L2PktQvSOeJz1IFManfk0g0
+         aOOc8wbAec23+6lna7l88mvTSw/T6+hGXLLmjcDqnpbB5K8aJd2H0a12IlBEO9+G8je+
+         epXeLbMe4KgPyVG6dX/iuK8tfRvaiqcRlHUhjIUooe163+SkDxVg3pOp5MIxCWddCy9f
+         EKiUgvW8H1y/WjUDh3sc8qmwye3RrTKK0GEYF8ktCgHVEdHPP2/y015tGG7Ywu6e4sK3
+         TtaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782957951; x=1783562751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lqmsGzRyf9KXMWuYwJ1qnqPOrw/78lVWzq4bTMsnek8=;
+        b=BzSOtv7QN6PDJAUQQpFgx+uuiJj/+U5dyLU03TTocAJ1dwxwoEa/y+YWUbC26xAu4U
+         wp5yu8kqpp0JpElHdPI2xtmSiKT+FjV48PfK7X4ktRH4mnR6fBdY83uDkfJmWBPE09m5
+         yKwolEqRiweWp5BgJHAyNrJIGdwoKU1uLeVg4jLeqfyh9tIfxM7sn0mqou7oidrFg+wT
+         O/0ZgMDZ+vJ115uc28TP06+p022wJZ9rxUhUoq9KzfAJ1Gnie/kf4ZuZxGP9rf1DbXo1
+         p9kw06XLi8ZeOwwWAG+EX2ONNxvvDiJHV49wx6ub/fsrTJ4IWv4dbzkrNaDCT9f+Ze8g
+         1oZw==
+X-Forwarded-Encrypted: i=1; AHgh+RpgyFepzB5n5MANmj+AHEssnZGyQl08yd1/flI3q5qI/34Q5Ex2pfZDzGDNaV0Lbk5LoDEOIu8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUYrLBsKdrkDtr/+3fh1mUSEHVzzGI8U2Se4qc6ZsIXvE4s6RK
+	G3KN7T4hLS3DNW5fGVk8vPUBV/fO8Rg6Pr/XdOc/lmK0JhbXmSH4u1qyCLNlSQ7xw19iZXpesGM
+	uMaqF8P5iPI0ExJAVmHXX8lYO/lkOQT0=
+X-Gm-Gg: AfdE7cl+A0LU/LUF8mgs1ieoYedkcY5zOjqJPMDt4hAUr8ulJEt3Li0fQncLDdVsuDN
+	QsCebrqwFPsJaeS/9MX9HqUctaXfqQd5EGjIQjrgIraTt8ReEi6rmTV+CA6g77hSjaDmngh1GFI
+	5Za+OFbd1eGJT7bbZklbfIumBoBu7++zeQwYBWp66leKxzzrN1ROQOMhUFAlgDoy1lFelIVn6xg
+	nZn195xBxwjoA9vpitAzWiZS6LkrtCKFL3lv/KuIgrrttfOCJBa8snrWr/f2ibhrAvcFpc35wKS
+	jBdwGI6vKzcnqEEeYleldtan9ChkBQMTOb7DOPX76w==
+X-Received: by 2002:a05:6402:43ce:b0:698:3b7c:7e50 with SMTP id
+ 4fb4d7f45d1cf-6989f37df1cmr2025391a12.38.1782957951233; Wed, 01 Jul 2026
+ 19:05:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260630070600.484-1-yimingqian591@gmail.com> <CAAVpQUC_EcpFf9GmNnD07KhFAOcPhrCa5xNF-idz0CsB=TJV9A@mail.gmail.com>
+In-Reply-To: <CAAVpQUC_EcpFf9GmNnD07KhFAOcPhrCa5xNF-idz0CsB=TJV9A@mail.gmail.com>
+From: =?UTF-8?B?6ZKx5LiA6ZOt?= <yimingqian591@gmail.com>
+Date: Thu, 2 Jul 2026 10:05:39 +0800
+X-Gm-Features: AVVi8Cf_QSah0g0A7OX-5JY5QlpZKuBsyf4LHvLf9bGF1X295pd1_ED5KQFV6N0
+Message-ID: <CAL_bE8JU8fpwracSRC5ziiT=YMW-XRkYNsUEGGuoSOv0gYZcwQ@mail.gmail.com>
+Subject: Re: [PATCH] af_unix: mark MSG_SPLICE_PAGES frags shared
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: security@kernel.org, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lingchen5202005@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303911-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303912-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:xmei5@asu.edu,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[yimingqian591@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:security@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lingchen5202005@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yimingqian591@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F5A66F2B75
+X-Rspamd-Queue-Id: 297626F2F0C
 
-On the error path where in6_dev_get(dev) returns NULL, xfrm6_fill_dst()
-releases the device reference with netdev_put() but leaves
-xdst->u.dst.dev set. dst_destroy() later calls netdev_put(dst->dev)
-again, so the same net_device reference is released twice, underflowing
-its refcount (ref_tracker WARNING + "unregister_netdevice: waiting for
-<dev> to become free").
+Thanks, I agree plain AF_UNIX does not by itself provide the writer side.
 
-Clear xdst->u.dst.dev after the netdev_put(), the same way the XFRM
-device-offload paths xfrm_dev_state_add() and xfrm_dev_policy_add() in
-net/xfrm/xfrm_device.c NULL ->dev when releasing the reference on error.
+  The concern was that MSG_SPLICE_PAGES imports externally owned pages into
+  skb frags, while unlike TCP/UDP/KCM this path does not mark them with
+  SKBFL_SHARED_FRAG. I checked the AF_UNIX sockmap path as well, but I do
+  not currently have a concrete in-tree chain where those frags reach a
+  writer that skips COW based on skb_has_shared_frag().
 
-  ref_tracker: reference already released.
-  ref_tracker: allocated in:
-   xfrm6_fill_dst (net/ipv6/xfrm6_policy.c:86)
-   ...
-   udpv6_sendmsg (net/ipv6/udp.c:1696)
-   ...
-  ref_tracker: freed in:
-   xfrm6_fill_dst (net/ipv6/xfrm6_policy.c:90)
-   ...
-  WARNING: lib/ref_tracker.c:322 at ref_tracker_free+0x58b/0x780
-   dst_destroy (net/core/dst.c:115)
-   rcu_core
-   handle_softirqs
-   ...
+  So this should be treated as a defensive consistency cleanup rather than
+  a security fix. I will drop the Fixes tag and the duplicate Reported-by
+  tags in v2.
 
-Fixes: 84c4a9dfbf43 ("xfrm6: release dev before returning error")
-Reported-by: AutonomousCodeSecurity@microsoft.com
-Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
----
- net/ipv6/xfrm6_policy.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
-index 125ea9a5b8a0..3b749475f6ed 100644
---- a/net/ipv6/xfrm6_policy.c
-+++ b/net/ipv6/xfrm6_policy.c
-@@ -88,6 +88,7 @@ static int xfrm6_fill_dst(struct xfrm_dst *xdst, struct net_device *dev,
- 	xdst->u.rt6.rt6i_idev = in6_dev_get(dev);
- 	if (!xdst->u.rt6.rt6i_idev) {
- 		netdev_put(dev, &xdst->u.dst.dev_tracker);
-+		xdst->u.dst.dev = NULL;
- 		return -ENODEV;
- 	}
- 
--- 
-2.43.0
-
+Kuniyuki Iwashima <kuniyu@google.com> =E4=BA=8E2026=E5=B9=B46=E6=9C=8830=E6=
+=97=A5=E5=91=A8=E4=BA=8C 23:51=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Tue, Jun 30, 2026 at 12:06=E2=80=AFAM Yiming Qian <yimingqian591@gmail=
+.com> wrote:
+> >
+> > unix_stream_sendmsg() splices external pages directly into skb frags wh=
+en
+> > MSG_SPLICE_PAGES is set, but it does not propagate SKBFL_SHARED_FRAG
+> > afterward.
+>
+> I think it doesn't matter with the plain AF_UNIX.
+>
+> Please elaborate on the scenario where this could be a problem.
+> e.g. sockmap ?
+>
+>
+> >
+> > That leaves later writers without the shared-frag marker even though th=
+e
+> > skb still references externally owned pages.
+> >
+> > Set the marker after a successful skb_splice_from_iter() call.
+> >
+> > Fixes: a0dbf5f818f90 ("af_unix: Support MSG_SPLICE_PAGES")
+> > Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> > Reported-by: Can Liu <lingchen5202005@gmail.com>
+>
+> Reported-by is not needed when it's identical to SOB tag.
+>
+>
+> > Signed-off-by: Yiming Qian <yimingqian591@gmail.com>
+> > Signed-off-by: Can Liu <lingchen5202005@gmail.com>
+> > ---
+> >  net/unix/af_unix.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index f7a9d55eee8a1..f2cd0f8ec0914 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -2458,6 +2458,7 @@ static int unix_stream_sendmsg(struct socket *soc=
+k, struct msghdr *msg,
+> >                                 goto out_free;
+> >
+> >                         size =3D err;
+> > +                       skb_shinfo(skb)->flags |=3D SKBFL_SHARED_FRAG;
+> >                         refcount_add(size, &sk->sk_wmem_alloc);
+> >                 } else {
+> >                         skb_put(skb, size - data_len);
+> > --
+> > 2.34.1
 
