@@ -1,189 +1,214 @@
-Return-Path: <netdev+bounces-304276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5SN1NTHdRmokewsAu9opvQ
-	(envelope-from <netdev+bounces-304276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 23:50:41 +0200
+	id IlAqDlnfRmqPewsAu9opvQ
+	(envelope-from <netdev+bounces-304277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 23:59:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D379D6FD109
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 23:50:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82C606FD1C0
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 23:59:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=queasysnail.net header.s=fm3 header.b="t y2DgKd";
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=BhXyxlsg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304276-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304276-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=google.com header.s=20251104 header.b=UUTxyPwA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304277-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304277-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6D9533015609
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 21:50:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF8E03017245
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 21:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCDA3B14AA;
-	Thu,  2 Jul 2026 21:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BDD3B47F9;
+	Thu,  2 Jul 2026 21:59:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBBD3AFCFD
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 21:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9743B3BEF
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 21:59:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783029020; cv=none; b=JrM25KTWfxsXbQ7/Kod2ozjPOIv8naqxmn+pt1PL4zka81x5cI/Bkm5KW9A049ljidH9qUkdYYammsb8PjDvMuhx4HwxgELKS0bdbnsv5YWoqekjI9T0bsH1FumDlseZccdLmzTralfdBeiJnh+nSrV849DVHwGlun3dborhOXA=
+	t=1783029575; cv=none; b=eNQd9pudaXvm9gxk6EX97wc5uD9XamTGQI8+KRjMf8Xn1H5sYm1Pyf4zHgYL+2fL6+J8rE2bTM7DARE5yZrP8jNAjFyN58YPb03UVC2nI2xm09FPWWWOdH8IYlEs+giiFLNJzl+UpZRRA5pGqN+uCTsAkv/N8pxObDYFHwUK3C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783029020; c=relaxed/simple;
-	bh=x6MA67vlRFjczPNkgY5TFczlie5G/uWMELnU2RQy+eQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q+lB12jDvqHAjLNGAAVCJrKghQe8dt/+w7J2aLkgxA0XQjnEc2qY2vFnekf2P3pFy3MKwoAin7Vagrfeim9Woz3SRTqOpbKiCAhXy57rpvoRmljIlRFlVaJ90LZ+mvHYgeKqTkiXBlRtka3qZNSIORE3cojLwYGaHapcF18cSWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ty2DgKdx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BhXyxlsg; arc=none smtp.client-ip=202.12.124.147
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.stl.internal (Postfix) with ESMTP id A17571D000E7;
-	Thu,  2 Jul 2026 17:50:16 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Thu, 02 Jul 2026 17:50:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1783029016; x=
-	1783115416; bh=RqdaJU3y72AdTevTt/ImBcstt0+4Pa0P8qxSJ8eLou8=; b=t
-	y2DgKdxbK8DCH0GUR0rmjkQUOD0akNGOzJREpsEbBsoINNTWPnb5kC2ZHTv8ZeUT
-	TES5ebjxzwu4Q7d7iCKzYuCQJmh51ItY/hTio6zgVnEPElXLgQ4w4MIyOSl2DJ4E
-	yD0OuYUskiT4WvCeA5wGxULywfJC4t4cjKz+JnfJh9lYUH/WgF7pTNcbgLbQ8m9t
-	hRZmbvm9IQdUiEi5535PxfZ9LfrDTBuYXy4NMDtE2raoSnLsD2XXyxGanTfWtu1q
-	n8Slvd8fV/kQc3AENqN4razaxEoZAyuKtH/yYU3s3IsaABPcz6uNb8JSv/NgnUKU
-	AvQEv4avY4hSQc6icFADQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1783029016; x=1783115416; bh=RqdaJU3y72AdTevTt/ImBcstt0+4Pa0P8qx
-	SJ8eLou8=; b=BhXyxlsgtJlh8dTUJyNQK2JgVIW31NEdGbsUyikP8rfCoN+3b5o
-	ks9/xLNxx2vgvoAK6BqOc9BLYKp0MaXKZ75zflus3yXn0m1ga5foon5t4j5XLyou
-	6+V8/Zb13A3MoFf04HyY0Q6pss158OZDgwZkYTdNVXPN8Uh55nXEL0JFUDGVa0rU
-	FlaaVe1GnypX+dDtfzzFiGL93t01IuH0hGY/xn44PBWT8L6MC2l+zKwJ/WPTLzn6
-	jbmpIAZQDfUM6Na8QWlP8XXxDzYz5WqGGeRepeCE2afZYNuxbU8uklIA+vQ9T6RJ
-	tHZq9MdAcp+WaOH52mHkWn1DjGAe5kKYREw==
-X-ME-Sender: <xms:F91Gau6rVIYwEph9MdTGFwR9omU2Plwc3LqrXWcwCb-iOpz0f5ht4Q>
-    <xme:F91Gam8DVrYar2Q7BUDr-bzis4-OFrrEiiHTy9UxlpVnbHvyKi0oXutI6a7jlhjkC
-    T-tT7FBVhmjTx33q2jLx3g1tLcm4Qnx6etV8I6Ud59ILDKOLyGRvoI>
-X-ME-Received: <xmr:F91GajrulelNP6DFWMiEw4xWMEmtUtvApfBBSY1LQVfIoYUJpKqa4pzQ4_E>
-X-ME-Proxy-Cause: dmFkZTEPRVIA/z/jYnrTSVJwJiMOy6vxPXJHDEGtiffUNgrKH91P0A+0h8Z/CCWAF86VyC
-    nxu6YGbqh58m1r0M1TOPPM/9mGyPpgznWmcOXK/Ct6Tw9+XfUZozTRyDcKjfaLMyQvb/hI
-    mrnDCC4udqEd6G675eLdkZDmN3wtk0h/s3N1f4CrW3ZZIzV9c3y9YeGfxtxtPfTE4++SQw
-    mPgCpYKoG4Oqj1Cx20pRKkSg0uHmmrZ2xi+gAcLRSjSkl32G1DgI7Cok6KcNqivmm+pQQ3
-    HzHAk9QMu27zESUxd9TBC8slU7DkQO97wTBFUftRuJv9DcYnX08mfnvDqnzlVDgDGYYwYR
-    L8g/Xhdlc02ywHEj7kSQcA0hi/WTrxw6NCilRxgGVb59x+wZSPfGvIlhHg4ufqjM2PHQLM
-    BhIjJ7/6iGtCS1RLCLydOMSeX30A3lYhS0BdxnPmuByi8iJfoB1OmZEm1uE5lnxO0bK2bo
-    loXAwgqljOZqNIRlG6r+gTNItKia9LdJNZPbPXmkRapnjaZan6/hmvjs//BbRBtjavkI9W
-    uwON6ir3YTyZSRq8alAN3MytEc6WvRFIA5wMCCtheGATjx1WadTUTmv9w57+gCBqbkkpTW
-    WPPSdDPdFH+5DKtqJ8TKvDd9jyvaifR78vT0I0NE3vkT4Vye0IjZdh66NQ3Q
-X-ME-Proxy: <xmx:GN1GanqoP4e1znVclXuAVkRCpiOdye0jlu1hE1-3cbB7uDOwQe_ZYw>
-    <xmx:GN1Gam3mLgzvd3sQQhBGympz-AP_cIvhy8TlUHsqQbQ1mon1uSkQng>
-    <xmx:GN1GalEIMiYaG79VWO41JbaVg-3TaBD4f2SJzk_B0rVRZZNbqQfXxA>
-    <xmx:GN1GahGhNaIRWnTQeg2SmYkg-0ae4Xwt9Bh4E4eckmx6I2FSXq1_SA>
-    <xmx:GN1Gas4fMD5pAPVPqo3HV5Mgw0jmWYp3FNTE-An1UNy_FVltgdbebZ2b>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 2 Jul 2026 17:50:15 -0400 (EDT)
-Date: Thu, 2 Jul 2026 23:50:13 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net, edumazet@google.com,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net/tls: Consume empty data records in
- tls_sw_read_sock()
-Message-ID: <akbdFcQP7oTp_n3s@krikkit>
-References: <20260630191551.875664-1-cel@kernel.org>
- <akaoXcfamBp8_mYe@krikkit>
- <0a03d16e-d4ce-422d-9492-3e31d910d8e5@app.fastmail.com>
+	s=arc-20240116; t=1783029575; c=relaxed/simple;
+	bh=/V1rwNDFD9xRESqnFxeRFnzSWjZJMsSsU9RN0HJ2nfc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kOaiaQ6kbFsrqxncqsyaZPLAm4vdIa0DE8dnNKN7SG19UH5lijNT/ykgE+UE5azwopKTtwTC/NKqTdFVmdukmVI1SkHDyuAlDs9h8SgHsM3OV9sWYzBehi7lJ1qCBL3yNxU/hB7dgXDls2zKhCiTsLtcUQhZ4kfoYCha5EtsiXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UUTxyPwA; arc=none smtp.client-ip=209.85.214.201
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2cacaf479f9so8639225ad.3
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 14:59:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1783029573; x=1783634373; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Dj8SH38Ve++9Zk/H/OUEK4h6BqvUJVzU5G2pZidlHcg=;
+        b=UUTxyPwAZefLoVtdXqIIANg2mm1w4IRrEY3lTkwyMtofQDXSfQIGsoGvbvrJYheeAX
+         eXPIpdnviNeaMEROKRfQNiFJTS5PkoWDpYNwYZX58p5oT1G2HtzVM9xovMkqzh85b6rT
+         7Vp0L8QKq76F7lZVaskD3yAsVSNqDYs9dXBMwmDSUV8E2d9m8vmS4/y46wDgiEhssyh9
+         Ox760F7nxUaGYL3qQun9PpZ0w8BgxXs3YHFxBQ80rZYUWu5uT13f6i/kWrVGpFYwL7Oz
+         P4hEIyYnuSowxusJSU/hxdMk9Y+dE6J0BOOuDLIZ+gSfjEBJt5UZbHqUZrzRpGCmcY5h
+         KYew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783029573; x=1783634373;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Dj8SH38Ve++9Zk/H/OUEK4h6BqvUJVzU5G2pZidlHcg=;
+        b=PxJIv5uYW2cP4wM6tYO1HYT26fJ6po66uXGCxbk+D8gOIABYe4+SrDZU91CP1IqPOP
+         3nk2FXnzLGrEqH2r5+M/DncWnqqELrh0//m3vWLUNdHCBgBaqK3L0SIS3UFY+UTtVA9R
+         a25YVgGKWmKxjkj0GfAcA30IHIgfZyR4oc4WL8/EjgQkeTPVoNrvlslf1+gQEA+/iCs5
+         /EqZgMl7zcN3HJW6Shcut+oLrnh1B48oJJurhCFEP3c1j/NtfXHldAjC0Zr96N9am+Al
+         IzNR/vzK2jsNjhrxuklpuHAzdb5EjmnzohSt3jFAE4eWHLEGxI3GwgTRmmJ4vbDG4afF
+         7PPA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqzzio5ZSAEbMtTzhvQI3JsWFc6H0EqN0KuZ6f/QqNoNb2prwbKqqZKCKz4GBgHo6ncD9lsBwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8Y43TYU1fB5Yucfb65+QcR0ecqf0J+jNjeT22Sgt8rnZ4rhkq
+	Q1117Qz0v/l2H0HdnPX853+f5xYLEfD37RTGBTQEU5MVXtgPc9wG2pDxE8R1/723WV8lkmNeOT5
+	XCYd/PA==
+X-Received: from plge11.prod.google.com ([2002:a17:902:cf4b:b0:2b6:417:db8d])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:230b:b0:2c9:98e2:76aa
+ with SMTP id d9443c01a7336-2ca9121f078mr74456995ad.38.1783029572961; Thu, 02
+ Jul 2026 14:59:32 -0700 (PDT)
+Date: Thu,  2 Jul 2026 21:59:26 +0000
+In-Reply-To: <6a461706.52c20a74.1f8b39.0008.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0a03d16e-d4ce-422d-9492-3e31d910d8e5@app.fastmail.com>
+Mime-Version: 1.0
+References: <6a461706.52c20a74.1f8b39.0008.GAE@google.com>
+X-Mailer: git-send-email 2.55.0.rc0.799.gd6f94ed593-goog
+Message-ID: <20260702215932.1418087-1-kuniyu@google.com>
+Subject: Re: [syzbot ci] Re: net: Support per-netns device unregistration
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: syzbot+ci052b96c9bf56ca1d@syzkaller.appspotmail.com
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzbot@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304276-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304277-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:cel@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_RECIPIENTS(0.00)[m:syzbot+ci052b96c9bf56ca1d@syzkaller.appspotmail.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:kuni1840@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzbot@lists.linux.dev,m:syzkaller-bugs@googlegroups.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com,lists.linux.dev,googlegroups.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,messagingengine.com:dkim,krikkit:mid]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,ci052b96c9bf56ca1d];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D379D6FD109
+X-Rspamd-Queue-Id: 82C606FD1C0
 
-2026-07-02, 15:52:49 -0400, Chuck Lever wrote:
+From: syzbot ci <syzbot+ci052b96c9bf56ca1d@syzkaller.appspotmail.com>
+Date: Thu, 02 Jul 2026 00:45:10 -0700
+> syzbot ci has tested the following series
 > 
+> [v1] net: Support per-netns device unregistration
+> https://lore.kernel.org/all/20260701214334.266991-1-kuniyu@google.com
+> * [PATCH v1 net-next 01/14] rtnetlink: Lock sock_net(skb->sk) in rtnl_newlink().
+> * [PATCH v1 net-next 02/14] rtnetlink: Call unregister_netdevice_many() only once in rtnl_link_unregister().
+> * [PATCH v1 net-next 03/14] rtnetlink: Add per-netns rtnl_work.
+> * [PATCH v1 net-next 04/14] net: Wrap default_device_exit_net() with __rtnl_net_lock().
+> * [PATCH v1 net-next 05/14] net: Hold __rtnl_net_lock() in netdev_wait_allrefs_any().
+> * [PATCH v1 net-next 06/14] net: Add per-netns netdev unregistration infra.
+> * [PATCH v1 net-next 07/14] net: Call unregister_netdevice_many() per netns.
+> * [PATCH v1 net-next 08/14] veth: Support per-netns device unregistration.
+> * [PATCH v1 net-next 09/14] bareudp: Protect bareudp_list with mutex.
+> * [PATCH v1 net-next 10/14] bareudp: Support per-netns netdev unregistration.
+> * [PATCH v1 net-next 11/14] ipvlan: Convert ipvl_port.count to refcount_t.
+> * [PATCH v1 net-next 12/14] ipvlan: Synchronise ipvlan_init() and ipvlan_uninit() for the same lower dev.
+> * [PATCH v1 net-next 13/14] ipvlan: Protect ipvl_port.ipvlans with mutex.
+> * [PATCH v1 net-next 14/14] ipvlan: Support per-netns netdev unregistration.
 > 
-> On Thu, Jul 2, 2026, at 2:05 PM, Sabrina Dubroca wrote:
-> > 2026-06-30, 15:15:51 -0400, Chuck Lever wrote:
-> >> A peer may send a zero-length TLS application_data record; TLS 1.3
-> >> explicitly permits these as a traffic-analysis countermeasure (RFC
-> >> 8446, Section 5.1). After decryption such a record has full_len ==
-> >> 0. tls_sw_read_sock() hands it to the read_actor, which has no
-> >> payload to consume and returns zero. The loop treats a zero return
-> >> as backpressure (used <= 0), requeues the skb at the head of
-> >> rx_list, and stops. rx_list is serviced head-first on the next
-> >> call, so the empty record is dequeued, fails the same way, and is
-> >> requeued again; every later record on the connection is blocked
-> >> behind it.
-> >> 
-> >> tls_sw_recvmsg() does not stall on this: a zero-length data record
-> >> copies nothing and falls through to consume_skb(). Mirror that in
-> >> the read_sock() path by recognizing an empty data record before
-> >> the actor runs, consuming it, and continuing.
-> >> 
-> >> Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
-> >> Signed-off-by: Chuck Lever <cel@kernel.org>
-> >> ---
-> >>  net/tls/tls_sw.c | 11 +++++++++++
-> >>  1 file changed, 11 insertions(+)
-> >
-> > Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-> >
-> > I think tls_sw_splice_read() suffers from a similar issue (returning 0
-> > even though more data may be available). Sashiko agrees, and also
-> > found a few more pre-existing issues.
+> and found the following issue:
+> possible deadlock in __dev_change_net_namespace
 > 
-> Do you want a v2 series with those issues addressed?
+> Full report is available here:
+> https://ci.syzbot.org/series/a744b257-d741-4780-8a53-f156b2a7afc9
+> 
+> ***
+> 
+> possible deadlock in __dev_change_net_namespace
+> 
+> tree:      net-next
+> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+> base:      d6e81529749190123aa0040626c7e5dbc20fdc9a
+> arch:      amd64
+> compiler:  Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+> config:    https://ci.syzbot.org/builds/243cd0ec-28f9-4d21-8f16-3d2fbad8388d/config
+> syz repro: https://ci.syzbot.org/findings/a8a0740d-fdec-4a20-9aa5-7cb955707913/syz_repro
+> 
+> veth0_macvtap: left promiscuous mode
+> ============================================
+> WARNING: possible recursive locking detected
+> syzkaller #0 Not tainted
+> --------------------------------------------
+> syz.1.18/5814 is trying to acquire lock:
+> ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+> ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
+> ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x1479/0x2200 net/core/dev.c:12768
+> 
+> but task is already holding lock:
+> ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+> ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
+> ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x146a/0x2200 net/core/dev.c:12768
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(&net->dev_unreg_lock);
+>   lock(&net->dev_unreg_lock);
+> 
+>  *** DEADLOCK ***
+> 
+>  May be due to missing lock nesting notation
 
-I'd be ok with this patch going in on its own, and the other issues
-being addressed separately. If you have time to look into those,
-that'd be great.
+Oh right, I'll squash this to patch 6.
 
--- 
-Sabrina
+---8<---
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 57fb4741d0ac..fcd58c2aa030 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -12574,10 +12574,10 @@ static void unregister_netdevice_move_net(struct net *net_old,
+ {
+ 	if (net_old > net) {
+ 		spin_lock(&net->dev_unreg_lock);
+-		spin_lock(&net_old->dev_unreg_lock);
++		spin_lock_nested(&net_old->dev_unreg_lock, SINGLE_DEPTH_NESTING);
+ 	} else {
+ 		spin_lock(&net_old->dev_unreg_lock);
+-		spin_lock(&net->dev_unreg_lock);
++		spin_lock_nested(&net->dev_unreg_lock, SINGLE_DEPTH_NESTING);
+ 	}
+ 
+ 	if (!list_empty(&dev->unreg_list_net)) {
+---8<---
 
