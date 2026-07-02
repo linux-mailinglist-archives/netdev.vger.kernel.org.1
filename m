@@ -1,265 +1,201 @@
-Return-Path: <netdev+bounces-303964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1BMlA6bpRWpeGgsAu9opvQ
-	(envelope-from <netdev+bounces-303964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:31:34 +0200
+	id gGhmBZ7qRWqbGgsAu9opvQ
+	(envelope-from <netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:35:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 531CB6F36B3
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:31:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A92D6F36DB
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:35:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=FuH34gzm;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=LeRqJwfm;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303964-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303964-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=qq.com header.s=s201512 header.b="r/PzeJEb";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303965-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=qq.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61EAD300FED2
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:31:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A83A1301690C
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27B02561A7;
-	Thu,  2 Jul 2026 04:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B7134E745;
+	Thu,  2 Jul 2026 04:35:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F1A39FD4
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 04:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FC1231A3B
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 04:35:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782966690; cv=none; b=TyVZqYoiJtsG8BvvWcTW18C+Oxnafke4ePVYRDMplhOgWmo9eju1aB3Iih1l5LuqBBrpbS7fG0fObzOtzjZkYqsTOx4ivFiTt/eDgJ+P3TGeUaM4uk23moJtpCF/ArHJ3+CCln64SgaJGIWe2w4gOFbpsYummo4mmfdL+Q3LtR8=
+	t=1782966919; cv=none; b=Ee/AsUlbAsrn4zWWrDHXa/iEJjJqX/rdSG5rHShERSYRZ6ZTh8WTzKZIKkw3DD/ds99q4T8SNLwOfIJLQtoNcMiT2WtxoBrw0bsWwKsp0tD8/5OmAPZKdliKMbBU3b2+lPpnA+KM7r6yHdb5PTMlk1c/9gyxMQBoIyjPCV8Lf/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782966690; c=relaxed/simple;
-	bh=vE7Hjf+MLc8902/ktwRaxiqP0uFvZ89u+t9/5HuFbB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tpo4/Vuzs5r6ktHDdKZl+2yVT5dakB5AL0IWQzE25SPBAJ79Fl3LIloqTo4FpuP3vWeIGqZwAuRNhiqa8sE3nO3tsiQAp0ELGgONiApbOzL6f72CO8E/T1QGxYEx5rcQQZkSsS/+wmFaPVxA7yu07kqaT72YLxFILwD+m3MejIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FuH34gzm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=LeRqJwfm; arc=none smtp.client-ip=205.220.168.131
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6621KMge3067786
-	for <netdev@vger.kernel.org>; Thu, 2 Jul 2026 04:31:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	9z14DdaScwvuUkS9S1aCzsy5HUZXH5Z2PoiV67T14h4=; b=FuH34gzmOQltaLm8
-	w2azdXwGaNSljN1NZWl5tRrWFe4uA2HTLHGrtEZeDI6F1NSElZalItaY1rlfDQlp
-	mh5DFLLg5Hyn8aWsWD6t12SIIPtapo88esXUFpiTA+s5i0D/JyJJeodFEBtrPM1R
-	BlMIOGSoTA8QdLgw4mL/D5sudvPCrug6FFhasCnx93V01qqK+qAEnGnq6iHfreuT
-	0WsyMdQjStUadCy53dK/6CAqZF//MWsHmkFLjBVGCI25dWSpa1b6Q28VSv0FWPTM
-	IFASBpqdwFQNtPbe8oSp4zMrK3ixrBnWFguc4JNFV2FRS5IzPFpEWcus+1oZQTAA
-	DTbTpg==
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f510aktmd-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 04:31:28 +0000 (GMT)
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c894391f000so2600477a12.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 21:31:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782966688; x=1783571488; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9z14DdaScwvuUkS9S1aCzsy5HUZXH5Z2PoiV67T14h4=;
-        b=LeRqJwfmaFAYcxhH2QOlcCYDqA30P6E0mh63YJNmYTq1i6sHlk0RgdyPmOzJ3khnBG
-         ihBLBWrr+YbPNh8kYGGt4MyXFYSL7LwWbouNiJ8k5Wo1XpnXydOLskIzQMinAbUXXFS/
-         VECkcZB6G+DI+yeO2OY5m/EV9Sjmmy7cUAsg5Vv9AulAEtjxWuG6ihpVJsROc5PAlRFI
-         2cHgp2XXZmbhGeKKnLIiPKA0x+b+tQSwrFq5HHEwQODRCntxU1kYJkPZTxsdC7DRH+3G
-         QrOyLasxLofgP5unOLMZjf50XGaN0QhXGdqNw6l6NwmwffXOn4Sgd41UzwuljpYY5K6w
-         qo6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782966688; x=1783571488;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9z14DdaScwvuUkS9S1aCzsy5HUZXH5Z2PoiV67T14h4=;
-        b=q5nIQx97Vt5VK+dK1CyDBiIOQcsLHJxsl8OYnw0ugFLcrCkNSBgy/M0e5+FSSdbLRX
-         NCQnRG4qMOMbUILqHF4I5HnUPVx5VSl4IGASHuuUYxOkek0NrsjrSvEcUkERWKp2Us1/
-         zr5dMMQALytD7AB5nzrvoxDlfxmPYt43cxLzWQ7tj/paXfZVl8i0xand9zbXlBT6Cqgl
-         IYPV01ZQ6VRFuSObTABkUoBP8Eye8FvfsEsqYG9Lnj8HVSAGXJY8JyPDpHp2C8CL1HaF
-         l/f+Uv/BdOI/ferjpyOYJMpoNy1Ty69BL6t2z2nPxE1Lu+ZpQZ7rijKbm0ITvdGxYVSi
-         /b1A==
-X-Forwarded-Encrypted: i=1; AFNElJ/ZKJoDu5QpHdcO5K6pXjPAY0DtlhLFMF+uQtUab9ZTvIviijqXvdMtMuGt64P6UAWtzNepe3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyged1Nr3Ycd/PXJL/xT3uiX46OwwhTlhxWHKpGWLs5NAy15uaj
-	HjiueUAIaLc80ibmPxtgbV3LNF/cizjFG2F/awqnt52aNUlBzNU71ge9+cIfEAYOpmesVvEYFSR
-	Pl9q2RmMm11GjxZzS5lCafttv7Oniax8cW2faobiygg0b5m7EMtqfbNrV7vcppcbgEYE=
-X-Gm-Gg: AfdE7cnYUVHwOR43afdNfDmhGzayXyPF1K21NVhuahzdFnNgBfWtD/HUd1Sx1K5hlrl
-	mJAAovTPOyZOFr1gTmftmOgTu6ea1pGlHRUk/49bTHZlQ1x/nrb4TS0e1bsm5qMVZkfit1To7Ff
-	QnRKH0kEjtOfmmaYJydq9ETbV2cNed+fYDShHaAQ0gNj2Cwfvcuy35MbE9GTwmAHFXKarbQ88MM
-	hRiM7oIu8NNaL/IWann1OZfZca9wUNgYCnn8WEw148dtytvh7e5icegK4Q3XGnlQTh9dHmiplA3
-	um0UqrBQRBmoA8Nfof7YrTLZ/ZnUl5/gcx5eGx9s59ASmMastqQzMX/81/cYoFAPDaCjMgzYLlK
-	WAmQ65Sun4DgRZFqHwa4Ao25p/uoiyA5TF3PJ0SZyh1I=
-X-Received: by 2002:a05:6a20:918b:b0:3b4:7e2d:a3bc with SMTP id adf61e73a8af0-3bff3c31bd9mr4183268637.0.1782966688025;
-        Wed, 01 Jul 2026 21:31:28 -0700 (PDT)
-X-Received: by 2002:a05:6a20:918b:b0:3b4:7e2d:a3bc with SMTP id adf61e73a8af0-3bff3c31bd9mr4183227637.0.1782966687526;
-        Wed, 01 Jul 2026 21:31:27 -0700 (PDT)
-Received: from [10.218.35.45] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb84366sm5441204eec.16.2026.07.01.21.31.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Jul 2026 21:31:27 -0700 (PDT)
-Message-ID: <bb0904d0-81f0-4575-aa17-007aa88f9942@oss.qualcomm.com>
-Date: Thu, 2 Jul 2026 10:01:21 +0530
+	s=arc-20240116; t=1782966919; c=relaxed/simple;
+	bh=3u6EvztuLUlA+ejRxZatA6N+wbu2IiMs7KXilJNbVk4=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=g9NPObCFy9ODXR4xwQOLXpOVU1XJWv4cda36a5c55r22yAVT5L/bDbt3YVtW1SQkc55tYCBTRFljKxtUvJQ7NjygrkVihUYzyiIWfXJTqbV4yEM9cioe3LKgoKUZlsxENs7Hx3R/3CXvpQtA8Z2LoOgSy76EebP7co9KLL81piI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=r/PzeJEb; arc=none smtp.client-ip=203.205.221.235
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1782966894; bh=t1GNANpFuzLE/PYGoogesdPNStNh8vPbm2FDGBZNhLk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=r/PzeJEbRkxUDEkqnJ660hHMqI7SYRjhgFpRl6gS+6hrhyp4vVF3e2NSA9lLfyO2u
+	 euT1nQF4bKCVJq2uV0LUp1bcK4IVIQaKAFTY1LrLx5+n4p+xfpxfwSYlCKslT+LcRh
+	 Y9N0RqvQttB2Hpo3R3c3gmTHIOD/arc/VL32caOM=
+Received: from lxu-ped-host.. ([111.198.231.89])
+	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
+	id 8B10EACB; Thu, 02 Jul 2026 12:34:49 +0800
+X-QQ-mid: xmsmtpt1782966889tpm5fdqw5
+Message-ID: <tencent_30FB52DFC6440984EEF0EEC70C90A7DAC606@qq.com>
+X-QQ-XMAILINFO: NAuAIaytDrXppw3uhnqACGI+GTfyRfCrUZI81C+oro9C457KCvnVIieR7bgYrO
+	 l46J0Yh1z6Y+FMKPn1PaHc9JNECPabpNNua0y7gzYBBTKgaw/5IEQ+UuW/SkTHmdcI+o8XkghSVA
+	 7qlRxQPchEH/z2zhmDwJSjzgqp6neHrDSy0Bq/Wz4hLaNnPk2Tex7ReBlRMeSVOpZugc4FjV0j1n
+	 9MzE/qZQROb4wCLZ2zOKF2vBAAfTjt1k6x05Yi4sIjESNqvzNYq1tgqaf6YyVysxP6AxdmJiXBDI
+	 2te7+BEgIDcNQMGdRq7xKVr/cTwQYppJZsUfNxm9irzAKvrNex7R+eWqvvjspczhJsX089HwW7xM
+	 iDeeOF1BIa4xVCJ7QaM3435QGCIDGB539ttTKOpCOxMbaGxSwKQq5M/TP6YylfyR1+9+gXv0Ke3W
+	 X6CwuS2p1ljngDK8MyVMqnYhW2Dok357WIBGfDySpgNfDutYKINhOESF40cv364CFl5TvExNqzcO
+	 DFY2xrnCuENUVu5gONmsSpTBVke63FFiS+buyl8Ba4dG56x9qx53wVsYtcQgkGlNLL8rD0m4IuJE
+	 C+JpCfAzgY6CuyNRx8BURm46FfSNNNA4v1+rQ68IlEGavh+BVYFRnTz2Jg3qM6N7pLyFE2Y82qYk
+	 MkI3lHgQxsHNWUuCvoIqrKrVLUpYkYQRKnWjdp9caegTvn5XANVdG2z4XsVNJ/Eu1sgEhlYzcTvE
+	 dVon1LaJ5SP49xQYzDGX05jotyTLUEtoRzlINz/JK2JaBuvjegBjRg6hTYY2mELly6SQR+lneIab
+	 t+d8Zw368u1mnqw2rjjCRCFj1Uij8zCOCRsOUjbqhupxVfDmYx4kWWtCWPJSBV2VI930DDG3slZa
+	 lHggq1fam3x9v5P9bR1czk2G026GoUmBYydKWv3A9JY2mokZqMMV7zMZ/PufAfY9A3AI0exqJubD
+	 s/dtOAkg3LlQXYLVuyjSixbvNJj+um6jzXbwKZ2rZvr3fsZpgsAdP/7XtUCKr00wbWmjfZyL+2PH
+	 35iRCWsXfXT60trK5wBXoUVLi5mu31Juq+RZ60cA==
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+From: Edward Adam Davis <eadavis@qq.com>
+To: andrii.nakryiko@gmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	eadavis@qq.com,
+	eddyz87@gmail.com,
+	emil@etsalapatis.com,
+	jiayuan.chen@linux.dev,
+	jolsa@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	memxor@gmail.com,
+	netdev@vger.kernel.org,
+	sashiko-bot@kernel.org,
+	sashiko-reviews@lists.linux.dev,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [PATCH v5] bpf: Fix smp_processor_id() call trace for preemptible kernels
+Date: Thu,  2 Jul 2026 12:34:50 +0800
+X-OQ-MSGID: <20260702043449.1021846-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CAEf4Bzb+OOrdGyxbzjh=7MUEbA5FC05E6_iwCjDXcnSO-HZ=ig@mail.gmail.com>
+References: <CAEf4Bzb+OOrdGyxbzjh=7MUEbA5FC05E6_iwCjDXcnSO-HZ=ig@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/1] bus: mhi: pci_generic: fix Rolling Wireless
- RW135R-GL and RW151 support
-To: zwq2226404116@163.com, mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc: mani@kernel.org, loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
-        Wanquan Zhong <wanquan.zhong@fibocom.com>
-References: <20260701095344.309409-1-zwq2226404116@163.com>
-Content-Language: en-US
-From: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-In-Reply-To: <20260701095344.309409-1-zwq2226404116@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: W1b46zXvHTWNFUMoiHvrR9xdjD2xX_B5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDA0MCBTYWx0ZWRfX7fbuktbEUX4I
- w49ny2uG5YLWP7dh0tCWICfr2iS2lZl8SUdh+rG7lQsmf++AKhMXPyCDGxd7C7EZtKz7olEP/zg
- 4fMCC+KiNWrP8GEhQmqEwnw4HzQ7jYLmvpTHvYHKecBNvKqUq5Z7sv9mzRorx3cT5PvlAdkjD/7
- KYy4SRGYbQ0qMjsBMyVPfMFflPh2NzGrW2BIKM3oKsHmOZh5wViyZ2X7fsuS96OnGaPrnDQTucH
- Yk7N5ThCEWhu4cgeKg+hHHIxLR+YROl5sf6nMdWBjVkX8Rfp3zKXKWXSJa6OnTBK2O9zbEqLyc7
- Pkrmir50jhjE0SSYL0pzoZHbY7Ux1dv4W8uyFb+KMOfO9bbVJeuf039Z4aP5IrZXTVlHYCZM+/s
- 6b3dzr1HfKovOLLMsKvHiRUs3p0zIt7qtJrov9qjC2jrfM1DyLFK7LrDDTaNxmD2xxFkIMebxDd
- eVCzArKM38UFUkx0GJw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDA0MCBTYWx0ZWRfXyHSGl57CsMcE
- GTsqKwlp7s6XUL+q3fxktPVxvsBXlXgtHbQ8gSvcwx+Qhy6k1YLC0FQuw4A95u8MSGiKxC93aH2
- xmVvhTG4iejkXAGlGPmHGPX6cF6nx0c=
-X-Authority-Analysis: v=2.4 cv=JpXBas4C c=1 sm=1 tr=0 ts=6a45e9a0 cx=c_pps
- a=rz3CxIlbcmazkYymdCej/Q==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=Byx-y9mGAAAA:8 a=6GUwiT5CAAAA:8 a=nWUtx5Q0ph_BRYhHASsA:9 a=QEXdDO2ut3YA:10
- a=bFCP_H2QrGi7Okbo017w:22 a=tp1klI1xYmtLYojU9LVd:22
-X-Proofpoint-ORIG-GUID: W1b46zXvHTWNFUMoiHvrR9xdjD2xX_B5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-07-02_01,2026-06-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0 malwarescore=0 impostorscore=0 clxscore=1015
- spamscore=0 priorityscore=1501 phishscore=0 lowpriorityscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607020040
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,qualcomm.com:dkim];
-	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,gmail.com,lunn.ch,davemloft.net,fibocom.com];
-	TAGGED_FROM(0.00)[bounces-303964-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:zwq2226404116@163.com,m:mhi@lists.linux.dev,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:mani@kernel.org,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:kuba@kernel.org,m:wanquan.zhong@fibocom.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[krishna.chundru@oss.qualcomm.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[163.com,lists.linux.dev,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303965-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrii.nakryiko@gmail.com,m:andrii@kernel.org,m:ast@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:eadavis@qq.com,m:eddyz87@gmail.com,m:emil@etsalapatis.com,m:jiayuan.chen@linux.dev,m:jolsa@kernel.org,m:linux-kernel@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:netdev@vger.kernel.org,m:sashiko-bot@kernel.org,m:sashiko-reviews@lists.linux.dev,m:song@kernel.org,m:syzkaller-bugs@googlegroups.com,m:yonghong.song@linux.dev,m:andriinakryiko@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,qq.com,gmail.com,etsalapatis.com,linux.dev,lists.linux.dev,googlegroups.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[qq.com];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krishna.chundru@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[eadavis@qq.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[qq.com:+];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,appspotmail.com:email,qq.com:dkim,qq.com:email,qq.com:mid,qq.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,syzkaller.appspot.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 531CB6F36B3
+X-Rspamd-Queue-Id: 6A92D6F36DB
 
+On Wed, 1 Jul 2026 12:57:52 -0700, Andrii Nakryiko wrote:
+> > bpf_mem_cache_free_rcu() maybe called in preemptible context, this
+> > will trigger the below warning message:
+> >
+> > BUG: using smp_processor_id() in preemptible [00000000] code: syz.0.17/5820
+> > caller is bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
+> > Call Trace:
+> >  check_preemption_disabled+0xd3/0xe0 lib/smp_processor_id.c:47
+> >  bpf_mem_cache_free_rcu+0x48/0xc0 kernel/bpf/memalloc.c:954
+> >  rhtab_delete_elem+0x185a/0x1b30 kernel/bpf/hashtab.c:2969
+> >  __rhtab_map_lookup_and_delete_batch+0x935/0xcb0 kernel/bpf/hashtab.c:3349
+> >  bpf_map_do_batch+0x445/0x630 kernel/bpf/syscall.c:-1
+> >  __sys_bpf+0x906/0xd90 kernel/bpf/syscall.c:-1
+> >
+> > this_cpu_ptr() requires the caller to prevent task migration.
+> > These helpers currently do not enforce that requirement and may
+> > be invoked from preemptible contexts, leading to accesses to another
+> > CPU's per-CPU cache after migration. Use get_cpu_ptr()/put_cpu_ptr()
+> > to pin the task while accessing the per-CPU allocator state.
+> >
+> > Fixes: 5af6807bdb10 ("bpf: Introduce bpf_mem_free_rcu() similar to kfree_rcu().")
+> > Fixes: 7c8199e24fa0 ("bpf: Introduce any context BPF specific memory allocator.")
+> > Reported-by: syzbot+fd7e415d891073b83e1f@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=fd7e415d891073b83e1f
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > ---
+> 
+> from what I can see, bpf_mem_free() is called through bpf kfuncs only,
+> and all BPF programs run with migration disabled. So this seems like a
+> false positive. For per-cpu checking, it should probably check that
+> either preemption is disabled or migration is disabled. tl;dr, there
+> doesn't seem to be any
+Today, I researched the call sites of bpf_mem_free() in detail; it is
+called directly by bpf kfuns only. 
 
+Different BPF program types execute in distinct kernel contexts: for
+instance, XDP and TC typically run in non-sleepable networking contexts,
+whereas `raw_tp`, `tracing`, `LSM`, `syscall` and especially sleepable
+BPF programs may run in contexts where preemption and migration are
+enabled. Consequently, any shared BPF code (such as a helper or kfunc)
+that accesses per-CPU data must not rely on the caller having disabled
+migration; instead, it must internally ensure that CPU migration does
+not occur during the access.
 
-On 7/1/2026 3:23 PM, zwq2226404116@163.com wrote:
-> From: Wanquan Zhong <wanquan.zhong@fibocom.com>
->
-> bus: mhi: pci_generic: fix Rolling Wireless RW135R-GL and RW151 support
->
-> - Increase RW151 MBIM channel ring size from 4 to 32
->
-> On HP and Lenovo laptop platforms the device probes successfully and
-> WWAN ports are created, but pci_generic enables runtime autosuspend
-> (PCI D3hot/M3) after a short idle period. Resume from runtime PM leaves
-> the modem in MHI SYS ERROR; driver recovery (reset) fails and the device
-> becomes inaccessible (PCIe config space reads as 0x7f). The failure is not
-> self-recoverable while runtime PM remains enabled; keeping power/control=on
-> avoids the issue.
-This might not be MHI issue, as the endpoint supports both D3hot and M3.
-After runtime suspend check what does your platform is doing as part of runtime
-suspend. It is more like a platform issue not a mhi issue.
+Taking into account the CI reviewer's feedback [1] and my further
+investigation into BPF programs as described above, the adjustments
+related to bpf_mem_free() should be retained.
 
-The change is like workaround on platform problem. so for the change
-no_m3 = true is not correct.
-
-- Krishna Chaitanya.
->
-> Set no_m3 on RW135R-GL and RW151 so probe does not enable runtime M3
-> autosuspend for these modules.
->
-> Power management testing (separate from runtime PM above):
-> - Suspend-to-RAM (S3/mem): tested on RW135R-GL and RW151; MHI/MBIM/wwan
->   function after wake.
-> - Suspend-to-disk (hibernate): not available on the test platforms
->   (/sys/power/state lacks "disk", ENODEV).
->
-> Signed-off-by: Wanquan Zhong <wanquan.zhong@fibocom.com>
->
-> ---
-> v2 -> v3: RW151 MBIM ring size 32; disable runtime M3 (no_m3)
->  drivers/bus/mhi/host/pci_generic.c | 4 +++-
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-> index d598bb3b3981..d0fee7e3ba3a 100644
-> --- a/drivers/bus/mhi/host/pci_generic.c
-> +++ b/drivers/bus/mhi/host/pci_generic.c
-> @@ -942,6 +942,7 @@ static const struct mhi_pci_dev_info mhi_rolling_rw135r_info = {
->  	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
->  	.dma_data_width = 32,
->  	.sideband_wake = false,
-> +	.no_m3 = true,
->  	.mru_default = 32768,
->  	.edl_trigger = true,
->  };
-> @@ -949,8 +950,8 @@ static const struct mhi_pci_dev_info mhi_rolling_rw135r_info = {
->  static const struct mhi_channel_config mhi_rolling_rw151_channels[] = {
->  	MHI_CHANNEL_CONFIG_UL(4, "DIAG", 16, 1),
->  	MHI_CHANNEL_CONFIG_DL(5, "DIAG", 16, 1),
-> -	MHI_CHANNEL_CONFIG_UL(12, "MBIM", 4, 0),
-> -	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 4, 0),
-> +	MHI_CHANNEL_CONFIG_UL(12, "MBIM", 32, 0),
-> +	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 32, 0),
->  	MHI_CHANNEL_CONFIG_UL(14, "NMEA", 32, 0),
->  	MHI_CHANNEL_CONFIG_DL(15, "NMEA", 32, 0),
->  	MHI_CHANNEL_CONFIG_UL(32, "DUN", 32, 0),
-> @@ -986,6 +987,7 @@ static const struct mhi_pci_dev_info mhi_rolling_rw151_info = {
->  	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
->  	.dma_data_width = 32,
->  	.sideband_wake = false,
-> +	.no_m3 = true,
->  	.mru_default = 32768,
->  	.edl_trigger = true,
->  };
->
-> --
-> 2.50.0
->
->
+[1]
+https://lore.kernel.org/all/20260630094823.897BD1F00A3D@smtp.kernel.org
+> 
+> pw-bot: cr
+> 
+> > v1 -> v2: using guard against preemption
+> > v2 -> v3: replace get/put_cpu() to bpf_disable/enable_instrumentation()
+> > v3 -> v4: disable preempt to make this_cpu_ptr() work
+> > v4 -> v5: in mem free disable preemption
+> >
+> 
+> maybe throttle your patch resubmission spree a bit?..
+My earlier actions were driven by a desire to keep pace with the CI
+reviewer's response speed.
+Moving forward, I will slow down the cadence of new patch submissions,
+as you suggested.
 
 
