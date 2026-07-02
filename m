@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-304112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304114-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xgUnHtVFRmoYNgsAu9opvQ
-	(envelope-from <netdev+bounces-304112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:04:53 +0200
+	id 8AkTEVhDRmpzNAsAu9opvQ
+	(envelope-from <netdev+bounces-304114-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:54:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FED6F6646
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:04:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01F66F63EA
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:54:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304112-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304112-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304114-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304114-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBA593189EB3
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:50:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D945630315C2
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1550B3AD522;
-	Thu,  2 Jul 2026 10:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5D63C8C48;
+	Thu,  2 Jul 2026 10:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D2F3C65FA;
-	Thu,  2 Jul 2026 10:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B5A3C5522;
+	Thu,  2 Jul 2026 10:50:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782989420; cv=none; b=j+9BXlSQtu53ChYaUtuk/ddGU3Bqb89+kG5/YF6ac2P/dmueHvjsCcQs7FChEARXHHv9KGbDeWX2g/1ZiwUAEPTX3fKzVijFXn0gA8S2sTvN2Y8KhDVwHqoxoDBrzUi1oDkLeEuT2BT2h57ZZh5XNYEkyS3vDQj4NbhtFC1JE5c=
+	t=1782989428; cv=none; b=py6qiw/kdOufrSM/mfUJ0UiMLFpF+7q/V2krHMoq+jdbG7hNdecamtkNHUTEDcbl61VRQ00yRApFBPBVWlt6cEkFKhZYaK7cIw5m1unFKLBSMSStwnaLoXCrJyOBJqOIY45QGWjJ7gj96eFM1xRJRtx3m9i5/LlQHzn3GB7nNyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782989420; c=relaxed/simple;
-	bh=djG+BVoeZp0a8+Pmhp0HRSNWjH4cFkQP5T/KGW9CgtE=;
+	s=arc-20240116; t=1782989428; c=relaxed/simple;
+	bh=lLyn6IiqBvOTuNKa0gszlqTnyGlQPSkD9PNfUzGoLcA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G+ZIL/NPS+nfVRR3IBcEXozj2m3xGkRTnneOmJ4uo6j7yJ4Y4EM8zXGMmnkkP2FC/kBPG6U1bftXZ8HapxWevIyqS+J0D5QXekqYA9dXJ40EtLTXu5wShrDNTpbmFqfa7mYvOJstvXTfRcNpyfwe9013YQ0E2OXsikF0tzQDHhw=
+	 MIME-Version; b=EtGSzcDEPpJGpVcydN/f0d5CyPKvrIpFxVHD4M3YuY0JzaXEXAg+RrCLz7AIg1J+0NO8/cgFk6ZAP1N67TCnOCoKFYrJASO60H9EAAT1pv59jZOmblCXjVjuOANiLS4pi1njFr45wyNy/yJpFnRt1o7mc75qJbV6dBtu+u5BGck=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
 Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id EFD2E602A3; Thu, 02 Jul 2026 12:50:16 +0200 (CEST)
+	id 6BE84601F0; Thu, 02 Jul 2026 12:50:25 +0200 (CEST)
 From: Florian Westphal <fw@strlen.de>
 To: <netdev@vger.kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>,
@@ -44,9 +44,9 @@ Cc: Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	<netfilter-devel@vger.kernel.org>,
 	pablo@netfilter.org
-Subject: [PATCH net-next 01/12] netfilter: nfnetlink_hook: Dump nat type chains
-Date: Thu,  2 Jul 2026 12:49:52 +0200
-Message-ID: <20260702105003.13550-2-fw@strlen.de>
+Subject: [PATCH net-next 03/12] netfilter: replace u_int8_t and u_int16t with u8 and u16
+Date: Thu,  2 Jul 2026 12:49:54 +0200
+Message-ID: <20260702105003.13550-4-fw@strlen.de>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260702105003.13550-1-fw@strlen.de>
 References: <20260702105003.13550-1-fw@strlen.de>
@@ -62,21 +62,21 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304112-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304114-lists,netdev=lfdr.de];
 	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
@@ -87,209 +87,112 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,nwl.cc:email,strlen.de:email,strlen.de:mid,strlen.de:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B8FED6F6646
+X-Rspamd-Queue-Id: D01F66F63EA
 
-From: Phil Sutter <phil@nwl.cc>
+From: Carlos Grillet <carlos@carlosgrillet.me>
 
-These chains are indirectly attached to the hook since they are
-not called for packets belonging to an established connection.
+Use preferred kernel integer type u8 instead of the POSIX u_int8_t
+variant.
 
-Introduce NF_HOOK_OP_NAT to identify the container and dump attached
-entries instead of the container itself.
+No functional change.
 
-Dump these entries with the dispatcher's priority value since their own
-priority merely defines ordering within the dispatcher's list.
-
-Signed-off-by: Phil Sutter <phil@nwl.cc>
+Signed-off-by: Carlos Grillet <carlos@carlosgrillet.me>
 Signed-off-by: Florian Westphal <fw@strlen.de>
 ---
- include/linux/netfilter.h      |  7 +++++++
- net/netfilter/nf_nat_core.c    |  6 ------
- net/netfilter/nf_nat_proto.c   |  8 ++++++++
- net/netfilter/nfnetlink_hook.c | 37 ++++++++++++++++++++++++++++++----
- 4 files changed, 48 insertions(+), 10 deletions(-)
+ include/net/ip_vs.h                    | 2 +-
+ net/netfilter/ipvs/ip_vs_nfct.c        | 2 +-
+ net/netfilter/nf_conntrack_amanda.c    | 2 +-
+ net/netfilter/nf_conntrack_h323_main.c | 2 +-
+ net/netfilter/xt_TCPOPTSTRIP.c         | 8 ++++----
+ 5 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/netfilter.h b/include/linux/netfilter.h
-index efbbfa770d66..e99afc1414cd 100644
---- a/include/linux/netfilter.h
-+++ b/include/linux/netfilter.h
-@@ -93,6 +93,7 @@ enum nf_hook_ops_type {
- 	NF_HOOK_OP_NF_TABLES,
- 	NF_HOOK_OP_BPF,
- 	NF_HOOK_OP_NFT_FT,
-+	NF_HOOK_OP_NAT,
- };
+diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+index 49297fec448a..ed2e9bc1bb4e 100644
+--- a/include/net/ip_vs.h
++++ b/include/net/ip_vs.h
+@@ -2123,7 +2123,7 @@ void ip_vs_update_conntrack(struct sk_buff *skb, struct ip_vs_conn *cp,
+ 			    int outin);
+ int ip_vs_confirm_conntrack(struct sk_buff *skb);
+ void ip_vs_nfct_expect_related(struct sk_buff *skb, struct nf_conn *ct,
+-			       struct ip_vs_conn *cp, u_int8_t proto,
++			       struct ip_vs_conn *cp, u8 proto,
+ 			       const __be16 port, int from_rs);
+ void ip_vs_conn_drop_conntrack(struct ip_vs_conn *cp);
  
- struct nf_hook_ops {
-@@ -140,6 +141,12 @@ struct nf_hook_entries {
- 	 */
- };
- 
-+struct nf_nat_lookup_hook_priv {
-+	struct nf_hook_entries __rcu *entries;
-+
-+	struct rcu_head rcu_head;
-+};
-+
- #ifdef CONFIG_NETFILTER
- static inline struct nf_hook_ops **nf_hook_entries_get_hook_ops(const struct nf_hook_entries *e)
+diff --git a/net/netfilter/ipvs/ip_vs_nfct.c b/net/netfilter/ipvs/ip_vs_nfct.c
+index 81974f69e5bb..347185fd0c8c 100644
+--- a/net/netfilter/ipvs/ip_vs_nfct.c
++++ b/net/netfilter/ipvs/ip_vs_nfct.c
+@@ -208,7 +208,7 @@ static void ip_vs_nfct_expect_callback(struct nf_conn *ct,
+  * Use port 0 to expect connection from any port.
+  */
+ void ip_vs_nfct_expect_related(struct sk_buff *skb, struct nf_conn *ct,
+-			       struct ip_vs_conn *cp, u_int8_t proto,
++			       struct ip_vs_conn *cp, u8 proto,
+ 			       const __be16 port, int from_rs)
  {
-diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
-index 63ff6b4d5d21..8ac326e1eb5b 100644
---- a/net/netfilter/nf_nat_core.c
-+++ b/net/netfilter/nf_nat_core.c
-@@ -39,12 +39,6 @@ static struct hlist_head *nf_nat_bysource __read_mostly;
- static unsigned int nf_nat_htable_size __read_mostly;
- static siphash_aligned_key_t nf_nat_hash_rnd;
- 
--struct nf_nat_lookup_hook_priv {
--	struct nf_hook_entries __rcu *entries;
--
--	struct rcu_head rcu_head;
--};
--
- struct nf_nat_hooks_net {
- 	struct nf_hook_ops *nat_hook_ops;
- 	unsigned int users;
-diff --git a/net/netfilter/nf_nat_proto.c b/net/netfilter/nf_nat_proto.c
-index 07f51fe75fbe..64b9bac228ea 100644
---- a/net/netfilter/nf_nat_proto.c
-+++ b/net/netfilter/nf_nat_proto.c
-@@ -770,6 +770,7 @@ static const struct nf_hook_ops nf_nat_ipv4_ops[] = {
- 		.pf		= NFPROTO_IPV4,
- 		.hooknum	= NF_INET_PRE_ROUTING,
- 		.priority	= NF_IP_PRI_NAT_DST,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- 	/* After packet filtering, change source */
- 	{
-@@ -777,6 +778,7 @@ static const struct nf_hook_ops nf_nat_ipv4_ops[] = {
- 		.pf		= NFPROTO_IPV4,
- 		.hooknum	= NF_INET_POST_ROUTING,
- 		.priority	= NF_IP_PRI_NAT_SRC,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- 	/* Before packet filtering, change destination */
- 	{
-@@ -784,6 +786,7 @@ static const struct nf_hook_ops nf_nat_ipv4_ops[] = {
- 		.pf		= NFPROTO_IPV4,
- 		.hooknum	= NF_INET_LOCAL_OUT,
- 		.priority	= NF_IP_PRI_NAT_DST,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- 	/* After packet filtering, change source */
- 	{
-@@ -791,6 +794,7 @@ static const struct nf_hook_ops nf_nat_ipv4_ops[] = {
- 		.pf		= NFPROTO_IPV4,
- 		.hooknum	= NF_INET_LOCAL_IN,
- 		.priority	= NF_IP_PRI_NAT_SRC,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- };
- 
-@@ -1031,6 +1035,7 @@ static const struct nf_hook_ops nf_nat_ipv6_ops[] = {
- 		.pf		= NFPROTO_IPV6,
- 		.hooknum	= NF_INET_PRE_ROUTING,
- 		.priority	= NF_IP6_PRI_NAT_DST,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- 	/* After packet filtering, change source */
- 	{
-@@ -1038,6 +1043,7 @@ static const struct nf_hook_ops nf_nat_ipv6_ops[] = {
- 		.pf		= NFPROTO_IPV6,
- 		.hooknum	= NF_INET_POST_ROUTING,
- 		.priority	= NF_IP6_PRI_NAT_SRC,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- 	/* Before packet filtering, change destination */
- 	{
-@@ -1045,6 +1051,7 @@ static const struct nf_hook_ops nf_nat_ipv6_ops[] = {
- 		.pf		= NFPROTO_IPV6,
- 		.hooknum	= NF_INET_LOCAL_OUT,
- 		.priority	= NF_IP6_PRI_NAT_DST,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- 	/* After packet filtering, change source */
- 	{
-@@ -1052,6 +1059,7 @@ static const struct nf_hook_ops nf_nat_ipv6_ops[] = {
- 		.pf		= NFPROTO_IPV6,
- 		.hooknum	= NF_INET_LOCAL_IN,
- 		.priority	= NF_IP6_PRI_NAT_SRC,
-+		.hook_ops_type	= NF_HOOK_OP_NAT,
- 	},
- };
- 
-diff --git a/net/netfilter/nfnetlink_hook.c b/net/netfilter/nfnetlink_hook.c
-index 5623c18fcd12..95005e9a6066 100644
---- a/net/netfilter/nfnetlink_hook.c
-+++ b/net/netfilter/nfnetlink_hook.c
-@@ -190,7 +190,7 @@ static int nfnl_hook_put_nft_ft_info(struct sk_buff *nlskb,
- 
- static int nfnl_hook_dump_one(struct sk_buff *nlskb,
- 			      const struct nfnl_dump_hook_data *ctx,
--			      const struct nf_hook_ops *ops,
-+			      const struct nf_hook_ops *ops, int priority,
- 			      int family, unsigned int seq)
+ 	struct nf_conntrack_expect *exp;
+diff --git a/net/netfilter/nf_conntrack_amanda.c b/net/netfilter/nf_conntrack_amanda.c
+index ddafbdfc96dc..f10ac2c49f4b 100644
+--- a/net/netfilter/nf_conntrack_amanda.c
++++ b/net/netfilter/nf_conntrack_amanda.c
+@@ -89,7 +89,7 @@ static int amanda_help(struct sk_buff *skb,
+ 	struct nf_conntrack_tuple *tuple;
+ 	unsigned int dataoff, start, stop, off, i;
+ 	char pbuf[sizeof("65535")], *tmp;
+-	u_int16_t len;
++	u16 len;
+ 	__be16 port;
+ 	int ret = NF_ACCEPT;
+ 	nf_nat_amanda_hook_fn *nf_nat_amanda;
+diff --git a/net/netfilter/nf_conntrack_h323_main.c b/net/netfilter/nf_conntrack_h323_main.c
+index 24931e379985..37b6314ca772 100644
+--- a/net/netfilter/nf_conntrack_h323_main.c
++++ b/net/netfilter/nf_conntrack_h323_main.c
+@@ -671,7 +671,7 @@ static int expect_h245(struct sk_buff *skb, struct nf_conn *ct,
+ static int callforward_do_filter(struct net *net,
+ 				 const union nf_inet_addr *src,
+ 				 const union nf_inet_addr *dst,
+-				 u_int8_t family)
++				 u8 family)
  {
- 	u16 event = nfnl_msg_type(NFNL_SUBSYS_HOOK, NFNL_MSG_HOOK_GET);
-@@ -244,7 +244,7 @@ static int nfnl_hook_dump_one(struct sk_buff *nlskb,
- 	if (ret)
- 		goto nla_put_failure;
+ 	int ret = 0;
  
--	ret = nla_put_be32(nlskb, NFNLA_HOOK_PRIORITY, htonl(ops->priority));
-+	ret = nla_put_be32(nlskb, NFNLA_HOOK_PRIORITY, htonl(priority));
- 	if (ret)
- 		goto nla_put_failure;
+diff --git a/net/netfilter/xt_TCPOPTSTRIP.c b/net/netfilter/xt_TCPOPTSTRIP.c
+index 93f064306901..265d21697847 100644
+--- a/net/netfilter/xt_TCPOPTSTRIP.c
++++ b/net/netfilter/xt_TCPOPTSTRIP.c
+@@ -16,7 +16,7 @@
+ #include <linux/netfilter/x_tables.h>
+ #include <linux/netfilter/xt_TCPOPTSTRIP.h>
  
-@@ -337,6 +337,30 @@ nfnl_hook_entries_head(u8 pf, unsigned int hook, struct net *net, const char *de
- 	return hook_head;
- }
- 
-+static int nfnl_hook_dump_nat(struct sk_buff *nlskb,
-+			      const struct nfnl_dump_hook_data *ctx,
-+			      const struct nf_hook_ops *ops,
-+			      int family, unsigned int seq)
-+{
-+	struct nf_nat_lookup_hook_priv *priv = ops->priv;
-+	struct nf_hook_entries *e = rcu_dereference(priv->entries);
-+	struct nf_hook_ops **nat_ops;
-+	int i, err;
-+
-+	if (!e)
-+		return 0;
-+
-+	nat_ops = nf_hook_entries_get_hook_ops(e);
-+
-+	for (i = 0; i < e->num_hook_entries; i++) {
-+		err = nfnl_hook_dump_one(nlskb, ctx, nat_ops[i],
-+					 ops->priority, family, seq);
-+		if (err)
-+			return err;
-+	}
-+	return 0;
-+}
-+
- static int nfnl_hook_dump(struct sk_buff *nlskb,
- 			  struct netlink_callback *cb)
+-static inline unsigned int optlen(const u_int8_t *opt, unsigned int offset)
++static inline unsigned int optlen(const u8 *opt, unsigned int offset)
  {
-@@ -365,8 +389,13 @@ static int nfnl_hook_dump(struct sk_buff *nlskb,
- 	ops = nf_hook_entries_get_hook_ops(e);
+ 	/* Beware zero-length options: make finite progress */
+ 	if (opt[offset] <= TCPOPT_NOP || opt[offset+1] == 0)
+@@ -33,8 +33,8 @@ tcpoptstrip_mangle_packet(struct sk_buff *skb,
+ 	const struct xt_tcpoptstrip_target_info *info = par->targinfo;
+ 	struct tcphdr *tcph, _th;
+ 	unsigned int optl, i, j;
+-	u_int16_t n, o;
+-	u_int8_t *opt;
++	u16 n, o;
++	u8 *opt;
+ 	int tcp_hdrlen;
  
- 	for (; i < e->num_hook_entries; i++) {
--		err = nfnl_hook_dump_one(nlskb, ctx, ops[i], family,
--					 cb->nlh->nlmsg_seq);
-+		if (ops[i]->hook_ops_type == NF_HOOK_OP_NAT)
-+			err = nfnl_hook_dump_nat(nlskb, ctx, ops[i], family,
-+						 cb->nlh->nlmsg_seq);
-+		else
-+			err = nfnl_hook_dump_one(nlskb, ctx, ops[i],
-+						 ops[i]->priority, family,
-+						 cb->nlh->nlmsg_seq);
- 		if (err)
- 			break;
- 	}
+ 	/* This is a fragment, no TCP header is available */
+@@ -97,7 +97,7 @@ tcpoptstrip_tg6(struct sk_buff *skb, const struct xt_action_param *par)
+ {
+ 	struct ipv6hdr *ipv6h = ipv6_hdr(skb);
+ 	int tcphoff;
+-	u_int8_t nexthdr;
++	u8 nexthdr;
+ 	__be16 frag_off;
+ 
+ 	nexthdr = ipv6h->nexthdr;
 -- 
 2.54.0
 
