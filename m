@@ -1,638 +1,286 @@
-Return-Path: <netdev+bounces-304053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304054-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TtScNpEtRmqmLAsAu9opvQ
-	(envelope-from <netdev+bounces-304053-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:21:21 +0200
+	id NhITHugtRmrALAsAu9opvQ
+	(envelope-from <netdev+bounces-304054-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:22:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E9D6F52D4
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:21:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18DC96F530D
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:22:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=nHtu6ydj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304053-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304053-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=CGW8nOdr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304054-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304054-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4AC6B3192E7A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:10:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE89E31AA4FA
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40AE547F2DF;
-	Thu,  2 Jul 2026 09:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7BD47D930;
+	Thu,  2 Jul 2026 09:09:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FC747ECED
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CED447AF66
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:09:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782983278; cv=none; b=XPYasOlgT4LUfFTH75cn/DvnAcY8+fMYgbqgAgpFEC68Hj27Js6puYS5BgkiOFlv4YdtHNjkodpWE1MqaD+5eg9w7qzlo7j3n1bZgsjyYBoVrrTvlof7yqFK+fYzYkJ0qbD+YUz7UuulKkV7X2L0pwBIxyf/ozWwCIf3YmEK8do=
+	t=1782983358; cv=none; b=r2AALssDWr9AkXEUiD/4vi1ybNdJ1dRvego8Ek0ARWRJ1fAHtVnwHEkc1KIe9NrF+j+0i7+tiyxHU6Z++W98WF1/8a40t8aFQ2N/ZaJko0hu6z/sjp9SMJVvmki/itMSruufADANG0k/QsSL22XrCCQHysSFG5ji/vOeL2hVF9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782983278; c=relaxed/simple;
-	bh=QTFFlRjVGXIhEZut4INRdxchuCCuyKanRwaUK6ROqZY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EhrFffcHwHtz+jDoaFOR/CiPQGbhFZn8pt2DXyWMXj3TACkZuXm3VyFYu+Rley3QeGzBC0nZSrepNUOl4X4GP3jxnWd8AOzb+XTjgH+Vt3jHrnfP5yjL6NVyXMhC/a8LkxfnDMMyj0/0Jo9Tg7CG5XphuHITIMZmU/9EbIvh4UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nHtu6ydj; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 48CD61A0DD4;
-	Thu,  2 Jul 2026 09:07:54 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1DB765FF03;
-	Thu,  2 Jul 2026 09:07:54 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B32E7104C9A26;
-	Thu,  2 Jul 2026 11:07:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1782983273; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=FeofcYR3mhc3/qJulPXjtkahzsyyUITKeWMQfZilDWg=;
-	b=nHtu6ydjRepSIbc+4g2QafZbYRY227mIo853DVi6Z7JKfWuzwu42Ub89QUZ7ADd4fgfs3e
-	hG3mNzeuJgvBnSrJLReMV4UxAVAjhW8Ja8aWYdWr4wbt9YZYJzk46nlIzx6JFg7k+NZScH
-	hvHe/tQeaAUzizFnrKdAd+9Dt7mzdhvgjxrQYlelZFMgHhX+CVf+/KUvdZBncp5JodyCd6
-	bb18LP6JV1jCuVTAAnRdFf4smIlMa8Tn8Wd7BDZvk9NfOCKnhX4wubklPmK6RcYgXOTGlq
-	Yc/gSXUHoCpsB/Qu1AOqKRFBaFLZEHEezxtI+vmjV7wvdWz0igFb9+GeaF29Bg==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Thu, 02 Jul 2026 11:07:32 +0200
-Subject: [PATCH net-next 10/10] net: dsa: microchip: move the drive
- strength config out of the common section
+	s=arc-20240116; t=1782983358; c=relaxed/simple;
+	bh=X8BM8CFdrVr64i5oR/ogrqx0u/nHaSGxTJtuTfxxlCs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FOtd8oCaboeSymW7+sLZ3m0IZGVMSni/NSHlRhmi6h1XqUcRZxKJv3/FEna+FpTnAMXJ8bw/Q0eNK448ofh3gKj/yx/tmwKcwR3FWTMxwRmnYsaRqihgk2wZDXFfvMqfOp1u2Uoghw8sCNgSO4TELXp1KvyD2GhJSwi7YWXjk8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CGW8nOdr; arc=none smtp.client-ip=74.125.224.42
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-664b05d408bso1447225d50.1
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 02:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782983355; x=1783588155; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VyfsxJg+kjzT4zTmiCCR7ZMxnpzzdi+ueWMGl0wz2n0=;
+        b=CGW8nOdrNkl5R9l5ocBfKVrULkoa1PCL7fFWTBpOFIpF8jRFG3ecIG9h9VQkshfbHt
+         VW+xr1xiBuManQLIvQUx0psc6YJennW8Q9XVCZkyeeAre+44TCySgg4Vo49QyLCgDlRS
+         jcb3e6DKSoSY9FToWRxz10zUwluDAx8/rYXLdMgKYF952S1Bpyzz0EEZw3ihR6UN/EiP
+         A0e580izNddzHEqTddancua21f1vF3QxIzPSweSd7kpc3sC0MZh+U/JjTg8yQblXG8Z6
+         H5KXnQyGVRClmjRgRY2KrzGb+emW+FhffxUJIYOGfATNck0OnBBTxilSssA+CbPtVEE9
+         4+uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782983355; x=1783588155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VyfsxJg+kjzT4zTmiCCR7ZMxnpzzdi+ueWMGl0wz2n0=;
+        b=EB2Dn0KnF7Ji/uFTuV0OLLlmfwvIx8mk0WueP5BupfWBEFTQuzXD3NytwD+iLTaKH9
+         XYQ9R6hdh8CiBgR0vw7i+/ypGaBAkdsBMV5/KXlpcK5w4a6pGlGerpFZ/CBzb8M9UZLx
+         8oA6n6q7nZ5tAK6rS1zMMG/bfvAvpX6vzIWEkDsjnk4KKsyf39LiBJW8py7yuRqaWM+l
+         +hoKpKAtRL1yt+WwNN2KR4v4uiOM/KNiqHx965bg5wfWU7RMWNFaVwFAtvAM0Bchk/vn
+         +qMpRmvfEMRxpNAopZ0GLFXQ2wXFkEps3DXk6K6yJ5l2U3Chy9f6dAdG6zjnw01tu7Iw
+         9uJw==
+X-Gm-Message-State: AOJu0YxYHzwgk5XOUztho450ROho04zq8NtzDOy9r/muBrLp0h3jYD2J
+	yw9IUOuR3TM5HRLv1G+ZkcjPbKpca8mhEb7M7M68VvEphCE991LpFI1TYLYnYxjR/MA=
+X-Gm-Gg: AfdE7cnkl5gjzKjLnDyQYx10EdWv5wvJ4wj0xseMEjnPd/zPN2ATQvZ0/gIFlWqSgMX
+	H7XyeY/x5DKNn+VUE+DdavYfV/0n2IEgyrhwCimgjRtv3Fh/TU+cwoKymiiUs20PPYWCwwAY6cC
+	/GZSRX8sILDut9ykah7PD75O0IQbMDn6YgyfXnSSX6j1YDiOdjaYEVxi+hf1BrY05rbQYGJ6YfQ
+	Db9+85g8TqCDOJZQL4BzI2T2tv9veWo7Pcx+O3FPgzAq6+cW8h9AW2vCEYI2u2UwHLjhqn01kQp
+	G5aqMynMoBvljOE/obtozIEBs2ekcCe9C3qq/2i10WnFe31XtnlY37HbhF6G7aNbCidh59vqHY5
+	fpAHSRgI60JmXdG967r4JdQI1rV0zf/R0u/ybo4JhO4QcrXq8AmTEHLDdgOPcDhcgAQxa0QkoFC
+	qWkuXirUWlL7w0hQ==
+X-Received: by 2002:a53:ac83:0:b0:664:d671:bff4 with SMTP id 956f58d0204a3-665915ae8e7mr4442469d50.4.1782983355137;
+        Thu, 02 Jul 2026 02:09:15 -0700 (PDT)
+Received: from houminxi ([61.170.226.21])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66624026c3asm837487d50.13.2026.07.02.02.09.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2026 02:09:14 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Minxi Hou <houminxi@gmail.com>,
+	aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests/net/openvswitch: add SCTP flow key test
+Date: Thu,  2 Jul 2026 05:09:08 -0400
+Message-ID: <20260702090908.1253688-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260702-clean-ksz-4th-v1-10-93441e695fa4@bootlin.com>
-References: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
-In-Reply-To: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.3
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-304054-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
-	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bastien.curutchet@bootlin.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-304053-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:houminxi@gmail.com,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 34E9D6F52D4
+X-Rspamd-Queue-Id: 18DC96F530D
 
-The drive strength configuration is done during the setup of all
-switches through a common function that then has specific behavior
-depending on the switch identity.
+Register OVS_KEY_ATTR_SCTP in the flow key parser so that sctp()
+can be used in flow specifications. The ovs_key_sctp class already
+exists (with src/dst fields matching the TCP/UDP siblings) but was
+not wired into the parser, so the token was silently dropped and the
+kernel rejected the flow.
 
-Split the common configuration in two functions: one is dedicated to the
-KSZ8 family, the other is dedicated to the KSZ9477 family.
-Remove the drive strength configuration from the lan937x_setup since
-the LAN937x family doesn't support it.
+Add test_sctp_connect_v4 exercising the SCTP flow key with
+port-specific matching: sctp(dst=4443) for client-to-server and
+sctp(src=4443) for server-to-client, mirroring the SCTP four-way
+handshake direction. The test verifies connectivity with flows
+installed, confirms failure after flow removal, then reinstalls
+and verifies recovery.
 
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
- drivers/net/dsa/microchip/ksz8.c         | 127 ++++++++++++++++++++++-
- drivers/net/dsa/microchip/ksz9477.c      |  54 +++++++++-
- drivers/net/dsa/microchip/ksz_common.c   | 171 ++-----------------------------
- drivers/net/dsa/microchip/ksz_common.h   |  32 +++++-
- drivers/net/dsa/microchip/lan937x_main.c |   4 -
- 5 files changed, 218 insertions(+), 170 deletions(-)
+ .../selftests/net/openvswitch/openvswitch.sh  | 92 +++++++++++++++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    |  5 +
+ 2 files changed, 97 insertions(+)
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 472cc62ea747..c4c769028a20 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -36,6 +36,15 @@
- #include "ksz8_reg.h"
- #include "ksz8.h"
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 2954245129a2..dd4d0b3bcc23 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -32,6 +32,7 @@ tests="
+ 	dec_ttl					ttl: dec_ttl decrements IP TTL
+ 	flow_set				flow-set: Flow modify
+ 	action_set				set: SET action rewrites fields
++	sctp_connect_v4				sctp: SCTP flow key matching
+ 	psample					psample: Sampling packets with psample"
  
-+/* ksz88x3_drive_strengths - Drive strength mapping for KSZ8863, KSZ8873, ..
-+ *			     variants.
-+ * This values are documented in KSZ8873 and KSZ8863 datasheets.
-+ */
-+static const struct ksz_drive_strength ksz88x3_drive_strengths[] = {
-+	{ 0,  8000 },
-+	{ KSZ8873_DRIVE_STRENGTH_16MA, 16000 },
-+};
-+
- struct ksz88xx_stats_raw {
- 	u64 rx;
- 	u64 rx_hi;
-@@ -2291,6 +2300,122 @@ static void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port)
- 	spin_unlock(&mib->stats64_lock);
+ info() {
+@@ -443,6 +444,97 @@ test_action_set() {
+ 	return 0
  }
  
-+/**
-+ * ksz88x3_drive_strength_write() - Set the drive strength configuration for
-+ *				    KSZ8863 compatible chip variants.
-+ * @dev:       ksz device
-+ * @props:     Array of drive strength properties to be set
-+ * @num_props: Number of properties in the array
-+ *
-+ * This function applies the specified drive strength settings to KSZ88X3 chip
-+ * variants (KSZ8873, KSZ8863).
-+ * It ensures the configurations align with what the chip variant supports and
-+ * warns or errors out on unsupported settings.
-+ *
-+ * Return: 0 on success, error code otherwise
-+ */
-+static int ksz88x3_drive_strength_write(struct ksz_device *dev,
-+					struct ksz_driver_strength_prop *props,
-+					int num_props)
-+{
-+	size_t array_size = ARRAY_SIZE(ksz88x3_drive_strengths);
-+	int microamp;
-+	int i, ret;
++# sctp_connect_v4 test
++# - sctp(dst=4443) matches client-to-server INIT
++# - sctp(src=4443) matches server-to-client INIT-ACK
++# - remove flows and verify connection fails, reinstall and recover
++test_sctp_connect_v4() {
++	local t="test_sctp_connect_v4"
 +
-+	for (i = 0; i < num_props; i++) {
-+		if (props[i].value == -1 || i == KSZ_DRIVER_STRENGTH_IO)
-+			continue;
++	which ncat >/dev/null 2>&1 || return $ksft_skip
++	modprobe -q sctp 2>/dev/null || return $ksft_skip
 +
-+		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
-+			 props[i].name);
-+	}
++	sbx_add "$t" || return $?
++	ovs_add_dp "$t" sctp4 || return 1
 +
-+	microamp = props[KSZ_DRIVER_STRENGTH_IO].value;
-+	ret = ksz_drive_strength_to_reg(ksz88x3_drive_strengths, array_size,
-+					microamp);
-+	if (ret < 0) {
-+		ksz_drive_strength_error(dev, ksz88x3_drive_strengths,
-+					 array_size, microamp);
-+		return ret;
-+	}
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "$t" "sctp4" "$ns" \
++		    "${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
 +
-+	return ksz_rmw8(dev, KSZ8873_REG_GLOBAL_CTRL_12,
-+			KSZ8873_DRIVE_STRENGTH_16MA, ret);
++	ip netns exec client ip addr add 172.31.110.10/24 dev c1
++	ip netns exec client ip link set c1 up
++	ip netns exec server ip addr add 172.31.110.20/24 dev s1
++	ip netns exec server ip link set s1 up
++
++	# ARP forwarding
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' \
++	    '1' || return 1
++
++	# SCTP port matching: dst for request, src for reply
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4(proto=132),sctp(dst=4443)' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4(proto=132),sctp(src=4443)' \
++	    '1' || return 1
++
++	echo "server" | \
++		ovs_netns_spawn_daemon "$t" "server" \
++				ncat --sctp -l 172.31.110.20 -vn 4443
++	sleep 0.1
++
++	info "verify SCTP association with port-keyed flows"
++	ovs_sbx "$t" ip netns exec client \
++	    ncat --sctp -i 1 -zv 172.31.110.20 4443 \
++	    || return 1
++
++	ovs_del_flows "$t" sctp4
++
++	info "verify connection fails without flows"
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0806),arp()' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0806),arp()' \
++	    '1' || return 1
++
++	echo "server2" | \
++		ovs_netns_spawn_daemon "$t" "server" \
++				ncat --sctp -l 172.31.110.20 -vn 4443
++	sleep 0.1
++
++	ovs_sbx "$t" ip netns exec client \
++	    ncat --sctp -w 2 -zv 172.31.110.20 4443 \
++	    >/dev/null 2>&1 \
++	    && { info "FAIL: connection should fail without flows"
++	         return 1; }
++
++	info "reinstall flows and verify recovery"
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(1),eth(),eth_type(0x0800),ipv4(proto=132),sctp(dst=4443)' \
++	    '2' || return 1
++	ovs_add_flow "$t" sctp4 \
++	    'in_port(2),eth(),eth_type(0x0800),ipv4(proto=132),sctp(src=4443)' \
++	    '1' || return 1
++
++	echo "server3" | \
++		ovs_netns_spawn_daemon "$t" "server" \
++				ncat --sctp -l 172.31.110.20 -vn 4443
++	sleep 0.1
++
++	ovs_sbx "$t" ip netns exec client \
++	    ncat --sctp -i 1 -zv 172.31.110.20 4443 \
++	    || return 1
++
++	return 0
 +}
 +
-+/**
-+ * ksz8_parse_drive_strength() - Extract and apply drive strength configurations
-+ *				 from device tree properties.
-+ * @dev:	ksz device
-+ *
-+ * This function reads the specified drive strength properties from the
-+ * device tree, validates against the supported chip variants, and sets
-+ * them accordingly. An error should be critical here, as the drive strength
-+ * settings are crucial for EMI compliance.
-+ *
-+ * Return: 0 on success, error code otherwise
-+ */
-+static int ksz8_parse_drive_strength(struct ksz_device *dev)
-+{
-+	struct ksz_driver_strength_prop of_props[] = {
-+		[KSZ_DRIVER_STRENGTH_HI] = {
-+			.name = "microchip,hi-drive-strength-microamp",
-+			.offset = SW_HI_SPEED_DRIVE_STRENGTH_S,
-+			.value = -1,
-+		},
-+		[KSZ_DRIVER_STRENGTH_LO] = {
-+			.name = "microchip,lo-drive-strength-microamp",
-+			.offset = SW_LO_SPEED_DRIVE_STRENGTH_S,
-+			.value = -1,
-+		},
-+		[KSZ_DRIVER_STRENGTH_IO] = {
-+			.name = "microchip,io-drive-strength-microamp",
-+			.offset = 0, /* don't care */
-+			.value = -1,
-+		},
-+	};
-+	struct device_node *np = dev->dev->of_node;
-+	bool have_any_prop = false;
-+	int i, ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(of_props); i++) {
-+		ret = of_property_read_u32(np, of_props[i].name,
-+					   &of_props[i].value);
-+		if (ret && ret != -EINVAL)
-+			dev_warn(dev->dev, "Failed to read %s\n",
-+				 of_props[i].name);
-+		if (ret)
-+			continue;
-+
-+		have_any_prop = true;
-+	}
-+
-+	if (!have_any_prop)
-+		return 0;
-+
-+	switch (dev->chip_id) {
-+	case KSZ88X3_CHIP_ID:
-+		return ksz88x3_drive_strength_write(dev, of_props,
-+						    ARRAY_SIZE(of_props));
-+	case KSZ8795_CHIP_ID:
-+	case KSZ8794_CHIP_ID:
-+	case KSZ8765_CHIP_ID:
-+		return ksz_drive_strength_write(dev, of_props,
-+						ARRAY_SIZE(of_props));
-+	default:
-+		/* KSZ8864, KSZ8895 */
-+		for (i = 0; i < ARRAY_SIZE(of_props); i++) {
-+			if (of_props[i].value == -1)
-+				continue;
-+
-+			dev_warn(dev->dev, "%s is not supported by this chip variant\n",
-+				 of_props[i].name);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int ksz8_setup(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
-@@ -2313,7 +2438,7 @@ static int ksz8_setup(struct dsa_switch *ds)
- 		return ret;
- 	}
- 
--	ret = ksz_parse_drive_strength(dev);
-+	ret = ksz8_parse_drive_strength(dev);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index 691b9b18c707..3ee995545c57 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -1615,6 +1615,58 @@ int ksz9477_enable_stp_addr(struct ksz_device *dev)
- 	return 0;
- }
- 
-+/**
-+ * ksz9477_parse_drive_strength() - Extract and apply drive strength
-+ *				    configurations from device tree properties.
-+ * @dev:	ksz device
-+ *
-+ * This function reads the specified drive strength properties from the
-+ * device tree, validates against the supported chip variants, and sets
-+ * them accordingly. An error should be critical here, as the drive strength
-+ * settings are crucial for EMI compliance.
-+ *
-+ * Return: 0 on success, error code otherwise
-+ */
-+static int ksz9477_parse_drive_strength(struct ksz_device *dev)
-+{
-+	struct ksz_driver_strength_prop of_props[] = {
-+		[KSZ_DRIVER_STRENGTH_HI] = {
-+			.name = "microchip,hi-drive-strength-microamp",
-+			.offset = SW_HI_SPEED_DRIVE_STRENGTH_S,
-+			.value = -1,
-+		},
-+		[KSZ_DRIVER_STRENGTH_LO] = {
-+			.name = "microchip,lo-drive-strength-microamp",
-+			.offset = SW_LO_SPEED_DRIVE_STRENGTH_S,
-+			.value = -1,
-+		},
-+		[KSZ_DRIVER_STRENGTH_IO] = {
-+			.name = "microchip,io-drive-strength-microamp",
-+			.offset = 0, /* don't care */
-+			.value = -1,
-+		},
-+	};
-+	struct device_node *np = dev->dev->of_node;
-+	bool have_any_prop = false;
-+	int i, ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(of_props); i++) {
-+		ret = of_property_read_u32(np, of_props[i].name,
-+					   &of_props[i].value);
-+		if (ret && ret != -EINVAL)
-+			dev_warn(dev->dev, "Failed to read %s\n",
-+				 of_props[i].name);
-+		if (ret)
-+			continue;
-+
-+		have_any_prop = true;
-+	}
-+
-+	if (!have_any_prop)
-+		return 0;
-+
-+	return ksz_drive_strength_write(dev, of_props, ARRAY_SIZE(of_props));
-+}
- static int ksz9477_setup(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
-@@ -1637,7 +1689,7 @@ static int ksz9477_setup(struct dsa_switch *ds)
- 		return ret;
- 	}
- 
--	ret = ksz_parse_drive_strength(dev);
-+	ret = ksz9477_parse_drive_strength(dev);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 15ed139564cb..67ab6ddb9e53 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -113,28 +113,6 @@ static const struct ksz_mib_names ksz9477_mib_names[] = {
- 	{ 0x83, "tx_discards" },
- };
- 
--struct ksz_driver_strength_prop {
--	const char *name;
--	int offset;
--	int value;
--};
--
--enum ksz_driver_strength_type {
--	KSZ_DRIVER_STRENGTH_HI,
--	KSZ_DRIVER_STRENGTH_LO,
--	KSZ_DRIVER_STRENGTH_IO,
--};
--
--/**
-- * struct ksz_drive_strength - drive strength mapping
-- * @reg_val:	register value
-- * @microamp:	microamp value
-- */
--struct ksz_drive_strength {
--	u32 reg_val;
--	u32 microamp;
--};
--
- /* ksz9477_drive_strengths - Drive strength mapping for KSZ9477 variants
-  *
-  * This values are not documented in KSZ9477 variants but confirmed by
-@@ -170,15 +148,6 @@ static const struct ksz_drive_strength ksz9477_drive_strengths[] = {
- 	{ SW_DRIVE_STRENGTH_28MA, 28000 },
- };
- 
--/* ksz88x3_drive_strengths - Drive strength mapping for KSZ8863, KSZ8873, ..
-- *			     variants.
-- * This values are documented in KSZ8873 and KSZ8863 datasheets.
-- */
--static const struct ksz_drive_strength ksz88x3_drive_strengths[] = {
--	{ 0,  8000 },
--	{ KSZ8873_DRIVE_STRENGTH_16MA, 16000 },
--};
--
- /**
-  * ksz_phylink_mac_disable_tx_lpi() - Callback to signal LPI support (Dummy)
-  * @config: phylink config structure
-@@ -3785,8 +3754,8 @@ static void ksz_parse_rgmii_delay(struct ksz_device *dev, int port_num,
-  * Returns: If found, the corresponding register value for that drive strength
-  * is returned. Otherwise, -EINVAL is returned indicating an invalid value.
-  */
--static int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
--				     size_t array_size, int microamp)
-+int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
-+			      size_t array_size, int microamp)
- {
- 	int i;
- 
-@@ -3809,9 +3778,9 @@ static int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
-  * is detected. It lists out all the supported drive strength values for
-  * reference in the error message.
-  */
--static void ksz_drive_strength_error(struct ksz_device *dev,
--				     const struct ksz_drive_strength *array,
--				     size_t array_size, int microamp)
-+void ksz_drive_strength_error(struct ksz_device *dev,
-+			      const struct ksz_drive_strength *array,
-+			      size_t array_size, int microamp)
- {
- 	char supported_values[100];
- 	size_t remaining_size;
-@@ -3850,9 +3819,9 @@ static void ksz_drive_strength_error(struct ksz_device *dev,
-  *
-  * Return: 0 on successful configuration, a negative error code on failure.
-  */
--static int ksz_drive_strength_write(struct ksz_device *dev,
--				    struct ksz_driver_strength_prop *props,
--				    int num_props)
-+int ksz_drive_strength_write(struct ksz_device *dev,
-+			     struct ksz_driver_strength_prop *props,
-+			     int num_props)
- {
- 	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
- 	int i, ret, reg;
-@@ -3889,130 +3858,6 @@ static int ksz_drive_strength_write(struct ksz_device *dev,
- 	return ksz_rmw8(dev, reg, mask, val);
- }
- 
--/**
-- * ksz88x3_drive_strength_write() - Set the drive strength configuration for
-- *				    KSZ8863 compatible chip variants.
-- * @dev:       ksz device
-- * @props:     Array of drive strength properties to be set
-- * @num_props: Number of properties in the array
-- *
-- * This function applies the specified drive strength settings to KSZ88X3 chip
-- * variants (KSZ8873, KSZ8863).
-- * It ensures the configurations align with what the chip variant supports and
-- * warns or errors out on unsupported settings.
-- *
-- * Return: 0 on success, error code otherwise
-- */
--static int ksz88x3_drive_strength_write(struct ksz_device *dev,
--					struct ksz_driver_strength_prop *props,
--					int num_props)
--{
--	size_t array_size = ARRAY_SIZE(ksz88x3_drive_strengths);
--	int microamp;
--	int i, ret;
--
--	for (i = 0; i < num_props; i++) {
--		if (props[i].value == -1 || i == KSZ_DRIVER_STRENGTH_IO)
--			continue;
--
--		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
--			 props[i].name);
--	}
--
--	microamp = props[KSZ_DRIVER_STRENGTH_IO].value;
--	ret = ksz_drive_strength_to_reg(ksz88x3_drive_strengths, array_size,
--					microamp);
--	if (ret < 0) {
--		ksz_drive_strength_error(dev, ksz88x3_drive_strengths,
--					 array_size, microamp);
--		return ret;
--	}
--
--	return ksz_rmw8(dev, KSZ8873_REG_GLOBAL_CTRL_12,
--			KSZ8873_DRIVE_STRENGTH_16MA, ret);
--}
--
--/**
-- * ksz_parse_drive_strength() - Extract and apply drive strength configurations
-- *				from device tree properties.
-- * @dev:	ksz device
-- *
-- * This function reads the specified drive strength properties from the
-- * device tree, validates against the supported chip variants, and sets
-- * them accordingly. An error should be critical here, as the drive strength
-- * settings are crucial for EMI compliance.
-- *
-- * Return: 0 on success, error code otherwise
-- */
--int ksz_parse_drive_strength(struct ksz_device *dev)
--{
--	struct ksz_driver_strength_prop of_props[] = {
--		[KSZ_DRIVER_STRENGTH_HI] = {
--			.name = "microchip,hi-drive-strength-microamp",
--			.offset = SW_HI_SPEED_DRIVE_STRENGTH_S,
--			.value = -1,
--		},
--		[KSZ_DRIVER_STRENGTH_LO] = {
--			.name = "microchip,lo-drive-strength-microamp",
--			.offset = SW_LO_SPEED_DRIVE_STRENGTH_S,
--			.value = -1,
--		},
--		[KSZ_DRIVER_STRENGTH_IO] = {
--			.name = "microchip,io-drive-strength-microamp",
--			.offset = 0, /* don't care */
--			.value = -1,
--		},
--	};
--	struct device_node *np = dev->dev->of_node;
--	bool have_any_prop = false;
--	int i, ret;
--
--	for (i = 0; i < ARRAY_SIZE(of_props); i++) {
--		ret = of_property_read_u32(np, of_props[i].name,
--					   &of_props[i].value);
--		if (ret && ret != -EINVAL)
--			dev_warn(dev->dev, "Failed to read %s\n",
--				 of_props[i].name);
--		if (ret)
--			continue;
--
--		have_any_prop = true;
--	}
--
--	if (!have_any_prop)
--		return 0;
--
--	switch (dev->chip_id) {
--	case KSZ88X3_CHIP_ID:
--		return ksz88x3_drive_strength_write(dev, of_props,
--						    ARRAY_SIZE(of_props));
--	case KSZ8795_CHIP_ID:
--	case KSZ8794_CHIP_ID:
--	case KSZ8765_CHIP_ID:
--	case KSZ8563_CHIP_ID:
--	case KSZ8567_CHIP_ID:
--	case KSZ9477_CHIP_ID:
--	case KSZ9563_CHIP_ID:
--	case KSZ9567_CHIP_ID:
--	case KSZ9893_CHIP_ID:
--	case KSZ9896_CHIP_ID:
--	case KSZ9897_CHIP_ID:
--	case LAN9646_CHIP_ID:
--		return ksz_drive_strength_write(dev, of_props,
--						ARRAY_SIZE(of_props));
--	default:
--		for (i = 0; i < ARRAY_SIZE(of_props); i++) {
--			if (of_props[i].value == -1)
--				continue;
--
--			dev_warn(dev->dev, "%s is not supported by this chip variant\n",
--				 of_props[i].name);
--		}
--	}
--
--	return 0;
--}
--
- static int ksz8463_configure_straps_spi(struct ksz_device *dev)
- {
- 	struct pinctrl *pinctrl;
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 029080838237..acaf70e6f393 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -511,7 +511,37 @@ int ksz_mdio_register(struct ksz_device *dev);
- int ksz_pirq_setup(struct ksz_device *dev, u8 p);
- int ksz_girq_setup(struct ksz_device *dev);
- void ksz_irq_free(struct ksz_irq *kirq);
--int ksz_parse_drive_strength(struct ksz_device *dev);
-+
-+struct ksz_driver_strength_prop {
-+	const char *name;
-+	int offset;
-+	int value;
-+};
-+
-+enum ksz_driver_strength_type {
-+	KSZ_DRIVER_STRENGTH_HI,
-+	KSZ_DRIVER_STRENGTH_LO,
-+	KSZ_DRIVER_STRENGTH_IO,
-+};
-+
-+/**
-+ * struct ksz_drive_strength - drive strength mapping
-+ * @reg_val:	register value
-+ * @microamp:	microamp value
-+ */
-+struct ksz_drive_strength {
-+	u32 reg_val;
-+	u32 microamp;
-+};
-+
-+void ksz_drive_strength_error(struct ksz_device *dev,
-+			      const struct ksz_drive_strength *array,
-+			      size_t array_size, int microamp);
-+int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
-+			      size_t array_size, int microamp);
-+int ksz_drive_strength_write(struct ksz_device *dev,
-+			     struct ksz_driver_strength_prop *props,
-+			     int num_props);
- 
- /* Common register access functions */
- static inline struct regmap *ksz_regmap_8(struct ksz_device *dev)
-diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
-index f060fbc4c4f4..86ce3a86705f 100644
---- a/drivers/net/dsa/microchip/lan937x_main.c
-+++ b/drivers/net/dsa/microchip/lan937x_main.c
-@@ -787,10 +787,6 @@ static int lan937x_setup(struct dsa_switch *ds)
- 		return ret;
- 	}
- 
--	ret = ksz_parse_drive_strength(dev);
--	if (ret)
--		return ret;
--
- 	/* set broadcast storm protection 10% rate */
- 	storm_mask = BROADCAST_STORM_RATE;
- 	storm_rate = (BROADCAST_STORM_VALUE * BROADCAST_STORM_PROT_RATE) / 100;
-
+ # psample test
+ # - use psample to observe packets
+ test_psample() {
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index e1ecfad2c03e..7cfc29ec7e59 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -1982,6 +1982,11 @@ class ovskey(nla):
+                 "icmp",
+                 ovskey.ovs_key_icmp,
+             ),
++            (
++                "OVS_KEY_ATTR_SCTP",
++                "sctp",
++                ovskey.ovs_key_sctp,
++            ),
+             (
+                 "OVS_KEY_ATTR_TCP_FLAGS",
+                 "tcp_flags",
 -- 
 2.54.0
 
