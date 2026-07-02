@@ -1,244 +1,247 @@
-Return-Path: <netdev+bounces-303957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rKjcIn7bRWqLGAsAu9opvQ
-	(envelope-from <netdev+bounces-303957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:31:10 +0200
+	id 3wo7ASLdRWq5GAsAu9opvQ
+	(envelope-from <netdev+bounces-303958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:38:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048866F342C
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:31:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 810C96F3488
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:38:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="s/dRdVA2";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303957-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303957-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=ArPrAVGB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303958-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303958-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9BBB73035A9E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:28:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA6D73002F8D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB81131353C;
-	Thu,  2 Jul 2026 03:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B2D275AEB;
+	Thu,  2 Jul 2026 03:35:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7020B311C38
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 03:28:07 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782962889; cv=pass; b=DrSPseoY5wfVSEmtR227NWS2qcSa8Zwzxt2Qcjc83gBUMYuFe3GzPPtjRP8FNGPNpVNuMrX08PQUy8KI0RauiGztrhcqrjrEDZsTKwhi3vVfN+VixlcaPm4szWFy6/LsLvDQL8VWkUEoSsgBzm90Cf92V31Dwte3ewe1igZBCZU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782962889; c=relaxed/simple;
-	bh=6twbAqzHSDVib4XGA6tF0E43wBC2SfvJwJvAtu/WDJU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VRiV4xx9cboNANWSGetYr7MrRZZDjrmCl7v7nMqzigaVGCWltWRcbzOhWMs6oYv4zuEgBrLRf8PBqnvinPPO+KNuntM56gsi28+DSxUdKPgb61iJxRQojcZP+LUAr6p/syJoqbG69o9Ultae2Ea2dfGFXNJpXS6zD9Txdip5Ouc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s/dRdVA2; arc=pass smtp.client-ip=209.85.214.181
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ca15944645so11396255ad.0
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 20:28:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782962887; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Cx6ZRSfwyD6/t+6Do/RnH0AzICx1ujH6i8E1NxDfI/ZOnvCm2IXI/ywcLM4mD8bM5f
-         61+Tl0KhsxoIyBuL7baGhuaVyI1K0PF0mcfgKg4AkFAJBC1VXastTHbDYdzSrNv491yM
-         tthzCPUOIjVtvz9B4qLRBjEqaYXaY2i9+MV19svMTdO8OxFOYkkZr76s0SofsAUNFpKF
-         rNWmcMFuuyW0gDTr4Fwr/od4yfVOl/E5fMGrCAO0dIj9yFDXbYvhwrJyQu7qK/+rr6VO
-         j4+2w7LkRzye5ei2BosraAI6jQOhoC+51GX7hZcdA6W8b/AUUm8ArG6A0k0NDe/39j9f
-         WbrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=BLmcQCP0CBFMMPDNg/zDhtk9PAcOKILSNB3reqJwEiU=;
-        fh=VTeJSuSAufryFAFMqAmK5OyfLnEHN44VDGEnHx8OEfU=;
-        b=bR5dxX+1kLqwIlmo4s15XAgZdFtWPpZ5pmfcgvrbPXtzbuN4WhWlDQOkHSHM/Vs8ji
-         tAR/yiWcgTuCwuZlKZA8iBpKppQATN0loJ+vRGS3F5Hh43lssXyedlnsj2Go8WWNdkH3
-         adgxB2VjNMcZbmER3Fv2zwA1b5XYVWeWodaxsJwpcjV5elNd+xL0sCxVSvdg1c9Xnz9S
-         bD2Illo6qg2aut9UUuSpTiDFoyK40/XcdYtDyfq16jQauK2sFOQ4mUx7VZ1imwVl0IMR
-         jjCb/N1YDC3us6DL5WhEZtddmbp5tK8SHpGiyAPDAyJ4+8nN0+D3KfEcBNDj8XDomi8W
-         M4EA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1782962887; x=1783567687; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BLmcQCP0CBFMMPDNg/zDhtk9PAcOKILSNB3reqJwEiU=;
-        b=s/dRdVA25jYqnZL9KlNPEPpxFGdAn1KmOLqUd05OHUBYsZwz7pIFLSVVztIaUx6gom
-         l58Goh/9SduQCCS8JA5QO/L2cxz/G49iiG8KwFyDQWXdyDR6nHx/CyCP6kv/Tzj8nlNp
-         oXOuGqRTwZq+vOLmu3i+uHdQabd6HQTiRMouzKOc0DGcGihNvzMcXXI0eLLUIg/bjtWv
-         oeiOQaLfrOwGo9VoBSUZUzIm+PgdbBN9fhJanB5C6+NHbYPY6gaTRKzH49mXZtIrWMex
-         Bw3Et5hUtFQHZLrNZELb8HuHhSS4zbZfQmpC2HWYTnDBxPxPGSXGAmjQr2xn7aB+vebM
-         Qwjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782962887; x=1783567687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=BLmcQCP0CBFMMPDNg/zDhtk9PAcOKILSNB3reqJwEiU=;
-        b=JooY2Wk2IBCOu5OOj3gWbFDY+Ee1ZRomCg3Kb4cmwLtocSedfwAIK3efDn4BxB1Amd
-         pTrLQwHOviiCdckoyMhCjRvMVAO3sZ9PoWku5xPrnpXuD5iLWfjGY6EPpgeUe0UogKqa
-         yGYB5lype6FAegWyokABiHIgGUv8lmXinsunxYfxNawsQUXiGV0V8lLOLUNeQ7nAp7X8
-         DvdrMezht2470vW8SXHiyvyMKKMNYOSpbcHu4MUdruJmEyNDgLY14XWyJU64R2xwm7mi
-         b0mhD/ZjcxlbPhPfs/G9nswRNzvPngLj8Pn16ColDJu8RcgM6q2pwwHHWTvTnSGZh8Hd
-         aB4Q==
-X-Forwarded-Encrypted: i=1; AHgh+RoQbLkLTEj8JLmCu2p0h4FtrkFH3H92iIIoJvC7E44T1Hn1ZFNjx6uaCg/0J5v87J/Bkh8rXfY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL2ifhp4tCP1/bDZFrAjoUDhmFVptvjIVC7Yofy9wosv1xAIsa
-	InYtNXJd/s9/KQ37qItnrvdgkNtJDvy/dP0I/7om7bJh0WxXovZ+RST3i1loM3cxUlRkVnRVU0W
-	3mIJvpTezQjJljHFcPsfdC46JF4gqG4i6TzLfI0mg
-X-Gm-Gg: AfdE7ckAtS1Ta+MIjgRTFLAsRgMGFSPkP3NjMPP/3w2X3C9BQQFdIlU69N1URsxeQ55
-	oKAjfAR4LJyr2Fz+bZE1so84MvQL4X1rU/BA8LPL8C5WhOc0spu9OUZqRao0WQfUzDp9dsNXTDO
-	cLakqJ64d2TRl9SR5wluzXYXK5Flwz9rxemdR+Rxl+TXs8JVd3EvCLv9bkWpT3udyJD8n1+1etT
-	zHgd94FYAS/qvPiFJY2B6GAJzUNAhZZzYckDnHdJV3hPRv0dAeTbECzaBbkyMFzI6kgnLiAVV95
-	sLB9yc6HddjjbAenxsZYPkm8HpqLAGCmX34mprWQpoExBxdGS04OBZ+kQi/oqdnDNYyfuVn57qs
-	coP2Lory0OnoMenT1N2+1rFZ8WuKEUSrOCQFxA8AyOw==
-X-Received: by 2002:a17:903:2c0f:b0:2ca:12aa:a395 with SMTP id
- d9443c01a7336-2ca7e6a62bamr52821975ad.17.1782962885989; Wed, 01 Jul 2026
- 20:28:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D73E30C60F;
+	Thu,  2 Jul 2026 03:35:18 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782963319; cv=none; b=mwzwo5HUktrYhaUU7X1uh2nXkDvcnvIJfBrBefBkV9qAtja8/FN7Vw2TmOjH+KFEhHnkr4MW02v97LxA9WfI9zCZDfkaRiui1JenVDEfp9m6nYuRxgmbu02kTdTf/4jQ3FCPYIN1FeH+g5oiivNxlqCmfd/3ORsh5SWxOD65ytI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782963319; c=relaxed/simple;
+	bh=Z/ySRfcvyA+3Hx7N9fLd4rbCIbkm680cwMfoAzv9nUs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E3WMcaRhaGRtVP4PDxRnYsIzguOG6dLalxVO8x+eJel1g1tmDQmS6TTsQGMFEmQjAepavA4TMN8B12xY611Kxzhj+wuDE9kPtcj+wVLAZrD5GN6FnKYK7HNH0OOpGaHi86qH4VPzJkI/fTD8mNK8h+Acog6dha2QsxCauUswo8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ArPrAVGB; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6621MrTq570199;
+	Wed, 1 Jul 2026 20:35:08 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=vwY6AEcf0rMG9F9PhDHZy1f
+	nCZkboMZ6nrHBEfdLHAo=; b=ArPrAVGB5W+TsZJm8Yl6iUP7+WM0o7fk9y2Rs3Z
+	Yg9JkIOFL71W1QZ+QJqZN0e4B0sE4J9iVzq0x3x9IyKzwRWrN1k0zoYjLw/Xst8V
+	5uos8hZbq4eAOt66lIBq6phORC+hCG8t1JvneFVDCli2DLwzJuagDnp8i/cjl1PT
+	SvxyQuVdfSYwtABINTSNG+GcB/5g2qAOywskjjGa/q1Q5Pq6j3/0nEDFpDLPUfWl
+	n1pIvXghgCsDxLvMODhQgAEIoYzaLduWEVXLZM/NP1IDZ3/nWW7lk5OE7LDIPLCB
+	pp1NyHF81F11v3csgLJVrBKkGYQfZWQUP6/TkhdkStvgJNQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4f5b990u7e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Jul 2026 20:35:07 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 1 Jul 2026 20:35:06 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 1 Jul 2026 20:35:06 -0700
+Received: from kernel-ep2.caveonetworks.com (unknown [10.29.36.53])
+	by maili.marvell.com (Postfix) with ESMTP id A679D3F7078;
+	Wed,  1 Jul 2026 20:35:01 -0700 (PDT)
+From: <nshettyj@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <bbhushan2@marvell.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <naveenm@marvell.com>, <tduszynski@marvell.com>,
+        <sumang@marvell.com>, <hramamurthy@google.com>, <rkannoth@marvell.com>,
+        "Nitin Shetty J" <nshettyj@marvell.com>
+Subject: [PATCH net v4] octeontx2-pf: check DMAC extraction support before filtering
+Date: Thu, 2 Jul 2026 09:04:51 +0530
+Message-ID: <20260702033451.2969880-1-nshettyj@marvell.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1782922354.git.namcao@linutronix.de> <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
-In-Reply-To: <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 1 Jul 2026 20:27:54 -0700
-X-Gm-Features: AVVi8Cc0CdVhsx__5HGrso2HoD3JAKnt5KjxP05QA2kzwt5BhmMX2QVBhxsy3SY
-Message-ID: <CAAVpQUAKESwPnzZAJSsSgR_perYn+S3PbnDAexnWdeGAeGcekw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] af_unix: Do not wait for garbage collector in sendmsg()
-To: Nam Cao <namcao@linutronix.de>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-devel@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: -5_bJl2zAP6Sa9r0S9y9inre_JJAMkpN
+X-Authority-Analysis: v=2.4 cv=GPk41ONK c=1 sm=1 tr=0 ts=6a45dc6c cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8 a=E9o4sS0pqQQeLg7t-9wA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: BknZ-a5B3WrvYJ7wOtj2SU5kBwGG0sNR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDAzMSBTYWx0ZWRfX+WdG00ES1c7Z
+ Bk0OqOwDVDpj5XKlzR8tq+GOIU0Ts23inj9kCwNdte5dw7j6ECguy/adWXMDd8+GEgmcSY6SN0o
+ k0CXzs5KsJ5QPGNck/3IiWUbT3Dd9LBmIQil8Zoo5vbq0cAlWlTarZBd1CnBtqtA48E4Bopc/QT
+ JMDc6dz5oGKq32/ldof1nz2Z2L4avNWoFG70Bk02MK5e356aRVkq+eSO7LCf3fX+fgJqnXCAM2k
+ o6Z9kWOA1NX3dcSJWbwX3PUTs7IgUxx0LD+tF4L12mSh/4Qy8l91PpfU6J/kotKcaI2RdDTXefV
+ k24ZPofoYF6jh0PhQDjgx9mict553kagtqVKkMHbT4UpDAC9ABDRQ7+5WIE5vFUZaPWkb31IdVM
+ 0fh7t7A9HZ8Z4K3qnXSnimcnOplYdL6seBiScHyTin0gMOrmxqZXVnZ13TkfZbMmCpRON6BuEP1
+ B0eyQa4RHItwnzWl4Mg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDAzMSBTYWx0ZWRfX5dAITJdip8ED
+ eidFKnLloHCxiQML7FwZrJfNeOIYxEGBNg2+9Tik2psk6IXXyZObpX4NJGguqRkGHUQSB58TH/k
+ UDoX5+N2j0D145XptiOCqJF9Qd1Ny/g=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-07-02_01,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303957-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303958-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:namcao@linutronix.de,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:gakula@marvell.com,m:sbhatta@marvell.com,m:hkelam@marvell.com,m:bbhushan2@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:naveenm@marvell.com,m:tduszynski@marvell.com,m:sumang@marvell.com,m:hramamurthy@google.com,m:rkannoth@marvell.com,m:nshettyj@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nshettyj@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 048866F342C
+X-Rspamd-Queue-Id: 810C96F3488
 
-On Wed, Jul 1, 2026 at 9:36=E2=80=AFAM Nam Cao <namcao@linutronix.de> wrote=
-:
->
-> AF_UNIX sockets' sendmsg() schedules and blocks on the garbage collector =
-if
-> user has too many inflight unix sockets
+From: Suman Ghosh <sumang@marvell.com>
 
-AND there is a cyclic reference
+Currently, configuring a VF MAC address via the PF (e.g., 'ip link
+set <pf> vf 0 mac <mac>') blindly attempts to install a DMAC-based
+hardware filter. However, the hardware parser profile might not
+support DMAC extraction.
 
->. This causes real-time issues, as
-> high priority processes who do need to send lots of unix sockets get
-> blocked by the garbage collector which runs as workqueue, causing a
-> priority inversion scenario.
+Check if the hardware parsing profile supports DMAC extraction
+before adding the filter. Additionally, emit a warning message
+to inform the operator if the MAC filter installation fails due
+to missing DMAC extraction support. Update config->mac only
+after hardware programming succeeds in otx2_set_vf_mac().
 
-So the real problem is the process creating cyclic references.
+Fixes: f0c2982aaf98 ("octeontx2-pf: Add support for SR-IOV management functions")
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+Signed-off-by: Nitin Shetty J <nshettyj@marvell.com>
 
->
-> The reason for blocking on garbage collector goes back to 2008, when
-> it was reported that "Local/unprivileged users can cause soft lockups
-> and take out system processes by triggering the OOM killer":
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D470201
->
-> The soft lockup was because a process can keep queueing AF_UNIX sockets t=
-o
-> another process that is exiting. Back in 2008, the garbage collector was
-> run synchronously by the exiting process, therefore keep queueing AF_UNIX
-> sockets blocks that process from exiting.
->
-> The solution to that issue was forcing sendmsg() to wait for ongoing
-> garbage collector.
->
-> The OOM killer issue was brought up again in 2010:
-> https://lore.kernel.org/lkml/AANLkTi=3DQ967xpX0KLMwX-=3D_4_1AKO5wjHEuJ1Tr=
-NjCj9@mail.gmail.com/
->
-> To resolve that report, beside blocking on the garbage collector, sendmsg=
-()
-> also schedules the garbage collector if the number of inflight AF_UNIX
-> sockets in the system is too high.
->
-> Then in 2015, once again, the OOM killer problem was brought up:
-> https://lore.kernel.org/lkml/20151228141435.GA13351@1wt.eu/
->
-> That time, the issue was resolved by disallowing a user from having more
-> inflight AF_UNIX sockets than their RLIMIT_NOFILE. That was done by commi=
-t
-> 712f4aad406b ("unix: properly account for FDs passed over unix sockets")
-> and commit 415e3d3e90ce ("unix: correctly track in-flight fds in sending
-> process user_struct").
->
-> Now, sendmsg() does not have to block on the garbage collector anymore,
-> because:
->
->   - The OOM killer issue has already been addressed by checking
->     RLIMIT_NOFILE.
->
->   - The soft lockup issue is no longer relevant, because the garbage
->     collector now runs asynchronously since commit d9f21b361333 ("af_unix=
-:
->     Try to run GC async.")
+---
+v4:
+ - Return the real mailbox error from the NPC_DMAC support query instead
+   of masking it as -EINVAL.
+ - Updated commit message.
+v3:
+ - Update config->mac only after hardware programming succeeds in
+   otx2_set_vf_mac().
+v2:
+ - Move the DMAC extraction check from otx2_set_vf_mac() into
+   otx2_do_set_vf_mac() which already holds pf->mbox.lock, so all
+   mbox operations are under a single lock/unlock pair. All error
+   paths now use the existing goto-out pattern, eliminating the
+   scattered mutex_unlock() + return calls from v1.
+ - Return -EOPNOTSUPP instead of 0 when DMAC extraction is not
+   supported, so the caller gets an explicit error rather than a
+   silent success.
+---
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 43 ++++++++++++++++---
+ 1 file changed, 37 insertions(+), 6 deletions(-)
 
-I don't think the latter is resolved.  Without blocking insane
-users, they can keep pushing sockets to the kernel work,
-which could be soft-lockup'd.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index b63df5737ff2..888ebd6cef39 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2517,10 +2517,42 @@ EXPORT_SYMBOL(otx2_config_hwtstamp_set);
+ 
+ static int otx2_do_set_vf_mac(struct otx2_nic *pf, int vf, const u8 *mac)
+ {
++	struct npc_get_field_status_req *freq;
++	struct npc_get_field_status_rsp *frsp;
+ 	struct npc_install_flow_req *req;
+ 	int err;
+ 
+ 	mutex_lock(&pf->mbox.lock);
++
++	/* Skip installing the DMAC filter if the hardware parser profile
++	 * does not support DMAC extraction.
++	 */
++	freq = otx2_mbox_alloc_msg_npc_get_field_status(&pf->mbox);
++	if (!freq) {
++		err = -ENOMEM;
++		goto out;
++	}
++
++	freq->field = NPC_DMAC;
++	err = otx2_sync_mbox_msg(&pf->mbox);
++	if (err)
++		goto out;
++
++	frsp = (struct npc_get_field_status_rsp *)otx2_mbox_get_rsp
++	       (&pf->mbox.mbox, 0, &freq->hdr);
++	if (IS_ERR(frsp)) {
++		err = PTR_ERR(frsp);
++		goto out;
++	}
++
++	if (!frsp->enable) {
++		netdev_warn(pf->netdev,
++			    "VF %d MAC filter not installed: DMAC extraction not supported by parser profile\n",
++			    vf);
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++
+ 	req = otx2_mbox_alloc_msg_npc_install_flow(&pf->mbox);
+ 	if (!req) {
+ 		err = -ENOMEM;
+@@ -2559,13 +2591,12 @@ static int otx2_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
+ 	if (!is_valid_ether_addr(mac))
+ 		return -EINVAL;
+ 
+-	config = &pf->vf_configs[vf];
+-	ether_addr_copy(config->mac, mac);
+-
+ 	ret = otx2_do_set_vf_mac(pf, vf, mac);
+-	if (ret == 0)
+-		dev_info(&pdev->dev,
+-			 "Load/Reload VF driver\n");
++	if (ret == 0) {
++		config = &pf->vf_configs[vf];
++		ether_addr_copy(config->mac, mac);
++		dev_info(&pdev->dev, "Load/Reload VF driver\n");
++	}
+ 
+ 	return ret;
+ }
+-- 
+2.48.1
 
-
->
-> Therefore, remove that to prevent priority inversion. Running all the
-> reproducers from the mentioned bug reports after this patch, no problem i=
-s
-> observed.
->
-> Signed-off-by: Nam Cao <namcao@linutronix.de>
-> ---
->  net/unix/garbage.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index 0783555e2526..f180c59b3da9 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -300,8 +300,6 @@ int unix_prepare_fpl(struct scm_fp_list *fpl)
->         if (!fpl->edges)
->                 goto err;
->
-> -       unix_schedule_gc(fpl->user);
-> -
->         return 0;
->
->  err:
-> --
-> 2.47.3
->
 
