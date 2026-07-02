@@ -1,138 +1,120 @@
-Return-Path: <netdev+bounces-304191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304192-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iQ+9DslnRmo1TQsAu9opvQ
-	(envelope-from <netdev+bounces-304191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 15:29:45 +0200
+	id 4gJ5NpVnRmpWSwsAu9opvQ
+	(envelope-from <netdev+bounces-304192-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 15:28:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB306F85B9
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 15:29:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 354906F8596
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 15:28:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=aDTBgyDq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304191-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304191-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b="EIIs/KW/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304192-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304192-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1BE8C303A110
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 13:20:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D8F93300B3E9
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 13:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B418B4A13AB;
-	Thu,  2 Jul 2026 13:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91DB47885D;
+	Thu,  2 Jul 2026 13:26:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A284F496919;
-	Thu,  2 Jul 2026 13:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C67F426400;
+	Thu,  2 Jul 2026 13:26:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782998427; cv=none; b=CWb2chWXpBjo6tLIWeYlPmKqWxXQuslj83yzm0oDx/4y86p5BG4+V+jrChzx4OEhKLZIoNroBKw/JOSwc3HP41deJuodHZ49nzcAVGrLT5+0Nh8OIcuBSDQHFISWrch4wwqx/FXz4Z2iKPdJQRDbas5YtuUBxY3U7Khgp/bGefQ=
+	t=1782998809; cv=none; b=qwBeWAoFc2oTuJ6hDACkQ1m57RJaxewITxayYDp59xmJtep55jT8cLGZLS12JATzW2CEKehHrUfbzUM6lCp227hRdJR5O4201j/cAQ8Unp+IaLzvoOBcDbuLujdHyFQKuo75ez5+Bv2iFNsnKtnOUOWabJwQVT/nLJXPVdh4eoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782998427; c=relaxed/simple;
-	bh=jce5eIDqJ1qhSHWuJeHjmciXAzoES83BFZce5IudpbE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZRFAn9dfZ7wzkBS3ZkdkCNkMkZxKMTyslFzda8aZgoPWNksUW/XD+i2X9ysc+sMR/vKTpFZdFVuKbrYQjIx/epCfkOkYhsqNA/A2oKF/kAjtNe3xqtGprOk/HJGgosUCEX2Wv6BgsbN0cRU9IZ+uGvMmulYopqLRIfLjNggez0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aDTBgyDq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D8131F000E9;
-	Thu,  2 Jul 2026 13:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782998426;
-	bh=8vpQVVgpuy1jDG+NB+a3fUPOj4X2FL4FrbzEm7M1nkY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=aDTBgyDqpxVQoj7rFqa4rxYFZUGWUu/dSuYymhUVWWzZKujsTtEpcDHH1eQf7m00v
-	 09nepxefNxYKjvHSxpEWDxIza0r7VKKBJXNxYQrsFtYBeKUKdTTGJ+2QcEPpf0AjEj
-	 9uiLS2hKHUs7IUxZ0A1RwtQIOjm4zn6Inyf3WE100H5ByzljQLRUSJ7VqQm0WndpPJ
-	 9XWfN3vhYVeVDfUjX8MQS2VVfcE/UkvLfBXK8CR3MlHCG5jamUMDxtG0ZNxxNy0wQa
-	 ldvYQZl5fxQz+hcSWsdF8w3Jby/NtPJJ6fcCHqs5IkmMiGik+ild4d2YxZ+1Sx90fg
-	 LVgHP0uiOTPOw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93BCD3927231;
-	Thu,  2 Jul 2026 13:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1782998809; c=relaxed/simple;
+	bh=gzEKKXRHW55NBy9kesVk1b/uOh+mwMrAihvh8BkHFXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=InE24BddIKXMprkicRnxlAT3ebyHIMBakB5Smkd0y1LU/5UGUYrnCjVgHWtpXyOh5PbFGif1MSBMNuWxTO42d5o8lulb7HLPSMe+5MO3+LeRXf1kgnsp4Wk0bXf2w/Kod9A9cfsPmXC7NYf7pSfckdha5wpvk3CLWRZMJNYSL5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EIIs/KW/; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iDgAaxSJmNrLZ/fcZee5jFXzDko+7FPC1vaAFIsohwU=; b=EIIs/KW/YC0jrhq6C5YR+VX2wd
+	Hp05SmTK9lu5/k7sv42rd+UAvLezidYJgLH6eXNo/kLPmn0SloCTAbkEq0bSi0ASgMqox3FOFLIwr
+	8ZvO+iE6BQ0kOKUDAa4E+hTMu3b7SVmIqnmUgV8XJDeVPX5sat84TKNsise1mn/xbKrs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wfHR6-00ANP5-6i; Thu, 02 Jul 2026 15:26:36 +0200
+Date: Thu, 2 Jul 2026 15:26:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tianchen Ding <dtcccc@linux.alibaba.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: mdio: select REGMAP_MMIO instead of depending
+ on it
+Message-ID: <d25ceff6-7f34-42a7-874c-c35eb9f7bb2c@lunn.ch>
+References: <20260702032653.1580616-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] octeontx2-af: NPC parser and RSS
- improvements
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178299840914.1667715.17957237174202579176.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Jul 2026 13:20:09 +0000
-References: <20260630062145.2533816-1-nshettyj@marvell.com>
-In-Reply-To: <20260630062145.2533816-1-nshettyj@marvell.com>
-To: Nitin Shetty J <nshettyj@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- hkelam@marvell.com, sbhatta@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kirankumark@marvell.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702032653.1580616-1-rosenp@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304191-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:nshettyj@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kirankumark@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com];
+	TAGGED_FROM(0.00)[bounces-304192-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dtcccc@linux.alibaba.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1FB306F85B9
+X-Rspamd-Queue-Id: 354906F8596
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 30 Jun 2026 11:51:43 +0530 you wrote:
-> From: Kiran Kumar K <kirankumark@marvell.com>
+On Wed, Jul 01, 2026 at 08:26:52PM -0700, Rosen Penev wrote:
+> REGMAP_MMIO is a hidden (non-user-visible) tristate symbol. Using
+> depends on it is incorrect because there is no way for the user to
+> enable it directly. Change to select, which is the convention used
+> by every other driver in the tree that needs REGMAP_MMIO.
 > 
-> This series extends the Marvell OcteonTX2 admin-function driver with two
-> improvements to the NPC (Network Parser CAM) block. The NPC parses packets
-> received by or transmitted from the NIX, and its matching CAM (MCAM)
-> selects which VFs, queues, or output ports handle each packet.
-> 
-> [...]
+> Fixes: 8057cbb8335c ("net: mdio: mscc-miim: Add depend of REGMAP_MMIO on MDIO_MSCC_MIIM")
+> Assisted-by: opencode:big-pickle
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 
-Here is the summary with links:
-  - [v2,1/2] octeontx2-af: reserve 4 PKINDs for skip-size custom use
-    https://git.kernel.org/netdev/net-next/c/5ba5611ef946
-  - [v2,2/2] octeontx2-af: Add RSS hashing support based on RoCEv2 header
-    https://git.kernel.org/netdev/net-next/c/961db18e28d0
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
