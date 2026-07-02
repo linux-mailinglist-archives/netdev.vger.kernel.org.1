@@ -1,223 +1,173 @@
-Return-Path: <netdev+bounces-304255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304258-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 44nfGFWrRmpIbQsAu9opvQ
-	(envelope-from <netdev+bounces-304255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 20:17:57 +0200
+	id fRYWBkyyRmpFbwsAu9opvQ
+	(envelope-from <netdev+bounces-304258-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 20:47:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A921F6FBEAD
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 20:17:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66AC36FC4A4
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 20:47:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=jvosburgh.net header.s=fm3 header.b="b c/aG25";
-	dkim=pass header.d=messagingengine.com header.s=fm2 header.b=e+gUvmVO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304255-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304255-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=jvosburgh.net;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=FwJfTHwE;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304258-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304258-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=mailbox.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1BE993023AE4
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 18:17:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D85313142048
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 18:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA753A4F46;
-	Thu,  2 Jul 2026 18:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104103A6EF1;
+	Thu,  2 Jul 2026 18:27:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47631C695;
-	Thu,  2 Jul 2026 18:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042E83A59B1;
+	Thu,  2 Jul 2026 18:27:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783016273; cv=none; b=VUUOcRdmA+C6n5pwR15UjI2jthQJu7z/1X2yIHWMZM+xOyYrsU5BNsVz0APZbwhafwy6isg+HFB27XlvP95pEXNTG/gjC68st5/MzfMX4zhmG/7Pfy/An8XCAv9FZHOadrXY9mc8yQ6mUHeriJ++h+1qE6Sq7i5tarqivxXptrM=
+	t=1783016829; cv=none; b=CacJnOnM6UCSlBpAOCJIC0lp4G+KjviA2k8XaesFc5paBruyHrWaGg4tc1APGCnuIGMtCUqxV6ehaSLSBM1gzKcvmrm0LEG9WXUwT/rRFWDekU/f5ExmEHjt/abYqDRdri0HRAAU2msD+JzShJRx01OYqaQTYczFaz2Gu9xFCmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783016273; c=relaxed/simple;
-	bh=VNiPHKbY+7ZcRzPkrxitR5jeoQEWzsnXA3gR7fEZbtw=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=bLNaA1nANmUnpr7gvp4lhj3Cvi0EPODu+Ir7uGIuizmyJQzxHn8rGU16/tBD/GT78bIAJk+4fYHlNHA+zKfryCg1KR/TylnIkud9O8R9MdlnpFudmwlp3220m+E+Xf44DWb88htXThtRWJiqr5avr5zIYCZXlAfTib3q4mq+e4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=bc/aG25I; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=e+gUvmVO; arc=none smtp.client-ip=202.12.124.151
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id DFAC91D000F7;
-	Thu,  2 Jul 2026 14:17:50 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Thu, 02 Jul 2026 14:17:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-type:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1783016270; x=
-	1783102670; bh=YVY6BUlsPF9I2q2TM3dbextXrdXPIAas80uysxwDYag=; b=b
-	c/aG25I8bGenpnyjG3yxEw1HzF+PGNX1fR772xAbgWkl/mhkhYczBPReDVmEq77S
-	/4r+hRGNrdJUAfeEJx1/yrG2nzFTjrWBlxFxPxkq0U5/vgSOfE/OSOvfR/Por3c8
-	5DdnPfP8LGbsmTunxtAYWN5vPD01/1qi3ZtA/c8GIZkrYB8eBRRDZo+h4M5Sz5TM
-	Rxeiviqeahlua/bNcoEVeFE1Px6B3PpiqM1OGIjaB/S5C+t1a8RXtTv85BJkFtmU
-	PVM/Rg8USx1NInd9hYLKuPTj5/OPMYzGSJJWsbLP/lier5CP7Zw0BuF8YN8d06Kt
-	1vD334u4NYp/pAnkulBTw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1783016270; x=1783102670; bh=Y
-	VY6BUlsPF9I2q2TM3dbextXrdXPIAas80uysxwDYag=; b=e+gUvmVODkcUoti/w
-	u8L+8oePr/zL14v2hEmb8cwoMMK9rEcfvymn72Zr5YykL9nt1Lp7tQ2yyvdsz/Bs
-	jQmAdctwDqvHcplhOkTINcv34JKiKS3RkiMwScr1J7kKLzky2p10zujr/GT2bG5B
-	G0UHBIzHUONyst+q5sDl+NeIGrkhaFC95hDfrtsLhnpmgQJQuA2OuMCqXUXKFsP9
-	0bKYjrIgSz807jGW4d4iWvZ6Y0MpM5PxTOrCE5hGs8VQFFzOnnr0x8ATcsHpznYO
-	LLTBKAB6eF8re+rkP+TPGUbiiX1uTegAaixDiGSikUQeHyPy9ut6Dg+hrTP0Jy89
-	OWAFw==
-X-ME-Sender: <xms:TqtGarYiy1Zy2wfwxRrmWCL5cjDIcQvnfKEihgeMCpE2XRGFsayXNg>
-    <xme:TqtGaoNZlSJtWEhHzxly65KDPm7Y8Ax-eEnTyichOd7JZo5LoPqbIIReOwFEqSUHL
-    M_u1JebL-pCyaSXMFs72tzDAt5idvunNWVd29REZrcl5T7wShVYbUs>
-X-ME-Received: <xmr:TqtGaoYECLR15D0NGNLbfjQ8UH9pUSOfSVKELJsXzOzKhnVvD-QMFFgYsu2g6ytSDZellQ>
-X-ME-Proxy-Cause: dmFkZTF4/cIK9Acjb8w71YMkf9mzYkJM0oE6xaNluclDjGLz3QVvcM1Gr7rAdK5Y+x8Zis
-    75nnWiPH2lbPXhr4RUJ2RgbbKKwkBa13RFwzAwYd4oaZlzp6rSwvWynstgLQaL36nHyAar
-    KcOdhaUuutxHAGDi6JemTTEGaRPOuUMcqJlrPdIE4IgXEo+Y+YO45wZ+ttpjehoPeCFCw1
-    VtxKfJdXTiN6DO44SbMCnGsYsdW1GAzl39hk3Nwaxf65sL/D+Y/RfV8gtWlJU0nhSbm4lq
-    a5pNufmR9pST4lonDmRlqohmF+nja5SyYnUqynm3fjoZONd1hZ5DsB10YTA3DtNQcw6otX
-    IB7muEo2sxdYPBOuxck+bgv8x0MbwMmzmmcWihKZhLFOwboSfPkUhxazZEPfe+ZUEfCiPQ
-    3uJigwIi1aH2caZg8AociavbTN4qT0DQ4/kkTAtUixAqhdGEgzywJsAqrsukaPyw1DuNRQ
-    jiVV7h7kG0vewTgnTEOR/H6orkdTkberyN2ZnoluaMp5xwbvEocEidK0rgFwpLgKMqZ09+
-    feEAS2H15Br2ywNE01+MAlJtjumc+4LF4JZVHNEpdrQuZa2PE95UQXH8DFXv1NBI1KVR0a
-    R4PU1WMysod8dN1DPSNo3ePZCfIXUwOgxGJ+ADwWNjUob6EbvZwCoqPmuFMA
-X-ME-Proxy: <xmx:TqtGau2emInibYahfStzJqkaXULs-DRExC3EwYaZZrxRANmJr2hqBg>
-    <xmx:TqtGamesK0V0cDMwyxxIfiao2yEfO8Zk1gc7nb6fwViYY2ESpMS5rA>
-    <xmx:TqtGanHYnQzeGCwHcRCta7-k8W9hFDXKHETW5iPY_207EdIsRUkBlw>
-    <xmx:TqtGav1A6Vi3AdJX8PapkCSIRYqRIpbe1t2ot8Za-SRARfoesDf93Q>
-    <xmx:TqtGam6IOnETit517iAvUqnACv2etKoYPT05FqOPcfzOaZCXcwpBv2n9>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 2 Jul 2026 14:17:50 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 1EA089FC68; Thu,  2 Jul 2026 11:17:49 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 1BD5B9FB76;
-	Thu,  2 Jul 2026 11:17:49 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Paritosh Potukuchi <paritoshpotukuchi@gmail.com>
-cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-    paritosh.potukuchi@amd.com
-Subject: Re: [RFC net-next] bonding: Retry updating slave MAC after a failure
-In-reply-to: 
- <CAMfiSebUf6rbHu4bVL-5vCFRs5cafiEeiNDpX3eQRdxKuRgGeQ@mail.gmail.com>
-References: <20260630150937.3508222-1-paritosh.potukuchi@amd.com>
- <2001256.1782860341@famine>
- <CAMfiSebUf6rbHu4bVL-5vCFRs5cafiEeiNDpX3eQRdxKuRgGeQ@mail.gmail.com>
-Comments: In-reply-to Paritosh Potukuchi <paritoshpotukuchi@gmail.com>
-   message dated "Wed, 01 Jul 2026 13:11:53 +0530."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1783016829; c=relaxed/simple;
+	bh=NeMrv1nWkBCLLNUEg54JNV8fu8oY4LOMjJiLTxtpX8c=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=P3YeIJnqI8DVENW8pEucDOCl/dhLbs0ZHKMcVFAynARihW0/lIXw755Kp9hcOHmNGC1QzCcNPvZqSXc74xkvhv+4ECl+HWqdlCneFT0maARnyxgU0Z0OerNbX+54RG4cCC8TuEmKl+dsTKUqgE6qG4AdHNkHb4ij/u8BxXMcmFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=FwJfTHwE; arc=none smtp.client-ip=80.241.56.161
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4grlXH0tTbz9tx6;
+	Thu,  2 Jul 2026 20:19:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1783016367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=384tUyVKGcuexzJQm/Gbh8Apy/SFEokWG8t45DtqO9k=;
+	b=FwJfTHwEggHqrODTUm9G5yRboHU/FWJxCiiGONmd96NlrhJBbXgNMrQu1iNOagteulFpWo
+	n1iIHjQN204RzY1VpjjIaX/Xo8hslqOlag4iGn9ZjDmI8Pet9LSF0wBTVWi34NIRChgsFW
+	H3gkSdR8P2Vlidxev5ZPM/vkKEgJjBXVuZuvg1PATNdBG66urfMNO2LqL2foUxSRTvMCRy
+	hYo6okX3fE3pKUTkyispai+z4TKUD5UhU9lqnjmI2Ov3JWaaljLStpNRLQ6w2uO9t+/iBY
+	/OBT3vG6FbvaLpNqJN9hEETQvuzcyQkuje8I8bHJlnYGLT4WT4bzn16j4ghfUw==
+Message-ID: <ebfe837b7d4ef61442822105c3d71ca306106c14.camel@mailbox.org>
+Subject: Re: [PATCH net-next 2/4] net: usb: centralize
+ usbnet_cdc_zte_rx_fixup in usbnet
+From: Manuel Ebner <manuelebner@mailbox.org>
+To: Oliver Neukum <oneukum@suse.com>, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, 	shaoxul@foxmail.com, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, 	linux-kernel@vger.kernel.org
+Date: Thu, 02 Jul 2026 20:19:21 +0200
+In-Reply-To: <20260702143142.890654-3-oneukum@suse.com>
+References: <20260702143142.890654-1-oneukum@suse.com>
+	 <20260702143142.890654-3-oneukum@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2083935.1783016269.1@famine>
-Date: Thu, 02 Jul 2026 11:17:49 -0700
-Message-ID: <2083936.1783016269@famine>
+X-MBO-RS-META: yojdsnwtbuix6fubd8wh6scysfssof5k
+X-MBO-RS-ID: d1d3bf10343cb94ada5
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm3,messagingengine.com:s=fm2];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-304255-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304258-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:oneukum@suse.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shaoxul@foxmail.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[suse.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:paritoshpotukuchi@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:paritosh.potukuchi@amd.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
-	RCPT_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[manuelebner@mailbox.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:email,vger.kernel.org:from_smtp,mailbox.org:dkim,mailbox.org:mid,mailbox.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A921F6FBEAD
+X-Rspamd-Queue-Id: 66AC36FC4A4
 
-Paritosh Potukuchi <paritoshpotukuchi@gmail.com> wrote:
+On Thu, 2026-07-02 at 16:25 +0200, Oliver Neukum wrote:
+> This helper is used by multiple drivers using usbnet.
+> It is better to be provided by usbnet than one of them.
+>=20
+> Signed-off-by: Oliver Neukum <oneukum@suse.com>
+> ---
+> =C2=A0drivers/net/usb/cdc_ether.c | 19 -------------------
+> =C2=A0drivers/net/usb/usbnet.c=C2=A0=C2=A0=C2=A0 | 19 +++++++++++++++++++
+> =C2=A02 files changed, 19 insertions(+), 19 deletions(-)
+>=20
+> ...
+>=20
+> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+> index 5544af1f4aa5..7beea6d0e731 100644
+> --- a/drivers/net/usb/usbnet.c
+> +++ b/drivers/net/usb/usbnet.c
+> @@ -2347,6 +2347,25 @@ void usbnet_cdc_status(struct usbnet *dev, struct =
+urb *urb)
+> =C2=A0	}
+> =C2=A0}
+> =C2=A0EXPORT_SYMBOL_GPL(usbnet_cdc_status);
+> +
+> +/* Make sure packets have correct destination MAC address
+   /*=C2=A0
+    * Make sure packets have the correct destination MAC address
+> + *
+> + * A firmware bug observed on some devices (ZTE MF823/831/910) is that t=
+he
+> + * device sends packets with a static, bogus, random MAC address (event =
+if
 
->> I think the proper thing to do is remove this comment block and
->make no other changes.
->
->  > This comment dates to sometime before git, when it was common
->for network device drivers to lack the ability to change the MAC while
->the interface is up.  To the best of my knowledge, that isn't a issue
->today.
->
->Sure Jay. That makes sense. Should I go ahead and post a patch 
->removing this comment?
+ (even if the device ...
 
-	Yes, please do so.
+> + * device MAC address has been updated). Always set MAC address to that =
+of the
+> + * device.
 
-	-J
+Always set the MAC address to the one of your device.
 
->  -Paritosh
->
->On Wed, 1 Jul 2026 at 04:29, Jay Vosburgh <jv@jvosburgh.net> wrote:
->
->    Paritosh Potukuchi <paritoshpotukuchi@gmail.com> wrote:
->
->    >I came across this TODO in bond_set_mac_address() :
->    >
->    >        /* TODO: consider downing the slave
->    >         * and retry ?
->    >         * User should expect communications
->    >         * breakage anyway until ARP finish
->    >         * updating, so...
->    >         */
->    >
->    >Currently, if the dev_set_mac_address() fails on a slave, we go
->    >ahead and unwind the bond and its slaves.
->    >
->    >As the TODO suggests, one possible solution is to try setting
->    >the MAC again, after putting down the interface. This is because some
->    >drivers may reject changing the MAC when the device is UP.
->    >
->    >The solution I am proposing is as follows:
->    >
->    >dev_set_mac_address on the slave
->    >        - If this fails, temporarily stop the slave - ndo_stop
->    >                - If stop fails, unwind
->    >        - call dev_set_mac_address() on the slave
->    >                - If this fails, unwind
->    >        - Bring up the slave by calling ndo_open
->    >                - If this fails, unwind
->    >If dev_set_mac_address on slave passes, we go to the next slave
->    >
->    >
->    >Before working on a patch, I wanted to get feedback on whether
->    >this interpretation of the TODO makes sense and whether there
->    >are concerns with temporarily stopping and restarting a slave
->    >during bond_set_mac_address().
->
->            I think the proper thing to do is remove this comment block
->    and
->    make no other changes.
->
->            This comment dates to sometime before git, when it was common
->    for network device drivers to lack the ability to change the MAC while
->    the interface is up.  To the best of my knowledge, that isn't a issue
->    today.
->
->            -J
->
+Thanks
+ Manuel
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+> + * device.
+> + */
+> +int usbnet_cdc_zte_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+> +{
+> +	if (skb->len < ETH_HLEN || !(skb->data[0] & 0x02))
+> +		return 1;
+> +
+> +	skb_reset_mac_header(skb);
+> +	ether_addr_copy(eth_hdr(skb)->h_dest, dev->net->dev_addr);
+> +
+> +	return 1;
+> +}
+> +EXPORT_SYMBOL_GPL(usbnet_cdc_zte_rx_fixup);
+> =C2=A0/*-----------------------------------------------------------------=
+--------*/
+> =C2=A0
+> =C2=A0static int __init usbnet_init(void)
 
