@@ -1,158 +1,169 @@
-Return-Path: <netdev+bounces-304099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fMhVMzxCRmr+MwsAu9opvQ
-	(envelope-from <netdev+bounces-304099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:49:32 +0200
+	id PgitAl5CRmoyNAsAu9opvQ
+	(envelope-from <netdev+bounces-304100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:50:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713DD6F62E6
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:49:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 517266F6323
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:50:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=NOKtO6Ls;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304099-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304099-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=iVBGqyxk;
+	dkim=pass header.d=redhat.com header.s=google header.b=N3V8b9CI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304100-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304100-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F275D31ADE85
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:36:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C783C31C3345
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F54373BE4;
-	Thu,  2 Jul 2026 10:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394E23B2FCC;
+	Thu,  2 Jul 2026 10:37:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C84357CE1
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 10:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ADA3A0B3F
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 10:37:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782988566; cv=none; b=D5pY3hMe5EuINEO7CoL3/f1L+anAIW52tfhrB3xKytWf/UDYyww9Z1SYT1x3MTb6UpzkD1+fKzubyUxsLJnLgynFaSahvgyHy+ydHcijLQtCrUnilppxnOzK8A0t0hgOTb1dgeZAQjY7mv93mMoSc+RCICGqmqwZEM9700GQcE4=
+	t=1782988653; cv=none; b=rUT2crP/MEJskBdC6J+93I3RM5+opVzKvuIKbqIKNve9Jq0aURqladi60N7X0lUgG2T2Uq2IJ9jPWlmcfEmIHiJ+lwn37pXlNsOOugk5pNEsQGy3cEJ1RL8zByURfG+YG92xi+L8lgZBZwyks97b8Ln2xgdtdmxkZrayw/UD/l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782988566; c=relaxed/simple;
-	bh=u78F4QdlrR7C1BYI5zDtdJCtyxUfspZXfPNBzuyN/eM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iuhmWuMXapUKoXsC57Z9J60BHTE/WBJMxjVb0OQFiLq8exOzSMSMgUHT+kJIOf3lYQt0cQ22YEcL6/B1WJvCVF0XkuWOcCP6NPwp8WKmwmqs8rU3im4v6LEmvsMhHmChG+5Co6v0WXeLTgQ81Fdm6lp3H+2pX1AyuVJNgy1ig7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=NOKtO6Ls; arc=none smtp.client-ip=209.85.218.42
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c12758e75afso261339266b.1
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 03:36:00 -0700 (PDT)
+	s=arc-20240116; t=1782988653; c=relaxed/simple;
+	bh=nddTsFpGNx0n7hooigV9Oq9WL9zEKKsr01A9M4TKXSY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QXP7Y+cGgcw0qDDuLl6lCcNQT9xIntedO/fnA6GPAMMkA6yVvlr2X/twQrOsadVWOxanOxvZcFaNwt4lPk0oX6RRpQ9lZ6VzI4VQahhqHLoE6mAagegK2AX2biRkBmDr+0ukcajPpfrIfpnZh/F3KWbPJbXY9KIoTzErGSBwZTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iVBGqyxk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=N3V8b9CI; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1782988650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nddTsFpGNx0n7hooigV9Oq9WL9zEKKsr01A9M4TKXSY=;
+	b=iVBGqyxkZgQqc2SFd4kWhvlyaBlnoPSf/S72skZfWMfYEYJ6zdsefEcmHFQ0zOl14nIeoP
+	SLK+cHIkSTEDDLPCftBn1rLDfBe2xRvBqv80CfXnQxQjXRuSPw46jjaCBNcB/d68eZ6R/M
+	nhA70hA7hX6yAw1vv4bglQuYWrEQ8SU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-550-j2djK4QnPsy3iyEba3wfzw-1; Thu, 02 Jul 2026 06:37:28 -0400
+X-MC-Unique: j2djK4QnPsy3iyEba3wfzw-1
+X-Mimecast-MFC-AGG-ID: j2djK4QnPsy3iyEba3wfzw_1782988648
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4744b72f90bso1162807f8f.0
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 03:37:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1782988559; x=1783593359; darn=vger.kernel.org;
-        h=content-type:mime-version:message-id:date:user-agent:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=u78F4QdlrR7C1BYI5zDtdJCtyxUfspZXfPNBzuyN/eM=;
-        b=NOKtO6LsvoIK3dwQteCncaPJ+g6OcppeqhO2+Xa7XrRrDnbeZvy5DdHH2UutfGIVCr
-         S/qkYU3bKmUr2e32gAzY1EhNJD8B1nrnHdcCz6BEJ1cC3R4fjw7FpukTx86ePzDS0BaC
-         buJ0EfBWH4I4bGQKG07nN8TzsvEgrmylGq9sqUt0AfEgTX8OAMM0b/F7QMtZeCvjPWb8
-         RDXgFFbgwrYUPQnNlgkipCiSMg/+5h3Y1DBUcKl3wG5ILjHi7di+v5NwxvmiCUWE8OCE
-         Kr5Nt6+UAcMs3o0pbMx7lWiXQAiJgcyuiWJl64+r/UifjbmQCzoUtnuK+4n4jV6bSlRg
-         71Tg==
+        d=redhat.com; s=google; t=1782988648; x=1783593448; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nddTsFpGNx0n7hooigV9Oq9WL9zEKKsr01A9M4TKXSY=;
+        b=N3V8b9CIjkagl5Zkq+MBy4IO8BcNMe01MkLCnI/rfJI6545CzB+mhkbVOXhkZ41cmz
+         F7EDY6v9FDUXF0q+jAErSGhtp4SAmqSxkLSB7bIjKrI2ZJyX3MaLtQ95rYBeRHLlUsF/
+         lkj9mHvoklG0h4r4bbPAc2TCvhLAbpsuBAxXyholH6Tt81MYlDiPmBMMwIkYzR0otpyI
+         zEGNkOjgAiCNEv/eyzepnRuCb+lQktl+L9ss5FJOxQPHC3uRXk/FDjmF/XKkqSrjfFjH
+         HSbLlMytUWL1H8cQLuDAHSqX78SWOC2LyM172/t9wYh/x1/tyWK/dtC2mJ67VW3Bsfj2
+         4j5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782988559; x=1783593359;
-        h=content-type:mime-version:message-id:date:user-agent:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=u78F4QdlrR7C1BYI5zDtdJCtyxUfspZXfPNBzuyN/eM=;
-        b=O1FYhsX9DLSBQzyTW7ZWCjQLxgIyAIjAoM91TdEm2VhQyHanxx9+4Sn4y10ephY09u
-         u0nj0hEHFLHm8jHq+/iycqr/YEs7EzcMZ4ku7MduriAN1Ylzz8zY1gc0zMKf9Yq//epU
-         Brb5ZR8aQIoTPpf+RxCJ5zFPl73FKuK9Sgh0JwyJO0GgiAIenFy0d+UuX+ND37su5mI7
-         IUrTkPlcg11Fd5hvkYoff++24rHGEZdjLDR4FnFUJavboq4mrfmEiyFpVr7X/CVKwjjV
-         zE9dLh1emgN+OE/zHnrbYeLo2R7OWJX0DMIQbWz2KXPNh9yJqPY0BChMGfd8VM8Y54Xi
-         z/VA==
-X-Forwarded-Encrypted: i=1; AHgh+RqO062Hky8DRMKLMRDfpuUiVU4erfMItLxjsZiajE6rV/cG16asB+rncB+GigPOyOt3dw1rS3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgpoGkqJ9XIy9fd7b7jNuaKmw0JFQOQlcgsE9F7RI2akjMbLGe
-	Ib04AzZwQAvRFjegMSxwF/a/lQOpi42YbObSwLRp98XBpcxzSqG40nMT9blB6ueZUbI=
-X-Gm-Gg: AfdE7cllaoYzG0OxYJV6+8GcVRbRL/yNgN8CAbkMT1JcPEwUhuOI0riQay5SkEUdHWG
-	JHaK87U6ozrjOOTNJPgmEU7wxkNSxz66Gr9EGu6sSPNOTkT3mEcHBBBfTYITXVgBMKHyW/0vaqc
-	QVi5OGDwAKzGEvcT/C1DWBO61/iW13jj5EP1UKbulsorijClBaTR3DDtPIHAFTSX2ZzteOhK+Kz
-	KFawcsPXZtonHqo78ekLGc7lXPjsqO0yHhB2Ikvx4RU5ePZjbf38ArAjjyMsRh2B06Sz68guTIv
-	Oay6MItctHayH+owcZXNnME7c74X+gA1ToOyM0l8T1cByx6JfQtiaGzQiby2tcJHQOazssdlzZ/
-	cvis3LldoV93RysdWjWq7wkDjgwMW2V39N9wZ7ZbgXl1CPnxMZq43tVpA7oiyy3yAt/X5joJTh0
-	5aIwMYdyudre4NSao=
-X-Received: by 2002:a17:906:44f:b0:c12:4f19:fad5 with SMTP id a640c23a62f3a-c12ae77c901mr167169566b.59.1782988559046;
-        Thu, 02 Jul 2026 03:35:59 -0700 (PDT)
-Received: from cloudflare.com ([104.28.21.182])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c12b62907ffsm107708366b.40.2026.07.02.03.35.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 03:35:58 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Alexei Starovoitov <ast@kernel.org>,  Daniel Borkmann
- <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard
- Zingerman <eddyz87@gmail.com>,  Kumar Kartikeya Dwivedi
- <memxor@gmail.com>,  Martin KaFai Lau <martin.lau@linux.dev>,  Song Liu
- <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  Jiri Olsa
- <jolsa@kernel.org>,  Emil Tsalapatis <emil@etsalapatis.com>,  Shuah Khan
- <shuah@kernel.org>,  John Fastabend <john.fastabend@gmail.com>,  Jiayuan
- Chen <jiayuan.chen@linux.dev>,  Eric Dumazet <edumazet@google.com>,
-  Kuniyuki Iwashima <kuniyu@google.com>,  Paolo Abeni <pabeni@redhat.com>,
-  Willem de Bruijn <willemb@google.com>,  "David S. Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,  Simon Horman
- <horms@kernel.org>,  Cong Wang <cong.wang@bytedance.com>,
-  bpf@vger.kernel.org,  linux-kselftest@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org
-Subject: Re: [PATCH bpf v3 1/4] selftests/bpf: Ensure UDP sockets are bound
-In-Reply-To: <20260702-sockmap-lookup-udp-leak-v3-1-ff8de8782468@rbox.co>
-	(Michal Luczaj's message of "Thu, 02 Jul 2026 01:28:19 +0200")
-References: <20260702-sockmap-lookup-udp-leak-v3-0-ff8de8782468@rbox.co>
-	<20260702-sockmap-lookup-udp-leak-v3-1-ff8de8782468@rbox.co>
-User-Agent: mu4e 1.14.1; emacs 30.2
-Date: Thu, 02 Jul 2026 12:35:57 +0200
-Message-ID: <878q7t3che.fsf@cloudflare.com>
+        d=1e100.net; s=20251104; t=1782988648; x=1783593448;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nddTsFpGNx0n7hooigV9Oq9WL9zEKKsr01A9M4TKXSY=;
+        b=O9ehta8O4GqHBrVeUoRrZQQB3BezaJqL6CKkbu/qXHCPjVt5uKG4C4bO90/oSAQ/42
+         kPv+1XijMAJB7+RpGURDo3BCSIj2iDVyLLzvcJlLcpuNatcX5ooD87D//Pfh5IKLJHgD
+         YtEhvCzGPFRBjXUm7UnQIdIhM1fs7Pma3Ljl0r9yWDZFrC3/aKYh3TgL0voK8uskfhpt
+         R6KIKTfF+pRDqRQTpUj5RBwwDtaYm1eTqlseOOhe/owgu9JlD03TfOkwAEge+2tLPV4e
+         Yu6/Uqn1jezjrlou2uhwpQbV7nD0vNtmyp6oCDWR3Cq621tCRX8D+xBUIRpVwmWnOTzc
+         PLAQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+9zmw8XQEjvVxHmI7t7D4/yCwLaBUnSPu/k/LB4sgR+ZU2iq4/J8OtNIb4h62cc9xMCvvvPPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwI/Fx1inAkwxqN8LLY44NvtndQ/OUWO0y6jISt6Nboo8bXD9O9
+	EKX8kd0eMLXY6IOtVDqp8Jw0PVA8kX1XuUuqrpuriBj8HcfJRSVU23+LGdye+9JkNshF1MxblTN
+	eFoPSyAbkVQ8xp5z2Le+KedmM+tVKs7PwnqGMPUCyYVD7nubBX4DBfwbPdQ==
+X-Gm-Gg: AfdE7cnbILzF6cZPavzsE0ZrDQ6JjRlxSrZpbrkgMV/PHaq6inXJJ/WXAzGk3y1LGOb
+	hpQDpXYeyl7/Y/6E0T8mOV43YQiqGlHv6IJOiGZsTucce4RLvlANJrDJM/ilWDoKBX31LyCkcwI
+	08UaKFdEWiPA1GqKlTwcpIiNqVVLLRNd4PA1ngOLfI1qoruZkbOeSqgzielGtIzihCl/QTqg0b8
+	DT79q+P6TBV0JdyQ90+gsuhYXWtE1TE6gBQD5rhGkeymGBeWNCmHuZRaj05rV4dclob+AArJFiM
+	EZ/OA4ViyACuX/GI3BuUrw3svkr4ZQuyJYaiRzi6B5Fk5iWhwgprugHw4yTUbaX0vsueUxr7l21
+	jilOSPLoOmWRwuSqoKV0dtWMaQqbH1+WCoV9/gG50u6Og3NKk24GO9ysdmB5OPjFCBonclBXiQc
+	HlExlS1BDK9Q==
+X-Received: by 2002:a05:600c:1594:b0:493:bcba:46a4 with SMTP id 5b1f17b1804b1-493c2b7dc45mr45641815e9.20.1782988647632;
+        Thu, 02 Jul 2026 03:37:27 -0700 (PDT)
+X-Received: by 2002:a05:600c:1594:b0:493:bcba:46a4 with SMTP id 5b1f17b1804b1-493c2b7dc45mr45641605e9.20.1782988647189;
+        Thu, 02 Jul 2026 03:37:27 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:5521:6b10:2eb7:f61a:75:4534? ([2a0d:3344:5521:6b10:2eb7:f61a:75:4534])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bfe616f5sm78192135e9.1.2026.07.02.03.37.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jul 2026 03:37:26 -0700 (PDT)
+Message-ID: <81a52d1a-350c-4242-845d-cde2e24724a1@redhat.com>
+Date: Thu, 2 Jul 2026 12:37:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/10] net: emac: fix sparse __iomem warnings in IAHT
+ register access
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20260630041634.284127-1-rosenp@gmail.com>
+ <20260630041634.284127-3-rosenp@gmail.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260630041634.284127-3-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304099-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304100-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mhal@rbox.co,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:john.fastabend@gmail.com,m:jiayuan.chen@linux.dev,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:cong.wang@bytedance.com,m:bpf@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,etsalapatis.com,google.com,redhat.com,davemloft.net,bytedance.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,rbox.co:email,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 713DD6F62E6
+X-Rspamd-Queue-Id: 517266F6323
 
-On Thu, Jul 02, 2026 at 01:28 AM +02, Michal Luczaj wrote:
-> Update sockmap_basic tests to bind sockets before they are used. This
-> accommodates the recent change in sockmap that rejects unbound UDP sockets.
->
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
+On 6/30/26 6:16 AM, Rosen Penev wrote:
+> Annotate iaht1/iaht2 in the EMAC4 register union with __iomem so
+> sparse does not warn about address-space mismatches, and simplify
+> emac_xaht_base() to return &p->u1.emac4sync.iaht1 (or the EMAC4
+> variant) directly instead of computing the offset by hand.
 
-Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
+This patch does not include the actual annotation.
+
+/P
+
 
