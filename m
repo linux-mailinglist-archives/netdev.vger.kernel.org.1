@@ -1,71 +1,70 @@
-Return-Path: <netdev+bounces-304199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QmRdNblvRmo9VAsAu9opvQ
-	(envelope-from <netdev+bounces-304199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:03:37 +0200
+	id 1p9VNdBvRmpGVAsAu9opvQ
+	(envelope-from <netdev+bounces-304200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:04:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCEA66F8A99
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:03:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54476F8AA3
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 16:03:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=n9UQCXIk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304199-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304199-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=huawei.com header.s=dkim header.b=EpFBEDHm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304200-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304200-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A83D8300B288
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 14:00:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7B450300184D
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 14:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97604B8DF6;
-	Thu,  2 Jul 2026 14:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F34F4BC01F;
+	Thu,  2 Jul 2026 14:01:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C144ADD8B;
-	Thu,  2 Jul 2026 14:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A7C4B8DE1;
+	Thu,  2 Jul 2026 14:01:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783000855; cv=none; b=ORCO8917PUOYeDToERhWeDrY28T3sdGZLnwRNffoM2rOrALpHOyVUZ4PZWpJBCqwdvZh+QKrZSFGlErWB9QYoTjVfaWSGKo50N+lLp7kzAhCiP/19rqPTbJmobVqnGHdU8kCxkHmhG4hS4Gx2SFu6wfuvWSvGJIuQHv+6+HKWhI=
+	t=1783000878; cv=none; b=XNdIAIHKGBXKf2/7Z1Tzfj/WWa7gK5fEJMOY+E+x/l+RuQ/aIuF/IYi2/SM5iE3Rrb2vdA2gDcaOp0xCXnOeO+HKwxU+Am3H6idxpJ9ScxEVOgnF4qvh8bCEvbXJfDo0NA7XzJ5HExRD397MknJPf95ED9+UI37O+W/uQfPmd34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783000855; c=relaxed/simple;
-	bh=NxGzxz36h2GTZCsN7+zsKburnLEv5LIAVAAa1+G7NFk=;
+	s=arc-20240116; t=1783000878; c=relaxed/simple;
+	bh=l2GDWoCRl2ghl3QVXEouQl50bAeAFW2E2Xq1bfIvgCY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zug89Y2xOoiZHYbc/UURsY24eeLb1Zx94BFYjehL6GriJ+LKZQgW1OEojgz3Kh797vNtodJxTVtzpHO5nWrpKsDlF2WKUUpwytKUzzvxevmL/VD+T02BGHz9jNJ5tY9y5+S0JonGontiQ6I1nV5Q4di1A9I86ZoVddWeMiTyHSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=n9UQCXIk; arc=none smtp.client-ip=113.46.200.221
+	 MIME-Version:Content-Type; b=OQZeLhPMaewSlDTow0VhFUXB2C7w47H1HWJ5WfDoN3gfdo0+ut21mjuVrrGFZkDhkceFYZQ5ZPVXK3X5uKMyHDv3LUbJUsQkqhNKvJKg2LmJUp1v9R9l4PSRtXJR6sG9vuZ6VRyBAHjhKMxs5k0RsxXvk0KCcC6zEFh1yhXovhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=EpFBEDHm; arc=none smtp.client-ip=113.46.200.216
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=rurax16pQxCQ7BXDE9yn3T2tSCVEnYVid19tKQDrMp0=;
-	b=n9UQCXIk+n9WZTWkb61OY1//SoqO32PkzYiRK2O/Er0PPmh6g6m+q0Sb23wbjaFKo4wXAl/Hr
-	djYP4rlv5Z5aFTt6oztsjjqp3C5gy1rAinEckJkQ6UgJJi6HjUA3ewuLhEDRYhCB+XTyS3B2Cj3
-	ngn3b9y/HJSo9q1FWxY/my0=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4grdb74s17zRhVG;
-	Thu,  2 Jul 2026 21:51:31 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id CE76940593;
-	Thu,  2 Jul 2026 22:00:40 +0800 (CST)
+	bh=UYEcfABS3rXsYIi9GxuFgomvsuhp90fOfMtQFJDuxrs=;
+	b=EpFBEDHmHYonqtjecPBEkCYGvBXdhJPvuTD+abyCOSL8AEWwP/ckMt8DAiaP9Q9p2p3P2QxQf
+	053hDzFgZIuFwxCpRIpNVh+/ft6oKPqlE6YYBVXFTFLR9pz3nc3YdQpt5ynwgURZ6ckWz4enXqG
+	4b1SBRf3VfaQG+JeO7mmh2o=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4grdbT4LrFz1T4yw;
+	Thu,  2 Jul 2026 21:51:49 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1434D40561;
+	Thu,  2 Jul 2026 22:00:42 +0800 (CST)
 Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 2 Jul 2026 22:00:40 +0800
+ 15.2.1544.11; Thu, 2 Jul 2026 22:00:41 +0800
 Received: from localhost.localdomain (10.50.85.175) by
  kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 2 Jul 2026 22:00:39 +0800
+ 15.2.1544.11; Thu, 2 Jul 2026 22:00:41 +0800
 From: Dong Chenchen <dongchenchen2@huawei.com>
 To: <daniel@iogearbox.net>, <edumazet@google.com>, <ncardwell@google.com>,
 	<kuniyu@google.com>, <john.fastabend@gmail.com>, <jakub@cloudflare.com>,
 	<jiayuan.chen@linux.dev>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<horms@kernel.org>, <zhangchangzhong@huawei.com>, <netdev@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Dong Chenchen <dongchenchen2@huawei.com>,
-	<syzbot+06dbd397158ec0ea4983@syzkaller.appspotmail.com>
-Subject: [PATCH net 1/2] bpf, sockmap: account only unread data in tcp_eat_skb
-Date: Thu, 2 Jul 2026 22:09:58 +0800
-Message-ID: <20260702140959.1806754-2-dongchenchen2@huawei.com>
+	<bpf@vger.kernel.org>, Dong Chenchen <dongchenchen2@huawei.com>
+Subject: [PATCH net 2/2] selftests/bpf: cover sockmap drop after partial TCP read
+Date: Thu, 2 Jul 2026 22:09:59 +0800
+Message-ID: <20260702140959.1806754-3-dongchenchen2@huawei.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260702140959.1806754-1-dongchenchen2@huawei.com>
 References: <20260702140959.1806754-1-dongchenchen2@huawei.com>
@@ -85,107 +84,147 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304199-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:zhangchangzhong@huawei.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:dongchenchen2@huawei.com,m:syzbot+06dbd397158ec0ea4983@syzkaller.appspotmail.com,m:johnfastabend@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304200-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:zhangchangzhong@huawei.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:dongchenchen2@huawei.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[iogearbox.net,google.com,gmail.com,cloudflare.com,linux.dev];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[dongchenchen2@huawei.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dongchenchen2@huawei.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[huawei.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime,syzkaller.appspot.com:url];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,06dbd397158ec0ea4983];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CCEA66F8A99
+X-Rspamd-Queue-Id: C54476F8AA3
 
-tcp_eat_skb() advances copied_seq by the full skb length when a sockmap
-verdict drops or redirects an skb. This assumes none of the skb has
-previously been consumed.
+Add a regression test for a TCP socket that is partially read before it
+is inserted into a sockmap with an SK_DROP verdict.
 
-That assumption does not hold when userspace partially reads an skb
-before adding the socket to a sockmap. A later packet invokes the
-verdict path, which dequeues the partially consumed skb. Adding its full
-length counts the consumed prefix twice and can move copied_seq beyond
-rcv_nxt, causing subsequent native TCP reads to fail.
+The test leaves part of the original skb on the receive queue, adds the
+socket to the map, and sends another byte to drive the verdict path.
+After removing the socket from the map, it invokes TCP_ZEROCOPY_RECEIVE
+on newly arrived native data.
 
-The following sequence reproduces the corruption:
+Without the tcp_eat_skb() fix, copied_seq includes the already consumed
+prefix, TCP_ZEROCOPY_RECEIVE triggers the sequence warning, and no data
+is copied. With the fix, the new byte is copied without a warning.
 
-  1. TCP receives a 200-byte segment; skb sits on sk_receive_queue.
-  2. Userspace reads 50 bytes //copied_seq = 50, rcv_nxt = 200
-  3. Socket is inserted into a sockmap with an SK_DROP verdict.
-  4. A 1-byte segment arrives and tcp_try_coalesce() merges it with the
-     existing skb. //skb->len = 201, copied_seq = 50, rcv_nxt = 201
-  5. The verdict path calls tcp_eat_skb(), which does:
-
-       copied_seq += skb->len; // copied_seq = 251, rcv_nxt = 201
-
-     This counts the 50 already-read bytes again.
-  6. After removing the socket from the map, native receive triggers the
-     sequence warning:
-
-       TCP recvmsg seq # bug 2: copied AA28C633, seq AA28C601,
-           rcvnxt AA28C602, fl 40
-       WARNING: net/ipv4/tcp.c:2745 at tcp_recvmsg_locked+0x45e/0x9f0
-
-Fix tcp_eat_skb() to advance copied_seq to the skb TCP end sequence and
-pass only the distance from the old copied_seq to end_seq to
-__tcp_cleanup_rbuf().
-
-Fixes: e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
-Reported-by: syzbot+06dbd397158ec0ea4983@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
 Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
 ---
- net/ipv4/tcp_bpf.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 73 +++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index cc0bd73f36b6..d640f8e06529 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -15,7 +15,7 @@
- void tcp_eat_skb(struct sock *sk, struct sk_buff *skb)
- {
- 	struct tcp_sock *tcp;
--	int copied;
-+	u32 end_seq, delta;
- 
- 	if (!skb || !skb->len || !sk_is_tcp(sk))
- 		return;
-@@ -24,10 +24,11 @@ void tcp_eat_skb(struct sock *sk, struct sk_buff *skb)
- 		return;
- 
- 	tcp = tcp_sk(sk);
--	copied = tcp->copied_seq + skb->len;
--	WRITE_ONCE(tcp->copied_seq, copied);
-+	end_seq = TCP_SKB_CB(skb)->end_seq;
-+	delta = end_seq - tcp->copied_seq;
-+	WRITE_ONCE(tcp->copied_seq, end_seq);
- 	tcp_rcv_space_adjust(sk);
--	__tcp_cleanup_rbuf(sk, skb->len);
-+	__tcp_cleanup_rbuf(sk, delta);
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+index cb3229711f93..106dd03cde84 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+@@ -1275,6 +1275,77 @@ static void test_sockmap_copied_seq(bool strp)
+ 	test_sockmap_pass_prog__destroy(skel);
  }
  
- static int bpf_tcp_ingress(struct sock *sk, struct sk_psock *psock,
++static void test_sockmap_drop_after_partial_read(void)
++{
++	int map, err, sent, recvd, zero = 0, on = 1;
++	struct test_sockmap_drop_prog *skel;
++	int c0 = -1, p0 = -1, c1 = -1, p1 = -1;
++	struct tcp_zerocopy_receive zc = {};
++	socklen_t zc_len = sizeof(zc);
++	char buf[200] = {}, rcv[50], addr[100];
++	struct bpf_program *prog;
++
++	skel = test_sockmap_drop_prog__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "open_and_load"))
++		return;
++
++	if (create_socket_pairs(AF_INET, SOCK_STREAM, &c0, &c1, &p0, &p1))
++		goto end;
++
++	sent = xsend(c0, buf, sizeof(buf), 0);
++	if (!ASSERT_EQ(sent, sizeof(buf), "xsend(native)"))
++		goto end;
++
++	recvd = recv_timeout(p0, rcv, sizeof(rcv), MSG_DONTWAIT, 1);
++	if (!ASSERT_EQ(recvd, sizeof(rcv), "recv_timeout(partial)"))
++		goto end;
++
++	prog = skel->progs.prog_skb_verdict;
++	map = bpf_map__fd(skel->maps.sock_map_rx);
++	err = bpf_prog_attach(bpf_program__fd(prog), map,
++			      BPF_SK_SKB_STREAM_VERDICT, 0);
++	if (!ASSERT_OK(err, "bpf_prog_attach"))
++		goto end;
++
++	err = bpf_map_update_elem(map, &zero, &p0, BPF_NOEXIST);
++	if (!ASSERT_OK(err, "bpf_map_update_elem"))
++		goto end;
++
++	sent = xsend(c0, buf, 1, 0);
++	if (!ASSERT_EQ(sent, 1, "xsend(drop)"))
++		goto end;
++
++	err = bpf_map_delete_elem(map, &zero);
++	if (!ASSERT_OK(err, "bpf_map_delete_elem"))
++		goto end;
++
++	sent = xsend(c0, buf, 1, 0);
++	if (!ASSERT_EQ(sent, 1, "xsend(native again)"))
++		goto end;
++
++	err = setsockopt(p0, SOL_SOCKET, SO_ZEROCOPY, &on, sizeof(on));
++	if (!ASSERT_OK(err, "setsockopt(SO_ZEROCOPY)"))
++		goto end;
++
++	zc.copybuf_address = (__u64)(unsigned long)addr;
++	zc.copybuf_len = sizeof(addr);
++	err = getsockopt(p0, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, &zc, &zc_len);
++	if (!ASSERT_OK(err, "getsockopt(TCP_ZEROCOPY_RECEIVE)"))
++		goto end;
++
++	ASSERT_EQ(zc.copybuf_len, 1, "TCP_ZEROCOPY_RECEIVE copied");
++end:
++	if (c0 >= 0)
++		close(c0);
++	if (p0 >= 0)
++		close(p0);
++	if (c1 >= 0)
++		close(c1);
++	if (p1 >= 0)
++		close(p1);
++	test_sockmap_drop_prog__destroy(skel);
++}
++
+ /* Wait until FIONREAD returns the expected value or timeout */
+ static int wait_for_fionread(int fd, int expected, unsigned int timeout_ms)
+ {
+@@ -1447,6 +1518,8 @@ void test_sockmap_basic(void)
+ 		test_sockmap_copied_seq(false);
+ 	if (test__start_subtest("sockmap recover with strp"))
+ 		test_sockmap_copied_seq(true);
++	if (test__start_subtest("sockmap drop after partial read"))
++		test_sockmap_drop_after_partial_read();
+ 	if (test__start_subtest("sockmap tcp multi channels"))
+ 		test_sockmap_multi_channels(SOCK_STREAM);
+ 	if (test__start_subtest("sockmap udp multi channels"))
 -- 
 2.43.0
 
