@@ -1,339 +1,245 @@
-Return-Path: <netdev+bounces-304018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ssvpGbgaRmpHKAsAu9opvQ
-	(envelope-from <netdev+bounces-304018-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 10:00:56 +0200
+	id RvHdBNYXRmrEJgsAu9opvQ
+	(envelope-from <netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:48:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2A66F485E
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 10:00:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF4A6F45E8
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:48:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=gDp6BZjf;
-	dkim=pass header.d=redhat.com header.s=google header.b=Tohd8Dir;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304018-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304018-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304019-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E3FB3154CA7
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:42:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3529B3011E91
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE2D3A6B9C;
-	Thu,  2 Jul 2026 07:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EB73B27F4;
+	Thu,  2 Jul 2026 07:45:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9177D3AC0FF
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948963A9861
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:45:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782978163; cv=none; b=CloBpq+sM0dpiMzAizRVQ/gX5IhnGnJVQLL9Srpzp5HYxn9IuT+Appk4kMR7aOO/8YrjE9DxmTBmEjLiWh8K10JRgkaeGyQzHItokDqNfIV9TtuOwO1BBHDTodrmdqwnYoDp0F6fWztrECmFhihO54UE2QiM8Uk/213vKBVtaHE=
+	t=1782978315; cv=none; b=guNLN2Yn1S4UeGHtI/hJtLn/Ze/IlDXmu2v4IPh9F77/1UZwzNWpxvW2jYvvIsS+ng951qZBJXR53Q0ix+nhBhEDnyY/RVommn3yNF3ymGCZzWaY4Il+9ZAeH1sxbZ6IaPhbT5MmNb9B07f3V91sqmtTVGvSLI2g+5gRczpDXqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782978163; c=relaxed/simple;
-	bh=MkwN5dCd6L8NNAmC8fUcYgtdXfx35Yl1FYi/+AhzZ+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GuEYgYZYTOy+w3AbH3mp4HFxZ3n6KR0suBnGCrIqgCf+SBjdZdiNJGqF3g2D43l6AWRV8HoPjQTKB+8ooS7mcpRPzMqbRf0H1NiwDt5ZwoHzbD/Ih0Uq4Zj0FsA82oY9tkiJhMNLaj/4oUR+tE/aZw1b20NcGwNeHLAetFzNbLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gDp6BZjf; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tohd8Dir; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782978158;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dx5alYF7wM5OvYX9ux70YYfyYzEem5hU9USAOkUPmog=;
-	b=gDp6BZjfVMI2YtQEXs42MQCWDbnTM26wvpNxAUNj4b/fSJ4cpMzCHJ6wJmXOY6F2QQKJhZ
-	GaL/2ZtTCn62yJTe8D8+Gp3CUmOoy0mPy1GuiMtcW9B03Y5i2VAy2Y+lBYtouECLixGzSl
-	Qk0RtB7kYLlSg453T9ypqvn3KbQesHw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-256-zPA7hVTwNgSDNf75CF0e9A-1; Thu, 02 Jul 2026 03:42:37 -0400
-X-MC-Unique: zPA7hVTwNgSDNf75CF0e9A-1
-X-Mimecast-MFC-AGG-ID: zPA7hVTwNgSDNf75CF0e9A_1782978156
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4744b72f90bso1020349f8f.0
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 00:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782978156; x=1783582956; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dx5alYF7wM5OvYX9ux70YYfyYzEem5hU9USAOkUPmog=;
-        b=Tohd8DirJSNf7pqE2cqyNRX9QELbfROtaaCtOOINxbuG+KOWcG6lKJ3KobOBnDaqEx
-         ohnr6ScwoSiHB+9Hc63gk8qUXspDy79GrxNzMoRVLyLLjBQjQMNxUaNMj7ndBrI10Eef
-         MyRtEd5uegG/sTZ/ekeTWM8iSzcv7DIgOqSH88itCI5PT8BkLzhaHVXHHToojxd8BMtS
-         zWI7c7pXboAphh2odNVGYy28ZydluSdJ4eLE66ufRjGheYqx6kOtzSdsv3SRam/O/w7C
-         3bQcaMbWpEOnHYox1yc/NIPzLHJs2xYESFcRed2wfwQjJN1xxh8D0Al17oTbFJpIbwyB
-         jzEw==
+	s=arc-20240116; t=1782978315; c=relaxed/simple;
+	bh=9v/bwCtbQ+tZr2fp0KR9gXhUXe24ytcZG+/0nu/Tsec=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=SJOyVFetAiqXaozi+gYif912B/xzYpz5zgjcyYBepPvwfsyQvl2wqxfje9vWFDKS98uSubPjKsAuhFBhV9EEj12XceDqEhHl/GGEe+fGHguFg8Y4sHUPZ+GrI2BlBRrLJH9EkjWJhXYcBaU+jpx4iEbdMX/VvKiRAKCF5PDVH3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-6a17ce8b08dso774671eaf.3
+        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 00:45:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782978156; x=1783582956;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dx5alYF7wM5OvYX9ux70YYfyYzEem5hU9USAOkUPmog=;
-        b=jJi9y7eTcdK+9676mvyv22hxZsCvPqBdR+jhUJR8cYZDaryjxoWwWoxis6OBWVe+gJ
-         D2WlDOzpNxl3WQ4Rit1bddABjoBoh/0qKNT3zg6sUE/0CgiMrrDRDa+r1WNcIFgtxZIx
-         0movmK3aoY7CNUjVVFAJxzG8G9RiqXimA/ckSKkViYdGimwoDyIxY/uTvqtthRzODxHD
-         R6VWNR3qX+fTQwD8MqxxY4UOVpDLUfhTxMII14KhKFUxIV3FMjYVtrP/cV4UEOKHDxDY
-         7KHa6/X9Qooe9WGPEh4pUPbw8pMFAJ090VNqWujfi39NLf9Ki/Rbg2mPhwELxukx+iBp
-         W8bg==
-X-Forwarded-Encrypted: i=1; AFNElJ9524PsesFy2OrECLYi1q2nxq5zuVBMZ13VW2IxogvQy/V4ODFQzBJuCPG27E08/uYqh+Vva0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMaNncvDjZcqRf7qbxlMUQYEd08xgtrPp7YZr7/zmaNz5vsiVZ
-	EXA6kdNmPqxRnqtjn/qFB+fLgY/MU/KWEl9xKDOsvf0TITk7T2nO24kVNl9wH6fhOUPQKDinJLs
-	+O+ihS9H+V5DEyAL8bxtaVmq+xCayHdxl11Yo790h8DbmZVjUv0HbIswRqw==
-X-Gm-Gg: AfdE7cm3OrkHWFoCWG0l5Iu/PRm1YOuXjrfRimUt+law3irdN0ydyGZCDuBR1YfPOXp
-	fQ4rnGQhVYxG4pD1SA3B/OdC7rDNVA+gZBbU5B397CbIEOMLbdVaNUue90VmT+UCbWDm52EqSUq
-	/DREchjMvY/Ujl6YkFV4Oj3jvtxnGC2qh2wPDjHZiA4u3Xk1kGfO7pZrcYFx7ZAOPIs66+c0zPQ
-	51z4cuQ2nffQRPR5aLCNh3UXJvwUDZk4a1x5Q2F2E4+zApDVVWgvZGTnodmL8D1UOPVZ45kNGPF
-	ADHTYx6aB6vCLaGJ7ajt8xWbZV+sWBL2z/JDEacBGwUSUw6oXll4gER3IRtm3CodFztvtwZ59ei
-	ueIppMtGbqGC6AkCvK6uCy3JEn/UXqy8Z
-X-Received: by 2002:a05:600d:c:b0:493:bfea:2780 with SMTP id 5b1f17b1804b1-493c2b442cdmr59747105e9.9.1782978155670;
-        Thu, 02 Jul 2026 00:42:35 -0700 (PDT)
-X-Received: by 2002:a05:600d:c:b0:493:bfea:2780 with SMTP id 5b1f17b1804b1-493c2b442cdmr59746625e9.9.1782978155014;
-        Thu, 02 Jul 2026 00:42:35 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493c6375764sm24174085e9.5.2026.07.02.00.42.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 00:42:34 -0700 (PDT)
-Date: Thu, 2 Jul 2026 03:42:30 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: Brett Sheffield <bacs@librecast.net>, regressions@lists.linux.dev,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Tim Gebauer <tim.gebauer@tu-dortmund.de>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [REGRESSION][BISECTED] tun/tap & vhost-net: multi-threaded
- network performance
-Message-ID: <20260702034152-mutt-send-email-mst@kernel.org>
-References: <akVnoOYQOrt8k-Gu@karahi.librecast.net>
- <20260701165359-mutt-send-email-mst@kernel.org>
- <ef33f0a7-f0b7-4bc4-9263-10d2b480d717@tu-dortmund.de>
+        d=1e100.net; s=20251104; t=1782978310; x=1783583110;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Me/2AKraw1ra1681YXvJ/43x71zgfTRdKV5wbNjIw/w=;
+        b=tUOEP4+Rzito2e2W0Msi7FDnUW5MSMq+IkWfKg6bLoQsjzhXLpfLD4SDT7Tin+VK0k
+         CNtRxKAsv0TeLEViiCIz+L7XuvQY5Ssjp7w2yL6YYXR5rjYdEbYrfi3Emux4ruZxHLi3
+         eNkr2lURkpI8X0ogySCYJgCogCmUlLf3J+3W7KcbKOA4Tw87hp9sa2/1mibWG/GuiHfZ
+         RxDo3Z/reRaMeqLL1DS3nG2n58vstzSEtlpfqiLfdFD2NjeCRQgKWB6QfMgY3TISxj8R
+         2m79rAT6vLM+fRpBd/kkPmcnhvmu1U8WuaERCsG4parouRuBisFqoFLt9301Gf9AZxqb
+         zY0g==
+X-Forwarded-Encrypted: i=1; AFNElJ91MfCYYoS4eSd3E9EFMjl5+7twrdc4PW+3dRERxxi7VIKkn6t9siaL6908jGSeHVrS02htles=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0+llAGIvZjWn728GceKBPEo1SAFUgoymfseZe+FhvtVDZKyQM
+	JRkyOQrzqnV9A46Z/VYv40cs7tCU4+KvtCSl80f4xh0AOzMGTlsTc7RP/MGmjPQWiMO80FKkx2h
+	1V4d0SsJsfSAVeb8crZGNZ3bWVpgM8VXNoipTUvPVMFbv9PNC/T3Up9lOUJQ=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef33f0a7-f0b7-4bc4-9263-10d2b480d717@tu-dortmund.de>
+X-Received: by 2002:a05:6820:1c81:b0:6a1:3699:4ca5 with SMTP id
+ 006d021491bc7-6a309ae7853mr2843353eaf.44.1782978310554; Thu, 02 Jul 2026
+ 00:45:10 -0700 (PDT)
+Date: Thu, 02 Jul 2026 00:45:10 -0700
+In-Reply-To: <20260701214334.266991-1-kuniyu@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a461706.52c20a74.1f8b39.0008.GAE@google.com>
+Subject: [syzbot ci] Re: net: Support per-netns device unregistration
+From: syzbot ci <syzbot+ci052b96c9bf56ca1d@syzkaller.appspotmail.com>
+To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, kuni1840@gmail.com, kuniyu@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304018-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[librecast.net,lists.linux.dev,vger.kernel.org,kernel.org,tu-dortmund.de,gmail.com,redhat.com,lunn.ch,davemloft.net,google.com];
+	TAGGED_FROM(0.00)[bounces-304019-lists,netdev=lfdr.de,ci052b96c9bf56ca1d];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:bacs@librecast.net,m:regressions@lists.linux.dev,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:tim.gebauer@tu-dortmund.de,m:willemdebruijn.kernel@gmail.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:kuni1840@gmail.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzbot@lists.linux.dev,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RSPAMD_EMAILBL_FAIL(0.00)[mst@redhat.com:query timed out];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,librecast.net:url,brettsheffield.com:url]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0D2A66F485E
+X-Rspamd-Queue-Id: 9CF4A6F45E8
 
-On Thu, Jul 02, 2026 at 09:24:59AM +0200, Simon Schippers wrote:
-> On 7/1/26 22:56, Michael S. Tsirkin wrote:
-> > On Wed, Jul 01, 2026 at 09:16:48PM +0200, Brett Sheffield wrote:
-> >> TL;DR - Commit 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3 causes
-> >> significant performance regressions with TAP interfaces and multithreaded
-> >> network code. Please revert.
-> >>
-> >>
-> >> Librecast is an IPv6 multicast library. One of the tests (0055) fails under
-> >> Linux 7.2-rc1. The test performs data synchronization over IPv6 multicast using a TAP
-> >> interface. This test has run successfully on every stable, LTS and mainline RC
-> >> released in the past year. Every kernel with my Tested-by has run this test.
-> >>
-> >> There have been a bunch of changes to MLDv2 so I started bisecting there, but
-> >> the culprit is actually 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3 "tun/tap &
-> >> vhost-net: avoid ptr_ring tail-drop when a qdisc is present"
-> >>
-> >> Reverting this commit fixes the test.
-> >>
-> >> To eliminate my code and any multicast weirdness, I ran tests with iperf3
-> >> comparing the same host running 7.2-rc1 both with and without 1d6e569b7d0
-> >> reverted.
-> 
-> Thank you very much for your bisect!
-> 
-> As the author, I am sorry for that regression!
-> 
-> > 
-> > Thanks a lot for the bisect! Reverting is not out of question, but
-> > just before we do, it is worth analyzing the situation.
-> > 
-> > Could you pls tell us
-> > - do you see packet drops?
-> 
-> iperf3 shows no TCP retransmissions, so there were never packet drops
-> when the patch was enabled.
-> It is the number after the sender data rate (example: threads 1,
-> reverted has 368 retransmissions/drops).
-> 
-> > - does it help to increase the tun queue size?
-> 
-> I agree, this would be great to know.
-> 
-> However, even then we must act. I am considering IFF_BACKPRESSURE
-> as a feature flag, defaulting to off. It would just enable/disable
-> the stopping logic in tun_net_xmit() and the waking logic
-> in __tun_wake_queue(). If disabled, it would result in the same logic
-> as before.
-> 
-> I could provide such a patch as [net] material.
-> 
-> Thanks again!
+syzbot ci has tested the following series
 
-Or BQL? I quickly wrote a prototype of that and it seems to work well -
-could you help test maybe?
+[v1] net: Support per-netns device unregistration
+https://lore.kernel.org/all/20260701214334.266991-1-kuniyu@google.com
+* [PATCH v1 net-next 01/14] rtnetlink: Lock sock_net(skb->sk) in rtnl_newlink().
+* [PATCH v1 net-next 02/14] rtnetlink: Call unregister_netdevice_many() only once in rtnl_link_unregister().
+* [PATCH v1 net-next 03/14] rtnetlink: Add per-netns rtnl_work.
+* [PATCH v1 net-next 04/14] net: Wrap default_device_exit_net() with __rtnl_net_lock().
+* [PATCH v1 net-next 05/14] net: Hold __rtnl_net_lock() in netdev_wait_allrefs_any().
+* [PATCH v1 net-next 06/14] net: Add per-netns netdev unregistration infra.
+* [PATCH v1 net-next 07/14] net: Call unregister_netdevice_many() per netns.
+* [PATCH v1 net-next 08/14] veth: Support per-netns device unregistration.
+* [PATCH v1 net-next 09/14] bareudp: Protect bareudp_list with mutex.
+* [PATCH v1 net-next 10/14] bareudp: Support per-netns netdev unregistration.
+* [PATCH v1 net-next 11/14] ipvlan: Convert ipvl_port.count to refcount_t.
+* [PATCH v1 net-next 12/14] ipvlan: Synchronise ipvlan_init() and ipvlan_uninit() for the same lower dev.
+* [PATCH v1 net-next 13/14] ipvlan: Protect ipvl_port.ipvlans with mutex.
+* [PATCH v1 net-next 14/14] ipvlan: Support per-netns netdev unregistration.
+
+and found the following issue:
+possible deadlock in __dev_change_net_namespace
+
+Full report is available here:
+https://ci.syzbot.org/series/a744b257-d741-4780-8a53-f156b2a7afc9
+
+***
+
+possible deadlock in __dev_change_net_namespace
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      d6e81529749190123aa0040626c7e5dbc20fdc9a
+arch:      amd64
+compiler:  Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+config:    https://ci.syzbot.org/builds/243cd0ec-28f9-4d21-8f16-3d2fbad8388d/config
+syz repro: https://ci.syzbot.org/findings/a8a0740d-fdec-4a20-9aa5-7cb955707913/syz_repro
+
+veth0_macvtap: left promiscuous mode
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+syz.1.18/5814 is trying to acquire lock:
+ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
+ffffffff9a9b0418 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x1479/0x2200 net/core/dev.c:12768
+
+but task is already holding lock:
+ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
+ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x146a/0x2200 net/core/dev.c:12768
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&net->dev_unreg_lock);
+  lock(&net->dev_unreg_lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+4 locks held by syz.1.18/5814:
+ #0: ffffffff8fdeb0c0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #0: ffffffff8fdeb0c0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x2a/0x2b0 net/core/rtnetlink.c:366
+ #1: ffffffff9a9b0380 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x76/0x2b0 net/core/rtnetlink.c:369
+ #2: ffff88810b6cf840 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0xbf/0x2b0 net/core/rtnetlink.c:369
+ #3: ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:342 [inline]
+ #3: ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: unregister_netdevice_move_net net/core/dev.c:-1 [inline]
+ #3: ffff88810b6cf8d8 (&net->dev_unreg_lock){+.+.}-{3:3}, at: __dev_change_net_namespace+0x146a/0x2200 net/core/dev.c:12768
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5814 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain kernel/locking/lockdep.c:3895 [inline]
+ __lock_acquire+0x24df/0x2cf0 kernel/locking/lockdep.c:5237
+ lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+ __raw_spin_lock include/linux/spinlock_api_smp.h:158 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:158
+ spin_lock include/linux/spinlock.h:342 [inline]
+ unregister_netdevice_move_net net/core/dev.c:-1 [inline]
+ __dev_change_net_namespace+0x1479/0x2200 net/core/dev.c:12768
+ do_setlink+0x2d1/0x4670 net/core/rtnetlink.c:3148
+ rtnl_changelink net/core/rtnetlink.c:3880 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:4053 [inline]
+ rtnl_newlink+0x1612/0x1b50 net/core/rtnetlink.c:4192
+ rtnetlink_rcv_msg+0x802/0xc00 net/core/rtnetlink.c:7109
+ netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+ sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+ __sock_sendmsg net/socket.c:790 [inline]
+ ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+ __sys_sendmsg net/socket.c:2770 [inline]
+ __do_sys_sendmsg net/socket.c:2775 [inline]
+ __se_sys_sendmsg net/socket.c:2773 [inline]
+ __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fbdc639ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fbdc59fe028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fbdc6615fa0 RCX: 00007fbdc639ce59
+RDX: 0000000000000000 RSI: 0000200000000740 RDI: 0000000000000003
+RBP: 00007fbdc6432e6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fbdc6616038 R14: 00007fbdc6615fa0 R15: 00007ffd94dcb1f8
+ </TASK>
+syz.1.18 (5814) used greatest stack depth: 19864 bytes left
 
 
-> > 
-> > Thanks a lot!
-> > 
-> > 
-> >> CPU: AMD Ryzen 9 9950X
-> >>
-> >> [ host ] - [ bridge ] - [ tap ] - [ guest (qemu) ]
-> >>
-> >> Running matching kernels on host and guest, I started iperf3 in server mode on
-> >> the guest and tested from the host so traffic passes through the tap interface.
-> >>
-> >> iperf3 -s -V                 # server
-> >> iperf3 -c guest -P nthreads  # client
-> >>
-> >> 7.2.0-rc1 (threads 1):
-> >>
-> >> [  5]   0.00-10.00  sec  20.2 GBytes  17.4 Gbits/sec    0            sender
-> >> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 1, reverted):
-> >>
-> >> [  5]   0.00-10.00  sec  15.3 GBytes  13.1 Gbits/sec  368            sender
-> >> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 2):
-> >>
-> >> [SUM]   0.00-10.00  sec  10.9 GBytes  9.33 Gbits/sec    0             sender
-> >> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 2, reverted):
-> >>
-> >> [SUM]   0.00-10.00  sec  15.9 GBytes  13.7 Gbits/sec  1567             sender
-> >> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 4):
-> >>
-> >> [SUM]   0.00-10.00  sec  10.9 GBytes  9.33 Gbits/sec    0             sender
-> >> [SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 4, reverted):
-> >>
-> >> [SUM]   0.00-10.00  sec  16.5 GBytes  14.1 Gbits/sec  6701             sender
-> >> [SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 8):
-> >>
-> >> [SUM]   0.00-10.00  sec  10.7 GBytes  9.15 Gbits/sec    0             sender
-> >> [SUM]   0.00-10.01  sec  10.6 GBytes  9.13 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 8, reverted):
-> >>
-> >> [SUM]   0.00-10.00  sec  16.2 GBytes  14.0 Gbits/sec  19319             sender
-> >> [SUM]   0.00-10.00  sec  15.7 GBytes  13.5 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 16):
-> >>
-> >> [SUM]   0.00-10.00  sec  10.9 GBytes  9.35 Gbits/sec    0             sender
-> >> [SUM]   0.00-10.01  sec  10.9 GBytes  9.32 Gbits/sec                  receiver
-> >>
-> >> 7.2.0-rc1 (threads 16, reverted):
-> >>
-> >> [SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec  43593             sender
-> >> [SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec                  receiver
-> >>
-> >>
-> >> As you can see, the new code works for single threaded, but for all other cases
-> >> there's a significant performance drop. I see this trade-off is mentioned in the
-> >> commit, but the performance drop off is much worse than suggested with the
-> >> current patch.
-> >>
-> >> In our multicast use case data is sent by multiple threads to multiple groups
-> >> simultaneously, this just breaks things to the extent that a <2 second test
-> >> times out after 5 minutes.
-> >>
-> >>
-> >> git bisect start
-> >> # status: waiting for both good and bad commits
-> >> # bad: [dc59e4fea9d83f03bad6bddf3fa2e52491777482] Linux 7.2-rc1
-> >> git bisect bad dc59e4fea9d83f03bad6bddf3fa2e52491777482
-> >> # status: waiting for good commit(s), bad commit known
-> >> # good: [36bdc0e815b4e8a05b9028d8ef8a25e1ead35cc1] net: usb: asix: ax88772: re-add usbnet_link_change() in phylink callbacks
-> >> git bisect good 36bdc0e815b4e8a05b9028d8ef8a25e1ead35cc1
-> >> # good: [db314398f618a3a23315f73c87f7d318eaf06c1b] Merge branch 'net-bridge-mcast-support-exponential-field-encoding'
-> >> git bisect good db314398f618a3a23315f73c87f7d318eaf06c1b
-> >> # bad: [079a028d6327e68cfa5d38b36123637b321c19a7] string: Remove strncpy() from the kernel
-> >> git bisect bad 079a028d6327e68cfa5d38b36123637b321c19a7
-> >> # bad: [f396f4005180928cd9e15e352a6512865d3bc908] Bluetooth: btmtk: fix URB leak in alloc_mtk_intr_urb error path
-> >> git bisect bad f396f4005180928cd9e15e352a6512865d3bc908
-> >> # bad: [ec1806a730a1c0b3d68a7f9afe81514fb0dd7991] netfilter: x_tables: disable 32bit compat interface in user namespaces
-> >> git bisect bad ec1806a730a1c0b3d68a7f9afe81514fb0dd7991
-> >> # good: [50c2d91c5dfa0e465826ec1f8dbad9cdc254bd85] mptcp: do not drop partial packets
-> >> git bisect good 50c2d91c5dfa0e465826ec1f8dbad9cdc254bd85
-> >> # good: [68993ced0f618e36cf33388f1e50223e5e6e78cc] Merge tag 'net-7.1-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
-> >> git bisect good 68993ced0f618e36cf33388f1e50223e5e6e78cc
-> >> # good: [34c78dff59a25110a4ce50c208e42a91490fe615] Merge branch 'net-use-ip_outnoroutes-drop-reason'
-> >> git bisect good 34c78dff59a25110a4ce50c208e42a91490fe615
-> >> # bad: [9587ed8137fb83d93f84b858337412f4500b21e9] Merge branch 'gve-add-support-for-ptp-gettimex64'
-> >> git bisect bad 9587ed8137fb83d93f84b858337412f4500b21e9
-> >> # bad: [83ea7fd73b11dd8cbf4416507a5eac3890b49fb0] net: dsa: microchip: remove unused phylink_mac_link_up() callback
-> >> git bisect bad 83ea7fd73b11dd8cbf4416507a5eac3890b49fb0
-> >> # bad: [f0de88303d5e7e04a1224bc7a00512b5a1c4fe7a] net: make is_skb_wmem() available to modules
-> >> git bisect bad f0de88303d5e7e04a1224bc7a00512b5a1c4fe7a
-> >> # bad: [c411baa463e85a779a7e68a00ba6298770b58c4c] netconsole: move push_ipv6() from netpoll
-> >> git bisect bad c411baa463e85a779a7e68a00ba6298770b58c4c
-> >> # good: [fba362c17d9d9211fc51f272156bb84fc23bdf98] ptr_ring: move free-space check into separate helper
-> >> git bisect good fba362c17d9d9211fc51f272156bb84fc23bdf98
-> >> # bad: [d0273dbe8be1640e597552f81faf1d6c9997d3e3] ipvlan: use netif_receive_skb() in ipvlan_process_multicast()
-> >> git bisect bad d0273dbe8be1640e597552f81faf1d6c9997d3e3
-> >> # bad: [3803065cd6b0630d4161d86aa04e2d1db0f3a0b5] Merge branch 'tun-tap-vhost-net-apply-qdisc-backpressure-on-full-ptr_ring-to-reduce-tx-drops'
-> >> git bisect bad 3803065cd6b0630d4161d86aa04e2d1db0f3a0b5
-> >> # bad: [1d6e569b7d0c0b2736636749e4be0a27f3cefcb3] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
-> >> git bisect bad 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3
-> >> # first bad commit: [1d6e569b7d0c0b2736636749e4be0a27f3cefcb3] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
-> >>
-> >> -- 
-> >> Brett Sheffield (he/him)
-> >> Librecast - Decentralising the Internet with Multicast
-> >> https://librecast.net/
-> >> https://blog.brettsheffield.com/
-> > 
+***
 
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
