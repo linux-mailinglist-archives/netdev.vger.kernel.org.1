@@ -1,388 +1,314 @@
-Return-Path: <netdev+bounces-304150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id c73JGhRQRmoxQgsAu9opvQ
-	(envelope-from <netdev+bounces-304150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:48:36 +0200
+	id VTkxMP9XRmrZRAsAu9opvQ
+	(envelope-from <netdev+bounces-304151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 14:22:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF9A6F6FE1
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 13:48:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB2B6F7808
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 14:22:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=bO1uWIuM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304150-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304150-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lG3zVab8;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304151-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304151-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDA76304EB82
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 11:41:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 22C293021870
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 11:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8414B47B41D;
-	Thu,  2 Jul 2026 11:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E024E47885D;
+	Thu,  2 Jul 2026 11:59:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9006D477983;
-	Thu,  2 Jul 2026 11:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FD3373BE4;
+	Thu,  2 Jul 2026 11:59:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782992443; cv=none; b=TSdSxkkSzqw689/jEU+QcvIjMQ8bNGRv1N5NONdqgKgQxmfrzCr4CXKNxJucws2iBrAdHcIUGqRJzbKGQ50jCamQak45YjFegORI30tAf+yPivqyyho2/C3OSv8fGILHq/n0JpjWkoBQwzITRXr7gfobQguQ14ifyVGPNhwYpnM=
+	t=1782993541; cv=none; b=mswFLAi0IA5ty8KAP+NXvrKeEh8Tr8m9ec/uPyLwwVdqq6+7PeX2zjzSCl3EVsaqfETIMS+Rcc/ah1sd9Fndv7SL7UjxRfhM43euIRx8F2BEWHg3FXXdHDDHgBXBJF46d95nDcL4APkf3cHFKIA4atYthaqRfAIaaOlgLTyK+Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782992443; c=relaxed/simple;
-	bh=DUGV6QqUVCifztfrIGhS7JWnmav/fmoUiopq8U/wlu8=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=IlFEktZVwsGpvZQElQgXEr7j17p/Y16S3HEAyVscNEbXrk+2QmkC9nqNZJwdS3b4Rkw9HA1h/sq0r8L2cOvT5RvN4UNdd4Ne71eEJJyWLPx+Tnz5P23CAjxbJCjzNPyoIkl9+8hZKtp1xKkh5r1xGD4j1OiBuMzuzxzs6Dg61uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=bO1uWIuM; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D82FCA47D1;
-	Thu,  2 Jul 2026 13:40:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1782992439; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=gGhzG0RV6YD2k5Np6umgYLfTh7aFI868qsQDAxEm8CI=;
-	b=bO1uWIuMQ/5loU1LwicZNBmP/HOoGVuLt56xPt/6Rc521FB9AZ2rwSnhp3uOufvHItofxg
-	NbHMyQIpSJlXjNASxeh9sZHaYSjtG+HNjKCgQgv54dqVQRa468pt60aFjudHIVVkzQDIwr
-	vqhHMkgx1u3mvNZgjfIjf7qhWx+ueUhYyONwd9yeNTnoQIExm7fQZz+OYsV85I5VkmYIvi
-	OoRMkeSDdRKKnyW6cOIYIWA64hKxSG/pXrc/26ZIzcsXL9Sl7Jat1gKR0Bt02csysHw6Jn
-	qkiFX1B+09dGzFBKfYQJc5swEjerJc8DAbszQDVxUcbW5JWbG9cp2CuWMu4ffw==
+	s=arc-20240116; t=1782993541; c=relaxed/simple;
+	bh=QmDK7QLobqPP9bGB3uSK4I2wtDujB2CKvgPtV1EpqMk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tbVdQSt7v+TbUaHzoDzSvZ/bsaBTbVU6sRyxW3S4p94x5aUmiA5hZ/QBXjohymaWNKctnzAnx3ihAX6uJvBB8K+cV+4OjkFI0cK9ebNiCCx87J2c6cKWJKM0/9U/tQugwIcL3ug/ZHeFK84sMS6pzEvUHvCz267wp7/JokQY8ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lG3zVab8; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78DC61F000E9;
+	Thu,  2 Jul 2026 11:58:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782993540;
+	bh=bujUXrxeKMEXmfr9FWXvhM2Ce9/ltyaOQsurmQ2F3Fo=;
+	h=From:To:Cc:Subject:Date;
+	b=lG3zVab83xzcoXG2mnkWPk/3IQtSX2h69xtnl92IeH4yMICTJyJXS73PNNECJD3HM
+	 gG1ZYUUV3Tjd+KalL4tyB+PQG0x6TficJy6HX+g0tST1dZ5KbYeZZMjOplo56oiiMK
+	 zDgKB7wHJiYaItIKpwikAbnVPJYfsN7+7KzBU/8JVe9kwNJYXRff1eYzvxhSQJprmw
+	 MCRDtxW7en2fQFqexjyRtJU/ld7O7M4xAZJ6UwgzCkVt7rchYxmZfM4KI0JoafqZJz
+	 oThB7Rekoc2anH3meiK/CcTQoyTyXQsXq7DEEAClatA7tYL120Y8wkKuThLBK+5HiA
+	 Gz0TnbMR2Z7YQ==
+From: Sumit Garg <sumit.garg@kernel.org>
+To: andersson@kernel.org,
+	konradybcio@kernel.org
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com,
+	sean@poorly.run,
+	akhilpo@oss.qualcomm.com,
+	lumag@kernel.org,
+	abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com,
+	marijn.suijten@somainline.org,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	vikash.garodia@oss.qualcomm.com,
+	bod@kernel.org,
+	mchehab@kernel.org,
+	elder@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jjohnson@kernel.org,
+	mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com,
+	mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com,
+	jenswi@kernel.org,
+	op-tee@lists.trustedfirmware.org,
+	apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: [PATCH v9 00/14] firmware: qcom: Add OP-TEE PAS service support
+Date: Thu,  2 Jul 2026 17:28:16 +0530
+Message-ID: <20260702115835.167602-1-sumit.garg@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 02 Jul 2026 13:40:35 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: javen <javen_xu@realsil.com.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, freddy_gu@realsil.com.cn, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, daniel@makrotopia.org, vladimir.oltean@nxp.com
-Subject: Re: [PATCH net-next v8 3/4] net: phy: realtek: add support for
- RTL8261C_CG
-In-Reply-To: <20260702032020.589-4-javen_xu@realsil.com.cn>
-References: <20260702032020.589-1-javen_xu@realsil.com.cn>
- <20260702032020.589-4-javen_xu@realsil.com.cn>
-Message-ID: <0132f42c95b84b7039e6b942fc7b999a@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-304151-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-304150-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andersson@kernel.org,m:konradybcio@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:mathieu.poirier@linaro.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss
+ .qualcomm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jenswi@kernel.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[48];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,vger.kernel.org,makrotopia.org,nxp.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:from_mime,vger.kernel.org:from_smtp,lunn.ch:email,realsil.com.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AAF9A6F6FE1
+X-Rspamd-Queue-Id: BDB2B6F7808
 
-Hi Javen
+From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
-On 2.7.2026 05:20, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> This patch adds support for Realtek phy chip RTL8261C_CG. Its PHY ID is
-> 0x001cc898.
-> This patch introduces a distinct family of handlers (probe, 
-> get_features,
-> config_aneg, read_status, config_intr, handle_interrupt).
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
-> ---
-> Changes in v2:
->  - no changes, new file
-> 
-> Changes in v3:
->  - re-order function according to the order in phy-c45.c
->  - add kernel-doc about return value
->  - add MASTER_SLAVE_CFG_MASTER_PREFERRED,
->    MASTER_SLAVE_CFG_SLAVE_PREFERRED, MASTER_SLAVE_CFG_UNKNOWN,
->    MASTER_SLAVE_CFG_UNSUPPORTED, MASTER_SLAVE_CFG_SLAVE_PREFERRED cfg
-> 
-> Changes in v4:
->  - no changes
-> 
-> Changes in v5:
->  - remove genphy_c45_pma_setup_forced() for this is already done when
->    calling genphy_c45_config_aneg()
-> 
-> Changes in v6:
->  - when PHY_INTERRUPT_DISABLE, clear IMR and ISR
->  - if AUTONEG_DISABLE, nothing need to do in rtl8261x_config_aneg
->  - add rtl8261x_read_status, support 1G speed
-> 
-> Changes in v7:
->  - remove RTL8261X_IMR and RTL8261X_ISR, duplicated definition
->  - modify commit message
->  - continue with default behavior when meet unknown sub_phy_id
->  - change the internal order of rtl8261x_read_status
->  - expand RTL8261X_INT_MASK_DEFAULT
->  - add the handle for ADVERTISE_1000HALF in rtl8261x_config_aneg
-> 
-> Changes in v8:
->  - no changes
-> ---
->  drivers/net/phy/realtek/realtek_main.c | 186 +++++++++++++++++++++++++
->  1 file changed, 186 insertions(+)
-> 
-> diff --git a/drivers/net/phy/realtek/realtek_main.c 
-> b/drivers/net/phy/realtek/realtek_main.c
-> index 27268811f564..ef3700894ebf 100644
-> --- a/drivers/net/phy/realtek/realtek_main.c
-> +++ b/drivers/net/phy/realtek/realtek_main.c
-> @@ -141,6 +141,10 @@
->  #define RTL8211F_PHYSICAL_ADDR_WORD1		17
->  #define RTL8211F_PHYSICAL_ADDR_WORD2		18
-> 
-> +#define RTL8261X_EXT_ADDR_REG			0xa436
-> +#define RTL8261X_EXT_DATA_REG			0xa438
-> +#define RTL_8261X_SUB_PHY_ID_ADDR		0x801d
-> +
->  #define RTL822X_VND1_SERDES_OPTION			0x697a
->  #define RTL822X_VND1_SERDES_OPTION_MODE_MASK		GENMASK(5, 0)
->  #define RTL822X_VND1_SERDES_OPTION_MODE_2500BASEX_SGMII		0
-> @@ -251,6 +255,32 @@
->  #define RTL_8221B_VM_CG				0x001cc84a
->  #define RTL_8251B				0x001cc862
->  #define RTL_8261C				0x001cc890
-> +#define RTL_8261C_CG				0x001cc898
-> +
-> +#define RTL8261C_CE_MODEL		0x00
-> +#define RTL8261X_INT_AUTONEG_ERROR	BIT(0)
-> +#define RTL8261X_INT_PAGE_RECV		BIT(2)
-> +#define RTL8261X_INT_AUTONEG_DONE	BIT(3)
-> +#define RTL8261X_INT_LINK_CHG		BIT(4)
-> +#define RTL8261X_INT_PHY_REG_ACCESS	BIT(5)
-> +#define RTL8261X_INT_PME		BIT(7)
-> +#define RTL8261X_INT_ALDPS_CHG		BIT(9)
-> +#define RTL8261X_INT_JABBER		BIT(10)
-> +
-> +#define RTL8261X_INT_MASK_DEFAULT	(RTL8261X_INT_AUTONEG_DONE | \
-> +					 RTL8261X_INT_LINK_CHG | \
-> +					 RTL8261X_INT_AUTONEG_ERROR | \
-> +					 RTL8261X_INT_JABBER)
-> +
-> +#define RTL8261X_INT_MASK_ALL		(RTL8261X_INT_AUTONEG_ERROR | \
-> +					 RTL8261X_INT_PAGE_RECV | \
-> +					 RTL8261X_INT_AUTONEG_DONE | \
-> +					 RTL8261X_INT_LINK_CHG | \
-> +					 RTL8261X_INT_PHY_REG_ACCESS | \
-> +					 RTL8261X_INT_PME | \
-> +					 RTL8261X_INT_ALDPS_CHG | \
-> +					 RTL8261X_INT_JABBER)
-> +
-> 
->  /* RTL8211E and RTL8211F support up to three LEDs */
->  #define RTL8211x_LED_COUNT			3
-> @@ -310,6 +340,150 @@ static int rtl821x_modify_ext_page(struct 
-> phy_device *phydev, u16 ext_page,
->  	return phy_restore_page(phydev, oldpage, ret);
->  }
-> 
-> +static int rtl8261x_probe(struct phy_device *phydev)
-> +{
-> +	int sub_phy_id, ret;
-> +
-> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_ADDR_REG,
-> +			    RTL_8261X_SUB_PHY_ID_ADDR);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_DATA_REG);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	sub_phy_id = (ret >> 8) & 0xff;
-> +
-> +	switch (sub_phy_id) {
-> +	case RTL8261C_CE_MODEL:
-> +		phydev_info(phydev, "RTL8261C detected (sub_id 0x%02x)\n", 
-> sub_phy_id);
-> +		break;
-> +
-> +	default:
-> +		phydev_warn(phydev, "Unknown sub_id 0x%02x, default behavior\n", 
-> sub_phy_id);
-> +		return -ENODEV;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int rtl8261x_get_features(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret = genphy_c45_pma_read_abilities(phydev);
-> +	if (ret)
-> +		return ret;
-> +	/*
-> +	 * Supplement Multi-Gig speeds that may not be automatically detected
-> +	 * RTL8261X supports 2.5G/5G in addition to standard 10G
-> +	 */
-> +	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-> +			 phydev->supported);
-> +	linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
-> +			 phydev->supported);
-> +
-> +	return 0;
-> +}
-> +
-> +static int rtl8261x_read_status(struct phy_device *phydev)
-> +{
-> +	int ret, val;
-> +
-> +	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete) {
-> +		val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-> +				   RTL822X_VND2_C22_REG(MII_STAT1000));
-> +		if (val < 0)
-> +			return val;
-> +
-> +		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
-> +	}
-> +
-> +	ret = genphy_c45_read_status(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-> +static int rtl8261x_config_intr(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
-> +		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8221B_VND2_INSR);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8221B_VND2_INER,
-> +				    RTL8261X_INT_MASK_DEFAULT);
-> +		if (ret < 0)
-> +			return ret;
-> +	} else {
-> +		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8221B_VND2_INER, 0);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL8221B_VND2_INSR);
-> +		if (ret < 0)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static irqreturn_t rtl8261x_handle_interrupt(struct phy_device 
-> *phydev)
-> +{
-> +	int irq_status;
-> +
-> +	irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND2, 
-> RTL8221B_VND2_INSR);
-> +	if (irq_status < 0) {
-> +		phy_error(phydev);
-> +		return IRQ_NONE;
-> +	}
-> +
-> +	if (!(irq_status & RTL8261X_INT_MASK_ALL))
-> +		return IRQ_NONE;
-> +
-> +	if (irq_status & (RTL8261X_INT_LINK_CHG | RTL8261X_INT_AUTONEG_DONE |
-> +	    RTL8261X_INT_AUTONEG_ERROR | RTL8261X_INT_JABBER))
-> +		phy_trigger_machine(phydev);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static int rtl8261x_config_aneg(struct phy_device *phydev)
-> +{
-> +	u16 adv_1g = 0;
-> +	int ret;
-> +
-> +	ret = genphy_c45_config_aneg(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (phydev->autoneg == AUTONEG_DISABLE)
-> +		return 0;
-> +
-> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-> +			      phydev->advertising))
-> +		adv_1g = ADVERTISE_1000FULL;
-> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
-> +			      phydev->advertising))
-> +		adv_1g |= ADVERTISE_1000HALF;
-> +
-> +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND2,
-> +				     RTL822X_VND2_C22_REG(MII_CTRL1000),
-> +				     ADVERTISE_1000FULL | ADVERTISE_1000HALF,
-> +				     adv_1g);
-> +	if (ret < 0)
-> +		return ret;
-> +	if (ret > 0)
-> +		return genphy_c45_restart_aneg(phydev);
-> +
-> +	return 0;
-> +}
-> +
->  static int rtl821x_probe(struct phy_device *phydev)
->  {
->  	struct device *dev = &phydev->mdio.dev;
-> @@ -3001,6 +3175,18 @@ static struct phy_driver realtek_drvs[] = {
->  		.resume		= genphy_resume,
->  		.read_mmd	= genphy_read_mmd_unsupported,
->  		.write_mmd	= genphy_write_mmd_unsupported,
-> +	}, {
-> +		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
-> +		.name			= "Realtek RTL8261C 10Gbps PHY",
-> +		.probe			= rtl8261x_probe,
-> +		.get_features		= rtl8261x_get_features,
-> +		.config_aneg		= rtl8261x_config_aneg,
-> +		.read_status		= rtl8261x_read_status,
-> +		.config_intr		= rtl8261x_config_intr,
-> +		.handle_interrupt	= rtl8261x_handle_interrupt,
-> +		.soft_reset		= genphy_c45_soft_reset,
-> +		.suspend		= genphy_c45_pma_suspend,
-> +		.resume			= genphy_c45_pma_resume,
->  	},
->  };
+Qcom platforms has the legacy of using non-standard SCM calls
+splintered over the various kernel drivers. These SCM calls aren't
+compliant with the standard SMC calling conventions which is a
+prerequisite to enable migration to the FF-A specifications from Arm.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+support these non-standard SCM calls. And even for newer architectures
+using S-EL2 with Hafnium support, QTEE won't be able to support SCM
+calls either with FF-A requirements coming in. And with both OP-TEE
+and QTEE drivers well integrated in the TEE subsystem, it makes further
+sense to reuse the TEE bus client drivers infrastructure.
 
-Thanks
-Nicolai
+The added benefit of TEE bus infrastructure is that there is support
+for discoverable/enumerable services. With that client drivers don't
+have to manually invoke a special SCM call to know the service status.
+
+So enable the generic Peripheral Authentication Service (PAS) provided
+by the firmware. It acts as the common layer with different TZ
+backends plugged in whether it's an SCM implementation or a proper
+TEE bus based PAS service implementation.
+
+The TEE PAS service ABI is designed to be extensible with additional API
+as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
+extensions of the PAS service needed while still maintaining backwards
+compatibility.
+
+Currently OP-TEE support is being added to provide the backend PAS
+service implementation which can be found as part of this PR [1].
+This implementation has been tested on Kodiak/RB3Gen2 and lemans
+EVK boards. In addition to that WIN/IPQ targets tested OP-TEE with
+this service too. Surely the backwards compatibility is maintained and
+tested for SCM backend.
+
+Note that kernel PAS service support while running in EL2 is at parity
+among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
+on proper IOMMU support being worked out on the PAS client end.
+
+Patch summary:
+- Patch #1: adds generic PAS service.
+- Patch #2: migrates SCM backend to generic PAS service.
+- Patch #3: adds TEE/OP-TEE backend for generic PAS service.
+- Patch #4-#12: migrates all client drivers to generic PAS service.
+- Patch #13: drops legacy PAS SCM exported APIs.
+
+The patch-set is based on v7.2-rc1 and can be found in git tree
+here [2].
+
+Merge strategy:
+
+It is expected due to APIs dependency, the entire patch-set to go via
+the Qcom tree. All other subsystem maintainers, it will be great if I
+can get acks for the corresponding subsystem patches.
+
+[1] https://github.com/OP-TEE/optee_os/pull/7721 (already merged)
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v9
+
+---
+Changes in v9:
+- Rebased to 7.2-rc1.
+- Enable SCM backend similar to TEE if ARCH_QCOM is set.
+- Address misc. comments from Konrad.
+- Add checks for corner cases (although not reachable as per OP-TEE ABI)
+  reported by Shashiko on patch #3.
+- Picked up review tags from Konrad.
+
+Changes in v8:
+- Rebased on mainline tip (no functional changes).
+- Now Lemans EVK is also tested to support OP-TEE PAS here:
+  https://github.com/OP-TEE/optee_os/pull/7845
+- Drop Kodiak DT patch as it is carried independently by Mukesh here:
+  https://lore.kernel.org/lkml/20260624063952.2242702-1-mukesh.ojha@oss.qualcomm.com/
+- Regarding Sashiko comments, I have already replied in v6 the ones that
+  don't apply but in v7 I got the same comments again. Specific context
+  reasoning which Shashiko ignores:
+    - ABI contract between Linux and TZ
+    - No support for multiple concurrent backends
+    - The TZ backend doesn’t detach during the entire boot cycle
+
+Changes in v7:
+- Rebased to qcom tree (for-next branch) tip.
+- Merged patch #5 and #7 due to build dependency.
+- Disabled modem for kodiak EL2 as it isn't tested yet.
+- Fix an issue found out by sashiko-bot for patch #4.
+
+Changes in v6:
+- Rebased to v7.1-rc4 tag.
+- Patch #14: fixed ret error print.
+- Add Kconfig descriptions for PAS symbols such that they are visible
+  in menuconfig to update.
+
+Changes in v5:
+- Incorporated misc. comments from Mukesh.
+- Split up patch #11 into 2 to add an independent commit for passing
+  proper PAS ID to set_remote_state API.
+- Picked up tags.
+
+Changes in v4:
+- Incorporate misc. comments on patch #4.
+- Picked up an ack for patch #10.
+- Clarify in cover letter about state of media support.
+
+Changes in v3:
+- Incorporated some style and misc. comments for patch #2, #3 and #4.
+- Add QCOM_PAS Kconfig dependency for various subsystems.
+- Switch from pseudo TA to proper TA invoke commands.
+
+Changes in v2:
+- Fixed kernel doc warnings.
+- Polish commit message and comments for patch #2.
+- Pass proper PAS ID in set_remote_state API for media firmware drivers.
+- Added Maintainer entry and dropped MODULE_AUTHOR.
+
+Sumit Garg (14):
+  firmware: qcom: Add a generic PAS service
+  firmware: qcom_scm: Migrate to generic PAS service
+  firmware: qcom: Add a PAS TEE service
+  remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+  remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+  remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+  remoteproc: qcom: Select QCOM_PAS generic service
+  drm/msm: Switch to generic PAS TZ APIs
+  media: qcom: Switch to generic PAS TZ APIs
+  media: qcom: Pass proper PAS ID to set_remote_state API
+  net: ipa: Switch to generic PAS TZ APIs
+  wifi: ath12k: Switch to generic PAS TZ APIs
+  firmware: qcom_scm: Remove SCM PAS wrappers
+  MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+
+ MAINTAINERS                                   |   9 +
+ drivers/firmware/qcom/Kconfig                 |  22 +-
+ drivers/firmware/qcom/Makefile                |   2 +
+ drivers/firmware/qcom/qcom_pas.c              | 299 +++++++++++
+ drivers/firmware/qcom/qcom_pas.h              |  50 ++
+ drivers/firmware/qcom/qcom_pas_tee.c          | 479 ++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
+ drivers/gpu/drm/msm/Kconfig                   |   1 +
+ drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
+ drivers/media/platform/qcom/iris/Kconfig      |  27 +-
+ .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
+ drivers/media/platform/qcom/venus/Kconfig     |   1 +
+ drivers/media/platform/qcom/venus/firmware.c  |  11 +-
+ drivers/net/ipa/Kconfig                       |   2 +-
+ drivers/net/ipa/ipa_main.c                    |  13 +-
+ drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
+ drivers/net/wireless/ath/ath12k/ahb.c         |  10 +-
+ drivers/remoteproc/Kconfig                    |   4 +-
+ drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
+ drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
+ drivers/remoteproc/qcom_wcnss.c               |  12 +-
+ drivers/soc/qcom/mdt_loader.c                 |  12 +-
+ include/linux/firmware/qcom/qcom_pas.h        |  43 ++
+ include/linux/firmware/qcom/qcom_scm.h        |  29 --
+ include/linux/soc/qcom/mdt_loader.h           |   6 +-
+ 26 files changed, 1095 insertions(+), 321 deletions(-)
+ create mode 100644 drivers/firmware/qcom/qcom_pas.c
+ create mode 100644 drivers/firmware/qcom/qcom_pas.h
+ create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+ create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+
+-- 
+2.53.0
+
 
