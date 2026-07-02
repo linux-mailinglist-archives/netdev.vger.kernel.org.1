@@ -1,141 +1,145 @@
-Return-Path: <netdev+bounces-303959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nt2DG1nhRWo7GQsAu9opvQ
-	(envelope-from <netdev+bounces-303959-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:56:09 +0200
+	id O6BEDWHlRWrAGQsAu9opvQ
+	(envelope-from <netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:13:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DC66F351E
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 05:56:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B0106F3629
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 06:13:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=KUNdYnSp;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=sDW7a4os;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303959-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-303959-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linutronix.de;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=microsoft.com (policy=reject);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303960-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 934F93014C7F
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 03:56:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 50ED53004615
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 04:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8309834BA50;
-	Thu,  2 Jul 2026 03:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204E434EEEA;
+	Thu,  2 Jul 2026 04:13:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EC0346ADB;
-	Thu,  2 Jul 2026 03:56:04 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042C22E0901;
+	Thu,  2 Jul 2026 04:13:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782964565; cv=none; b=lgCNIsWS9BrSFyN3U9RANc5oNNWGBoUbpaHv/IhKg4srkDAs1bSXRP6GcP/paowRH2pGgTCzXelqewyvtWmdG7MO1A6G4yQBdVVRfApwfbf7sN6k4ve3BKn0p4jgCTdaAZr0PtSn912bL1uCq4KiGas/d4xkjV8PL32IpPSYeX8=
+	t=1782965595; cv=none; b=SJv4yN0Fw8xIIJ66uHxA1zjkzwpLbpr11Ejz3EeT9uZBO+qrt/5Ql7FbRwTezXCRfIaTgmexRK0gXjb6qJk9RnllN1IIUoAEzrKvB8JDV8lJtzKYn4uhtcZ7+zDLEmUYHH9gg/kv5Ya7CjwHUiwbMWUTXMw9R/bpIKWRaIIxZfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782964565; c=relaxed/simple;
-	bh=s9sWY3b6DZJtpaHOY3IYQlwXTPK/+k8OqmVOVhjqcVs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lJ4UW0ijebJg1MHJhx/MB9OERAGhnJl57P+bZLi4Ui+aj4tC+JCOC6A5cgxNKC1HGoLpUKWbvoUT3qKUVMrm113wX6nlBope0VtGBIwCmFN4y4zi4Cj1RCUXH/4sgFtc5vY/jNdj6D1UhGpGsMejJQqGUf5QYhyveZz0hNBgJY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KUNdYnSp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sDW7a4os; arc=none smtp.client-ip=193.142.43.55
-From: Nam Cao <namcao@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1782964562;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YeKbZYIUoPqATqmVp5Bu9QBztfXVewRC+ox4dLk0Gug=;
-	b=KUNdYnSpDALsHG5DVCcRKSxSs2uv3e37OMLArcDcEQIcRlyE6kXq83LmCbNNffyavtvi3G
-	a20yG8a2FaOzIrNgsXOe3KrZ7emC3QK59FKSl0w03rK4opgdzbqxzoGwhl0qFpKALyVOp2
-	+Pnk8Esk3rQkRCHTHQQJBUtS9upltQcUM273CnS4T5Fhur67ZC+BxOmw6CZrlh8YMK8PDk
-	7QWVVpNxZJ9OlzE8YfAKgOzACXELwU+PUmL82s2Ogspb294w+DqCmqnz9RN7Z1SftS9G6P
-	Zmn0bOU1CoH4XorYMnN7EpzRZ/vGU1E3bUKZTBOYOxvG8xDUffQlt4KnNfOcWg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1782964562;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YeKbZYIUoPqATqmVp5Bu9QBztfXVewRC+ox4dLk0Gug=;
-	b=sDW7a4osVaxO1ELi9fwoNuHQ2n5ylZsl2xgIfFMC3vE1V2ig0BOGoihipaEj2vu4jA/IgN
-	cumtLCtCqkbTbgBw==
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH 1/2] af_unix: Do not wait for garbage collector in
- sendmsg()
-In-Reply-To: <CAAVpQUAKESwPnzZAJSsSgR_perYn+S3PbnDAexnWdeGAeGcekw@mail.gmail.com>
-References: <cover.1782922354.git.namcao@linutronix.de>
- <e663a83195f3d9f6d7ad4907c37ae3e45c151062.1782922354.git.namcao@linutronix.de>
- <CAAVpQUAKESwPnzZAJSsSgR_perYn+S3PbnDAexnWdeGAeGcekw@mail.gmail.com>
-Date: Thu, 02 Jul 2026 05:56:00 +0200
-Message-ID: <87o6gqujsf.fsf@yellow.woof>
+	s=arc-20240116; t=1782965595; c=relaxed/simple;
+	bh=gZPjvKr3IxnQ6hiSUc3ilImgoP+GuC2xkdc+CgjbSWs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iFnk5cW6ouFj6lBWVq4CSffzb2BaLnpLxa2XS5/aOCJDmQ5NVV4RV52I/bh+Fb3czZncd0SM+1svtUAkZShzoLir9dMPuhMIwVlzvAYw6+RGbE9oIvAuYqyjcO60vrKcqGVi6Rs7MV5vbhZz6c9KRbJtvP7rDVoigxXg8jgFCQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Received: by linux.microsoft.com (Postfix, from userid 1009)
+	id ED9F320B7169; Wed,  1 Jul 2026 21:13:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com ED9F320B7169
+From: Dexuan Cui <decui@microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	kees@kernel.org,
+	jacob.e.keller@intel.com,
+	ssengar@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [PATCH net v3 0/2] Fix MANA RX with bounce buffering
+Date: Wed,  1 Jul 2026 21:12:35 -0700
+Message-ID: <20260702041237.617719-1-decui@microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[microsoft.com : SPF not aligned (relaxed), No valid DKIM,reject];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303959-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[namcao@linutronix.de,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:kees@kernel.org,m:jacob.e.keller@intel.com,m:ssengar@linux.microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303960-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[decui@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[namcao@linutronix.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[decui@microsoft.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,yellow.woof:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D9DC66F351E
+X-Rspamd-Queue-Id: 2B0106F3629
 
-Kuniyuki Iwashima <kuniyu@google.com> writes:
-> On Wed, Jul 1, 2026 at 9:36=E2=80=AFAM Nam Cao <namcao@linutronix.de> wro=
-te:
->> Now, sendmsg() does not have to block on the garbage collector anymore,
->> because:
->>
->>   - The OOM killer issue has already been addressed by checking
->>     RLIMIT_NOFILE.
->>
->>   - The soft lockup issue is no longer relevant, because the garbage
->>     collector now runs asynchronously since commit d9f21b361333 ("af_uni=
-x:
->>     Try to run GC async.")
->
-> I don't think the latter is resolved.  Without blocking insane
-> users, they can keep pushing sockets to the kernel work,
-> which could be soft-lockup'd.
+With swiotlb=force, the MANA NIC fails to work properly due to commit
+730ff06d3f5c ("net: mana: Use page pool fragments for RX buffers instead
+of full pages to improve memory efficiency.").
 
-User cannot push more than RLIMIT_NOFILE before GC runs. And the GC
-grabs the spin lock, clean up the present stuffs, and exit.
+This happens because, with the standard MTU=1500, the aforementioned
+commit uses page pool frags with PP_FLAG_DMA_MAP, but fails to call
+page_pool_dma_sync_for_cpu() to sync the received packet for CPU acces
+before handing the RX buffer to the stack.
 
-So user could make the GC runs again and again, but there wouldn't be
-soft lockup, as the GC yields after short intervals.
+Here patch #2 adds the required page_pool_dma_sync_for_cpu().
 
-Nam
+Patch #1 validates the packet length reported by the NIC. With patch #2,
+page_pool_dma_sync_for_cpu() uses the packet length, so we don't want
+to blindly trust the packet length, just in case.
+
+There is no change between v2 and v3.
+v3 just swaps the order of the 2 patches in v2, as suggested by Simon [3].
+
+Please review.
+
+Thanks,
+Dexuan
+
+References:
+[1] v1: https://lore.kernel.org/netdev/20260618035029.249361-1-decui@microsoft.com/
+[2] v2: https://lore.kernel.org/netdev/20260624222605.1794719-1-decui@microsoft.com/
+[3] https://lore.kernel.org/netdev/20260626145048.GB1310988@horms.kernel.org/
+
+Dexuan Cui (2):
+  net: mana: Validate the packet length reported by the NIC
+  net: mana: Sync page pool RX frags for CPU
+
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 61 +++++++++++++++----
+ include/net/mana/mana.h                       |  8 +++
+ 2 files changed, 58 insertions(+), 11 deletions(-)
+
+-- 
+2.34.1
+
 
