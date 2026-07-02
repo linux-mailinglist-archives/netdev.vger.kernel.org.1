@@ -1,53 +1,63 @@
-Return-Path: <netdev+bounces-304012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304013-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cNAYOoUVRmopJgsAu9opvQ
-	(envelope-from <netdev+bounces-304012-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:38:45 +0200
+	id t5ITHiAXRmqMJgsAu9opvQ
+	(envelope-from <netdev+bounces-304013-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:45:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7A16F4450
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:38:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67B646F454A
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:45:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=BWyr5dcc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304012-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304012-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=tu-dortmund.de;
+	dkim=pass header.d=rbox.co header.s=selector2 header.b="ZMG3bZi/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304013-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304013-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=rbox.co;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5C672306C218
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:28:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3E8D130A11B7
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8FD7390CBE;
-	Thu,  2 Jul 2026 07:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60D4394471;
+	Thu,  2 Jul 2026 07:30:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD9422AE48;
-	Thu,  2 Jul 2026 07:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8D63939BD;
+	Thu,  2 Jul 2026 07:30:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782977306; cv=none; b=TzAAr6qGMxjLcSwqIzvBpAN/19JmAKGq1BDe7VEuC9veKt3mbHVBV3D4OJf3d6yQY2wtZRo+8RVAoyL0QX2Pga+oh9KMMuF48BUC3wB6ZkDUZ0Y6J+3K6AaMxJs2Njs0zamf/UQyBvvPexx+ge0IZbqt2MmLbZqbwCxly5+7tGk=
+	t=1782977453; cv=none; b=fc+PHAHsZiU2iB8tquNcRmwOTA5dhqChiLGOhxW3nMS/xAbL4IYrQ5gx8/KLRZbVGVpCxKfyTNG6eFte6f7xlPAatMPQ8vJiUJJWvz9Wr+CqRvMbdOE9O4YFSztZL8WTnOyRHJ9Re5a8hmgmVrBuL2Ma1/KZLbzRI1Ej/oEbZUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782977306; c=relaxed/simple;
-	bh=NJeiksJO78iR9t8cXUukeWHQOFfQoezzDn8j+VRKgk0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XRzF3l9pqX2aww4cGVzDoFXFwKwPlPq4QKgXwcKKdEVAGNyv0YIZlVQhS/lcLePlYDCh2dfZJztnP/Of/pxII3UGjFKfTORVlANeB4pnAz04SL6eFTeocbwcGNHziiRFznHZx9Cbq5oOPF6hU8LXy2Q98+1n+Iqjdaxg4N4qLWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=BWyr5dcc; arc=none smtp.client-ip=129.217.128.51
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tu-dortmund.de;
-	s=unimail; t=1782977100;
-	bh=La6s/wDBQeN7i677tpytxXwZXluN8mGE3HaYImPdj74=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=BWyr5dcc7Zqre4mNkft7AvXDg82yt+AQgLzxYnvWur9wIDNt8eTTw1VMZZTJUx0U1
-	 7NoohewfiFinhUAeykdh5k4OJIRNoJC0jaW0jiRunaBYUk7V4FqxVbtG8pHxFZQeA0
-	 WWVk0UvTJBrqq0SvhRosNRwKf/6Al3W4MWAFBr8M=
-Received: from [129.217.186.236] ([129.217.186.236])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.2/8.19.0.2) with ESMTPSA id 6627OxPZ022200
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 2 Jul 2026 09:24:59 +0200 (CEST)
-Message-ID: <ef33f0a7-f0b7-4bc4-9263-10d2b480d717@tu-dortmund.de>
-Date: Thu, 2 Jul 2026 09:24:59 +0200
+	s=arc-20240116; t=1782977453; c=relaxed/simple;
+	bh=b5Yh/1B5RAfqkXa6kZW8y8XuCwb9JRcdG9Cc6vPOrcM=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GNwG/9tia0C3G8WpX3G8Vi9+i6hd318ROAuDSnjQf2zuw7E/ai91Bn1J13VUgwfTI2jVeLmWH4Ubbwg/u+R9SrukyKrhE2NF7y+flnTHRse4it7PlheuG/8Rw2aar37FjMNpsF8tSP8Upu4u6fYpXV9ypwOBT6pWoRMStIIZXRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ZMG3bZi/; arc=none smtp.client-ip=185.226.149.38
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1wfBsc-00BOKQ-T0; Thu, 02 Jul 2026 09:30:38 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=T0KU9Qlc02n2j5IdAO8aCi86nlSvwxBOmtJy+AvJI5s=; b=ZMG3bZi/7Dml2jz332+5aTfLBY
+	U93C5alk3kpGZpnQ7/RMi63KycR4qg86NIQHlX2u+Gev2XzSSjw2IMS8XksWh7ytUpzPFKfeBgMKF
+	J+Q9lPmBfakqsDbh527/hbJnUKa2epzoUCkiccyf7keUMXGuOCBc+5UWLaWaqIHE08XCTWHeSWYB7
+	EdrhJgL4cGMkOOjDFjRjhP7wdgDQvCMnAE+EPTF3TCvhSlQJzh38cEd+6Cn1NLX65VdX6D/aqWrB3
+	TCeo6PWIMwjUaHgmDYW8Kp8xGISIkthV21sGzw3HUASAikRIeGcjMI96E7UITaXvVHNbjFjUMbWuG
+	pTFTaXZw==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1wfBsb-0006gp-S3; Thu, 02 Jul 2026 09:30:38 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.95)
+	id 1wfBsK-003HJw-OZ;
+	Thu, 02 Jul 2026 09:30:20 +0200
+Message-ID: <352c268e-508a-4155-b597-b0f172c0a1cf@rbox.co>
+Date: Thu, 2 Jul 2026 09:30:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,233 +65,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION][BISECTED] tun/tap & vhost-net: multi-threaded
- network performance
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-        Brett Sheffield <bacs@librecast.net>
-Cc: regressions@lists.linux.dev, netdev@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <akVnoOYQOrt8k-Gu@karahi.librecast.net>
- <20260701165359-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <20260701165359-mutt-send-email-mst@kernel.org>
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH bpf v3 3/4] selftests/bpf: Adapt sockmap update error
+ handling
+To: bot+bpf-ci@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com,
+ martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+ jolsa@kernel.org, emil@etsalapatis.com, shuah@kernel.org,
+ john.fastabend@gmail.com, jakub@cloudflare.com, jiayuan.chen@linux.dev,
+ edumazet@google.com, kuniyu@google.com, pabeni@redhat.com,
+ willemb@google.com, davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
+ cong.wang@bytedance.com
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, martin.lau@kernel.org,
+ clm@meta.com, ihor.solodrai@linux.dev
+References: <20260702-sockmap-lookup-udp-leak-v3-3-ff8de8782468@rbox.co>
+ <03d8ce102b71c68c30e98be36feaebe539055195c2323ec3b3fd84f157487afd@mail.kernel.org>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <03d8ce102b71c68c30e98be36feaebe539055195c2323ec3b3fd84f157487afd@mail.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304012-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:bacs@librecast.net,m:regressions@lists.linux.dev,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:tim.gebauer@tu-dortmund.de,m:willemdebruijn.kernel@gmail.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,kernel.org,tu-dortmund.de,gmail.com,redhat.com,lunn.ch,davemloft.net,google.com];
+	TAGGED_FROM(0.00)[bounces-304013-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bot+bpf-ci@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:cong.wang@bytedance.com,m:bpf@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:bot@kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,etsalapatis.com,cloudflare.com,google.com,redhat.com,davemloft.net,bytedance.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[rbox.co:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,librecast.net:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,brettsheffield.com:url,tu-dortmund.de:dkim,tu-dortmund.de:mid,tu-dortmund.de:from_mime]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[rbox.co:dkim,rbox.co:mid,rbox.co:from_mime,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6E7A16F4450
+X-Rspamd-Queue-Id: 67B646F454A
 
-On 7/1/26 22:56, Michael S. Tsirkin wrote:
-> On Wed, Jul 01, 2026 at 09:16:48PM +0200, Brett Sheffield wrote:
->> TL;DR - Commit 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3 causes
->> significant performance regressions with TAP interfaces and multithreaded
->> network code. Please revert.
->>
->>
->> Librecast is an IPv6 multicast library. One of the tests (0055) fails under
->> Linux 7.2-rc1. The test performs data synchronization over IPv6 multicast using a TAP
->> interface. This test has run successfully on every stable, LTS and mainline RC
->> released in the past year. Every kernel with my Tested-by has run this test.
->>
->> There have been a bunch of changes to MLDv2 so I started bisecting there, but
->> the culprit is actually 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3 "tun/tap &
->> vhost-net: avoid ptr_ring tail-drop when a qdisc is present"
->>
->> Reverting this commit fixes the test.
->>
->> To eliminate my code and any multicast weirdness, I ran tests with iperf3
->> comparing the same host running 7.2-rc1 both with and without 1d6e569b7d0
->> reverted.
-
-Thank you very much for your bisect!
-
-As the author, I am sorry for that regression!
-
+On 7/2/26 02:00, bot+bpf-ci@kernel.org wrote:
+>> @@ -93,8 +90,12 @@ static void test_insert_bound(struct test_sockmap_listen *skel __always_unused,
+>>  	errno = 0;
+>>  	value = s;
+>>  	err = bpf_map_update_elem(mapfd, &key, &value, BPF_NOEXIST);
+>> -	if (!err || errno != EOPNOTSUPP)
+>> -		FAIL_ERRNO("map_update: expected EOPNOTSUPP");
+>> +	if (sotype == SOCK_STREAM) {
+>> +		ASSERT_ERR(err, "map_update");
+>> +		ASSERT_EQ(errno, EOPNOTSUPP, "errno");
+>> +	} else if (err) {
+>> +		ASSERT_OK(err, "map_update");
+>> +	}
 > 
-> Thanks a lot for the bisect! Reverting is not out of question, but
-> just before we do, it is worth analyzing the situation.
-> 
-> Could you pls tell us
-> - do you see packet drops?
+> This isn't a bug, but could the UDP branch just be `else ASSERT_OK(err,
+> "map_update");` — the `if (err)` guard looks redundant since ASSERT_OK is
+> a no-op on success?
 
-iperf3 shows no TCP retransmissions, so there were never packet drops
-when the patch was enabled.
-It is the number after the sender data rate (example: threads 1,
-reverted has 368 retransmissions/drops).
-
-> - does it help to increase the tun queue size?
-
-I agree, this would be great to know.
-
-However, even then we must act. I am considering IFF_BACKPRESSURE
-as a feature flag, defaulting to off. It would just enable/disable
-the stopping logic in tun_net_xmit() and the waking logic
-in __tun_wake_queue(). If disabled, it would result in the same logic
-as before.
-
-I could provide such a patch as [net] material.
-
-Thanks again!
-
-> 
-> Thanks a lot!
-> 
-> 
->> CPU: AMD Ryzen 9 9950X
->>
->> [ host ] - [ bridge ] - [ tap ] - [ guest (qemu) ]
->>
->> Running matching kernels on host and guest, I started iperf3 in server mode on
->> the guest and tested from the host so traffic passes through the tap interface.
->>
->> iperf3 -s -V                 # server
->> iperf3 -c guest -P nthreads  # client
->>
->> 7.2.0-rc1 (threads 1):
->>
->> [  5]   0.00-10.00  sec  20.2 GBytes  17.4 Gbits/sec    0            sender
->> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 1, reverted):
->>
->> [  5]   0.00-10.00  sec  15.3 GBytes  13.1 Gbits/sec  368            sender
->> [  5]   0.00-10.00  sec  2.00 GBytes  1.72 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 2):
->>
->> [SUM]   0.00-10.00  sec  10.9 GBytes  9.33 Gbits/sec    0             sender
->> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 2, reverted):
->>
->> [SUM]   0.00-10.00  sec  15.9 GBytes  13.7 Gbits/sec  1567             sender
->> [SUM]   0.00-10.00  sec  4.00 GBytes  3.43 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 4):
->>
->> [SUM]   0.00-10.00  sec  10.9 GBytes  9.33 Gbits/sec    0             sender
->> [SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 4, reverted):
->>
->> [SUM]   0.00-10.00  sec  16.5 GBytes  14.1 Gbits/sec  6701             sender
->> [SUM]   0.00-10.00  sec  8.00 GBytes  6.87 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 8):
->>
->> [SUM]   0.00-10.00  sec  10.7 GBytes  9.15 Gbits/sec    0             sender
->> [SUM]   0.00-10.01  sec  10.6 GBytes  9.13 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 8, reverted):
->>
->> [SUM]   0.00-10.00  sec  16.2 GBytes  14.0 Gbits/sec  19319             sender
->> [SUM]   0.00-10.00  sec  15.7 GBytes  13.5 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 16):
->>
->> [SUM]   0.00-10.00  sec  10.9 GBytes  9.35 Gbits/sec    0             sender
->> [SUM]   0.00-10.01  sec  10.9 GBytes  9.32 Gbits/sec                  receiver
->>
->> 7.2.0-rc1 (threads 16, reverted):
->>
->> [SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec  43593             sender
->> [SUM]   0.00-10.00  sec  14.4 GBytes  12.4 Gbits/sec                  receiver
->>
->>
->> As you can see, the new code works for single threaded, but for all other cases
->> there's a significant performance drop. I see this trade-off is mentioned in the
->> commit, but the performance drop off is much worse than suggested with the
->> current patch.
->>
->> In our multicast use case data is sent by multiple threads to multiple groups
->> simultaneously, this just breaks things to the extent that a <2 second test
->> times out after 5 minutes.
->>
->>
->> git bisect start
->> # status: waiting for both good and bad commits
->> # bad: [dc59e4fea9d83f03bad6bddf3fa2e52491777482] Linux 7.2-rc1
->> git bisect bad dc59e4fea9d83f03bad6bddf3fa2e52491777482
->> # status: waiting for good commit(s), bad commit known
->> # good: [36bdc0e815b4e8a05b9028d8ef8a25e1ead35cc1] net: usb: asix: ax88772: re-add usbnet_link_change() in phylink callbacks
->> git bisect good 36bdc0e815b4e8a05b9028d8ef8a25e1ead35cc1
->> # good: [db314398f618a3a23315f73c87f7d318eaf06c1b] Merge branch 'net-bridge-mcast-support-exponential-field-encoding'
->> git bisect good db314398f618a3a23315f73c87f7d318eaf06c1b
->> # bad: [079a028d6327e68cfa5d38b36123637b321c19a7] string: Remove strncpy() from the kernel
->> git bisect bad 079a028d6327e68cfa5d38b36123637b321c19a7
->> # bad: [f396f4005180928cd9e15e352a6512865d3bc908] Bluetooth: btmtk: fix URB leak in alloc_mtk_intr_urb error path
->> git bisect bad f396f4005180928cd9e15e352a6512865d3bc908
->> # bad: [ec1806a730a1c0b3d68a7f9afe81514fb0dd7991] netfilter: x_tables: disable 32bit compat interface in user namespaces
->> git bisect bad ec1806a730a1c0b3d68a7f9afe81514fb0dd7991
->> # good: [50c2d91c5dfa0e465826ec1f8dbad9cdc254bd85] mptcp: do not drop partial packets
->> git bisect good 50c2d91c5dfa0e465826ec1f8dbad9cdc254bd85
->> # good: [68993ced0f618e36cf33388f1e50223e5e6e78cc] Merge tag 'net-7.1-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
->> git bisect good 68993ced0f618e36cf33388f1e50223e5e6e78cc
->> # good: [34c78dff59a25110a4ce50c208e42a91490fe615] Merge branch 'net-use-ip_outnoroutes-drop-reason'
->> git bisect good 34c78dff59a25110a4ce50c208e42a91490fe615
->> # bad: [9587ed8137fb83d93f84b858337412f4500b21e9] Merge branch 'gve-add-support-for-ptp-gettimex64'
->> git bisect bad 9587ed8137fb83d93f84b858337412f4500b21e9
->> # bad: [83ea7fd73b11dd8cbf4416507a5eac3890b49fb0] net: dsa: microchip: remove unused phylink_mac_link_up() callback
->> git bisect bad 83ea7fd73b11dd8cbf4416507a5eac3890b49fb0
->> # bad: [f0de88303d5e7e04a1224bc7a00512b5a1c4fe7a] net: make is_skb_wmem() available to modules
->> git bisect bad f0de88303d5e7e04a1224bc7a00512b5a1c4fe7a
->> # bad: [c411baa463e85a779a7e68a00ba6298770b58c4c] netconsole: move push_ipv6() from netpoll
->> git bisect bad c411baa463e85a779a7e68a00ba6298770b58c4c
->> # good: [fba362c17d9d9211fc51f272156bb84fc23bdf98] ptr_ring: move free-space check into separate helper
->> git bisect good fba362c17d9d9211fc51f272156bb84fc23bdf98
->> # bad: [d0273dbe8be1640e597552f81faf1d6c9997d3e3] ipvlan: use netif_receive_skb() in ipvlan_process_multicast()
->> git bisect bad d0273dbe8be1640e597552f81faf1d6c9997d3e3
->> # bad: [3803065cd6b0630d4161d86aa04e2d1db0f3a0b5] Merge branch 'tun-tap-vhost-net-apply-qdisc-backpressure-on-full-ptr_ring-to-reduce-tx-drops'
->> git bisect bad 3803065cd6b0630d4161d86aa04e2d1db0f3a0b5
->> # bad: [1d6e569b7d0c0b2736636749e4be0a27f3cefcb3] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
->> git bisect bad 1d6e569b7d0c0b2736636749e4be0a27f3cefcb3
->> # first bad commit: [1d6e569b7d0c0b2736636749e4be0a27f3cefcb3] tun/tap & vhost-net: avoid ptr_ring tail-drop when a qdisc is present
->>
->> -- 
->> Brett Sheffield (he/him)
->> Librecast - Decentralising the Internet with Multicast
->> https://librecast.net/
->> https://blog.brettsheffield.com/
-> 
+Ugh, sorry. If there are no other comments for this series, I'd happy to
+fix it later in bpf-next.
 
