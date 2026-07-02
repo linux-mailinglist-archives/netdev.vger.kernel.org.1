@@ -1,218 +1,202 @@
-Return-Path: <netdev+bounces-303988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ejhwEaQERmq8HwsAu9opvQ
-	(envelope-from <netdev+bounces-303988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:26:44 +0200
+	id laJ8KhcFRmraHwsAu9opvQ
+	(envelope-from <netdev+bounces-303989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:28:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69E706F3CC0
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:26:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04DC46F3CFB
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:28:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LyTMJKPD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303988-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303988-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=WE2qNO7B;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303989-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303989-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2BBF93046D6A
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 06:22:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0718304D7D8
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 06:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD41386C0D;
-	Thu,  2 Jul 2026 06:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133E3386C31;
+	Thu,  2 Jul 2026 06:24:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013009.outbound.protection.outlook.com [40.93.201.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F64D3859CE
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 06:21:58 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782973320; cv=none; b=h+MFwknTcjJH7ACC/gcAuhl0Kkd1EyUiiRCAZK9qCxFkH4/ks/941Aki1M2E2gdVzHSi4rQZPZHDwSfmmpwOXMX70zcIZG11JHdYlJEiDxWRNzwpFZGeX/R60Gu2WVH1gzJSlFH8WhXGfUxjPqbcUW58GLwVM+qNgNRvgCGVr4E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782973320; c=relaxed/simple;
-	bh=Xz1wb76anL5E5ME/dtrL8oHkFhMXv3brH7Mycv91DBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QTgaFkz5LLdf/izFwh7WiDvkyNA/Tk54x4GOxNkVYucQ1tqTnbwd2e8uGJV40ylkLznUD5bJD2oONYNWemCsET/lmGxEFpnGjQt0ZbkO0jakg1rW6WB/s+XXYfNuCKGswrIC7ZdI6bzQqeoGmfgHmWwKi5NkHpEYRqsLmvIGALE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LyTMJKPD; arc=none smtp.client-ip=209.85.214.175
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2ca64c3ce5fso13317845ad.3
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 23:21:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782973318; x=1783578118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p+AybXHCcO4BnLqFoauWvt1KwEn7CeMrNml46vf7sfE=;
-        b=LyTMJKPDd9og/E13MDsh3ENnkIDwMeOKzw6jG4Jj7TYDr2XRO2kTbEU3n8yPWNRcei
-         HPbES4ohp1delPdO4k3PPEvV/cTZFx8U8wiKV/yi9fEcnd09928PqkcF1ELhnuj/gjmx
-         0yBITzT52K9WWDD4HPw7+uJWOXUYjLZBkW+OvaOuxupCTAM/DusJ1NkBnWuLRE/NdnlK
-         YzrEUP0SQ11/3/hHINA7vDIMYg4G0uIx+0Q+RujQftafHXrwwuLKufttzo9IYtomWp6Y
-         aeUMhQSTIQgrTpg4XFKkzRR4rU02Iiw0JUkTYDdGNdD80anWffpXHngDs2JFtAE8VOBh
-         9kpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782973318; x=1783578118;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=p+AybXHCcO4BnLqFoauWvt1KwEn7CeMrNml46vf7sfE=;
-        b=CMO8hW7nW1TdP7VmRTJ/r4gGneEiWNCG4NE247s4lAxY10feGyIpYGSpTLNHtlgQvC
-         KIY/mS30/UegON9tB9L8Xf+qOXJzLyQqs/DrRF4AqRR4QOOU6vnNMHMr3a8eaE6tmjc+
-         F8cFAmMBt+ybW82VqbCx90smr8UMLy18cjIHZrFC5bfvsGokaoBaD8R+F6A9q2slyedW
-         NuJClODRj5iQ7SqYPQmhOm1nQsApoDCCwloCGs7VB2Aj5aIjdcLkEsR+QErJkwgM63hu
-         Q/4qTCzoPM4ycIvMIDMNDXCRFU6E2FmfP32Lb+ZsPwcCUMrmQzDcJoCj+TB89fzTXJp+
-         cz/A==
-X-Forwarded-Encrypted: i=1; AHgh+Rpa/c2k6oLupf7IXd+y+PdLuj1zzlm8j+Q0IvkN4g+f8eNPGes3oqcBgMRZc9gh8y0OsxufkqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeBl3WHxE5Cyy3dj/bDFCqgIgFSlkbmJgglJN4lcSbBCJEEWnn
-	I5ianteb1sS/UloZ+WS/y67iepWIhnVPTks1nIh4QmnNkWGcfWUTWRae
-X-Gm-Gg: AfdE7clipSftmq7dm8izCr6bkdUP8wMmmThA+zwaaPv3NFmHwuguCO9EqZU7AzwobRy
-	pbpplqGKMRoLOc4MS6FojI9s5O0ZeCuptDZWroX8gcZrrLk4we8jiIDXpmkf1bpeDvFdZK/p5TZ
-	yGRNpPyGg9BB57UIN2o5hhVgSmbU+yS8IEB8FjMsyI5/JogSl6A7J+eiE7940xxci6bG82ZUjD9
-	iI6PlORZ4P9J+CivDYh/AnjiaFghA0MY/u5k7XA7onsSccqgKbdNIT1Q9vi479QxcsOcb74qqbe
-	0J+V2q47ZObSWI22H8OgCyj/CSKUDlJ0rVrlM7PkI+3a4zfRDMhHQY8/gvmAGK2w2jCffziIMIg
-	c68K82RGpPu2llVa+dS8UvOVNlhRfk7xqqRyxZD23z/NUjki/234/arwGO03YCyY5ABfb97Dl8Y
-	Em/UqK2LMhYfYsT7P6nAgJiehchMbI+9MV+w==
-X-Received: by 2002:a17:903:41c7:b0:2c9:c46b:129b with SMTP id d9443c01a7336-2ca7e67c028mr50539785ad.5.1782973317756;
-        Wed, 01 Jul 2026 23:21:57 -0700 (PDT)
-Received: from nbai25050028.. ([2403:8600:2090:6f:cce5:6a06:d746:c95f])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b3c7fa65asm5296145c88.6.2026.07.01.23.21.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 23:21:57 -0700 (PDT)
-From: Aniket Negi <aniket.negi03@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	aniket.negi@airoha.com
-Subject: Re: [PATCH net v2] net: airoha: fix MIB stats collection to be lossless
-Date: Thu,  2 Jul 2026 11:51:47 +0530
-Message-ID: <20260702062150.8291-1-aniket.negi03@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <akWYEf5wusTq9_ol@lore-desk>
-References: <akWYEf5wusTq9_ol@lore-desk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BED363C51;
+	Thu,  2 Jul 2026 06:24:16 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782973458; cv=fail; b=teuldTYiroWbSlc59piOxJ+J0bYTVCjnDJozOQ4ORE1rypzxFcd7K2nghAcbIwQ7wcLUwChKGOgWf1E4L35fJTAKhVyCv8mk7tDmVA0eAl0AopO+OmRsJAquyTWBGqA4guqsHXLgik10Y3UOaQJ+AwQn0tJ0C7VTTDJsOIqyye8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782973458; c=relaxed/simple;
+	bh=oSQM7i113ZuE1wqdvlKp1zs3slcl9CgSPCuBzzHD5g4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=igH0UCQa4XiIY4wv59j/zU3esiu/85ZuaN5iJvyIBi5bVmbaPDlHYykvX7Vpauj71z3xEPq7kInb/67wg8aHV7KoDA9LZKrYn+yg/dGIiD8Y1LEi0MBpDxdSBL1luZ+6n99VEGJ3Lblm1k1H0RG/JUjbJyVv999HTeVZaEi+Wbo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WE2qNO7B; arc=fail smtp.client-ip=40.93.201.9
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oAM0qofUmwfTgLL6UNXfAVVKkBM3MnrlvdwOfmbF7sZOa/V80wXOn9x7zE4GHefiUQH5jAmnLNR5rsg2wksQpnm8jY2qhun3fucfGdt51w0L382OEtUuu+kc+F5o3CA5QMIB4w1JThu2Gmj+txfyG0jfWTQka/wbLNH4k0GiL+2eme5o1O37WVX3/Qe3RMhr1NA7gttHhm3sNJxai4+QVGspnYV2p9uZXvaaD3ulYX7VWQNX4j3y0mNjk/E5Mvdi5voASLO29DsmMHgsjLqq5Lc1YSBakqrve51JGG6ckLCpDcMXi1ij/siOvC/Nk/KoFssviu7wikiibKA0XELoHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C2P55EZO9qWdrbWmXUYa0EeYRT4i2zbzoevwoCSa11g=;
+ b=mgKPrpsvYPD/UfKf4oumqb+hgJXXyzmzwRSg6gOLwcw1/P7sz2MLpXAp893oqEPLhyoqEEsjwcpjAl0wTBqdhXXzymlSKyf42EmIRMVmHItWVGPNL5yvCX6ah/sTiG0/rM/JoL3O+Dva2d/4kVkskEAlvUbfUlXKb/wXd1S/B0k3sHM/K29Rpv4q1ZyAQw6cR7n9I4wpYMW7MLc2O36+CBQ9nI9ogD+g+viqGXx70LzxCmZbwnvW5Q6C1WjLcTQl9yhUT+1oJ28+rGAQM2cYAPdHbB3NeyEu6jAqapbS33l+iVTMBmQ4mKpLBaXaN2hbzC6zJGUo2t1CEH5BOkIQhQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C2P55EZO9qWdrbWmXUYa0EeYRT4i2zbzoevwoCSa11g=;
+ b=WE2qNO7BOtYQwhF9FCDNiTENJr4wSgvbdVwAemw4yE68Qa3GyTzUxiJfn9tlS3lXExOXKjQeyVTpBCOtEm8nFjEAC8lihR0OdtRv/MPiwHimHAwN/EG3X7kGCgv+jxkF3+poPpCE3EKlEy13KYRu3F6S1naXRDjYACmTVIJc8UYZjrmjZSBqSqEKZmNa7QfZ3nUEb5st/u0v/JJmG1l4B3gjI5IDxGgxu72fgLph9fqW4i0mGxa1jxmDEPkYOHqaak3A7TwzSBjkkDxOqeih086fZdk6+eHva7ToTE4sjAGR9LfeKhNArekLpsCyTSHNtMHkIf3qnm1mhU+i9wpcOg==
+Received: from DM6PR07CA0082.namprd07.prod.outlook.com (2603:10b6:5:337::15)
+ by CH3PR12MB8458.namprd12.prod.outlook.com (2603:10b6:610:155::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Thu, 2 Jul
+ 2026 06:24:10 +0000
+Received: from DS1PEPF0001708F.namprd03.prod.outlook.com
+ (2603:10b6:5:337:cafe::ae) by DM6PR07CA0082.outlook.office365.com
+ (2603:10b6:5:337::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.10 via Frontend Transport; Thu, 2
+ Jul 2026 06:24:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS1PEPF0001708F.mail.protection.outlook.com (10.167.17.139) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.6 via Frontend Transport; Thu, 2 Jul 2026 06:24:09 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 1 Jul
+ 2026 23:23:50 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Wed, 1 Jul 2026 23:23:49 -0700
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Wed, 1 Jul 2026 23:23:44 -0700
+From: Nimrod Oren <noren@nvidia.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>, Willem de Bruijn
+	<willemb@google.com>, Wei Wang <weibunny@fb.com>, David Wei <dw@davidwei.uk>,
+	Cosmin Ratiu <cratiu@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>, Nimrod Oren <noren@nvidia.com>
+Subject: [PATCH net-next 0/2] selftests: drv-net: run XDP tests with both IP versions
+Date: Thu, 2 Jul 2026 09:23:46 +0300
+Message-ID: <20260702062348.2123960-1-noren@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001708F:EE_|CH3PR12MB8458:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b220315-7178-4698-12eb-08ded80286a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|1800799024|82310400026|23010399003|376014|7416014|18002099003|13003099007|6133799003|56012099006|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	N+Li3xpjkCc1ia6kcII4Cj1mllY0SGx5zmwSrZQdps0jE8DvwhfM6W3jXjSzs6JWYqzbyx3PZBRZaqLdBEzPGjVWoWGhY5Uq6yf9yxxev7XYEC4eKFPVu20L2CPslsZu+W9XBETE2kJBpypZAS6bpBTj8EDwa/eLa6WQiNmswjuD19eZ1uxD70KgGdalDpo4f3wfHxN4sxpRw1DwHsUsM/iMsoxaKiIcL0nPwFFHtJafCBWi8jE3x3yw8kYa2NLYECJ+OtE1IIC3QZUOXGPglaTlWsV4rm1FjVODqfVvvAwcLLGoz94YC7zP2mfJzFus6ST5hfX9Kp7kTV5EV/jp1VLeVuFacQDkqmmvHsqUxjTt3n9fgBhELMbMGn4aOJ+X+YYTXUyy5bd7PHGAW5v5AWtm3uq3Mr7EohDAA3/tozTxfWpFRP+QaUJ1LN6zjAZYZSv9RQg2ePIfdx/5yx2OpxBBDp8UDfR03Edozd+lEtzHzA83lCu6T07Q8+bCburY17r/hSQZHT5Gqrk8OPAfv5ek6ZDfSSSZcFQ3Fr0DNhWfkQ7CMGlZYKu1WI2qwXiJ2mEZyNA1dEMDQFY7FQr251yiFkCokgKCMoToIg37Gddm1Kd0BgZ8R2LoWktNdmmmicIe1Dvq5yvE4uFALiviaULcXX/2QgWqkvbw2qv5WN1IUmHoJoMQoFU7y1vvjH5LSFkuXdKeURmqX2+0tsMvHw==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(1800799024)(82310400026)(23010399003)(376014)(7416014)(18002099003)(13003099007)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	znSRV2wVC4wrqvaXRA07PtDLRDJGFXN18KYVM+IxZS3HKJuC/Kv3XXngvgYhSHRaOdBaP8lQdqTkDObgYbFA+Z09DwcQRnHyzfDVUOfQkIXussxLFHHCutwG2iDtv5Tn1IRoJG1AjhIv2Iahtz6k6W8SCZployh40Q5HtQOP5VkoTn2UyPcMrneDJv/xd1ZfvKlnjqTXgp6Fyo8Oo6DoOMFp0ssvQOOevitUag5/1BsRmeNhbJ/bAWD0W3upTBU6fYvMHiAAv62WqB0mCscHvJCjVJelH1UYW4LfrMKU9mjwgND/zPGDpr8uqVIU5eFekmi5/YLoJ1FH0f9MfV09ZZN6XCt67zgUQCTzS3zyE64raDQIwLFz+f0Uc2BIlvRWBTyAIdUcLwcDKDHTT8nuykvrm2groL2puu2QpyuiAwkaelExUFWOQQakXeVrexxQ
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 06:24:09.2057
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b220315-7178-4698-12eb-08ded80286a5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF0001708F.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8458
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-303988-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[aniketnegi03@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:aniket.negi@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aniketnegi03@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:bobbyeshleman@meta.com,m:willemb@google.com,m:weibunny@fb.com,m:dw@davidwei.uk,m:cratiu@nvidia.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:noren@nvidia.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-303989-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,fomichev.me,meta.com,google.com,fb.com,davidwei.uk,nvidia.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,xdp.py:url,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:from_mime];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 69E706F3CC0
+X-Rspamd-Queue-Id: 04DC46F3CFB
 
-> > Signed-off-by: Aniket Negi <aniket.negi03@gmail.com>
-> 
-> Hi Aniket,
-> 
-> just few nits inline. Fixing them:
-> 
-> Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> 
+The driver selftest environment picks a single address family for tests
+which use the generic address fields. When both IPv4 and IPv6 are
+available it prefers IPv6, which can leave IPv4 paths untested and hide
+IPv4-only bugs.
 
-Ok sure. I'll update.
+This happened recently in the XDP selftest, where an IPv4 checksum bug
+was missed when IPv6 was also configured. XDP traffic handling has
+IP-version-specific code paths, and the follow-up discussion concluded
+that the XDP tests should run against both IP versions [1].
 
-> > +	dev->stats.mib_prev.tx_runt_cnt = val;
-> > +
-> > +	/* tx_len[0]: RUNT (32-bit, delta) + E64 (64-bit, absolute) → {0, 64} bucket.
-> > +	 * Accumulate RUNT delta in tx_runt_accum64, then assign tx_len[0] as
-> > +	 * accum + E64_abs so each call gives the correct combined total.
-> > +	 */
-> 
-> no new-line here.
-> 
-> > +
-> > +	dev->stats.tx_len[i] = dev->stats.mib_prev.tx_runt_accum64;
-> 
+This series changes NetDrvEpEnv from exposing only the initially selected
+address family to allowing tests to switch the generic address fields
+between IP versions. xdp.py uses this to run the XDP traffic cases over
+both IPv4 and IPv6. Test variants whose required IP version is not
+configured are skipped.
 
-Sure, You are reffering to both the spaces above and below comment section?. Same for rx_runt and rx_long/tx_long.
+[1] https://lore.kernel.org/20260518143138.74839bf9@kernel.org/
 
-I'll update as following:
- +	dev->stats.mib_prev.tx_runt_cnt = val;
- +	/* tx_len[0]: RUNT (32-bit, delta) + E64 (64-bit, absolute) → {0, 64} bucket.
- +	 * Accumulate RUNT delta in tx_runt_accum64, then assign tx_len[0] as
- +	 * accum + E64_abs so each call gives the correct combined total.
- +	 */
- +	dev->stats.tx_len[i] = dev->stats.mib_prev.tx_runt_accum64;
+Nimrod Oren (2):
+  selftests: drv-net: allow switching env IP version
+  selftests: drv-net: xdp: run with both IP versions
 
-> > +		u32 tx_drops;
-> > +		u32 tx_broadcast;
-> > +		u32 tx_multicast;
-> > +		u32 tx_runt_cnt;
-> 
-> 		u32 tx_runt;
-> 
-> > +		u32 tx_long_cnt;
-> 
-> 		u32 tx_long;
-> 
-> > +		u64 tx_runt_accum64;
-> 
-> 		64 tx_runt64;
-> 
-> > +		u32 rx_drops;
-> > +		u32 rx_broadcast;
-> > +		u32 rx_multicast;
-> > +		u32 rx_errors;
-> > +		u32 rx_crc_error;
-> > +		u32 rx_over_errors;
-> > +		u32 rx_fragment;
-> > +		u32 rx_jabber;
-> > +		u32 rx_runt_cnt;
-> 
-> 		u32 rx_runt;
-> 
-> > +		u32 rx_long_cnt;
-> 
-> 		u32 rx_long;
-> 
-> > +		u64 rx_runt_accum64;
-> 
-> 		u64 rx_runt64;
-> 
-> > +	} mib_prev;
-> >  };
+ .../selftests/drivers/net/lib/py/env.py       | 27 ++++--
+ tools/testing/selftests/drivers/net/xdp.py    | 94 +++++++++++++++----
+ 2 files changed, 97 insertions(+), 24 deletions(-)
 
-Acked the change name from tx_runt_cnt to tx_run, tx_long_cnt to tx_long, tx_runt_accum64 to tx_runt64. Same for rx counters.
+-- 
+2.45.0
 
-Best Regards,
-Aniket Negi
 
