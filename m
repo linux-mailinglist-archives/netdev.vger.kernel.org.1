@@ -1,248 +1,339 @@
-Return-Path: <netdev+bounces-304006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304007-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QAsCF88NRmptIQsAu9opvQ
-	(envelope-from <netdev+bounces-304006-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:05:51 +0200
+	id e4wSBmEQRmoiIwsAu9opvQ
+	(envelope-from <netdev+bounces-304007-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:16:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC36C6F3FFD
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:05:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6566C6F413C
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 09:16:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304006-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-304006-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304007-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304007-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 70FF6300FC8E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:05:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6150302658C
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 07:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B3438F630;
-	Thu,  2 Jul 2026 07:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBFE38F925;
+	Thu,  2 Jul 2026 07:13:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mx1.white.stw.pengutronix.de (mx1.white.stw.pengutronix.de [185.203.200.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A480C38F945
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 07:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0C038E8DC;
+	Thu,  2 Jul 2026 07:13:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782975939; cv=none; b=j1eif2lu9eedlkQnAkTMTexupBkqBxC1RDkP8qz9yFiLYxwBZQYZvpwDq8M3qElFqI5GK28FB59jZiUK14RoWtJciO1jE2kGJXVAHSq9JNngleB1BmTErT8vVkmIlLTzkrAKIsCLZJqbZuHSTG86sYhVX/9hwvkg8UNnPzCHdC4=
+	t=1782976389; cv=none; b=PCsS2uJS+06LGvIeMK0rnNvulXPyj9fGb7RBC50zlCmRIUCQVtZZXsImeEhnogXtFVoRVyI0hsToDBLvmq7PSBqrmfBi60muxgUibi+t+K3S7OaIzAkK7+OUPWZrsHrq7t0MoKCO+1RDLnRKfRXcG9GfumvNdUez2FOZLCVnaic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782975939; c=relaxed/simple;
-	bh=b8P1gAhVWl2gjJi3fXh7iFoT6mSxEr6QODkwOCA7CBQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AwLNGlQKgzOzlBbwP97eaz3UXXvdA5pGT3/DKq7/4kBYZTae3Jd5vf8L4NuGYojxWxf6Jt0ghtdfvS7EmDm3NOVOwpBzP7kTh9t4lm6M3E2PBFEenCQzQUiVh21rEPY2xH5E7O/4AcjJUshXEeWHYGUVH4j+TMKqSKV/b+L0wrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-X-UUID: 684c998c75e411f1aa26b74ffac11d73-20260702
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:4bf09062-0d05-4400-b7f7-446d8884ad66,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:26c9664204f3eb6a2b90aebe4cb1b8d5,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|865|898,TC:nil,Content:0
-	|15|52,EDM:-3,IP:nil,URL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
-	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 684c998c75e411f1aa26b74ffac11d73-20260702
-X-User: weirongguang@kylinos.cn
-Received: from [10.42.20.136] [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <weirongguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 1660990033; Thu, 02 Jul 2026 15:05:28 +0800
-Message-ID: <bc2c7b23-bcaf-4c10-adde-753ede92b7a7@kylinos.cn>
-Date: Thu, 2 Jul 2026 15:05:26 +0800
+	s=arc-20240116; t=1782976389; c=relaxed/simple;
+	bh=QypvFCHvOgZ4g7vX3sMWHeIMkrjkcfjm8eROUXTFqk0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ps/TG/B/alBwUufoZUzHZb702JFrSgBxqkN9KruVYXv5FBIGkA5Xj2onjxOe/lxl/xdjbWWhkNOpTG8lFK3e7zZOeVpMb1nbeShFcbb93cEcoe30Wn1x6Gm9w9WUgHDaPHlg4tfgAnwRiPAvcbmdQy4CSCRcSUgx1VsVs69GnvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.200.13
+Received: from drehscheibe.grey.stw.pengutronix.de (drehscheibe.grey.stw.pengutronix.de [IPv6:2a0a:edc0:0:c01:1d::a2])
+	(Authenticated sender: relay-from-drehscheibe.grey.stw.pengutronix.de)
+	by mx1.white.stw.pengutronix.de (Postfix) with ESMTPSA id 4694B2003DD;
+	Thu, 02 Jul 2026 09:13:02 +0200 (CEST)
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1wfBba-005hya-0Y;
+	Thu, 02 Jul 2026 09:13:02 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1wfBba-0000000DEQZ-0Bxw;
+	Thu, 02 Jul 2026 09:13:02 +0200
+Date: Thu, 2 Jul 2026 09:13:02 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
+Subject: Re: [PATCH net-next v4 2/2] net: pse-pd: add Realtek/Broadcom PSE
+ MCU driver
+Message-ID: <akYPfkRbEzWFuC6j@pengutronix.de>
+References: <20260630105651.756058-1-jelonek.jonas@gmail.com>
+ <20260630105651.756058-3-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] ice: use dev_err_probe() in ice_probe()
-Content-Language: en-US
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Rongguang Wei <clementwei90@163.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- aleksandr.loktionov@intel.com, przemyslaw.kitszel@intel.com,
- anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch
-References: <20260701013618.29934-1-clementwei90@163.com>
- <akUmFsLra3VpRNPg@boxer>
-From: weirongguang <weirongguang@kylinos.cn>
-In-Reply-To: <akUmFsLra3VpRNPg@boxer>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260630105651.756058-3-jelonek.jonas@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[kylinos.cn];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304006-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-304007-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:maciej.fijalkowski@intel.com,m:clementwei90@163.com,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:aleksandr.loktionov@intel.com,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:andrew+netdev@lunn.ch,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[weirongguang@kylinos.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[intel.com,163.com];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[weirongguang@kylinos.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EC36C6F3FFD
+X-Rspamd-Queue-Id: 6566C6F413C
 
+Hi Jonas,
 
-
-在 2026/7/1 22:37, Maciej Fijalkowski 写道:
-> On Wed, Jul 01, 2026 at 09:36:18AM +0800, Rongguang Wei wrote:
->> From: Rongguang Wei <weirongguang@kylinos.cn>
->>
->> dev_err_probe() logs the error and returns the supplied error code, which
->> allows probe error paths to be written more compactly.
->>
->> Use dev_err_probe() in ice_probe() for error paths that currently print an
->> error message and immediately return the same error code. This keeps the
->> existing error handling semantics while reducing open-coded logging and
->> return sequences.
->>
->> Signed-off-by: Rongguang Wei <weirongguang@kylinos.cn>
->> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->> ---
->> v2:
->>   - Fix commit message per Aleksandr Loktionov's recommendation.
->> v1: https://lore.kernel.org/netdev/20260630032537.42605-1-clementwei90@163.com/T/#t
->> ---
->>  drivers/net/ethernet/intel/ice/ice_main.c | 24 ++++++++---------------
->>  1 file changed, 8 insertions(+), 16 deletions(-)
+On Tue, Jun 30, 2026 at 10:56:50AM +0000, Jonas Jelonek wrote:
+> A range of PoE switches use a small microcontroller on the PCB to front
+> the actual PSE silicon. The host CPU talks to that MCU over I2C/SMBus or
+> UART using a fixed 12-byte request/response protocol with a trailing
+> checksum; the PSE chips are managed by the MCU and are not accessed
+> directly. The same protocol family is spoken by Realtek and Broadcom PSE
+> MCUs, diverging in opcode numbering and a few response layouts, which the
+> driver abstracts behind a per-dialect opcode table and parser hooks
+> selected by the compatible. The specific PSE chip behind the MCU is
+> detected at runtime and only influences per-chip constants (power scaling
+> and the per-port cap).
 > 
-> Could we also address rest of sites within driver at this very same
-> commit?
+> The driver is split into a shared core and two transport modules:
 > 
-> drivers/net/ethernet/intel/ice/ice_dcb_lib.c-873-       dev_err(dev, "DCB init failed\n");
-> drivers/net/ethernet/intel/ice/ice_dcb_lib.c:874:       return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-4482-         dev_warn(dev, "Failed to initialize hardware after applying Tx scheduling configuration.\n");
-> drivers/net/ethernet/intel/ice/ice_main.c:4483:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-4543-         dev_err(dev, "Fail during requesting FW: %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_main.c:4544:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-4961-         dev_err(dev, "ice_init_pf failed: %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_main.c:4962:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-5192-         dev_err(dev, "BAR0 I/O map error %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_main.c:5193:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-5206-         dev_err(dev, "DMA configuration failed: 0x%x\n", err);
-> drivers/net/ethernet/intel/ice/ice_main.c:5207:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-5244-         dev_err(dev, "ice_init_hw failed: %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_main.c:5245:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_main.c-9627-         netdev_err(netdev, "Failed to get link info, error %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_main.c:9628:         return err;
-> --
-> drivers/net/ethernet/intel/ice/devlink/devlink.c-1244-          dev_err(dev, "ice_init_hw failed: %d\n", err);
-> drivers/net/ethernet/intel/ice/devlink/devlink.c:1245:          return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_ptp.c-1935-          dev_err(ice_pf_to_dev(pf), "PTP failed to set time %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_ptp.c:1936:          return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_ptp.c-2000-          dev_err(dev, "PTP failed to adjust time, err %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_ptp.c:2001:          return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_sriov.c-829-         dev_err(dev, "Failed to enable SR-IOV: %d\n", err);
-> drivers/net/ethernet/intel/ice/ice_sriov.c:830:         return err;
-> --
-> drivers/net/ethernet/intel/ice/ice_eswitch_br.c-314-            dev_info(dev, "Bridge port lookup failed (vsi=%u)\n", vsi_idx);
-> drivers/net/ethernet/intel/ice/ice_eswitch_br.c:315:            return ERR_PTR(-EINVAL);
+> - PSE_REALTEK_MCU: protocol, message framing, dialect machinery, and the
+>   pse_controller_ops glue.
+> - PSE_REALTEK_MCU_I2C / PSE_REALTEK_MCU_UART: transport modules
+>   registering the MCU on an I2C bus or a serdev port respectively.
 > 
-Hi, 
-Per commit a787e5400a1c("driver core: add device probe log helper"), dev_err_probe was 
-originally designed for probe functions in device driver to handle -EPROBE_DEFER.
+> The realtek-pse-mcu-* files and PSE_REALTEK_MCU* symbols match the
+> realtek,pse-mcu-rtk / realtek,pse-mcu-brcm compatibles: all name the
+> Realtek PSE-MCU front-end, not the MCU silicon or the PSE chip behind
+> it (see the binding for the prefix rationale). Broadcom PSE MCUs speak
+> the same protocol family and are handled by the same shared core
+> through the dialect abstraction selected by the '-brcm' compatible.
+> 
+> Power budgeting is left to the MCU firmware; the driver advertises
+> PSE_BUDGET_EVAL_STRAT_DYNAMIC (controller-managed budget) accordingly.
+> 
+> Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
 
-Using it elsewhere is not the common pattern in the kernel. I'm unsure whether this aligns
-with the intended usage if we also address the rest of the sites within the driver.
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
->> index e2fd2dab03e3..31aa42f8e6d3 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_main.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
->> @@ -5161,10 +5161,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
->>  	struct ice_hw *hw;
->>  	int err;
->>  
->> -	if (pdev->is_virtfn) {
->> -		dev_err(dev, "can't probe a virtual function\n");
->> -		return -EINVAL;
->> -	}
->> +	if (pdev->is_virtfn)
->> +		return dev_err_probe(dev, -EINVAL, "can't probe a virtual function\n");
->>  
->>  	/* when under a kdump kernel initiate a reset before enabling the
->>  	 * device in order to clear out any pending DMA transactions. These
->> @@ -5188,10 +5186,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
->>  		return err;
->>  
->>  	err = pcim_iomap_regions(pdev, BIT(ICE_BAR0), dev_driver_string(dev));
->> -	if (err) {
->> -		dev_err(dev, "BAR0 I/O map error %d\n", err);
->> -		return err;
->> -	}
->> +	if (err)
->> +		return dev_err_probe(dev, err, "BAR0 I/O map error %d\n", err);
->>  
->>  	pf = ice_allocate_pf(dev);
->>  	if (!pf)
->> @@ -5202,10 +5198,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
->>  
->>  	/* set up for high or low DMA */
->>  	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
->> -	if (err) {
->> -		dev_err(dev, "DMA configuration failed: 0x%x\n", err);
->> -		return err;
->> -	}
->> +	if (err)
->> +		return dev_err_probe(dev, err, "DMA configuration failed: 0x%x\n", err);
->>  
->>  	pci_set_master(pdev);
->>  	pf->pdev = pdev;
->> @@ -5240,10 +5234,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
->>  		return ice_probe_recovery_mode(pf);
->>  
->>  	err = ice_init_hw(hw);
->> -	if (err) {
->> -		dev_err(dev, "ice_init_hw failed: %d\n", err);
->> -		return err;
->> -	}
->> +	if (err)
->> +		return dev_err_probe(dev, err, "ice_init_hw failed: %d\n", err);
->>  
->>  	ice_init_dev_hw(pf);
->>  
->> -- 
->> 2.25.1
->>
->>
+LGTM, there are some nitpicks from my side
+otherwise:
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+...
+> +/* Shorthand for the designated-initializer entries in dialect opcode tables. */
+> +#define RTPSE_MCU_OP(opc)	{ .op = (opc), .valid = true }
+> +
+> +/* Forward-declared so dialects can supply response parsers (defined below). */
+
+No forward declarations please move the structs here.
+
+> +struct rtpse_mcu_info;
+> +struct rtpse_mcu_port_status;
+> +
+> +struct rtpse_mcu_dialect {
+> +	struct rtpse_mcu_opcode opcode[RTPSE_MCU_NUM_CMDS];
+> +
+> +	/*
+> +	 * Response parsers. Each dialect must supply its own; the core calls
+> +	 * these unconditionally rather than carrying a default that would
+> +	 * silently mis-decode bytes from a dialect that forgot to set them.
+> +	 */
+> +	int (*parse_system_info)(const u8 *payload, struct rtpse_mcu_info *info);
+> +	int (*parse_port_class)(const struct rtpse_mcu_port_status *status);
+> +	const char *(*mcu_type_str)(unsigned int mcu_type);
+> +};
+> +struct rtpse_mcu_port_config {
+> +	bool enable;
+
+in this struct we use only enable, do you plan to wire it somewhere
+later? I assume you wont to keep it as documentation. May be add some
+debug traces? And add some comments what do you already know about this
+fields.
+
+> +	u8 function_mode;
+> +	u8 detection_type;
+> +	u8 cls_type;
+> +	u8 disconnect_type;
+> +	u8 pair_type;
+> +};
+> +
+> +struct rtpse_mcu_port_ext_config {
+
+Same here.
+
+> +	u8 inrush_mode;
+> +	u8 limit_type;
+> +	u8 max_power;
+> +	u8 priority;
+> +	u8 chip_addr;
+> +	u8 channel;
+> +};
+
+
+> +static int rtpse_mcu_port_set_pw_limit(struct pse_controller_dev *pcdev, int id, int max_mW)
+> +{
+> +	const struct rtpse_mcu_opcode *type_opc, *val_opc;
+> +	struct rtpse_mcu_ctrl *pse = to_rtpse_mcu_ctrl(pcdev);
+> +	const struct rtpse_mcu_chip_info *chip = pse->chip;
+> +	unsigned int prg_val;
+> +	int ret;
+> +
+> +	if (max_mW < 0 || max_mW > chip->max_mW_per_port)
+> +		return -ERANGE;
+> +
+> +	type_opc = &pse->dialect->opcode[RTPSE_MCU_CMD_PORT_SET_POWER_LIMIT_TYPE];
+> +	val_opc = &pse->dialect->opcode[chip->pw_set_cmd];
+> +	if (!type_opc->valid || !val_opc->valid)
+> +		return -EOPNOTSUPP;
+> +
+> +	/*
+> +	 * Switch the port to user-defined limit mode first, then program the
+> +	 * limit value. If the second cmd fails, the port is left in
+> +	 * user-defined mode but with the previous limit value; the next
+> +	 * successful set_pw_limit call recovers it.
+> +	 */
+> +	ret = rtpse_mcu_port_cmd(pse, id, type_opc->op, RTPSE_MCU_PORT_PW_LIMIT_TYPE_USER);
+> +	if (ret)
+> +		return ret;
+> +
+> +	prg_val = min_t(unsigned int, max_mW / chip->pw_set_lsb_mW, 0xff);
+
+Add some define for 0xff.
+Can max_mW be zero?
+
+> +
+> +	return rtpse_mcu_port_cmd(pse, id, val_opc->op, prg_val);
+> +}
+> +
+> +static int rtpse_mcu_port_get_pw_limit_ranges(struct pse_controller_dev *pcdev, int id,
+> +					      struct pse_pw_limit_ranges *out)
+> +{
+> +	struct ethtool_c33_pse_pw_limit_range *range;
+> +	struct rtpse_mcu_ctrl *pse = to_rtpse_mcu_ctrl(pcdev);
+
+In the drivers/net, All declarations should be in reverse tree style.
+
+> +	range = kzalloc_obj(*range, GFP_KERNEL);
+> +	if (!range)
+> +		return -ENOMEM;
+> +
+> +	range[0].min = 0;
+> +	range[0].max = pse->chip->max_mW_per_port;
+> +
+> +	out->c33_pw_limit_ranges = range;
+> +	return 1;
+> +}
+> +
+
+
+> +static int rtpse_mcu_discover(struct rtpse_mcu_ctrl *pse, struct rtpse_mcu_info *info)
+> +{
+> +	struct rtpse_mcu_ext_config ext_config;
+> +	unsigned long deadline;
+> +	int ret;
+> +
+> +	/*
+> +	 * The MCU may not answer on the bus yet right after power-up or
+> +	 * enable-gpios assertion: depending on the transport it either stays
+> +	 * silent (-ETIMEDOUT) or does not ACK its address at all (-ENXIO /
+> +	 * -EREMOTEIO). Retry within a bounded wall-time window so a slow boot
+> +	 * still probes, while a genuinely unresponsive MCU fails with its real
+> +	 * error instead of deferring forever and masking it.
+> +	 */
+> +	deadline = jiffies + msecs_to_jiffies(RTPSE_MCU_BOOT_TIMEOUT_MS);
+> +	do {
+> +		ret = rtpse_mcu_get_info(pse, info);
+> +		if (ret != -ETIMEDOUT && ret != -ENXIO && ret != -EREMOTEIO &&
+> +		    ret != -EAGAIN)
+
+For this section sashiko has an opinion:
+https://sashiko.dev/#/patchset/20260630105651.756058-1-jelonek.jonas%40gmail.com
+
+> +			break;
+> +		msleep(RTPSE_MCU_BOOT_RETRY_MS);
+> +	} while (time_before(jiffies, deadline));
+> +	if (ret)
+> +		return dev_err_probe(pse->dev, ret, "failed to read MCU info\n");
+> +
+> +	switch (info->device_id) {
+> +	case RTPSE_MCU_DEVICE_ID_RTL8238B:
+> +		pse->chip = &rtl8238b_info;
+> +		break;
+> +	case RTPSE_MCU_DEVICE_ID_RTL8239:
+> +		pse->chip = &rtl8239_info;
+> +		break;
+> +	case RTPSE_MCU_DEVICE_ID_RTL8239C:
+> +		pse->chip = &rtl8239c_info;
+> +		break;
+> +	case RTPSE_MCU_DEVICE_ID_BCM59111:
+> +		pse->chip = &bcm59111_info;
+> +		break;
+> +	case RTPSE_MCU_DEVICE_ID_BCM59121:
+> +		pse->chip = &bcm59121_info;
+> +		break;
+> +	default:
+> +		return dev_err_probe(pse->dev, -EINVAL, "unknown PSE id 0x%x\n",
+> +				     info->device_id);
+> +	}
+> +
+> +	if (!info->max_ports || info->max_ports > RTPSE_MCU_MAX_PORTS)
+> +		return dev_err_probe(pse->dev, -EINVAL,
+> +				     "MCU reports invalid port count %u\n", info->max_ports);
+> +
+> +	ret = rtpse_mcu_get_ext_config(pse, &ext_config);
+> +	if (ret)
+> +		return dev_err_probe(pse->dev, ret, "failed to read MCU ext config\n");
+> +
+> +	dev_info(pse->dev, "%s MCU, %s (id 0x%04x), %u ports across %u PSE chip(s)\n",
+> +		 pse->dialect->mcu_type_str(info->mcu_type), pse->chip->name,
+> +		 info->device_id, info->max_ports, ext_config.num_of_pses);
+
+Reduce it to debug level print.
+
+> +	return 0;
+> +}
+> +
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
