@@ -1,168 +1,180 @@
-Return-Path: <netdev+bounces-304042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304044-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mbVkDPIqRmrcKwsAu9opvQ
-	(envelope-from <netdev+bounces-304042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:10:10 +0200
+	id 4TtJFyAsRmpFLAsAu9opvQ
+	(envelope-from <netdev+bounces-304044-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:15:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E3E6F515C
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:10:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D4E6F5218
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 11:15:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=PisJ7vjl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304042-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304042-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=EBX44Ub2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304044-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304044-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A809130FE150
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 08:59:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B60530C74B9
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B2B42A7B8;
-	Thu,  2 Jul 2026 08:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2F446AF3B;
+	Thu,  2 Jul 2026 09:07:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE83E367F2F;
-	Thu,  2 Jul 2026 08:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4023C548EE;
+	Thu,  2 Jul 2026 09:07:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782982784; cv=none; b=OYKgmPGTF547KWv3W5YWpO3p8Tf2G0eh/e/SEQJKYcQn+lDWq5Fq4SGSQwfsYNLtnFn95DcpoLGaWlkwRuL/b+6zLJbobAesc1bRfLJQ5T2FK5AcuzVSP1ufwcrF+U7iTuHrxeNzNndscc8r7u2B+W649eIqxHVmLjl4WE1Ph2o=
+	t=1782983261; cv=none; b=Qs1P5ZMQmilyDc+5m3pcFRRnRhqeRMoHMH5WXDPhoXzDayu0J+BaG3jP9Bk1YwDtS51w2XBgv73/cquoq1l6z/aT9EQ6LXrrM/F+UZgOtMCzADCzCCBljSXwJlCajvbbMXcijzvz1VB1xJgs7Nf+9k2UzQgWCyC/nXpo7eE7Uw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782982784; c=relaxed/simple;
-	bh=gYLTkBsJEUClTNfXhPkNzHUVAl7MUmlSeasGQSngDn4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QMtUccKUjg3wG6mjtj3n7KEo2ZYvC9VLCf1mXLOcJDw9kbjzDuimkHuxFhihn70SCr77COjdZKOwA62hwgfiutFE61w4aOv+zjgyCMxIq61OJ6QBtc61oIxlNd0HzFODYkh3bbXHY8PldtBWWhY6B4vHdODEWIgo1Kac/x5foRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PisJ7vjl; arc=none smtp.client-ip=192.198.163.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782982783; x=1814518783;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gYLTkBsJEUClTNfXhPkNzHUVAl7MUmlSeasGQSngDn4=;
-  b=PisJ7vjlwiWLBlSkdnkDw6wV3LlsKjYcdxuDEpLY8EoFIzK4QVMb4k73
-   zr5Ir3cjijjjjqk47iNDCsSDg0Dc5LJBETMUOH0mxLmikcR9e8kGUrDqI
-   7T3LSSZl6Wrgg5mOGckHamKxZOxybMktX0ASzthPp8+Rg+rCeQkzspxp/
-   ON43gWsZhAVYCk4ZHXLyxTmD4O9x/F+J3vHgbeOzcI4lKxdjJhTPNvoY+
-   Uss7++GvmPdS6T4Vm/XSyLRvEg1K1tBIlogqQX8OYf6u7J6t9Q46/Te1O
-   6JmnPlRXhu3zceWEWN2i1ZPiNyaNDXbDxvSjD8jZK4S2lfR6w6zphY6Gc
-   A==;
-X-CSE-ConnectionGUID: YQKrb66CQyC3o2SSeLGkcA==
-X-CSE-MsgGUID: 6+t08cZhSYutIJKE6GHvNQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11834"; a="83861764"
-X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
-   d="scan'208";a="83861764"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 01:59:42 -0700
-X-CSE-ConnectionGUID: YjT0r9y3SOWMz/XZRomMBw==
-X-CSE-MsgGUID: ZStAWpo+QtOOnZ714iy4cA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
-   d="scan'208";a="257146674"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.213])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2026 01:59:33 -0700
-Date: Thu, 2 Jul 2026 11:59:30 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	mkalderon@marvell.com, zyjzyj2000@gmail.com, sagi@grimberg.me,
-	mgurtovoy@nvidia.com, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-	bvanassche@acm.org, kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
-	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
-	trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
-	jlayton@kernel.org, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, achender@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, kees@kernel.org, markzhang@nvidia.com,
-	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH rdma-next v8] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <akYocsiHWdH8Tncq@ashevche-desk.local>
-References: <20260619203107.606359-1-ernis@linux.microsoft.com>
- <akX/P/0TiSQ38YdS@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1782983261; c=relaxed/simple;
+	bh=oScd7japEOC1idJH44EGaJHkPP1XthX0ei3V7q31hFA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CeVb+KXawiuX9XSmb+4wNnB2arCdA029nTebRqRVptDPkrtBTf+YH/IeZFLUrCnTUv83tBiB+aZb8BA+1+ZkRlwfhehsCrAv2XFp7Q/pOlXVdgPtCN8emMyGpu3sOJ6tv9wG/G34bpFEApMe/eJFwA49UC1cF3Ix/2cDVWh8UXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EBX44Ub2; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 46B211A0DD4;
+	Thu,  2 Jul 2026 09:07:36 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 120F25FF03;
+	Thu,  2 Jul 2026 09:07:36 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DD2DA104C960F;
+	Thu,  2 Jul 2026 11:07:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1782983254; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=RRvU3NLk/4mpVHffnMQIvXjqWxDkr7EvtkKewizk1/4=;
+	b=EBX44Ub2oGWA4o66nt8hPWbJ/Bijm+M39Vn8fT9/KjzYlDIzhlpM32Tmi/XNSlXU1UZ/l3
+	bxM+aelg3kQ/fPgRJnWV4YHaLLz5zFmJHSORAsq5uC1CBK+iaOKWamWpCeVHE/FFtzt4FT
+	HsvRo7mqYX/GEmi/6cvz9yB3BGXsS0sFl8WlY9I35wPpbEAs+iL9uH2/jDkgRHOum3UgcW
+	5kHOyhvCU8+wt+QIOhvcCJ4CSewccxAn1j3asu8MEc1YLYRJHENqKkjTa6WFOBsMoD+Idz
+	w55I1WlmAO/FCgHcMNfnmxkN5ucfd1ok8dGhPgF7zaOC9N+Hm9bBWICuJysRfw==
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: [PATCH net-next 00/10] net: dsa: microchip: move non-common
+ function out of ksz_common.c
+Date: Thu, 02 Jul 2026 11:07:22 +0200
+Message-Id: <20260702-clean-ksz-4th-v1-0-93441e695fa4@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <akX/P/0TiSQ38YdS@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQqDMBBG4avIrB0wUVP1KuJC7N86tIySBBHFu
+ xtcfov3TgrwgkBddpLHJkEWTTB5RtM86hcs72SyhXWFMzVPf4zKv3BwFWc2rraNe6GtSlBqVo+
+ P7M+vJ0VkxR5puK4beDXEQmkAAAA=
+X-Change-ID: 20260615-clean-ksz-4th-1652867e943e
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
+ =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+X-Mailer: b4 0.14.3
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-304042-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:ernis@linux.microsoft.com,m:jgg@ziepe.ca,m:leon@kernel.org,m:mkalderon@marvell.com,m:zyjzyj2000@gmail.com,m:sagi@grimberg.me,m:mgurtovoy@nvidia.com,m:haris.iqbal@ionos.com,m:jinpu.wang@ionos.com,m:bvanassche@acm.org,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:kch@nvidia.com,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:metze@samba.org,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:markzhang@nvidia.com,m:ebadger@purestorage.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:target-devel@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-cifs@vger.kernel.org,m:samba-technical@lists.samba.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:rds-devel@oss.oracle.com,m:jg
- g@nvidia.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[ziepe.ca,kernel.org,marvell.com,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.dk,lst.de,samba.org,talpey.com,oracle.com,brown.name,redhat.com,davemloft.net,google.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
+	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:pascal.eberhard@se.com,m:miquel.raynal@bootlin.com,m:thomas.petazzoni@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bastien.curutchet@bootlin.com,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-304044-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,ashevche-desk.local:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 39E3E6F515C
+X-Rspamd-Queue-Id: C9D4E6F5218
 
-On Wed, Jul 01, 2026 at 11:03:43PM -0700, Erni Sri Satya Vennela wrote:
-> On Fri, Jun 19, 2026 at 01:30:39PM -0700, Erni Sri Satya Vennela wrote:
-> > The capability counter fields in struct ib_device_attr are declared
-> > as signed int, but these values are inherently non-negative. Drivers
-> > maintain their cached caps as u32 and assign them directly into these
-> > int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
-> > negative value visible to the IB core.
-> > 
-> > Change the signed int capability fields to u32 to match the
-> > underlying nature of the data. Also update consumers across the IB
-> > core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
-> > are not forced back through signed int or u8 via min()/min_t() or
-> > narrowing local variables.
-> 
-> Just a friendly follow-up on this patch. The Sashiko review mentioned a
-> low-priority item, and I'd appreciate any guidance on whether the change
-> is needed.
+Hi all,
 
-As I read this it needs to be fixed, the problem is that there is
-a potential of a weird case (not sure they are IRL) when somebody can use
-INT_MIN (in representation of signed number) to actually mean 0x80000000
-size.
+This series continues the rework of the KSZ driver initiated by three
+previous series (see [1], [2] & [3]).
 
-> https://sashiko.dev/#/patchset/20260619203107.606359-1-ernis%40linux.microsoft.com
+The KSZ driver handles more than 20 switches split in several families.
+This was previously handled through a common set of dsa_switch_ops
+operations that used device-specific ksz_dev_ops callbacks. The three
+previous series have split this common struct dsa_switch_ops into 5
+to connect the ksz_dev_ops's implentations directly to the new
+dsa_swicth ops.
 
+This series continues in the same vein and moves out of ksz_common.c all
+the functions that aren't truly common to all the families.
+
+On top of this on-going rework I added PTP and periodic output support for
+the KSZ8463 (which was my first goal). There are still more than 13 patches
+left for all this so this series will be followed by two others and if you
+want to see the full picture we can check my github ([4]).
+
+FYI, I only have a KSZ8463 so, unfortunately, I can't test other switches.
+
+The next series is going to add PTP support for the KSZ8463. The final one
+will add periodic output support for the KSZ8463.
+
+[1]: https://lore.kernel.org/r/20260505-clean-ksz-driver-v1-0-05d70fa42461@bootlin.com
+[2]: https://lore.kernel.org/r/20260521-clean-ksz-2nd-series-v3-0-75c38971c19a@bootlin.com
+[3]: https://lore.kernel.org/r/20260608-clean-ksz-3rd-v2-0-6e61b7be23c4@bootlin.com
+[4]: https://github.com/bastien-curutchet/linux/tree/ksz_rework
+
+Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+---
+Bastien Curutchet (Schneider Electric) (8):
+      net: dsa: microchip: make ksz_is_port_mac_global_usable() static
+      net: dsa: microchip: move ksz88xx stats handling in ksz8.c
+      net: dsa: microchip: move ksz_get_gbit() and ksz_get_xmii() to ksz9477.c
+      net: dsa: microchip: move KSZ9477 errata handling to ksz9477.c
+      net: dsa: microchip: handle KSZ8-specific tc setup in ksz8.c
+      net: dsa: microchip: move ksz9477_set_default_prio_queue_mapping() to ksz9477.c
+      net: dsa: microchip: rename ksz9477_drive_strength_write()
+      net: dsa: microchip: move the drive strength config out of the common section
+
+Vladimir Oltean (2):
+      net: dsa: microchip: split ksz8_change_mtu()
+      net: dsa: microchip: split port_max_mtu() implementation
+
+ drivers/net/dsa/microchip/ksz8.c         | 429 ++++++++++++++++++++--
+ drivers/net/dsa/microchip/ksz9477.c      | 164 ++++++++-
+ drivers/net/dsa/microchip/ksz9477.h      |   4 +-
+ drivers/net/dsa/microchip/ksz_common.c   | 594 +++----------------------------
+ drivers/net/dsa/microchip/ksz_common.h   |  85 ++++-
+ drivers/net/dsa/microchip/lan937x_main.c |   6 +-
+ 6 files changed, 679 insertions(+), 603 deletions(-)
+---
+base-commit: 1c664ec4b9ea827b609d296921ed5bad8a40a158
+change-id: 20260615-clean-ksz-4th-1652867e943e
+
+Best regards,
 -- 
-With Best Regards,
-Andy Shevchenko
-
+Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 
 
