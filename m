@@ -1,347 +1,162 @@
-Return-Path: <netdev+bounces-304262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id A4smNpO4RmoGcQsAu9opvQ
-	(envelope-from <netdev+bounces-304262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 21:14:27 +0200
+	id dCJxDxm6RmpXcQsAu9opvQ
+	(envelope-from <netdev+bounces-304263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 21:20:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0BD6FC740
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 21:14:27 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D5F6FC7FA
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 21:20:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linaro.org header.s=google header.b=RgkwURSj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304262-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304262-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linaro.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304263-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304263-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2EABF303B15B
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 19:14:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0A8B83008690
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 19:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AE73859C7;
-	Thu,  2 Jul 2026 19:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE63357CE9;
+	Thu,  2 Jul 2026 19:19:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF31F384CE6
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 19:14:16 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783019659; cv=pass; b=RGa3ATBkBhqk5VdVd8E/5DtrJCDX8TC1XNnBIZyWFaBuiHBUefwGYzI+Ddt+RQqdovLk4MJYO48WKOLR3LIlEDjIwQnfruoaZckxLjXWyqnuNy6c9U5bXVotNsX001PaHWaZ1P8SbA18DAzIg7CtfzNTMDad1w+6jJDYsY3qE/Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783019659; c=relaxed/simple;
-	bh=AFRxrS3Iacb87huKcZLkeP4rPFbsF1/y1vtgJZmH1yQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=txSN1J5TA7Fy4YEyGjlNeALxZY1AQPXN2am2222NrJA5XGZKHEmqO2d4tKtbNf0ekqBzjsBhNOWTBADtUt9iSUsm+aYgNNtbwcQz7aOli8eM8AcYhXSrqZHB85Pkxnbig1h0tC2pfQ+2XRD2Yc9ZUL4/F1NihnMSP/norTB1Igg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RgkwURSj; arc=pass smtp.client-ip=209.85.208.51
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-698bf053053so835924a12.3
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 12:14:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783019655; cv=none;
-        d=google.com; s=arc-20260327;
-        b=BdYaII23eg4IWeOYc4XOc2iGl8AVxK8G/5QjQr08ejhTmaVWKK8eYkzGB+qDr0yIg0
-         K58K64h+TIGfwJ3zE6fpQFwvV40ovOQDcgDaxGr+OdVmUxjqgwvJ4V1qHvYnbo7fPTYO
-         KCXRpjMTZ6FiFcAlXzlArUHFuYvuW/q5prxPZRfQ5J36oZzW+AspfYXnZrSQoWKakeHF
-         EyUKSEKqzUn0V/5ejCo371jgt1uPSMW1kQ1AhmwCOKVYjioIgGLmz3OO4gLQrVXZe0S2
-         oTLO16y54PbB5lVXOcewe1eue5Yfr+ckjudaMRSZARvRoBK97goA7rTMGfYKzHRGQo8L
-         gTNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Dfas/91RHw7TRgs4MMexcFlE2KWowDBMjBihd9aSOjU=;
-        fh=xiqfVqHKTajeYQiBaGv2ANi3sn8x+zfNLeplP3cbWEA=;
-        b=cWP1RESfm/JzTH19s4v5Z8+snuXxmC/RvSy7N3MqzSpY5yhYZPf73gdK/ePPkQIYoS
-         gLM0GolpbTdUO5sLH9zpOMxIidTbiDXOEbnTUusy48s1oNcBBozFREQIYg0qZF8ZeKGx
-         wdwCcBlP27o3HoyEIblogsTfwXi9tuuMZqLbBRWaF13HMwCBQXgE8cjP5O/z1slxTDFK
-         UyRgLAAs28Vjth4LNRIcaGYU9EY02lx2VEObq+9ifKEd3/lwHx+Hxak4pofwl0DKrE2N
-         IJwLxEYDKnMKXGsoYljldoLSRWD3A2QHfzUB9yIQCn/lz5jV0mf/BmjO0UvQCf5pXhUl
-         D4Lg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1783019655; x=1783624455; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Dfas/91RHw7TRgs4MMexcFlE2KWowDBMjBihd9aSOjU=;
-        b=RgkwURSj3i+qlMo0vyXjDMQorNP287GxHINwOzCcpIbiBQn1R0u6FCnhLNzBPyqGdm
-         Aj6Dqi3xvVgZaia1AhUGtUACf4UpLyxR40dRzZVI+0Co1X4uFrhGWgBf7GNelVsSqTVf
-         BjWB44zt3RvVz/gzbYbbEYVEnqhUPMRKUO8xA1Dh/AOLwU4cEwZzx7mDqRx0GaGXC0wZ
-         wR8l+6z9Twp0zGYcx70YrItlNWwIXuGhETmbFPXLGRKZC6//POim/lAbdzRPP3CvInyT
-         piQ1HUohh18nZmSZd94ODMKFhyNzMGgAazG6UUJ1V3fj0H6NHw4B/dzlidHPSMfdwWdS
-         772A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783019655; x=1783624455;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Dfas/91RHw7TRgs4MMexcFlE2KWowDBMjBihd9aSOjU=;
-        b=is0wc91eWBXG1EpLIwj23jqdQVDWIIH5uBxoSy7x0XfsdRsUMsHQSo8O6F5jEgzbaq
-         czC6l+6po58X5iWvh11JNcr6je7kzwXrNjUPoZAZ5Vq/mKwn84PGRZZSvZSBhG5I4qud
-         F2ZJNgqRKPco7behtrnVhRe14B5LSv2SN8FLQbE1y8ZhaUPMYrjQuiVMQSAQK2UTHzKR
-         pu4vsBOHt62G+akE3Hce3SYpLXaJ5sC76EBWMKRkBGen6oCWEAUx5rfYjTea8OPU455n
-         glCq2Z61gBEK8aDBi+kHu0rE7gYHiedUPeDVhPAPmkwdkR/HdKqR6ngHGdcRXbkGq8pd
-         lPbw==
-X-Forwarded-Encrypted: i=1; AHgh+RrpTeFeqxD7nni/1wOCu0GRsjJiExSQO7vvjtIJczm0Jc6oh9lG9TvqhI4gDiLi6QDANqccieY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx54Tbm59mi6ABURNoJnYdgAuIOQul47zimLkY/Qgs2DOmlNRkh
-	uDGq4PerAO5caS8ui5cCC9QcE8Gh/jQtQ5RknFNl5O4Zcp9qMEDXwO11ZAIoTJP+9bWPmkGkzgc
-	4/P2C3eIsWLAPk/TsmHhfwx5OAKo5GCnomfzQ8CNKnw==
-X-Gm-Gg: AfdE7cmDCv84CtXb/EfXo63i4Xv0Yc8zkB9nQVCL8qoxUKa13vi91PH4kh9bjoLrFm2
-	7aSOOL1bwaksFd/SHojy3XBv9ZhTLZXymKkMq0XEX3/pNQIyuyE3iZeNzZ2e1SeWnafCDhXgL5O
-	lg9qbL5KiDwu6sVrGNshRKnytOIwUmIqi5/cxam0rb2X4I6nFWxQ/NPKc3wI3t4cSrvph4ip3do
-	oXQxD5s3y80lGocX4M1tbEyMHB6aolxx0Wn+IyBZ2+9jiD4cd/KD1IEgkZQi57CyeOxfiqhLCZp
-	tjH33IB1PLMGb4/fQtYGCMpIYwAt/Ug=
-X-Received: by 2002:a05:6402:42c6:b0:695:f580:a66f with SMTP id
- 4fb4d7f45d1cf-698a2cda40dmr3064278a12.21.1783019655273; Thu, 02 Jul 2026
- 12:14:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A123386579
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 19:19:09 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783019952; cv=none; b=CH7VEjksV82wiv6VEfp8qSW7+uwA11LXsb2+O3O8i6JzDJXx7iyXIqdIQQe+Rm7CYePhR5rIkj+EOPcm0PS6vzlMMQwlth8wroBVJ1zHu4RzLYCL9/IncVd2zwf98HjTMwP+0M23HSTb+VN2ZsqSxkaTO9EH9QS2HhA4Vy9cG4Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783019952; c=relaxed/simple;
+	bh=BXFEv4+ZyyVGIZZ2caJJocv825e7NCyvtXtm/toI+Ok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y64DtXgZ1ePEZTV3Y2siaJMKQLJ0+aKmE35IwTS5Pi0jA+ckP/0AzuGOU9lm7yh09bZSgg3/0ApvlBIRjWnCjzSUxV9OxGk1N0CG7utCqCLLVadbz8KkSz3y1ACpirlgd8hBLeVnlb2yOrS+v8hqDGGsQxp15FeYVzCG/hft0jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 65D9460218; Thu, 02 Jul 2026 21:19:07 +0200 (CEST)
+Date: Thu, 2 Jul 2026 21:19:03 +0200
+From: Florian Westphal <fw@strlen.de>
+To: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, netdev@vger.kernel.org, horms@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com,
+	kys@microsoft.com
+Subject: Re: [PATCH ipsec] xfrm: policy: use hlist_del_init_rcu in
+ xfrm_hash_rebuild to avoid bydst poison
+Message-ID: <aka5pwAGGI56QrrS@strlen.de>
+References: <20260702185805.615241-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260702115835.167602-1-sumit.garg@kernel.org>
-In-Reply-To: <20260702115835.167602-1-sumit.garg@kernel.org>
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-Date: Thu, 2 Jul 2026 13:14:03 -0600
-X-Gm-Features: AVVi8CeXvNLFBEH_Z9SIZx0oNo56nh0xA5WRLgXhkbS1U9sxKdwz3gfEHooCZ0g
-Message-ID: <CANLsYkyFJ+CbUJpwWAy28KHvmNz6rJRtM5KrEzHjyAha-7grTQ@mail.gmail.com>
-Subject: Re: [PATCH v9 00/14] firmware: qcom: Add OP-TEE PAS service support
-To: Sumit Garg <sumit.garg@kernel.org>
-Cc: andersson@kernel.org, konradybcio@kernel.org, 
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org, 
-	linux-media@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org, 
-	linux-remoteproc@vger.kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run, 
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev, 
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org, airlied@gmail.com, 
-	simona@ffwll.ch, vikash.garodia@oss.qualcomm.com, bod@kernel.org, 
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	jjohnson@kernel.org, trilokkumar.soni@oss.qualcomm.com, 
-	mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com, 
-	jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com, 
-	vignesh.viswanathan@oss.qualcomm.com, srinivas.kandagatla@oss.qualcomm.com, 
-	amirreza.zarrabi@oss.qualcomm.com, jenswi@kernel.org, 
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com, 
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org, 
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260702185805.615241-1-xmei5@asu.edu>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:sumit.garg@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:freedreno@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath12k@lists.infradead.org,m:linux-remoteproc@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:robin.clark@oss.qualcomm.com,m:sean@poorly.run,m:akhilpo@oss.qualcomm.com,m:lumag@kernel.org,m:abhinav.kumar@linux.dev,m:jesszhan0024@gmail.com,m:marijn.suijten@somainline.org,m:airlied@gmail.com,m:simona@ffwll.ch,m:vikash.garodia@oss.qualcomm.com,m:bod@kernel.org,m:mchehab@kernel.org,m:elder@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jjohnson@kernel.org,m:trilokkumar.soni@oss.qualcomm.com,m:mukesh.ojha@oss.qualcomm.com,m:pavan.kondeti@oss.qualcomm.com,m:jorge.ramirez@oss.qual
- comm.com,m:tonyh@qti.qualcomm.com,m:vignesh.viswanathan@oss.qualcomm.com,m:srinivas.kandagatla@oss.qualcomm.com,m:amirreza.zarrabi@oss.qualcomm.com,m:jenswi@kernel.org,m:op-tee@lists.trustedfirmware.org,m:apurupa@qti.qualcomm.com,m:skare@qti.qualcomm.com,m:linux-kernel@vger.kernel.org,m:sumit.garg@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-304262-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[strlen.de];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[mathieu.poirier@linaro.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[48];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mathieu.poirier@linaro.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,qti.qualcomm.com,lists.trustedfirmware.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-304263-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,linaro.org:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,asu.edu:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6B0BD6FC740
+X-Rspamd-Queue-Id: 33D5F6FC7FA
 
-Hey Sumit - nice hearing from you...
-
-Is there some kind of overarching design harminisation between what
-you are proposing here and what Arnaud posted back in April [1] ?
-
-[1]. https://lists.trustedfirmware.org/archives/list/op-tee@lists.trustedfi=
-rmware.org/thread/VMKTRATYUFWL2TP7NHN5KJ37MSVZZMPK/
-
-On Thu, 2 Jul 2026 at 05:59, Sumit Garg <sumit.garg@kernel.org> wrote:
->
-> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
->
-> Qcom platforms has the legacy of using non-standard SCM calls
-> splintered over the various kernel drivers. These SCM calls aren't
-> compliant with the standard SMC calling conventions which is a
-> prerequisite to enable migration to the FF-A specifications from Arm.
->
-> OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
-> support these non-standard SCM calls. And even for newer architectures
-> using S-EL2 with Hafnium support, QTEE won't be able to support SCM
-> calls either with FF-A requirements coming in. And with both OP-TEE
-> and QTEE drivers well integrated in the TEE subsystem, it makes further
-> sense to reuse the TEE bus client drivers infrastructure.
->
-> The added benefit of TEE bus infrastructure is that there is support
-> for discoverable/enumerable services. With that client drivers don't
-> have to manually invoke a special SCM call to know the service status.
->
-> So enable the generic Peripheral Authentication Service (PAS) provided
-> by the firmware. It acts as the common layer with different TZ
-> backends plugged in whether it's an SCM implementation or a proper
-> TEE bus based PAS service implementation.
->
-> The TEE PAS service ABI is designed to be extensible with additional API
-> as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
-> extensions of the PAS service needed while still maintaining backwards
-> compatibility.
->
-> Currently OP-TEE support is being added to provide the backend PAS
-> service implementation which can be found as part of this PR [1].
-> This implementation has been tested on Kodiak/RB3Gen2 and lemans
-> EVK boards. In addition to that WIN/IPQ targets tested OP-TEE with
-> this service too. Surely the backwards compatibility is maintained and
-> tested for SCM backend.
->
-> Note that kernel PAS service support while running in EL2 is at parity
-> among OP-TEE vs QTEE. Especially the media (venus/iris) support depends
-> on proper IOMMU support being worked out on the PAS client end.
->
-> Patch summary:
-> - Patch #1: adds generic PAS service.
-> - Patch #2: migrates SCM backend to generic PAS service.
-> - Patch #3: adds TEE/OP-TEE backend for generic PAS service.
-> - Patch #4-#12: migrates all client drivers to generic PAS service.
-> - Patch #13: drops legacy PAS SCM exported APIs.
->
-> The patch-set is based on v7.2-rc1 and can be found in git tree
-> here [2].
->
-> Merge strategy:
->
-> It is expected due to APIs dependency, the entire patch-set to go via
-> the Qcom tree. All other subsystem maintainers, it will be great if I
-> can get acks for the corresponding subsystem patches.
->
-> [1] https://github.com/OP-TEE/optee_os/pull/7721 (already merged)
-> [2] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/=
-log/?h=3Dqcom-pas-v9
->
+Xiang Mei (Microsoft) <xmei5@asu.edu> wrote:
+> xfrm_hash_rebuild() unlinks each policy from its bydst chain with
+> hlist_del_rcu() and re-inserts it. For an inexact policy the re-insert goes
+> through xfrm_policy_inexact_insert(), which can fail on a GFP_ATOMIC
+> allocation; on failure the error path only WARN_ONCE()s and continues, so the
+> policy is left with a poisoned bydst node (LIST_POISON2). The next rebuild
+> calls hlist_del_rcu() on that node again, dereferences the poison, and takes a
+> general protection fault.
+> 
+> Use hlist_del_init_rcu() instead, so a failed-reinsert node is left unhashed
+> (pprev == NULL) rather than poisoned. The next rebuild's hlist_del_init_rcu()
+> is then a no-op for it, and the non-failing case is unchanged.
+> 
+> The reinsert allocation is GFP_ATOMIC (it runs under xfrm_policy_lock), so in
+> practice this is only reached under memory pressure; the crash below was
+> reproduced deterministically by forcing that allocation to fail with fault
+> injection (failslab).
+> 
+> Crash:
+>   Oops: general protection fault, probably for non-canonical address
+>   0xfbd59c0000000024: 0000 [#1] SMP KASAN NOPTI
+>   KASAN: maybe wild-memory-access in range [0xdead000000000120-0xdead000000000127]
+>   ...
+>   Workqueue: events xfrm_hash_rebuild
+>   RIP: 0010:xfrm_hash_rebuild+0x5b3/0x1190
+>   RAX: dead000000000122   (LIST_POISON2 + offset)
+>   ...
+>   Call Trace:
+>    hlist_del_rcu (include/linux/rculist.h:599)
+>    xfrm_hash_rebuild (net/xfrm/xfrm_policy.c:1365)
+>    process_one_work (kernel/workqueue.c:3322)
+>    worker_thread (kernel/workqueue.c:3486)
+>    kthread (kernel/kthread.c:436)
+>    ret_from_fork (arch/x86/kernel/process.c:158)
+>    ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
+>    ...
+>   Kernel panic - not syncing: Fatal exception in interrupt
+> 
+> Fixes: 563d5ca93e88 ("xfrm: switch migrate to xfrm_policy_lookup_bytype")
+> Reported-by: AutonomousCodeSecurity@microsoft.com
+> Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
 > ---
-> Changes in v9:
-> - Rebased to 7.2-rc1.
-> - Enable SCM backend similar to TEE if ARCH_QCOM is set.
-> - Address misc. comments from Konrad.
-> - Add checks for corner cases (although not reachable as per OP-TEE ABI)
->   reported by Shashiko on patch #3.
-> - Picked up review tags from Konrad.
->
-> Changes in v8:
-> - Rebased on mainline tip (no functional changes).
-> - Now Lemans EVK is also tested to support OP-TEE PAS here:
->   https://github.com/OP-TEE/optee_os/pull/7845
-> - Drop Kodiak DT patch as it is carried independently by Mukesh here:
->   https://lore.kernel.org/lkml/20260624063952.2242702-1-mukesh.ojha@oss.q=
-ualcomm.com/
-> - Regarding Sashiko comments, I have already replied in v6 the ones that
->   don't apply but in v7 I got the same comments again. Specific context
->   reasoning which Shashiko ignores:
->     - ABI contract between Linux and TZ
->     - No support for multiple concurrent backends
->     - The TZ backend doesn=E2=80=99t detach during the entire boot cycle
->
-> Changes in v7:
-> - Rebased to qcom tree (for-next branch) tip.
-> - Merged patch #5 and #7 due to build dependency.
-> - Disabled modem for kodiak EL2 as it isn't tested yet.
-> - Fix an issue found out by sashiko-bot for patch #4.
->
-> Changes in v6:
-> - Rebased to v7.1-rc4 tag.
-> - Patch #14: fixed ret error print.
-> - Add Kconfig descriptions for PAS symbols such that they are visible
->   in menuconfig to update.
->
-> Changes in v5:
-> - Incorporated misc. comments from Mukesh.
-> - Split up patch #11 into 2 to add an independent commit for passing
->   proper PAS ID to set_remote_state API.
-> - Picked up tags.
->
-> Changes in v4:
-> - Incorporate misc. comments on patch #4.
-> - Picked up an ack for patch #10.
-> - Clarify in cover letter about state of media support.
->
-> Changes in v3:
-> - Incorporated some style and misc. comments for patch #2, #3 and #4.
-> - Add QCOM_PAS Kconfig dependency for various subsystems.
-> - Switch from pseudo TA to proper TA invoke commands.
->
-> Changes in v2:
-> - Fixed kernel doc warnings.
-> - Polish commit message and comments for patch #2.
-> - Pass proper PAS ID in set_remote_state API for media firmware drivers.
-> - Added Maintainer entry and dropped MODULE_AUTHOR.
->
-> Sumit Garg (14):
->   firmware: qcom: Add a generic PAS service
->   firmware: qcom_scm: Migrate to generic PAS service
->   firmware: qcom: Add a PAS TEE service
->   remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
->   remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
->   remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
->   remoteproc: qcom: Select QCOM_PAS generic service
->   drm/msm: Switch to generic PAS TZ APIs
->   media: qcom: Switch to generic PAS TZ APIs
->   media: qcom: Pass proper PAS ID to set_remote_state API
->   net: ipa: Switch to generic PAS TZ APIs
->   wifi: ath12k: Switch to generic PAS TZ APIs
->   firmware: qcom_scm: Remove SCM PAS wrappers
->   MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
->
->  MAINTAINERS                                   |   9 +
->  drivers/firmware/qcom/Kconfig                 |  22 +-
->  drivers/firmware/qcom/Makefile                |   2 +
->  drivers/firmware/qcom/qcom_pas.c              | 299 +++++++++++
->  drivers/firmware/qcom/qcom_pas.h              |  50 ++
->  drivers/firmware/qcom/qcom_pas_tee.c          | 479 ++++++++++++++++++
->  drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
->  drivers/gpu/drm/msm/Kconfig                   |   1 +
->  drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
->  drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
->  drivers/media/platform/qcom/iris/Kconfig      |  27 +-
->  .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
->  drivers/media/platform/qcom/venus/Kconfig     |   1 +
->  drivers/media/platform/qcom/venus/firmware.c  |  11 +-
->  drivers/net/ipa/Kconfig                       |   2 +-
->  drivers/net/ipa/ipa_main.c                    |  13 +-
->  drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
->  drivers/net/wireless/ath/ath12k/ahb.c         |  10 +-
->  drivers/remoteproc/Kconfig                    |   4 +-
->  drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
->  drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
->  drivers/remoteproc/qcom_wcnss.c               |  12 +-
->  drivers/soc/qcom/mdt_loader.c                 |  12 +-
->  include/linux/firmware/qcom/qcom_pas.h        |  43 ++
->  include/linux/firmware/qcom/qcom_scm.h        |  29 --
->  include/linux/soc/qcom/mdt_loader.h           |   6 +-
->  26 files changed, 1095 insertions(+), 321 deletions(-)
->  create mode 100644 drivers/firmware/qcom/qcom_pas.c
->  create mode 100644 drivers/firmware/qcom/qcom_pas.h
->  create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
->  create mode 100644 include/linux/firmware/qcom/qcom_pas.h
->
-> --
-> 2.53.0
->
+>  net/xfrm/xfrm_policy.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> index 7ef861a0e823..2612a405542b 100644
+> --- a/net/xfrm/xfrm_policy.c
+> +++ b/net/xfrm/xfrm_policy.c
+> @@ -1362,7 +1362,7 @@ static void xfrm_hash_rebuild(struct work_struct *work)
+>  		if (xfrm_policy_is_dead_or_sk(policy))
+>  			continue;
+>  
+> -		hlist_del_rcu(&policy->bydst);
+> +		hlist_del_init_rcu(&policy->bydst);
+
+This patch is dubious.  I looks to me as if it papers over the
+actual bug.
+
+Why is there a memory allocation error?
+
+The first loop -- before unlink -- is supposed to preallocate the new
+bins and chain heads.
+
+This is also why there is a WARN. No memory allocations are supposed to
+occur after the hlist_del_rcu(), there is supposed to be a guarantee
+that the insertion succeeds.
+
 
