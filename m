@@ -1,167 +1,185 @@
-Return-Path: <netdev+bounces-303910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EIPFH0a4RWoiEQsAu9opvQ
-	(envelope-from <netdev+bounces-303910-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 03:00:54 +0200
+	id /xS5LlW5RWpJEQsAu9opvQ
+	(envelope-from <netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 03:05:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB9C46F2B49
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 03:00:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5A66F2B75
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 03:05:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=atmark-techno.com header.s=google header.b=Yx6XpBeI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303910-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-303910-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=atmark-techno.com;
+	dkim=pass header.d=asu.edu header.s=google header.b=KjLhFvIc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303911-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96C67302F271
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 01:00:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C031C302EEDB
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 01:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC9F42AA6;
-	Thu,  2 Jul 2026 01:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E3F225417;
+	Thu,  2 Jul 2026 01:05:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from gw2.atmark-techno.com (gw2.atmark-techno.com [35.74.137.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B12F224D6
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 01:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E977262E
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 01:05:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782954052; cv=none; b=X37R2po/aPgYOA7Lp2BSNaGg65hIp7jKAMGFW0yaCLjcMlBXT2Bp9paMK3LMcuZTXsEYZlBt60+GmuRu3AKgTxMFBI4Ai/fSKjyXGxLr04+aVddEypRYKzTPLMP3q5vEiq6dn08NRk+ehRJ6ihyZ02ya8sC7dwZgrk+NUauBv6o=
+	t=1782954323; cv=none; b=aaEpFuD6E0Jw9ezXVMSKwqKJczGZGZLbBemTBCi31HhFdO5UmleXjHZVuQaotB32dsDkJnPc2ZNqvz8/dfkIcO/G15RhzV2rw/EIU47o0xGkhnQyAb+Hf3AJgZR9r0cYQKi4T8MlG2ftY3xdMMge566FfbU8UrCiWhiScgqE5aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782954052; c=relaxed/simple;
-	bh=JSdxwTjGuLjPKD2MFftoxTD6yZmcAVuXoW0ZxbMbcAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lsg4QZxuNNXVHUOhnLq6uWaB/uNds+kRj8bTNsqwOW9hswE7DeHhUdryawJVa6aGA4D8zrpzZShtNuelfg3pzUWHHooIRm95fC2t+F60fAtPsRRSWXSZgMtU89OiWAn9UGJo1QEE9Pbrkj4fuoeqyWHmMp8HvoTCiHtaPrCPX30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=atmark-techno.com; spf=pass smtp.mailfrom=atmark-techno.com; dkim=pass (2048-bit key) header.d=atmark-techno.com header.i=@atmark-techno.com header.b=Yx6XpBeI; arc=none smtp.client-ip=35.74.137.57
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by gw2.atmark-techno.com (Postfix) with ESMTPS id 3CDE3406
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 10:00:44 +0900 (JST)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c889d1eedcdso1313455a12.1
-        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 18:00:44 -0700 (PDT)
+	s=arc-20240116; t=1782954323; c=relaxed/simple;
+	bh=BL7fpg+hev2aTdz+USemxNuBl28/n+mItaSQrlZpMJA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pdmkHOH7jOporUNqDzGfVEtFbJ/LRKF+N/ScMsiBc65d542FLheRicq55Ck4UfXqsiq5LGOfmyQogfpaVVdG5vvP5GaONEfA2Mi03BMLpRx08BKcMt0dMF5AFxe/h7NTed2OWyfoGN7iYm5a9V4A6IabL9fHre+oAvqIcHenPoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=KjLhFvIc; arc=none smtp.client-ip=209.85.216.54
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-37fcae0ecb3so933937a91.3
+        for <netdev@vger.kernel.org>; Wed, 01 Jul 2026 18:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atmark-techno.com; s=google; t=1782954043; x=1783558843; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dYVIvz2xiwDyxGktXu2b/BOw3jOsNJ0bfYAQd0mQ/PY=;
-        b=Yx6XpBeIQeCInVuGNYy37XpP0BGaNv2NqGWOPrSSjdJAw3mVBpLB18fP/Yhucho2g4
-         x64EIRYjSZtsWRJuOmI7XXt7yQJNy3mlZkoGleMOVHsiD/1Qt9DjKxKnCy9f9VUjr6em
-         pJZBVcZpgwO1h+R37a0VzqZj0jj/2stUTIkbOq1WhcDQbkKBRKnYfNzBylVcyGz3R28n
-         7xvs3oMDiXlc40qlfkkyEc7GnyFTdC+INgOZUEihWewngGpQF4RrMqWR/ojuqpr6Qwa6
-         IiaPiC34IIx3cE5l4OSCxA6sLhN55ooe9MwAsE3dlgE1F0iQNpEKvmZLYJdFL4Elfppt
-         cNEQ==
+        d=asu.edu; s=google; t=1782954321; x=1783559121; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WeonFO4IjuG4HJdhzbTWC6iM3TkwFvdMtNEruwDISF8=;
+        b=KjLhFvIcDoJD9eF6GAXIC/PRfw9IG2TN6vx/4d5uVKaB/XzQHJjWk6R5ybytuvQKZD
+         O0b77S8m3nG9XW7Aoj2SoetVGt5826Tvh34deidU5VyxwfuxSbcGlJDtSkr5k7i3jmrk
+         /NZtzFRjYWLF/Id3Gvr0JJqXLAt7lYJ/mYJ6sixxZp+2SND06h5zrI0MC4Dqz7hyfx/j
+         fOnKvAs7CUER4HXxKyH4YZ1RwVIsTwXEzPDAlb4YjqoxhwlVJhSOGWXed2Vp5ieNPgTk
+         d8z9huDcPWCNs5/86XCoybi/wJrT7AAI8POCyAOCmu143lDeVSLNwjMVnjUjiDOufeqU
+         QTTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782954043; x=1783558843;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dYVIvz2xiwDyxGktXu2b/BOw3jOsNJ0bfYAQd0mQ/PY=;
-        b=b6uhyATc9oAJgzqIJU2NhCJJ39PBz4GaOF2wEQD0h5L8feWPtDPJ5ifyrDkJqrTVHu
-         e64+sy/a0gB/Jb+fVinoeOUZ8+BWeAGiGDX37+L5QySB46lmfE6DhOv8sbxfJsEMdrU1
-         gzVppkWTWxKVKF41xdaqTz4msGUKdeh4/UnVudTMXq1bfufZeHC9hFNOZYqlcx6piXQd
-         BvAvWdSD5w1vWL+ufU9U+3QNpb+qz16TKq89WtG7onZrMCcTcw+QCXDwi+cow5bnzHnP
-         vHDnQm1iOyRuE+e7PEJWTh0LS3xkoPbuaXokJSLc8kpJbfVFjFE7oMMMZX4FeHOJGFbt
-         8VaA==
-X-Forwarded-Encrypted: i=1; AHgh+RouuPziLpqHoChN4KwaogYb1NldWWqQFLVSTLBmJ1r+y99uvqwBvv7m+tVuP2yMv55AVuWTAoc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV3l+RMEZ0nDzGAdfB1JQpD8iE/KBK8QSy3hJvfh9zzlFZObmb
-	3rbIyDqgx1dClCocJzRvvovFRfjpnV1tULx6hZP4kD9JrteCiHI/8Qd9IxjL2bkBxIj06FPrtE2
-	HVABKJ2e9HJb+NvPSrqON+PM5WWVUnPW7GUlTC5KXjV0ySoE1qUv+ePJyaIs=
-X-Gm-Gg: AfdE7cnJVZHPGQKLHm+h6lzLqJk1YJn27CchrP+w+3chPtEHurABrxgDam0/o6KEXRF
-	/Osk8Ujc1tXUxMBnH5lOpIakJ8xNk35zeUh9tIJtC1Mnm2wgOAY/zGjSx7DZxfBoWgO50nIKEuo
-	3vyw/zhPb2UlvVAcNezY7lu0b0ekDJRvnJMC/O4ZM0LceMKB1ukg1tuvE/bApVlnbhvNt3v84ya
-	vg8X0c7/rmEV2NI/E60Ox0cNT0GozY4wYB9rPAZfIHdLOqAkVNqzw0Lw6czRcL538ldT1bFNKJm
-	/yscGgTamoqRm6tUbHlJXuZ6+CmDIniRUOXOptxTaSEzk0xNELqDI7KtHpzphAjK2HK21dNqhBt
-	anApNTPEzbj/dcmWC2cEP6aC7PH407/RRWdFJwFRVfgF/c52RdNdYQR4cDhE=
-X-Received: by 2002:a17:90b:17c2:b0:36d:689a:cb27 with SMTP id 98e67ed59e1d1-380aa22b082mr3768071a91.24.1782954043100;
-        Wed, 01 Jul 2026 18:00:43 -0700 (PDT)
-X-Received: by 2002:a17:90b:17c2:b0:36d:689a:cb27 with SMTP id 98e67ed59e1d1-380aa22b082mr3768041a91.24.1782954042395;
-        Wed, 01 Jul 2026 18:00:42 -0700 (PDT)
-Received: from localhost (sodcd-04p2-40.ppp11.odn.ad.jp. [203.139.65.40])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-380e16057d0sm86255a91.8.2026.07.01.18.00.41
+        d=1e100.net; s=20251104; t=1782954321; x=1783559121;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WeonFO4IjuG4HJdhzbTWC6iM3TkwFvdMtNEruwDISF8=;
+        b=pyfgA3BjM+R42KT2yzmJ/JDSFyElhaKL2HI2ShlRV68pGThi1bhFZwveQxXqLcBHih
+         RwfNHsONDUWGHUIZXm1hlgXB5MlRSMMKNSKw1NsIcCttasWUt67NFIVSPbS+nDmHjGCF
+         MnUlls1buOAdfLhzIjZc/g15TeRhNjsTrhrDdM/J/D99QTIjY605yh+mgBr72UlqKuat
+         Qbf9LWbJ8f6Y38oKSS3cobjRI2Bh85k/Qp/hId5UG+2i1rU/TEwW1r6VBZTzAeeo+bSt
+         cjIxV7xVhsLuprF1ONjOw+mmNatxWT8j0dTch56/xpukylsc0pVUO1HFCS6YqlzsV0zt
+         MzOg==
+X-Forwarded-Encrypted: i=1; AHgh+RoNDdjCNm4sQRuaQWTPVkI2u0n0DhhyBAEve1w6xrgM7x4ghVEMTIvwqBqe6NGDvKqcfmF+AZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrCuOGMN8nMf89Axvdmzvs1K39VIhFBslmwiJQ/MroXoKdIVel
+	IapUya7pTD0oAZN4HTKmbrOatrabOry8rgpu/TMrrUgE7wtRnmtBRGSlZdRxJaPG3Q==
+X-Gm-Gg: AfdE7cn+Mj143X02zONo9UAlsM8urZG5WEM5Fs3osf7K9+xH5ADE8KLlQD1q0G2f5TB
+	sxdZgLUDOq4KVcVjENipT029WCWI4z2KfDT1cbdLYTnEgPmUAblIzyCI80Vd9LltJTu+N1SETrB
+	nhrBRI4mCUtFRy9TspzN5z9lCSU/lCSBnkOLgu4uPxYxEKG/epixpTH1mt2httiX6Pup5RuYUnU
+	ZzA7ol7hubyPCRDCDM/KYHCAlBvUEvzGvWy0yDFG2ngcfVE69GDK/77exCtH59U6a8pd/bDrP7K
+	lRkqMFMfGMLejMXn0PyzOMslNpSovks56x4bhi/6Shbr9BlrnOXHix7JnhSJ5/32ZgfE6X6qLCS
+	+mbosBj1+iEwU4nIKtrlcYz4AC8unozCAjpfnZm2R20foWfMx0EbizM34ev/t3YTBrh9GjUL+Xe
+	wqqoLm9pafl5D00V9zUw==
+X-Received: by 2002:a17:90a:e7cf:b0:37f:9ce1:7369 with SMTP id 98e67ed59e1d1-380aa21c833mr4035350a91.31.1782954320615;
+        Wed, 01 Jul 2026 18:05:20 -0700 (PDT)
+Received: from xiang.tailc0aff1.ts.net ([20.171.14.70])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb84366sm3417434eec.16.2026.07.01.18.05.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 18:00:41 -0700 (PDT)
-Date: Thu, 2 Jul 2026 10:00:30 +0900
-From: Dominique Martinet <dominique.martinet@atmark-techno.com>
-To: Sasha Levin <sashal@kernel.org>
-Cc: stable@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
+        Wed, 01 Jul 2026 18:05:20 -0700 (PDT)
+From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Mat Martineau <mathew.j.martineau@linux.intel.com>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Rajat Gupta <rajat.gupta@oss.qualcomm.com>,
-	Yiming Qian <yimingqian591@gmail.com>,
-	Keenan Dong <keenanat2000@gmail.com>,
-	Han Guidong <2045gemini@gmail.com>,
-	Zhang Cen <rollkingzzc@gmail.com>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Victor Nogueira <victor@mojatatu.com>
-Subject: Re: [PATCH 5.10.y] net/sched: fix pedit partial COW leading to page
- cache corruption
-Message-ID: <akW4LleEw9axSYaB@atmark-techno.com>
-References: <20260630-cve-2026-46331-v1-2-c1986f356f26@atmark-techno.com>
- <stable-reply-pedit-cow-510-20260701193800@kernel.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	AutonomousCodeSecurity@microsoft.com,
+	tgopinath@linux.microsoft.com,
+	kys@microsoft.com,
+	"Xiang Mei (Microsoft)" <xmei5@asu.edu>
+Subject: [PATCH ipsec] xfrm6: clear dst.dev on error to avoid double netdev_put in xfrm6_fill_dst()
+Date: Thu,  2 Jul 2026 01:05:16 +0000
+Message-ID: <20260702010516.221830-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <stable-reply-pedit-cow-510-20260701193800@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[atmark-techno.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[atmark-techno.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-303911-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-303910-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sashal@kernel.org,m:stable@vger.kernel.org,m:jhs@mojatatu.com,m:xiyou.wangcong@gmail.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:kuba@kernel.org,m:mathew.j.martineau@linux.intel.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:rajat.gupta@oss.qualcomm.com,m:yimingqian591@gmail.com,m:keenanat2000@gmail.com,m:2045gemini@gmail.com,m:rollkingzzc@gmail.com,m:dcaratti@redhat.com,m:toke@redhat.com,m:victor@mojatatu.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,m:xmei5@asu.edu,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[dominique.martinet@atmark-techno.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,kernel.org,linux.intel.com,redhat.com,oss.qualcomm.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dominique.martinet@atmark-techno.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[atmark-techno.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CB9C46F2B49
+X-Rspamd-Queue-Id: 0F5A66F2B75
 
-Sasha Levin wrote on Wed, Jul 01, 2026 at 08:38:34PM -0400:
-> > [Dominique: plenty of context conflict but the code itself could still
-> > mostly be used]
-> 
-> Thanks! However, the same upstream fix (899ee91156e5) is already queued for
-> 5.10.y via Wentao Guan's backport, which brings in the act_pedit
-> RCU/percpu-stats prerequisites first and then applies the fix nearly
-> verbatim.
+On the error path where in6_dev_get(dev) returns NULL, xfrm6_fill_dst()
+releases the device reference with netdev_put() but leaves
+xdst->u.dst.dev set. dst_destroy() later calls netdev_put(dst->dev)
+again, so the same net_device reference is released twice, underflowing
+its refcount (ref_tracker WARNING + "unregister_netdevice: waiting for
+<dev> to become free").
 
-Oh, thanks!
-Sorry for the noise, I'll remember to check next time.
+Clear xdst->u.dst.dev after the netdev_put(), the same way the XFRM
+device-offload paths xfrm_dev_state_add() and xfrm_dev_policy_add() in
+net/xfrm/xfrm_device.c NULL ->dev when releasing the reference on error.
 
+  ref_tracker: reference already released.
+  ref_tracker: allocated in:
+   xfrm6_fill_dst (net/ipv6/xfrm6_policy.c:86)
+   ...
+   udpv6_sendmsg (net/ipv6/udp.c:1696)
+   ...
+  ref_tracker: freed in:
+   xfrm6_fill_dst (net/ipv6/xfrm6_policy.c:90)
+   ...
+  WARNING: lib/ref_tracker.c:322 at ref_tracker_free+0x58b/0x780
+   dst_destroy (net/core/dst.c:115)
+   rcu_core
+   handle_softirqs
+   ...
+
+Fixes: 84c4a9dfbf43 ("xfrm6: release dev before returning error")
+Reported-by: AutonomousCodeSecurity@microsoft.com
+Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+---
+ net/ipv6/xfrm6_policy.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+index 125ea9a5b8a0..3b749475f6ed 100644
+--- a/net/ipv6/xfrm6_policy.c
++++ b/net/ipv6/xfrm6_policy.c
+@@ -88,6 +88,7 @@ static int xfrm6_fill_dst(struct xfrm_dst *xdst, struct net_device *dev,
+ 	xdst->u.rt6.rt6i_idev = in6_dev_get(dev);
+ 	if (!xdst->u.rt6.rt6i_idev) {
+ 		netdev_put(dev, &xdst->u.dst.dev_tracker);
++		xdst->u.dst.dev = NULL;
+ 		return -ENODEV;
+ 	}
+ 
 -- 
-Dominique
+2.43.0
+
 
