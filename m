@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-304079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Fx5cBvA+RmrTMgsAu9opvQ
-	(envelope-from <netdev+bounces-304079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:35:28 +0200
+	id vD5gDPw+RmrXMgsAu9opvQ
+	(envelope-from <netdev+bounces-304080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:35:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 993416F5FCF
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:35:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D5A6F5FDD
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:35:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LtmD8fG3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304079-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304079-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=K+3aqqNI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304080-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304080-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9FD03320168E
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:51:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 430C331957E9
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 09:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40A84C77DA;
-	Thu,  2 Jul 2026 09:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EC6480343;
+	Thu,  2 Jul 2026 09:43:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1149480DCE
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649E547CC69
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 09:43:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782985398; cv=none; b=ZNixAwCKb3mKux6vAjdWs0YruafPWGJWxiCRYJt37mzZM63Qw1Dxz8zFWgXBIZSYJV5+1iFtIqQqjE7L7Xg7CJ+lViMFY6uyrmFRxKeQtCOymgSkwuv3C1tTpziwIy8QnZ8Q2geapbRfwvhNSDXtDygBQ00o6/auyINANAlCQX0=
+	t=1782985414; cv=none; b=NmMUZXSsAh7gENqaaawIxpDoIvKSDSIUG4/mzYHaxAQO14Zv/UIOw3QdUdDXCw7fKg2Kcf+SznkEKWd+KzBmhkTaf89sJc5IJ4X06WOdTuKN/ONVtsN3hdNeQWe0WeQBS5IDaIPJqKMugeZs0C0x+V+r8tKf7pMszl4qIV8XtQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782985398; c=relaxed/simple;
-	bh=/Z5QH5xGIhTuueFEUkqDtjio/PvnL55at3Q56Vk1Qm0=;
+	s=arc-20240116; t=1782985414; c=relaxed/simple;
+	bh=pOdAUpTY7VdmO2zJNJlQhA/y5rutGS8uz+Zk2m3/oWo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RZJBL5IsyDBOFj0LiwHj6hqyHAx1T7mvTUCefRnEaEFsL5X8PQ/HNI/U0CuwOsstDotBbi5bTBu9aLNyh3nX6f8RYQI/+h+o0DaQZjNHLxSj3Xx2WfjKjuN+V1eggUKY9iHYBTYm5Hp2P/0HcjzwcjzkwD/GsLjn9KH5GQA25sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LtmD8fG3; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=D39lZ8M/tPahfOfAJ0hdI6QeWY5P/R9JRIXsD5czdNW/0klxA4WPUoLImwcFfY+Xc3rh8Ef7hevF4KwMUNtHdvHLLxy3x/Ng0kApzBY/UUqUF/xCXawkDrSEmiX6Gy+wY2JunsBGQKRsh6oc9waNJwKkWIahyriYhWTPWe7KpVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K+3aqqNI; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782985396;
+	s=mimecast20190719; t=1782985411;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D6xNiSJ7cXeNZHCZuu0zC6iFo82L/QJuzyBnhtWmIGI=;
-	b=LtmD8fG3xzlbx0YpLT+GWxtw1HUDf78WxyTo9OodxtBWgQ8S2gfwAo39o4N/DrBuPF9G7l
-	Gt2QIMCw5KgqhWTIpBoSniHRK7oKEixUU35pZX1+Wh9xw1co6ugWEf5MiBQfRtoe9OdRdL
-	+C3bqjp/lfpPp06q9W+V4xqQCgxU/4Y=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=roDh6mmUlFNcXrwzbI7m0CnSSEDydvq2qq6/HQSOpdA=;
+	b=K+3aqqNIH/M3ZgiMibyg370T5s43MXACJ4Z/J5x5H0LpB5NkbKhs4cm60EiaaY1egjdw8M
+	HsWYKQi/o6d3f/rUhjsBNpmG/QGkmeCmpDsfUUBOVQZYPY26Z5fZqVej8emXpza3M4Aq27
+	b+FQ0OoT87AglymRg0bYeEVXE3zrsxE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-148-9IXg27smPkyfGlOnlKCX_g-1; Thu,
- 02 Jul 2026 05:43:12 -0400
-X-MC-Unique: 9IXg27smPkyfGlOnlKCX_g-1
-X-Mimecast-MFC-AGG-ID: 9IXg27smPkyfGlOnlKCX_g_1782985390
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-389-HWyScGX9NYiq9_nwQY3OnA-1; Thu,
+ 02 Jul 2026 05:43:25 -0400
+X-MC-Unique: HWyScGX9NYiq9_nwQY3OnA-1
+X-Mimecast-MFC-AGG-ID: HWyScGX9NYiq9_nwQY3OnA_1782985399
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3418A184B0B6;
-	Thu,  2 Jul 2026 09:43:10 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 44B27195394F;
+	Thu,  2 Jul 2026 09:43:19 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.48.252])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C387B196B0A3;
-	Thu,  2 Jul 2026 09:43:04 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 17003196B0A3;
+	Thu,  2 Jul 2026 09:43:13 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: illusion.wang@nebula-matrix.com
 Cc: dimon.zhao@nebula-matrix.com,
@@ -79,11 +79,11 @@ Cc: dimon.zhao@nebula-matrix.com,
 	skhan@linuxfoundation.org,
 	hkallweit1@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 net-next 08/10] net/nebula-matrix: add Dispatch layer implementation
-Date: Thu,  2 Jul 2026 11:43:01 +0200
-Message-ID: <20260702094301.111400-1-pabeni@redhat.com>
-In-Reply-To: <20260630010718.4346-9-illusion.wang@nebula-matrix.com>
-References: <20260630010718.4346-9-illusion.wang@nebula-matrix.com>
+Subject: Re: [PATCH v20 net-next 09/10] net/nebula-matrix: add common/ctrl dev init/remove operation
+Date: Thu,  2 Jul 2026 11:43:10 +0200
+Message-ID: <20260702094310.111412-1-pabeni@redhat.com>
+In-Reply-To: <20260630010718.4346-10-illusion.wang@nebula-matrix.com>
+References: <20260630010718.4346-10-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,13 +99,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
-	TAGGED_FROM(0.00)[bounces-304079-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-304080-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
@@ -122,13 +122,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 993416F5FCF
+X-Rspamd-Queue-Id: C6D5A6F5FDD
 
 From: AI Reviewer <ai@example.com>
 
@@ -136,84 +136,71 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev/
 ---
-net/nebula-matrix: add Dispatch layer implementation
-    
-This patch introduces a control-level routing mechanism for the Dispatch layer,
-supporting direct and channel routing paths based on declared control levels.
-It establishes the message handling framework and sets up the resource layer
-locking strategy for operations like MSI-X configuration.
+net/nebula-matrix: add common/ctrl dev init/remove operation
 
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
-> index f0b4406ca5601..ca565c6c4819f 100644
-> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+This patch adds nbl_dev_setup_common_dev and nbl_dev_setup_ctrl_dev helpers,
+plus matching teardown paths, and wires them into nbl_dev_init and
+nbl_dev_remove.
+
+> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
+> index 5deb21e35f8ef..8feae561d0f13 100644
+> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
+> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
 
 [ ... ]
 
-> +static void nbl_disp_chan_configure_msix_map_resp(void *priv, u16 src_id,
-> +						  u16 msg_id, void *data,
-> +						  u32 data_len)
-> +{
-> +	struct nbl_dispatch_mgt *disp_mgt = (struct nbl_dispatch_mgt *)priv;
-> +	struct nbl_channel_ops *chan_ops = disp_mgt->chan_ops_tbl->ops;
-> +	struct nbl_resource_ops *res_ops = disp_mgt->res_ops_tbl->ops;
-> +	struct nbl_resource_mgt *p = disp_mgt->res_ops_tbl->priv;
-> +	struct device *dev = disp_mgt->common->dev;
-> +	struct nbl_chan_param_cfg_msix_map param = { 0 };
-> +	struct nbl_chan_ack_info chan_ack;
-> +	int err = NBL_CHAN_RESP_OK;
-> +	int copy_len;
-> +	int ret;
-> +
-> +	copy_len = data_len < sizeof(param) ? data_len : sizeof(param);
-> +	memcpy(&param, data, copy_len);
-> +	ret = NBL_OPS_CALL_LOCK_RET(disp_mgt, res_ops->configure_msix_map, p,
-> +				    src_id, le16_to_cpu(param.num_net_msix),
-> +				    le16_to_cpu(param.num_others_msix),
-> +				    le16_to_cpu(param.msix_mask_en));
+> @@ -38,11 +190,29 @@ int nbl_dev_init(struct nbl_adapter *adapter)
+>  	dev_mgt->chan_ops_tbl = chan_ops_tbl;
+>  	adapter->core.dev_mgt = dev_mgt;
+>  
 
 [Severity: High]
-This is a pre-existing issue, but does exposing this configuration via
-channel messages allow a VM to trigger an unbounded memory leak?
+Does this initialize the common device components before the chip is actually
+initialized?
 
-Looking at the underlying nbl_res_intr_configure_msix_map() implementation,
-it allocates device-managed memory for the MSI-X map table:
+If nbl_dev_setup_common_dev() configures queues (which accesses hardware)
+before the hardware is brought up via nbl_dev_setup_ctrl_dev(), could writing
+to those queue registers cause hardware faults?
 
-nbl_res_intr_configure_msix_map() {
-    ...
-    msix_map_table->base_addr = dmam_alloc_coherent(dev,
-                                                msix_map_table->size,
-                                                &msix_map_table->dma,
-                                                GFP_KERNEL);
-    ...
-}
-
-However, prior to this allocation, it appears to call
-nbl_res_intr_destroy_msix_map(), which merely clears the pointer without
-freeing the previously allocated memory:
-
-nbl_res_intr_destroy_msix_map() {
-    ...
-    intr_mgt->func_intr_res[func_id].msix_map_table.base_addr = NULL;
-    ...
-}
-
-Since this patch wires up nbl_disp_chan_configure_msix_map_resp() to
-process NBL_CHAN_MSG_CONFIGURE_MSIX_MAP channel messages from untrusted VMs,
-could a compromised VM repeatedly send these messages to exhaust host memory
-and DMA mapping space?
-
+> +	ret = nbl_dev_setup_common_dev(adapter);
 > +	if (ret)
-> +		err = NBL_CHAN_RESP_ERR;
+> +		return ret;
 > +
-> +	NBL_CHAN_ACK(chan_ack, src_id, NBL_CHAN_MSG_CONFIGURE_MSIX_MAP, msg_id,
-> +		     err, NULL, 0);
-> +	ret = chan_ops->send_ack(disp_mgt->chan_ops_tbl->priv, &chan_ack);
-> +	if (ret)
-> +		dev_err(dev,
-> +			"channel send ack failed with ret: %d, msg_type: %d\n",
-> +			ret, NBL_CHAN_MSG_CONFIGURE_MSIX_MAP);
-> +}
+> +	if (common->has_ctrl) {
+> +		ret = nbl_dev_setup_ctrl_dev(adapter);
+> +		if (ret)
+> +			goto setup_ctrl_dev_fail;
+> +	}
+>  
+>  	return 0;
+> +setup_ctrl_dev_fail:
+> +	nbl_dev_remove_common_dev(adapter);
+> +	return ret;
+>  }
+>  
+>  void nbl_dev_remove(struct nbl_adapter *adapter)
+>  {
+
+[Severity: High]
+Are the teardown operations in the correct order here?
+
+The comment in nbl_dev_remove_ctrl_dev() mentions that setting the driver
+status to false triggers the firmware to clean up the qinfo registers.
+
+If nbl_dev_remove_ctrl_dev() deinitializes the chip first, will the
+subsequent call to nbl_dev_remove_common_dev() attempt to tear down the
+queues by writing directly to those deactivated qinfo registers? 
+
+Could this lead to PCIe master aborts or panics during driver unbind?
+
+> +	struct nbl_common_info *common = &adapter->common;
+> +
+> +	if (common->has_ctrl)
+> +		nbl_dev_remove_ctrl_dev(adapter);
+> +	nbl_dev_remove_common_dev(adapter);
+>  }
+>  
+>  /* ----------  Dev start process  ---------- */
 -- 
 This is an AI-generated review.
 
