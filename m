@@ -1,189 +1,276 @@
-Return-Path: <netdev+bounces-304106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304107-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gE8vDhRBRmqOMwsAu9opvQ
-	(envelope-from <netdev+bounces-304106-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:44:36 +0200
+	id 4aIxHTdDRmpwNAsAu9opvQ
+	(envelope-from <netdev+bounces-304107-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:53:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E56C36F61AC
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:44:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9CC46F63E1
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 12:53:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=SOQWFAL+;
-	dkim=pass header.d=redhat.com header.s=google header.b=lDuLJHXh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304106-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-304106-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b="YyCq/OUg";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304107-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-304107-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 27DDC302679D
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:43:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20514319B6FD
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 10:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A38639A061;
-	Thu,  2 Jul 2026 10:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432DB3A7F6B;
+	Thu,  2 Jul 2026 10:43:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D5F3A3E60
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 10:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEC439D6F2;
+	Thu,  2 Jul 2026 10:43:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782988981; cv=none; b=PR/kcVPJiEwhOyIU7KFlfSG32xyg+0tQDyAUe+BTTPhG85vuqGtIMgcWGpRh6jhnmPZtzA7iXP6Hn8BVutqQKyxu3dwwk4i0tHJKmLOX56ekllNhAj3BdKL6b0ZAdyrnF9CJlVTsWHMAjXv2gxS6wd0itd9Kq0zR1/MkaV2vdnI=
+	t=1782988997; cv=none; b=lod43z5O9Jqo3D57Gvw+nprXf2r8eLgvfmWrCXYsjXfTacMRjNABKbowCVAjxW7hH51FIiZa20zV5EvFth9XryPu0hOAWHgf7lcF2Ip+vnhHIp/IW5h3mIP413qE1VQnqYMCPDWZY9tZT+pOW1aBddgXUNIKSXYunm6V+q9uPhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782988981; c=relaxed/simple;
-	bh=6sQRIq7b9Zu9XKPDiUd+ggNhyc4hQiLpe1Vw/AVrFSU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B2IYSenkfV8Zu8dp8e2NASq17OjjmNASj7M5Qt/wOMUmADgyTqSBHV7enTHo01SOUWtl/FOnZZ0Aupk4YjqpkxR0NvcD6JMyFHBwyumreRskFnYP7EgGpLl4f9v8gA6aQqpzcK3EpHhCRABlkqkWCkDTL9NmtKS/BRNBr60f4Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SOQWFAL+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lDuLJHXh; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782988979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FqGzQrV1pDX1atAYAe3/sAYqSpXdWp3fwZzPzPU+03Y=;
-	b=SOQWFAL+2CVmVE3Vee8SgPxzv/cGnWvcGgktoOswuKrAMX5TzqjHOR8N0RuMMYYiuYiRfq
-	neygJfQzeU+aAtTn4T3nJnkn1y1/Zw7ptdWqcqMiFyVQ/tj42QghjzVJv57zIWn5rD3wRr
-	wqA0oxaNs3dFmlrSssc54gJa7ZJXX7A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-kHCLttAROx-T_dGoMckYBQ-1; Thu, 02 Jul 2026 06:42:58 -0400
-X-MC-Unique: kHCLttAROx-T_dGoMckYBQ-1
-X-Mimecast-MFC-AGG-ID: kHCLttAROx-T_dGoMckYBQ_1782988977
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-46fd6d94a8dso820999f8f.2
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 03:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1782988977; x=1783593777; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FqGzQrV1pDX1atAYAe3/sAYqSpXdWp3fwZzPzPU+03Y=;
-        b=lDuLJHXhKRVycDXq/Bfbc8ZcHeKJ4QO+H5qyx9wV7UAWQndtayWL7sDvDnrFMtWCfO
-         oAq1Fv2LijwjBCPihkPL48+V+RVx5xKaG1nJVplRfXV+Z3Z0MycJChwHy7Jvg6AWx9dM
-         7F2ap4rdWo+24wcU8dNO8Xr6mRrbLJ7Fwg1q5mqw/jz38YSEsEYZDiqstFzI4oZu4587
-         6PfIr5vjJ0Zli2C/7unxLVagzpAAciJub4UQIorngRR/iQk8i7/2Jpc/+KgpBxXf3QE7
-         ddDUMFiF39l2t1869YTFT/+YrHuAUYpfFoeKjdM2ateqHzGZQyle4AvFcIY0ZPrWhoux
-         0dlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782988977; x=1783593777;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FqGzQrV1pDX1atAYAe3/sAYqSpXdWp3fwZzPzPU+03Y=;
-        b=lCt5AhpJHbWGBEHFq41tuwwAEOIz+EDzcYsSCRmIrLNqo4Yn/d7y90YORZE3IHSQKp
-         X0x7sEpYU60AyO8PT+olyJ8Chx6rw0jR6NRuuyleox53bJ9vMhj20ZMdKWfoGnWhLwlV
-         cwvVcZUN7SRDlQz9q4x2dv9J9eIHlv+A9hC6EWDXqqz/x7pi2Y4Q5h44ppELUgDx9lLv
-         FX/7JeeZB/o0jPXe4HML8/y153n6sK9loTht3+hsON6oU3CCXBIpn8fKuWfcubCIqirc
-         wcxbKiaZdm0vMSA79ukwIOT1mCaNjGKGvXMLNka/3clGZvoCcXn2R581cTtHH54/aG37
-         3C5g==
-X-Forwarded-Encrypted: i=1; AHgh+RqoeaP433HYZsF3C1pxWlKNA7Fwq33VrbV+NOU8yeGmjCO/KUsgzaB/dx1ri2ITdv89RsvYZf4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGKhj4wOTl6NwjENqtCZ5QiXkIFXLwf7gFvD6PJoNouKfO1NNE
-	+/LdTqEcydRyqkf0AVIlJJoCChSXxkY53kGb8W5t9iJv9D/Y8Syb8eI/wNRABStGI9TuKXY0WG0
-	AdWJv66YQcqD5qrzGWUt41GWH+gbY6ZfGMKK7X8dmPH1lqOtE16Lt+JMtlNaNmosFhQ==
-X-Gm-Gg: AfdE7cmF/Fkzel9M0QhFSCaZmOBomDgB5cwSG8ymBKHfpMqGaluD1qtipZBrIFwML0R
-	StBZ9LK/sM9P365Asfj+vXtyO2vyU0D3iYBtANzhFYOuJYm2Y7y46m2eBFWcCt4EbJx6/5ZAAac
-	ha5HFWhNexp6ODYg1I4MirmzDoGEB15VipdO0NHIV1WwjnCDuh6v5PiCJs4dNBsav185aQXIvvU
-	xk+QdeGtJHLX/WvSOWVsMELgpNsbJJqCuEbcsU4OxI4P9DDcJuGfS0i7tPGMJjHO9UmlqMcPCFF
-	hth05BO+O5hm90PP7hMRx8COPxrYhFasXYQJxoymF18Pz53la5CYNXjC4gDbVcmAjXGYPA2+pCo
-	FuvOOr4JLZK+WTyjWH3VVcjLrCtDvIpRn0ehemjYenP1Nn+w1UBsFb+sbgv61Y/dYKeQBLrXHWQ
-	Z5nk3kZc1chw==
-X-Received: by 2002:a5d:5d08:0:b0:476:135a:1349 with SMTP id ffacd0b85a97d-477571cb873mr8078453f8f.6.1782988976755;
-        Thu, 02 Jul 2026 03:42:56 -0700 (PDT)
-X-Received: by 2002:a5d:5d08:0:b0:476:135a:1349 with SMTP id ffacd0b85a97d-477571cb873mr8078421f8f.6.1782988976326;
-        Thu, 02 Jul 2026 03:42:56 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:5521:6b10:2eb7:f61a:75:4534? ([2a0d:3344:5521:6b10:2eb7:f61a:75:4534])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-477dd94c829sm7517038f8f.24.2026.07.02.03.42.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jul 2026 03:42:55 -0700 (PDT)
-Message-ID: <517ee2e3-1bc8-48ad-94c7-5d8e47073d5f@redhat.com>
-Date: Thu, 2 Jul 2026 12:42:54 +0200
+	s=arc-20240116; t=1782988997; c=relaxed/simple;
+	bh=nsPzh/zgN7ngRSlLTkKGe5aFUbv/ow2gLvGD1TkU8bY=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=jFuFgOZ+0iPDfytL1qOc5epebc3rWphPzKw5xue8yTp1Z8CKuthpIL8WJkbWaNBhaq+DkxLQB9mSBS7/fJR2qunpS4tXk8ei3vcm9PQXiO+g/CQwFsrMPaDkMXb4fktzhf79vwo97dm/bttaw+MkO8dTA0g/ZHmYFdFDWKHsIbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=YyCq/OUg; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9DE2FA47FB;
+	Thu,  2 Jul 2026 12:43:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1782988993; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=djGlSa1buOQKB09c6s+Wra8IujoJXlF1brDw/moIWjQ=;
+	b=YyCq/OUgNZaF9E2UgYkCt52zcoy1FIybsqm7EVp6pjiuT96VGjo4hNmEl+QeZJb8L7hw7P
+	g6EE2jhM5w/2CqlPCs8HfVTEuRREr7A+oJRlU2a8xxiSxEVo9o8fIb3v9yZyeiBUpe2VcV
+	5vQ6W5AeZDooNsSc7ch7Czj5YgJd5d5tBupG8d0uSX++BdMXDJDpmFNUJuxY2GMvm08wH8
+	A47WjV36/iX2FKT+j1lpGCjaCqmuoWueasCfEEHY/Hhy/OoC07uHQMBBjjx/5wTPlSoWdY
+	h7/+MuFMMI7sUc1zj0oNMsyvNfgu8plnxTuc3HRgA492EmTw7JvCHEOdJHdlxg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/10] net: emac: use DMA-specific and SMP memory barriers
-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>
-References: <20260630041634.284127-1-rosenp@gmail.com>
- <20260630041634.284127-4-rosenp@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260630041634.284127-4-rosenp@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Thu, 02 Jul 2026 12:43:12 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Paolo Valerio
+ <pvalerio@redhat.com>, Vladimir Kondratiev
+ <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
+ <gregory.clement@bootlin.com>, =?UTF-8?Q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v3 04/15] net: macb: unify queue index variable
+ naming convention and types
+In-Reply-To: <20260701-macb-context-v3-4-00268d5b1502@bootlin.com>
+References: <20260701-macb-context-v3-0-00268d5b1502@bootlin.com>
+ <20260701-macb-context-v3-4-00268d5b1502@bootlin.com>
+Message-ID: <34ac1fa491f6f12ef4154f3ca1a9fb58@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-304106-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:theo.lebrun@bootlin.com,m:conor.dooley@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:pvalerio@redhat.com,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-304107-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,tuxon.dev,mobileye.com,bootlin.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:email,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,tipi-net.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E56C36F61AC
+X-Rspamd-Queue-Id: C9CC46F63E1
 
-On 6/30/26 6:16 AM, Rosen Penev wrote:
-> @@ -1845,7 +1845,7 @@ static int emac_poll_rx(void *param, int budget)
+On 1.7.2026 17:59, Théo Lebrun wrote:
+> Variables are named q or queue_index. Types are int, unsigned int, u32
+> and u16. Use `unsigned int q` everywhere.
+> 
+> Skip over taprio functions. They use `u8 queue_id` which fits with the
+> `struct macb_queue_enst_config` field. Using `queue_id` everywhere
+> would be too verbose.
+> 
+> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 32 
+> ++++++++++++++++----------------
+>  1 file changed, 16 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
+> b/drivers/net/ethernet/cadence/macb_main.c
+> index 86c0e9ccbfce..3b75797381b6 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -877,7 +877,7 @@ static void gem_shuffle_tx_one_ring(struct 
+> macb_queue *queue)
+>  static void gem_shuffle_tx_rings(struct macb *bp)
+>  {
+>  	struct macb_queue *queue;
+> -	int q;
+> +	unsigned int q;
+> 
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; q++, queue++)
+>  		gem_shuffle_tx_one_ring(queue);
+> @@ -1258,7 +1258,7 @@ static void macb_tx_error_task(struct work_struct 
+> *work)
+>  						      tx_error_task);
+>  	bool			halt_timeout = false;
+>  	struct macb		*bp = queue->bp;
+> -	u32			queue_index;
+> +	unsigned int		q;
+>  	u32			packets = 0;
+>  	u32			bytes = 0;
+>  	struct macb_tx_skb	*tx_skb;
+> @@ -1267,9 +1267,9 @@ static void macb_tx_error_task(struct work_struct 
+> *work)
+>  	unsigned int		tail;
+>  	unsigned long		flags;
+> 
+> -	queue_index = queue - bp->queues;
+> +	q = queue - bp->queues;
+>  	netdev_vdbg(bp->netdev, "macb_tx_error_task: q = %u, t = %u, h = 
+> %u\n",
+> -		    queue_index, queue->tx_tail, queue->tx_head);
+> +		    q, queue->tx_tail, queue->tx_head);
+> 
+>  	/* Prevent the queue NAPI TX poll from running, as it calls
+>  	 * macb_tx_complete(), which in turn may call netif_wake_subqueue().
+> @@ -1342,7 +1342,7 @@ static void macb_tx_error_task(struct work_struct 
+> *work)
+>  		macb_tx_unmap(bp, tx_skb, 0);
 >  	}
->  
->  	if (unlikely(budget && test_bit(MAL_COMMAC_RX_STOPPED, &dev->commac.flags))) {
-> -		mb();
-> +		dma_rmb();
->  		if (!(dev->rx_desc[slot].ctrl & MAL_RX_CTRL_EMPTY)) {
->  			DBG2(dev, "rx restart" NL);
->  			received = 0;
+> 
+> -	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, 
+> queue_index),
+> +	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, q),
+>  				  packets, bytes);
+> 
+>  	/* Set end of TX queue */
+> @@ -1407,7 +1407,7 @@ static bool ptp_one_step_sync(struct sk_buff 
+> *skb)
+>  static int macb_tx_complete(struct macb_queue *queue, int budget)
+>  {
+>  	struct macb *bp = queue->bp;
+> -	u16 queue_index = queue - bp->queues;
+> +	unsigned int q = queue - bp->queues;
+>  	unsigned long flags;
+>  	unsigned int tail;
+>  	unsigned int head;
+> @@ -1469,14 +1469,14 @@ static int macb_tx_complete(struct macb_queue 
+> *queue, int budget)
+>  		}
+>  	}
+> 
+> -	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, 
+> queue_index),
+> +	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, q),
+>  				  packets, bytes);
+> 
+>  	queue->tx_tail = tail;
+> -	if (__netif_subqueue_stopped(bp->netdev, queue_index) &&
+> +	if (__netif_subqueue_stopped(bp->netdev, q) &&
+>  	    CIRC_CNT(queue->tx_head, queue->tx_tail,
+>  		     bp->tx_ring_size) <= MACB_TX_WAKEUP_THRESH(bp))
+> -		netif_wake_subqueue(bp->netdev, queue_index);
+> +		netif_wake_subqueue(bp->netdev, q);
+>  	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
+> 
+>  	if (packets)
+> @@ -2470,10 +2470,10 @@ static int macb_pad_and_fcs(struct sk_buff 
+> **skb, struct net_device *netdev)
+>  static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
+>  				   struct net_device *netdev)
+>  {
+> -	u16 queue_index = skb_get_queue_mapping(skb);
+>  	struct macb *bp = netdev_priv(netdev);
+> -	struct macb_queue *queue = &bp->queues[queue_index];
+> +	unsigned int q = skb_get_queue_mapping(skb);
+>  	unsigned int desc_cnt, nr_frags, frag_size, f;
+> +	struct macb_queue *queue = &bp->queues[q];
+>  	unsigned int hdrlen;
+>  	unsigned long flags;
+>  	bool is_lso;
+> @@ -2512,8 +2512,8 @@ static netdev_tx_t macb_start_xmit(struct sk_buff 
+> *skb,
+> 
+>  #if defined(DEBUG) && defined(VERBOSE_DEBUG)
+>  	netdev_vdbg(bp->netdev,
+> -		    "start_xmit: queue %hu len %u head %p data %p tail %p end %p\n",
+> -		    queue_index, skb->len, skb->head, skb->data,
+> +		    "start_xmit: queue %u len %u head %p data %p tail %p end %p\n",
+> +		    q, skb->len, skb->head, skb->data,
+>  		    skb_tail_pointer(skb), skb_end_pointer(skb));
+>  	print_hex_dump(KERN_DEBUG, "data: ", DUMP_PREFIX_OFFSET, 16, 1,
+>  		       skb->data, 16, true);
+> @@ -2539,7 +2539,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff 
+> *skb,
+>  	/* This is a hard error, log it. */
+>  	if (CIRC_SPACE(queue->tx_head, queue->tx_tail,
+>  		       bp->tx_ring_size) < desc_cnt) {
+> -		netif_stop_subqueue(netdev, queue_index);
+> +		netif_stop_subqueue(netdev, q);
+>  		netdev_dbg(netdev, "tx_head = %u, tx_tail = %u\n",
+>  			   queue->tx_head, queue->tx_tail);
+>  		ret = NETDEV_TX_BUSY;
+> @@ -2555,7 +2555,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff 
+> *skb,
+>  	/* Make newly initialized descriptor visible to hardware */
+>  	wmb();
+>  	skb_tx_timestamp(skb);
+> -	netdev_tx_sent_queue(netdev_get_tx_queue(bp->netdev, queue_index),
+> +	netdev_tx_sent_queue(netdev_get_tx_queue(bp->netdev, q),
+>  			     skb->len);
+> 
+>  	spin_lock(&bp->lock);
+> @@ -2564,7 +2564,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff 
+> *skb,
+>  	spin_unlock(&bp->lock);
+> 
+>  	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
+> -		netif_stop_subqueue(netdev, queue_index);
+> +		netif_stop_subqueue(netdev, q);
+> 
+>  unlock:
+>  	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
 
-Sashiko geimini thinks the above is not enough for PowerPC:
 
-https://sashiko.dev/#/patchset/20260630041634.284127-1-rosenp%40gmail.com
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-> diff --git a/drivers/net/ethernet/ibm/emac/zmii.c b/drivers/net/ethernet/ibm/emac/zmii.c
-> index a3839cf02ec4..5144ee94a7d2 100644
-> --- a/drivers/net/ethernet/ibm/emac/zmii.c
-> +++ b/drivers/net/ethernet/ibm/emac/zmii.c
-> @@ -258,8 +258,8 @@ static int zmii_probe(struct platform_device *ofdev)
->  	/* Disable all inputs by default */
->  	out_be32(&dev->base->fer, 0);
->  
-> -	printk(KERN_INFO "ZMII %pOF initialized\n", ofdev->dev.of_node);
-> -	wmb();
-> +	dev_info(&ofdev->dev, "ZMII initialized\n");
-
-The printk change is unrelated and should go in a different patch.
-
-/P
-
+Thanks
+Nicolai
 
