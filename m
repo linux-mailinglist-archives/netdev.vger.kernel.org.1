@@ -1,452 +1,416 @@
-Return-Path: <netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-303992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Jo3nE3MERmqrHwsAu9opvQ
-	(envelope-from <netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:25:55 +0200
+	id WcGnDVcJRmqCIAsAu9opvQ
+	(envelope-from <netdev+bounces-303992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:46:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C9226F3CAA
-	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:25:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E63A6F3E36
+	for <lists+netdev@lfdr.de>; Thu, 02 Jul 2026 08:46:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=TPGvykes;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-303991-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=microchip.com header.s=mchp header.b="fAKAG6m/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-303992-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-303992-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microchip.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A3339302C3C0
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 06:25:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2AB030071C4
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 06:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BE438B127;
-	Thu,  2 Jul 2026 06:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7929B35C19B;
+	Thu,  2 Jul 2026 06:45:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010035.outbound.protection.outlook.com [52.101.85.35])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91F138AC7C;
-	Thu,  2 Jul 2026 06:24:40 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782973482; cv=fail; b=ZkvdUd3MlbXxDi+P2L6SLHMmQgmuOdkp2UcuKyGa2+oeBi0kZy43/+ee2E2poHJEcxAa1fAOGKD3JFwXvHXzGh8Jp2QIIaeeLhva2ZtbHOPKAk2qRWINfFJmRUyO08BRb5TCFHHIPnBZuLZ/DAdGS6+S+Gy6yqDPBzLnur29ls8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782973482; c=relaxed/simple;
-	bh=NavQOWDGtSduDgCBykMN4fYbMGODT6VJwXyqLRj5WLg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NnHPBVD8SxPovMYPweRynSFXaknDsEIqD7uDPruEo6VjxyjjuI+loR6XmJ1v6gcw0c+oPHnruzScfnV6gRAQCcUWuj39/kYdPEawzCOnVYWgB50JVCLxLvCB/72plhb4rwkvT0AFufKmrD6uMGaqOzLQeSFAYHNUnr5KGY2gEL8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TPGvykes; arc=fail smtp.client-ip=52.101.85.35
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BDGnhyEKfREeG5NJ9wZnxWglZ7fSpZjNc+oISpXFwLNmNCnRZHmNA9HfYA1UdG9PFhMX8sRaUVjVthJT2wLfmfy+fNwzLV3+M+VMR1sfylehizNkvT4cGC9SjuUaaVOSQoqcKkLcxNufUUqTyzInDey+zu/lQrtjgHXPr3XLoQYWdaqZk2e0uyIQzsYpFm32KPXiz1/mKNHpHTWUfK3RwTitOEtHXMgTNHYD7N/Fc0286VfVxXm+xWcNXhgNF4PxG+H3gQsO1hRS2+zqnh9EIDikhvRlmENjIFJ8fgcgxCw35EBIGj3sMIMiyRn6sJPpsS56nPxZnxgYe2+A3FPj3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xwpY1hL5/2oRrVH3xusOME+WKeAW1y7BAHEUKM13eFM=;
- b=C7o/nBT7TEnyuXIR54ey4Cal6Logzuqpbj9JJ1NI/YNCeR5VVRP2DGpNynMmNHi/IszDbJn4zp4HHU3mr5vDhME2sBO9LI8SDlfQyoCyACldZxNGSGpXw0UW0Z3TBD3RyQ4OntxLB32mzZIGklnp8YSXJ0mJf+9uSa7kF3076wbkqAmoLDfaJG3jglHnb7swYv7Nh07l40iT8oPyUWQnYREgzghFk6lZ2h2B7Y7MRh8Cez7m40TkwPgXoZ/S7bHic1Bz9hJCa3yHm6ZfjA5MeJgnSbSr70xSAJQ6fWjfePD1LfVyUCJpjYRX2mKmZBJQ7Js5Xa52RFRKXCGlQriPxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xwpY1hL5/2oRrVH3xusOME+WKeAW1y7BAHEUKM13eFM=;
- b=TPGvykesXVFxfUrx7CVmBb6lpEX1jg50HDRObqvWNYR9kLxASknBsQ+PpqgyvkrZjXVGY44J7TNDTLbLIWNh0Pm6OK0aPj59FvvP1wjQUQ9B9dhQq5o+K+WXRUTQ3f8CeMlJzlyTp6P/oBzuL7Kb2GLr/TQt6IXWLJy8jhQ785TaY3pUioICEQOlPj6G2qImGdWd/9VsoilrqrULTKFT0XqaHoXtURjBbRFo7FwbuNRwxquakNRWDUXPKbL5nHTW1GVdIQx989dMGTAsyyFNpQN2PKsrvYL7jE9/bCFxVtRp+uab3m4to/IGAuz8PtEp3W17TX7LmHzMnyGqoDkUlQ==
-Received: from DS7PR03CA0305.namprd03.prod.outlook.com (2603:10b6:8:2b::25) by
- SA1PR12MB8164.namprd12.prod.outlook.com (2603:10b6:806:338::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.8; Thu, 2 Jul 2026 06:24:25 +0000
-Received: from DS1PEPF00017090.namprd03.prod.outlook.com
- (2603:10b6:8:2b:cafe::7d) by DS7PR03CA0305.outlook.office365.com
- (2603:10b6:8:2b::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.181.10 via Frontend Transport; Thu, 2
- Jul 2026 06:24:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Thu, 2 Jul 2026 06:24:24 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 1 Jul
- 2026 23:24:11 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 1 Jul 2026 23:24:10 -0700
-Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Wed, 1 Jul 2026 23:24:05 -0700
-From: Nimrod Oren <noren@nvidia.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
-	<shuah@kernel.org>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
- Fastabend" <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>, Willem de Bruijn
-	<willemb@google.com>, Wei Wang <weibunny@fb.com>, David Wei <dw@davidwei.uk>,
-	Cosmin Ratiu <cratiu@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Nimrod Oren <noren@nvidia.com>, Carolina Jubran
-	<cjubran@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net-next 2/2] selftests: drv-net: xdp: run with both IP versions
-Date: Thu, 2 Jul 2026 09:23:48 +0300
-Message-ID: <20260702062348.2123960-3-noren@nvidia.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20260702062348.2123960-1-noren@nvidia.com>
-References: <20260702062348.2123960-1-noren@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718BF30E0E5;
+	Thu,  2 Jul 2026 06:45:57 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782974759; cv=none; b=O36pp0vLQwcePIrk62S4djY2soC5W9DZOw+ZFfmWdXx4xjtGH5KiDXkBxz2BkokI9JQAXUzN8P+yme1H1Fb26qFw2Kl7TQkob4smzs1vQNjtwJnOpKfweGjp9C9e1BfXzs8Fdsv/y/DdBNFSHpKMiqdlMxWU48zFq3xQMU1DW10=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782974759; c=relaxed/simple;
+	bh=oafHbTqvYnD8PkJiHZ54xpL8DuHYAlIimC2twBvVnFk=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=hSIHlRYyOHpo67GsbYpnmbJP3LyOhXHFKF/aPosbGyZxnS7Ac9N2EPssq0yf72PBUjPqb+nhBBAtbO9k1ZsOkRvQmOgqRqeaIeBJSJMaZefBR3Ld2ZDKEoaCyxVEPOqRbr5deOWJlf6lT9F88DdxjnODcftiBm0FyjIvDxzO88o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fAKAG6m/; arc=none smtp.client-ip=68.232.154.123
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1782974759; x=1814510759;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=oafHbTqvYnD8PkJiHZ54xpL8DuHYAlIimC2twBvVnFk=;
+  b=fAKAG6m/e0PjLZ4euy2iE6xUgAJMkiE5X+FhYzccosLreFntDSH8uwR9
+   g9EuC6IMgnWyNHTVoHQJ4c7hZOUsQ8O/exO6zWdI4A1Va+tyUA/WdUlXn
+   +Hvy4BKq1Sn0MO2Kd3ea45/CCdUHjNOXk6AIX9+luPvSw3izV9Nqnxx5L
+   llEMW1ZJYuarIg3XqmeEUXvk1dppTu/tYXjfTHJ/NakrztejIFTkiQThg
+   D6HjqP7tnZVaOKX+DKrFA0azw6aKBcqxVGqe9T6/DuDCiyOUDFVeJyRYq
+   LBSMA0s9WHDdPJUcwuK9qwxthieLZmb/rgH+2H9zZCyLQr9FODdVZg4bN
+   Q==;
+X-CSE-ConnectionGUID: AQuILjO0Q1WuPwPTD8CXbw==
+X-CSE-MsgGUID: 14PEA4udQUCvnH53+RUs2g==
+X-IronPort-AV: E=Sophos;i="6.25,143,1779174000"; 
+   d="scan'208";a="60349671"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Jul 2026 23:45:52 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Wed, 1 Jul 2026 23:45:50 -0700
+Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Wed, 1 Jul 2026 23:45:47 -0700
+From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+Subject: [PATCH net-next v8 0/9] net: dsa: add DSA support for the LAN9645x
+ switch chip family
+Date: Thu, 2 Jul 2026 08:45:11 +0200
+Message-ID: <20260702-dsa_lan9645x_switch_driver_base-v8-0-90228d8bba58@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|SA1PR12MB8164:EE_
-X-MS-Office365-Filtering-Correlation-Id: c2e42912-1420-4b1e-c27c-08ded8028fbe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|376014|82310400026|36860700016|1800799024|22082099003|18002099003|56012099006|6133799003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	WDslS0Ly1seWWI/CcL4ixxa2ajf3ecZ/E9/oY24PBl/3VllH91i3aCplI1useZuz6naeuxXp8TTydEinfQ1k7NLRa6jNQCZWflPtbxBGfOpBp0GIR4jBZ7MYR9s+WG3UNqzn/2ogVps9YWZIUJvEIL+V73NGYrkMTcIsGvNFti+L2uAnalw6WdrkP9oyG0BG/APhOsLpdri49gqKo/tQLKa6oWUnWEOZcf8oeBxjAH0+K1tPyseoBrmT/1VPhMyKtfUqkW4N+pFhlkdt4eg2qtZW+nWVdMyNooA7x6ptHZAHPAZ8b8DgRZP2DzsPLgf0mgobzS52ugW9YrklxBqpmXXKc6mTwENsTCvLNz90IbrAXvepqyJMzKj7fagUAtfsaXkBIYcqgczmEvBrwDhpLM3xglX//vfAM4hDXdEDobDAOt/sh4Uwi8Cf0cxqU+VsAAWQAy0Zic+/U8VBPnmCHyiIXH75OVl4J706W219rBlZ4jFGA6w/HoNEdGDiE2xKbHKQLseX766pUBoJCi7OjexSnH/qwswEBkw0jFFM17cW0/1HOiGGcrbjUatxJK4/J2F8TyeUiD8M57cwSTxR7Yr5R3hCws3zHoHhGqxYvBEXIKzDgZ8EtZd6vuMq9W+6GKx7qzCUhCZx9fJmAll1KrV99KwymrK1FBOTCDY76z8iowwicwo1Y8CMNtR2wt7+7vxXt8pOtmejtDNxUG6jZQ==
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(82310400026)(36860700016)(1800799024)(22082099003)(18002099003)(56012099006)(6133799003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	xguh54AF0j/IO9Y184ewrgcW24c0+8HlWm3JWfLchk+A0EWwRmNWXubfigTVsW29CtxJpjdIni58PvQ7iYpwsY1T7hYSoAJLhGaZK+J+gtt6sAQKlx0cVnvH51EAsBxrG062vBp16EYOfvkspoD6UZCmgfs6DKUH+m+60ZkT3tKoriJneVGQDteSJiSqf38zyMZ0QwR6dtkh27HeXtGWwI0F6IHBcAqbvFAmk8uHq78+8nxk/cTiqxXrbUwBMpltCJabj6T6AzNhelprcyzf0mShbbiD7uR6T00zbn7nhpNJko/zPbGyPSR3lr38QcGlT83PRlQpI+w0P4HVGIqGMChTgTiATNgoAZpvbGBKOnYBIyL9LWC4arL4KwpSIMFLi83wiB0LqIV/MCVvR1ft7h/ZP1Hrh6BDHfWqsUS0Ll4f44zaVCZmgnp+Jm1iPvPS
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 06:24:24.4594
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2e42912-1420-4b1e-c27c-08ded8028fbe
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017090.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8164
+X-B4-Tracking: v=1; b=H4sIAPcIRmoC/43RyWrDMBAG4FcJOtdFu+Se+h6lGC0ztaCxg2Tcl
+ JB3r+KLDTU4x2Hg+2e5kQI5QSFvpxvJMKeSxqEW9uVEQu+GL2hSrDXhlGvKGW1icd23G1ot1bU
+ rP2kKfRdzmiF33hVoBOPeYxAGoidVuWTAdF0SPsgAUzPAdSKftdOnMo35d4me2dJfUgQVhykza
+ 2jjEW1wTLQa1fs5hTyGPl1ew3he/JlvTC6PTV5NNIpKEJ5qy/ZMsZryiWvMoprOxWBVqwTVcc+
+ UG1M8YcrHnMxrShU6682eqVZTMXtsqmq22qJHIRGd2DP1xuTm2NTVlFHS1oGWKMKeaVZTP/N38
+ /g7x5aCNtrQf7vf7/c/BIOc8tQCAAA=
+To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "Vladimir
+ Oltean" <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Russell King
+	<linux@armlinux.org.uk>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+X-Mailer: b4 0.15-dev
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,fomichev.me,meta.com,google.com,fb.com,davidwei.uk,nvidia.com,vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-303992-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:woojung.huh@microchip.com,m:linux@armlinux.org.uk,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:jensemil.schulzostergaard@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:shuah@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:bobbyeshleman@meta.com,m:willemb@google.com,m:weibunny@fb.com,m:dw@davidwei.uk,m:cratiu@nvidia.com,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:noren@nvidia.com,m:cjubran@nvidia.com,m:dtatulea@nvidia.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-303991-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RWL_MAILSPIKE_POSSIBLE(0.00)[104.64.211.4:from];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bridge_mld.sh:url,bridge_mdb.sh:url,bridge_vlan_unaware.sh:url,microchip.com:url,microchip.com:from_mime,microchip.com:dkim,microchip.com:email,microchip.com:mid,test_fdb_stress_test.sh:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C9226F3CAA
+X-Rspamd-Queue-Id: 3E63A6F3E36
 
-Parameterize test cases by IP version using @ksft_variants. Set the
-environment's IP version at the start of each case using a new local
-helper, which also handles restoring the original value via defer().
+This series provides the Microchip LAN9645X Switch driver.
 
-The last case is left unparameterized because it does not send traffic
-or exercise IP-version-specific code.
+The LAN9645x is a family of chips with ethernet switch functionality and
+multiple peripheral functions. The switch delivers up to 9 ethernet
+ports and 12 Gbps switching bandwidth.
 
-While here, fix an int vs str comparison bug `if cfg.addr_ipver == 4`.
+The switch chip has 5 integrated copper PHYs, support for 2x RGMII
+interfaces, 2x SGMII and one QSGMII interface.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Nimrod Oren <noren@nvidia.com>
+The switch chip is from the same design architecture family as ocelot
+and lan966x, and the driver reflects this similarity. However, LAN9645x
+does not have an internal CPU in any package, and must be driven
+externally. For register IO it supports interfaces such as SPI, I2C and
+MDIO.
+
+The chip supports a variety of network features such as
+
+* Mactable for MDB/FDB functionality
+* Bridge forwarding offload
+* VLAN-aware bridging
+* IGMP/MLD snooping
+* Link aggregation
+* PTP timestamping
+* FRER (802.1CB)
+* Media Redundancy Protocol
+* Parallel Redundancy and High-Availability Seamless Redundancy
+  (HSR/PRP) in DANH/DANP mode
+* Per stream filtering and policing
+* Shapers such as Credit Based Shaping and Time Aware Shaing
+* Frame preemption
+* A TCAM (VCAP) for line-rate frame processing
+
+The LAN9645x family consists of the following SKUs:
+
+LAN96455F
+LAN96457F
+LAN96459F
+LAN96455S
+LAN96457S
+LAN96459S
+
+The difference between the SKUs is the number of supported ports (5, 7
+or 9) and features supported. The F subfamily supports HSR/PRP and TSN,
+while the S subfamily does not.
+
+The intended way to bind this driver is using a parent MFD driver,
+responsible for the register IO protocol, and distributing regmaps to
+child devices. The goal is to use the same approach as the MFD driver in
+drivers/mfd/ocelot-spi.c.
+
+This driver expects to request named regmaps from a parent device. This
+approach is similar to the DSA driver
+
+drivers/net/dsa/ocelot/ocelot_ext.c
+
+which supports being driven by an external CPU via SPI with parent
+device drivers/mfd/ocelot-spi.c.
+
+The MFD driver will come in a later series, because there are
+requirements on the number of child devices before a driver qualifies as
+a MFD device.
+
+Development is done using the LAN966x as a host CPU, running the lan966x
+swichdev driver, using the EVB-LAN9668 EDS2 board.
+
+The datasheet is available here:
+https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/LAN9645xF-Data-Sheet-DS00006065.pdf
+
+This series will deliver the following features:
+
+* Standalone ports
+* Bridge forwarding and FDB offloading
+* VLAN-aware bridge
+* Stats integration
+
+More support will be added at a later stage. Here is a tentative plan of
+future patches for this DSA driver:
+
+* Add LAG support.
+* Add MDB support.
+* Add TC matchall mirror support.
+* Add TC matchall police support.
+* Add DCB/qos support.
+* Add simple TC support: mqprio, cbs, tbf, ebf.
+* Add TC flower filter support.
+* Add HSR/PRP offloading support.
+* Add PTP support.
+* Add TC taprio support.
+
+For completeness I include tentative plan of planned patches for
+LAN9645x peripherals:
+
+* Extend pinctrl-ocelot for LAN9645x:
+  https://lore.kernel.org/linux-gpio/20260119-pinctrl_ocelot_extend_support_for_lan9645x-v1-0-1228155ed0ee@microchip.com/
+* Add driver for internal PHY:
+  https://lore.kernel.org/netdev/20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com/
+* MFD driver for managing register IO protocol and child device
+  initialization.
+* Extend pinctrl-microchip-sgpio for LAN9645x support.
+* Extend i2c_designware for LAN9645x support.
+* Add driver for outbound interrupt controller.
+* Add serdes driver for lan9645x.
+
+Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 ---
- tools/testing/selftests/drivers/net/xdp.py | 94 ++++++++++++++++++----
- 1 file changed, 77 insertions(+), 17 deletions(-)
+Changes in v8:
+- Individual patches mention specific v8 changes
+- Do not use the name CPU_PORT for the chips internal CPU port module,
+  as it collides with the DSA CPU port (the NPI front port). Drop the
+  CPU_PORT macro and reference the module as lan9645x->num_phys_ports,
+  mirroring ocelot/felix.
+- Reword the port map and related comments to distinguish the chip CPU
+  port modules (indices 9-10) from the DSA CPU port.
+- Add a port_mux_lock mutex to serialize port mux arbitration in
+  the phylink mac_prepare path.
+- Link to v7: https://lore.kernel.org/r/20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com
 
-diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
-index 2ad5932299e8..0369929f3c51 100755
---- a/tools/testing/selftests/drivers/net/xdp.py
-+++ b/tools/testing/selftests/drivers/net/xdp.py
-@@ -172,25 +172,45 @@ def _test_pass(cfg, bpf_info, msg_sz):
-     ksft_eq(stats[XDPStats.RX.value], stats[XDPStats.PASS.value], "RX and PASS stats mismatch")
- 
- 
--def test_xdp_native_pass_sb(cfg):
-+_ipvers = [
-+    KsftNamedVariant("ipv4", "4"),
-+    KsftNamedVariant("ipv6", "6"),
-+]
-+
-+
-+def _set_ipver_defer_restore(cfg, ipver):
-+    old_ipver = cfg.addr_ipver
-+    cfg.set_ipver(ipver)
-+    defer(cfg.set_ipver, old_ipver)
-+
-+
-+@ksft_variants(_ipvers)
-+def test_xdp_native_pass_sb(cfg, ipver):
-     """
-     Tests the XDP_PASS action for single buffer case.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
- 
-     _test_pass(cfg, bpf_info, 256)
- 
- 
--def test_xdp_native_pass_mb(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_pass_mb(cfg, ipver):
-     """
-     Tests the XDP_PASS action for a multi-buff size.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     bpf_info = BPFProgInfo("xdp_prog_frags", "xdp_native.bpf.o", "xdp.frags", 9000)
- 
-     _test_pass(cfg, bpf_info, 8000)
-@@ -219,25 +239,33 @@ def _test_drop(cfg, bpf_info, msg_sz):
-     ksft_eq(stats[XDPStats.RX.value], stats[XDPStats.DROP.value], "RX and DROP stats mismatch")
- 
- 
--def test_xdp_native_drop_sb(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_drop_sb(cfg, ipver):
-     """
-     Tests the XDP_DROP action for a signle-buff case.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
- 
-     _test_drop(cfg, bpf_info, 256)
- 
- 
--def test_xdp_native_drop_mb(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_drop_mb(cfg, ipver):
-     """
-     Tests the XDP_DROP action for a multi-buff case.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     bpf_info = BPFProgInfo("xdp_prog_frags", "xdp_native.bpf.o", "xdp.frags", 9000)
- 
-     _test_drop(cfg, bpf_info, 8000)
-@@ -287,13 +315,17 @@ def _test_xdp_native_tx(cfg, bpf_info, payload_lens):
-         ksft_eq(stats[XDPStats.TX.value], expected_pkts, "TX stats mismatch")
- 
- 
--def test_xdp_native_tx_sb(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_tx_sb(cfg, ipver):
-     """
-     Tests the XDP_TX action for a single-buff case.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
- 
-     # Ensure there's enough room for an ETH / IP / UDP header
-@@ -302,13 +334,17 @@ def test_xdp_native_tx_sb(cfg):
-     _test_xdp_native_tx(cfg, bpf_info, [0, 1500 // 2, 1500 - pkt_hdr_len])
- 
- 
--def test_xdp_native_tx_mb(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_tx_mb(cfg, ipver):
-     """
-     Tests the XDP_TX action for a multi-buff case.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     bpf_info = BPFProgInfo("xdp_prog_frags", "xdp_native.bpf.o",
-                            "xdp.frags", 9000)
-     # The first packet ensures we exercise the fragmented code path.
-@@ -447,13 +483,17 @@ def _test_xdp_native_tail_adjst(cfg, pkt_sz_lst, offset_lst):
-     return {"status": "pass"}
- 
- 
--def test_xdp_native_adjst_tail_grow_data(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_adjst_tail_grow_data(cfg, ipver):
-     """
-     Tests the XDP tail adjustment by growing packet data.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     pkt_sz_lst = [512, 1024, 2048]
-     offset_lst = [1, 16, 32, 64, 128, 256]
-     res = _test_xdp_native_tail_adjst(
-@@ -465,13 +505,17 @@ def test_xdp_native_adjst_tail_grow_data(cfg):
-     _validate_res(res, offset_lst, pkt_sz_lst)
- 
- 
--def test_xdp_native_adjst_tail_shrnk_data(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_adjst_tail_shrnk_data(cfg, ipver):
-     """
-     Tests the XDP tail adjustment by shrinking packet data.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     pkt_sz_lst = [512, 1024, 2048]
-     offset_lst = [-16, -32, -64, -128, -256]
-     res = _test_xdp_native_tail_adjst(
-@@ -535,7 +579,7 @@ def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
-             # after we eat into it. We send large-enough packets, but if HDS
-             # is enabled head will only contain headers. Don't try to eat
-             # more than 28 bytes (UDPv4 + eth hdr left: (14 + 20 + 8) - 14)
--            l2_cut_off = 28 if cfg.addr_ipver == 4 else 48
-+            l2_cut_off = 28 if cfg.addr_ipver == "4" else 48
-             if pkt_sz > hds_thresh and offset > l2_cut_off:
-                 ksft_pr(
-                 f"Failed run: pkt_sz ({pkt_sz}) > HDS threshold ({hds_thresh}) and "
-@@ -579,18 +623,22 @@ def _test_xdp_native_head_adjst(cfg, prog, pkt_sz_lst, offset_lst):
-     return {"status": "pass"}
- 
- 
--def test_xdp_native_adjst_head_grow_data(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_adjst_head_grow_data(cfg, ipver):
-     """
-     Tests the XDP headroom growth support.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
- 
-     This function sets up the packet size and offset lists, then calls the
-     _test_xdp_native_head_adjst_mb function to perform the actual test. The
-     test is passed if the headroom is successfully extended for given packet
-     sizes and offsets.
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     pkt_sz_lst = [512, 1024, 2048]
- 
-     # Negative values result in headroom shrinking, resulting in growing of payload
-@@ -600,18 +648,22 @@ def test_xdp_native_adjst_head_grow_data(cfg):
-     _validate_res(res, offset_lst, pkt_sz_lst)
- 
- 
--def test_xdp_native_adjst_head_shrnk_data(cfg):
-+@ksft_variants(_ipvers)
-+def test_xdp_native_adjst_head_shrnk_data(cfg, ipver):
-     """
-     Tests the XDP headroom shrinking support.
- 
-     Args:
-         cfg: Configuration object containing network settings.
-+        ipver: IP version to use ("4" or "6").
- 
-     This function sets up the packet size and offset lists, then calls the
-     _test_xdp_native_head_adjst_mb function to perform the actual test. The
-     test is passed if the headroom is successfully shrunk for given packet
-     sizes and offsets.
-     """
-+    _set_ipver_defer_restore(cfg, ipver)
-+
-     pkt_sz_lst = [512, 1024, 2048]
- 
-     # Positive values result in headroom growing, resulting in shrinking of payload
-@@ -621,12 +673,19 @@ def test_xdp_native_adjst_head_shrnk_data(cfg):
-     _validate_res(res, offset_lst, pkt_sz_lst)
- 
- 
--@ksft_variants([
--    KsftNamedVariant("pass", XDPAction.PASS),
--    KsftNamedVariant("drop", XDPAction.DROP),
--    KsftNamedVariant("tx", XDPAction.TX),
--])
--def test_xdp_native_qstats(cfg, act):
-+def _qstats_variants():
-+    actions = [
-+        ("pass", XDPAction.PASS),
-+        ("drop", XDPAction.DROP),
-+        ("tx", XDPAction.TX),
-+    ]
-+    for ipver in ["4", "6"]:
-+        for name, act in actions:
-+            yield KsftNamedVariant(f"{name}_ipv{ipver}", act, ipver)
-+
-+
-+@ksft_variants(_qstats_variants())
-+def test_xdp_native_qstats(cfg, act, ipver):
-     """
-     Send 1000 messages. Expect XDP action specified in @act.
-     Make sure the packets were counted to interface level qstats
-@@ -634,6 +693,7 @@ def test_xdp_native_qstats(cfg, act):
-     """
- 
-     cfg.require_cmd("socat")
-+    _set_ipver_defer_restore(cfg, ipver)
- 
-     bpf_info = BPFProgInfo("xdp_prog", "xdp_native.bpf.o", "xdp", 1500)
-     prog_info = _load_xdp_prog(cfg, bpf_info)
+Changes in v7:
+- Individual patches mention specific v7 changes
+- Do not mark the BPDU range 01:80:C2:00:00:0X as offloaded in the tag driver.
+- Refactor cpu queue based frame classification to use categories default, trap
+  and copy, which mirrors usage instead of being based on frame types.
+- Add registers ANA:COMMON:CPUQ_8021_CFG for bpdu cpu queue configuration.
+- Use cpu queue LAN9645X_CPUQ_TRAP for bpdu frames.
+- Refactor IGMP/MLD/IPMC_CTRL to use new LAN9645X_CPUQ_DEF,
+  LAN9645X_CPUQ_TRAP and LAN9645X_CPUQ_COPY queues.
+- Add __aligned(2) to mac variable in lan9645x_mdb_update_dest.
+- Link to v6: https://lore.kernel.org/r/20260527-dsa_lan9645x_switch_driver_base-v6-0-4d409ae64f3c@microchip.com
+
+Changes in v6:
+- Individual patches mention specific v6 changes
+- Rebased on net-next, bumping DSA_TAG_PROTO_LAN9645X_VALUE to 34
+- Link to v5: https://lore.kernel.org/r/20260518-dsa_lan9645x_switch_driver_base-v5-0-968fbf34ffa3@microchip.com
+
+Changes in v5:
+- Individual patches mention specific v5 changes
+- Undo offset fix in postpull_rcsum. The original logic was correct for
+  CHECKSUM_COMPLETE host NICs
+- Use __always_inline in lan9645x_ifh_{get,set}
+- remove double space after = in set_merge_mask
+- remove unused fields dd_dis and tsn_dis, and add SKU supported port validation
+  during setup
+- phylink: remove MAC_2500FD
+- phylink: add comment about empty supported_interfaces for port 5-6.
+- phylink: fix 2:1 rgmii port muxing for port module 4 and 7 to be fully
+  dynamic and validate requested mux settings.
+- phylink: add comment about 2:1 rgmii port muxing for port module 4
+  and 7.
+- rx/tx-internal-delay-ps checked against supported 2ns value
+- init lan9645x->npi = -1 at probe and check port < 0 in npi_deinit
+- use ds->ageing_time_max
+- use packed p->host_flood_req for atomic r/w
+- fix typo in set_ageing_time comment
+- include lan9645x->bridge deref under lock in brige_join
+- switch -EBUSY to -EINVAL for vlan add/del in the reserved range.
+- remove reserved HSR vlan
+- lan9645x_mac_init returns error on table init timeout
+- add comment about skipping LOCKED entries on fdb dump
+- skip igmp/mld redir for npi port
+- make lan9645x_stats_init void
+- add SCNT_TX_BUFDROP to tx_dropped
+- change rmon range {0,64} -> {64, 64}. Runt frames counted elsewhere.
+- remove rx_crc, rx_symbol_err from rx_packets, as they are already
+  counted in SZ_* buckets.
+- add defensive cancel_delayed_work_sync in stats_free
+- Link to v4: https://lore.kernel.org/r/20260430-dsa_lan9645x_switch_driver_base-v4-0-f1b6005fa8b7@microchip.com
+
+Changes in v4:
+- v3 was deferred, but I made some changes based on the Sashiko review
+- Individual patches mention specific v4 changes
+- Fix offset in postpull_rcsum so prefix eth header is cleared, not
+  actual eth header, so tag driver works with CHECKSUM_COMPLETE host
+  NICs
+- Fix untagged rx on vlan aware port with pvid
+- Add comment to QSYS_RES_CFG configuration
+- Phylink_mac_prepare: fix to make sure we can dynamically change rgmii
+  on port 4
+- Move ports allocation to probe
+- tag_npi_setup: reject cascaded setups
+- Skip WARN_ON in lan9645x_to_port
+- set_host_flood changed to per port work to coalesce values and skip
+  atomic allocations
+- Fix clear HOST_PVID vlan membership when a port joins a bridge.
+- Explicit default value write to tag type register for untagged frames
+- Use lan_rmw for ANA_DROP_CFG
+- Add comment for error path in lan9645x_vlan_hw_wr
+- Remove mac_entries list and just do direct IO to mac table from
+  fdb_add/fdb_del.
+- Clean up fresh mdb when hw mac table write fails.
+- Remove rx_uc and tx_uc from ethtool stats list, as they are derivable
+  from the eth-mac group
+- Split stats_init into stats_alloc and stats_init, use alloc in probe
+  and init in dsa_setup
+- Link to v3: https://lore.kernel.org/r/20260410-dsa_lan9645x_switch_driver_base-v3-0-aadc8595306d@microchip.com
+
+Changes in v3:
+- Individual patches mention specific v3 changes.
+- Add guard before vlan_remove_tag on xmit
+- Add pskb_may_pull checks on rx
+- Remove additionalProperties: true in bindings
+- Remove unnecessary | from description in bindings
+- Change top level $ref to dsa.yaml#/$defs/ethernet-ports
+- Use ethernet-ports and ethernet-port
+- Move ethernet-ports under properties instead of patternProperties
+- Move unevaluatedProperties: false after $ref
+- Update bindings example to use ethernet-ports and ethernet-port
+- Move DEV_MAC_TAGS_CFG to port setup, instead of vlan config, so vlan
+  overhead is always included in port frame maxlen calculation.
+- Remove code disabling ipv6 on conduit
+- Use of_property_read_u32 for {rx,tx}-internal-delay-ps
+- Use dsa_user_ports(ds) instead of
+  GENMASK(lan9645x->num_phys_ports - 1, 0) as base flood mask.
+- Add comment explaining obey vlan
+- Allow disabling aging with explicit zero parameters.
+- Fix non-forwarding STP states in bridge fwd calculation.
+- Restore host flood state on bridge leave.
+- Avoid mac_entry dealloc when mac table writes fail.
+- Avoid mdb_entry dealloc when mac table writes fail.
+- Dealloc mac_entries on deinit.
+- Dealloc mdb_entries on deinit.
+- Link to v2: https://lore.kernel.org/r/20260324-dsa_lan9645x_switch_driver_base-v2-0-f7504e3b0681@microchip.com
+
+Changes in v2:
+- Individual patches have specific v2 changes.
+- Ran DSA, and std counters, selftests, which prompted several changes.
+  The following selftests pass, except for some expected failures:
+    - bridge_vlan_aware.sh
+    - bridge_vlan_unaware.sh
+    - bridge_vlan_mcast.sh
+    - no_forwarding.sh
+    - bridge_mdb.sh
+    - bridge_mld.sh
+    - test_fdb_stress_test.sh
+    - .../drivers/net/hw/ethtool_rmon.sh
+    - .../drivers/net/hw/ethtool_std_stats.sh (from Ioana's series)
+- Added new patch for MDB management, as this was required for selftests.
+- Added port_set_host_flood to enable unknown traffic to standalone during
+  promisc/ALL_MULTI (selftests).
+- Remove the dubugfs.
+- Link to v1: https://lore.kernel.org/r/20260303-dsa_lan9645x_switch_driver_base-v1-0-bff8ca1396f5@microchip.com
+
+---
+Jens Emil Schulz Østergaard (9):
+      net: dsa: add tag driver for LAN9645X
+      dt-bindings: net: lan9645x: add LAN9645X switch bindings
+      net: dsa: lan9645x: add autogenerated register macros
+      net: dsa: lan9645x: add basic dsa driver for LAN9645X
+      net: dsa: lan9645x: add bridge support
+      net: dsa: lan9645x: add vlan support
+      net: dsa: lan9645x: add mac table integration
+      net: dsa: lan9645x: add mdb management
+      net: dsa: lan9645x: add port statistics
+
+ .../net/dsa/microchip,lan96455s-switch.yaml        |  111 ++
+ MAINTAINERS                                        |   10 +
+ drivers/net/dsa/Kconfig                            |    2 +
+ drivers/net/dsa/microchip/Makefile                 |    1 +
+ drivers/net/dsa/microchip/lan9645x/Kconfig         |   11 +
+ drivers/net/dsa/microchip/lan9645x/Makefile        |   12 +
+ drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c  |  307 ++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_main.c | 1041 +++++++++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_main.h |  441 +++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_mdb.c  |  398 ++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c  |   85 +
+ .../net/dsa/microchip/lan9645x/lan9645x_phylink.c  |  414 +++++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_port.c |  226 +++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_regs.h | 1937 ++++++++++++++++++++
+ .../net/dsa/microchip/lan9645x/lan9645x_stats.c    |  929 ++++++++++
+ .../net/dsa/microchip/lan9645x/lan9645x_stats.h    |  279 +++
+ drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c |  403 ++++
+ include/linux/dsa/lan9645x.h                       |  144 ++
+ include/net/dsa.h                                  |    2 +
+ net/dsa/Kconfig                                    |   11 +
+ net/dsa/Makefile                                   |    1 +
+ net/dsa/tag_lan9645x.c                             |  311 ++++
+ 22 files changed, 7076 insertions(+)
+---
+base-commit: 1c664ec4b9ea827b609d296921ed5bad8a40a158
+change-id: 20260210-dsa_lan9645x_switch_driver_base-312bbfc37edb
+
+Best regards,
 -- 
-2.45.0
+Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 
 
