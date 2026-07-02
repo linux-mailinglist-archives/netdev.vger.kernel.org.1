@@ -1,298 +1,180 @@
-Return-Path: <netdev+bounces-304279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Kz1nNDjiRmpwfAsAu9opvQ
-	(envelope-from <netdev+bounces-304279-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:12:08 +0200
+	id vHlGIBLmRmocfQsAu9opvQ
+	(envelope-from <netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:28:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8CE6FD26D
-	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:12:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA2636FD316
+	for <lists+netdev@lfdr.de>; Fri, 03 Jul 2026 00:28:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=HnBzeJa+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304279-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-304279-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b="FX/+iBZN";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-304280-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=meta.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BE96B3018D28
-	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:12:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 82D0430416AF
+	for <lists+netdev@lfdr.de>; Thu,  2 Jul 2026 22:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1145237A833;
-	Thu,  2 Jul 2026 22:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4B73BE636;
+	Thu,  2 Jul 2026 22:28:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EEE22332E
-	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 22:12:04 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783030326; cv=pass; b=OFsHZKRsOxM/zsV5xtuQlapWBFXHNdEWslzU71IdsH39qQRv3alvfs/kdrZ7lQcVYyExQOHx8nxdxgcOCJaOTBJDG4BYDR3f/uZS1FtkWmu7j3PYhhKAjNFxVYkXmCrRar7RFoRu4Gcm4OhSqNyOyS1jMTMrqjuIyou3oIY3024=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783030326; c=relaxed/simple;
-	bh=CX5YXwkzsxbjJBT2OIlUwG4oFTJrtyWYB/BkD/S8fhY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=afQHC08vE/gqW/NltqEQLOMZA/gvHRvdSDmpLSIai26xlJtwbfNy6mp5okc8KDI6bA3HNNSyu44RQOX80c3vbJTuaBP6q3bvE+rfYDRtmvSYAeZrRFrGHpx9jSpLXADNqgB/cwiCj7TrUXKxRnaurEu3lxPFRP7Em/QG5iVH05g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=HnBzeJa+; arc=pass smtp.client-ip=209.85.215.179
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c9aea40d799so1122827a12.0
-        for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 15:12:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783030323; cv=none;
-        d=google.com; s=arc-20260327;
-        b=J2/W7MnEsrnbLObzdyPzKbcCw7oWduWwcBSr8riB+Hsuf7TAmZm2WCmW/4Kmbw1+FI
-         Oa4nXAbrqh0bajJxtOO/aSmIsUUcSn2TELlTF10U4boDG7ZWJ6NJPlV5oMaj0yFF2IOh
-         TMs0nM07/mwJ6WqAeZgG5+cR3Cm6xbACT90RZCaLtg0d65e292JFK+xQqiGlOr1aSnzL
-         irkIfyuC+OcRzc5Chgsxlv/6kfqkUTBUczw9VxyePPtI1hJGABLNnFe2cHrLzfOTmI0N
-         NggueBulRvT+XEwgftM/2NUYacLCb7ytMWQ+BdDOGfUT9g5m4Bz5GdBoK+O3rpt3nPTm
-         alxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MRUmP52vY013mSbfIXwpgJp8jMWEcHcxvZP2AdpKO8Y=;
-        fh=kLfW3wGLg1a+l8JjDVG3FtJIAVLqzOHOrm3lY1eEa/E=;
-        b=gvT6wF7Iv9mdB6V8Fg3ip2RYS1uVGhU1uRnVsnFrESbx8KStZYxD/GUiugo8rbUWFA
-         yHvpZpxUMMVv2gwsX4ECDginY2iMe31VYazlXD56irYZ/9U5bHgTO4oGiLQrknjPFQ/c
-         x8GH9678R/Pvd3BYlu0nwJ+N+KTVqxQxLOm8iE5czFQUHT4O5LsJYikxPwmiXMUIoOr6
-         IHLenztb5+ToVMLJHtTCxMsq78pjfey5R3k4OM7r7Z1cLMj0xMnGrs4ohsD/Vr6g6g1v
-         GLQZlFIyEL2V3FAr6IeJrvC5yv/x8pxCznBFFavVk2ZdyYNDks79VMo63lxr9gDklOVY
-         WFrg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1783030323; x=1783635123; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MRUmP52vY013mSbfIXwpgJp8jMWEcHcxvZP2AdpKO8Y=;
-        b=HnBzeJa+7ByXjtu0FVuEhedqtxJn/a9Li6qe1Ybv24vUHEoUiu7IMPvWmECGaifF9d
-         glCmQYlQk/0fY5j7tjKwA0crtEaV/xn9JXkSnv3X8OViFZi00NI3UaJ6AePC5nbeHJtI
-         6ENWvn4pgbTJFSHUxf4o42yutWttEtEhFHrshil+/y+ehxcRnKjEJ0XCiEu4Ra5ssqQZ
-         fEHxAXCaCtL/TqrLPb/zOWQR+RCauH/UGa8qBTh5A1nV/+0fDXIjDOFp0PBFfY3s4gu4
-         0dJ7NGmb8//TfPyOsCqYK0QsdQmtvFltDOIUvmk2opO/oMqT9WEQi9BM3PdfsA09n9Y5
-         NRzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783030323; x=1783635123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MRUmP52vY013mSbfIXwpgJp8jMWEcHcxvZP2AdpKO8Y=;
-        b=P1LsWq99EKdO98MKpjWEp8eCNmHPNIdgjLfgnyL7ZAdturuYzXcfFAQNso5ocOpINq
-         d6ZN9rlpu3zjT5j0EPejSVAu9yt8Q7+QmVIXqv23JitC6h0eci1s4BOzjLpeMfEpwaZe
-         aIhjJrrLyMSZe0JMWhurhqMyIhuPrH/S+QKHlxa22BudP1klkvwY1CiKSyheABqU4zlW
-         +IGKjH47OAHEXYcbnjLNpQQj2EtpBAJzmjAOkszA4QiCtdZg8BlYIykJpp/nSIuEcaYw
-         uvUGxS0BN8BYcz/noyD2ITosZdeR0l22OdnnfogPqYYUrRrnIBOmEp8PnvbUiIMNjh2Y
-         c3ZQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/sfdR8zL+Xjue2GLEJG2v5XjHRWoykEgc55u7NuhWm/SBv/BvhBUnbsdiVtvVuTb/y/w+35iI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUghB+wgh6gCYnd7T1rq5By9E4ZPpXHJ36jhs7WgCvP+ShBrGd
-	NbtDtOZJfr/AxoHP8dHkwMarDNH4IaLgfob1vn0lH03y9bsMJYNbsPCTwwPtuav+nuf0tfm0lyD
-	8yBBetOxFFqr91DVLjro5yJ06HBjc/+528pVpYLnp
-X-Gm-Gg: AfdE7cmXOShkyrXKvG2wZh/NMQu72oaU9B/315fpGqV41I+xMxTYuFemkZhs1xzs/JX
-	RhZ5gRyvuz2Ic+CYVoPaIE+sMeoEVpCYkGGlKDqZS6GKGvT/m2wP2zDh7/qmsxuFvVOEr0wQD5p
-	ASyJ9Aa9BQWB6QoSVPEd1hjBzT2dMzVRQYvWH7f6/BJBu5Ude+sQPeObqQSJyPr0JXwuY1tBT+/
-	hkxtBMjGWr17TsbZElF5musAjwqxWswuf8tA7KloIGkv88T0odf9gUEwm4MVVNjEVCa9ga4uMoF
-	YbBYWxtQSolHkMv0IJnOZ5HRG78=
-X-Received: by 2002:a05:6a20:6a09:b0:3bf:bde7:d671 with SMTP id
- adf61e73a8af0-3bff40ed566mr8240013637.20.1783030323272; Thu, 02 Jul 2026
- 15:12:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB608364926
+	for <netdev@vger.kernel.org>; Thu,  2 Jul 2026 22:28:21 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783031303; cv=none; b=tlp346QA7/OZlcLDMIXlV46jrEdAA5sr1uFFcRZ2ln4Mdd/bb/e00ckcI7BpWSgpnXi9e4yOJIUMb5W7fpAoUjfPRIJB5nlJ+R8GDRYgmDeRwnMcNT8TdghIcP4OXKc5lD2GXKXgm2qVNFuNpqOrv4QAUnXAkBMs4dbqPTY1wRw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783031303; c=relaxed/simple;
+	bh=NhPOBFymM4iytlpbMVnpsIX4tj32JcuO5EuJy37qJ20=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uwtJDptccUDCf2IGFC14eu55/8gsk+1ICXlTYJAq6JVyYgb0PrL1vZVoFJkU6njWn9z1tTxynV2Adlmizb2Ar+sDdt1hz9u0eujtSpBoSPflbBInhAK2DdLvOqljIPppyRMHVGMt7HKvnnkuk7BjYuK9xzTj42NfgHC7oBrAq/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=FX/+iBZN; arc=none smtp.client-ip=67.231.153.30
+Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 662IrZ9p3942411
+	for <netdev@vger.kernel.org>; Thu, 2 Jul 2026 15:28:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=AiFEfhNTIOViBQyl8B
+	wIWC6v3Ib53cvu8YduqIAlzko=; b=FX/+iBZNK+r6qx7+qRW3bQa6AcfQ0ATQ2+
+	uOfqtMejWKeI2jeyzLerMoEsU/8wWbSSpfj6NGQatlEYVopopUbTbXhO0XGIAHRV
+	2hNfRKhnwojDceMCKow8v9WW/sbHy1jH7mUR2O91pDYNmvsADPEuMROfKcEdLFHP
+	4WMEejfkNKR++JJ6e3ugQsRgo0452K6W1WslcqwheHcDSXHCi6CY7qnNg4zHYokt
+	kMY5BQQ9xPIv0Choba8IzVHBDrC/GJIHrSB1mDaXpq7dE1ZSXlP9PJgQUyk0kqGm
+	RkujvzQJtLgcbNmHIpDw2Vqqerr7qTt1afIklNEsxf/dpv3phVEw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4f5c0srq43-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 02 Jul 2026 15:28:20 -0700 (PDT)
+Received: from twshared6916.34.frc3.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Thu, 2 Jul 2026 22:28:18 +0000
+Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
+	id B6F3B40F35B7D; Thu,  2 Jul 2026 15:25:09 -0700 (PDT)
+From: Zhiping Zhang <zhipingz@meta.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Saeed
+ Mahameed Michael <saeedm@nvidia.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Mark
+ Bloch <mbloch@nvidia.com>
+CC: Michael Guralnik <michaelgur@nvidia.com>, <netdev@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Zhiping Zhang
+	<zhipingz@meta.com>, <stable@vger.kernel.org>
+Subject: [PATCH net v2] net/mlx5: free mlx5_st_idx_data on final dealloc
+Date: Thu, 2 Jul 2026 15:24:58 -0700
+Message-ID: <20260702222507.1234467-1-zhipingz@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260702185805.615241-1-xmei5@asu.edu> <aka5pwAGGI56QrrS@strlen.de>
-In-Reply-To: <aka5pwAGGI56QrrS@strlen.de>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Thu, 2 Jul 2026 15:11:52 -0700
-X-Gm-Features: AVVi8CcGXAKI5XA8PqeMzxoh9pZd4KHMe8lq3zXn7qz1OYTUA3EyYNQ_TL4QT5g
-Message-ID: <CAPpSM+RshE2OFZCJjM0mRumWt3cixu9QBNh+rmS0z=AKPR25LQ@mail.gmail.com>
-Subject: Re: [PATCH ipsec] xfrm: policy: use hlist_del_init_rcu in
- xfrm_hash_rebuild to avoid bydst poison
-To: Florian Westphal <fw@strlen.de>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, netdev@vger.kernel.org, horms@kernel.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com, 
-	kys@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAyMDIzNCBTYWx0ZWRfX2rFJID6GbxqE
+ mKUYiG0PHatEyzbqfqPWxdTPDXpaxDvZ+pZuZ+SaxiDcTB+CkGLRo01Lg5Ko+1huhnQbNKMHdGd
+ yCGICI5ZNt+wc2wyDCi1F7ODMtzJ12NALEOOv4IKggi0JYQ4shwKpx9vQXWzlqQHEET1G4ZBJ32
+ RU8XoPjh8qAOFMrHX6Ovy1tx3fVvGwVID7g34foz7/wgZvpij1Y6CEtLmLJozP6iIyRQAgiUphV
+ RpgX8Zx8CvwWLGGlBtARvNvKFVp5rciZR9OcIhQ+RiAcvMdPvwdyf4ca0nVH1J9UVbhTwlQnP4l
+ o3gBnx+1esTWXvPyhRBnuYxXbE0RgQqZfVJaiSs18poGmsvxUs3nLkeOOnmRtteC4b29x6G2RR6
+ E46Aa04ISPymjCb2muKlrpMi0iSgMH1I1sYmCLhE/VW/GgsZb1Cv/FyyPutJU3HQA6QAGf5B6TX
+ 1E9LXtNnIjE4r9R8aOw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAyMDIzNCBTYWx0ZWRfX0fbrVa938Cb9
+ l4p0lBo/CyokPZhfdTXHCVy6NckaCKi3t93Msn0Q3if8YT07xPiKg9+PUeTQztA3qtU0YhN9Q+N
+ lBRMLTUprKV+p1nTeBiVHV7WY1HpUZo=
+X-Authority-Analysis: v=2.4 cv=H7rrBeYi c=1 sm=1 tr=0 ts=6a46e604 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=GbPsI2Ihf5RTnMjR_gZv:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=Ikd4Dj_1AAAA:8
+ a=vNmdTtWwCD1Yl-TW2gAA:9 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-GUID: 0yxEn4R4zRjjgEwYN7f7RUTABUVvADsa
+X-Proofpoint-ORIG-GUID: 0yxEn4R4zRjjgEwYN7f7RUTABUVvADsa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-07-02_03,2026-06-26_01,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[meta.com:d:+,kernel.org:s:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-304280-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:fw@strlen.de,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:AutonomousCodeSecurity@microsoft.com,m:tgopinath@linux.microsoft.com,m:kys@microsoft.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jgg@ziepe.ca,m:leon@kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:michaelgur@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zhipingz@meta.com,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-304279-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[meta.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6A8CE6FD26D
+X-Rspamd-Queue-Id: EA2636FD316
 
-On Thu, Jul 2, 2026 at 12:19=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Xiang Mei (Microsoft) <xmei5@asu.edu> wrote:
-> > xfrm_hash_rebuild() unlinks each policy from its bydst chain with
-> > hlist_del_rcu() and re-inserts it. For an inexact policy the re-insert =
-goes
-> > through xfrm_policy_inexact_insert(), which can fail on a GFP_ATOMIC
-> > allocation; on failure the error path only WARN_ONCE()s and continues, =
-so the
-> > policy is left with a poisoned bydst node (LIST_POISON2). The next rebu=
-ild
-> > calls hlist_del_rcu() on that node again, dereferences the poison, and =
-takes a
-> > general protection fault.
-> >
-> > Use hlist_del_init_rcu() instead, so a failed-reinsert node is left unh=
-ashed
-> > (pprev =3D=3D NULL) rather than poisoned. The next rebuild's hlist_del_=
-init_rcu()
-> > is then a no-op for it, and the non-failing case is unchanged.
-> >
-> > The reinsert allocation is GFP_ATOMIC (it runs under xfrm_policy_lock),=
- so in
-> > practice this is only reached under memory pressure; the crash below wa=
-s
-> > reproduced deterministically by forcing that allocation to fail with fa=
-ult
-> > injection (failslab).
-> >
-> > Crash:
-> >   Oops: general protection fault, probably for non-canonical address
-> >   0xfbd59c0000000024: 0000 [#1] SMP KASAN NOPTI
-> >   KASAN: maybe wild-memory-access in range [0xdead000000000120-0xdead00=
-0000000127]
-> >   ...
-> >   Workqueue: events xfrm_hash_rebuild
-> >   RIP: 0010:xfrm_hash_rebuild+0x5b3/0x1190
-> >   RAX: dead000000000122   (LIST_POISON2 + offset)
-> >   ...
-> >   Call Trace:
-> >    hlist_del_rcu (include/linux/rculist.h:599)
-> >    xfrm_hash_rebuild (net/xfrm/xfrm_policy.c:1365)
-> >    process_one_work (kernel/workqueue.c:3322)
-> >    worker_thread (kernel/workqueue.c:3486)
-> >    kthread (kernel/kthread.c:436)
-> >    ret_from_fork (arch/x86/kernel/process.c:158)
-> >    ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-> >    ...
-> >   Kernel panic - not syncing: Fatal exception in interrupt
-> >
-> > Fixes: 563d5ca93e88 ("xfrm: switch migrate to xfrm_policy_lookup_bytype=
-")
-> > Reported-by: AutonomousCodeSecurity@microsoft.com
-> > Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
-> > ---
-> >  net/xfrm/xfrm_policy.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-> > index 7ef861a0e823..2612a405542b 100644
-> > --- a/net/xfrm/xfrm_policy.c
-> > +++ b/net/xfrm/xfrm_policy.c
-> > @@ -1362,7 +1362,7 @@ static void xfrm_hash_rebuild(struct work_struct =
-*work)
-> >               if (xfrm_policy_is_dead_or_sk(policy))
-> >                       continue;
-> >
-> > -             hlist_del_rcu(&policy->bydst);
-> > +             hlist_del_init_rcu(&policy->bydst);
->
-> This patch is dubious.  I looks to me as if it papers over the
-> actual bug.
->
-> Why is there a memory allocation error?
->
-> The first loop -- before unlink -- is supposed to preallocate the new
-> bins and chain heads.
->
-Agreed, and my patch hides it instead of avoiding it. The problem is
-the prep loop's guard is inverted:
+Workloads that repeatedly allocate and release mkeys carrying TPH
+steering-tag hints (e.g. churning RDMA MRs) leak one
+struct mlx5_st_idx_data per cycle; kmemleak flags it as unreferenced
+and the kmalloc slab grows over time.
 
-        if (policy->selector.prefixlen_d < dbits ||
-            policy->selector.prefixlen_s < sbits)
-                continue;
+When the last reference to an ST table entry is dropped,
+mlx5_st_dealloc_index() removed the entry from idx_xa but the backing
+mlx5_st_idx_data allocation was never freed.
 
-That skips exactly the policies reinserted via the tree (prefixlen <
-threshold =3D> policy_hash_bysel() NULL =3D> xfrm_policy_inexact_insert()),=
- and
-preallocates for the exact ones instead, which never allocate and get
-pruned again at out_unlock. So the inexact bin/node is allocated GFP_ATOMIC
-after the hlist_del_rcu(), and that's the failure the WARN catches.
+Free idx_data after the xa_erase() so the lifetime of the bookkeeping
+struct matches the lifetime of the ST entry it tracks.
 
-The reproducer lowers then raises the threshold so those bins are pruned
-and reallocated during reinsert; failslab just makes the failure
-deterministic, OOM would do the same.
-
-v2 inverts the guard so prep prepares the set that's actually reinserted:
-
-        -       if (policy->selector.prefixlen_d < dbits ||
-        -           policy->selector.prefixlen_s < sbits)
-        +       if (policy->selector.prefixlen_d >=3D dbits &&
-        +           policy->selector.prefixlen_s >=3D sbits)
-                        continue;
-
-Then inexact_insert() finds bin+node present and allocates nothing, so the
-reinsert can't fail; a prep failure still hits goto out_unlock before any
-unlink. hlist_del_rcu vs _init_ then no longer matters.
-
+Cc: stable@vger.kernel.org
+Fixes: 888a7776f4fb ("net/mlx5: Add support for device steering tag")
+Reviewed-by: Michael Gur <michaelgur@nvidia.com>
+Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
 ---
-  net/xfrm/xfrm_policy.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v2: respin per maintainer-netdev.rst; no code change.
+v1: https://lore.kernel.org/linux-rdma/20260612170406.3339093-1-zhipingz@=
+meta.com/
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 7ef861a0e823..932a313b9460 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -1329,8 +1329,8 @@ static void xfrm_hash_rebuild(struct work_struct *wor=
-k)
-                        }
-                }
+ drivers/net/ethernet/mellanox/mlx5/core/lib/st.c | 1 +
+ 1 file changed, 1 insertion(+)
 
--               if (policy->selector.prefixlen_d < dbits ||
--                   policy->selector.prefixlen_s < sbits)
-+               if (policy->selector.prefixlen_d >=3D dbits &&
-+                   policy->selector.prefixlen_s >=3D sbits)
-                        continue;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c b/drivers/n=
+et/ethernet/mellanox/mlx5/core/lib/st.c
+index 997be91f0a13..7cedc348790d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
+@@ -175,6 +175,7 @@ int mlx5_st_dealloc_index(struct mlx5_core_dev *dev, =
+u16 st_index)
+=20
+ 	if (refcount_dec_and_test(&idx_data->usecount)) {
+ 		xa_erase(&st->idx_xa, st_index);
++		kfree(idx_data);
+ 		/* We leave PCI config space as was before, no mkey will refer to it *=
+/
+ 	}
+=20
+--=20
+2.53.0-Meta
 
-                bin =3D xfrm_policy_inexact_alloc_bin(policy, dir);
----
-
-
-I checked the new patch on the reproducer, and the crash can't be triggered=
-.
-If you agree with this new patch, I'll send this as v2. I can also share
-the reproducer if you need that to do further checks.
-
-Xiang
-
-
-Xiang
-
-> This is also why there is a WARN. No memory allocations are supposed to
-> occur after the hlist_del_rcu(), there is supposed to be a guarantee
-> that the insertion succeeds.
->
 
